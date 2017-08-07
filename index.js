@@ -1,8 +1,6 @@
-/*jshint node:true*/
-module.exports = {
-  name: 'onedata-websocket-client',
+/* eslint-env node */
+'use strict';
 
-  isDevelopingAddon: function() {
-    return true;
-  }
+module.exports = {
+  name: 'onedata-websocket-client'
 };
