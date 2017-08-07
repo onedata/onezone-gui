@@ -37,9 +37,9 @@ export default Service.extend({
         data,
         subscribe
       });
-      requesting.then(({ payload: { success, data, error } }) => {
+      requesting.then(({ payload: { success, data: payloadData, error } }) => {
         if (success) {
-          resolve(data);
+          resolve(payloadData);
         } else {
           reject(error);
         }
