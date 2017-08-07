@@ -1,0 +1,60 @@
+{
+  "Onedata: license header": {
+		"prefix": "one-head",
+		"body": [
+      "/**",
+      " * $1 ",
+      " *",
+      " * @module $2",
+      " * @author Jakub Liput",
+      " * @copyright (C) 2017 ACK CYFRONET AGH",
+      " * @license This software is released under the MIT license cited in 'LICENSE.txt'.",
+      " */"
+		]
+	},
+  "Ember: set multiple": {
+		"prefix": "ember-sm",
+		"body": [
+			"this.setPropeties({",
+      "  $1: $2,",
+      "  $3",
+      "});"
+		]
+	},
+  "Ember: set": {
+		"prefix": "ember-set",
+		"body": [
+			"this.get('$1')"
+		]
+	},
+  "Ember: get": {
+		"prefix": "ember-get",
+		"body": [
+			"this.get('$1')"
+		]
+	},
+	"Ember: get single property to variable": {
+		"prefix": "ember-lgs",
+		"body": [
+			"let $1 = this.get('$1');"
+		]
+	},
+	"Ember: get multiple properties to variables": {
+		"prefix": "ember-lgm",
+		"body": [
+			"let {",
+			"  $1  ",
+			"} = this.getProperties(",
+			"	 '$1'",
+			");"
+		]
+	},
+	"Ember: destructure Ember": {
+		"prefix": "ember-de",
+		"body": [
+			"const {",
+			"  $1",
+			"} = Ember;"
+		]
+	}
+}
