@@ -3,7 +3,7 @@
  *
  * @module utils/bytes-to-string
  * @author Jakub Liput
- * @copyright (C) 2016 ACK CYFRONET AGH
+ * @copyright (C) 2016-2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -67,7 +67,7 @@ export default function bytesToString(bytes, { iecFormat = false } = { iecFormat
     return '';
   } else {
     let [number, unit] =
-      (iecFormat ? bytesToStringIEC : bytesToStringSI)(bytes);
+    (iecFormat ? bytesToStringIEC : bytesToStringSI)(bytes);
     return `${Math.round(number * 10) / 10} ${unit}`;
   }
 }
