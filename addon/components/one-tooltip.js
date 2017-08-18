@@ -20,7 +20,7 @@ export default BsTooltip.extend({
    * Arrow position.
    * @type {string}
    * 
-   * For top and bottom tootip placement valid values are: left, right, center
+   * For top and bottom tooltip placement valid values are: left, right, center
    * For left and right tooltip placement valid values are: top, bottom, center
    */
   arrowPlacement: 'center',
@@ -40,32 +40,29 @@ export default BsTooltip.extend({
    * @param {boolean} isVertical 
    */
   replaceArrow(delta, dimension, isVertical) {
-    let {
-      overlayElement,
-      arrowPlacement,
-    } = this.getProperties(
-      'overlayElement',
-      'arrowPlacement'
-    );
-    let arrowElement = overlayElement.find('.tooltip-arrow');
-
-    // ember-bootstrap bugfix - arrowElement is different in each rerender
-    this.set('arrowElement', arrowElement);
-
     this._super(delta, dimension, isVertical);
 
+    let {
+      arrowElement,
+      arrowPlacement,
+    } = this.getProperties(
+      'arrowElement',
+      'arrowPlacement'
+    );
+    arrowElement = $(arrowElement);
+    
     let offset = this._getArrowRelativeOffset();
     switch (arrowPlacement) {
-    case 'left':
-      offset += delta / 2;
-      /* falls through */
-    case 'right':
-      arrowElement.css('transform', `translateX(${offset}px)`);
-      break;
-    case 'top':
-    case 'bottom':
-      arrowElement.css('transform', `translateY(${offset}px)`);
-      break;
+      case 'left':
+        offset += delta / 2;
+        /* falls through */
+      case 'right':
+        arrowElement.css('transform', `translateX(${offset}px)`);
+        break;
+      case 'top':
+      case 'bottom':
+        arrowElement.css('transform', `translateY(${offset}px)`);
+        break;
     }
   },
 
@@ -80,14 +77,14 @@ export default BsTooltip.extend({
     let arrowPlacement = this.get('arrowPlacement');
     let arrowOffset = -this._getArrowRelativeOffset();
     switch (arrowPlacement) {
-    case 'left':
-    case 'right':
-      offset.left += arrowOffset;
-      break;
-    case 'top':
-    case 'bottom':
-      offset.top += arrowOffset;
-      break;
+      case 'left':
+      case 'right':
+        offset.left += arrowOffset;
+        break;
+      case 'top':
+      case 'bottom':
+        offset.top += arrowOffset;
+        break;
     }
 
     this._super(offset, placement);
@@ -103,6 +100,7 @@ export default BsTooltip.extend({
       'arrowPlacement',
       'arrowOffset'
     );
+    overlayElement = $(overlayElement);
     let offset;
     if (arrowPlacement === 'left' || arrowPlacement === 'right') {
       offset = overlayElement.width() / 2 - arrowOffset;
