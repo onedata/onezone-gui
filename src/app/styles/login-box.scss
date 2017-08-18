@@ -1,0 +1,12 @@
+// TODO temporary style - style should be custom for Onezone and moved from oz-gui-default
+
+.login-box {
+  .login-main-title {
+    &.zone {
+      background-image: url($root-url + 'assets/images/onezone-logo.svg');
+    }
+  }
+  .login-logo {
+    background-image: url($root-url + 'assets/images/control-panel.svg');
+  }
+}
