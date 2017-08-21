@@ -78,7 +78,8 @@
   "private": true,
   "ember-addon": {
     "paths": [
-      "lib/onedata-gui-common"
+      "lib/onedata-gui-common",
+      "lib/onedata-gui-websocket-client"
     ]
   },
   "dependencies": {}
