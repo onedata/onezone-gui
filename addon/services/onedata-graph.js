@@ -26,8 +26,7 @@ export default Service.extend({
     operation,
     data,
     scope = 'private',
-    subscribe =
-    false
+    subscribe = false,
   }) {
     let gri = this._gri(entityType, entityId, aspect, scope);
     return new Promise((resolve, reject) => {
@@ -35,7 +34,7 @@ export default Service.extend({
         gri,
         operation,
         data,
-        subscribe
+        subscribe,
       });
       requesting.then(({ payload: { success, data: payloadData, error } }) => {
         if (success) {

@@ -5,7 +5,7 @@ import wait from 'ember-test-helpers/wait';
 import Ember from 'ember';
 
 const {
-  Evented
+  Evented,
 } = Ember;
 
 class WebSocketMock {
@@ -50,13 +50,13 @@ describe('Unit | Service | onedata websocket', function () {
         service.on('push', (m) => {
           pushHandler(m);
         });
-      }
+      },
     });
 
     service._initWebsocket().then(() => {
       let _webSocket = service.get('_webSocket');
       _webSocket.onmessage({
-        data: JSON.stringify({ batch: [{ type: 'push', payload: 'hello' }] })
+        data: JSON.stringify({ batch: [{ type: 'push', payload: 'hello' }] }),
       });
       wait().then(() => {
         expect(pushHandlerDone).to.be.true;
@@ -82,8 +82,8 @@ describe('Unit | Service | onedata websocket', function () {
             data: JSON.stringify({
               id: messageId,
               type: 'response',
-              payload: responsePayload
-            })
+              payload: responsePayload,
+            }),
           });
         }, 0);
       };

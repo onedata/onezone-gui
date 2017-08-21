@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'onedata-websocket-client'
+  name: 'onedata-websocket-client',
 };

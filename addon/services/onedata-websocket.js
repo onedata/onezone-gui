@@ -10,6 +10,7 @@ const {
   ObjectProxy,
   PromiseProxyMixin,
   RSVP: { Promise },
+  isArray,
 } = Ember;
 
 const ObjectPromiseProxy = ObjectProxy.extend(PromiseProxyMixin);
@@ -26,7 +27,7 @@ export default Ember.Service.extend(Evented, {
   /**
    * Max time in milliseconds for receiving a response for message
    *
-   * If we don't receive reponse for sent message in this time, the message's
+   * If we don't receive response for sent message in this time, the message's
    * promise will be rejected.
    * @type {number}
    */
@@ -39,7 +40,7 @@ export default Ember.Service.extend(Evented, {
   webSocketInitializedProxy: computed('_initDefer.promise', function () {
     return ObjectPromiseProxy.create({
       promise: this.get('_initDefer.promise') ||
-        new Promise((_, reject) => reject())
+        new Promise((_, reject) => reject()),
     });
   }).readOnly(),
 
@@ -116,7 +117,7 @@ export default Ember.Service.extend(Evented, {
       sendDeferred.reject({
         error: 'collision',
         details: {
-          id
+          id,
         },
       });
     }
@@ -128,8 +129,8 @@ export default Ember.Service.extend(Evented, {
       sendDeferred.reject({
         error: 'send-failed',
         details: {
-          error
-        }
+          error,
+        },
       });
     }
     _deferredMessages.set(id, sendDeferred);
@@ -173,7 +174,7 @@ export default Ember.Service.extend(Evented, {
 
       // FIXME send me a handshake it will be better for me
     } catch (error) {
-      console.error(`WebSocket initializtion error: ${error}`);
+      console.error(`WebSocket initialization error: ${error}`);
       _initDefer.reject(error);
     }
 
@@ -189,7 +190,7 @@ export default Ember.Service.extend(Evented, {
   _onMessage({ data }) {
     data = JSON.parse(data);
 
-    if (data.batch) {
+    if (isArray(data.batch)) {
       // not using forEach for performance
       let batch = data.batch;
       let length = batch.length;
@@ -288,7 +289,7 @@ export default Ember.Service.extend(Evented, {
       _deferredMessages.delete(id);
       deferred.resolve(message);
     } else {
-      throw `Tried to handle message with unknown UUID: ${id}`;
+      throw new Error(`Tried to handle message with unknown UUID: ${id}`);
     }
   },
 
