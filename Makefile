@@ -1,7 +1,7 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
 
-.PHONY: deps build_mock build_dev build_prod doc clean test
+.PHONY: deps build_mock build_dev build_prod doc clean test tesxt_xunit_output pull_onedata_gui_common push_onedata_gui_common
 
 all: build_dev
 
@@ -31,3 +31,9 @@ test: deps
 
 test_xunit_output: deps
 	cd $(SRC_DIR) && xvfb-run ember test -r xunit
+
+pull_onedata_gui_common:
+	git subtree pull --prefix=src/lib/onedata-gui-common onedata-gui-common `git rev-parse --abbrev-ref HEAD`
+
+push_onedata_gui_common: pull_onedata_gui_common
+	git subtree push --prefix=src/lib/onedata-gui-common onedata-gui-common `git rev-parse --abbrev-ref HEAD`
