@@ -1,1 +1,1 @@
-export { default } from 'onedata-websocket-client/services/onedata-rpc';
+export { default } from 'onedata-gui-websocket-client/services/onedata-rpc';

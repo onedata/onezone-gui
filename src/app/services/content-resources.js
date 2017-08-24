@@ -9,12 +9,29 @@
 
 import Ember from 'ember';
 
+const {
+  RSVP: {
+    Promise,
+  },
+  inject: {
+    service,
+  },
+} = Ember;
+
 export default Ember.Service.extend({
+  providerManager: service(),
+
   /**
    * @param {string} type
    * @returns {Promise}
    */
-  getModelFor( /* type, id */ ) {
-    throw new Error('service:content-resources: not implemented')
+  getModelFor(type, id) {
+    switch (type) {
+      case 'providers':
+        return this.get('providerManager').getRecord(id);
+
+      default:
+        return new Promise((resolve, reject) => reject('No such model type: ' + type));
+    }
   },
 });
