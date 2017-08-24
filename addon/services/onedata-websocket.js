@@ -39,7 +39,7 @@ export default Ember.Service.extend(Evented, {
   webSocketInitializedProxy: computed('_initDefer.promise', function () {
     return ObjectPromiseProxy.create({
       promise: this.get('_initDefer.promise') ||
-        new Promise((_, reject) => reject())
+        new Promise((_, reject) => reject()),
     });
   }).readOnly(),
 
@@ -53,6 +53,11 @@ export default Ember.Service.extend(Evented, {
    * @type {RSVP.Deferred}
    */
   _initDefer: null,
+
+  /**
+   * @type {RSVP.Deferred}
+   */
+  _closeDefer: null,
 
   /**
    * Maps message id -> deferred
@@ -74,6 +79,7 @@ export default Ember.Service.extend(Evented, {
   _webSocket: null,
 
   initPromise: readOnly('_initDefer.promise'),
+  closePromise: readOnly('_initDefer.promise'),
 
   /**
    * @param {object} options
@@ -81,7 +87,11 @@ export default Ember.Service.extend(Evented, {
    * @returns {Promise} resolves with success handshake message
    */
   initConnection(options) {
-    return this._initWebsocket().then(() => this._handshake(options));
+    return this._initNewConnection(options);
+  },
+
+  closeConnection() {
+    return this._closeConnectionStart();
   },
 
   /**
@@ -95,11 +105,11 @@ export default Ember.Service.extend(Evented, {
    */
   send(subtype, message) {
     let {
-      socket,
+      _webSocket,
       _deferredMessages,
       responseTimeout,
     } = this.getProperties(
-      'socket',
+      '_webSocket',
       '_deferredMessages',
       'responseTimeout'
     );
@@ -116,20 +126,20 @@ export default Ember.Service.extend(Evented, {
       sendDeferred.reject({
         error: 'collision',
         details: {
-          id
+          id,
         },
       });
     }
     try {
       let rawMessageString = JSON.stringify(rawMessage);
       console.debug(`onedata-websocket: Will send: ${rawMessageString}`);
-      socket.send(rawMessageString);
+      _webSocket.send(rawMessageString);
     } catch (error) {
       sendDeferred.reject({
         error: 'send-failed',
         details: {
-          error
-        }
+          error,
+        },
       });
     }
     _deferredMessages.set(id, sendDeferred);
@@ -164,7 +174,6 @@ export default Ember.Service.extend(Evented, {
 
     try {
       let socket = new WebSocketClass(url);
-      this.set('socket', socket);
       socket.onopen = this._onOpen.bind(this);
       socket.onmessage = this._onMessage.bind(this);
       socket.onerror = this._onError.bind(this);
@@ -178,6 +187,20 @@ export default Ember.Service.extend(Evented, {
     }
 
     return _initDefer.promise;
+  },
+
+  _initNewConnection(options) {
+    return this._initWebsocket().then(() => this._handshake(options));
+  },
+
+  _closeConnectionStart() {
+    let _webSocket = this.get('_webSocket');
+    let _closeDefer = defer();
+    this.set('_closeDefer', _closeDefer);
+
+    _webSocket.close();
+
+    return _closeDefer;
   },
 
   _onOpen( /*event*/ ) {
@@ -223,9 +246,15 @@ export default Ember.Service.extend(Evented, {
     });
   },
 
+  // TODO handle errors - reject inits, etc.
   _onError( /*event*/ ) {},
 
-  _onClose( /*event*/ ) {},
+  _onClose( /*event*/ ) {
+    let _closeDefer = this.get('_closeDefer');
+    if (_closeDefer) {
+      _closeDefer.resolve();
+    }
+  },
 
   /** 
    * Generates a random uuid of message
