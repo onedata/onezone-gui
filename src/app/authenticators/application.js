@@ -6,7 +6,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OnedataWebsocket from 'onedata-gui-websocket-client/services/onedata-graph';
+import OnedataWebsocket from 'onedata-gui-websocket-client/authenticators/onedata-websocket';
 import OnedataWebsocketMock from 'onedata-gui-websocket-client/authenticators/onedata-websocket-mock';
 
 import config from 'ember-get-config';

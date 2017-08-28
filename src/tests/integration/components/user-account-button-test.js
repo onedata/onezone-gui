@@ -1,24 +1,31 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 
-describe('Integration | Component | user account button', function() {
+import sessionStub from '../../helpers/stubs/services/session';
+
+const USERNAME = 'some_username';
+
+describe('Integration | Component | user account button', function () {
   setupComponentTest('user-account-button', {
-    integration: true
+    integration: true,
   });
 
-  it('renders', function() {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.on('myAction', function(val) { ... });
-    // Template block usage:
-    // this.render(hbs`
-    //   {{#user-account-button}}
-    //     template content
-    //   {{/user-account-button}}
-    // `);
+  beforeEach(function () {
+    this.register('service:session', sessionStub);
+    this.inject.service('session', { as: 'session' });
 
-    this.render(hbs`{{user-account-button}}`);
-    expect(this.$()).to.have.length(1);
+    let session = this.container.lookup('service:session');
+    session.get('data.authenticated').identity.user = USERNAME;
+  });
+
+  it('uses WS account button with username provided by session', function () {
+    this.render(hbs `{{user-account-button}}`);
+
+    let $username = this.$('.user-account-button-username');
+
+    expect($username).to.exist;
+    expect($username).to.contain(USERNAME);
   });
 });
