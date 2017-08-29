@@ -3,6 +3,8 @@ import loginBox from './onedata-gui-common/components/login-box';
 import oneFormFields from './onedata-gui-common/components/one-form-fields';
 import applicationError from './onedata-gui-common/components/application-error';
 import providerPlace from './onedata-gui-common/components/provider-place';
+import providersList from './onedata-gui-common/components/providers-list';
+import contentUsers from './onedata-gui-common/components/content-users';
 
 const translations = {
   components: {
@@ -11,6 +13,8 @@ const translations = {
     oneFormFields,
     applicationError,
     providerPlace,
+    providersList,
+    contentUsers,
   },
 };
 
