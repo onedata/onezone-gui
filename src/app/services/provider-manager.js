@@ -21,9 +21,10 @@ const {
 } = Ember;
 
 export default Service.extend({
-  // FIXME to implement using onedata-websocket services
+  // TODO to implement using onedata-websocket services
 
   store: service(),
+
   /**
    * Fetch collection of onepanel ClusterStorage
    * 
@@ -40,7 +41,6 @@ export default Service.extend({
         ])
       ),
     });
-    // return this.get('store').findAll('provider');
   },
 
   /**
