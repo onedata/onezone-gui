@@ -26,7 +26,7 @@ export default BaseAuthenticator.extend({
    * See if we can estabilish connection with authenticated user.
    * It is based on browser session (cookies).
    *
-   * Restore is done once, only on start, so it's safe to to _tryHandshake
+   * Restore is done once, only on start, so it's safe to `_tryHandshake`
    * because we are sure, that the connection was not open yet.
    *
    * Side effects: a websocket connection can be made, either anonymous or not
@@ -51,7 +51,7 @@ export default BaseAuthenticator.extend({
   },
 
   /**
-   * To logout user from session, we should call server to remove it's session.
+   * To logout user from session, we should call server to remove its session.
    * It should invalidate our cookies with session, so after closing WebSocket
    * connection, we can try if handshake will give us anonymous connection
    * (what is expected).
