@@ -23,7 +23,7 @@ export default Ember.Service.extend({
 
   /**
    * @param {string} type
-   * @returns {Promise}
+   * @returns {PromiseArray}
    */
   getCollectionFor(type) {
     switch (type) {

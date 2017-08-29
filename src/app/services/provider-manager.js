@@ -29,7 +29,7 @@ export default Service.extend({
    * Fetch collection of onepanel ClusterStorage
    * 
    * @param {string} id
-   * @return {ObjectPromiseProxy} resolves ArrayProxy of SpaceDetails promise proxies
+   * @return {PromiseArray.EmberObject} resolves ArrayProxy of SpaceDetails promise proxies
    */
   getProviders() {
     return PromiseArray.create({
