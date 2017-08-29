@@ -2,8 +2,8 @@
 <strong>Initialized:</strong> <span>{{websocketInitialized}}</span>
 {{#if websocketInitialized}}
   {{!--{{input type="text" value=messageValue}}--}}
-  <button {{action (action "sendRpc")}}>RPC</button>
-  <button {{action (action "getRecord")}}>Get user</button>
+  <button {{action "sendRpc"}}>RPC</button>
+  <button {{action "getRecord"}}>Get user</button>
 {{/if}}
 {{#if messageResponse}}
   <div>RPC response:</div>

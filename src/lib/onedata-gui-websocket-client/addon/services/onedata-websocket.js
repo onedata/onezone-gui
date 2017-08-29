@@ -1,3 +1,14 @@
+/**
+ * Onedata Websocket Sync API - low-level Websocket operation service
+ *
+ * For mocked service, that does not need backend, see `onedata-websocket`
+ *
+ * @module services/onedata-websocket
+ * @author Jakub Liput
+ * @copyright (C) 2017 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Ember from 'ember';
 import _zipObject from 'lodash/zipObject';
 
