@@ -1,1 +1,1 @@
-export { default } from 'onedata-websocket-client/components/api-example';
+export { default } from 'onedata-gui-websocket-client/components/api-example';

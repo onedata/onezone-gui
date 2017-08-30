@@ -1,0 +1,23 @@
+{
+  "name": "onedata-gui-websocket-client",
+  "description": "Addon that adds support and utils for Onedata WebSocket sync API",
+  "main": "index.js",
+  "authors": [
+    "Jakub Liput <jakub.liput@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "ember-addon"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+  }
+}
