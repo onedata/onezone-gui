@@ -48,6 +48,7 @@ export default Service.extend({
    * @return {ObjectPromiseProxy} resolves ClusterStorage ObjectProxy
    */
   getRecord(id) {
+    // TODO currently only a mock, use store in VFS-3617
     return PromiseObject.create({
       promise: Promise.resolve(
         EmberObject.create({
@@ -56,7 +57,6 @@ export default Service.extend({
         })
       ),
     });
-    // FIXME use store.findRecord
   },
 
 });

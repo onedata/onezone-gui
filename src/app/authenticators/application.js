@@ -7,7 +7,7 @@
  */
 
 import OnedataWebsocket from 'onedata-gui-websocket-client/authenticators/onedata-websocket';
-import OnedataWebsocketMock from 'onedata-gui-websocket-client/authenticators/onedata-websocket-mock';
+import OnedataWebsocketMock from 'onedata-gui-websocket-client/authenticators/mocks/onedata-websocket';
 
 import config from 'ember-get-config';
 

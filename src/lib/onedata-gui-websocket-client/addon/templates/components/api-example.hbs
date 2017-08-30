@@ -1,11 +1,25 @@
 <p>Hello api example</p>
-<strong>Initialized:</strong> <span>{{websocketInitialized}}</span>
-{{#if websocketInitialized}}
-  {{!--{{input type="text" value=messageValue}}--}}
-  <button {{action "sendRpc"}}>RPC</button>
-  <button {{action "getRecord"}}>Get user</button>
-{{/if}}
+<strong>Authenticated:</strong> <span>{{isAuthenticated}}</span>
+{{!--{{input type="text" value=messageValue}}--}}
+{{one-way-input value=inputValue update=(action (mut inputValue))}}
+<button {{action "sendRpc"}}>RPC</button>
+<button {{action "getRecord"}}>Get user</button>
+<button {{action "createRecord"}}>Create something</button>
+<button {{action "updateRecord"}}>Edit tmpRecord</button>
+<button {{action "deleteRecord"}}>Delete tmpRecord</button>
+<button {{action "getTokens"}}>Get tokens</button>
 {{#if messageResponse}}
   <div>RPC response:</div>
   <code>{{messageResponse}}</code>
 {{/if}}
+
+{{#if tmpRecord}}
+  <div><strong>tmp record:</strong> {{tmpRecord.name}}</div>
+{{/if}}
+
+<div>
+  User, GroupList, Group-0, SpaceList, Space-0
+</div>
+<div>
+  {{spaceZeroPromise.content}}
+</div>
