@@ -8,14 +8,14 @@ import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
 
 describe('Unit | Model | group', function () {
   setupModelTest('group', {
-    needs: [],
+    needs: ['service:onedata-token-api'],
   });
 
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
   });
 
-  it('resolves invite token data using graph', function (done) {
+  it('resolves invite token using token api service and graph', function (done) {
     let model = this.subject();
     model.set('id', 'od_group.some_id.instance');
 

@@ -204,6 +204,10 @@ export default Ember.Service.extend(Evented, {
 
     let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;
 
+    _initDefer.promise.catch(() => {
+      console.error('Websocket initialization error');
+    });
+
     try {
       let socket = new WebSocketClass(url);
       socket.onopen = this._onOpen.bind(this);
@@ -280,7 +284,9 @@ export default Ember.Service.extend(Evented, {
   },
 
   // TODO: handle errors - reject inits, etc.
-  _onError( /*event*/ ) {},
+  _onError( /* event */ ) {
+    this.get('_initDefer').reject();
+  },
 
   _onClose( /*event*/ ) {
     let _closeDefer = this.get('_closeDefer');

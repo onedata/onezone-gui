@@ -1,32 +1,48 @@
 /**
- * An authenticator for `ember-simple-auth` that uses Onedata WebSocket API
+ * A base for `ember-simple-auth` authenticators that use Onedata WebSocket API
+ * Used both by real authenticator and mock authenticator
  *
- * Using `onedata-websocket` service internally
- *
- * @module authenticators/onedata-websocket
+ * @module authenticators/-base
  * @author Jakub Liput
  * @copyright (C) 2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
-import OnedataBaseAuthenticator from 'onedata-gui-websocket-client/authenticators/-base';
-import OnedataWebsocketUtils from 'onedata-gui-websocket-client/mixins/onedata-websocket-utils';
+import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
 
-const {
-  inject: { service },
-  RSVP: { Promise },
-} = Ember;
+import { Promise } from 'rsvp';
 
-export default OnedataBaseAuthenticator.extend(OnedataWebsocketUtils, {
-  onedataWebsocket: service(),
+export default BaseAuthenticator.extend({
+  /**
+   * @virtual
+   * @returns {Promise<undefined>}
+   */
+  forceCloseConnection() {
+    throw new Error('not implemented');
+  },
 
   /**
-   * @override
+   * @virtual
+   * @returns {Promise<undefined>}
+   */
+  tryHandshake() {
+    throw new Error('not implemented');
+  },
+
+  /**
+   * @virtual
    * @returns {Promise<undefined>}
    */
   closeConnection() {
-    return this.get('onedataWebsocket').closeConnection(...arguments);
+    throw new Error('not implemented');
+  },
+
+  /**
+   * @virtual
+   * @returns {Promise<undefined>}
+   */
+  remoteInvalidate() {
+    throw new Error('not implemented');
   },
 
   /**
@@ -66,27 +82,17 @@ export default OnedataBaseAuthenticator.extend(OnedataWebsocketUtils, {
    * @returns {Promise} resolves when an anonymous connection is established
    */
   invalidate() {
-    let onedataWebsocket = this.get('onedataWebsocket');
     return new Promise((resolve, reject) => {
-      let remoteInvalidate = this.remoteInvalidate();
-      remoteInvalidate.then(() => {
-        let closing = onedataWebsocket.closeConnection();
+      let remoteInvalidation = this.remoteInvalidate();
+      remoteInvalidation.then(() => {
+        let closing = this.closeConnection();
         closing.then(() => {
           // NOTE: reject and resolve are inverted here!
           return this.tryHandshake().then(reject, resolve);
         });
         closing.catch(reject);
       });
-      remoteInvalidate.catch(reject);
+      remoteInvalidation.catch(reject);
     });
-  },
-
-  /**
-   * Invalidate session on remote
-   * @returns {Promise} resolves when session on server side has been
-   *  invalidated successfully
-   */
-  remoteInvalidate() {
-    return $.post('/logout');
   },
 });

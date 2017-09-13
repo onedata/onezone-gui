@@ -7,7 +7,7 @@ import GraphContextStub from '../../helpers/stubs/services/onedata-graph-context
 import sinon from 'sinon';
 
 describe('Unit | Serializer | context collection', function () {
-  setupTest('serializer:context-collection', {
+  setupTest('serializer:-context-collection', {
     needs: [],
   });
 

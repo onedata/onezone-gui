@@ -1,8 +1,8 @@
 /**
- * A serializer that should be used for models that needs authHint when finding
+ * A serializer that should be used for models that need authHint when finding
  * record.
  *
- * @module serializers/context-collection
+ * @module serializers/-context-collection
  * @author Jakub Liput
  * @copyright (C) 2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

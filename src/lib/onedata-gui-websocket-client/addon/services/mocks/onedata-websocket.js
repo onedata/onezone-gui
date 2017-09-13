@@ -1,7 +1,10 @@
 /**
- * Default Onedata Websocket service mock using hanshake that checks cookies
+ * NOTE: it always throw an error, because `onedata-websocket` is not mocked
  *
- * To use with `authenticator:mocks/onedata-websocket` that also uses cookies
+ * Development implementation of `service:onedata-websocket`
+ * 
+ * Just to notify user, that trying to use onedata-websocket in development
+ * mode is wrong
  *
  * @module services/mocks/onedata-websocket
  * @author Jakub Liput
@@ -9,26 +12,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OnedataWebsocketBase from 'onedata-gui-websocket-client/services/mocks/onedata-websocket-base';
-import CookiesHandshake from 'onedata-gui-websocket-client/mixins/services/onedata-websocket-cookies-handshake';
+import Service from '@ember/service';
 
-import { Promise } from 'rsvp';
-
-export default OnedataWebsocketBase.extend(CookiesHandshake, {
-  handleSendGraph({
-    gri,
-    operation,
-  }) {
-    if (gri.match(/od_user/) && operation === 'get') {
-      return Promise.resolve({
-        payload: {
-          success: true,
-          data: {
-            gri,
-            name: 'Some user',
-          },
-        },
-      });
-    }
+export default Service.extend({
+  init() {
+    this._super(...arguments);
+    throw new Error(
+      'service:mocks/onedata-websocket: Cannot use service:onedata-websocket ' +
+      'in mocked environment'
+    );
   },
 });

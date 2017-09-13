@@ -17,6 +17,7 @@
   "devDependencies": {
     "bootstrap-sass": "3.3.7", 
     "broccoli-asset-rev": "2.5.0", 
+    "chai-as-promised": "7.1.1", 
     "chai-jquery": "2.0.0", 
     "chartist-plugin-legend": "0.6.1", 
     "ember-ajax": "3.0.0", 
@@ -52,6 +53,7 @@
     "ember-i18n": "5.0.2", 
     "ember-invoke-action": "git+https://github.com/kliput/ember-invoke-action.git#ec5bf575516ef52a2084c33c1719ff25ebf9fc5f", 
     "ember-load-initializers": "1.0.0", 
+    "ember-local-storage": "1.4.0", 
     "ember-lodash": "4.17.5", 
     "ember-notify": "5.2.1", 
     "ember-one-way-controls": "2.0.1", 

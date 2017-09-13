@@ -9,12 +9,11 @@
 
 import Service, { inject } from '@ember/service';
 import { computed } from '@ember/object';
-import gri from 'onedata-gui-websocket-client/utils/gri';
+import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 
 export default Service.extend({
   store: inject(),
   session: inject(),
-  currentUser: inject(),
 
   userId: computed.oneWay('session.data.authenticated.identity.user'),
 
@@ -26,7 +25,7 @@ export default Service.extend({
     }
     return store.findRecord(
       'user',
-      gri('od_user', userId, 'instance', 'protected')
+      userGri(userId)
     );
   },
 });

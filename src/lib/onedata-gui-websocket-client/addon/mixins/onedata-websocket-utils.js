@@ -1,5 +1,7 @@
 /**
- * Additional util functions that facilitate usage of onedata-websocket service 
+ * Additional util functions that facilitate usage of onedata-websocket service
+ * Implements functions needed by `authenticator:onedata-websocket` for production
+ * environment
  *
  * @module mixins/onedata-websocket-utils
  * @author Jakub Liput
