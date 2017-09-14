@@ -8,15 +8,13 @@ import sinon from 'sinon';
 
 describe('Unit | Serializer | context collection', function () {
   setupTest('serializer:context-collection', {
-    // Specify the other units that are required for this test.
-    // needs: ['serializer:context-collection'],
+    needs: [],
   });
 
   beforeEach(function () {
     registerService(this, 'onedata-graph-context', GraphContextStub);
   });
 
-  // Replace this with your real tests.
   it('uses onedata-graph-context to register context of list records', function () {
     const hash = {
       gri: 'hello.world.foo',

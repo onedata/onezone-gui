@@ -16,8 +16,7 @@ class WebSocketMock {
 
 describe('Unit | Service | onedata websocket', function () {
   setupTest('service:onedata-websocket', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
+    needs: [],
   });
 
   it('resolves initWebsocket promise by opening ws connection', function (done) {

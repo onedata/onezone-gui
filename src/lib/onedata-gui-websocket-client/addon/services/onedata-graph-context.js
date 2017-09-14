@@ -48,6 +48,7 @@ export default Service.extend({
    * Adds an entry to records mapping (see `findRecordContext` property)
    * @param {string} requestedGri GRI (just record id)
    * @param {string} contextGri GRI (just record id)
+   * @returns {undefined}
    */
   register(requestedGri, contextGri) {
     let contexts = this.get('findRecordContext');
@@ -62,6 +63,7 @@ export default Service.extend({
   /**
    * Removes GRI from context of all possible requestedGri
    * @param {string} contextGri GRI
+   * @returns {undefined}
    */
   deregister(contextGri) {
     let contexts = this.get('findRecordContext');

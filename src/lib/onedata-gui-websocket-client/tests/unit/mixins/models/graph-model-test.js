@@ -4,7 +4,6 @@ import Ember from 'ember';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 
 describe('Unit | Mixin | models/graph model', function () {
-  // Replace this with your real tests.
   it('has parsed gri computed properties', function () {
     const gri = 'aa.bb.cc:dd';
     let GraphModelObject = Ember.Object.extend(GraphModelMixin, {

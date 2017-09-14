@@ -38,5 +38,12 @@ module.exports = {
       },
     ],
     'semi': 2,
+    'valid-jsdoc': [
+      1,
+      {
+        requireParamDescription: false,
+        requireReturnDescription: false,
+      },
+    ],
   },
 };

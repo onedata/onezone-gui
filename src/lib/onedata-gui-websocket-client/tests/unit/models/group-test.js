@@ -8,17 +8,11 @@ import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
 
 describe('Unit | Model | group', function () {
   setupModelTest('group', {
-    // Specify the other units that are required for this test.
     needs: [],
   });
 
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
-  });
-
-  it('exists', function () {
-    let model = this.subject();
-    expect(model).to.be.ok;
   });
 
   it('resolves invite token data using graph', function (done) {

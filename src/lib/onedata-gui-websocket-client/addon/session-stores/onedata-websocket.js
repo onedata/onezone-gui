@@ -32,6 +32,5 @@ export default BaseSessionStore.extend(OnedataWebsocketUtils, {
         }));
       handshaking.catch(() => resolve({}));
     });
-
   },
 });

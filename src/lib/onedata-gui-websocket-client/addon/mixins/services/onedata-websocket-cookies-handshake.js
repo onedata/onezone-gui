@@ -30,7 +30,7 @@ export default Mixin.create({
   /**
    * Default implementation of mocked handshake that uses cookies to check
    * if user is authenticated
-   * @implements
+   * @override
    * @returns {Promise.<HandshakeData>}
    */
   handleSendHandshake() {

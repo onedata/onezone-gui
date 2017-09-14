@@ -17,6 +17,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
  * Modifies input object.
  * It is not recursive!
  * @param {Object} data
+ * @returns {Object} modified data object
  */
 function stripObject(data) {
   for (let prop in data) {

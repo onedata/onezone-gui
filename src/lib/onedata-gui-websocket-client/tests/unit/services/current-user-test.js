@@ -13,8 +13,7 @@ import StoreStub from '../../helpers/stubs/services/store';
 
 describe('Unit | Service | current user', function () {
   setupTest('service:current-user', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
+    needs: [],
   });
 
   beforeEach(function () {
@@ -22,7 +21,7 @@ describe('Unit | Service | current user', function () {
     registerService(this, 'store', StoreStub);
   });
 
-  it('returns user record provied by store if available', function (done) {
+  it('returns user record provided by store if available', function (done) {
     const userEntityId = 'user1';
     const userRecord = {};
     lookupService(this, 'session').set(

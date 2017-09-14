@@ -16,7 +16,7 @@ export default OnedataWebsocketBase.extend({
 
   /**
    * Resolves immediately
-   * @implements
+   * @override
    */
   handleSendHandshake() {
     return Promise.resolve(this.get('handshakeData'));

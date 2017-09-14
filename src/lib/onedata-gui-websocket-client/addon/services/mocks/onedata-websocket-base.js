@@ -51,6 +51,8 @@ export default Service.extend({
 
   /**
    * @abstract
+   * @throws {Error} not implemented
+   * @returns {undefined}
    */
   handleSendRpc() {
     throw new Error('service:onedata-websocket-mock: handleSendRpc not implemented');
@@ -63,6 +65,8 @@ export default Service.extend({
    * - `handleRpc`
    * - `handleGraph`
    * @param {String} subtype one of: handshake, rpc, graph
+   * @param {object} message
+   * @returns {Promise<object>} resolves with message response
    */
   sendMessage(subtype, message) {
     let handlerFun = this[camelize(`handle-send-${subtype}`)];
