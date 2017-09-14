@@ -19,12 +19,13 @@ export default Service.extend({
   onedataWebsocket: service(),
 
   /**
-   * 
    * @param {string} gri
    * @param {string} operation one of: get, update, delete
    * @param {object} data
    * @param {[String,String]} authHint [HintType, Id of subject]
-   * @param {string} scope 
+   * @param {string} [subscribe=false]
+   * @returns {Promise<object, object>} resolves with Onedata Graph resource
+   *   (typically record data)
    */
   request({
     gri,

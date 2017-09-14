@@ -36,7 +36,8 @@ export default Serializer.extend({
    * Registers context ("through what record should we ask for record?")
    * for each of elements of list of this raw record.
    * @param {Object} hash raw object returned from graph
-   * @param {Array.String} hash.list each element is a foreign key (GRI)
+   * @param {Array<string>} hash.list each element is a foreign key (GRI)
+   * @returns {undefined}
    */
   registerContextForItems(hash) {
     var collectionList = hash.list;

@@ -76,7 +76,7 @@ Please export following modules in Ember:
 ## Tests and mocks included
 
 - `authenticator:mocks/onedata-websocket`
-  - on `authorize` it adds an valid authorization cookie for mocked handshake in `service:mocks/onedata-websocket`
+  - on `authorize` it adds a valid authorization cookie for mocked handshake in `service:mocks/onedata-websocket`
   - used in development app runs
 - `service:mocks/onedata-websocket-base`
   - do not use WebSocket connection, but instead it allows to use internal functions that can be mocked

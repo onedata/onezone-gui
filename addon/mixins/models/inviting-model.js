@@ -17,6 +17,7 @@ export default Mixin.create({
 
   /**
    * @param {string} receiverType one of: user, group
+   * @returns {Promise<string>}
    */
   getInviteToken(receiverType) {
     let {

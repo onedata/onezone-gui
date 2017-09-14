@@ -111,9 +111,9 @@ export default Ember.Service.extend(Evented, {
    * The promise rejects on:
    * - uuid collision
    * - websocket adapter exception
-   * @param {object} message
    * @param {string} subtype one of: handshake, rpc, graph
-   * @return {Promise}
+   * @param {object} message
+   * @returns {Promise<object, object>} resolves with Onedata Sync API response
    */
   sendMessage(subtype, message) {
     let {
@@ -169,6 +169,11 @@ export default Ember.Service.extend(Evented, {
     return sendDeferred.promise;
   },
 
+  /**
+   * @private
+   * @param {string} messageId
+   * @returns {undefined}
+   */
   _responseTimeout(messageId) {
     let _deferredMessages = this.get('_deferredMessages');
     if (_deferredMessages.has(messageId)) {
@@ -235,8 +240,8 @@ export default Ember.Service.extend(Evented, {
     this.get('_initDefer').resolve();
   },
 
-  // TODO move unpacking into protocol level?
-  // TODO currently supporting only batch messages
+  // TODO: move unpacking into protocol level?
+  // TODO: currently supporting only batch messages
   _onMessage({ data }) {
     data = JSON.parse(data);
 
@@ -255,7 +260,7 @@ export default Ember.Service.extend(Evented, {
   /**
    * @param {object} options
    * @param {number} protocolVersion
-   * @returns {Promise}
+   * @returns {Promise<object, object>} resolves with successful handshake data
    */
   _handshake({ protocolVersion } = { protocolVersion: 1 }) {
     return new Promise((resolve, reject) => {
@@ -274,7 +279,7 @@ export default Ember.Service.extend(Evented, {
     });
   },
 
-  // TODO handle errors - reject inits, etc.
+  // TODO: handle errors - reject inits, etc.
   _onError( /*event*/ ) {},
 
   _onClose( /*event*/ ) {
@@ -304,7 +309,8 @@ export default Ember.Service.extend(Evented, {
   ),
 
   /**
-   * @param {object} message 
+   * @param {object} message
+   * @returns {undefined}
    */
   _handleMessage(message) {
     console.debug(`onedata-websocket: Handling message: ${JSON.stringify(message)}`);
@@ -352,8 +358,10 @@ export default Ember.Service.extend(Evented, {
     }
   },
 
-  /** 
-   * @return {string}
+  /**
+   * Helper: if response reports badMessage error, return id of bad message
+   * @param {string} message 
+   * @returns {string|undefined}
    */
   _badMessageId(message) {
     if (

@@ -8,7 +8,6 @@ import OnedataWebsocketService from '../../helpers/stubs/services/onedata-websoc
 
 describe('Unit | Service | onedata rpc', function () {
   setupTest('service:onedata-rpc', {
-    // Specify the other units that are required for this test.
     needs: [],
   });
 
@@ -40,8 +39,8 @@ describe('Unit | Service | onedata rpc', function () {
           function: 'testRpc',
           args: { hello: 'world' },
         });
+        done();
       });
-      done();
     });
   });
 });

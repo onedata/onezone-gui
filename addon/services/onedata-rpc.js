@@ -19,9 +19,8 @@ export default Service.extend({
   onedataWebsocket: service(),
 
   /**
-   * 
-   * @param {string} methodName 
-   * @param {string} data
+   * @param {string} methodName
+   * @param {string} args
    * @returns {Promise} resolves with method return data
    */
   request(methodName, args = {}) {

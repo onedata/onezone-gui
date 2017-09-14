@@ -12,6 +12,8 @@ module.exports = {
 
   /**
    * Make public files from this addon to be merged into application's public.
+   * @override
+   * @returns {any}
    */
   treeForPublic: function () {
     var tree = this._super.treeForPublic.apply(this, arguments);

@@ -24,6 +24,7 @@ export default BaseAuthenticator.extend(OnedataWebsocketUtils, {
   /**
    * Just pass authenticated data from session-store
    * @param {object} data a handshake data
+   * @returns {Promise<object>} resolves with passed data
    */
   restore(data) {
     return Promise.resolve(data);

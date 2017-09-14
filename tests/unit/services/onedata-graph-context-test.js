@@ -4,8 +4,7 @@ import { setupTest } from 'ember-mocha';
 
 describe('Unit | Service | onedata graph context', function () {
   setupTest('service:onedata-graph-context', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
+    needs: [],
   });
 
   it('removes specific registered context, leaving previous contexts', function () {

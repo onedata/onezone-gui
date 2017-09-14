@@ -13,8 +13,7 @@ import OnedataGraphContextStub from '../../helpers/stubs/services/onedata-graph-
 
 describe('Unit | Adapter | onedata websocket', function () {
   setupTest('adapter:onedata-websocket', {
-    // Specify the other units that are required for this test.
-    // needs: ['serializer:foo']
+    needs: [],
   });
 
   beforeEach(function () {
@@ -23,10 +22,10 @@ describe('Unit | Adapter | onedata websocket', function () {
   });
 
   it('uses graph service to findRecord', function (done) {
-    const store = {};
-    const type = {};
-    const recordId = 'record_id';
-    const graphData = {};
+    let store = {};
+    let type = {};
+    let recordId = 'record_id';
+    let graphData = {};
     let adapter = this.subject();
 
     let graph = lookupService(this, 'onedata-graph');
@@ -51,15 +50,15 @@ describe('Unit | Adapter | onedata websocket', function () {
 
   it('uses graph service to createRecord with support for metadata and null trimming',
     function (done) {
-      const store = {};
-      const modelName = 'something';
-      const type = { modelName };
-      const authHint = ['asUser', 'u1'];
-      const recordData = {
+      let store = {};
+      let modelName = 'something';
+      let type = { modelName };
+      let authHint = ['asUser', 'u1'];
+      let recordData = {
         foo: 'bar',
         one: null,
       };
-      const snapshot = {
+      let snapshot = {
         record: {
           toJSON: () => recordData,
           _meta: {
@@ -67,7 +66,7 @@ describe('Unit | Adapter | onedata websocket', function () {
           },
         },
       };
-      const retGraphData = {};
+      let retGraphData = {};
       let adapter = this.subject();
       let graph = lookupService(this, 'onedata-graph');
       let graphRequestStub = stub(graph, 'request');
@@ -91,16 +90,16 @@ describe('Unit | Adapter | onedata websocket', function () {
     });
 
   it('uses graph service to updateRecord', function (done) {
-    const store = {};
-    const modelName = 'something';
-    const type = {
+    let store = {};
+    let modelName = 'something';
+    let type = {
       modelName,
     };
-    const recordId = 'a:b:c';
-    const recordData = {
+    let recordId = 'a:b:c';
+    let recordData = {
       foo: 'bar',
     };
-    const snapshot = {
+    let snapshot = {
       record: {
         toJSON() {
           return recordData;
@@ -108,7 +107,7 @@ describe('Unit | Adapter | onedata websocket', function () {
         id: recordId,
       },
     };
-    const graphData = {};
+    let graphData = {};
     let adapter = this.subject();
 
     let graph = lookupService(this, 'onedata-graph');
@@ -132,16 +131,16 @@ describe('Unit | Adapter | onedata websocket', function () {
   });
 
   it('uses graph service to deleteRecord', function (done) {
-    const store = {};
-    const modelName = 'something';
-    const type = {
+    let store = {};
+    let modelName = 'something';
+    let type = {
       modelName,
     };
-    const recordId = 'a:b:c';
-    const recordData = {
+    let recordId = 'a:b:c';
+    let recordData = {
       foo: 'bar',
     };
-    const snapshot = {
+    let snapshot = {
       record: {
         toJSON() {
           return recordData;
@@ -149,7 +148,7 @@ describe('Unit | Adapter | onedata websocket', function () {
         id: recordId,
       },
     };
-    const graphData = {};
+    let graphData = {};
     let adapter = this.subject();
 
     let graph = lookupService(this, 'onedata-graph');
