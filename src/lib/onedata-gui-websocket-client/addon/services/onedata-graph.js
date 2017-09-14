@@ -18,33 +18,37 @@ const {
 export default Service.extend({
   onedataWebsocket: service(),
 
-  // FIXME handle rejects from socket level
-
   /**
-   * 
-   * @param {string} entityType 
-   * @param {string} entityId 
-   * @param {string} aspect 
+   * @param {string} gri
    * @param {string} operation one of: get, update, delete
-   * @param {string} scope 
+   * @param {object} data
+   * @param {[String,String]} authHint [HintType, Id of subject]
+   * @param {string} [subscribe=false]
+   * @returns {Promise<object, object>} resolves with Onedata Graph resource
+   *   (typically record data)
    */
   request({
-    entityType,
-    entityId,
-    aspect,
+    gri,
     operation,
     data,
-    scope = 'private',
+    authHint,
     subscribe = false,
   }) {
-    let gri = this._gri(entityType, entityId, aspect, scope);
     return new Promise((resolve, reject) => {
-      let requesting = this.get('onedataWebsocket').send('graph', {
+      let message = {
         gri,
         operation,
         data,
         subscribe,
-      });
+      };
+      if (authHint) {
+        if (Array.isArray(authHint) && authHint.length === 2) {
+          message.authHint = authHint.join(':');
+        } else {
+          throw new Error('service:onedata-graph: invalid authHint');
+        }
+      }
+      let requesting = this.get('onedataWebsocket').sendMessage('graph', message);
       requesting.then(({ payload: { success, data: payloadData, error } }) => {
         if (success) {
           resolve(payloadData);
@@ -54,20 +58,5 @@ export default Service.extend({
       });
       requesting.catch(reject);
     });
-  },
-
-  // CRUD - to move!
-
-  getRecord(entityType, entityId) {
-    return this.request({
-      entityType,
-      entityId,
-      aspect: 'data',
-      operation: 'get',
-    });
-  },
-
-  _gri(entityType, entityId, aspect, scope) {
-    return `${entityType}.${entityId || 'null'}.${aspect}${scope && ':' + scope}`;
   },
 });

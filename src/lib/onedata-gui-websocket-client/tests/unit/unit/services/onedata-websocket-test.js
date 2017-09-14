@@ -16,8 +16,7 @@ class WebSocketMock {
 
 describe('Unit | Service | onedata websocket', function () {
   setupTest('service:onedata-websocket', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
+    needs: [],
   });
 
   it('resolves initWebsocket promise by opening ws connection', function (done) {
@@ -88,7 +87,7 @@ describe('Unit | Service | onedata websocket', function () {
         }, 0);
       };
 
-      service.send({}).then(m => {
+      service.sendMessage({}).then(m => {
         expect(m).has.property('payload');
         expect(m.payload).has.property('x');
         expect(m.payload.x).to.equal(responsePayload.x);

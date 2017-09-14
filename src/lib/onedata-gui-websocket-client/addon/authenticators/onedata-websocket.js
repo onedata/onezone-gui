@@ -9,32 +9,25 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
 import Ember from 'ember';
+import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
+import OnedataWebsocketUtils from 'onedata-gui-websocket-client/mixins/onedata-websocket-utils';
 
 const {
   inject: { service },
   RSVP: { Promise },
 } = Ember;
 
-const NOBODY_IDENTITY = 'nobody';
-
-export default BaseAuthenticator.extend({
+export default BaseAuthenticator.extend(OnedataWebsocketUtils, {
   onedataWebsocket: service(),
 
   /**
-   * See if we can estabilish connection with authenticated user.
-   * It is based on browser session (cookies).
-   *
-   * Restore is done once, only on start, so it's safe to `_tryHandshake`
-   * because we are sure, that the connection was not open yet.
-   *
-   * Side effects: a websocket connection can be made, either anonymous or not
-   *
-   * @returns {Promise}
+   * Just pass authenticated data from session-store
+   * @param {object} data a handshake data
+   * @returns {Promise<object>} resolves with passed data
    */
-  restore() {
-    return this._tryHandshake();
+  restore(data) {
+    return Promise.resolve(data);
   },
 
   /**
@@ -47,7 +40,7 @@ export default BaseAuthenticator.extend({
    * @returns {Promise}
    */
   authenticate() {
-    return this._forceCloseConnection().then(() => this._tryHandshake());
+    return this.forceCloseConnection().then(() => this.tryHandshake());
   },
 
   /**
@@ -72,7 +65,7 @@ export default BaseAuthenticator.extend({
         let closing = onedataWebsocket.closeConnection();
         closing.then(() => {
           // NOTE: reject and resolve are inverted here!
-          return this._tryHandshake().then(reject, resolve);
+          return this.tryHandshake().then(reject, resolve);
         });
         closing.catch(reject);
       });
@@ -87,34 +80,5 @@ export default BaseAuthenticator.extend({
    */
   remoteInvalidate() {
     return $.post('/logout');
-  },
-
-  _forceCloseConnection() {
-    let onedataWebsocket = this.get('onedataWebsocket');
-    return new Promise(resolve =>
-      onedataWebsocket.closeConnection().then(resolve, resolve)
-    );
-  },
-
-  /**
-   * Try to connect with backend and see if we got anonymous or non-anonymous
-   * session. Resolve on non-anonymous session, reject otherwise.
-   * @returns {Promise} resolves with handshake data (Object)
-   */
-  _tryHandshake() {
-    return new Promise((resolve, reject) => {
-      let init = this.get('onedataWebsocket').initConnection();
-      init.then(data => {
-        if (typeof data !== 'object') {
-          throw new Error(
-            'authorizer:onedata-websocket: invalid handshake response');
-        }
-        if (data.identity === NOBODY_IDENTITY) {
-          reject();
-        } else {
-          resolve(data);
-        }
-      });
-    });
   },
 });

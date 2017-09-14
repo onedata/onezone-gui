@@ -30,7 +30,7 @@ const ObjectPromiseProxy = ObjectProxy.extend(PromiseProxyMixin);
  * Default value for ``responseTimeout`` in service
  * @type {number}
  */
-const RESPONSE_TIMEOUT_MS = 1 * 60 * 1000;
+const RESPONSE_TIMEOUT_MS = 10 * 1000;
 
 const AVAIL_MESSAGE_HANDLERS = ['response', 'push'];
 
@@ -72,7 +72,7 @@ export default Ember.Service.extend(Evented, {
   _closeDefer: null,
 
   /**
-   * Maps message id -> deferred
+   * Maps message id -> { sendDeferred: RSVP.Deferred, timeoutId: Number }
    * @type {Map}
    */
   _deferredMessages: new Map(),
@@ -111,11 +111,11 @@ export default Ember.Service.extend(Evented, {
    * The promise rejects on:
    * - uuid collision
    * - websocket adapter exception
-   * @param {object} message
    * @param {string} subtype one of: handshake, rpc, graph
-   * @return {Promise}
+   * @param {object} message
+   * @returns {Promise<object, object>} resolves with Onedata Sync API response
    */
-  send(subtype, message) {
+  sendMessage(subtype, message) {
     let {
       _webSocket,
       _deferredMessages,
@@ -154,17 +154,36 @@ export default Ember.Service.extend(Evented, {
         },
       });
     }
-    _deferredMessages.set(id, sendDeferred);
-    // FIXME register timeout and clear it after message resolve
-    // FIXME optimize - do not create whole function every time
-    window.setTimeout(function () {
-      if (_deferredMessages.has(id)) {
-        sendDeferred.reject({
-          error: 'timeout',
-        });
-      }
-    }, responseTimeout);
+    let timeoutId = window.setTimeout(
+      () => this._responseTimeout(id),
+      responseTimeout
+    );
+
+    _deferredMessages.set(id, { sendDeferred, timeoutId });
+    let sendPromise = sendDeferred.promise;
+    sendPromise.catch(error =>
+      console.warn(
+        `service:onedata-websocket: sendMessage error: ${JSON.stringify(error)}`
+      )
+    );
     return sendDeferred.promise;
+  },
+
+  /**
+   * @private
+   * @param {string} messageId
+   * @returns {undefined}
+   */
+  _responseTimeout(messageId) {
+    let _deferredMessages = this.get('_deferredMessages');
+    if (_deferredMessages.has(messageId)) {
+      let { sendDeferred } = _deferredMessages.get(messageId);
+      _deferredMessages.delete(messageId);
+      sendDeferred.reject({
+        error: 'timeout',
+        message: 'Server response timeout',
+      });
+    }
   },
 
   /**
@@ -180,9 +199,10 @@ export default Ember.Service.extend(Evented, {
     this.set('_initDefer', _initDefer);
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     let host = window.location.hostname;
-    let port = 8001;
+    let port = 443;
+    let suffix = '/graph_sync/';
 
-    let url = protocol + host + (port === '' ? '' : ':' + port);
+    let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;
 
     try {
       let socket = new WebSocketClass(url);
@@ -191,8 +211,6 @@ export default Ember.Service.extend(Evented, {
       socket.onerror = this._onError.bind(this);
       socket.onclose = this._onClose.bind(this);
       this.set('_webSocket', socket);
-
-      // FIXME send me a handshake it will be better for me
     } catch (error) {
       console.error(`WebSocket initialization error: ${error}`);
       _initDefer.reject(error);
@@ -207,20 +225,23 @@ export default Ember.Service.extend(Evented, {
 
   _closeConnectionStart() {
     let _webSocket = this.get('_webSocket');
-    let _closeDefer = defer();
-    this.set('_closeDefer', _closeDefer);
-
-    _webSocket.close();
-
-    return _closeDefer;
+    if (_webSocket) {
+      let _closeDefer = defer();
+      this.set('_closeDefer', _closeDefer);
+      _webSocket.close();
+      return _closeDefer.promise;
+    } else {
+      // if there is no _webSocket, we assume, that there is no connection at all
+      return Promise.resolve();
+    }
   },
 
   _onOpen( /*event*/ ) {
     this.get('_initDefer').resolve();
   },
 
-  // TODO move unpacking into protocol level?
-  // TODO currently supporting only batch messages
+  // TODO: move unpacking into protocol level?
+  // TODO: currently supporting only batch messages
   _onMessage({ data }) {
     data = JSON.parse(data);
 
@@ -239,11 +260,11 @@ export default Ember.Service.extend(Evented, {
   /**
    * @param {object} options
    * @param {number} protocolVersion
-   * @returns {Promise}
+   * @returns {Promise<object, object>} resolves with successful handshake data
    */
   _handshake({ protocolVersion } = { protocolVersion: 1 }) {
     return new Promise((resolve, reject) => {
-      let handshaking = this.send('handshake', {
+      let handshaking = this.sendMessage('handshake', {
         supportedVersions: [protocolVersion],
         sessionId: null,
       });
@@ -258,7 +279,7 @@ export default Ember.Service.extend(Evented, {
     });
   },
 
-  // TODO handle errors - reject inits, etc.
+  // TODO: handle errors - reject inits, etc.
   _onError( /*event*/ ) {},
 
   _onClose( /*event*/ ) {
@@ -288,7 +309,8 @@ export default Ember.Service.extend(Evented, {
   ),
 
   /**
-   * @param {object} message 
+   * @param {object} message
+   * @returns {undefined}
    */
   _handleMessage(message) {
     console.debug(`onedata-websocket: Handling message: ${JSON.stringify(message)}`);
@@ -324,17 +346,22 @@ export default Ember.Service.extend(Evented, {
       id,
     } = message;
     if (_deferredMessages.has(id)) {
-      let deferred = _deferredMessages.get(id);
+      let { sendDeferred, timeoutId } = _deferredMessages.get(id);
       // NOTE Map.delete will not work on IE 10 or lower
       _deferredMessages.delete(id);
-      deferred.resolve(message);
+      clearTimeout(timeoutId);
+      sendDeferred.resolve(message);
     } else {
-      throw new Error(`Tried to handle message with unknown UUID: ${id}`);
+      console.warn(
+        `Tried to handle message with unknown UUID: ${id} - maybe there was a timeout?`
+      );
     }
   },
 
-  /** 
-   * @return {string}
+  /**
+   * Helper: if response reports badMessage error, return id of bad message
+   * @param {string} message 
+   * @returns {string|undefined}
    */
   _badMessageId(message) {
     if (

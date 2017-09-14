@@ -66,3 +66,29 @@ let ExportAuthenticator = MOCK_BACKEND ? OnedataWebsocketMock : OnedataWebsocket
 export default ExportAuthenticator;
 ```
 
+#### Other important exports
+
+Please export following modules in Ember:
+- `application:session-store` -> `onedata-gui-websocket-client/session-stores/onedata-websocket`
+- `application:serializer` -> `onedata-gui-websocket-client/serializers/onedata-websocket`
+
+
+## Tests and mocks included
+
+- `authenticator:mocks/onedata-websocket`
+  - on `authorize` it adds a valid authorization cookie for mocked handshake in `service:mocks/onedata-websocket`
+  - used in development app runs
+- `service:mocks/onedata-websocket-base`
+  - do not use WebSocket connection, but instead it allows to use internal functions that can be mocked
+  - used to test higher layers: `service:onedata-rpc` and `service:onedata-graph`
+  - used as a base for cookies-mock (below)
+- `mixins/services/onedata-websocket-cookies-handshake`
+  - implemements `handleSendHandshake` for `service:backend-mock/onedata-websocket-base` that checks if fake cookie is set
+- `service:mocks/onedata-websocket`
+  - allows handshake without backend
+  - used in development app runs
+- `service:mock/onedata-rpc`
+  - should be used for development app runs that uses RPC
+- `service:mock/onedata-graph`
+  - used as mock for adapter tests
+  - should be used for development app runs that uses model (be a mock for real adapter)

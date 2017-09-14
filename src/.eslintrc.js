@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 module.exports = {
   root: true,
   parserOptions: {
@@ -20,6 +22,7 @@ module.exports = {
     'comma-dangle': [
       1,
       "always-multiline",
-    ]
+    ],
+    'semi': 2,
   }
 };
