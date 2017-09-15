@@ -61,9 +61,9 @@ export default Service.extend({
   /**
    * Mocking send message
    * Please implement or override send handlers:
-   * - `handleHandshake`
-   * - `handleRpc`
-   * - `handleGraph`
+   * - `handleSendHandshake`
+   * - `handleSendRpc`
+   * - `handleSendGraph`
    * @param {String} subtype one of: handshake, rpc, graph
    * @param {object} message
    * @returns {Promise<object>} resolves with message response

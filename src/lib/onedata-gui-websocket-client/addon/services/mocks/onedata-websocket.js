@@ -12,4 +12,23 @@
 import OnedataWebsocketBase from 'onedata-gui-websocket-client/services/mocks/onedata-websocket-base';
 import CookiesHandshake from 'onedata-gui-websocket-client/mixins/services/onedata-websocket-cookies-handshake';
 
-export default OnedataWebsocketBase.extend(CookiesHandshake);
+import { Promise } from 'rsvp';
+
+export default OnedataWebsocketBase.extend(CookiesHandshake, {
+  handleSendGraph({
+    gri,
+    operation,
+  }) {
+    if (gri.match(/od_user/) && operation === 'get') {
+      return Promise.resolve({
+        payload: {
+          success: true,
+          data: {
+            gri,
+            name: 'Some user',
+          },
+        },
+      });
+    }
+  },
+});
