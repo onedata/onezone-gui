@@ -2,6 +2,8 @@
 'use strict';
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const defineSassColors = require('./lib/onedata-gui-common/addon/utils/define-sass-colors');
+const colors = require('./lib/onedata-gui-common/addon/colors').default;
 
 module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
@@ -50,6 +52,8 @@ module.exports = function (defaults) {
       },
     },
   });
+
+  defineSassColors(app, colors);
 
   // Use `app.import` to add additional libraries to the generated
   // output files.
