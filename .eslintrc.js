@@ -1,66 +1,49 @@
+/* eslint-env node */
+
 module.exports = {
   root: true,
   parserOptions: {
     ecmaVersion: 2017,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   extends: 'eslint:recommended',
   env: {
     browser: true,
     es6: true,
+    jquery: true,
   },
   rules: {
-    'block-scoped-var': 2,
-    'camelcase': 2,
-    'curly': [
-      2,
-      'all'
-    ],
-    'dot-notation': [
-      2,
-      {
-        'allowKeywords': true
-      }
-    ],
-    'eqeqeq': [
-      2,
-      'allow-null'
-    ],
-    'guard-for-in': 2,
-    'new-cap': 2,
-    'no-caller': 2,
-    'no-cond-assign': [
-      2,
-      'except-parens'
-    ],
     'no-console': 0,
-    'no-debugger': 2,
-    'no-empty': 2,
-    'no-eval': 2,
-    'no-extend-native': 2,
-    'no-extra-parens': 1,
-    'no-irregular-whitespace': 2,
-    'no-iterator': 2,
-    'no-loop-func': 2,
-    'no-multi-str': 2,
-    'no-new': 1,
-    'no-proto': 2,
-    'no-script-url': 2,
-    'no-sequences': 2,
-    'no-shadow': 2,
-    'no-undef': 2,
-    'no-unused-vars': 2,
-    'no-with': 2,
+    'dot-location': [
+      1,
+      'property',
+    ],
+    'eol-last': 1,
+    'comma-dangle': [
+      1,
+      'always-multiline',
+    ],
     'quotes': [
-      2,
+      1,
       'single',
+    ],
+    'quote-props': [
+      1,
+      'consistent-as-needed',
+    ],
+    'no-warning-comments': [
+      1,
       {
-        "avoidEscape": true,
-      }
+        terms: ['fixme'],
+      },
     ],
-    'semi': [
-      2,
-      'always'
+    'semi': 2,
+    'valid-jsdoc': [
+      1,
+      {
+        requireParamDescription: false,
+        requireReturnDescription: false,
+      },
     ],
-  }
+  },
 };

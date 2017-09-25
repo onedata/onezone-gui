@@ -5,7 +5,7 @@ import wait from 'ember-test-helpers/wait';
 import Ember from 'ember';
 
 const {
-  Evented
+  Evented,
 } = Ember;
 
 class WebSocketMock {
@@ -16,8 +16,7 @@ class WebSocketMock {
 
 describe('Unit | Service | onedata websocket', function () {
   setupTest('service:onedata-websocket', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
+    needs: [],
   });
 
   it('resolves initWebsocket promise by opening ws connection', function (done) {
@@ -50,13 +49,13 @@ describe('Unit | Service | onedata websocket', function () {
         service.on('push', (m) => {
           pushHandler(m);
         });
-      }
+      },
     });
 
     service._initWebsocket().then(() => {
       let _webSocket = service.get('_webSocket');
       _webSocket.onmessage({
-        data: JSON.stringify({ batch: [{ type: 'push', payload: 'hello' }] })
+        data: JSON.stringify({ batch: [{ type: 'push', payload: 'hello' }] }),
       });
       wait().then(() => {
         expect(pushHandlerDone).to.be.true;
@@ -82,13 +81,13 @@ describe('Unit | Service | onedata websocket', function () {
             data: JSON.stringify({
               id: messageId,
               type: 'response',
-              payload: responsePayload
-            })
+              payload: responsePayload,
+            }),
           });
         }, 0);
       };
 
-      service.send({}).then(m => {
+      service.sendMessage({}).then(m => {
         expect(m).has.property('payload');
         expect(m.payload).has.property('x');
         expect(m.payload.x).to.equal(responsePayload.x);
