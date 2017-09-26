@@ -17,7 +17,7 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
 
   groupList: belongsTo('groupList'),
 
-  // members of space
+  // members of this space
   sharedUserList: belongsTo('sharedUserList'),
   sharedGroupList: belongsTo('sharedGroupList'),
 });

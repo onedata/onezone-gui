@@ -1,5 +1,5 @@
 /**
- * Just import default application route from `onedata-gui-common` 
+ * Injects function for generating development model for onezone-gui
  *
  * @module routes/application
  * @author Jakub Liput
@@ -8,5 +8,9 @@
  */
 
 import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
+import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
+import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
 
-export default OnedataApplicationRoute.extend({});
+export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
+  generateDevelopmentModel,
+});

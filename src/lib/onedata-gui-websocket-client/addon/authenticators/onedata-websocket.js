@@ -10,7 +10,7 @@
  */
 
 import Ember from 'ember';
-import BaseAuthenticator from 'ember-simple-auth/authenticators/base';
+import OnedataBaseAuthenticator from 'onedata-gui-websocket-client/authenticators/-base';
 import OnedataWebsocketUtils from 'onedata-gui-websocket-client/mixins/onedata-websocket-utils';
 
 const {
@@ -18,8 +18,16 @@ const {
   RSVP: { Promise },
 } = Ember;
 
-export default BaseAuthenticator.extend(OnedataWebsocketUtils, {
+export default OnedataBaseAuthenticator.extend(OnedataWebsocketUtils, {
   onedataWebsocket: service(),
+
+  /**
+   * @override
+   * @returns {Promise<undefined>}
+   */
+  closeConnection() {
+    return this.get('onedataWebsocket').closeConnection(...arguments);
+  },
 
   /**
    * Just pass authenticated data from session-store

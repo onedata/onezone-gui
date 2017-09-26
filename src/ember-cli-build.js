@@ -2,13 +2,15 @@
 'use strict';
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const defineSassColors = require('./lib/onedata-gui-common/addon/utils/define-sass-colors');
+const colors = require('./lib/onedata-gui-common/addon/colors').default;
 
 module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
     'ember-cli-babel': {
       includePolyfill: true,
     },
-    sassOptions: {
+    'sassOptions': {
       includePaths: [
         'app/styles',
         // onedata-gui-common addon
@@ -22,26 +24,26 @@ module.exports = function (defaults) {
     // a "bootstrap" should be imported into app.scss
     'ember-cli-bootstrap-sassy': {
       // import SASS styles and some JS that is used outside of ember-bootstrap components 
-      'js': [
+      js: [
         'transition',
         // TODO: rewrite collapses to ember-bootstrap components
         'tooltip',
         'collapse',
         'popover',
       ],
-      'glyphicons': false,
+      glyphicons: false,
     },
     // import only JS
     'ember-bootstrap': {
-      'importBootstrapCSS': false,
-      'importBootstrapTheme': false,
-      'importBootstrapFont': true,
-      'bootstrapVersion': 3,
+      importBootstrapCSS: false,
+      importBootstrapTheme: false,
+      importBootstrapFont: true,
+      bootstrapVersion: 3,
     },
     'ember-cli-chartist': {
-      'useCustomCSS': true,
+      useCustomCSS: true,
     },
-    nodeAssets: {
+    'nodeAssets': {
       'chartist-plugin-legend': {
         vendor: {
           include: ['chartist-plugin-legend.js'],
@@ -50,6 +52,8 @@ module.exports = function (defaults) {
       },
     },
   });
+
+  defineSassColors(app, colors);
 
   // Use `app.import` to add additional libraries to the generated
   // output files.

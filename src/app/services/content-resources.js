@@ -22,7 +22,8 @@ export default Ember.Service.extend({
   providerManager: service(),
 
   /**
-   * @param {string} type
+   * @param {string} type plural type of tab, eg. providers
+   * @param {string} id record ID
    * @returns {Promise}
    */
   getModelFor(type, id) {

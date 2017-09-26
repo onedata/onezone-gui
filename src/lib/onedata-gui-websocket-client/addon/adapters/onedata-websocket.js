@@ -112,7 +112,6 @@ export default Adapter.extend({
     let recordId = snapshot.record.id;
     stripObject(data);
     return onedataGraph.request({
-      // NOTE: adding od_ because it is needed by early versions of server
       gri: recordId,
       operation: 'update',
       data,

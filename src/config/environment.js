@@ -3,11 +3,11 @@
 
 module.exports = function (environment) {
   let ENV = {
-    modulePrefix: 'onezone-gui',
+    'modulePrefix': 'onezone-gui',
     environment,
-    rootURL: '/',
-    locationType: 'hash',
-    EmberENV: {
+    'rootURL': '/',
+    'locationType': 'hash',
+    'EmberENV': {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
@@ -19,10 +19,10 @@ module.exports = function (environment) {
         Date: false,
       },
     },
-    onedataTabs: [
+    'onedataTabs': [
       { id: 'providers', icon: 'provider' },
     ],
-    layoutConfig: {
+    'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
       formInputColumns: 'col-xs-12 col-sm-7',
       formSubmitColumns: 'col-xs-12 col-sm-7 col-sm-offset-5 text-xs-center',
@@ -34,10 +34,10 @@ module.exports = function (environment) {
       routeAfterAuthentication: 'onedata',
       routeIfAlreadyAuthenticated: 'onedata',
     },
-    i18n: {
+    'i18n': {
       defaultLocale: 'en',
     },
-    APP: {
+    'APP': {
       // Here you can pass flags/options to your application instance
       // when it is created
     },

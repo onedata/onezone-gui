@@ -10,23 +10,20 @@
 import Mixin from '@ember/object/mixin';
 import { inject } from '@ember/service';
 
-import gri from 'onedata-gui-websocket-client/utils/gri';
-
 export default Mixin.create({
-  onedataGraph: inject(),
+  onedataTokenApi: inject(),
 
   /**
    * @param {string} receiverType one of: user, group
-   * @returns {Promise<string>}
+   * @returns {Promise<string, any>}
    */
   getInviteToken(receiverType) {
     let {
       entityType,
       entityId,
     } = this.getProperties('entityType', 'entityId');
-    return this.get('onedataGraph').request({
-      gri: gri(entityType, entityId, `invite_${receiverType}_token`),
-      operation: 'create',
-    }).then(({ data }) => data);
+
+    return this.get('onedataTokenApi')
+      .getInviteToken(entityType, entityId, receiverType);
   },
 });
