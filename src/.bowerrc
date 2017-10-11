@@ -1,0 +1,9 @@
+{
+  "directory": "bower_components",
+  "analytics": false,
+  "registry": {
+    "search": [
+      "https://registry.bower.io"
+    ]
+  }
+}
