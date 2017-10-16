@@ -1,0 +1,13 @@
+.content-providers {
+  position: absolute;
+  @include fill-container();
+  @media (max-width: $screen-xs-max) {
+    .provider-place-drop {
+      .btn {
+        display: block;
+        width: initial;
+        margin: 0 auto;
+      }
+    }
+  }
+}

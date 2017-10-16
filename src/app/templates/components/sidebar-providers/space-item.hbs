@@ -1,0 +1,6 @@
+{{item.contentComponent}}
+{{#status-toolbar as |toolbar|}}
+  {{toolbar.icon 
+    icon="provider"
+    outerText=(bytes-to-string item.definition.spaceSize)}}
+{{/status-toolbar}}
