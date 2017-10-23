@@ -12,14 +12,14 @@ import DS from 'ember-data';
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 export default DS.Transform.extend({
-  deserialize: function(value) {
+  deserialize: function (value) {
     if (!Ember.$.isPlainObject(value)) {
       return {};
     } else {
       return value;
     }
   },
-  serialize: function(value) {
+  serialize: function (value) {
     if (!Ember.$.isPlainObject(value)) {
       return {};
     } else {

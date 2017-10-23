@@ -2,7 +2,7 @@
  * A sidebar for providers (extension of ``two-level-sidebar``)
  *
  * @module components/sidebar-providers
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -30,6 +30,11 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-providers/provider-item',
+
+  /**
+   * @override
+   */
   triggerEventOnPrimaryItemSelection: true,
 
   /**
@@ -37,34 +42,48 @@ export default TwoLevelSidebar.extend({
    */
   sidebarType: 'providers',
 
-  secondLevelItemsProxy: computed('model.collection.[]', 'primaryItemId', function () {
-    let {
-      model,
-      primaryItemId,
-    } = this.getProperties('model', 'primaryItemId');
-    return get(model, 'collection').filter(item => item.get('id') === primaryItemId)[0].get('spaceList.list');
-  }),
-
-  secondLevelItems: computed('secondLevelItemsProxy.{isFulfilled,content}', function () {
-    let {
-      primaryItemId,
-      secondLevelItemsProxy,
-    } = this.getProperties('primaryItemId', 'secondLevelItemsProxy');
-    let {
-      isFulfilled,
-      content,
-    } = secondLevelItemsProxy.getProperties('isFulfilled', 'content');
-    if (isFulfilled) {
-      return content.map(item => ({
-        id: item.get('id'),
-        label: item.get('name'),
-        icon: 'space',
-        withoutRoute: true,
-        component: 'sidebar-providers/space-item',
-        spaceSize: item.get('supportSizes')[primaryItemId],
-      }));
-    } else {
-      return [];
+  /**
+   * An array with spaces for the active provider
+   * @type {Ember.ComputedProperty<DS.PromiseManyArray<Space>>}
+   */
+  secondLevelItemsProxy: computed(
+    'model.collection.[]', 'primaryItemId',
+    function () {
+      let {
+        model,
+        primaryItemId,
+      } = this.getProperties('model', 'primaryItemId');
+      return get(model, 'collection')
+        .filter(item => item.get('id') === primaryItemId)[0].get('spaceList.list');
     }
-  }).readOnly(),
+  ),
+
+  /**
+   * @override
+   */
+  secondLevelItems: computed(
+    'secondLevelItemsProxy.{isFulfilled,content}',
+    function () {
+      let {
+        primaryItemId,
+        secondLevelItemsProxy,
+      } = this.getProperties('primaryItemId', 'secondLevelItemsProxy');
+      let {
+        isFulfilled,
+        content,
+      } = secondLevelItemsProxy.getProperties('isFulfilled', 'content');
+      if (isFulfilled) {
+        return content.map(item => ({
+          id: item.get('id'),
+          label: item.get('name'),
+          icon: 'space',
+          withoutRoute: true,
+          component: 'sidebar-providers/space-item',
+          spaceSize: item.get('supportSizes')[primaryItemId],
+        }));
+      } else {
+        return [];
+      }
+    }
+  ).readOnly(),
 });

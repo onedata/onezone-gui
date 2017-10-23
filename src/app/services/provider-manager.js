@@ -2,7 +2,7 @@
  * Provides data for routes and components assoctiated with providers tab
  *
  * @module services/provider-manager
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -21,10 +21,9 @@ export default Service.extend({
   currentUser: service(),
 
   /**
-   * Fetch collection of onepanel ClusterStorage
+   * Fetches collection of all providers
    * 
-   * @param {string} id
-   * @return {PromiseArray.EmberObject} resolves ArrayProxy of SpaceDetails promise proxies
+   * @return {Promise<DS.RecordArray<Provider>>} resolves to an array of providers
    */
   getProviders() {
     return this.get('currentUser').getCurrentUserRecord().then((user) =>
@@ -35,11 +34,11 @@ export default Service.extend({
   },
 
   /**
+   * Returns provider with specified id
    * @param {string} id
-   * @return {ObjectPromiseProxy} resolves ClusterStorage ObjectProxy
+   * @return {Promise<Provider>} provider promise
    */
   getRecord(id) {
     return this.get('store').findRecord('provider', id);
   },
-
 });
