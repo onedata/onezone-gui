@@ -1,6 +1,6 @@
 {{#promise-proxy-container proxy=_providersProxy}}
   {{#if _mobileMode}}
-    {{provider-place/drop provider=selectedProvider}}
+    {{provider-place/drop provider=selectedProvider class="in-content"}}
   {{else}}
     {{#one-atlas as |atlas|}}
       {{#each _providers as |provider|}}

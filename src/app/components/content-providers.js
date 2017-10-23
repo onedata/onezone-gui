@@ -15,15 +15,31 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend({
   classNames: ['content-providers'],
-  
+
   providerManager: inject(),
 
+  /**
+   * Selected (active) provider
+   * @type {Provider}
+   */
   selectedProvider: null,
 
+  /**
+   * Proxy with an array of all provider
+   * @type {PromiseObject<DS.RecordArray<Provider>>}
+   */
   _providersProxy: null,
 
+  /**
+   * Array of all prviders
+   * @type {DS.RecordArray<Provider>>}
+   */
   _providers: readOnly('_providersProxy.content'),
 
+  /**
+   * If true, page component has the mobile layout
+   * @type {boolean}
+   */
   _mobileMode: false,
 
   /**
@@ -34,6 +50,10 @@ export default Component.extend({
     return () => this._windowResized();
   }),
 
+  /**
+   * Window object (for testing purposes only)
+   * @type {Window}
+   */
   _window: window,
 
   init() {
@@ -41,7 +61,6 @@ export default Component.extend({
     this.set('_providersProxy', PromiseObject.create({
       promise: this.get('providerManager').getProviders(),
     }));
-    // this.get('_providersProxy').then((d) => console.log(d.objectAt(0).get('spaceList').get('list')));
   },
 
   didInsertElement() {
