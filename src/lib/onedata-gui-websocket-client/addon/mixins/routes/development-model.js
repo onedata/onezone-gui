@@ -22,6 +22,11 @@ import config from 'ember-get-config';
 import { isDevelopment, isModelMocked } from 'onedata-gui-websocket-client/utils/development-environment';
 import { Promise } from 'rsvp';
 
+// Default developmentModelConfig
+const DEFAULT_CONFIG = {
+  clearOnReload: true,
+};
+
 export default Ember.Mixin.create({
   /**
    * @type {object} Ember Config (eg. ember-get-config)
@@ -100,12 +105,9 @@ export default Ember.Mixin.create({
    */
   _getDevelopmentModelConfig() {
     const config = _.assign({}, this.get('developmentModelConfig') || {});
-    const defaultConfig = {
-      clearOnReload: true,
-    };
-    Object.keys(defaultConfig).forEach((key) => {
+    Object.keys(DEFAULT_CONFIG).forEach((key) => {
       if (config[key] === undefined) {
-        config[key] = defaultConfig[key];
+        config[key] = DEFAULT_CONFIG[key];
       }
     });
     return config;

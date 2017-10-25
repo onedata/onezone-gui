@@ -15,6 +15,7 @@ describe('Unit | Mixin | routes/development model', function () {
         envConfig,
         store: storeStub,
         generateDevelopmentModel() {},
+        clearDevelopmentModel: () => Promise.resolve(), 
         isDevelopment() {},
         isModelMocked() {},
       });
@@ -24,6 +25,7 @@ describe('Unit | Mixin | routes/development model', function () {
     let subject = this.RoutesDevelopmentModelObject.create();
 
     let generateDevelopmentModel = sinon.stub(subject, 'generateDevelopmentModel');
+    let clearDevelopmentModel = sinon.spy(subject, 'clearDevelopmentModel');
     let isDevelopment = sinon.stub(subject, 'isDevelopment');
     isDevelopment.returns(true);
     let isModelMocked = sinon.stub(subject, 'isModelMocked');
@@ -34,6 +36,7 @@ describe('Unit | Mixin | routes/development model', function () {
     wait().then(() => {
       expect(isDevelopment).to.be.calledOnce;
       expect(isModelMocked).to.be.called;
+      expect(clearDevelopmentModel).to.be.called;
       expect(generateDevelopmentModel).to.not.be.called;
       expect(promise).to.eventually.be.fulfilled.notify(done);
     });
@@ -43,6 +46,7 @@ describe('Unit | Mixin | routes/development model', function () {
     let subject = this.RoutesDevelopmentModelObject.create();
 
     let generateDevelopmentModel = sinon.stub(subject, 'generateDevelopmentModel');
+    let clearDevelopmentModel = sinon.spy(subject, 'clearDevelopmentModel');
     generateDevelopmentModel.resolves();
     let isDevelopment = sinon.stub(subject, 'isDevelopment');
     isDevelopment.returns(true);
@@ -53,6 +57,7 @@ describe('Unit | Mixin | routes/development model', function () {
     wait().then(() => {
       expect(isDevelopment).to.be.calledOnce;
       expect(isModelMocked).to.be.called;
+      expect(clearDevelopmentModel).to.be.called;
       expect(generateDevelopmentModel).to.be.calledOnce;
       expect(promise).to.eventually.be.fulfilled.notify(done);
     });
