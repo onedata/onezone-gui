@@ -20,6 +20,7 @@ export default Component.extend({
 
   /**
    * Selected (active) provider
+   * @virtual
    * @type {Provider}
    */
   selectedProvider: null,

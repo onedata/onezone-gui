@@ -41,11 +41,6 @@ export default LocalstorageAdapter.extend({
     get(this, '_storage').clear();
   },
 
-  init() {
-    this._super(...arguments);
-    get(this, '_storage').clear();
-  },
-
   findAll() {
     throw new Error('adapter:local-storage: findAll is not supported');
   },

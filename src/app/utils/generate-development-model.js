@@ -18,7 +18,7 @@ const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 
-/*
+/**
  * @export
  * @function
  * @param {EmberData.Store} store
@@ -36,12 +36,12 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all(providers.map(provider => {
+      return Promise.all(providers.map(provider => 
         createListRecord(store, 'space', spaces).then(lr => {
           provider.set('spaceList', lr);
           return provider.save();
-        });
-      })).then(() => listRecords);
+        })
+      )).then(() => listRecords);
     })
     .then(listRecords => createUserRecord(store, listRecords));
 }
