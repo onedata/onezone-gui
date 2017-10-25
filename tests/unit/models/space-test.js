@@ -7,7 +7,7 @@ import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
 
 describe('Unit | Model | space', function () {
   setupModelTest('space', {
-    needs: [],
+    needs: ['service:onedata-token-api'],
   });
 
   beforeEach(function () {

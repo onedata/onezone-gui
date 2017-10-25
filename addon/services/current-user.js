@@ -9,30 +9,23 @@
 
 import Service, { inject } from '@ember/service';
 import { computed } from '@ember/object';
-import gri from 'onedata-gui-websocket-client/utils/gri';
+import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 
 export default Service.extend({
   store: inject(),
   session: inject(),
-  currentUser: inject(),
 
   userId: computed.oneWay('session.data.authenticated.identity.user'),
 
-  /**
-   * Resolve record of currently signed-in user
-   * @returns {Promise<OnedataWebsocket.User>}
-   */
   getCurrentUserRecord() {
-    let {
-      store,
-      userId,
-    } = this.getProperties('store', 'userId');
+    let store = this.get('store');
+    let userId = this.get('userId');
     if (!userId) {
       throw new 'service:current-user: session unauthenticated or user id is not set';
     }
     return store.findRecord(
       'user',
-      gri('od_user', userId, 'instance', 'protected')
+      userGri(userId)
     );
   },
 });

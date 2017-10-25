@@ -1,5 +1,5 @@
 /**
- * Currently just set specific primary key for JSON serializer
+ * Base serializer for `adapter:onedata-websocket`
  *
  * @module serializers/onedata-websocket
  * @author Jakub Liput

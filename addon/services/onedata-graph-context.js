@@ -34,7 +34,7 @@ import _ from 'lodash';
 export default Service.extend({
   /**
    * Maps: recordId (String) -> list of internal Id of record that
-   * requested it (Array.String)
+   *   requested it (Array.String)
    * @type {Map}
    */
   findRecordContext: null,
@@ -73,10 +73,9 @@ export default Service.extend({
   },
 
   /**
-   * Take last registered contextGri for some requestedGri if available
+   * Take last registered contextGri for some requestedGri
    * @param {String} requestedId
-   * @returns {String|undefined} GRI of collection record that holds record
-   *   with requestedId; if not registered: returns undefined
+   * @returns {String} gri of collection record that holds record with requestedId
    */
   getContext(requestedId) {
     let registeredContexts = this.get('findRecordContext').get(requestedId);
@@ -85,10 +84,8 @@ export default Service.extend({
 
   /**
    * Create complete authHint for some requestedId, based on registered context
-   * if available.
    * @param {string} requestedId
-   * @returns {Array<string>|undefined} [auth hint type, context GRI]
-   *   or undefined when there is no auth hint for `requestedId`
+   * @returns {Array.string} [auth hint type, context GRI]
    */
   getAuthHint(requestedId) {
     let contextId = this.getContext(requestedId);

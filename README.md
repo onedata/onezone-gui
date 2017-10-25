@@ -48,47 +48,32 @@ In ``package.json`` of Ember app project:
 Then dependencies of the in-repo addon should be installed to the parent project.
 It is required as in this issue on Github: https://github.com/ember-cli/ember-cli/issues/4164
 
-#### Use onedata-gui-websocket-client authenticator
+#### Default exports
 
-The authenticator use by `ember-simple-auth` session is placed in:
-`onedata-gui-websocket-client/authenticators/onedata-websocket`
-
-Please export it as a default authenticator. You should also conditionally export mocked authenticator, for example:
-
-```javascript
-import OnedataWebsocket from 'onedata-gui-websocket-client/authenticators/onedata-websocket';
-import OnedataWebsocketMock from 'onedata-gui-websocket-client/authenticators/onedata-websocket-mock';
-
-import config from 'ember-get-config';
-
-const { APP: { MOCK_BACKEND } } = config;
-let ExportAuthenticator = MOCK_BACKEND ? OnedataWebsocketMock : OnedataWebsocket;
-export default ExportAuthenticator;
-```
-
-#### Other important exports
-
-Please export following modules in Ember:
-- `application:session-store` -> `onedata-gui-websocket-client/session-stores/onedata-websocket`
-- `application:serializer` -> `onedata-gui-websocket-client/serializers/onedata-websocket`
+Please export following modules in Ember app:
+- `session-store:application` -> `onedata-gui-websocket-client/session-stores/application`
+- `serializer:application` -> `onedata-gui-websocket-client/serializers/application`
+- `adapter:application` -> `onedata-gui-websocket-client/serializers/application`
 
 
 ## Tests and mocks included
 
-- `authenticator:mocks/onedata-websocket`
-  - on `authorize` it adds a valid authorization cookie for mocked handshake in `service:mocks/onedata-websocket`
-  - used in development app runs
-- `service:mocks/onedata-websocket-base`
-  - do not use WebSocket connection, but instead it allows to use internal functions that can be mocked
-  - used to test higher layers: `service:onedata-rpc` and `service:onedata-graph`
-  - used as a base for cookies-mock (below)
-- `mixins/services/onedata-websocket-cookies-handshake`
-  - implemements `handleSendHandshake` for `service:backend-mock/onedata-websocket-base` that checks if fake cookie is set
-- `service:mocks/onedata-websocket`
-  - allows handshake without backend
-  - used in development app runs
-- `service:mock/onedata-rpc`
-  - should be used for development app runs that uses RPC
-- `service:mock/onedata-graph`
-  - used as mock for adapter tests
-  - should be used for development app runs that uses model (be a mock for real adapter)
+Some of injected services and modules have special export, that chooses version of implementation between websocket implementation and mocked version for development. These are:
+- adapter
+- authenticator
+- serializer
+- session-store
+- onedata-rpc
+- onedata-token-api
+
+The `onedata-websocket` service has this kind of export too, but it's only for throwing error when it is tried to be used in development mode.
+
+
+## Development environment and model
+
+In development mode, the mock model will be created on entering application route using localstorage adapter.
+If you want to clear the storage, you can clear localstorage in your browser or just invoke:
+```javascript
+AppName.__container__.lookup('adapter:application').clearLocalStorage()
+```
+where `AppName` is object with Ember Application, eg. OnezoneGui.

@@ -8,18 +8,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import OnedataAuthenticatorBase from 'onedata-gui-websocket-client/authenticators/-base';
+import OnedataWebsocketUtilsMock from 'onedata-gui-websocket-client/mixins/onedata-websocket-utils-mock';
 
-import OnedataWebsocketAuthenticator from 'onedata-gui-websocket-client/authenticators/onedata-websocket';
+import { Promise } from 'rsvp';
+import { inject } from '@ember/service';
 
-const {
-  inject: { service },
-  RSVP: { Promise },
-} = Ember;
-
-export default OnedataWebsocketAuthenticator.extend({
-  onedataWebsocket: service(),
-  cookies: service(),
+export default OnedataAuthenticatorBase.extend(OnedataWebsocketUtilsMock, {
+  cookies: inject(),
 
   // TODO validate username/password
   authenticate() {
@@ -29,6 +25,15 @@ export default OnedataWebsocketAuthenticator.extend({
 
   /**
    * @override
+   * @returns {Promise<undefined>}
+   */
+  closeConnection() {
+    return Promise.resolve();
+  },
+
+  /**
+   * @override
+   * @returns {Promise<undefined>}
    */
   remoteInvalidate() {
     return new Promise(resolve => {
