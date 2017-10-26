@@ -45,7 +45,7 @@ describe('Unit | Utility | generate development model', function () {
       ].forEach(modelName =>
         expect(createRecord).to.be.calledWith(modelName, sinon.match.object)
       );
-      stubsToCheck.forEach(stub => expect(stub).to.be.calledOnce);
+      stubsToCheck.forEach(stub => expect(stub).to.be.called);
       done();
     });
   });

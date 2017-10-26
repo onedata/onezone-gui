@@ -1,0 +1,10 @@
+{{one-icon icon="provider"}} 
+<span class="one-label">{{item.name}}</span>
+{{#status-toolbar as |toolbar|}}
+  {{toolbar.icon 
+    icon="space"
+    innerText=_spaces.length}}
+  {{toolbar.icon
+    icon="provider"
+    outerText=(bytes-to-string _totalSupportSize)}}
+{{/status-toolbar}}

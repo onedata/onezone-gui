@@ -1,2 +1,20 @@
-{{api-example}}
-{{yield}}
+{{#promise-proxy-container proxy=_providersProxy}}
+  {{#if _mobileMode}}
+    {{provider-place/drop provider=selectedProvider class="in-content"}}
+  {{else}}
+    {{#one-atlas as |atlas|}}
+      {{#each _providers as |provider|}}
+        {{#atlas.point latitude=provider.latitude longitude=provider.longitude}}
+          {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
+            {{provider-place
+              provider=provider
+              atlasWidth=atlas.width
+              circleSizeScale=2
+              active=(eq provider selectedProvider)
+              renderDrop=(eq provider selectedProvider)}}
+          {{/link-to}}
+        {{/atlas.point}}
+      {{/each}}
+    {{/one-atlas}}
+  {{/if}}
+{{/promise-proxy-container}}

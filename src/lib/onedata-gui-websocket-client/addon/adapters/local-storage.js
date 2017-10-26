@@ -40,4 +40,12 @@ export default LocalstorageAdapter.extend({
   clearLocalStorage() {
     get(this, '_storage').clear();
   },
+
+  findAll() {
+    throw new Error('adapter:local-storage: findAll is not supported');
+  },
+
+  query() {
+    throw new Error('adapter:local-storage: query is not supported');
+  },
 });
