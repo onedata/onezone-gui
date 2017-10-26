@@ -15,7 +15,7 @@ describe('Unit | Mixin | routes/development model', function () {
         envConfig,
         store: storeStub,
         generateDevelopmentModel() {},
-        clearDevelopmentModel: () => Promise.resolve(), 
+        clearDevelopmentModel: () => Promise.resolve(),
         isDevelopment() {},
         isModelMocked() {},
       });

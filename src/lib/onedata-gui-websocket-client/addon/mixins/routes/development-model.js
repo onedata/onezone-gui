@@ -65,9 +65,9 @@ export default Ember.Mixin.create({
    * @returns {Promise<undefined, any>}
    */
   clearDevelopmentModel() {
-    throw new Error(
-      'route:<development-model-mixin>: clearDevelopmentModel not implemented'
-    );
+    return Promise.reject({
+      message: 'route:<development-model-mixin>: clearDevelopmentModel not implemented',
+    });
   },
 
   beforeModel() {
