@@ -4,16 +4,18 @@
   {{else}}
     {{#one-atlas as |atlas|}}
       {{#each _providers as |provider|}}
-        {{#atlas.point latitude=provider.latitude longitude=provider.longitude}}
-          {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
-            {{provider-place
-              provider=provider
-              atlasWidth=atlas.width
-              circleSizeScale=2
-              active=(eq provider selectedProvider)
-              renderDrop=(eq provider selectedProvider)}}
-          {{/link-to}}
-        {{/atlas.point}}
+        {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+          {{#position.point}}
+            {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
+              {{provider-place
+                provider=provider
+                atlasWidth=atlas.width
+                circleSizeScale=2
+                active=(eq provider selectedProvider)
+                renderDrop=(eq provider selectedProvider)}}
+            {{/link-to}}
+          {{/position.point}}
+        {{/atlas.position}}
       {{/each}}
     {{/one-atlas}}
   {{/if}}
