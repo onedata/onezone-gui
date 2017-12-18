@@ -9,6 +9,7 @@
 
 import Ember from 'ember';
 import config from 'ember-get-config';
+import isRecord from 'onedata-gui-common/utils/is-record';
 
 const {
   inject: {
@@ -32,6 +33,15 @@ export default Ember.Route.extend({
   sidebar: service(),
   sidebarResources: service(),
 
+  beforeModel(transition) {
+    const resourceType = transition.params['onedata.sidebar'].type;
+    if (resourceType) {
+      let mainMenu = this.get('mainMenu');
+      mainMenu.currentItemIdChanged(resourceType);
+      mainMenu.set('isLoadingItem', true);
+    }
+  },
+
   model({ type }) {
     let sidebarResources = this.get('sidebarResources');
     return new Promise((resolve, reject) => {
@@ -39,7 +49,8 @@ export default Ember.Route.extend({
         let gettingCollection = sidebarResources.getCollectionFor(type);
         gettingCollection
           .then(proxyCollection => {
-            return Promise.all(proxyCollection);
+            return isRecord(proxyCollection) ? proxyCollection :
+              Promise.all(proxyCollection);
           })
           .then(collection => {
             resolve({
@@ -55,10 +66,9 @@ export default Ember.Route.extend({
     });
   },
 
-  afterModel(model) {
-    let { resourceType } = model;
+  afterModel() {
     let mainMenu = this.get('mainMenu');
-    mainMenu.currentItemIdChanged(resourceType);
+    mainMenu.set('isLoadingItem', false);
   },
 
   renderTemplate(controller, model) {
@@ -75,4 +85,15 @@ export default Ember.Route.extend({
       model
     });
   },
+
+  actions: {
+    error() {
+      let mainMenu = this.get('mainMenu');
+      mainMenu.setProperties({
+        isFailedItem: true,
+        isLoadingItem: false,
+      });
+      return true;
+    },
+  }
 });
