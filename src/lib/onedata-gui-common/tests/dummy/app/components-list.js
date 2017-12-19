@@ -1,10 +1,12 @@
 export default [
+  'bezier-curve',
   'name-conflict',
   'one-atlas',
   'one-dynamic-tree',
   'one-pie-chart',
   'one-tree',
   'one-way-toggle',
+  'promise-proxy-container',
   'provider-place',
   'providers-list',
   'resource-load-error',
