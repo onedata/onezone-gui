@@ -1,12 +1,44 @@
-// TODO temporary style - style should be custom for Onezone and moved from oz-gui-default
-
 .login-box {
-  .login-main-title {
-    &.zone {
-      background-image: url($root-url + 'assets/images/onezone-logo.svg');
+  .login-header {
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 100px;
+    color: $color-one-white;
+    font-weight: bold;
+
+    @media(max-height: 600px) {
+      margin-bottom: 50px;
     }
   }
-  .login-logo {
-    background-image: url($root-url + 'assets/images/control-panel.svg');
+
+  .zone-image {
+    position: relative;
+    right: -13px;
+    height: 80px;
+    background-size: contain;
+    background-image: url('/assets/images/oneworld.svg');
+    background-repeat: no-repeat;
+    background-position: right center;
+  }
+
+  .zone-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 23px;
+    font-size: 14pt;
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 100%;
+  }
+
+  .zone-name {
+    word-break: break-word;
+  }
+
+  .zone-subtitle {
+    font-size: 0.8em;
+    opacity: 0.8;
   }
 }
