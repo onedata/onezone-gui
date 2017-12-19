@@ -1,4 +1,5 @@
+import header from './login-box/header';
+
 export default {
-  brandTitle: 'Onezone',
-  brandSubtitle: 'development version',
+  header,
 };
