@@ -23,7 +23,7 @@ $login-colors: (
   surfsara: #FFF,
 );
 
-.auth-icon {
+.social-box .auth-icon {
   @function box-fg-color($color) {
     @if (lightness($color) > 80) {
       @return $color-one-blue-gray;

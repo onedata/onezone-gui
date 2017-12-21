@@ -3,6 +3,7 @@ import LoginFormConainer from 'onedata-gui-common/components/login-box/login-for
 import AUTHORIZERS from 'onezone-gui/utils/authorizers';
 
 export default LoginFormConainer.extend({
+  classNames: ['login-form-container'],
 
   /**
    * Authorizer selected in dropdown
@@ -102,13 +103,43 @@ export default LoginFormConainer.extend({
       this.send('authenticate', authorizer.type);
     },
     backAction() {
-
+      this.set('showAuthenticationError', false);
+      this.send('usernameLoginToggle');
     },
     authenticate() {
 
     },
     usernameLoginToggle() {
+      let {
+        isProvidersDropdownVisible,
+        formAnimationTimeoutId,
+      } = this.getProperties(
+        'isProvidersDropdownVisible',
+        'formAnimationTimeoutId'
+      );
+      let loginForm = this.$('.basicauth-login-form-container');
+      let authorizersSelect = this.$('.authorizers-select-container');
+      clearTimeout(formAnimationTimeoutId);
 
+      this.toggleProperty('isUsernameLoginActive');
+      if (this.get('isUsernameLoginActive')) {
+        this._animateHide(authorizersSelect);
+        this._animateShow(loginForm, true);
+        this.$('.login-username').focus();
+        // hide dropdown
+        if (isProvidersDropdownVisible) {
+          this.send('showMoreClick');
+        }
+        this.set('formAnimationTimeoutId', 
+          setTimeout(() => authorizersSelect.addClass('hide'), 333)
+        );
+      } else {
+        this._animateHide(loginForm);
+        this._animateShow(authorizersSelect, true);
+        this.set('formAnimationTimeoutId', 
+          setTimeout(() => loginForm.addClass('hide'), 333)
+        );
+      }
     },
     showMoreClick() {
       let dropdownAnimationTimeoutId = this.get('dropdownAnimationTimeoutId');

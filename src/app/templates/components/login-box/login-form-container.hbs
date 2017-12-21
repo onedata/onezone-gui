@@ -1,8 +1,8 @@
-<div class="login-form-container animated fast {{if hasAuthorizersForSelect "hide" "always-visible"}}">
+<div class="basicauth-login-form-container animated fast {{if hasAuthorizersForSelect "hide" "always-visible"}}">
   <h2>{{t "components.loginBox.loginFormContainer.formSubtitle"}}
     <span class="subtitle-tip">
       {{one-icon icon="sign-question"}}
-      {{bs-tooltip title=(if hasAuthorizersForSelect 
+      {{one-tooltip title=(if hasAuthorizersForSelect 
         (t "components.loginBox.loginFormContainer.formSubtitleTip")
         (t "components.loginBox.loginFormContainer.noProvidersFormSubtitleTip"))}}
     </span>

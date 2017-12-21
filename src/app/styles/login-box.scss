@@ -15,7 +15,6 @@
       height: 25px;
       width: 25px;
       
-      
       font-size: 18px;
       .social-icon-image {
         background-size: 20px 20px;
@@ -49,41 +48,15 @@
 }
 
 .login-icon-box {
-  margin: 0;
+  position: relative;
   border-radius: $border-radius-large;
   overflow: hidden;
   text-align: center;
   text-decoration: none !important;
   user-select: none;
+
   &:hover {
     color: white;
-  }
-}
-
-.social-box {
-  position: relative;
-  display: inline-block;
-  vertical-align: top;
-  &.disabled {
-    opacity: 0.3;
-    a {
-      cursor: default;
-    }
-  }
-  .social-icon-image {
-    width: 100%;
-    height: 100%;
-    background-size: 40px 40px;
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
-}
-
-.login-icon-box {
-  &.active {
-    .one-icon {
-      color: transparent !important;
-    }
   }
 
   .one-icon {
@@ -118,6 +91,25 @@
       font-size: 42px;
       letter-spacing: -1.1px;
     }
+  }
+}
+
+.social-box {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  &.disabled {
+    opacity: 0.3;
+    a {
+      cursor: default;
+    }
+  }
+  .social-icon-image {
+    width: 100%;
+    height: 100%;
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: center center;
   }
 }
 
@@ -170,7 +162,7 @@
 
   h2 {
     margin: 0px 20px 20px 20px;
-    font-size: 13pt;
+    font-size: 12pt;
     font-family: 'Open Sans Semibold';
     text-align: center;
     .subtitle-tip {
@@ -182,15 +174,20 @@
     }
   }
 
+  .login-form-container {
+    position: relative;
+    min-height: 250px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
   .login-icon-box {
     display: inline-block;
     height: 50px;
     width: 50px;
-    text-align: center;
     line-height: 50px;
     font-size: 35px;
-    
-    cursor: pointer; cursor: hand;
+    cursor: pointer;
 
     .loader {
       // position hack
@@ -206,9 +203,11 @@
 
   .authorizers-select-container {
     position: absolute;
+    top: 0;
     left: 0;
     right: 0;
     margin-bottom: 30px;
+    text-align: center;
     &.fadeOut {
       z-index: -1;
     }
@@ -223,13 +222,12 @@
         }
      }
     }
-    
     .dropdown-label {
       position: absolute;
       top: 1px;
       height: $input-height-base - 2px;
-      line-height: $input-height-base - 2px;
       padding: 0 15px;
+      line-height: $input-height-base - 2px;
       border-right: 1px solid $input-border;
       z-index: 2;
       color: $main-text-color;

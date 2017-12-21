@@ -82,7 +82,7 @@ export default Ember.Component.extend({
 
   click() {
     // hide tooltip
-    this.$().trigger('mouseout');
+    this.$()[0].dispatchEvent(new Event('mouseleave'));
   },
 
   actions: {
