@@ -27,6 +27,6 @@ export default Ember.Component.extend({
     },
     showMoreClick() {
       this.get('showMoreClick')();
-    }
-  }
+    },
+  },
 });

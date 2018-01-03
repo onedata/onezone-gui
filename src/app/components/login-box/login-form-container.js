@@ -1,9 +1,19 @@
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
 import AUTHORIZERS from 'onezone-gui/utils/authorizers';
+import Ember from 'ember';
+// import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
+import { inject } from '@ember/service';
+import _ from 'lodash';
+
+const I18N_PREFIX = 'components.loginBox.loginFormContainer.';
+const ANIMATION_TIMEOUT = 333;
 
 export default LoginFormConainer.extend({
   classNames: ['login-form-container'],
+
+  i18n: inject(),
+  globalNotify: inject(),
 
   /**
    * Authorizer selected in dropdown
@@ -11,10 +21,33 @@ export default LoginFormConainer.extend({
    */
   selectedAuthorizer: null,
 
+  /**
+   * If true, component is waiting for data to load.
+   * @type {boolean}
+   */
   isLoading: false,
+
+  /**
+   * Selected auth provider.
+   * @type {AuthorizerInfo}
+   */
   _activeAuthorizer: null,
+
+  /**
+   * Timeout id used to control auth providers dropdown visibility animation.
+   * @type {number}
+   */
   dropdownAnimationTimeoutId: -1,
+
+  /**
+   * Timeout id used to control form mode change animation.
+   * @type {number}
+   */
   formAnimationTimeoutId: -1,
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   hasAuthorizersForSelect: computed.notEmpty('authorizersForSelect'),
 
   /**
@@ -49,8 +82,18 @@ export default LoginFormConainer.extend({
     }
   }),
 
-  initSupportedAuthorizers: function () {
+  init() {
+    this._super(...arguments);
+    this.initSupportedAuthorizers();
+  },
+
+  /**
+   * Loads auth providers from backend.
+   * @returns {undefined}
+   */
+  initSupportedAuthorizers() {
     this.set('isLoading', true);
+    // TODO load authorizers
     // const p = this.get('onezoneServer').getSupportedAuthorizers();
     const p = Promise.resolve({authorizers: AUTHORIZERS.map(a => a.type)});
     p.then((data) => {
@@ -73,42 +116,116 @@ export default LoginFormConainer.extend({
         }
       });
       this.set('supportedAuthorizers', authorizers);
-    });
-
-    p.catch(error => {
-      const msg = error && error.message || this.get('i18n').t('components.socialBoxList.fetchProvidersFailedUnknown');
+    }).catch(error => {
+      const msg = error && error.message ||
+        this.get('i18n').t(I18N_PREFIX + 'fetchProvidersFailedUnknown');
       this.set('errorMessage', msg);
-    });
+    }).finally(() => this.set('isLoading', false));
+  },
 
-    p.finally(() => this.set('isLoading', false));
-  }.on('init'),
-
+  /**
+   * Powerselect item matcher used by its search engine.
+   * @param {AuthorizerInfo} authorizer 
+   * @param {string} term Query string.
+   * @returns {boolean} True, if authorizer matches given term.
+   */
   authorizersSelectMatcher(authorizer, term) {
     return authorizer.name.toLowerCase().indexOf(term.toLowerCase());
   },
 
+  /**
+   * Launches element show animation.
+   * @param {jQuery} element
+   * @param {boolean} delayed if true, animation will be delayed
+   * @returns {undefined}
+   */
   _animateShow(element, delayed) {
     element
       .addClass((delayed ? 'short-delay ' : '') + 'fadeIn')
       .removeClass('hide fadeOut');
   },
 
+  /**
+   * Launches element hide animation.
+   * @param {jQuery} element
+   * @returns {undefined}
+   */
   _animateHide(element) {
     element.addClass('fadeOut').removeClass('short-delay fadeIn');
   },
 
+  /**
+   * Notifies about authentication error using auth provider.
+   * @param {object} error
+   * @returns {undefined}
+   */
+  authEndpointError(error) {
+    this.get('globalNotify').backendError('authentication', {
+      message: this.get('i18n').t(I18N_PREFIX + 'authEndpointError') +
+        (error.message ? ' - ' + error.message : '.'),
+    });
+  },
+
   actions: {
+    /**
+     * Action called on auth provider select.
+     * @param {AuthorizerInfo} authorizer
+     * @return {undefined}
+     */
     authorizerSelected(authorizer) {
       this.set('selectedAuthorizer', authorizer);
       this.send('authenticate', authorizer.type);
     },
+
+    /**
+     * Back button action in username/password mode. Shows auth providers list.
+     * @returns {undefined}
+     */
     backAction() {
       this.set('showAuthenticationError', false);
       this.send('usernameLoginToggle');
     },
-    authenticate() {
 
+    /**
+     * Performs authentication using given auth provider name.
+     * @param {string} providerName
+     * @returns {undefined}
+     */
+    authenticate(providerName) {
+      let provider = _.find(this.get('supportedAuthorizers'), { type: providerName });
+      this.set('_activeAuthorizer', provider);
+      // TODO implement authentication
+      // const p = this.get('onezoneServer').getLoginEndpoint(providerName);
+      // p.then(
+      //   (data) => {
+      //     handleLoginEndpoint(data, () => {
+      //       this.authEndpointError({
+      //         message: this.get('i18n').t(I18N_PREFIX + 'authEndpointConfError'),
+      //       });
+      //     });
+      //   },
+      //   (error) => {
+      //     this.authEndpointError(error);
+      //   }
+      // ).then(() => {
+      //   this.setProperties({
+      //     _activeAuthorizer: null,
+      //     selectedAuthorizer: null,
+      //   });
+      // });
+      // return p;
+      // Temporary implementation
+      this.setProperties({
+        _activeAuthorizer: null,
+        selectedAuthorizer: null,
+      });
+      return new Ember.RSVP.Promise((resolve) => resolve());
     },
+
+    /**
+     * Toggles login form mode between username/password and auth providers list.
+     * @returns {undefined}
+     */
     usernameLoginToggle() {
       let {
         isProvidersDropdownVisible,
@@ -131,16 +248,21 @@ export default LoginFormConainer.extend({
           this.send('showMoreClick');
         }
         this.set('formAnimationTimeoutId', 
-          setTimeout(() => authorizersSelect.addClass('hide'), 333)
+          setTimeout(() => authorizersSelect.addClass('hide'), ANIMATION_TIMEOUT)
         );
       } else {
         this._animateHide(loginForm);
         this._animateShow(authorizersSelect, true);
         this.set('formAnimationTimeoutId', 
-          setTimeout(() => loginForm.addClass('hide'), 333)
+          setTimeout(() => loginForm.addClass('hide'), ANIMATION_TIMEOUT)
         );
       }
     },
+
+    /**
+     * Shows dropdown with all auth providers
+     * @returns {undefined}
+     */
     showMoreClick() {
       let dropdownAnimationTimeoutId = this.get('dropdownAnimationTimeoutId');
       this.toggleProperty('isProvidersDropdownVisible');
@@ -151,7 +273,7 @@ export default LoginFormConainer.extend({
       } else {
         this._animateHide(authorizersDropdown);
         this.set('dropdownAnimationTimeoutId', 
-          setTimeout(() => authorizersDropdown.addClass('hide'), 333)
+          setTimeout(() => authorizersDropdown.addClass('hide'), ANIMATION_TIMEOUT)
         );
       }
     },

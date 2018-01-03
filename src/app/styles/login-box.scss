@@ -75,10 +75,10 @@
   
   &.more {
     background-color: white;
-    color: $color-one-blue-gray;
+    color: $color-one-dark-gray;
     font-weight: bold;    
     &:hover {
-      color: $color-one-blue-gray;
+      color: $color-one-dark-gray;
     }
     &::before {
       content: '\B7\B7\B7';
@@ -98,6 +98,7 @@
   position: relative;
   display: inline-block;
   vertical-align: top;
+  cursor: default !important;
   &.disabled {
     opacity: 0.3;
     a {
