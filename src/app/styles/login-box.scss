@@ -177,7 +177,7 @@
   .login-form-container {
     position: relative;
     min-height: 250px;
-    max-width: 380px;
+    max-width: 400px;
     margin: 0 auto;
   }
 
@@ -207,7 +207,6 @@
     left: 0;
     right: 0;
     margin-bottom: 30px;
-    text-align: center;
     &.fadeOut {
       z-index: -1;
     }
@@ -244,6 +243,6 @@
     }
   }
   .buttons-list {
-    font-size: 19px;
+    font-size: 32px;
   }
 }
