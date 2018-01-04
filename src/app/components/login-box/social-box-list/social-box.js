@@ -25,9 +25,16 @@ export default Component.extend({
   /**
    * Oneicon character name (for iconType == oneicon) or image file name
    * (without extension)
+   * @virtual
    * @type {string}
    */
   iconName: 'key',
+
+  /**
+   * If true, box is used to authenticate - spinner is visible instead of image
+   * @type {boolean}
+   */
+  active: false,
 
   /** Name of social/login service (eg. 'twitter')
    * @type {string}
@@ -51,6 +58,12 @@ export default Component.extend({
    * @type {number}
    */
   spinnerScale: 0.25,
+
+  /**
+   * Property only for testing purposes.
+   * @type {Window}
+   */
+  _window: window,
 
   /**
    * Full icon name (oneicon glyph name or file path).
@@ -96,10 +109,11 @@ export default Component.extend({
       const {
         disabled,
         link,
-      } = this.getProperties('disabled', 'link');
+        _window,
+      } = this.getProperties('disabled', 'link', '_window');
       if (!disabled) {
         if (link) {
-          window.location = link;
+          _window.location = link;
         } else {
           this.sendAction('action', this);
         }

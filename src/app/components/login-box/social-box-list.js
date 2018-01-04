@@ -7,6 +7,7 @@
  */
 
 import Component from '@ember/component';
+import RSVP from 'rsvp';
 
 export default Component.extend({
   /**
@@ -29,6 +30,14 @@ export default Component.extend({
    * @type {Array<AuthorizerInfo>}
    */
   supportedAuthorizers: null,
+
+  /**
+   * Action called on auth provider social-box click.
+   * @returns {RSVP.Promise}
+   */
+  authenticate: () => new RSVP.Promise(
+    (resolve, reject) => reject(new Error('not implemented'))
+  ),
 
   /**
    * Action invoked on 'show more' button click.
