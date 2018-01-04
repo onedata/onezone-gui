@@ -9,5 +9,6 @@
  * @returns {boolean} true if data is valid (can be used)
  */
 export default function validateGetLoginEndpoint({ method, url, formData }) {
-  return !!((method === 'get' || (method === 'post' && typeof(formData) === 'object')) && url);
+  return !!((method === 'get' ||
+    (method === 'post' && typeof (formData) === 'object')) && url);
 }

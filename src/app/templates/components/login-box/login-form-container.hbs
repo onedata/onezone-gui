@@ -1,8 +1,8 @@
-<div class="basicauth-login-form-container animated fast {{if hasAuthorizersForSelect "hide" "always-visible"}}">
+<div class="basicauth-login-form-container animated fast {{if (or isLoading _hasAuthorizersForSelect) "hide" "always-visible"}}">
   <h2>{{t "components.loginBox.loginFormContainer.formSubtitle"}}
     <span class="subtitle-tip">
       {{one-icon icon="sign-question"}}
-      {{one-tooltip title=(if hasAuthorizersForSelect 
+      {{one-tooltip title=(if _hasAuthorizersForSelect 
         (t "components.loginBox.loginFormContainer.formSubtitleTip")
         (t "components.loginBox.loginFormContainer.noProvidersFormSubtitleTip"))}}
     </span>
@@ -11,27 +11,27 @@
     authenticationSuccess=authenticationSuccess
     authenticationFailure=authenticationFailure
     authenticationStarted=authenticationStarted
-    backButtonAction=(action "backAction")
+    backButtonAction=(if _hasAuthorizersForSelect (action "backAction") undefined)
   }}
 </div>
-{{#if hasAuthorizersForSelect}}
+{{#if _hasAuthorizersForSelect}}
   <div class="authorizers-select-container animated fast">
     <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>
     {{login-box/social-box-list
-        supportedAuthorizers=authorizersForButtons 
+        supportedAuthorizers=_authorizersForButtons 
         isLoading=isLoading 
         authenticate=(action "authenticate")
-        onUsernameLoginClick=(action "usernameLoginToggle")
-        showMoreButton=showMoreProvidersButton
+        usernameLoginClick=(action "usernameLoginToggle")
+        showMoreButton=_showMoreProvidersButton
         showMoreClick=(action "showMoreClick")}}
     <div class="authorizers-dropdown-container animated fast hide">
       {{#power-select
-        options=authorizersForSelect
+        options=_authorizersForSelect
         onchange=(action "authorizerSelected")
         selected=selectedAuthorizer
-        matcher=authorizersSelectMatcher
+        matcher=_authorizersSelectMatcher
         dropdownClass="authorizers-dropdown"
-        placeholder=(t 'components.loginBox.loginFormContainer.findProviderPlaceholder')
+        placeholder=(t "components.loginBox.loginFormContainer.findProviderPlaceholder")
         disabled=_activeAuthorizer
         as |authorizer|}}
         {{login-box/social-box-list/social-box 
@@ -43,7 +43,7 @@
         }}
         {{authorizer.name}}
       {{/power-select}}
-      <div class="dropdown-label">{{t 'components.loginBox.loginFormContainer.loginWith'}}</div>
+      <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.loginWith"}}</div>
     </div>
   </div>
 {{/if}}

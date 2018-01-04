@@ -8,16 +8,16 @@ describe('Unit | Utility | validate get login endpoint', function () {
       method: 'post',
       url: 'https://example.com',
     });
-    
+
     expect(result).to.be.false;
   });
-  
+
   it('passes validation of get method with url only', function () {
     let result = validateGetLoginEndpoint({
       method: 'get',
       url: 'https://example.com',
     });
-    
+
     expect(result).to.be.true;
   });
 });

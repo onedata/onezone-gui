@@ -1,10 +1,21 @@
+/**
+ * Login container implementation specific for Onezone. In addition to standard
+ * login/password form, introduces sign in using auth providers specified
+ * by backend.
+ * @module components/login-box/login-form-container
+ * @author Michal Borzecki, Jakub Liput
+ * @copyright (C) 2016-2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
+import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
 import AUTHORIZERS from 'onezone-gui/utils/authorizers';
-import Ember from 'ember';
 // import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
-import { inject } from '@ember/service';
 import _ from 'lodash';
+
+import Ember from 'ember';
 
 const I18N_PREFIX = 'components.loginBox.loginFormContainer.';
 const ANIMATION_TIMEOUT = 333;
@@ -37,44 +48,55 @@ export default LoginFormConainer.extend({
    * Timeout id used to control auth providers dropdown visibility animation.
    * @type {number}
    */
-  dropdownAnimationTimeoutId: -1,
+  _dropdownAnimationTimeoutId: -1,
 
   /**
    * Timeout id used to control form mode change animation.
    * @type {number}
    */
-  formAnimationTimeoutId: -1,
+  _formAnimationTimeoutId: -1,
 
   /**
+   * Animation time (visibility toggle animation).
+   * @type {number}
+   */
+  _animationTimeout: ANIMATION_TIMEOUT,
+
+  /**
+   * If true, there are some auth providers to show.
    * @type {Ember.ComputedProperty<boolean>}
    */
-  hasAuthorizersForSelect: computed.notEmpty('authorizersForSelect'),
+  _hasAuthorizersForSelect: computed.notEmpty('_authorizersForSelect'),
 
   /**
+   * If true, 'show more' button will be visible in auth buttons bar.
    * @type {computed.boolean}
    */
-  showMoreProvidersButton: computed.gt('supportedAuthorizers.length', 7),
+  _showMoreProvidersButton: computed.gt('supportedAuthorizers.length', 7),
 
   /**
+   * Array of auth providers for buttons bar (available space
+   * is limited, so max length of that array is 6/7).
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  authorizersForButtons: computed('supportedAuthorizers.[]', function () {
+  _authorizersForButtons: computed('supportedAuthorizers.[]', function () {
     const {
       supportedAuthorizers,
-      showMoreProvidersButton,
-    } = this.getProperties('supportedAuthorizers', 'showMoreProvidersButton');
+      _showMoreProvidersButton,
+    } = this.getProperties('supportedAuthorizers', '_showMoreProvidersButton');
     if (supportedAuthorizers) {
-      return supportedAuthorizers.slice(0, showMoreProvidersButton ? 6 : 7);
+      return supportedAuthorizers.slice(0, _showMoreProvidersButton ? 6 : 7);
     } else {
       return [];
     }
   }),
 
   /**
+   * Array of auth providers for powerselect
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  authorizersForSelect: computed('supportedAuthorizers.[]', function () {
-    let supportedAuthorizers = this.get('supportedAuthorizers');
+  _authorizersForSelect: computed('supportedAuthorizers.[]', function () {
+    const supportedAuthorizers = this.get('supportedAuthorizers');
     if (supportedAuthorizers) {
       return supportedAuthorizers.filter(auth => auth.type !== 'basicAuth');
     } else {
@@ -84,18 +106,18 @@ export default LoginFormConainer.extend({
 
   init() {
     this._super(...arguments);
-    this.initSupportedAuthorizers();
+    this._initSupportedAuthorizers();
   },
 
   /**
    * Loads auth providers from backend.
    * @returns {undefined}
    */
-  initSupportedAuthorizers() {
+  _initSupportedAuthorizers() {
     this.set('isLoading', true);
     // TODO load authorizers
     // const p = this.get('onezoneServer').getSupportedAuthorizers();
-    const p = Promise.resolve({authorizers: AUTHORIZERS.map(a => a.type)});
+    const p = Promise.resolve({ authorizers: AUTHORIZERS.map(a => a.type) });
     p.then((data) => {
       let predefinedAuthorizersList = AUTHORIZERS.map(auth => auth.type);
       let authorizers = [];
@@ -129,7 +151,7 @@ export default LoginFormConainer.extend({
    * @param {string} term Query string.
    * @returns {boolean} True, if authorizer matches given term.
    */
-  authorizersSelectMatcher(authorizer, term) {
+  _authorizersSelectMatcher(authorizer, term) {
     return authorizer.name.toLowerCase().indexOf(term.toLowerCase());
   },
 
@@ -159,7 +181,7 @@ export default LoginFormConainer.extend({
    * @param {object} error
    * @returns {undefined}
    */
-  authEndpointError(error) {
+  _authEndpointError(error) {
     this.get('globalNotify').backendError('authentication', {
       message: this.get('i18n').t(I18N_PREFIX + 'authEndpointError') +
         (error.message ? ' - ' + error.message : '.'),
@@ -182,8 +204,10 @@ export default LoginFormConainer.extend({
      * @returns {undefined}
      */
     backAction() {
-      this.set('showAuthenticationError', false);
-      this.send('usernameLoginToggle');
+      if (this.get('isUsernameLoginActive')) {
+        this.set('showAuthenticationError', false);
+        this.send('usernameLoginToggle');
+      }
     },
 
     /**
@@ -192,20 +216,24 @@ export default LoginFormConainer.extend({
      * @returns {undefined}
      */
     authenticate(providerName) {
-      let provider = _.find(this.get('supportedAuthorizers'), { type: providerName });
+      const {
+        supportedAuthorizers,
+        authenticationSuccess,
+      } = this.getProperties('supportedAuthorizers', 'authenticationSuccess');
+      const provider = _.find(supportedAuthorizers, { type: providerName });
       this.set('_activeAuthorizer', provider);
       // TODO implement authentication
       // const p = this.get('onezoneServer').getLoginEndpoint(providerName);
       // p.then(
       //   (data) => {
       //     handleLoginEndpoint(data, () => {
-      //       this.authEndpointError({
+      //       this._authEndpointError({
       //         message: this.get('i18n').t(I18N_PREFIX + 'authEndpointConfError'),
       //       });
       //     });
       //   },
       //   (error) => {
-      //     this.authEndpointError(error);
+      //     this._authEndpointError(error);
       //   }
       // ).then(() => {
       //   this.setProperties({
@@ -219,6 +247,7 @@ export default LoginFormConainer.extend({
         _activeAuthorizer: null,
         selectedAuthorizer: null,
       });
+      authenticationSuccess();
       return new Ember.RSVP.Promise((resolve) => resolve());
     },
 
@@ -227,16 +256,18 @@ export default LoginFormConainer.extend({
      * @returns {undefined}
      */
     usernameLoginToggle() {
-      let {
+      const {
         isProvidersDropdownVisible,
-        formAnimationTimeoutId,
+        _formAnimationTimeoutId,
+        _animationTimeout,
       } = this.getProperties(
         'isProvidersDropdownVisible',
-        'formAnimationTimeoutId'
+        '_formAnimationTimeoutId',
+        '_animationTimeout'
       );
-      let loginForm = this.$('.basicauth-login-form-container');
-      let authorizersSelect = this.$('.authorizers-select-container');
-      clearTimeout(formAnimationTimeoutId);
+      const loginForm = this.$('.basicauth-login-form-container');
+      const authorizersSelect = this.$('.authorizers-select-container');
+      clearTimeout(_formAnimationTimeoutId);
 
       this.toggleProperty('isUsernameLoginActive');
       if (this.get('isUsernameLoginActive')) {
@@ -247,14 +278,14 @@ export default LoginFormConainer.extend({
         if (isProvidersDropdownVisible) {
           this.send('showMoreClick');
         }
-        this.set('formAnimationTimeoutId', 
-          setTimeout(() => authorizersSelect.addClass('hide'), ANIMATION_TIMEOUT)
+        this.set('_formAnimationTimeoutId',
+          setTimeout(() => authorizersSelect.addClass('hide'), _animationTimeout)
         );
       } else {
         this._animateHide(loginForm);
         this._animateShow(authorizersSelect, true);
-        this.set('formAnimationTimeoutId', 
-          setTimeout(() => loginForm.addClass('hide'), ANIMATION_TIMEOUT)
+        this.set('_formAnimationTimeoutId',
+          setTimeout(() => loginForm.addClass('hide'), _animationTimeout)
         );
       }
     },
@@ -264,16 +295,19 @@ export default LoginFormConainer.extend({
      * @returns {undefined}
      */
     showMoreClick() {
-      let dropdownAnimationTimeoutId = this.get('dropdownAnimationTimeoutId');
+      const {
+        _dropdownAnimationTimeoutId,
+        _animationTimeout,
+      } = this.getProperties('_dropdownAnimationTimeoutId', '_animationTimeout');
       this.toggleProperty('isProvidersDropdownVisible');
-      let authorizersDropdown = this.$('.authorizers-dropdown-container');
-      clearTimeout(dropdownAnimationTimeoutId);
+      const authorizersDropdown = this.$('.authorizers-dropdown-container');
+      clearTimeout(_dropdownAnimationTimeoutId);
       if (this.get('isProvidersDropdownVisible')) {
         this._animateShow(authorizersDropdown);
       } else {
         this._animateHide(authorizersDropdown);
-        this.set('dropdownAnimationTimeoutId', 
-          setTimeout(() => authorizersDropdown.addClass('hide'), ANIMATION_TIMEOUT)
+        this.set('_dropdownAnimationTimeoutId',
+          setTimeout(() => authorizersDropdown.addClass('hide'), _animationTimeout)
         );
       }
     },

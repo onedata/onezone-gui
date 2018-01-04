@@ -1,25 +1,23 @@
-import Ember from 'ember';
-
 /**
- * Renders single login button. Can optionally has a "link" property set to go
+ * Renders single login button. Can optionally have a "link" property set to go
  * to a provided link instead of invoking action.
- * @module components/social-box
- * @author Jakub Liput
- * @copyright (C) 2016-2017 ACK CYFRONET AGH
+ * @module components/login-box/social-box-list/social-box
+ * @author Jakub Liput, Michal Borzecki
+ * @copyright (C) 2016-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-const {
-  computed,
-  String: { htmlSafe },
-} = Ember;
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import { htmlSafe } from '@ember/string';
 
-export default Ember.Component.extend({
+export default Component.extend({
   tagName: 'div',
   classNames: ['social-box'],
 
   /**
-   * Use oneicon (fonticon) or image placed in ``/assets/images/auth-providers/{iconName}.{iconType}``
+   * Use oneicon (fonticon) or image placed in 
+   * `/assets/images/auth-providers/{iconName}.{iconType}`
    * @type {string} one of: oneicon, png, jpg, svg, <or other image format>
    */
   iconType: 'oneicon',
@@ -31,10 +29,15 @@ export default Ember.Component.extend({
    */
   iconName: 'key',
 
-  /** Name of social/login service (eg. 'twitter') */
+  /** Name of social/login service (eg. 'twitter')
+   * @type {string}
+   */
   type: null,
 
-  /** Href for link when clicked */
+  /**
+   * Href for link when clicked
+   * @type {string}
+   */
   link: '',
 
   /**
@@ -49,7 +52,11 @@ export default Ember.Component.extend({
    */
   spinnerScale: 0.25,
 
-  _iconName: computed('iconType', 'iconName', function() {
+  /**
+   * Full icon name (oneicon glyph name or file path).
+   * @type {Ember.ComputedProperty<string>}
+   */
+  _iconName: computed('iconType', 'iconName', function () {
     let {
       iconName,
       iconType,
@@ -61,7 +68,11 @@ export default Ember.Component.extend({
     }
   }),
 
-  socialIconStyle: computed('_iconName', 'iconType', function () {
+  /**
+   * Custom css styles for icon.
+   * @type {Ember.ComputedProperty<string>}
+   */
+  _socialIconStyle: computed('_iconName', 'iconType', function () {
     let {
       _iconName,
       iconType,
@@ -75,11 +86,6 @@ export default Ember.Component.extend({
     return htmlSafe(style);
   }),
 
-  hasLink: function() {
-    let link = this.get('link');
-    return link && link.length !== 0;
-  }.property('link'),
-
   click() {
     // hide tooltip
     this.$()[0].dispatchEvent(new Event('mouseleave'));
@@ -87,9 +93,13 @@ export default Ember.Component.extend({
 
   actions: {
     clicked() {
-      if (!this.get('disabled')) {
-        if (this.get('hasLink')) {
-          window.location = this.get('link');
+      const {
+        disabled,
+        link,
+      } = this.getProperties('disabled', 'link');
+      if (!disabled) {
+        if (link) {
+          window.location = link;
         } else {
           this.sendAction('action', this);
         }
