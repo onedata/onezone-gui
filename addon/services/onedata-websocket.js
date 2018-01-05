@@ -1,6 +1,11 @@
 /**
  * Onedata Websocket Sync API - low-level Websocket operation service
  *
+ * Sent events:
+ * - push:graph
+ * - push:nosub
+ * - push:error
+ * 
  * For mocked service, that does not need backend, see `onedata-websocket`
  *
  * @module services/onedata-websocket
@@ -10,7 +15,7 @@
  */
 
 import Ember from 'ember';
-import _zipObject from 'lodash/zipObject';
+import _ from 'lodash';
 
 const {
   RSVP: { defer },
@@ -22,6 +27,7 @@ const {
   PromiseProxyMixin,
   RSVP: { Promise },
   isArray,
+  Service,
 } = Ember;
 
 const ObjectPromiseProxy = ObjectProxy.extend(PromiseProxyMixin);
@@ -34,7 +40,7 @@ const RESPONSE_TIMEOUT_MS = 10 * 1000;
 
 const AVAIL_MESSAGE_HANDLERS = ['response', 'push'];
 
-export default Ember.Service.extend(Evented, {
+export default Service.extend(Evented, {
   /**
    * Max time in milliseconds for receiving a response for message
    *
@@ -309,7 +315,7 @@ export default Ember.Service.extend(Evented, {
       });
   },
 
-  _MESSAGE_HANDLERS: _zipObject(
+  _MESSAGE_HANDLERS: _.zipObject(
     AVAIL_MESSAGE_HANDLERS,
     AVAIL_MESSAGE_HANDLERS.map(t => '_' + camelize(`handle-${t}-message`))
   ),
@@ -333,16 +339,23 @@ export default Ember.Service.extend(Evented, {
     }
   },
 
+  /**
+   * Handles a push message from server
+   * - some messages are error responses for requests, these are used to reject
+   *   promises 
+   * - some messages are regular push messages with various subtypes - they cause
+   *   an event to be sent (`push:<subtype>`), eg. `push:graph`
+   * @param {object} message
+   * @returns {undefined}
+   */
   _handlePushMessage(message) {
     // HACK convert push error message to response message
     let badMessageId = this._badMessageId(message);
     if (badMessageId) {
-      // TODO possibly unsafe
-      message.id = badMessageId;
-      message.type = 'response';
-      this._handleResponseMessage(message);
+      const badMessage = _.assign({}, message, { id: badMessageId, type: 'response' });
+      this._handleResponseMessage(badMessage);
     } else {
-      this.trigger('push', message);
+      this.trigger(`push:${message.subtype}`, message.payload);
     }
   },
 
