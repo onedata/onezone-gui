@@ -43,7 +43,7 @@
     "ember-export-application-global": "2.0.0",
     "ember-get-config": "0.2.2",
     "ember-load-initializers": "1.0.0",
-    "ember-local-storage": "1.4.0",
+    "ember-local-storage": "1.4.1",
     "ember-lodash": "4.17.5",
     "ember-one-way-controls": "2.0.1",
     "ember-resolver": "4.3.0",
