@@ -10,8 +10,6 @@
 import Ember from 'ember';
 import Evented from '@ember/object/evented';
 
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-
 const {
   Service,
   inject: { service },
@@ -40,14 +38,10 @@ export default Service.extend(Evented, {
     operation,
     data,
     authHint,
-    subscribe = true,
+    // FIXME: change to true when it will be fixed
+    subscribe = false,
   }) {
     return new Promise((resolve, reject) => {
-      // TODO: temporary hack to disable subscription on user model
-      const { entityType } = parseGri(gri);
-      if (entityType === 'od_user') {
-        subscribe = false;
-      }
       let message = {
         gri,
         operation,

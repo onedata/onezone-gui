@@ -17,14 +17,14 @@ describe('Unit | Model | group', function () {
 
   it('resolves invite token using token api service and graph', function (done) {
     let model = this.subject();
-    model.set('id', 'od_group.some_id.instance');
+    model.set('id', 'group.some_id.instance');
 
     const TOKEN = 'abcd';
     let graph = lookupService(this, 'onedata-graph');
     let graphRequestStub = sinon.stub(graph, 'request');
     let graphData = { data: TOKEN };
     let graphValidArgs = {
-      gri: sinon.match(new RegExp('.*od_group.*some_id.*invite.*user.*')),
+      gri: sinon.match(new RegExp('.*group.*some_id.*invite.*user.*')),
       operation: 'create',
     };
     graphRequestStub

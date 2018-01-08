@@ -9,7 +9,7 @@
 
 import { computed } from '@ember/object';
 import Component from '@ember/component';
-import { A } from '@ember/array';
+import { get } from '@ember/object';
 
 export default Component.extend({
   tagName: '',
@@ -19,6 +19,14 @@ export default Component.extend({
    * @type {Provider}
    */
   item: undefined,
+
+  /**
+   * Just an one-way alias
+   * @type {Provider}
+   */
+  provider: computed.reads('item'),
+
+  providerId: computed.reads('provider.entityId'),
 
   /**
    * Icon class based on item status
@@ -35,31 +43,56 @@ export default Component.extend({
     }
   }),
 
-  _spacesProxy: computed.readOnly('item.spaceList.list'),
+  _spaceList: computed.reads('provider.spaceList'),
 
   /**
-   * Total provider support size
+   * Spaces supported by provider visible by current user
    * @type {Ember.ComputedProperty<Ember.Array<Space>>}
    */
-  _spaces: computed('_spacesProxy.{isFulfilled,content}', function () {
-    const {
-      isFulfilled,
-      content,
-    } = this.get('_spacesProxy').getProperties('isFulfilled', 'content');
-    return isFulfilled ? content : A();
-  }),
+  _spaces: computed.reads('_spaceList.content.list.content'),
+
+  _spaceIdsLoaded: computed(
+    '_spaceList.isLoaded',
+    function _getSpaceIdsLoaded() {
+      const _spaceList = this.get('_spaceList');
+      return !!(
+        _spaceList &&
+        get(_spaceList, 'isLoaded')
+      );
+    }
+  ),
+
+  _spacesLoaded: computed(
+    '_spaceIdsLoaded',
+    '_spaceList.list.isFulfilled',
+    function _getSpacesLoaded() {
+      const _spaceIdsLoaded = this.get('_spaceIdsLoaded');
+      const _spaceList = this.get('_spaceList');
+      return !!(
+        _spaceIdsLoaded &&
+        get(_spaceList, 'list.isFulfilled')
+      );
+    }),
 
   /**
    * Total provider support size
    * @type {Ember.ComputedProperty<number>}
    */
-  _totalSupportSize: computed('_spaces.[]', function () {
-    const {
-      _spaces,
-      item,
-    } = this.getProperties('_spaces', 'item');
-    return _spaces.reduce(
-      (sum, space) => sum + space.get(`supportSizes.${item.get('id')}`), 0
-    );
-  }),
+  _totalSupportSize: computed(
+    '_spaces.@each.supportSizes',
+    '_spacesLoaded',
+    'providerId',
+    function _getTotalSupportSize() {
+      const {
+        _spaces,
+        _spacesLoaded,
+        providerId,
+      } = this.getProperties('_spaces', '_spacesLoaded', 'providerId');
+      if (_spacesLoaded) {
+        return _spaces.reduce(
+          (sum, space) => sum + get(space, `supportSizes.${providerId}`),
+          0
+        );
+      }
+    }),
 });
