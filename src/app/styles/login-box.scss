@@ -1,12 +1,250 @@
-// TODO temporary style - style should be custom for Onezone and moved from oz-gui-default
-
-.login-box {
-  .login-main-title {
-    &.zone {
-      background-image: url($root-url + 'assets/images/onezone-logo.svg');
+.authorizers-dropdown .ember-power-select-option, 
+.authorizers-dropdown-container .ember-power-select-trigger {
+  position: relative;
+  padding-left: 50px;
+  color: $main-text-color;
+  .social-box {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 25px;
+    margin: 0 10px;
+    .login-icon-box {
+      display: block;
+      height: 25px;
+      width: 25px;
+      
+      font-size: 18px;
+      .social-icon-image {
+        background-size: 20px 20px;
+      }
+      .one-icon {
+        line-height: 25px;
+      }
+      .spin-spinner {
+        //alignement fix
+        transform: translateY(-1px);
+      }
     }
   }
-  .login-logo {
-    background-image: url($root-url + 'assets/images/control-panel.svg');
+}
+
+.authorizers-dropdown-container .ember-power-select-trigger {
+  .social-box {
+    left: 100px;
+  }
+}
+
+.ember-basic-dropdown-content.authorizers-dropdown {
+  position: fixed;
+  font-size: 10pt;
+  &.ember-basic-dropdown--transitioned-in {
+    position: absolute;
+  }
+  .ember-power-select-options[role="listbox"] {
+    max-height: 200px;
+  }
+}
+
+.login-icon-box {
+  position: relative;
+  border-radius: $border-radius-large;
+  overflow: hidden;
+  text-align: center;
+  text-decoration: none !important;
+  user-select: none;
+
+  &:hover {
+    color: white;
+  }
+
+  .one-icon {
+    line-height: inherit;
+  }
+  
+  &.rhea {
+    .one-icon {
+      font-size: 50px;
+    }
+    .ember-power-select-option & .one-icon,
+    .ember-power-select-trigger & .one-icon {
+      font-size: 25px;
+    }
+  }
+  
+  &.more {
+    background-color: white;
+    color: $color-one-dark-gray;
+    font-weight: bold;    
+    &:hover {
+      color: $color-one-dark-gray;
+    }
+    &::before {
+      content: '\B7\B7\B7';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      font-weight: normal;
+      font-size: 42px;
+      letter-spacing: -1.1px;
+    }
+  }
+}
+
+.social-box {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  cursor: default !important;
+  &.disabled {
+    opacity: 0.3;
+    a {
+      cursor: default;
+    }
+  }
+  .social-icon-image {
+    width: 100%;
+    height: 100%;
+    background-size: 40px 40px;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+}
+
+.login-box {
+  .login-header {
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 100px;
+    color: $color-one-white;
+    font-weight: bold;
+
+    @media(max-height: 600px) {
+      margin-bottom: 50px;
+    }
+  }
+
+  .zone-image {
+    position: relative;
+    right: -13px;
+    height: 80px;
+    background-size: contain;
+    background-image: url('/assets/images/oneworld.svg');
+    background-repeat: no-repeat;
+    background-position: right center;
+  }
+
+  .zone-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 23px;
+    font-size: 14pt;
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 100%;
+  }
+
+  .zone-name {
+    word-break: break-word;
+  }
+
+  .zone-subtitle {
+    font-size: 0.8em;
+    opacity: 0.8;
+  }
+  .row-login-header {
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    margin: 0px 20px 20px 20px;
+    font-size: 12pt;
+    font-family: 'Open Sans Semibold';
+    text-align: center;
+    .subtitle-tip {
+      position: relative;
+      top: 2px;
+      left: 2px;
+      opacity: 0.8;
+      font-size: 90%;
+    }
+  }
+
+  .login-form-container {
+    position: relative;
+    min-height: 250px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .login-icon-box {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    line-height: 50px;
+    font-size: 35px;
+    cursor: pointer;
+
+    .loader {
+      // position hack
+      position: absolute;
+      top: 23px;
+      left: 30px;
+      font-size: 40px;
+      max-width: 40px;
+      width: 40px;
+      color: rgba(white, 0.5);
+    }
+  }
+
+  .authorizers-select-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-bottom: 30px;
+    &.fadeOut {
+      z-index: -1;
+    }
+    .authorizers-dropdown-container {
+      position: relative;
+      opacity: 0;
+      margin-top: 10px;
+      .ember-power-select-trigger[aria-expanded] {
+        color: $color-one-white;
+        & ~ .dropdown-label {
+          color: $color-one-white;
+        }
+     }
+    }
+    .dropdown-label {
+      position: absolute;
+      top: 1px;
+      height: $input-height-base - 2px;
+      padding: 0 15px;
+      line-height: $input-height-base - 2px;
+      border-right: 1px solid $input-border;
+      z-index: 2;
+      color: $main-text-color;
+    }
+    .ember-power-select-trigger {
+      min-height: 45px;
+      padding: 11px 40px 11px 110px;
+      .social-box-component {
+        left: 94px;
+      }
+      .ember-power-select-selected-item {
+        padding-left: 35px;
+      }
+    }
+  }
+  .buttons-list {
+    font-size: 32px;
+    text-align: center;
   }
 }
