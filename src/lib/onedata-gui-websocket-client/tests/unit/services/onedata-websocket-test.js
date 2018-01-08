@@ -40,13 +40,13 @@ describe('Unit | Service | onedata websocket', function () {
     service.set('_webSocketClass', WebSocketMock);
     let pushHandlerDone = false;
     let pushHandler = function (m) {
-      expect(m.payload).to.equal('hello');
+      expect(m).to.equal('hello');
       pushHandlerDone = true;
     };
 
     Ember.Object.extend(Evented).create({
       init() {
-        service.on('push', (m) => {
+        service.on('push:graph', (m) => {
           pushHandler(m);
         });
       },
@@ -55,7 +55,13 @@ describe('Unit | Service | onedata websocket', function () {
     service._initWebsocket().then(() => {
       let _webSocket = service.get('_webSocket');
       _webSocket.onmessage({
-        data: JSON.stringify({ batch: [{ type: 'push', payload: 'hello' }] }),
+        data: JSON.stringify({
+          batch: [{
+            type: 'push',
+            subtype: 'graph',
+            payload: 'hello',
+          }],
+        }),
       });
       wait().then(() => {
         expect(pushHandlerDone).to.be.true;

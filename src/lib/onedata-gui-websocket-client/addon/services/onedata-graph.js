@@ -8,6 +8,9 @@
  */
 
 import Ember from 'ember';
+import Evented from '@ember/object/evented';
+
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 const {
   Service,
@@ -15,8 +18,13 @@ const {
   RSVP: { Promise },
 } = Ember;
 
-export default Service.extend({
+export default Service.extend(Evented, {
   onedataWebsocket: service(),
+
+  init() {
+    this._super(...arguments);
+    this.get('onedataWebsocket').on('push:graph', this, this.handlePush);
+  },
 
   /**
    * @param {string} gri
@@ -32,9 +40,14 @@ export default Service.extend({
     operation,
     data,
     authHint,
-    subscribe = false,
+    subscribe = true,
   }) {
     return new Promise((resolve, reject) => {
+      // TODO: temporary hack to disable subscription on user model
+      const { entityType } = parseGri(gri);
+      if (entityType === 'od_user') {
+        subscribe = false;
+      }
       let message = {
         gri,
         operation,
@@ -58,5 +71,27 @@ export default Service.extend({
       });
       requesting.catch(reject);
     });
+  },
+
+  /**
+   * @param {object} payload payload of push message from server
+   * @param {string} payload.updateType type of push, one of: updated, deleted
+   * @param {string} payload.gri GRI of entity to update/delete
+   * @param {object|undefined} payload.data if updateType is updated: object
+   *   containing properties to change in record; undefined otherwise
+   * 
+   * @returns {undefined}
+   */
+  handlePush({ updateType, gri, data }) {
+    switch (updateType) {
+      case 'updated':
+      case 'deleted':
+        this.trigger(`push:${updateType}`, gri, data);
+        break;
+      default:
+        throw new Error(
+          `service:onedata-graph: not supported push update type: ${updateType}`
+        );
+    }
   },
 });

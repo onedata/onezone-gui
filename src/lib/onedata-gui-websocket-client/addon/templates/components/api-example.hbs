@@ -14,7 +14,12 @@
 {{/if}}
 
 {{#if tmpRecord}}
-  <div><strong>tmp record:</strong> {{tmpRecord.name}}</div>
+  <div>
+    <strong>tmp record:</strong> {{tmpRecord.name}}
+    {{#if tmpRecord.isDeleted}}
+      (deleted)
+    {{/if}}
+  </div>
 {{/if}}
 
 <div>
