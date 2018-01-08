@@ -11,6 +11,7 @@ import { inject } from '@ember/service';
 import Adapter from 'ember-data/adapter';
 
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 /**
  * Strips the object from own properties which values are null or undefined
@@ -33,6 +34,23 @@ export default Adapter.extend({
   onedataGraphContext: inject(),
 
   defaultSerializer: 'onedata-websocket',
+
+  init() {
+    this._super(...arguments);
+    const onedataGraph = this.get('onedataGraph');
+    onedataGraph.on('push:updated', this, this.pushUpdated);
+    onedataGraph.on('push:deleted', this, this.pushDeleted);
+  },
+
+  destroy() {
+    try {
+      const onedataGraph = this.get('onedataGraph');
+      onedataGraph.off('push:updated', this, this.pushUpdated);
+      onedataGraph.off('push:deleted', this, this.pushDeleted);
+    } finally {
+      this._super(...arguments);
+    }
+  },
 
   /**
    * @override
@@ -91,7 +109,7 @@ export default Adapter.extend({
 
     return onedataGraph.request({
       // NOTE: adding od_ because it is needed by early versions of server
-      gri: gri('od_' + modelName, null, 'instance'),
+      gri: gri(modelNameFrontToBack(modelName), null, 'instance'),
       operation: 'create',
       data,
       authHint,
@@ -142,4 +160,47 @@ export default Adapter.extend({
   query() {
     throw new Error('adapter:onedata-websocket: query is not supported');
   },
+
+  pushUpdated(gri, data) {
+    let { entityType: modelName } = parseGri(gri);
+    // TODO: stripping can be unnescessary in future
+    modelName = modelNameBackToFront(modelName);
+    return this.get('store').push({
+      modelName,
+      data: { id: gri, type: modelName, attributes: data },
+    });
+  },
+
+  pushDeleted(gri) {
+    const store = this.get('store');
+    let { entityType: modelName } = parseGri(gri);
+    // TODO: stripping can be unnescessary in future
+    modelName = modelNameBackToFront(modelName);
+    const record = store.peekRecord(modelName, gri);
+    if (record) {
+      record.deleteRecord();
+      // TODO: maybe unload record, but we lost deleted flag then...
+    }
+  },
+
 });
+
+/**
+ * Temporary function to create model names from current backend model names
+ * that starts with `od_`
+ * @param {string} backendModelName
+ * @returns {string}
+ */
+function modelNameBackToFront(backendModelName) {
+  return backendModelName.match(/(od_)?(.*)/)[2];
+}
+
+/**
+ * Temporary function to create current backend model names from model names
+ * (backend names currently starts with `od_`)
+ * @param {string} frontendModelName
+ * @returns {string}
+ */
+function modelNameFrontToBack(frontendModelName) {
+  return 'od_' + frontendModelName;
+}

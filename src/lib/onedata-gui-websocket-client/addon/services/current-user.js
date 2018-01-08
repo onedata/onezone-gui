@@ -18,10 +18,14 @@ export default Service.extend({
   userId: computed.oneWay('session.data.authenticated.identity.user'),
 
   getCurrentUserRecord() {
-    let store = this.get('store');
-    let userId = this.get('userId');
+    const {
+      store,
+      userId,
+    } = this.getProperties('store', 'userId');
     if (!userId) {
-      throw new 'service:current-user: session unauthenticated or user id is not set';
+      throw new Error(
+        'service:current-user: session unauthenticated or user id is not set'
+      );
     }
     return store.findRecord(
       'user',
