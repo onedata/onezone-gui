@@ -40,8 +40,8 @@ describe('Unit | Utility | generate development model', function () {
     promise.then(() => {
       [
         'user',
-        'spaceList', 'groupList', 'providerList',
-        'space', 'group', 'provider',
+        'spaceList', 'groupList', 'providerList', 'clientTokenList',
+        'space', 'group', 'provider', 'clientToken',
       ].forEach(modelName =>
         expect(createRecord).to.be.calledWith(modelName, sinon.match.object)
       );

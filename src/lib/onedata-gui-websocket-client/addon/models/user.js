@@ -1,7 +1,7 @@
 /**
  * @module models/user
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -17,4 +17,5 @@ export default Model.extend({
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
+  clientTokenList: belongsTo('clientTokenList'),
 });

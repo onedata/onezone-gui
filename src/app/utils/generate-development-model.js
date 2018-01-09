@@ -3,7 +3,7 @@
  *
  * @module utils/generate-development-model
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  *
  */
@@ -17,6 +17,12 @@ const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
+const NUMBER_OF_CLIENT_TOKENS = 3;
+
+const CLIENT_TOKEN_PREFIX = 'MDAxNWxvY2F00aW9uIG9uZXpvbmUKMDAzYmlkZW500aWZpZX' +
+  'IgQ1NPdEp5OEc5R19XdG96b1JMUzhlaDlQSkpJbjk3d3U3bzIwbVU1NkhnMAowMDFhY2lkIHRp' +
+  'bWUgPCAxNTQ2OTQ3MjY5CjAwMmZzaWduYXR1cmUgGQBEVOx4J8kMbqR5h801dXEcKvkhDEsZA5' +
+  'aDoLmCia01E';
 
 /**
  * @export
@@ -25,7 +31,7 @@ const NUMBER_OF_SPACES = 3;
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  const types = ['space', 'group', 'provider'];
+  const types = ['space', 'group', 'provider', 'clientToken'];
   const names = ['one', 'two', 'three'];
   return Promise.all(
       types.map(type =>
@@ -63,6 +69,8 @@ function createEntityRecords(store, type, names) {
       return createProvidersRecords(store);
     case 'space':
       return createSpacesRecords(store);
+    case 'clientToken':
+      return createClientTokensRecords(store);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -101,6 +109,16 @@ function createSpacesRecords(store) {
         _.range(NUMBER_OF_PROVIDERS).map(String),
         _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
       ),
+    }).save();
+  }));
+}
+
+function createClientTokensRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map((index) => {
+    const tokenString = CLIENT_TOKEN_PREFIX + String(index);
+    return store.createRecord('clientToken', {
+      id: tokenString,
+      token: tokenString,
     }).save();
   }));
 }

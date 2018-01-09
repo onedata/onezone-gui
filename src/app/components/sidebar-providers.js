@@ -3,11 +3,11 @@
  *
  * @module components/sidebar-providers
  * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed, get } from '@ember/object';
+import { default as EmberObject, computed, get } from '@ember/object';
 
 import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
 import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
@@ -53,8 +53,13 @@ export default TwoLevelSidebar.extend({
         model,
         primaryItemId,
       } = this.getProperties('model', 'primaryItemId');
-      return get(model, 'collection')
-        .filter(item => item.get('id') === primaryItemId)[0].get('spaceList.list');
+      let provider = null;
+      if (model.resourceType === 'providers') {
+        provider = get(model, 'collection')
+          .filter(item => item.get('id') === primaryItemId)[0] || null;
+      }
+      return provider ? provider.get('spaceList.list') :
+        EmberObject.create({ isFulFilled: false });
     }
   ),
 
