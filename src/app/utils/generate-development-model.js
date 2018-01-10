@@ -17,7 +17,7 @@ const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
-const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_CLIENT_TOKENS = 0;
 
 const CLIENT_TOKEN_PREFIX = 'MDAxNWxvY2F00aW9uIG9uZXpvbmUKMDAzYmlkZW500aWZpZX' +
   'IgQ1NPdEp5OEc5R19XdG96b1JMUzhlaDlQSkpJbjk3d3U3bzIwbVU1NkhnMAowMDFhY2lkIHRp' +

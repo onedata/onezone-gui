@@ -206,7 +206,7 @@ export default Service.extend(Evented, {
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     let host = window.location.hostname;
     let port = 443;
-    let suffix = '/graph_sync/';
+    let suffix = '/graph_sync/gui';
 
     let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;
 

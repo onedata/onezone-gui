@@ -18,7 +18,8 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<string>}
    */
   shortToken: computed('item.token', function () {
-    return shortenToken(this.get('item.token'));
+    const tokenString = this.get('item.token');
+    return tokenString ? shortenToken(this.get('item.token')) : '';
   }),
 });
 

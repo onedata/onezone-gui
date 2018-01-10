@@ -1,1 +1,8 @@
-tokens
+<textarea class="token-textarea">{{selectedToken.token}}</textarea>
+{{#copy-button
+  success=(action "copySuccess")
+  error=(action "copyError")
+  class="btn btn-primary"
+  clipboardTarget=".token-textarea"}}
+  {{one-icon icon="clipboard-copy"}} {{t "components.contentTokens.copy"}}
+{{/copy-button}}

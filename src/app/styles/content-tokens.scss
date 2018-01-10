@@ -1,0 +1,17 @@
+.content-tokens {
+  .token-textarea {
+    font-family: monospace;
+    width: 100%;
+    height: 120px;
+  }
+  @media (max-width: $screen-xs-max) {
+    padding: $padding-large-vertical $padding-large-horizontal;
+    .token-textarea {
+      height: 200px;
+    }
+  }
+  .oneicon-clipboard-copy {
+    position: relative;
+    left: -0.2em;
+  }
+}

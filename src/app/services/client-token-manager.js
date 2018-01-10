@@ -41,4 +41,20 @@ export default Service.extend({
   getRecord(id) {
     return this.get('store').findRecord('clientToken', id);
   },
+
+  /**
+   * Creates new token
+   * @returns {Promise}
+   */
+  createRecord() {
+    const token = this.get('store').createRecord('clientToken', {});
+    return this.get('currentUser').getCurrentUserRecord().then((user) =>
+      user.get('clientTokenList').then((clientTokenList) =>
+        clientTokenList.get('list').then((list) => {
+          list.pushObject(token);
+          return list.save().then(() => token);
+        })
+      )
+    );
+  },
 });

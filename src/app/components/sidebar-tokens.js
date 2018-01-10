@@ -44,4 +44,9 @@ export default TwoLevelSidebar.extend({
    * @override
    */
   secondLevelItems: Object.freeze([]),
+
+  /**
+   * @override
+   */
+  showCreateOnEmpty: false,
 });
