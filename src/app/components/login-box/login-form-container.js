@@ -223,20 +223,18 @@ export default LoginFormConainer.extend({
       this.set('_activeAuthorizer', authorizer);
 
       return onezoneServer.getLoginEndpoint({ idp: authorizerName })
-        .then(
-          (data) => {
-            handleLoginEndpoint(data, () => {
-              this._authEndpointError({
-                message: this.get('i18n').t(I18N_PREFIX +
-                  'authEndpointConfError'),
-              });
-              authenticationSuccess();
+        .then(data => {
+          handleLoginEndpoint(data, () => {
+            this._authEndpointError({
+              message: this.get('i18n').t(I18N_PREFIX +
+                'authEndpointConfError'),
             });
-          },
-          (error) => {
-            this._authEndpointError(error);
-          }
-        ).then(() => {
+            authenticationSuccess();
+          });
+        })
+        .catch(error => {
+          this._authEndpointError(error);
+        }).then(() => {
           this.setProperties({
             _activeAuthorizer: null,
             selectedAuthorizer: null,

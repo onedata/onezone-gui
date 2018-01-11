@@ -1,6 +1,6 @@
 {{#if error}}
   {{application-error
-    message=(t (concat i18nPrefix "error") providerName=providerName)
+    message=(tt this "error" providerName=provider.name)
     error=error
     messageType="internal"
     class="md"

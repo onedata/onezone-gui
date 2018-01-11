@@ -52,24 +52,22 @@ export default Component.extend(I18n, {
     if (providerId) {
       this._goToProvider(providerId);
     } else {
-      this.set('error', this.t('noProviderId'));
+      safeExec(this, 'set', 'error', this.t('noProviderId'));
     }
   },
 
   _goToProvider(providerId) {
     return this.get('onezoneServer').getProviderRedirectUrl(providerId)
-      .then(
-        (data) => {
-          if (data.url) {
-            this.get('_window').location = data.url;
-          } else {
-            this.set('error', this.t('noUrlServer'));
-          }
-        },
-        (error) => {
-          this.set('error', error);
+      .then(data => {
+        if (data.url) {
+          this.get('_window').location = data.url;
+        } else {
+          safeExec(this, 'set', 'error', this.t('noUrlServer'));
         }
-      )
+      })
+      .catch(error => {
+        safeExec(this, 'set', 'error', error);
+      })
       .finally(() => safeExec(this, 'set', 'isLoading', false));
   },
 });

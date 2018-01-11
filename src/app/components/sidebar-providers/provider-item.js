@@ -26,6 +26,9 @@ export default Component.extend({
    */
   provider: computed.reads('item'),
 
+  /**
+   * @type {Ember.computed<string>}
+   */
   providerId: computed.reads('provider.entityId'),
 
   /**
@@ -43,6 +46,9 @@ export default Component.extend({
     }
   }),
 
+  /**
+   * @type {Ember.Computed<models/SpaceList>}
+   */
   _spaceList: computed.reads('provider.spaceList'),
 
   /**
@@ -51,6 +57,10 @@ export default Component.extend({
    */
   _spaces: computed.reads('_spaceList.content.list.content'),
 
+  /**
+   * True if we know the list of space ids (eg. for counting spaces)
+   * @type {Ember.Computed<boolean>}
+   */
   _spaceIdsLoaded: computed(
     '_spaceList.isLoaded',
     function _getSpaceIdsLoaded() {
@@ -62,6 +72,10 @@ export default Component.extend({
     }
   ),
 
+  /**
+   * True if information about spaces is loaded (eg. for displaying support sizes)
+   * @type {Ember.Computed<boolean>}
+   */
   _spacesLoaded: computed(
     '_spaceIdsLoaded',
     '_spaceList.list.isFulfilled',

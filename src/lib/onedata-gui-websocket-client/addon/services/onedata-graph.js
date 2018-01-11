@@ -38,7 +38,7 @@ export default Service.extend(Evented, {
     operation,
     data,
     authHint,
-    // FIXME: change to true when it will be fixed
+    // TODO: change to true if backend will be done
     subscribe = false,
   }) {
     return new Promise((resolve, reject) => {
