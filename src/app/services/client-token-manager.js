@@ -40,7 +40,7 @@ export default Service.extend({
 
   /**
    * Creates new token
-   * @returns {Promise}
+   * @returns {Promise<ClientToken>}
    */
   createRecord() {
     const token = this.get('store').createRecord('clientToken', {});
@@ -54,5 +54,14 @@ export default Service.extend({
         )
       )
     );
+  },
+
+  /**
+   * Deletes token
+   * @param {string} id token id
+   * @returns {Promise}
+   */
+  deleteRecord(id) {
+    return this.getRecord(id).then(token => token.destroyRecord());
   },
 });

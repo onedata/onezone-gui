@@ -20,7 +20,7 @@ export default Ember.Mixin.create({
             type: snapshot.modelName,
             id: snapshot.id,
             attributes: {
-              token: snapshot.id + 'tokenstring',
+              token: snapshot._attributes.token || snapshot.id + 'tokenstring',
             },
           },
         };

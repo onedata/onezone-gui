@@ -13,6 +13,9 @@ import { inject as service } from '@ember/service';
 export default Service.extend({
   providerManager: service(),
   clientTokenManager: service(),
+  router: service(),
+  globalNotify: service(),
+  i18n: service(),
 
   /**
    * @param {string} type
@@ -28,6 +31,30 @@ export default Service.extend({
         return Promise.reject({ message: 'User management not implemented yet' });
       default:
         return new Promise((resolve, reject) => reject('No such collection: ' + type));
+    }
+  },
+
+  getButtonsFor(type) {
+    switch (type) {
+      case 'tokens':
+        return [{
+          icon: 'add-filled',
+          tip: 'Create token',
+          action: () => {
+            const {
+              i18n,
+              globalNotify,
+              router,
+              clientTokenManager,
+            } = this.getProperties('i18n', 'globalNotify', 'router', 'clientTokenManager');
+            return clientTokenManager.createRecord().then((token) => {
+              globalNotify.success(i18n.t('components.contentTokens.tokenCreateSuccess'));
+              router.get('router').transitionTo('onedata.sidebar.content', 'tokens', token.get('id'));
+            }).catch(error => globalNotify.backendError('token creation', error));
+          },
+        }];
+      default:
+        return [];
     }
   },
 });
