@@ -7,18 +7,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
-
-const {
-  Service,
-  inject: { service },
-} = Ember;
+import Service from '@ember/service';
+import { inject } from '@ember/service';
 
 export default Service.extend({
   // TODO to implement using onedata-websocket services
 
-  store: service(),
-  currentUser: service(),
+  store: inject(),
+  currentUser: inject(),
 
   /**
    * Fetches collection of all tokens
@@ -50,10 +46,12 @@ export default Service.extend({
     const token = this.get('store').createRecord('clientToken', {});
     return this.get('currentUser').getCurrentUserRecord().then((user) =>
       user.get('clientTokenList').then((clientTokenList) =>
-        clientTokenList.get('list').then((list) => {
-          list.pushObject(token);
-          return list.save().then(() => token);
-        })
+        clientTokenList.get('list').then((list) =>
+          token.save().then(() => {
+            list.pushObject(token);
+            return list.save().then(() => token);
+          })
+        )
       )
     );
   },

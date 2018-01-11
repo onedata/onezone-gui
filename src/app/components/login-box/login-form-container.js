@@ -14,8 +14,7 @@ import LoginFormConainer from 'onedata-gui-common/components/login-box/login-for
 import AUTHORIZERS from 'onezone-gui/utils/authorizers';
 // import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
-
-import Ember from 'ember';
+import RSVP from 'rsvp';
 
 const I18N_PREFIX = 'components.loginBox.loginFormContainer.';
 const ANIMATION_TIMEOUT = 333;
@@ -248,7 +247,7 @@ export default LoginFormConainer.extend({
         selectedAuthorizer: null,
       });
       authenticationSuccess();
-      return new Ember.RSVP.Promise((resolve) => resolve());
+      return new RSVP.Promise((resolve) => resolve());
     },
 
     /**

@@ -10,15 +10,28 @@
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 
-export default Component.extend({
-  classNames: ['content-tokens'],
+const I18N_PREFIX = 'components.contentTokens.';
 
+export default Component.extend({
+  classNames: ['content-tokens-empty'],
+
+  i18n: inject(),
+  router: inject(),
   globalNotify: inject(),
   clientTokenManager: inject(),
 
   actions: {
     createToken() {
-      return this.get('clientTokenManager').createRecord();
+      const {
+        i18n,
+        globalNotify,
+        router,
+        clientTokenManager,
+      } = this.getProperties('i18n', 'globalNotify', 'router', 'clientTokenManager');
+      return clientTokenManager.createRecord().then((token) => {
+        globalNotify.success(i18n.t(I18N_PREFIX + 'tokenCreateSuccess'));
+        router.get('router').transitionTo('onedata.sidebar.content', 'tokens', token.get('id'));
+      }).catch(error => globalNotify.backendError('token creation', error));
     },
   },
 });

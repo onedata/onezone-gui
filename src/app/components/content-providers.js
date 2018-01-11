@@ -12,6 +12,7 @@ import { computed } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import $ from 'jquery';
 
 export default Component.extend({
   classNames: ['content-providers'],

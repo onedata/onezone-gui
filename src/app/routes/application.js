@@ -13,9 +13,9 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
-  developmentModelConfig: {
+  developmentModelConfig: Object.freeze({
     clearOnReload: true,
-  },
+  }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
 });

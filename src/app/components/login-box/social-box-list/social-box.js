@@ -60,6 +60,13 @@ export default Component.extend({
   spinnerScale: 0.25,
 
   /**
+   * Action called on click
+   * @type {function}
+   * @return {undefined}
+   */
+  action: () => {},
+
+  /**
    * Property only for testing purposes.
    * @type {Window}
    */
@@ -110,12 +117,13 @@ export default Component.extend({
         disabled,
         link,
         _window,
-      } = this.getProperties('disabled', 'link', '_window');
+        action,
+      } = this.getProperties('disabled', 'link', '_window', 'action');
       if (!disabled) {
         if (link) {
           _window.location = link;
         } else {
-          this.sendAction('action', this);
+          action(this);
         }
       }
     },
