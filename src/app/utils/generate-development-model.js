@@ -17,7 +17,7 @@ const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
-const NUMBER_OF_CLIENT_TOKENS = 0;
+const NUMBER_OF_CLIENT_TOKENS = 3;
 
 /**
  * @export
@@ -76,8 +76,10 @@ function createEntityRecords(store, type, names) {
 function createListRecord(store, type, records) {
   const listType = type + 'List';
   const listRecord = store.createRecord(listType, {});
-  listRecord.get('list').pushObjects(records);
-  return listRecord.save();
+  return listRecord.get('list').then(list => {
+    list.pushObjects(records);
+    return list.save().then(() => listRecord.save());
+  });
 }
 
 function createProvidersRecords(store) {

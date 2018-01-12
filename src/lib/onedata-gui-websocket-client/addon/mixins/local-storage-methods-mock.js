@@ -8,14 +8,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
 
 const CLIENT_TOKEN_PREFIX = 'MDAxNWxvY2F00aW9uIG9uZXpvbmUKMDAzYmlkZW500aWZpZX' +
   'IgQ1NPdEp5OEc5R19XdG96b1JMUzhlaDlQSkpJbjk3d3U3bzIwbVU1NkhnMAowMDFhY2lkIHRp' +
   'bWUgPCAxNTQ2OTQ3MjY5CjAwMmZzaWduYXR1cmUgGQBEVOx4J8kMbqR5h801dXEcKvkhDEsZA5' +
   'aDoLmCia01E';
 
-export default Ember.Mixin.create({
+export default Mixin.create({
   createRecord(store, type, snapshot) {
     const result = this._super(...arguments);
     switch (snapshot.modelName) {

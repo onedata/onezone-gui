@@ -9,6 +9,7 @@
 
 import Service from '@ember/service';
 import { inject } from '@ember/service';
+import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
 
 export default Service.extend({
   // TODO to implement using onedata-websocket services
@@ -46,12 +47,7 @@ export default Service.extend({
     const token = this.get('store').createRecord('clientToken', {});
     return this.get('currentUser').getCurrentUserRecord().then((user) =>
       user.get('clientTokenList').then((clientTokenList) =>
-        clientTokenList.get('list').then((list) =>
-          token.save().then(() => {
-            list.pushObject(token);
-            return list.save().then(() => token);
-          })
-        )
+        addRecordToList(token, clientTokenList)
       )
     );
   },
@@ -62,6 +58,18 @@ export default Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
-    return this.getRecord(id).then(token => token.destroyRecord());
+    return this.getRecord(id).then((token) => 
+      this.get('currentUser').getCurrentUserRecord().then((user) =>
+        user.get('clientTokenList').then((clientTokenList) =>
+          clientTokenList.get('list').then((list) =>
+            list.removeObject(token).save().then(() =>
+              clientTokenList.save().then(() =>
+                token.destroyRecord()
+              )
+            )
+          )
+        )
+      )
+    );
   },
 });
