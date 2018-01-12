@@ -9,6 +9,9 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
+import $ from 'jquery';
+
+const I18N_PREFIX = 'services.sidebarResources.';
 
 export default Service.extend({
   providerManager: service(),
@@ -35,11 +38,14 @@ export default Service.extend({
   },
 
   getButtonsFor(type) {
+    const i18n = this.get('i18n');
     switch (type) {
       case 'tokens':
         return [{
           icon: 'add-filled',
-          tip: 'Create token',
+          title: i18n.t(I18N_PREFIX + 'createToken'),
+          tip: i18n.t(I18N_PREFIX + 'createToken'),
+          class: 'create-token-btn',
           action: () => {
             const {
               i18n,
@@ -50,6 +56,8 @@ export default Service.extend({
             return clientTokenManager.createRecord().then((token) => {
               globalNotify.success(i18n.t('components.contentTokens.tokenCreateSuccess'));
               router.get('router').transitionTo('onedata.sidebar.content', 'tokens', token.get('id'));
+              const sidebarContainer = $('.col-sidebar');
+              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight - sidebarContainer[0].clientHeight);
             }).catch(error => globalNotify.backendError('token creation', error));
           },
         }];

@@ -19,11 +19,6 @@ const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 0;
 
-const CLIENT_TOKEN_PREFIX = 'MDAxNWxvY2F00aW9uIG9uZXpvbmUKMDAzYmlkZW500aWZpZX' +
-  'IgQ1NPdEp5OEc5R19XdG96b1JMUzhlaDlQSkpJbjk3d3U3bzIwbVU1NkhnMAowMDFhY2lkIHRp' +
-  'bWUgPCAxNTQ2OTQ3MjY5CjAwMmZzaWduYXR1cmUgGQBEVOx4J8kMbqR5h801dXEcKvkhDEsZA5' +
-  'aDoLmCia01E';
-
 /**
  * @export
  * @function
@@ -89,7 +84,6 @@ function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     return store.createRecord('provider', {
-      id: String(index),
       name: `Provider ${index}`,
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
@@ -103,7 +97,6 @@ function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     const perProviderSize = 1048576;
     return store.createRecord('space', {
-      id: String(index),
       name: `Space ${index}`,
       supportSizes: _.zipObject(
         _.range(NUMBER_OF_PROVIDERS).map(String),
@@ -114,11 +107,7 @@ function createSpacesRecords(store) {
 }
 
 function createClientTokensRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map((index) => {
-    const tokenString = CLIENT_TOKEN_PREFIX + String(index);
-    return store.createRecord('clientToken', {
-      id: tokenString,
-      token: tokenString,
-    }).save();
+  return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
+    return store.createRecord('clientToken', {}).save();
   }));
 }
