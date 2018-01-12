@@ -11,18 +11,23 @@ import Header from 'onedata-gui-common/components/login-box/header';
 import layout from 'onezone-gui/templates/components/login-box/header';
 import { computed } from '@ember/object';
 import { inject } from '@ember/service';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const I18N_PREFIX = 'components.loginBox.header';
 
-export default Header.extend({
+export default Header.extend(I18n, {
   layout,
 
   i18n: inject(),
 
+  i18nPrefix: 'components.loginBox.header',
+
   /**
    * @override
    */
-  brandTitle: computed.reads('model.zoneName'),
+  brandTitle: computed('model.zoneName', function getBrandTitle() {
+    return this.get('model.zoneName') || this.t('brandTitle');
+  }),
 
   /**
    * @override

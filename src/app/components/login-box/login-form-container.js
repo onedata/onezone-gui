@@ -23,7 +23,7 @@ export default LoginFormConainer.extend({
 
   i18n: inject(),
   globalNotify: inject(),
-  onedataWebsocket: inject(),
+  onedataConnection: inject(),
   onezoneServer: inject(),
 
   /**
@@ -115,7 +115,7 @@ export default LoginFormConainer.extend({
    */
   _initSupportedAuthorizers() {
     /** @type {Array<string>} */
-    const ipds = this.get('onedataWebsocket.connectionAttributes.idps');
+    const ipds = this.get('onedataConnection.identityProviders');
 
     const predefinedAuthorizersList = AUTHORIZERS.map(auth => auth.type);
     const finalIdps = [];

@@ -15,7 +15,7 @@ import LoginBox from 'onedata-gui-common/components/login-box';
 
 export default LoginBox.extend({
   i18n: inject(),
-  onedataWebsocket: inject(),
+  onedataConnection: inject(),
 
   /**
    * @override
@@ -26,7 +26,7 @@ export default LoginBox.extend({
     this._super(...arguments);
     this.set(
       'headerModel.zoneName',
-      this.get('onedataWebsocket.connectionAttributes.zoneName')
+      this.get('onedataConnection.zoneName')
     );
   },
 });
