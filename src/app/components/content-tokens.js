@@ -15,25 +15,48 @@ const I18N_PREFIX = 'components.contentTokens.';
 export default Component.extend({
   classNames: ['content-tokens'],
 
+  i18n: inject(),
   globalNotify: inject(),
+  clientTokenManager: inject(),
+  router: inject(),
 
   actions: {
     copySuccess() {
-      let {
+      const {
         i18n,
         globalNotify,
       } = this.getProperties('i18n', 'globalNotify');
 
       globalNotify.info(i18n.t(I18N_PREFIX + 'tokenCopySuccess'));
     },
-
     copyError() {
-      let {
+      const {
         i18n,
         globalNotify,
       } = this.getProperties('i18n', 'globalNotify');
 
       globalNotify.info(i18n.t(I18N_PREFIX + 'tokenCopyError'));
+    },
+    removeToken() {
+      const {
+        i18n,
+        globalNotify,
+        clientTokenManager,
+        selectedToken,
+        router,
+      } = this.getProperties(
+        'i18n',
+        'globalNotify',
+        'clientTokenManager',
+        'selectedToken',
+        'router'
+      );
+      clientTokenManager.deleteRecord(selectedToken.get('id'))
+        .then(() => {
+          globalNotify.success(i18n.t(I18N_PREFIX + 'tokenDeleteSuccess'));
+          router.get('router').transitionTo('onedata.sidebar.index', 'tokens');
+        })
+        .catch(error => globalNotify.backendError('token deletion', error));
     },
   },
 });

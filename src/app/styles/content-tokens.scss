@@ -10,8 +10,10 @@
       height: 200px;
     }
   }
-  .oneicon-clipboard-copy {
-    position: relative;
-    left: -0.2em;
+  .btn {
+    .oneicon {
+      position: relative;
+      left: -0.2em;
+    }
   }
 }
