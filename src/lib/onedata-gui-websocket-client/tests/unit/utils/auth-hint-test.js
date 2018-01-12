@@ -4,10 +4,10 @@ import authHintGet from 'onedata-gui-websocket-client/utils/auth-hint-get';
 
 describe('Unit | Utility | auth hints', function () {
   let authHintGetCases = [
-    ['od_group', 'users', 'throughGroup'],
-    ['od_group', 'groups', 'throughGroup'],
-    ['od_space', 'users', 'throughSpace'],
-    ['od_space', 'groups', 'throughSpace'],
+    ['group', 'users', 'throughGroup'],
+    ['group', 'groups', 'throughGroup'],
+    ['space', 'users', 'throughSpace'],
+    ['space', 'groups', 'throughSpace'],
   ];
 
   // define 4 test - each for combination in authHintGetCases

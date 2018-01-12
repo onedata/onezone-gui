@@ -11,12 +11,13 @@
 import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
-import { providerStatusList } from 'onedata-gui-websocket-client/models/provider';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
+
+const providerStatusList = ['online', 'offline'];
 
 /**
  * @export
@@ -81,7 +82,7 @@ function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     return store.createRecord('provider', {
-      id: String(index),
+      id: `provider.${index}.instance:protected`,
       name: `Provider ${index}`,
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
@@ -95,7 +96,7 @@ function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     const perProviderSize = 1048576;
     return store.createRecord('space', {
-      id: String(index),
+      id: `space.${index}.instance:protected`,
       name: `Space ${index}`,
       supportSizes: _.zipObject(
         _.range(NUMBER_OF_PROVIDERS).map(String),

@@ -29,9 +29,9 @@ export default Service.extend({
         function: methodName,
         args,
       });
-      requesting.then(({ payload: { success, args, error } }) => {
+      requesting.then(({ payload: { success, data, error } }) => {
         if (success) {
-          resolve(args);
+          resolve(data);
         } else {
           reject(error);
         }

@@ -15,7 +15,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 export default Mixin.create({
   gri: computed.oneWay('id'),
 
-  parsedGri: computed('gri', function () {
+  parsedGri: computed('gri', function getParsedGri() {
     let gri = this.get('gri');
     if (gri) {
       return parseGri(gri);

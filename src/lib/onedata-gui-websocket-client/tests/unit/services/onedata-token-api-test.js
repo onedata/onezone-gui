@@ -24,14 +24,14 @@ describe('Unit | Service | onedata token api', function () {
     const graphRequestStub = sinon.stub(graph, 'request');
     const graphData = { data: TOKEN };
     const graphValidArgs = {
-      gri: sinon.match(new RegExp('.*od_group.*some_id.*invite.*user.*')),
+      gri: sinon.match(new RegExp('.*group.*some_id.*invite.*user.*')),
       operation: 'create',
     };
     graphRequestStub
       .withArgs(graphValidArgs)
       .resolves(graphData);
 
-    const promise = service.getInviteToken('od_group', 'some_id', 'user');
+    const promise = service.getInviteToken('group', 'some_id', 'user');
 
     wait().then(() => {
       expect(graphRequestStub).to.be.calledWith(graphValidArgs);

@@ -1,10 +1,19 @@
 {{one-icon icon="provider"}} 
 <span class="one-label">{{item.name}}</span>
-{{#status-toolbar as |toolbar|}}
-  {{toolbar.icon 
-    icon="space"
-    innerText=_spaces.length}}
-  {{toolbar.icon
-    icon="provider"
-    outerText=(bytes-to-string _totalSupportSize)}}
-{{/status-toolbar}}
+{{#if (or _spaceIdsLoaded _spacesLoaded)}}
+  {{#status-toolbar as |toolbar|}}
+    {{#if _spaceIdsLoaded}}
+      {{toolbar.icon 
+        icon="space"
+        innerText=_spaces.length
+      }}
+    {{/if}}
+    {{#if _spacesLoaded}}
+      {{toolbar.icon
+        icon="provider"
+        outerText=(bytes-to-string _totalSupportSize)
+      }}
+    {{/if}}
+  {{/status-toolbar}}
+{{/if}}
+

@@ -1,0 +1,12 @@
+{{#if error}}
+  {{application-error
+    message=(tt this "error" providerName=provider.name)
+    error=error
+    messageType="internal"
+    class="md"
+  }}
+{{else}}
+  {{loading-container isLoading=true absoluteCentered=true}}
+{{/if}}
+
+{{yield}}
