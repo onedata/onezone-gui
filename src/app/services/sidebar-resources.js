@@ -37,6 +37,11 @@ export default Service.extend({
     }
   },
 
+  /**
+   * Returns sidebar buttons definitions
+   * @param {string} type
+   * @returns {Array<object>}
+   */
   getButtonsFor(type) {
     const i18n = this.get('i18n');
     switch (type) {
@@ -52,12 +57,24 @@ export default Service.extend({
               globalNotify,
               router,
               clientTokenManager,
-            } = this.getProperties('i18n', 'globalNotify', 'router', 'clientTokenManager');
+            } = this.getProperties(
+              'i18n',
+              'globalNotify',
+              'router',
+              'clientTokenManager'
+            );
             return clientTokenManager.createRecord().then((token) => {
-              globalNotify.success(i18n.t('components.contentTokens.tokenCreateSuccess'));
-              router.get('router').transitionTo('onedata.sidebar.content', 'tokens', token.get('id'));
+              globalNotify.success(i18n.t(
+                'components.contentTokens.tokenCreateSuccess'
+              ));
+              router.get('router').transitionTo(
+                'onedata.sidebar.content',
+                'tokens',
+                token.get('id')
+              );
               const sidebarContainer = $('.col-sidebar');
-              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight - sidebarContainer[0].clientHeight);
+              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+                sidebarContainer[0].clientHeight);
             }).catch(error => globalNotify.backendError('token creation', error));
           },
         }];

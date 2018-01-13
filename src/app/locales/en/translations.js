@@ -4,6 +4,7 @@ import onedataCommonTranslations from './onedata-gui-common';
 import loginBox from './components/login-box';
 import brandInfo from './components/brand-info';
 import contentTokens from './components/content-tokens';
+import contentTokensEmpty from './components/content-tokens-empty';
 
 import sidebarResources from './services/sidebar-resources';
 
@@ -12,6 +13,7 @@ let translations = {
     loginBox,
     brandInfo,
     contentTokens,
+    contentTokensEmpty,
   },
   services: {
     sidebarResources,

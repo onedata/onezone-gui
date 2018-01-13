@@ -1,5 +1,5 @@
 /**
- * An component with infrmation about no available token.
+ * A component with information about no available token.
  *
  * @module components/content-tokens-empty
  * @author Michal Borzecki
@@ -30,7 +30,8 @@ export default Component.extend({
       } = this.getProperties('i18n', 'globalNotify', 'router', 'clientTokenManager');
       return clientTokenManager.createRecord().then((token) => {
         globalNotify.success(i18n.t(I18N_PREFIX + 'tokenCreateSuccess'));
-        router.get('router').transitionTo('onedata.sidebar.content', 'tokens', token.get('id'));
+        router.get('router').transitionTo('onedata.sidebar.content', 'tokens',
+          token.get('id'));
       }).catch(error => globalNotify.backendError('token creation', error));
     },
   },

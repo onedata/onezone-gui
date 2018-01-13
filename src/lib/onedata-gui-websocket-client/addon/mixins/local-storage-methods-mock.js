@@ -31,6 +31,6 @@ export default Mixin.create({
         };
       default:
         return result;
-    } 
+    }
   },
 });

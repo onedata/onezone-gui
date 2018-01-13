@@ -25,7 +25,7 @@ export default function addRecordToList(record, recordList, saveRecordEntity = t
   return initPromise.then(() =>
     recordList.get('list').then(list => {
       list.pushObject(record);
-      return list.save().then(() => 
+      return list.save().then(() =>
         recordList.save().then(() => record)
       );
     })

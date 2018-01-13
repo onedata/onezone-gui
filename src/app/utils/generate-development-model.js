@@ -37,12 +37,14 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all(providers.map(provider =>
-        createListRecord(store, 'space', spaces).then(lr => {
-          provider.set('spaceList', lr);
-          return provider.save();
-        })
-      )).then(() => listRecords);
+      return Promise.all([providers, spaces]).then(([providerList, spacesList]) =>
+        Promise.all(providerList.map(provider =>
+          createListRecord(store, 'space', spacesList).then(lr => {
+            provider.set('spaceList', lr);
+            return provider.save();
+          })
+        ))
+      ).then(() => listRecords);
     })
     .then(listRecords => createUserRecord(store, listRecords));
 }

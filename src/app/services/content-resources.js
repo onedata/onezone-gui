@@ -27,7 +27,8 @@ export default Service.extend({
       case 'tokens':
         return this.get('clientTokenManager').getRecord(id);
       default:
-        return new RSVP.Promise((resolve, reject) => reject('No such model type: ' + type));
+        return new RSVP.Promise((resolve, reject) =>
+          reject('No such model type: ' + type));
     }
   },
 });

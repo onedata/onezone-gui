@@ -10,10 +10,9 @@
 import Service from '@ember/service';
 import { inject } from '@ember/service';
 import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
+import removeRecordFromList from 'onedata-gui-websocket-client/utils/remove-record-from-list';
 
 export default Service.extend({
-  // TODO to implement using onedata-websocket services
-
   store: inject(),
   currentUser: inject(),
 
@@ -58,16 +57,10 @@ export default Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
-    return this.getRecord(id).then((token) => 
+    return this.getRecord(id).then((token) =>
       this.get('currentUser').getCurrentUserRecord().then((user) =>
         user.get('clientTokenList').then((clientTokenList) =>
-          clientTokenList.get('list').then((list) =>
-            list.removeObject(token).save().then(() =>
-              clientTokenList.save().then(() =>
-                token.destroyRecord()
-              )
-            )
-          )
+          removeRecordFromList(token, clientTokenList)
         )
       )
     );
