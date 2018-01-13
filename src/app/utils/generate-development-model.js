@@ -11,13 +11,14 @@
 import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
-import { providerStatusList } from 'onedata-gui-websocket-client/models/provider';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
+
+const providerStatusList = ['online', 'offline'];
 
 /**
  * @export

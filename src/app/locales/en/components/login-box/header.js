@@ -1,5 +1,5 @@
 export default {
-  brandTitle: 'Onezone',
+  brandTitle: 'Unnamed',
   brandSubtitle: 'development version',
   isolatedZone: 'isolated zone',
 };

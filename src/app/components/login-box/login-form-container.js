@@ -12,9 +12,8 @@ import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
 import AUTHORIZERS from 'onezone-gui/utils/authorizers';
-// import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
+import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
-import RSVP from 'rsvp';
 
 const I18N_PREFIX = 'components.loginBox.loginFormContainer.';
 const ANIMATION_TIMEOUT = 333;
@@ -24,6 +23,8 @@ export default LoginFormConainer.extend({
 
   i18n: inject(),
   globalNotify: inject(),
+  onedataConnection: inject(),
+  onezoneServer: inject(),
 
   /**
    * Authorizer selected in dropdown
@@ -113,35 +114,28 @@ export default LoginFormConainer.extend({
    * @returns {undefined}
    */
   _initSupportedAuthorizers() {
-    this.set('isLoading', true);
-    // TODO load authorizers
-    // const p = this.get('onezoneServer').getSupportedAuthorizers();
-    const p = Promise.resolve({ authorizers: AUTHORIZERS.map(a => a.type) });
-    p.then((data) => {
-      let predefinedAuthorizersList = AUTHORIZERS.map(auth => auth.type);
-      let authorizers = [];
-      predefinedAuthorizersList.forEach((auth, index) => {
-        if (data.authorizers.indexOf(auth) > -1) {
-          authorizers.push(AUTHORIZERS[index]);
-        }
-      });
-      data.authorizers.forEach((auth) => {
-        if (predefinedAuthorizersList.indexOf(auth) === -1) {
-          // default configuration for unknown authorizer
-          authorizers.push({
-            type: auth,
-            name: auth.capitalize(),
-            iconType: 'oneicon',
-            iconName: 'key',
-          });
-        }
-      });
-      this.set('supportedAuthorizers', authorizers);
-    }).catch(error => {
-      const msg = error && error.message ||
-        this.get('i18n').t(I18N_PREFIX + 'fetchProvidersFailedUnknown');
-      this.set('errorMessage', msg);
-    }).finally(() => this.set('isLoading', false));
+    /** @type {Array<string>} */
+    const ipds = this.get('onedataConnection.identityProviders');
+
+    const predefinedAuthorizersList = AUTHORIZERS.map(auth => auth.type);
+    const finalIdps = [];
+    predefinedAuthorizersList.forEach((auth, index) => {
+      if (ipds.indexOf(auth) > -1) {
+        finalIdps.push(AUTHORIZERS[index]);
+      }
+    });
+    ipds.forEach((auth) => {
+      if (predefinedAuthorizersList.indexOf(auth) === -1) {
+        // default configuration for unknown authorizer
+        finalIdps.push({
+          type: auth,
+          name: auth.capitalize(),
+          iconType: 'oneicon',
+          iconName: 'key',
+        });
+      }
+    });
+    this.set('supportedAuthorizers', finalIdps);
   },
 
   /**
@@ -211,43 +205,41 @@ export default LoginFormConainer.extend({
 
     /**
      * Performs authentication using given auth provider name.
-     * @param {string} providerName
+     * @param {string} authorizerName
      * @returns {undefined}
      */
-    authenticate(providerName) {
+    authenticate(authorizerName) {
       const {
         supportedAuthorizers,
         authenticationSuccess,
-      } = this.getProperties('supportedAuthorizers', 'authenticationSuccess');
-      const provider = _.find(supportedAuthorizers, { type: providerName });
-      this.set('_activeAuthorizer', provider);
-      // TODO implement authentication
-      // const p = this.get('onezoneServer').getLoginEndpoint(providerName);
-      // p.then(
-      //   (data) => {
-      //     handleLoginEndpoint(data, () => {
-      //       this._authEndpointError({
-      //         message: this.get('i18n').t(I18N_PREFIX + 'authEndpointConfError'),
-      //       });
-      //     });
-      //   },
-      //   (error) => {
-      //     this._authEndpointError(error);
-      //   }
-      // ).then(() => {
-      //   this.setProperties({
-      //     _activeAuthorizer: null,
-      //     selectedAuthorizer: null,
-      //   });
-      // });
-      // return p;
-      // Temporary implementation
-      this.setProperties({
-        _activeAuthorizer: null,
-        selectedAuthorizer: null,
-      });
-      authenticationSuccess();
-      return new RSVP.Promise((resolve) => resolve());
+        onezoneServer,
+      } = this.getProperties(
+        'supportedAuthorizers',
+        'authenticationSuccess',
+        'onezoneServer'
+      );
+
+      const authorizer = _.find(supportedAuthorizers, { type: authorizerName });
+      this.set('_activeAuthorizer', authorizer);
+
+      return onezoneServer.getLoginEndpoint({ idp: authorizerName })
+        .then(data => {
+          handleLoginEndpoint(data, () => {
+            this._authEndpointError({
+              message: this.get('i18n').t(I18N_PREFIX +
+                'authEndpointConfError'),
+            });
+            authenticationSuccess();
+          });
+        })
+        .catch(error => {
+          this._authEndpointError(error);
+        }).then(() => {
+          this.setProperties({
+            _activeAuthorizer: null,
+            selectedAuthorizer: null,
+          });
+        });
     },
 
     /**

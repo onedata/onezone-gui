@@ -5,6 +5,7 @@ import loginBox from './components/login-box';
 import brandInfo from './components/brand-info';
 import contentTokens from './components/content-tokens';
 import contentTokensEmpty from './components/content-tokens-empty';
+import contentProviderRedirect from './components/content-provider-redirect';
 
 import sidebarResources from './services/sidebar-resources';
 
@@ -14,6 +15,7 @@ let translations = {
     brandInfo,
     contentTokens,
     contentTokensEmpty,
+    contentProviderRedirect,
   },
   services: {
     sidebarResources,
