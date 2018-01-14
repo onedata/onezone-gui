@@ -68,6 +68,11 @@ export default Service.extend(Evented, {
   webSocketIsOpened: readOnly('webSocketInitializedProxy.isFulfilled'),
 
   /**
+   * @type {object}
+   */
+  _connectionAttributes: null,
+
+  /**
    * @type {RSVP.Deferred}
    */
   _initDefer: null,
@@ -100,12 +105,24 @@ export default Service.extend(Evented, {
   closePromise: readOnly('_initDefer.promise'),
 
   /**
+   * An object containing connection attributes sent after successful handshake.
+   * Properties:
+   * - `zoneName`: string
+   * - `serviceVersion`: string (version of Zone server backend)
+   * - `ipds`: string[] (id providers - names of identity providers for authentication)
+   * @type {Ember.ComputedProperty<object>}
+   */
+  connectionAttributes: computed.reads('_connectionAttributes'),
+
+  /**
    * @param {object} options
    * @param {number} options.protocolVersion
    * @returns {Promise} resolves with success handshake message
    */
   initConnection(options) {
-    return this._initNewConnection(options);
+    const init = this._initNewConnection(options);
+    init.then(data => this.set('connectionAttributes', data.attributes));
+    return init;
   },
 
   closeConnection() {
@@ -206,7 +223,7 @@ export default Service.extend(Evented, {
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     let host = window.location.hostname;
     let port = 443;
-    let suffix = '/graph_sync/';
+    let suffix = '/graph_sync/gui';
 
     let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;
 
@@ -269,10 +286,13 @@ export default Service.extend(Evented, {
 
   /**
    * @param {object} options
-   * @param {number} protocolVersion
+   * @param {number} options.protocolVersion
    * @returns {Promise<object, object>} resolves with successful handshake data
    */
-  _handshake({ protocolVersion } = { protocolVersion: 1 }) {
+  _handshake(options) {
+    options = options || {};
+    const protocolVersion = (options.protocolVersion === undefined) ? 1 : options.protocolVersion;
+
     return new Promise((resolve, reject) => {
       let handshaking = this.sendMessage('handshake', {
         supportedVersions: [protocolVersion],
