@@ -11,10 +11,14 @@ import Service from '@ember/service';
 import { inject } from '@ember/service';
 import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
 import removeRecordFromList from 'onedata-gui-websocket-client/utils/remove-record-from-list';
+import { get } from '@ember/object';
 
 export default Service.extend({
   store: inject(),
   currentUser: inject(),
+
+  // FIXME: temporary solution for creating client-tokens
+  onedataGraph: inject(),
 
   /**
    * Fetches collection of all tokens
@@ -43,12 +47,35 @@ export default Service.extend({
    * @returns {Promise<ClientToken>}
    */
   createRecord() {
-    const token = this.get('store').createRecord('clientToken', {});
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('clientTokenList').then((clientTokenList) =>
-        addRecordToList(token, clientTokenList)
-      )
-    );
+    // FIXME: temporary solution for creating client-tokens
+
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => {
+        const userId = get(user, 'entityId');
+        return user.get('clientTokenList')
+          .then(clientTokenList => {
+            return this.get('onedataGraph')
+              .request({
+                gri: `user.${userId}.client_tokens:private`,
+                operation: 'create',
+                data: {},
+              })
+              .then(tokenData => {
+                tokenData.id = tokenData.gri;
+                const token = this.get('store')
+                  .createRecord('clientToken', tokenData);
+                return addRecordToList(token, clientTokenList, false);
+              });
+          });
+      });
+
+    // FIXME: uncomment when clientToken will be a stand-alone model
+    // const token = this.get('store').createRecord('clientToken', {});
+    // return this.get('currentUser').getCurrentUserRecord().then((user) =>
+    //   user.get('clientTokenList').then((clientTokenList) =>
+    //     addRecordToList(token, clientTokenList)
+    //   )
+    // );
   },
 
   /**
