@@ -14,17 +14,18 @@ export default Component.extend({
   tagName: '',
 
   /**
-   * Shorter version of token
+   * Shorter version of token only for presentations purposes.
    * @type {Ember.ComputedProperty<string>}
    */
   shortToken: computed('item.token', function () {
     const tokenString = this.get('item.token');
-    return tokenString ? shortenToken(this.get('item.token')) : '';
+    return tokenString ? shortenToken(tokenString) : '';
   }),
 });
 
 /**
- * Creates shorter version of full client token.
+ * Creates shorter version of full client token (only for presentation, it is
+ * useless for backend).
  * @param {string} token 
  * @returns {string}
  */

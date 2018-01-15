@@ -11,9 +11,9 @@
 import LocalstorageAdapter from 'ember-local-storage/adapters/local';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import localStorageMethodsMock from 'onedata-gui-websocket-client/mixins/local-storage-methods-mock';
+import LocalStorageMethodsMock from 'onedata-gui-websocket-client/mixins/local-storage-methods-mock';
 
-export default LocalstorageAdapter.extend(localStorageMethodsMock, {
+export default LocalstorageAdapter.extend(LocalStorageMethodsMock, {
   _storageKey() {
     return decodeURIComponent(this._super(...arguments));
   },

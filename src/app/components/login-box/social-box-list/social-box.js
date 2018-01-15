@@ -62,6 +62,7 @@ export default Component.extend({
   /**
    * Action called on click
    * @type {function}
+   * @param {Ember.Component} thisComponent this component instance
    * @return {undefined}
    */
   action: () => {},

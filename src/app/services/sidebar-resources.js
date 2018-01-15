@@ -2,23 +2,18 @@
  * An abstraction layer for getting data for sidebar of various tabs
  *
  * @module services/sidebar-resources
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import $ from 'jquery';
-
-const I18N_PREFIX = 'services.sidebarResources.';
 
 export default Service.extend({
   providerManager: service(),
   clientTokenManager: service(),
-  router: service(),
-  globalNotify: service(),
-  i18n: service(),
+  clientTokenActions: service(),
 
   /**
    * @param {string} type
@@ -43,41 +38,9 @@ export default Service.extend({
    * @returns {Array<object>}
    */
   getButtonsFor(type) {
-    const i18n = this.get('i18n');
     switch (type) {
       case 'tokens':
-        return [{
-          icon: 'add-filled',
-          title: i18n.t(I18N_PREFIX + 'createToken'),
-          tip: i18n.t(I18N_PREFIX + 'createToken'),
-          class: 'create-token-btn',
-          action: () => {
-            const {
-              i18n,
-              globalNotify,
-              router,
-              clientTokenManager,
-            } = this.getProperties(
-              'i18n',
-              'globalNotify',
-              'router',
-              'clientTokenManager'
-            );
-            return clientTokenManager.createRecord().then((token) => {
-              globalNotify.success(i18n.t(
-                'components.contentTokens.tokenCreateSuccess'
-              ));
-              router.get('router').transitionTo(
-                'onedata.sidebar.content',
-                'tokens',
-                token.get('id')
-              );
-              const sidebarContainer = $('.col-sidebar');
-              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-                sidebarContainer[0].clientHeight);
-            }).catch(error => globalNotify.backendError('token creation', error));
-          },
-        }];
+        return this.get('clientTokenActions.actionButtons');
       default:
         return [];
     }

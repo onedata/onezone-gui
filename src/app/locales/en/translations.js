@@ -8,6 +8,7 @@ import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 
 import sidebarResources from './services/sidebar-resources';
+import clientTokenActions from './services/client-token-actions';
 
 let translations = {
   components: {
@@ -19,6 +20,7 @@ let translations = {
   },
   services: {
     sidebarResources,
+    clientTokenActions,
   },
 };
 
