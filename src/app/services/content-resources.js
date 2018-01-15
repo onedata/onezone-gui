@@ -20,6 +20,7 @@ const {
 
 export default Ember.Service.extend({
   providerManager: service(),
+  currentUser: service(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -30,7 +31,8 @@ export default Ember.Service.extend({
     switch (type) {
       case 'providers':
         return this.get('providerManager').getRecord(id);
-
+      case 'users':
+        return this.get('currentUser').getCurrentUserRecord();
       default:
         return new Promise((resolve, reject) => reject('No such model type: ' + type));
     }

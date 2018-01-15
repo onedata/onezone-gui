@@ -14,6 +14,7 @@ import _ from 'lodash';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
+const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 
@@ -51,6 +52,7 @@ function createUserRecord(store, listRecords) {
   const userRecord = store.createRecord('user', {
     id: userGri(USER_ID),
     name: USERNAME,
+    login: USER_LOGIN,
   });
   listRecords.forEach(lr =>
     userRecord.set(camelize(lr.constructor.modelName), lr)
