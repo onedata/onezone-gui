@@ -1,8 +1,9 @@
 .content-tokens {
   .token-textarea {
-    font-family: monospace;
     width: 100%;
     height: 120px;
+    margin-bottom: $padding-base-vertical;
+    font-family: monospace;
   }
   @media (max-width: $screen-xs-max) {
     padding: $padding-large-vertical $padding-large-horizontal;
