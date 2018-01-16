@@ -11,5 +11,5 @@
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default function userGri(userId) {
-  return gri('user', userId, 'instance', 'protected');
+  return gri('user', userId, 'instance', 'private');
 }

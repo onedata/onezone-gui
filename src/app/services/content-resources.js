@@ -15,6 +15,7 @@ export default Service.extend({
   providerManager: inject(),
   clientTokenManager: inject(),
   currentUser: inject(),
+  spaceManager: inject(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -29,6 +30,8 @@ export default Service.extend({
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':
         return this.get('clientTokenManager').getRecord(id);
+      case 'spaces':
+        return this.get('spaceManager').getRecord(id);
       default:
         return new RSVP.Promise((resolve, reject) =>
           reject('No such model type: ' + type));

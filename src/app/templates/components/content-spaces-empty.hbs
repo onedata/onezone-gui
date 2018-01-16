@@ -1,0 +1,29 @@
+{{#content-info
+  class="scroll-breakpoint-400"
+  header=(tt this "title")
+  text=(tt this "text")
+}}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{#link-to "onedata.sidebar.content" "spaces" "new"}}
+          {{tt this "p1a"}}
+        {{/link-to}}
+        {{tt this "p1t"}}
+      </li>
+      <li>
+        {{tt this "p2t"}}
+        {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+          {{tt this "p2a"}}
+        {{/link-to}}
+      </li>
+      <li>
+        {{tt this "p3t1"}}
+        {{#link-to "onedata.sidebar.content" "groups" "join"}}
+          {{tt this "p3a"}}
+        {{/link-to}}
+        {{tt this "p3t2"}}
+      </li>
+    </ul>  
+  </p>
+{{/content-info}}

@@ -18,6 +18,9 @@ module.exports = {
     es6: true,
     jquery: true,
   },
+  plugins: [
+    'promise',
+  ],
   rules: {
     'no-console': 0,
     'dot-location': [
@@ -51,5 +54,16 @@ module.exports = {
         requireReturnDescription: false,
       },
     ],
+
+    'promise/always-return': 'off', // default: error
+    'promise/no-return-wrap': 'error',
+    'promise/param-names': 'error',
+    'promise/catch-or-return': 'off', // default: error
+    'promise/no-native': 'error',
+    'promise/no-nesting': 'off', // default: warn
+    'promise/no-promise-in-callback': 'warn',
+    'promise/no-callback-in-promise': 'off', // default: warn
+    'promise/avoid-new': 'off', // default: warn
+    'promise/no-return-in-finally': 'warn'
   },
 };

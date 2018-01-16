@@ -1,0 +1,22 @@
+{{!-- FIXME: disable button if no name --}}
+
+{{#content-info
+  class="scroll-breakpoint-400"
+  header=(tt this "title")
+  text=(tt this "text")
+  buttonLabel=(tt this "createButton")
+  buttonAction=(action "createSpace" spaceName)
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      <input
+        value={{spaceName}}
+        oninput={{action (mut spaceName) value="target.value"}}
+        onenter={{action "createSpace" spaceName}}
+        disabled={{isWorking}}
+        placeholder={{tt this "spaceName"}}
+        class="form-control new-space-name"
+      >
+    </div>
+  </div>
+{{/content-info}}

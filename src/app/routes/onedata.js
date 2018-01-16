@@ -11,6 +11,7 @@
 import { inject } from '@ember/service';
 
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
+import { Promise } from 'rsvp';
 
 export default OnedataRoute.extend({
   currentUser: inject(),

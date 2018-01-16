@@ -72,6 +72,7 @@
     "ember-spin-spinner": "0.3.3",
     "ember-truth-helpers": "2.0.0",
     "eslint-plugin-ember": "5.0.3",
+    "eslint-plugin-promise": "3.6.0",
     "loader.js": "4.6.0",
     "perfect-scrollbar": "0.8.1",
     "round10": "1.0.3",
