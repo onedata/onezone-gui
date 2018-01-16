@@ -1,12 +1,17 @@
-{{yield}}
 <div class="content-row">
   <h1>{{tt this "name"}}</h1>
-  <div class="name-container">{{user.name}}</div>
+  <div class="indented-row">
+    {{one-icon icon="user-profile" class="user-image"}}
+    {{one-inline-editor value=user.name onSave=(action "saveName") class="name-editor"}}
+  </div>
 </div>
 <div class="content-row">
   <h1>{{tt this "login"}}</h1>
-  <div class="login-container">{{user.login}}</div>
-</div>
+  <div class="indented-row">
+    {{one-inline-editor value=user.login onSave=(action "saveLogin") class="login-editor"}}</div>
+  </div>
 <div class="content-row">
   <h1>{{tt this "authorizers"}}</h1>
+  <div class="indented-row">
+  </div>
 </div>
