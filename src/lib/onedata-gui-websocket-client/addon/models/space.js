@@ -8,11 +8,15 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
+import { inject } from '@ember/service';
 
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Model.extend(GraphModelMixin, InvitingModelMixin, {
+  onedataGraph: inject(),
+
   name: attr('string'),
 
   /**
@@ -21,9 +25,31 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
    */
   supportSizes: attr('object'),
 
+  providerList: belongsTo('providerList'),
+
   groupList: belongsTo('groupList'),
 
   // members of this space
   sharedUserList: belongsTo('sharedUserList'),
   sharedGroupList: belongsTo('sharedGroupList'),
+
+  //#region 
+
+  /**
+   * @param {string} target one of: user, group, provider
+   * @return {Promise} GRI request
+   */
+  getInvitationToken(target) {
+    const entityId = this.get('entityId');
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'space',
+        entityId,
+        aspect: `invite_${target}_token`,
+      }),
+      operation: 'create',
+    });
+  },
+
+  //#endregion
 });

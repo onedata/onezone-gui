@@ -11,12 +11,15 @@ import { default as Service, inject } from '@ember/service';
 import { resolve } from 'rsvp';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   providerManager: inject(),
   clientTokenManager: inject(),
   clientTokenActions: inject(),
   currentUser: inject(),
+  spaceManager: inject(),
+  spaceActions: inject(),
 
   /**
    * @param {string} type
@@ -28,6 +31,8 @@ export default Service.extend({
         return this.get('providerManager').getProviders();
       case 'tokens':
         return this.get('clientTokenManager').getClientTokens();
+      case 'spaces':
+        return this.get('spaceManager').getSpaces();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
           return PromiseArray.create({
@@ -48,6 +53,8 @@ export default Service.extend({
     switch (type) {
       case 'tokens':
         return this.get('clientTokenActions.actionButtons');
+      case 'spaces':
+        return this.get('spaceActions.buttons');
       default:
         return [];
     }

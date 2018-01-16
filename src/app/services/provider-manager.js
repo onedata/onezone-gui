@@ -11,8 +11,6 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 
 export default Service.extend({
-  // TODO to implement using onedata-websocket services
-
   store: service(),
   currentUser: service(),
 

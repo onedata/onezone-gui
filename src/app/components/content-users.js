@@ -80,6 +80,8 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    // FIXME: fix this eslint error
+    // eslint-disable-next-line promise/catch-or-return
     this.get('linkedAccountManager').getLinkedAccounts().then(linkedAccounts =>
       safeExec(this, 'set', '_linkedAccounts', linkedAccounts)
     ).catch(error =>

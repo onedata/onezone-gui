@@ -12,6 +12,7 @@ import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
+import { Promise } from 'rsvp';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -46,6 +47,18 @@ export default function generateDevelopmentModel(store) {
           createListRecord(store, 'space', spacesList).then(lr => {
             provider.set('spaceList', lr);
             return provider.save();
+          })
+        ))
+      ).then(() => listRecords);
+    })
+    .then(listRecords => {
+      const providers = listRecords[types.indexOf('provider')].get('list');
+      const spaces = listRecords[types.indexOf('space')].get('list');
+      return Promise.all([providers, spaces]).then(([providerList, spaceList]) =>
+        Promise.all(spaceList.map(space =>
+          createListRecord(store, 'provider', providerList).then(lr => {
+            space.set('providerList', lr);
+            return space.save();
           })
         ))
       ).then(() => listRecords);

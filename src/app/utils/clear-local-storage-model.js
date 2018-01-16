@@ -1,3 +1,5 @@
+import { Promise } from 'rsvp';
+
 /**
  * Clears out localStorage model
  *

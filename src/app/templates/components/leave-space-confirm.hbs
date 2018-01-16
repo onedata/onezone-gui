@@ -1,0 +1,13 @@
+<h1>{{tt this "title"}}</h1>
+<p>{{tt this "text"}}</p>
+<div class="btn-toolbar">
+  {{#bs-button class="btn btn-sm" type="info" onClick=closeAction}}
+    {{tt this "doNotLeave"}}
+  {{/bs-button}}
+  {{#one-spin-button
+    class="btn btn-sm btn-danger"
+    action=submitAction
+  }}
+    {{one-icon icon="leave"}} <span>{{tt this "yesLeave"}}</span>
+  {{/one-spin-button}}
+</div>

@@ -6,6 +6,7 @@ import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
+import { Promise } from 'rsvp';
 
 const OnezoneServerStub = Service.extend({
   getProviderRedirectUrl() {

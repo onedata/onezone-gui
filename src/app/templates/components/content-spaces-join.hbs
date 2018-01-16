@@ -1,0 +1,21 @@
+{{!-- FIXME: disable button if no token --}}
+
+{{#content-info
+  class="scroll-breakpoint-400"
+  header=(tt this "header")
+  text=(tt this "text")
+  buttonLabel=(tt this "joinButton")
+  buttonAction=(action "joinSpace" token)
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      <input
+        value={{token}}
+        oninput={{action (mut token) value="target.value"}}
+        onsubmit={{action "joinSpace" token}}
+        class="form-control"
+        placeholder={{tt this "placeholder"}}
+      >
+    </div>
+  </div>
+{{/content-info}}

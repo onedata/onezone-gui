@@ -1,0 +1,45 @@
+{{!-- FIXME: implement https://app.invisionapp.com/d/main#/console/9453427/251076376/preview --}}
+{{!-- FIXME: style fixes --}}
+
+{{#content-info
+  class="scroll-breakpoint-600"
+  header=(tt this "getSupportHeader")
+  text=(tt this "leadText")
+}}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{tt this "p1_1"}}
+        {{#link-to "onedata.sidebar" "spaces"}}
+          {{tt this "manageSpacesHead"}}
+        {{/link-to}}
+        {{tt this "p1_2"}}
+        {{#link-to "onedata.sidebar.content" "spaces" "new"}}
+          {{tt this "create"}}
+        {{/link-to}}
+        {{tt this "p1_3"}}
+      </li>
+      <li>
+        {{tt this "pIfYouHave"}}
+        <strong>{{tt this "space"}} {{tt this "invitationToken"}}</strong>,
+        {{tt this "pVisit"}}
+        {{#link-to "onedata.sidebar" "spaces"}}
+          {{tt this "manageSpacesHead"}}
+        {{/link-to}}
+        {{tt this "p2_2"}}
+        {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+          {{tt this "joinSpace"}}
+        {{/link-to}}
+      </li>
+      <li>
+        {{tt this "pIfYouHave"}}
+        <strong>{{tt this "group"}} {{tt this "invitationToken"}}</strong>,
+        {{tt this "pVisit"}}
+        {{#link-to "onedata.sidebar" "groups"}}
+          {{tt this "manageGroupsHead"}}
+        {{/link-to}}
+        {{tt this "p3_2"}}
+      </li>
+    </ul>  
+  </p>
+{{/content-info}}

@@ -1,0 +1,15 @@
+{{one-icon icon="space"}} 
+<span class="one-label">{{item.name}}</span>
+{{#status-toolbar as |toolbar|}}
+  {{toolbar.icon
+    icon="support"
+    outerText=_totalSupportSizeHuman
+    hint=(tt this "totalStorageHint" size=_totalSupportSizeHuman)
+  }}
+  {{toolbar.icon
+    icon="provider"
+    outerText=_providersCount
+    hint=(tt this "supportCountHint" count=_providersCount)
+  }}
+{{/status-toolbar}}
+
