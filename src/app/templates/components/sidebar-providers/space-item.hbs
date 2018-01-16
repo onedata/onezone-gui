@@ -1,7 +1,7 @@
-{{#if item.icon}}
-  {{one-icon class=iconClass icon=item.icon}} 
-{{/if}}
-<span class="one-label">{{item.label}}</span>
+{{one-icon class=iconClass icon="space"}} 
+{{#truncated-string class="after-icon"}}
+  <span class="one-label">{{item.label}}</span>
+{{/truncated-string}}
 {{#status-toolbar as |toolbar|}}
   {{toolbar.icon 
     icon="provider"

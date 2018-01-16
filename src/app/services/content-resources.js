@@ -3,23 +3,17 @@
  *
  * @module services/content-resources
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import { inject } from '@ember/service';
+import Service from '@ember/service';
+import RSVP from 'rsvp';
 
-const {
-  RSVP: {
-    Promise,
-  },
-  inject: {
-    service,
-  },
-} = Ember;
-
-export default Ember.Service.extend({
-  providerManager: service(),
+export default Service.extend({
+  providerManager: inject(),
+  clientTokenManager: inject(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -30,9 +24,11 @@ export default Ember.Service.extend({
     switch (type) {
       case 'providers':
         return this.get('providerManager').getRecord(id);
-
+      case 'tokens':
+        return this.get('clientTokenManager').getRecord(id);
       default:
-        return new Promise((resolve, reject) => reject('No such model type: ' + type));
+        return new RSVP.Promise((resolve, reject) =>
+          reject('No such model type: ' + type));
     }
   },
 });

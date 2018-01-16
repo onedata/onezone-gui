@@ -1,0 +1,12 @@
+<textarea class="token-textarea form-control">{{selectedToken.token}}</textarea>
+{{#copy-button
+  success=(action "copySuccess")
+  error=(action "copyError")
+  class="btn btn-primary"
+  clipboardTarget=".token-textarea"}}
+  {{one-icon icon="clipboard-copy"}} {{t "components.contentTokens.copy"}}
+{{/copy-button}}
+<button class="btn btn-danger pull-right" {{action "removeToken"}}>
+  {{one-icon icon="remove"}}
+  {{t "components.contentTokens.deleteToken"}}
+</button>
