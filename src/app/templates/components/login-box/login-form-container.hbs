@@ -24,26 +24,14 @@
         usernameLoginClick=(action "usernameLoginToggle")
         showMoreButton=_showMoreProvidersButton
         showMoreClick=(action "showMoreClick")}}
-    <div class="authorizers-dropdown-container animated fast hide">
-      {{#power-select
-        options=_authorizersForSelect
-        onchange=(action "authorizerSelected")
-        selected=selectedAuthorizer
-        matcher=_authorizersSelectMatcher
-        dropdownClass="authorizers-dropdown"
+      {{#authorizers-dropdown
+        class="animated fast hide"
+        authorizers=_authorizersForSelect
+        onSelect=(action "authorizerSelected")
+        selectedAuthorizer=selectedAuthorizer
         placeholder=(t "components.loginBox.loginFormContainer.findProviderPlaceholder")
-        disabled=_activeAuthorizer
-        as |authorizer|}}
-        {{login-box/social-box-list/social-box 
-          active=(eq authorizer _activeAuthorizer)
-          spinnerScale=0.15
-          type=authorizer.type
-          iconType=authorizer.iconType
-          iconName=authorizer.iconName
-        }}
-        {{authorizer.name}}
-      {{/power-select}}
-      <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.loginWith"}}</div>
-    </div>
+        disabled=_activeAuthorizer}}
+        <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.loginWith"}}</div>
+      {{/authorizers-dropdown}}
   </div>
 {{/if}}

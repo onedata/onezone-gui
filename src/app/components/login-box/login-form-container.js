@@ -291,7 +291,7 @@ export default LoginFormConainer.extend({
         _animationTimeout,
       } = this.getProperties('_dropdownAnimationTimeoutId', '_animationTimeout');
       this.toggleProperty('isProvidersDropdownVisible');
-      const authorizersDropdown = this.$('.authorizers-dropdown-container');
+      const authorizersDropdown = this.$('.authorizers-dropdown');
       clearTimeout(_dropdownAnimationTimeoutId);
       if (this.get('isProvidersDropdownVisible')) {
         this._animateShow(authorizersDropdown);
