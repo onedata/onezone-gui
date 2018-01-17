@@ -20,4 +20,5 @@ export default Model.extend(GraphModelMixin, {
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
   clientTokenList: belongsTo('clientTokenList'),
+  linkedAccountList: belongsTo('linkedAccountList'),
 });
