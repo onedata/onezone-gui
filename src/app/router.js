@@ -6,12 +6,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import EmberRouter from '@ember/routing/router';
 import onedataRouterSetup from 'onedata-gui-common/utils/onedata-router-setup';
 
 import config from './config/environment';
 
-const Router = Ember.Router.extend({
+const Router = EmberRouter.extend({
   location: config.locationType,
   rootURL: config.rootURL,
 });

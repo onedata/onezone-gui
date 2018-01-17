@@ -1,5 +1,7 @@
 {{one-icon icon="provider"}} 
-<span class="one-label">{{item.name}}</span>
+{{#truncated-string class="after-icon"}}
+  <span class="one-label">{{item.name}}</span>
+{{/truncated-string}}
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
   {{#status-toolbar as |toolbar|}}
     {{#if _spaceIdsLoaded}}

@@ -4,6 +4,7 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
 import { A } from '@ember/array';
+import RSVP from 'rsvp';
 
 describe('Unit | Utility | generate development model', function () {
   it('creates and saves records', function (done) {
@@ -20,8 +21,9 @@ describe('Unit | Utility | generate development model', function () {
             const save = sinon.stub(this, 'save');
             save.resolves(this);
             stubsToCheck.push(save);
-
-            this.set('list', A());
+            const list = A();
+            list.save = () => Promise.resolve();
+            this.set('list', RSVP.Promise.resolve(list));
           },
           save() {},
         })
@@ -40,8 +42,8 @@ describe('Unit | Utility | generate development model', function () {
     promise.then(() => {
       [
         'user',
-        'spaceList', 'groupList', 'providerList',
-        'space', 'group', 'provider',
+        'spaceList', 'groupList', 'providerList', 'clientTokenList',
+        'space', 'group', 'provider', 'clientToken',
       ].forEach(modelName =>
         expect(createRecord).to.be.calledWith(modelName, sinon.match.object)
       );

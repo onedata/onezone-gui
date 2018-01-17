@@ -18,14 +18,14 @@
                   iconType=authorizer.iconType 
                   iconName=authorizer.iconName
                   tip=(concat (t "components.loginBox.socialBoxList.loginUsing") (t "components.loginBox.socialBoxList.onepanelAccount"))
-                  action="usernameBoxClick"}}
+                  action=(action "usernameBoxClick")}}
               {{else}}
                 {{login-box/social-box-list/social-box 
                   type=authorizer.type
                   iconType=authorizer.iconType
                   iconName=authorizer.iconName
                   tip=(concat (t "components.loginBox.socialBoxList.loginUsing") authorizer.name)
-                  action="authenticate"
+                  action=(action "authenticate")
                 }}
               {{/if}}
             {{/each}}
@@ -33,7 +33,7 @@
               {{login-box/social-box-list/social-box 
                 type="more"
                 iconType="text"
-                action="showMoreClick"
+                action=(action "showMoreClick")
                 tip=(t "components.loginBox.socialBoxList.showMore")
               }}
             {{/if}}

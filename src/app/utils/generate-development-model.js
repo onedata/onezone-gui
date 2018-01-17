@@ -3,7 +3,7 @@
  *
  * @module utils/generate-development-model
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  *
  */
@@ -17,6 +17,7 @@ const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
+const NUMBER_OF_CLIENT_TOKENS = 3;
 
 const providerStatusList = ['online', 'offline'];
 
@@ -27,7 +28,7 @@ const providerStatusList = ['online', 'offline'];
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  const types = ['space', 'group', 'provider'];
+  const types = ['space', 'group', 'provider', 'clientToken'];
   const names = ['one', 'two', 'three'];
   return Promise.all(
       types.map(type =>
@@ -38,12 +39,14 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all(providers.map(provider =>
-        createListRecord(store, 'space', spaces).then(lr => {
-          provider.set('spaceList', lr);
-          return provider.save();
-        })
-      )).then(() => listRecords);
+      return Promise.all([providers, spaces]).then(([providerList, spacesList]) =>
+        Promise.all(providerList.map(provider =>
+          createListRecord(store, 'space', spacesList).then(lr => {
+            provider.set('spaceList', lr);
+            return provider.save();
+          })
+        ))
+      ).then(() => listRecords);
     })
     .then(listRecords => createUserRecord(store, listRecords));
 }
@@ -66,6 +69,8 @@ function createEntityRecords(store, type, names) {
       return createProvidersRecords(store);
     case 'space':
       return createSpacesRecords(store);
+    case 'clientToken':
+      return createClientTokensRecords(store);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -76,15 +81,16 @@ function createEntityRecords(store, type, names) {
 function createListRecord(store, type, records) {
   const listType = type + 'List';
   const listRecord = store.createRecord(listType, {});
-  listRecord.get('list').pushObjects(records);
-  return listRecord.save();
+  return listRecord.get('list').then(list => {
+    list.pushObjects(records);
+    return list.save().then(() => listRecord.save());
+  });
 }
 
 function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     return store.createRecord('provider', {
-      id: `provider.${index}.instance:protected`,
       name: `Provider ${index}`,
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
@@ -98,12 +104,17 @@ function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     const perProviderSize = 1048576;
     return store.createRecord('space', {
-      id: `space.${index}.instance:protected`,
       name: `Space ${index}`,
       supportSizes: _.zipObject(
         _.range(NUMBER_OF_PROVIDERS).map(String),
         _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
       ),
     }).save();
+  }));
+}
+
+function createClientTokensRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
+    return store.createRecord('clientToken', {}).save();
   }));
 }
