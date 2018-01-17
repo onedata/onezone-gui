@@ -11,6 +11,7 @@
 import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
+import { A } from '@ember/array';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -18,6 +19,7 @@ const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
+const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const providerStatusList = ['online', 'offline'];
 
@@ -28,7 +30,7 @@ const providerStatusList = ['online', 'offline'];
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  const types = ['space', 'group', 'provider', 'clientToken'];
+  const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
   const names = ['one', 'two', 'three'];
   return Promise.all(
       types.map(type =>
@@ -71,6 +73,8 @@ function createEntityRecords(store, type, names) {
       return createSpacesRecords(store);
     case 'clientToken':
       return createClientTokensRecords(store);
+    case 'linkedAccount':
+      return createLinkedAccount(store);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -117,4 +121,16 @@ function createClientTokensRecords(store) {
   return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
     return store.createRecord('clientToken', {}).save();
   }));
+}
+
+function createLinkedAccount(store) {
+  return Promise.all(LINKED_ACCOUNT_TYPES.map(type => 
+    store.createRecord('linkedAccount', {
+      type,
+      emails: A([
+        `email1@${type}.com`,
+        `email2@${type}.com`,
+      ]),
+    }).save()
+  ));
 }
