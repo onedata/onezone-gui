@@ -21,6 +21,7 @@ export default Component.extend(I18n, {
 
   globalNotify: inject(),
   linkedAccountManager: inject(),
+  authorizerManager: inject(),
 
   /**
    * @override
@@ -48,6 +49,11 @@ export default Component.extend(I18n, {
   _linkedAccounts: undefined,
 
   /**
+   * @type {undefined|AuthorizerInfo}
+   */
+  _selectedAuthorizer: undefined,
+
+  /**
    * Object with mapping authorizerType -> authorizerDefinition
    * @type {Ember.ComputedProperty<object>}
    */
@@ -60,6 +66,14 @@ export default Component.extend(I18n, {
       );
     }
     return accountsAuthorizers;
+  }),
+
+  /**
+   * @type {Array<AuthorizerInfo>}
+   */
+  _availableAuthorizers: computed(function () {
+    return this.get('authorizerManager').getAvailableAuthorizers()
+      .filter(authorizer => authorizer.type !== 'basicAuth');
   }),
 
   init() {
@@ -106,6 +120,9 @@ export default Component.extend(I18n, {
       const user = this.get('user');
       user.set('login', login && login.length ? login : null);
       return this._saveUser();
+    },
+    authorizerSelected(authorizer) {
+      // FIXME
     },
   },
 });

@@ -11,7 +11,6 @@
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
-import AUTHORIZERS from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 
@@ -23,7 +22,7 @@ export default LoginFormConainer.extend({
 
   i18n: inject(),
   globalNotify: inject(),
-  onedataConnection: inject(),
+  authorizerManager: inject(),
   onezoneServer: inject(),
 
   /**
@@ -61,6 +60,14 @@ export default LoginFormConainer.extend({
    * @type {number}
    */
   _animationTimeout: ANIMATION_TIMEOUT,
+
+  /**
+   * Array of all suported authorizers
+   * @type {Array<AuthorizerInfo>}
+   */
+  supportedAuthorizers: computed(function () {
+    return this.get('authorizerManager').getAvailableAuthorizers();
+  }),
 
   /**
    * If true, there are some auth providers to show.
@@ -103,40 +110,6 @@ export default LoginFormConainer.extend({
       return [];
     }
   }),
-
-  init() {
-    this._super(...arguments);
-    this._initSupportedAuthorizers();
-  },
-
-  /**
-   * Loads auth providers from backend.
-   * @returns {undefined}
-   */
-  _initSupportedAuthorizers() {
-    /** @type {Array<string>} */
-    const ipds = this.get('onedataConnection.identityProviders');
-
-    const predefinedAuthorizersList = AUTHORIZERS.map(auth => auth.type);
-    const finalIdps = [];
-    predefinedAuthorizersList.forEach((auth, index) => {
-      if (ipds.indexOf(auth) > -1) {
-        finalIdps.push(AUTHORIZERS[index]);
-      }
-    });
-    ipds.forEach((auth) => {
-      if (predefinedAuthorizersList.indexOf(auth) === -1) {
-        // default configuration for unknown authorizer
-        finalIdps.push({
-          type: auth,
-          name: auth.capitalize(),
-          iconType: 'oneicon',
-          iconName: 'key',
-        });
-      }
-    });
-    this.set('supportedAuthorizers', finalIdps);
-  },
 
   /**
    * Powerselect item matcher used by its search engine.

@@ -39,6 +39,12 @@
       line-height: $add-box-size;
     }
   }
+  .authorizers-dropdown {
+    max-width: 300px;
+    .ember-power-select-placeholder {
+      margin-left: -30px;
+    }
+  }
   @media (min-width: $screen-sm-min) {
     .indented-row {
       margin-left: 20px;

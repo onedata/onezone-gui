@@ -45,7 +45,11 @@
           iconType="oneicon"
           iconName="add"}}
         <div class="account-description">
-          <div class="account-type">{{tt this "addAccount"}}</div>
+          {{authorizers-dropdown
+            authorizers=_availableAuthorizers
+            onSelect=(action "authorizerSelected")
+            selectedAuthorizer=_selectedAuthorizer
+            placeholder=(tt this "addAccountDropdownPlaceholder")}}
         </div>
       </li>
     {{/loading-container}}
