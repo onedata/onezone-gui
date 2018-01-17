@@ -11,11 +11,16 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import authorizers from 'onezone-gui/utils/authorizers';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   classNames: 'content-users',
 
   globalNotify: inject(),
+  linkedAccountManager: inject(),
 
   /**
    * @override
@@ -26,6 +31,45 @@ export default Component.extend(I18n, {
    * @type {models/user}
    */
   user: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  _loadingLinkedAccounts: true,
+
+  /**
+   * @type {undefined|object}
+   */
+  _loadingLinkedAccountsError: undefined,
+
+  /**
+   * @type {undefined|DS.RecordArray<models/LinkedAccount}
+   */
+  _linkedAccounts: undefined,
+
+  /**
+   * Object with mapping authorizerType -> authorizerDefinition
+   * @type {Ember.ComputedProperty<object>}
+   */
+  _accountsAuthorizers: computed('_linkedAccounts.@each.type', function () {
+    const _linkedAccounts = this.get('_linkedAccounts');
+    const accountsAuthorizers = {};
+    if (_linkedAccounts) {
+      _linkedAccounts.mapBy('type').forEach(type =>
+        accountsAuthorizers[type] = _.find(authorizers, { type }) || {}
+      );
+    }
+    return accountsAuthorizers;
+  }),
+
+  init() {
+    this._super(...arguments);
+    this.get('linkedAccountManager').getLinkedAccounts().then(linkedAccounts =>
+      safeExec(this, 'set', '_linkedAccounts', linkedAccounts)
+    ).catch(error =>
+      safeExec(this, 'set', '_loadingLinkedAccountsError', error)
+    ).finally(() => safeExec(this, 'set', '_loadingLinkedAccounts', false));
+  },
 
   /**
    * Shows global info about save error.

@@ -16,7 +16,38 @@
     {{one-inline-editor value=user.login onSave=(action "saveLogin") class="login-editor"}}</div>
   </div>
 <div class="content-row">
-  <h1>{{tt this "authorizers"}}</h1>
-  <div class="indented-row">
-  </div>
+  <h1>{{tt this "linkedAccounts"}}</h1>
+  <ul class="indented-row linked-accounts-list">
+    {{#loading-container
+      isLoading=_loadingLinkedAccounts
+      errorReason=_loadingLinkedAccountsError}}
+      {{#each _linkedAccounts as |account|}}
+        <li class="linked-account full-social-icon content-row">
+          {{login-box/social-box-list/social-box
+            type=account.type
+            iconType=(get (get _accountsAuthorizers account.type) "iconType")
+            iconName=(get (get _accountsAuthorizers account.type) "iconName")}}
+          <div class="account-description">
+            {{#truncated-string class="account-type"}}
+              {{get (get _accountsAuthorizers account.type) "name"}}
+            {{/truncated-string}}
+            {{#each account.emails as |email|}}
+              {{#truncated-string class="account-email"}}
+                {{email}}
+              {{/truncated-string}}
+            {{/each}}
+          </div>
+        </li>
+      {{/each}}
+      <li class="linked-account full-social-icon content-row">
+        {{login-box/social-box-list/social-box
+          type="add"
+          iconType="oneicon"
+          iconName="add"}}
+        <div class="account-description">
+          <div class="account-type">{{tt this "addAccount"}}</div>
+        </div>
+      </li>
+    {{/loading-container}}
+  </ul>
 </div>

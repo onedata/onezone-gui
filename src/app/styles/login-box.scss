@@ -65,7 +65,7 @@
   
   &.rhea {
     .one-icon {
-      font-size: 50px;
+      font-size: $large-social-box-size;
     }
     .ember-power-select-option & .one-icon,
     .ember-power-select-trigger & .one-icon {
@@ -99,6 +99,9 @@
   display: inline-block;
   vertical-align: top;
   cursor: default !important;
+  a {
+    color: $color-one-white;
+  }
   &.disabled {
     opacity: 0.3;
     a {
@@ -111,6 +114,28 @@
     background-size: 40px 40px;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+}
+
+.login-box, .full-social-icon {
+  .login-icon-box {
+    display: inline-block;
+    height: $large-social-box-size;
+    width: $large-social-box-size;
+    line-height: $large-social-box-size;
+    font-size: 35px;
+    cursor: pointer;
+
+    .loader {
+      // position hack
+      position: absolute;
+      top: 23px;
+      left: 30px;
+      font-size: 40px;
+      max-width: 40px;
+      width: 40px;
+      color: rgba(white, 0.5);
+    }
   }
 }
 
@@ -180,26 +205,6 @@
     min-height: 250px;
     max-width: 400px;
     margin: 0 auto;
-  }
-
-  .login-icon-box {
-    display: inline-block;
-    height: 50px;
-    width: 50px;
-    line-height: 50px;
-    font-size: 35px;
-    cursor: pointer;
-
-    .loader {
-      // position hack
-      position: absolute;
-      top: 23px;
-      left: 30px;
-      font-size: 40px;
-      max-width: 40px;
-      width: 40px;
-      color: rgba(white, 0.5);
-    }
   }
 
   .authorizers-select-container {

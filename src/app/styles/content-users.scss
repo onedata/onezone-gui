@@ -1,4 +1,44 @@
 .content-users {
+  .linked-accounts-list {
+    position: relative;
+    min-height: 100px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  .linked-account {
+    position: relative;
+    min-height: $large-social-box-size + 2 * $content-row-vertical-padding;
+    padding-left: $large-social-box-size + $padding-base-horizontal;
+  }
+  .login-icon-box {
+    cursor: default !important;
+  }
+  .social-box {
+    position: absolute;
+    top: $content-row-vertical-padding;
+    left: 0;
+  }
+  .account-description {
+    padding: $padding-xs-vertical 0;
+  }
+  .account-type {
+    font-size: 110%;
+    font-weight: bold;
+  }
+  .account-email {
+    margin-top: $padding-base-vertical;
+  }
+  .login-icon-box.add {
+    $border-width: 2px;
+    $add-box-size: $large-social-box-size - 2 * $border-width;
+    background-color: $color-one-white;
+    border: 2px solid $color-one-blue-gray;
+    color: $color-one-blue-gray;
+    .one-icon {
+      line-height: $add-box-size;
+    }
+  }
   @media (min-width: $screen-sm-min) {
     .indented-row {
       margin-left: 20px;
@@ -12,6 +52,9 @@
       display: inline-block;
       vertical-align: middle;
       max-width: 270px;
+    }
+    .linked-accounts-list {
+      margin-left: 40px;
     }
   }
   @media (max-width: $screen-xs-max) {
