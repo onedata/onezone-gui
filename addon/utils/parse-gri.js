@@ -13,7 +13,7 @@
  * @returns {Object} contains strings with GRI parts
  */
 export default function (griValue) {
-  let m = griValue.match(/(.*)\.(.*)\.([^:]*):?(.*)?/);
+  let m = griValue.match(/(.*)\.(.*)\.([^:,]*)(,[^:]*)?(:.*)?/);
   if (!m) {
     throw new Error('util:gri#parseGri: unparsable gri: ' + griValue);
   }
@@ -21,6 +21,7 @@ export default function (griValue) {
     entityType: m[1],
     entityId: m[2],
     aspect: m[3],
-    scope: m[4],
+    aspectId: m[4] && m[4].slice(1),
+    scope: m[5] && m[5].slice(1),
   };
 }

@@ -45,4 +45,17 @@ export default Service.extend({
   __handle_testRPC(args = {}) {
     return Promise.resolve(args);
   },
+
+  __handle_getLoginEndpoint( /*idp*/ ) {
+    return Promise.resolve({
+      method: 'get',
+      url: window.location.origin + '/dev_login',
+    });
+  },
+
+  __handle_getProviderRedirectURL( /*providerId*/ ) {
+    return Promise.resolve({
+      url: 'http://localhost:4201',
+    });
+  },
 });

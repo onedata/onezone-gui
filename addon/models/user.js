@@ -1,7 +1,7 @@
 /**
  * @module models/user
- * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @author Jakub Liput, Michal Borzecki
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -18,4 +18,5 @@ export default Model.extend(GraphModelMixin, {
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
+  clientTokenList: belongsTo('clientTokenList'),
 });
