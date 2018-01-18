@@ -36,9 +36,9 @@ export default Component.extend(I18n, {
   user: undefined,
 
   /**
-   * @type {boolean}
+   * @type {Ember.ComputedProperty<boolean>}
    */
-  _loadingLinkedAccounts: true,
+  _loadingLinkedAccounts: computed.not('_linkedAccounts.isLoaded'),
 
   /**
    * @type {undefined|object}
@@ -59,11 +59,11 @@ export default Component.extend(I18n, {
    * Object with mapping authorizerType -> authorizerDefinition
    * @type {Ember.ComputedProperty<object>}
    */
-  _accountsAuthorizers: computed('_linkedAccounts.@each.type', function () {
+  _accountsAuthorizers: computed('_linkedAccounts.isLoaded', function () {
     const _linkedAccounts = this.get('_linkedAccounts');
     const accountsAuthorizers = {};
-    if (_linkedAccounts) {
-      _linkedAccounts.mapBy('type').forEach(type =>
+    if (_linkedAccounts && _linkedAccounts.get('isLoaded')) {
+      _linkedAccounts.mapBy('providerId').forEach(type =>
         accountsAuthorizers[type] = _.find(authorizers, { type }) || {}
       );
     }
@@ -84,7 +84,7 @@ export default Component.extend(I18n, {
       safeExec(this, 'set', '_linkedAccounts', linkedAccounts)
     ).catch(error =>
       safeExec(this, 'set', '_loadingLinkedAccountsError', error)
-    ).finally(() => safeExec(this, 'set', '_loadingLinkedAccounts', false));
+    );
   },
 
   /**

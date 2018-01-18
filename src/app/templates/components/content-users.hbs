@@ -24,14 +24,14 @@
       {{#each _linkedAccounts as |account|}}
         <li class="linked-account full-social-icon content-row">
           {{login-box/social-box-list/social-box
-            type=account.type
-            iconType=(get (get _accountsAuthorizers account.type) "iconType")
-            iconName=(get (get _accountsAuthorizers account.type) "iconName")}}
+            type=account.providerId
+            iconType=(get (get _accountsAuthorizers account.providerId) "iconType")
+            iconName=(get (get _accountsAuthorizers account.providerId) "iconName")}}
           <div class="account-description">
             {{#truncated-string class="account-type"}}
-              {{get (get _accountsAuthorizers account.type) "name"}}
+              {{get (get _accountsAuthorizers account.providerId) "name"}}
             {{/truncated-string}}
-            {{#each account.emails as |email|}}
+            {{#each account.emailList as |email|}}
               {{#truncated-string class="account-email"}}
                 {{email}}
               {{/truncated-string}}

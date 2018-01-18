@@ -11,6 +11,6 @@ import attr from 'ember-data/attr';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 
 export default Model.extend(GraphModelMixin, {
-  type: attr('string'),
-  emails: attr('array'),
+  providerId: attr('string'),
+  emailList: attr('array'),
 });
