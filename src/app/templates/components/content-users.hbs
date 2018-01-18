@@ -22,7 +22,7 @@
       isLoading=_loadingLinkedAccounts
       errorReason=_loadingLinkedAccountsError}}
       {{#each _linkedAccounts as |account|}}
-        <li class="linked-account full-social-icon content-row">
+        <li class="linked-account full-social-icon content-row {{account.providerId}}-account">
           {{login-box/social-box-list/social-box
             type=account.providerId
             iconType=(get (get _accountsAuthorizers account.providerId) "iconType")
@@ -39,7 +39,7 @@
           </div>
         </li>
       {{/each}}
-      <li class="linked-account full-social-icon content-row">
+      <li class="linked-account full-social-icon content-row add-account">
         {{login-box/social-box-list/social-box
           type="add"
           iconType="oneicon"

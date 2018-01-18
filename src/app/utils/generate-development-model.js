@@ -124,12 +124,12 @@ function createClientTokensRecords(store) {
 }
 
 function createLinkedAccount(store) {
-  return Promise.all(LINKED_ACCOUNT_TYPES.map(type =>
+  return Promise.all(LINKED_ACCOUNT_TYPES.map(providerId =>
     store.createRecord('linkedAccount', {
-      type,
-      emails: A([
-        `email1@${type}.com`,
-        `email2@${type}.com`,
+      providerId,
+      emailList: A([
+        `email1@${providerId}.com`,
+        `email2@${providerId}.com`,
       ]),
     }).save()
   ));
