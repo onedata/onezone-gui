@@ -168,6 +168,11 @@
       z-index: -1;
     }
     .authorizers-dropdown {
+      .ember-power-select-trigger {
+        .social-box {
+          left: 100px;
+        }
+      }
       position: relative;
       opacity: 0;
       margin-top: 10px;

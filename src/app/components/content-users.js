@@ -14,6 +14,7 @@ import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import authorizers from 'onezone-gui/utils/authorizers';
+import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 
 export default Component.extend(I18n, {
@@ -22,6 +23,7 @@ export default Component.extend(I18n, {
   globalNotify: inject(),
   linkedAccountManager: inject(),
   authorizerManager: inject(),
+  onezoneServer: inject(),
 
   /**
    * @override
@@ -107,6 +109,18 @@ export default Component.extend(I18n, {
     });
   },
 
+  /**
+   * Notifies about auth endpoint error.
+   * @param {object} error
+   * @returns {undefined}
+   */
+  _authEndpointError(error) {
+    this.get('globalNotify').backendError(this.tt('authentication'), {
+      message: this.tt('authEndpointError') +
+        (error.message ? ' - ' + error.message : '.'),
+    });
+  },
+
   actions: {
     saveName(name) {
       const user = this.get('user');
@@ -122,7 +136,19 @@ export default Component.extend(I18n, {
       return this._saveUser();
     },
     authorizerSelected(authorizer) {
-      // FIXME
+      this.set('_selectedAuthorizer', authorizer);
+      return this.get('onezoneServer').getLoginEndpoint({
+        idp: authorizer.type,
+        linkAccount: true,
+        redirectUrl: window.location.toString(),
+      }).then(data =>
+        handleLoginEndpoint(data, () =>
+          this._authEndpointError({
+            message: this.tt('authEndpointConfError'),
+          })
+        )
+      ).catch(error => this._authEndpointError(error))
+      .then(() => safeExec(this, 'set', '_selectedAuthorizer', undefined));
     },
   },
 });
