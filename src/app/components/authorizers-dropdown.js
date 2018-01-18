@@ -7,11 +7,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Component from '@ember/component';
 
-export default Ember.Component.extend({
+export default Component.extend({
   classNames: ['authorizers-dropdown'],
-  
+
   /**
    * @type {Array<AuthorizerInfo>}
    */

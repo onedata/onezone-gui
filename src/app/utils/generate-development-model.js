@@ -124,7 +124,7 @@ function createClientTokensRecords(store) {
 }
 
 function createLinkedAccount(store) {
-  return Promise.all(LINKED_ACCOUNT_TYPES.map(type => 
+  return Promise.all(LINKED_ACCOUNT_TYPES.map(type =>
     store.createRecord('linkedAccount', {
       type,
       emails: A([

@@ -23,7 +23,7 @@ describe('Integration | Component | content tokens', function () {
       id: '1',
       token: tokenString,
     }));
-    this.render(hbs`{{content-tokens selectedToken=token}}`);
+    this.render(hbs `{{content-tokens selectedToken=token}}`);
     expect(this.$('textarea').text().trim()).to.equal(tokenString);
   });
 });

@@ -138,17 +138,17 @@ export default Component.extend(I18n, {
     authorizerSelected(authorizer) {
       this.set('_selectedAuthorizer', authorizer);
       return this.get('onezoneServer').getLoginEndpoint({
-        idp: authorizer.type,
-        linkAccount: true,
-        redirectUrl: window.location.toString(),
-      }).then(data =>
-        handleLoginEndpoint(data, () =>
-          this._authEndpointError({
-            message: this.tt('authEndpointConfError'),
-          })
-        )
-      ).catch(error => this._authEndpointError(error))
-      .then(() => safeExec(this, 'set', '_selectedAuthorizer', undefined));
+          idp: authorizer.type,
+          linkAccount: true,
+          redirectUrl: window.location.toString(),
+        }).then(data =>
+          handleLoginEndpoint(data, () =>
+            this._authEndpointError({
+              message: this.tt('authEndpointConfError'),
+            })
+          )
+        ).catch(error => this._authEndpointError(error))
+        .finally(() => safeExec(this, 'set', '_selectedAuthorizer', undefined));
     },
   },
 });
