@@ -22,14 +22,14 @@
       isLoading=_loadingLinkedAccounts
       errorReason=_loadingLinkedAccountsError}}
       {{#each _linkedAccounts as |account|}}
-        <li class="linked-account full-social-icon content-row {{account.providerId}}-account">
+        <li class="linked-account full-social-icon content-row {{account.idp}}-account">
           {{login-box/social-box-list/social-box
-            type=account.providerId
-            iconType=(get (get _accountsAuthorizers account.providerId) "iconType")
-            iconName=(get (get _accountsAuthorizers account.providerId) "iconName")}}
+            type=account.idp
+            iconType=(get (get _accountsAuthorizers account.idp) "iconType")
+            iconName=(get (get _accountsAuthorizers account.idp) "iconName")}}
           <div class="account-description">
             {{#truncated-string class="account-type"}}
-              {{get (get _accountsAuthorizers account.providerId) "name"}}
+              {{get (get _accountsAuthorizers account.idp) "name"}}
             {{/truncated-string}}
             {{#each account.emailList as |email|}}
               {{#truncated-string class="account-email"}}

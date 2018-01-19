@@ -63,7 +63,7 @@ export default Component.extend(I18n, {
     const _linkedAccounts = this.get('_linkedAccounts');
     const accountsAuthorizers = {};
     if (_linkedAccounts && _linkedAccounts.get('isLoaded')) {
-      _linkedAccounts.mapBy('providerId').forEach(type =>
+      _linkedAccounts.mapBy('idp').forEach(type =>
         accountsAuthorizers[type] = _.find(authorizers, { type }) || {}
       );
     }

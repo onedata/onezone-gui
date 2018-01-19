@@ -14,7 +14,7 @@ const linkedAccountManagerStub = Service.extend({
   getLinkedAccounts() {
     const accounts = [
       EmberObject.create({
-        providerId: 'google',
+        idp: 'google',
         emailList: ['one@one.one'],
       }),
     ];
