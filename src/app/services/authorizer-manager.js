@@ -16,7 +16,7 @@ export default Service.extend({
 
   /**
    * Returns array of authorizers types supported by backend
-   * @return {Array<AuthorizerInfo>}
+   * @return {Array<string>}
    */
   getAvailableAuthorizersTypes() {
     return this.get('onedataConnection.identityProviders');

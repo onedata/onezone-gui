@@ -8,6 +8,9 @@
  */
 
 import { default as Service, inject } from '@ember/service';
+import DS from 'ember-data';
+import { resolve } from 'rsvp';
+import { A } from '@ember/array';
 
 export default Service.extend({
   providerManager: inject(),
@@ -27,7 +30,9 @@ export default Service.extend({
         return this.get('clientTokenManager').getClientTokens();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return [user];
+          return DS.PromiseArray.create({
+            promise: resolve(A([user])),
+          });
         });
       default:
         return new Promise((resolve, reject) => reject('No such collection: ' + type));

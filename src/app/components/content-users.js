@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, set } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
@@ -46,7 +46,7 @@ export default Component.extend(I18n, {
   _loadingLinkedAccountsError: undefined,
 
   /**
-   * @type {undefined|DS.RecordArray<models/LinkedAccount}
+   * @type {undefined|DS.RecordArray<models/LinkedAccount>}
    */
   _linkedAccounts: undefined,
 
@@ -56,7 +56,7 @@ export default Component.extend(I18n, {
   _selectedAuthorizer: undefined,
 
   /**
-   * Object with mapping authorizerType -> authorizerDefinition
+   * Object with mapping authorizerType -> authorizerInfo
    * @type {Ember.ComputedProperty<object>}
    */
   _accountsAuthorizers: computed('_linkedAccounts.isLoaded', function () {
@@ -115,8 +115,8 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   _authEndpointError(error) {
-    this.get('globalNotify').backendError(this.tt('authentication'), {
-      message: this.tt('authEndpointError') +
+    this.get('globalNotify').backendError(this.t('authentication'), {
+      message: this.t('authEndpointError') +
         (error.message ? ' - ' + error.message : '.'),
     });
   },
@@ -127,12 +127,12 @@ export default Component.extend(I18n, {
       if (!name || !name.length) {
         return reject();
       }
-      user.set('name', name);
+      set(user, 'name', name);
       return this._saveUser();
     },
     saveLogin(login) {
       const user = this.get('user');
-      user.set('login', login && login.length ? login : null);
+      set(user, 'login', login && login.length ? login : null);
       return this._saveUser();
     },
     authorizerSelected(authorizer) {
@@ -144,7 +144,7 @@ export default Component.extend(I18n, {
         }).then(data =>
           handleLoginEndpoint(data, () =>
             this._authEndpointError({
-              message: this.tt('authEndpointConfError'),
+              message: this.t('authEndpointConfError'),
             })
           )
         ).catch(error => this._authEndpointError(error))

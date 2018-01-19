@@ -8,6 +8,7 @@
  */
 
 import Component from '@ember/component';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 
 export default Component.extend({
   classNames: ['authorizers-dropdown'],
@@ -46,7 +47,7 @@ export default Component.extend({
    * @param {AuthorizerInfo} authorizer selected authorizer
    * @returns {undefined}
    */
-  onSelect: () => {},
+  onSelect: notImplementedThrow,
 
   /**
    * Powerselect item matcher used by its search engine.
