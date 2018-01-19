@@ -108,7 +108,10 @@ export default Adapter.extend({
     stripObject(data);
 
     return onedataGraph.request({
-      gri: gri(modelName, null, 'instance'),
+      gri: gri({
+        entityType: modelName,
+        aspect: 'instance',
+      }),
       operation: 'create',
       data,
       authHint,
@@ -128,8 +131,10 @@ export default Adapter.extend({
     let data = snapshot.record.toJSON();
     let recordId = snapshot.record.id;
     stripObject(data);
+    const griData = parseGri(recordId);
+    griData.scope = 'private';
     return onedataGraph.request({
-      gri: recordId,
+      gri: gri(griData),
       operation: 'update',
       data,
     });
@@ -146,8 +151,10 @@ export default Adapter.extend({
   deleteRecord(store, type, snapshot) {
     let onedataGraph = this.get('onedataGraph');
     let recordId = snapshot.record.id;
+    const griData = parseGri(recordId);
+    griData.scope = 'private';
     return onedataGraph.request({
-      gri: recordId,
+      gri: gri(griData),
       operation: 'delete',
     });
   },

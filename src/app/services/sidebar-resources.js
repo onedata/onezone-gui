@@ -7,13 +7,16 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service from '@ember/service';
-import { inject as service } from '@ember/service';
+import { default as Service, inject } from '@ember/service';
+import { resolve } from 'rsvp';
+import { A } from '@ember/array';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
-  providerManager: service(),
-  clientTokenManager: service(),
-  clientTokenActions: service(),
+  providerManager: inject(),
+  clientTokenManager: inject(),
+  clientTokenActions: inject(),
+  currentUser: inject(),
 
   /**
    * @param {string} type
@@ -26,7 +29,11 @@ export default Service.extend({
       case 'tokens':
         return this.get('clientTokenManager').getClientTokens();
       case 'users':
-        return Promise.reject({ message: 'User management not implemented yet' });
+        return this.get('currentUser').getCurrentUserRecord().then(user => {
+          return PromiseArray.create({
+            promise: resolve(A([user])),
+          });
+        });
       default:
         return new Promise((resolve, reject) => reject('No such collection: ' + type));
     }

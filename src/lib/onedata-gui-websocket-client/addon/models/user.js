@@ -14,9 +14,11 @@ export default Model.extend(GraphModelMixin, {
   isCollection: true,
 
   name: attr('string'),
+  login: attr('string'),
 
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
   clientTokenList: belongsTo('clientTokenList'),
+  linkedAccountList: belongsTo('linkedAccountList'),
 });

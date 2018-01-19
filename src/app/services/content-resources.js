@@ -14,6 +14,7 @@ import RSVP from 'rsvp';
 export default Service.extend({
   providerManager: inject(),
   clientTokenManager: inject(),
+  currentUser: inject(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -24,6 +25,8 @@ export default Service.extend({
     switch (type) {
       case 'providers':
         return this.get('providerManager').getRecord(id);
+      case 'users':
+        return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':
         return this.get('clientTokenManager').getRecord(id);
       default:

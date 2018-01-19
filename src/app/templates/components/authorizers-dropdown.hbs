@@ -1,0 +1,19 @@
+{{#power-select
+  options=authorizers
+  onchange=(action "authorizerSelected")
+  selected=selectedAuthorizer
+  matcher=_authorizersSelectMatcher
+  dropdownClass="authorizers-dropdown-element"
+  placeholder=placeholder
+  disabled=disabled
+  as |authorizer|}}
+  {{login-box/social-box-list/social-box 
+    active=(eq authorizer activeAuthorizer)
+    spinnerScale=0.15
+    type=authorizer.type
+    iconType=authorizer.iconType
+    iconName=authorizer.iconName
+  }}
+  {{authorizer.name}}
+{{/power-select}}
+{{yield}}

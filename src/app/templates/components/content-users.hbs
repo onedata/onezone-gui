@@ -1,0 +1,59 @@
+<div class="row content-row header-row hidden-xs">
+  <h1>
+    <span class="one-label">{{tt this "profile"}}</span>
+  </h1>
+</div>
+<div class="content-row">
+  <h1>{{tt this "name"}}</h1>
+  <div class="indented-row">
+    {{one-icon icon="user-profile" class="user-image"}}
+    {{one-inline-editor value=user.name onSave=(action "saveName") class="name-editor"}}
+  </div>
+</div>
+<div class="content-row">
+  <h1>{{tt this "login"}}</h1>
+  <div class="indented-row">
+    {{one-inline-editor value=user.login onSave=(action "saveLogin") class="login-editor"}}</div>
+  </div>
+<div class="content-row">
+  <h1>{{tt this "linkedAccounts"}}</h1>
+  <ul class="indented-row linked-accounts-list">
+    {{#loading-container
+      isLoading=_loadingLinkedAccounts
+      errorReason=_loadingLinkedAccountsError}}
+      {{#each _linkedAccounts as |account|}}
+        <li class="linked-account full-social-icon content-row {{account.idp}}-account">
+          {{login-box/social-box-list/social-box
+            type=account.idp
+            iconType=(get (get _accountsAuthorizers account.idp) "iconType")
+            iconName=(get (get _accountsAuthorizers account.idp) "iconName")}}
+          <div class="account-description">
+            {{#truncated-string class="account-type"}}
+              {{get (get _accountsAuthorizers account.idp) "name"}}
+            {{/truncated-string}}
+            {{#each account.emailList as |email|}}
+              {{#truncated-string class="account-email"}}
+                {{email}}
+              {{/truncated-string}}
+            {{/each}}
+          </div>
+        </li>
+      {{/each}}
+      <li class="linked-account full-social-icon content-row add-account">
+        {{login-box/social-box-list/social-box
+          type="add"
+          iconType="oneicon"
+          iconName="add"}}
+        <div class="account-description">
+          {{authorizers-dropdown
+            authorizers=_availableAuthorizers
+            onSelect=(action "authorizerSelected")
+            selectedAuthorizer=_selectedAuthorizer
+            activeAuthorizer=_selectedAuthorizer
+            disabled=_selectedAuthorizer
+            placeholder=(tt this "addAccountDropdownPlaceholder")}}
+        </div>
+      </li>
+    {{/loading-container}}
+  </ul>
+</div>

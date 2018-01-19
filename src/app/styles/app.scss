@@ -1,8 +1,12 @@
 @import 'onedata-gui-common';
 
+$large-social-box-size: 50px;
+
 // Project-specific styles
 @import 'authorizers';
+@import 'authorizers-dropdown';
 @import 'content-providers';
+@import 'content-users';
 @import 'content-tokens';
 @import 'login-box';
 @import 'sidebar-providers';

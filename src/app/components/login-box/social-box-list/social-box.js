@@ -107,11 +107,6 @@ export default Component.extend({
     return htmlSafe(style);
   }),
 
-  click() {
-    // hide tooltip
-    this.$()[0].dispatchEvent(new Event('mouseleave'));
-  },
-
   actions: {
     clicked() {
       const {
@@ -120,6 +115,7 @@ export default Component.extend({
         _window,
         action,
       } = this.getProperties('disabled', 'link', '_window', 'action');
+      this.element.dispatchEvent(new Event('mouseleave'));
       if (!disabled) {
         if (link) {
           _window.location = link;
