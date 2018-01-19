@@ -8,9 +8,9 @@
  */
 
 import { default as Service, inject } from '@ember/service';
-import DS from 'ember-data';
 import { resolve } from 'rsvp';
 import { A } from '@ember/array';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
   providerManager: inject(),
@@ -30,7 +30,7 @@ export default Service.extend({
         return this.get('clientTokenManager').getClientTokens();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return DS.PromiseArray.create({
+          return PromiseArray.create({
             promise: resolve(A([user])),
           });
         });
