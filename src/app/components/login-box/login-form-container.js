@@ -8,6 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { notEmpty, gt } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
@@ -73,13 +74,13 @@ export default LoginFormConainer.extend({
    * If true, there are some auth providers to show.
    * @type {Ember.ComputedProperty<boolean>}
    */
-  _hasAuthorizersForSelect: computed.notEmpty('_authorizersForSelect'),
+  _hasAuthorizersForSelect: notEmpty('_authorizersForSelect'),
 
   /**
    * If true, 'show more' button will be visible in auth buttons bar.
    * @type {computed.boolean}
    */
-  _showMoreProvidersButton: computed.gt('supportedAuthorizers.length', 7),
+  _showMoreProvidersButton: gt('supportedAuthorizers.length', 7),
 
   /**
    * Array of auth providers for buttons bar (available space
