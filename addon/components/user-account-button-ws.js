@@ -5,46 +5,37 @@
  * NOTE: requires onedata websocket managed session
  *
  * @module components/user-account-button-ws
- * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @author Jakub Liput, Michal Borzecki
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import { reads } from '@ember/object/computed';
+
+import { inject as service } from '@ember/service';
 
 import UserAccountButton from 'onedata-gui-common/components/user-account-button';
 import layout from 'onedata-gui-common/templates/components/user-account-button';
-
-const {
-  inject: { service },
-  get,
-} = Ember;
 
 export default UserAccountButton.extend({
   layout,
 
   currentUser: service(),
-  globalNotify: service(),
+
+  /**
+   * @type {models/user}
+   */
+  user: undefined,
 
   /**
    * @override
    */
-  username: null,
+  username: reads('user.name'),
 
   init() {
     this._super(...arguments);
-    this.get('currentUser').getCurrentUserRecord().then(user => {
-      this.set('username', get(user, 'name'));
-    })
-  },
-
-  actions: {
-    /**
-     * @override
-     */
-    manageAccount() {
-      // TODO implement
-      this.get('globalNotify').error('Account settings not implemented yet');
-    },
+    this.get('currentUser').getCurrentUserRecord().then(user =>
+      this.set('user', user)
+    );
   },
 });
