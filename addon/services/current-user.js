@@ -7,15 +7,16 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { oneWay } from '@ember/object/computed';
+
 import Service, { inject } from '@ember/service';
-import { computed } from '@ember/object';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 
 export default Service.extend({
   store: inject(),
   session: inject(),
 
-  userId: computed.oneWay('session.data.authenticated.identity.user'),
+  userId: oneWay('session.data.authenticated.identity.user'),
 
   getCurrentUserRecord() {
     const {

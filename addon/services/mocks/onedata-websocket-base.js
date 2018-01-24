@@ -12,14 +12,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Service from '@ember/service';
 
-const {
-  Service,
-  RSVP: { Promise },
-  computed: { readOnly },
-  String: { camelize },
-} = Ember;
+import { Promise } from 'rsvp';
+import { readOnly } from '@ember/object/computed';
+import { camelize } from '@ember/string';
 
 export default Service.extend({
   initPromise: null,

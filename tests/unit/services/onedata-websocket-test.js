@@ -1,12 +1,9 @@
+import EmberObject from '@ember/object';
+import Evented from '@ember/object/evented';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import wait from 'ember-test-helpers/wait';
-import Ember from 'ember';
-
-const {
-  Evented,
-} = Ember;
 
 class WebSocketMock {
   constructor() {
@@ -44,7 +41,7 @@ describe('Unit | Service | onedata websocket', function () {
       pushHandlerDone = true;
     };
 
-    Ember.Object.extend(Evented).create({
+    EmberObject.extend(Evented).create({
       init() {
         service.on('push:graph', (m) => {
           pushHandler(m);

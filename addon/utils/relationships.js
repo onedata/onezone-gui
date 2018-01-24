@@ -7,7 +7,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { belongsTo as origBelongsTo, hasMany as origHasMany } from 'ember-data/relationships';
+import {
+  belongsTo as origBelongsTo,
+  hasMany as origHasMany,
+} from 'ember-data/relationships';
 
 export function belongsTo(modelName) {
   return origBelongsTo(modelName, { async: true, inverse: null });

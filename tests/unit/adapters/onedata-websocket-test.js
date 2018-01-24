@@ -95,7 +95,7 @@ describe('Unit | Adapter | onedata websocket', function () {
     let type = {
       modelName,
     };
-    let recordId = 'a:b:c';
+    let recordId = 'a.b.c:private';
     let recordData = {
       foo: 'bar',
     };
@@ -136,7 +136,7 @@ describe('Unit | Adapter | onedata websocket', function () {
     let type = {
       modelName,
     };
-    let recordId = 'a:b:c';
+    let recordId = 'a.b.c:private';
     let recordData = {
       foo: 'bar',
     };
