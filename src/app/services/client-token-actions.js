@@ -54,7 +54,7 @@ export default Service.extend(I18n, {
     );
     return clientTokenManager.createRecord().then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
-      router.get('router').transitionTo(
+      router.transitionTo(
         'onedata.sidebar.content',
         'tokens',
         token.get('id')

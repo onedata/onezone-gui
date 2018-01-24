@@ -46,7 +46,7 @@ export default Component.extend(I18n, {
       clientTokenManager.deleteRecord(selectedToken.get('id'))
         .then(() => {
           globalNotify.success(this.t('tokenDeleteSuccess'));
-          router.get('router').transitionTo('onedata.sidebar.index', 'tokens');
+          router.transitionTo('onedata.sidebar.index', 'tokens');
         })
         .catch(error => globalNotify.backendError(this.t('tokenDeletion'), error));
     },
