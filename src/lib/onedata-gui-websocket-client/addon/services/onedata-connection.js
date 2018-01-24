@@ -7,24 +7,25 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { reads } from '@ember/object/computed';
+
 import Service, { inject } from '@ember/service';
-import { computed } from '@ember/object';
 
 export default Service.extend({
   onedataWebsocket: inject(),
 
-  attributes: computed.reads('onedataWebsocket.connectionAttributes'),
+  attributes: reads('onedataWebsocket.connectionAttributes'),
 
   /**
    * Name of zone instance
    * @type {Ember.Computed<string>}
    */
-  zoneName: computed.reads('attributes.zoneName'),
+  zoneName: reads('attributes.zoneName'),
 
   /**
    * @type {Ember.Computed<Array<string>>}
    */
-  idps: computed.reads('attributes.idps'),
+  idps: reads('attributes.idps'),
 
   /**
    * Stores list of identity provider ids,
@@ -32,5 +33,5 @@ export default Service.extend({
    * It's an alias to `idps` attribute.
    * @type {Ember.Computed<Array<string>>}
    */
-  identityProviders: computed.reads('idps'),
+  identityProviders: reads('idps'),
 });

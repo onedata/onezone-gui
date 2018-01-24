@@ -8,12 +8,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { oneWay, readOnly } from '@ember/object/computed';
+
 import Mixin from '@ember/object/mixin';
 import { computed } from '@ember/object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Mixin.create({
-  gri: computed.oneWay('id'),
+  gri: oneWay('id'),
 
   parsedGri: computed('gri', function getParsedGri() {
     let gri = this.get('gri');
@@ -22,8 +24,8 @@ export default Mixin.create({
     }
   }),
 
-  entityType: computed.readOnly('parsedGri.entityType'),
-  entityId: computed.readOnly('parsedGri.entityId'),
-  aspect: computed.readOnly('parsedGri.aspect'),
-  scope: computed.readOnly('parsedGri.scope'),
+  entityType: readOnly('parsedGri.entityType'),
+  entityId: readOnly('parsedGri.entityId'),
+  aspect: readOnly('parsedGri.aspect'),
+  scope: readOnly('parsedGri.scope'),
 });
