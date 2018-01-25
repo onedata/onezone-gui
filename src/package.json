@@ -75,7 +75,7 @@
     "loader.js": "4.6.0",
     "perfect-scrollbar": "0.8.1",
     "round10": "1.0.3",
-    "sinon": "4.2.1",
+    "sinon": "4.2.0",
     "sinon-chai": "2.14.0"
   },
   "engines": {
