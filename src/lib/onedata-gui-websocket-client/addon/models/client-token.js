@@ -13,5 +13,8 @@ import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-mo
 
 export default Model.extend(GraphModelMixin, {
   token: attr('string'),
-  name: computed.reads('token'),
+  name: computed('token', function () {
+    const token = this.get('token');
+    return token.slice(0, 3) + '...' + token.slice(token.length - 12, token.length);
+  }),
 });

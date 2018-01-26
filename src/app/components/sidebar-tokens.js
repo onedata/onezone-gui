@@ -28,11 +28,6 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-tokens/token-item',
-
-  /**
-   * @override
-   */
   triggerEventOnPrimaryItemSelection: true,
 
   /**
