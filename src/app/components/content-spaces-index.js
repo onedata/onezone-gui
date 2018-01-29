@@ -95,7 +95,8 @@ export default Component.extend(I18n, UserProxyMixin, {
         aspectActions: this.get('globalActions'),
         aspectActionsTitle: 'Space',
       });
-      this.set('leaveSpaceModalTriggers', '.btn-leave-space.btn;a.leave-space:modal');
+      this.set('leaveSpaceModalTriggers',
+        '.btn-leave-space.btn;a.leave-space:modal');
     });
   },
 
