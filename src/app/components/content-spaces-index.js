@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, set } from '@ember/object';
+import { computed, set, observer } from '@ember/object';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
@@ -84,16 +84,28 @@ export default Component.extend(I18n, UserProxyMixin, {
     }];
   }),
 
+  globalActionsObserver: observer('globalActions', function () {
+    this.set('navigationState.aspectActions', this.get('globalActions'));
+  }),
+
   init() {
     this._super(...arguments);
     next(() => {
-      this.set('navigationState.aspectActions', this.get('globalActions'));
+      this.get('navigationState').setProperties({
+        aspectActions: this.get('globalActions'),
+        aspectActionsTitle: 'Space',
+      });
       this.set('leaveSpaceModalTriggers', '.btn-leave-space.btn;a.leave-space:modal');
     });
   },
 
   willDestroyElement() {
-    next(() => this.get('navigationState').set('aspectActions', []));
+    next(() => {
+      this.get('navigationState').setProperties({
+        aspectActions: [],
+        aspectActionsTitle: undefined,
+      });
+    });
     this._super(...arguments);
   },
 
