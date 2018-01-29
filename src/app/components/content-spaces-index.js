@@ -13,6 +13,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, set } from '@ember/object';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
+import { next } from '@ember/runloop';
 
 export default Component.extend(I18n, UserProxyMixin, {
   classNames: ['content-spaces-redirect'],
@@ -20,6 +21,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   onezoneServer: inject(),
   currentUser: inject(),
   globalNotify: inject(),
+  navigationState: inject(),
 
   /**
    * @override 
@@ -31,6 +33,11 @@ export default Component.extend(I18n, UserProxyMixin, {
    * @type {models/Space}
    */
   space: undefined,
+
+  /**
+   * @type {string}
+   */
+  leaveSpaceModalTriggers: '',
 
   /**
    * @type {string}
@@ -50,6 +57,45 @@ export default Component.extend(I18n, UserProxyMixin, {
       return spaceId && defaultSpaceId && (spaceId === defaultSpaceId);
     }
   ),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<AspectAction>>}
+   */
+  globalActions: computed('isDefaultSpace', function () {
+    const isDefaultSpace = this.get('isDefaultSpace');
+    return [{
+      action: () => this.send('toggleDefaultSpace'),
+      title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
+      class: 'toggle-default-space',
+      buttonStyle: 'default',
+      icon: isDefaultSpace ? 'home-outline' : 'home',
+    }, {
+      action: () => this.send('openAddStorage'),
+      title: this.t('addStorage'),
+      class: 'open-add-storage',
+      buttonStyle: 'primary',
+      icon: 'provider-add',
+    }, {
+      action: () => {},
+      title: this.t('leave'),
+      class: 'leave-space',
+      buttonStyle: 'danger',
+      icon: 'leave-space',
+    }];
+  }),
+
+  init() {
+    this._super(...arguments);
+    next(() => {
+      this.set('navigationState.aspectActions', this.get('globalActions'));
+      this.set('leaveSpaceModalTriggers', '.btn-leave-space.btn;a.leave-space:modal');
+    });
+  },
+
+  willDestroyElement() {
+    next(() => this.get('navigationState').set('aspectActions', []));
+    this._super(...arguments);
+  },
 
   /**
    * Shows global info about save error.
@@ -87,11 +133,6 @@ export default Component.extend(I18n, UserProxyMixin, {
   actions: {
     openAddStorage() {
       throw new Error('not implemented');
-    },
-    openLeaveModal(fromFullToolbar) {
-      if (!fromFullToolbar) {
-        this.set('_deregisterModalOpen', true);
-      }
     },
     leave() {
       const spaceId = this.get('spaceId');
