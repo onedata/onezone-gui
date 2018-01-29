@@ -12,7 +12,7 @@
       }}
     </span>
     {{!-- FIXME: properly implement switching between sidebar and content menu --}}
-    {{#one-collapsible-toolbar isGlobal=false showInMobileSidebar=false as |dropdown|}}
+    {{#one-collapsible-toolbar showMinimized=false as |dropdown|}}
       {{#each globalActions as |act|}}
         {{!-- TODO: design and UX: should be a toggle or some icon --}}
         {{#dropdown.item
