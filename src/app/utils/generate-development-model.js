@@ -24,6 +24,9 @@ const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const providerStatusList = ['online', 'offline'];
 
+const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
+const names = ['one', 'two', 'three'];
+
 /**
  * @export
  * @function
@@ -31,8 +34,6 @@ const providerStatusList = ['online', 'offline'];
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
-  const names = ['one', 'two', 'three'];
   return Promise.all(
       types.map(type =>
         createEntityRecords(store, type, names)
@@ -67,15 +68,22 @@ export default function generateDevelopmentModel(store) {
 }
 
 function createUserRecord(store, listRecords) {
-  const userRecord = store.createRecord('user', {
-    id: userGri(USER_ID),
-    name: USERNAME,
-    login: USER_LOGIN,
-  });
-  listRecords.forEach(lr =>
-    userRecord.set(camelize(lr.constructor.modelName), lr)
-  );
-  return userRecord.save();
+  const spacesIndex = types.indexOf('space');
+  listRecords[spacesIndex].get('list')
+    .then(list => list.get('firstObject'))
+    .then(space => space.get('entityId'))
+    .then(defaultSpaceId => {
+      const userRecord = store.createRecord('user', {
+        id: userGri(USER_ID),
+        name: USERNAME,
+        login: USER_LOGIN,
+        defaultSpaceId,
+      });
+      listRecords.forEach(lr =>
+        userRecord.set(camelize(lr.constructor.modelName), lr)
+      );
+      return userRecord.save();
+    });
 }
 
 function createEntityRecords(store, type, names) {

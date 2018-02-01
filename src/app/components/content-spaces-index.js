@@ -81,9 +81,10 @@ export default Component.extend(I18n, UserProxyMixin, {
   _setAsDefaultSpace(enable) {
     const spaceId = enable ? this.get('space.entityId') : null;
     return this.get('currentUser').getCurrentUserRecord()
-      // FIXME: safe exec  
       .then(user => user.setDefaultSpaceId(spaceId))
-      .catch(error => this.get('globalNotify').backendError('test', error));
+      .catch(error =>
+        this.get('globalNotify').backendError(this.t('changingDefaultSpace'), error)
+      );
   },
 
   actions: {

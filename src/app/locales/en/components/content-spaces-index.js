@@ -5,6 +5,7 @@ export default {
   addStorage: 'Add storage',
   saving: 'saving space options',
   editSpaceNameHint: 'Change space name',
-  unsetDefault: 'Unset default',
+  unsetDefault: 'Is default (unset)',
   setDefault: 'Set as default',
+  changingDefaultSpace: 'changing default space',
 };

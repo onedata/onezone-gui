@@ -19,7 +19,7 @@
         triggerClasses="btn-default-space"
         itemAction=(action "toggleDefaultSpace")
       }}
-        {{one-icon icon=(if isDefaultSpace "home-outline" "home")}}
+        {{one-icon icon=(if isDefaultSpace "home" "home-outline")}}
         <span class="text">{{tt this (if isDefaultSpace "unsetDefault" "setDefault")}}</span>
       {{/dropdown.item}}
       {{#dropdown.item
