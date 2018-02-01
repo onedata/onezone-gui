@@ -20,6 +20,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   onezoneServer: inject(),
   currentUser: inject(),
   globalNotify: inject(),
+  router: inject(),
 
   /**
    * @override 
@@ -88,8 +89,8 @@ export default Component.extend(I18n, UserProxyMixin, {
   },
 
   actions: {
-    openAddStorage() {
-      throw new Error('not implemented');
+    openAddSupport() {
+      this.get('router').transitionTo('onedata.sidebar.content.aspect', 'support');
     },
     openLeaveModal(fromFullToolbar) {
       if (!fromFullToolbar) {

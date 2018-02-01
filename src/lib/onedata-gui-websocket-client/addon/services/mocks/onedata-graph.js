@@ -10,6 +10,15 @@
 import Evented from '@ember/object/evented';
 import { Promise } from 'rsvp';
 import Service from '@ember/service';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+
+const messageNotSupported = Object.freeze({
+  success: false,
+  error: { id: 'notSupported' },
+  data: {},
+});
+
+const responseDelay = 100;
 
 export default Service.extend(Evented, {
   /**
@@ -47,19 +56,47 @@ export default Service.extend(Evented, {
     });
 
     if (response.success) {
-      return Promise.resolve(response);
+      return new Promise(resolve => {
+        setTimeout(() => resolve(response), responseDelay);
+      });
     } else {
       return Promise.reject(response);
     }
   },
 
-  response() {
-    return {
-      success: false,
-      error: { id: 'notSupported' },
-      data: {},
-    };
+  response({
+    gri,
+    operation,
+    data,
+    authHint,
+  }) {
+    const {
+      entityType,
+      entityId,
+      aspect,
+    } = parseGri(gri);
+    const handler = this.get(`handlers.${entityType}.${aspect}`);
+    if (handler) {
+      return handler(operation, entityId, data, authHint);
+    } else {
+      return messageNotSupported;
+    }
   },
+
+  handlers: Object.freeze({
+    space: {
+      invite_provider_token(operation, /* spaceId, data, authHint*/ ) {
+        if (operation === 'create') {
+          return {
+            success: true,
+            data: randomToken(),
+          };
+        } else {
+          return messageNotSupported;
+        }
+      },
+    },
+  }),
 
   // FIXME: implement mocked graph responses
   // response({
@@ -78,3 +115,14 @@ export default Service.extend(Evented, {
   //   (success ? Promise.resolve : Promise.reject)(responseData);
   // },
 });
+
+const exampleToken =
+  'MDAxNWxvY2F00aW9uIG9uZXpvbmUKMDAzYmlkZW500aWZpZXIgM2E00NGx2bUM00cW5VcHAtSGx3X2NIZFhGT2ZJWXAwdG5Td1V5UEJ2LWtEMAowMDI4Y2lkIHRva2VuVHlwZSA9IHNwYWNlX3N1cHBvcnRfdG9rZW4KMDAyZnNpZ25hdHVyZSA6OiqbyenXe005Y4hXgbOYHgatNArPXTBCq01c4igkMrfAo';
+
+/**
+ * @returns {string}
+ */
+function randomToken() {
+  const randInt = Math.floor(Math.random() * 10000);
+  return exampleToken + randInt;
+}

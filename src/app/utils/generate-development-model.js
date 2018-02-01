@@ -19,7 +19,7 @@ const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
-const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_CLIENT_TOKENS = 0;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const providerStatusList = ['online', 'offline'];
@@ -71,7 +71,7 @@ function createUserRecord(store, listRecords) {
   const spacesIndex = types.indexOf('space');
   listRecords[spacesIndex].get('list')
     .then(list => list.get('firstObject'))
-    .then(space => space.get('entityId'))
+    .then(space => space && space.get('entityId'))
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
         id: userGri(USER_ID),

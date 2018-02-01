@@ -1,7 +1,8 @@
 export default {
   title: 'Create new space',
-  text: 'This space will have no initial storage attached. You can add it ' +
-    'later in space options using "Add storage" option.',
+  text: 'Enter a name below to create new space. The newly created space will ' +
+    'have no initial support from any Oneprovider. ' +
+    'You can add it after creation in space options using "Add support" option.',
   createButton: 'Create new space',
   spaceName: 'Space name',
 };

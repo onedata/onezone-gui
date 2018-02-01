@@ -2,7 +2,7 @@ export default {
   leave: 'Leave space',
   setHome: 'Set as home',
   isHome: 'Home space',
-  addStorage: 'Add storage',
+  addSupport: 'Add support',
   saving: 'saving space options',
   editSpaceNameHint: 'Change space name',
   unsetDefault: 'Is default (unset)',
