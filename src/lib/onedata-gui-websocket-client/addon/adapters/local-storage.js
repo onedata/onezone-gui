@@ -35,7 +35,11 @@ export default LocalstorageAdapter.extend(LocalStorageMethodsMock, {
       entityType = type;
       aspect = 'instance';
     }
-    return gri(entityType, this._super(...arguments), aspect);
+    return gri({
+      entityType,
+      entityId: this._super(...arguments),
+      aspect,
+    });
   },
 
   clearLocalStorage() {
