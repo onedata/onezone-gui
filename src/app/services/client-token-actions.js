@@ -10,6 +10,7 @@
 import { default as Service, inject } from '@ember/service';
 import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import $ from 'jquery';
 
 export default Service.extend(I18n, {
   clientTokenManager: inject(),
@@ -53,7 +54,7 @@ export default Service.extend(I18n, {
     );
     return clientTokenManager.createRecord().then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
-      router.get('router').transitionTo(
+      router.transitionTo(
         'onedata.sidebar.content',
         'tokens',
         token.get('id')

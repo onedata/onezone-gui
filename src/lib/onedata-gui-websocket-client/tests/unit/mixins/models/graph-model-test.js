@@ -1,12 +1,12 @@
+import EmberObject from '@ember/object';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import Ember from 'ember';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 
 describe('Unit | Mixin | models/graph model', function () {
   it('has parsed gri computed properties', function () {
     const gri = 'aa.bb.cc:dd';
-    let GraphModelObject = Ember.Object.extend(GraphModelMixin, {
+    let GraphModelObject = EmberObject.extend(GraphModelMixin, {
       id: gri,
     });
     let subject = GraphModelObject.create();

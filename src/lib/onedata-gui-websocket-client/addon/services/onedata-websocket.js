@@ -14,21 +14,17 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
-import _ from 'lodash';
+import { computed } from '@ember/object';
 
-const {
-  RSVP: { defer },
-  computed,
-  computed: { readOnly },
-  Evented,
-  String: { camelize },
-  ObjectProxy,
-  PromiseProxyMixin,
-  RSVP: { Promise },
-  isArray,
-  Service,
-} = Ember;
+import { readOnly, reads } from '@ember/object/computed';
+import Evented from '@ember/object/evented';
+import { camelize } from '@ember/string';
+import ObjectProxy from '@ember/object/proxy';
+import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';
+import { Promise, defer } from 'rsvp';
+import { isArray } from '@ember/array';
+import Service from '@ember/service';
+import _ from 'lodash';
 
 const ObjectPromiseProxy = ObjectProxy.extend(PromiseProxyMixin);
 
@@ -86,7 +82,7 @@ export default Service.extend(Evented, {
    * Maps message id -> { sendDeferred: RSVP.Deferred, timeoutId: Number }
    * @type {Map}
    */
-  _deferredMessages: new Map(),
+  _deferredMessages: undefined,
 
   /**
    * A class for creating new WebSocket object
@@ -112,7 +108,12 @@ export default Service.extend(Evented, {
    * - `ipds`: string[] (id providers - names of identity providers for authentication)
    * @type {Ember.ComputedProperty<object>}
    */
-  connectionAttributes: computed.reads('_connectionAttributes'),
+  connectionAttributes: reads('_connectionAttributes'),
+
+  init() {
+    this._super(...arguments);
+    this.set('_deferredMessages', new Map());
+  },
 
   /**
    * @param {object} options

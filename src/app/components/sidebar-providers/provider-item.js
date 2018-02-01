@@ -7,6 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { get } from '@ember/object';
@@ -24,12 +25,12 @@ export default Component.extend({
    * Just an one-way alias
    * @type {Provider}
    */
-  provider: computed.reads('item'),
+  provider: reads('item'),
 
   /**
    * @type {Ember.computed<string>}
    */
-  providerId: computed.reads('provider.entityId'),
+  providerId: reads('provider.entityId'),
 
   /**
    * Icon class based on item status
@@ -49,13 +50,13 @@ export default Component.extend({
   /**
    * @type {Ember.Computed<models/SpaceList>}
    */
-  _spaceList: computed.reads('provider.spaceList'),
+  _spaceList: reads('provider.spaceList'),
 
   /**
    * Spaces supported by provider visible by current user
    * @type {Ember.ComputedProperty<Ember.Array<Space>>}
    */
-  _spaces: computed.reads('_spaceList.content.list.content'),
+  _spaces: reads('_spaceList.content.list.content'),
 
   /**
    * True if we know the list of space ids (eg. for counting spaces)

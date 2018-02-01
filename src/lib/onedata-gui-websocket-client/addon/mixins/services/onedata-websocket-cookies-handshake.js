@@ -10,13 +10,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
 
-const {
-  Mixin,
-  RSVP: { Promise },
-  inject: { service },
-} = Ember;
+import { Promise } from 'rsvp';
+import { inject as service } from '@ember/service';
 
 export default Mixin.create({
   cookies: service(),

@@ -16,7 +16,7 @@
  * @abstract
  */
 
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
 import _ from 'lodash';
 import config from 'ember-get-config';
 import { isDevelopment, isModelMocked } from 'onedata-gui-websocket-client/utils/development-environment';
@@ -27,7 +27,7 @@ const DEFAULT_CONFIG = {
   clearOnReload: true,
 };
 
-export default Ember.Mixin.create({
+export default Mixin.create({
   /**
    * @type {object} Ember Config (eg. ember-get-config)
    */
