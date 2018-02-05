@@ -8,11 +8,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { reads } from '@ember/object/computed';
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
@@ -44,7 +44,7 @@ export default Component.extend(I18n, {
   /**
    * @type {string}
    */
-  providerId: computed.reads('provider.entityId'),
+  providerId: reads('provider.entityId'),
 
   init() {
     this._super(...arguments);

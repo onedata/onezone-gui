@@ -7,6 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { not } from '@ember/object/computed';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
@@ -38,7 +39,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  _loadingLinkedAccounts: computed.not('_linkedAccounts.isLoaded'),
+  _loadingLinkedAccounts: not('_linkedAccounts.isLoaded'),
 
   /**
    * @type {undefined|object}

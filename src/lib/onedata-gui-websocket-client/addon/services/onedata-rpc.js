@@ -7,13 +7,9 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Service, { inject as service } from '@ember/service';
 
-const {
-  Service,
-  inject: { service },
-  RSVP: { Promise },
-} = Ember;
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   onedataWebsocket: service(),

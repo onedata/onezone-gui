@@ -68,7 +68,7 @@ export default Component.extend(I18n, UserProxyMixin, {
       title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
       class: 'toggle-default-space',
       buttonStyle: 'default',
-      icon: isDefaultSpace ? 'home-outline' : 'home',
+      icon: isDefaultSpace ? 'home' : 'home-outline',
     }, {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
@@ -76,7 +76,7 @@ export default Component.extend(I18n, UserProxyMixin, {
       buttonStyle: 'primary',
       icon: 'provider-add',
     }, {
-      action: () => {},
+      action: () => this.send('openLeaveModal'),
       title: this.t('leave'),
       class: 'leave-space',
       buttonStyle: 'danger',
@@ -140,12 +140,20 @@ export default Component.extend(I18n, UserProxyMixin, {
   _setAsDefaultSpace(enable) {
     const spaceId = enable ? this.get('space.entityId') : null;
     return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.setDefaultSpaceId(spaceId));
+      .then(user => user.setDefaultSpaceId(spaceId))
+      .catch(error =>
+        this.get('globalNotify').backendError(this.t('changingDefaultSpace'), error)
+      );
   },
 
   actions: {
     openAddStorage() {
       throw new Error('not implemented');
+    },
+    openLeaveModal(fromFullToolbar) {
+      if (!fromFullToolbar) {
+        this.set('_deregisterModalOpen', true);
+      }
     },
     leave() {
       const spaceId = this.get('spaceId');

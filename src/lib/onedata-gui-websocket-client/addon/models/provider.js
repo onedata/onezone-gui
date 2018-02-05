@@ -5,6 +5,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { alias } from '@ember/object/computed';
+
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { computed } from '@ember/object';
@@ -31,7 +33,7 @@ export default Model.extend(GraphModelMixin, {
   }),
 
   //#region Aliases and backward-compatibility
-  host: computed.alias('domain'),
+  host: alias('domain'),
   status: computed('online', function getStatus() {
     return this.get('online') ? 'online' : 'offline';
   }),

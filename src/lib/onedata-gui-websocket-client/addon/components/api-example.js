@@ -9,21 +9,17 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Ember from 'ember';
+import Component from '@ember/component';
+
+import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
+import { oneWay } from '@ember/object/computed';
 
 import layout from 'onedata-gui-websocket-client/templates/components/api-example';
 
 import { Promise } from 'rsvp';
 
-const {
-  inject: {
-    service,
-  },
-  computed,
-  computed: { oneWay },
-} = Ember;
-
-export default Ember.Component.extend({
+export default Component.extend({
   layout,
 
   store: service(),

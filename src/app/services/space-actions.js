@@ -1,6 +1,7 @@
 import Service, { inject } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import $ from 'jquery';
 
 export default Service.extend(I18n, {
   router: inject(),
