@@ -11,20 +11,7 @@
         editHint=(tt this "editSpaceNameHint")
       }}
     </span>
-    {{!-- FIXME: properly implement switching between sidebar and content menu --}}
-    {{#one-collapsible-toolbar showMinimized=false as |dropdown|}}
-      {{#each globalActions as |act|}}
-        {{!-- TODO: design and UX: should be a toggle or some icon --}}
-        {{#dropdown.item
-          buttonStyle=act.buttonStyle
-          triggerClasses=act.class
-          itemAction=act.action
-        }}
-          {{one-icon icon=act.icon}}
-          <span class="text">{{act.title}}</span>
-        {{/dropdown.item}}
-      {{/each}}
-    {{/one-collapsible-toolbar}}
+    {{actions-toolbar actionsArray=globalActions}}
   </h1>
   {{#one-switchable-popover-modal
     triggersConfiguration=leaveSpaceModalTriggers

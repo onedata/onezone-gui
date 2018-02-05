@@ -10,18 +10,18 @@
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, set, observer } from '@ember/object';
+import { computed, set } from '@ember/object';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
-export default Component.extend(I18n, UserProxyMixin, {
+export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
   classNames: ['content-spaces-redirect'],
 
   onezoneServer: inject(),
   currentUser: inject(),
   globalNotify: inject(),
-  navigationState: inject(),
 
   /**
    * @override 
@@ -38,6 +38,13 @@ export default Component.extend(I18n, UserProxyMixin, {
    * @type {string}
    */
   leaveSpaceModalTriggers: '',
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function () {
+    return this.t('space');
+  }),
 
   /**
    * @type {string}
@@ -59,55 +66,72 @@ export default Component.extend(I18n, UserProxyMixin, {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<AspectAction>>}
+   * @type {Ember.ComputedProperty<AspectAction>}
    */
-  globalActions: computed('isDefaultSpace', function () {
+  toggleDefaultSpaceAction: computed('isDefaultSpace', function () {
     const isDefaultSpace = this.get('isDefaultSpace');
-    return [{
+    return {
       action: () => this.send('toggleDefaultSpace'),
       title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
       class: 'toggle-default-space',
       buttonStyle: 'default',
       icon: isDefaultSpace ? 'home' : 'home-outline',
-    }, {
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<AspectAction>}
+   */
+  openAddStorageAction: computed(function () {
+    return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
       class: 'open-add-storage',
       buttonStyle: 'primary',
       icon: 'provider-add',
-    }, {
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<AspectAction>}
+   */
+  openLeaveModalAction: computed(function () {
+    return {
       action: () => this.send('openLeaveModal'),
       title: this.t('leave'),
       class: 'leave-space',
       buttonStyle: 'danger',
       icon: 'leave-space',
-    }];
+    };
   }),
 
-  globalActionsObserver: observer('globalActions', function () {
-    this.set('navigationState.aspectActions', this.get('globalActions'));
-  }),
+  /**
+   * @type {Ember.ComputedProperty<Array<AspectAction>>}
+   */
+  globalActions: computed(
+    'toggleDefaultSpaceAction',
+    'openAddStorageAction',
+    'openLeaveModalAction',
+    function () {
+      const {
+        toggleDefaultSpaceAction,
+        openAddStorageAction,
+        openLeaveModalAction,
+      } = this.getProperties(
+        'toggleDefaultSpaceAction',
+        'openAddStorageAction',
+        'openLeaveModalAction'
+      );
+      return [toggleDefaultSpaceAction, openAddStorageAction, openLeaveModalAction];
+    }
+  ),
 
   init() {
     this._super(...arguments);
     next(() => {
-      this.get('navigationState').setProperties({
-        aspectActions: this.get('globalActions'),
-        aspectActionsTitle: 'Space',
-      });
       this.set('leaveSpaceModalTriggers',
         '.btn-leave-space.btn;a.leave-space:modal');
     });
-  },
-
-  willDestroyElement() {
-    next(() => {
-      this.get('navigationState').setProperties({
-        aspectActions: [],
-        aspectActionsTitle: undefined,
-      });
-    });
-    this._super(...arguments);
   },
 
   /**

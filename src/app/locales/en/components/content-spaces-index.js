@@ -1,4 +1,5 @@
 export default {
+  space: 'Space',
   leave: 'Leave space',
   setHome: 'Set as home',
   isHome: 'Home space',
