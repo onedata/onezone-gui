@@ -1,4 +1,4 @@
-import { oneWay, equal } from '@ember/object/computed';
+import { oneWay } from '@ember/object/computed';
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
@@ -8,11 +8,6 @@ import layout from 'onedata-gui-common/templates/components/app-layout';
 import { invokeAction, invoke } from 'ember-invoke-action';
 
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-
-const MOBILE_APPLAYOUT_STATE = {
-  CONTENT: 1,
-  SIDEBAR: 2,
-};
 
 /**
  * Makes layout for whole application in authorized mode.
@@ -37,35 +32,16 @@ export default Component.extend({
   sidebarResources: service(),
   eventsBus: service(),
   sideMenu: service(),
-  globalCollapsibleToolbar: service(),
   scrollState: service(),
   router: service(),
+  navigationState: service(),
 
   // TODO: too much relations: we got mainMenuItemChanged event
   currentTabId: oneWay('mainMenu.currentItemId'),
   sidenavTabId: null,
   sidebarSecondaryItem: null,
-  mobileAppLayoutHeader: computed('mobileAppLayoutState', 'currentTabId',
-    'sidebarSecondaryItem',
-    function () {
-      let {
-        mobileAppLayoutState,
-        currentTabId,
-        sidebarSecondaryItem
-      } = this.getProperties(
-        'mobileAppLayoutState',
-        'currentTabId',
-        'sidebarSecondaryItem'
-      );
-      if (mobileAppLayoutState === MOBILE_APPLAYOUT_STATE.SIDEBAR ||
-        !sidebarSecondaryItem) {
-        return currentTabId;
-      } else {
-        return sidebarSecondaryItem.label;
-      }
-    }),
-  mobileAppLayoutState: MOBILE_APPLAYOUT_STATE.SIDEBAR,
-  showMobileSidebar: equal('mobileAppLayoutState', MOBILE_APPLAYOUT_STATE.SIDEBAR),
+  globalMenuOpened: false,
+  showMobileSidebar: computed.equal('navigationState.activeContentLevel', 'sidebar'),
 
   sidenavContentComponent: computed('sidenavTabId', function () {
     let sidenavTabId = this.get('sidenavTabId');
@@ -179,11 +155,13 @@ export default Component.extend({
     changeResourceId() {
       return invokeAction(this, 'changeResourceId', ...arguments);
     },
-    globalCollapsibleToolbarToggle() {
-      this.toggleProperty('globalCollapsibleToolbar.isDropdownOpened');
-    },
     scrollOccurred(event) {
       this.get('scrollState').scrollOccurred(event);
     },
+    toggleGlobalMenu(opened) {
+      if (opened !== this.get('globalMenuOpened')) {
+        this.set('globalMenuOpened', opened);
+      }
+    }
   }
 });

@@ -1,8 +1,9 @@
 export default {
+  space: 'Space',
   leave: 'Leave space',
   setHome: 'Set as home',
   isHome: 'Home space',
-  addSupport: 'Add support',
+  addStorage: 'Add support',
   saving: 'saving space options',
   editSpaceNameHint: 'Change space name',
   unsetDefault: 'Is default (unset)',

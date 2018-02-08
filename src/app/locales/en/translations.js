@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
 
+import spaces from './tabs/spaces';
+
 import loginBox from './components/login-box';
 import brandInfo from './components/brand-info';
 import contentTokens from './components/content-tokens';
@@ -21,6 +23,9 @@ import sidebarResources from './services/sidebar-resources';
 import clientTokenActions from './services/client-token-actions';
 
 let translations = {
+  tabs: {
+    spaces,
+  },
   components: {
     loginBox,
     brandInfo,

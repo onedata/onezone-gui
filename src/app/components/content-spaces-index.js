@@ -13,8 +13,10 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, set } from '@ember/object';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
+import { next } from '@ember/runloop';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
-export default Component.extend(I18n, UserProxyMixin, {
+export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
   classNames: ['content-spaces-redirect'],
 
   onezoneServer: inject(),
@@ -36,6 +38,18 @@ export default Component.extend(I18n, UserProxyMixin, {
   /**
    * @type {string}
    */
+  leaveSpaceModalTriggers: '',
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function () {
+    return this.t('space');
+  }),
+
+  /**
+   * @type {string}
+   */
   spaceId: computed.reads('space.entityId'),
 
   /**
@@ -51,6 +65,75 @@ export default Component.extend(I18n, UserProxyMixin, {
       return spaceId && defaultSpaceId && (spaceId === defaultSpaceId);
     }
   ),
+
+  /**
+   * @type {Ember.ComputedProperty<AspectAction>}
+   */
+  toggleDefaultSpaceAction: computed('isDefaultSpace', function () {
+    const isDefaultSpace = this.get('isDefaultSpace');
+    return {
+      action: () => this.send('toggleDefaultSpace'),
+      title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
+      class: 'toggle-default-space',
+      buttonStyle: 'default',
+      icon: isDefaultSpace ? 'home' : 'home-outline',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<AspectAction>}
+   */
+  openAddStorageAction: computed(function () {
+    return {
+      action: () => this.send('openAddStorage'),
+      title: this.t('addStorage'),
+      class: 'open-add-storage',
+      buttonStyle: 'primary',
+      icon: 'provider-add',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<AspectAction>}
+   */
+  openLeaveModalAction: computed(function () {
+    return {
+      action: () => this.send('openLeaveModal'),
+      title: this.t('leave'),
+      class: 'leave-space',
+      buttonStyle: 'danger',
+      icon: 'leave-space',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<AspectAction>>}
+   */
+  globalActions: computed(
+    'toggleDefaultSpaceAction',
+    'openAddStorageAction',
+    'openLeaveModalAction',
+    function () {
+      const {
+        toggleDefaultSpaceAction,
+        openAddStorageAction,
+        openLeaveModalAction,
+      } = this.getProperties(
+        'toggleDefaultSpaceAction',
+        'openAddStorageAction',
+        'openLeaveModalAction'
+      );
+      return [toggleDefaultSpaceAction, openAddStorageAction, openLeaveModalAction];
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    next(() => {
+      this.set('leaveSpaceModalTriggers',
+        '.btn-leave-space.btn;a.leave-space:modal');
+    });
+  },
 
   /**
    * Shows global info about save error.
@@ -89,7 +172,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   },
 
   actions: {
-    openAddSupport() {
+    openAddStorage() {
       this.get('router').transitionTo('onedata.sidebar.content.aspect', 'support');
     },
     openLeaveModal(fromFullToolbar) {

@@ -11,37 +11,10 @@
         editHint=(tt this "editSpaceNameHint")
       }}
     </span>
-    {{!-- FIXME: properly implement switching between sidebar and content menu --}}
-    {{#one-collapsible-toolbar isGlobal=false showInMobileSidebar=false as |dropdown|}}
-      {{!-- TODO: design and UX: should be a toggle or some icon --}}
-      {{#dropdown.item
-        buttonStyle="default"
-        triggerClasses="btn-default-space"
-        itemAction=(action "toggleDefaultSpace")
-      }}
-        {{one-icon icon=(if isDefaultSpace "home" "home-outline")}}
-        <span class="text">{{tt this (if isDefaultSpace "unsetDefault" "setDefault")}}</span>
-      {{/dropdown.item}}
-      {{#dropdown.item
-        buttonStyle="primary"
-        triggerClasses="btn-add-storage"
-        itemAction=(action "openAddSupport")
-      }}
-        {{one-icon icon="provider-add"}}
-        <span class="text">{{tt this "addSupport"}}</span>
-      {{/dropdown.item}}
-      {{#dropdown.item
-        buttonStyle="danger"
-        triggerClasses="btn-leave-space"
-        itemAction=(action "openLeaveModal")
-      }}
-        {{one-icon icon="leave-space"}}
-        <span class="text">{{tt this "leave"}}</span>
-      {{/dropdown.item}}
-    {{/one-collapsible-toolbar}}
+    {{actions-toolbar actionsArray=globalActions}}
   </h1>
   {{#one-switchable-popover-modal
-    triggersConfiguration=".btn-leave-space.btn;a.btn-leave-space:modal"
+    triggersConfiguration=leaveSpaceModalTriggers
     popoverClass="popover-leave-space"
     submit=(action "leave")
     as |ospm|
