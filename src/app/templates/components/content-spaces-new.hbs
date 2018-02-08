@@ -1,22 +1,30 @@
-{{!-- FIXME: disable button if no name --}}
-
 {{#content-info
   class="scroll-breakpoint-400"
   header=(tt this "title")
+  imagePath="assets/images/space-new.svg"
   text=(tt this "text")
   buttonLabel=(tt this "createButton")
   buttonAction=(action "createSpace" spaceName)
+  buttonDisabled=(not spaceName)
+  as |contentInfo|
 }}
   <div class="row">
     <div class="col-xs-12">
-      <input
-        value={{spaceName}}
-        oninput={{action (mut spaceName) value="target.value"}}
-        onenter={{action "createSpace" spaceName}}
-        disabled={{isWorking}}
-        placeholder={{tt this "spaceName"}}
-        class="form-control new-space-name"
-      >
+      {{#bs-form
+        onSubmit=(action contentInfo.buttonAction)
+        submitOnEnter=true
+        as |form|
+      }}
+        <input
+          id="new-space-name"
+          value={{spaceName}}
+          oninput={{action (mut spaceName) value="target.value"}}
+          disabled={{isWorking}}
+          placeholder={{tt this "spaceName"}}
+          disabled={{contentInfo.actionInProgress}}
+          class="form-control new-space-name"
+        >
+      {{/bs-form}}
     </div>
   </div>
 {{/content-info}}

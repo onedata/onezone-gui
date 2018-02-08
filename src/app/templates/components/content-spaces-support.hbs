@@ -1,22 +1,47 @@
-{{!-- FIXME: three tabs, port utils for generating commands --}}
-{{#content-info
-  class="scroll-breakpoint-600"
-  header="Get support for space"
-}}
-  <div class="row">
-    {{#promise-proxy-container proxy=supportTokenProxy}}
-      <textarea class="token-input form-control" rows="4" readonly>
-        {{supportTokenProxy.content}}
-      </textarea>
-    {{/promise-proxy-container}}
-  </div>
-  <div class="row">
-    {{#one-spin-button
-      class="btn btn-sm btn-primary"
-      action=(action "getNewSupportToken")
-    }}
-      {{one-icon icon="token"}} <span>Generate new token</span>
-    {{/one-spin-button}}
-  </div>
-{{/content-info}}
+<div class="row content-row header-row">
+  <h1>
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+  </h1>
+</div>
+
+<div class="row content-row">
+  {{#bs-tab class="only-tab-bar" as |tab|}}
+    {{#tab.pane title=(tt this "requestSupport.tabName")}}
+      {{content-spaces-support/request-support
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+    {{#tab.pane title=(tt this "deployProvider.tabName")}}
+      {{content-spaces-support/deploy-provider
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+    {{#tab.pane title=(tt this "exposeData.tabName")}}
+      {{content-spaces-support/expose-data
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+  {{/bs-tab}}
+
+
+
+  {{!-- {{#promise-proxy-container proxy=supportTokenProxy}}
+    <textarea class="token-textarea form-control" rows="4" readonly>{{supportTokenProxy.content}}</textarea>
+  {{/promise-proxy-container}}
+  {{#one-spin-button class="btn btn-sm btn-primary" action=(action "getNewSupportToken") }}
+    {{one-icon icon="token"}}
+    <span>Generate new token</span>
+  {{/one-spin-button}} --}}
+</div>
 

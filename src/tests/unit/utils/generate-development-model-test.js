@@ -46,7 +46,8 @@ describe('Unit | Utility | generate development model', function () {
         'linkedAccountList',
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',
       ].forEach(modelName =>
-        expect(createRecord).to.be.calledWith(modelName, sinon.match.object)
+        expect(createRecord, `createRecord for ${modelName}`).to.be.calledWith(
+          modelName, sinon.match.object)
       );
       stubsToCheck.forEach(stub => expect(stub).to.be.called);
       done();

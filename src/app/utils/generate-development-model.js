@@ -69,9 +69,9 @@ export default function generateDevelopmentModel(store) {
 
 function createUserRecord(store, listRecords) {
   const spacesIndex = types.indexOf('space');
-  listRecords[spacesIndex].get('list')
-    .then(list => list.get('firstObject'))
-    .then(space => space.get('entityId'))
+  return listRecords[spacesIndex].get('list')
+    .then(list => list.get('length') > 0 ? list.get('firstObject ') : null)
+    .then(space => space && space.get('entityId'))
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
         id: userGri(USER_ID),
@@ -117,7 +117,8 @@ function createProvidersRecords(store) {
     let sign = index % 2 ? -1 : 1;
     return store.createRecord('provider', {
       name: `Provider ${index}`,
-      latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
+      latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
+        sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
       status: providerStatusList[index % providerStatusList.length],
       host: `10.0.0.${index + 1}`,

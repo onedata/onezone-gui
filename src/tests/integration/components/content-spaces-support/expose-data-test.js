@@ -3,9 +3,9 @@ import { describe, it } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 
-describe('Integration | Component | space without support', function() {
-  setupComponentTest('space-without-support', {
-    integration: true,
+describe('Integration | Component | content spaces support/expose data', function() {
+  setupComponentTest('content-spaces-support/expose-data', {
+    integration: true
   });
 
   it('renders', function() {
@@ -13,12 +13,12 @@ describe('Integration | Component | space without support', function() {
     // Handle any actions with this.on('myAction', function(val) { ... });
     // Template block usage:
     // this.render(hbs`
-    //   {{#space-without-support}}
+    //   {{#content-spaces-support/expose-data}}
     //     template content
-    //   {{/space-without-support}}
+    //   {{/content-spaces-support/expose-data}}
     // `);
 
-    this.render(hbs`{{space-without-support}}`);
+    this.render(hbs`{{content-spaces-support/expose-data}}`);
     expect(this.$()).to.have.length(1);
   });
 });

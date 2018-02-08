@@ -9,6 +9,10 @@ export default Component.extend(I18n, {
 
   spaceName: undefined,
 
+  didInsertElement() {
+    document.getElementById('new-space-name').focus();
+  },
+
   actions: {
     createSpace() {
       const spaceName = this.get('spaceName');
