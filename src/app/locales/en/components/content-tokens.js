@@ -6,4 +6,6 @@ export default {
   tokenDeleteSuccess: 'Token deleted successfully.',
   deleteToken: 'Remove',
   tokenDeletion: 'token deletion',
+  description: 'The token can be used for authentication of Oneclient and ' +
+    'Onedata REST API calls.',
 };

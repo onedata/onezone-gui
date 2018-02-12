@@ -1,1 +1,22 @@
-// FIXME: probably to remove
+.content-tokens {
+  .token-textarea {
+    width: 100%;
+    height: 120px;
+    margin-top: 0;
+  }
+  @media (max-width: $screen-xs-max) {
+    padding: 0 $padding-large-horizontal;
+    .token-textarea {
+      height: 200px;
+    }
+    .content-info .world-map {
+      top: $padding-base-vertical;
+    }
+  }
+  @media (min-width: $screen-sm-min) {
+    .content-info .world-map {
+      top: 2 * $onedata-logo-margin-top + $onedata-logo-height + $padding-base-vertical;
+      bottom: $padding-base-vertical;
+    }
+  }
+}

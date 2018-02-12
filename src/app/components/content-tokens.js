@@ -9,15 +9,37 @@
 
 import Component from '@ember/component';
 import { inject } from '@ember/service';
+import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-tokens'],
 
   i18n: inject(),
   globalNotify: inject(),
   clientTokenManager: inject(),
   router: inject(),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function () {
+    return this.t('header');
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<AspectAction>>}
+   */
+  globalActions: computed(function () {
+    return [{
+      action: () => this.send('removeToken'),
+      title: this.t('deleteToken'),
+      class: 'delete-token',
+      buttonStyle: 'danger',
+      icon: 'remove',
+    }];
+  }),
 
   /**
    * @override
