@@ -28,7 +28,7 @@ module.exports = function (environment) {
     'onedataTabs': [
       { id: 'providers', icon: 'provider' },
       { id: 'tokens', icon: 'tokens' },
-      { id: 'spaces', icon: 'space', defaultAspect: 'providers' },
+      { id: 'spaces', icon: 'space' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
