@@ -8,8 +8,8 @@
  */
 
 import Component from '@ember/component';
-import { get, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
 
@@ -49,7 +49,7 @@ export default Component.extend(I18n, GlobalActions, {
         const providerColors = this.get('providersColors');
         return providersProxy.map(provider => ({
           provider,
-          color: providerColors[get(provider, 'id')],
+          color: providerColors[get(provider, 'entityId')],
         }));
       } else {
         return undefined;
@@ -66,7 +66,7 @@ export default Component.extend(I18n, GlobalActions, {
     function getProvidersColors() {
       const providersProxy = this.get('providersProxy');
       if (get(providersProxy, 'isFulfilled')) {
-        const providerIds = get(providersProxy, 'content').mapBy('id').sort();
+        const providerIds = get(providersProxy, 'content').mapBy('entityId').sort();
         const colors = generateColors(providerIds.length);
         return _.zipObject(providerIds, colors);
       }
