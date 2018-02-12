@@ -27,6 +27,8 @@ const providerStatusList = ['online', 'offline'];
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
 const names = ['one', 'two', 'three'];
 
+const perProviderSize = 1048576;
+
 /**
  * @export
  * @function
@@ -40,6 +42,7 @@ export default function generateDevelopmentModel(store) {
         .then(records => createListRecord(store, type, records))
       )
     )
+    // push space list into providers
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
@@ -52,16 +55,21 @@ export default function generateDevelopmentModel(store) {
         ))
       ).then(() => listRecords);
     })
+    // push provider list and support info into spaces
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
       return Promise.all([providers, spaces]).then(([providerList, spaceList]) =>
-        Promise.all(spaceList.map(space =>
-          createListRecord(store, 'provider', providerList).then(lr => {
+        Promise.all(spaceList.map(space => {
+          space.set('supportSizes', _.zipObject(
+            providers.mapBy('entityId'),
+            _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
+          ));
+          return createListRecord(store, 'provider', providerList).then(lr => {
             space.set('providerList', lr);
             return space.save();
-          })
-        ))
+          });
+        }))
       ).then(() => listRecords);
     })
     .then(listRecords => createUserRecord(store, listRecords));
@@ -128,13 +136,8 @@ function createProvidersRecords(store) {
 
 function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
-    const perProviderSize = 1048576;
     return store.createRecord('space', {
       name: `Space ${index}`,
-      supportSizes: _.zipObject(
-        _.range(NUMBER_OF_PROVIDERS).map(String),
-        _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
-      ),
     }).save();
   }));
 }

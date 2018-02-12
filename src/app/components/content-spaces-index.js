@@ -83,19 +83,6 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
-  openAddStorageAction: computed(function () {
-    return {
-      action: () => this.send('openAddStorage'),
-      title: this.t('addStorage'),
-      class: 'open-add-storage',
-      buttonStyle: 'primary',
-      icon: 'provider-add',
-    };
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<AspectAction>}
-   */
   openLeaveModalAction: computed(function () {
     return {
       action: () => this.send('openLeaveModal'),
@@ -111,19 +98,16 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
    */
   globalActions: computed(
     'toggleDefaultSpaceAction',
-    'openAddStorageAction',
     'openLeaveModalAction',
-    function () {
+    function getGlobalActions() {
       const {
         toggleDefaultSpaceAction,
-        openAddStorageAction,
         openLeaveModalAction,
       } = this.getProperties(
         'toggleDefaultSpaceAction',
-        'openAddStorageAction',
         'openLeaveModalAction'
       );
-      return [toggleDefaultSpaceAction, openAddStorageAction, openLeaveModalAction];
+      return [toggleDefaultSpaceAction, openLeaveModalAction];
     }
   ),
 
@@ -172,9 +156,6 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
   },
 
   actions: {
-    openAddStorage() {
-      this.get('router').transitionTo('onedata.sidebar.content.aspect', 'support');
-    },
     openLeaveModal(fromFullToolbar) {
       if (!fromFullToolbar) {
         this.set('_deregisterModalOpen', true);

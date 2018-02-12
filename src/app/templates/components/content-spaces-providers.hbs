@@ -1,4 +1,26 @@
-{{#promise-proxy-container proxy=providersProxy}}
+<div class="row content-row header-row hidden-xs">
+  <h1 class="with-menu">
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+    {{actions-toolbar actionsArray=globalActions}}
+  </h1>
+</div>
+
+<div class="row">
+  {{#promise-proxy-container proxy=providersProxy}}
+    {{providers-list
+      providersData=providersData
+      selectedSpace=space
+      showSelectedSpaceSupportSize=true
+      showSupportedSpacesCount=false
+    }}
+  {{/promise-proxy-container}}
+</div>
+
+
+
+{{!-- {{#promise-proxy-container proxy=providersProxy}}
   {{#if _mobileMode}}
     <span>FIXME: mobile mode not implemented</span>
   {{else}}
@@ -19,4 +41,4 @@
       {{/each}}
     {{/one-atlas}}
   {{/if}}
-{{/promise-proxy-container}}
+{{/promise-proxy-container}} --}}

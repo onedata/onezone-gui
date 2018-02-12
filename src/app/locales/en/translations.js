@@ -15,6 +15,7 @@ import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesSupport from './components/content-spaces-support';
+import contentSpacesProviders from './components/content-spaces-providers';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 
@@ -40,6 +41,7 @@ let translations = {
     contentProviderEmpty,
     contentSpacesJoin,
     contentSpacesSupport,
+    contentSpacesProviders,
     leaveSpaceConfirm,
   },
   services: {
