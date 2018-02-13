@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { htmlSafe } from '@ember/string';
+import { htmlSafe, isHTMLSafe } from '@ember/string';
 import Ember from 'ember';
 
 const i18nPrefix = 'errors.backendErrors.';
@@ -24,18 +24,31 @@ const i18nPrefix = 'errors.backendErrors.';
 export default function getErrorDescription(error, i18n) {
   const errorId = error.id;
   let message;
+  let errorJson;
 
   if (typeof error === 'object' && error.id) {
     message = i18n.t(i18nPrefix + errorId, error.details);
+    if (message.toString().startsWith('<missing-')) {
+      message = '';
+    }
+    try {
+      errorJson = JSON.stringify(error);
+    } catch (e) {
+      errorJson = '';
+    }
+  } else if (isHTMLSafe(error)) {
+    message = error;
   } else {
     try {
-      message = JSON.stringify(error);
+      errorJson = JSON.stringify(error);
     } catch (e) {
       if (!(e instanceof TypeError)) {
         throw error;
       }
     }
   }
-
-  return htmlSafe(Ember.Handlebars.Utils.escapeExpression(message));
+  message = Ember.Handlebars.Utils.escapeExpression(message);
+  errorJson = errorJson ?
+    `<br><code>${Ember.Handlebars.Utils.escapeExpression(errorJson)}</code>` : '';
+  return htmlSafe(message + errorJson);
 }

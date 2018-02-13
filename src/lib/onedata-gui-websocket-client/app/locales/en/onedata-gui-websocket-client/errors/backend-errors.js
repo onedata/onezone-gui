@@ -22,48 +22,48 @@ export default {
   macaroonTtlTooLong: 'Operation could not be authorized (macaroon TTL too long).',
   badBasicCredentials: 'Operation could not be authorized (bad basic credentials).',
   malformedData: 'Malformed request (malformed data).',
-  missingRequiredValue: 'Required value of “{{key}}” is missing.',
+  missingRequiredValue: 'Required value of "{{key}}" is missing.',
   missingAtLeastOneValue: 'Required values of {{keys}} are missing.',
-  badData: 'Value of “{{key}}” provided in request is invalid.',
-  badValueEmpty: 'Value of “{{key}}” provided in request cannot be empty.',
-  badValueString: 'Value of “{{key}}” provided in request must be a string.',
-  badValueListOfStrings: 'Value of “{{key}}” provided in request must be a ' +
+  badData: 'Value of "{{key}}" provided in request is invalid.',
+  badValueEmpty: 'Value of "{{key}}" provided in request cannot be empty.',
+  badValueString: 'Value of "{{key}}" provided in request must be a string.',
+  badValueListOfStrings: 'Value of "{{key}}" provided in request must be a ' +
     'list of strings.',
-  badValueBoolean: 'Value of “{{key}}” provided in request must be a boolean.',
-  badValueInteger: 'Value of “{{key}}” provided in request must be an integer.',
-  badValueFloat: 'Value of “{{key}}” provided in request must be a float.',
-  badValueJSON: 'Value of “{{key}}” provided in request must be a JSON.',
-  badValueToken: 'Value of “{{key}}” provided in request must be a valid token.',
-  badValueListOfIPv4Addresses: 'Value of “{{key}}” provided in request must ' +
+  badValueBoolean: 'Value of "{{key}}" provided in request must be a boolean.',
+  badValueInteger: 'Value of "{{key}}" provided in request must be an integer.',
+  badValueFloat: 'Value of "{{key}}" provided in request must be a float.',
+  badValueJSON: 'Value of "{{key}}" provided in request must be a JSON.',
+  badValueToken: 'Value of "{{key}}" provided in request must be a valid token.',
+  badValueListOfIPv4Addresses: 'Value of "{{key}}" provided in request must ' +
     'be a list of valid IPv4 adresses.',
-  badValueDomain: 'Value of “{{key}}” provided in request must be a valid ' +
+  badValueDomain: 'Value of "{{key}}" provided in request must be a valid ' +
     'domain name.',
-  badValueSubdomain: 'Value of “{{key}}” provided in request must be a valid ' +
+  badValueSubdomain: 'Value of "{{key}}" provided in request must be a valid ' +
     'subdomain name.',
-  badValueEmail: 'Value of “{{key}}” provided in request must be a valid ' +
+  badValueEmail: 'Value of "{{key}}" provided in request must be a valid ' +
     'e-mail address.',
-  badValueTooLow: 'Value of “{{key}}” provided in request must be greater ' +
+  badValueTooLow: 'Value of "{{key}}" provided in request must be greater ' +
     'or equal to {{limit}}.',
-  badValueTooHigh: 'Value of “{{key}}” provided in request should be less ' +
+  badValueTooHigh: 'Value of "{{key}}" provided in request should be less ' +
     'or equal to {{limit}}.',
-  badValueNotInRange: 'Value of “{{key}}” provided in request should be ' +
+  badValueNotInRange: 'Value of "{{key}}" provided in request should be ' +
     'between {{low}} and {{high}}.',
-  badValueNotAllowed: 'Value of “{{key}}” provided in request is not ' +
+  badValueNotAllowed: 'Value of "{{key}}" provided in request is not ' +
     'allowed, valid values: {{allowed}}.',
-  badValueListNotAllowed: 'Value of “{{key}}” provided in request must be a ' +
+  badValueListNotAllowed: 'Value of "{{key}}" provided in request must be a ' +
     'list, allowed values: {{allowed}}.',
-  badValueIdNotFound: 'Resource does not exist: “{{key}}”.',
-  badValueIdentifierOccupied: 'The identifier provided for “{{key}}” is occupied.',
-  badValueTokenType: 'The token provided in “{{key}}” has invalid type.',
-  badValueIntentifier: 'Value of “{{key}}” provided in request must be a ' +
+  badValueIdNotFound: 'Resource does not exist: "{{key}}".',
+  badValueIdentifierOccupied: 'The identifier provided for "{{key}}" is occupied.',
+  badValueTokenType: 'The token provided in "{{key}}" has invalid type.',
+  badValueIntentifier: 'Value of "{{key}}" provided in request must be a ' +
     'valid identifier.',
-  badValueLogin: 'Value of “{{key}}” provided in request must be a valid login.',
+  badValueLogin: 'Value of "{{key}}" provided in request must be a valid login.',
   subdomainDelegationDisabled: 'This operation is not available while ' +
     'subdomain delegation is disabled.',
-  relationDoesNotExist: 'The {{childType}} (Id: “{{childId}}”) does not ' +
+  relationDoesNotExist: 'The {{childType}} (Id: "{{childId}}") does not ' +
     'belong to the {{parentType}} (Id: {{parentId}}).',
-  relationAlreadyExists: 'The {{childType}} (Id: “{{childId}}”) already ' +
+  relationAlreadyExists: 'The {{childType}} (Id: "{{childId}}") already ' +
     'belongs to the {{parentType}} (Id: {{parentId}}).',
   cannotDeleteEntity: 'Unexpected error while deleting the {{childType}} (Id: ' +
-    '“{{childId}}”).',
+    '"{{childId}}").',
 };
