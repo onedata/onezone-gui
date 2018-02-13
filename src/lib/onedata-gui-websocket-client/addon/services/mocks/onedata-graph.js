@@ -97,23 +97,6 @@ export default Service.extend(Evented, {
       },
     },
   }),
-
-  // FIXME: implement mocked graph responses
-  // response({
-  //   gri,
-  //   operation,
-  //   data,
-  //   authHint,
-  //   subscribe = false,
-  // }) {
-  //   const persistence = this.get('persistence');
-  //   const griData = parseGri(gri);
-  //   const {
-  //     success,
-  //     responseData,
-  //   } = _.find(persistence, griData);
-  //   (success ? Promise.resolve : Promise.reject)(responseData);
-  // },
 });
 
 const exampleToken =

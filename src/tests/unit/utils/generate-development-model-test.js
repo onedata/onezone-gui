@@ -5,6 +5,7 @@ import sinon from 'sinon';
 import EmberObject from '@ember/object';
 import { A } from '@ember/array';
 import { Promise } from 'rsvp';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 describe('Unit | Utility | generate development model', function () {
   it('creates and saves records', function (done) {
@@ -23,7 +24,7 @@ describe('Unit | Utility | generate development model', function () {
             stubsToCheck.push(save);
             const list = A();
             list.save = () => Promise.resolve();
-            this.set('list', Promise.resolve(list));
+            this.set('list', PromiseObject.create({ promise: Promise.resolve(list) }));
           },
           save() {},
         })

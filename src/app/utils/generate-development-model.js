@@ -13,6 +13,7 @@ import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise } from 'rsvp';
+import { get } from '@ember/object';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -62,7 +63,7 @@ export default function generateDevelopmentModel(store) {
       return Promise.all([providers, spaces]).then(([providerList, spaceList]) =>
         Promise.all(spaceList.map(space => {
           space.set('supportSizes', _.zipObject(
-            providers.mapBy('entityId'),
+            get(providers, 'content').mapBy('entityId'),
             _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
           ));
           return createListRecord(store, 'provider', providerList).then(lr => {

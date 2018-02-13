@@ -19,6 +19,7 @@ import generateColors from 'onedata-gui-common/utils/generate-colors';
 
 export default Component.extend(I18n, GlobalActions, {
   router: service(),
+  i18n: service(),
 
   i18nPrefix: 'components.contentSpacesProviders',
 
@@ -62,7 +63,7 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {Ember.ComputedProperty<Object>}
    */
   providersColors: computed(
-    'providersProxy.{content.@each.id,isFulfilled}',
+    'providersProxy.{content.@each.entityId,isFulfilled}',
     function getProvidersColors() {
       const providersProxy = this.get('providersProxy');
       if (get(providersProxy, 'isFulfilled')) {
