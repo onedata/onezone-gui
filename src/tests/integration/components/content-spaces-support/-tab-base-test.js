@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 describe('Integration | Component | content spaces support/ tab base', function() {
   setupComponentTest('content-spaces-support/-tab-base', {
-    integration: true
+    integration: true,
   });
 
   it('renders', function() {

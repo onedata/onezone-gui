@@ -22,8 +22,8 @@ function _curlCommand(url, token, suffix = '') {
   if (!url || !token) {
     return undefined;
   }
-  token = token.replace(/'/g, `\\'`);
-  let onezoneUrl = _onezoneUrl().replace(/'/g, `\\'`);
+  token = token.replace(/'/g, '\\\'');
+  let onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
   return `curl ${url} | sh -s '${onezoneUrl}' '${token}' ${suffix}`;
 }
 

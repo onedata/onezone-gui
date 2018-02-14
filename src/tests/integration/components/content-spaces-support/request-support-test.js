@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 describe('Integration | Component | content spaces support/request support', function() {
   setupComponentTest('content-spaces-support/request-support', {
-    integration: true
+    integration: true,
   });
 
   it('renders', function() {
