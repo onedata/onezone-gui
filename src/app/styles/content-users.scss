@@ -11,15 +11,28 @@
     min-height: $large-social-box-size + 2 * $content-row-vertical-padding;
     padding-left: $large-social-box-size + $padding-base-horizontal;
   }
-  .login-icon-box {
+  .login-icon-box:not(.add) {
     cursor: default !important;
+  }
+  .login-icon-box.add:hover {
+    background-color: transparentize($color: map-get($login-colors, plgrid), $amount: 0.9)
   }
   .social-box {
     position: absolute;
     top: $content-row-vertical-padding;
     left: 0;
   }
+  .show-dropdown-description {
+    display: inline-block;
+    line-height: $large-social-box-size;
+    font-style: italic;
+  }
+  .authorizers-dropdown {
+    position: absolute;
+    top: 3px;
+  }
   .account-description {
+    position: relative;
     padding: $padding-xs-vertical 0;
   }
   .account-type {
