@@ -66,7 +66,7 @@ export default Service.extend(I18n, {
       })
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
-        router.get('router').transitionTo(
+        router.transitionTo(
           'onedata.sidebar.content',
           'spaces',
           get(space, 'id'),
