@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
 
+import providers from './tabs/providers';
+import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 
 import loginBox from './components/login-box';
@@ -24,6 +26,8 @@ import clientTokenActions from './services/client-token-actions';
 
 let translations = {
   tabs: {
+    providers,
+    tokens,
     spaces,
   },
   components: {
