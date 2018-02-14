@@ -16,6 +16,5 @@ export default function userGri(userId) {
     entityId: userId,
     aspect: 'instance',
     scope: 'private',
-    operation: 'get',
   });
 }
