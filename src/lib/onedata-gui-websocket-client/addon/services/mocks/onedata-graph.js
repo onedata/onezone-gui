@@ -9,8 +9,9 @@
 
 import Evented from '@ember/object/evented';
 import { Promise } from 'rsvp';
-import Service from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import { get } from '@ember/object';
 
 const messageNotSupported = Object.freeze({
   success: false,
@@ -21,6 +22,9 @@ const messageNotSupported = Object.freeze({
 const responseDelay = 100;
 
 export default Service.extend(Evented, {
+  store: service(),
+  currentUser: service(),
+
   /**
    * @param {string} gri
    * @param {string} operation one of: get, update, delete
@@ -47,21 +51,19 @@ export default Service.extend(Evented, {
     - subscribe: ${subscribe}`
     );
 
-    const response = this.response({
-      gri,
-      operation,
-      data,
-      authHint,
-      subscribe,
+    return new Promise(resolve => {
+      setTimeout(
+        () => resolve(
+          this.response({
+            gri,
+            operation,
+            data,
+            authHint,
+            subscribe,
+          })),
+        responseDelay
+      );
     });
-
-    if (response.success) {
-      return new Promise(resolve => {
-        setTimeout(() => resolve(response), responseDelay);
-      });
-    } else {
-      return Promise.reject(response);
-    }
   },
 
   response({
@@ -77,9 +79,11 @@ export default Service.extend(Evented, {
     } = parseGri(gri);
     const handler = this.get(`handlers.${entityType}.${aspect}`);
     if (handler) {
-      return handler(operation, entityId, data, authHint);
+      return Promise.resolve(
+        handler.bind(this)(operation, entityId, data, authHint)
+      );
     } else {
-      return messageNotSupported;
+      return Promise.reject(messageNotSupported);
     }
   },
 
@@ -91,6 +95,38 @@ export default Service.extend(Evented, {
             success: true,
             data: randomToken(),
           };
+        } else {
+          throw messageNotSupported;
+        }
+      },
+    },
+    user: {
+      client_tokens(operation) {
+        if (operation === 'create') {
+          const token = randomToken();
+          return this.get('store')
+            .createRecord('clientToken', {
+              token,
+            })
+            .save()
+            .then(clientToken => {
+              const clientTokenId = get(clientToken, 'id');
+              // real operation of adding token to list is server-side
+              return this.get('currentUser')
+                .getCurrentUserRecord()
+                .then(user => get(user, 'clientTokenList'))
+                .then(clientTokens => get(clientTokens, 'list'))
+                .then(list => {
+                  list.pushObject(clientToken);
+                  return list.save();
+                })
+                .then(() => ({
+                  success: true,
+                  id: clientTokenId,
+                  gri: clientTokenId,
+                  token,
+                }));
+            });
         } else {
           return messageNotSupported;
         }
