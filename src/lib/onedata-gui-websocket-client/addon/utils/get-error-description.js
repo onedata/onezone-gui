@@ -36,6 +36,8 @@ export default function getErrorDescription(error, i18n) {
     } catch (e) {
       errorJson = undefined;
     }
+  } else if (typeof error === 'object' && error.message) {
+    message = error.message;
   } else if (isHTMLSafe(error)) {
     message = error;
   } else {

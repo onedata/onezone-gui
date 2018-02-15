@@ -27,7 +27,8 @@ const ClientTokenManager = Service.extend({
    * @return {Promise<DS.RecordArray<ClientToken>>} resolves to an array of tokens
    */
   getClientTokens() {
-    return this.get('currentUser').getCurrentUserRecord()
+    return this.get('currentUser')
+      .getCurrentUserRecord()
       .then(user =>
         user.get('clientTokenList').then((clientTokenList) =>
           clientTokenList.get('list')
@@ -67,8 +68,7 @@ const ClientTokenManager = Service.extend({
           })
           .then(tokenData => {
             const tokenGri = tokenData.gri;
-            return user.get('clientTokenList')
-              .then(clientTokenList => clientTokenList.reload(true))
+            return user.belongsTo('clientTokenList').reload()
               .then(() =>
                 this.get('store').findRecord('clientToken', tokenGri)
               );
@@ -85,8 +85,9 @@ const ClientTokenManager = Service.extend({
     return this.getRecord(id)
       .then(token => token.destroyRecord()
         .then(destroyResult => {
-          this.getClientTokens()
-            .then(list => list.reload())
+          this.get('currentUser')
+            .getCurrentUserRecord()
+            .then(user => user.belongsTo('clientTokenList').reload())
             .then(() => destroyResult);
         })
       );

@@ -4,4 +4,5 @@ export default {
   joinButton: 'Join the space',
   placeholder: 'Space invitation token',
   joiningSpace: 'joining the space',
+  joinedSpaceSuccess: 'Space joined successfully',
 };

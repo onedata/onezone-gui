@@ -73,17 +73,55 @@ export default Model.extend(GraphModelMixin, {
     return this._leaveRelation('group', groupId);
   },
 
+  joinSpace(token) {
+    return this._joinRelation('space', token);
+  },
+
+  joinGroup(token) {
+    return this._joinRelation('group', token);
+  },
+
   _leaveRelation(aspect, relationId) {
     const entityId = this.get('entityId');
     return this.get('onedataGraph').request({
-      gri: gri({
-        entityType: 'user',
-        entityId,
-        aspect,
-        aspectId: relationId,
-      }),
-      operation: 'delete',
-    });
+        gri: gri({
+          entityType: 'user',
+          entityId,
+          aspect,
+          aspectId: relationId,
+        }),
+        operation: 'delete',
+      })
+      .then(() => this._reloadList(aspect));
+  },
+
+  /**
+   * 
+   * @param {*} entityType 
+   * @param {*} token 
+   * @returns {Object} joined record
+   */
+  _joinRelation(entityType, token) {
+    return this.get('onedataGraph').request({
+        gri: gri({
+          entityType,
+          aspect: 'join',
+          scope: 'private',
+        }),
+        operation: 'create',
+        data: {
+          token,
+        },
+        authHint: ['asUser', this.get('entityId')],
+      })
+      .then(({ gri }) => {
+        return this._reloadList(entityType)
+          .then(() => this.get('store').findRecord(entityType, gri));
+      });
+  },
+
+  _reloadList(entityType) {
+    return this.belongsTo(`${entityType}List`).reload();
   },
 
   //#endregion

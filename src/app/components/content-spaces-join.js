@@ -1,15 +1,14 @@
 import Component from '@ember/component';
-import { inject } from '@ember/service';
-import gri from 'onedata-gui-websocket-client/utils/gri';
+import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, {
-  onedataGraph: inject(),
-  currentUser: inject(),
-  globalNotify: inject(),
+  onedataGraph: service(),
+  currentUser: service(),
+  globalNotify: service(),
+  router: service(),
 
   i18nPrefix: 'components.contentSpacesJoin',
 
@@ -22,25 +21,14 @@ export default Component.extend(I18n, {
   actions: {
     joinSpace(token) {
       return this.get('currentUser').getCurrentUserRecord()
-        .then(user => {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              const userId = get(user, 'entityId');
-              resolve(this.get('onedataGraph').request({
-                gri: gri({
-                  entityType: 'space',
-                  aspect: 'join',
-                  scope: 'private',
-                }),
-                operation: 'create',
-                data: {
-                  token,
-                },
-                authHint: ['asUser', userId],
-              }));
-            }, 5000);
-          });
-
+        .then(user => user.joinSpace(token))
+        .then(spaceRecord => {
+          this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
+          return this.get('router').transitionTo(
+            'onedata.sidebar.content.index',
+            // FIXME: transition does not highlight sidebar item
+            get(spaceRecord, 'id')
+          );
         })
         .catch(error => {
           this.get('globalNotify').backendError(this.t('joiningSpace'), error);
