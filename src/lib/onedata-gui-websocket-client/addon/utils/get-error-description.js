@@ -19,7 +19,7 @@ const i18nPrefix = 'errors.backendErrors.';
  * @export
  * @param {object} error
  * @param {object} i18n
- * @return {Ember.String.htmlSafe}
+ * @return {object}
  */
 export default function getErrorDescription(error, i18n) {
   const errorId = error.id;
@@ -29,12 +29,12 @@ export default function getErrorDescription(error, i18n) {
   if (typeof error === 'object' && error.id) {
     message = i18n.t(i18nPrefix + errorId, error.details);
     if (message.toString().startsWith('<missing-')) {
-      message = '';
+      message = undefined;
     }
     try {
       errorJson = JSON.stringify(error);
     } catch (e) {
-      errorJson = '';
+      errorJson = undefined;
     }
   } else if (isHTMLSafe(error)) {
     message = error;
@@ -47,8 +47,13 @@ export default function getErrorDescription(error, i18n) {
       }
     }
   }
-  message = Ember.Handlebars.Utils.escapeExpression(message);
+  message = message ?
+    htmlSafe(Ember.Handlebars.Utils.escapeExpression(message)) : undefined;
   errorJson = errorJson ?
-    `<br><code>${Ember.Handlebars.Utils.escapeExpression(errorJson)}</code>` : '';
-  return htmlSafe(message + errorJson);
+    htmlSafe(`<code>${Ember.Handlebars.Utils.escapeExpression(errorJson)}</code>`) :
+    undefined;
+  return {
+    message,
+    errorJsonString: errorJson,
+  };
 }
