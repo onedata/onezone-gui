@@ -18,6 +18,8 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import generateColors from 'onedata-gui-common/utils/generate-colors';
 
 export default Component.extend(I18n, GlobalActions, {
+  classNames: ['content-spaces-providers'],
+
   router: service(),
   i18n: service(),
 
