@@ -5,6 +5,9 @@
       <p>{{t "components.contentSpacesSupport.tabsCommon.descCommand"}}</p>
     </div>
     <div class="row content-row no-border">
+      {{content-spaces-support/-os-supported}}
+    </div>
+    <div class="row content-row no-border">
       <h5>{{t "components.contentSpacesSupport.tabsCommon.command"}}</h5>
       <div class="row loadable-row lg">
         {{#promise-proxy-container proxy=commandProxy}}

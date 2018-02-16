@@ -37,5 +37,6 @@ export default {
     command: 'Command',
     generateToken: 'Generate another token',
     copy: 'Copy',
+    distributionsSupported: 'The following GNU/Linux distributions are supported:',
   },
 };
