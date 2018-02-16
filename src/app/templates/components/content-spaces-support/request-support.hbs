@@ -12,18 +12,18 @@
           <textarea class="token-textarea form-control" rows="4" readonly>{{tokenProxy.content}}</textarea>
         {{/promise-proxy-container}}
       </div>
-      <a class="clickable" {{action "getToken"}}>
-        {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
-      </a>
       {{#copy-button
-        success=(action "copySuccess" "token")
-        error=(action "copyError" "token")
-        class="btn btn-primary pull-right"
+        success=(action "copySuccess" "command")
+        error=(action "copyError" "command")
+        class="btn btn-primary pull-left"
         clipboardTarget=".token-textarea"
       }}
         {{one-icon icon="clipboard-copy"}}
         {{t "components.contentSpacesSupport.tabsCommon.copy"}}
       {{/copy-button}}
+      <a class="clickable btn-get-token pull-right" {{action "getToken"}}>
+        {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
+      </a>
     </div>
   </div>
   <img class="col-image hidden-xs hidden-sm col-md-5 col-lg-4" src="assets/images/space-support-request.svg">

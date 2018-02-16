@@ -8,4 +8,6 @@ export default {
   unsetDefault: 'Is default (unset)',
   setDefault: 'Set as default',
   changingDefaultSpace: 'changing default space',
+  leavingSpace: 'leaving space',
+  spaceLeftSuccess: 'Space left successfully',
 };

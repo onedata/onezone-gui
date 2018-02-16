@@ -7,7 +7,6 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
 import Service, { inject } from '@ember/service';
 import { get } from '@ember/object';
 
@@ -38,16 +37,20 @@ export default Service.extend({
   },
 
   createRecord({ name }) {
-    return this.get('currentUser').getCurrentUserRecord().then((user) => {
-      const space = this.get('store').createRecord('space', {
-        name,
-        _meta: {
-          authHint: ['asUser', get(user, 'entityId')],
-        },
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => {
+        return this.get('store').createRecord('space', {
+            name,
+            _meta: {
+              authHint: ['asUser', get(user, 'entityId')],
+            },
+          })
+          .save()
+          .then(space =>
+            user.belongsTo('spaceList')
+            .reload()
+            .then(() => space)
+          );
       });
-      return user.get('spaceList').then(spaceList =>
-        addRecordToList(space, spaceList)
-      );
-    });
   },
 });

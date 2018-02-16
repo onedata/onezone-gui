@@ -46,6 +46,12 @@ export default Component.extend(I18n, GlobalActions, {
    */
   i18nPrefix: 'components.contentTokens',
 
+  /**
+   * @virtual
+   * @type {ClientToken}
+   */
+  selectedToken: undefined,
+
   actions: {
     copySuccess() {
       this.get('globalNotify').info(this.t('tokenCopySuccess'));

@@ -5,24 +5,27 @@
       <p>{{t "components.contentSpacesSupport.tabsCommon.descCommand"}}</p>
     </div>
     <div class="row content-row no-border">
+      {{content-spaces-support/-os-supported}}
+    </div>
+    <div class="row content-row no-border">
       <h5>{{t "components.contentSpacesSupport.tabsCommon.command"}}</h5>
       <div class="row loadable-row lg">
         {{#promise-proxy-container proxy=commandProxy}}
           <textarea class="token-textarea form-control" rows="4" readonly>{{commandProxy.content}}</textarea>
         {{/promise-proxy-container}}
       </div>
-      <a class="clickable" {{action "getToken"}}>
-        {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
-      </a>
       {{#copy-button
         success=(action "copySuccess" "command")
         error=(action "copyError" "command")
-        class="btn btn-primary pull-right"
+        class="btn btn-primary pull-left"
         clipboardTarget=".token-textarea"
       }}
         {{one-icon icon="clipboard-copy"}}
         {{t "components.contentSpacesSupport.tabsCommon.copy"}}
       {{/copy-button}}
+      <a class="clickable btn-get-token pull-right" {{action "getToken"}}>
+        {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
+      </a>
     </div>
   </div>
   <img class="col-image hidden-xs hidden-sm col-md-5 col-lg-4" src="assets/images/space-support-deploy.svg">

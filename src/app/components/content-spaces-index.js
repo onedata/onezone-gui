@@ -74,7 +74,7 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
     return {
       action: () => this.send('toggleDefaultSpace'),
       title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
-      class: 'toggle-default-space',
+      class: 'btn-toggle-default-space',
       buttonStyle: 'default',
       icon: isDefaultSpace ? 'home' : 'home-outline',
     };
@@ -87,7 +87,7 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
     return {
       action: () => this.send('openLeaveModal'),
       title: this.t('leave'),
-      class: 'leave-space',
+      class: 'btn-leave-space',
       buttonStyle: 'danger',
       icon: 'leave-space',
     };
@@ -115,7 +115,7 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
     this._super(...arguments);
     next(() => {
       this.set('leaveSpaceModalTriggers',
-        '.btn-leave-space.btn;a.leave-space:modal');
+        '.btn-leave-space.btn;a.btn-leave-space:modal');
     });
   },
 
@@ -166,6 +166,13 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
       return this.get('currentUser').getCurrentUserRecord()
         .then(user =>
           user.leaveSpace(spaceId)
+        )
+        .then(() => {
+          this.get('globalNotify').info(this.t('spaceLeftSuccess'));
+          this.get('router').transitionTo('onedata.sidebar.index');
+        })
+        .catch(error =>
+          this.get('globalNotify').backendError(this.t('leavingSpace'), error)
         );
     },
     saveSpaceName(name) {

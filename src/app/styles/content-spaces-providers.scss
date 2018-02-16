@@ -1,0 +1,10 @@
+.content-spaces-providers {
+  .row-space-providers-support-chart {
+    // currently the map is too high because of ocean
+    position: relative;
+    top: -100px;
+  }
+  .space-providers-support-chart {
+    padding: 100px;
+  }
+}

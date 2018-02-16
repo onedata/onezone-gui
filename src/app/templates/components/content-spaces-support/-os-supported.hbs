@@ -1,0 +1,13 @@
+<p>{{t "components.contentSpacesSupport.tabsCommon.distributionsSupported"}}</p>
+<div class="row">
+  <div class="col-xs-8 col-sm-12 col-centered text-center">
+    {{#each distributions as |dist|}}
+      <span class="support-os">
+        <img
+          src="assets/images/os-logo/{{dist.id}}.svg"
+        >
+        {{one-tooltip title=dist.name}}
+      </span>
+    {{/each}}
+  </div>
+</div>

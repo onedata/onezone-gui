@@ -9,6 +9,8 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import _ from 'lodash';
 
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
@@ -33,7 +35,15 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   sharedUserList: belongsTo('sharedUserList'),
   sharedGroupList: belongsTo('sharedGroupList'),
 
-  //#region 
+  //#region utils
+
+  totalSize: computed('supportSizes', function getTotalSize() {
+    return _.sum(_.values(this.get('supportSizes')));
+  }),
+
+  //#endregion
+
+  //#region graph operations
 
   /**
    * @param {string} target one of: user, group, provider
