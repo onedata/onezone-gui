@@ -1,5 +1,5 @@
 export default {
-  header: 'Add storage',
+  header: 'Get support',
   copy: {
     token: {
       success: 'The support token has been copied to clipboard',

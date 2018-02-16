@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 describe('Integration | Component | content spaces support/expose data', function() {
   setupComponentTest('content-spaces-support/expose-data', {
-    integration: true
+    integration: true,
   });
 
   it('renders', function() {

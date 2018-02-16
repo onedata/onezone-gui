@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 describe('Integration | Component | content spaces add storage', function() {
   setupComponentTest('content-spaces-add-storage', {
-    integration: true
+    integration: true,
   });
 
   it('renders', function() {

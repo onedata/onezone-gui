@@ -223,7 +223,7 @@ export default Service.extend(Evented, {
     this.set('_initDefer', _initDefer);
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     let host = window.location.hostname;
-    let port = 443;
+    let port = window.location.port;
     let suffix = '/graph_sync/gui';
 
     let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;

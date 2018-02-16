@@ -1,22 +1,70 @@
+<div class="row content-row header-row hidden-xs">
+  <h1 class="with-menu">
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+    {{actions-toolbar actionsArray=globalActions}}
+  </h1>
+</div>
+
 {{#promise-proxy-container proxy=providersProxy}}
-  {{#if _mobileMode}}
-    <span>FIXME: mobile mode not implemented</span>
-  {{else}}
-    {{#one-atlas as |atlas|}}
-      {{#each _providers as |provider|}}
-        {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
-          {{#position.point}}
-            {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
-              {{provider-place
-                provider=provider
-                atlasWidth=atlas.width
-                circleSizeScale=2
-                active=(eq provider selectedProvider)
-                renderDrop=(eq provider selectedProvider)}}
-            {{/link-to}}
-          {{/position.point}}
-        {{/atlas.position}}
-      {{/each}}
-    {{/one-atlas}}
-  {{/if}}
+
+  <div class="row">
+    <div class="col-xs-12 col-md-5 col-lg-4 col-space-provider-list">
+      <div class="row content-row loadable-row">
+        {{#promise-proxy-container proxy=providersProxy}}
+          {{providers-list
+            class="space-providers-list"
+            providersData=providersData
+            selectedSpace=space
+            showSelectedSpaceSupportSize=true
+            showSupportedSpacesCount=false
+          }}
+        {{/promise-proxy-container}}
+      </div>
+    </div>
+    
+    <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas">
+      <div class="row">
+        {{#unless _mobileMode}}
+          <div class="row content-row loadable-row">
+            {{#promise-proxy-container proxy=providersProxy}}
+              <div class="row" style="height: 500px;">
+                {{#one-atlas class="space-providers-atlas" as |atlas|}}
+                  {{#each providersProxy.content as |provider|}}
+                    {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+                      {{#position.point}}
+                        {{!-- {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}} --}}
+                          {{provider-place
+                            provider=provider
+                            atlasWidth=atlas.width
+                            circleSizeScale=2
+                            active=(eq provider selectedProvider)
+                            renderDrop=(eq provider selectedProvider)
+                            circleColor=(get providersColors provider.entityId)
+                            hint=provider.name
+                          }}
+                        {{!-- {{/link-to}} --}}
+                      {{/position.point}}
+                    {{/atlas.position}}
+                  {{/each}}
+                {{/one-atlas}}
+              </div>
+            {{/promise-proxy-container}}
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+    
+    <div class="col-xs-12 col-md-5 col-lg-4">
+      {{#promise-proxy-container proxy=providersProxy}}
+        {{space-providers-support-chart
+          class="space-providers-support-chart"
+          space=space
+          providersColors=providersColors
+        }}
+      {{/promise-proxy-container}}
+    </div>
+  </div>
+
 {{/promise-proxy-container}}

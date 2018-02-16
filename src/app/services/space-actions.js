@@ -30,7 +30,7 @@ export default Service.extend(I18n, {
       icon: 'add-filled',
       title: this.t('btnCreate.title'),
       tip: this.t('btnCreate.hint'),
-      // class: 'create-space-btn',
+      class: 'create-space-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
     };
   }),
@@ -38,10 +38,10 @@ export default Service.extend(I18n, {
   btnJoin: computed('router', function getBtnCreate() {
     const router = this.get('router');
     return {
-      icon: 'join',
+      icon: 'join-plug',
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
-      // class: 'join-space-btn',
+      class: 'join-space-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'join'),
     };
   }),
@@ -66,7 +66,7 @@ export default Service.extend(I18n, {
       })
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
-        router.get('router').transitionTo(
+        router.transitionTo(
           'onedata.sidebar.content',
           'spaces',
           get(space, 'id'),

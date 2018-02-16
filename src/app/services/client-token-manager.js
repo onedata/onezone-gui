@@ -12,6 +12,7 @@ import { inject } from '@ember/service';
 import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
 import removeRecordFromList from 'onedata-gui-websocket-client/utils/remove-record-from-list';
 import { get } from '@ember/object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 // TODO: needed for temporary hack
 import config from 'ember-get-config';
@@ -49,11 +50,12 @@ const ClientTokenManager = Service.extend({
    */
   createRecord() {
     const token = this.get('store').createRecord('clientToken', {});
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('clientTokenList').then((clientTokenList) =>
-        addRecordToList(token, clientTokenList)
-      )
-    );
+    return token.save();
+    // return this.get('currentUser').getCurrentUserRecord().then((user) =>
+    //   user.get('clientTokenList').then((clientTokenList) =>
+    //     addRecordToList(token, clientTokenList)
+    //   )
+    // );
   },
 
   /**
@@ -62,13 +64,17 @@ const ClientTokenManager = Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
-    return this.getRecord(id).then((token) =>
-      this.get('currentUser').getCurrentUserRecord().then((user) =>
-        user.get('clientTokenList').then((clientTokenList) =>
-          removeRecordFromList(token, clientTokenList)
-        )
-      )
-    );
+    return this.getRecord(id)
+      .then(token => token.destroyRecord());
+    // FIXME: then reload tokens list
+
+    // return this.getRecord(id).then((token) =>
+    //   this.get('currentUser').getCurrentUserRecord().then((user) =>
+    //     user.get('clientTokenList').then((clientTokenList) =>
+    //       removeRecordFromList(token, clientTokenList)
+    //     )
+    //   )
+    // );
   },
 });
 
@@ -83,22 +89,30 @@ if (!isDevelopment(config)) {
       return this.get('currentUser').getCurrentUserRecord()
         .then(user => {
           const userId = get(user, 'entityId');
-          return user.get('clientTokenList')
-            .then(clientTokenList => {
-              return this.get('onedataGraph')
-                .request({
-                  gri: `user.${userId}.client_tokens:private`,
-                  operation: 'create',
-                  data: {},
-                })
-                .then(tokenData => {
-                  tokenData.id = tokenData.gri;
-                  const token = this.get('store')
-                    .createRecord('clientToken', tokenData);
-                  return addRecordToList(token, clientTokenList, false);
-                });
+          const tokenCreateGri = gri({
+            entityType: 'user',
+            entityId: userId,
+            aspect: 'client_tokens',
+            scope: 'private',
+          });
+          return this.get('onedataGraph')
+            .request({
+              gri: tokenCreateGri,
+              operation: 'create',
+              data: {},
+            })
+            .then(tokenData => {
+              const tokenGri = tokenData.gri;
+              return user.get('clientTokenList')
+                .then(clientTokenList => clientTokenList.reload(true))
+                .then(() => this.get('store').findRecord('clientToken', tokenGri));
             });
         });
+    },
+
+    getTokenList() {
+      return this.get('currentUser').getCurrentUserRecord()
+        .then(user => user.get('clientTokenList'));
     },
   });
 }
