@@ -12,8 +12,14 @@ import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { get } from '@ember/object';
 
-export default Component.extend({
+import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+
+export default Component.extend(I18n, {
   tagName: '',
+
+  i18nPrefix: 'components.sidebarProviders.providerItem',
 
   /**
    * Provider item
@@ -110,4 +116,6 @@ export default Component.extend({
         );
       }
     }),
+
+  _totalSupportSizeHuman: computedPipe(bytesToString, '_totalSupportSize'),
 });

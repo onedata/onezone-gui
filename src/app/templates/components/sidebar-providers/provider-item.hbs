@@ -1,5 +1,5 @@
 {{one-icon icon="provider"}} 
-{{#truncated-string class="after-icon"}}
+{{#truncated-string class="after-icon before-status"}}
   <span class="one-label">{{item.name}}</span>
 {{/truncated-string}}
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
@@ -8,12 +8,14 @@
       {{toolbar.icon 
         icon="space"
         innerText=_spaces.length
+        hint=(tt this "spaceCountHint" count=_spaces.length)
       }}
     {{/if}}
     {{#if _spacesLoaded}}
       {{toolbar.icon
         icon="provider"
-        outerText=(bytes-to-string _totalSupportSize)
+        outerText=_totalSupportSizeHuman
+        hint=(tt this "totalSupportHint" size=_totalSupportSizeHuman)
       }}
     {{/if}}
   {{/status-toolbar}}

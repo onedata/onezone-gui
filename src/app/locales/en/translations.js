@@ -11,6 +11,7 @@ import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
+import sidebarProviders from './components/sidebar-providers';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -36,6 +37,7 @@ let translations = {
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
+    sidebarProviders,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,
