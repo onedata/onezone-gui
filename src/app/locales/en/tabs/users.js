@@ -1,5 +1,5 @@
 export default {
   aspects: {
-    index: 'Provider overview',
+    index: 'Account settings',
   },
 };

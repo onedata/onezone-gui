@@ -1,7 +1,7 @@
 export default {
   aspects: {
-    index: 'Overview',
-    providers: 'Providers',
-    support: 'Support',
+    index: 'Space overview',
+    providers: 'Space providers',
+    support: 'Get support',
   },
 };

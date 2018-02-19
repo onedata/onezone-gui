@@ -5,6 +5,7 @@ import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 import providers from './tabs/providers';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
+import users from './tabs/users';
 
 import loginBox from './components/login-box';
 import brandInfo from './components/brand-info';
@@ -32,6 +33,7 @@ let translations = {
     providers,
     tokens,
     spaces,
+    users,
   },
   components: {
     loginBox,

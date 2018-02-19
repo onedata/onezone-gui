@@ -1,5 +1,5 @@
 export default {
   aspects: {
-    index: 'Overview',
+    index: 'Client token',
   },
 };
