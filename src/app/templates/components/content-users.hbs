@@ -43,15 +43,22 @@
         {{login-box/social-box-list/social-box
           type="add"
           iconType="oneicon"
-          iconName="add"}}
+          iconName="add-filled"
+          click=(action "toggleAuthorizersDropdown")}}
         <div class="account-description">
+          <div class="show-dropdown-description animated fast" {{action "toggleAuthorizersDropdown"}}>
+            {{tt this "addAccount"}}
+          </div>
           {{authorizers-dropdown
             authorizers=_availableAuthorizers
             onSelect=(action "authorizerSelected")
             selectedAuthorizer=_selectedAuthorizer
             activeAuthorizer=_selectedAuthorizer
             disabled=_selectedAuthorizer
-            placeholder=(tt this "addAccountDropdownPlaceholder")}}
+            placeholder=(tt this "addAccountDropdownPlaceholder")
+            renderInPlace=true
+            verticalPosition="above"
+            class="animated fast hide"}}
         </div>
       </li>
     {{/loading-container}}

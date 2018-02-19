@@ -42,6 +42,17 @@ export default Component.extend({
   disabled: false,
 
   /**
+   * @type {boolean}
+   */
+  renderInPlace: false,
+
+  /**
+   * One of: above, below, auto
+   * @type {string}
+   */
+  verticalPosition: 'auto',
+
+  /**
    * Action called on authorizer select.
    * @type {function}
    * @param {AuthorizerInfo} authorizer selected authorizer
