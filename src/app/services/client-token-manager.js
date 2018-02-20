@@ -29,11 +29,7 @@ const ClientTokenManager = Service.extend({
   getClientTokens() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user =>
-        user.get('clientTokenList').then((clientTokenList) =>
-          clientTokenList.get('list')
-        )
-      );
+      .then(user => user.get('clientTokenList'));
   },
 
   /**
@@ -43,6 +39,7 @@ const ClientTokenManager = Service.extend({
    */
   getRecord(id) {
     return this.getClientTokens()
+      .then(listRecord => get(listRecord, 'list'))
       .then(list => list.find(t => id == get(t, 'id')));
   },
 

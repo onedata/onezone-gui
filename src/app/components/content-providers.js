@@ -27,18 +27,15 @@ export default Component.extend({
   selectedProvider: null,
 
   /**
-   * @virtual optional
-   * If not provided, `_providersProxy` property will be initialized on init
-   * using `providerManager` using all available providers
-   * @type
+   * @virtual
    */
-  providerProxy: null,
+  providerList: null,
 
-  /**
-   * Proxy with an array of all provider
-   * @type {PromiseObject<DS.RecordArray<Provider>>}
-   */
-  _providersProxy: null,
+  _providersProxy: computed('providerList.list', function () {
+    return PromiseObject.create({
+      promise: this.get('providerList.list'),
+    });
+  }),
 
   /**
    * Array of all prviders
@@ -65,18 +62,6 @@ export default Component.extend({
    * @type {Window}
    */
   _window: window,
-
-  init() {
-    this._super(...arguments);
-    const providersProxy = this.get('providersProxy');
-    if (providersProxy) {
-      this.set('_providersProxy', providersProxy);
-    } else {
-      this.set('_providersProxy', PromiseObject.create({
-        promise: this.get('providerManager').getProviders(),
-      }));
-    }
-  },
 
   didInsertElement() {
     this._super(...arguments);

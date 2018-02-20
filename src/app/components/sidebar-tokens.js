@@ -26,8 +26,8 @@ export default TwoLevelSidebar.extend({
    * @override
    * Keep original sorting from server, but make a copy of array
    */
-  sortedCollection: computed('model.collection.[]', function () {
-    return A(this.get('model.collection').toArray());
+  sortedCollection: computed('model.collection.list.[]', function () {
+    return A(this.get('model.collection.list').toArray());
   }),
 
   /**

@@ -20,11 +20,9 @@ export default Service.extend({
    * @return {Promise<DS.RecordArray<Provider>>} resolves to an array of providers
    */
   getProviders() {
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('providerList').then((providerList) =>
-        providerList.get('list')
-      )
-    );
+    return this.get('currentUser')
+      .getCurrentUserRecord()
+      .then(user => user.get('providerList'));
   },
 
   /**

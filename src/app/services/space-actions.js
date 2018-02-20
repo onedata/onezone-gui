@@ -67,9 +67,10 @@ export default Service.extend(I18n, {
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
         return router.transitionTo(
-          'onedata.sidebar.content',
+          'onedata.sidebar.content.aspect',
           'spaces',
           get(space, 'id'),
+          'index',
         ).then(() => {
           const sidebarContainer = $('.col-sidebar');
           $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -

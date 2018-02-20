@@ -20,11 +20,9 @@ export default Service.extend({
    * @return {Promise<DS.RecordArray<Space>>} resolves to an array of providers
    */
   getSpaces() {
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('spaceList').then((spacesList) =>
-        spacesList.get('list')
-      )
-    );
+    return this.get('currentUser')
+      .getCurrentUserRecord()
+      .then(user => user.get('spaceList'));
   },
 
   /**
@@ -46,9 +44,7 @@ export default Service.extend({
             },
           })
           .save()
-          .then(space =>
-            user.belongsTo('spaceList')
-            .reload()
+          .then(space => user.belongsTo('spaceList').reload(true)
             .then(() => space)
           );
       });
