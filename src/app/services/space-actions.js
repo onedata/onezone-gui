@@ -66,14 +66,15 @@ export default Service.extend(I18n, {
       })
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
-        router.transitionTo(
+        return router.transitionTo(
           'onedata.sidebar.content',
           'spaces',
           get(space, 'id'),
-        );
-        const sidebarContainer = $('.col-sidebar');
-        $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-          sidebarContainer[0].clientHeight);
+        ).then(() => {
+          const sidebarContainer = $('.col-sidebar');
+          $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+            sidebarContainer[0].clientHeight);
+        });
       })
       .catch(error => globalNotify.backendError(this.t('spaceCreation'), error));
   },

@@ -10,20 +10,15 @@
 }}
   <div class="row">
     <div class="col-xs-12">
-      {{#bs-form
-        onSubmit=(action contentInfo.buttonAction)
-        submitOnEnter=true
-        as |form|
-      }}
         <input
           id="join-space-token"
           value={{token}}
           oninput={{action (mut token) value="target.value"}}
+          onkeydown={{invoke-on-enter contentInfo.buttonAction}}
           placeholder={{tt this "placeholder"}}
           disabled={{contentInfo.actionInProgress}}
           class="form-control join-space-token"
         >
-      {{/bs-form}}
     </div>
   </div>
 {{/content-info}}

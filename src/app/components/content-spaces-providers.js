@@ -94,7 +94,10 @@ export default Component.extend(I18n, GlobalActions, {
 
   actions: {
     openAddStorage() {
-      this.get('router').transitionTo('onedata.sidebar.content.aspect', 'support');
+      return this.get('router').transitionTo(
+        'onedata.sidebar.content.aspect',
+        'support'
+      );
     },
   },
 });

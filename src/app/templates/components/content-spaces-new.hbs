@@ -10,21 +10,16 @@
 }}
   <div class="row">
     <div class="col-xs-12">
-      {{#bs-form
-        onSubmit=(action contentInfo.buttonAction)
-        submitOnEnter=true
-        as |form|
-      }}
-        <input
-          id="new-space-name"
-          value={{spaceName}}
-          oninput={{action (mut spaceName) value="target.value"}}
-          disabled={{isWorking}}
-          placeholder={{tt this "spaceName"}}
-          disabled={{contentInfo.actionInProgress}}
-          class="form-control new-space-name"
-        >
-      {{/bs-form}}
+      <input
+        id="new-space-name"
+        value={{spaceName}}
+        oninput={{action (mut spaceName) value="target.value"}}
+        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        disabled={{isWorking}}
+        placeholder={{tt this "spaceName"}}
+        disabled={{contentInfo.actionInProgress}}
+        class="form-control new-space-name"
+      >
     </div>
   </div>
 {{/content-info}}
