@@ -4,6 +4,16 @@
     position: relative;
     top: -100px;
   }
+  @media (max-width: $screen-xs-max) {
+    .row-space-providers-support-chart {
+      top: -200px;
+    }
+  }
+  @media (max-width: 500px) {
+    .row-space-providers-support-chart {
+      top: -300px;
+    }
+  }
   .space-providers-support-chart {
     padding: 100px;
   }

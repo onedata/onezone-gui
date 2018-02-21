@@ -7,7 +7,8 @@
 
 import Model from 'ember-data/model';
 import { hasMany } from 'onedata-gui-websocket-client/utils/relationships';
+import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-conflict-model';
 
-export default Model.extend({
+export default Model.extend(listConflictModel, {
   list: hasMany('sharedGroup'),
 });

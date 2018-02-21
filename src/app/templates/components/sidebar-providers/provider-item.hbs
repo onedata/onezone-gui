@@ -1,6 +1,6 @@
 {{one-icon icon="provider"}} 
 {{#truncated-string class="after-icon before-status"}}
-  <span class="one-label">{{item.name}}</span>
+  {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
   {{#status-toolbar as |toolbar|}}
