@@ -1,9 +1,9 @@
 {
   "name": "onezone-gui",
-  "version": "0.0.0",
+  "version": "0.0.0-current",
   "description": "A web frontend for Onezone - component of Onedata",
   "license": "MIT",
-  "author": "",
+  "author": "ACK CYFRONET AGH",
   "directories": {
     "doc": "doc",
     "test": "tests"
