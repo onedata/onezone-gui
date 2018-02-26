@@ -8,9 +8,7 @@
  */
 
 import { default as Service, inject } from '@ember/service';
-import { resolve } from 'rsvp';
 import { A } from '@ember/array';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { Promise } from 'rsvp';
 
 export default Service.extend({
@@ -35,9 +33,7 @@ export default Service.extend({
         return this.get('spaceManager').getSpaces();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return PromiseArray.create({
-            promise: resolve(A([user])),
-          });
+          return Promise.resolve({ list: A([user]) });
         });
       default:
         return new Promise((resolve, reject) => reject('No such collection: ' + type));
