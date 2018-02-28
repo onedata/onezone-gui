@@ -8,16 +8,18 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import $ from 'jquery';
 
 export default Component.extend({
   classNames: ['content-providers'],
 
   providerManager: inject(),
+  router: inject(),
 
   /**
    * Selected (active) provider
@@ -42,6 +44,14 @@ export default Component.extend({
    * @type {DS.RecordArray<Provider>>}
    */
   _providers: readOnly('_providersProxy.content'),
+
+  /**
+   * Clustered providers
+   * @type {Array<Object>}
+   */
+  _clusteredProviders: computed('_providers', function _clusteredProviders() {
+    return clusterizeProviders(this.get('_providers') || []);
+  }),
 
   /**
    * If true, page component has the mobile layout
@@ -91,5 +101,16 @@ export default Component.extend({
    */
   _windowResized() {
     this.set('_mobileMode', window.innerWidth < 768);
+  },
+
+  actions: {
+    providerChanged(provider) {
+      this.get('router').transitionTo(
+        'onedata.sidebar.content.aspect',
+        'providers',
+        get(provider, 'id'),
+        'index'
+      );
+    },
   },
 });

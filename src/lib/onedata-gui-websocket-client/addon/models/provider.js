@@ -13,7 +13,7 @@ import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 
-export const providerStatusList = ['online', 'offline', 'pending'];
+export const providerStatusList = ['online', 'offline'];
 
 export default Model.extend(GraphModelMixin, {
   name: attr('string'),
