@@ -51,7 +51,7 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
     return [{
       id: 'index',
       label: this.t('aspects.index'),
-      icon: 'space',
+      icon: 'overview',
     }, {
       id: 'providers',
       label: this.t('aspects.providers'),
