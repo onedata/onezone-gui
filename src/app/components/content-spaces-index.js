@@ -11,12 +11,14 @@ import Component from '@ember/component';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, set } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 
-export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
+export default Component.extend(I18n, UserProxyMixin, GlobalActions, HasDefaultSpace, {
   classNames: ['content-spaces-redirect'],
 
   onezoneServer: inject(),
@@ -52,19 +54,7 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
    */
   spaceId: computed.reads('space.entityId'),
 
-  /**
-   * TODO: make an util from this code
-   * @returns {boolean|undefined} true if loaded space is the default
-   */
-  isDefaultSpace: computed(
-    'space.entityId',
-    'userProxy.content.defaultSpaceId',
-    function getIsDefaultSpace() {
-      const spaceId = this.get('space.entityId');
-      const defaultSpaceId = this.get('userProxy.content.defaultSpaceId');
-      return spaceId && defaultSpaceId && (spaceId === defaultSpaceId);
-    }
-  ),
+  isDefaultSpace: reads('hasDefaultSpace'),
 
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
