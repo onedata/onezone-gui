@@ -10,4 +10,6 @@ export default {
   changingDefaultSpace: 'changing default space',
   leavingSpace: 'leaving space',
   spaceLeftSuccess: 'Space left successfully',
+  tileSpaceTitle: 'Space size',
+  tileProvidersTitle: 'Providers',
 };

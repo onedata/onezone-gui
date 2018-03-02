@@ -20,6 +20,30 @@
   {{/one-switchable-popover-modal}}
 </div>
 
-<div class="row">
-  {{yield}}
+<div class="row content-row">
+  <div class="one-tile-container">
+    {{#one-tile title=(tt this "tileSpaceTitle")}}
+      <div class="large-text truncate">
+        {{_totalSupportSizeHuman}}
+      </div>
+    {{/one-tile}}
+
+    {{#one-tile title=(tt this "tileProvidersTitle") aspect="providers"}}
+      {{#loading-container
+        isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
+      }}
+        <div class="absolute-align-middle-center full-width">
+          {{space-providers-support-chart
+            class="space-providers-support-chart"
+            space=space
+            providersColors=providersColors
+            forceMobile=true
+            disableLegend=true
+          }}
+        </div>
+      {{/loading-container}}
+    {{/one-tile}}
+
+    {{yield}}
+  </div>
 </div>
