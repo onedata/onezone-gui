@@ -23,6 +23,7 @@ import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
+import contentGroupsJoin from './components/content-groups-join';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/space-actions';
@@ -52,6 +53,7 @@ let translations = {
     contentSpacesSupport,
     contentSpacesProviders,
     leaveSpaceConfirm,
+    contentGroupsJoin,
   },
   services: {
     clientTokenActions,
