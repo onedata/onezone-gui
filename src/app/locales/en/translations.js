@@ -25,7 +25,7 @@ import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 
 import spaceActions from './services/space-actions';
-import sidebarResources from './services/sidebar-resources';
+import groupActions from './services/space-actions';
 import clientTokenActions from './services/client-token-actions';
 
 let translations = {
@@ -54,9 +54,9 @@ let translations = {
     leaveSpaceConfirm,
   },
   services: {
-    sidebarResources,
     clientTokenActions,
     spaceActions,
+    groupActions,
   },
 };
 

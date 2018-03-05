@@ -21,6 +21,7 @@ const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_GROUPS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const providerStatusList = ['online', 'offline'];
@@ -103,6 +104,8 @@ function createEntityRecords(store, type, names) {
       return createSpacesRecords(store);
     case 'clientToken':
       return createClientTokensRecords(store);
+    case 'group':
+      return createGroupsRecords(store);
     case 'linkedAccount':
       return createLinkedAccount(store);
     default:
@@ -146,6 +149,12 @@ function createSpacesRecords(store) {
 function createClientTokensRecords(store) {
   return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
     return store.createRecord('clientToken', {}).save();
+  }));
+}
+
+function createGroupsRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_GROUPS).map((index) => {
+    return store.createRecord('group', { name: `group${index}` }).save();
   }));
 }
 
