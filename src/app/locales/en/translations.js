@@ -24,9 +24,10 @@ import contentSpacesProviders from './components/content-spaces-providers';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
+import contentGroupsNew from './components/content-groups-new';
 
 import spaceActions from './services/space-actions';
-import groupActions from './services/space-actions';
+import groupActions from './services/group-actions';
 import clientTokenActions from './services/client-token-actions';
 
 let translations = {
@@ -54,6 +55,7 @@ let translations = {
     contentSpacesProviders,
     leaveSpaceConfirm,
     contentGroupsJoin,
+    contentGroupsNew,
   },
   services: {
     clientTokenActions,
