@@ -7,18 +7,21 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import Component from '@ember/component';
-import { get } from '@ember/object';
 import _ from 'lodash';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, HasDefaultSpace, {
   tagName: '',
 
   i18nPrefix: 'components.sidebarSpaces.spaceItem',
+
+  userProxy: reads('sidebar.userProxy'),
 
   /**
    * Provider item

@@ -10,13 +10,19 @@
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, set } from '@ember/object';
+import { computed, get, set } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
+import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
+import generateColors from 'onedata-gui-common/utils/generate-colors';
+import _ from 'lodash';
 
-export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
+export default Component.extend(I18n, UserProxyMixin, GlobalActions, HasDefaultSpace, {
   classNames: ['content-spaces-redirect'],
 
   onezoneServer: inject(),
@@ -50,21 +56,9 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
   /**
    * @type {string}
    */
-  spaceId: computed.reads('space.entityId'),
+  spaceId: reads('space.entityId'),
 
-  /**
-   * TODO: make an util from this code
-   * @returns {boolean|undefined} true if loaded space is the default
-   */
-  isDefaultSpace: computed(
-    'space.entityId',
-    'userProxy.content.defaultSpaceId',
-    function getIsDefaultSpace() {
-      const spaceId = this.get('space.entityId');
-      const defaultSpaceId = this.get('userProxy.content.defaultSpaceId');
-      return spaceId && defaultSpaceId && (spaceId === defaultSpaceId);
-    }
-  ),
+  isDefaultSpace: reads('hasDefaultSpace'),
 
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
@@ -110,6 +104,39 @@ export default Component.extend(I18n, UserProxyMixin, GlobalActions, {
       return [toggleDefaultSpaceAction, openLeaveModalAction];
     }
   ),
+
+  providersProxy: reads('space.providerList.list'),
+
+  // FIXME: make a common mixin for providersColors property?
+  /**
+   * Global colors for each provider
+   * @type {Ember.ComputedProperty<Object>}
+   */
+  providersColors: computed(
+    'providersProxy.{content.@each.entityId,isFulfilled}',
+    function getProvidersColors() {
+      const providersProxy = this.get('providersProxy');
+      if (get(providersProxy, 'isFulfilled')) {
+        const providerIds = get(providersProxy, 'content').mapBy('entityId').sort();
+        const colors = generateColors(providerIds.length);
+        return _.zipObject(providerIds, colors);
+      }
+    }),
+
+  /**
+   * Total support size for space
+   * @type {Ember.ComputedProperty<number>}
+   */
+  _totalSupportSize: computed(
+    'space.supportSizes',
+    function _getTotalSupportSize() {
+      const supportSizes = this.get('space.supportSizes');
+      if (supportSizes) {
+        return _.sum(_.values(supportSizes));
+      }
+    }),
+
+  _totalSupportSizeHuman: computedPipe(bytesToString, '_totalSupportSize'),
 
   init() {
     this._super(...arguments);
