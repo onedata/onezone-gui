@@ -3,7 +3,7 @@
  *
  * @module components/content-provider
  * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -14,6 +14,7 @@ import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import $ from 'jquery';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend({
   classNames: ['content-providers'],
@@ -60,6 +61,11 @@ export default Component.extend({
   _mobileMode: false,
 
   /**
+   * @type {boolean}
+   */
+  _popoverClosedByUser: false,
+
+  /**
    * Window resize event handler
    * @type {ComputedProperty<Function>}
    */
@@ -81,6 +87,17 @@ export default Component.extend({
     } = this.getProperties('_window', '_windowResizeHandler');
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
+    this.$().click((event) => {
+      safeExec(this, () => {
+        const target = $(event.originalEvent.target);
+        if (!this.get('_mobileMode')) {
+          this.set(
+            '_popoverClosedByUser', !target.hasClass('provider-place') &&
+            target.parents('.provider-place').length === 0
+          );
+        }
+      });
+    });
   },
 
   willDestroyElement() {
@@ -111,6 +128,9 @@ export default Component.extend({
         get(provider, 'id'),
         'index'
       );
+    },
+    showPopover() {
+      this.set('_popoverClosedByUser', false);
     },
   },
 });

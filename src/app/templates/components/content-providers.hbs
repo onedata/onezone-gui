@@ -10,11 +10,12 @@
               {{provider-place
                 provider=square.providers
                 atlasWidth=atlas.width
-                circleSizeScale=2
-                active=(contains selectedProvider square.providers)
+                circleSizeScale=1.2
+                active=(and (not _popoverClosedByUser) (contains selectedProvider square.providers))
                 renderDrop=(contains selectedProvider square.providers)
                 selectedProvider=selectedProvider
-                providerSelectedAction=(action "providerChanged")}}
+                providerSelectedAction=(action "providerChanged")
+                showTriggered=(action "showPopover")}}
             {{/link-to}}
           {{/position.point}}
         {{/atlas.position}}
