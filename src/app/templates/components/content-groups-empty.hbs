@@ -1,0 +1,13 @@
+{{#content-info
+  class="scroll-breakpoint-400"
+  header=(tt this "title")
+  text=(tt this "text")
+}}
+  <p class="lead">
+    {{tt this "textStart"}}
+    {{#link-to "onedata.sidebar.content" "groups" "new"}}{{tt this "textCreate"}}{{/link-to}}
+    {{tt this "textOr"}}
+    {{#link-to "onedata.sidebar.content" "groups" "join"}}{{tt this "textJoin"}}{{/link-to}}
+    {{tt this "textEnd"}}
+  </p>
+{{/content-info}}
