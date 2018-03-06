@@ -2,11 +2,11 @@
 
 @font-face {
   font-family: 'oneicons';
-  src:  url('#{$icomoon-font-path}/oneicons.eot?tc4ywe');
-  src:  url('#{$icomoon-font-path}/oneicons.eot?tc4ywe#iefix') format('embedded-opentype'),
-    url('#{$icomoon-font-path}/oneicons.ttf?tc4ywe') format('truetype'),
-    url('#{$icomoon-font-path}/oneicons.woff?tc4ywe') format('woff'),
-    url('#{$icomoon-font-path}/oneicons.svg?tc4ywe#oneicons') format('svg');
+  src:  url('#{$icomoon-font-path}/oneicons.eot?q7t0yl');
+  src:  url('#{$icomoon-font-path}/oneicons.eot?q7t0yl#iefix') format('embedded-opentype'),
+    url('#{$icomoon-font-path}/oneicons.ttf?q7t0yl') format('truetype'),
+    url('#{$icomoon-font-path}/oneicons.woff?q7t0yl') format('woff'),
+    url('#{$icomoon-font-path}/oneicons.svg?q7t0yl#oneicons') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -334,6 +334,11 @@
 .oneicon-providers-outline {
   &:before {
     content: unicode($oneicon-providers-outline); 
+  }
+}
+.oneicon-providers {
+  &:before {
+    content: unicode($oneicon-providers); 
   }
 }
 .oneicon-remove {

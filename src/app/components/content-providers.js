@@ -3,21 +3,24 @@
  *
  * @module components/content-provider
  * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import $ from 'jquery';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend({
   classNames: ['content-providers'],
 
   providerManager: inject(),
+  router: inject(),
 
   /**
    * Selected (active) provider
@@ -44,10 +47,23 @@ export default Component.extend({
   _providers: readOnly('_providersProxy.content'),
 
   /**
+   * Clustered providers
+   * @type {Array<Object>}
+   */
+  _clusteredProviders: computed('_providers', function _clusteredProviders() {
+    return clusterizeProviders(this.get('_providers') || []);
+  }),
+
+  /**
    * If true, page component has the mobile layout
    * @type {boolean}
    */
   _mobileMode: false,
+
+  /**
+   * @type {boolean}
+   */
+  _popoverClosedByUser: false,
 
   /**
    * Window resize event handler
@@ -71,6 +87,17 @@ export default Component.extend({
     } = this.getProperties('_window', '_windowResizeHandler');
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
+    this.$().click((event) => {
+      safeExec(this, () => {
+        const target = $(event.originalEvent.target);
+        if (!this.get('_mobileMode')) {
+          this.set(
+            '_popoverClosedByUser', !target.hasClass('provider-place') &&
+            target.parents('.provider-place').length === 0
+          );
+        }
+      });
+    });
   },
 
   willDestroyElement() {
@@ -91,5 +118,19 @@ export default Component.extend({
    */
   _windowResized() {
     this.set('_mobileMode', window.innerWidth < 768);
+  },
+
+  actions: {
+    providerChanged(provider) {
+      this.get('router').transitionTo(
+        'onedata.sidebar.content.aspect',
+        'providers',
+        get(provider, 'id'),
+        'index'
+      );
+    },
+    showPopover() {
+      this.set('_popoverClosedByUser', false);
+    },
   },
 });
