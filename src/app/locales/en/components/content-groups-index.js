@@ -1,4 +1,8 @@
 export default {
   header: 'Group',
-  description: 'TODO Some description',
+  youCanManageUsing: 'Currently, you can manage the group settings and ' +
+    'permissions using ',
+  oneprovider: 'Oneprovider web application',
+  haveNoAccess: 'Unfortunately you have no access to ',
+  anyProvider: 'any Oneprovider yet',
 };

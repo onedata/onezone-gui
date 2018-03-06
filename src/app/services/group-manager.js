@@ -36,9 +36,7 @@ export default Service.extend({
    * @return {Promise<Group>} group promise
    */
   getRecord(id) {
-    return this.getGroups()
-      .then(listRecord => get(listRecord, 'list'))
-      .then(list => list.find(g => id == get(g, 'id')));
+    return this.get('store').findRecord('group', id);
   },
 
   /**
