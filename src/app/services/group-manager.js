@@ -11,11 +11,13 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import _ from 'lodash';
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   store: service(),
   currentUser: service(),
-  onedataGraph: service(),
+  spaceManager: service(),
+  providerManager: service(),
 
   /**
    * Fetches collection of all groups
@@ -53,7 +55,7 @@ export default Service.extend({
             },
           }))
           .save()
-          .then(group => user.belongsTo('groupList').reload(true).then(() => group));
+          .then(group => this.reloadList().then(() => group));
       });
   },
 
@@ -65,9 +67,20 @@ export default Service.extend({
   joinGroup(token) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.joinGroup(token)
-        .then(group => user.belongsTo('groupList').reload(true)
-          .then(() => group)
-        )
+        .then(group => Promise.all(
+          this.reloadList(),
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList()
+        ).then(() => group))
       );
+  },
+
+  /**
+   * Reloads group list
+   * @returns {Promise<GroupList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('groupList').reload(true));
   },
 });
