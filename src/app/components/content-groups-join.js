@@ -9,11 +9,10 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
-  groupManager: service(),
+  groupActions: service(),
   globalNotify: service(),
   router: service(),
 
@@ -31,17 +30,7 @@ export default Component.extend(I18n, {
 
   actions: {
     joinGroup(token) {
-      return this.get('groupManager').joinGroup(token)
-        .then(groupRecord => {
-          this.get('globalNotify').info(this.t('joinedGroupSuccess'));
-          return this.get('router').transitionTo(
-            'onedata.sidebar.content.index',
-            get(groupRecord, 'id')
-          );
-        })
-        .catch(error => {
-          this.get('globalNotify').backendError(this.t('joiningGroup'), error);
-        });
+      return this.get('groupActions').joinGroup(token);
     },
   },
 });

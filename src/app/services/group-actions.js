@@ -92,4 +92,24 @@ export default Service.extend(I18n, {
       })
       .catch(error => globalNotify.backendError(this.t('groupCreation'), error));
   },
+
+  /**
+   * Joins to existing group using token
+   * @param {string} token
+   * @returns {Promise} A promise, which resolves to group if it has
+   * been joined successfully.
+   */
+  joinGroup(token) {
+    return this.get('groupManager').joinGroup(token)
+      .then(groupRecord => {
+        this.get('globalNotify').info(this.t('joinedGroupSuccess'));
+        return this.get('router').transitionTo(
+          'onedata.sidebar.content.index',
+          get(groupRecord, 'id')
+        );
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+      });
+  },
 });

@@ -10,4 +10,6 @@ export default {
   },
   groupCreateSuccess: 'New group created successfully',
   groupCreation: 'creating group',
+  joiningGroup: 'joining the group',
+  joinedGroupSuccess: 'Group joined successfully',
 };
