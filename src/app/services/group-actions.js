@@ -1,7 +1,7 @@
 /**
  * A service which provides groups manipulation functions ready to use for gui
  *
- * @module services/client-token-actions
+ * @module services/group-actions
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -11,6 +11,7 @@ import Service, { inject } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
+import { next } from '@ember/runloop';
 
 export default Service.extend(I18n, {
   router: inject(),
@@ -79,16 +80,19 @@ export default Service.extend(I18n, {
       })
       .then(group => {
         globalNotify.success(this.t('groupCreateSuccess'));
-        return router.transitionTo(
-          'onedata.sidebar.content.aspect',
-          'groups',
-          get(group, 'id'),
-          'index',
-        ).then(() => {
-          const sidebarContainer = $('.col-sidebar');
-          $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-            sidebarContainer[0].clientHeight);
-        });
+        next(() =>
+          router.transitionTo(
+            'onedata.sidebar.content.aspect',
+            'groups',
+            get(group, 'id'),
+            'index',
+          ).then(() => {
+            const sidebarContainer = $('.col-sidebar');
+            $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+              sidebarContainer[0].clientHeight);
+          })
+        );
+        return group;
       })
       .catch(error => globalNotify.backendError(this.t('groupCreation'), error));
   },
@@ -104,8 +108,10 @@ export default Service.extend(I18n, {
       .then(groupRecord => {
         this.get('globalNotify').info(this.t('joinedGroupSuccess'));
         return this.get('router').transitionTo(
-          'onedata.sidebar.content.index',
-          get(groupRecord, 'id')
+          'onedata.sidebar.content.aspect',
+          'groups',
+          get(groupRecord, 'id'),
+          'index'
         );
       })
       .catch(error => {

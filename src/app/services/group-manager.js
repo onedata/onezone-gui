@@ -65,11 +65,11 @@ export default Service.extend({
   joinGroup(token) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.joinGroup(token)
-        .then(group => Promise.all(
+        .then(group => Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList()
-        ).then(() => group))
+          this.get('spaceManager').reloadList(),
+        ]).then(() => group))
       );
   },
 

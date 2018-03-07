@@ -34,7 +34,7 @@ export default Component.extend(I18n, {
       const {
         groupName,
         groupActions,
-       } = this.getProperties('groupName', 'groupActions');
+      } = this.getProperties('groupName', 'groupActions');
       return groupActions.createGroup({ name: groupName });
     },
   },

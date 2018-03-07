@@ -32,7 +32,7 @@ export default Component.extend(I18n, {
 
   /**
    * Id of the first available provider (if exists). Used to navigate
-   * to Oneprovider page.
+   * to Oneprovider web client.
    * @type {ObjectProxy<string>}
    */
   firstProviderIdProxy: computed(function () {

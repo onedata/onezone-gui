@@ -1,7 +1,6 @@
 export default {
   btnCreate: {
     title: 'Create new group',
-    // FIXME: hint
     hint: 'Create new group',
   },
   btnJoin: {
