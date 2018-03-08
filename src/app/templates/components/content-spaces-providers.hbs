@@ -22,13 +22,15 @@
             selectedSpace=space
             showSelectedSpaceSupportSize=true
             showSupportedSpacesCount=false
+            providerClickAction=(action "providerClicked")
           }}
         </div>
       </div>
       
       <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
-        <div class="row">
-          {{#unless _mobileMode}}
+        {{!-- FIXME: mobile mode is not detected --}}
+        {{#unless _mobileMode}}
+          <div class="row row-space-providers-map hidden-xs">
             <div class="row content-row loadable-row">
               <div class="row" style="height: 500px;">
                 {{#one-atlas class="space-providers-atlas" as |atlas|}}
@@ -52,9 +54,10 @@
                 {{/one-atlas}}
               </div>
             </div>
-          {{/unless}}
         </div>
-        <div class="row row-space-providers-support-chart">
+        {{/unless}}
+        
+        <div class="row content-row row-space-providers-support-chart">
           {{space-providers-support-chart
             class="space-providers-support-chart"
             space=space

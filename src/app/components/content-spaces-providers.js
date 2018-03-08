@@ -99,5 +99,9 @@ export default Component.extend(I18n, GlobalActions, {
         'support'
       );
     },
+    providerClicked(provider) {
+      return this.get('router').transitionTo('onedata.sidebar.content', 'providers',
+        get(provider, 'id'));
+    },
   },
 });

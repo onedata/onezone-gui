@@ -23,7 +23,7 @@ import generateColors from 'onedata-gui-common/utils/generate-colors';
 import _ from 'lodash';
 
 export default Component.extend(I18n, UserProxyMixin, GlobalActions, HasDefaultSpace, {
-  classNames: ['content-spaces-redirect'],
+  classNames: ['content-spaces-index'],
 
   onezoneServer: inject(),
   currentUser: inject(),

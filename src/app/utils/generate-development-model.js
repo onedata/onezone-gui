@@ -29,7 +29,7 @@ const providerStatusList = ['online', 'offline'];
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
 const names = ['one', 'two', 'three'];
 
-const perProviderSize = 1048576;
+const perProviderSize = Math.pow(1024, 4);
 
 /**
  * @export
