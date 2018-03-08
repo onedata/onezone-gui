@@ -18,6 +18,8 @@ export default Service.extend({
   currentUser: inject(),
   spaceManager: inject(),
   spaceActions: inject(),
+  groupManager: inject(),
+  groupActions: inject(),
 
   /**
    * @param {string} type
@@ -31,6 +33,8 @@ export default Service.extend({
         return this.get('clientTokenManager').getClientTokens();
       case 'spaces':
         return this.get('spaceManager').getSpaces();
+      case 'groups':
+        return this.get('groupManager').getGroups();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
           return Promise.resolve({ list: A([user]) });
@@ -51,6 +55,8 @@ export default Service.extend({
         return this.get('clientTokenActions.actionButtons');
       case 'spaces':
         return this.get('spaceActions.buttons');
+      case 'groups':
+        return this.get('groupActions.buttons');
       default:
         return [];
     }

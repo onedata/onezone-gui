@@ -33,4 +33,13 @@ export default Service.extend({
   getRecord(id) {
     return this.get('store').findRecord('provider', id);
   },
+
+  /**
+   * Reloads providers list
+   * @returns {Promise<ProviderList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('providerList').reload(true));
+  },
 });

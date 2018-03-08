@@ -44,9 +44,16 @@ export default Service.extend({
             },
           })
           .save()
-          .then(space => user.belongsTo('spaceList').reload(true)
-            .then(() => space)
-          );
+          .then(space => this.reloadList().then(() => space));
       });
+  },
+
+  /**
+   * Reloads space list
+   * @returns {Promise<SpaceList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('spaceList').reload(true));
   },
 });
