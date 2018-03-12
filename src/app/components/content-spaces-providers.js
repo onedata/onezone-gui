@@ -11,13 +11,12 @@ import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import _ from 'lodash';
 
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import generateColors from 'onedata-gui-common/utils/generate-colors';
+import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 
-export default Component.extend(I18n, GlobalActions, {
+export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   classNames: ['content-spaces-providers'],
 
   router: service(),
@@ -56,22 +55,6 @@ export default Component.extend(I18n, GlobalActions, {
         }));
       } else {
         return undefined;
-      }
-    }),
-
-  // TODO: maybe this is not needed - better compute color live in providersData
-  /**
-   * Global colors for each provider
-   * @type {Ember.ComputedProperty<Object>}
-   */
-  providersColors: computed(
-    'providersProxy.{content.@each.entityId,isFulfilled}',
-    function getProvidersColors() {
-      const providersProxy = this.get('providersProxy');
-      if (get(providersProxy, 'isFulfilled')) {
-        const providerIds = get(providersProxy, 'content').mapBy('entityId').sort();
-        const colors = generateColors(providerIds.length);
-        return _.zipObject(providerIds, colors);
       }
     }),
 
