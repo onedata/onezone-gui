@@ -30,13 +30,12 @@ export default {
       'this space using your storage.',
   },
   tabsCommon: {
-    descDistros: 'The following Linux distributions are supported:',
     descCommand: 'The following command installs docker and configures ' +
       'a dockerized Oneprovider instance.',
     token: 'Token',
     command: 'Command',
     generateToken: 'Generate another token',
     copy: 'Copy',
-    distributionsSupported: 'The following GNU/Linux distributions are supported:',
+    distributionsSupported: 'The following Linux distributions are supported:',
   },
 };

@@ -12,11 +12,10 @@ import Component from '@ember/component';
 export default Component.extend({
   tagName: '',
   distributions: Object.freeze([
-    { id: 'redhat', name: 'RedHat' },
-    { id: 'centos', name: 'CentOS' },
-    { id: 'fedora', name: 'Fedora' },
-    { id: 'debian', name: 'Debian' },
-    { id: 'ubuntu', name: 'Ubuntu' },
+    { id: 'ubuntu', name: 'Ubuntu 14.04, 16.04' },
+    { id: 'debian', name: 'Debian 8' },
+    { id: 'centos', name: 'CentOS 7' },
+    { id: 'redhat', name: 'RedHat Linux 7' },
+    { id: 'fedora', name: 'Fedora 21, 22' },
   ]),
-
 });
