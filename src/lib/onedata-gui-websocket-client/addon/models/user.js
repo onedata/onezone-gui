@@ -52,17 +52,21 @@ export default Model.extend(GraphModelMixin, {
   setDefaultSpaceId(spaceId) {
     const operation = spaceId ? 'create' : 'delete';
     const entityId = this.get('entityId');
-    return this.get('onedataGraph').request({
-      gri: gri({
-        entityType: 'user',
-        entityId,
-        aspect: 'default_space',
-      }),
-      operation,
-      data: {
-        spaceId,
-      },
-    });
+    return this.get('onedataGraph')
+      .request({
+        gri: gri({
+          entityType: 'user',
+          entityId,
+          aspect: 'default_space',
+        }),
+        operation,
+        data: {
+          spaceId,
+        },
+      })
+      .then(() => {
+        return this.reload(true);
+      });
   },
 
   leaveSpace(spaceId) {
