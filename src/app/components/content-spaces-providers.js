@@ -1,5 +1,5 @@
 /**
- * FIXME: jsdoc 
+ * A providers view for single space - show supporting providers summary
  *
  * @module components/content-spaces-providers
  * @author Jakub Liput

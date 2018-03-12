@@ -1,3 +1,12 @@
+/**
+ * A support page for space
+ *
+ * @module components/content-spaces-support
+ * @author Jakub Liput
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { inject } from '@ember/service';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';

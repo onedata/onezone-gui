@@ -28,9 +28,8 @@
       </div>
       
       <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
-        {{!-- FIXME: mobile mode is not detected --}}
-        {{#unless _mobileMode}}
-          <div class="row row-space-providers-map hidden-xs">
+        {{#unless media.isMobile}}
+          <div class="row row-space-providers-map">
             <div class="row content-row loadable-row">
               <div class="row" style="height: 500px;">
                 {{#one-atlas class="space-providers-atlas" as |atlas|}}

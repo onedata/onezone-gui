@@ -25,9 +25,9 @@ export default Component.extend(I18n, {
         .then(spaceRecord => {
           this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
           return this.get('router').transitionTo(
-            'onedata.sidebar.content.index',
-            // FIXME: transition does not highlight sidebar item
-            get(spaceRecord, 'id')
+            'onedata.sidebar.content.aspect',
+            get(spaceRecord, 'id'),
+            'index',
           );
         })
         .catch(error => {

@@ -22,7 +22,7 @@ export default Service.extend(I18n, {
     return [btnCreate, btnJoin];
   }),
 
-  // FIXME: the button should have optional link option to define a subroute
+  // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route
   btnCreate: computed('router', function getBtnCreate() {
     const router = this.get('router');
