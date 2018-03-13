@@ -17,10 +17,7 @@ import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
-import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
-import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
-import _ from 'lodash';
 
 export default Component.extend(
   I18n,
@@ -111,21 +108,6 @@ export default Component.extend(
     ),
 
     providersProxy: reads('space.providerList.list'),
-
-    /**
-     * Total support size for space
-     * @type {Ember.ComputedProperty<number>}
-     */
-    _totalSupportSize: computed(
-      'space.supportSizes',
-      function _getTotalSupportSize() {
-        const supportSizes = this.get('space.supportSizes');
-        if (supportSizes) {
-          return _.sum(_.values(supportSizes));
-        }
-      }),
-
-    _totalSupportSizeHuman: computedPipe(bytesToString, '_totalSupportSize'),
 
     init() {
       this._super(...arguments);
