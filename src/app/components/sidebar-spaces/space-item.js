@@ -83,5 +83,5 @@ export default Component.extend(I18n, HasDefaultSpace, {
       }
     }),
 
-  _totalSupportSizeHuman: computedPipe(bytesToString, '_totalSupportSize'),
+  _totalSupportSizeHuman: computedPipe('_totalSupportSize', bytesToString),
 });
