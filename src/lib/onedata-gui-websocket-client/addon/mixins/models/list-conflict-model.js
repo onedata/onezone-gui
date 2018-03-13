@@ -9,26 +9,33 @@
  */
 
 import { get, observer } from '@ember/object';
+import { debounce } from '@ember/runloop';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
-import { isArray } from '@ember/array';
 import Mixin from '@ember/object/mixin';
 
 export default Mixin.create({
-  // FIXME: there are hard-to-reproduce bugs: sometimes one item in collection
-  // does not have a conflictLabel attached
-  addConflictLabels: observer('list.content.@each.{name,entityId}', function () {
+  observeConflictLabels: observer(
+    'list.isFulfilled',
+    'list.content.@each.name',
+    function observeConflictLabels() {
+      if (this.get('list.isFulfilled')) {
+        debounce(this, '_addConflictLabels', 100);
+      }
+    }),
+
+  _addConflictLabels() {
     const listContent = this.get('list.content');
-    if (isArray(listContent) && listContent.every(r => get(r, 'name') != null)) {
+    if (listContent.every(r => get(r, 'name') != null)) {
       addConflictLabels(
         listContent,
         'name',
         'entityId'
       );
     }
-  }),
+  },
 
   init() {
     this._super(...arguments);
-    this.addConflictLabels();
+    this.observeConflictLabels();
   },
 });
