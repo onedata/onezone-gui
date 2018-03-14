@@ -1,5 +1,5 @@
 {{#promise-proxy-container proxy=_providersProxy}}
-  {{#if _mobileMode}}
+  {{#if (and _mobileMode selectedProvider)}}
     {{provider-place/drop provider=selectedProvider class="in-content"}}
   {{else}}
     {{#one-atlas as |atlas|}}
@@ -11,11 +11,10 @@
                 provider=square.providers
                 atlasWidth=atlas.width
                 circleSizeScale=1.2
-                active=(and (not _popoverClosedByUser) (contains selectedProvider square.providers))
+                active=(contains selectedProvider square.providers)
                 renderDrop=(contains selectedProvider square.providers)
                 selectedProvider=selectedProvider
-                providerSelectedAction=(action "providerChanged")
-                showTriggered=(action "showPopover")}}
+                providerSelectedAction=(action "providerChanged")}}
             {{/link-to}}
           {{/position.point}}
         {{/atlas.position}}

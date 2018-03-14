@@ -81,7 +81,7 @@ export default Component.extend(
      */
     openLeaveModalAction: computed(function () {
       return {
-        action: () => this.send('openLeaveModal'),
+        action: () => {},
         title: this.t('leave'),
         class: 'btn-leave-space',
         buttonStyle: 'danger',
@@ -154,11 +154,6 @@ export default Component.extend(
     },
 
     actions: {
-      openLeaveModal(fromFullToolbar) {
-        if (!fromFullToolbar) {
-          this.set('_deregisterModalOpen', true);
-        }
-      },
       leave() {
         const spaceId = this.get('spaceId');
         return this.get('currentUser').getCurrentUserRecord()

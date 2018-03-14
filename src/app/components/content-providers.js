@@ -34,6 +34,9 @@ export default Component.extend({
    */
   providerList: null,
 
+  /**
+   * @type {Ember.ComputedProperty<PromiseObject<DS.RecordArray<Provider>>>>}
+   */
   _providersProxy: computed('providerList.list', function () {
     return PromiseObject.create({
       promise: this.get('providerList.list'),
@@ -42,13 +45,13 @@ export default Component.extend({
 
   /**
    * Array of all prviders
-   * @type {DS.RecordArray<Provider>>}
+   * @type {Ember.ComputedProperty<DS.RecordArray<Provider>>>}
    */
   _providers: readOnly('_providersProxy.content'),
 
   /**
    * Clustered providers
-   * @type {Array<Object>}
+   * @type {Ember.ComputedProperty<Array<Object>>}
    */
   _clusteredProviders: computed('_providers', function _clusteredProviders() {
     return clusterizeProviders(this.get('_providers') || []);
@@ -61,13 +64,8 @@ export default Component.extend({
   _mobileMode: false,
 
   /**
-   * @type {boolean}
-   */
-  _popoverClosedByUser: false,
-
-  /**
    * Window resize event handler
-   * @type {ComputedProperty<Function>}
+   * @type {Ember.ComputedProperty<Function>}
    */
   _windowResizeHandler: computed(function () {
     return () => this._windowResized();
@@ -91,10 +89,10 @@ export default Component.extend({
       safeExec(this, () => {
         const target = $(event.originalEvent.target);
         if (!this.get('_mobileMode')) {
-          this.set(
-            '_popoverClosedByUser', !target.hasClass('provider-place') &&
-            target.parents('.provider-place').length === 0
-          );
+          if (!target.hasClass('provider-place') &&
+            target.parents('.provider-place').length === 0) {
+            this.get('router').transitionTo('onedata.sidebar.content', 'providers', 'notSelected');
+          }
         }
       });
     });
@@ -128,9 +126,6 @@ export default Component.extend({
         get(provider, 'id'),
         'index'
       );
-    },
-    showPopover() {
-      this.set('_popoverClosedByUser', false);
     },
   },
 });
