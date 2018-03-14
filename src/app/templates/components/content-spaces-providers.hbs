@@ -31,6 +31,7 @@
         {{#unless media.isMobile}}
           <div class="row row-space-providers-map">
             <div class="row content-row loadable-row">
+              <h1>Providers map</h1>
               <div class="row" style="height: 500px;">
                 {{#one-atlas class="space-providers-atlas" as |atlas|}}
                   {{#each providersProxy.content as |provider|}}
@@ -57,28 +58,27 @@
         {{/unless}}
         
         <div class="row content-row row-space-providers-support-chart">
-          {{space-providers-support-chart
-            class="space-providers-support-chart"
-            space=space
-            providersColors=providersColors
-          }}
+          <h1>Support by providers</h1>
+          <div class="inner-row-content">
+            {{space-providers-support-chart
+              class="space-providers-support-chart"
+              space=space
+              providersColors=providersColors
+            }}
+          </div>
         </div>
       </div>
     </div>
     
   {{else}}
-  
-    {{#content-info}}
-      {{content-info
-        header=(tt this "noSupport.header")
-        text=(tt this "noSupport.text")
-        imagePath="assets/images/space-get-support.svg"
-        buttonLabel=(tt this "addStorage")
-        class="no-support scroll-breakpoint-600"
-        buttonAction=(action "openAddStorage")
-      }}
-    {{/content-info}}
-  
+    {{content-info
+      header=(tt this "noSupport.header")
+      text=(tt this "noSupport.text")
+      imagePath="assets/images/space-get-support.svg"
+      buttonLabel=(tt this "addStorage")
+      class="no-support scroll-breakpoint-600"
+      buttonAction=(action "openAddStorage")
+    }}
   {{/if}}
 
 {{/promise-proxy-container}}

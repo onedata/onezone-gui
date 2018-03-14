@@ -1,13 +1,11 @@
 <div class="row content-row header-row">
   <h1 class="normal-case with-menu">
-    <span class="one-label">
-      {{one-inline-editor
-        value=space.name
-        onSave=(action "saveSpaceName")
-        class="name-editor short"
-        editHint=(tt this "editSpaceNameHint")
-      }}
-    </span>
+    {{one-inline-editor
+      value=space.name
+      onSave=(action "saveSpaceName")
+      class="one-label name-editor short"
+      editHint=(tt this "editSpaceNameHint")
+    }}
     {{actions-toolbar actionsArray=globalActions}}
   </h1>
   {{#one-switchable-popover-modal
