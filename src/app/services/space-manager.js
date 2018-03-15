@@ -34,6 +34,10 @@ export default Service.extend({
     return this.get('store').findRecord('space', id);
   },
 
+  /**
+   * Creates new space
+   * @returns {Promise<Space>}
+   */
   createRecord({ name }) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => {

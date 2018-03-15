@@ -1,3 +1,13 @@
+/**
+ * Adds a `userProxy` property to object containing PromiseObject with current
+ * user record.
+ *
+ * @module mixins/user-proxy
+ * @author Jakub Liput
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Mixin from '@ember/object/mixin';
 import ObjectProxy from '@ember/object/proxy';
 import PromiseProxyMixin from '@ember/object/promise-proxy-mixin';

@@ -46,7 +46,7 @@ export default Mixin.create({
         'spaceEntityId',
         'defaultSpaceId',
       );
-      return spaceEntityId && defaultSpaceId && (spaceEntityId === defaultSpaceId);
+      return spaceEntityId && (spaceEntityId === defaultSpaceId);
     }
   ),
 });

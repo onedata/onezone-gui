@@ -21,6 +21,10 @@ export default Component.extend(I18n, HasDefaultSpace, {
 
   i18nPrefix: 'components.sidebarSpaces.spaceItem',
 
+  /**
+   * Proxy of current user
+   * @type {Ember.ComputedProperty<PromiseObject<models/User>>}
+   */
   userProxy: reads('sidebar.userProxy'),
 
   /**
@@ -60,6 +64,10 @@ export default Component.extend(I18n, HasDefaultSpace, {
     }
   ),
 
+  /**
+   * Number of providers supporting the space
+   * @type {Ember.ComputedProperty<number>}
+   */
   _providersCount: computed(
     'space.supportSizes',
     function _getProvidersCount() {
@@ -83,5 +91,9 @@ export default Component.extend(I18n, HasDefaultSpace, {
       }
     }),
 
-  _totalSupportSizeHuman: computedPipe('_totalSupportSize', bytesToString),
+  /**
+   * Human-readable total support for space (eg. "30 GiB")
+   * @type {Ember.ComputedProperty<string>}
+   */
+  _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
 });

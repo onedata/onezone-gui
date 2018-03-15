@@ -1,17 +1,27 @@
+/**
+ * A join space view (input for space invitation token)
+ *
+ * @module components/content-spaces-join
+ * @author Jakub Liput
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
 
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
-  onedataGraph: service(),
-  currentUser: service(),
-  globalNotify: service(),
-  router: service(),
+  spaceActions: service(),
 
   i18nPrefix: 'components.contentSpacesJoin',
 
+  /**
+   * A join token updated by input element
+   * @type {string}
+   * @private
+   */
   token: undefined,
 
   didInsertElement() {
@@ -20,19 +30,7 @@ export default Component.extend(I18n, {
 
   actions: {
     joinSpace(token) {
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => user.joinSpace(token))
-        .then(spaceRecord => {
-          this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
-          return this.get('router').transitionTo(
-            'onedata.sidebar.content.aspect',
-            get(spaceRecord, 'id'),
-            'index',
-          );
-        })
-        .catch(error => {
-          this.get('globalNotify').backendError(this.t('joiningSpace'), error);
-        });
+      return this.get('spaceActions').joinSpace(token);
     },
   },
 });

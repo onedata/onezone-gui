@@ -1,5 +1,5 @@
 /**
- * Default content for single space
+ * Default content for single space - overview of space aspects
  *
  * @module components/content-spaces-index
  * @author Jakub Liput
@@ -27,7 +27,6 @@ export default Component.extend(
   ProvidersColors, {
     classNames: ['content-spaces-index'],
 
-    onezoneServer: inject(),
     currentUser: inject(),
     globalNotify: inject(),
     router: inject(),
@@ -56,10 +55,14 @@ export default Component.extend(
     }),
 
     /**
-     * @type {string}
+     * @type {Ember.ComputedProperty<string>}
      */
     spaceId: reads('space.entityId'),
 
+    /**
+     * True if space loaded into this content is default for current user
+     * @type {Ember.ComputedProperty<boolean>}
+     */
     isDefaultSpace: reads('hasDefaultSpace'),
 
     /**
@@ -107,6 +110,9 @@ export default Component.extend(
       }
     ),
 
+    /**
+     * @type {PromiseArray<models/Provider>}
+     */
     providersProxy: reads('space.providerList.list'),
 
     init() {
