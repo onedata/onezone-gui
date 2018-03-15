@@ -8,14 +8,7 @@
  */
 
 function _onezoneUrl(windowLocation = window.location) {
-  let protocol = windowLocation.protocol;
-  let prefix = `${protocol}//${windowLocation.host}`;
-  let port = windowLocation.port;
-  let suffix = (port &&
-    !(protocol === 'http' && port === 80) &&
-    !(protocol === 'https' && port === 443)
-  ) ? `:${port}` : '';
-  return `${prefix}${suffix}`;
+  return windowLocation.origin.toString();
 }
 
 function _curlCommand(url, token, suffix = '') {
