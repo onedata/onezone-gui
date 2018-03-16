@@ -33,10 +33,5 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
-  triggerEventOnPrimaryItemSelection: true,
-
-  /**
-   * @override
-   */
   sidebarType: 'providers',
 });
