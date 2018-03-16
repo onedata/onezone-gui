@@ -1,0 +1,29 @@
+{{#promise-proxy-container proxy=firstProviderIdProxy}}
+  {{#content-info
+    class="scroll-breakpoint-600"
+    imagePath="assets/images/group.svg"
+    header=(tt this "header")
+    subheader=group.name}}
+    <div class="text-center">
+      {{#if (not-eq firstProviderIdProxy.content undefined)}}
+        <p class="lead">
+          {{tt this "youCanManageUsing"}}
+          {{#link-to 
+            "onedata.sidebar.content.aspect"
+            "providers"
+            firstProviderIdProxy.content
+            "redirect"
+          }}{{tt this "oneprovider"}}{{/link-to}}.
+        </p>
+      {{else}}
+        <p class="lead">
+          {{tt this "youCanManageUsing"}}{{tt this "oneprovider"}}.
+        </p>
+        <p class="lead">
+          {{tt this "haveNoAccess"}}
+          {{#link-to "onedata.sidebar" "providers"}}{{tt this "anyProvider"}}{{/link-to}}.
+        </p>
+      {{/if}}
+    </div>
+  {{/content-info}}
+{{/promise-proxy-container}}

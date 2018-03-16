@@ -59,9 +59,9 @@ export default Service.extend(I18n, {
         'tokens',
         token.get('id')
       );
-      const sidebarContainer = $('.col-sidebar');
-      $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-        sidebarContainer[0].clientHeight);
+      // TODO: instead that, always scroll to sidebar position on changing
+      // sidebar chosen item
+      $('.col-sidebar').scrollTop(0);
     }).catch(error => globalNotify.backendError(this.t('tokenCreation'), error));
   },
 });

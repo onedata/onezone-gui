@@ -1,0 +1,84 @@
+{{#if providersProxy.content.length}}
+  <div class="row content-row header-row hidden-xs">
+    <h1 class="with-menu">
+      <span class="one-label">
+        {{tt this "header"}}
+      </span>
+      {{actions-toolbar actionsArray=globalActions}}
+    </h1>
+  </div>
+{{/if}}
+
+{{#promise-proxy-container proxy=providersProxy}}
+
+  {{#if providersProxy.content.length}}
+
+    <div class="row">
+      <div class="col-xs-12 col-md-5 col-lg-4 col-space-provider-list">
+        <div class="row content-row loadable-row">
+          {{providers-list
+            class="space-providers-list"
+            providersData=providersData
+            selectedSpace=space
+            showSelectedSpaceSupportSize=true
+            showSupportedSpacesCount=false
+            providerClickAction=(action "providerClicked")
+          }}
+        </div>
+      </div>
+      
+      <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
+        {{#unless media.isMobile}}
+          <div class="row row-space-providers-map">
+            <div class="row content-row loadable-row">
+              <h1>Providers map</h1>
+              <div class="row" style="height: 500px;">
+                {{#one-atlas class="space-providers-atlas" as |atlas|}}
+                  {{#each providersProxy.content as |provider|}}
+                    {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+                      {{#position.point}}
+                        {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
+                          {{provider-place
+                            provider=provider
+                            atlasWidth=atlas.width
+                            circleSizeScale=2
+                            active=(eq provider selectedProvider)
+                            renderDrop=(eq provider selectedProvider)
+                            circleColor=(get providersColors provider.entityId)
+                            hint=provider.name
+                          }}
+                        {{/link-to}}
+                      {{/position.point}}
+                    {{/atlas.position}}
+                  {{/each}}
+                {{/one-atlas}}
+              </div>
+            </div>
+        </div>
+        {{/unless}}
+        
+        <div class="row content-row row-space-providers-support-chart">
+          <h1>Support by providers</h1>
+          <div class="inner-row-content">
+            {{space-providers-support-chart
+              class="space-providers-support-chart"
+              space=space
+              providersColors=providersColors
+            }}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  {{else}}
+    {{content-info
+      header=(tt this "noSupport.header")
+      text=(tt this "noSupport.text")
+      imagePath="assets/images/space-get-support.svg"
+      buttonLabel=(tt this "addStorage")
+      class="no-support scroll-breakpoint-600"
+      buttonAction=(action "openAddStorage")
+    }}
+  {{/if}}
+
+{{/promise-proxy-container}}

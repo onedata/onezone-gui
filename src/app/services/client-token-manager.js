@@ -8,18 +8,14 @@
  */
 
 import Service from '@ember/service';
-import { inject } from '@ember/service';
-import addRecordToList from 'onedata-gui-websocket-client/utils/add-record-to-list';
-import removeRecordFromList from 'onedata-gui-websocket-client/utils/remove-record-from-list';
+import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
-
-// TODO: needed for temporary hack
-import config from 'ember-get-config';
-import { isDevelopment } from 'onedata-gui-websocket-client/utils/development-environment';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 const ClientTokenManager = Service.extend({
-  store: inject(),
-  currentUser: inject(),
+  store: service(),
+  currentUser: service(),
+  onedataGraph: service(),
 
   /**
    * Fetches collection of all tokens
@@ -27,11 +23,9 @@ const ClientTokenManager = Service.extend({
    * @return {Promise<DS.RecordArray<ClientToken>>} resolves to an array of tokens
    */
   getClientTokens() {
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('clientTokenList').then((clientTokenList) =>
-        clientTokenList.get('list')
-      )
-    );
+    return this.get('currentUser')
+      .getCurrentUserRecord()
+      .then(user => user.get('clientTokenList'));
   },
 
   /**
@@ -40,7 +34,9 @@ const ClientTokenManager = Service.extend({
    * @return {Promise<ClientToken>} token promise
    */
   getRecord(id) {
-    return this.get('store').findRecord('clientToken', id);
+    return this.getClientTokens()
+      .then(listRecord => get(listRecord, 'list'))
+      .then(list => list.find(t => id == get(t, 'id')));
   },
 
   /**
@@ -48,12 +44,29 @@ const ClientTokenManager = Service.extend({
    * @returns {Promise<ClientToken>}
    */
   createRecord() {
-    const token = this.get('store').createRecord('clientToken', {});
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('clientTokenList').then((clientTokenList) =>
-        addRecordToList(token, clientTokenList)
-      )
-    );
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => {
+        const userId = get(user, 'entityId');
+        const tokenCreateGri = gri({
+          entityType: 'user',
+          entityId: userId,
+          aspect: 'client_tokens',
+          scope: 'private',
+        });
+        return this.get('onedataGraph')
+          .request({
+            gri: tokenCreateGri,
+            operation: 'create',
+            data: {},
+          })
+          .then(tokenData => {
+            const tokenGri = tokenData.gri;
+            return user.belongsTo('clientTokenList').reload()
+              .then(() =>
+                this.get('store').findRecord('clientToken', tokenGri)
+              );
+          });
+      });
   },
 
   /**
@@ -62,45 +75,16 @@ const ClientTokenManager = Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
-    return this.getRecord(id).then((token) =>
-      this.get('currentUser').getCurrentUserRecord().then((user) =>
-        user.get('clientTokenList').then((clientTokenList) =>
-          removeRecordFromList(token, clientTokenList)
-        )
-      )
-    );
+    return this.getRecord(id)
+      .then(token => token.destroyRecord()
+        .then(destroyResult => {
+          this.get('currentUser')
+            .getCurrentUserRecord()
+            .then(user => user.belongsTo('clientTokenList').reload())
+            .then(() => destroyResult);
+        })
+      );
   },
 });
-
-// TODO: a temporary hack to enable creating tokens in current backend
-if (!isDevelopment(config)) {
-  ClientTokenManager.reopen({
-    onedataGraph: inject(),
-    /**
-     * @override
-     */
-    createRecord() {
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => {
-          const userId = get(user, 'entityId');
-          return user.get('clientTokenList')
-            .then(clientTokenList => {
-              return this.get('onedataGraph')
-                .request({
-                  gri: `user.${userId}.client_tokens:private`,
-                  operation: 'create',
-                  data: {},
-                })
-                .then(tokenData => {
-                  tokenData.id = tokenData.gri;
-                  const token = this.get('store')
-                    .createRecord('clientToken', tokenData);
-                  return addRecordToList(token, clientTokenList, false);
-                });
-            });
-        });
-    },
-  });
-}
 
 export default ClientTokenManager;

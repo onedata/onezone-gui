@@ -12,6 +12,8 @@ import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
+import { Promise } from 'rsvp';
+import { get } from '@ember/object';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -19,9 +21,15 @@ const USER_LOGIN = 'stub_user';
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_GROUPS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const providerStatusList = ['online', 'offline'];
+
+const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
+const names = ['one', 'two', 'three'];
+
+const perProviderSize = Math.pow(1024, 4);
 
 /**
  * @export
@@ -30,14 +38,13 @@ const providerStatusList = ['online', 'offline'];
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
-  const names = ['one', 'two', 'three'];
   return Promise.all(
       types.map(type =>
         createEntityRecords(store, type, names)
         .then(records => createListRecord(store, type, records))
       )
     )
+    // push space list into providers
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
@@ -50,19 +57,43 @@ export default function generateDevelopmentModel(store) {
         ))
       ).then(() => listRecords);
     })
+    // push provider list and support info into spaces
+    .then(listRecords => {
+      const providers = listRecords[types.indexOf('provider')].get('list');
+      const spaces = listRecords[types.indexOf('space')].get('list');
+      return Promise.all([providers, spaces]).then(([providerList, spaceList]) =>
+        Promise.all(spaceList.map(space => {
+          space.set('supportSizes', _.zipObject(
+            get(providers, 'content').mapBy('entityId'),
+            _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
+          ));
+          return createListRecord(store, 'provider', providerList).then(lr => {
+            space.set('providerList', lr);
+            return space.save();
+          });
+        }))
+      ).then(() => listRecords);
+    })
     .then(listRecords => createUserRecord(store, listRecords));
 }
 
 function createUserRecord(store, listRecords) {
-  const userRecord = store.createRecord('user', {
-    id: userGri(USER_ID),
-    name: USERNAME,
-    login: USER_LOGIN,
-  });
-  listRecords.forEach(lr =>
-    userRecord.set(camelize(lr.constructor.modelName), lr)
-  );
-  return userRecord.save();
+  const spacesIndex = types.indexOf('space');
+  return listRecords[spacesIndex].get('list')
+    .then(list => list.get('length') > 0 ? list.get('firstObject ') : null)
+    .then(space => space && space.get('entityId'))
+    .then(defaultSpaceId => {
+      const userRecord = store.createRecord('user', {
+        id: userGri(USER_ID),
+        name: USERNAME,
+        login: USER_LOGIN,
+        defaultSpaceId,
+      });
+      listRecords.forEach(lr =>
+        userRecord.set(camelize(lr.constructor.modelName), lr)
+      );
+      return userRecord.save();
+    });
 }
 
 function createEntityRecords(store, type, names) {
@@ -73,6 +104,8 @@ function createEntityRecords(store, type, names) {
       return createSpacesRecords(store);
     case 'clientToken':
       return createClientTokensRecords(store);
+    case 'group':
+      return createGroupsRecords(store);
     case 'linkedAccount':
       return createLinkedAccount(store);
     default:
@@ -96,7 +129,8 @@ function createProvidersRecords(store) {
     let sign = index % 2 ? -1 : 1;
     return store.createRecord('provider', {
       name: `Provider ${index}`,
-      latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
+      latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
+        sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
       status: providerStatusList[index % providerStatusList.length],
       host: `10.0.0.${index + 1}`,
@@ -106,13 +140,8 @@ function createProvidersRecords(store) {
 
 function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
-    const perProviderSize = 1048576;
     return store.createRecord('space', {
       name: `Space ${index}`,
-      supportSizes: _.zipObject(
-        _.range(NUMBER_OF_PROVIDERS).map(String),
-        _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
-      ),
     }).save();
   }));
 }
@@ -120,6 +149,12 @@ function createSpacesRecords(store) {
 function createClientTokensRecords(store) {
   return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
     return store.createRecord('clientToken', {}).save();
+  }));
+}
+
+function createGroupsRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_GROUPS).map((index) => {
+    return store.createRecord('group', { name: `group${index}` }).save();
   }));
 }
 

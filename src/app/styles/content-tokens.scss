@@ -2,19 +2,21 @@
   .token-textarea {
     width: 100%;
     height: 120px;
-    margin-bottom: $padding-base-vertical;
-    font-family: monospace;
+    margin-top: 0;
   }
   @media (max-width: $screen-xs-max) {
-    padding: $padding-large-vertical $padding-large-horizontal;
+    padding: 0 $padding-large-horizontal;
     .token-textarea {
       height: 200px;
     }
+    .content-info .world-map {
+      top: $padding-base-vertical;
+    }
   }
-  .btn {
-    .oneicon {
-      position: relative;
-      left: -0.2em;
+  @media (min-width: $screen-sm-min) {
+    .content-info .world-map {
+      top: 2 * $onedata-logo-margin-top + $onedata-logo-height + $padding-base-vertical;
+      bottom: $padding-base-vertical;
     }
   }
 }

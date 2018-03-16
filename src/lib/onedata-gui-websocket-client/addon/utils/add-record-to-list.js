@@ -17,7 +17,7 @@ import RSVP from 'rsvp';
  * @return {RSVP.Promise} Promise, that resolves to record object if all
  * save operations success.
  */
-export default function addRecordToList(record, recordList, saveRecordEntity = true) {
+export default function addRecordToList(record, recordList, saveRecordEntity = false) {
   let initPromise = RSVP.Promise.resolve();
   if (saveRecordEntity) {
     initPromise = record.save();

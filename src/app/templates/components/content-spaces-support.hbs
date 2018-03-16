@@ -1,0 +1,37 @@
+<div class="row content-row header-row hidden-xs">
+  <h1>
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+  </h1>
+</div>
+
+<div class="row content-row">
+  {{#bs-tab class="only-tab-bar" as |tab|}}
+    {{#tab.pane title=(tt this "requestSupport.tabName")}}
+      {{content-spaces-support/request-support
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+    {{#tab.pane title=(tt this "deployProvider.tabName")}}
+      {{content-spaces-support/deploy-provider
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+    {{#tab.pane title=(tt this "exposeData.tabName")}}
+      {{content-spaces-support/expose-data
+        copySuccess=(action "copySuccess")
+        copyError=(action "copyError")
+        getToken=(action "getNewSupportToken")
+        tokenProxy=supportTokenProxy
+      }}
+    {{/tab.pane}}
+  {{/bs-tab}}
+</div>
+

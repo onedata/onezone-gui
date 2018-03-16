@@ -5,7 +5,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { reads } from '@ember/object/computed';
+import { computed } from '@ember/object';
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
@@ -13,5 +13,9 @@ import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-mo
 
 export default Model.extend(GraphModelMixin, {
   token: attr('string'),
-  name: reads('token'),
+  name: computed('token', function () {
+    const token = this.get('token');
+    return token &&
+      token.slice(0, 3) + '...' + token.slice(token.length - 12, token.length);
+  }),
 });

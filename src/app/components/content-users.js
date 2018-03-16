@@ -18,6 +18,8 @@ import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 
+const animationTimeout = 333;
+
 export default Component.extend(I18n, {
   classNames: 'content-users',
 
@@ -55,6 +57,24 @@ export default Component.extend(I18n, {
    * @type {undefined|AuthorizerInfo}
    */
   _selectedAuthorizer: undefined,
+
+  /**
+   * Timeout id used to control add-account form mode change animation.
+   * @type {number}
+   */
+  _formAnimationTimeoutId: -1,
+
+  /**
+   * Animation time (visibility toggle animation).
+   * @type {number}
+   */
+  _animationTimeout: animationTimeout,
+
+  /**
+   * If true, dropdown with auth providers is visible in add-account section
+   * @type {boolean}
+   */
+  _isProvidersDropdownVisible: false,
 
   /**
    * Object with mapping authorizerType -> authorizerInfo
@@ -122,6 +142,27 @@ export default Component.extend(I18n, {
     });
   },
 
+  /**
+   * Launches element show animation.
+   * @param {jQuery} element
+   * @param {boolean} delayed if true, animation will be delayed
+   * @returns {undefined}
+   */
+  _animateShow(element, delayed) {
+    element
+      .addClass((delayed ? 'short-delay ' : '') + 'fadeIn')
+      .removeClass('hide fadeOut');
+  },
+
+  /**
+   * Launches element hide animation.
+   * @param {jQuery} element
+   * @returns {undefined}
+   */
+  _animateHide(element) {
+    element.addClass('fadeOut').removeClass('short-delay fadeIn');
+  },
+
   actions: {
     saveName(name) {
       const user = this.get('user');
@@ -135,6 +176,34 @@ export default Component.extend(I18n, {
       const user = this.get('user');
       set(user, 'login', login && login.length ? login : null);
       return this._saveUser();
+    },
+    toggleAuthorizersDropdown() {
+      const {
+        _formAnimationTimeoutId,
+        _animationTimeout,
+      } = this.getProperties(
+        '_formAnimationTimeoutId',
+        '_animationTimeout'
+      );
+      const dropdownDesc = this.$('.show-dropdown-description');
+      const authDropdown = this.$('.authorizers-dropdown');
+      clearTimeout(_formAnimationTimeoutId);
+
+      this.toggleProperty('_isProvidersDropdownVisible');
+      if (this.get('_isProvidersDropdownVisible')) {
+        this._animateHide(dropdownDesc);
+        this._animateShow(authDropdown, true);
+        this.$('.login-username').focus();
+        this.set('_formAnimationTimeoutId',
+          setTimeout(() => dropdownDesc.addClass('hide'), _animationTimeout)
+        );
+      } else {
+        this._animateHide(authDropdown);
+        this._animateShow(dropdownDesc, true);
+        this.set('_formAnimationTimeoutId',
+          setTimeout(() => authDropdown.addClass('hide'), _animationTimeout)
+        );
+      }
     },
     authorizerSelected(authorizer) {
       this.set('_selectedAuthorizer', authorizer);

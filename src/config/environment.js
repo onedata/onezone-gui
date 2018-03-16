@@ -19,9 +19,17 @@ module.exports = function (environment) {
         Date: false,
       },
     },
+    /**
+     * Objects in collection:
+     * - id: string
+     * - icon: string
+     * - [defaultAspect]: string
+     */
     'onedataTabs': [
       { id: 'providers', icon: 'provider' },
       { id: 'tokens', icon: 'tokens' },
+      { id: 'spaces', icon: 'space' },
+      { id: 'groups', icon: 'group' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',

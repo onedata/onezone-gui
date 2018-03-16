@@ -1,18 +1,20 @@
 {{#promise-proxy-container proxy=_providersProxy}}
-  {{#if _mobileMode}}
+  {{#if (and _mobileMode selectedProvider)}}
     {{provider-place/drop provider=selectedProvider class="in-content"}}
   {{else}}
     {{#one-atlas as |atlas|}}
-      {{#each _providers as |provider|}}
-        {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+      {{#each _clusteredProviders as |square|}}
+        {{#atlas.position latitude=square.latitude longitude=square.longitude as |position|}}
           {{#position.point}}
-            {{#link-to "onedata.sidebar.content.aspect" "providers" provider.id "index"}}
+            {{#link-to "onedata.sidebar.content.aspect" "providers" square.providers.[0].id "index"}}
               {{provider-place
-                provider=provider
+                provider=square.providers
                 atlasWidth=atlas.width
-                circleSizeScale=2
-                active=(eq provider selectedProvider)
-                renderDrop=(eq provider selectedProvider)}}
+                circleSizeScale=1.2
+                active=(contains selectedProvider square.providers)
+                renderDrop=(contains selectedProvider square.providers)
+                selectedProvider=selectedProvider
+                providerSelectedAction=(action "providerChanged")}}
             {{/link-to}}
           {{/position.point}}
         {{/atlas.position}}

@@ -1,6 +1,6 @@
 {{one-icon icon="provider"}} 
-{{#truncated-string class="after-icon"}}
-  <span class="one-label">{{item.name}}</span>
+{{#truncated-string class="after-icon before-status"}}
+  {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
   {{#status-toolbar as |toolbar|}}
@@ -8,12 +8,14 @@
       {{toolbar.icon 
         icon="space"
         innerText=_spaces.length
+        hint=(tt this "spaceCountHint" count=_spaces.length)
       }}
     {{/if}}
     {{#if _spacesLoaded}}
       {{toolbar.icon
         icon="provider"
-        outerText=(bytes-to-string _totalSupportSize)
+        outerText=_totalSupportSizeHumanReadable
+        hint=(tt this "totalSupportHint" size=_totalSupportSizeHumanReadable)
       }}
     {{/if}}
   {{/status-toolbar}}

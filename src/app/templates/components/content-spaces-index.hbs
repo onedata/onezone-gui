@@ -1,0 +1,40 @@
+<div class="row content-row header-row">
+  <h1 class="normal-case with-menu">
+    {{one-inline-editor
+      value=space.name
+      onSave=(action "saveSpaceName")
+      class="one-label name-editor short"
+      editHint=(tt this "editSpaceNameHint")
+    }}
+    {{actions-toolbar actionsArray=globalActions}}
+  </h1>
+  {{#one-switchable-popover-modal
+    triggersConfiguration=leaveSpaceModalTriggers
+    popoverClass="popover-leave-space"
+    submit=(action "leave")
+    as |ospm|
+  }}
+    {{leave-space-confirm submitAction=ospm.submit closeAction=ospm.close}}
+  {{/one-switchable-popover-modal}}
+</div>
+
+<div class="row content-row">
+  <div class="one-tile-container text-center">
+    {{#one-tile title=(tt this "tileProvidersTitle") aspect="providers"}}
+      {{#loading-container
+        isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
+      }}
+        <div class="support-chart-container absolute-align-middle-center full-width">
+          {{space-providers-support-chart
+            space=space
+            providersColors=providersColors
+            forceMobile=true
+            hideLegend=true
+          }}
+        </div>
+      {{/loading-container}}
+    {{/one-tile}}
+
+    {{yield}}
+  </div>
+</div>

@@ -1,12 +1,26 @@
-<textarea class="token-textarea form-control">{{selectedToken.token}}</textarea>
-{{#copy-button
-  success=(action "copySuccess")
-  error=(action "copyError")
-  class="btn btn-primary"
-  clipboardTarget=".token-textarea"}}
-  {{one-icon icon="clipboard-copy"}} {{t "components.contentTokens.copy"}}
-{{/copy-button}}
-<button class="btn btn-danger pull-right" {{action "removeToken"}}>
-  {{one-icon icon="remove"}}
-  {{t "components.contentTokens.deleteToken"}}
-</button>
+<div class="row content-row header-row hidden-xs">
+  <h1 class="normal-case">
+    <span class="one-label">
+      {{selectedToken.name}}
+    </span>
+    {{actions-toolbar actionsArray=globalActions}}
+  </h1>
+</div>
+{{#content-info
+  class="scroll-breakpoint-600"
+  header=(tt this "header")
+  text=(tt this "description")}}
+  <div class="token-row">
+    <textarea class="token-textarea form-control">{{selectedToken.token}}</textarea>
+    <div class="text-center">
+      {{#copy-button
+        success=(action "copySuccess")
+        error=(action "copyError")
+        class="btn btn-primary"
+        clipboardTarget=".token-textarea"
+      }}
+        {{one-icon icon="clipboard-copy"}} {{t "components.contentTokens.copy"}}
+      {{/copy-button}}
+    </div>
+  </div>
+{{/content-info}}

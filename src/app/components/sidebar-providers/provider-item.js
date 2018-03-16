@@ -3,7 +3,7 @@
  *
  * @module components/sidebar-providers/provider-item
  * @author Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,8 +12,14 @@ import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { get } from '@ember/object';
 
-export default Component.extend({
+import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+
+export default Component.extend(I18n, {
   tagName: '',
+
+  i18nPrefix: 'components.sidebarProviders.providerItem',
 
   /**
    * Provider item
@@ -110,4 +116,10 @@ export default Component.extend({
         );
       }
     }),
+
+  /**
+   * Human-readable total support provided by the provider (eg. "30 GiB")
+   * @type {Ember.ComputedProperty<string>}
+   */
+  _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
 });

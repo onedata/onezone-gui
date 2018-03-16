@@ -10,7 +10,7 @@
  *
  * @module services/onedata-websocket
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -223,7 +223,7 @@ export default Service.extend(Evented, {
     this.set('_initDefer', _initDefer);
     let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     let host = window.location.hostname;
-    let port = 443;
+    let port = window.location.port;
     let suffix = '/graph_sync/gui';
 
     let url = protocol + host + (port === '' ? '' : ':' + port) + suffix;

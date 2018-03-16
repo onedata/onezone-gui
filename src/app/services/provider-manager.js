@@ -3,7 +3,7 @@
  *
  * @module services/provider-manager
  * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,8 +11,6 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 
 export default Service.extend({
-  // TODO to implement using onedata-websocket services
-
   store: service(),
   currentUser: service(),
 
@@ -22,11 +20,9 @@ export default Service.extend({
    * @return {Promise<DS.RecordArray<Provider>>} resolves to an array of providers
    */
   getProviders() {
-    return this.get('currentUser').getCurrentUserRecord().then((user) =>
-      user.get('providerList').then((providerList) =>
-        providerList.get('list')
-      )
-    );
+    return this.get('currentUser')
+      .getCurrentUserRecord()
+      .then(user => user.get('providerList'));
   },
 
   /**
@@ -36,5 +32,14 @@ export default Service.extend({
    */
   getRecord(id) {
     return this.get('store').findRecord('provider', id);
+  },
+
+  /**
+   * Reloads providers list
+   * @returns {Promise<ProviderList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('providerList').reload(true));
   },
 });
