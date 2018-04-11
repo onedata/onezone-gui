@@ -91,7 +91,11 @@ export default Component.extend({
         if (!this.get('_mobileMode')) {
           if (!target.hasClass('provider-place') &&
             target.parents('.provider-place').length === 0) {
-            this.get('router').transitionTo('onedata.sidebar.content', 'providers', 'notSelected');
+            this.get('router').transitionTo(
+              'onedata.sidebar.content',
+              'providers',
+              'notSelected'
+            );
           }
         }
       });
