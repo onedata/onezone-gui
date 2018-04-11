@@ -3,7 +3,7 @@
  *
  * @module components/sidebar-providers/provider-item
  * @author Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -117,5 +117,9 @@ export default Component.extend(I18n, {
       }
     }),
 
-  _totalSupportSizeHuman: computedPipe('_totalSupportSize', bytesToString),
+  /**
+   * Human-readable total support provided by the provider (eg. "30 GiB")
+   * @type {Ember.ComputedProperty<string>}
+   */
+  _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
 });

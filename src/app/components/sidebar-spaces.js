@@ -3,7 +3,7 @@
  *
  * @module components/sidebar-providers
  * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -16,6 +16,12 @@ import { inject as service } from '@ember/service';
 
 export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
   layout,
+
+  /**
+   * Note: `currentUser` service is needed by `UserProxyMixin`
+   * which is needed by `space-item` to work.
+   * @type {Ember.Service}
+   */
   currentUser: service(),
 
   i18nPrefix: 'components.sidebarSpaces',

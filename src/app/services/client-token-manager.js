@@ -12,10 +12,6 @@ import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
-// TODO: needed for temporary hack
-import config from 'ember-get-config';
-import { isDevelopment } from 'onedata-gui-websocket-client/utils/development-environment';
-
 const ClientTokenManager = Service.extend({
   store: service(),
   currentUser: service(),
@@ -90,9 +86,5 @@ const ClientTokenManager = Service.extend({
       );
   },
 });
-
-if (isDevelopment(config)) {
-  // TODO: put hacks here
-}
 
 export default ClientTokenManager;

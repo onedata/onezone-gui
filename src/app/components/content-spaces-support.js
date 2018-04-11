@@ -19,8 +19,15 @@ export default Component.extend(UserProxyMixin, I18n, {
 
   i18nPrefix: 'components.contentSpacesSupport',
 
+  /**
+   * @type {models/Space}
+   */
   space: undefined,
 
+  /**
+   * Resolves with support token, can be updated with `_updateSupportToken`
+   * @type {PromiseObject<string>}
+   */
   supportTokenProxy: undefined,
 
   init() {

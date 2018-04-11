@@ -53,8 +53,6 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
           provider,
           color: providerColors[get(provider, 'entityId')],
         }));
-      } else {
-        return undefined;
       }
     }),
 

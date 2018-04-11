@@ -1,13 +1,23 @@
-import Service, { inject } from '@ember/service';
+/**
+ * A service which provides spaces manipulation functions ready to use for GUI 
+ *
+ * @module services/space-actions
+ * @author Jakub Liput
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
+import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 
 export default Service.extend(I18n, {
-  router: inject(),
-  i18n: inject(),
-  spaceManager: inject(),
-  globalNotify: inject(),
+  router: service(),
+  i18n: service(),
+  spaceManager: service(),
+  globalNotify: service(),
+  currentUser: service(),
 
   i18nPrefix: 'services.spaceActions',
 
@@ -49,7 +59,7 @@ export default Service.extend(I18n, {
   /**
    * Creates new space
    * @returns {Promise} A promise, which resolves to new space if it has
-   * been created successfully.
+   *    been created successfully.
    */
   createSpace({ name }) {
     const {
@@ -78,5 +88,26 @@ export default Service.extend(I18n, {
         });
       })
       .catch(error => globalNotify.backendError(this.t('spaceCreation'), error));
+  },
+
+  /**
+   * Joins a space
+   * @param {string} token an invitation token
+   * @returns {Promise} A promise of transition into view of newly joined space
+   */
+  joinSpace(token) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.joinSpace(token))
+      .then(spaceRecord => {
+        this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
+        return this.get('router').transitionTo(
+          'onedata.sidebar.content.aspect',
+          get(spaceRecord, 'id'),
+          'index',
+        );
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+      });
   },
 });

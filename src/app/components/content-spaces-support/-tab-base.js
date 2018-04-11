@@ -1,5 +1,6 @@
 /**
  * Common component logic for support space modal tabs
+ * 
  * @module components/content-spaces-support/-tab-base
  * @author Jakub Liput
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
@@ -47,10 +48,18 @@ export default Component.extend({
    */
   tokenProxy: undefined,
 
+  /**
+   * Selector for input for copying to clipboard
+   * @type {Ember.ComputedProperty<string>}
+   */
   _clipboardTarget: computed(function () {
     return `#${this.get('elementId')} .token-input`;
   }),
 
+  /**
+   * Proxy for generated provider setup command
+   * @type {Ember.ComputedProperty<PromiseObject<string>>}
+   */
   commandProxy: computed('commandType', 'tokenProxy.promise', function () {
     const tokenPromise = this.get('tokenProxy.promise');
     const commandType = this.get('commandType');
@@ -60,8 +69,6 @@ export default Component.extend({
           generateShellCommand(commandType, { token })
         ),
       });
-    } else {
-      return undefined;
     }
   }),
 
