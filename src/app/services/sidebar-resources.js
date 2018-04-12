@@ -7,11 +7,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { default as Service, inject } from '@ember/service';
+import { inject } from '@ember/service';
 import { A } from '@ember/array';
 import { Promise } from 'rsvp';
+import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 
-export default Service.extend({
+export default SidebarResources.extend({
   providerManager: inject(),
   clientTokenManager: inject(),
   clientTokenActions: inject(),
