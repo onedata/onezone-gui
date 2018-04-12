@@ -46,11 +46,6 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
   /**
    * @override
    */
-  triggerEventOnPrimaryItemSelection: true,
-
-  /**
-   * @override
-   */
   sidebarType: 'spaces',
 
   secondLevelItems: computed(function getSecondLevelItems() {
