@@ -94,7 +94,7 @@ export default Component.extend({
             this.get('router').transitionTo(
               'onedata.sidebar.content',
               'providers',
-              'notSelected'
+              'not-selected'
             );
           }
         }
