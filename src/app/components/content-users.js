@@ -12,7 +12,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
-import { computed, set } from '@ember/object';
+import { computed, set, get } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
@@ -169,13 +169,23 @@ export default Component.extend(I18n, {
       if (!name || !name.length) {
         return reject();
       }
+      const oldName = get(user, 'name');
       set(user, 'name', name);
-      return this._saveUser();
+      return this._saveUser().catch((error) => {
+        // Restore old user name
+        set(user, 'name', oldName);
+        throw error;
+      });
     },
     saveLogin(login) {
       const user = this.get('user');
+      const oldLogin = get(user, 'login');
       set(user, 'login', login && login.length ? login : null);
-      return this._saveUser();
+      return this._saveUser().catch((error) => {
+        // Restore old user login
+        set(user, 'login', oldLogin);
+        throw error;
+      });
     },
     toggleAuthorizersDropdown() {
       const {
