@@ -8,7 +8,7 @@
  */
 
 import Service, { inject } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 import { next } from '@ember/runloop';
@@ -16,6 +16,7 @@ import { next } from '@ember/runloop';
 export default Service.extend(I18n, {
   router: inject(),
   i18n: inject(),
+  contentResources: inject(),
   groupManager: inject(),
   globalNotify: inject(),
 
@@ -70,10 +71,12 @@ export default Service.extend(I18n, {
       globalNotify,
       router,
       groupManager,
+      contentResources,
     } = this.getProperties(
       'globalNotify',
       'router',
-      'groupManager'
+      'groupManager',
+      'contentResources',
     );
     return groupManager.createRecord({
         name,
@@ -84,7 +87,7 @@ export default Service.extend(I18n, {
           router.transitionTo(
             'onedata.sidebar.content.aspect',
             'groups',
-            get(group, 'id'),
+            contentResources.getRoutableIdFor(group),
             'index',
           ).then(() => {
             const sidebarContainer = $('.col-sidebar');
@@ -104,13 +107,14 @@ export default Service.extend(I18n, {
    * been joined successfully.
    */
   joinGroup(token) {
+    const contentResources = this.get('contentResources');
     return this.get('groupManager').joinGroup(token)
       .then(groupRecord => {
         this.get('globalNotify').info(this.t('joinedGroupSuccess'));
         return this.get('router').transitionTo(
           'onedata.sidebar.content.aspect',
           'groups',
-          get(groupRecord, 'id'),
+          contentResources.getRoutableIdFor(groupRecord),
           'index'
         );
       })

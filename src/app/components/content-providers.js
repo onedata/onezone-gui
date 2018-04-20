@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { readOnly } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -21,6 +21,7 @@ export default Component.extend({
 
   providerManager: inject(),
   router: inject(),
+  contentResources: inject(),
 
   /**
    * Selected (active) provider
@@ -124,10 +125,11 @@ export default Component.extend({
 
   actions: {
     providerChanged(provider) {
+      const contentResources = this.get('contentResources');
       this.get('router').transitionTo(
         'onedata.sidebar.content.aspect',
         'providers',
-        get(provider, 'id'),
+        contentResources.getRoutableIdFor(provider),
         'index'
       );
     },

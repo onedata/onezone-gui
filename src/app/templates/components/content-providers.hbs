@@ -6,7 +6,7 @@
       {{#each _clusteredProviders as |square|}}
         {{#atlas.position latitude=square.latitude longitude=square.longitude as |position|}}
           {{#position.point}}
-            {{#link-to "onedata.sidebar.content.aspect" "providers" square.providers.[0].id "index"}}
+            {{#link-to "onedata.sidebar.content.aspect" "providers" (model-routable-id square.providers.[0]) "index"}}
               {{provider-place
                 provider=square.providers
                 atlasWidth=atlas.width
