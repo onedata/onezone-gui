@@ -32,6 +32,7 @@ import contentGroupsEmpty from './components/content-groups-empty';
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clientTokenActions from './services/client-token-actions';
+import clientTokenManager from './services/client-token-manager';
 
 let translations = {
   tabs: {
@@ -65,6 +66,7 @@ let translations = {
   },
   services: {
     clientTokenActions,
+    clientTokenManager,
     spaceActions,
     groupActions,
   },

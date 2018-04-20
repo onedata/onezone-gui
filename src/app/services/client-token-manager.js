@@ -11,11 +11,15 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-const ClientTokenManager = Service.extend({
+const ClientTokenManager = Service.extend(I18n, {
   store: service(),
   currentUser: service(),
   onedataGraph: service(),
+  i18n: service(),
+
+  i18nPrefix: 'services.clientTokenManager',
 
   /**
    * Fetches collection of all tokens
@@ -36,7 +40,13 @@ const ClientTokenManager = Service.extend({
   getRecord(id) {
     return this.getClientTokens()
       .then(listRecord => get(listRecord, 'list'))
-      .then(list => list.find(t => id == get(t, 'id')));
+      .then(list => {
+        const token = list.find(t => id == get(t, 'id'));
+        if (!token) {
+          throw new Error(this.t('getTokenError', { id }));
+        }
+        return token;
+      });
   },
 
   /**
