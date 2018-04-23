@@ -33,6 +33,7 @@ import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
+import guiUtils from './services/gui-utils';
 
 let translations = {
   tabs: {
@@ -69,6 +70,7 @@ let translations = {
     clientTokenManager,
     spaceActions,
     groupActions,
+    guiUtils,
   },
 };
 
