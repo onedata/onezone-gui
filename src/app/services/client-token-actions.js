@@ -15,7 +15,7 @@ import $ from 'jquery';
 export default Service.extend(I18n, {
   clientTokenManager: inject(),
   router: inject(),
-  contentResources: inject(),
+  guiUtils: inject(),
   globalNotify: inject(),
   i18n: inject(),
 
@@ -48,19 +48,19 @@ export default Service.extend(I18n, {
       globalNotify,
       router,
       clientTokenManager,
-      contentResources,
+      guiUtils,
     } = this.getProperties(
       'globalNotify',
       'router',
       'clientTokenManager',
-      'contentResources'
+      'guiUtils'
     );
     return clientTokenManager.createRecord().then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
       router.transitionTo(
         'onedata.sidebar.content',
         'tokens',
-        contentResources.getRoutableIdFor(token)
+        guiUtils.getRoutableIdFor(token)
       );
       // TODO: instead that, always scroll to sidebar position on changing
       // sidebar chosen item

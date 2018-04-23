@@ -10,7 +10,6 @@
 import { inject } from '@ember/service';
 import Service from '@ember/service';
 import RSVP from 'rsvp';
-import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 
 export default Service.extend({
   providerManager: inject(),
@@ -40,13 +39,5 @@ export default Service.extend({
         return new RSVP.Promise((resolve, reject) =>
           reject('No such model type: ' + type));
     }
-  },
-
-  /**
-   * @param {object|string} model
-   * @returns {string}
-   */
-  getRoutableIdFor(model) {
-    return modelRoutableId(model);
   },
 });

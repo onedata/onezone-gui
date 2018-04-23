@@ -21,7 +21,7 @@ export default Component.extend({
 
   providerManager: inject(),
   router: inject(),
-  contentResources: inject(),
+  guiUtils: inject(),
 
   /**
    * Selected (active) provider
@@ -125,11 +125,11 @@ export default Component.extend({
 
   actions: {
     providerChanged(provider) {
-      const contentResources = this.get('contentResources');
+      const guiUtils = this.get('guiUtils');
       this.get('router').transitionTo(
         'onedata.sidebar.content.aspect',
         'providers',
-        contentResources.getRoutableIdFor(provider),
+        guiUtils.getRoutableIdFor(provider),
         'index'
       );
     },

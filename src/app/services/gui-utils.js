@@ -10,6 +10,7 @@
 import GuiUtils from 'onedata-gui-common/services/gui-utils';
 import { computed } from '@ember/object';
 import { inject } from '@ember/service';
+import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 
 export default GuiUtils.extend({
   onedataConnection: inject(),
@@ -27,4 +28,13 @@ export default GuiUtils.extend({
   guiName: computed(function () {
     return this.get('onedataConnection.zoneName') || this.t('unnamedZone');
   }),
+
+  /**
+   * @override
+   * @param {object|string} model
+   * @returns {string}
+   */
+  getRoutableIdFor(model) {
+    return modelRoutableId(model);
+  },
 });

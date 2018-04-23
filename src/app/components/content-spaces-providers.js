@@ -21,7 +21,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
 
   router: service(),
   i18n: service(),
-  contentResources: service(),
+  guiUtils: service(),
 
   i18nPrefix: 'components.contentSpacesProviders',
 
@@ -82,11 +82,11 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
       );
     },
     providerClicked(provider) {
-      const contentResources = this.get('contentResources');
+      const guiUtils = this.get('guiUtils');
       return this.get('router').transitionTo(
         'onedata.sidebar.content',
         'providers',
-        contentResources.getRoutableIdFor(provider)
+        guiUtils.getRoutableIdFor(provider)
       );
     },
   },

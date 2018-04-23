@@ -16,7 +16,7 @@ import { next } from '@ember/runloop';
 export default Service.extend(I18n, {
   router: inject(),
   i18n: inject(),
-  contentResources: inject(),
+  guiUtils: inject(),
   groupManager: inject(),
   globalNotify: inject(),
 
@@ -71,12 +71,12 @@ export default Service.extend(I18n, {
       globalNotify,
       router,
       groupManager,
-      contentResources,
+      guiUtils,
     } = this.getProperties(
       'globalNotify',
       'router',
       'groupManager',
-      'contentResources',
+      'guiUtils',
     );
     return groupManager.createRecord({
         name,
@@ -87,7 +87,7 @@ export default Service.extend(I18n, {
           router.transitionTo(
             'onedata.sidebar.content.aspect',
             'groups',
-            contentResources.getRoutableIdFor(group),
+            guiUtils.getRoutableIdFor(group),
             'index',
           ).then(() => {
             const sidebarContainer = $('.col-sidebar');
@@ -107,14 +107,14 @@ export default Service.extend(I18n, {
    * been joined successfully.
    */
   joinGroup(token) {
-    const contentResources = this.get('contentResources');
+    const guiUtils = this.get('guiUtils');
     return this.get('groupManager').joinGroup(token)
       .then(groupRecord => {
         this.get('globalNotify').info(this.t('joinedGroupSuccess'));
         return this.get('router').transitionTo(
           'onedata.sidebar.content.aspect',
           'groups',
-          contentResources.getRoutableIdFor(groupRecord),
+          guiUtils.getRoutableIdFor(groupRecord),
           'index'
         );
       })
