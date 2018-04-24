@@ -18,6 +18,7 @@ export default Service.extend(I18n, {
   spaceManager: service(),
   globalNotify: service(),
   currentUser: service(),
+  guiUtils: service(),
 
   i18nPrefix: 'services.spaceActions',
 
@@ -66,10 +67,12 @@ export default Service.extend(I18n, {
       globalNotify,
       router,
       spaceManager,
+      guiUtils,
     } = this.getProperties(
       'globalNotify',
       'router',
-      'spaceManager'
+      'spaceManager',
+      'guiUtils',
     );
     return spaceManager.createRecord({
         name,
@@ -79,7 +82,7 @@ export default Service.extend(I18n, {
         return router.transitionTo(
           'onedata.sidebar.content.aspect',
           'spaces',
-          get(space, 'id'),
+          guiUtils.getRoutableIdFor(space),
           'index',
         ).then(() => {
           const sidebarContainer = $('.col-sidebar');
@@ -96,13 +99,14 @@ export default Service.extend(I18n, {
    * @returns {Promise} A promise of transition into view of newly joined space
    */
   joinSpace(token) {
+    const guiUtils = this.get('guiUtils');
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.joinSpace(token))
       .then(spaceRecord => {
         this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
         return this.get('router').transitionTo(
           'onedata.sidebar.content.aspect',
-          get(spaceRecord, 'id'),
+          guiUtils.getRoutableIdFor(spaceRecord),
           'index',
         );
       })
