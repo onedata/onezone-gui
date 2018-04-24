@@ -3,5 +3,6 @@ export default {
     index: 'Space overview',
     providers: 'Space providers',
     support: 'Get support',
+    notFound: 'Space not found',
   },
 };

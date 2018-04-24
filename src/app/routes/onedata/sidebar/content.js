@@ -23,12 +23,14 @@ import { get } from '@ember/object';
 function findGri(griIds, id) {
   let modelId;
   for (let i = 0; i < griIds.length; i++) {
-    let entityId;
+    let parsedGri;
     try {
-      entityId = parseGri(griIds[i]).entityId;
+      parsedGri = parseGri(griIds[i]);
     } catch (error) {
       continue;
     }
+    const entityId = parsedGri.aspect === 'client_token' ?
+      parsedGri.aspectId : parsedGri.entityId;
     if (!entityId) {
       continue;
     }

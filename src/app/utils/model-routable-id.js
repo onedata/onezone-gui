@@ -21,7 +21,9 @@ export default function modelRoutableId(model) {
   let modelId = typeof model === 'string' ? model : get(model, 'id');
   try {
     if (model) {
-      entityId = parseGri(modelId).entityId;
+      const parsedGri = parseGri(modelId);
+      entityId = parsedGri.aspect === 'client_token' ?
+        parsedGri.aspectId : parsedGri.entityId;
     }
   } catch (err) {
     return null;
