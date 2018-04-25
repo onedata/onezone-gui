@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 32.000001 31.999999"
+   version="1.1"
+   id="svg28"
+   sodipodi:docname="onezone-logo.svg"
+   width="32"
+   height="32"
+   inkscape:version="0.92.2 2405546, 2018-03-11">
+  <metadata
+     id="metadata32">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Zasób 5</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1135"
+     id="namedview30"
+     showgrid="false"
+     inkscape:zoom="14.836825"
+     inkscape:cx="14.447839"
+     inkscape:cy="9.6840959"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg28" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#fff;}.cls-2{fill:#f63b3b;}</style>
+  </defs>
+  <title
+     id="title6">Zasób 5</title>
+  <g
+     id="g864"
+     transform="translate(-0.01410404,0.13531561)">
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path14"
+       d="M 11.972749,10.70524 10.061492,8.8608764 A 2.8668863,2.8668863 0 1 0 9.105863,9.9216245 l 1.911258,1.8443635 a 6.5078319,6.5078319 0 0 1 0.955628,-1.060748 z m 0,0"
+       class="cls-2" />
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path16"
+       d="m 20.229382,10.475889 2.59931,-4.3672235 a 2.8668863,2.8668863 0 1 0 -1.26143,-0.7358341 l -2.561085,4.3576671 a 6.5747259,6.5747259 0 0 1 1.251874,0.7453905 z m 0,0"
+       class="cls-2" />
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path18"
+       d="m 29.174067,14.097722 a 2.8668863,2.8668863 0 0 0 -2.704429,1.911258 l -3.640946,-0.33447 c 0,0 0,0.05734 0,0.07645 a 6.6320636,6.6320636 0 0 1 -0.143344,1.376106 l 3.60272,0.353582 a 2.8668863,2.8668863 0 1 0 2.866887,-3.344701 z m 0,0"
+       class="cls-2" />
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path20"
+       d="M 19.235528,25.517486 18.4328,22.000772 a 6.6894014,6.6894014 0 0 1 -1.423887,0.324914 l 0.802728,3.52627 a 2.8668863,2.8668863 0 1 0 1.423887,-0.33447 z m 0,0"
+       class="cls-2" />
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path22"
+       d="m 9.7843597,17.146178 -4.4818992,1.500337 a 2.8668863,2.8668863 0 1 0 0.4778144,1.576788 1.7583569,1.7583569 0 0 0 0,-0.191126 L 10.281287,18.522284 A 6.7562954,6.7562954 0 0 1 9.8130286,17.136622 Z m 0,0"
+       class="cls-2" />
+    <path
+       style="fill:#f63b3b;stroke-width:0.95562875"
+       inkscape:connector-curvature="0"
+       id="path24"
+       d="m 21.21368,15.75096 a 4.9597133,4.9597133 0 1 1 -4.959714,-4.959713 4.9597133,4.9597133 0 0 1 4.959714,4.959713 z m 0,0"
+       class="cls-2" />
+  </g>
+</svg>

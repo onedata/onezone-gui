@@ -9,6 +9,7 @@
 
 import GuiUtils from 'onedata-gui-common/services/gui-utils';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 
@@ -28,6 +29,16 @@ export default GuiUtils.extend({
   guiName: computed(function () {
     return this.get('onedataConnection.zoneName') || this.t('unnamedZone');
   }),
+
+  /**
+   * @override
+   */
+  guiVersion: reads('onedataConnection.serviceVersion'),
+
+  /**
+   * @override
+   */
+  guiIcon: 'assets/images/onezone-logo.svg',
 
   /**
    * @override

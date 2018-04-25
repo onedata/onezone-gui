@@ -9,7 +9,6 @@ import groups from './tabs/groups';
 import users from './tabs/users';
 
 import loginBox from './components/login-box';
-import brandInfo from './components/brand-info';
 import contentTokens from './components/content-tokens';
 import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
@@ -45,7 +44,6 @@ let translations = {
   },
   components: {
     loginBox,
-    brandInfo,
     contentTokens,
     contentTokensEmpty,
     contentProviderRedirect,
