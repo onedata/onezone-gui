@@ -47,7 +47,7 @@ export default OnedataSidebarContentRoute.extend({
    * @override
    */
   availableResourceId(resourceId, collection) {
-    let griIds = isRecord(collection) ?
+    const griIds = isRecord(collection) ?
       collection.hasMany('list').ids() :
       get(collection, 'list').map(model => get(model, 'id'));
     return findGri(griIds, resourceId);

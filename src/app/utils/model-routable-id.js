@@ -18,13 +18,11 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 export default function modelRoutableId(model) {
   let entityId = null;
   model = model || {};
-  let modelId = typeof model === 'string' ? model : get(model, 'id');
+  const modelId = typeof model === 'string' ? model : get(model, 'id');
   try {
-    if (model) {
-      const parsedGri = parseGri(modelId);
-      entityId = parsedGri.aspect === 'client_token' ?
-        parsedGri.aspectId : parsedGri.entityId;
-    }
+    const parsedGri = parseGri(modelId);
+    entityId = parsedGri.aspect === 'client_token' ?
+      parsedGri.aspectId : parsedGri.entityId;
   } catch (err) {
     return null;
   }
