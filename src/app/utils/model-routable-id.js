@@ -21,6 +21,8 @@ export default function modelRoutableId(model) {
   const modelId = typeof model === 'string' ? model : get(model, 'id');
   try {
     const parsedGri = parseGri(modelId);
+    // client_token is treated exceptionally because it has 
+    // non standard model representation provided by backend
     entityId = parsedGri.aspect === 'client_token' ?
       parsedGri.aspectId : parsedGri.entityId;
   } catch (err) {

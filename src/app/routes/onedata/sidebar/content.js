@@ -1,7 +1,7 @@
 /**
  * A route for loading a view associated with some specific resource.
  * It is an extended version of the same route from onedata-gui-common.
- * It adds support for gri.
+ * It adds support for GRI.
  *
  * @module routes/onedata/sidebar/content
  * @author Michal Borzecki
@@ -10,31 +10,21 @@
  */
 
 import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sidebar/content';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import isRecord from 'onedata-gui-common/utils/is-record';
+import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
 
 /**
- * Finds gri in griIds using pure entityId.
+ * Finds GRI in griIds using pure entityId.
  * @param {Array<string>} griIds
- * @param {string} id
+ * @param {string} entityId
  * @returns {string|undefined}
  */
-function findGri(griIds, id) {
+function findGri(griIds, entityId) {
   let modelId;
   for (let i = 0; i < griIds.length; i++) {
-    let parsedGri;
-    try {
-      parsedGri = parseGri(griIds[i]);
-    } catch (error) {
-      continue;
-    }
-    const entityId = parsedGri.aspect === 'client_token' ?
-      parsedGri.aspectId : parsedGri.entityId;
-    if (!entityId) {
-      continue;
-    }
-    if (id === entityId) {
+    const griEntityId = modelRoutableId(griIds[i]);
+    if (griEntityId && entityId === griEntityId) {
       modelId = griIds[i];
       break;
     }

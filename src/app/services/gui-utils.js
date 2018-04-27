@@ -1,5 +1,5 @@
 /**
- * Provides data specific for onezone gui.
+ * Provides data and implementation of utils specific for onezone-gui
  *
  * @module services/gui-utils
  * @author Michal Borzecki

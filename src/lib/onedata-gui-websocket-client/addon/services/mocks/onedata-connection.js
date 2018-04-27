@@ -15,6 +15,6 @@ export default Service.extend({
   onedataWebsocket: inject(),
 
   zoneName: 'Hello world',
-  serviceVersion: '18.02.0-beta5',
+  serviceVersion: '18.02.0-mock',
   identityProviders: Object.freeze(AUTHORIZERS.map(auth => auth.type)),
 });

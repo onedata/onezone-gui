@@ -41,7 +41,7 @@ const ClientTokenManager = Service.extend(I18n, {
     return this.getClientTokens()
       .then(listRecord => get(listRecord, 'list'))
       .then(list => {
-        const token = list.find(t => id == get(t, 'id'));
+        const token = list.find(t => id === get(t, 'id'));
         if (!token) {
           throw new Error(this.t('getTokenError', { id }));
         }
