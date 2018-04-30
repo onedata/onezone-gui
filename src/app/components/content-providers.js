@@ -62,7 +62,7 @@ export default Component.extend({
         return {
           lat: 0,
           lng: 0,
-          scale: 0,
+          scale: 1,
         };
       } else {
         const latitudes = _providers.map(p => get(p, 'latitude'));
