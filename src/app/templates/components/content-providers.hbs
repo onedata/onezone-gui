@@ -2,23 +2,31 @@
   {{#if (and _mobileMode selectedProvider)}}
     {{provider-place/drop provider=selectedProvider class="in-content"}}
   {{else}}
-    {{#one-atlas as |atlas|}}
+    {{#one-map
+      triggerWindowEventName="providerPlaceRefresh"
+      onViewportChange=(action "mapViewportChanged")
+      initialState=_mapInitialState
+      as |map|}}
       {{#each _clusteredProviders as |square|}}
-        {{#atlas.position latitude=square.latitude longitude=square.longitude as |position|}}
-          {{#position.point}}
-            {{#link-to "onedata.sidebar.content.aspect" "providers" (model-routable-id square.providers.[0]) "index"}}
+        {{#map.position latitude=square.latitude longitude=square.longitude as |x y|}}
+          {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
+            {{#link-to "onedata.sidebar.content.aspect"
+              "providers"
+              (model-routable-id square.providers.[0])
+              "index"
+              (query-params mapLat=_mapState.lat mapLng=_mapState.lng mapScale=_mapState.scale)}}
               {{provider-place
                 provider=square.providers
-                atlasWidth=atlas.width
+                atlasWidth=1000
                 circleSizeScale=1.2
                 active=(contains selectedProvider square.providers)
                 renderDrop=(contains selectedProvider square.providers)
                 selectedProvider=selectedProvider
-                providerSelectedAction=(action "providerChanged")}}
+                popoverPlacement=(popover-placement x=x y=y width=map.width height=map.height)}}
             {{/link-to}}
-          {{/position.point}}
-        {{/atlas.position}}
+          {{/if}}
+        {{/map.position}}
       {{/each}}
-    {{/one-atlas}}
+    {{/one-map}}
   {{/if}}
 {{/promise-proxy-container}}
