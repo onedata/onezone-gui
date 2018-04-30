@@ -172,11 +172,10 @@ export default Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
-    let {
+    const {
       _window,
       _windowResizeHandler,
-      _mapState,
-    } = this.getProperties('_window', '_windowResizeHandler', '_mapState');
+    } = this.getProperties('_window', '_windowResizeHandler');
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
     this.$().click((event) => {
@@ -185,13 +184,14 @@ export default Component.extend({
         if (!this.get('_mobileMode')) {
           if (!target.hasClass('provider-place') &&
             target.parents('.provider-place').length === 0) {
+            const _mapState = this.get('_mapState');
             const queryMapState =
               _.mapKeys(_mapState || {}, (v, k) => 'map' + _.upperFirst(k));
             this.get('router').transitionTo(
-              'onedata.sidebar.content.aspect',
+              'onedata.sidebar.content',
               'providers',
               'not-selected',
-              'index', { queryParams: queryMapState }
+              { queryParams: queryMapState }
             );
           }
         }
