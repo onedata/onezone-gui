@@ -190,8 +190,7 @@ export default Component.extend({
             this.get('router').transitionTo(
               'onedata.sidebar.content',
               'providers',
-              'not-selected',
-              { queryParams: queryMapState }
+              'not-selected', { queryParams: queryMapState }
             );
           }
         }
