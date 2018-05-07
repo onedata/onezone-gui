@@ -2,7 +2,7 @@
  * An abstraction layer for Onedata Sync API Websocket connection properties 
  *
  * @module services/onedata-connection
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -21,6 +21,11 @@ export default Service.extend({
    * @type {Ember.Computed<string>}
    */
   zoneName: reads('attributes.zoneName'),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  serviceVersion: reads('attributes.serviceVersion'),
 
   /**
    * @type {Ember.Computed<Array<string>>}

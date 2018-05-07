@@ -11,7 +11,7 @@
           {{#link-to 
             "onedata.sidebar.content.aspect"
             "providers"
-            firstProviderIdProxy.content
+            (model-routable-id firstProviderIdProxy.content)
             "redirect"
           }}{{tt this "oneprovider"}}{{/link-to}}.
         </p>

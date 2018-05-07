@@ -9,7 +9,6 @@ import groups from './tabs/groups';
 import users from './tabs/users';
 
 import loginBox from './components/login-box';
-import brandInfo from './components/brand-info';
 import contentTokens from './components/content-tokens';
 import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
@@ -32,6 +31,8 @@ import contentGroupsEmpty from './components/content-groups-empty';
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clientTokenActions from './services/client-token-actions';
+import clientTokenManager from './services/client-token-manager';
+import guiUtils from './services/gui-utils';
 
 let translations = {
   tabs: {
@@ -43,7 +44,6 @@ let translations = {
   },
   components: {
     loginBox,
-    brandInfo,
     contentTokens,
     contentTokensEmpty,
     contentProviderRedirect,
@@ -65,8 +65,10 @@ let translations = {
   },
   services: {
     clientTokenActions,
+    clientTokenManager,
     spaceActions,
     groupActions,
+    guiUtils,
   },
 };
 
