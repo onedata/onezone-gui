@@ -48,6 +48,20 @@ export default Component.extend({
   _mapCalculatedAreaPadding: 2,
 
   /**
+   * XY coordinates of map drag start.
+   * @type {object}
+   */
+  dragStartXY: Object.freeze({}),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isWhileDraggingMap: computed('dragStartXY', function () {
+    const dragStartXY = this.get('dragStartXY');
+    return dragStartXY.x !== undefined && dragStartXY.y !== undefined;
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<object>}
    */
   _mapDefaultState: computed(
@@ -96,7 +110,7 @@ export default Component.extend({
       const queryParams = this.get('navigationState.queryParams');
       const mapStateFromQuery = Object.keys(queryParams).reduce((s, key) => {
         if (_.startsWith(key, 'map')) {
-          const newKey = _.lowerFirst(key.substring(3));
+          const newKey = key.substring(4);
           s[newKey] = queryParams[key];
         }
         return s;
@@ -131,7 +145,7 @@ export default Component.extend({
   _clusteredProviders: computed(
     '_providers',
     '_mapState',
-    function _clusteredProviders() {
+    function _getClusteredProviders() {
       const {
         _providers,
         _mapState,
@@ -178,20 +192,30 @@ export default Component.extend({
     } = this.getProperties('_window', '_windowResizeHandler');
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
-    this.$().click((event) => {
+    const thisElement = this.$()[0];
+    thisElement.addEventListener('mousedown', (event) => {
       safeExec(this, () => {
-        const target = $(event.originalEvent.target);
-        if (!this.get('_mobileMode')) {
-          if (!target.hasClass('provider-place') &&
-            target.parents('.provider-place').length === 0) {
-            const _mapState = this.get('_mapState');
-            const queryMapState =
-              _.mapKeys(_mapState || {}, (v, k) => 'map' + _.upperFirst(k));
-            this.get('router').transitionTo(
-              'onedata.sidebar.content',
-              'providers',
-              'not-selected', { queryParams: queryMapState }
-            );
+        this.set('dragStartXY', { x: event.clientX, y: event.clientY });
+      });
+    }, true);
+    thisElement.addEventListener('mouseup', (event) => {
+      safeExec(this, () => {
+        const dragStartXY = this.get('dragStartXY');
+        this.set('dragStartXY', {});
+        if (dragStartXY.x === event.clientX && dragStartXY.y === event.clientY) {
+          const target = $(event.target);
+          if (!this.get('_mobileMode')) {
+            const ignoredElements =
+              '.provider-place, .jvectormap-zoomin, .jvectormap-zoomout';
+            if (!target.is(ignoredElements) &&
+              target.parents(ignoredElements).length === 0) {
+              const queryMapState = this._getQueryMapState();
+              this.get('router').transitionTo(
+                'onedata.sidebar.content',
+                'providers',
+                'not-selected', { queryParams: queryMapState }
+              );
+            }
           }
         }
       });
@@ -218,6 +242,15 @@ export default Component.extend({
     this.set('_mobileMode', window.innerWidth < 768);
   },
 
+  /**
+   * Generates query-params object with map state, that can be passed to
+   * transition.
+   * @returns {object}
+   */
+  _getQueryMapState() {
+    return _.mapKeys(this.get('_mapState') || {}, (v, k) => 'map_' + k);
+  },
+
   actions: {
     mapViewportChanged(event) {
       this.set('_mapState', {
@@ -225,6 +258,14 @@ export default Component.extend({
         lng: event.lng,
         scale: event.scale,
       });
+    },
+    providerSelected(provider) {
+      const queryParams = this._getQueryMapState();
+      this.get('router').transitionTo(
+        'onedata.sidebar.content',
+        'providers',
+        this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
+      );
     },
   },
 });
