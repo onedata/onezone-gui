@@ -16,8 +16,8 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   name: attr('string'),
   type: attr('string'),
 
-  userList: belongsTo('group-user-list', { async: true }),
-  groupList: belongsTo('group-group-list', { async: true }),
+  userPermissionList: belongsTo('group-user-permission-list'),
+  groupPermissionList: belongsTo('group-group-permission-list'),
 
   // for features, that will be moved from OP GUI to OZ GUI
   // spaceList: belongsTo('spaceList'),

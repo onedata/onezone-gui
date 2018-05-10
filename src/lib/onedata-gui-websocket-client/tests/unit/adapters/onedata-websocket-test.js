@@ -42,7 +42,7 @@ describe('Unit | Adapter | onedata websocket', function () {
     let graphContext = lookupService(this, 'onedata-graph-context');
     stub(graphContext, 'getAuthHint').returns(undefined);
 
-    adapter.findRecord(store, type, recordId).then(adapterRecord => {
+    adapter.findRecord(store, type, recordId, {}).then(adapterRecord => {
       expect(adapterRecord).to.equal(graphData);
       done();
     });

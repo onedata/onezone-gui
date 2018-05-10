@@ -39,13 +39,11 @@ export default Model.extend(GraphModelMixin, {
     const {
       store,
       defaultSpaceId,
-      entityId,
     } = this.getProperties('store', 'defaultSpaceId', 'entityId');
     return store.findRecord('space', gri({
       entityType: 'space',
       entityId: defaultSpaceId,
       aspect: 'instance',
-      authHint: ['asUser', entityId],
     }));
   },
 

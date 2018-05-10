@@ -1,0 +1,46 @@
+<div class="row content-row header-row hidden-xs">
+  <h1>
+    <span class="one-label">
+      {{tt this "members"}}
+    </span>
+  </h1>
+</div>
+<div class="row">
+  {{#loading-container
+    isLoading=(not groupPermissionListLoaded)
+    errorReason=groupPermissionListLoadError}}
+    {{#one-collapsible-list class="groups-list" as |list|}}
+      {{list.header title=(tt this "groups")}}
+      {{#each groupPermissionList.content key="id" as |groupPermissions|}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header}}
+            {{groupPermissions.sharedGroup.name}}
+          {{/listItem.header}}
+          {{#listItem.content}}
+          test
+          {{/listItem.content}}
+        {{/list.item}}
+      {{/each}}
+    {{/one-collapsible-list}}
+  {{/loading-container}}
+</div>
+<div class="row">
+  {{#loading-container
+    isLoading=(not userPermissionListLoaded)
+    errorReason=userPermissionListLoadError}}
+    {{#one-collapsible-list class="users-list" as |list|}}
+      {{list.header title=(tt this "users")}}
+      {{#each userPermissionList.content key="id" as |userPermissions|}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header}}
+            {{userPermissions.sharedUser.name}}
+          {{/listItem.header}}
+          {{#listItem.content}}
+          test
+          {{/listItem.content}}
+        {{/list.item}}
+      {{/each}}
+    {{/one-collapsible-list}}
+  {{/loading-container}}
+</div>
+{{yield}}

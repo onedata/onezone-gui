@@ -14,10 +14,14 @@ import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise } from 'rsvp';
 import { get } from '@ember/object';
+import groupPermissionsFlags from 'onedata-gui-websocket-client/utils/group-permissions-flags';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
+const NUMBER_OF_SHARED_USERS = 3;
+const NUMBER_OF_SHARED_GROUPS = 3;
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
@@ -38,10 +42,26 @@ const perProviderSize = Math.pow(1024, 4);
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  return Promise.all(
-      types.map(type =>
-        createEntityRecords(store, type, names)
-        .then(records => createListRecord(store, type, records))
+  let sharedUsersGri, sharedGroupsGri;
+  // create shared users
+  return createSharedUsersRecords(store)
+    .then(sharedUsers =>
+      sharedUsersGri = sharedUsers.map(sharedUser => get(sharedUser, 'gri'))
+    )
+    .then(() =>
+      createSharedGroupsRecords(store)
+    )
+    // create shared groups
+    .then(sharedGroups =>
+      sharedGroupsGri = sharedGroups.map(sharedGroup => get(sharedGroup, 'gri'))
+    )
+    // create main resources lists
+    .then(() =>
+      Promise.all(
+        types.map(type =>
+          createEntityRecords(store, type, names)
+            .then(records => createListRecord(store, type, records))
+        )
       )
     )
     // push space list into providers
@@ -74,6 +94,19 @@ export default function generateDevelopmentModel(store) {
         }))
       ).then(() => listRecords);
     })
+    // add permissions to groups
+    .then(listRecords =>
+      listRecords[types.indexOf('group')].get('list')
+        .then(groups =>
+          Promise.all(groups.map(group =>
+            createPermissionsForGroup(store, group, sharedUsersGri, sharedGroupsGri)
+            .then(() =>
+              group.save()
+            )
+          ))
+        )
+        .then(() => listRecords)
+    )
     .then(listRecords => createUserRecord(store, listRecords));
 }
 
@@ -168,4 +201,70 @@ function createLinkedAccount(store) {
       ]),
     }).save()
   ));
+}
+
+function createSharedUsersRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
+    return store.createRecord('sharedUser', { name: `sharedUser${index}` }).save();
+  }));
+}
+
+function createSharedGroupsRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_SHARED_GROUPS).map((index) => {
+    return store.createRecord('sharedGroup', { name: `sharedGroup${index}` }).save();
+  }));
+}
+
+function createPermissionsForGroup(store, group, sharedUsersGri, sharedGroupsGri) {
+  return createGroupPermissionsRecords(store, group, sharedUsersGri, 'user')
+    .then((userPermissions) =>
+      createListRecord(store, 'groupUserPermission', userPermissions)
+    )
+    .then((userPermissionList) =>
+      group.set('userPermissionList', userPermissionList)
+    )
+    .then(() =>
+      createGroupPermissionsRecords(store, group, sharedGroupsGri, 'group')
+    )
+    .then((groupPermissions) =>
+      createListRecord(store, 'groupGroupPermission', groupPermissions)
+    )
+    .then((groupPermissionList) =>
+      group.set('groupPermissionList', groupPermissionList)
+    );
+}
+
+function createGroupPermissionsRecords(store, group, sharedGriArray, type) {
+  const groupGri = get(group, 'gri');
+  let groupId;
+  try {
+    groupId = parseGri(groupGri).entityId;
+  } catch (e) {
+    return Promise.resolve([]);
+  }
+  const permissions = groupPermissionsFlags
+    .reduce((perms, flag) => {
+      perms[flag] = true;
+      return perms;
+    }, {});
+  const recordData = {
+    groupId,
+    permissions,
+  };
+  let griProperty;
+  let modelName;
+  switch (type) {
+    case 'user':
+      griProperty = 'sharedUserGri';
+      modelName = 'groupUserPermission';
+      break;
+    case 'group':
+      griProperty = 'sharedGroupGri';
+      modelName = 'groupGroupPermission';
+      break;
+  }
+  return Promise.all(_.range(sharedGriArray.length).map((index) => {
+    recordData[griProperty] = sharedGriArray[index];
+    return store.createRecord(modelName, recordData).save();
+  }));
 }

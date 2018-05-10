@@ -1,7 +1,6 @@
 export default {
   aspects: {
-    index: 'Group overview',
+    index: 'Overview',
     members: 'Members',
-    notFound: 'Group not found',
   },
 };

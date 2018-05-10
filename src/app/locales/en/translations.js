@@ -15,6 +15,7 @@ import contentProviderRedirect from './components/content-provider-redirect';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
+import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -27,6 +28,7 @@ import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsEmpty from './components/content-groups-empty';
+import contentGroupsMembers from './components/content-groups-members';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -50,6 +52,7 @@ let translations = {
     contentUsers,
     sidebarSpaces,
     sidebarProviders,
+    sidebarGroups,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,
@@ -62,6 +65,7 @@ let translations = {
     contentGroupsNew,
     contentGroupsIndex,
     contentGroupsEmpty,
+    contentGroupsMembers,
   },
   services: {
     clientTokenActions,

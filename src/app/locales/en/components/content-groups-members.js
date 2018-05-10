@@ -1,0 +1,28 @@
+export default {
+  members: 'Members',
+  groups: 'Groups',
+  users: 'Users',
+  permissionGroups: {
+    groupManagement: 'Group management',
+    hierarchyManagement: 'Hierarchy management',
+    userManagement: 'User management',
+    spaceManagement: 'Space management',
+  },
+  permissions: {
+    viewGroup: 'View group',
+    modifyGroup: 'Modify group',
+    setPrivileges: 'Set privileges',
+    removeGroup: 'Remove group',
+    createChildGroup: 'Create child group',
+    inviteChildGroup: 'Invite child group',
+    removeChildGroup: 'Remove child group',
+    createParentGroup: 'Create parent group',
+    joinParentGroup: 'Join parent group',
+    leaveParentGroup: 'Leave parent group',
+    inviteUser: 'Invite user',
+    removeUser: 'Remove user',
+    createSpace: 'Create space',
+    joinSpace: 'Join space',
+    leaveSpace: 'Leave space',
+  },
+};
