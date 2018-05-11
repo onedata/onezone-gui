@@ -11,13 +11,32 @@
     errorReason=groupPermissionListLoadError}}
     {{#one-collapsible-list class="groups-list" as |list|}}
       {{list.header title=(tt this "groups")}}
-      {{#each groupPermissionList.content key="id" as |groupPermissions|}}
+      {{#each proxyGroupPermissionList key="id" as |groupPermissions|}}
         {{#list.item as |listItem|}}
           {{#listItem.header}}
-            {{groupPermissions.sharedGroup.name}}
+            <span class="item-icon-container">
+              {{one-icon class="item-icon" icon="group"}}
+              {{one-tooltip
+                title=groupPermissions.model.sharedGroup.name
+                placement="top"
+                arrowPlacement="left"
+                triggerEvents="hover"
+              }}
+            </span>
+            {{#if groupPermissions.modified}}M{{/if}}
+            <span class="one-label">
+              {{groupPermissions.model.sharedGroup.name}}
+            </span>
           {{/listItem.header}}
           {{#listItem.content}}
-          test
+            {{#render-later triggerRender=listItem.isActive}}
+              {{permissions-tree-editor
+                permissionsGroups=groupedPermissionsFlags
+                permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
+                permissionsTranslationsPath=(concat i18nPrefix ".permissions")
+                actualPermissions=groupPermissions.persistedPermissions
+                permissionsChanged=(action "permissionsModified" groupPermissions)}}
+            {{/render-later}}
           {{/listItem.content}}
         {{/list.item}}
       {{/each}}
@@ -30,13 +49,32 @@
     errorReason=userPermissionListLoadError}}
     {{#one-collapsible-list class="users-list" as |list|}}
       {{list.header title=(tt this "users")}}
-      {{#each userPermissionList.content key="id" as |userPermissions|}}
+      {{#each proxyUserPermissionList key="id" as |userPermissions|}}
         {{#list.item as |listItem|}}
           {{#listItem.header}}
-            {{userPermissions.sharedUser.name}}
+            <span class="item-icon-container">
+              {{one-icon class="item-icon" icon="user"}}
+              {{one-tooltip
+                title=groupPermissions.model.sharedUser.name
+                placement="top"
+                arrowPlacement="left"
+                triggerEvents="hover"
+              }}
+            </span>
+            {{#if groupPermissions.modified}}M{{/if}}
+            <span class="one-label">
+              {{userPermissions.model.sharedUser.name}}
+            </span>
           {{/listItem.header}}
           {{#listItem.content}}
-          test
+            {{#render-later triggerRender=listItem.isActive}}
+              {{permissions-tree-editor
+                permissionsGroups=groupedPermissionsFlags
+                permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
+                permissionsTranslationsPath=(concat i18nPrefix ".permissions")
+                actualPermissions=userPermissions.persistedPermissions
+                permissionsChanged=(action "permissionsModified" userPermissions)}}
+            {{/render-later}}
           {{/listItem.content}}
         {{/list.item}}
       {{/each}}

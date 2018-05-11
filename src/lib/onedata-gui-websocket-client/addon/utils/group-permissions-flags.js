@@ -16,7 +16,7 @@ export const groupedFlags = [{
     'removeGroup',
   ],
 }, {
-  groupName: 'hierarchyManagement',
+  groupName: 'groupHierarchyManagement',
   permissions: [
     'createChildGroup',
     'inviteChildGroup',

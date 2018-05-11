@@ -4,7 +4,7 @@ export default {
   users: 'Users',
   permissionGroups: {
     groupManagement: 'Group management',
-    hierarchyManagement: 'Hierarchy management',
+    groupHierarchyManagement: 'Group hierarchy management',
     userManagement: 'User management',
     spaceManagement: 'Space management',
   },

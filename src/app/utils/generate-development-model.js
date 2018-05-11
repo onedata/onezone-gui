@@ -28,8 +28,6 @@ const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
-const providerStatusList = ['online', 'offline'];
-
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
 const names = ['one', 'two', 'three'];
 
@@ -165,7 +163,7 @@ function createProvidersRecords(store) {
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
-      status: providerStatusList[index % providerStatusList.length],
+      online: [true, false][index % 2],
       host: `10.0.0.${index + 1}`,
     }).save();
   }));
