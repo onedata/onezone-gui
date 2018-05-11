@@ -44,7 +44,7 @@ export default OnedataBaseAuthenticator.extend(OnedataWebsocketUtils, {
    *  invalidated successfully
    */
   remoteInvalidate() {
-    return xhrToPromise($.get('/do_logout'));
+    return xhrToPromise($.get('/logout'));
   },
 });
 
@@ -57,7 +57,7 @@ export default OnedataBaseAuthenticator.extend(OnedataWebsocketUtils, {
  *   and session is created; rejects otherwise
  */
 function doLogin(username, password) {
-  const jqPromise = $.ajax('/do_login', {
+  const jqPromise = $.ajax('/login', {
     method: 'POST',
     beforeSend: (xhr) => {
       xhr.setRequestHeader(

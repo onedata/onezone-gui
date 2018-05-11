@@ -28,6 +28,8 @@ export default SidebarResources.extend({
    */
   getCollectionFor(type) {
     switch (type) {
+      case 'data':
+        return this.get('spaceManager').getSpaces();
       case 'providers':
         return this.get('providerManager').getProviders();
       case 'tokens':

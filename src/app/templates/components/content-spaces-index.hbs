@@ -20,18 +20,26 @@
 
 <div class="row content-row">
   <div class="one-tile-container text-center">
-    {{#one-tile title=(tt this "tileProvidersTitle") aspect="providers"}}
+    {{#one-tile title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
       {{#loading-container
         isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
       }}
-        <div class="support-chart-container absolute-align-middle-center full-width">
-          {{space-providers-support-chart
-            space=space
-            providersColors=providersColors
-            forceMobile=true
-            hideLegend=true
-          }}
-        </div>
+        {{#if isSupported}}
+          <div class="support-chart-container absolute-align-middle-center full-width">
+            {{space-providers-support-chart
+              space=space
+              providersColors=providersColors
+              forceMobile=true
+              hideLegend=true
+            }}
+          </div>
+        {{else}}
+          <figure class="main-figure">
+            <img class="main-image" src="assets/images/space-get-support.svg">
+            <span class="one-label">Get support</span>  
+          </figure>
+          
+        {{/if}}
       {{/loading-container}}
     {{/one-tile}}
 

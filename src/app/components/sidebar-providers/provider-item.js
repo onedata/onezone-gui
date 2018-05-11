@@ -11,13 +11,17 @@ import { reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { get } from '@ember/object';
+import { inject as service } from '@ember/service';
 
+import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',
+
+  currentUser: service(),
 
   i18nPrefix: 'components.sidebarProviders.providerItem',
 
@@ -52,6 +56,23 @@ export default Component.extend(I18n, {
         return 'animated infinite hinge pulse-red-mint';
     }
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean|undefined>}
+   */
+  isDefaultProvider: computed(
+    'userProxy.content.defaultProviderId',
+    'provider.id',
+    function getIsDefaultProvider() {
+      const {
+        userProxy,
+        provider,
+      } = this.getProperties('userProxy', 'provider');
+      const user = get(userProxy, 'content');
+      return user &&
+        get(user, 'defaultProviderId') === get(provider, 'entityId');
+    },
+  ),
 
   /**
    * @type {Ember.Computed<models/SpaceList>}

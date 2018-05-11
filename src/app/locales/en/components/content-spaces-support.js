@@ -36,6 +36,8 @@ export default {
     command: 'Command',
     generateToken: 'Generate another token',
     copy: 'Copy',
-    distributionsSupported: 'The following Linux distributions are supported:',
+    distributionsSupported: 'The following Linux distributions are officially supported. ' +
+      'Hovewer, since the deployment is Docker-based, it is likely to work on other systems.',
+
   },
 };
