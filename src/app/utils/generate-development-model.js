@@ -249,20 +249,9 @@ function createGroupPermissionsRecords(store, group, sharedGriArray, type) {
     groupId,
     permissions,
   };
-  let griProperty;
-  let modelName;
-  switch (type) {
-    case 'user':
-      griProperty = 'sharedUserGri';
-      modelName = 'groupUserPermission';
-      break;
-    case 'group':
-      griProperty = 'sharedGroupGri';
-      modelName = 'groupGroupPermission';
-      break;
-  }
+  const modelName = type === 'user' ? 'groupUserPermission' :'groupGroupPermission';
   return Promise.all(_.range(sharedGriArray.length).map((index) => {
-    recordData[griProperty] = sharedGriArray[index];
+    recordData['subjectGri'] = sharedGriArray[index];
     return store.createRecord(modelName, recordData).save();
   }));
 }

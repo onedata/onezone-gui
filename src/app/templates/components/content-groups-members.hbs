@@ -17,7 +17,7 @@
             <span class="item-icon-container">
               {{one-icon class="item-icon" icon="group"}}
               {{one-tooltip
-                title=groupPermissions.model.sharedGroup.name
+                title=groupPermissions.model.subject.name
                 placement="top"
                 arrowPlacement="left"
                 triggerEvents="hover"
@@ -25,7 +25,7 @@
             </span>
             {{#if groupPermissions.modified}}M{{/if}}
             <span class="one-label">
-              {{groupPermissions.model.sharedGroup.name}}
+              {{groupPermissions.model.subject.name}}
             </span>
           {{/listItem.header}}
           {{#listItem.content}}
@@ -35,6 +35,7 @@
                 permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
                 permissionsTranslationsPath=(concat i18nPrefix ".permissions")
                 actualPermissions=groupPermissions.persistedPermissions
+                initialPermissions=groupPermissions.overridePermissions
                 permissionsChanged=(action "permissionsModified" groupPermissions)}}
             {{/render-later}}
           {{/listItem.content}}
@@ -55,15 +56,15 @@
             <span class="item-icon-container">
               {{one-icon class="item-icon" icon="user"}}
               {{one-tooltip
-                title=groupPermissions.model.sharedUser.name
+                title=groupPermissions.model.subject.name
                 placement="top"
                 arrowPlacement="left"
                 triggerEvents="hover"
               }}
             </span>
-            {{#if groupPermissions.modified}}M{{/if}}
+            {{#if userPermissions.modified}}M{{/if}}
             <span class="one-label">
-              {{userPermissions.model.sharedUser.name}}
+              {{userPermissions.model.subject.name}}
             </span>
           {{/listItem.header}}
           {{#listItem.content}}
@@ -73,6 +74,7 @@
                 permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
                 permissionsTranslationsPath=(concat i18nPrefix ".permissions")
                 actualPermissions=userPermissions.persistedPermissions
+                initialPermissions=groupPermissions.overridePermissions
                 permissionsChanged=(action "permissionsModified" userPermissions)}}
             {{/render-later}}
           {{/listItem.content}}

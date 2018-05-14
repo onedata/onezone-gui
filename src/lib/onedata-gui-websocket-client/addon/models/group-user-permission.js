@@ -10,7 +10,6 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { computed } from '@ember/object';
-import { and, reads } from '@ember/object/computed';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Model.extend({
@@ -22,7 +21,7 @@ export default Model.extend({
   /**
    * GRI of the group which permissions are described in the model
    */
-  sharedUserGri: attr('string'),
+  subjectGri: attr('string'),
 
   /**
    * It is an object with key-value pairs: permission -> true/false.
@@ -34,18 +33,18 @@ export default Model.extend({
   /**
    * @type {Ember.ComputedProperty<models/shared-user>}
    */
-  sharedUser: computed('groupId', 'sharedUserGri', function () {
+  subject: computed('groupId', 'subjectGri', function () {
     const {
       store,
       groupId,
-      sharedUserGri,
-    } = this.getProperties('store', 'groupId', 'sharedUserGri');
+      subjectGri,
+    } = this.getProperties('store', 'groupId', 'subjectGri');
     
     let promise;
-    if (!groupId || !sharedUserGri) {
+    if (!groupId || !subjectGri) {
       promise = new Promise(() => {});
     } else {
-      promise =  store.findRecord('shared-user', sharedUserGri, {
+      promise =  store.findRecord('shared-user', subjectGri, {
         adapterOptions: {
           _meta: {
             authHint: ['asGroup', groupId],
@@ -57,16 +56,5 @@ export default Model.extend({
       promise,
     });
   }),
-
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  sharedUserLoaded: and('sharedUser.isFulfilled', 'sharedUser.isLoaded'),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  sharedUserLoadError: reads('sharedUser.reason'),
 });
 

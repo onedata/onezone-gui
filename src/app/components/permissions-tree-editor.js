@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed, observer } from '@ember/object';
+import { computed } from '@ember/object';
 import { inject } from '@ember/service';
 import _ from 'lodash';
 
@@ -32,7 +32,7 @@ export default Component.extend({
   initialPermissions: Object.freeze({}),
 
   /**
-   * Actually saved permissions.
+   * Actually saved permissions (used to show diff).
    * @type {Object}
    */
   actualPermissions: undefined,
@@ -50,19 +50,16 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<array<object>}
    */
   initialTreeState: computed(
-    'initialPermissions',
     'permissionsGroups',
     'permissionGroupsTranslationsPath',
     'permissionsTranslationsPath',
     function () {
       const {
-        initialPermissions,
         permissionsGroups,
         permissionGroupsTranslationsPath,
         permissionsTranslationsPath,
         i18n,
       } = this.getProperties(
-        'initialPermissions',
         'permissionsGroups',
         'permissionGroupsTranslationsPath',
         'permissionsTranslationsPath',
@@ -75,7 +72,6 @@ export default Component.extend({
           text: i18n.t(permissionsTranslationsPath + '.' + permission),
           field: {
             type: 'checkbox',
-            defaultValue: initialPermissions[permission],
           },
         }));
         return {
@@ -88,17 +84,64 @@ export default Component.extend({
     }
   ),
 
-  actualPermissionsObserver: observer('actualPermissions', function () {
-    const actualPermissions = this.get('actualPermissions');
-    if (actualPermissions) {
-      this.set('initialPermissions', actualPermissions);
-    }
+  /**
+   * State of tree for not modified permissions.
+   * @type {Ember.ComputedPropert<Object>}
+   */
+  actualPermissionsTreeValues: computed(
+    'actualPermissions',
+    'permissionsGroups',
+    function () {
+      const {
+        actualPermissions,
+        permissionsGroups,
+      } = this.getProperties('actualPermissions', 'permissionsGroups');
+      if (!actualPermissions) {
+        return [];
+      } else {
+        return permissionsGroups.reduce((tree, group) => {
+          tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
+            groupPerms[name] = actualPermissions[name];
+            return groupPerms;
+          }, {});
+          return tree;
+        }, {});
+      }
   }),
 
-  init() {
-    this._super(...arguments);
-    this.actualPermissionsObserver();
-  },
+  treeOverrideValues: computed(
+    'initialPermissions',
+    'permissionsGroups',
+    function () {
+      const {
+        permissionsGroups,
+        initialPermissions,
+      } = this.getProperties(
+        'permissionsGroups',
+        'initialPermissions',
+      );
+      return initialPermissions ?
+        permissionsGroups.reduce((tree, group) => {
+          tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
+            groupPerms[name] = initialPermissions[name];
+            return groupPerms;
+          }, {});
+          return tree;
+        }, {}) : undefined;
+    }
+  ),
+
+  // actualPermissionsObserver: observer('actualPermissions', function () {
+  //   const actualPermissions = this.get('actualPermissions');
+  //   if (actualPermissions) {
+  //     this.set('initialPermissions', actualPermissions);
+  //   }
+  // }),
+
+  // init() {
+  //   this._super(...arguments);
+  //   this.actualPermissionsObserver();
+  // },
 
   /**
    * Check if new values are changed by user
