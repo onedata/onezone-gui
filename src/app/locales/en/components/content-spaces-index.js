@@ -12,4 +12,5 @@ export default {
   spaceLeftSuccess: 'Space left successfully',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
+  getSupport: 'Get support',
 };

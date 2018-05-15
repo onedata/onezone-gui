@@ -89,7 +89,9 @@ export default Model.extend(GraphModelMixin, {
   },
 
   leaveSpace(spaceId) {
-    return this._leaveRelation('space', spaceId);
+    return this._leaveRelation('space', spaceId)
+      .then(() => this.get('providerList'))
+      .then(providerList => providerList.hasMany('list').reload());
   },
 
   leaveGroup(groupId) {

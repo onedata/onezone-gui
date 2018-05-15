@@ -1,19 +1,19 @@
 /**
- * A sidebar for user (extension of ``two-level-sidebar``)
+ * A sidebar for data (uses internally `two-level-sidebar`)
  *
  * @module components/sidebar-providers
- * @author Michal Borzecki
+ * @author Jakub Liput
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import sortByPropertyOrDefault from 'onedata-gui-common/utils/sort-by-property-or-default';
 import _ from 'lodash';
 
 export default Component.extend(UserProxyMixin, {
@@ -37,7 +37,22 @@ export default Component.extend(UserProxyMixin, {
     });
   }),
 
-  providersOptions: reads('providersOptionsProxy.content'),
+  /**
+   * @type {Ember.ComputedProperty<Array<models.Provider|undefined>>}
+   */
+  providersOptions: computed('providersOptionsProxy.content', function () {
+    /** @type {Array<models.Provider>|undefined} */
+    const providersOptionsList = this.get('providersOptionsProxy.content');
+    /** @type {string} */
+    const defaultProviderId = this.get('userProxy.content.defaultProviderId');
+    if (providersOptionsList) {
+      return sortByPropertyOrDefault(
+        providersOptionsList.toArray(),
+        defaultProviderId,
+        'name'
+      );
+    }
+  }),
 
   queryParams: computed('selectedProvider.entityId', function getQueryParams() {
     return {
@@ -51,21 +66,12 @@ export default Component.extend(UserProxyMixin, {
   },
 
   chooseInitialProvider() {
-    const defaultProviderId = this.get('userProxy.content.defaultProviderId');
-    const providers = this.get('providersOptionsProxy.content').toArray();
-    let initialProvider;
-    if (get(providers, 'length') > 0) {
-      initialProvider =
-        _.find(providers, p => get(p, 'entityId') === defaultProviderId) ||
-        providers[0];
-    }
-
-    this.set('selectedProvider', initialProvider);
+    this.set('selectedProvider', this.get('providersOptions')[0]);
   },
 
   actions: {
-    dataProviderChanged(selectedProvider) {
-      this.set('selectedProvider', selectedProvider);
+    providerMatcher(provider, term) {
+      return _.includes(get(provider, 'name'), term) ? 1 : -1;
     },
   },
 });
