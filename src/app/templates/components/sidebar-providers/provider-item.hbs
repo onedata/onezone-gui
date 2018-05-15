@@ -4,6 +4,12 @@
 {{/truncated-string}}
 {{#if (or _spaceIdsLoaded _spacesLoaded)}}
   {{#status-toolbar as |toolbar|}}
+    {{#if isDefaultProvider}}
+      {{toolbar.icon
+        icon="home"
+        hint=(tt this "defaultProviderHint")
+      }}
+    {{/if}}
     {{#if _spaceIdsLoaded}}
       {{toolbar.icon 
         icon="space"

@@ -8,6 +8,7 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { inject } from '@ember/service';
+import { camelize } from '@ember/string';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -27,6 +28,8 @@ export default Model.extend(GraphModelMixin, {
    */
   defaultSpaceId: attr('string'),
 
+  defaultProviderId: attr('string'),
+
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
@@ -35,33 +38,41 @@ export default Model.extend(GraphModelMixin, {
 
   //#region Non-store User operations
 
-  getDefaultSpace() {
+  getDetaultRelation(type) {
     const {
       store,
-      defaultSpaceId,
       entityId,
-    } = this.getProperties('store', 'defaultSpaceId', 'entityId');
+    } = this.getProperties('store', 'entityId');
+    const defaultRelationId = this.get(camelize(`default-${type}-id`));
     return store.findRecord('space', gri({
       entityType: 'space',
-      entityId: defaultSpaceId,
+      entityId: defaultRelationId,
       aspect: 'instance',
       authHint: ['asUser', entityId],
     }));
   },
 
-  setDefaultSpaceId(spaceId) {
-    const operation = spaceId ? 'create' : 'delete';
+  getDefaultSpace() {
+    return this.getDefaultRelation('space');
+  },
+
+  getDefaultProvider() {
+    return this.getDefaultRelation('provider');
+  },
+
+  setDefaultRelation(type, relationId) {
+    const operation = relationId ? 'create' : 'delete';
     const entityId = this.get('entityId');
     return this.get('onedataGraph')
       .request({
         gri: gri({
           entityType: 'user',
           entityId,
-          aspect: 'default_space',
+          aspect: `default_${type}`,
         }),
         operation,
         data: {
-          spaceId,
+          [camelize(`${type}-id`)]: relationId,
         },
       })
       .then(() => {
@@ -69,8 +80,18 @@ export default Model.extend(GraphModelMixin, {
       });
   },
 
+  setDefaultSpaceId(spaceId) {
+    this.setDefaultRelation('space', spaceId);
+  },
+
+  setDefaultProviderId(providerId) {
+    this.setDefaultRelation('provider', providerId);
+  },
+
   leaveSpace(spaceId) {
-    return this._leaveRelation('space', spaceId);
+    return this._leaveRelation('space', spaceId)
+      .then(() => this.get('providerList'))
+      .then(providerList => providerList.hasMany('list').reload());
   },
 
   leaveGroup(groupId) {

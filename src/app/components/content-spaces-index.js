@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import { inject } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, set } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
@@ -64,6 +64,11 @@ export default Component.extend(
      * @type {Ember.ComputedProperty<boolean>}
      */
     isDefaultSpace: reads('hasDefaultSpace'),
+
+    /**
+     * @type {Ember.ComputedProperty<boolean>}
+     */
+    isSupported: gt('space.providerList.list.length', 0),
 
     /**
      * @type {Ember.ComputedProperty<AspectAction>}

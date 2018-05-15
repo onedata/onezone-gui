@@ -11,6 +11,9 @@ const breakpointValues = require('./lib/onedata-gui-common/addon/breakpoint-valu
 
 module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
+    'fingerprint': {
+      extensions: ['js', 'css', 'map'],
+    },
     'ember-cli-babel': {
       includePolyfill: true,
     },
