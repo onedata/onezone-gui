@@ -1,12 +1,15 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
-import _ from 'lodash';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 
 export default Component.extend({
   classNames: ['permissions-tree-editor'],
 
   i18n: inject(),
+  store: inject(),
 
   /**
    * @type {array<object>}
@@ -26,25 +29,21 @@ export default Component.extend({
   permissionsTranslationsPath: undefined,
 
   /**
+   * Model with permissions.
+   */
+  modelProxy: Object.freeze({}),
+
+  /**
    * Initial state of the permissions.
    * @type {Object}
    */
-  initialPermissions: Object.freeze({}),
+  overridePermissions: reads('modelProxy.overridePermissions'),
 
   /**
    * Actually saved permissions (used to show diff).
    * @type {Object}
    */
-  actualPermissions: undefined,
-
-  /**
-   * @type {function}
-   * @param {object} permissions permissions state. If not changed, the initial
-   *   permissions object is passed
-   * @returns {undefined}
-   */
-  // TODO rebase with develop, use ...ignore callback
-  permissionsChanged: () => {},
+  persistedPermissions: reads('modelProxy.persistedPermissions'),
 
   /**
    * @type {Ember.ComputedProperty<array<object>}
@@ -84,63 +83,82 @@ export default Component.extend({
     }
   ),
 
-  /**
-   * State of tree for not modified permissions.
-   * @type {Ember.ComputedPropert<Object>}
-   */
-  actualPermissionsTreeValues: computed(
-    'actualPermissions',
-    'permissionsGroups',
-    function () {
-      const {
-        actualPermissions,
-        permissionsGroups,
-      } = this.getProperties('actualPermissions', 'permissionsGroups');
-      if (!actualPermissions) {
-        return [];
-      } else {
-        return permissionsGroups.reduce((tree, group) => {
-          tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
-            groupPerms[name] = actualPermissions[name];
-            return groupPerms;
-          }, {});
-          return tree;
-        }, {});
-      }
-  }),
-
-  treeOverrideValues: computed(
-    'initialPermissions',
-    'permissionsGroups',
-    function () {
-      const {
-        permissionsGroups,
-        initialPermissions,
-      } = this.getProperties(
-        'permissionsGroups',
-        'initialPermissions',
-      );
-      return initialPermissions ?
-        permissionsGroups.reduce((tree, group) => {
-          tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
-            groupPerms[name] = initialPermissions[name];
-            return groupPerms;
-          }, {});
-          return tree;
-        }, {}) : undefined;
-    }
-  ),
-
-  // actualPermissionsObserver: observer('actualPermissions', function () {
-  //   const actualPermissions = this.get('actualPermissions');
-  //   if (actualPermissions) {
-  //     this.set('initialPermissions', actualPermissions);
-  //   }
+  // /**
+  //  * State of tree for not modified permissions.
+  //  * @type {Ember.ComputedPropert<Object>}
+  //  */
+  // persistedPermissionsTreeValues: computed(
+  //   'persistedPermissions',
+  //   'permissionsGroups',
+  //   function () {
+  //     const {
+  //       persistedPermissions,
+  //       permissionsGroups,
+  //     } = this.getProperties('persistedPermissions', 'permissionsGroups');
+  //     if (!persistedPermissions) {
+  //       return [];
+  //     } else {
+  //       return permissionsGroups.reduce((tree, group) => {
+  //         tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
+  //           groupPerms[name] = persistedPermissions.indexOf(name) !== -1;
+  //           return groupPerms;
+  //         }, {});
+  //         return tree;
+  //       }, {});
+  //     }
   // }),
 
-  // init() {
-  //   this._super(...arguments);
-  //   this.actualPermissionsObserver();
+  // treeOverrideValues: computed(
+  //   'initialPermissions',
+  //   'permissionsGroups',
+  //   function () {
+  //     this.privilegesArrayToTree(this.get('initialPermissions')) : undefined;
+  //   }
+  // ),
+
+  modelProxyObserver: observer('modelProxy', function () {
+    const modelProxy = this.get('modelProxy');
+    if (!modelProxy.get('model')) {
+      modelProxy.set('model', PromiseObject.create({
+        promise: this.get('store')
+          .findRecord('privilege', modelProxy.get('modelGri'))
+          .then((privilegesModel) => {
+            const privileges =
+              privilegesArrayToObject(privilegesModel.get('privileges'), this.get('permissionsGroups'));
+            modelProxy.setProperties({
+              modifiedPermissions: privileges,
+              persistedPermissions: privileges,
+              overridePermissions: privileges,
+            });
+            return privilegesModel;
+          }),
+      }));
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+    this.modelProxyObserver();
+  },
+
+  // privilegesArrayToGroupedTree(arr) {
+  //   const permissionsGroups = this.get('permissionsGroups');
+  //   return arr ? permissionsGroups.reduce((tree, group) => {
+  //     tree[group.groupName] = group.permissions.reduce((groupPerms, name) => {
+  //       groupPerms[name] = arr.indexOf(name) !== -1;
+  //       return groupPerms;
+  //     }, {});
+  //     return tree;
+  //   }, {}) : {};
+  // },
+
+  // privilegesArrayToFlatTree(arr) {
+  //   const permissionsGroups = this.get('permissionsGroups');
+  //   const privilegesNames = _.flatten(_.values(permissionsGroups));
+  //   return arr ? privilegesNames.reduce((tree, privilegeName) => {
+  //     tree[privilegeName] = arr.indexOf(privilegeName) !== -1;
+  //     return tree;
+  //   }, {}) : {};
   // },
 
   /**
@@ -149,22 +167,28 @@ export default Component.extend({
    * @returns {boolean}
    */
   areValuesChanged(newValues) {
-    const actualPermissions = this.get('actualPermissions');
-    return actualPermissions ? !_.isEqual(newValues, actualPermissions) : false;
+    const persistedPermissions = this.get('persistedPermissions');
+    return !Object.keys(persistedPermissions).reduce((isEqual, groupName) => {
+      return Object.keys(persistedPermissions[groupName]).reduce((isEq, privName) => {
+        return isEq &&
+          persistedPermissions[groupName][privName] === newValues[groupName][privName];
+      }, isEqual);
+    }, true);
   },
 
   actions: {
     treeValuesChanged(values) {
       const {
-        permissionsChanged,
-        actualPermissions,
-      } = this.getProperties('permissionsChanged', 'actualPermissions');
-      values = _.assign({}, ..._.values(values));
-      if (this.areValuesChanged(values)) {
-        permissionsChanged(values);
-      } else if (actualPermissions) {
-        permissionsChanged(actualPermissions);
-      }
+        modelProxy,
+      } = this.getProperties(
+        'modelProxy'
+      );
+      // values = _.assign({}, ..._.values(values));
+      // values = Object.keys(values).filter(key => values[key]);
+      // const permissions = this.areValuesChanged(values) ?
+      //   values : persistedPermissions;
+      modelProxy.set('modifiedPermissions', values);
+      modelProxy.set('modified', this.areValuesChanged(values));
     },
   },
 });

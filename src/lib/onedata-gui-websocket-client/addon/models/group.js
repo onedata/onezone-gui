@@ -15,14 +15,11 @@ import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/invit
 export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   name: attr('string'),
   type: attr('string'),
-
-  userPermissionList: belongsTo('group-user-permission-list'),
-  groupPermissionList: belongsTo('group-group-permission-list'),
-
+  
   // for features, that will be moved from OP GUI to OZ GUI
   // spaceList: belongsTo('spaceList'),
 
-  // // members of this group
-  // sharedUserList: belongsTo('sharedUserList'),
-  // sharedGroupList: belongsTo('sharedGroupList'),
+  // members of this group
+  sharedUserList: belongsTo('sharedUserList'),
+  sharedGroupList: belongsTo('sharedGroupList'),
 });

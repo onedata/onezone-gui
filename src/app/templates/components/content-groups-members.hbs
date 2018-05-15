@@ -4,28 +4,33 @@
       {{tt this "members"}}
     </span>
   </h1>
+  <button {{action "batchEdit"}}>Batch edit</button>
 </div>
 <div class="row">
   {{#loading-container
-    isLoading=(not groupPermissionListLoaded)
-    errorReason=groupPermissionListLoadError}}
-    {{#one-collapsible-list class="groups-list" as |list|}}
+    isLoading=sharedGroupList.isPending
+    errorReason=sharedGroupList.reason}}
+    {{#one-collapsible-list
+      hasCheckboxes=true
+      class="groups-list"
+      selectionChanged=(action "modelsSelected" "group")
+      as |list|}}
       {{list.header title=(tt this "groups")}}
-      {{#each proxyGroupPermissionList key="id" as |groupPermissions|}}
-        {{#list.item as |listItem|}}
+      {{#each proxySharedGroupList key="subject" as |groupProxy|}}
+        {{#list.item selectionValue=groupProxy as |listItem|}}
           {{#listItem.header}}
             <span class="item-icon-container">
               {{one-icon class="item-icon" icon="group"}}
               {{one-tooltip
-                title=groupPermissions.model.subject.name
+                title=groupProxy.subject.name
                 placement="top"
                 arrowPlacement="left"
                 triggerEvents="hover"
               }}
             </span>
-            {{#if groupPermissions.modified}}M{{/if}}
+            {{#if groupProxy.modified}}M{{/if}}
             <span class="one-label">
-              {{groupPermissions.model.subject.name}}
+              {{groupProxy.subject.name}}
             </span>
           {{/listItem.header}}
           {{#listItem.content}}
@@ -34,9 +39,7 @@
                 permissionsGroups=groupedPermissionsFlags
                 permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
                 permissionsTranslationsPath=(concat i18nPrefix ".permissions")
-                actualPermissions=groupPermissions.persistedPermissions
-                initialPermissions=groupPermissions.overridePermissions
-                permissionsChanged=(action "permissionsModified" groupPermissions)}}
+                modelProxy=groupProxy}}
             {{/render-later}}
           {{/listItem.content}}
         {{/list.item}}
@@ -46,25 +49,29 @@
 </div>
 <div class="row">
   {{#loading-container
-    isLoading=(not userPermissionListLoaded)
-    errorReason=userPermissionListLoadError}}
-    {{#one-collapsible-list class="users-list" as |list|}}
+    isLoading=sharedUserList.isPending
+    errorReason=sharedUserList.reason}}
+    {{#one-collapsible-list
+      hasCheckboxes=true
+      class="users-list"
+      selectionChanged=(action "modelsSelected" "user")
+      as |list|}}
       {{list.header title=(tt this "users")}}
-      {{#each proxyUserPermissionList key="id" as |userPermissions|}}
-        {{#list.item as |listItem|}}
+      {{#each proxySharedUserList key="subject" as |userProxy|}}
+        {{#list.item selectionValue=userProxy as |listItem|}}
           {{#listItem.header}}
             <span class="item-icon-container">
-              {{one-icon class="item-icon" icon="user"}}
+              {{one-icon class="item-icon" icon="group"}}
               {{one-tooltip
-                title=groupPermissions.model.subject.name
+                title=userProxy.subject.name
                 placement="top"
                 arrowPlacement="left"
                 triggerEvents="hover"
               }}
             </span>
-            {{#if userPermissions.modified}}M{{/if}}
+            {{#if userProxy.modified}}M{{/if}}
             <span class="one-label">
-              {{userPermissions.model.subject.name}}
+              {{userProxy.subject.name}}
             </span>
           {{/listItem.header}}
           {{#listItem.content}}
@@ -73,9 +80,7 @@
                 permissionsGroups=groupedPermissionsFlags
                 permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
                 permissionsTranslationsPath=(concat i18nPrefix ".permissions")
-                actualPermissions=userPermissions.persistedPermissions
-                initialPermissions=groupPermissions.overridePermissions
-                permissionsChanged=(action "permissionsModified" userPermissions)}}
+                modelProxy=userProxy}}
             {{/render-later}}
           {{/listItem.content}}
         {{/list.item}}
@@ -84,3 +89,20 @@
   {{/loading-container}}
 </div>
 {{yield}}
+{{#bs-modal
+  open=batchEditActive
+  onHide=(action "batchEditClose")
+  class="batch-privileges-edit"
+  as |modal|}}
+  {{#modal.body}}
+    {{#loading-container
+      isLoading=batchEditModalModel.model.isPending
+      errorReason=batchEditModalModel.model.reason}}
+      {{permissions-tree-editor
+        permissionsGroups=groupedPermissionsFlags
+        permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
+        permissionsTranslationsPath=(concat i18nPrefix ".permissions")
+        modelProxy=batchEditModalModel}}
+    {{/loading-container}}
+  {{/modal.body}}
+{{/bs-modal}}

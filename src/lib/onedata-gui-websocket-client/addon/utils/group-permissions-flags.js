@@ -10,35 +10,36 @@
 export const groupedFlags = [{
   groupName: 'groupManagement',
   permissions: [
-    'viewGroup',
-    'modifyGroup',
-    'setPrivileges',
-    'removeGroup',
+    'group_view',
+    'group_update',
+    'group_set_privileges',
+    'group_delete',
   ],
 }, {
   groupName: 'groupHierarchyManagement',
   permissions: [
-    'createChildGroup',
-    'inviteChildGroup',
-    'removeChildGroup',
-    'createParentGroup',
-    'joinParentGroup',
-    'leaveParentGroup',
+    'group_create_child',
+    'group_invite_child',
+    'group_remove_child',
+    'group_create_parent',
+    'group_join_parent',
+    'group_leave_parent',
   ],
 }, {
   groupName: 'userManagement',
   permissions: [
-    'inviteUser',
-    'removeUser',
+    'group_invite_user',
+    'group_remove_user',
   ],
 }, {
   groupName: 'spaceManagement',
   permissions: [
-    'createSpace',
-    'joinSpace',
-    'leaveSpace',
+    'group_create_space',
+    'group_join_space',
+    'group_leave_space',
   ],
 }];
+
 
 export default groupedFlags
   .map(group => group.permissions)

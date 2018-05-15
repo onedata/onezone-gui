@@ -1,8 +1,4 @@
 .content-groups-members {
-  .groups-list {
-    margin-bottom: 0;
-  }
-
   @media (min-width: 768px) {
     .one-dynamic-tree {
       max-width: 350px;
@@ -25,6 +21,13 @@
     .one-tree-item-content .form-group {
       min-width: 7em;
       width: 7em;
+    }
+  }
+
+  .one-collapsible-list-item-content {
+    position: relative;
+    &.opened {
+      min-height: 150px;
     }
   }
 

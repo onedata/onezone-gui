@@ -1,7 +1,11 @@
-{{one-dynamic-tree
-  class="border-dashed"
-  definition=initialTreeState
-  compareValues=actualPermissionsTreeValues
-  overrideValues=treeOverrideValues
-  valuesChanged=(action "treeValuesChanged")}}
-{{yield}}
+{{#loading-container
+  isLoading=modelProxy.model.isPending
+  errorReason=modelProxy.model.reason}}
+  {{one-dynamic-tree
+    class="border-dashed"
+    definition=initialTreeState
+    compareValues=persistedPermissions
+    overrideValues=overridePermissions
+    valuesChanged=(action "treeValuesChanged")}}
+  {{yield}}
+{{/loading-container}}

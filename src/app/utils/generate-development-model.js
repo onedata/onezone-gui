@@ -16,6 +16,7 @@ import { Promise } from 'rsvp';
 import { get } from '@ember/object';
 import groupPermissionsFlags from 'onedata-gui-websocket-client/utils/group-permissions-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -40,19 +41,15 @@ const perProviderSize = Math.pow(1024, 4);
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsersGri, sharedGroupsGri;
+  let sharedUsers, sharedGroups;
   // create shared users
   return createSharedUsersRecords(store)
-    .then(sharedUsers =>
-      sharedUsersGri = sharedUsers.map(sharedUser => get(sharedUser, 'gri'))
-    )
+    .then(su => sharedUsers = su)
     .then(() =>
       createSharedGroupsRecords(store)
     )
     // create shared groups
-    .then(sharedGroups =>
-      sharedGroupsGri = sharedGroups.map(sharedGroup => get(sharedGroup, 'gri'))
-    )
+    .then(sg => sharedGroups = sg)
     // create main resources lists
     .then(() =>
       Promise.all(
@@ -92,15 +89,17 @@ export default function generateDevelopmentModel(store) {
         }))
       ).then(() => listRecords);
     })
-    // add permissions to groups
+    // add shared groups, users and permissions to groups
     .then(listRecords =>
       listRecords[types.indexOf('group')].get('list')
+        .then(groups => 
+          Promise.all(groups.map(group =>
+            attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
+          ))
+        )
         .then(groups =>
           Promise.all(groups.map(group =>
-            createPermissionsForGroup(store, group, sharedUsersGri, sharedGroupsGri)
-            .then(() =>
-              group.save()
-            )
+            createPermissionsForGroup(store, group, sharedUsers, sharedGroups)
           ))
         )
         .then(() => listRecords)
@@ -213,45 +212,43 @@ function createSharedGroupsRecords(store) {
   }));
 }
 
-function createPermissionsForGroup(store, group, sharedUsersGri, sharedGroupsGri) {
-  return createGroupPermissionsRecords(store, group, sharedUsersGri, 'user')
-    .then((userPermissions) =>
-      createListRecord(store, 'groupUserPermission', userPermissions)
-    )
-    .then((userPermissionList) =>
-      group.set('userPermissionList', userPermissionList)
-    )
-    .then(() =>
-      createGroupPermissionsRecords(store, group, sharedGroupsGri, 'group')
-    )
-    .then((groupPermissions) =>
-      createListRecord(store, 'groupGroupPermission', groupPermissions)
-    )
-    .then((groupPermissionList) =>
-      group.set('groupPermissionList', groupPermissionList)
-    );
+function attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups) {
+  return createListRecord(store, 'sharedGroup', sharedGroups)
+    .then(list => group.set('sharedGroupList', list))
+    .then(() => createListRecord(store, 'sharedUser', sharedUsers))
+    .then(list => {
+      group.set('sharedUserList', list);
+      return group.save();
+    });
 }
 
-function createGroupPermissionsRecords(store, group, sharedGriArray, type) {
+function createPermissionsForGroup(store, group, sharedUsers, sharedGroups) {
+  return Promise.all([
+    createGroupPermissionsRecords(store, group, sharedUsers, 'user'),
+    createGroupPermissionsRecords(store, group, sharedGroups, 'group'),
+  ]);
+}
+
+function createGroupPermissionsRecords(store, group, sharedArray, type) {
+  const sharedGriArray = sharedArray.map(subject => subject.get('id'));
   const groupGri = get(group, 'gri');
-  let groupId;
+  let groupId, subjectId;
   try {
     groupId = parseGri(groupGri).entityId;
   } catch (e) {
     return Promise.resolve([]);
   }
-  const permissions = groupPermissionsFlags
-    .reduce((perms, flag) => {
-      perms[flag] = true;
-      return perms;
-    }, {});
   const recordData = {
-    groupId,
-    permissions,
+    privileges: groupPermissionsFlags.slice(0),
   };
-  const modelName = type === 'user' ? 'groupUserPermission' :'groupGroupPermission';
   return Promise.all(_.range(sharedGriArray.length).map((index) => {
-    recordData['subjectGri'] = sharedGriArray[index];
-    return store.createRecord(modelName, recordData).save();
+    subjectId = parseGri(sharedGriArray[index]).entityId;
+    recordData.id = gri({
+      entityType: 'group',
+      entityId: groupId,
+      aspect: type === 'user' ? 'user_privileges' : 'child_privileges',
+      aspectId: subjectId,
+    });
+    return store.createRecord('privilege', recordData).save();
   }));
 }
