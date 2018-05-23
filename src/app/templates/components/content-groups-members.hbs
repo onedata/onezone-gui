@@ -1,92 +1,45 @@
-<div class="row content-row header-row hidden-xs">
-  <h1>
-    <span class="one-label">
-      {{tt this "members"}}
-    </span>
-  </h1>
-  <button {{action "batchEdit"}}>Batch edit</button>
+{{#sticky-element}}
+  <div class="row content-row header-row hidden-xs has-border">
+    <h1 class="with-menu">
+      <span class="one-label">
+        {{tt this "members"}}
+      </span>
+      <div class="btn-toolbar with-place-for-dots">
+        {{#bs-button class="btn btn-sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}Multiedit{{/bs-button}}
+      </div>
+      {{actions-toolbar isMinimized=true actionsArray=headerActions}}
+    </h1>
+  </div>
+{{/sticky-element}}
+<div class="row">
+  {{collection-permissions
+    isLoadingList=sharedGroupList.isPending
+    loadingListError=sharedGroupList.reason
+    proxyList=proxySharedGroupList
+    subjectType="group"
+    modelsSelected=(action "modelsSelected" "group")
+    listHeader=(tt this "groups")
+    itemIcon="group"
+    groupedPrivilegesFlags=groupedPrivilegesFlags
+    privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
+    privilegesTranslationsPath=(concat i18nPrefix ".privileges")
+    save=(action "saveOne")
+    reset=(action "reset")}}
 </div>
 <div class="row">
-  {{#loading-container
-    isLoading=sharedGroupList.isPending
-    errorReason=sharedGroupList.reason}}
-    {{#one-collapsible-list
-      hasCheckboxes=true
-      class="groups-list"
-      selectionChanged=(action "modelsSelected" "group")
-      as |list|}}
-      {{list.header title=(tt this "groups")}}
-      {{#each proxySharedGroupList key="subject" as |groupProxy|}}
-        {{#list.item selectionValue=groupProxy as |listItem|}}
-          {{#listItem.header}}
-            <span class="item-icon-container">
-              {{one-icon class="item-icon" icon="group"}}
-              {{one-tooltip
-                title=groupProxy.subject.name
-                placement="top"
-                arrowPlacement="left"
-                triggerEvents="hover"
-              }}
-            </span>
-            {{#if groupProxy.modified}}M{{/if}}
-            <span class="one-label">
-              {{groupProxy.subject.name}}
-            </span>
-          {{/listItem.header}}
-          {{#listItem.content}}
-            {{#render-later triggerRender=listItem.isActive}}
-              {{permissions-tree-editor
-                permissionsGroups=groupedPermissionsFlags
-                permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
-                permissionsTranslationsPath=(concat i18nPrefix ".permissions")
-                modelProxy=groupProxy}}
-            {{/render-later}}
-          {{/listItem.content}}
-        {{/list.item}}
-      {{/each}}
-    {{/one-collapsible-list}}
-  {{/loading-container}}
-</div>
-<div class="row">
-  {{#loading-container
-    isLoading=sharedUserList.isPending
-    errorReason=sharedUserList.reason}}
-    {{#one-collapsible-list
-      hasCheckboxes=true
-      class="users-list"
-      selectionChanged=(action "modelsSelected" "user")
-      as |list|}}
-      {{list.header title=(tt this "users")}}
-      {{#each proxySharedUserList key="subject" as |userProxy|}}
-        {{#list.item selectionValue=userProxy as |listItem|}}
-          {{#listItem.header}}
-            <span class="item-icon-container">
-              {{one-icon class="item-icon" icon="group"}}
-              {{one-tooltip
-                title=userProxy.subject.name
-                placement="top"
-                arrowPlacement="left"
-                triggerEvents="hover"
-              }}
-            </span>
-            {{#if userProxy.modified}}M{{/if}}
-            <span class="one-label">
-              {{userProxy.subject.name}}
-            </span>
-          {{/listItem.header}}
-          {{#listItem.content}}
-            {{#render-later triggerRender=listItem.isActive}}
-              {{permissions-tree-editor
-                permissionsGroups=groupedPermissionsFlags
-                permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
-                permissionsTranslationsPath=(concat i18nPrefix ".permissions")
-                modelProxy=userProxy}}
-            {{/render-later}}
-          {{/listItem.content}}
-        {{/list.item}}
-      {{/each}}
-    {{/one-collapsible-list}}
-  {{/loading-container}}
+  {{collection-permissions
+    isLoadingList=sharedUserList.isPending
+    loadingListError=sharedUserList.reason
+    proxyList=proxySharedUserList
+    subjectType="user"
+    modelsSelected=(action "modelsSelected" "user")
+    listHeader=(tt this "users")
+    itemIcon="user"
+    groupedPrivilegesFlags=groupedPrivilegesFlags
+    privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
+    privilegesTranslationsPath=(concat i18nPrefix ".privileges")
+    save=(action "saveOne")
+    reset=(action "reset")}}
 </div>
 {{yield}}
 {{#bs-modal
@@ -95,14 +48,27 @@
   class="batch-privileges-edit"
   as |modal|}}
   {{#modal.body}}
+    {{#modal.header}}
+      <h1>{{tt this "batchEditModalHeader"}}</h1>
+    {{/modal.header}}
     {{#loading-container
       isLoading=batchEditModalModel.model.isPending
       errorReason=batchEditModalModel.model.reason}}
-      {{permissions-tree-editor
-        permissionsGroups=groupedPermissionsFlags
-        permissionGroupsTranslationsPath=(concat i18nPrefix ".permissionGroups")
-        permissionsTranslationsPath=(concat i18nPrefix ".permissions")
+      {{privileges-tree-editor
+        privilegesGroups=groupedPrivilegesFlags
+        privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
+        privilegesTranslationsPath=(concat i18nPrefix ".privileges")
         modelProxy=batchEditModalModel}}
     {{/loading-container}}
   {{/modal.body}}
+  {{#if batchEditModalModel.model.isFulfilled}}
+    {{#modal.footer}}
+      {{#bs-button class="btn btn-warning" onClick=(action "batchEditClose")}}{{tt this "batchEditModalCancel"}}{{/bs-button}}
+      {{#one-spin-button
+        class="btn btn-primary"
+        action=(action "saveBatch")}}
+        {{tt this "batchEditModalSave"}}
+      {{/one-spin-button}}
+    {{/modal.footer}}
+  {{/if}}
 {{/bs-modal}}

@@ -4,8 +4,9 @@
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState
-    compareValues=persistedPermissions
-    overrideValues=overridePermissions
+    compareValues=persistedPrivileges
+    overrideValues=overridePrivileges
+    disabledFieldsPaths=treeDisabledPaths
     valuesChanged=(action "treeValuesChanged")}}
   {{yield}}
 {{/loading-container}}

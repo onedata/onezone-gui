@@ -1,7 +1,7 @@
 /**
- * Names of flags for group permissions.
+ * Names of flags for group privileges.
  * 
- * @module constants/permission-group-flags
+ * @module constants/privileges-group-flags
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -9,7 +9,7 @@
 
 export const groupedFlags = [{
   groupName: 'groupManagement',
-  permissions: [
+  privileges: [
     'group_view',
     'group_update',
     'group_set_privileges',
@@ -17,7 +17,7 @@ export const groupedFlags = [{
   ],
 }, {
   groupName: 'groupHierarchyManagement',
-  permissions: [
+  privileges: [
     'group_create_child',
     'group_invite_child',
     'group_remove_child',
@@ -27,13 +27,13 @@ export const groupedFlags = [{
   ],
 }, {
   groupName: 'userManagement',
-  permissions: [
+  privileges: [
     'group_invite_user',
     'group_remove_user',
   ],
 }, {
   groupName: 'spaceManagement',
-  permissions: [
+  privileges: [
     'group_create_space',
     'group_join_space',
     'group_leave_space',
@@ -42,5 +42,5 @@ export const groupedFlags = [{
 
 
 export default groupedFlags
-  .map(group => group.permissions)
+  .map(group => group.privileges)
   .reduce((all, groupPerms) => all.concat(groupPerms), []);

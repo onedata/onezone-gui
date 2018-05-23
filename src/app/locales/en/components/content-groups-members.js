@@ -2,13 +2,13 @@ export default {
   members: 'Members',
   groups: 'Groups',
   users: 'Users',
-  permissionGroups: {
+  privilegeGroups: {
     groupManagement: 'Group management',
     groupHierarchyManagement: 'Group hierarchy management',
     userManagement: 'User management',
     spaceManagement: 'Space management',
   },
-  permissions: {
+  privileges: {
     group_view: 'View group',
     group_update: 'Modify group',
     group_set_privileges: 'Set privileges',
@@ -25,4 +25,12 @@ export default {
     group_join_space: 'Join space',
     group_leave_space: 'Leave space',
   },
+  privilegesPersistence: 'privileges persistence',
+  groupMembers: 'Group members',
+  batchEdit: 'Multiedit',
+  batchEditModalHeader: 'Change privileges',
+  batchEditModalSave: 'Save changes',
+  batchEditModalCancel: 'Cancel',
+  inviteGroup: 'Invite group',
+  inviteUser: 'Invite user',
 };

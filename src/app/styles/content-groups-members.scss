@@ -1,11 +1,60 @@
 .content-groups-members {
-  @media (min-width: 768px) {
+  .user-list {
+    margin-top: 2 * $padding-large-vertical;
+  }
+
+  .one-tree-root {
+    background-color: $main-content-hover-background;
+  }
+
+  .one-collapsible-list-item-content {
+    position: relative;
+    &.opened {
+      min-height: 150px;
+    }
+  }
+
+  .privileges-tree-editor {
+    margin: $padding-large-horizontal;
+  }
+
+  .item-modified-header .one-label {
+    color: $color-one-blue-gray;
+    font-style: italic;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .privileges-tree-editor {
+      margin-top: 0;
+    }
+  }
+}
+
+.batch-privileges-edit.modal {
+  .one-dynamic-tree {
+    margin: 0 auto;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .one-dynamic-tree {
+      margin: 0 -2em;
+    }
+  }
+  
+  .modal-dialog {
+    max-height: 100%;
+  }
+}
+
+.content-groups-members, .batch-privileges-edit.modal {
+  @media (max-width: $screen-xs-max) {
+    .form-group {
+      text-align: right;
+    }
+  }
+  @media (min-width: $screen-sm-min) {
     .one-dynamic-tree {
       max-width: 350px;
-    }
-
-    .one-tree-root {
-      background-color: $main-content-hover-background;
     }
 
     .form-group {
@@ -19,19 +68,8 @@
     }
 
     .one-tree-item-content .form-group {
-      min-width: 7em;
-      width: 7em;
+      min-width: 4em;
+      width: 4em;
     }
-  }
-
-  .one-collapsible-list-item-content {
-    position: relative;
-    &.opened {
-      min-height: 150px;
-    }
-  }
-
-  .permissions-tree-editor  {
-    margin: $padding-large-horizontal;
   }
 }

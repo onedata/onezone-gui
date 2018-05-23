@@ -14,7 +14,7 @@ import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise } from 'rsvp';
 import { get } from '@ember/object';
-import groupPermissionsFlags from 'onedata-gui-websocket-client/utils/group-permissions-flags';
+import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
@@ -89,7 +89,7 @@ export default function generateDevelopmentModel(store) {
         }))
       ).then(() => listRecords);
     })
-    // add shared groups, users and permissions to groups
+    // add shared groups, users and privileges to groups
     .then(listRecords =>
       listRecords[types.indexOf('group')].get('list')
         .then(groups => 
@@ -99,7 +99,7 @@ export default function generateDevelopmentModel(store) {
         )
         .then(groups =>
           Promise.all(groups.map(group =>
-            createPermissionsForGroup(store, group, sharedUsers, sharedGroups)
+            createPrivilegesForGroup(store, group, sharedUsers, sharedGroups)
           ))
         )
         .then(() => listRecords)
@@ -222,14 +222,14 @@ function attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
     });
 }
 
-function createPermissionsForGroup(store, group, sharedUsers, sharedGroups) {
+function createPrivilegesForGroup(store, group, sharedUsers, sharedGroups) {
   return Promise.all([
-    createGroupPermissionsRecords(store, group, sharedUsers, 'user'),
-    createGroupPermissionsRecords(store, group, sharedGroups, 'group'),
+    createGroupPrivilegesRecords(store, group, sharedUsers, 'user'),
+    createGroupPrivilegesRecords(store, group, sharedGroups, 'group'),
   ]);
 }
 
-function createGroupPermissionsRecords(store, group, sharedArray, type) {
+function createGroupPrivilegesRecords(store, group, sharedArray, type) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
   const groupGri = get(group, 'gri');
   let groupId, subjectId;
@@ -239,7 +239,7 @@ function createGroupPermissionsRecords(store, group, sharedArray, type) {
     return Promise.resolve([]);
   }
   const recordData = {
-    privileges: groupPermissionsFlags.slice(0),
+    privileges: groupPrivilegesFlags.slice(0),
   };
   return Promise.all(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;

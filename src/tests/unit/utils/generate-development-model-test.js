@@ -46,9 +46,8 @@ describe('Unit | Utility | generate development model', function () {
         'user',
         'sharedGroup', 'sharedUser',
         'spaceList', 'groupList', 'providerList', 'clientTokenList',
-        'linkedAccountList', 'groupGroupPermissionList', 'groupUserPermissionList',
-        'space', 'group', 'provider', 'clientToken', 'linkedAccount',
-        'groupGroupPermission', 'groupUserPermission',
+        'linkedAccountList',
+        'space', 'group', 'provider', 'clientToken', 'linkedAccount', 'privilege',
       ].forEach(modelName =>
         expect(createRecord, `createRecord for ${modelName}`).to.be.calledWith(
           modelName, sinon.match.object)

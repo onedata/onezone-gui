@@ -1,0 +1,49 @@
+{{#loading-container
+  isLoading=isLoadingList
+  errorReason=loadingListError}}
+  {{#one-collapsible-list
+    hasCheckboxes=true
+    class=(concat subjectType "-list")
+    selectionChanged=modelsSelected
+    as |list|}}
+    {{list.header title=listHeader}}
+    {{#each proxyList key="subject" as |subjectProxy|}}
+      {{#list.item selectionValue=subjectProxy as |listItem|}}
+        {{#listItem.header class=(if subjectProxy.modified "item-modified-header")}}
+          <span class="item-icon-container">
+            {{one-icon class="item-icon" icon=itemIcon}}
+            {{one-tooltip
+              title=subjectProxy.subject.name
+              placement="top"
+              arrowPlacement="left"
+              triggerEvents="hover"
+            }}
+          </span>
+          <span class="one-label">
+            {{subjectProxy.subject.name}}
+          </span>
+          {{#if subjectProxy.modified}}
+            <div class="btn-toolbar hidden-xs">
+              {{#bs-button class="btn btn-sm" type="primary" disabled=subjectProxy.saving onClick=(action save subjectProxy)}}Save{{/bs-button}}
+              {{#bs-button class="btn btn-sm" type="danger" disabled=subjectProxy.saving onClick=(action reset subjectProxy)}}Reset{{/bs-button}}
+            </div>
+          {{/if}}
+        {{/listItem.header}}
+        {{#listItem.content}}
+          {{#render-later triggerRender=listItem.isActive}}
+            <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
+              {{#bs-button class="btn btn-sm" type="primary" disabled=(or subjectProxy.saving (not subjectProxy.modified)) onClick=(action save subjectProxy)}}Save{{/bs-button}}
+              {{#bs-button class="btn btn-sm" type="danger" disabled=(or subjectProxy.saving (not subjectProxy.modified)) onClick=(action reset subjectProxy)}}Reset{{/bs-button}}
+            </div>
+            {{privileges-tree-editor
+              privilegesGroups=groupedPrivilegesFlags
+              privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+              privilegesTranslationsPath=privilegesTranslationsPath
+              modelProxy=subjectProxy
+              editionEnabled=true}}
+          {{/render-later}}
+        {{/listItem.content}}
+      {{/list.item}}
+    {{/each}}
+  {{/one-collapsible-list}}
+{{/loading-container}}

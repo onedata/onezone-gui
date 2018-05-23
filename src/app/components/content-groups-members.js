@@ -13,7 +13,7 @@ import EmberObject, { computed } from '@ember/object';
 import { gt, reads, filterBy, union } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-permissions-flags';
+import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -21,23 +21,27 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import _ from 'lodash';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-groups-members'],
 
   i18n: inject(),
   store: inject(),
+  globalNotify: inject(),
 
   /**
    * @override
    */
   i18nPrefix: 'components.contentGroupsMembers',
 
+  editionEnabled: true,
+
   /**
    * @type {Array<Object>}
    */
-  groupedPermissionsFlags: groupedFlags,
+  groupedPrivilegesFlags: groupedFlags,
 
   /**
    * Set in `init` method
@@ -123,6 +127,52 @@ export default Component.extend(I18n, {
 
   batchEditModalModel: Object.freeze({}),
 
+  headerActions: computed(function () {
+    return [{
+      action: () => this.send('inviteGroup'),
+      title: this.t('inviteGroup'),
+      class: 'invite-group',
+      icon: 'remove',
+    }, {
+      action: () => this.send('inviteUser'),
+      title: this.t('inviteUser'),
+      class: 'invite-user',
+      icon: 'remove',
+    }];
+  }),
+
+  batchEditAvailable: gt('selectedModelProxies.length', 0),
+
+  batchEditAction: computed('batchEditAvailable', function () {
+    return {
+      action: () => this.send('batchEdit'),
+      title: this.t('batchEdit'),
+      class: 'batch-edit',
+      icon: 'rename',
+      disabled: !this.get('batchEditAvailable'),
+    };
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function () {
+    return this.t('groupMembers');
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActions: computed('headerActions', 'batchEditAction', function () {
+    const {
+      headerActions,
+      batchEditAction,
+    } = this.getProperties('headerActions', 'batchEditAction');
+    return [batchEditAction, ...headerActions];
+  }),
+
   init() {
     this._super(...arguments);
     this.set('modifiedModels', A());
@@ -135,7 +185,7 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * Prepares list of container objects for permissions models
+   * Prepares list of container objects for privileges models
    * @param {DS.ManyArray} list
    * @param {string} subjectType `user` or `group`
    * @returns {Ember.A<EmberObject>}
@@ -166,19 +216,20 @@ export default Component.extend(I18n, {
         subject,
         modelGri,
         model: undefined,
-        modifiedPermissions: undefined,
-        persistedPermissions: undefined,
-        overridePermissions: undefined,
+        modifiedPrivileges: undefined,
+        persistedPrivileges: undefined,
+        overridePrivileges: undefined,
         modified: false,
+        saving: false,
       });
     }));
   },
 
   calculateBatchEditModel(models) {
-    const groupedPermissionsFlags = this.get('groupedPermissionsFlags');
+    const groupedPrivilegesFlags = this.get('groupedPrivilegesFlags');
     const privilegesFlatTree = {};
     models.forEach(model => {
-      const privileges = _.assign({}, ..._.values(model.get('modifiedPermissions')));
+      const privileges = _.assign({}, ..._.values(model.get('modifiedPrivileges')));
       Object.keys(privileges).forEach(privName => {
         if (privilegesFlatTree[privName] === undefined) {
           privilegesFlatTree[privName] = privileges[privName];
@@ -187,13 +238,68 @@ export default Component.extend(I18n, {
         }
       });
     });
-    return groupedPermissionsFlags.reduce((tree, group) => {
-      tree[group.groupName] = group.permissions.reduce((subtree, priv) => {
+    return groupedPrivilegesFlags.reduce((tree, group) => {
+      tree[group.groupName] = group.privileges.reduce((subtree, priv) => {
         subtree[priv] = privilegesFlatTree[priv];
         return subtree;
       }, {});
       return tree;
     }, {});
+  },
+
+  batchEditApply() {
+    const {
+      selectedModelProxies,
+      batchEditModalModel,
+    } = this.getProperties('selectedModelProxies', 'batchEditModalModel');
+    const batchModifiedPrivileges = batchEditModalModel.get('modifiedPrivileges');
+    selectedModelProxies.forEach(modelProxy => {
+      const {
+        modifiedPrivileges,
+        persistedPrivileges,
+      } = modelProxy.getProperties('modifiedPrivileges', 'persistedPrivileges');
+      const resultTree = {};
+      let modified = false;
+      Object.keys(modifiedPrivileges).forEach(groupName => {
+        resultTree[groupName] = {};
+        Object.keys(modifiedPrivileges[groupName]).forEach(privName => {
+          const obtainedValue = batchModifiedPrivileges[groupName][privName];
+          resultTree[groupName][privName] = obtainedValue === 2 ?
+            modifiedPrivileges[groupName][privName] : obtainedValue;
+            modified = modified ||
+              resultTree[groupName][privName] !==
+              persistedPrivileges[groupName][privName];
+        });
+      });
+      modelProxy.setProperties({
+        modifiedPrivileges: resultTree,
+        overridePrivileges: resultTree,
+        modified,
+      });
+    });
+  },
+
+  saveModel(modelProxy) {
+    const {
+      modifiedPrivileges,
+      model,
+    } = modelProxy.getProperties('modifiedPrivileges', 'model');
+    const flattenedPrivilegesTree =
+      _.assign({}, ..._.values(modifiedPrivileges));
+    const privileges = Object.keys(flattenedPrivilegesTree)
+      .filter(key => flattenedPrivilegesTree[key]);
+    model.set('privileges', privileges);
+    modelProxy.set('saving', true);
+    const promise = model.get('content').save().then(() => {
+      safeExec(modelProxy, () => modelProxy.setProperties({
+        modified: false,
+        persistedPrivileges: modifiedPrivileges,
+      }));
+    });
+    promise.finally(() => {
+      safeExec(modelProxy, () => modelProxy.set('saving', false));
+    });
+    return promise;
   },
 
   actions: {
@@ -207,12 +313,12 @@ export default Component.extend(I18n, {
       const {
         selectedModelProxies,
         store,
-        groupedPermissionsFlags,
-      } = this.getProperties('selectedModelProxies', 'store', 'groupedPermissionsFlags');
+        groupedPrivilegesFlags,
+      } = this.getProperties('selectedModelProxies', 'store', 'groupedPrivilegesFlags');
       const modelProxy = EmberObject.create({
-        modifiedPermissions: undefined,
-        persistedPermissions: undefined,
-        overridePermissions: undefined,
+        modifiedPrivileges: undefined,
+        persistedPrivileges: undefined,
+        overridePrivileges: undefined,
         modified: false,
       });
       modelProxy.set('model', PromiseObject.create({
@@ -225,15 +331,15 @@ export default Component.extend(I18n, {
                 .then((privilegesModel) => {
                   const privileges = privilegesArrayToObject(
                     privilegesModel.get('privileges'),
-                    groupedPermissionsFlags
+                    groupedPrivilegesFlags
                   );
                   selectedProxy.setProperties({
                     model: PromiseObject.create({
                       promise: Promise.resolve(privilegesModel),
                     }),
-                    modifiedPermissions: privileges,
-                    persistedPermissions: privileges,
-                    overridePermissions: privileges,
+                    modifiedPrivileges: privileges,
+                    persistedPrivileges: privileges,
+                    overridePrivileges: privileges,
                   });
                   return selectedProxy;
                 });
@@ -242,9 +348,9 @@ export default Component.extend(I18n, {
           .then(modelProxies => safeExec(this, () => {
             const batchPrivileges = this.calculateBatchEditModel(modelProxies);
             modelProxy.setProperties({
-              modifiedPermissions: batchPrivileges,
-              persistedPermissions: batchPrivileges,
-              overridePermissions: batchPrivileges,
+              modifiedPrivileges: batchPrivileges,
+              persistedPrivileges: batchPrivileges,
+              overridePrivileges: batchPrivileges,
             });
           })),
       }));
@@ -255,6 +361,35 @@ export default Component.extend(I18n, {
     },
     batchEditClose() {
       this.set('batchEditActive', false);
+    },
+    saveOne(modelProxy) {
+      return this.saveModel(modelProxy)
+        .catch(error => this.get('globalNotify')
+          .backendError(this.t('privilegesPersistence'), error)
+        );
+    },
+    saveBatch() {
+      this.batchEditApply();
+      const selectedModelProxies = this.get('selectedModelProxies');
+      const savePromises = selectedModelProxies.map(
+        modelProxy => this.saveModel(modelProxy)
+      );
+      return Promise.all(savePromises)
+        .catch((error) => {
+          this.get('globalNotify')
+            .backendError(this.t('privilegesPersistence'), error);
+        })
+        .finally(() => safeExec(this, 'set', 'batchEditActive', false));
+    },
+    reset(modelProxy) {
+      if (modelProxy.get('modified')) {
+        const persistedPrivileges = modelProxy.get('persistedPrivileges');
+        modelProxy.setProperties({
+          modifiedPrivileges: persistedPrivileges,
+          overridePrivileges: _.assign({}, persistedPrivileges),
+          modified: false,
+        });
+      }
     },
   },
 });
