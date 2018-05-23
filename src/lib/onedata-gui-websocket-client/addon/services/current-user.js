@@ -11,6 +11,7 @@ import { oneWay } from '@ember/object/computed';
 
 import Service, { inject } from '@ember/service';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   store: inject(),
@@ -24,7 +25,7 @@ export default Service.extend({
       userId,
     } = this.getProperties('store', 'userId');
     if (!userId) {
-      throw new Error(
+      return Promise.reject(
         'service:current-user: session unauthenticated or user id is not set'
       );
     }

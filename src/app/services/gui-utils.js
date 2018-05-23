@@ -10,11 +10,30 @@
 import GuiUtils from 'onedata-gui-common/services/gui-utils';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
+import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 
-export default GuiUtils.extend({
-  onedataConnection: inject(),
+export default GuiUtils.extend(UserProxyMixin, {
+  onedataConnection: service(),
+
+  currentUser: service(),
+
+  /**
+   * @override
+   */
+  defaultProviderId: computed('userProxy.content.defaultProviderId', function () {
+    return this.get('userProxy.content.defaultProviderId');
+  }),
+
+  /**
+   * @override 
+   * @param {string} providerEntityId 
+   */
+  setDefaultProviderId(providerEntityId) {
+    return this.get('userProxy')
+      .then(user => user.setDefaultProviderId(providerEntityId));
+  },
 
   /**
    * @override
