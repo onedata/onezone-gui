@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import EmberObject, { computed } from '@ember/object';
-import { gt, reads, filterBy, union } from '@ember/object/computed';
+import { union } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
@@ -30,13 +30,12 @@ export default Component.extend(I18n, GlobalActions, {
   i18n: inject(),
   store: inject(),
   globalNotify: inject(),
+  media: inject(),
 
   /**
    * @override
    */
   i18nPrefix: 'components.contentGroupsMembers',
-
-  editionEnabled: true,
 
   /**
    * @type {Array<Object>}
@@ -56,47 +55,25 @@ export default Component.extend(I18n, GlobalActions, {
   sharedUserList: undefined,
 
   /**
-   * Set in `init` method
-   * @type {DS.ManyArray}
+   * @type {PromiseObject<string>}
    */
-  groupPermissionList: undefined,
+  invitationTokenProxy: undefined,
 
   /**
-   * Set in `init` method
-   * @type {DS.ManyArray}
+   * @type {EmberObject}
    */
-  userPermissionList: undefined,
+  batchEditModalModel: Object.freeze({}),
 
   /**
-   * @type {*}
+   * @type {Ember.Array<EmberObject>}
    */
-  groupPermissionListLoadError: undefined,
+  selectedSharedUserProxies: Object.freeze(A()),
 
   /**
-   * @type {*>}
+   * @type {Ember.Array<EmberObject>}
    */
-  userPermissionListLoadError: undefined,
-
-  /**
-   * @type {Ember.A}
-   */
-  modifiedModels: undefined,
-
-  /**
-   * @type {Ember.ComputedProperty<number>}
-   */
-  hasModifiedModels: gt('modifiedModels.length', 0),
-
-  /**
-   * @type {Ember.ComputedProperty<DS.ManyArray>}
-   */
-  groupPermissionListLoaded: reads('groupPermissionList.isFulfilled'),
-
-  /**
-   * @type {Ember.ComputedProperty<DS.ManyArray>}
-   */
-  userPermissionListLoaded: reads('userPermissionList.isFulfilled'),
-
+  selectedSharedGroupProxies: Object.freeze(A()),
+  
   /**
    * @type {Ember.A<EmberObject>}
    */
@@ -115,34 +92,56 @@ export default Component.extend(I18n, GlobalActions, {
       A();
   }),
 
-  modelProxies: union('proxySharedGroupList', 'proxySharedUserList'),
+  /**
+   * @type {Ember.ComputedProperty<Array<EmberObject>>}
+   */
+  selectedModelProxies: union(
+    'selectedSharedUserProxies',
+    'selectedSharedGroupProxies'
+  ),
 
-  modifiedModelProxies: filterBy('modelProxies', 'modified', true),
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isAnySelectedModelSaving: computed(
+    'selectedModelProxies.@each.saving',
+    function () {
+      return this.get('selectedModelProxies').filterBy('saving', true).length > 0;
+    }
+  ),
 
-  selectedSharedUserProxies: Object.freeze(A()),
-
-  selectedSharedGroupProxies: Object.freeze(A()),
-
-  selectedModelProxies: union('selectedSharedUserProxies', 'selectedSharedGroupProxies'),
-
-  batchEditModalModel: Object.freeze({}),
-
+  /**
+   * @type {Ember.ComputedProperty<Array<Object>>}
+   */
   headerActions: computed(function () {
     return [{
-      action: () => this.send('inviteGroup'),
+      action: () => this.send('showInvitationToken', 'group'),
       title: this.t('inviteGroup'),
       class: 'invite-group',
-      icon: 'remove',
+      icon: 'group-invite',
     }, {
-      action: () => this.send('inviteUser'),
+      action: () => this.send('showInvitationToken', 'user'),
       title: this.t('inviteUser'),
       class: 'invite-user',
-      icon: 'remove',
+      icon: 'user-add',
     }];
   }),
 
-  batchEditAvailable: gt('selectedModelProxies.length', 0),
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  batchEditAvailable: computed(
+    'selectedModelProxies.length',
+    'isAnySelectedModelSaving',
+    function () {
+      return this.get('selectedModelProxies.length') > 0 &&
+        !this.get('isAnySelectedModelSaving');
+    }
+  ),
 
+  /**
+   * @type {Ember.ComputedProperty<Object>}
+   */
   batchEditAction: computed('batchEditAvailable', function () {
     return {
       action: () => this.send('batchEdit'),
@@ -175,7 +174,6 @@ export default Component.extend(I18n, GlobalActions, {
 
   init() {
     this._super(...arguments);
-    this.set('modifiedModels', A());
     this.set('sharedGroupList', PromiseArray.create({
       promise: this.get('group').get('sharedGroupList').then(sgl => sgl.get('list')),
     }));
@@ -185,33 +183,36 @@ export default Component.extend(I18n, GlobalActions, {
   },
 
   /**
+   * Generates privilege model GRI for given model
+   * @param {DS.Model} model
+   * @param {string} type `group` or `user`
+   * @returns {string}
+   */
+  getPrivilegesGriForModel(model, type) {
+    let groupId, subjectId;
+    try {
+      groupId = parseGri(this.get('group.id')).entityId;
+      subjectId = parseGri(model.get('id')).entityId;
+    } catch (e) {
+      console.error(e);
+    }
+    return gri({
+      entityType: 'group',
+      entityId: groupId,
+      aspect: type === 'user' ? 'user_privileges' : 'child_privileges',
+      aspectId: subjectId,
+    });
+  },
+
+  /**
    * Prepares list of container objects for privileges models
    * @param {DS.ManyArray} list
    * @param {string} subjectType `user` or `group`
    * @returns {Ember.A<EmberObject>}
    */
   preparePermissionListProxy(list, subjectType) {
-    const group = this.get('group');
-    let groupId;
-    try {
-      groupId = parseGri(group.get('id')).entityId;
-    } catch (e) {
-      console.error(e);
-      return A();
-    }
     return A(list.map(subject => {
-      let subjectId;
-      try {
-        subjectId = parseGri(subject.get('id')).entityId;
-      } catch (e) {
-        console.error(e);
-      }
-      const modelGri = gri({
-        entityType: 'group',
-        entityId: groupId,
-        aspect: subjectType === 'user' ? 'user_privileges' : 'child_privileges',
-        aspectId: subjectId,
-      });
+      const modelGri = this.getPrivilegesGriForModel(subject, subjectType);
       return EmberObject.create({
         subject,
         modelGri,
@@ -225,6 +226,64 @@ export default Component.extend(I18n, GlobalActions, {
     }));
   },
 
+  /**
+   * Loads all data necessary for creating batch edit model
+   * @returns {undefined}
+   */
+  loadBatchEditModel() {
+    const {
+      selectedModelProxies,
+      store,
+      groupedPrivilegesFlags,
+    } = this.getProperties('selectedModelProxies', 'store', 'groupedPrivilegesFlags');
+    const modelProxy = EmberObject.create({
+      modifiedPrivileges: undefined,
+      persistedPrivileges: undefined,
+      overridePrivileges: undefined,
+      modified: false,
+    });
+    modelProxy.set('model', PromiseObject.create({
+      promise: Promise.all(selectedModelProxies.map(selectedProxy => {
+          if (selectedProxy.get('model')) {
+            return selectedProxy;
+          } else {
+            return store
+              .findRecord('privilege', selectedProxy.get('modelGri'))
+              .then((privilegesModel) => {
+                const privileges = privilegesArrayToObject(
+                  privilegesModel.get('privileges'),
+                  groupedPrivilegesFlags
+                );
+                selectedProxy.setProperties({
+                  model: PromiseObject.create({
+                    promise: Promise.resolve(privilegesModel),
+                  }),
+                  modifiedPrivileges: privileges,
+                  persistedPrivileges: privileges,
+                  overridePrivileges: privileges,
+                });
+                return selectedProxy;
+              });
+          }
+        }))
+        .then(modelProxies => safeExec(this, () => {
+          const batchPrivileges = this.calculateBatchEditModel(modelProxies);
+          modelProxy.setProperties({
+            modifiedPrivileges: batchPrivileges,
+            persistedPrivileges: batchPrivileges,
+            overridePrivileges: batchPrivileges,
+          });
+        })),
+    }));
+    this.set('batchEditModalModel', modelProxy);
+  },
+
+  /**
+   * Calculates model for batch edition tree. It merges all permissions from
+   * given models creating a new tree.
+   * @param {Ember.A<EmberObject>} models model proxies
+   * @returns {Object}
+   */
   calculateBatchEditModel(models) {
     const groupedPrivilegesFlags = this.get('groupedPrivilegesFlags');
     const privilegesFlatTree = {};
@@ -247,6 +306,11 @@ export default Component.extend(I18n, GlobalActions, {
     }, {});
   },
 
+  /**
+   * Gets all changes from batch edit values tree and applies them
+   * to all selected models.
+   * @returns {undefined}
+   */
   batchEditApply() {
     const {
       selectedModelProxies,
@@ -279,6 +343,11 @@ export default Component.extend(I18n, GlobalActions, {
     });
   },
 
+  /**
+   * Saves model (taken from model proxy)
+   * @param {EmberObject} modelProxy
+   * @returns {Promise}
+   */
   saveModel(modelProxy) {
     const {
       modifiedPrivileges,
@@ -302,6 +371,20 @@ export default Component.extend(I18n, GlobalActions, {
     return promise;
   },
 
+  /**
+   * Loads new invitation token for selected subject
+   * @param {string} subject `user` or `group`
+   * @returns {PromiseObject<string>}
+   */
+  loadInvitationToken(subject) {
+    return this.set(
+      'invitationTokenProxy',
+      PromiseObject.create({
+        promise: this.get('group').getInviteToken(subject),
+      })
+    );
+  },
+
   actions: {
     modelsSelected(type, models) {
       this.set(
@@ -310,54 +393,8 @@ export default Component.extend(I18n, GlobalActions, {
       );
     },
     batchEdit() {
-      const {
-        selectedModelProxies,
-        store,
-        groupedPrivilegesFlags,
-      } = this.getProperties('selectedModelProxies', 'store', 'groupedPrivilegesFlags');
-      const modelProxy = EmberObject.create({
-        modifiedPrivileges: undefined,
-        persistedPrivileges: undefined,
-        overridePrivileges: undefined,
-        modified: false,
-      });
-      modelProxy.set('model', PromiseObject.create({
-        promise: Promise.all(selectedModelProxies.map(selectedProxy => {
-            if (selectedProxy.get('model')) {
-              return selectedProxy;
-            } else {
-              return store
-                .findRecord('privilege', selectedProxy.get('modelGri'))
-                .then((privilegesModel) => {
-                  const privileges = privilegesArrayToObject(
-                    privilegesModel.get('privileges'),
-                    groupedPrivilegesFlags
-                  );
-                  selectedProxy.setProperties({
-                    model: PromiseObject.create({
-                      promise: Promise.resolve(privilegesModel),
-                    }),
-                    modifiedPrivileges: privileges,
-                    persistedPrivileges: privileges,
-                    overridePrivileges: privileges,
-                  });
-                  return selectedProxy;
-                });
-            }
-          }))
-          .then(modelProxies => safeExec(this, () => {
-            const batchPrivileges = this.calculateBatchEditModel(modelProxies);
-            modelProxy.setProperties({
-              modifiedPrivileges: batchPrivileges,
-              persistedPrivileges: batchPrivileges,
-              overridePrivileges: batchPrivileges,
-            });
-          })),
-      }));
-      this.setProperties({
-        batchEditModalModel: modelProxy,
-        batchEditActive: true,
-      });
+      this.loadBatchEditModel();
+      this.set('batchEditActive', true);
     },
     batchEditClose() {
       this.set('batchEditActive', false);
@@ -370,8 +407,7 @@ export default Component.extend(I18n, GlobalActions, {
     },
     saveBatch() {
       this.batchEditApply();
-      const selectedModelProxies = this.get('selectedModelProxies');
-      const savePromises = selectedModelProxies.map(
+      const savePromises = this.get('selectedModelProxies').map(
         modelProxy => this.saveModel(modelProxy)
       );
       return Promise.all(savePromises)
@@ -381,15 +417,21 @@ export default Component.extend(I18n, GlobalActions, {
         })
         .finally(() => safeExec(this, 'set', 'batchEditActive', false));
     },
-    reset(modelProxy) {
-      if (modelProxy.get('modified')) {
-        const persistedPrivileges = modelProxy.get('persistedPrivileges');
-        modelProxy.setProperties({
-          modifiedPrivileges: persistedPrivileges,
-          overridePrivileges: _.assign({}, persistedPrivileges),
-          modified: false,
-        });
-      }
+    showInvitationToken(subject) {
+      this.loadInvitationToken(subject);
+      this.set('visibleInvitationToken', subject);
+    },
+    generateInvitationToken() {
+      this.loadInvitationToken(this.get('visibleInvitationToken'));
+    },
+    hideInvitationToken() {
+      this.set('visibleInvitationToken', null);
+    },
+    copyTokenSuccess() {
+      this.get('globalNotify').info(this.t('copyTokenSuccess'));
+    },
+    copyTokenError() {
+      this.get('globalNotify').info(this.t('copyTokenError'));
     },
   },
 });

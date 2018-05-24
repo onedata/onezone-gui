@@ -38,9 +38,7 @@ export default Component.extend(UserProxyMixin, I18n, {
   },
 
   _getNewSupportToken() {
-    return this.get('space')
-      .getInvitationToken('provider')
-      .then(({ data }) => data);
+    return this.get('space').getInviteToken('provider');
   },
 
   _updateSupportToken() {

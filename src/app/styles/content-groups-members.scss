@@ -16,16 +16,40 @@
 
   .privileges-tree-editor {
     margin: $padding-large-horizontal;
+    margin-left: 65px;
   }
 
   .item-modified-header .one-label {
-    color: $color-one-blue-gray;
-    font-style: italic;
+    font-weight: bold;
   }
 
   @media (max-width: $screen-xs-max) {
     .privileges-tree-editor {
+      margin-left: $padding-large-horizontal;
       margin-top: 0;
+    }
+  }
+
+  .token-row {
+    position: relative;
+    min-height: 150px;
+    h1 {
+      position: relative;
+    }
+    .close-icon {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.7em;
+      &:hover {
+        color: $color-one-light-gray;
+      }
+    }
+    @media (max-width: $screen-xs-max) {
+      .close-icon {
+        right: $mobile-horizontal-content-padding;
+      }
     }
   }
 }
@@ -44,6 +68,25 @@
   .modal-dialog {
     max-height: 100%;
   }
+
+  .tree-container {
+    min-height: 150px;
+  }
+
+  .batch-edit-tree-title {
+    margin: 0 auto;
+    transform: translateX(-1em);
+    .one-icon {
+      font-size: 2.4em;
+    }
+    .one-icon, .one-label {
+      vertical-align: middle;
+    }
+  }
+
+  .modal-footer {
+    line-height: $padding-base-vertical * 2 + $line-height-computed + 15px;
+  }
 }
 
 .content-groups-members, .batch-privileges-edit.modal {
@@ -53,7 +96,7 @@
     }
   }
   @media (min-width: $screen-sm-min) {
-    .one-dynamic-tree {
+    .one-dynamic-tree, .batch-edit-tree-title {
       max-width: 350px;
     }
 
