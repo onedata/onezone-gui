@@ -23,13 +23,6 @@
     font-weight: bold;
   }
 
-  @media (max-width: $screen-xs-max) {
-    .privileges-tree-editor {
-      margin-left: $padding-large-horizontal;
-      margin-top: 0;
-    }
-  }
-
   .token-row {
     position: relative;
     min-height: 150px;
@@ -46,7 +39,21 @@
         color: $color-one-light-gray;
       }
     }
-    @media (max-width: $screen-xs-max) {
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .item-modified-header {
+      padding-right: 230px;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .privileges-tree-editor {
+      margin-left: $padding-large-horizontal;
+      margin-top: 0;
+    }
+    .token-row {
+      border-bottom: 1px solid $main-border-color;
       .close-icon {
         right: $mobile-horizontal-content-padding;
       }
@@ -58,18 +65,13 @@
   .one-dynamic-tree {
     margin: 0 auto;
   }
-
-  @media (max-width: $screen-xs-max) {
-    .one-dynamic-tree {
-      margin: 0 -2em;
-    }
-  }
   
   .modal-dialog {
     max-height: 100%;
   }
 
   .tree-container {
+    position: relative;
     min-height: 150px;
   }
 
@@ -85,7 +87,13 @@
   }
 
   .modal-footer {
-    line-height: $padding-base-vertical * 2 + $line-height-computed + 15px;
+    line-height: $padding-base-vertical * 3 + $line-height-computed;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .one-dynamic-tree {
+      margin: 0 -2em;
+    }
   }
 }
 
@@ -93,6 +101,10 @@
   @media (max-width: $screen-xs-max) {
     .form-group {
       text-align: right;
+    }
+
+    .one-dynamic-tree label {
+      max-width: calc(100% - 60px);
     }
   }
   @media (min-width: $screen-sm-min) {

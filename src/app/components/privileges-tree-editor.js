@@ -15,6 +15,22 @@ import { inject } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 
+/**
+ * @typedef {EmberObject} PrivilegesModelProxy
+ * @property {DS.Model} subject subject of privileges
+ *   (e.g. shared-user of shared-group)
+ * @property {string} modelGri gri of privileges model
+ * @property {DS.Model} model privileges model
+ * @property {boolean} modified are privileges modified (has unsaved changes)
+ * @property {boolean} saving is model saving now
+ * @property {Object} persistedPrivileges tree of privileges, that are saved
+ *   (state before privileges change)
+ * @property {Object} modifiedPrivileges tree of privileges, that contains actual
+ * state with modifications (== persistedPrivileges after user changes)
+ * @property {Object} overridePrivileges tree of privileges, that should override
+ *   actual state of tree component values (for example used to reset tree)
+ */
+
 export default Component.extend({
   classNames: ['privileges-tree-editor'],
 
@@ -22,7 +38,8 @@ export default Component.extend({
   store: inject(),
 
   /**
-   * @type {array<object>}
+   * Grouped privileges used to construct tree nodes
+   * @type {Array<Object>}
    */
   privilegesGroups: Object.freeze([]),
 
@@ -40,6 +57,7 @@ export default Component.extend({
 
   /**
    * Model with privileges.
+   * @type {PrivilegesModelProxy}
    */
   modelProxy: Object.freeze({}),
 
@@ -68,7 +86,8 @@ export default Component.extend({
   persistedPrivileges: reads('modelProxy.persistedPrivileges'),
 
   /**
-   * @type {Ember.ComputedProperty<array<object>}
+   * Tree definition
+   * @type {Ember.ComputedProperty<Array<Object>}
    */
   initialTreeState: computed(
     'initialPrivileges',
@@ -114,6 +133,10 @@ export default Component.extend({
     }
   ),
 
+  /**
+   * Tree paths, which are disabled for edition. Used to block tree edition.
+   * @type {Ember.ComputedProperty<Ember.Array<string>>}
+   */
   treeDisabledPaths: computed('editionEnabled', 'privilegesGroups', function () {
     const { 
       editionEnabled,
@@ -121,39 +144,6 @@ export default Component.extend({
     } = this.getProperties('editionEnabled', 'privilegesGroups');
     return editionEnabled ? A() : A(privilegesGroups.map(g => g.groupName));
   }),
-
-  // /**
-  //  * State of tree for not modified privileges.
-  //  * @type {Ember.ComputedPropert<Object>}
-  //  */
-  // persistedPrivilegesTreeValues: computed(
-  //   'persistedPrivileges',
-  //   'privilegesGroups',
-  //   function () {
-  //     const {
-  //       persistedPrivileges,
-  //       privilegesGroups,
-  //     } = this.getProperties('persistedPrivileges', 'privilegesGroups');
-  //     if (!persistedPrivileges) {
-  //       return [];
-  //     } else {
-  //       return privilegesGroups.reduce((tree, group) => {
-  //         tree[group.groupName] = group.privileges.reduce((groupPerms, name) => {
-  //           groupPerms[name] = persistedPrivileges.indexOf(name) !== -1;
-  //           return groupPerms;
-  //         }, {});
-  //         return tree;
-  //       }, {});
-  //     }
-  // }),
-
-  // treeOverrideValues: computed(
-  //   'initialPrivileges',
-  //   'privilegesGroups',
-  //   function () {
-  //     this.privilegesArrayToTree(this.get('initialPrivileges')) : undefined;
-  //   }
-  // ),
 
   overridePrivilegesObserver: observer('overridePrivileges', function () {
     const {
@@ -168,12 +158,15 @@ export default Component.extend({
   modelProxyObserver: observer('modelProxy', function () {
     const modelProxy = this.get('modelProxy');
     if (!modelProxy.get('model')) {
+      // load model from backend if empty
       modelProxy.set('model', PromiseObject.create({
         promise: this.get('store')
           .findRecord('privilege', modelProxy.get('modelGri'))
           .then((privilegesModel) => {
-            const privileges =
-              privilegesArrayToObject(privilegesModel.get('privileges'), this.get('privilegesGroups'));
+            const privileges = privilegesArrayToObject(
+              privilegesModel.get('privileges'),
+              this.get('privilegesGroups')
+            );
             modelProxy.setProperties({
               modifiedPrivileges: privileges,
               persistedPrivileges: privileges,
@@ -191,29 +184,9 @@ export default Component.extend({
     this.modelProxyObserver();
   },
 
-  // privilegesArrayToGroupedTree(arr) {
-  //   const privilegesGroups = this.get('privilegesGroups');
-  //   return arr ? privilegesGroups.reduce((tree, group) => {
-  //     tree[group.groupName] = group.privileges.reduce((groupPerms, name) => {
-  //       groupPerms[name] = arr.indexOf(name) !== -1;
-  //       return groupPerms;
-  //     }, {});
-  //     return tree;
-  //   }, {}) : {};
-  // },
-
-  // privilegesArrayToFlatTree(arr) {
-  //   const privilegesGroups = this.get('privilegesGroups');
-  //   const privilegesNames = _.flatten(_.values(privilegesGroups));
-  //   return arr ? privilegesNames.reduce((tree, privilegeName) => {
-  //     tree[privilegeName] = arr.indexOf(privilegeName) !== -1;
-  //     return tree;
-  //   }, {}) : {};
-  // },
-
   /**
-   * Check if new values are changed by user
-   * @param {object} newValues
+   * Checks if new values are changed by user (differ from persistedPrivileges)
+   * @param {object} newValues new tree of privileges
    * @returns {boolean}
    */
   areValuesChanged(newValues) {
@@ -228,17 +201,10 @@ export default Component.extend({
 
   actions: {
     treeValuesChanged(values) {
-      const {
-        modelProxy,
-      } = this.getProperties(
-        'modelProxy'
-      );
-      // values = _.assign({}, ..._.values(values));
-      // values = Object.keys(values).filter(key => values[key]);
-      // const privileges = this.areValuesChanged(values) ?
-      //   values : persistedPrivileges;
-      modelProxy.set('modifiedPrivileges', values);
-      modelProxy.set('modified', this.areValuesChanged(values));
+      this.get('modelProxy').setProperties({
+        modifiedPrivileges: values,
+        modified: this.areValuesChanged(values),
+      });
     },
   },
 });

@@ -1,11 +1,14 @@
-{{#sticky-element enabled=(not media.isTablet)}}
+{{#sticky-element top=navigationState.globalBarHeight}}
   <div class="row content-row header-row hidden-xs has-border">
+    {{log media}}
     <h1 class="with-menu">
       <span class="one-label">
         {{tt this "members"}}
       </span>
       <div class="btn-toolbar with-place-for-dots">
-        {{#bs-button class="btn btn-sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}Multiedit{{/bs-button}}
+        {{#bs-button size="sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}
+          {{tt this "multiedit"}}
+        {{/bs-button}}
       </div>
       {{actions-toolbar isMinimized=true actionsArray=headerActions}}
     </h1>
@@ -26,50 +29,45 @@
             success=(action "copyTokenSuccess")
             error=(action "copyTokenError")
             class="btn btn-sm btn-primary pull-left"
-            clipboardTarget=".token-textarea.invitation-token"
-          }}
-            {{one-icon icon="clipboard-copy"}}
-            {{tt this "copy"}}
+            clipboardTarget=".token-textarea.invitation-token"}}
+            {{one-icon icon="clipboard-copy"}} {{tt this "copy"}}
           {{/copy-button}}
-          <a class="clickable btn-get-token pull-right" {{action "generateInvitationToken"}}>{{tt this "generateToken"}}</a>
+          <a class="clickable btn-get-token pull-right" {{action "generateInvitationToken"}}>
+            {{tt this "generateToken"}}
+          </a>
         </div>
       {{/loading-container}}
     </div>
   {{/if}}
 {{/sticky-element}}
-<div class="row">
-  {{#loading-container
-    isLoading=sharedGroupList.isPending
-    errorReason=sharedGroupList.reason}}
+{{#loading-container
+  isLoading=(or sharedGroupList.isPending sharedUserList.isPending)
+  errorReason=(or sharedGroupList.reason sharedUserList.reason)}}
+  <div class="row">
     {{collection-permissions
-      proxyList=proxySharedGroupList
+      proxyList=proxyGroupModelList
       subjectType="group"
       modelsSelected=(action "modelsSelected" "group")
       listHeader=(tt this "groups")
       itemIcon="group"
       groupedPrivilegesFlags=groupedPrivilegesFlags
-      privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
-      privilegesTranslationsPath=(concat i18nPrefix ".privileges")
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
       save=(action "saveOne")}}
-  {{/loading-container}}
-</div>
-<div class="row">
-  {{#loading-container
-    isLoading=sharedUserList.isPending
-    errorReason=sharedUserList.reason}}
+  </div>
+  <div class="row">
     {{collection-permissions
-      proxyList=proxySharedUserList
+      proxyList=proxyUserModelList
       subjectType="user"
       modelsSelected=(action "modelsSelected" "user")
       listHeader=(tt this "users")
       itemIcon="user"
       groupedPrivilegesFlags=groupedPrivilegesFlags
-      privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
-      privilegesTranslationsPath=(concat i18nPrefix ".privileges")
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
       save=(action "saveOne")}}
-  {{/loading-container}}
-</div>
-{{yield}}
+  </div>
+{{/loading-container}}
 {{#bs-modal
   open=batchEditActive
   onHide=(action "batchEditClose")
@@ -80,16 +78,23 @@
       <h1>{{tt this "batchEditModalHeader"}}</h1>
     {{/modal.header}}
     <div class="tree-container">
-      <div class="batch-edit-tree-title hidden-xs">{{one-icon icon="group"}}<span class="one-label">Selected items</span></div>
+      {{#if batchEditModalModel.model.isFulfilled}}
+        <div class="batch-edit-tree-title hidden-xs">
+          {{one-icon icon="group"}}
+          <span class="one-label">{{tt this "batchEditModalSelectedItems"}}</span>
+        </div>
+      {{/if}}
       {{privileges-tree-editor
         privilegesGroups=groupedPrivilegesFlags
-        privilegeGroupsTranslationsPath=(concat i18nPrefix ".privilegeGroups")
-        privilegesTranslationsPath=(concat i18nPrefix ".privileges")
+        privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+        privilegesTranslationsPath=privilegesTranslationsPath
         modelProxy=batchEditModalModel}}
     </div>
   {{/modal.body}}
   {{#modal.footer}}
-    {{#bs-button class="btn btn-default" onClick=(action "batchEditClose")}}{{tt this "batchEditModalCancel"}}{{/bs-button}}
+    {{#bs-button onClick=(action "batchEditClose")}}
+      {{tt this "batchEditModalCancel"}}
+    {{/bs-button}}
     {{#if batchEditModalModel.model.isFulfilled}}
       {{#one-spin-button
         class="btn btn-primary"
@@ -99,3 +104,4 @@
     {{/if}}
   {{/modal.footer}}
 {{/bs-modal}}
+{{yield}}

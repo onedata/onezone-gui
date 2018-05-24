@@ -51,6 +51,9 @@ export default TwoLevelSidebar.extend(I18n, {
    */
   showCreateOnEmpty: false,
 
+  /**
+   * @override
+   */
   secondLevelItems: computed(function getSecondLevelItems() {
     return [{
       id: 'index',

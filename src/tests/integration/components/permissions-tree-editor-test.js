@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 
 describe('Integration | Component | permissions tree editor', function() {
   setupComponentTest('permissions-tree-editor', {
-    integration: true
+    integration: true,
   });
 
   it('renders', function() {

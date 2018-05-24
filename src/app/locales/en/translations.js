@@ -29,6 +29,7 @@ import contentGroupsNew from './components/content-groups-new';
 import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
+import collectionPermissions from './components/collection-permissions';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -66,6 +67,7 @@ let translations = {
     contentGroupsIndex,
     contentGroupsEmpty,
     contentGroupsMembers,
+    collectionPermissions,
   },
   services: {
     clientTokenActions,

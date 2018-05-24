@@ -10,13 +10,19 @@
 import Component from '@ember/component';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: '',
 
   /**
-   * @type {Ember.A<EmberObject>}
+   * @override
+   */
+  i18nPrefix: 'components.collectionPermissions',
+
+  /**
+   * @type {Ember.A<PrivilegesModelProxy>}
    * @virtual
    */
   proxyList: undefined,
@@ -32,7 +38,7 @@ export default Component.extend({
    * Called after list item selection.
    * @virtual
    * @type {function}
-   * @param {Array<EmberObject>} modelsProxies array of selected models
+   * @param {Array<PrivilegesModelProxy>} modelsProxies array of selected models
    * @returns {any}
    */
   modelsSelected: notImplementedWarn,
@@ -74,8 +80,8 @@ export default Component.extend({
   /**
    * Callback responsible for privileges persistence.
    * @type {function}
-   * @param {EmberObject} modelProxy
-   * @returns {Promise<EmberObject>}
+   * @param {PrivilegesModelProxy} modelProxy
+   * @returns {Promise<PrivilegesModelProxy>}
    */
   save: notImplementedThrow,
 
