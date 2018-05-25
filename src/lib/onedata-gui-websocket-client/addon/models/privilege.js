@@ -18,4 +18,3 @@ export default Model.extend({
    */
   privileges: attr('array'),
 });
-

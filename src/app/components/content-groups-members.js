@@ -87,7 +87,7 @@ export default Component.extend(I18n, GlobalActions, {
   privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
     return this.get('i18nPrefix') + '.privilegeGroups';
   }),
-  
+
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
@@ -358,9 +358,9 @@ export default Component.extend(I18n, GlobalActions, {
           const obtainedValue = batchModifiedPrivileges[groupName][privName];
           resultTree[groupName][privName] = obtainedValue === 2 ?
             modifiedPrivileges[groupName][privName] : obtainedValue;
-            modified = modified ||
-              resultTree[groupName][privName] !==
-              persistedPrivileges[groupName][privName];
+          modified = modified ||
+            resultTree[groupName][privName] !==
+            persistedPrivileges[groupName][privName];
         });
       });
       modelProxy.setProperties({

@@ -15,7 +15,7 @@ import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/invit
 export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   name: attr('string'),
   type: attr('string'),
-  
+
   // for features, that will be moved from OP GUI to OZ GUI
   // spaceList: belongsTo('spaceList'),
 

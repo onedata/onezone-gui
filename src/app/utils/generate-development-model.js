@@ -55,7 +55,7 @@ export default function generateDevelopmentModel(store) {
       Promise.all(
         types.map(type =>
           createEntityRecords(store, type, names)
-            .then(records => createListRecord(store, type, records))
+          .then(records => createListRecord(store, type, records))
         )
       )
     )
@@ -92,17 +92,17 @@ export default function generateDevelopmentModel(store) {
     // add shared groups, users and privileges to groups
     .then(listRecords =>
       listRecords[types.indexOf('group')].get('list')
-        .then(groups => 
-          Promise.all(groups.map(group =>
-            attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
-          ))
-        )
-        .then(groups =>
-          Promise.all(groups.map(group =>
-            createPrivilegesForGroup(store, group, sharedUsers, sharedGroups)
-          ))
-        )
-        .then(() => listRecords)
+      .then(groups =>
+        Promise.all(groups.map(group =>
+          attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
+        ))
+      )
+      .then(groups =>
+        Promise.all(groups.map(group =>
+          createPrivilegesForGroup(store, group, sharedUsers, sharedGroups)
+        ))
+      )
+      .then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
 }

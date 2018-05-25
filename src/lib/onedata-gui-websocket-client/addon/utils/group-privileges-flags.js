@@ -40,7 +40,6 @@ export const groupedFlags = [{
   ],
 }];
 
-
 export default groupedFlags
   .map(group => group.privileges)
   .reduce((all, groupPerms) => all.concat(groupPerms), []);

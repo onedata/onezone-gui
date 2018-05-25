@@ -138,7 +138,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<Ember.Array<string>>}
    */
   treeDisabledPaths: computed('editionEnabled', 'privilegesGroups', function () {
-    const { 
+    const {
       editionEnabled,
       privilegesGroups,
     } = this.getProperties('editionEnabled', 'privilegesGroups');
@@ -194,7 +194,8 @@ export default Component.extend({
     return !Object.keys(persistedPrivileges).reduce((isEqual, groupName) => {
       return Object.keys(persistedPrivileges[groupName]).reduce((isEq, privName) => {
         return isEq &&
-          persistedPrivileges[groupName][privName] === newValues[groupName][privName];
+          persistedPrivileges[groupName][privName] ===
+          newValues[groupName][privName];
       }, isEqual);
     }, true);
   },

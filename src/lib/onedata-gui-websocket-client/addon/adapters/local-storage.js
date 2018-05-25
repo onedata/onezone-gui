@@ -82,5 +82,5 @@ function delayResponse(response) {
     });
   } else {
     return response;
-  }  
+  }
 }
