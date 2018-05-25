@@ -11,6 +11,9 @@ const breakpointValues = require('./lib/onedata-gui-common/addon/breakpoint-valu
 
 module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
+    'fingerprint': {
+      extensions: ['js', 'css', 'map'],
+    },
     'ember-cli-babel': {
       includePolyfill: true,
     },
@@ -82,7 +85,11 @@ module.exports = function (defaults) {
 
   BOWER_ASSETS.forEach(path => app.import(app.bowerDirectory + '/' + path));
 
-  app.import('vendor/chartist-plugin-legend/chartist-plugin-legend.js');
+  const VENDOR_ASSETS = [
+    'chartist-plugin-legend/chartist-plugin-legend.js',
+  ];
+
+  VENDOR_ASSETS.forEach(path => app.import('vendor/' + path));
 
   return app.toTree();
 };

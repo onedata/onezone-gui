@@ -9,7 +9,7 @@
 
 import { inject } from '@ember/service';
 import Service from '@ember/service';
-import RSVP from 'rsvp';
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   providerManager: inject(),
@@ -25,6 +25,8 @@ export default Service.extend({
    */
   getModelFor(type, id) {
     switch (type) {
+      case 'data':
+        return this.get('spaceManager').getRecord(id);
       case 'providers':
         return this.get('providerManager').getRecord(id);
       case 'users':
@@ -36,8 +38,7 @@ export default Service.extend({
       case 'groups':
         return this.get('groupManager').getRecord(id);
       default:
-        return new RSVP.Promise((resolve, reject) =>
-          reject('No such model type: ' + type));
+        return Promise.reject('No such model type: ' + type);
     }
   },
 });

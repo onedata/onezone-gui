@@ -31,6 +31,12 @@ export default Component.extend(I18n, {
   provider: undefined,
 
   /**
+   * @virutal optional
+   * @type {string}
+   */
+  spaceId: undefined,
+
+  /**
    * @type {boolean}
    */
   isLoading: false,
@@ -48,16 +54,20 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    const providerId = this.get('providerId');
+    const {
+      providerId,
+      spaceId,
+    } = this.getProperties('providerId', 'spaceId');
     if (providerId) {
-      this._goToProvider(providerId);
+      this._goToProvider(providerId, spaceId);
     } else {
       safeExec(this, 'set', 'error', this.t('noProviderId'));
     }
   },
 
-  _goToProvider(providerId) {
-    return this.get('onezoneServer').getProviderRedirectUrl(providerId)
+  _goToProvider(providerId, spaceId) {
+    const path = spaceId ? `#/onedata/data/${spaceId}` : null;
+    return this.get('onezoneServer').getProviderRedirectUrl(providerId, path)
       .then(data => {
         if (data.url) {
           this.get('_window').location = data.url;

@@ -14,6 +14,10 @@ and create a static docker with those files.
 
 Getting Started
 ---------------
+Before building make sure submodules are initialized:
+```
+make submodules
+```
 
 To build a development release of GUI:
 

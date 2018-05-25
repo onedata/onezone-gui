@@ -9,11 +9,18 @@
       .btn-container {
         text-align: center;
       }
-      .btn {
-        display: inline-block;
-        padding: $padding-base-vertical $padding-large-horizontal;
-        font-size: 100%;
+      .row-btn {
+        &:not(:last-of-type) {
+            padding-bottom: 8px;
+        }
+        .btn {
+            display: inline-block;
+            padding: $padding-base-vertical $padding-large-horizontal;
+            font-size: 100%;
+            width: 280px;
+        }
       }
+      
     }
   }
   .one-atlas {

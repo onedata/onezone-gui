@@ -37,3 +37,12 @@ pull_onedata_gui_common:
 
 push_onedata_gui_common: pull_onedata_gui_common
 	git subtree push --prefix=src/lib/onedata-gui-common onedata-gui-common `git rev-parse --abbrev-ref HEAD`
+
+##
+## Submodules
+##
+
+submodules:
+	git submodule sync --recursive ${submodule}
+	git submodule update --init --recursive ${submodule}
+
