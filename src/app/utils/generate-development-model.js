@@ -91,18 +91,21 @@ export default function generateDevelopmentModel(store) {
     })
     // add shared groups, users and privileges to groups
     .then(listRecords =>
-      listRecords[types.indexOf('group')].get('list')
-      .then(groups =>
-        Promise.all(groups.map(group =>
-          attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
-        ))
-      )
-      .then(groups =>
-        Promise.all(groups.map(group =>
-          createPrivilegesForGroup(store, group, sharedUsers, sharedGroups)
-        ))
-      )
-      .then(() => listRecords)
+      Promise.all(['group', 'space'].map(modelType =>
+        listRecords[types.indexOf(modelType)].get('list')
+        .then(models =>
+          Promise.all(models.map(model =>
+            attachSharedUsersGroupsToModel(store, model, sharedUsers, sharedGroups)
+          ))
+        )
+        .then(models =>
+          Promise.all(models.map(model =>
+            createPrivilegesForModel(
+              store, model, modelType, sharedUsers, sharedGroups, groupPrivilegesFlags
+            )
+          ))
+        )
+      )).then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
 }
@@ -212,7 +215,7 @@ function createSharedGroupsRecords(store) {
   }));
 }
 
-function attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups) {
+function attachSharedUsersGroupsToModel(store, group, sharedUsers, sharedGroups) {
   return createListRecord(store, 'sharedGroup', sharedGroups)
     .then(list => group.set('sharedGroupList', list))
     .then(() => createListRecord(store, 'sharedUser', sharedUsers))
@@ -222,31 +225,43 @@ function attachSharedUsersGroupsToGroup(store, group, sharedUsers, sharedGroups)
     });
 }
 
-function createPrivilegesForGroup(store, group, sharedUsers, sharedGroups) {
+function createPrivilegesForModel(
+  store, model, modelType, sharedUsers, sharedGroups, privilegesFlags
+) {
   return Promise.all([
-    createGroupPrivilegesRecords(store, group, sharedUsers, 'user'),
-    createGroupPrivilegesRecords(store, group, sharedGroups, 'group'),
+    createPrivilegesRecords(
+      store, model, modelType, sharedUsers, privilegesFlags, 'user'
+    ),
+    createPrivilegesRecords(
+      store, model, modelType, sharedGroups, privilegesFlags, 'group'
+    ),
   ]);
 }
 
-function createGroupPrivilegesRecords(store, group, sharedArray, type) {
+function createPrivilegesRecords(
+  store, model, modelType, sharedArray, privilegesArray, privilegesType
+) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
-  const groupGri = get(group, 'gri');
-  let groupId, subjectId;
+  const modelGri = get(model, 'gri');
+  let modelId, subjectId;
   try {
-    groupId = parseGri(groupGri).entityId;
+    modelId = parseGri(modelGri).entityId;
   } catch (e) {
     return Promise.resolve([]);
   }
   const recordData = {
-    privileges: groupPrivilegesFlags.slice(0),
+    privileges: privilegesArray.slice(0),
   };
+  let aspect = privilegesType === 'user' ? 'user_privileges' : 'group_privileges';
+  if (modelType === 'group' && privilegesType === 'group') {
+    aspect = 'child_privileges';
+  }
   return Promise.all(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
-      entityType: 'group',
-      entityId: groupId,
-      aspect: type === 'user' ? 'user_privileges' : 'child_privileges',
+      entityType: modelType,
+      entityId: modelId,
+      aspect,
       aspectId: subjectId,
     });
     return store.createRecord('privilege', recordData).save();
