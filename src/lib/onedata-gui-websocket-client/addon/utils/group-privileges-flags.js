@@ -38,6 +38,14 @@ export const groupedFlags = [{
     'group_join_space',
     'group_leave_space',
   ],
+}, {
+  groupName: 'handleManagement',
+  privileges: [
+    'group_create_handle',
+    'group_leave_handle',
+    'group_create_handle_service',
+    'group_leave_handle_service',
+  ],
 }];
 
 export default groupedFlags

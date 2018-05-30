@@ -7,6 +7,7 @@ export default {
     groupHierarchyManagement: 'Group hierarchy management',
     userManagement: 'User management',
     spaceManagement: 'Space management',
+    handleManagement: 'Handle management',
   },
   privileges: {
     group_view: 'View group',
@@ -24,6 +25,10 @@ export default {
     group_create_space: 'Create space',
     group_join_space: 'Join space',
     group_leave_space: 'Leave space',
+    group_create_handle: 'Create handle',
+    group_leave_handle: 'Leave handle',
+    group_create_handle_service: 'Create handle service',
+    group_leave_handle_service: 'Leave handle service',
   },
   privilegesPersistence: 'privileges persistence',
   privilegesSaveSuccess: 'Privileges has been saved successfully',
