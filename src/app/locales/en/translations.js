@@ -30,6 +30,8 @@ import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
 import collectionPermissions from './components/collection-permissions';
+import privilegesBatchEditModal from './components/privileges-batch-edit-modal';
+import invitationTokenPresenter from './components/invitation-token-presenter';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -68,6 +70,8 @@ let translations = {
     contentGroupsEmpty,
     contentGroupsMembers,
     collectionPermissions,
+    privilegesBatchEditModal,
+    invitationTokenPresenter,
   },
   services: {
     clientTokenActions,

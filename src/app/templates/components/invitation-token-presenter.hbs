@@ -1,0 +1,19 @@
+<h1>
+  <span class="one-label">{{tt this (concat tokenType "InvitationToken")}}</span>
+  {{one-icon icon="close" class="close-icon" click=(action close)}}
+</h1>
+{{#promise-proxy-container proxy=tokenProxy sizeClass="sm"}}
+  <div class="inner-row-content">
+    <textarea class="token-textarea invitation-token form-control" rows="2" readonly>{{tokenProxy.content}}</textarea>
+    {{#copy-button
+      success=(action "copyTokenSuccess")
+      error=(action "copyTokenError")
+      class="btn btn-sm btn-primary pull-left"
+      clipboardTarget=".token-textarea.invitation-token"}}
+      {{one-icon icon="clipboard-copy"}} {{tt this "copy"}}
+    {{/copy-button}}
+    <a class="clickable btn-get-token pull-right" {{action generateToken}}>
+      {{tt this "generateToken"}}
+    </a>
+  </div>
+{{/promise-proxy-container}}
