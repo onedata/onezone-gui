@@ -15,6 +15,7 @@ import { A } from '@ember/array';
 import { Promise } from 'rsvp';
 import { get } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
+import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
@@ -31,6 +32,11 @@ const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
 const names = ['one', 'two', 'three'];
+
+const privileges = {
+  space: spacePrivilegesFlags,
+  group: groupPrivilegesFlags,
+};
 
 const perProviderSize = Math.pow(1024, 4);
 
@@ -101,7 +107,7 @@ export default function generateDevelopmentModel(store) {
         .then(models =>
           Promise.all(models.map(model =>
             createPrivilegesForModel(
-              store, model, modelType, sharedUsers, sharedGroups, groupPrivilegesFlags
+              store, model, modelType, sharedUsers, sharedGroups, privileges[modelType]
             )
           ))
         )
