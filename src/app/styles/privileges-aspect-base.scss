@@ -1,4 +1,4 @@
-.content-groups-members {
+.privileges-aspect-base {
   .user-list {
     margin-top: 2 * $padding-large-vertical;
   }
@@ -23,22 +23,6 @@
     font-weight: bold;
   }
 
-  .token-row {
-    position: relative;
-    min-height: 150px;
-    h1 {
-      position: relative;
-    }
-    .close-icon {
-      @include vertical-align-middle();
-      right: 0;
-      font-size: 1.7em;
-      &:hover {
-        color: $color-one-light-gray;
-      }
-    }
-  }
-
   @media (min-width: $screen-sm-min) {
     .item-modified-header {
       padding-right: 230px;
@@ -50,52 +34,10 @@
       margin-left: $padding-large-horizontal;
       margin-top: 0;
     }
-    .token-row {
-      border-bottom: 1px solid $main-border-color;
-      .close-icon {
-        right: $mobile-horizontal-content-padding;
-      }
-    }
   }
 }
 
-.batch-privileges-edit.modal {
-  .one-dynamic-tree {
-    margin: 0 auto;
-  }
-  
-  .modal-dialog {
-    max-height: 100%;
-  }
-
-  .tree-container {
-    position: relative;
-    min-height: 150px;
-  }
-
-  .batch-edit-tree-title {
-    margin: 0 auto;
-    transform: translateX(-1em);
-    .one-icon {
-      font-size: 2.4em;
-    }
-    .one-icon, .one-label {
-      vertical-align: middle;
-    }
-  }
-
-  .modal-footer {
-    line-height: $padding-base-vertical * 3 + $line-height-computed;
-  }
-
-  @media (max-width: $screen-xs-max) {
-    .one-dynamic-tree {
-      margin: 0 -2em;
-    }
-  }
-}
-
-.content-groups-members, .batch-privileges-edit.modal {
+.privileges-aspect-base, .batch-privileges-edit.modal {
   @media (max-width: $screen-xs-max) {
     .form-group {
       text-align: right;

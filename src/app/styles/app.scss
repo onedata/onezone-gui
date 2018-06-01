@@ -12,4 +12,6 @@ $large-social-box-size: 50px;
 @import 'content-spaces-support';
 @import 'content-spaces-providers';
 @import 'content-spaces-index';
-@import 'content-groups-members';
+@import 'privileges-aspect-base';
+@import 'invitation-token-presenter';
+@import 'privileges-batch-edit-modal';

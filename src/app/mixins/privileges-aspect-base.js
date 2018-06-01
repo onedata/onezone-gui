@@ -178,7 +178,7 @@ export default Mixin.create({
   batchEditAction: computed('batchEditAvailable', function () {
     return {
       action: () => this.send('batchEdit'),
-      title: this.t('batchEdit'),
+      title: this.t('multiedit'),
       class: 'batch-edit',
       icon: 'rename',
       disabled: !this.get('batchEditAvailable'),

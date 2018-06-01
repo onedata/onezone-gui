@@ -17,7 +17,7 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
-  classNames: ['content-spaces-privileges'],
+  classNames: ['privileges-aspect-base', 'content-spaces-privileges'],
 
   i18n: inject(),
   store: inject(),
