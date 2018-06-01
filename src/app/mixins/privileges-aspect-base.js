@@ -31,6 +31,12 @@ export default Mixin.create({
   model: undefined,
 
   /**
+   * @type {string}
+   * @virtual
+   */
+  modelType: undefined,
+
+  /**
    * @type {Array<Object>}
    * @virtual
    */
@@ -200,6 +206,7 @@ export default Mixin.create({
    * @returns {string}
    */
   getPrivilegesGriForModel(subjectModel, type) {
+    const modelType = this.get('modelType');
     let modelId, subjectId;
     try {
       modelId = parseGri(this.get('model.id')).entityId;
@@ -213,7 +220,7 @@ export default Mixin.create({
       return '';
     }
     return gri({
-      entityType: 'group',
+      entityType: modelType,
       entityId: modelId,
       aspect: this.get(`privilegeGriAspects.${type}`),
       aspectId: subjectId,
