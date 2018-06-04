@@ -221,13 +221,13 @@ function createSharedGroupsRecords(store) {
   }));
 }
 
-function attachSharedUsersGroupsToModel(store, group, sharedUsers, sharedGroups) {
+function attachSharedUsersGroupsToModel(store, model, sharedUsers, sharedGroups) {
   return createListRecord(store, 'sharedGroup', sharedGroups)
-    .then(list => group.set('sharedGroupList', list))
+    .then(list => model.set('sharedGroupList', list))
     .then(() => createListRecord(store, 'sharedUser', sharedUsers))
     .then(list => {
-      group.set('sharedUserList', list);
-      return group.save();
+      model.set('sharedUserList', list);
+      return model.save();
     });
 }
 

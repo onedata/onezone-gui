@@ -1,7 +1,7 @@
 /**
  * Names of flags for group privileges.
  * 
- * @module constants/privileges-group-flags
+ * @module utils/group-privileges-flags
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

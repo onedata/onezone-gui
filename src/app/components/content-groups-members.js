@@ -20,8 +20,6 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   classNames: ['privileges-aspect-base', 'content-groups-members'],
 
   i18n: service(),
-  store: service(),
-  globalNotify: service(),
   navigationState: service(),
 
   /**

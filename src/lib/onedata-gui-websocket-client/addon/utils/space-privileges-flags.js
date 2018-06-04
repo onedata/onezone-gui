@@ -1,7 +1,7 @@
 /**
  * Names of flags for space privileges.
  * 
- * @module constants/space-group-flags
+ * @module utils/space-privileges-flags
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

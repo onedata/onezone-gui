@@ -11,7 +11,7 @@ import Mixin from '@ember/object/mixin';
 import EmberObject, { computed, get, getProperties } from '@ember/object';
 import { union } from '@ember/object/computed';
 import { A } from '@ember/array';
-import { inject as service  } from '@ember/service';
+import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -23,6 +23,7 @@ import _ from 'lodash';
 
 export default Mixin.create({
   store: service(),
+  globalNotify: service(),
 
   /**
    * @type {DS.Model}

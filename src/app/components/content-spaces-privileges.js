@@ -1,7 +1,7 @@
 /**
  * A privileges aspect of space.
  *
- * @module components/content-space-privileges
+ * @module components/content-spaces-privileges
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,17 +12,15 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   classNames: ['privileges-aspect-base', 'content-spaces-privileges'],
 
-  i18n: inject(),
-  store: inject(),
-  globalNotify: inject(),
-  navigationState: inject(),
+  i18n: service(),
+  navigationState: service(),
 
   /**
    * @override
