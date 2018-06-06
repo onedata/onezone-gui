@@ -24,13 +24,15 @@ import Route from '@ember/routing/route';
 
 import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
+import { get } from '@ember/object';
+import isRecord from 'onedata-gui-common/utils/is-record';
 
 // TODO: refactor to create route-, or application-specific special ids
 const SPECIAL_IDS = [
   'empty',
   'new',
   'join',
-  'notSelected',
+  'not-selected',
 ];
 
 function isSpecialResourceId(id) {
@@ -42,34 +44,54 @@ export default Route.extend({
   navigationState: service(),
 
   beforeModel(transition) {
-    const resourceId = transition.params['onedata.sidebar.content'].resource_id;
-    this.get('navigationState').setProperties({
-      activeResourceId: resourceId,
-      isActiveResourceLoading: false,
-      globalSidenavResourceType: null,
-    });
+    this.set('navigationState.queryParams', get(transition, 'queryParams'));
+    const navigationState = this.get('navigationState');
+    if (navigationState.get('globalSidenavResourceType')) {
+      navigationState.set('globalSidenavResourceType', null);
+    }
+    navigationState.set('isActiveResourceLoading', false);
   },
 
-  model({ resource_id: resourceId }) {
+  model({ resource_id: resourceId }, transition) {
     // TODO: validate and use resourceType
     let {
       collection,
       resourceType
     } = this.modelFor('onedata.sidebar');
 
+    const queryParams = get(transition, 'queryParams');
+
     if (isSpecialResourceId(resourceId)) {
-      return { resourceId, collection };
+      if (resourceId === 'empty' && get(collection, 'list.length')) {
+        this.transitionTo('onedata.sidebar.index');
+        return;
+      } else {
+        this.set('navigationState.activeResourceId', resourceId);
+        return { resourceId, collection, queryParams };
+      }
     } else {
-      return new Promise((resolve, reject) => {
-        let gettingResource = this.get('contentResources')
-          .getModelFor(resourceType, resourceId);
-        gettingResource.then(resource => resolve({
-          resourceId,
-          resource,
+      const existingResourceId = this.availableResourceId(resourceId, collection);
+      this.set('navigationState.activeResourceId', existingResourceId);
+      if (existingResourceId) {
+        return new Promise((resolve, reject) => {
+          let gettingResource = this.get('contentResources')
+            .getModelFor(resourceType, existingResourceId);
+          gettingResource.then(resource => resolve({
+            resourceId: existingResourceId,
+            resource,
+            collection,
+            queryParams,
+          }));
+          gettingResource.catch(reject);
+        });
+      } else {
+        return Promise.resolve({
+          resourceId: null,
+          resource: null,
           collection,
-        }));
-        gettingResource.catch(reject);
-      });
+          queryParams,
+        });
+      }
     }
   },
 
@@ -86,6 +108,27 @@ export default Route.extend({
       into: 'onedata',
       outlet: 'content'
     });
+  },
+
+  /**
+   * Checks if collection contains model with specified resourceId. 
+   * @param {string} resourceId ID of resource as in URL
+   * @param {object} collection collection object
+   * @returns {string} id of found model
+   */
+  availableResourceId(resourceId, collection) {
+    let modelId;
+    if (isRecord(collection)) {
+      modelId = collection.hasMany('list').ids().indexOf(resourceId) > -1 ?
+        resourceId : null;
+    } else {
+      const model = get(collection, 'list')
+        .filter(model => get(model, 'id') === resourceId)[0];
+      if (model) {
+        modelId = get(model, 'id');
+      }
+    }
+    return modelId;
   },
 
   actions: {
