@@ -8,27 +8,38 @@
  */
 
 import Route from '@ember/routing/route';
-
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import { observer } from '@ember/object';
+import _ from 'lodash';
+import config from 'ember-get-config';
 
-function getDefaultResourceId(list) {
-  let defaultResource = list.objectAt(0);
-  return get(defaultResource, 'id');
+const {
+  onedataTabs
+} = config;
+
+function getDefaultResource(list) {
+  return list.objectAt(0);
 }
 
 export default Route.extend({
   globalNotify: service(),
   media: service(),
+  guiUtils: service(),
 
   model() {
     return this.modelFor('onedata.sidebar');
   },
 
-  afterModel(model /*, transition*/ ) {
+  afterModel(model, transition) {
+    const sidebarType = transition.params['onedata.sidebar'].type;
+    const tab = _.find(onedataTabs, t => t.id === sidebarType);
     if (!this.get('media.isMobile')) {
-      this.redirectToDefault(model);
+      if (tab && tab.allowIndex) {
+        this.transitionTo('onedata.sidebar.content', 'not-selected');
+      } else {
+        this.redirectToDefault(model);
+      }
     }
   },
 
@@ -42,9 +53,10 @@ export default Route.extend({
   }),
 
   redirectToDefault({ resourceType, collection }) {
+    const guiUtils = this.get('guiUtils');
     const list = get(collection, 'list');
     let resourceIdToRedirect = get(list, 'length') > 0 ?
-      getDefaultResourceId(list) : 'empty';
+      guiUtils.getRoutableIdFor(getDefaultResource(list)) : 'empty';
     if (resourceIdToRedirect != null) {
       this.transitionTo(`onedata.sidebar.content`, resourceType, resourceIdToRedirect);
     } else {
