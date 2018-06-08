@@ -30,10 +30,8 @@
       position: relative;
     }
     .close-icon {
-      position: absolute;
+      @include vertical-align-middle();
       right: 0;
-      top: 50%;
-      transform: translateY(-50%);
       font-size: 1.7em;
       &:hover {
         color: $color-one-light-gray;

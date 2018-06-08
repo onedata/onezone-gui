@@ -1,6 +1,4 @@
-{{#loading-container
-  isLoading=modelProxy.model.isPending
-  errorReason=modelProxy.model.reason}}
+{{#promise-proxy-container proxy=modelProxy.model}}
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState
@@ -9,4 +7,4 @@
     disabledFieldsPaths=treeDisabledPaths
     valuesChanged=(action "treeValuesChanged")}}
   {{yield}}
-{{/loading-container}}
+{{/promise-proxy-container}}

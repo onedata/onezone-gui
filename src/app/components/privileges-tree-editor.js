@@ -9,9 +9,9 @@
 
 import Component from '@ember/component';
 import { A } from '@ember/array';
-import { computed, observer } from '@ember/object';
+import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 
@@ -26,7 +26,7 @@ import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileg
  * @property {Object} persistedPrivileges tree of privileges, that are saved
  *   (state before privileges change)
  * @property {Object} modifiedPrivileges tree of privileges, that contains actual
- * state with modifications (== persistedPrivileges after user changes)
+ *   state with modifications (== persistedPrivileges after user changes)
  * @property {Object} overridePrivileges tree of privileges, that should override
  *   actual state of tree component values (for example used to reset tree)
  */
@@ -34,8 +34,8 @@ import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileg
 export default Component.extend({
   classNames: ['privileges-tree-editor'],
 
-  i18n: inject(),
-  store: inject(),
+  i18n: service(),
+  store: service(),
 
   /**
    * Grouped privileges used to construct tree nodes
@@ -87,7 +87,7 @@ export default Component.extend({
 
   /**
    * Tree definition
-   * @type {Ember.ComputedProperty<Array<Object>}
+   * @type {Ember.ComputedProperty<Array<Object>>}
    */
   initialTreeState: computed(
     'initialPrivileges',
@@ -157,14 +157,14 @@ export default Component.extend({
 
   modelProxyObserver: observer('modelProxy', function () {
     const modelProxy = this.get('modelProxy');
-    if (!modelProxy.get('model')) {
+    if (!get(modelProxy, 'model')) {
       // load model from backend if empty
       modelProxy.set('model', PromiseObject.create({
         promise: this.get('store')
-          .findRecord('privilege', modelProxy.get('modelGri'))
+          .findRecord('privilege', get(modelProxy, 'modelGri'))
           .then((privilegesModel) => {
             const privileges = privilegesArrayToObject(
-              privilegesModel.get('privileges'),
+              get(privilegesModel, 'privileges'),
               this.get('privilegesGroups')
             );
             modelProxy.setProperties({

@@ -1,7 +1,7 @@
 export default {
   aspects: {
-    index: 'Group overview',
     members: 'Members',
+    more: 'More',
     notFound: 'Group not found',
   },
 };

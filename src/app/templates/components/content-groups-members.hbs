@@ -18,10 +18,7 @@
         <span class="one-label">{{tt this (concat visibleInvitationToken "InvitationToken")}}</span>
         {{one-icon icon="close" class="close-icon" click=(action "hideInvitationToken")}}
       </h1>
-      {{#loading-container
-        isLoading=invitationTokenProxy.isPending
-        errorReason=invitationTokenProxy.reason
-        sizeClass="sm"}}
+      {{#promise-proxy-container proxy=invitationTokenProxy sizeClass="sm"}}
         <div class="inner-row-content">
           <textarea class="token-textarea invitation-token form-control" rows="2" readonly>{{invitationTokenProxy.content}}</textarea>
           {{#copy-button
@@ -35,7 +32,7 @@
             {{tt this "generateToken"}}
           </a>
         </div>
-      {{/loading-container}}
+      {{/promise-proxy-container}}
     </div>
   {{/if}}
 {{/sticky-element}}

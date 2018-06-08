@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import EmberObject, { computed } from '@ember/object';
+import EmberObject, { computed, get, getProperties } from '@ember/object';
 import { union } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -18,7 +18,7 @@ import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
@@ -27,10 +27,10 @@ import _ from 'lodash';
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-groups-members'],
 
-  i18n: inject(),
-  store: inject(),
-  globalNotify: inject(),
-  navigationState: inject(),
+  i18n: service(),
+  store: service(),
+  globalNotify: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -43,16 +43,24 @@ export default Component.extend(I18n, GlobalActions, {
   groupedPrivilegesFlags: groupedFlags,
 
   /**
-   * Set in `init` method
-   * @type {DS.ManyArray}
+   * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  sharedGroupList: undefined,
+  sharedGroupList: computed(function () {
+    return PromiseArray.create({
+      promise: get(this.get('group'), 'sharedGroupList')
+        .then(sgl => get(sgl, 'list')),
+    });
+  }),
 
   /**
-   * Set in `init` method
-   * @type {DS.ManyArray}
+   * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  sharedUserList: undefined,
+  sharedUserList: computed(function () {
+    return PromiseArray.create({
+      promise: get(this.get('group'), 'sharedUserList')
+        .then(sgl => get(sgl, 'list')),
+    });
+  }),
 
   /**
    * @type {PromiseObject<string>}
@@ -186,18 +194,6 @@ export default Component.extend(I18n, GlobalActions, {
     return [batchEditAction, ...headerActions];
   }),
 
-  init() {
-    this._super(...arguments);
-    this.set('sharedGroupList', PromiseArray.create({
-      promise: this.get('group').get('sharedGroupList')
-        .then(sgl => sgl.get('list')),
-    }));
-    this.set('sharedUserList', PromiseArray.create({
-      promise: this.get('group').get('sharedUserList')
-        .then(sgl => sgl.get('list')),
-    }));
-  },
-
   /**
    * Generates privilege model GRI for given subject model
    * @param {DS.Model} subjectModel
@@ -208,9 +204,13 @@ export default Component.extend(I18n, GlobalActions, {
     let groupId, subjectId;
     try {
       groupId = parseGri(this.get('group.id')).entityId;
-      subjectId = parseGri(subjectModel.get('id')).entityId;
-    } catch (e) {
-      console.error(e);
+      subjectId = parseGri(get(subjectModel, 'id')).entityId;
+    } catch (error) {
+      console.error(
+        'component:content-group-members: getPrivilegesGriForModel: ' +
+        'error parsing GRI: ',
+        error
+      );
       return '';
     }
     return gri({
@@ -253,14 +253,14 @@ export default Component.extend(I18n, GlobalActions, {
       store,
       groupedPrivilegesFlags,
     } = this.getProperties('store', 'groupedPrivilegesFlags');
-    if (modelProxy.get('model')) {
+    if (get(modelProxy, 'model')) {
       return Promise.resolve(modelProxy);
     } else {
       return store
-        .findRecord('privilege', modelProxy.get('modelGri'))
+        .findRecord('privilege', get(modelProxy, 'modelGri'))
         .then((privilegesModel) => {
           const privileges = privilegesArrayToObject(
-            privilegesModel.get('privileges'),
+            get(privilegesModel, 'privileges'),
             groupedPrivilegesFlags
           );
           modelProxy.setProperties({
@@ -315,7 +315,7 @@ export default Component.extend(I18n, GlobalActions, {
     const groupedPrivilegesFlags = this.get('groupedPrivilegesFlags');
     const privilegesFlatTree = {};
     modelProxies.forEach(model => {
-      const privileges = _.assign({}, ..._.values(model.get('modifiedPrivileges')));
+      const privileges = _.assign({}, ..._.values(get(model, 'modifiedPrivileges')));
       Object.keys(privileges).forEach(privName => {
         if (privilegesFlatTree[privName] === undefined) {
           privilegesFlatTree[privName] = privileges[privName];
@@ -344,20 +344,21 @@ export default Component.extend(I18n, GlobalActions, {
       selectedModelProxies,
       batchEditModalModel,
     } = this.getProperties('selectedModelProxies', 'batchEditModalModel');
-    const batchModifiedPrivileges = batchEditModalModel.get('modifiedPrivileges');
+    const batchModifiedPrivileges = get(batchEditModalModel, 'modifiedPrivileges');
     selectedModelProxies.forEach(modelProxy => {
       const {
         modifiedPrivileges,
         persistedPrivileges,
-      } = modelProxy.getProperties('modifiedPrivileges', 'persistedPrivileges');
+      } = getProperties(modelProxy, 'modifiedPrivileges', 'persistedPrivileges');
       const resultTree = {};
       let modified = false;
       Object.keys(modifiedPrivileges).forEach(groupName => {
         resultTree[groupName] = {};
         Object.keys(modifiedPrivileges[groupName]).forEach(privName => {
           const obtainedValue = batchModifiedPrivileges[groupName][privName];
-          resultTree[groupName][privName] = obtainedValue === 2 ?
-            modifiedPrivileges[groupName][privName] : obtainedValue;
+          resultTree[groupName][privName] = (obtainedValue === 2 ?
+            modifiedPrivileges[groupName][privName] : obtainedValue
+          );
           modified = modified ||
             resultTree[groupName][privName] !==
             persistedPrivileges[groupName][privName];
@@ -375,29 +376,28 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * Saves model (taken from model proxy)
    * @param {EmberObject} modelProxy
-   * @returns {Promise}
+   * @returns {Promise<ModelProxy>}
    */
   saveModel(modelProxy) {
     const {
       modifiedPrivileges,
       model,
-    } = modelProxy.getProperties('modifiedPrivileges', 'model');
+    } = getProperties(modelProxy, 'modifiedPrivileges', 'model');
     const flattenedPrivilegesTree =
       _.assign({}, ..._.values(modifiedPrivileges));
     const privileges = Object.keys(flattenedPrivilegesTree)
       .filter(key => flattenedPrivilegesTree[key]);
     model.set('privileges', privileges);
     modelProxy.set('saving', true);
-    const promise = model.get('content').save().then(() => {
+    return get(model, 'content').save().then(() => {
       safeExec(modelProxy, () => modelProxy.setProperties({
         modified: false,
         persistedPrivileges: modifiedPrivileges,
       }));
-    });
-    promise.finally(() => {
+      return modelProxy;
+    }).finally(() => {
       safeExec(modelProxy, () => modelProxy.set('saving', false));
     });
-    return promise;
   },
 
   /**
@@ -431,9 +431,11 @@ export default Component.extend(I18n, GlobalActions, {
     saveOne(modelProxy) {
       return this.saveModel(modelProxy)
         .then(() => this.get('globalNotify').info(this.t('privilegesSaveSuccess')))
-        .catch(error => this.get('globalNotify')
-          .backendError(this.t('privilegesPersistence'), error)
-        );
+        .catch(error => {
+          this.get('globalNotify')
+            .backendError(this.t('privilegesPersistence'), error);
+          throw error;
+        });
     },
     saveBatch() {
       this.batchEditApply();
@@ -445,6 +447,7 @@ export default Component.extend(I18n, GlobalActions, {
         .catch((error) => {
           this.get('globalNotify')
             .backendError(this.t('privilegesPersistence'), error);
+          throw error;
         })
         .finally(() => safeExec(this, 'set', 'batchEditActive', false));
     },
