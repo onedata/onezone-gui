@@ -1,7 +1,7 @@
 /**
  * @module models/provider
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,7 +13,7 @@ import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 
-export const providerStatusList = ['online', 'offline', 'pending'];
+export const providerStatusList = ['online', 'offline'];
 
 export default Model.extend(GraphModelMixin, {
   name: attr('string'),
@@ -21,8 +21,8 @@ export default Model.extend(GraphModelMixin, {
   // urls: attr('array'),
   // clientName: attr('string'),
   redirectionPoint: attr('string'),
-  longitude: attr('number'),
-  latitude: attr('number'),
+  longitude: attr('number', { defaultValue: 0 }),
+  latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),
   domain: attr('string'),
 

@@ -5,14 +5,14 @@
  *
  * @module authenticators/onedata-websocket
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import OnedataBaseAuthenticator from 'onedata-gui-websocket-client/authenticators/-base';
 import OnedataWebsocketUtils from 'onedata-gui-websocket-client/mixins/onedata-websocket-utils';
 import xhrToPromise from 'onedata-gui-websocket-client/utils/xhr-to-promise';
-import Promise from 'rsvp';
+import { Promise } from 'rsvp';
 
 import { inject } from '@ember/service';
 

@@ -4,7 +4,7 @@
  *
  * @module services/onedata-token-api
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -16,7 +16,11 @@ export default Service.extend({
 
   getInviteToken(inviterType, inviterEntityId, receiverType) {
     return this.get('onedataGraph').request({
-      gri: gri(inviterType, inviterEntityId, `invite_${receiverType}_token`),
+      gri: gri({
+        entityType: inviterType,
+        entityId: inviterEntityId,
+        aspect: `invite_${receiverType}_token`,
+      }),
       operation: 'create',
     }).then(({ data }) => data);
   },

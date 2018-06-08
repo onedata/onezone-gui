@@ -4,12 +4,17 @@
  *
  * @module utils/user-gri
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default function userGri(userId) {
-  return gri('user', userId, 'instance', 'protected');
+  return gri({
+    entityType: 'user',
+    entityId: userId,
+    aspect: 'instance',
+    scope: 'private',
+  });
 }
