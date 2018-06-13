@@ -58,8 +58,8 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
       label: this.t('aspects.providers'),
       icon: 'provider',
     }, {
-      id: 'privileges',
-      label: this.t('aspects.privileges'),
+      id: 'members',
+      label: this.t('aspects.members'),
       icon: 'group',
     }];
   }),

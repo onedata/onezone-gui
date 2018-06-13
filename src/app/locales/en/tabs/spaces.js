@@ -2,7 +2,7 @@ export default {
   aspects: {
     index: 'Space overview',
     providers: 'Space providers',
-    privileges: 'Space privileges',
+    members: 'Space members',
     support: 'Get support',
     notFound: 'Space not found',
   },

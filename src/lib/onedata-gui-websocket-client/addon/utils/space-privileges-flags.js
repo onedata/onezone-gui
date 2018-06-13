@@ -14,8 +14,15 @@ export const groupedFlags = [{
     'space_update',
     'space_delete',
     'space_set_privileges',
+  ],
+}, {
+  groupName: 'dataManagement',
+  privileges: [
     'space_write_data',
     'space_manage_shares',
+    'space_view_transfers',
+    'space_schedule_transfers',
+    'space_cancel_transfers',
   ],
 }, {
   groupName: 'userManagement',
