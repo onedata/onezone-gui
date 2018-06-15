@@ -1,0 +1,10 @@
+{{#promise-proxy-container proxy=modelProxy.model}}
+  {{one-dynamic-tree
+    class="border-dashed"
+    definition=initialTreeState
+    compareValues=persistedPrivileges
+    overrideValues=overridePrivileges
+    disabledFieldsPaths=treeDisabledPaths
+    valuesChanged=(action "treeValuesChanged")}}
+  {{yield}}
+{{/promise-proxy-container}}

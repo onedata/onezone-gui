@@ -1,0 +1,21 @@
+.invitation-token-presenter {
+  position: relative;
+  min-height: 150px;
+  h1 {
+    position: relative;
+  }
+  .close-icon {
+    @include vertical-align-middle();
+    position: absolute;
+    right: 0;
+    font-size: 1.7em;
+    &:hover {
+      color: $color-one-light-gray;
+    }
+  }
+  @media (max-width: $screen-xs-max) {
+    .close-icon {
+      right: $mobile-horizontal-content-padding;
+    }
+  }
+}

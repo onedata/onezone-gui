@@ -1,7 +1,6 @@
 export default {
   header: 'Group',
-  youCanManageUsing: 'Currently, you can manage the group settings and ' +
-    'permissions using ',
+  youCanManageUsing: 'Currently, advanced settings of the group are available in ',
   oneprovider: 'Oneprovider web application',
   haveNoAccess: 'Unfortunately you have no access to ',
   anyProvider: 'any Oneprovider yet',

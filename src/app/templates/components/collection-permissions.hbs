@@ -1,0 +1,62 @@
+{{#one-collapsible-list
+  hasCheckboxes=true
+  class=(concat subjectType "-list")
+  selectionChanged=modelsSelected
+  as |list|}}
+  {{list.header title=listHeader}}
+  {{#each proxyList key="subject" as |modelProxy|}}
+    {{#list.item selectionValue=modelProxy as |listItem|}}
+      {{#listItem.header class=(if modelProxy.modified "item-modified-header")}}
+        <span class="item-icon-container">
+          {{one-icon class="item-icon" icon=itemIcon}}
+          {{one-tooltip
+            title=modelProxy.subject.name
+            placement="top"
+            arrowPlacement="left"
+            triggerEvents="hover"
+          }}
+        </span>
+        <span class="one-label">
+          {{modelProxy.subject.name}}
+        </span>
+        {{#if modelProxy.modified}}
+          <div class="btn-toolbar hidden-xs">
+            {{#bs-button size="sm" type="primary"
+              disabled=modelProxy.saving
+              onClick=(action save modelProxy)}}
+              {{tt this "save"}}
+            {{/bs-button}}
+            {{#bs-button size="sm" type="danger"
+              disabled=modelProxy.saving
+              onClick=(action "reset" modelProxy)}}
+              {{tt this "reset"}}
+            {{/bs-button}}
+          </div>
+        {{/if}}
+      {{/listItem.header}}
+      {{#listItem.content}}
+        {{#render-later triggerRender=listItem.isActive}}
+          <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
+            {{#bs-button size="sm" type="primary"
+              disabled=(or modelProxy.saving (not modelProxy.modified))
+              onClick=(action save modelProxy)}}
+              {{tt this "save"}}
+            {{/bs-button}}
+            
+            {{#bs-button size="sm" type="danger"
+              disabled=(or modelProxy.saving (not modelProxy.modified))
+              onClick=(action "reset" modelProxy)}}
+              {{tt this "reset"}}
+            {{/bs-button}}
+          </div>
+          {{privileges-tree-editor
+            privilegesGroups=groupedPrivilegesFlags
+            privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+            privilegesTranslationsPath=privilegesTranslationsPath
+            modelProxy=modelProxy
+            editionEnabled=(not modelProxy.saving)}}
+        {{/render-later}}
+      {{/listItem.content}}
+    {{/list.item}}
+  {{/each}}
+{{/one-collapsible-list}}

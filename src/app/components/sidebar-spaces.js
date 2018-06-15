@@ -57,6 +57,10 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
       id: 'providers',
       label: this.t('aspects.providers'),
       icon: 'provider',
+    }, {
+      id: 'members',
+      label: this.t('aspects.members'),
+      icon: 'group',
     }];
   }),
 });

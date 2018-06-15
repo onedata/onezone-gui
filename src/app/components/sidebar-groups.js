@@ -11,11 +11,17 @@ import { computed } from '@ember/object';
 import { A } from '@ember/array';
 import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
 import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default TwoLevelSidebar.extend({
+export default TwoLevelSidebar.extend(I18n, {
   layout,
 
   classNames: ['sidebar-groups'],
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.sidebarGroups',
 
   /**
    * @override
@@ -43,10 +49,20 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
-  secondLevelItems: Object.freeze([]),
+  showCreateOnEmpty: false,
 
   /**
    * @override
    */
-  showCreateOnEmpty: false,
+  secondLevelItems: computed(function getSecondLevelItems() {
+    return [{
+      id: 'members',
+      label: this.t('aspects.members'),
+      icon: 'group',
+    }, {
+      id: 'more',
+      label: this.t('aspects.more'),
+      icon: 'overview',
+    }];
+  }),
 });

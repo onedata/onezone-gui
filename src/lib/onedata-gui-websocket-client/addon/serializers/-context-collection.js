@@ -8,7 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Serializer from 'onedata-gui-websocket-client/serializers/onedata-websocket';
+import Serializer from 'onedata-gui-websocket-client/serializers/application';
 
 import { inject } from '@ember/service';
 

@@ -17,7 +17,8 @@ describe('Unit | Utility | generate development model', function () {
           modelName,
         })
         .extend({
-          id: 'some_id',
+          id: 'sth.7g35du7c.instance',
+          gri: 'sth.7g35du7c.instance',
           init() {
             const save = sinon.stub(this, 'save');
             save.resolves(this);
@@ -43,9 +44,11 @@ describe('Unit | Utility | generate development model', function () {
     promise.then(() => {
       [
         'user',
+        'sharedGroup', 'sharedUser',
         'spaceList', 'groupList', 'providerList', 'clientTokenList',
         'linkedAccountList',
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',
+        'privilege',
       ].forEach(modelName =>
         expect(createRecord, `createRecord for ${modelName}`).to.be.calledWith(
           modelName, sinon.match.object)

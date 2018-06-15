@@ -31,5 +31,5 @@ export default function gri() {
     // aspectId is not supported in old signature
     scope = arguments[3];
   }
-  return `${entityType}.${entityId || 'null'}.${aspect}${aspectId ? ',' + aspectId : ''}${scope ? ':' + scope : ''}`;
+  return `${entityType}.${entityId || 'null'}.${aspect}${aspectId ? ',' + aspectId : ''}:${scope ? scope : 'private'}`;
 }

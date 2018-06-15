@@ -12,10 +12,30 @@ import LocalstorageAdapter from 'ember-local-storage/adapters/local';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import LocalStorageMethodsMock from 'onedata-gui-websocket-client/mixins/local-storage-methods-mock';
+import { Promise } from 'rsvp';
+import { later } from '@ember/runloop';
+
+const responseDelay = 0;
 
 export default LocalstorageAdapter.extend(LocalStorageMethodsMock, {
   _storageKey() {
     return decodeURIComponent(this._super(...arguments));
+  },
+
+  findRecord() {
+    return delayResponse(this._super(...arguments));
+  },
+
+  createRecord() {
+    return delayResponse(this._super(...arguments));
+  },
+
+  updateRecord() {
+    return delayResponse(this._super(...arguments));
+  },
+
+  deleteRecord() {
+    return delayResponse(this._super(...arguments));
   },
 
   /**
@@ -54,3 +74,13 @@ export default LocalstorageAdapter.extend(LocalStorageMethodsMock, {
     throw new Error('adapter:local-storage: query is not supported');
   },
 });
+
+function delayResponse(response) {
+  if (responseDelay) {
+    return new Promise((resolve) => {
+      later(this, () => resolve(response), responseDelay);
+    });
+  } else {
+    return response;
+  }
+}
