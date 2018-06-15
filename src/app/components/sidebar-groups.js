@@ -54,6 +54,11 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-groups/group-item',
+
+  /**
+   * @override
+   */
   secondLevelItems: computed(function getSecondLevelItems() {
     return [{
       id: 'members',

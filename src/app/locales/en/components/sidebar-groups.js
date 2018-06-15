@@ -3,4 +3,8 @@ export default {
     members: 'Members',
     more: 'More',
   },
+  groupItem: {
+    rename: 'Rename',
+    groupPersistence: 'group persistence',
+  },
 };

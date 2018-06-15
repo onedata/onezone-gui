@@ -1,0 +1,14 @@
+{{one-icon class="sidebar-item-icon" icon="group"}}
+{{one-inline-editor
+  isEditing=isRenaming
+  value=item.name
+  showEmptyInfo=false
+  onSave=(action "rename")
+  editOnClick=false
+  onEdit=(action "toggleRename")
+  class="one-label name-editor"
+  click=(action "editorClick")}}
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="vertical"
+  actionsArray=itemActions}}
