@@ -18,4 +18,15 @@ export default Component.extend({
    * @type {Array<AspectAction>}
    */
   actionsArray: Object.freeze([]),
+
+  /**
+   * If set, it will control state of toolbar collapse
+   * @type {boolean|undefined}
+   */
+  isMinimized: undefined,
+
+  /**
+   * @type {number}
+   */
+  minimumFullWindowSize: 768,
 });
