@@ -27,7 +27,7 @@ export default {
     space_remove_provider: 'Remove provider',
   },
   privilegesPersistence: 'privileges persistence',
-  privilegesSaveSuccess: 'Privileges has been saved successfully',
+  privilegesSaveSuccess: 'Privileges have been saved successfully',
   spacePrivileges: 'Space privileges',
   multiedit: 'Multiedit',
   inviteGroup: 'Invite group',

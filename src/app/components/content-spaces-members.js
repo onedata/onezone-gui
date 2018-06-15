@@ -15,8 +15,10 @@ import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privilege
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
+import layout from 'onezone-gui/templates/components/-privileges-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
+  layout,
   classNames: ['privileges-aspect-base', 'content-spaces-members'],
 
   i18n: service(),

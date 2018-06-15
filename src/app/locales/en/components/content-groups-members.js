@@ -31,7 +31,7 @@ export default {
     group_leave_handle_service: 'Leave handle service',
   },
   privilegesPersistence: 'privileges persistence',
-  privilegesSaveSuccess: 'Privileges has been saved successfully',
+  privilegesSaveSuccess: 'Privileges have been saved successfully',
   groupMembers: 'Group members',
   multiedit: 'Multiedit',
   inviteGroup: 'Invite group',
