@@ -74,6 +74,23 @@ export default Service.extend({
   },
 
   /**
+   * Deletes group
+   * @param {string} id group id
+   * @returns {Promise}
+   */
+  deleteRecord(id) {
+    return this.getRecord(id)
+      .then(group => group.destroyRecord()
+        .then(destroyResult => {
+          this.get('currentUser')
+            .getCurrentUserRecord()
+            .then(user => user.belongsTo('groupList').reload())
+            .then(() => destroyResult);
+        })
+      );
+  },
+
+  /**
    * Reloads group list
    * @returns {Promise<GroupList>}
    */

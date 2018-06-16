@@ -21,6 +21,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   globalNotify: service(),
+  groupManager: service(),
 
   /**
    * @override
@@ -31,6 +32,16 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isRenaming: false,
+
+  /**
+   * @type {boolean}
+   */
+  removeGroupModalOpen: false,
+
+  /**
+   * @type {boolean}
+   */
+  isRemoving: false,
 
   /**
    * @type {Ember.ComputedProperty<Group>}
@@ -45,8 +56,20 @@ export default Component.extend(I18n, {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
       class: 'rename-group-action',
-      icon: 'edit-icon',
+      icon: 'rename',
       disabled: this.get('isRenaming'),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  removeAction: computed(function () {
+    return {
+      action: () => this.send('showRemoveModal'),
+      title: this.t('remove'),
+      class: 'remove-group-action',
+      icon: 'remove',
     };
   }),
 
@@ -58,8 +81,9 @@ export default Component.extend(I18n, {
     function () {
       const {
         renameAction,
-      } = this.getProperties('renameAction');
-      return [renameAction];
+        removeAction,
+      } = this.getProperties('renameAction', 'removeAction');
+      return [renameAction, removeAction];
     }
   ),
 
@@ -96,6 +120,29 @@ export default Component.extend(I18n, {
           set(group, 'name', oldName);
           throw error;
         });
+    },
+    showRemoveModal() {
+      this.set('removeGroupModalOpen', true);
+    },
+    closeRemoveModal() {
+      this.set('removeGroupModalOpen', false);
+    },
+    remove() {
+      const {
+        group,
+        groupManager,
+        globalNotify,
+      } = this.getProperties('group', 'groupManager', 'globalNotify');
+      this.set('isRemoving', true);
+      return groupManager.deleteRecord(get(group, 'id')).finally(() => {
+        safeExec(this, 'setProperties', {
+          isRemoving: false,
+          removeGroupModalOpen: false,
+        });
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('groupDeletion'), error);
+      });
     },
   },
 });
