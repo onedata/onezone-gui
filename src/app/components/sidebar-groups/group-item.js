@@ -44,6 +44,16 @@ export default Component.extend(I18n, {
   isRemoving: false,
 
   /**
+   * @type {boolean}
+   */
+  leaveGroupModalOpen: false,
+
+  /**
+   * @type {boolean}
+   */
+  isLeaving: false,
+
+  /**
    * @type {Ember.ComputedProperty<Group>}
    */
   group: reads('item'),
@@ -64,6 +74,18 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  leaveAction: computed(function () {
+    return {
+      action: () => this.send('showLeaveModal'),
+      title: this.t('leave'),
+      class: 'leave-group-action',
+      icon: 'group-leave-group',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   removeAction: computed(function () {
     return {
       action: () => this.send('showRemoveModal'),
@@ -78,12 +100,15 @@ export default Component.extend(I18n, {
    */
   itemActions: computed(
     'renameAction',
+    'removeAction',
+    'leaveAction',
     function () {
       const {
         renameAction,
         removeAction,
-      } = this.getProperties('renameAction', 'removeAction');
-      return [renameAction, removeAction];
+        leaveAction,
+      } = this.getProperties('renameAction', 'removeAction', 'leaveAction');
+      return [renameAction, leaveAction, removeAction];
     }
   ),
 
@@ -142,6 +167,29 @@ export default Component.extend(I18n, {
       })
       .catch(error => {
         globalNotify.backendError(this.t('groupDeletion'), error);
+      });
+    },
+    showLeaveModal() {
+      this.set('leaveGroupModalOpen', true);
+    },
+    closeLeaveModal() {
+      this.set('leaveGroupModalOpen', false);
+    },
+    leave() {
+      const {
+        group,
+        groupManager,
+        globalNotify,
+      } = this.getProperties('group', 'groupManager', 'globalNotify');
+      this.set('isLeaving', true);
+      return groupManager.leaveGroup(get(group, 'id')).finally(() => {
+        safeExec(this, 'setProperties', {
+          isLeaving: false,
+          leaveGroupModalOpen: false,
+        });
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('groupLeaving'), error);
       });
     },
   },

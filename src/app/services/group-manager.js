@@ -74,6 +74,16 @@ export default Service.extend({
   },
 
   /**
+   * Removes user from a group
+   * @param {string} id group id
+   * @returns {Promise}
+   */
+  leaveGroup(id) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.leaveGroup(id));
+  },
+
+  /**
    * Deletes group
    * @param {string} id group id
    * @returns {Promise}
