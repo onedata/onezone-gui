@@ -7,6 +7,6 @@ export default {
   aspects: {
     index: 'Overview',
     providers: 'Providers',
-    privileges: 'Privileges',
+    members: 'Members',
   },
 };

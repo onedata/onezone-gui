@@ -32,7 +32,7 @@ import contentGroupsMembers from './components/content-groups-members';
 import collectionPermissions from './components/collection-permissions';
 import privilegesBatchEditModal from './components/privileges-batch-edit-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
-import contentSpacesPrivileges from './components/content-spaces-privileges';
+import contentSpacesMembers from './components/content-spaces-members';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -73,7 +73,7 @@ let translations = {
     collectionPermissions,
     privilegesBatchEditModal,
     invitationTokenPresenter,
-    contentSpacesPrivileges,
+    contentSpacesMembers,
   },
   services: {
     clientTokenActions,

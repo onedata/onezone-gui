@@ -1,7 +1,7 @@
 /**
  * A privileges aspect of space.
  *
- * @module components/content-spaces-privileges
+ * @module components/content-spaces-members
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -15,9 +15,11 @@ import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privilege
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
+import layout from 'onezone-gui/templates/components/-privileges-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
-  classNames: ['privileges-aspect-base', 'content-spaces-privileges'],
+  layout,
+  classNames: ['privileges-aspect-base', 'content-spaces-members'],
 
   i18n: service(),
   navigationState: service(),
@@ -25,7 +27,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentSpacesPrivileges',
+  i18nPrefix: 'components.contentSpacesMembers',
 
   /**
    * @override
