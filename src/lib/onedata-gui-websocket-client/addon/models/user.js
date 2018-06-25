@@ -12,6 +12,7 @@ import { camelize } from '@ember/string';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import joinRelation from 'onedata-gui-websocket-client/utils/join-relation';
 
 export default Model.extend(GraphModelMixin, {
   onedataGraph: inject(),
@@ -127,22 +128,15 @@ export default Model.extend(GraphModelMixin, {
    * @returns {Object} joined record
    */
   _joinRelation(entityType, token) {
-    return this.get('onedataGraph').request({
-        gri: gri({
-          entityType,
-          aspect: 'join',
-          scope: 'private',
-        }),
-        operation: 'create',
-        data: {
-          token,
-        },
-        authHint: ['asUser', this.get('entityId')],
-      })
-      .then(({ gri }) => {
-        return this._reloadList(entityType)
-          .then(() => this.get('store').findRecord(entityType, gri));
-      });
+    return joinRelation(
+      this.get('onedataGraph'),
+      entityType,
+      token,
+      ['asUser', this.get('entityId')]
+    ).then(({ gri }) => {
+      return this._reloadList(entityType)
+        .then(() => this.get('store').findRecord(entityType, gri));
+    });
   },
 
   _reloadList(entityType) {

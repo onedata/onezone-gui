@@ -8,7 +8,7 @@
  */
 
 import Service, { inject } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 import { next } from '@ember/runloop';
@@ -69,14 +69,10 @@ export default Service.extend(I18n, {
   createGroup({ name }) {
     const {
       globalNotify,
-      router,
       groupManager,
-      guiUtils,
     } = this.getProperties(
       'globalNotify',
-      'router',
       'groupManager',
-      'guiUtils',
     );
     return groupManager.createRecord({
         name,
@@ -84,12 +80,7 @@ export default Service.extend(I18n, {
       .then(group => {
         globalNotify.success(this.t('groupCreateSuccess'));
         next(() =>
-          router.transitionTo(
-            'onedata.sidebar.content.aspect',
-            'groups',
-            guiUtils.getRoutableIdFor(group),
-            'index',
-          ).then(() => {
+          this.redirectToGroup(group).then(() => {
             const sidebarContainer = $('.col-sidebar');
             $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
               sidebarContainer[0].clientHeight);
@@ -107,19 +98,127 @@ export default Service.extend(I18n, {
    * been joined successfully.
    */
   joinGroup(token) {
-    const guiUtils = this.get('guiUtils');
     return this.get('groupManager').joinGroup(token)
       .then(groupRecord => {
         this.get('globalNotify').info(this.t('joinedGroupSuccess'));
-        return this.get('router').transitionTo(
-          'onedata.sidebar.content.aspect',
-          'groups',
-          guiUtils.getRoutableIdFor(groupRecord),
-          'index'
-        );
+        return this.redirectToGroup(groupRecord);
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);
       });
   },
+
+  /**
+   * Joins group to a space using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Space>}
+   */
+  joinGroupToSpace(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinGroupToSpace(group, token)
+      .then(space => {
+        globalNotify.success(this.t('joinGroupToSpaceSuccess', {
+          groupName: get(group, 'name'),
+          spaceName: get(space, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return space;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningGroupToSpace'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Joins group as a subgroup
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Group>} parent group
+   */
+  joinGroupAsSubgroup(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinGroupAsSubgroup(group, token)
+      .then(parentGroup => {
+        globalNotify.success(this.t('joinGroupAsSubgroupSuccess', {
+          groupName: get(group, 'name'),
+          parentGroupName: get(parentGroup, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return parentGroup;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningGroupAsSubgroup'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Deletes group
+   * @param {Group} group
+   * @returns {Promise}
+   */
+  deleteGroup(group) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    this.set('isRemoving', true);
+    return groupManager.deleteRecord(get(group, 'id')).then(() => {
+      globalNotify.success(this.t(
+        'deleteGroupSuccess',
+        { groupName: get(group, 'name') }
+      ));
+    })
+    .catch(error => {
+      globalNotify.backendError(this.t('groupDeletion'), error);
+    });
+  },
+
+  /**
+   * Leave group
+   * @param {Group} group
+   * @returns {Promise}
+   */
+  leaveGroup(group) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    this.set('isRemoving', true);
+    return groupManager.leaveGroup(get(group, 'id')).then(() => {
+      globalNotify.success(this.t(
+        'leaveGroupSuccess',
+        { groupName: get(group, 'name') }
+      ));
+    })
+    .catch(error => {
+      globalNotify.backendError(this.t('groupLeaving'), error);
+    });
+  },
+
+  /**
+   * Redirects to group page
+   * @param {Group} group 
+   * @returns {Promise}
+   */
+  redirectToGroup(group) {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    return router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'groups',
+      guiUtils.getRoutableIdFor(group),
+      'index',
+    );
+  }
 });

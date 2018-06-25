@@ -29,6 +29,8 @@ import contentGroupsNew from './components/content-groups-new';
 import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
+import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
+import contentGroupsJoinSpace from './components/content-groups-join-space';
 import collectionPermissions from './components/collection-permissions';
 import privilegesBatchEditModal from './components/privileges-batch-edit-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
@@ -70,6 +72,8 @@ let translations = {
     contentGroupsIndex,
     contentGroupsEmpty,
     contentGroupsMembers,
+    contentGroupsJoinAsSubgroup,
+    contentGroupsJoinSpace,
     collectionPermissions,
     privilegesBatchEditModal,
     invitationTokenPresenter,

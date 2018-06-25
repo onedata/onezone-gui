@@ -21,7 +21,9 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   globalNotify: service(),
-  groupManager: service(),
+  groupActions: service(),
+  router: service(),
+  guiUtils: service(),
 
   /**
    * @override
@@ -74,6 +76,48 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinAsSubgroupAction: computed(function () {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-as-subgroup'
+      ),
+      title: this.t('joinAsSubgroup'),
+      class: 'join-as-subgroup-action',
+      icon: 'join-space',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  joinSpaceAction: computed(function () {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-space'
+      ),
+      title: this.t('joinSpace'),
+      class: 'join-space-action',
+      icon: 'space-join',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   leaveAction: computed(function () {
     return {
       action: () => this.send('showLeaveModal'),
@@ -100,15 +144,31 @@ export default Component.extend(I18n, {
    */
   itemActions: computed(
     'renameAction',
+    'joinAsSubgroupAction',
+    'joinSpaceAction',
     'removeAction',
     'leaveAction',
     function () {
       const {
         renameAction,
+        joinAsSubgroupAction,
+        joinSpaceAction,
         removeAction,
         leaveAction,
-      } = this.getProperties('renameAction', 'removeAction', 'leaveAction');
-      return [renameAction, leaveAction, removeAction];
+      } = this.getProperties(
+        'renameAction',
+        'joinAsSubgroupAction',
+        'joinSpaceAction',
+        'removeAction',
+        'leaveAction'
+      );
+      return [
+        renameAction,
+        joinAsSubgroupAction,
+        joinSpaceAction,
+        leaveAction,
+        removeAction,
+      ];
     }
   ),
 
@@ -155,18 +215,15 @@ export default Component.extend(I18n, {
     remove() {
       const {
         group,
-        groupManager,
-        globalNotify,
-      } = this.getProperties('group', 'groupManager', 'globalNotify');
+        groupActions,
+      } = this.getProperties('group', 'groupActions');
       this.set('isRemoving', true);
-      return groupManager.deleteRecord(get(group, 'id')).finally(() => {
+      return groupActions.deleteGroup(group).finally(() => {
         safeExec(this, 'setProperties', {
           isRemoving: false,
           removeGroupModalOpen: false,
         });
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('groupDeletion'), error);
+        next(() => this.get('router').transitionTo('onedata.sidebar'));
       });
     },
     showLeaveModal() {
@@ -178,18 +235,15 @@ export default Component.extend(I18n, {
     leave() {
       const {
         group,
-        groupManager,
-        globalNotify,
-      } = this.getProperties('group', 'groupManager', 'globalNotify');
+        groupActions,
+      } = this.getProperties('group', 'groupActions');
       this.set('isLeaving', true);
-      return groupManager.leaveGroup(get(group, 'id')).finally(() => {
+      return groupActions.leaveGroup(group).finally(() => {
         safeExec(this, 'setProperties', {
           isLeaving: false,
           leaveGroupModalOpen: false,
         });
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('groupLeaving'), error);
+        next(() => this.get('router').transitionTo('onedata.sidebar'));
       });
     },
   },

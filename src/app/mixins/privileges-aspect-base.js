@@ -8,7 +8,7 @@
  */
 
 import Mixin from '@ember/object/mixin';
-import EmberObject, { computed, get, getProperties } from '@ember/object';
+import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { union } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
@@ -42,6 +42,11 @@ export default Mixin.create({
    * @virtual
    */
   groupedPrivilegesFlags: undefined,
+
+  /**
+   * @type {string|undefined}
+   */
+  visibleInvitationToken: undefined,
 
   /**
    * @type {PromiseObject<string>}
@@ -184,6 +189,17 @@ export default Mixin.create({
       icon: 'rename',
       disabled: !this.get('batchEditAvailable'),
     };
+  }),
+
+  modelObserver: observer('model', function() {
+    // reset state after model change
+    this.setProperties({
+      visibleInvitationToken: undefined,
+      selectedUserModelProxies: A(),
+      selectedGroupModelProxies: A(),
+      batchEditActive: false,
+      batchEditModalModel: {},
+    });
   }),
 
   /**

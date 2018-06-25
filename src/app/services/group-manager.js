@@ -11,7 +11,8 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import _ from 'lodash';
-import { Promise } from 'rsvp';
+import { Promise, resolve, reject } from 'rsvp';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Service.extend({
   store: service(),
@@ -33,10 +34,13 @@ export default Service.extend({
   /**
    * Returns group with specified id
    * @param {string} id
+   * @param {boolean} backgroundReload
    * @return {Promise<Group>} group promise
    */
-  getRecord(id) {
-    return this.get('store').findRecord('group', id);
+  getRecord(id, backgroundReload = true) {
+    const store = this.get('store');
+    const existingRecord = !backgroundReload && store.peekRecord('group', id);
+    return existingRecord ? resolve(existingRecord) : store.findRecord('group', id);
   },
 
   /**
@@ -79,8 +83,14 @@ export default Service.extend({
    * @returns {Promise}
    */
   leaveGroup(id) {
+    let entityId;
+    try {
+      entityId = parseGri(id).entityId;
+    } catch (e) {
+      return reject(e);
+    }
     return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.leaveGroup(id));
+      .then(user => user.leaveGroup(entityId));
   },
 
   /**
@@ -89,14 +99,45 @@ export default Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
-    return this.getRecord(id)
-      .then(group => group.destroyRecord()
-        .then(destroyResult => {
-          this.get('currentUser')
-            .getCurrentUserRecord()
-            .then(user => user.belongsTo('groupList').reload())
-            .then(() => destroyResult);
-        })
+    return this.getRecord(id, false)
+      .then(group => group.destroyRecord())
+      .then(destroyResult =>
+        this.reloadList().then(() => destroyResult)
+      );
+  },
+
+  /**
+   * Joins group to a space using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Space>}
+   */
+  joinGroupToSpace(group, token) {
+    return group.joinSpace(token)
+      .then(space =>
+        Promise.all([
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+          space.belongsTo('sharedGroupList').reload(true),
+        ]).then(() => space)
+      );
+  },
+
+  /**
+   * Joins group as a subgroup
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Group>} parent group
+   */
+  joinGroupAsSubgroup(group, token) {
+    return group.joinGroup(token)
+      .then(group =>
+        Promise.all([
+          this.reloadList(),
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+          group.belongsTo('sharedGroupList').reload(true),
+        ]).then(() => group)
       );
   },
 

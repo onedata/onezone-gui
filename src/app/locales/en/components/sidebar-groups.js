@@ -5,6 +5,8 @@ export default {
   },
   groupItem: {
     rename: 'Rename',
+    joinAsSubgroup: 'Join as subgroup',
+    joinSpace: 'Join space',
     leave: 'Leave',
     remove: 'Remove',
     leaveGroup: 'Leave group',
@@ -13,7 +15,5 @@ export default {
     removeGroupAreYouSure: 'Are you sure you want to remove group {{groupName}}?',
     cancel: 'Cancel',
     groupPersistence: 'group persistence',
-    groupDeletion: 'group deletion',
-    groupLeaving: 'leaving group',
   },
 };
