@@ -220,5 +220,5 @@ export default Service.extend(I18n, {
       guiUtils.getRoutableIdFor(group),
       'index',
     );
-  }
+  },
 });
