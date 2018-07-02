@@ -101,7 +101,8 @@ export default Service.extend(I18n, {
     return this.get('groupManager').joinGroup(token)
       .then(groupRecord => {
         this.get('globalNotify').info(this.t('joinedGroupSuccess'));
-        return this.redirectToGroup(groupRecord);
+        this.redirectToGroup(groupRecord);
+        return groupRecord;
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);

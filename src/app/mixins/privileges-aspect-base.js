@@ -116,7 +116,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyGroupModelList: computed('sharedGroupList.isFulfilled', function () {
+  proxyGroupModelList: computed('sharedGroupList.content.[]', function () {
     return this.get('sharedGroupList.isFulfilled') ?
       this.preparePermissionListProxy(this.get('sharedGroupList'), 'group') :
       A();
@@ -125,7 +125,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyUserModelList: computed('sharedUserList.isFulfilled', function () {
+  proxyUserModelList: computed('sharedUserList.content.[]', function () {
     return this.get('sharedUserList.isFulfilled') ?
       this.preparePermissionListProxy(this.get('sharedUserList'), 'user') :
       A();
@@ -195,12 +195,22 @@ export default Mixin.create({
     // reset state after model change
     this.setProperties({
       visibleInvitationToken: undefined,
-      selectedUserModelProxies: A(),
-      selectedGroupModelProxies: A(),
-      batchEditActive: false,
-      batchEditModalModel: {},
     });
   }),
+
+  listsObserver: observer(
+    'sharedGroupList.content.[]',
+    'sharedUserList.content.[]',
+    function () {
+      // reset state after lists change
+      this.setProperties({
+        selectedUserModelProxies: A(),
+        selectedGroupModelProxies: A(),
+        batchEditActive: false,
+        batchEditModalModel: {},
+      });
+    }
+  ),
 
   /**
    * Loads new invitation token for selected subject
@@ -426,10 +436,20 @@ export default Mixin.create({
 
   actions: {
     modelsSelected(type, models) {
-      this.set(
-        type === 'user' ? 'selectedUserModelProxies' : 'selectedGroupModelProxies',
-        A(models),
-      );
+      const {
+        proxyGroupModelList,
+        proxyUserModelList,
+      } = this.getProperties('proxyGroupModelList', 'proxyUserModelList');
+      let originList, targetListName;
+      if (type === 'user') {
+        originList = proxyUserModelList;
+        targetListName = 'selectedUserModelProxies';
+      } else {
+        originList = proxyGroupModelList;
+        targetListName = 'selectedGroupModelProxies';
+      }
+      models = models.filter(m => originList.includes(m));
+      this.set(targetListName, A(models));
     },
     batchEdit() {
       this.loadBatchEditModel();

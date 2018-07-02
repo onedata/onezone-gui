@@ -252,14 +252,18 @@ export default Service.extend(Evented, {
   },
 
   _closeConnectionStart() {
-    let _webSocket = this.get('_webSocket');
-    if (_webSocket) {
+    let {
+      _webSocket,
+      webSocketIsOpened,
+    } = this.getProperties('_webSocket', 'webSocketIsOpened');
+    if (_webSocket && webSocketIsOpened) {
       let _closeDefer = defer();
       this.set('_closeDefer', _closeDefer);
       _webSocket.close();
       return _closeDefer.promise;
     } else {
-      // if there is no _webSocket, we assume, that there is no connection at all
+      // if there is no _webSocket or active connection, we assume,
+      // that there is no connection at all
       return Promise.resolve();
     }
   },

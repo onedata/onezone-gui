@@ -99,10 +99,17 @@ export default Service.extend({
    * @returns {Promise}
    */
   deleteRecord(id) {
+    let group;
     return this.getRecord(id, false)
-      .then(group => group.destroyRecord())
+      .then(g => {
+        group = g;
+        return group.destroyRecord();
+      })
       .then(destroyResult =>
-        this.reloadList().then(() => destroyResult)
+        Promise.all([
+          ...this.updateRelatedGroups(group),
+          this.reloadList(),
+        ]).then(() => destroyResult)
       );
   },
 
@@ -118,7 +125,7 @@ export default Service.extend({
         Promise.all([
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          space.belongsTo('sharedGroupList').reload(true),
+          space.belongsTo('groupList').reload(true),
         ]).then(() => space)
       );
   },
@@ -136,7 +143,7 @@ export default Service.extend({
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          group.belongsTo('sharedGroupList').reload(true),
+          group.belongsTo('childList').reload(true),
         ]).then(() => group)
       );
   },
@@ -148,5 +155,43 @@ export default Service.extend({
   reloadList() {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.belongsTo('groupList').reload(true));
+  },
+
+  /**
+   * Updates group lists in parents of given group
+   * @param {Group} group 
+   * @returns {Array<Promise>}
+   */
+  updateRelatedGroups(group) {
+    const entityId = get(group, 'entityId');
+    const groups = this.get('store').peekAll('group');
+
+    return groups.map(g => {
+      let parentChildList = g.belongsTo('childList').value();
+      parentChildList = parentChildList ?
+        parentChildList.hasMany('list').value() : null;
+      if (parentChildList &&
+        parentChildList.map(c => get(c, 'entityId')).includes(entityId)) {
+        return g.belongsTo('childList').value().reload();
+      } else {
+        return resolve();
+      }
+    });
+  },
+
+  /**
+   * Reloads shared group with given entityId
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  reloadSharedGroup(entityId) {
+    const sharedGroups = this.get('store').peekAll('shared-group');
+    for (let i = 0; i < get(sharedGroups, 'length'); i++) {
+      const sharedGroup = sharedGroups.objectAt(i);
+      if (get(sharedGroup, 'entityId') === entityId) {
+        return sharedGroup.reload();
+      }
+    }
+    return resolve();
   },
 });

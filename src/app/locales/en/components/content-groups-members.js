@@ -12,6 +12,7 @@ export default {
   privileges: {
     group_view: 'View group',
     group_update: 'Modify group',
+    group_view_privileges: 'View privileges',
     group_set_privileges: 'Set privileges',
     group_delete: 'Remove group',
     group_create_child: 'Create child group',

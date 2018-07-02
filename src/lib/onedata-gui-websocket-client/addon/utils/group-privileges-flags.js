@@ -12,6 +12,7 @@ export const groupedFlags = [{
   privileges: [
     'group_view',
     'group_update',
+    'group_view_privileges',
     'group_set_privileges',
     'group_delete',
   ],

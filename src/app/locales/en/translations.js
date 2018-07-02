@@ -26,7 +26,6 @@ import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
-import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
@@ -69,7 +68,6 @@ let translations = {
     leaveSpaceConfirm,
     contentGroupsJoin,
     contentGroupsNew,
-    contentGroupsIndex,
     contentGroupsEmpty,
     contentGroupsMembers,
     contentGroupsJoinAsSubgroup,

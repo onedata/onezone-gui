@@ -14,6 +14,7 @@ export default {
     space_write_data: 'Write files',
     space_manage_shares: 'Manage shares',
     space_update: 'Modify space',
+    space_view_privileges: 'View privileges',
     space_set_privileges: 'Set privileges',
     space_delete: 'Remove space',
     space_view_transfers: 'View transfers',

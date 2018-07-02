@@ -9,6 +9,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { inject as service } from '@ember/service';
+import { alias } from '@ember/object/computed';
 
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
@@ -23,9 +24,12 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   // for features, that will be moved from OP GUI to OZ GUI
   // spaceList: belongsTo('spaceList'),
 
-  // members of this group
-  sharedUserList: belongsTo('sharedUserList'),
-  sharedGroupList: belongsTo('sharedGroupList'),
+  parentList: belongsTo('groupList'),
+  childList: belongsTo('sharedGroupList'),
+  userList: belongsTo('sharedUserList'),
+
+  sharedUserList: alias('userList'),
+  sharedGroupList: alias('childList'),
 
   joinSpace(token) {
     return this._joinRelation('space', token);

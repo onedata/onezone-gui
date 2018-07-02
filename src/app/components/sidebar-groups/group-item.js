@@ -22,8 +22,10 @@ export default Component.extend(I18n, {
   i18n: service(),
   globalNotify: service(),
   groupActions: service(),
+  groupManager: service(),
   router: service(),
   guiUtils: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -197,8 +199,10 @@ export default Component.extend(I18n, {
       return group.save()
         .then(() => {
           this.send('toggleRename', false);
-          
         })
+        .then(() =>
+          this.get('groupManager').reloadSharedGroup(get(group, 'entityId'))
+        )
         .catch((error) => {
           globalNotify.backendError(this.t('groupPersistence'), error);
           // Restore old group name
@@ -216,14 +220,17 @@ export default Component.extend(I18n, {
       const {
         group,
         groupActions,
-      } = this.getProperties('group', 'groupActions');
+        navigationState,
+      } = this.getProperties('group', 'groupActions', 'navigationState');
       this.set('isRemoving', true);
       return groupActions.deleteGroup(group).finally(() => {
         safeExec(this, 'setProperties', {
           isRemoving: false,
           removeGroupModalOpen: false,
         });
-        next(() => this.get('router').transitionTo('onedata.sidebar'));
+        if (group === get(navigationState, 'activeResource')) {
+          next(() => this.get('router').transitionTo('onedata.sidebar'));
+        }
       });
     },
     showLeaveModal() {
