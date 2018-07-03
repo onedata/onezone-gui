@@ -85,6 +85,11 @@ export default Component.extend(I18n, {
    */
   save: notImplementedThrow,
 
+  /**
+   * @type {Array<Action>}
+   */
+  itemActions: undefined,
+
   actions: {
     reset(modelProxy) {
       if (modelProxy.get('modified')) {

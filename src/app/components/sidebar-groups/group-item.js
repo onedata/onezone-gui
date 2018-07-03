@@ -31,7 +31,7 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.sidebarGroups.groupItem',
-  
+
   /**
    * @type {boolean}
    */
@@ -174,6 +174,26 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * If actual group disappeared from the sidebar, redirects to groups main page
+   * @returns {Promise}
+   */
+  redirectOnGroupDeletion() {
+    const {
+      group,
+      navigationState,
+      router,
+    } = this.getProperties('group', 'navigationState', 'router');
+    return get(get(navigationState, 'activeResourceCollection'), 'list')
+      .then(groupList => {
+        const groupEntityId = get(group, 'entityId');
+        const availableEntityIds = groupList.map(g => get(g, 'entityId'));
+        if (availableEntityIds.indexOf(groupEntityId) === -1) {
+          next(() => router.transitionTo('onedata.sidebar', 'groups'));
+        }
+      });
+  },
+
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -220,18 +240,16 @@ export default Component.extend(I18n, {
       const {
         group,
         groupActions,
-        navigationState,
-      } = this.getProperties('group', 'groupActions', 'navigationState');
+      } = this.getProperties('group', 'groupActions');
       this.set('isRemoving', true);
-      return groupActions.deleteGroup(group).finally(() => {
-        safeExec(this, 'setProperties', {
-          isRemoving: false,
-          removeGroupModalOpen: false,
+      return groupActions.deleteGroup(group)
+        .then(() => this.redirectOnGroupDeletion())
+        .finally(() => {
+          safeExec(this, 'setProperties', {
+            isRemoving: false,
+            removeGroupModalOpen: false,
+          });
         });
-        if (group === get(navigationState, 'activeResource')) {
-          next(() => this.get('router').transitionTo('onedata.sidebar'));
-        }
-      });
     },
     showLeaveModal() {
       this.set('leaveGroupModalOpen', true);
@@ -245,13 +263,14 @@ export default Component.extend(I18n, {
         groupActions,
       } = this.getProperties('group', 'groupActions');
       this.set('isLeaving', true);
-      return groupActions.leaveGroup(group).finally(() => {
-        safeExec(this, 'setProperties', {
-          isLeaving: false,
-          leaveGroupModalOpen: false,
-        });
-        next(() => this.get('router').transitionTo('onedata.sidebar'));
-      });
+      return groupActions.leaveGroup(group)
+        .then(() => this.redirectOnGroupDeletion())
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            isLeaving: false,
+            leaveGroupModalOpen: false,
+          })
+        );
     },
   },
 });

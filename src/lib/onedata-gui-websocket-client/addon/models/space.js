@@ -32,7 +32,7 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
 
   sharedUserList: alias('userList'),
   sharedGroupList: alias('groupList'),
-  
+
   //#region utils
 
   totalSize: computed('supportSizes', function getTotalSize() {

@@ -21,4 +21,9 @@ export default {
   groupDeletion: 'group deletion',
   leaveGroupSuccess: 'Group "{{groupName}}" left successfully',
   groupLeaving: 'leaving group',
+  removeSubgroupSuccess: 'Group "{{childGroupName}}" has been removed from group ' +
+    '"{{parentGroupName}}"',
+  removeUserFromGroupSuccess: 'User "{{userName}}" has been removed from group ' +
+    '"{{groupName}}"',
+  userDeletion: 'user deletion',
 };

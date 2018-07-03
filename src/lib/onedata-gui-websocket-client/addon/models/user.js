@@ -13,6 +13,7 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import joinRelation from 'onedata-gui-websocket-client/utils/join-relation';
+import leaveRelation from 'onedata-gui-websocket-client/utils/leave-relation';
 
 export default Model.extend(GraphModelMixin, {
   onedataGraph: inject(),
@@ -108,17 +109,13 @@ export default Model.extend(GraphModelMixin, {
   },
 
   _leaveRelation(aspect, relationId) {
-    const entityId = this.get('entityId');
-    return this.get('onedataGraph').request({
-        gri: gri({
-          entityType: 'user',
-          entityId,
-          aspect,
-          aspectId: relationId,
-        }),
-        operation: 'delete',
-      })
-      .then(() => this._reloadList(aspect));
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'user',
+      this.get('entityId'),
+      aspect,
+      relationId,
+    ).then(() => this._reloadList(aspect));
   },
 
   /**
@@ -131,8 +128,7 @@ export default Model.extend(GraphModelMixin, {
     return joinRelation(
       this.get('onedataGraph'),
       entityType,
-      token,
-      ['asUser', this.get('entityId')]
+      token, ['asUser', this.get('entityId')]
     ).then(({ gri }) => {
       return this._reloadList(entityType)
         .then(() => this.get('store').findRecord(entityType, gri));

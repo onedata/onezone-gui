@@ -94,6 +94,16 @@ export default Mixin.create({
   batchEditModalModel: Object.freeze({}),
 
   /**
+   * @type {Array<Action>}
+   */
+  userActions: undefined,
+
+  /**
+   * @type {Array<Action>}
+   */
+  groupActions: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
   sharedGroupList: computed('model', function () {
@@ -191,7 +201,7 @@ export default Mixin.create({
     };
   }),
 
-  modelObserver: observer('model', function() {
+  modelObserver: observer('model', function () {
     // reset state after model change
     this.setProperties({
       visibleInvitationToken: undefined,
@@ -323,7 +333,13 @@ export default Mixin.create({
     });
     modelProxy.set('model', PromiseObject.create({
       promise: Promise.all(selectedModelProxies.map(modelProxy =>
-          this.loadModelForProxy(modelProxy)
+          this.loadModelForProxy(modelProxy).then(mp => {
+            const model = get(mp, 'model');
+            if (get(model, 'isRejected')) {
+              throw get(model, 'reason');
+            }
+            return mp;
+          })
         ))
         .then(modelProxies => safeExec(this, () => {
           const batchPrivileges = this.calculateBatchEditModel(modelProxies);
@@ -385,7 +401,7 @@ export default Mixin.create({
       } = modelProxy.getProperties('modifiedPrivileges', 'persistedPrivileges');
       const resultTree = {};
       let modified = false;
-      Object.keys(modifiedPrivileges).forEach(groupName => {
+      Object.keys(modifiedPrivileges || {}).forEach(groupName => {
         resultTree[groupName] = {};
         Object.keys(modifiedPrivileges[groupName]).forEach(privName => {
           const obtainedValue = batchModifiedPrivileges[groupName][privName];

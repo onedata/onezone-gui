@@ -172,15 +172,16 @@ export default Service.extend(I18n, {
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
     this.set('isRemoving', true);
-    return groupManager.deleteRecord(get(group, 'id')).then(() => {
-      globalNotify.success(this.t(
-        'deleteGroupSuccess',
-        { groupName: get(group, 'name') }
-      ));
-    })
-    .catch(error => {
-      globalNotify.backendError(this.t('groupDeletion'), error);
-    });
+    return groupManager.deleteRecord(get(group, 'id'))
+      .then(() => {
+        globalNotify.success(this.t(
+          'deleteGroupSuccess', { groupName: get(group, 'name') }
+        ));
+      })
+      .catch(error => {
+        group.rollbackAttributes();
+        globalNotify.backendError(this.t('groupDeletion'), error);
+      });
   },
 
   /**
@@ -194,15 +195,15 @@ export default Service.extend(I18n, {
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
     this.set('isRemoving', true);
-    return groupManager.leaveGroup(get(group, 'id')).then(() => {
-      globalNotify.success(this.t(
-        'leaveGroupSuccess',
-        { groupName: get(group, 'name') }
-      ));
-    })
-    .catch(error => {
-      globalNotify.backendError(this.t('groupLeaving'), error);
-    });
+    return groupManager.leaveGroup(get(group, 'id'))
+      .then(() => {
+        globalNotify.success(this.t(
+          'leaveGroupSuccess', { groupName: get(group, 'name') }
+        ));
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('groupLeaving'), error);
+      });
   },
 
   /**
@@ -221,5 +222,55 @@ export default Service.extend(I18n, {
       guiUtils.getRoutableIdFor(group),
       'index',
     );
+  },
+
+  /**
+   * Removes subgroup from group
+   * @param {Group|SharedGroup} parent 
+   * @param {Group|SharedGroup} child
+   * @returns {Promise}
+   */
+  removeSubgroupFromGroup(parent, child) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    this.set('isRemoving', true);
+    return groupManager.removeGroupFromParentGroup(
+      get(parent, 'entityId'),
+      get(child, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeSubgroupSuccess', {
+        parentGroupName: get(parent, 'name'),
+        childGroupName: get(child, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('groupDeletion'), error);
+    });
+  },
+
+  /**
+   * Removes user from group
+   * @param {Group|SharedGroup} group 
+   * @param {User|SharedUser} user
+   * @returns {Promise}
+   */
+  removeUserFromGroup(group, user) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    this.set('isRemoving', true);
+    return groupManager.removeUserFromParentGroup(
+      get(group, 'entityId'),
+      get(user, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeUserFromGroupSuccess', {
+        groupName: get(group, 'name'),
+        userName: get(user, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('userDeletion'), error);
+    });
   },
 });

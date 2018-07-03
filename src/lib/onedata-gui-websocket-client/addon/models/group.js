@@ -43,8 +43,7 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
     return joinRelation(
       this.get('onedataGraph'),
       entityType,
-      token,
-      ['asGroup', this.get('entityId')]
+      token, ['asGroup', this.get('entityId')]
     ).then(({ gri }) =>
       this.get('store').findRecord(entityType, gri)
     );

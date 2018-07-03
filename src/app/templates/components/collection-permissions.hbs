@@ -6,7 +6,9 @@
   {{list.header title=listHeader}}
   {{#each proxyList key="subject" as |modelProxy|}}
     {{#list.item selectionValue=modelProxy as |listItem|}}
-      {{#listItem.header class=(if modelProxy.modified "item-modified-header")}}
+      {{#listItem.header
+        disableToggleIcon=itemActions.length
+        class=(if modelProxy.modified "item-modified-header")}}
         <span class="item-icon-container">
           {{one-icon class="item-icon" icon=itemIcon}}
           {{one-tooltip
@@ -32,6 +34,15 @@
               {{tt this "reset"}}
             {{/bs-button}}
           </div>
+        {{/if}}
+        {{#if itemActions.length}}
+          {{actions-toolbar
+            isMinimized=true
+            toolbarClasses=""
+            toolbarToggleClasses="btn-menu-toggle"
+            dropdownPlacement="auto"
+            actionsArray=itemActions
+            actionsArg=modelProxy}}
         {{/if}}
       {{/listItem.header}}
       {{#listItem.content}}

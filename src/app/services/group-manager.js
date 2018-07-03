@@ -13,9 +13,11 @@ import { get } from '@ember/object';
 import _ from 'lodash';
 import { Promise, resolve, reject } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import leaveRelation from 'onedata-gui-websocket-client/utils/leave-relation';
 
 export default Service.extend({
   store: service(),
+  onedataGraph: service(),
   currentUser: service(),
   spaceManager: service(),
   providerManager: service(),
@@ -107,7 +109,7 @@ export default Service.extend({
       })
       .then(destroyResult =>
         Promise.all([
-          ...this.updateRelatedGroups(group),
+          this.updateGroupPresenceInActualParents(get(group, 'entityId')),
           this.reloadList(),
         ]).then(() => destroyResult)
       );
@@ -158,25 +160,100 @@ export default Service.extend({
   },
 
   /**
-   * Updates group lists in parents of given group
-   * @param {Group} group 
+   * Reloads group list only if passed entityId is the same as current
+   * user entityId.
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  reloadListIfCurrentUser(entityId) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user =>
+        get(user, 'entityId') === entityId ?
+        this.reloadList() : resolve()
+      );
+  },
+
+  /**
+   * Updates child lists in actual (not reloaded) parents of given group
+   * @param {string} entityId 
    * @returns {Array<Promise>}
    */
-  updateRelatedGroups(group) {
-    const entityId = get(group, 'entityId');
+  updateGroupPresenceInActualParents(entityId) {
     const groups = this.get('store').peekAll('group');
 
-    return groups.map(g => {
-      let parentChildList = g.belongsTo('childList').value();
+    return Promise.all(groups.map(group => {
+      let parentChildList = group.belongsTo('childList').value();
       parentChildList = parentChildList ?
         parentChildList.hasMany('list').value() : null;
       if (parentChildList &&
-        parentChildList.map(c => get(c, 'entityId')).includes(entityId)) {
-        return g.belongsTo('childList').value().reload();
+        parentChildList.map(g => get(g, 'entityId')).includes(entityId)) {
+        return group.belongsTo('childList').value().reload()
+          .catch(this.ignoreForbidden);
       } else {
         return resolve();
       }
-    });
+    }));
+  },
+
+  /**
+   * Returns already loaded group by entityId (or undefined if not loaded)
+   * @param {string} entityId 
+   * @returns {Group|undefined}
+   */
+  getLoadedGroupByEntityId(entityId) {
+    return this.get('store').peekAll('group')
+      .filter(g => get(g, 'entityId') === entityId)[0];
+  },
+
+  /**
+   * Reloads selected list from group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId 
+   * @param {string} listName
+   * @returns {Promise}
+   */
+  reloadModelList(entityId, listName) {
+    const group = this.getLoadedGroupByEntityId(entityId);
+    if (group) {
+      const list = group.belongsTo(listName).value();
+      const hasMany = list ? list.hasMany('list').value() : null;
+      if (list) {
+        return list.reload().then(result => {
+          return hasMany ? list.hasMany('list').reload() : result;
+        });
+      }
+    }
+    return resolve();
+  },
+
+  /**
+   * Reloads parentList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  reloadParentList(entityId) {
+    return this.reloadModelList(entityId, 'parentList');
+  },
+
+  /**
+   * Reloads childList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  reloadChildList(entityId) {
+    return this.reloadModelList(entityId, 'childList');
+  },
+
+  /**
+   * Reloads userList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  reloadUserList(entityId) {
+    return this.reloadModelList(entityId, 'userList');
   },
 
   /**
@@ -193,5 +270,59 @@ export default Service.extend({
       }
     }
     return resolve();
+  },
+
+  /**
+   * @param {string} parentEntityId 
+   * @param {string} childEntityId
+   * @returns {Promise}
+   */
+  removeGroupFromParentGroup(parentEntityId, childEntityId) {
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'group',
+      parentEntityId,
+      'child',
+      childEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadList(),
+        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
+        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} groupEntityId 
+   * @param {string} userEntityId
+   * @returns {Promise}
+   */
+  removeUserFromParentGroup(groupEntityId, userEntityId) {
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'group',
+      groupEntityId,
+      'user',
+      userEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadUserList(groupEntityId).catch(this.ignoreForbidden),
+        this.reloadListIfCurrentUser(userEntityId),
+      ])
+    );
+  },
+
+  /**
+   * Util function used to ignore `forbidden` errors
+   * @param {*} result 
+   * @returns {*}
+   */
+  ignoreForbidden(result) {
+    if (result && result.id !== 'forbidden') {
+      throw result;
+    } else {
+      return result;
+    }
   },
 });

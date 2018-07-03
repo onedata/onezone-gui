@@ -37,4 +37,14 @@ export default {
   multiedit: 'Multiedit',
   inviteGroup: 'Invite group',
   inviteUser: 'Invite user',
+  removeGroup: 'Remove',
+  removeUser: 'Remove',
+  removeGroupHeader: 'Remove group',
+  removeUserHeader: 'Remove user',
+  removeGroupAreYouSure: 'Are you sure you want to remove group {{groupName}} ' +
+    'from this group?',
+  removeUserAreYouSure: 'Are you sure you want to remove user {{userName}} ' +
+    'from this group?',
+  cancel: 'Cancel',
+  remove: 'Remove',
 };

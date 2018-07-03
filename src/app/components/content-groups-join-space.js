@@ -31,6 +31,11 @@ export default Component.extend(I18n, {
    */
   token: '',
 
+  didInsertElement() {
+    this._super(...arguments);
+    this.$('#join-space-token').focus();
+  },
+
   actions: {
     joinGroup(token) {
       const {
