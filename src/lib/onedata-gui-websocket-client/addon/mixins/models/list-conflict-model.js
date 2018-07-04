@@ -25,7 +25,7 @@ export default Mixin.create({
 
   _addConflictLabels() {
     const listContent = this.get('list.content');
-    if (listContent.every(r => get(r, 'name') != null)) {
+    if (listContent && listContent.every(r => get(r, 'name') != null)) {
       addConflictLabels(
         listContent,
         'name',

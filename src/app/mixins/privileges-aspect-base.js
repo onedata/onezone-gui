@@ -109,7 +109,7 @@ export default Mixin.create({
   sharedGroupList: computed('model', function () {
     return PromiseArray.create({
       promise: get(this.get('model'), 'sharedGroupList')
-        .then(sgl => get(sgl, 'list')),
+        .then(sgl => sgl ? get(sgl, 'list') : A()),
     });
   }),
 
@@ -119,7 +119,7 @@ export default Mixin.create({
   sharedUserList: computed('model', function () {
     return PromiseArray.create({
       promise: get(this.get('model'), 'sharedUserList')
-        .then(sgl => get(sgl, 'list')),
+        .then(sul => sul ? get(sul, 'list') : A()),
     });
   }),
 
