@@ -93,12 +93,11 @@ export default Service.extend({
     }
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.leaveGroup(entityId))
-      .then(destroyResult =>{
+      .then(destroyResult => {
         return Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          this.updateGroupPresenceInActualSpaces(entityId),
         ]).then(() => destroyResult);
       });
   },
@@ -115,13 +114,15 @@ export default Service.extend({
         group = g;
         return group.destroyRecord();
       })
-      .then(destroyResult =>{
+      .then(destroyResult => {
+        const entityId = get(group, 'entityId');
         return Promise.all([
-          this.updateGroupPresenceInActualParents(get(group, 'entityId')),
+          this.updateGroupPresenceInLoadedParents(entityId),
+          this.updateGroupPresenceInLoadedChildren(entityId),
+          this.updateGroupPresenceInLoadedSpaces(entityId),
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          this.updateGroupPresenceInActualSpaces(get(group, 'entityId')),
         ]).then(() => destroyResult);
       });
   },
@@ -145,20 +146,92 @@ export default Service.extend({
 
   /**
    * Joins group as a subgroup
-   * @param {Group} group 
+   * @param {Group} childGroup 
    * @param {string} token
    * @returns {Promise<Group>} parent group
    */
-  joinGroupAsSubgroup(group, token) {
-    return group.joinGroup(token)
-      .then(group =>
+  joinGroupAsSubgroup(childGroup, token) {
+    return childGroup.joinGroup(token)
+      .then(parentGroup =>
         Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          group.belongsTo('childList').reload(true),
-        ]).then(() => group)
+          this.reloadChildList(get(parentGroup, 'entityId')),
+          this.reloadParentList(get(childGroup, 'entityId')),
+        ]).then(() => parentGroup)
       );
+  },
+
+  /**
+   * @param {string} parentEntityId 
+   * @param {string} childEntityId
+   * @returns {Promise}
+   */
+  removeChildGroup(parentEntityId, childEntityId) {
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'group',
+      parentEntityId,
+      'child',
+      childEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadList(),
+        this.get('providerManager').reloadList(),
+        this.get('spaceManager').reloadList(),
+        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
+        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} groupEntityId 
+   * @param {string} userEntityId
+   * @returns {Promise}
+   */
+  removeUserFromParentGroup(groupEntityId, userEntityId) {
+    const currentUser = this.get('currentUser');
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'group',
+      groupEntityId,
+      'user',
+      userEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadUserList(groupEntityId).catch(this.ignoreForbidden),
+        currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          this.reloadList(),
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+        ])),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} parentEntityId 
+   * @param {string} childEntityId
+   * @returns {Promise}
+   */
+  leaveGroupAsGroup(parentEntityId, childEntityId) {
+    return leaveRelation(
+      this.get('onedataGraph'),
+      'group',
+      childEntityId,
+      'parent',
+      parentEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
+        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
+        this.reloadList(),
+        this.get('providerManager').reloadList(),
+        this.get('spaceManager').reloadList(),
+      ])
+    );
   },
 
   /**
@@ -171,20 +244,19 @@ export default Service.extend({
   },
 
   /**
-   * Updates child lists in actual (not reloaded) parents of given group
+   * Updates lists in actual (not reloaded) models
+   * @param {string} modelType
    * @param {string} entityId 
+   * @param {string} listName
    * @returns {Array<Promise>}
    */
-  updateGroupPresenceInActualParents(entityId) {
-    const groups = this.get('store').peekAll('group');
-
-    return Promise.all(groups.map(group => {
-      let parentChildList = group.belongsTo('childList').value();
-      parentChildList = parentChildList ?
-        parentChildList.hasMany('list').value() : null;
-      if (parentChildList &&
-        parentChildList.map(g => get(g, 'entityId')).includes(entityId)) {
-        return group.belongsTo('childList').value().reload()
+  updateGroupPresenceInLoadedModels(modelType, entityId, listName) {
+    const models = this.get('store').peekAll(modelType);
+    return Promise.all(models.map(model => {
+      let list = model.belongsTo(listName).value();
+      list = list ? list.hasMany('list').value() : null;
+      if (list && list.map(m => get(m, 'entityId')).includes(entityId)) {
+        return model.belongsTo(listName).value().reload()
           .catch(this.ignoreForbidden);
       } else {
         return resolve();
@@ -193,25 +265,30 @@ export default Service.extend({
   },
 
   /**
+   * Updates child lists in actual (not reloaded) parents of given group
+   * @param {string} entityId 
+   * @returns {Array<Promise>}
+   */
+  updateGroupPresenceInLoadedParents(entityId) {
+    return this.updateGroupPresenceInLoadedModels('group', entityId, 'childList');
+  },
+
+  /**
+   * Updates parent lists in actual (not reloaded) children of given group
+   * @param {string} entityId 
+   * @returns {Array<Promise>}
+   */
+  updateGroupPresenceInLoadedChildren(entityId) {
+    return this.updateGroupPresenceInLoadedModels('group', entityId, 'parentList');
+  },
+
+  /**
    * Updates group lists in actual (not reloaded) spaces
    * @param {string} entityId 
    * @returns {Array<Promise>}
    */
-  updateGroupPresenceInActualSpaces(entityId) {
-    const spaces = this.get('store').peekAll('space');
-
-    return Promise.all(spaces.map(space => {
-      let spaceGroupList = space.belongsTo('groupList').value();
-      spaceGroupList = spaceGroupList ?
-        spaceGroupList.hasMany('list').value() : null;
-      if (spaceGroupList &&
-        spaceGroupList.map(g => get(g, 'entityId')).includes(entityId)) {
-        return space.belongsTo('groupList').value().reload()
-          .catch(this.ignoreForbidden);
-      } else {
-        return resolve();
-      }
-    }));
+  updateGroupPresenceInLoadedSpaces(entityId) {
+    return this.updateGroupPresenceInLoadedModels('space', entityId, 'groupList');
   },
 
   /**
@@ -289,54 +366,6 @@ export default Service.extend({
       }
     }
     return resolve();
-  },
-
-  /**
-   * @param {string} parentEntityId 
-   * @param {string} childEntityId
-   * @returns {Promise}
-   */
-  removeGroupFromParentGroup(parentEntityId, childEntityId) {
-    return leaveRelation(
-      this.get('onedataGraph'),
-      'group',
-      parentEntityId,
-      'child',
-      childEntityId
-    ).then(() =>
-      Promise.all([
-        this.reloadList(),
-        this.get('providerManager').reloadList(),
-        this.get('spaceManager').reloadList(),
-        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
-        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
-      ])
-    );
-  },
-
-  /**
-   * @param {string} groupEntityId 
-   * @param {string} userEntityId
-   * @returns {Promise}
-   */
-  removeUserFromParentGroup(groupEntityId, userEntityId) {
-    const currentUser = this.get('currentUser');
-    return leaveRelation(
-      this.get('onedataGraph'),
-      'group',
-      groupEntityId,
-      'user',
-      userEntityId
-    ).then(() =>
-      Promise.all([
-        this.reloadUserList(groupEntityId).catch(this.ignoreForbidden),
-        currentUser.runIfThisUser(userEntityId, () => Promise.all([
-          this.reloadList(),
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-        ])),
-      ])
-    );
   },
 
   /**

@@ -28,6 +28,7 @@ import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
+import contentGroupsParents from './components/content-groups-parents';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
 import collectionPermissions from './components/collection-permissions';
@@ -70,6 +71,7 @@ let translations = {
     contentGroupsNew,
     contentGroupsEmpty,
     contentGroupsMembers,
+    contentGroupsParents,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
     collectionPermissions,

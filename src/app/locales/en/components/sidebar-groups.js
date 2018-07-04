@@ -1,10 +1,10 @@
 export default {
   aspects: {
     members: 'Members',
+    parents: 'Parents',
   },
   groupItem: {
     rename: 'Rename',
-    joinAsSubgroup: 'Join as subgroup',
     joinSpace: 'Join space',
     leave: 'Leave',
     remove: 'Remove',

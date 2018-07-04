@@ -1,8 +1,8 @@
 {{#content-info
-  class="scroll-breakpoint-700"
+  class=(concat-classes "scroll-breakpoint-700" (if isInnerView "preserve-header"))
   header=(tt this "header")
   imagePath="assets/images/group-join-group.svg"
-  text=(tt this "text" groupName=group.name)
+  text=(or text (tt this "text" groupName=group.name))
   buttonLabel=(tt this "joinButton")
   buttonAction=(action "joinGroup" token)
   buttonDisabled=(not token)

@@ -152,7 +152,7 @@ export default Service.extend(I18n, {
           groupName: get(group, 'name'),
           parentGroupName: get(parentGroup, 'name'),
         }));
-        next(() => this.redirectToGroup(group));
+        next(() => this.redirectToGroup(group, 'parents'));
         return parentGroup;
       })
       .catch(error => {
@@ -171,7 +171,6 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    this.set('isRemoving', true);
     return groupManager.deleteRecord(get(group, 'id'))
       .then(() => {
         globalNotify.success(this.t(
@@ -194,7 +193,6 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    this.set('isRemoving', true);
     return groupManager.leaveGroup(get(group, 'id'))
       .then(() => {
         globalNotify.success(this.t(
@@ -208,10 +206,11 @@ export default Service.extend(I18n, {
 
   /**
    * Redirects to group page
-   * @param {Group} group 
+   * @param {Group} group
+   * @param {string} aspect
    * @returns {Promise}
    */
-  redirectToGroup(group) {
+  redirectToGroup(group, aspect = 'index') {
     const {
       router,
       guiUtils,
@@ -220,7 +219,7 @@ export default Service.extend(I18n, {
       'onedata.sidebar.content.aspect',
       'groups',
       guiUtils.getRoutableIdFor(group),
-      'index',
+      aspect,
     );
   },
 
@@ -230,13 +229,12 @@ export default Service.extend(I18n, {
    * @param {Group|SharedGroup} child
    * @returns {Promise}
    */
-  removeSubgroupFromGroup(parent, child) {
+  removeChildGroup(parent, child) {
     const {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    this.set('isRemoving', true);
-    return groupManager.removeGroupFromParentGroup(
+    return groupManager.removeChildGroup(
       get(parent, 'entityId'),
       get(child, 'entityId')
     ).then(() => {
@@ -255,22 +253,44 @@ export default Service.extend(I18n, {
    * @param {User|SharedUser} user
    * @returns {Promise}
    */
-  removeUserFromGroup(group, user) {
+  removeUser(group, user) {
     const {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    this.set('isRemoving', true);
     return groupManager.removeUserFromParentGroup(
       get(group, 'entityId'),
       get(user, 'entityId')
     ).then(() => {
-      globalNotify.success(this.t('removeUserFromGroupSuccess', {
+      globalNotify.success(this.t('removeUserSuccess', {
         groupName: get(group, 'name'),
         userName: get(user, 'name'),
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('userDeletion'), error);
+    });
+  },
+
+  /**
+   * Leaves from parent group
+   * @param {Group|SharedGroup} parent 
+   * @param {Group|SharedGroup} child
+   * @returns {Promise}
+   */
+  leaveParentGroup(parent, child) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    return groupManager.leaveGroupAsGroup(
+      get(parent, 'entityId'),
+      get(child, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('leaveGroupSuccess', {
+        groupName: get(parent, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('groupLeaving'), error);
     });
   },
 });

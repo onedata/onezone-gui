@@ -64,6 +64,10 @@ export default TwoLevelSidebar.extend(I18n, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',
+    }, {
+      id: 'parents',
+      label: this.t('aspects.parents'),
+      icon: 'parents',
     }];
   }),
 });

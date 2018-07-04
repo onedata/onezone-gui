@@ -154,8 +154,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       );
       this.set('isRemoving', true);
       const promise = type === 'group' ?
-        groupActionsService.removeSubgroupFromGroup(group, model) :
-        groupActionsService.removeUserFromGroup(group, model);
+        groupActionsService.removeChildGroup(group, model) :
+        groupActionsService.removeUser(group, model);
       return promise
         .then(() => {
           // detect if user/subgroup removing removed also group
