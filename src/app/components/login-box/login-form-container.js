@@ -196,7 +196,7 @@ export default LoginFormConainer.extend({
       const authorizer = _.find(supportedAuthorizers, { type: authorizerName });
       this.set('_activeAuthorizer', authorizer);
 
-      return onezoneServer.getLoginEndpoint({ idp: authorizerName })
+      return onezoneServer.getLoginEndpoint(authorizerName)
         .then(data => {
           handleLoginEndpoint(data, () => {
             this._authEndpointError({
