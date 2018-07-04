@@ -92,7 +92,15 @@ export default Service.extend({
       return reject(e);
     }
     return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.leaveGroup(entityId));
+      .then(user => user.leaveGroup(entityId))
+      .then(destroyResult =>{
+        return Promise.all([
+          this.reloadList(),
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+          this.updateGroupPresenceInActualSpaces(entityId),
+        ]).then(() => destroyResult);
+      });
   },
 
   /**
@@ -107,12 +115,15 @@ export default Service.extend({
         group = g;
         return group.destroyRecord();
       })
-      .then(destroyResult =>
-        Promise.all([
+      .then(destroyResult =>{
+        return Promise.all([
           this.updateGroupPresenceInActualParents(get(group, 'entityId')),
           this.reloadList(),
-        ]).then(() => destroyResult)
-      );
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+          this.updateGroupPresenceInActualSpaces(get(group, 'entityId')),
+        ]).then(() => destroyResult);
+      });
   },
 
   /**
@@ -160,20 +171,6 @@ export default Service.extend({
   },
 
   /**
-   * Reloads group list only if passed entityId is the same as current
-   * user entityId.
-   * @param {string} entityId
-   * @returns {Promise}
-   */
-  reloadListIfCurrentUser(entityId) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user =>
-        get(user, 'entityId') === entityId ?
-        this.reloadList() : resolve()
-      );
-  },
-
-  /**
    * Updates child lists in actual (not reloaded) parents of given group
    * @param {string} entityId 
    * @returns {Array<Promise>}
@@ -188,6 +185,28 @@ export default Service.extend({
       if (parentChildList &&
         parentChildList.map(g => get(g, 'entityId')).includes(entityId)) {
         return group.belongsTo('childList').value().reload()
+          .catch(this.ignoreForbidden);
+      } else {
+        return resolve();
+      }
+    }));
+  },
+
+  /**
+   * Updates group lists in actual (not reloaded) spaces
+   * @param {string} entityId 
+   * @returns {Array<Promise>}
+   */
+  updateGroupPresenceInActualSpaces(entityId) {
+    const spaces = this.get('store').peekAll('space');
+
+    return Promise.all(spaces.map(space => {
+      let spaceGroupList = space.belongsTo('groupList').value();
+      spaceGroupList = spaceGroupList ?
+        spaceGroupList.hasMany('list').value() : null;
+      if (spaceGroupList &&
+        spaceGroupList.map(g => get(g, 'entityId')).includes(entityId)) {
+        return space.belongsTo('groupList').value().reload()
           .catch(this.ignoreForbidden);
       } else {
         return resolve();
@@ -287,6 +306,8 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadList(),
+        this.get('providerManager').reloadList(),
+        this.get('spaceManager').reloadList(),
         this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
         this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
       ])
@@ -299,6 +320,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   removeUserFromParentGroup(groupEntityId, userEntityId) {
+    const currentUser = this.get('currentUser');
     return leaveRelation(
       this.get('onedataGraph'),
       'group',
@@ -308,7 +330,11 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadUserList(groupEntityId).catch(this.ignoreForbidden),
-        this.reloadListIfCurrentUser(userEntityId),
+        currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          this.reloadList(),
+          this.get('providerManager').reloadList(),
+          this.get('spaceManager').reloadList(),
+        ])),
       ])
     );
   },
