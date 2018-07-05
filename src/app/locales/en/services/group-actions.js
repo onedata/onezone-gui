@@ -11,11 +11,11 @@ export default {
   groupCreation: 'creating group',
   joiningGroup: 'joining the group',
   joinedGroupSuccess: 'Group joined successfully',
-  joinGroupToSpaceSuccess: 'Successfully joined group "{{groupName}}" to space ' +
-    '"{{spaceName}}"',
-  joiningGroupToSpace: 'joining space',
-  joinGroupAsSubgroupSuccess: 'Successfully joined group "{{groupName}}" to group ' +
-    '"{{parentGroupName}}"',
+  joinSpaceAsGroupSuccess: 'Successfully joined space "{{spaceName}}" as group ' +
+    '"{{groupName}}"',
+  joiningSpaceAsGroup: 'joining space',
+  joinGroupAsSubgroupSuccess: 'Successfully joined group "{{parentGroupName}}" ' +
+    'as group "{{groupName}}"',
   joiningGroupAsSubgroup: 'joining group as subgroup',
   deleteGroupSuccess: 'Group "{{groupName}}" has been removed',
   groupDeletion: 'group deletion',

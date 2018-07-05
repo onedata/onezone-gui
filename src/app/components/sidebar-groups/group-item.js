@@ -194,10 +194,8 @@ export default Component.extend(I18n, {
       return group.save()
         .then(() => {
           this.send('toggleRename', false);
+          this.get('groupManager').reloadLoadedSharedGroup(get(group, 'entityId'));
         })
-        .then(() =>
-          this.get('groupManager').reloadSharedGroup(get(group, 'entityId'))
-        )
         .catch((error) => {
           globalNotify.backendError(this.t('groupPersistence'), error);
           // Restore old group name

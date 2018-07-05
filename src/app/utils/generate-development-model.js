@@ -47,7 +47,7 @@ const perProviderSize = Math.pow(1024, 4);
  */
 export default function generateDevelopmentModel(store) {
   let sharedUsers, sharedGroups, groups;
-  const groupsEntityIds = _.range(NUMBER_OF_GROUPS).map(i => 'asdfggroup' + i);
+  const groupsEntityIds = _.range(NUMBER_OF_GROUPS).map(i => 'groupid' + i);
 
   // create shared users
   return createSharedUsersRecords(store)
@@ -106,15 +106,17 @@ export default function generateDevelopmentModel(store) {
       listRecords[types.indexOf('group')].get('list')
       .then(models =>
         Promise.all(models.map(model =>
-          attachSharedUsersGroupsToModel(store, model, 'group', sharedUsers, sharedGroups,
-            groups)
+          attachSharedUsersGroupsToModel(
+            store, model, 'group', sharedUsers, sharedGroups, groups
+          )
         ))
       ).then(() =>
         listRecords[types.indexOf('space')].get('list')
         .then(models =>
           Promise.all(models.map(model =>
-            attachSharedUsersGroupsToModel(store, model, 'space', sharedUsers,
-              sharedGroups)
+            attachSharedUsersGroupsToModel(
+              store, model, 'space', sharedUsers, sharedGroups
+            )
           ))
         )
       ).then(() =>
@@ -123,8 +125,12 @@ export default function generateDevelopmentModel(store) {
           .then(models =>
             Promise.all(models.map(model =>
               createPrivilegesForModel(
-                store, model, modelType, sharedUsers, sharedGroups, privileges[
-                  modelType]
+                store,
+                model,
+                modelType,
+                sharedUsers,
+                sharedGroups,
+                privileges[modelType]
               )
             ))
           )

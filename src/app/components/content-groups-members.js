@@ -109,7 +109,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   headerActions: reads('inviteActions'),
 
   /**
-   * @type {Array<Action>}
+   * @type {Ember.ComputedProperty<Array<Action>>}
    */
   groupActions: computed(function () {
     return [{
@@ -121,7 +121,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   }),
 
   /**
-   * @type {Array<Action>}
+   * @type {Ember.ComputedProperty<Array<Action>>}
    */
   userActions: computed(function () {
     return [{

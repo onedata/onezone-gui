@@ -74,7 +74,7 @@ export default Service.extend(I18n, {
       'globalNotify',
       'groupManager',
     );
-    return groupManager.createRecord({
+    return groupManager.createGroup({
         name,
       })
       .then(group => {
@@ -115,14 +115,14 @@ export default Service.extend(I18n, {
    * @param {string} token
    * @returns {Promise<Space>}
    */
-  joinGroupToSpace(group, token) {
+  joinSpaceAsGroup(group, token) {
     const {
       globalNotify,
       groupManager,
     } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinGroupToSpace(group, token)
+    return groupManager.joinSpaceAsGroup(group, token)
       .then(space => {
-        globalNotify.success(this.t('joinGroupToSpaceSuccess', {
+        globalNotify.success(this.t('joinSpaceAsGroupSuccess', {
           groupName: get(group, 'name'),
           spaceName: get(space, 'name'),
         }));
@@ -130,7 +130,7 @@ export default Service.extend(I18n, {
         return space;
       })
       .catch(error => {
-        globalNotify.backendError(this.t('joiningGroupToSpace'), error);
+        globalNotify.backendError(this.t('joiningSpaceAsGroup'), error);
         throw error;
       });
   },
@@ -146,7 +146,7 @@ export default Service.extend(I18n, {
       globalNotify,
       groupManager,
     } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinGroupAsSubgroup(group, token)
+    return groupManager.joinGroupAsGroup(group, token)
       .then(parentGroup => {
         globalNotify.success(this.t('joinGroupAsSubgroupSuccess', {
           groupName: get(group, 'name'),
@@ -171,7 +171,7 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.deleteRecord(get(group, 'id'))
+    return groupManager.deleteGroup(get(group, 'id'))
       .then(() => {
         globalNotify.success(this.t(
           'deleteGroupSuccess', { groupName: get(group, 'name') }
@@ -234,7 +234,7 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.removeChildGroup(
+    return groupManager.removeGroupFromGroup(
       get(parent, 'entityId'),
       get(child, 'entityId')
     ).then(() => {
@@ -258,7 +258,7 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
-    return groupManager.removeUserFromParentGroup(
+    return groupManager.removeUserFromGroup(
       get(group, 'entityId'),
       get(user, 'entityId')
     ).then(() => {

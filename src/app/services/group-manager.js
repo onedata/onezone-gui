@@ -50,7 +50,7 @@ export default Service.extend({
    * @param {object} group group representation
    * @returns {Promise<Group>}
    */
-  createRecord(group) {
+  createGroup(group) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => {
         return this.get('store').createRecord('group', _.merge({}, group, {
@@ -107,7 +107,7 @@ export default Service.extend({
    * @param {string} id group id
    * @returns {Promise}
    */
-  deleteRecord(id) {
+  deleteGroup(id) {
     let group;
     return this.getRecord(id, false)
       .then(g => {
@@ -133,7 +133,7 @@ export default Service.extend({
    * @param {string} token
    * @returns {Promise<Space>}
    */
-  joinGroupToSpace(group, token) {
+  joinSpaceAsGroup(group, token) {
     return group.joinSpace(token)
       .then(space =>
         Promise.all([
@@ -150,7 +150,7 @@ export default Service.extend({
    * @param {string} token
    * @returns {Promise<Group>} parent group
    */
-  joinGroupAsSubgroup(childGroup, token) {
+  joinGroupAsGroup(childGroup, token) {
     return childGroup.joinGroup(token)
       .then(parentGroup =>
         Promise.all([
@@ -168,7 +168,7 @@ export default Service.extend({
    * @param {string} childEntityId
    * @returns {Promise}
    */
-  removeChildGroup(parentEntityId, childEntityId) {
+  removeGroupFromGroup(parentEntityId, childEntityId) {
     return leaveRelation(
       this.get('onedataGraph'),
       'group',
@@ -191,7 +191,7 @@ export default Service.extend({
    * @param {string} userEntityId
    * @returns {Promise}
    */
-  removeUserFromParentGroup(groupEntityId, userEntityId) {
+  removeUserFromGroup(groupEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
     return leaveRelation(
       this.get('onedataGraph'),
@@ -245,9 +245,9 @@ export default Service.extend({
 
   /**
    * Updates lists in actual (not reloaded) models
-   * @param {string} modelType
-   * @param {string} entityId 
-   * @param {string} listName
+   * @param {string} modelType e.g. `space`, `group`
+   * @param {string} entityId group entityId
+   * @param {string} listName name of list relation in modelType model
    * @returns {Array<Promise>}
    */
   updateGroupPresenceInLoadedModels(modelType, entityId, listName) {
@@ -266,7 +266,7 @@ export default Service.extend({
 
   /**
    * Updates child lists in actual (not reloaded) parents of given group
-   * @param {string} entityId 
+   * @param {string} entityId group entityId
    * @returns {Array<Promise>}
    */
   updateGroupPresenceInLoadedParents(entityId) {
@@ -275,7 +275,7 @@ export default Service.extend({
 
   /**
    * Updates parent lists in actual (not reloaded) children of given group
-   * @param {string} entityId 
+   * @param {string} entityId group entityId
    * @returns {Array<Promise>}
    */
   updateGroupPresenceInLoadedChildren(entityId) {
@@ -284,7 +284,7 @@ export default Service.extend({
 
   /**
    * Updates group lists in actual (not reloaded) spaces
-   * @param {string} entityId 
+   * @param {string} entityId group entityId
    * @returns {Array<Promise>}
    */
   updateGroupPresenceInLoadedSpaces(entityId) {
@@ -293,7 +293,7 @@ export default Service.extend({
 
   /**
    * Returns already loaded group by entityId (or undefined if not loaded)
-   * @param {string} entityId 
+   * @param {string} entityId group entityId
    * @returns {Group|undefined}
    */
   getLoadedGroupByEntityId(entityId) {
@@ -304,8 +304,8 @@ export default Service.extend({
   /**
    * Reloads selected list from group identified by entityId. If list has not been
    * fetched, nothing is reloaded
-   * @param {string} entityId 
-   * @param {string} listName
+   * @param {string} entityId group entityId
+   * @param {string} listName e.g. `childList`
    * @returns {Promise}
    */
   reloadModelList(entityId, listName) {
@@ -325,7 +325,7 @@ export default Service.extend({
   /**
    * Reloads parentList of group identified by entityId. If list has not been
    * fetched, nothing is reloaded
-   * @param {string} entityId
+   * @param {string} entityId group entityId
    * @returns {Promise}
    */
   reloadParentList(entityId) {
@@ -335,7 +335,7 @@ export default Service.extend({
   /**
    * Reloads childList of group identified by entityId. If list has not been
    * fetched, nothing is reloaded
-   * @param {string} entityId
+   * @param {string} entityId group entityId
    * @returns {Promise}
    */
   reloadChildList(entityId) {
@@ -345,7 +345,7 @@ export default Service.extend({
   /**
    * Reloads userList of group identified by entityId. If list has not been
    * fetched, nothing is reloaded
-   * @param {string} entityId
+   * @param {string} entityId group entityId
    * @returns {Promise}
    */
   reloadUserList(entityId) {
@@ -353,11 +353,11 @@ export default Service.extend({
   },
 
   /**
-   * Reloads shared group with given entityId
-   * @param {string} entityId
+   * Reloads shared group with given entityId (only if it has been loaded earlier)
+   * @param {string} entityId group/shared-Group entityId
    * @returns {Promise}
    */
-  reloadSharedGroup(entityId) {
+  reloadLoadedSharedGroup(entityId) {
     const sharedGroups = this.get('store').peekAll('shared-group');
     for (let i = 0; i < get(sharedGroups, 'length'); i++) {
       const sharedGroup = sharedGroups.objectAt(i);

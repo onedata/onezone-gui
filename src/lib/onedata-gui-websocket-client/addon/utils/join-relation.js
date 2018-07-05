@@ -11,7 +11,6 @@
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 /**
- * 
  * @param {services/OnedataGraph} onedataGraph 
  * @param {string} entityType Entity type of model specified by token
  * @param {string} token invitation token

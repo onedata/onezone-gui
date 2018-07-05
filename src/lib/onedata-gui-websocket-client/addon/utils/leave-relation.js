@@ -10,7 +10,6 @@
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 /**
- * 
  * @param {services/OnedataGraph} onedataGraph 
  * @param {string} entityType
  * @param {string} entityId

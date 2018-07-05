@@ -1,5 +1,5 @@
 /**
- * A parents aspect of group.
+ * A parents aspect of a group.
  *
  * @module components/content-groups-parents
  * @author Michal Borzecki
@@ -103,7 +103,7 @@ export default Component.extend(I18n, GlobalActions, {
       this.set('parentToLeave', parent);
     },
     closeLeaveParentModal() {
-      this.set('parentToLeave');
+      this.set('parentToLeave', null);
     },
     leaveParent() {
       const {

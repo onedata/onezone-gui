@@ -37,12 +37,12 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    joinGroup(token) {
+    joinSpace(token) {
       const {
         group,
         groupActions,
       } = this.getProperties('group', 'groupActions');
-      return groupActions.joinGroupToSpace(group, token);
+      return groupActions.joinSpaceAsGroup(group, token);
     },
   },
 });
