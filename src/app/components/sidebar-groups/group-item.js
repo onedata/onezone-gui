@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get, set } from '@ember/object';
+import { computed, get, set, getProperties } from '@ember/object';
 import { next } from '@ember/runloop';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
@@ -155,13 +155,20 @@ export default Component.extend(I18n, {
    */
   redirectOnGroupDeletion() {
     const {
-      group,
       navigationState,
       router,
-    } = this.getProperties('group', 'navigationState', 'router');
-    return get(get(navigationState, 'activeResourceCollection'), 'list')
+    } = this.getProperties('navigationState', 'router');
+    const {
+      activeResourceCollection,
+      activeResource,
+    } = getProperties(
+      navigationState,
+      'activeResourceCollection',
+      'activeResource'
+    );
+    const groupEntityId = get(activeResource, 'entityId');
+    return get(activeResourceCollection, 'list')
       .then(groupList => {
-        const groupEntityId = get(group, 'entityId');
         const availableEntityIds = groupList.map(g => get(g, 'entityId'));
         if (availableEntityIds.indexOf(groupEntityId) === -1) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));
