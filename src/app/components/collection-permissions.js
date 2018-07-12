@@ -1,5 +1,6 @@
 /**
- * Permissions presenter and editor for a collection of models.
+ * Permissions presenter and editor for a collection of models. Yields list
+ * when there are no items to present.
  *
  * @module components/collection-permissions
  * @author Michal Borzecki

@@ -116,7 +116,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       action: (...args) => this.send('showRemoveModal', 'group', ...args),
       title: this.t('removeGroup'),
       class: 'remove-group',
-      icon: 'remove',
+      icon: 'close',
     }];
   }),
 
@@ -128,7 +128,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       action: (...args) => this.send('showRemoveModal', 'user', ...args),
       title: this.t('removeUser'),
       class: 'remove-user',
-      icon: 'remove',
+      icon: 'close',
     }];
   }),
 

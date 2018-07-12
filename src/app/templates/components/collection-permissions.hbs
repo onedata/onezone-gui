@@ -3,7 +3,7 @@
   class=(concat subjectType "-list")
   selectionChanged=modelsSelected
   as |list|}}
-  {{list.header title=listHeader}}
+  {{list.header title=listHeader searchVisible=proxyList.length}}
   {{#each proxyList key="subject" as |modelProxy|}}
     {{#list.item selectionValue=modelProxy as |listItem|}}
       {{#listItem.header
@@ -23,11 +23,11 @@
         </span>
         {{#if modelProxy.modified}}
           <div class="btn-toolbar hidden-xs">
-            {{#bs-button size="sm" type="primary"
-              disabled=modelProxy.saving
-              onClick=(action save modelProxy)}}
+            {{#one-spin-button
+              action=(action save modelProxy)
+              class="btn btn-sm btn-primary"}}
               {{tt this "save"}}
-            {{/bs-button}}
+            {{/one-spin-button}}
             {{#bs-button size="sm" type="danger"
               disabled=modelProxy.saving
               onClick=(action "reset" modelProxy)}}
@@ -69,5 +69,7 @@
         {{/render-later}}
       {{/listItem.content}}
     {{/list.item}}
+  {{else}}
+    {{yield list}}
   {{/each}}
 {{/one-collapsible-list}}

@@ -13,11 +13,11 @@ import { get } from '@ember/object';
 import _ from 'lodash';
 import { Promise, resolve, reject } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import leaveRelation from 'onedata-gui-websocket-client/utils/leave-relation';
+import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
   store: service(),
-  onedataGraph: service(),
+  onedataGraphUtils: service(),
   currentUser: service(),
   spaceManager: service(),
   providerManager: service(),
@@ -40,9 +40,7 @@ export default Service.extend({
    * @return {Promise<Group>} group promise
    */
   getRecord(id, backgroundReload = true) {
-    const store = this.get('store');
-    const existingRecord = !backgroundReload && store.peekRecord('group', id);
-    return existingRecord ? resolve(existingRecord) : store.findRecord('group', id);
+    return this.get('store').findRecord('group', id, { backgroundReload });
   },
 
   /**
@@ -169,8 +167,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   removeGroupFromGroup(parentEntityId, childEntityId) {
-    return leaveRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').leaveRelation(
       'group',
       parentEntityId,
       'child',
@@ -180,8 +177,8 @@ export default Service.extend({
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('spaceManager').reloadList(),
-        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
-        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
+        this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+        this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
       ])
     );
   },
@@ -193,15 +190,14 @@ export default Service.extend({
    */
   removeUserFromGroup(groupEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
-    return leaveRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').leaveRelation(
       'group',
       groupEntityId,
       'user',
       userEntityId
     ).then(() =>
       Promise.all([
-        this.reloadUserList(groupEntityId).catch(this.ignoreForbidden),
+        this.reloadUserList(groupEntityId).catch(ignoreForbiddenError),
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
@@ -217,16 +213,15 @@ export default Service.extend({
    * @returns {Promise}
    */
   leaveGroupAsGroup(parentEntityId, childEntityId) {
-    return leaveRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').leaveRelation(
       'group',
       childEntityId,
       'parent',
       parentEntityId
     ).then(() =>
       Promise.all([
-        this.reloadParentList(childEntityId).catch(this.ignoreForbidden),
-        this.reloadChildList(parentEntityId).catch(this.ignoreForbidden),
+        this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+        this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('spaceManager').reloadList(),
@@ -257,7 +252,7 @@ export default Service.extend({
       list = list ? list.hasMany('list').value() : null;
       if (list && list.map(m => get(m, 'entityId')).includes(entityId)) {
         return model.belongsTo(listName).value().reload()
-          .catch(this.ignoreForbidden);
+          .catch(ignoreForbiddenError);
       } else {
         return resolve();
       }
@@ -366,18 +361,5 @@ export default Service.extend({
       }
     }
     return resolve();
-  },
-
-  /**
-   * Util function used to ignore `forbidden` errors
-   * @param {*} result 
-   * @returns {*}
-   */
-  ignoreForbidden(result) {
-    if (result && result.id !== 'forbidden') {
-      throw result;
-    } else {
-      return result;
-    }
   },
 });

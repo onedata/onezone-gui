@@ -13,10 +13,9 @@ import { alias } from '@ember/object/computed';
 
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
-import joinRelation from 'onedata-gui-websocket-client/utils/join-relation';
 
 export default Model.extend(GraphModelMixin, InvitingModelMixin, {
-  onedataGraph: service(),
+  onedataGraphUtils: service(),
 
   name: attr('string'),
   type: attr('string'),
@@ -40,8 +39,7 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
   },
 
   _joinRelation(entityType, token) {
-    return joinRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').joinRelation(
       entityType,
       token, ['asGroup', this.get('entityId')]
     ).then(({ gri }) =>

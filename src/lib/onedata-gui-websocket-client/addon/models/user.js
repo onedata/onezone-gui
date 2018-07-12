@@ -12,11 +12,10 @@ import { camelize } from '@ember/string';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import joinRelation from 'onedata-gui-websocket-client/utils/join-relation';
-import leaveRelation from 'onedata-gui-websocket-client/utils/leave-relation';
 
 export default Model.extend(GraphModelMixin, {
   onedataGraph: inject(),
+  onedataGraphUtils: inject(),
 
   isCollection: true,
 
@@ -109,8 +108,7 @@ export default Model.extend(GraphModelMixin, {
   },
 
   _leaveRelation(aspect, relationId) {
-    return leaveRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').leaveRelation(
       'user',
       this.get('entityId'),
       aspect,
@@ -125,8 +123,7 @@ export default Model.extend(GraphModelMixin, {
    * @returns {Object} joined record
    */
   _joinRelation(entityType, token) {
-    return joinRelation(
-      this.get('onedataGraph'),
+    return this.get('onedataGraphUtils').joinRelation(
       entityType,
       token, ['asUser', this.get('entityId')]
     ).then(({ gri }) => {

@@ -10,7 +10,7 @@
     <h1>{{tt this "removeGroupHeader"}}</h1>
   {{/modal.header}}
   {{#modal.body class="text-center"}}
-    {{tt this "removeGroupAreYouSure" groupName=groupToRemove.name}}
+    {{tt this "removeGroupAreYouSure" groupName=groupToRemove.name parentGroupName=group.name}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}
     {{#bs-button disabled=isRemoving onClick=(action "hideRemoveModal" "group")}}
@@ -35,7 +35,7 @@
     <h1>{{tt this "removeUserHeader"}}</h1>
   {{/modal.header}}
   {{#modal.body class="text-center"}}
-    {{tt this "removeUserAreYouSure" userName=userToRemove.name}}
+    {{tt this "removeUserAreYouSure" userName=userToRemove.name parentGroupName=group.name}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}
     {{#bs-button disabled=isRemoving onClick=(action "hideRemoveModal" "user")}}

@@ -77,16 +77,15 @@ export default Component.extend(I18n, GlobalActions, {
   }),
 
   /**
-   * @override 
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @type {Ember.ComputedProperty<Action>}
    */
-  globalActions: computed(function () {
+  joinAsSubgroupAction: computed(function () {
     const {
       router,
       guiUtils,
       group,
     } = this.getProperties('router', 'guiUtils', 'group');
-    return [{
+    return {
       action: () => router.transitionTo(
         'onedata.sidebar.content.aspect',
         guiUtils.getRoutableIdFor(group),
@@ -95,7 +94,15 @@ export default Component.extend(I18n, GlobalActions, {
       title: this.t('joinAsSubgroup'),
       class: 'join-as-subgroup-action',
       icon: 'join-space',
-    }];
+    };
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  globalActions: computed('joinAsSubgroupAction', function () {
+    return [this.get('joinAsSubgroupAction')];
   }),
 
   actions: {

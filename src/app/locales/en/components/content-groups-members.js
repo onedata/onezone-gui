@@ -34,17 +34,23 @@ export default {
   privilegesPersistence: 'privileges persistence',
   privilegesSaveSuccess: 'Privileges have been saved successfully',
   groupMembers: 'Group members',
-  multiedit: 'Multiedit',
+  multiedit: 'Bulk edit',
   inviteGroup: 'Invite group',
   inviteUser: 'Invite user',
-  removeGroup: 'Remove',
-  removeUser: 'Remove',
-  removeGroupHeader: 'Remove group',
-  removeUserHeader: 'Remove user',
-  removeGroupAreYouSure: 'Are you sure you want to remove group {{groupName}} ' +
-    'from this group?',
-  removeUserAreYouSure: 'Are you sure you want to remove user {{userName}} ' +
-    'from this group?',
+  removeGroup: 'Remove this member',
+  removeUser: 'Remove this member',
+  removeGroupHeader: 'Remove member',
+  removeUserHeader: 'Remove member',
+  removeGroupAreYouSure: '"{{groupName}}" will no longer be a member of ' +
+    '"{{parentGroupName}}". Are you sure?',
+  removeUserAreYouSure: '"{{userName}}" will no longer be a member of ' +
+    '"{{parentGroupName}}". Are you sure?',
   cancel: 'Cancel',
   remove: 'Remove',
+  noSubgroupsStart: 'This group has no subgroups. To invite a subgroup, ',
+  noSubgroupsInvite: 'generate an invitation token',
+  noSubgroupsEnd: ' and send it to the subgroup owner.',
+  noUsersStart: 'This group has no users. To invite a user, ',
+  noUsersInvite: 'generate an invitation token',
+  noUsersEnd: ' and send it to the user.',
 };

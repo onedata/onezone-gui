@@ -75,43 +75,46 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all([providers, spaces]).then(([providerList, spacesList]) =>
-        Promise.all(providerList.map(provider =>
-          createListRecord(store, 'space', spacesList).then(lr => {
-            provider.set('spaceList', lr);
-            return provider.save();
-          })
-        ))
-      ).then(() => listRecords);
+      return Promise.all([providers, spaces])
+        .then(([providerList, spacesList]) =>
+          Promise.all(providerList.map(provider =>
+            createListRecord(store, 'space', spacesList).then(lr => {
+              provider.set('spaceList', lr);
+              return provider.save();
+            })
+          ))
+        )
+        .then(() => listRecords);
     })
     // push provider list and support info into spaces
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all([providers, spaces]).then(([providerList, spaceList]) =>
-        Promise.all(spaceList.map(space => {
-          space.set('supportSizes', _.zipObject(
-            get(providers, 'content').mapBy('entityId'),
-            _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
-          ));
-          return createListRecord(store, 'provider', providerList).then(lr => {
-            space.set('providerList', lr);
-            return space.save();
-          });
-        }))
-      ).then(() => listRecords);
+      return Promise.all([providers, spaces])
+        .then(([providerList, spaceList]) =>
+          Promise.all(spaceList.map(space => {
+            space.set('supportSizes', _.zipObject(
+              get(providers, 'content').mapBy('entityId'),
+              _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
+            ));
+            return createListRecord(store, 'provider', providerList).then(lr => {
+              space.set('providerList', lr);
+              return space.save();
+            });
+          }))
+        )
+        .then(() => listRecords);
     })
     // add shared groups, users and privileges to groups
-    .then(listRecords =>
-      listRecords[types.indexOf('group')].get('list')
+    .then(listRecords => listRecords[types.indexOf('group')].get('list')
       .then(models =>
         Promise.all(models.map(model =>
           attachSharedUsersGroupsToModel(
             store, model, 'group', sharedUsers, sharedGroups, groups
           )
         ))
-      ).then(() =>
-        listRecords[types.indexOf('space')].get('list')
+      )
+      .then(() => listRecords[types.indexOf('space')].get('list')
         .then(models =>
           Promise.all(models.map(model =>
             attachSharedUsersGroupsToModel(
@@ -119,9 +122,9 @@ export default function generateDevelopmentModel(store) {
             )
           ))
         )
-      ).then(() =>
-        Promise.all(['space', 'group'].map(modelType =>
-          listRecords[types.indexOf(modelType)].get('list')
+      )
+      .then(() => Promise.all(['space', 'group'].map(modelType => {
+        return listRecords[types.indexOf(modelType)].get('list')
           .then(models =>
             Promise.all(models.map(model =>
               createPrivilegesForModel(
@@ -133,9 +136,9 @@ export default function generateDevelopmentModel(store) {
                 privileges[modelType]
               )
             ))
-          )
-        ))
-      ).then(() => listRecords)
+          );
+      })))
+      .then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
 }
@@ -252,7 +255,12 @@ function createSharedGroupsRecords(store, groupsEntityIds) {
 }
 
 function attachSharedUsersGroupsToModel(
-  store, model, modelType, sharedUsers, sharedGroups, groups
+  store,
+  model,
+  modelType,
+  sharedUsers,
+  sharedGroups,
+  groups
 ) {
   return createListRecord(store, 'sharedGroup', sharedGroups)
     .then(list => model.set(modelType === 'group' ? 'childList' : 'groupList', list))
@@ -270,7 +278,12 @@ function attachSharedUsersGroupsToModel(
 }
 
 function createPrivilegesForModel(
-  store, model, modelType, sharedUsers, sharedGroups, privilegesFlags
+  store,
+  model,
+  modelType,
+  sharedUsers,
+  sharedGroups,
+  privilegesFlags
 ) {
   return Promise.all([
     createPrivilegesRecords(
@@ -283,7 +296,12 @@ function createPrivilegesForModel(
 }
 
 function createPrivilegesRecords(
-  store, model, modelType, sharedArray, privilegesArray, privilegesType
+  store,
+  model,
+  modelType,
+  sharedArray,
+  privilegesArray,
+  privilegesType
 ) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
   const modelGri = get(model, 'gri');
