@@ -39,4 +39,14 @@ export default Service.extend({
    * @type {Ember.Computed<Array<string>>}
    */
   identityProviders: reads('idps'),
+
+  /**
+   * @type {Ember.Computed<Array<string>>}
+   */
+  brandSubtitle: reads('attributes.brandSubtitle'),
+
+  /**
+   * @type {Ember.Computed<Array<string>>}
+   */
+  loginNotification: reads('attributes.loginNotification'),
 });

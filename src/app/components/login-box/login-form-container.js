@@ -8,7 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { notEmpty, gt } from '@ember/object/computed';
+import { notEmpty, gt, reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
@@ -25,6 +25,7 @@ export default LoginFormConainer.extend({
   globalNotify: inject(),
   authorizerManager: inject(),
   onezoneServer: inject(),
+  onedataConnection: inject(),
 
   /**
    * Authorizer selected in dropdown
@@ -61,6 +62,12 @@ export default LoginFormConainer.extend({
    * @type {number}
    */
   _animationTimeout: ANIMATION_TIMEOUT,
+
+  /**
+   * Admin message provided by backend
+   * @type {string}
+   */
+  loginNotification: reads('onedataConnection.loginNotification'),
 
   /**
    * Array of all suported authorizers

@@ -132,6 +132,7 @@
   .zone-subtitle {
     font-size: 0.8em;
     opacity: 0.8;
+    word-break: break-word;
   }
   .row-login-header {
     margin-bottom: 10px;
@@ -207,5 +208,21 @@
   .buttons-list {
     font-size: 32px;
     text-align: center;
+  }
+
+  .login-notification {
+    padding: $padding-base-horizontal;
+    margin: 80px auto $padding-base-vertical 0;
+    background-color: rgba($color-one-blue-gray, 0.3);
+    border: 1px solid lighten($color-one-blue-gray, 15%);
+    text-align: center;
+    font-family: 'Open Sans Semibold';
+    word-wrap: break-word;
+    @media (min-width: $screen-sm-min) {
+      position: absolute;
+      width: $screen-sm-min - 2 * $padding-base-horizontal;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 }

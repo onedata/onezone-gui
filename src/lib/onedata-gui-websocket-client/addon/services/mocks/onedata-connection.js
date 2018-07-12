@@ -17,4 +17,6 @@ export default Service.extend({
   zoneName: 'Hello world',
   serviceVersion: '18.02.0-mock',
   identityProviders: Object.freeze(AUTHORIZERS.map(auth => auth.type)),
+  brandSubtitle: 'Isolated zone',
+  loginNotification: '',
 });

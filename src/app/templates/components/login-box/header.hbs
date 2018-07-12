@@ -5,9 +5,11 @@
       <div class="zone-name">
         {{brandTitle}}
       </div>
-      <div class="zone-subtitle">
-        {{brandSubtitle}}
-      </div>
+      {{#if brandSubtitle}}
+        <div class="zone-subtitle">
+          {{brandSubtitle}}
+        </div>
+      {{/if}}
     </div>
   </div>
 </div>
