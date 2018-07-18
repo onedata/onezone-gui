@@ -12,6 +12,7 @@ export default {
   privileges: {
     group_view: 'View group',
     group_update: 'Modify group',
+    group_view_privileges: 'View privileges',
     group_set_privileges: 'Set privileges',
     group_delete: 'Remove group',
     group_create_child: 'Create child group',
@@ -33,7 +34,23 @@ export default {
   privilegesPersistence: 'privileges persistence',
   privilegesSaveSuccess: 'Privileges have been saved successfully',
   groupMembers: 'Group members',
-  multiedit: 'Multiedit',
+  multiedit: 'Bulk edit',
   inviteGroup: 'Invite group',
   inviteUser: 'Invite user',
+  removeGroup: 'Remove this member',
+  removeUser: 'Remove this member',
+  removeGroupHeader: 'Remove member',
+  removeUserHeader: 'Remove member',
+  removeGroupAreYouSure: '"{{groupName}}" will no longer be a member of ' +
+    '"{{parentGroupName}}". Are you sure?',
+  removeUserAreYouSure: '"{{userName}}" will no longer be a member of ' +
+    '"{{parentGroupName}}". Are you sure?',
+  cancel: 'Cancel',
+  remove: 'Remove',
+  noSubgroupsStart: 'This group has no subgroups. To invite a subgroup, ',
+  noSubgroupsInvite: 'generate an invitation token',
+  noSubgroupsEnd: ' and send it to the subgroup owner.',
+  noUsersStart: 'This group has no users. To invite a user, ',
+  noUsersInvite: 'generate an invitation token',
+  noUsersEnd: ' and send it to the user.',
 };

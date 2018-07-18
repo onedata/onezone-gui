@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupModelTest } from 'ember-mocha';
 import sinon from 'sinon';
+import Service from '@ember/service';
 
 import { registerService, lookupService } from '../../helpers/stub-service';
 import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
@@ -13,6 +14,7 @@ describe('Unit | Model | group', function () {
 
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
+    registerService(this, 'onedata-graph-utils', Service);
   });
 
   it('resolves invite token using token api service and graph', function (done) {

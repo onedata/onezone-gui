@@ -15,6 +15,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Model.extend(GraphModelMixin, {
   onedataGraph: inject(),
+  onedataGraphUtils: inject(),
 
   isCollection: true,
 
@@ -107,17 +108,12 @@ export default Model.extend(GraphModelMixin, {
   },
 
   _leaveRelation(aspect, relationId) {
-    const entityId = this.get('entityId');
-    return this.get('onedataGraph').request({
-        gri: gri({
-          entityType: 'user',
-          entityId,
-          aspect,
-          aspectId: relationId,
-        }),
-        operation: 'delete',
-      })
-      .then(() => this._reloadList(aspect));
+    return this.get('onedataGraphUtils').leaveRelation(
+      'user',
+      this.get('entityId'),
+      aspect,
+      relationId,
+    ).then(() => this._reloadList(aspect));
   },
 
   /**
@@ -127,22 +123,13 @@ export default Model.extend(GraphModelMixin, {
    * @returns {Object} joined record
    */
   _joinRelation(entityType, token) {
-    return this.get('onedataGraph').request({
-        gri: gri({
-          entityType,
-          aspect: 'join',
-          scope: 'private',
-        }),
-        operation: 'create',
-        data: {
-          token,
-        },
-        authHint: ['asUser', this.get('entityId')],
-      })
-      .then(({ gri }) => {
-        return this._reloadList(entityType)
-          .then(() => this.get('store').findRecord(entityType, gri));
-      });
+    return this.get('onedataGraphUtils').joinRelation(
+      entityType,
+      token, ['asUser', this.get('entityId')]
+    ).then(({ gri }) => {
+      return this._reloadList(entityType)
+        .then(() => this.get('store').findRecord(entityType, gri));
+    });
   },
 
   _reloadList(entityType) {

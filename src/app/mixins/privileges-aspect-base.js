@@ -8,7 +8,7 @@
  */
 
 import Mixin from '@ember/object/mixin';
-import EmberObject, { computed, get, getProperties } from '@ember/object';
+import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { union } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
@@ -42,6 +42,11 @@ export default Mixin.create({
    * @virtual
    */
   groupedPrivilegesFlags: undefined,
+
+  /**
+   * @type {string|undefined}
+   */
+  visibleInvitationToken: undefined,
 
   /**
    * @type {PromiseObject<string>}
@@ -89,12 +94,22 @@ export default Mixin.create({
   batchEditModalModel: Object.freeze({}),
 
   /**
+   * @type {Array<Action>}
+   */
+  userActions: undefined,
+
+  /**
+   * @type {Array<Action>}
+   */
+  groupActions: undefined,
+
+  /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
   sharedGroupList: computed('model', function () {
     return PromiseArray.create({
       promise: get(this.get('model'), 'sharedGroupList')
-        .then(sgl => get(sgl, 'list')),
+        .then(sgl => sgl ? get(sgl, 'list') : A()),
     });
   }),
 
@@ -104,14 +119,14 @@ export default Mixin.create({
   sharedUserList: computed('model', function () {
     return PromiseArray.create({
       promise: get(this.get('model'), 'sharedUserList')
-        .then(sgl => get(sgl, 'list')),
+        .then(sul => sul ? get(sul, 'list') : A()),
     });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyGroupModelList: computed('sharedGroupList.isFulfilled', function () {
+  proxyGroupModelList: computed('sharedGroupList.content.[]', function () {
     return this.get('sharedGroupList.isFulfilled') ?
       this.preparePermissionListProxy(this.get('sharedGroupList'), 'group') :
       A();
@@ -120,7 +135,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyUserModelList: computed('sharedUserList.isFulfilled', function () {
+  proxyUserModelList: computed('sharedUserList.content.[]', function () {
     return this.get('sharedUserList.isFulfilled') ?
       this.preparePermissionListProxy(this.get('sharedUserList'), 'user') :
       A();
@@ -185,6 +200,27 @@ export default Mixin.create({
       disabled: !this.get('batchEditAvailable'),
     };
   }),
+
+  modelObserver: observer('model', function () {
+    // reset state after model change
+    this.setProperties({
+      visibleInvitationToken: undefined,
+    });
+  }),
+
+  listsObserver: observer(
+    'sharedGroupList.content.[]',
+    'sharedUserList.content.[]',
+    function () {
+      // reset state after lists change
+      this.setProperties({
+        selectedUserModelProxies: A(),
+        selectedGroupModelProxies: A(),
+        batchEditActive: false,
+        batchEditModalModel: {},
+      });
+    }
+  ),
 
   /**
    * Loads new invitation token for selected subject
@@ -297,7 +333,13 @@ export default Mixin.create({
     });
     modelProxy.set('model', PromiseObject.create({
       promise: Promise.all(selectedModelProxies.map(modelProxy =>
-          this.loadModelForProxy(modelProxy)
+          this.loadModelForProxy(modelProxy).then(mp => {
+            const model = get(mp, 'model');
+            if (get(model, 'isRejected')) {
+              throw get(model, 'reason');
+            }
+            return mp;
+          })
         ))
         .then(modelProxies => safeExec(this, () => {
           const batchPrivileges = this.calculateBatchEditModel(modelProxies);
@@ -359,7 +401,7 @@ export default Mixin.create({
       } = modelProxy.getProperties('modifiedPrivileges', 'persistedPrivileges');
       const resultTree = {};
       let modified = false;
-      Object.keys(modifiedPrivileges).forEach(groupName => {
+      Object.keys(modifiedPrivileges || {}).forEach(groupName => {
         resultTree[groupName] = {};
         Object.keys(modifiedPrivileges[groupName]).forEach(privName => {
           const obtainedValue = batchModifiedPrivileges[groupName][privName];
@@ -410,10 +452,20 @@ export default Mixin.create({
 
   actions: {
     modelsSelected(type, models) {
-      this.set(
-        type === 'user' ? 'selectedUserModelProxies' : 'selectedGroupModelProxies',
-        A(models),
-      );
+      const {
+        proxyGroupModelList,
+        proxyUserModelList,
+      } = this.getProperties('proxyGroupModelList', 'proxyUserModelList');
+      let originList, targetListName;
+      if (type === 'user') {
+        originList = proxyUserModelList;
+        targetListName = 'selectedUserModelProxies';
+      } else {
+        originList = proxyGroupModelList;
+        targetListName = 'selectedGroupModelProxies';
+      }
+      models = models.filter(m => originList.includes(m));
+      this.set(targetListName, A(models));
     },
     batchEdit() {
       this.loadBatchEditModel();

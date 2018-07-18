@@ -1,0 +1,80 @@
+{{#sticky-element top=navigationState.globalBarHeight}}
+  <div class="row content-row header-row hidden-xs has-border">
+    <h1 class="with-menu">
+      <span class="one-label">
+        {{tt this "parents"}}
+      </span>
+      {{actions-toolbar isMinimized=true actionsArray=globalActions}}
+    </h1>
+  </div>
+  {{#if parentListProxy.length}}
+    <div class="form-group form-group-sm form-group-light search-group content-search with-place-for-dots">
+      <div class="input-group with-icon-addon">
+        {{search-bar search=(action (mut searchString)) class="form-control"}}
+        <div class="input-group-addon">
+          {{one-icon icon="search"}}
+        </div>
+      </div>
+    </div>
+  {{/if}}
+{{/sticky-element}}
+{{#promise-proxy-container proxy=parentListProxy}}
+  {{#if parentListProxy.length}}
+    {{#one-collapsible-list searchQuery=searchString as |list|}}
+      {{#each parentListProxy as |parent|}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header isCollapsible=false disableToggleIcon=true}}
+            <span class="item-icon-container">
+              {{one-icon class="item-icon" icon="group"}}
+              {{one-tooltip
+                title=parent.name
+                placement="top"
+                arrowPlacement="left"
+                triggerEvents="hover"
+              }}
+            </span>
+            <span class="one-label">
+              {{parent.name}}
+            </span>
+            {{actions-toolbar
+              isMinimized=true
+              toolbarClasses=""
+              toolbarToggleClasses="btn-menu-toggle"
+              dropdownPlacement="auto"
+              actionsArray=itemActions
+              actionsArg=parent}}
+          {{/listItem.header}}
+        {{/list.item}}
+      {{/each}}
+    {{/one-collapsible-list}}
+  {{else}}
+    {{content-groups-join-as-subgroup
+      isInnerView=true
+      group=group
+      text=(tt this "noParentsText" groupName=group.name)}}
+  {{/if}}
+{{/promise-proxy-container}}
+{{#bs-modal
+  class="leave-parent-modal"
+  onHide=(action "closeLeaveParentModal")
+  open=parentToLeave
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "leaveParentModalTitle"}}</h1>
+  {{/modal.header}}
+  {{#modal.body class="text-center"}}
+    {{tt this "leaveParentAreYouSure" groupName=parentToLeave.name}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button disabled=isLeaving onClick=(action "closeLeaveParentModal")}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      action=(action "leaveParent")
+      class="btn btn-danger"
+    }}
+      {{tt this "leaveGroup"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/bs-modal}}

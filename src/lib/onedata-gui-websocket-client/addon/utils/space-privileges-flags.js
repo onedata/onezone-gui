@@ -13,6 +13,7 @@ export const groupedFlags = [{
     'space_view',
     'space_update',
     'space_delete',
+    'space_view_privileges',
     'space_set_privileges',
   ],
 }, {

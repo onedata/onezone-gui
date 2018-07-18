@@ -9,14 +9,5 @@
     .token-textarea {
       height: 200px;
     }
-    .content-info .world-map {
-      top: $padding-base-vertical;
-    }
-  }
-  @media (min-width: $screen-sm-min) {
-    .content-info .world-map {
-      top: 2 * $onedata-logo-margin-top + $onedata-logo-height + $padding-base-vertical;
-      bottom: $padding-base-vertical;
-    }
   }
 }

@@ -5,7 +5,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 describe('Unit | Utility | gri', function () {
   it('allows to omit scope (old format)', function () {
     let result = gri('oneentity', 'oneid', 'oneaspect');
-    expect(result).to.be.equal('oneentity.oneid.oneaspect');
+    expect(result).to.be.equal('oneentity.oneid.oneaspect:private');
   });
   it('still supports old signature of function', function () {
     let result = gri('oneentity', 'oneid', 'oneaspect', 'protected');

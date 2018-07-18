@@ -1,0 +1,62 @@
+{{one-icon class="sidebar-item-icon" icon="group"}}
+{{one-inline-editor
+  isEditing=isRenaming
+  value=item.name
+  showEmptyInfo=false
+  onSave=(action "rename")
+  editOnClick=false
+  onEdit=(action "toggleRename")
+  class="one-label name-editor"
+  click=(action "editorClick")}}
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="auto"
+  actionsArray=itemActions}}
+
+{{#bs-modal
+  class="leave-group-modal"
+  open=leaveGroupModalOpen
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "leaveGroup"}}</h1>
+  {{/modal.header}}
+  {{#modal.body class="text-center"}}
+    {{tt this "leaveGroupAreYouSure" groupName=group.name}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button disabled=isLeaving onClick=(action "closeLeaveModal")}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      action=(action "leave")
+      class="btn btn-danger"
+    }}
+      {{tt this "leave"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/bs-modal}}
+
+{{#bs-modal
+  class="remove-group-modal"
+  open=removeGroupModalOpen
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "removeGroup"}}</h1>
+  {{/modal.header}}
+  {{#modal.body class="text-center"}}
+    {{tt this "removeGroupAreYouSure" groupName=group.name}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button disabled=isRemoving onClick=(action "closeRemoveModal")}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      action=(action "remove")
+      class="btn btn-danger"
+    }}
+      {{tt this "remove"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/bs-modal}}

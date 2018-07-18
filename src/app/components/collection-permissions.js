@@ -1,5 +1,6 @@
 /**
- * Permissions presenter and editor for a collection of models.
+ * Permissions presenter and editor for a collection of models. Yields list
+ * when there are no items to present.
  *
  * @module components/collection-permissions
  * @author Michal Borzecki
@@ -84,6 +85,11 @@ export default Component.extend(I18n, {
    * @returns {Promise<PrivilegesModelProxy>}
    */
   save: notImplementedThrow,
+
+  /**
+   * @type {Array<Action>}
+   */
+  itemActions: undefined,
 
   actions: {
     reset(modelProxy) {

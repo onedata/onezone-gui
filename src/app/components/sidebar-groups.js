@@ -54,15 +54,20 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-groups/group-item',
+
+  /**
+   * @override
+   */
   secondLevelItems: computed(function getSecondLevelItems() {
     return [{
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',
     }, {
-      id: 'more',
-      label: this.t('aspects.more'),
-      icon: 'overview',
+      id: 'parents',
+      label: this.t('aspects.parents'),
+      icon: 'parents',
     }];
   }),
 });

@@ -24,7 +24,7 @@
   isLoading=(or sharedGroupList.isPending sharedUserList.isPending)
   errorReason=(or sharedGroupList.reason sharedUserList.reason)}}
   <div class="row">
-    {{collection-permissions
+    {{#collection-permissions
       proxyList=proxyGroupModelList
       subjectType="group"
       modelsSelected=(action "modelsSelected" "group")
@@ -33,10 +33,26 @@
       groupedPrivilegesFlags=groupedPrivilegesFlags
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
-      save=(action "saveOne")}}
+      save=(action "saveOne")
+      itemActions=groupActions as |list|}}
+      {{#list.item as |listItem|}}
+        {{#listItem.header
+          class="text-center"
+          disableToggleIcon=true
+          isCollapsible=false
+          hasCheckbox=false
+          truncate=false}}
+          <span class="one-label">
+            {{tt this "noSubgroupsStart"}}
+            <a {{action "showInvitationToken" "group"}}>{{tt this "noSubgroupsInvite"}}</a>
+            {{tt this "noSubgroupsEnd"}}
+          </span>
+        {{/listItem.header}}
+      {{/list.item}}
+    {{/collection-permissions}}
   </div>
   <div class="row">
-    {{collection-permissions
+    {{#collection-permissions
       proxyList=proxyUserModelList
       subjectType="user"
       modelsSelected=(action "modelsSelected" "user")
@@ -45,7 +61,23 @@
       groupedPrivilegesFlags=groupedPrivilegesFlags
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
-      save=(action "saveOne")}}
+      save=(action "saveOne")
+      itemActions=userActions as |list|}}
+      {{#list.item as |listItem|}}
+        {{#listItem.header
+          class="text-center"
+          disableToggleIcon=true
+          isCollapsible=false
+          hasCheckbox=false
+          truncate=false}}
+          <span class="one-label">
+            {{tt this "noUsersStart"}}
+            <a {{action "showInvitationToken" "user"}}>{{tt this "noUsersInvite"}}</a>
+            {{tt this "noUsersEnd"}}
+          </span>
+        {{/listItem.header}}
+      {{/list.item}}
+    {{/collection-permissions}}
   </div>
 {{/loading-container}}
 {{privileges-batch-edit-modal
