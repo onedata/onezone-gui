@@ -34,7 +34,7 @@ export const groupedFlags = [{
 }, {
   groupName: 'groupManagement',
   privileges: [
-    'space_invite_group',
+    'space_add_group',
     'space_remove_group',
   ],
 }, {

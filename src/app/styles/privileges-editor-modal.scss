@@ -1,4 +1,4 @@
-.batch-privileges-edit.modal {
+.privileges-editor-modal {
   .one-dynamic-tree {
     margin: 0 auto;
   }
@@ -25,6 +25,12 @@
 
   .modal-footer {
     line-height: $padding-base-vertical * 3 + $line-height-computed;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .one-dynamic-tree, .batch-edit-tree-title {
+      max-width: 350px;
+    }
   }
 
   @media (max-width: $screen-xs-max) {

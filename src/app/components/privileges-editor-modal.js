@@ -1,7 +1,7 @@
 /**
  * A modal for batch changing privileges.
  *
- * @module components/privileges-batch-edit-modal
+ * @module components/privileges-editor-modal
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -20,12 +20,12 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.privilegesBatchEditModal',
+  i18nPrefix: 'components.privilegesEditorModal',
 
   /**
    * @type {boolean}
    */
-  modalActive: false,
+  opened: false,
 
   /**
    * Grouped privileges used to construct tree nodes.
@@ -62,4 +62,9 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   close: notImplementedThrow,
+
+  /**
+   * @type {boolean}
+   */
+  processing: false,
 });

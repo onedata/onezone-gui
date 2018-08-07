@@ -1,0 +1,31 @@
+.privileges-tree-editor {
+  @media (max-width: $screen-xs-max) {
+    .form-group {
+      text-align: right;
+    }
+
+    .one-dynamic-tree label {
+      max-width: calc(100% - 60px);
+    }
+  }
+  @media (min-width: $screen-sm-min) {
+    .one-dynamic-tree, .batch-edit-tree-title {
+      max-width: 350px;
+    }
+
+    .form-group {
+      text-align: right;
+      padding-right: $padding-small-horizontal;
+    }
+  }
+  .one-dynamic-tree .one-tree .one-tree-list > li {
+    &.has-checkbox-group.subtree-expanded > .tree-item-content-container {
+      margin-right: initial;
+    }
+
+    .one-tree-item-content .form-group {
+      min-width: 4em;
+      width: 4em;
+    }
+  }
+}

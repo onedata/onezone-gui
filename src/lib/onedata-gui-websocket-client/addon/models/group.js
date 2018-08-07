@@ -9,7 +9,8 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { inject as service } from '@ember/service';
-import { alias } from '@ember/object/computed';
+import { computed } from '@ember/object';
+import { alias, equal } from '@ember/object/computed';
 
 import GraphModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
@@ -19,16 +20,36 @@ export default Model.extend(GraphModelMixin, InvitingModelMixin, {
 
   name: attr('string'),
   type: attr('string'),
+  scope: attr('string'),
+  directMembership: attr('boolean'),
+  canViewPrivileges: attr('boolean'),
 
   // for features, that will be moved from OP GUI to OZ GUI
   // spaceList: belongsTo('spaceList'),
 
   parentList: belongsTo('groupList'),
-  childList: belongsTo('sharedGroupList'),
+  childList: belongsTo('groupList'),
   userList: belongsTo('sharedUserList'),
 
-  sharedUserList: alias('userList'),
-  sharedGroupList: alias('childList'),
+  /**
+   * Alias to make access to the group/user members compatible with the space model
+   * @type {Ember.ComputedProperty<GroupList>}
+   */
+  groupList: alias('childList'),
+
+  /**
+   * True if user is an effective member of that group
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  membership: computed('scope', function membership() {
+    return ['private', 'protected'].indexOf(this.get('scope')) !== -1;
+  }),
+
+  /**
+   * True, if user has a "View group" privilege
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasViewPrivilege: equal('scope', 'private'),
 
   joinSpace(token) {
     return this._joinRelation('space', token);

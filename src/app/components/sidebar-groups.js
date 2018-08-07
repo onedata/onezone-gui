@@ -8,7 +8,6 @@
  */
 
 import { computed } from '@ember/object';
-import { A } from '@ember/array';
 import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
 import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -27,14 +26,6 @@ export default TwoLevelSidebar.extend(I18n, {
    * @override
    */
   model: null,
-
-  /**
-   * @override
-   * Keep original sorting from server, but make a copy of array
-   */
-  sortedCollection: computed('model.collection.list.[]', function () {
-    return A(this.get('model.collection.list').toArray());
-  }),
 
   /**
    * @override
@@ -68,6 +59,10 @@ export default TwoLevelSidebar.extend(I18n, {
       id: 'parents',
       label: this.t('aspects.parents'),
       icon: 'parents',
+    }, {
+      id: 'hierarchy',
+      label: this.t('aspects.hierarchy'),
+      icon: 'hierarchy',
     }];
   }),
 });

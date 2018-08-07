@@ -9,8 +9,8 @@ describe('Unit | Service | onedata graph context', function () {
 
   it('removes specific registered context, leaving previous contexts', function () {
     const requestedId = 'a:b:c';
-    let firstContext = 'x:y:z';
-    let secondContext = '1:2:3';
+    let firstContext = 'group.abc.children';
+    let secondContext = 'space.def.groups';
     let service = this.subject();
 
     service.register(requestedId, firstContext);
@@ -24,8 +24,8 @@ describe('Unit | Service | onedata graph context', function () {
   // Replace this with your real tests.
   it('returns last registered context', function () {
     const requestedId = 'a:b:c';
-    let firstContext = 'x:y:z';
-    let secondContext = '1:2:3';
+    let firstContext = 'group.abc.children';
+    let secondContext = 'space.def.groups';
     let service = this.subject();
 
     service.register(requestedId, firstContext);

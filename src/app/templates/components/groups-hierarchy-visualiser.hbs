@@ -1,0 +1,74 @@
+{{!-- to avoid z-index incrementing to preserve left-over-right column
+z-index order, columns are rendered in the reversed order. In that case
+right column will always be before left in html --}}
+{{#each (reverse columnManager.columns) key="columnId" as |column|}}
+  {{groups-hierarchy-visualiser/column
+    column=column
+    showParents=(action "showParents")
+    showChildren=(action "showChildren")
+    removeRelation=(action (mut relationToRemove))
+    modifyPrivileges=(action (mut relationPrivilegesToChange))
+    renameGroup=(action "renameGroup")
+    leaveGroup=(action (mut groupToLeave))
+    removeGroup=(action (mut groupToRemove))
+    createRelativeGroup=(action "showCreateRelativeModal")
+    addYourGroup=(action "showAddYourGroupModal")
+    joinUsingToken=(action (mut groupConsumingToken))
+    inviteUsingToken=(action (mut invitingGroupUsingToken))
+    viewGroup=(action "viewGroup")}}
+  {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
+{{/each}}
+{{group-leave-modal
+  opened=groupToLeave
+  close=(action (mut groupToLeave) null)
+  proceed=(action "leaveGroup")
+  processing=isLeavingGroup
+  group=groupToLeave}}
+{{group-remove-modal
+  opened=groupToRemove
+  close=(action (mut groupToRemove) null)
+  proceed=(action "removeGroup")
+  processing=isRemovingGroup
+  group=groupToRemove}}
+{{group-remove-relation-modal
+  opened=relationToRemove
+  close=(action (mut relationToRemove) null)
+  proceed=(action "removeRelation")
+  processing=isRemovingRelation
+  parentGroup=relationToRemove.parentGroup
+  childGroup=relationToRemove.childGroup}}
+{{group-create-relative-modal
+  opened=groupToCreateRelative
+  close=(action (mut groupToCreateRelative) null)
+  proceed=(action "createRelative")
+  processing=isCreatingRelativeGroup
+  relatedGroup=groupToCreateRelative
+  relation=newRelativeGroupType}}
+{{group-add-your-group-modal
+  opened=groupToAddYourGroup
+  close=(action (mut groupToAddYourGroup) null)
+  proceed=(action "addYourGroup")
+  processing=isAddingYourGroup
+  relatedGroup=groupToAddYourGroup
+  relation=addYourGroupType}}
+{{group-join-using-token-modal
+  opened=groupConsumingToken
+  close=(action (mut groupConsumingToken) null)
+  proceed=(action "joinUsingToken")
+  processing=isGroupConsumingToken}}
+{{group-invite-using-token-modal
+  opened=invitingGroupUsingToken
+  close=(action (mut invitingGroupUsingToken) null)
+  group=invitingGroupUsingToken}}
+{{#if privilegesEditorModel}}
+  {{privileges-editor-modal
+    privilegesGroups=groupedPrivilegesFlags
+    privilegeGroupsTranslationsPath="components.contentGroupsMembers.privilegeGroups"
+    privilegesTranslationsPath="components.contentGroupsMembers.privileges"
+    modelProxy=privilegesEditorModel
+    save=(action "savePrivileges")
+    close=(action (mut relationPrivilegesToChange) null)
+    opened=relationPrivilegesToChange
+    processing=isSavingRelationPrivileges
+    treeRootText=privilegesTreeRootText}}
+{{/if}}

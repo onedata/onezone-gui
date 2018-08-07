@@ -16,4 +16,18 @@ export default ErrorExtractor.extend({
    * @override
    */
   extractorFunction: getErrorDetails,
+
+  /**
+   * @param {*} error
+   * @returns {string} 
+   */
+  getType(error) {
+    const errorId = (error || {}).id;
+    switch (errorId) {
+      case 'forbidden':
+        return 'forbidden';
+      default:
+        return 'error';
+    }
+  },
 });

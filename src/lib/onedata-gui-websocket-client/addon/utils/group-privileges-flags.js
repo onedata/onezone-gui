@@ -19,11 +19,9 @@ export const groupedFlags = [{
 }, {
   groupName: 'groupHierarchyManagement',
   privileges: [
-    'group_create_child',
-    'group_invite_child',
+    'group_add_child',
     'group_remove_child',
-    'group_create_parent',
-    'group_join_parent',
+    'group_add_parent',
     'group_leave_parent',
   ],
 }, {
@@ -35,8 +33,7 @@ export const groupedFlags = [{
 }, {
   groupName: 'spaceManagement',
   privileges: [
-    'group_create_space',
-    'group_join_space',
+    'group_add_space',
     'group_leave_space',
   ],
 }, {

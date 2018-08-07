@@ -1,0 +1,37 @@
+{{#proceed-process-modal
+  opened=opened
+  close=close
+  proceed=(action "add")
+  processing=processing
+  modalClass="group-add-your-group-modal"
+  headerText=(tt this "addYourGroup")
+  proceedButtonClass="btn btn-primary proceed"
+  proceedButtonText=(tt this "add")
+  proceedDisabled=proceedDisabled}}
+  <p class="input-top-description">
+    {{tt this "message"
+      relation=relation
+      groupName=relatedGroup.name}}
+  </p>
+  <div class="dropdown-container">
+    {{#promise-proxy-container proxy=availableGroups sizeClass="sm"}}
+      {{#power-select
+        options=groupsForDropdown
+        selected=selectedGroup
+        onchange=(action (mut selectedGroup))
+        matcher=(action "groupMatcher")
+        searchEnabled=true
+        renderInPlace=true
+        placeholder=(tt this "dropdownPlaceholder")
+        as |group|
+      }}
+        <div class="option-container">
+          {{#truncated-string}}
+            {{one-icon icon="group"}}
+            <span class="text group-name">{{group.name}}</span>
+          {{/truncated-string}}
+        </div>
+      {{/power-select}}
+    {{/promise-proxy-container}}
+  </div>
+{{/proceed-process-modal}}

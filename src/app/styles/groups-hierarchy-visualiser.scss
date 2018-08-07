@@ -1,0 +1,347 @@
+.groups-hierarchy-visualiser {
+  $animation-time: 0.3s;
+  $column-header-height: 50px;
+  $box-border-color: $main-border-color;
+  $box-border-active-color: $color-one-azure;
+  $relation-indicator-color: $main-border-color;
+  $relation-indicator-active-color: $color-one-azure;
+  $line-height: 2px;
+  $line-color: $color-one-azure;
+  $line-active-color: $color-one-dark-blue;
+  $line-extra-hover-place: 5px;
+  $actions-trigger-color: $main-text-color;
+  $actions-trigger-active-color: $color-one-azure;
+
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  .group-box {
+    position: absolute;
+    padding: $padding-base-vertical $padding-small-horizontal;
+    padding-left: 30px + $padding-small-horizontal;
+    border: $line-height solid $box-border-color;
+    border-radius: $border-radius-large;
+    background-color: $color-one-white;
+    opacity: 1;
+    transition: top $animation-time / 2 linear, left $animation-time linear, opacity $animation-time linear;
+    font-size: 0.9em;
+
+    &:hover, &.hovered {
+      box-shadow: 0 0 2px 2px rgba($box-border-active-color, 0.4);
+      border-color: $box-border-active-color;
+    }
+
+    .box-icon {
+      @include vertical-align-middle();
+      position: absolute;
+      left: $padding-small-horizontal;
+      font-size: 1.8em;
+    }
+  }
+
+  .actions-trigger {
+    $trigger-size: 22px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%) translateY(1px);
+    display: none;
+    color: $actions-trigger-color;
+    font-size: $trigger-size;
+    cursor: pointer;
+    &:hover {
+      color: $color-one-azure;
+    }
+    &::after {
+      content: '';
+      @include absolute-align-middle-center();
+      display: block;
+      width: $trigger-size * 0.9;
+      height: $trigger-size * 0.9;
+      background-color: $color-one-white;
+      border-radius: 100%;
+      z-index: -1;
+    }
+  }
+
+  .group-box {
+    &.active {
+      border-color: $color-one-azure;
+    }
+
+    &.filtered-out {
+      $filtered-out-border-color: lighten($box-border-color, 10%);
+      border-color: $filtered-out-border-color;
+      color: lighten($main-text-color, 40%);
+      .group-box-relation {
+        &:not(.active) {
+          color: $main-text-color;
+        }
+        // adds pseudotransparency effect
+        &::after {
+          @include fill-container();
+          content: '';
+          position: absolute;
+          display: block;
+          background-color: rgba($color-one-white, 0.5)
+        }
+      }
+
+      .group-actions-trigger {
+        color: lighten($color-one-dark-gray, 20%);
+      }
+
+      .group-actions-trigger:hover, &.actions-opened .group-actions-trigger {
+        color: lighten($color-one-azure, 20%);
+      }
+    }
+
+    &:hover, &.hovered, &.actions-opened {
+      .group-actions-trigger {
+        display: block;
+      }
+    }
+
+    &.actions-opened .group-actions-trigger {
+      color: $actions-trigger-active-color;
+    }
+  }
+
+  .group-actions-trigger {
+    bottom: 0;
+  }
+
+  .group-box-relation {
+    $relation-indicator-translate-y: translateY(-50%) translateY($line-height);
+    $relation-icon-margin-fix: 0.2em;
+
+    position: absolute;
+    top: 100% * (2 / 3);
+    padding: 0 0.8 * $padding-xs-horizontal;
+    border-radius: $border-radius-base;
+    background-color: $relation-indicator-color;
+    font-family: 'Open Sans Semibold';
+    font-size: 0.6em;
+    line-height: 16px;
+    white-space: nowrap;
+
+    .one-icon {
+      position: relative;
+      font-size: 1.3em;
+      line-height: 0;
+      top: 0.3em;
+    }
+
+    &:hover {
+      background-color: darken($relation-indicator-color, 10%);
+    }
+
+    &.no-view .one-icon {
+      font-size: 2em;
+    }
+
+    &.active {
+      background-color: $relation-indicator-active-color;
+      color: $color-one-white;
+      &:hover {
+        background-color: lighten($relation-indicator-active-color, 10%);
+      }
+    }
+
+    &.loading {
+      min-width: 3em;
+      .spinner div {
+        background-color: $main-text-color !important;
+      }
+      &.active .spinner div {
+        background-color: $color-one-white !important;
+      }
+    }
+
+    &.parents {
+      left: 0;
+      transform: $relation-indicator-translate-y translateX(-100%) translateX(2 * $padding-xs-horizontal);
+      .one-icon {
+        margin-left: -$relation-icon-margin-fix;
+      } 
+    }
+
+    &.children {
+      right: 0;
+      transform: $relation-indicator-translate-y translateX(100%) translateX(-2 * $padding-xs-horizontal);
+      .one-icon {
+        margin-left: -$relation-icon-margin-fix;
+        margin-right: -$relation-icon-margin-fix;
+      } 
+    }
+
+    &.error {
+      border: 2px solid $box-border-color;
+      color: $color-one-danger;
+      background-color: $color-one-white;
+      line-height: 12px;
+
+      &:hover {
+        border-color: $relation-indicator-active-color;
+        background-color: $color-one-white;
+      }
+
+      .one-icon {
+        font-size: 1.8em !important;
+      }
+    }
+
+    &.error, &.no-view {
+      &.parents .one-icon {
+        margin-right: -$relation-icon-margin-fix;
+      }
+    }
+  }
+
+  .direct-membership-icon {
+    position: absolute;
+    top: $padding-small-vertical;
+    right: $padding-small-vertical;
+    font-size: 1.2em;
+  }
+
+  .column-loader {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba($color-one-semiwhite, 0.5);
+    .resource-load-error {
+      margin: $padding-small-horizontal;
+    }
+  }
+
+  .column-separator {
+    position: absolute;
+    top: 0;
+    transform: translateY($column-header-height) translateX(-$line-height / 2);
+    transition: left $animation-time linear;
+    z-index: 1;
+  }
+
+  .column-separator-placeholder {
+    position: absolute;
+    width: $line-height / 2;
+    background-color: $main-border-color;
+  }
+
+  .column-separator-line {
+    position: absolute;
+    width: $line-height;
+    background-color: $line-color;
+    transition: left $animation-time linear;
+
+    &.hovered {
+      width: $line-height * 2;
+      transform: translateX(-$line-height / 2) translateY(-$line-height / 2);
+      border-bottom: $line-height solid $line-active-color;
+      background-color: $line-active-color;
+      box-sizing: content-box;
+    }
+  }
+
+  .group-box-line {
+    position: absolute;
+    height: $line-height;
+    background-color: $line-color;
+    transition: width $animation-time linear, left $animation-time linear, top $animation-time / 2 linear;
+    transform: translateX(-$line-height);
+
+    // adds extra height to make hover more available to user
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -$line-extra-hover-place;
+      bottom: -$line-extra-hover-place;
+      left: 0;
+      right: 0;
+    }
+
+    &.hovered {
+      height: $line-height * 2;
+      transform: translateX(-$line-height) translateY(-$line-height / 2);
+      background-color: $line-active-color;
+    }
+
+    &.actions-visible .actions-trigger {
+      display: block;
+    }
+
+    &.actions-opened .actions-trigger {
+      color: $actions-trigger-active-color;
+    }
+
+    .actions-trigger {
+      @include absolute-align-middle-center;
+    }
+  }
+
+
+  .column {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    padding-top: $column-header-height;
+    transition: left $animation-time linear, width $animation-time linear;
+  }
+
+  .column-header {
+    position: absolute;
+    top: 0;
+    height: $column-header-height;
+    width: 100%;
+    line-height: $column-header-height;
+    border: 1px solid $main-border-color;
+    border-width: 0 1px 1px 0px;
+    text-align: center;
+    background-color: white;
+    z-index: 2;
+  }
+
+  .group-boxes-container {
+    position: absolute;
+    top: $column-header-height;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .one-inline-editor {
+    &.editor {
+      padding-right: 40px;
+    }
+
+    &:hover {
+      .one-label {
+        border: 0;
+      }
+    }
+
+    .action-icons {
+      font-size: 1.4em;
+    }
+
+    .one-label {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      // override inline-editor click cursor
+      cursor: initial !important;
+    }
+
+    input {
+      // reducing additional input height to make "inline" look
+      margin: -($padding-small-vertical + 3.5px) 0;
+    }
+  }
+}
+
+.groups-hierarchy-visualiser-actions {
+  font-size: 0.8em;
+}

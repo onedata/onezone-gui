@@ -1,0 +1,37 @@
+{{#truncated-string class="column-header"}}
+  {{#if (eq column.relationType "parents")}}
+    {{tt this "parentsOfGroup" groupName=column.relatedGroup.name}}
+  {{else if (eq column.relationType "children")}}
+    {{tt this "childrenOfGroup" groupName=column.relatedGroup.name}}
+  {{else if (eq column.relationType "startPoint")}}
+    {{column.model.content.[0].name}}
+  {{/if}}
+{{/truncated-string}}
+{{#perfect-scrollbar-element
+  class="group-boxes-container"
+  onScroll=(action "scroll")
+  supressScrollY=column.model.isPending}}
+  {{#each column.groupBoxes key="groupId" as |groupBox|}}
+    {{groups-hierarchy-visualiser/group-box
+      groupBox=groupBox
+      parentsRelationActive=(eq groupBox column.parentsRelationGroupBox)
+      childrenRelationActive=(eq groupBox column.childrenRelationGroupBox)
+      showParents=(action showParents column groupBox.group)
+      showChildren=(action showChildren column groupBox.group)
+      viewGroup=(action viewGroup groupBox.group)
+      renameGroup=(action renameGroup groupBox.group)
+      createRelativeGroup=(action createRelativeGroup groupBox.group)
+      addYourGroup=(action addYourGroup groupBox.group)
+      inviteUsingToken=(action inviteUsingToken groupBox.group)
+      joinUsingToken=(action joinUsingToken groupBox.group)
+      leaveGroup=(action leaveGroup groupBox.group)
+      removeGroup=(action removeGroup groupBox.group)
+      modifyPrivileges=modifyPrivileges
+      removeRelation=removeRelation}}
+  {{/each}}
+{{/perfect-scrollbar-element}}
+{{#if (not column.model.isFulfilled)}}
+  <div class="column-loader">
+    {{promise-proxy-container proxy=column.model}}
+  </div>
+{{/if}}

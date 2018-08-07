@@ -21,8 +21,8 @@
   {{/if}}
 {{/sticky-element}}
 {{#loading-container
-  isLoading=(or sharedGroupList.isPending sharedUserList.isPending)
-  errorReason=(or sharedGroupList.reason sharedUserList.reason)}}
+  isLoading=(or groupList.isPending userList.isPending)
+  errorReason=(or groupList.reason userList.reason)}}
   <div class="row">
     {{#collection-permissions
       proxyList=proxyGroupModelList
@@ -80,12 +80,14 @@
     {{/collection-permissions}}
   </div>
 {{/loading-container}}
-{{privileges-batch-edit-modal
+{{privileges-editor-modal
   privilegesGroups=groupedPrivilegesFlags
   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
   privilegesTranslationsPath=privilegesTranslationsPath
   modelProxy=batchEditModalModel
   save=(action "saveBatch")
   close=(action "batchEditClose")
-  modalActive=batchEditActive}}
+  opened=batchEditActive
+  processing=isBatchEditSaving
+  treeRootText=(tt this "batchEditModalSelectedItems")}}
 {{yield}}

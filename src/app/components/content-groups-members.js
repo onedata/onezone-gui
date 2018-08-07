@@ -40,8 +40,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    * @override
    */
   privilegeGriAspects: Object.freeze({
-    user: 'user_privileges',
-    group: 'child_privileges',
+    user: 'user',
+    group: 'child',
   }),
 
   /**
@@ -50,7 +50,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   modelType: 'group',
 
   /**
-   * @type {SharedGroup}
+   * @type {Group}
    */
   groupToRemove: null,
 

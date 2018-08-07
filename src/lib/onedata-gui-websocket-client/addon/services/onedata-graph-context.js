@@ -51,6 +51,11 @@ export default Service.extend({
    * @returns {undefined}
    */
   register(requestedGri, contextGri) {
+    const authHintThrough = authHintGet(contextGri);
+    // do not register context if it is incorrect
+    if (!authHintThrough) {
+      return;
+    }
     let contexts = this.get('findRecordContext');
     let registeredContexts = contexts.get(requestedGri);
     if (registeredContexts == null) {

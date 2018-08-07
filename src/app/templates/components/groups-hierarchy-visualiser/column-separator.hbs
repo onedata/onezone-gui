@@ -1,0 +1,16 @@
+<div
+  class="column-separator-placeholder"
+  style={{html-safe (concat "top: " separator.topLineY "px; height: " separator.topLineHeight "px;")}}></div>
+{{#if separator.centralLineHeight}}
+  <div
+    class="column-separator-line"
+    style={{html-safe (concat "top: " separator.centralLineY "px; height: " separator.centralLineHeight "px;")}}></div>
+  {{#if separator.hoveredLine}}
+    <div
+      class="column-separator-line hovered"
+      style={{html-safe (concat "top: " separator.hoveredLine.lineY "px; height: " separator.hoveredLine.lineHeight "px;")}}></div>
+  {{/if}}
+{{/if}}
+<div
+  class="column-separator-placeholder"
+  style={{html-safe (concat "top: " separator.bottomLineY "px; height: " separator.bottomLineHeight "px;")}}></div>
