@@ -1,3 +1,13 @@
+/**
+ * Workspace implementation for groups hierarchy visualiser. It contains values,
+ * that are related to environment only.
+ * 
+ * @module utils/groups-hierarchy-visualiser/workspace
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed } from '@ember/object';
 
 export default EmberObject.extend({

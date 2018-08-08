@@ -1,5 +1,163 @@
 /**
- * A component that shows groups hierarchy using graph like representation.
+ * A component that shows groups hierarchy using tree like representation, where
+ * each level of tree is represented as a column.
+ * Graph is created using following elements:
+ *  * Logic:
+ *    - GroupsHierarchyVisualiser component - creates new columns, updates
+ *      Workspace with new information on window resize.
+ *    - Workspace - contains information about environment - width and height of
+ *      available place, columns number and width, group box size etc.
+ *      Is injected to all logic elements.
+ *    - ColumnManager - manages columns. Allows adding and replacing columns
+ *      with animation, automatically removes/adds columns to fulfill needed
+ *      columns number.
+ *    - Column - column representation. Handles column positioning and scrolling,
+ *      creating group boxes according to given model. Automatically infers
+ *      context using previous and next column and calculates position values,
+ *      that are common for many elements inside column (to optimize calculations).
+ *    - ColumnSeparator - calculates position of column separator elements.
+ *    - GroupBox - calculates position for group box.
+ *    - GroupBoxLine (including GroupBoxRightLine and GroupBoxLeftLine) - calculates
+ *      position and hover state of lines related to specified group box.
+ *    - Relation - simple class which represents a parent-child relation.
+ * 
+ *                   GroupsHierarchyVisualiser component
+ *                                    |
+ *                    +---------------+---------------+
+ *                    |                               |
+ *                    |1-1                            |1-1
+ *                    |                               |
+ *                Workspace                     ColumnManager
+ *                                                    |
+ *                                                    |1-n
+ *                                                    |
+ *                                                  Column
+ *                                                    |
+ *                                    +---------------+---------------+
+ *                                    |                               |
+ *                                    |1-m                            |1-1
+ *                                    |                               |
+ *                                 GroupBox                    ColumnSeparator
+ *                                    |
+ *                    +---------------+---------------+
+ *                    |                               |
+ *                    |1-1                            |1-1
+ *                    |                               |
+ *             GroupBoxLeftLine               GroupBoxRightLine
+ *                    |                               |
+ *                    |1-1                            |1-1
+ *                    |                               |
+ *                Relation                        Relation
+ * 
+ *  * Components:
+ *    - GroupsHierarchyVisualiser component - renders columns, related column
+ *      separators and needed modals, handles group and relation actions.
+ *    - GroupsHierarchyVisualiser/Column component - renders column header and
+ *      group boxes in perfect scroll component. Also renders loading placeholder
+ *      if necessary.
+ *    - GroupsHierarchyVisualiser/ColumnSeparator component - renders vertical
+ *      line between two columns. Also shows line that connects opposite group box
+ *      lines to create a relation line.
+ *    - GroupsHierarchyVisualiser/GroupBox component - renders group box: group
+ *      box lines, name, name editor, group box relations and group actions.
+ *    - GroupsHierarchyVisualiser/GroupBoxLeftLine and GroupBoxRightLine components
+ *      - renders left/right line, that connects group box to the separator and
+ *      optional relation actions.
+ *    - GroupsHierarchyVisualiser/GroupBoxRelation component - renders child/parent
+ *      relation indicator - number of groups in relation. It is a trigger to
+ *      show/hide relation in previous/next column.
+ *    - modals: GroupLeaveModal, GroupRemoveModal, GroupRemoveRelationModal,
+ *      GroupCreateRelativeModal, GroupAddYourGroupModal, GroupJoinUsingTokenModal,
+ *      GroupInviteUsingTokenModal, PrivilegesEditorModal.
+ * 
+ *                        GroupsHierarchyVisualiser
+ *                                    |
+ *                    +---------------+---------------+
+ *                    |                               |
+ *                    |1-n                            |1-n
+ *                    |                               |
+ *             ColumnSeparator                      Column
+ *                                                    |
+ *                                                    |1-m
+ *                                                    |
+ *                                                 GroupBox
+ *                                                    |
+ *                                 +------------------+------------------+
+ *                                 |                  |                  |
+ *                                 |1-1               |1-1               |1-2
+ *                                 |                  |                  |
+ *                         GroupBoxLeftLine   GroupBoxRightLine  GroupBoxRelation
+ * 
+ * Column types:
+ *   There are four types of columns:
+ *     * empty - column used as a placeholder. It does not represent any
+ *       relation/group.
+ *     * startPoint - column used to initialize graph. It always contains only
+ *       one group, which is the same as passed to GroupsHierarchyVisualiser
+ *       component.
+ *     * children - column with children of some group.
+ *     * parents - column with parents of some group.
+ *   To fully describe these types there are tree fields in Column class:
+ *     * relationType - string name of the type: `empty`, `startPoint`,
+ *       `children`, `parents`.
+ *     * relatedGroup - group which is a context for relation. It must be not
+ *       null for children and parents types, and null for empty and startPoint.
+ *       For children it is a parent group for those children, for parents it
+ *       is a children group of those parents.
+ *     * model - ProxyArray with groups. For empty type it should be an empty
+ *       array, for startPoint it must contain an array with exactly one group,
+ *       for children/parents there are no requirements - can contain many groups,
+ *       or be an empty array.
+ * 
+ * Flow:
+ *   * GroupsHierarchyVisualiser component attaches its' own window resize
+ *     handlers and setups Workspace and ColumnManager objects (Workspace is
+ *     passed to ColumnManager).
+ *   * Workspace calculates number of columns and column width according to
+ *     detected component width. These informations are recalculated on each
+ *     window resize.
+ *   * ColumnManager observes Workspace.columnsNumber and adds empty/removes
+ *     existing columns to satisfy columnsNumber requirement. When array of
+ *     columns changes, ColumnManager updates prevColumn and nextColumn fields
+ *     in columns, to allow them to recalculate tree context.
+ *   * On init GroupsHierarchyVisualiser, depending on columnsNumber, tries to
+ *     add startPoint column with main group and, if possible, children column
+ *     for that group. Columns are created by GroupsHierarchyVisualiser methods
+ *     and placed in tree using ColumnManager methods.
+ *   * GroupsHierarchyVisualiser renders columns using
+ *     GroupsHierarchyVisualiser/Column component.
+ *   * Column observes model, and when there are new groups available, it creates
+ *     new GroupBox objects.
+ *   * According to searchString in Workspace and groupName in GroupBox Column
+ *     sorts group boxes. Sorted array is then used to render group boxes using
+ *     GroupsHierarchyVisualiser/GroupBox component.
+ *   * Each GroupBox creates its' own GroupBoxLeftLine and GroupBoxRightLine
+ *     instances.
+ *   * GroupBox lines calculates theirs positions using values precalculated in
+ *     Column (they are the same for all lines in the same column).
+ *   * GroupBox position is calculated according to the index of group box in
+ *     sorted group box array and the group box size values in Workspace.
+ *   * Relation context - which group box has an expanded column and where to draw
+ *     relation lines is calculated using data in Column.prevColumn and
+ *     Column.nextColumn and is available through fields:
+ *     Column.parentsRelationGroupBox, Column.childrenRelationGroupBox,
+ *     Column.hasParentsLines, Column.hasChildrenLines.
+ *   * Using column relation context proper GroupBox is marked as active and
+ *     some lines changes thier visibility status and actions availability
+ *     (relation actions, which are placed on lines are available only on "n"
+ *     part of 1-n relation line. In code it means, that only left or right group
+ *     box line or none of them can have available actions, not both).
+ *   * Having information about group box lines placement, ColumnSeparator can
+ *     calculate positions of separator lines. Separator draws lines between
+ *     column, where it is placed and the nextColumn so it does not depend on
+ *     prevColumn.
+ *   * GroupsHierarchyVisualiser/ColumnSeparator component renders separator,
+ *     GroupsHierarchyVisualiser/GroupBox component renders group box,
+ *     GroupsHierarchyVisualiser/GroupBoxLine component renders right and left 
+ *     group box line and GroupsHierarchyVisualiser/GroupBoxRelation renders
+ *     relation indicator. There are no calculations, that depend on already
+ *     rendered components (e.g. real height of rendered group box) - all values
+ *     are fixed in Workspace and properties computed in utils.
  *
  * @module components/groups-hierarchy-visualiser
  * @author Michal Borzecki

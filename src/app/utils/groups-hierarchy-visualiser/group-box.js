@@ -1,3 +1,20 @@
+/**
+ * Group box implementation for groups hierarchy visualiser.
+ * 
+ * Filtration status of group box is defined in GroupBox instead of Column
+ * to make GroupBox more standalone.
+ * 
+ * Y position of the group box is calculated without knowledge about Y positions
+ * of earlier group boxes in column. Index in column and fixed group box height
+ * is used instead. It is a quicker way, because we do not need to wait for render
+ * to specify the position of the box.
+ *
+ * @module utils/groups-hierarchy-visualiser/group-box
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed } from '@ember/object';
 import { reads, and } from '@ember/object/computed';
 import GroupBoxLeftLine from 'onezone-gui/utils/groups-hierarchy-visualiser/group-box-left-line';

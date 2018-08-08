@@ -1,6 +1,6 @@
 /**
- * Shows number of groups in relation (parents or children). Also shows status
- * of loading relation data (spinner or error).
+ * Shows number of groups in relation (parents or children) in groups hierarchy
+ * visualiser. Also shows status of loading relation data (spinner or error).
  *
  * @module components/groups-hierarchy-visualiser/group-box-relation
  * @author Michal Borzecki

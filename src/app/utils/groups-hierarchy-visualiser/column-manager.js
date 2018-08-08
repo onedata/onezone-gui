@@ -1,3 +1,18 @@
+/**
+ * Manages columns in groups hierarchy visualiser. Main responsibilities:
+ *   * injects Workspace into column,
+ *   * sets prevColumn and nextColumn fields for each Column,
+ *   * reacts to columnsNumber change and adds/removes columns to fulfill that
+ *     number requirement,
+ *   * exposes methods to manipulate columns from the outside: insertColumnBefore,
+ *     insertColumnAfter, replaceColumn.
+ *
+ * @module utils/groups-hierarchy-visualiser/column-manager
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { A } from '@ember/array';
 import { next, later } from '@ember/runloop';

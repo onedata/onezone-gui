@@ -1,3 +1,13 @@
+/**
+ * Group box line in groups hierarchy component. It is a base class for left and
+ * right line and should not be used standalone.
+ *
+ * @module utils/groups-hierarchy-visualiser/group-box-line
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 

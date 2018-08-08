@@ -1,5 +1,5 @@
 /**
- * Draws block representation of a group.
+ * Draws block representation of a group in groups hierarchy visualiser.
  *
  * @module components/groups-hierarchy-visualiser/group-box
  * @author Michal Borzecki

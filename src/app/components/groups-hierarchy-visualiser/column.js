@@ -1,5 +1,6 @@
 /**
- * Draws column in groups hierarchy visualiser.
+ * Draws column in groups hierarchy visualiser. Deals with scroll change and
+ * passes group/relation actions down to the group boxes.
  *
  * @module components/groups-hierarchy-visualiser/column
  * @author Michal Borzecki

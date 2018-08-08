@@ -1,5 +1,6 @@
 /**
- * Draws column separator.
+ * Draws column separator in groups hierarchy visualise using data available
+ * through `separator` property. 
  *
  * @module components/groups-hierarchy-visualiser/column-separator
  * @author Michal Borzecki

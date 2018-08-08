@@ -1,6 +1,6 @@
 /**
- * Draws a group box line (left or right) according to properties passed using
- * the `line` property.
+ * Draws a group box line (left or right) in groups hierarchy visualiser according
+ * to values passed using the `line` property.
  *
  * @module components/groups-hierarchy-visualiser/group-box-line
  * @author Michal Borzecki

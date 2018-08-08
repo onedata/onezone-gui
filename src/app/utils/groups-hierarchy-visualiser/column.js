@@ -1,3 +1,30 @@
+/**
+ * Calculates properties related to group hierarchy visualiser column.
+ * Main responsibilities:
+ *  * observes model and updates group boxes array,
+ *  * inferes column context using prevColumn and nextColumn,
+ *  * reacts to line hover change and changes related line hover,
+ *  * creates separator,
+ *  * calculates position values for lines and group boxes, that are the same
+ *    across whole column,
+ *  * calculates column X position using prevColumn X position
+ * 
+ * Column ID:
+ *  Each column has an integer columnId, which is unique across the whole
+ *  application. ID for new column is equal to lastGeneratedId+1. It means, that
+ *  columnId generates an order, which tells us that one column has been created
+ *  later than another.
+ * 
+ * Column types:
+ *  To read more about column types, see documentation for
+ *  components/groups-hierarchy-visualiser.
+ *
+ * @module utils/groups-hierarchy-visualiser/column
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed, observer, get, set, getProperties } from '@ember/object';
 import { reads, sort, filterBy, bool } from '@ember/object/computed';
 import { A } from '@ember/array';
@@ -337,7 +364,7 @@ export default EmberObject.extend({
         'nextColumn'
       );
       // Existence of childrenRelationGroupBox usually means that nextColumn
-      // also exists, but when some dynamic columns changes occurrs, there are
+      // also exists, but when some dynamic columns changes occur, there are
       // situations when these properties are not fully recalculated
       // (childrenRelationGroupBox !== null but nextColumn === null) 
       if (nextColumn && childrenRelationGroupBox) {
@@ -370,7 +397,7 @@ export default EmberObject.extend({
         'prevColumn'
       );
       // Existence of parentsRelationGroupBox usually means that prevColumn
-      // also exists, but when some dynamic columns changes occurrs, there are
+      // also exists, but when some dynamic columns changes occur, there are
       // situations when these properties are not fully recalculated
       // (parentsRelationGroupBox !== null but prevColumn === null) 
       if (prevColumn && parentsRelationGroupBox) {

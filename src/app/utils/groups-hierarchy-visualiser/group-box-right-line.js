@@ -1,3 +1,12 @@
+/**
+ * Right GroupBoxLine implementation for groups hierarchy visualiser.
+ *
+ * @module utils/groups-hierarchy-visualiser/group-box-right-line
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import GroupBoxLine from 'onezone-gui/utils/groups-hierarchy-visualiser/group-box-line';
 import Relation from 'onezone-gui/utils/groups-hierarchy-visualiser/relation';
 import { computed, getProperties, get } from '@ember/object';
