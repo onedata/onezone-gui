@@ -32,7 +32,10 @@ export default Service.extend({
   getGroups() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('groupList'));
+      .then(user => user.get('groupList'))
+      .then(groupList => groupList.get('list')
+        .then(() => groupList)
+      );
   },
 
   /**

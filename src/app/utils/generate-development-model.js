@@ -216,8 +216,9 @@ function createGroupsRecords(store) {
   return Promise.all(_.range(NUMBER_OF_GROUPS).map((index) => {
     return store.createRecord('group', {
       name: `group${index}`,
-      hasViewPrivilege: true,
+      scope: 'private',
       directMembership: true,
+      canViewPrivileges: true,
     }).save();
   }));
 }
