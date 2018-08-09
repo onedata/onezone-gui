@@ -38,9 +38,9 @@ export default {
     'be a list of valid IPv4 adresses.',
   badValueDomain: 'Value of "{{key}}" provided in request must be a valid ' +
     'domain name.',
-  badValueSubdomain: 'Value of "{{key}}" provided in request must be a valid ' +
+  badValueSubdomain: 'Value  provided in request must be a valid ' +
     'subdomain name.',
-  badValueEmail: 'Value of "{{key}}" provided in request must be a valid ' +
+  badValueEmail: 'Value provided in request must be a valid ' +
     'e-mail address.',
   badValueTooLow: 'Value of "{{key}}" provided in request must be greater ' +
     'or equal to {{limit}}.',
@@ -52,19 +52,22 @@ export default {
     'allowed, valid values: {{allowed}}.',
   badValueListNotAllowed: 'Value of "{{key}}" provided in request must be a ' +
     'list, allowed values: {{allowed}}.',
-  badValueIdNotFound: 'Resource does not exist: "{{key}}".',
+  badValueIdNotFound: 'Resource does not exist.',
   badValueIdentifierOccupied: 'The identifier provided for "{{key}}" is occupied.',
   badValueTokenType: 'The token provided in "{{key}}" has invalid type.',
   badValueIntentifier: 'Value of "{{key}}" provided in request must be a ' +
     'valid identifier.',
-  badValueLogin: 'Value of "{{key}}" provided in request must be a valid login.',
+  badValueAlias: 'Value provided in request must be a valid alias.',
+  badValueUserName: 'Value provided in request must be a valid user name.',
+  badValueName: 'Value provided in request must be a valid name.',
   subdomainDelegationDisabled: 'This operation is not available while ' +
     'subdomain delegation is disabled.',
+  protectedGroup: 'This group is protected and cannot be deleted',
   relationDoesNotExist: 'The {{childType}} (Id: "{{childId}}") does not ' +
     'belong to the {{parentType}} (Id: {{parentId}}).',
   relationAlreadyExists: 'The {{childType}} (Id: "{{childId}}") already ' +
     'belongs to the {{parentType}} (Id: {{parentId}}).',
-  cannotDeleteEntity: 'Unexpected error while deleting the {{childType}} (Id: ' +
-    '"{{childId}}").',
+  cannotDeleteEntity: 'Unexpected error while deleting the {{entityType}} (Id: ' +
+    '"{{entityId}}").',
   cannotJoinGroupToItself: 'Cannot join group to itself.',
 };

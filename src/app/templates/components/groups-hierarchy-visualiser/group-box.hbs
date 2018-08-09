@@ -25,7 +25,7 @@
     class="one-label name-editor"
     inputClasses="input-sm"}}
 {{else}}
-  {{groupBox.group.name}}
+  {{#truncated-string class="group-name"}}{{groupBox.group.name}}{{/truncated-string}}
 {{/if}}
 
 {{groups-hierarchy-visualiser/group-box-relation

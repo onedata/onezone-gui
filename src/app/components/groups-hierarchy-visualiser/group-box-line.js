@@ -12,6 +12,7 @@ import { getProperties, computed, get } from '@ember/object';
 import { reads, and } from '@ember/object/computed';
 import { next } from '@ember/runloop';
 import { htmlSafe } from '@ember/string';
+import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -25,6 +26,8 @@ export default Component.extend(I18n, {
     'actionsOpened',
   ],
   attributeBindings: ['style'],
+
+  i18n: service(),
 
   /**
    * @override

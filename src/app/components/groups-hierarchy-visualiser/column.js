@@ -10,6 +10,7 @@
 
 import Component from '@ember/component';
 import { computed, observer, getProperties } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
@@ -17,6 +18,7 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 
 export default Component.extend(I18n, {
   classNames: ['column'],
+  classNameBindings: ['relationType'],
   attributeBindings: ['style'],
 
   /**
@@ -140,6 +142,11 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  relationType: reads('column.relationType'),
 
   /**
    * @type {Ember.ComputedProperty<SafeString>}

@@ -27,6 +27,7 @@ export default Component.extend(I18n, {
     'clickable',
   ],
 
+  i18n: service(),
   globalNotify: service(),
 
   /**
