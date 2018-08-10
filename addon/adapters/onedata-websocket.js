@@ -7,6 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { get } from '@ember/object';
 import { inject } from '@ember/service';
 import Adapter from 'ember-data/adapter';
 
@@ -60,13 +61,14 @@ export default Adapter.extend({
    * @param {DS.Snapshot} snapshot
    * @returns {Promise} promise} store
    */
-  findRecord(store, type, id, /* snapshot */ ) {
+  findRecord(store, type, id, snapshot) {
     let {
       onedataGraph,
       onedataGraphContext,
     } = this.getProperties('onedataGraph', 'onedataGraphContext');
 
-    let authHint = onedataGraphContext.getAuthHint(id);
+    let authHint = get(snapshot, 'adapterOptions._meta.authHint') ||
+      onedataGraphContext.getAuthHint(id);
 
     return onedataGraph.request({
       gri: id,
