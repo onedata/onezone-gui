@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
     'isFilteredOut:filtered-out',
     'actionsOpened',
     'hovered',
+    'groupIdClass',
   ],
   attributeBindings: ['style'],
 
@@ -192,6 +193,14 @@ export default Component.extend(I18n, {
     'groupBox.leftLine.hovered',
     'groupBox.rightLine.hovered'
   ),
+
+  /**
+   * String in format `group-groupEntityId`.
+   * @type {Ember.ComputedProperty<string>}
+   */
+  groupIdClass: computed('groupBox.group.entityId', function groupIdClass() {
+    return `group-${this.get('groupBox.group.entityId')}`;
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
