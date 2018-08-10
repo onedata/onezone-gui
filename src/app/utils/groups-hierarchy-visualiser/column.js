@@ -122,7 +122,7 @@ export default EmberObject.extend({
     'nextColumn.{relationType,relatedGroup,columnId}',
     'relationType',
     'groupBoxes.[]',
-    function parentsRelationGroupBox() {
+    function childrenRelationGroupBox() {
       return this.findRelationGroupBox(this.get('nextColumn'), 'children');
     }
   ),
