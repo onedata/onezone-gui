@@ -26,7 +26,7 @@ const NUMBER_OF_SHARED_USERS = 3;
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
-const NUMBER_OF_GROUPS = 3;
+const NUMBER_OF_GROUPS = 10;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
@@ -46,22 +46,16 @@ const perProviderSize = Math.pow(1024, 4);
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers, sharedGroups, groups;
-  const groupsEntityIds = _.range(NUMBER_OF_GROUPS).map(i => 'groupid' + i);
+  let sharedUsers, groups;
 
   // create shared users
   return createSharedUsersRecords(store)
     .then(su => sharedUsers = su)
-    .then(() =>
-      createSharedGroupsRecords(store, groupsEntityIds)
-    )
-    // create shared groups
-    .then(sg => sharedGroups = sg)
     // create main resources lists
     .then(() =>
       Promise.all(
         types.map(type =>
-          createEntityRecords(store, type, names, { groupsEntityIds })
+          createEntityRecords(store, type, names)
           .then(records => {
             if (type === 'group') {
               groups = records;
@@ -105,12 +99,12 @@ export default function generateDevelopmentModel(store) {
         )
         .then(() => listRecords);
     })
-    // add shared groups, users and privileges to groups
+    // add groups, users and privileges to groups
     .then(listRecords => listRecords[types.indexOf('group')].get('list')
       .then(models =>
         Promise.all(models.map(model =>
           attachSharedUsersGroupsToModel(
-            store, model, 'group', sharedUsers, sharedGroups, groups
+            store, model, 'group', sharedUsers, groups
           )
         ))
       )
@@ -118,7 +112,7 @@ export default function generateDevelopmentModel(store) {
         .then(models =>
           Promise.all(models.map(model =>
             attachSharedUsersGroupsToModel(
-              store, model, 'space', sharedUsers, sharedGroups
+              store, model, 'space', sharedUsers, groups
             )
           ))
         )
@@ -132,7 +126,7 @@ export default function generateDevelopmentModel(store) {
                 model,
                 modelType,
                 sharedUsers,
-                sharedGroups,
+                groups,
                 privileges[modelType]
               )
             ))
@@ -218,11 +212,13 @@ function createClientTokensRecords(store) {
   }));
 }
 
-function createGroupsRecords(store, { groupsEntityIds }) {
-  return Promise.all(groupsEntityIds.map((id, index) => {
+function createGroupsRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_GROUPS).map((index) => {
     return store.createRecord('group', {
-      id: `group.${id}.instance`,
       name: `group${index}`,
+      scope: 'private',
+      directMembership: true,
+      canViewPrivileges: true,
     }).save();
   }));
 }
@@ -245,24 +241,14 @@ function createSharedUsersRecords(store) {
   }));
 }
 
-function createSharedGroupsRecords(store, groupsEntityIds) {
-  return Promise.all(groupsEntityIds.map((id, index) => {
-    return store.createRecord('sharedGroup', {
-      id: `shared-group.${id}.instance`,
-      name: `group${index}`,
-    }).save();
-  }));
-}
-
 function attachSharedUsersGroupsToModel(
   store,
   model,
   modelType,
   sharedUsers,
-  sharedGroups,
   groups
 ) {
-  return createListRecord(store, 'sharedGroup', sharedGroups)
+  return createListRecord(store, 'group', groups)
     .then(list => model.set(modelType === 'group' ? 'childList' : 'groupList', list))
     .then(() => {
       if (modelType === 'group') {
@@ -282,7 +268,7 @@ function createPrivilegesForModel(
   model,
   modelType,
   sharedUsers,
-  sharedGroups,
+  groups,
   privilegesFlags
 ) {
   return Promise.all([
@@ -290,7 +276,7 @@ function createPrivilegesForModel(
       store, model, modelType, sharedUsers, privilegesFlags, 'user'
     ),
     createPrivilegesRecords(
-      store, model, modelType, sharedGroups, privilegesFlags, 'group'
+      store, model, modelType, groups, privilegesFlags, 'group'
     ),
   ]);
 }

@@ -29,15 +29,25 @@ import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsParents from './components/content-groups-parents';
+import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
 import collectionPermissions from './components/collection-permissions';
-import privilegesBatchEditModal from './components/privileges-batch-edit-modal';
+import privilegesEditorModal from './components/privileges-editor-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
 import contentSpacesMembers from './components/content-spaces-members';
+import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
+import groupLeaveModal from './components/group-leave-modal';
+import groupRemoveModal from './components/group-remove-modal';
+import groupRemoveRelationModal from './components/group-remove-relation-modal';
+import groupCreateRelativeModal from './components/group-create-relative-modal';
+import groupAddYourGroupModal from './components/group-add-your-group-modal';
+import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
+import groupInviteUsingTokenModal from './components/group-invite-using-token-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
+import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
 import guiUtils from './services/gui-utils';
@@ -72,18 +82,28 @@ let translations = {
     contentGroupsEmpty,
     contentGroupsMembers,
     contentGroupsParents,
+    contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
     collectionPermissions,
-    privilegesBatchEditModal,
+    privilegesEditorModal,
     invitationTokenPresenter,
     contentSpacesMembers,
+    groupsHierarchyVisualiser,
+    groupLeaveModal,
+    groupRemoveModal,
+    groupRemoveRelationModal,
+    groupCreateRelativeModal,
+    groupAddYourGroupModal,
+    groupJoinUsingTokenModal,
+    groupInviteUsingTokenModal,
   },
   services: {
     clientTokenActions,
     clientTokenManager,
     spaceActions,
     groupActions,
+    privilegeActions,
     guiUtils,
   },
 };

@@ -15,7 +15,6 @@ import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import { Promise } from 'rsvp';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -23,7 +22,8 @@ import _ from 'lodash';
 
 export default Mixin.create({
   store: service(),
-  globalNotify: service(),
+  privilegeManager: service(),
+  privilegeActions: service(),
 
   /**
    * @type {DS.Model}
@@ -57,8 +57,8 @@ export default Mixin.create({
    * @type {Object}
    */
   privilegeGriAspects: Object.freeze({
-    user: 'user_privileges',
-    group: 'group_privileges',
+    user: 'user',
+    group: 'group',
   }),
 
   /**
@@ -89,6 +89,11 @@ export default Mixin.create({
   batchEditActive: false,
 
   /**
+   * @type {boolean}
+   */
+  isBatchEditSaving: false,
+
+  /**
    * @type {PrivilegesModelProxy}
    */
   batchEditModalModel: Object.freeze({}),
@@ -106,9 +111,9 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  sharedGroupList: computed('model', function () {
+  groupList: computed('model', function () {
     return PromiseArray.create({
-      promise: get(this.get('model'), 'sharedGroupList')
+      promise: get(this.get('model'), 'groupList')
         .then(sgl => sgl ? get(sgl, 'list') : A()),
     });
   }),
@@ -116,9 +121,9 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  sharedUserList: computed('model', function () {
+  userList: computed('model', function () {
     return PromiseArray.create({
-      promise: get(this.get('model'), 'sharedUserList')
+      promise: get(this.get('model'), 'userList')
         .then(sul => sul ? get(sul, 'list') : A()),
     });
   }),
@@ -126,18 +131,18 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyGroupModelList: computed('sharedGroupList.content.[]', function () {
-    return this.get('sharedGroupList.isFulfilled') ?
-      this.preparePermissionListProxy(this.get('sharedGroupList'), 'group') :
+  proxyGroupModelList: computed('groupList.content.[]', function () {
+    return this.get('groupList.isFulfilled') ?
+      this.preparePermissionListProxy(this.get('groupList'), 'group') :
       A();
   }),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<PrivilegesModelProxy>>}
    */
-  proxyUserModelList: computed('sharedUserList.content.[]', function () {
-    return this.get('sharedUserList.isFulfilled') ?
-      this.preparePermissionListProxy(this.get('sharedUserList'), 'user') :
+  proxyUserModelList: computed('userList.content.[]', function () {
+    return this.get('userList.isFulfilled') ?
+      this.preparePermissionListProxy(this.get('userList'), 'user') :
       A();
   }),
 
@@ -209,8 +214,8 @@ export default Mixin.create({
   }),
 
   listsObserver: observer(
-    'sharedGroupList.content.[]',
-    'sharedUserList.content.[]',
+    'groupList.content.[]',
+    'userList.content.[]',
     function () {
       // reset state after lists change
       this.setProperties({
@@ -250,18 +255,18 @@ export default Mixin.create({
       subjectId = parseGri(get(subjectModel, 'id')).entityId;
     } catch (error) {
       console.error(
-        'component:content-group-members: getPrivilegesGriForModel: ' +
+        'mixin:privileges-aspect-base: getPrivilegesGriForModel: ' +
         'error parsing GRI: ',
         error
       );
       return '';
     }
-    return gri({
-      entityType: modelType,
-      entityId: modelId,
-      aspect: this.get(`privilegeGriAspects.${type}`),
-      aspectId: subjectId,
-    });
+    return this.get('privilegeManager').generateGri(
+      modelType,
+      modelId,
+      this.get(`privilegeGriAspects.${type}`),
+      subjectId
+    );
   },
 
   /**
@@ -428,25 +433,28 @@ export default Mixin.create({
    * @returns {Promise<ModelProxy>}
    */
   saveModel(modelProxy) {
+    const privilegeManager = this.get('privilegeManager');
     const {
       modifiedPrivileges,
       model,
     } = getProperties(modelProxy, 'modifiedPrivileges', 'model');
-    const flattenedPrivilegesTree =
-      _.assign({}, ..._.values(modifiedPrivileges));
-    const privileges = Object.keys(flattenedPrivilegesTree)
-      .filter(key => flattenedPrivilegesTree[key]);
-    model.set('privileges', privileges);
+    model.set('privileges', privilegeManager.treeToArray(modifiedPrivileges));
     modelProxy.set('saving', true);
-    const promise = get(model, 'content').save().then(() => {
-      safeExec(modelProxy, () => modelProxy.setProperties({
-        modified: false,
-        persistedPrivileges: modifiedPrivileges,
-      }));
-      return modelProxy;
-    }).finally(() => {
-      safeExec(modelProxy, () => modelProxy.set('saving', false));
-    });
+    const promise = get(model, 'content').save()
+      .then(() => {
+        safeExec(modelProxy, () => modelProxy.setProperties({
+          modified: false,
+          persistedPrivileges: modifiedPrivileges,
+        }));
+        return modelProxy;
+      })
+      .catch(error => {
+        get(model, 'content').rollbackAttributes();
+        throw error;
+      })
+      .finally(() => {
+        safeExec(modelProxy, () => modelProxy.set('saving', false));
+      });
     return promise;
   },
 
@@ -475,27 +483,19 @@ export default Mixin.create({
       this.set('batchEditActive', false);
     },
     saveOne(modelProxy) {
-      return this.saveModel(modelProxy)
-        .then(() => this.get('globalNotify').info(this.t('privilegesSaveSuccess')))
-        .catch(error => {
-          this.get('globalNotify')
-            .backendError(this.t('privilegesPersistence'), error);
-          throw error;
-        });
+      return this.get('privilegeActions').handleSave(this.saveModel(modelProxy));
     },
     saveBatch() {
       this.batchEditApply();
       const savePromises = this.get('selectedModelProxies').map(
         modelProxy => this.saveModel(modelProxy)
       );
-      return Promise.all(savePromises)
-        .then(() => this.get('globalNotify').info(this.t('privilegesSaveSuccess')))
-        .catch((error) => {
-          this.get('globalNotify')
-            .backendError(this.t('privilegesPersistence'), error);
-          throw error;
-        })
-        .finally(() => safeExec(this, 'set', 'batchEditActive', false));
+      this.set('isBatchEditSaving', true);
+      return this.get('privilegeActions').handleSave(Promise.all(savePromises))
+        .finally(() => safeExec(this, 'setProperties', {
+          batchEditActive: false,
+          isBatchEditSaving: false,
+        }));
     },
     showInvitationToken(subject) {
       this.loadInvitationToken(subject);

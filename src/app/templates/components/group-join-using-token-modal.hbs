@@ -1,0 +1,20 @@
+{{#proceed-process-modal
+  opened=opened
+  close=close
+  proceed=(action "join")
+  processing=processing
+  modalClass="group-join-using-token-modal"
+  headerText=(tt this "joinUsingToken")
+  proceedButtonClass="btn btn-primary proceed"
+  proceedButtonText=(tt this "join")
+  proceedDisabled=proceedDisabled
+  onShown=(action "onShown")}}
+  <p class="input-top-description">{{tt this "enterToken"}}</p>
+  <input
+    value={{token}}
+    oninput={{action (mut token) value="target.value"}}
+    onkeydown={{invoke-on-enter (action "redirectToSubmit")}}
+    placeholder={{tt this "tokenPlaceholder"}}
+    disabled={{processing}}
+    class="form-control modal-input join-group-invitation-token">
+{{/proceed-process-modal}}

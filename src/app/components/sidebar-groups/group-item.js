@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get, set, getProperties } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import { next } from '@ember/runloop';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
@@ -158,19 +158,10 @@ export default Component.extend(I18n, {
       navigationState,
       router,
     } = this.getProperties('navigationState', 'router');
-    const {
-      activeResourceCollection,
-      activeResource,
-    } = getProperties(
-      navigationState,
-      'activeResourceCollection',
-      'activeResource'
-    );
-    const groupEntityId = get(activeResource, 'entityId');
-    return get(activeResourceCollection, 'list')
-      .then(groupList => {
-        const availableEntityIds = groupList.map(g => get(g, 'entityId'));
-        if (availableEntityIds.indexOf(groupEntityId) === -1) {
+    const groupEntityId = get(navigationState, 'activeResource.entityId');
+    return navigationState.resourceCollectionContainsEntityId(groupEntityId)
+      .then(contains => {
+        if (contains) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));
         }
       });
@@ -201,7 +192,6 @@ export default Component.extend(I18n, {
       return group.save()
         .then(() => {
           this.send('toggleRename', false);
-          this.get('groupManager').reloadLoadedSharedGroup(get(group, 'entityId'));
         })
         .catch((error) => {
           globalNotify.backendError(this.t('groupPersistence'), error);

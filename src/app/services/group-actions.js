@@ -139,9 +139,10 @@ export default Service.extend(I18n, {
    * Joins group as a subgroup
    * @param {Group} group 
    * @param {string} token
+   * @param {boolean} redirect 
    * @returns {Promise<Group>} parent group
    */
-  joinGroupAsSubgroup(group, token) {
+  joinGroupAsSubgroup(group, token, redirect = true) {
     const {
       globalNotify,
       groupManager,
@@ -152,7 +153,9 @@ export default Service.extend(I18n, {
           groupName: get(group, 'name'),
           parentGroupName: get(parentGroup, 'name'),
         }));
-        next(() => this.redirectToGroup(group, 'parents'));
+        if (redirect) {
+          next(() => this.redirectToGroup(group, 'parents'));
+        }
         return parentGroup;
       })
       .catch(error => {
@@ -210,7 +213,7 @@ export default Service.extend(I18n, {
    * @param {string} aspect
    * @returns {Promise}
    */
-  redirectToGroup(group, aspect = 'index') {
+  redirectToGroup(group, aspect = 'members') {
     const {
       router,
       guiUtils,
@@ -225,8 +228,8 @@ export default Service.extend(I18n, {
 
   /**
    * Removes subgroup from group
-   * @param {Group|SharedGroup} parent 
-   * @param {Group|SharedGroup} child
+   * @param {Group} parent 
+   * @param {Group} child
    * @returns {Promise}
    */
   removeChildGroup(parent, child) {
@@ -249,8 +252,8 @@ export default Service.extend(I18n, {
 
   /**
    * Removes user from group
-   * @param {Group|SharedGroup} group 
-   * @param {User|SharedUser} user
+   * @param {Group} group 
+   * @param {User} user
    * @returns {Promise}
    */
   removeUser(group, user) {
@@ -273,8 +276,8 @@ export default Service.extend(I18n, {
 
   /**
    * Leaves from parent group
-   * @param {Group|SharedGroup} parent 
-   * @param {Group|SharedGroup} child
+   * @param {Group} parent 
+   * @param {Group} child
    * @returns {Promise}
    */
   leaveParentGroup(parent, child) {
@@ -292,5 +295,119 @@ export default Service.extend(I18n, {
     }).catch(error => {
       globalNotify.backendError(this.t('groupLeaving'), error);
     });
+  },
+
+  /**
+   * Creates parent for specified child group
+   * @param {Group} child 
+   * @param {Object} parentRepresentation
+   * @return {Promise}
+   */
+  createParent(child, parentRepresentation) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    return groupManager.createParent(get(child, 'entityId'), parentRepresentation)
+      .then(() => {
+        globalNotify.success(this.t('createParentGroupSuccess', {
+          parentGroupName: get(parentRepresentation, 'name'),
+        }));
+      }).catch(error => {
+        globalNotify.backendError(this.t('parentGroupCreation'), error);
+      });
+  },
+
+  /**
+   * Creates child for specified parent group
+   * @param {Group} parent 
+   * @param {Object} childRepresentation
+   * @return {Promise}
+   */
+  createChild(parent, childRepresentation) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    return groupManager.createChild(get(parent, 'entityId'), childRepresentation)
+      .then(() => {
+        globalNotify.success(this.t('createChildGroupSuccess', {
+          childGroupName: get(childRepresentation, 'name'),
+        }));
+      }).catch(error => {
+        globalNotify.backendError(this.t('childGroupCreation'), error);
+      });
+  },
+
+  /**
+   * Adds parent to specified child group
+   * @param {Group} group 
+   * @param {Object} futureParent
+   * @return {Promise}
+   */
+  addParent(group, futureParent) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    return groupManager.addChild(
+      get(futureParent, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('addParentGroupSuccess', {
+        parentGroupName: get(futureParent, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('parentGroupAddition'), error);
+    });
+  },
+
+  /**
+   * Adds child to specified parent group
+   * @param {Group} group 
+   * @param {Object} futureChild
+   * @return {Promise}
+   */
+  addChild(group, futureChild) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    return groupManager.addChild(
+      get(group, 'entityId'),
+      get(futureChild, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('addChildGroupSuccess', {
+        childGroupName: get(futureChild, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('childGroupAddition'), error);
+    });
+  },
+
+  /**
+   * Removes relation by combining leaving parent or (if needed) removing child
+   * @param {Group} parentGroup 
+   * @param {Group} childGroup 
+   * @return {Promise}
+   */
+  removeRelation(parentGroup, childGroup) {
+    const {
+      groupManager,
+      globalNotify,
+    } = this.getProperties('groupManager', 'globalNotify');
+    const parentEntityId = get(parentGroup, 'entityId');
+    const childEntityId = get(childGroup, 'entityId');
+    return groupManager.leaveGroupAsGroup(parentEntityId, childEntityId)
+      .catch(() =>
+        groupManager.removeGroupFromGroup(parentEntityId, childEntityId)
+      )
+      .then(() => globalNotify.success(this.t('removeRelationSuccess', {
+        parentGroupName: get(parentGroup, 'name'),
+        childGroupName: get(childGroup, 'name'),
+      })))
+      .catch(error => {
+        globalNotify.backendError(this.t('groupLeaving'), error);
+      });
   },
 });

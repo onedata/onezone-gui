@@ -14,11 +14,12 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
+import { scheduleOnce } from '@ember/runloop';
 
 /**
  * @typedef {EmberObject} PrivilegesModelProxy
  * @property {DS.Model} subject subject of privileges
- *   (e.g. shared-user of shared-group)
+ *   (e.g. shared-user or group)
  * @property {string} modelGri gri of privileges model
  * @property {DS.Model} model privileges model
  * @property {boolean} modified are privileges modified (has unsaved changes)
@@ -181,7 +182,9 @@ export default Component.extend({
   init() {
     this._super(...arguments);
     this.overridePrivilegesObserver();
-    this.modelProxyObserver();
+    // Moving model processing to the next runloop frame to avoid double set
+    // in the same render (modelProxyObserver changes modelProxy content)
+    scheduleOnce('afterRender', this, 'modelProxyObserver');
   },
 
   /**

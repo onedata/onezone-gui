@@ -43,8 +43,7 @@ describe('Unit | Utility | generate development model', function () {
     const promise = generateDevelopmentModel(StoreStub);
     promise.then(() => {
       [
-        'user',
-        'sharedGroup', 'sharedUser',
+        'user', 'sharedUser',
         'spaceList', 'groupList', 'providerList', 'clientTokenList',
         'linkedAccountList',
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',

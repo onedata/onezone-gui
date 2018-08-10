@@ -13,10 +13,12 @@ import { get } from '@ember/object';
 import _ from 'lodash';
 import { Promise, resolve, reject } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
   store: service(),
+  onedataGraph: service(),
   onedataGraphUtils: service(),
   currentUser: service(),
   spaceManager: service(),
@@ -30,7 +32,10 @@ export default Service.extend({
   getGroups() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('groupList'));
+      .then(user => user.get('groupList'))
+      .then(groupList => groupList.get('list')
+        .then(() => groupList)
+      );
   },
 
   /**
@@ -230,6 +235,78 @@ export default Service.extend({
   },
 
   /**
+   * Creates parent for specified child group
+   * @param {string} childEntityId 
+   * @param {Object} parentGroupRepresentation
+   * @return {Promise}
+   */
+  createParent(childEntityId, parentGroupRepresentation) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'group',
+        aspect: 'instance',
+      }),
+      operation: 'create',
+      data: parentGroupRepresentation,
+      authHint: ['asGroup', childEntityId],
+    }).then(() => {
+      return Promise.all([
+        this.reloadList(),
+        this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+      ]);
+    });
+  },
+
+  /**
+   * Creates child for specified parent group
+   * @param {string} parentEntityId 
+   * @param {Object} childGroupRepresentation
+   * @return {Promise}
+   */
+  createChild(parentEntityId, childGroupRepresentation) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => this.get('onedataGraph').request({
+        gri: gri({
+          entityType: 'group',
+          entityId: parentEntityId,
+          aspect: 'child',
+        }),
+        operation: 'create',
+        data: childGroupRepresentation,
+        authHint: ['asUser', get(user, 'entityId')],
+      }).then(() => {
+        return Promise.all([
+          this.reloadList(),
+          this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+        ]);
+      }));
+  },
+
+  /**
+   * Adds group to the children of another group
+   * @param {string} groupEntityId 
+   * @param {string} futureChildEntityId
+   * @return {Promise}
+   */
+  addChild(groupEntityId, futureChildEntityId) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'group',
+        entityId: groupEntityId,
+        aspect: 'child',
+        aspectId: futureChildEntityId,
+      }),
+      operation: 'create',
+    }).then(() => {
+      return Promise.all([
+        this.reloadList(),
+        this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
+        this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
+      ]);
+    });
+  },
+
+  /**
    * Reloads group list
    * @returns {Promise<GroupList>}
    */
@@ -248,11 +325,13 @@ export default Service.extend({
   updateGroupPresenceInLoadedModels(modelType, entityId, listName) {
     const models = this.get('store').peekAll(modelType);
     return Promise.all(models.map(model => {
-      let list = model.belongsTo(listName).value();
-      list = list ? list.hasMany('list').value() : null;
-      if (list && list.map(m => get(m, 'entityId')).includes(entityId)) {
-        return model.belongsTo(listName).value().reload()
-          .catch(ignoreForbiddenError);
+      const list = model.belongsTo(listName).value();
+      const ids = list ? list.hasMany('list').ids() : null;
+      if (ids && ids.some(id => parseGri(id).entityId === entityId)) {
+        return list.reload().then(() => list.hasMany('list').reload());
+      } else if (list) {
+        // simulate reload to recalculated properties
+        list.notifyPropertyChange('isReloading');
       } else {
         return resolve();
       }
@@ -345,21 +424,5 @@ export default Service.extend({
    */
   reloadUserList(entityId) {
     return this.reloadModelList(entityId, 'userList');
-  },
-
-  /**
-   * Reloads shared group with given entityId (only if it has been loaded earlier)
-   * @param {string} entityId group/shared-Group entityId
-   * @returns {Promise}
-   */
-  reloadLoadedSharedGroup(entityId) {
-    const sharedGroups = this.get('store').peekAll('shared-group');
-    for (let i = 0; i < get(sharedGroups, 'length'); i++) {
-      const sharedGroup = sharedGroups.objectAt(i);
-      if (get(sharedGroup, 'entityId') === entityId) {
-        return sharedGroup.reload();
-      }
-    }
-    return resolve();
   },
 });
