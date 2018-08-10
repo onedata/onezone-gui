@@ -12,7 +12,7 @@ import { registerService } from '../../../helpers/stub-service';
 describe(
   'Integration | Component | groups hierarchy visualiser/group box line',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/group-bxox-line', {
+    setupComponentTest('groups-hierarchy-visualiser/group-box-line', {
       integration: true,
     });
 

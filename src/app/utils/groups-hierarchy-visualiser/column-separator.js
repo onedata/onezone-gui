@@ -305,7 +305,7 @@ export default EmberObject.extend({
     'workspace.lineWidth',
     'nextColumn.{scrollTop,hoveredLeftLineGroupBoxes.firstObject.leftLine.absoluteY,hoveredLeftLineGroupBoxes.lastObject.leftLine.absoluteY}',
     'column.{scrollTop,hoveredRightLineGroupBoxes.firstObject.rightLine.absoluteY,hoveredRightLineGroupBoxes.lastObject.rightLine.absoluteY}',
-    function hoveredLines() {
+    function hoveredLine() {
       const {
         hasCentralLine,
         nextColumn,
