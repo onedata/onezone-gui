@@ -15,7 +15,7 @@
     cursor: default !important;
   }
   .login-icon-box.add:hover {
-    background-color: transparentize($color: map-get($login-colors, plgrid), $amount: 0.9)
+    background-color: transparentize($color: #026381, $amount: 0.9)
   }
   .social-box {
     position: absolute;

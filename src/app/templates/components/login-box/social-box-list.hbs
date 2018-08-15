@@ -11,28 +11,19 @@
         {{else}}
           <div>
             {{#each supportedAuthorizers as |authorizer|}}
-              {{!-- basicAuth is a special case --}}
-              {{#if (eq authorizer.type "basicAuth")}}
-                {{login-box/social-box-list/social-box 
-                  type="username" 
-                  iconType=authorizer.iconType 
-                  iconName=authorizer.iconName
-                  tip=(concat (t "components.loginBox.socialBoxList.loginUsing") (t "components.loginBox.socialBoxList.onepanelAccount"))
-                  action=(action "usernameBoxClick")}}
-              {{else}}
-                {{login-box/social-box-list/social-box 
-                  type=authorizer.type
-                  iconType=authorizer.iconType
-                  iconName=authorizer.iconName
-                  tip=(concat (t "components.loginBox.socialBoxList.loginUsing") authorizer.name)
-                  action=(action "authenticate")
-                }}
-              {{/if}}
+              {{login-box/social-box-list/social-box 
+                authId=authorizer.id
+                iconPath=authorizer.iconPath
+                iconBackgroundColor=authorizer.iconBackgroundColor
+                tip=(concat (t "components.loginBox.socialBoxList.loginUsing") authorizer.displayName)
+                action=(action (if (eq authorizer.id "onepanel") "usernameBoxClick" "authenticate"))
+              }}
             {{/each}}
             {{#if showMoreButton}}
               {{login-box/social-box-list/social-box 
-                type="more"
-                iconType="text"
+                authId="more"
+                socialIconStyle=""
+                iconBackgroundColor="#fff"
                 action=(action "showMoreClick")
                 tip=(t "components.loginBox.socialBoxList.showMore")
               }}

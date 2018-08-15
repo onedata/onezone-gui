@@ -21,17 +21,18 @@
     {{#loading-container
       isLoading=_loadingLinkedAccounts
       errorReason=_loadingLinkedAccountsError}}
-      {{#each _linkedAccounts as |account|}}
+      {{#each accountsInfo as |accountInfo|}}
         <li class="linked-account full-social-icon content-row {{account.idp}}-account">
           {{login-box/social-box-list/social-box
-            type=account.idp
-            iconType=(get (get _accountsAuthorizers account.idp) "iconType")
-            iconName=(get (get _accountsAuthorizers account.idp) "iconName")}}
+            authId=accountInfo.account.idp
+            iconPath=accountInfo.authorizer.iconPath
+            iconBackgroundColor=accountInfo.authorizer.iconBackgroundColor
+          }}
           <div class="account-description">
             {{#truncated-string class="account-type"}}
-              {{get (get _accountsAuthorizers account.idp) "name"}}
+              {{accountInfo.authorizer.displayName}}
             {{/truncated-string}}
-            {{#each account.emailList as |email|}}
+            {{#each accountInfo.account.emailList as |email|}}
               {{#truncated-string class="account-email"}}
                 {{email}}
               {{/truncated-string}}
@@ -41,16 +42,16 @@
       {{/each}}
       <li class="linked-account full-social-icon content-row add-account">
         {{login-box/social-box-list/social-box
-          type="add"
-          iconType="oneicon"
-          iconName="add-filled"
+          authId="add"
+          iconPath="/assets/images/account-add-filled.svg"
+          aStyle=""
           click=(action "toggleAuthorizersDropdown")}}
         <div class="account-description">
           <div class="show-dropdown-description animated fast" {{action "toggleAuthorizersDropdown"}}>
             {{tt this "addAccount"}}
           </div>
           {{authorizers-dropdown
-            authorizers=_availableAuthorizers
+            authorizers=authorizersForSelect
             onSelect=(action "authorizerSelected")
             selectedAuthorizer=_selectedAuthorizer
             activeAuthorizer=_selectedAuthorizer
@@ -58,7 +59,8 @@
             placeholder=(tt this "addAccountDropdownPlaceholder")
             renderInPlace=true
             verticalPosition="above"
-            class="animated fast hide"}}
+            class="animated fast hide"
+          }}
         </div>
       </li>
     {{/loading-container}}

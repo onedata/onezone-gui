@@ -113,7 +113,7 @@ export default LoginFormConainer.extend({
   _authorizersForSelect: computed('supportedAuthorizers.[]', function () {
     const supportedAuthorizers = this.get('supportedAuthorizers');
     if (supportedAuthorizers) {
-      return supportedAuthorizers.filter(auth => auth.type !== 'basicAuth');
+      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
     } else {
       return [];
     }
@@ -170,7 +170,7 @@ export default LoginFormConainer.extend({
      */
     authorizerSelected(authorizer) {
       this.set('selectedAuthorizer', authorizer);
-      this.send('authenticate', authorizer.type);
+      this.send('authenticate', authorizer.id);
     },
 
     /**

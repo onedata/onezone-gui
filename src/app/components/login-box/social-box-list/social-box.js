@@ -10,48 +10,51 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import contrast from 'npm:contrast';
+import {
+  defaultIconBackgroundColor,
+  defaultIconPath,
+  darkFgColor,
+  lightFgColor,
+} from 'onezone-gui/utils/auth-box-config';
 
 export default Component.extend({
   tagName: 'div',
   classNames: ['social-box'],
 
   /**
-   * Use oneicon (fonticon) or image placed in 
-   * `/assets/images/auth-providers/{iconName}.{iconType}`
-   * @type {string} one of: oneicon, png, jpg, svg, <or other image format>
+   * @virtual 
+   * Id of authorizer, e.g. google, plgrid, dropbox, google, facebook, ...
+   * @type {string}
    */
-  iconType: 'oneicon',
+  authId: undefined,
 
   /**
-   * Oneicon character name (for iconType == oneicon) or image file name
-   * (without extension)
    * @virtual
    * @type {string}
    */
-  iconName: 'key',
+  iconBackgroundColor: undefined,
+
+  /**
+   * @virtual
+   * URL to go when clicked
+   * @type {string}
+   */
+  link: '',
+
+  /**
+   * @virtual
+   * Text for tooltip
+   * @type {string}
+   */
+  tip: '',
 
   /**
    * If true, box is used to authenticate - spinner is visible instead of image
    * @type {boolean}
    */
   active: false,
-
-  /** Name of social/login service (eg. 'twitter')
-   * @type {string}
-   */
-  type: null,
-
-  /**
-   * Href for link when clicked
-   * @type {string}
-   */
-  link: '',
-
-  /**
-   * Text for tooltip
-   * @type {string}
-   */
-  tip: '',
 
   /**
    * Spinner scale
@@ -65,7 +68,7 @@ export default Component.extend({
    * @param {Ember.Component} thisComponent this component instance
    * @return {undefined}
    */
-  action: () => {},
+  action: notImplementedIgnore,
 
   /**
    * Property only for testing purposes.
@@ -74,37 +77,38 @@ export default Component.extend({
   _window: window,
 
   /**
-   * Full icon name (oneicon glyph name or file path).
    * @type {Ember.ComputedProperty<string>}
    */
-  _iconName: computed('iconType', 'iconName', function () {
-    let {
-      iconName,
-      iconType,
-    } = this.getProperties('iconName', 'iconType');
-    if (iconType === 'oneicon') {
-      return iconName;
-    } else {
-      return `/assets/images/auth-providers/${iconName}.${iconType}`;
+  socialIconStyle: computed(
+    'authId',
+    'iconPath',
+    function socialIconStyle() {
+      let iconPath = this.get('iconPath');
+      iconPath = iconPath || defaultIconPath;
+      const style = `background-image: url(${iconPath});`;
+      return htmlSafe(style);
     }
-  }),
+  ),
 
   /**
-   * Custom css styles for icon.
    * @type {Ember.ComputedProperty<string>}
    */
-  _socialIconStyle: computed('_iconName', 'iconType', function () {
-    let {
-      _iconName,
-      iconType,
-    } = this.getProperties('_iconName', 'iconType');
-    let style = '';
-    if (iconType !== 'oneicon') {
-      style = `background-image: url(${_iconName});`;
-    } else {
-      style = '';
+  aStyle: computed(
+    'iconBackgroundColor',
+    function aStyle() {
+      let iconBackgroundColor;
+      iconBackgroundColor = this.get('iconBackgroundColor') ||
+        defaultIconBackgroundColor;
+      const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
+        lightFgColor;
+      const style = `background-color: ${iconBackgroundColor}; color: ${fgColor};`;
+      return htmlSafe(style);
     }
-    return htmlSafe(style);
+  ),
+
+  hasLink: computed('link', function hasLink() {
+    let link = this.get('link');
+    return link && link.length !== 0;
   }),
 
   actions: {

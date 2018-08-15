@@ -14,7 +14,6 @@ import { reject } from 'rsvp';
 import { inject } from '@ember/service';
 import { computed, set, get } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 
@@ -76,27 +75,32 @@ export default Component.extend(I18n, {
    */
   _isProvidersDropdownVisible: false,
 
-  /**
-   * Object with mapping authorizerType -> authorizerInfo
-   * @type {Ember.ComputedProperty<object>}
-   */
-  _accountsAuthorizers: computed('_linkedAccounts.isLoaded', function () {
-    const _linkedAccounts = this.get('_linkedAccounts');
-    const accountsAuthorizers = {};
-    if (_linkedAccounts && _linkedAccounts.get('isLoaded')) {
-      _linkedAccounts.mapBy('idp').forEach(type =>
-        accountsAuthorizers[type] = _.find(authorizers, { type }) || {}
-      );
-    }
-    return accountsAuthorizers;
+  identityProviders: computed(function identityProviders() {
+    return this.get('authorizerManager').getAvailableAuthorizers();
   }),
 
   /**
-   * @type {Array<AuthorizerInfo>}
+   * Array of auth providers for powerselect
+   * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  _availableAuthorizers: computed(function () {
-    return this.get('authorizerManager').getAvailableAuthorizers()
-      .filter(authorizer => authorizer.type !== 'basicAuth');
+  authorizersForSelect: computed('identityProviders.[]', function () {
+    const supportedAuthorizers = this.get('identityProviders');
+    if (supportedAuthorizers) {
+      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
+    } else {
+      return [];
+    }
+  }),
+
+  accountsInfo: computed('_linkedAccounts.[]', 'identityProviders', function accounts() {
+    const {
+      _linkedAccounts,
+      identityProviders,
+    } = this.getProperties('_linkedAccounts', 'identityProviders');
+    return _linkedAccounts.map(linkedAccount => ({
+      account: linkedAccount,
+      authorizer: _.find(identityProviders, { id: get(linkedAccount, 'idp') }),
+    }));
   }),
 
   init() {
@@ -218,7 +222,7 @@ export default Component.extend(I18n, {
     authorizerSelected(authorizer) {
       this.set('_selectedAuthorizer', authorizer);
       return this.get('onezoneServer').getLoginEndpoint({
-          idp: authorizer.type,
+          idp: authorizer.id,
           linkAccount: true,
           redirectUrl: window.location.toString(),
         }).then(data =>
