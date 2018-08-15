@@ -4,7 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
-import RSVP from 'rsvp';
+import { resolve } from 'rsvp';
 
 describe('Integration | Component | login box/social box list', function () {
   setupComponentTest('login-box/social-box-list', {
@@ -56,14 +56,12 @@ describe('Integration | Component | login box/social box list', function () {
   });
 
   it('shows clickable custom auth providers', function (done) {
-    const authenticateSpy = sinon.spy(() => new RSVP.Promise((resolve) => resolve));
+    const authenticateSpy = sinon.spy(() => resolve());
     this.on('authenticateSpy', authenticateSpy);
     this.set('supportedAuthorizers', [{
-      type: 'provider1',
-      iconType: 'oneicon',
+      id: 'provider1',
     }, {
-      type: 'provider2',
-      iconType: 'oneicon',
+      id: 'provider2',
     }]);
     this.render(hbs `{{login-box/social-box-list
       supportedAuthorizers=supportedAuthorizers

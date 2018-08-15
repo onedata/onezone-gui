@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { registerService } from '../../helpers/stub-service';
 import EmberObject from '@ember/object';
 import Service from '@ember/service';
-import { Promise, resolve } from 'rsvp';
+import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 
@@ -19,7 +19,7 @@ const linkedAccountManagerStub = Service.extend({
       }),
     ];
     accounts.isLoaded = true;
-    return new Promise((resolve) => resolve(accounts));
+    return resolve(accounts);
   },
 });
 
@@ -75,15 +75,14 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders linked account', function (done) {
+  it('renders linked account', function () {
     this.render(hbs `{{content-users user=user}}`);
-    wait().then(() => {
-      expect(this.$('.google-account')).to.exist;
-      expect(this.$('.google-account .account-type').text().trim())
+    return wait().then(() => {
+      expect(this.$('.google-account'), 'google-account').to.exist;
+      expect(this.$('.google-account .account-type', 'Google+ text').text().trim())
         .to.equal('Google+');
-      expect(this.$('.google-account .account-email').text().trim())
+      expect(this.$('.google-account .account-email', 'email text').text().trim())
         .to.equal('one@one.one');
-      done();
     });
   });
 
