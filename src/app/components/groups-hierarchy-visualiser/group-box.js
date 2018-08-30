@@ -250,7 +250,7 @@ export default Component.extend(I18n, {
         icon: 'join-plug',
       }],
       title: this.t('addChildGroup'),
-      class: 'add-group-action',
+      class: 'add-child-group-action',
       icon: 'add-filled',
     };
   }),
@@ -277,7 +277,7 @@ export default Component.extend(I18n, {
         icon: 'join-plug',
       }],
       title: this.t('addParentGroup'),
-      class: 'add-group-action',
+      class: 'add-parent-group-action',
       icon: 'add-filled',
     };
   }),

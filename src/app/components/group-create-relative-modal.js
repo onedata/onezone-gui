@@ -52,6 +52,12 @@ export default Component.extend(I18n, {
   proceed: notImplementedThrow,
 
   /**
+   * Modal fade animation
+   * @type {boolean}
+   */
+  fade: true,
+
+  /**
    * Group for which new group will be created
    * @type {Group}
    * @virtual

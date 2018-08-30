@@ -69,6 +69,12 @@ export default EmberObject.extend({
   animationTime: 300,
 
   /**
+   * Fade setting for modals
+   * @type {boolean}
+   */
+  modalFade: true,
+
+  /**
    * Minimum column width for the special case of one-column layout
    * (usually a mobile view)
    * @type {Ember.ComputedProperty<number>}

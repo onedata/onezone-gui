@@ -591,7 +591,7 @@ export default Component.extend(I18n, {
     const groupEntityId = get(group, 'entityId');
     return navigationState.resourceCollectionContainsEntityId(groupEntityId)
       .then(contains => {
-        if (contains) {
+        if (!contains) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));
         }
         return contains;
@@ -772,7 +772,7 @@ export default Component.extend(I18n, {
         .then(() =>
           this.redirectOnGroupDeletion().then(willRedirect => {
             if (!willRedirect) {
-              safeExec(this, 'reloadModel', groupToRemove);
+              safeExec(this, 'reloadModel');
             }
           })
         )
