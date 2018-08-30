@@ -94,11 +94,13 @@ export default Service.extend({
     } catch (e) {
       return reject(e);
     }
+    const group = this.getLoadedGroupByEntityId(entityId);
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.leaveGroup(entityId))
       .then(destroyResult => {
         return Promise.all([
           this.reloadList(),
+          group ? group.reload() : resolve(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
         ]).then(() => destroyResult);
