@@ -120,11 +120,7 @@ export default Service.extend({
         return group.destroyRecord();
       })
       .then(destroyResult => {
-        const entityId = get(group, 'entityId');
         return Promise.all([
-          this.updateGroupPresenceInLoadedParents(entityId),
-          this.updateGroupPresenceInLoadedChildren(entityId),
-          this.updateGroupPresenceInLoadedSpaces(entityId),
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
@@ -315,56 +311,6 @@ export default Service.extend({
   reloadList() {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.belongsTo('groupList').reload(true));
-  },
-
-  /**
-   * Updates lists in actual (not reloaded) models
-   * @param {string} modelType e.g. `space`, `group`
-   * @param {string} entityId group entityId
-   * @param {string} listName name of list relation in modelType model
-   * @returns {Array<Promise>}
-   */
-  updateGroupPresenceInLoadedModels(modelType, entityId, listName) {
-    const models = this.get('store').peekAll(modelType);
-    return Promise.all(models.map(model => {
-      const list = model.belongsTo(listName).value();
-      const ids = list ? list.hasMany('list').ids() : null;
-      if (ids && ids.some(id => parseGri(id).entityId === entityId)) {
-        return list.reload().then(() => list.hasMany('list').reload());
-      } else if (list) {
-        // simulate reload to recalculated properties
-        list.notifyPropertyChange('isReloading');
-      } else {
-        return resolve();
-      }
-    }));
-  },
-
-  /**
-   * Updates child lists in actual (not reloaded) parents of given group
-   * @param {string} entityId group entityId
-   * @returns {Array<Promise>}
-   */
-  updateGroupPresenceInLoadedParents(entityId) {
-    return this.updateGroupPresenceInLoadedModels('group', entityId, 'childList');
-  },
-
-  /**
-   * Updates parent lists in actual (not reloaded) children of given group
-   * @param {string} entityId group entityId
-   * @returns {Array<Promise>}
-   */
-  updateGroupPresenceInLoadedChildren(entityId) {
-    return this.updateGroupPresenceInLoadedModels('group', entityId, 'parentList');
-  },
-
-  /**
-   * Updates group lists in actual (not reloaded) spaces
-   * @param {string} entityId group entityId
-   * @returns {Array<Promise>}
-   */
-  updateGroupPresenceInLoadedSpaces(entityId) {
-    return this.updateGroupPresenceInLoadedModels('space', entityId, 'groupList');
   },
 
   /**
