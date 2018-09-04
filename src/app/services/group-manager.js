@@ -100,7 +100,7 @@ export default Service.extend({
       .then(destroyResult => {
         return Promise.all([
           this.reloadList(),
-          group ? group.reload() : resolve(),
+          group ? group.reload().catch(ignoreForbiddenError) : resolve(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
         ]).then(() => destroyResult);
