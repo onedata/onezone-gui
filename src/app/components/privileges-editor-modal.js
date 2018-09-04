@@ -67,10 +67,4 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   processing: false,
-
-  /**
-   * Modal fade animation
-   * @type {boolean}
-   */
-  fade: true,
 });

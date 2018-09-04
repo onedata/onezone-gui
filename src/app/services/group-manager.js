@@ -100,7 +100,7 @@ export default Service.extend({
       .then(destroyResult => {
         return Promise.all([
           this.reloadList(),
-          group ? group.reload() : resolve(),
+          group ? group.reload().catch(ignoreForbiddenError) : resolve(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
         ]).then(() => destroyResult);
@@ -319,8 +319,7 @@ export default Service.extend({
    * @returns {Group|undefined}
    */
   getLoadedGroupByEntityId(entityId) {
-    return this.get('store').peekAll('group')
-      .filter(g => get(g, 'entityId') === entityId)[0];
+    return this.get('store').peekAll('group').findBy('entityId', entityId);
   },
 
   /**
