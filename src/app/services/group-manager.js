@@ -78,6 +78,7 @@ export default Service.extend({
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
+          this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
         ]).then(() => group))
       );
   },
@@ -268,6 +269,7 @@ export default Service.extend({
           entityType: 'group',
           entityId: parentEntityId,
           aspect: 'child',
+          scope: 'auto',
         }),
         operation: 'create',
         data: childGroupRepresentation,
@@ -293,6 +295,7 @@ export default Service.extend({
         entityId: groupEntityId,
         aspect: 'child',
         aspectId: futureChildEntityId,
+        scope: 'auto',
       }),
       operation: 'create',
     }).then(() => {

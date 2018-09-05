@@ -395,6 +395,63 @@ export default Component.extend(I18n, {
     return () => this.recalculateAvailableArea();
   }),
 
+  groupToLeaveObserver: observer(
+    'groupToLeave.directMembership',
+    function groupToLeaveObserver() {
+      const {
+        groupToLeave,
+        isLeavingGroup,
+      } = this.getProperties('groupToLeave', 'isLeavingGroup');
+      // if user left group without our action, close leave-group modal
+      if (
+        groupToLeave &&
+        !isLeavingGroup &&
+        !get(groupToLeave, 'directMembership')
+      ) {
+        this.set('groupToLeave', null);
+      }
+    }
+  ),
+
+  relationToRemoveObserver: observer(
+    'relationToRemove.exists',
+    function relationToRemoveObserver() {
+      const {
+        relationToRemove,
+        isRemovingRelation,
+      } = this.getProperties('relationToRemove', 'isRemovingRelation');
+      // if relation disappeard without our action, close remove-relation modal
+      if (
+        relationToRemove &&
+        !isRemovingRelation &&
+        !get(relationToRemove, 'exists')
+      ) {
+        this.set('relationToRemove', null);
+      }
+    }
+  ),
+
+  relationPrivilegesToChangeObserver: observer(
+    'relationPrivilegesToChange.{exists,parentGroup.canViewPrivileges}',
+    function relationPrivilegesToChangeObserver() {
+      const {
+        relationPrivilegesToChange,
+        isSavingRelationPrivileges,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'isSavingRelationPrivileges'
+      );
+      // if relation disappeard without action or user lost access to privileges
+      // information, close privileges-editor modal
+      if (relationPrivilegesToChange && !isSavingRelationPrivileges && (
+        !get(relationPrivilegesToChange, 'exists') ||
+        !get(relationPrivilegesToChange, 'parentGroup.canViewPrivileges')
+      )) {
+        this.set('relationPrivilegesToChange', null);
+      }
+    }
+  ),
+
   /**
    * Observes resetTrigger changes. Exact value of the resetTrigger
    * is not important.

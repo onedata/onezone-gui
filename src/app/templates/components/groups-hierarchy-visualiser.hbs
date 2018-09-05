@@ -19,14 +19,14 @@ right column will always be before left in html --}}
   {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
 {{/each}}
 {{group-leave-modal
-  opened=groupToLeave
+  opened=(and groupToLeave (not groupToLeave.isDeleted))
   close=(action (mut groupToLeave) null)
   proceed=(action "leaveGroup")
   processing=isLeavingGroup
   group=groupToLeave
   fade=workspace.modalFade}}
 {{group-remove-modal
-  opened=groupToRemove
+  opened=(and groupToRemove (or isRemovingGroup (not groupToRemove.isDeleted)))
   close=(action (mut groupToRemove) null)
   proceed=(action "removeGroup")
   processing=isRemovingGroup
@@ -41,7 +41,7 @@ right column will always be before left in html --}}
   childGroup=relationToRemove.childGroup
   fade=workspace.modalFade}}
 {{group-create-relative-modal
-  opened=groupToCreateRelative
+  opened=(and groupToCreateRelative (or isCreatingRelativeGroup (not groupToCreateRelative.isDeleted)))
   close=(action (mut groupToCreateRelative) null)
   proceed=(action "createRelative")
   processing=isCreatingRelativeGroup
@@ -49,7 +49,7 @@ right column will always be before left in html --}}
   relation=newRelativeGroupType
   fade=workspace.modalFade}}
 {{group-add-your-group-modal
-  opened=groupToAddYourGroup
+  opened=(and groupToAddYourGroup (or isAddingYourGroup (not groupToAddYourGroup.isDeleted)))
   close=(action (mut groupToAddYourGroup) null)
   proceed=(action "addYourGroup")
   processing=isAddingYourGroup
@@ -57,13 +57,13 @@ right column will always be before left in html --}}
   relation=addYourGroupType
   fade=workspace.modalFade}}
 {{group-join-using-token-modal
-  opened=groupConsumingToken
+  opened=(and groupConsumingToken (or isGroupConsumingToken (not groupConsumingToken.isDeleted)))
   close=(action (mut groupConsumingToken) null)
   proceed=(action "joinUsingToken")
   processing=isGroupConsumingToken
   fade=workspace.modalFade}}
 {{group-invite-using-token-modal
-  opened=invitingGroupUsingToken
+  opened=(and invitingGroupUsingToken (not invitingGroupUsingToken.isDeleted))
   close=(action (mut invitingGroupUsingToken) null)
   group=invitingGroupUsingToken
   fade=workspace.modalFade}}
