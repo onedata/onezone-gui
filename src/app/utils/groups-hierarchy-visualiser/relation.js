@@ -25,24 +25,39 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   exists: computed(
-    'parentGroup.childList.list.[]',
-    'childGroup.parentList.list.[]',
+    'parentGroup.childList.{list.[],isReloading}',
+    'childGroup.parentList.{list.[],isReloading}',
     function relationToRemoveExists() {
       const {
         parentGroup,
         childGroup,
       } = this.getProperties('parentGroup', 'childGroup');
-      // We need to check both children and parents lists, because they can
-      // update separatedly and there may be a situation when one list does
+      const hasParentViewPrivilege = get(parentGroup, 'hasViewPrivilege');
+      const hasChildViewPrivilege = get(childGroup, 'hasViewPrivilege');
+      const parentId = get(parentGroup, 'id');
+      const childId = get(childGroup, 'id');
+
+      // If we cannot get relation information, then we can't assume that
+      // relation exists
+      if (!hasChildViewPrivilege && !hasParentViewPrivilege) {
+        return false;
+      }
+
+      // We need to check both children and parents lists if possible, because
+      // they can update separatedly and there may be a situation when one list does
       // not satisfy relation while the second one does it (because it
       // is outdated).
-      const childList = parentGroup.belongsTo('childList').value();
       const parentList = childGroup.belongsTo('parentList').value();
-      if (parentList && childList) {
-        const parentIds = parentList.hasMany('list').ids();
-        const childIds = childList.hasMany('list').ids();
-        return parentIds.indexOf(get(parentGroup, 'id')) !== -1 &&
-          childIds.indexOf(get(childGroup, 'id')) !== -1;
+      const childList = parentGroup.belongsTo('childList').value();
+      const parentIds = parentList ? parentList.hasMany('list').ids() : null;
+      const childIds = childList ? childList.hasMany('list').ids() : null;
+      if (parentIds && childIds) {
+        return parentIds.indexOf(parentId) !== -1 &&
+          childIds.indexOf(childId) !== -1;
+      } else if (parentIds) {
+        return parentIds.indexOf(parentId) !== -1;
+      } else if (childIds) {
+        return childIds.indexOf(childId) !== -1;
       } else {
         return false;
       }

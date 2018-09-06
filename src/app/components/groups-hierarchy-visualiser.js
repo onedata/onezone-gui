@@ -104,10 +104,10 @@
  *       null for children and parents types, and null for empty and startPoint.
  *       For children it is a parent group for those children, for parents it
  *       is a children group of those parents.
- *     * model - ProxyArray with groups. For empty type it should be an empty
- *       array, for startPoint it must contain an array with exactly one group,
- *       for children/parents there are no requirements - can contain many groups,
- *       or be an empty array.
+ *     * model - ProxyObject with with group-list model. For empty type it should
+ *       be a model with an empty array, for startPoint it must contain an array
+ *       with exactly one group, for children/parents there are no requirements -
+ *       can contain many groups, or be an empty array.
  * 
  * Flow:
  *   * GroupsHierarchyVisualiser component attaches its' own window resize
@@ -172,10 +172,11 @@ import { alias } from '@ember/object/computed';
 import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve, reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
-import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import { createEmptyColumnModel, default as Column } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
@@ -556,14 +557,18 @@ export default Component.extend(I18n, {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
       promise = get(parentGroup, 'childList')
-        .then(childList => get(childList, 'list'))
-        .then(groupsList => Promise.all(
-          groupsList.map(g => g.reload())
-        ).then(() => groupsList));
+        .then(childList => {
+          return get(childList, 'list')
+            .then(groupsList => Promise.all(
+              groupsList.map(g => g.reload())
+            ))
+            .then(() => childList);
+          }
+        );
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseArray.create({ promise });
+    return PromiseObject.create({ promise });
   },
 
   /**
@@ -575,13 +580,17 @@ export default Component.extend(I18n, {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
       promise = get(childGroup, 'parentList')
-        .then(parentList => get(parentList, 'list'))
-        .then(list => Promise.all(
-          list.map(g => g.reload())).then(() => list));
+        .then(parentList => {
+          return get(parentList, 'list')
+            .then(list => Promise.all(
+              list.map(g => g.reload())
+            ))
+            .then(() => parentList);
+        });
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseArray.create({ promise });
+    return PromiseObject.create({ promise });
   },
 
   /**
@@ -589,9 +598,11 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<Ember.A<Group>>}
    */
   loadThisGroupAsArray() {
-    return PromiseArray.create({
+    return PromiseObject.create({
       promise: this.get('group').reload()
-        .then(groupProxy => A([groupProxy])),
+        .then(groupProxy => EmberObject.create({
+          list: PromiseArray.create({ promise: resolve(A([groupProxy])) }),
+        })),
     });
   },
 
@@ -631,7 +642,7 @@ export default Component.extend(I18n, {
       case 'children':
         return this.loadGroupChildren(relatedGroup);
       case 'empty':
-        return PromiseArray.create({ promise: resolve(A()) });
+        return createEmptyColumnModel();
     }
   },
 
@@ -652,7 +663,7 @@ export default Component.extend(I18n, {
         if (!contains) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));
         }
-        return contains;
+        return !contains;
       });
   },
 
@@ -679,7 +690,7 @@ export default Component.extend(I18n, {
         }
         const modelPromise = relatedGroupReloadPromise
           .then(() => this.createColumnModel(column));
-        set(column, 'model', PromiseArray.create({ promise: modelPromise }));
+        set(column, 'model', PromiseObject.create({ promise: modelPromise }));
       });
   },
 
