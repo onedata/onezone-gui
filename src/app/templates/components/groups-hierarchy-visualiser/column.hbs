@@ -32,10 +32,6 @@
 {{/perfect-scrollbar-element}}
 {{#if (or (not column.model.isFulfilled) column.model.isForbidden)}}
   <div class="column-loader">
-    {{promise-proxy-container
-      proxy=column.model
-      isLoaded=(and column.model.isFulfilled (not column.model.isForbidden))
-      isError=(or column.model.isRejected column.model.isForbidden)
-      errorReason=(or column.model.reason column.model.forbiddenError)}}
+    {{promise-proxy-container proxy=column.model}}
   </div>
 {{/if}}
