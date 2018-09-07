@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
     'isFilteredOut:filtered-out',
     'actionsOpened',
     'hovered',
+    'groupIdClass',
   ],
   attributeBindings: ['style'],
 
@@ -194,6 +195,14 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * String in format `group-groupEntityId`.
+   * @type {Ember.ComputedProperty<string>}
+   */
+  groupIdClass: computed('groupBox.group.entityId', function groupIdClass() {
+    return `group-${this.get('groupBox.group.entityId')}`;
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   viewGroupAction: computed(function viewGroupAction() {
@@ -241,7 +250,7 @@ export default Component.extend(I18n, {
         icon: 'join-plug',
       }],
       title: this.t('addChildGroup'),
-      class: 'add-group-action',
+      class: 'add-child-group-action',
       icon: 'add-filled',
     };
   }),
@@ -268,7 +277,7 @@ export default Component.extend(I18n, {
         icon: 'join-plug',
       }],
       title: this.t('addParentGroup'),
-      class: 'add-group-action',
+      class: 'add-parent-group-action',
       icon: 'add-filled',
     };
   }),

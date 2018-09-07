@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, getProperties } from '@ember/object';
+import { computed, observer, getProperties, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -18,7 +18,10 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 
 export default Component.extend(I18n, {
   classNames: ['column'],
-  classNameBindings: ['relationType'],
+  classNameBindings: [
+    'relationType',
+    'groupIdClass',
+  ],
   attributeBindings: ['style'],
 
   /**
@@ -147,6 +150,17 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   relationType: reads('column.relationType'),
+
+  /**
+   * String in format `group-groupEntityId`.
+   * @type {Ember.ComputedProperty<string>}
+   */
+  groupIdClass: computed('column.relatedGroup.entityId', function groupIdClass() {
+    const relatedGroup = this.get('column.relatedGroup');
+    if (relatedGroup) {
+      return `group-${get(relatedGroup, 'entityId')}`;
+    }
+  }),
 
   /**
    * @type {Ember.ComputedProperty<SafeString>}

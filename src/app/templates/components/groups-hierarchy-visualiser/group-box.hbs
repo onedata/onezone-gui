@@ -1,11 +1,13 @@
 {{#if groupBox.leftLine.isVisible}}
   {{groups-hierarchy-visualiser/group-box-line
+    class="line-to-parent"
     line=groupBox.leftLine
     modifyPrivileges=modifyPrivileges
     removeRelation=removeRelation}}
 {{/if}}
 {{#if groupBox.rightLine.isVisible}}
   {{groups-hierarchy-visualiser/group-box-line
+    class="line-to-child"
     line=groupBox.rightLine
     modifyPrivileges=modifyPrivileges
     removeRelation=removeRelation}}
