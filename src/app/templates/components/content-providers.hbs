@@ -18,6 +18,7 @@
               {{provider-place
                 provider=square.providers
                 atlasWidth=1500
+                circleSizeScale=_providerCircleScale
                 active=(contains selectedProvider square.providers)
                 renderDrop=(and (contains selectedProvider square.providers) (not isWhileDraggingMap))
                 selectedProvider=selectedProvider
