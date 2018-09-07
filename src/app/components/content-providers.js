@@ -124,6 +124,13 @@ export default Component.extend({
   ),
 
   /**
+   * @type {Ember.ComputedProperty<number>}
+   */
+  _providerCircleScale: computed('_mapState.scale', function () {
+    return 1.4 + this.get('_mapState.scale') / 6;
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<PromiseObject<DS.RecordArray<Provider>>>>}
    */
   _providersProxy: computed('providerList.list', function () {
@@ -150,7 +157,7 @@ export default Component.extend({
         _providers,
         _mapState,
       } = this.getProperties('_providers', '_mapState');
-      const squareSideLength = 10 / (_mapState.scale || 1);
+      const squareSideLength = 15 / (_mapState.scale || 1);
       return clusterizeProviders(_providers || [], squareSideLength, squareSideLength);
     }
   ),
