@@ -115,7 +115,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<PromiseObject<DS.RecordArray<Provider>>>>}
    */
-  _providersProxy: computed('providerList.list', function () {
+  _providersProxy: computed('providerList', function () {
     return PromiseObject.create({
       promise: this.get('providerList.list'),
     });
