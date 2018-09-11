@@ -322,8 +322,7 @@ export default Service.extend({
    * @returns {Group|undefined}
    */
   getLoadedGroupByEntityId(entityId) {
-    return this.get('store').peekAll('group')
-      .filter(g => get(g, 'entityId') === entityId)[0];
+    return this.get('store').peekAll('group').findBy('entityId', entityId);
   },
 
   /**

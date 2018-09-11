@@ -75,6 +75,24 @@ const GroupStub = EmberObject.extend({
   },
 });
 
+class FakeWindow {
+  constructor() {
+    this.resizeHandler = () => {};
+  }
+
+  addEventListener(eventType, handler) {
+    if (eventType === 'resize') {
+      this.resizeHandler = handler;
+    }
+  }
+
+  removeEventListener(eventType) {
+    if (eventType === 'resize') {
+      this.resizeHandler = null;
+    }
+  }
+}
+
 describe('Integration | Component | groups hierarchy visualiser', function () {
   setupComponentTest('groups-hierarchy-visualiser', {
     integration: true,
@@ -125,30 +143,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       width: 1200,
       height: 700,
     };
-    const _window = {
-      resizeHandler: () => {},
-
-      addEventListener(eventType, handler) {
-        if (eventType === 'resize') {
-          this.resizeHandler = handler;
-        }
-      },
-
-      removeEventListener(eventType) {
-        if (eventType === 'resize') {
-          this.resizeHandler = null;
-        }
-      },
-    };
     this.setProperties({
       containerSize,
       containerStyle: getContainerStyle(containerSize),
       group,
       workspace: Workspace.create({
         animationTime: 0,
-        modalFade: false,
       }),
-      _window,
+      _window: new FakeWindow(),
     });
   });
 
@@ -227,7 +229,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       });
   });
 
-  it('renders children column properly', function () {
+  it('renders children groups and title in children column', function () {
     this.render(hbs `
       <div style={{containerStyle}}>
         {{groups-hierarchy-visualiser group=group workspace=workspace}}
@@ -249,7 +251,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       });
   });
 
-  it('renders parents column properly', function () {
+  it('renders parents groups and title in parents column', function () {
     this.render(hbs `
       <div style={{containerStyle}}>
         {{groups-hierarchy-visualiser group=group workspace=workspace}}
@@ -276,7 +278,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       });
   });
 
-  it('renders empty column properly', function () {
+  it('renders no groups in empty column', function () {
     this.render(hbs `
       <div style={{containerStyle}}>
         {{groups-hierarchy-visualiser group=group workspace=workspace}}
@@ -651,8 +653,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       .then(() => {
         const helper = new GroupsHierarchyVisualiserHelper(this.$());
         expect(helper.getAllColumns()).to.have.length(1);
-        expect(this.$('.line-to-child')).to.have.length(0);
-        expect(this.$('.line-to-parent')).to.have.length(0);
+        expect(this.$('.line-to-child')).to.not.exist;
+        expect(this.$('.line-to-parent')).to.not.exist;
       });
   });
 

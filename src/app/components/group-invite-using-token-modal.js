@@ -41,12 +41,6 @@ export default Component.extend(I18n, {
   close: notImplementedThrow,
 
   /**
-   * Modal fade animation
-   * @type {boolean}
-   */
-  fade: true,
-
-  /**
    * Group for which invitation token will be generated
    * @type {Group}
    * @virtual
