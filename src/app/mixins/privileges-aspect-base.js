@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { Promise } from 'rsvp';
+import { Promise, reject } from 'rsvp';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
@@ -111,20 +111,24 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  groupList: computed('model', function () {
+  groupList: computed('model.hasViewPrivilege', function () {
     return PromiseArray.create({
-      promise: get(this.get('model'), 'groupList')
-        .then(sgl => sgl ? get(sgl, 'list') : A()),
+      promise: this.get('model.hasViewPrivilege') ?
+        get(this.get('model'), 'groupList').then(sgl =>
+          sgl ? get(sgl, 'list') : A()
+        ) : reject({ id: 'forbidden' }),
     });
   }),
 
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  userList: computed('model', function () {
+  userList: computed('model.hasViewPrivilege', function () {
     return PromiseArray.create({
-      promise: get(this.get('model'), 'userList')
-        .then(sul => sul ? get(sul, 'list') : A()),
+      promise: this.get('model.hasViewPrivilege') ?
+        get(this.get('model'), 'userList').then(sul =>
+          sul ? get(sul, 'list') : A()
+        ) : reject({ id: 'forbidden' }),
     });
   }),
 
