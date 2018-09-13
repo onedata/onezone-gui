@@ -12,7 +12,6 @@ import Component from '@ember/component';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -23,7 +22,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.collectionPermissions',
 
   /**
-   * @type {Ember.A<PrivilegesModelProxy>}
+   * @type {Ember.A<PrivilegeModelProxy>}
    * @virtual
    */
   proxyList: undefined,
@@ -39,7 +38,7 @@ export default Component.extend(I18n, {
    * Called after list item selection.
    * @virtual
    * @type {function}
-   * @param {Array<PrivilegesModelProxy>} modelsProxies array of selected models
+   * @param {Array<PrivilegeModelProxy>} modelsProxies array of selected models
    * @returns {any}
    */
   modelsSelected: notImplementedWarn,
@@ -81,8 +80,8 @@ export default Component.extend(I18n, {
   /**
    * Callback responsible for privileges persistence.
    * @type {function}
-   * @param {PrivilegesModelProxy} modelProxy
-   * @returns {Promise<PrivilegesModelProxy>}
+   * @param {PrivilegeModelProxy} modelProxy
+   * @returns {Promise<PrivilegeModelProxy>}
    */
   save: notImplementedThrow,
 
@@ -93,14 +92,7 @@ export default Component.extend(I18n, {
 
   actions: {
     reset(modelProxy) {
-      if (modelProxy.get('modified')) {
-        const persistedPrivileges = modelProxy.get('persistedPrivileges');
-        modelProxy.setProperties({
-          modifiedPrivileges: persistedPrivileges,
-          overridePrivileges: _.assign({}, persistedPrivileges),
-          modified: false,
-        });
-      }
+      modelProxy.resetModifications();
     },
   },
 });

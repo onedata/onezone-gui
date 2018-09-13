@@ -88,6 +88,6 @@
   save=(action "saveBatch")
   close=(action "batchEditClose")
   opened=batchEditActive
-  processing=isBatchEditSaving
+  processing=batchEditModalModel.isSaving
   treeRootText=(tt this "batchEditModalSelectedItems")}}
 {{yield}}

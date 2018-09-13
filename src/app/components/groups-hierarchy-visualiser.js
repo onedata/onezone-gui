@@ -180,6 +180,7 @@ import { createEmptyColumnModel, default as Column } from 'onezone-gui/utils/gro
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
+import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -192,6 +193,7 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   navigationState: service(),
   router: service(),
+  store: service(),
 
   /**
    * @override
@@ -364,7 +366,7 @@ export default Component.extend(I18n, {
 
   /**
    * Privileges model for relation privileges editor
-   * @type {Ember.ComputedProperty<PrivilegesModelProxy|null>}
+   * @type {Ember.ComputedProperty<PrivilegeModelProxy|null>}
    */
   privilegesEditorModel: computed(
     'relationPrivilegesToChange',
@@ -372,15 +374,25 @@ export default Component.extend(I18n, {
       const {
         relationPrivilegesToChange,
         privilegeManager,
-      } = this.getProperties('relationPrivilegesToChange', 'privilegeManager');
+        groupedPrivilegesFlags,
+        store,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'privilegeManager',
+        'groupedPrivilegesFlags',
+        'store'
+      );
       if (relationPrivilegesToChange) {
-        return EmberObject.create({
-          modelGri: privilegeManager.generateGri(
-            'group',
-            get(relationPrivilegesToChange, 'parentGroup.entityId'),
-            'child',
-            get(relationPrivilegesToChange, 'childGroup.entityId'),
-          ),
+        const gri = privilegeManager.generateGri(
+          'group',
+          get(relationPrivilegesToChange, 'parentGroup.entityId'),
+          'child',
+          get(relationPrivilegesToChange, 'childGroup.entityId'),
+        );
+        return PrivilegeModelProxy.create({
+          store,
+          griArray: [gri],
+          groupedPrivilegesFlags,
         });
       } else {
         return null;
@@ -444,10 +456,11 @@ export default Component.extend(I18n, {
       );
       // if relation disappeard without action or user lost access to privileges
       // information, close privileges-editor modal
-      if (relationPrivilegesToChange && !isSavingRelationPrivileges && (
-        !get(relationPrivilegesToChange, 'exists') ||
-        !get(relationPrivilegesToChange, 'parentGroup.canViewPrivileges')
-      )) {
+      if (
+        relationPrivilegesToChange &&
+        !isSavingRelationPrivileges &&
+        !get(relationPrivilegesToChange, 'canViewPrivileges')
+      ) {
         this.set('relationPrivilegesToChange', null);
       }
     }
@@ -563,8 +576,7 @@ export default Component.extend(I18n, {
               groupsList.map(g => g.reload())
             ))
             .then(() => childList);
-          }
-        );
+        });
     } else {
       promise = reject({ id: 'forbidden' });
     }
@@ -855,29 +867,14 @@ export default Component.extend(I18n, {
     savePrivileges() {
       const {
         privilegesEditorModel,
-        privilegeManager,
         privilegeActions,
       } = this.getProperties(
         'privilegesEditorModel',
-        'privilegeManager',
         'privilegeActions'
       );
-      const {
-        modifiedPrivileges,
-        model,
-      } = getProperties(privilegesEditorModel, 'modifiedPrivileges', 'model');
-      set(model, 'privileges', privilegeManager.treeToArray(modifiedPrivileges));
-
-      this.set('isSavingRelationPrivileges', true);
-      const promise = get(model, 'content').save()
-        .catch(error => {
-          get(model, 'content').rollbackAttributes();
-          throw error;
-        });
-      return privilegeActions.handleSave(promise)
+      return privilegeActions.handleSave(privilegesEditorModel.save())
         .finally(() =>
           safeExec(this, 'setProperties', {
-            isSavingRelationPrivileges: false,
             relationPrivilegesToChange: null,
           })
         );

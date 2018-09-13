@@ -7,10 +7,10 @@
   headerText=(tt this "header")
   proceedButtonClass="btn btn-primary proceed"
   proceedButtonText=(tt this "save")
-  proceedDisabled=(not modelProxy.model.isFulfilled)
+  proceedDisabled=(not modelProxy.isLoaded)
   textCenter=false}}
   <div class="tree-container">
-    {{#if modelProxy.model.isFulfilled}}
+    {{#if modelProxy.isLoaded}}
       <div class="batch-edit-tree-title hidden-xs">
         {{one-icon icon="group"}}
         <span class="one-label">{{treeRootText}}</span>

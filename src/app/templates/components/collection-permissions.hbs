@@ -8,7 +8,7 @@
     {{#list.item selectionValue=modelProxy as |listItem|}}
       {{#listItem.header
         disableToggleIcon=itemActions.length
-        class=(if modelProxy.modified "item-modified-header")}}
+        class=(if modelProxy.isModified "item-modified-header")}}
         <span class="item-icon-container">
           {{one-icon class="item-icon" icon=itemIcon}}
           {{one-tooltip
@@ -21,7 +21,7 @@
         <span class="one-label">
           {{modelProxy.subject.name}}
         </span>
-        {{#if modelProxy.modified}}
+        {{#if modelProxy.isModified}}
           <div class="btn-toolbar hidden-xs">
             {{#one-spin-button
               action=(action save modelProxy)
@@ -29,7 +29,7 @@
               {{tt this "save"}}
             {{/one-spin-button}}
             {{#bs-button size="sm" type="danger"
-              disabled=modelProxy.saving
+              disabled=modelProxy.isSaving
               onClick=(action "reset" modelProxy)}}
               {{tt this "reset"}}
             {{/bs-button}}
@@ -49,13 +49,13 @@
         {{#render-later triggerRender=listItem.isActive}}
           <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
             {{#bs-button size="sm" type="primary"
-              disabled=(or modelProxy.saving (not modelProxy.modified))
+              disabled=(or modelProxy.saving (not modelProxy.isModified))
               onClick=(action save modelProxy)}}
               {{tt this "save"}}
             {{/bs-button}}
             
             {{#bs-button size="sm" type="danger"
-              disabled=(or modelProxy.saving (not modelProxy.modified))
+              disabled=(or modelProxy.saving (not modelProxy.isModified))
               onClick=(action "reset" modelProxy)}}
               {{tt this "reset"}}
             {{/bs-button}}
@@ -65,7 +65,7 @@
             privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
             privilegesTranslationsPath=privilegesTranslationsPath
             modelProxy=modelProxy
-            editionEnabled=(not modelProxy.saving)}}
+            editionEnabled=(not modelProxy.isSaving)}}
         {{/render-later}}
       {{/listItem.content}}
     {{/list.item}}

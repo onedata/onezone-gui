@@ -69,6 +69,6 @@ right column will always be before left in html --}}
     save=(action "savePrivileges")
     close=(action (mut relationPrivilegesToChange) null)
     opened=relationPrivilegesToChange
-    processing=isSavingRelationPrivileges
+    processing=privilegesEditorModel.isSaving
     treeRootText=privilegesTreeRootText}}
 {{/if}}

@@ -154,7 +154,6 @@ export default Component.extend({
     }
   ),
 
-
   /**
    * Window resize event handler
    * @type {Ember.ComputedProperty<Function>}

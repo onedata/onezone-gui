@@ -8,6 +8,7 @@
  */
 
 import EmberObject, { computed, get } from '@ember/object';
+import { and } from '@ember/object/computed';
 
 export default EmberObject.extend({
   /**
@@ -63,4 +64,9 @@ export default EmberObject.extend({
       }
     }
   ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  canViewPrivileges: and('exists', 'parentGroup.canViewPrivileges'),
 });

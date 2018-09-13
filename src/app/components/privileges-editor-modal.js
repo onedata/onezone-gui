@@ -47,7 +47,7 @@ export default Component.extend(I18n, {
 
   /**
    * Model with privileges.
-   * @type {PrivilegesModelProxy}
+   * @type {PrivilegeModelProxy}
    */
   modelProxy: Object.freeze({}),
 

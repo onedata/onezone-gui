@@ -183,8 +183,8 @@ export default EmberObject.extend({
     'sortedGroupBoxes.@each.isLeftLineVisible',
     'parentsRelationGroupBox.isLeftLineVisible',
     function groupBoxesWithLeftLines() {
-    return A(this.get('sortedGroupBoxes').filterBy('isLeftLineVisible', true));
-  }),
+      return A(this.get('sortedGroupBoxes').filterBy('isLeftLineVisible', true));
+    }),
 
   /**
    * Array of group boxes, that have a right line
@@ -194,8 +194,8 @@ export default EmberObject.extend({
     'sortedGroupBoxes.@each.isRightLineVisible',
     'childrenRelationGroupBox.isRightLineVisible',
     function groupBoxesWithRightLines() {
-    return A(this.get('sortedGroupBoxes').filterBy('isRightLineVisible', true));
-  }),
+      return A(this.get('sortedGroupBoxes').filterBy('isRightLineVisible', true));
+    }),
 
   /**
    * X position of group box (relative to column)

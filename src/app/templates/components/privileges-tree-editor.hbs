@@ -1,9 +1,9 @@
-{{#promise-proxy-container proxy=modelProxy.model}}
+{{#promise-proxy-container proxy=modelProxy.models}}
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState
-    compareValues=persistedPrivileges
-    overrideValues=overridePrivileges
+    compareValues=modelProxy.effectivePrivilegesSnapshot
+    overrideValues=modelProxy.effectivePrivilegesSnapshot
     disabledFieldsPaths=treeDisabledPaths
     valuesChanged=(action "treeValuesChanged")}}
   {{yield}}
