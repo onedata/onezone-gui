@@ -181,6 +181,7 @@ import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
+import { getOwner } from '@ember/application';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -193,7 +194,6 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   navigationState: service(),
   router: service(),
-  store: service(),
 
   /**
    * @override
@@ -375,12 +375,10 @@ export default Component.extend(I18n, {
         relationPrivilegesToChange,
         privilegeManager,
         groupedPrivilegesFlags,
-        store,
       } = this.getProperties(
         'relationPrivilegesToChange',
         'privilegeManager',
-        'groupedPrivilegesFlags',
-        'store'
+        'groupedPrivilegesFlags'
       );
       if (relationPrivilegesToChange) {
         const gri = privilegeManager.generateGri(
@@ -389,8 +387,7 @@ export default Component.extend(I18n, {
           'child',
           get(relationPrivilegesToChange, 'childGroup.entityId'),
         );
-        return PrivilegeModelProxy.create({
-          store,
+        return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
           griArray: [gri],
           groupedPrivilegesFlags,
         });

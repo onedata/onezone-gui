@@ -40,7 +40,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, get } from '@ember/object';
+import EmberObject, { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -48,6 +48,7 @@ import { Promise, resolve } from 'rsvp';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 import _ from 'lodash';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { inject as service } from '@ember/service';
 
 /**
  * @typedef {Object} PrivilegeDiff
@@ -56,11 +57,8 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
  */
 
 export default EmberObject.extend({
-  /**
-   * @type {DS.Store}
-   * @virtual
-   */
-  store: null,
+  store: service(),
+  onedataGraph: service(),
 
   /**
    * Array of privilege GRI
@@ -114,6 +112,12 @@ export default EmberObject.extend({
    * @type {boolean}
    */
   isSaving: false,
+
+  /**
+   * True if models has been loaded at least once
+   * @type {boolean}
+   */
+  hasBeenLoaded: false,
 
   /**
    * Array of fetched privilege models
@@ -192,6 +196,27 @@ export default EmberObject.extend({
     }
   ),
 
+  isLoadedObserver: observer('isLoaded', function isLoadedObserver() {
+    if (this.get('isLoaded') && !this.get('hasBeenLoaded')) {
+      this.set('hasBeenLoaded', true);
+    }
+  }),
+
+  changesObserver: observer(
+    'isModified',
+    'persistedPrivileges',
+    function isLoadedObserver() {
+      if (!this.get('isModified')) {
+        this.updateSnapshot();
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.isLoadedObserver();
+  },
+
   /**
    * Reloads all models according to specified griArray
    * @returns {PromiseArray<Privilege>}
@@ -199,12 +224,11 @@ export default EmberObject.extend({
   reloadModels() {
     const promiseArray = PromiseArray.create({
       promise: Promise.all(this.get('griArray').map(gri =>
-        this.get('store').findRecord('privilege', gri)
+        this.get('store').findRecord('privilege', gri, { reload: true })
       )),
     });
     this.set('models', promiseArray);
     promiseArray.then(() => {
-      safeExec(this, 'updateSnapshot');
       safeExec(this, 'resetModifications');
     });
     return promiseArray;
@@ -244,7 +268,13 @@ export default EmberObject.extend({
       return resolve();
     }
     this.set('isSaving', true);
-    const persistedPrivilegesSnapshot = this.get('persistedPrivilegesSnapshot');
+    const {
+      persistedPrivilegesSnapshot,
+      onedataGraph,
+    } = this.getProperties(
+      'persistedPrivilegesSnapshot',
+      'onedataGraph'
+    );
     return Promise.all(this.get('models.content').map((model, index) => {
         const diff = this.getPrivilegesModificationDiff(
           persistedPrivilegesSnapshot.objectAt(index)
@@ -253,9 +283,11 @@ export default EmberObject.extend({
           return resolve();
         } else {
           const gri = get(model, 'gri');
-          console.log(diff);
-          // TODO save implementation
-          return resolve();
+          return onedataGraph.request({
+            gri,
+            operation: 'update',
+            data: diff,
+          });
         }
       }))
       .finally(() => {

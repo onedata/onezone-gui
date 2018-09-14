@@ -1,4 +1,7 @@
-{{#promise-proxy-container proxy=modelProxy.models}}
+{{#promise-proxy-container
+  proxy=modelProxy.models
+  isLoading=(and modelProxy.isLoading (not modelProxy.hasBeenLoaded))
+  isLoaded=(and modelProxy.hasBeenLoaded (not modelProxy.models.isRejected))}}
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState

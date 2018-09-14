@@ -19,9 +19,9 @@ import { reject } from 'rsvp';
 import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
+import { getOwner } from '@ember/application';
 
 export default Mixin.create({
-  store: service(),
   privilegeManager: service(),
   privilegeActions: service(),
 
@@ -288,8 +288,7 @@ export default Mixin.create({
         let modelProxy = proxyList.findBy('subject', subject);
         if (!modelProxy) {
           const modelGri = this.getPrivilegesGriForModel(subject, subjectType);
-          return PrivilegeModelProxy.create({
-            store: this.get('store'),
+          return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
             groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
             griArray: [modelGri],
             subject,
@@ -309,12 +308,14 @@ export default Mixin.create({
    */
   loadBatchEditModel() {
     const selectedModelProxies = this.get('selectedModelProxies');
-    this.set('batchEditModalModel', PrivilegeModelProxy.create({
-      store: this.get('store'),
-      griArray: _.flatten(selectedModelProxies.mapBy('griArray')),
-      sumPrivileges: true,
-      groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
-    }));
+    this.set(
+      'batchEditModalModel',
+      PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
+        griArray: _.flatten(selectedModelProxies.mapBy('griArray')),
+        sumPrivileges: true,
+        groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
+      })
+    );
   },
 
   actions: {
@@ -342,8 +343,7 @@ export default Mixin.create({
       this.set('batchEditActive', false);
     },
     saveOne(modelProxy) {
-      return this.get('privilegeActions').handleSave(modelProxy.save())
-        .then(() => safeExec(this, () => modelProxy.reloadModels()));
+      return this.get('privilegeActions').handleSave(modelProxy.save(true));
     },
     saveBatch() {
       const {
