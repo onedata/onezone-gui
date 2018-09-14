@@ -26,6 +26,7 @@ export default LoginFormConainer.extend({
   authorizerManager: inject(),
   onezoneServer: inject(),
   onedataConnection: inject(),
+  navigationState: inject(),
 
   /**
    * Authorizer selected in dropdown
@@ -117,6 +118,11 @@ export default LoginFormConainer.extend({
     } else {
       return [];
     }
+  }),
+
+  // FIXME: use of this flag is temporary, cookie maybe?
+  authFor: computed('navigationState.queryParams.auth_for', function authFor() {
+    return this.get('navigationState.queryParams.auth_for');
   }),
 
   /**

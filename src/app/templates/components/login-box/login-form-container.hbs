@@ -19,6 +19,12 @@
 </div>
 {{#if _hasAuthorizersForSelect}}
   <div class="authorizers-select-container animated fast">
+    {{#if authFor}}      
+      <h2>
+        {{t "components.loginBox.loginFormContainer.authorizeFor"}} {{authFor}}
+      </h2>
+    {{/if}}
+    
     <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>
     {{login-box/social-box-list
       supportedAuthorizers=_authorizersForButtons 

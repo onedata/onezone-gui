@@ -12,4 +12,6 @@ export default {
   fetchProvidersFailedUnknown: 'unknown reason',
   authEndpointError: 'Getting authentication endpoint failed',
   authEndpointConfError: 'Authorization configuration is invalid, please contact system administrator',
+  // FIXME: another text
+  authorizeFor: 'Go to the Onepanel of',
 };
