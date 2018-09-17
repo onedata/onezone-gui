@@ -63,7 +63,7 @@ describe(
 
       this.set('column', column);
       this.render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      wait(() => {
+      return wait(() => {
         expect(this.$('.column-header').text()).to.contain('testname');
       });
     });

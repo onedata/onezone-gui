@@ -263,43 +263,51 @@ export default EmberObject.extend({
     this.updateModificationState();
   },
 
-  save(reloadModels) {
+  /**
+   * Saves modifications
+   * @param {boolean} reloadModels if true, models will be reloaded after save
+   * @returns {Promise}
+   */
+  save(reloadModels = false) {
+    let promise;
     if (!this.get('isModified')) {
-      return resolve();
-    }
-    this.set('isSaving', true);
-    const {
-      persistedPrivilegesSnapshot,
-      onedataGraph,
-    } = this.getProperties(
-      'persistedPrivilegesSnapshot',
-      'onedataGraph'
-    );
-    return Promise.all(this.get('models.content').map((model, index) => {
-        const diff = this.getPrivilegesModificationDiff(
-          persistedPrivilegesSnapshot.objectAt(index)
-        );
-        if (!get(diff, 'grant.length') && !get(diff, 'revoke.length')) {
-          return resolve();
-        } else {
-          const gri = get(model, 'gri');
-          return onedataGraph.request({
-            gri,
-            operation: 'update',
-            data: diff,
-          });
-        }
-      }))
-      .finally(() => {
-        safeExec(this, 'set', 'isSaving', false);
-      })
-      .then(() => {
-        safeExec(this, () => {
-          if (reloadModels) {
-            return this.reloadModels();
+      promise = resolve();
+    } else {
+      this.set('isSaving', true);
+      const {
+        persistedPrivilegesSnapshot,
+        onedataGraph,
+      } = this.getProperties(
+        'persistedPrivilegesSnapshot',
+        'onedataGraph'
+      );
+      promise = Promise.all(this.get('models.content').map((model, index) => {
+          const diff = this.getPrivilegesModificationDiff(
+            persistedPrivilegesSnapshot.objectAt(index)
+          );
+          if (!get(diff, 'grant.length') && !get(diff, 'revoke.length')) {
+            return resolve();
+          } else {
+            const gri = get(model, 'gri');
+            return onedataGraph.request({
+              gri,
+              operation: 'update',
+              data: diff,
+            });
           }
+        }))
+        .finally(() => {
+          safeExec(this, 'set', 'isSaving', false);
         });
+    }
+    promise.then(() => {
+      safeExec(this, () => {
+        if (reloadModels) {
+          return this.reloadModels();
+        }
       });
+    });
+    return promise;
   },
 
   /**

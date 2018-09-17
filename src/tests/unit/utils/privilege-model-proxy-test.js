@@ -5,6 +5,7 @@ import Service from '@ember/service';
 import { resolve } from 'rsvp';
 import EmberObject, { get, set } from '@ember/object';
 import _ from 'lodash';
+import sinon from 'sinon';
 
 const StoreStub = Service.extend({
   privilegeModels: Object.freeze({}),
@@ -16,9 +17,16 @@ const StoreStub = Service.extend({
   },
 });
 
+const OnedataGraphStub = Service.extend({
+  request() {
+    return resolve();
+  },
+});
+
 describe('Unit | Utility | privilege model proxy', function () {
   beforeEach(function () {
     this.store = StoreStub.create();
+    this.onedataGraph = OnedataGraphStub.create();
     set(this.store, 'privilegeModels', {
       a: EmberObject.create({
         gri: 'a',
@@ -170,5 +178,40 @@ describe('Unit | Utility | privilege model proxy', function () {
       });
   });
 
-  // TODO saving test
+  it('does not persist changes if nothing is modified', function () {
+    const proxy = PrivilegeModelProxy.create({
+      store: this.store,
+      onedataGraph: this.onedataGraph,
+      griArray: ['a'],
+      groupedPrivilegesFlags: this.groupedPrivileges,
+    });
+    const requestSpy = sinon.spy(this.onedataGraph, 'request');
+    return proxy.reloadModels()
+      .then(() => proxy.save())
+      .then(() => expect(requestSpy).to.not.be.called);
+  });
+
+  it('perists changes if there are modifications', function () {
+    const proxy = PrivilegeModelProxy.create({
+      store: this.store,
+      onedataGraph: this.onedataGraph,
+      griArray: ['a'],
+      groupedPrivilegesFlags: this.groupedPrivileges,
+    });
+    const requestSpy = sinon.spy(this.onedataGraph, 'request');
+    return proxy.reloadModels()
+      .then(() => {
+        const newPrivileges =
+          _.cloneDeep(get(proxy, 'effectivePrivilegesSnapshot'));
+        newPrivileges['g1']['g1.1'] = false;
+        proxy.setNewPrivileges(newPrivileges);
+        return proxy.save();
+      })
+      .then(() => {
+        expect(requestSpy).to.be.calledOnce;
+        const revoke = requestSpy.args[0][0].data.revoke;
+        expect(revoke).to.have.length(1);
+        expect(revoke).to.contain('g1.1');
+      });
+  });
 });

@@ -343,7 +343,9 @@ export default Mixin.create({
       this.set('batchEditActive', false);
     },
     saveOne(modelProxy) {
-      return this.get('privilegeActions').handleSave(modelProxy.save(true));
+      return this.get('privilegeActions')
+        .handleSave(modelProxy.save(true))
+        .then(() => modelProxy);
     },
     saveBatch() {
       const {
