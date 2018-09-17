@@ -566,9 +566,9 @@ export default Component.extend(I18n, {
   loadGroupChildren(parentGroup) {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
-      promise = get(parentGroup, 'childList')
+      promise = parentGroup.belongsTo('childList').reload()
         .then(childList => {
-          return get(childList, 'list')
+          return childList.hasMany('list').reload()
             .then(groupsList => Promise.all(
               groupsList.map(g => g.reload())
             ))
@@ -588,9 +588,9 @@ export default Component.extend(I18n, {
   loadGroupParents(childGroup) {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
-      promise = get(childGroup, 'parentList')
+      promise = childGroup.belongsTo('parentList').reload()
         .then(parentList => {
-          return get(parentList, 'list')
+          return parentList.hasMany('list').reload()
             .then(list => Promise.all(
               list.map(g => g.reload())
             ))

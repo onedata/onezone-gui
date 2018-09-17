@@ -30,6 +30,18 @@ const RelationList = EmberObject.extend({
   }),
 
   length: reads('_list.length'),
+
+  hasMany() {
+    const model = this;
+    return {
+      ids() {
+        return get(model, '_list').mapBy('name');
+      },
+      reload() {
+        return get(model, 'list');
+      },
+    };
+  },
 });
 
 const GroupStub = EmberObject.extend({
@@ -70,15 +82,10 @@ const GroupStub = EmberObject.extend({
     const model = this;
     return {
       value() {
-        return {
-          hasMany() {
-            return {
-              ids() {
-                return get(model, `_${relationName}`).mapBy('name');
-              },
-            };
-          },
-        };
+        return get(model, `${relationName}.content`);
+      },
+      reload() {
+        return get(model, relationName);
       },
     };
   },
