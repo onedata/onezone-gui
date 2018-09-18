@@ -1,0 +1,51 @@
+{{partial "components/-privileges-aspect-base"}}
+
+{{#bs-modal
+  class="remove-group-modal"
+  open=groupToRemove
+  onHide=(action "hideRemoveModal" "group")
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "removeGroupHeader"}}</h1>
+  {{/modal.header}}
+  {{#modal.body class="text-center"}}
+    {{tt this "removeGroupAreYouSure" groupName=groupToRemove.name spaceName=space.name}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button disabled=isRemoving onClick=(action "hideRemoveModal" "group")}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      action=(action "remove" "group")
+      class="btn btn-danger"
+    }}
+      {{tt this "remove"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/bs-modal}}
+
+{{#bs-modal
+  class="remove-user-modal"
+  open=userToRemove
+  onHide=(action "hideRemoveModal" "user")
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "removeUserHeader"}}</h1>
+  {{/modal.header}}
+  {{#modal.body class="text-center"}}
+    {{tt this "removeUserAreYouSure" userName=userToRemove.name spaceName=space.name}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button disabled=isRemoving onClick=(action "hideRemoveModal" "user")}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      action=(action "remove" "user")
+      class="btn btn-danger"
+    }}
+      {{tt this "remove"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/bs-modal}}

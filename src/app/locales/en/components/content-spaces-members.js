@@ -40,4 +40,14 @@ export default {
   noUsersInvite: 'generate an invitation token',
   noUsersEnd: ' and send it to the user.',
   batchEditModalSelectedItems: 'Selected items',
+  removeGroup: 'Remove this member',
+  removeUser: 'Remove this member',
+  removeGroupHeader: 'Remove member',
+  removeUserHeader: 'Remove member',
+  removeGroupAreYouSure: '"{{groupName}}" will no longer be a member of ' +
+    '"{{spaceName}}". Are you sure?',
+  removeUserAreYouSure: '"{{userName}}" will no longer be a member of ' +
+    '"{{spaceName}}". Are you sure?',
+  cancel: 'Cancel',
+  remove: 'Remove',
 };

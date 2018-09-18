@@ -16,7 +16,6 @@ import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { next } from '@ember/runloop';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   classNames: ['privileges-aspect-base', 'content-groups-members'],
@@ -144,31 +143,15 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       const {
         groupActionsService,
         group,
-        router,
-        navigationState,
       } = this.getProperties(
         'groupActionsService',
         'group',
-        'router',
-        'navigationState',
       );
       this.set('isRemoving', true);
       const promise = type === 'group' ?
         groupActionsService.removeChildGroup(group, model) :
         groupActionsService.removeUser(group, model);
       return promise
-        .then(() => {
-          // detect if user/subgroup removing removed also group
-          // that is actually viewed
-          return get(get(navigationState, 'activeResourceCollection'), 'list')
-            .then(groupList => {
-              const groupEntityId = get(group, 'entityId');
-              const availableEntityIds = groupList.map(g => get(g, 'entityId'));
-              if (availableEntityIds.indexOf(groupEntityId) === -1) {
-                next(() => router.transitionTo('onedata.sidebar', 'groups'));
-              }
-            });
-        })
         .finally(() => {
           safeExec(this, 'setProperties', {
             isRemoving: false,

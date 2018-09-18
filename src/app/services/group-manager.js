@@ -326,24 +326,14 @@ export default Service.extend({
   },
 
   /**
-   * Reloads selected list from group identified by entityId. If list has not been
-   * fetched, nothing is reloaded
+   * Reloads selected list from group identified by entityId.
    * @param {string} entityId group entityId
    * @param {string} listName e.g. `childList`
    * @returns {Promise}
    */
   reloadModelList(entityId, listName) {
     const group = this.getLoadedGroupByEntityId(entityId);
-    if (group) {
-      const list = group.belongsTo(listName).value();
-      const hasMany = list ? list.hasMany('list').value() : null;
-      if (list) {
-        return list.reload().then(result => {
-          return hasMany ? list.hasMany('list').reload() : result;
-        });
-      }
-    }
-    return resolve();
+    return group ? group.reloadList(listName) : resolve();
   },
 
   /**
