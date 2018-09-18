@@ -9,7 +9,7 @@
 
 import Mixin from '@ember/object/mixin';
 import { computed, get, observer } from '@ember/object';
-import { union } from '@ember/object/computed';
+import { union, reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -62,18 +62,6 @@ export default Mixin.create({
   }),
 
   /**
-   * @type {string}
-   * @virtual
-   */
-  privilegesTranslationsPath: undefined,
-
-  /**
-   * @type {string}
-   * @virtual
-   */
-  privilegeGroupsTranslationsPath: undefined,
-
-  /**
    * @type {Ember.Array<PrivilegeModelProxy>}
    */
   selectedUserModelProxies: Object.freeze(A()),
@@ -94,14 +82,28 @@ export default Mixin.create({
   batchEditModalModel: Object.freeze({}),
 
   /**
-   * @type {Array<Action>}
+   * @type {GraphSingleModel}
    */
-  userActions: undefined,
+  memberToRemove: null,
 
   /**
-   * @type {Array<Action>}
+   * @type {string}
    */
-  groupActions: undefined,
+  memberTypeToRemove: null,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  privilegesTranslationsPath: computed('i18nPrefix', function () {
+    return this.get('i18nPrefix') + '.privileges';
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
+    return this.get('i18nPrefix') + '.privilegeGroups';
+  }),
 
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
@@ -200,6 +202,55 @@ export default Mixin.create({
       disabled: !this.get('batchEditAvailable'),
     };
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  groupActions: computed(function () {
+    return [{
+      action: (...args) => this.send('showRemoveMemberModal', 'group', ...args),
+      title: this.t('removeThisMember'),
+      class: 'remove-group',
+      icon: 'close',
+    }];
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  userActions: computed(function () {
+    return [{
+      action: (...args) => this.send('showRemoveMemberModal', 'user', ...args),
+      title: this.t('removeThisMember'),
+      class: 'remove-user',
+      icon: 'close',
+    }];
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function () {
+    return this.t('members');
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  globalActions: computed('inviteActions', 'batchEditAction', function () {
+    const {
+      inviteActions,
+      batchEditAction,
+    } = this.getProperties('inviteActions', 'batchEditAction');
+    return [batchEditAction, ...inviteActions];
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  headerActions: reads('inviteActions'),
 
   modelObserver: observer('model', function () {
     // reset state after model change
@@ -318,6 +369,17 @@ export default Mixin.create({
     );
   },
 
+  /**
+   * Removes member. Should be implemented in component.
+   * @virtual
+   * @param {string} type type of member model
+   * @param {GraphSingleModel} member member model
+   * @return {Promise}
+   */
+  removeMember() {
+    return reject('Not implemented.');
+  },
+
   actions: {
     modelsSelected(type, models) {
       const {
@@ -369,6 +431,24 @@ export default Mixin.create({
     },
     hideInvitationToken() {
       this.set('visibleInvitationToken', null);
+    },
+    showRemoveMemberModal(type, modelProxy) {
+      this.setProperties({
+        memberToRemove: get(modelProxy, 'subject'),
+        memberTypeToRemove: type,
+      });
+    },
+    removeMember() {
+      this.set('isRemovingMember', true);
+      return this.removeMember(
+        this.get('memberTypeToRemove'),
+        this.get('memberToRemove')
+      ).finally(() =>
+        safeExec(this, 'setProperties', {
+          isRemovingMember: false,
+          memberToRemove: null,
+        })
+      );
     },
   },
 });
