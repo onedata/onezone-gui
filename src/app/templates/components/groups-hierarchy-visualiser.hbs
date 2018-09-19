@@ -10,6 +10,7 @@ right column will always be before left in html --}}
     modifyPrivileges=(action (mut relationPrivilegesToChange))
     renameGroup=(action "renameGroup")
     leaveGroup=(action (mut groupToLeave))
+    joinGroup=(action (mut groupToJoin))
     removeGroup=(action (mut groupToRemove))
     createRelativeGroup=(action "showCreateRelativeModal")
     addYourGroup=(action "showAddYourGroupModal")
@@ -24,6 +25,13 @@ right column will always be before left in html --}}
   proceed=(action "leaveGroup")
   processing=isLeavingGroup
   group=groupToLeave}}
+{{join-as-user-modal
+  opened=(and groupToJoin (not groupToJoin.isDeleted))
+  close=(action (mut groupToJoin) null)
+  proceed=(action "joinGroup")
+  processing=isJoiningGroup
+  modelType="group"
+  model=groupToJoin}}
 {{group-remove-modal
   opened=(and groupToRemove (or isRemovingGroup (not groupToRemove.isDeleted)))
   close=(action (mut groupToRemove) null)

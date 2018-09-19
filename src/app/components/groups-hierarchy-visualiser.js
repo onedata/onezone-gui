@@ -226,6 +226,18 @@ export default Component.extend(I18n, {
   isLeavingGroup: false,
 
   /**
+   * Group for join-as-user-modal
+   * @type {Group|null}
+   */
+  groupToJoin: null,
+
+  /**
+   * If true, user is joining `groupToJoin`
+   * @type {boolean}
+   */
+  isJoiningGroup: false,
+
+  /**
    * Group for group-remove-modal
    * @type {Group|null}
    */
@@ -419,6 +431,24 @@ export default Component.extend(I18n, {
         !get(groupToLeave, 'directMembership')
       ) {
         this.set('groupToLeave', null);
+      }
+    }
+  ),
+
+  groupToJoinObserver: observer(
+    'groupToJoin.directMembership',
+    function groupToJoinObserver() {
+      const {
+        groupToJoin,
+        isJoiningGroup,
+      } = this.getProperties('groupToJoin', 'isJoiningGroup');
+      // if user joined group without our action, close join-as-user modal
+      if (
+        groupToJoin &&
+        !isJoiningGroup &&
+        get(groupToJoin, 'directMembership')
+      ) {
+        this.set('groupToJoin', null);
       }
     }
   ),
@@ -837,6 +867,20 @@ export default Component.extend(I18n, {
           safeExec(this, 'setProperties', {
             isLeavingGroup: false,
             groupToLeave: null,
+          })
+        );
+    },
+    joinGroup() {
+      const {
+        groupToJoin,
+        groupActions,
+      } = this.getProperties('groupToJoin', 'groupActions');
+      this.set('isJoiningGroup', true);
+      return groupActions.joinGroupAsUser(groupToJoin)
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            isJoiningGroup: false,
+            groupToJoin: null,
           })
         );
     },

@@ -110,6 +110,23 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins user to an existing group (without token)
+   * @param {Group} group
+   * @returns {Promise} A promise, which resolves to group if it has
+   * been joined successfully.
+   */
+  joinGroupAsUser(group) {
+    return this.get('groupManager').joinGroupAsUser(get(group, 'entityId'))
+      .then(groupRecord => {
+        this.get('globalNotify').info(this.t('joinedGroupSuccess'));
+        return groupRecord;
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+      });
+  },
+
+  /**
    * Joins group to a space using token
    * @param {Group} group 
    * @param {string} token

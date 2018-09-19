@@ -84,6 +84,37 @@ export default Service.extend({
   },
 
   /**
+   * Joins user to a group without token
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  joinGroupAsUser(entityId) {
+    const group = this.getLoadedGroupByEntityId(entityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'group',
+            entityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        group ? group.reload() : resolve(),
+        this.reloadUserList(entityId).catch(ignoreForbiddenError),
+      ]));
+  },
+
+  /**
    * Removes user from a group
    * @param {string} id group id
    * @returns {Promise}
