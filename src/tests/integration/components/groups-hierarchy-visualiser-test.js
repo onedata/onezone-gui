@@ -46,7 +46,7 @@ const RelationList = EmberObject.extend({
 
 const GroupStub = EmberObject.extend({
   hasViewPrivilege: true,
-  membership: true,
+  isEffectiveMember: true,
   directMembership: true,
   _token: 'token1',
 

@@ -38,7 +38,7 @@ describe(
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
-          membership: true,
+          isEffectiveMember: true,
         }),
       });
 
@@ -169,7 +169,7 @@ describe(
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
-          membership: true,
+          isEffectiveMember: true,
           directMembership: false,
         }),
       });
@@ -191,7 +191,7 @@ describe(
         const groupBox = EmberObject.create({
           group: EmberObject.create({
             name: 'testname',
-            membership: false,
+            isEffectiveMember: false,
           }),
         });
 
@@ -207,7 +207,7 @@ describe(
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
-          membership: true,
+          isEffectiveMember: true,
           directMembership: true,
         }),
       });
