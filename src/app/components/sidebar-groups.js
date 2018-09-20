@@ -58,6 +58,10 @@ export default TwoLevelSidebar.extend(I18n, {
       id: 'hierarchy',
       label: this.t('aspects.hierarchy'),
       icon: 'hierarchy',
+    }, {
+      id: 'membership',
+      label: this.t('aspects.membership'),
+      icon: 'membership',
     }];
   }),
 });

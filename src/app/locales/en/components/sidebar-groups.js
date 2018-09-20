@@ -1,8 +1,8 @@
 export default {
   aspects: {
     members: 'Members',
-    parents: 'Parents',
     hierarchy: 'Hierarchy',
+    membership: 'Membership',
   },
   groupItem: {
     rename: 'Rename',
