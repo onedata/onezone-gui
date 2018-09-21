@@ -1,4 +1,7 @@
-{{one-icon icon=iconName}}
+{{one-icon class="type-icon" icon=iconName}}
 {{#if showName}}
-  {{#truncated-string class="record-name"}}{{pathElement.record.name}}mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm mmmmmmmmmmmmmmmmmmmmmm{{/truncated-string}}
+  {{#truncated-string class="record-name"}}{{record.name}}{{/truncated-string}}
+  {{#link-to "onedata.sidebar.content.aspect" (concat recordType "s") (model-routable-id record.id) "index"}}
+    {{one-icon class="link-icon" icon="link-external"}}
+  {{/link-to}}
 {{/if}}

@@ -8,29 +8,37 @@
   .membership-block {
     position: relative;
     padding-left: 2.5em;
-    max-width: 300px;
-    .one-icon {
+    max-width: 250px;
+    .type-icon {
       @include vertical-align-middle();
       position: absolute;
       left: $padding-xs-horizontal;
       font-size: 1.7em;
     }
     .record-name {
-      margin-right: $padding-xs-horizontal;
+      margin-right: 2em;
     }
-    &.group .one-icon {
+    &.group .type-icon {
       color: $color-one-yellow;
     }
-    &.space .one-icon {
+    &.space .type-icon {
       color: $color-one-azure;
     }
-    &.provider .one-icon {
+    &.provider .type-icon {
       color: $color-one-mint;
+    }
+    .link-icon {
+      @include vertical-align-middle();
+      position: absolute;
+      right: $padding-xs-horizontal;
+      font-size: 1em;
+      color: $color-one-azure;
     }
   }
   .membership-relation {
     position: relative;
     width: 100px;
+    height: 2 * $line-dot-size;
     .line {
       @include vertical-align-middle();
       position: absolute;
@@ -54,13 +62,55 @@
       right: 0;
       transform: translateX(50%) translateY(-50%);
     }
+    &.hovered {
+      .line, .dot {
+        background-color: $color-one-blue-gray;
+      }
+      .actions-trigger {
+        display: block;
+      }
+    }
+
+    .actions-trigger {
+      $trigger-size: 22px;
+      @include absolute-align-middle-center();
+      position: absolute;
+      left: 50%;
+      display: none;
+      color: $color-one-blue-gray;
+      font-size: $trigger-size;
+      cursor: pointer;
+      &:hover {
+        color: $color-one-azure;
+      }
+      &::after {
+        content: '';
+        @include absolute-align-middle-center();
+        display: block;
+        width: $trigger-size * 0.9;
+        height: $trigger-size * 0.9;
+        background-color: $color-one-white;
+        border-radius: 100%;
+        z-index: -1;
+      }
+    }
   }
   .membership {
+    position: relative;
     border-bottom: 1px solid $main-border-color;
     line-height: $line-height-computed + 2 * $padding-large-vertical;
     white-space: nowrap;
     &:last-child {
       border-bottom: 0;
+    }
+    .ps-container {
+      &.ps-active-x {
+        cursor: move;
+      }
+      // moving horizontal scroll error fix
+      & > .ps-scrollbar-x-rail {
+        left: 0 !important;
+      }
     }
   }
 }

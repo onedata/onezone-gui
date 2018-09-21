@@ -4,9 +4,11 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { Promise } from 'rsvp';
+import RecognizerMixin from 'ember-gestures/mixins/recognizers';
 
-export default Component.extend({
+export default Component.extend(RecognizerMixin, {
   classNames: ['membership'],
+  recognizers: 'pan',
 
   store: service(),
 
@@ -21,6 +23,12 @@ export default Component.extend({
    * @virtual
    */
   path: null,
+
+  /**
+   * Horizontal scroll state stored on pan gesture start
+   * @type {number}
+   */
+  panStartScrollX: 0,
 
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Array<GraphSingleModel>>>}
@@ -67,6 +75,21 @@ export default Component.extend({
     }
   }),
 
+  panStart() {
+    const scrollContainer = this.getScrollContainer();
+    if (scrollContainer) {
+      this.set('panStartScrollX', scrollContainer.scrollLeft());
+    }
+  },
+
+  panMove(event) {
+    const panStartScrollX = this.get('panStartScrollX');
+    const scrollContainer = this.getScrollContainer();
+    if (scrollContainer) {
+      scrollContainer.scrollLeft(panStartScrollX - event.originalEvent.gesture.deltaX);
+    }
+  },
+  
   /**
    * Loads record using given GRI
    * @param {string} recordGri 
@@ -75,5 +98,9 @@ export default Component.extend({
   fetchRecordByGri(recordGri) {
     const entityType = parseGri(recordGri).entityType;
     return this.get('store').findRecord(entityType, recordGri);
+  },
+
+  getScrollContainer() {
+    return this.$().children('.ps-container');
   },
 });

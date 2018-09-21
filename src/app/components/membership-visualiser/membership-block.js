@@ -7,6 +7,12 @@ export default Component.extend({
   classNameBindings: ['recordType'],
 
   /**
+   * @type {Object}
+   * @virtual
+   */
+  pathElement: null,
+
+  /**
    * @type {Ember.ComputerProperty<GraphSingleModel>}
    */
   record: reads('pathElement.record'),

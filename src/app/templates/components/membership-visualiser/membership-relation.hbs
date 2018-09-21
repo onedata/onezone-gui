@@ -1,3 +1,26 @@
 <div class="dot dot-left"></div>
 <div class="dot dot-right"></div>
 <div class="line"></div>
+
+{{one-icon
+  class=(concat "actions-trigger actions-relation-" elementId)
+  icon="settings-circle-filled"
+  click=(action "toggleActions" (not actionsOpened))}}
+
+{{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
+{{#render-later triggerRender=actionsOpened}}
+  {{#one-webui-popover
+    class="relation-actions"
+    popoverStyle="with-dropdown"
+    padding=false
+    triggerSelector=(concat ".actions-relation-" elementId)
+    open=actionsOpened
+    onToggle=(action "toggleActions")}}
+    {{#click-outside action=(action "toggleActions" false) except-selector=(concat ".actions-relation-" elementId)}}
+      {{actions-popover-content
+        actionsArray=relationActions
+        actionClicked=(action "toggleActions" false)
+        class="membership-visualiser-actions"}}
+    {{/click-outside}}
+  {{/one-webui-popover}}
+{{/render-later}}
