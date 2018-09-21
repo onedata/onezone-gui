@@ -161,7 +161,7 @@ export default Component.extend(I18n, {
    * Triggers relation removing
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,

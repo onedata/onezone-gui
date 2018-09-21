@@ -132,7 +132,7 @@ export default Component.extend(I18n, {
    * Shows privileges editor
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   modifyPrivileges: notImplementedThrow,
@@ -141,7 +141,7 @@ export default Component.extend(I18n, {
    * Triggers relation removing
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,

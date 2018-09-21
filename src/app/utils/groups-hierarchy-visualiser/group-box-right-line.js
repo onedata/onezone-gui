@@ -8,7 +8,7 @@
  */
 
 import GroupBoxLine from 'onezone-gui/utils/groups-hierarchy-visualiser/group-box-line';
-import Relation from 'onezone-gui/utils/groups-hierarchy-visualiser/relation';
+import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 import { computed, getProperties, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
@@ -62,9 +62,9 @@ export default GroupBoxLine.extend({
    */
   relation: computed('groupBox.{group,column.relatedGroup}', function relation() {
     const groupBox = this.get('groupBox');
-    return Relation.create({
-      parentGroup: get(groupBox, 'group'),
-      childGroup: get(groupBox, 'column.relatedGroup'),
+    return MembershipRelation.create({
+      parent: get(groupBox, 'group'),
+      child: get(groupBox, 'column.relatedGroup'),
     });
   }),
 });

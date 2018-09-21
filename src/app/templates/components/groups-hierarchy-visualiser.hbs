@@ -35,8 +35,8 @@ right column will always be before left in html --}}
   close=(action (mut relationToRemove) null)
   proceed=(action "removeRelation")
   processing=isRemovingRelation
-  parentGroup=relationToRemove.parentGroup
-  childGroup=relationToRemove.childGroup}}
+  parentGroup=relationToRemove.parent
+  childGroup=relationToRemove.child}}
 {{group-create-relative-modal
   opened=(and groupToCreateRelative (or isCreatingRelativeGroup (not groupToCreateRelative.isDeleted)))
   close=(action (mut groupToCreateRelative) null)

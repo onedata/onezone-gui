@@ -57,7 +57,7 @@ export default Component.extend(I18n, {
    * Shows privileges editor
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   modifyPrivileges: notImplementedThrow,
@@ -66,7 +66,7 @@ export default Component.extend(I18n, {
    * Triggers relation removing
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,
@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
   hovered: reads('line.hovered'),
 
   /**
-   * @type {Ember.ComputedProperty<Utils/GroupHierarchyVisualiser/Relation>}
+   * @type {Ember.ComputedProperty<Utils/MembershipRelation>}
    */
   relation: reads('line.relation'),
 
@@ -130,7 +130,7 @@ export default Component.extend(I18n, {
   relationActions: computed(
     'modifyPrivilegesAction',
     'removeRelationAction',
-    'relation.parentGroup.canViewPrivileges',
+    'relation.parent.canViewPrivileges',
     function relationActions() {
       const {
         modifyPrivilegesAction,
@@ -141,7 +141,7 @@ export default Component.extend(I18n, {
         'removeRelationAction',
         'relation',
       );
-      const parentGroup = get(relation, 'parentGroup');
+      const parentGroup = get(relation, 'parent');
       const canViewPrivileges = parentGroup ?
         get(parentGroup, 'canViewPrivileges') : false;
       const actions = [];

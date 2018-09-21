@@ -44,7 +44,7 @@ describe(
         actionsEnabled: true,
         hovered: false,
         relation: {
-          parentGroup: {
+          parent: {
             canViewPrivileges: true,
           },
         },
@@ -90,7 +90,7 @@ describe(
           actionsEnabled: true,
           hovered: true,
           relation: {
-            parentGroup: {
+            parent: {
               canViewPrivileges: false,
             },
           },
@@ -113,7 +113,7 @@ describe(
         actionsEnabled: true,
         hovered: true,
         relation: {
-          parentGroup: {
+          parent: {
             canViewPrivileges: true,
           },
         },

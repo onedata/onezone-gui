@@ -47,7 +47,7 @@
  *                    |                               |
  *                    |1-1                            |1-1
  *                    |                               |
- *                Relation                        Relation
+ *            MembershipRelation              MembershipRelation
  * 
  *  * Components:
  *    - GroupsHierarchyVisualiser component - renders columns, related column
@@ -239,7 +239,7 @@ export default Component.extend(I18n, {
 
   /**
    * Relation for group-remove-relation-modal
-   * @type {Utils/GroupHierarchyVisualiser/Relation|null}
+   * @type {Utils/MembershipRelation|null}
    */
   relationToRemove: null,
 
@@ -306,7 +306,7 @@ export default Component.extend(I18n, {
 
   /**
    * Relation for privileges-editor-modal
-   * @type {Utils/GroupHierarchyVisualiser/Relation|null}
+   * @type {Utils/MembershipRelation|null}
    */
   relationPrivilegesToChange: null,
 
@@ -355,8 +355,8 @@ export default Component.extend(I18n, {
       const relation = this.get('relationPrivilegesToChange');
       if (relation) {
         return this.t('privilegesTreeRootText', {
-          parentName: get(relation, 'parentGroup.name'),
-          childName: get(relation, 'childGroup.name'),
+          parentName: get(relation, 'parent.name'),
+          childName: get(relation, 'child.name'),
         });
       } else {
         return '';
@@ -383,9 +383,9 @@ export default Component.extend(I18n, {
       if (relationPrivilegesToChange) {
         const gri = privilegeManager.generateGri(
           'group',
-          get(relationPrivilegesToChange, 'parentGroup.entityId'),
+          get(relationPrivilegesToChange, 'parent.entityId'),
           'child',
-          get(relationPrivilegesToChange, 'childGroup.entityId'),
+          get(relationPrivilegesToChange, 'child.entityId'),
         );
         return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
           griArray: [gri],
@@ -442,7 +442,7 @@ export default Component.extend(I18n, {
   ),
 
   relationPrivilegesToChangeObserver: observer(
-    'relationPrivilegesToChange.{exists,parentGroup.canViewPrivileges}',
+    'relationPrivilegesToChange.canViewPrivileges',
     function relationPrivilegesToChangeObserver() {
       const {
         relationPrivilegesToChange,
@@ -883,8 +883,8 @@ export default Component.extend(I18n, {
       } = this.getProperties('relationToRemove', 'groupActions');
       this.set('isRemovingRelation', true);
       return groupActions.removeRelation(
-          get(relationToRemove, 'parentGroup'),
-          get(relationToRemove, 'childGroup')
+          get(relationToRemove, 'parent'),
+          get(relationToRemove, 'child')
         )
         .then(() => safeExec(this, 'reloadModel'))
         .finally(() =>
