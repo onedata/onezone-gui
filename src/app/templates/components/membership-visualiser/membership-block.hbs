@@ -1,2 +1,4 @@
 {{one-icon icon=iconName}}
-{{pathElement.record.name}}
+{{#if showName}}
+  {{#truncated-string class="record-name"}}{{pathElement.record.name}}mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm mmmmmmmmmmmmmmmmmmmmmm{{/truncated-string}}
+{{/if}}

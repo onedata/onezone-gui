@@ -6,6 +6,8 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { Promise } from 'rsvp';
 
 export default Component.extend({
+  classNames: ['membership'],
+
   store: service(),
 
   /**

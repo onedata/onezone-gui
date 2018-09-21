@@ -1,9 +1,10 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, not } from '@ember/object/computed';
 
 export default Component.extend({
   classNames: ['membership-element', 'membership-block'],
+  classNameBindings: ['recordType'],
 
   /**
    * @type {Ember.ComputerProperty<GraphSingleModel>}
@@ -14,6 +15,11 @@ export default Component.extend({
    * @type {Ember.ComputerProperty<string>}
    */
   recordType: reads('record.entityType'),
+
+  /**
+   * @type {Ember.ComputerProperty<boolean>}
+   */
+  showName: not('pathElement.startBlock'),
 
   /**
    * Block icon
