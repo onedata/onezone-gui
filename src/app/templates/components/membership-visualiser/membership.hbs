@@ -1,0 +1,5 @@
+{{#promise-proxy-container proxy=recordsProxy}}
+  {{#each pathElements key="id" as |pathElement|}}
+    {{component (concat "membership-visualiser/membership-" pathElement.type) pathElement=pathElement}}
+  {{/each}}
+{{/promise-proxy-container}}
