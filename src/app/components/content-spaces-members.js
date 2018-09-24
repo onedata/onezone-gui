@@ -42,7 +42,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  model: reads('space'),
+  record: reads('space'),
 
   /**
    * @override

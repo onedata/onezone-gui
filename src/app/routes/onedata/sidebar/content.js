@@ -21,15 +21,15 @@ import { get } from '@ember/object';
  * @returns {string|undefined}
  */
 function findGri(griIds, entityId) {
-  let modelId;
+  let recordId;
   for (let i = 0; i < griIds.length; i++) {
     const griEntityId = modelRoutableId(griIds[i]);
     if (griEntityId && entityId === griEntityId) {
-      modelId = griIds[i];
+      recordId = griIds[i];
       break;
     }
   }
-  return modelId;
+  return recordId;
 }
 
 export default OnedataSidebarContentRoute.extend({
@@ -39,7 +39,7 @@ export default OnedataSidebarContentRoute.extend({
   availableResourceId(resourceId, collection) {
     const griIds = isRecord(collection) ?
       collection.hasMany('list').ids() :
-      get(collection, 'list').map(model => get(model, 'id'));
+      get(collection, 'list').map(record => get(record, 'id'));
     return findGri(griIds, resourceId);
   },
 });

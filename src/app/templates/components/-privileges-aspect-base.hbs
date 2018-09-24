@@ -25,9 +25,9 @@
   errorReason=(or groupList.reason userList.reason)}}
   <div class="row">
     {{#collection-permissions
-      proxyList=proxyGroupModelList
+      proxyList=proxyGroupRecordList
       subjectType="group"
-      modelsSelected=(action "modelsSelected" "group")
+      recordsSelected=(action "recordsSelected" "group")
       listHeader=(tt this "groups")
       itemIcon="group"
       groupedPrivilegesFlags=groupedPrivilegesFlags
@@ -53,9 +53,9 @@
   </div>
   <div class="row">
     {{#collection-permissions
-      proxyList=proxyUserModelList
+      proxyList=proxyUserRecordList
       subjectType="user"
-      modelsSelected=(action "modelsSelected" "user")
+      recordsSelected=(action "recordsSelected" "user")
       listHeader=(tt this "users")
       itemIcon="user"
       groupedPrivilegesFlags=groupedPrivilegesFlags
@@ -84,7 +84,7 @@
   privilegesGroups=groupedPrivilegesFlags
   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
   privilegesTranslationsPath=privilegesTranslationsPath
-  modelProxy=batchEditModalModel
+  recordProxy=batchEditModalModel
   save=(action "saveBatch")
   close=(action "batchEditClose")
   opened=batchEditActive

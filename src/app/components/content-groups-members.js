@@ -67,7 +67,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  model: reads('group'),
+  record: reads('group'),
 
   /**
    * @override
@@ -133,14 +133,14 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   }),
 
   actions: {
-    showRemoveModal(type, modelProxy) {
-      this.set(type + 'ToRemove', get(modelProxy, 'subject'));
+    showRemoveModal(type, recordProxy) {
+      this.set(type + 'ToRemove', get(recordProxy, 'subject'));
     },
     hideRemoveModal(type) {
       this.set(type + 'ToRemove', null);
     },
     remove(type) {
-      const model = this.get(type + 'ToRemove');
+      const record = this.get(type + 'ToRemove');
       const {
         groupActionsService,
         group,
@@ -154,8 +154,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       );
       this.set('isRemoving', true);
       const promise = type === 'group' ?
-        groupActionsService.removeChildGroup(group, model) :
-        groupActionsService.removeUser(group, model);
+        groupActionsService.removeChildGroup(group, record) :
+        groupActionsService.removeUser(group, record);
       return promise
         .then(() => {
           // detect if user/subgroup removing removed also group
@@ -164,7 +164,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
             .then(groupList => {
               const groupEntityId = get(group, 'entityId');
               const availableEntityIds = groupList.map(g => get(g, 'entityId'));
-              if (availableEntityIds.indexOf(groupEntityId) === -1) {
+              if (!availableEntityIds.includes(groupEntityId)) {
                 next(() => router.transitionTo('onedata.sidebar', 'groups'));
               }
             });

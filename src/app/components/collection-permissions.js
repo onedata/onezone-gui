@@ -1,5 +1,5 @@
 /**
- * Permissions presenter and editor for a collection of models. Yields list
+ * Permissions presenter and editor for a collection of records. Yields list
  * when there are no items to present.
  *
  * @module components/collection-permissions
@@ -22,7 +22,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.collectionPermissions',
 
   /**
-   * @type {Ember.A<PrivilegeModelProxy>}
+   * @type {Ember.A<PrivilegeRecordProxy>}
    * @virtual
    */
   proxyList: undefined,
@@ -38,13 +38,13 @@ export default Component.extend(I18n, {
    * Called after list item selection.
    * @virtual
    * @type {function}
-   * @param {Array<PrivilegeModelProxy>} modelsProxies array of selected models
+   * @param {Array<PrivilegeRecordProxy>} recordsProxies array of selected records
    * @returns {any}
    */
-  modelsSelected: notImplementedWarn,
+  recordsSelected: notImplementedWarn,
 
   /**
-   * Header of the models list.
+   * Header of the records list.
    * @virtual
    * @type {string}
    */
@@ -80,8 +80,8 @@ export default Component.extend(I18n, {
   /**
    * Callback responsible for privileges persistence.
    * @type {function}
-   * @param {PrivilegeModelProxy} modelProxy
-   * @returns {Promise<PrivilegeModelProxy>}
+   * @param {PrivilegeRecordProxy} recordProxy
+   * @returns {Promise<PrivilegeRecordProxy>}
    */
   save: notImplementedThrow,
 
@@ -91,8 +91,8 @@ export default Component.extend(I18n, {
   itemActions: undefined,
 
   actions: {
-    reset(modelProxy) {
-      modelProxy.resetModifications();
+    reset(recordProxy) {
+      recordProxy.resetModifications();
     },
   },
 });

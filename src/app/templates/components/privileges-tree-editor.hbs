@@ -1,12 +1,12 @@
 {{#promise-proxy-container
-  proxy=modelProxy.models
-  isLoading=(and modelProxy.isLoading (not modelProxy.hasBeenLoaded))
-  isLoaded=(and modelProxy.hasBeenLoaded (not modelProxy.models.isRejected))}}
+  proxy=recordProxy.models
+  isLoading=(and recordProxy.isLoading (not recordProxy.hasBeenLoaded))
+  isLoaded=(and recordProxy.hasBeenLoaded (not recordProxy.models.isRejected))}}
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState
-    compareValues=modelProxy.effectivePrivilegesSnapshot
-    overrideValues=modelProxy.effectivePrivilegesSnapshot
+    compareValues=recordProxy.effectivePrivilegesSnapshot
+    overrideValues=recordProxy.effectivePrivilegesSnapshot
     disabledFieldsPaths=treeDisabledPaths
     valuesChanged=(action "treeValuesChanged")}}
   {{yield}}

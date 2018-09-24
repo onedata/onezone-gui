@@ -1,11 +1,11 @@
 /**
- * Container for one or many privilege models (depends on griArray and
+ * Container for one or many privilege records (depends on griArray and
  * sumPrivileges properties). Allows to automatically fetch/save data and manage
  * modification state of the privileges to deal with privilege editors.
  * 
- * Modification detection does not depend on real model values. Snapshot of model
+ * Modification detection does not depend on real record values. Snapshot of record
  * is used to compare and detect changes to prevent from unpredictable behavior
- * during some model dynamic update.
+ * during some record dynamic update.
  * 
  * Internally (and also through setNewPrivileges method) privileges are stored using
  * object representation. All privileges are grouped under corresponding keys according
@@ -24,17 +24,17 @@
  * ```
  * 
  * Important methods:
- * * reloadModels() - loads/reloads privilege models from server (also updates
+ * * reloadRecords() - loads/reloads privilege records from server (also updates
  *     snapshot),
- * * updateSnapshot() - updates privileges snapshot if model changed outside
- *     reloadModels,
+ * * updateSnapshot() - updates privileges snapshot if records changed outside
+ *     reloadRecords,
  * * resetModifications() - resets state of modified privileges. Also calls
  *     updateSnapshot() to refresh state,
  * * setNewPrivileges() - takes modified privileges as an argument to remember
  *     modification state,
  * * save() - saves modifications.
  *
- * @module utils/privilege-model-proxy
+ * @module utils/privilege-record-proxy
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -75,14 +75,14 @@ export default EmberObject.extend({
   groupedPrivilegesFlags: null,
 
   /**
-   * If true, all privileges from all models will be merged into one privileges
-   * object. Otherwise only first model privileges will be used.
+   * If true, all privileges from all records will be merged into one privileges
+   * object. Otherwise only first record privileges will be used.
    * @type {boolean}
    */
   sumPrivileges: false,
 
   /**
-   * Optional model related to privileges.
+   * Optional record related to privileges.
    * @type {GraphModel|null}
    */
   subject: null,
@@ -114,68 +114,72 @@ export default EmberObject.extend({
   isSaving: false,
 
   /**
-   * True if models has been loaded at least once
+   * True if records has been loaded at least once
    * @type {boolean}
    */
   hasBeenLoaded: false,
 
   /**
-   * Array of fetched privilege models
+   * Array of fetched privilege records
    * @type {PromiseArray<Privilege>}
    */
-  models: null,
+  records: null,
 
   /**
-   * Contains error, which occurred while fetching models, or null.
+   * Contains error, which occurred while fetching records, or null.
    * @type {*}
    */
   fetchError: computed(
-    'models.{reason,content.@each.isForbidden}',
+    'records.{reason,content.@each.isForbidden}',
     function fetchError() {
-      const models = this.get('models');
-      let reason = get(models, 'reason');
+      const records = this.get('records');
+      let reason = get(records, 'reason');
       if (reason) {
         return reason;
       } else {
-        const forbiddenModel = (get(models, 'content') || []).findBy('isForbidden');
-        return get(forbiddenModel || {}, 'forbiddenError');
+        const forbiddenRecord =
+          (get(records, 'content') || []).findBy('isForbidden');
+        return get(forbiddenRecord || {}, 'forbiddenError');
       }
     }
   ),
 
   /**
-   * If true then at least one model is loading
+   * If true then at least one record is loading
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isLoading: reads('models.isPending'),
+  isLoading: reads('records.isPending'),
 
   /**
-   * If true then all models are loaded
+   * If true then all records are loaded
    * @type {boolean}
    */
-  isLoaded: reads('models.isFulfilled'),
+  isLoaded: reads('records.isFulfilled'),
 
   /**
-   * Array of privilege objects extracted from models
+   * Array of privilege objects extracted from records
    * @type {Ember.ComputedProperty<Ember.A<Object>>}
    */
   persistedPrivileges: computed(
     'isLoaded',
-    'models.content.@each.privileges',
+    'records.content.@each.privileges',
     function persistedPrivileges() {
       const {
         isLoaded,
-        models,
+        records,
         groupedPrivilegesFlags,
-      } = this.getProperties('isLoaded', 'models', 'groupedPrivilegesFlags');
-      return isLoaded ? A(models.map(model =>
-        privilegesArrayToObject(get(model, 'privileges'), groupedPrivilegesFlags)
+      } = this.getProperties('isLoaded', 'records', 'groupedPrivilegesFlags');
+      return isLoaded ? A(records.map(record =>
+        privilegesArrayToObject(get(record, 'privileges'), groupedPrivilegesFlags)
       )) : A();
     }
   ),
 
   /**
-   * Privileges used to calculate modification state
+   * Privileges used to calculate modification state. Each privilege can have
+   * 3 possible values: true, false and 2. 2 means, that some of privilege
+   * records does not have this permission and some of them does
+   * (combined true and false values).
    * @type {Ember.ComputedProperty<Object>}
    */
   effectivePrivilegesSnapshot: computed(
@@ -218,16 +222,16 @@ export default EmberObject.extend({
   },
 
   /**
-   * Reloads all models according to specified griArray
+   * Reloads all records according to specified griArray
    * @returns {PromiseArray<Privilege>}
    */
-  reloadModels() {
+  reloadRecords() {
     const promiseArray = PromiseArray.create({
       promise: Promise.all(this.get('griArray').map(gri =>
         this.get('store').findRecord('privilege', gri, { reload: true })
       )),
     });
-    this.set('models', promiseArray);
+    this.set('records', promiseArray);
     promiseArray.then(() => {
       safeExec(this, 'resetModifications');
     });
@@ -240,7 +244,7 @@ export default EmberObject.extend({
    */
   updateSnapshot() {
     const copy = this.get('persistedPrivileges')
-      .map(modelPriviletes => _.cloneDeep(modelPriviletes));
+      .map(recordPrivileges => _.cloneDeep(recordPrivileges));
     this.set('persistedPrivilegesSnapshot', copy);
   },
 
@@ -265,10 +269,10 @@ export default EmberObject.extend({
 
   /**
    * Saves modifications
-   * @param {boolean} reloadModels if true, models will be reloaded after save
+   * @param {boolean} reloadRecords if true, records will be reloaded after save
    * @returns {Promise}
    */
-  save(reloadModels = false) {
+  save(reloadRecords = false) {
     let promise;
     if (!this.get('isModified')) {
       promise = resolve();
@@ -281,14 +285,14 @@ export default EmberObject.extend({
         'persistedPrivilegesSnapshot',
         'onedataGraph'
       );
-      promise = Promise.all(this.get('models.content').map((model, index) => {
+      promise = Promise.all(this.get('records.content').map((record, index) => {
           const diff = this.getPrivilegesModificationDiff(
             persistedPrivilegesSnapshot.objectAt(index)
           );
           if (!get(diff, 'grant.length') && !get(diff, 'revoke.length')) {
             return resolve();
           } else {
-            const gri = get(model, 'gri');
+            const gri = get(record, 'gri');
             return onedataGraph.request({
               gri,
               operation: 'update',
@@ -302,8 +306,8 @@ export default EmberObject.extend({
     }
     promise.then(() => {
       safeExec(this, () => {
-        if (reloadModels) {
-          return this.reloadModels();
+        if (reloadRecords) {
+          return this.reloadRecords();
         }
       });
     });
@@ -320,24 +324,21 @@ export default EmberObject.extend({
       effectivePrivilegesSnapshot: snapshot,
       modifiedPrivileges: newValues,
     } = this.getProperties('effectivePrivilegesSnapshot', 'modifiedPrivileges');
-
-    const isModified = !Object.keys(snapshot).reduce((isEqual, groupName) => {
-      return Object.keys(snapshot[groupName]).reduce((isEq, privName) => {
-        return isEq &&
-          snapshot[groupName][privName] ===
-          newValues[groupName][privName];
-      }, isEqual);
-    }, true);
-    this.set('isModified', isModified);
+    this.set('isModified', !_.isEqual(snapshot, newValues));
   },
 
   /**
    * Merges all permissions from given objects creating a new privileges object
-   * @param {Array<Object>} objects
-   * @returns {Object}
+   * @param {Array<Object>} objects Object compatible with
+   *   `privilegesArrayToObject` function result.
+   * @returns {Object} Object, which format is compatible with `object` items and
+   *   `privilegesArrayToObject` function result.
    */
   mergePrivilegeObjects(objects) {
     const groupedPrivilegesFlags = this.get('groupedPrivilegesFlags');
+    /** @type {Object} mapping without grouping:
+     *    privilegeName (string) -> true|false|2
+     */
     const privilegesFlatTree = {};
     objects.forEach(privilegeObject => {
       const privileges = _.assign({}, ..._.values(privilegeObject));
