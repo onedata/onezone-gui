@@ -20,6 +20,7 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default Mixin.create({
   privilegeManager: service(),
@@ -87,6 +88,7 @@ export default Mixin.create({
   memberToRemove: null,
 
   /**
+   * `group` or `user`
    * @type {string}
    */
   memberTypeToRemove: null,
@@ -94,21 +96,27 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  privilegesTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privileges';
-  }),
+  privilegesTranslationsPath: computed(
+    'i18nPrefix',
+    function privilegesTranslationsPath() {
+      return this.get('i18nPrefix') + '.privileges';
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privilegeGroups';
-  }),
+  privilegeGroupsTranslationsPath: computed(
+    'i18nPrefix',
+    function privilegeGroupsTranslationsPath() {
+      return this.get('i18nPrefix') + '.privilegeGroups';
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  groupList: computed('record.hasViewPrivilege', function () {
+  groupList: computed('record.hasViewPrivilege', function groupList() {
     return PromiseArray.create({
       promise: this.get('record.hasViewPrivilege') !== false ?
         get(this.get('record'), 'groupList').then(sgl =>
@@ -120,7 +128,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  userList: computed('record.hasViewPrivilege', function () {
+  userList: computed('record.hasViewPrivilege', function userList() {
     return PromiseArray.create({
       promise: this.get('record.hasViewPrivilege') !== false ?
         get(this.get('record'), 'userList').then(sul =>
@@ -156,7 +164,7 @@ export default Mixin.create({
    */
   isAnySelectedRecordSaving: computed(
     'selectedRecordProxies.@each.saving',
-    function () {
+    function isAnySelectedRecordSaving() {
       return this.get('selectedRecordProxies').filterBy('saving', true).length > 0;
     }
   ),
@@ -167,7 +175,7 @@ export default Mixin.create({
   batchEditAvailable: computed(
     'selectedRecordProxies.length',
     'isAnySelectedRecordSaving',
-    function () {
+    function batchEditAvailable() {
       return this.get('selectedRecordProxies.length') > 0 &&
         !this.get('isAnySelectedRecordSaving');
     }
@@ -176,7 +184,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  inviteActions: computed(function () {
+  inviteActions: computed(function inviteActions() {
     return [{
       action: () => this.send('showInvitationToken', 'group'),
       title: this.t('inviteGroup'),
@@ -193,7 +201,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  batchEditAction: computed('batchEditAvailable', function () {
+  batchEditAction: computed('batchEditAvailable', function batchEditAction() {
     return {
       action: () => this.send('batchEdit'),
       title: this.t('multiedit'),
@@ -206,7 +214,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  groupActions: computed(function () {
+  groupActions: computed(function groupActions() {
     return [{
       action: (...args) => this.send('showRemoveMemberModal', 'group', ...args),
       title: this.t('removeThisMember'),
@@ -218,7 +226,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  userActions: computed(function () {
+  userActions: computed(function userActions() {
     return [{
       action: (...args) => this.send('showRemoveMemberModal', 'user', ...args),
       title: this.t('removeThisMember'),
@@ -231,7 +239,7 @@ export default Mixin.create({
    * @override 
    * @type {Ember.ComputedProperty<string>}
    */
-  globalActionsTitle: computed(function () {
+  globalActionsTitle: computed(function globalActionsTitle() {
     return this.t('members');
   }),
 
@@ -239,20 +247,24 @@ export default Mixin.create({
    * @override 
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  globalActions: computed('inviteActions', 'batchEditAction', function () {
-    const {
-      inviteActions,
-      batchEditAction,
-    } = this.getProperties('inviteActions', 'batchEditAction');
-    return [batchEditAction, ...inviteActions];
-  }),
+  globalActions: computed(
+    'inviteActions',
+    'batchEditAction',
+    function globalActions() {
+      const {
+        inviteActions,
+        batchEditAction,
+      } = this.getProperties('inviteActions', 'batchEditAction');
+      return [batchEditAction, ...inviteActions];
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   headerActions: reads('inviteActions'),
 
-  recordObserver: observer('record', function () {
+  recordObserver: observer('record', function recordObserver() {
     // reset state after record change
     this.setProperties({
       visibleInvitationToken: undefined,
@@ -262,7 +274,7 @@ export default Mixin.create({
   listsObserver: observer(
     'groupList.content.[]',
     'userList.content.[]',
-    function () {
+    function listsObserver() {
       // reset state after lists change
       this.setProperties({
         selectedUserRecordProxies: A(),
@@ -377,7 +389,7 @@ export default Mixin.create({
    * @return {Promise}
    */
   removeMember() {
-    return reject('Not implemented.');
+    return notImplementedReject();
   },
 
   actions: {

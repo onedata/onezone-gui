@@ -326,7 +326,8 @@ export default Service.extend({
   },
 
   /**
-   * Reloads selected list from group identified by entityId.
+   * Reloads selected list from group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
    * @param {string} entityId group entityId
    * @param {string} listName e.g. `childList`
    * @returns {Promise}
