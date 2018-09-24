@@ -88,7 +88,10 @@ export default Service.extend(I18n, {
         );
         return group;
       })
-      .catch(error => globalNotify.backendError(this.t('groupCreation'), error));
+      .catch(error => {
+        globalNotify.backendError(this.t('groupCreation'), error);
+        throw error;
+      });
   },
 
   /**
@@ -106,6 +109,7 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+        throw error;
       });
   },
 
@@ -123,6 +127,7 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+        throw error;
       });
   },
 
@@ -200,6 +205,7 @@ export default Service.extend(I18n, {
       .catch(error => {
         group.rollbackAttributes();
         globalNotify.backendError(this.t('groupDeletion'), error);
+        throw error;
       });
   },
 
@@ -221,6 +227,7 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         globalNotify.backendError(this.t('groupLeaving'), error);
+        throw error;
       });
   },
 
@@ -264,6 +271,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('groupDeletion'), error);
+      throw error;
     });
   },
 
@@ -288,6 +296,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('userDeletion'), error);
+      throw error;
     });
   },
 
@@ -311,6 +320,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('groupLeaving'), error);
+      throw error;
     });
   },
 
@@ -332,6 +342,7 @@ export default Service.extend(I18n, {
         }));
       }).catch(error => {
         globalNotify.backendError(this.t('parentGroupCreation'), error);
+        throw error;
       });
   },
 
@@ -353,6 +364,7 @@ export default Service.extend(I18n, {
         }));
       }).catch(error => {
         globalNotify.backendError(this.t('childGroupCreation'), error);
+        throw error;
       });
   },
 
@@ -376,6 +388,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('parentGroupAddition'), error);
+      throw error;
     });
   },
 
@@ -399,6 +412,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('childGroupAddition'), error);
+      throw error;
     });
   },
 
@@ -425,6 +439,7 @@ export default Service.extend(I18n, {
       })))
       .catch(error => {
         globalNotify.backendError(this.t('groupLeaving'), error);
+        throw error;
       });
   },
 });
