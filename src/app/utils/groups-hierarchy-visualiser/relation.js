@@ -28,7 +28,7 @@ export default EmberObject.extend({
   exists: computed(
     'parentGroup.childList.{list.[],isReloading}',
     'childGroup.parentList.{list.[],isReloading}',
-    function relationToRemoveExists() {
+    function exists() {
       const {
         parentGroup,
         childGroup,

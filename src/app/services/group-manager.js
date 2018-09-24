@@ -363,18 +363,9 @@ export default Service.extend({
    * @param {string} listName e.g. `childList`
    * @returns {Promise}
    */
-  reloadModelList(entityId, listName) {
+  reloadRecordList(entityId, listName) {
     const group = this.getLoadedGroupByEntityId(entityId);
-    if (group) {
-      const list = group.belongsTo(listName).value();
-      const hasMany = list ? list.hasMany('list').value() : null;
-      if (list) {
-        return list.reload().then(result => {
-          return hasMany ? list.hasMany('list').reload() : result;
-        });
-      }
-    }
-    return resolve();
+    return group ? group.reloadList(listName) : resolve();
   },
 
   /**
@@ -384,7 +375,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadParentList(entityId) {
-    return this.reloadModelList(entityId, 'parentList');
+    return this.reloadRecordList(entityId, 'parentList');
   },
 
   /**
@@ -394,7 +385,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadChildList(entityId) {
-    return this.reloadModelList(entityId, 'childList');
+    return this.reloadRecordList(entityId, 'childList');
   },
 
   /**
@@ -404,6 +395,6 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadUserList(entityId) {
-    return this.reloadModelList(entityId, 'userList');
+    return this.reloadRecordList(entityId, 'userList');
   },
 });

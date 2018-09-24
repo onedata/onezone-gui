@@ -39,10 +39,10 @@ export default Component.extend({
   privilegesTranslationsPath: undefined,
 
   /**
-   * Model with privileges.
-   * @type {PrivilegeModelProxy}
+   * Record proxy with privileges.
+   * @type {PrivilegeRecordProxy}
    */
-  modelProxy: Object.freeze({}),
+  recordProxy: Object.freeze({}),
 
   /**
    * If false, edition will be not available.
@@ -60,13 +60,13 @@ export default Component.extend({
    * State of the privileges, which will override tree state on change.
    * @type {Object}
    */
-  overridePrivileges: reads('modelProxy.effectivePrivilegesSnapshot'),
+  overridePrivileges: reads('recordProxy.effectivePrivilegesSnapshot'),
 
   /**
    * Actually saved privileges (used to show diff).
    * @type {Object}
    */
-  persistedPrivileges: reads('modelProxy.persistedPrivileges'),
+  persistedPrivileges: reads('recordProxy.persistedPrivileges'),
 
   /**
    * Tree definition
@@ -141,24 +141,24 @@ export default Component.extend({
     }
   }),
 
-  modelProxyObserver: observer('modelProxy', function () {
-    const modelProxy = this.get('modelProxy');
-    if (!get(modelProxy, 'isLoaded') && !get(modelProxy, 'isLoading')) {
-      modelProxy.reloadModels();
+  recordProxyObserver: observer('recordProxy', function () {
+    const recordProxy = this.get('recordProxy');
+    if (!get(recordProxy, 'isLoaded') && !get(recordProxy, 'isLoading')) {
+      recordProxy.reloadRecords();
     }
   }),
 
   init() {
     this._super(...arguments);
     this.overridePrivilegesObserver();
-    // Moving model processing to the next runloop frame to avoid double set
-    // in the same render (modelProxyObserver changes modelProxy content)
-    scheduleOnce('afterRender', this, 'modelProxyObserver');
+    // Moving record processing to the next runloop frame to avoid double set
+    // in the same render (recordProxyObserver changes recordProxy content)
+    scheduleOnce('afterRender', this, 'recordProxyObserver');
   },
 
   actions: {
     treeValuesChanged(values) {
-      this.get('modelProxy').setNewPrivileges(values);
+      this.get('recordProxy').setNewPrivileges(values);
     },
   },
 });

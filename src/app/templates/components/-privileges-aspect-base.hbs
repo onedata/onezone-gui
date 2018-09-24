@@ -25,9 +25,9 @@
   errorReason=(or groupList.reason userList.reason)}}
   <div class="row">
     {{#collection-permissions
-      proxyList=proxyGroupModelList
+      proxyList=proxyGroupRecordList
       subjectType="group"
-      modelsSelected=(action "modelsSelected" "group")
+      recordsSelected=(action "recordsSelected" "group")
       listHeader=(tt this "groups")
       itemIcon="group"
       groupedPrivilegesFlags=groupedPrivilegesFlags
@@ -43,9 +43,9 @@
           hasCheckbox=false
           truncate=false}}
           <span class="one-label">
-            {{tt this "noSubgroupsStart"}}
-            <a {{action "showInvitationToken" "group"}}>{{tt this "noSubgroupsInvite"}}</a>
-            {{tt this "noSubgroupsEnd"}}
+            {{tt this "noGroupsStart"}}
+            <a {{action "showInvitationToken" "group"}}>{{tt this "noGroupsInvite"}}</a>
+            {{tt this "noGroupsEnd"}}
           </span>
         {{/listItem.header}}
       {{/list.item}}
@@ -53,9 +53,9 @@
   </div>
   <div class="row">
     {{#collection-permissions
-      proxyList=proxyUserModelList
+      proxyList=proxyUserRecordList
       subjectType="user"
-      modelsSelected=(action "modelsSelected" "user")
+      recordsSelected=(action "recordsSelected" "user")
       listHeader=(tt this "users")
       itemIcon="user"
       groupedPrivilegesFlags=groupedPrivilegesFlags
@@ -84,10 +84,19 @@
   privilegesGroups=groupedPrivilegesFlags
   privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
   privilegesTranslationsPath=privilegesTranslationsPath
-  modelProxy=batchEditModalModel
+  recordProxy=batchEditModalModel
   save=(action "saveBatch")
   close=(action "batchEditClose")
   opened=batchEditActive
   processing=batchEditModalModel.isSaving
   treeRootText=(tt this "batchEditModalSelectedItems")}}
+{{proceed-process-modal
+  opened=(and memberToRemove (not memberToRemove.isDeleted))
+  close=(action (mut memberToRemove) null)
+  proceed=(action "removeMember")
+  processing=isRemovingMember
+  modalClass="remove-member"
+  headerText=(tt this "removeMemberHeader")
+  messageText=(tt this "removeMemberAreYouSure" modelName=model.name memberName=memberToRemove.name)
+  proceedButtonText=(tt this "remove")}}
 {{yield}}

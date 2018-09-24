@@ -9,7 +9,6 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
@@ -23,6 +22,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
 
   i18n: service(),
   navigationState: service(),
+  spaceActions: service(),
 
   /**
    * @override
@@ -42,44 +42,21 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  model: reads('space'),
+  record: reads('space'),
 
   /**
    * @override
    */
-  privilegesTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privileges';
-  }),
-
-  /**
-   * @override
-   */
-  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privilegeGroups';
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<string>}
-   */
-  globalActionsTitle: computed(function () {
-    return this.t('spacePrivileges');
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  globalActions: computed('inviteActions', 'batchEditAction', function () {
+  removeMember(type, member) {
     const {
-      inviteActions,
-      batchEditAction,
-    } = this.getProperties('inviteActions', 'batchEditAction');
-    return [batchEditAction, ...inviteActions];
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  headerActions: reads('inviteActions'),
+      spaceActions,
+      space,
+    } = this.getProperties(
+      'spaceActions',
+      'space',
+    );
+    return type === 'group' ?
+      spaceActions.removeGroup(space, member) :
+      spaceActions.removeUser(space, member);
+  },
 });
