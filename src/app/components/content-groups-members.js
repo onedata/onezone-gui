@@ -51,7 +51,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  model: reads('group'),
+  record: reads('group'),
 
   /**
    * @override
