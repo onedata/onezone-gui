@@ -120,6 +120,15 @@ export default Component.extend(I18n, {
   leaveGroup: notImplementedThrow,
 
   /**
+   * Triggers joining group (as user)
+   * @type {Function}
+   * @virtual
+   * @param {Group} group
+   * @returns {undefined}
+   */
+  joinGroup: notImplementedThrow,
+
+  /**
    * Triggers group removing
    * @type {Function}
    * @virtual

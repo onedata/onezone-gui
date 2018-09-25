@@ -165,25 +165,53 @@ describe(
       expect(this.$('.direct-membership-icon')).to.not.exist;
     });
 
-    it('does not show "leave" action if directMembership is false', function () {
-      const groupBox = EmberObject.create({
-        group: EmberObject.create({
-          name: 'testname',
-          membership: true,
-          directMembership: false,
-        }),
-      });
+    it(
+      'shows "join" instead of "leave" action if directMembership is false',
+      function () {
+        const groupBox = EmberObject.create({
+          group: EmberObject.create({
+            name: 'testname',
+            membership: true,
+            directMembership: false,
+          }),
+        });
 
-      this.set('groupBox', groupBox);
-      this.render(hbs `
-        {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
-      `);
+        this.set('groupBox', groupBox);
+        this.render(hbs `
+          {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        `);
 
-      const $groupBox = this.$('.group-box');
-      return click($groupBox.find('.group-actions-trigger')[0]).then(() => {
-        expect($('body .webui-popover.in .leave-group-action')).to.not.exist;
-      });
-    });
+        const $groupBox = this.$('.group-box');
+        return click($groupBox.find('.group-actions-trigger')[0]).then(() => {
+          expect($('body .webui-popover.in .leave-group-action')).to.not.exist;
+          expect($('body .webui-popover.in .join-group-action')).to.exist;
+        });
+      }
+    );
+
+    it(
+      'shows "leave" instead of "join" action if directMembership is true',
+      function () {
+        const groupBox = EmberObject.create({
+          group: EmberObject.create({
+            name: 'testname',
+            membership: true,
+            directMembership: true,
+          }),
+        });
+
+        this.set('groupBox', groupBox);
+        this.render(hbs `
+          {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
+        `);
+
+        const $groupBox = this.$('.group-box');
+        return click($groupBox.find('.group-actions-trigger')[0]).then(() => {
+          expect($('body .webui-popover.in .leave-group-action')).to.exist;
+          expect($('body .webui-popover.in .join-group-action')).to.not.exist;
+        });
+      }
+    );
 
     it(
       'does not show actions trigger for groups with membership == false',

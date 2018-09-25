@@ -90,7 +90,10 @@ export default Service.extend(I18n, {
             sidebarContainer[0].clientHeight);
         });
       })
-      .catch(error => globalNotify.backendError(this.t('spaceCreation'), error));
+      .catch(error => {
+        globalNotify.backendError(this.t('spaceCreation'), error);
+        throw error;
+      });
   },
 
   /**
@@ -115,6 +118,7 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+        throw error;
       });
   },
 
@@ -139,6 +143,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('groupDeletion'), error);
+      throw error;
     });
   },
 
@@ -163,6 +168,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('userDeletion'), error);
+      throw error;
     });
   },
 });
