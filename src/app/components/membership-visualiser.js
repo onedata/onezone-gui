@@ -8,7 +8,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { resolve, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
-import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
+import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
@@ -160,7 +160,7 @@ export default Component.extend(I18n, {
           parentType === 'group' && childType === 'group' ? 'child' : childType,
           get(relationPrivilegesToChange, 'child.entityId'),
         );
-        return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
+        return PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
           griArray: [gri],
           groupedPrivilegesFlags,
         });
@@ -180,12 +180,12 @@ export default Component.extend(I18n, {
       .then((p) => this.set('paths', p));
   },
 
-  getMembershipGri(modelGri) {
+  getMembershipGri(recordGri) {
     const {
       entityType,
       entityId,
     } = getProperties(this.get('contextRecord'), 'entityType', 'entityId');
-    return gri(_.assign(parseGri(modelGri), {
+    return gri(_.assign(parseGri(recordGri), {
       aspect: `eff_${entityType}_membership`,
       aspectId: entityId,
       scope: 'private',

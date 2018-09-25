@@ -11,7 +11,6 @@ import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
@@ -122,11 +121,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<PromiseObject<DS.RecordArray<Provider>>>>}
    */
-  _providersProxy: computed('providerList', function () {
-    return PromiseObject.create({
-      promise: this.get('providerList.list'),
-    });
-  }),
+  _providersProxy: reads('providerList.list'),
 
   /**
    * Array of all prviders
@@ -176,7 +171,6 @@ export default Component.extend({
         'defaultMapStateGenerated',
       );
       if (!defaultMapStateGenerated && get(_providersProxy, 'isFulfilled')) {
-        this.set('defaultMapStateGenerated', true);
         const providers = get(_providersProxy, 'content');
         if (get(providers, 'length') > 0) {
           const latitudes = providers.map(p => get(p, 'latitude'));
@@ -196,6 +190,7 @@ export default Component.extend({
             scale,
           });
         }
+        this.set('defaultMapStateGenerated', true);
       }
     }
   ),

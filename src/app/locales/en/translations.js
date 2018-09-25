@@ -44,6 +44,7 @@ import groupCreateRelativeModal from './components/group-create-relative-modal';
 import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
 import groupInviteUsingTokenModal from './components/group-invite-using-token-modal';
+import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
 
 import spaceActions from './services/space-actions';
@@ -98,6 +99,7 @@ let translations = {
     groupAddYourGroupModal,
     groupJoinUsingTokenModal,
     groupInviteUsingTokenModal,
+    joinAsUserModal,
     membershipVisualiser,
   },
   services: {

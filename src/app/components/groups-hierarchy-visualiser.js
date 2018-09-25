@@ -180,7 +180,7 @@ import { createEmptyColumnModel, default as Column } from 'onezone-gui/utils/gro
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
-import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
+import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 
 export default Component.extend(I18n, {
@@ -224,6 +224,18 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isLeavingGroup: false,
+
+  /**
+   * Group for join-as-user-modal
+   * @type {Group|null}
+   */
+  groupToJoin: null,
+
+  /**
+   * If true, user is joining `groupToJoin`
+   * @type {boolean}
+   */
+  isJoiningGroup: false,
 
   /**
    * Group for group-remove-modal
@@ -366,7 +378,7 @@ export default Component.extend(I18n, {
 
   /**
    * Privileges model for relation privileges editor
-   * @type {Ember.ComputedProperty<PrivilegeModelProxy|null>}
+   * @type {Ember.ComputedProperty<PrivilegeRecordProxy|null>}
    */
   privilegesEditorModel: computed(
     'relationPrivilegesToChange',
@@ -387,7 +399,7 @@ export default Component.extend(I18n, {
           'child',
           get(relationPrivilegesToChange, 'child.entityId'),
         );
-        return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
+        return PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
           griArray: [gri],
           groupedPrivilegesFlags,
         });
@@ -419,6 +431,24 @@ export default Component.extend(I18n, {
         !get(groupToLeave, 'directMembership')
       ) {
         this.set('groupToLeave', null);
+      }
+    }
+  ),
+
+  groupToJoinObserver: observer(
+    'groupToJoin.directMembership',
+    function groupToJoinObserver() {
+      const {
+        groupToJoin,
+        isJoiningGroup,
+      } = this.getProperties('groupToJoin', 'isJoiningGroup');
+      // if user joined group without our action, close join-as-user modal
+      if (
+        groupToJoin &&
+        !isJoiningGroup &&
+        get(groupToJoin, 'directMembership')
+      ) {
+        this.set('groupToJoin', null);
       }
     }
   ),
@@ -837,6 +867,20 @@ export default Component.extend(I18n, {
           safeExec(this, 'setProperties', {
             isLeavingGroup: false,
             groupToLeave: null,
+          })
+        );
+    },
+    joinGroup() {
+      const {
+        groupToJoin,
+        groupActions,
+      } = this.getProperties('groupToJoin', 'groupActions');
+      this.set('isJoiningGroup', true);
+      return groupActions.joinGroupAsUser(groupToJoin)
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            isJoiningGroup: false,
+            groupToJoin: null,
           })
         );
     },

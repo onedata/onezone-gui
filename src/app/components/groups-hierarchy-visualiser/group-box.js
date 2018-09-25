@@ -141,6 +141,14 @@ export default Component.extend(I18n, {
   leaveGroup: notImplementedThrow,
 
   /**
+   * Triggers joining group (as user)
+   * @type {Function}
+   * @virtual
+   * @returns {undefined}
+   */
+  joinGroup: notImplementedThrow,
+
+  /**
    * Triggers group removing
    * @type {Function}
    * @virtual
@@ -297,6 +305,18 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinAction: computed(function joinAction() {
+    return {
+      action: () => this.get('joinGroup')(),
+      title: this.t('join'),
+      class: 'join-group-action',
+      icon: 'join-plug',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   removeAction: computed(function removeAction() {
     return {
       action: () => this.get('removeGroup')(),
@@ -315,6 +335,7 @@ export default Component.extend(I18n, {
     'addChildGroupAction',
     'addParentGroupAction',
     'leaveAction',
+    'joinAction',
     'removeAction',
     'groupBox.group.directMembership',
     function groupActions() {
@@ -324,6 +345,7 @@ export default Component.extend(I18n, {
         addChildGroupAction,
         addParentGroupAction,
         leaveAction,
+        joinAction,
         removeAction,
       } = this.getProperties(
         'viewGroupAction',
@@ -331,6 +353,7 @@ export default Component.extend(I18n, {
         'addChildGroupAction',
         'addParentGroupAction',
         'leaveAction',
+        'joinAction',
         'removeAction'
       );
       const actions = [
@@ -341,6 +364,8 @@ export default Component.extend(I18n, {
       ];
       if (this.get('groupBox.group.directMembership')) {
         actions.push(leaveAction);
+      } else {
+        actions.push(joinAction);
       }
       actions.push(removeAction);
       return actions;
