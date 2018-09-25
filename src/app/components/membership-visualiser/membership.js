@@ -5,6 +5,8 @@ import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { Promise } from 'rsvp';
 import RecognizerMixin from 'ember-gestures/mixins/recognizers';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
+import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 
 export default Component.extend(RecognizerMixin, {
   classNames: ['membership'],
@@ -23,6 +25,24 @@ export default Component.extend(RecognizerMixin, {
    * @virtual
    */
   path: null,
+
+  /**
+   * Shows privileges editor
+   * @type {Function}
+   * @virtual
+   * @param {Utils/MembershipRelation} relation
+   * @returns {undefined}
+   */
+  modifyPrivileges: notImplementedThrow,
+
+  /**
+   * Triggers relation removing
+   * @type {Function}
+   * @virtual
+   * @param {Utils/MembershipRelation} relation
+   * @returns {undefined}
+   */
+  removeRelation: notImplementedThrow,
 
   /**
    * Horizontal scroll state stored on pan gesture start
@@ -61,13 +81,16 @@ export default Component.extend(RecognizerMixin, {
         elements.push({
           id: `relation|${get(prevBlock, 'gri')}|${get(block, 'gri')}`,
           type: 'relation',
-          parent: block,
-          child: prevBlock,
+          relation: MembershipRelation.create({
+            parent: block,
+            child: prevBlock,
+          }),
         }, {
           id: 'block|' + get(block, 'gri'),
           type: 'block',
           record: block,
         });
+        prevBlock = block;
       });
       return elements;
     } else {
@@ -97,7 +120,11 @@ export default Component.extend(RecognizerMixin, {
    */
   fetchRecordByGri(recordGri) {
     const entityType = parseGri(recordGri).entityType;
-    return this.get('store').findRecord(entityType, recordGri);
+    return this.get('store').findRecord(entityType, recordGri)
+      .then(record => Promise.all([
+        record.get('groupList'),
+        record.get('userList'),
+      ]).then(() => record));
   },
 
   getScrollContainer() {

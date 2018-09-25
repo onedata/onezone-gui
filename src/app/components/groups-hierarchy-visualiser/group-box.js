@@ -152,7 +152,7 @@ export default Component.extend(I18n, {
    * Shows privileges editor
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   modifyPrivileges: notImplementedThrow,

@@ -8,6 +8,10 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { resolve, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
+import PrivilegeModelProxy from 'onezone-gui/utils/privilege-model-proxy';
+import { getOwner } from '@ember/application';
+import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
+import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 
 /**
  * @typedef {Object} MembershipPath
@@ -19,11 +23,13 @@ export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
 
   store: service(),
+  privilegeManager: service(),
+  privilegeActions: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.relationship-visualiser',
+  i18nPrefix: 'components.membershipVisualiser',
 
   /**
    * User or group
@@ -45,11 +51,124 @@ export default Component.extend(I18n, {
   maxPathsNumber: 5,
 
   /**
+   * Relation for privileges-editor-modal
+   * @type {Utils/MembershipRelation|null}
+   */
+  relationPrivilegesToChange: null,
+
+  /**
+   * @type {Utils/MembershipRelation}
+   */
+  relationToRemove: null,
+
+  /**
+   * @type {boolean}
+   */
+  isRemovingRelation: false,
+
+  /**
    * @type {Ember.ComputedProperty<Ember.A>}
    */
   paths: computed(function paths() {
     return A();
   }),
+
+  /**
+   * 1-level-nested tree with privileges. It should group privileges
+   * into categories.
+   * @type {Ember.ComputedProperty<Object>}
+   */
+  groupedPrivilegesFlags: computed(
+    'relationPrivilegesToChange.parentType',
+    function groupedPrivilegesFlags() {
+      return this.get('relationPrivilegesToChange.parentType') === 'space' ?
+        spaceFlags : groupFlags;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  privilegeGroupsTranslationsPath: computed(
+    'relationPrivilegesToChange.parentType',
+    function privilegeGroupsTranslationsPath() {
+      const modelName = 
+        this.get('relationPrivilegesToChange.parentType') === 'space' ?
+        'Space' : 'Group';
+      return `components.content${modelName}sMembers.privilegeGroups`;
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  privilegesTranslationsPath: computed(
+    'relationPrivilegesToChange.parentType',
+    function privilegesTranslationsPath() {
+      const modelName =
+        this.get('relationPrivilegesToChange.parentType') === 'space' ?
+        'Space' : 'Group';
+      return `components.content${modelName}sMembers.privileges`;
+    }
+  ),
+
+  /**
+   * Text for the header of the relation privileges tree
+   * @type {Ember.ComputedProperty<string>}
+   */
+  privilegesTreeRootText: computed(
+    'relationPrivilegesToChange',
+    function privilegesTreeRootText() {
+      const relation = this.get('relationPrivilegesToChange');
+      if (relation) {
+        return this.t('privilegesTreeRootText', {
+          parentType: this.t(get(relation, 'parentType')),
+          parentName: get(relation, 'parent.name'),
+          upperChildType: _.upperFirst(this.t(get(relation, 'childType'))),
+          childName: get(relation, 'child.name'),
+        });
+      } else {
+        return '';
+      }
+    }
+  ),
+
+  /**
+   * Privileges model for relation privileges editor
+   * @type {Ember.ComputedProperty<PrivilegeModelProxy|null>}
+   */
+  privilegesEditorModel: computed(
+    'relationPrivilegesToChange',
+    function privilegesEditorModel() {
+      const {
+        relationPrivilegesToChange,
+        privilegeManager,
+        groupedPrivilegesFlags,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'privilegeManager',
+        'groupedPrivilegesFlags'
+      );
+      if (relationPrivilegesToChange) {
+        const {
+          parentType,
+          childType,
+        } = getProperties(relationPrivilegesToChange, 'parentType', 'childType');
+        const gri = privilegeManager.generateGri(
+          parentType,
+          get(relationPrivilegesToChange, 'parent.entityId'),
+          parentType === 'group' && childType === 'group' ? 'child' : childType,
+          get(relationPrivilegesToChange, 'child.entityId'),
+        );
+        return PrivilegeModelProxy.create(getOwner(this).ownerInjection(), {
+          griArray: [gri],
+          groupedPrivilegesFlags,
+        });
+      } else {
+        return null;
+      }
+    }
+  ),
 
   init() {
     this._super(...arguments);
@@ -158,5 +277,46 @@ export default Component.extend(I18n, {
       }));
     }
     return donePaths;
+  },
+
+  actions: {
+    savePrivileges() {
+      const {
+        privilegesEditorModel,
+        privilegeActions,
+      } = this.getProperties(
+        'privilegesEditorModel',
+        'privilegeActions'
+      );
+      return privilegeActions.handleSave(privilegesEditorModel.save())
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            relationPrivilegesToChange: null,
+          })
+        );
+    },
+    removeRelation() {
+      const {
+        relationToRemove,
+      } = this.getProperties('relationToRemove');
+      this.set('isRemovingRelation', true);
+      return Promise.resolve().then(() => 
+        safeExec(this, 'setProperties', {
+          isRemovingRelation: false,
+          relationToRemove: null,
+        })
+      );
+      // return groupActions.removeRelation(
+      //     get(relationToRemove, 'parent'),
+      //     get(relationToRemove, 'child')
+      //   )
+      //   .then(() => safeExec(this, 'reloadModel'))
+      //   .finally(() =>
+      //     safeExec(this, 'setProperties', {
+      //       isRemovingRelation: false,
+      //       relationToRemove: null,
+      //     })
+      //   );
+    },
   },
 });

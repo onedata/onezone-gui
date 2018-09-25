@@ -30,13 +30,13 @@ right column will always be before left in html --}}
   proceed=(action "removeGroup")
   processing=isRemovingGroup
   group=groupToRemove}}
-{{group-remove-relation-modal
+{{remove-relation-modal
   opened=relationToRemove
   close=(action (mut relationToRemove) null)
   proceed=(action "removeRelation")
   processing=isRemovingRelation
-  parentGroup=relationToRemove.parent
-  childGroup=relationToRemove.child}}
+  parent=relationToRemove.parent
+  child=relationToRemove.child}}
 {{group-create-relative-modal
   opened=(and groupToCreateRelative (or isCreatingRelativeGroup (not groupToCreateRelative.isDeleted)))
   close=(action (mut groupToCreateRelative) null)

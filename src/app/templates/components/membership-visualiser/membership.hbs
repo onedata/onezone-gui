@@ -1,7 +1,16 @@
 {{#promise-proxy-container proxy=recordsProxy}}
   {{#perfect-scrollbar-element suppressScrollY=true}}
     {{#each pathElements key="id" as |pathElement|}}
-      {{component (concat "membership-visualiser/membership-" pathElement.type) pathElement=pathElement}}
+      {{#if (eq pathElement.type "block")}}
+        {{membership-visualiser/membership-block
+          record=pathElement.record
+          showName=(not pathElement.startBlock)}}
+      {{else}}
+        {{membership-visualiser/membership-relation
+          relation=pathElement.relation
+          modifyPrivileges=(action modifyPrivileges pathElement.relation)
+          removeRelation=(action removeRelation pathElement.relation)}}
+      {{/if}}
     {{/each}}
   {{/perfect-scrollbar-element}}
 {{/promise-proxy-container}}

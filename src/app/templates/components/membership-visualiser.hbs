@@ -1,3 +1,26 @@
 {{#each paths key="id" as |path|}}
-  {{membership-visualiser/membership pathStart=contextRecord path=path}}
+  {{membership-visualiser/membership
+    pathStart=contextRecord
+    path=path
+    removeRelation=(action (mut relationToRemove))
+    modifyPrivileges=(action (mut relationPrivilegesToChange))}}
 {{/each}}
+{{remove-relation-modal
+  opened=relationToRemove
+  close=(action (mut relationToRemove) null)
+  proceed=(action "removeRelation")
+  processing=isRemovingRelation
+  parent=relationToRemove.parent
+  child=relationToRemove.child}}
+{{#if privilegesEditorModel}}
+  {{privileges-editor-modal
+    privilegesGroups=groupedPrivilegesFlags
+    privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+    privilegesTranslationsPath=privilegesTranslationsPath
+    modelProxy=privilegesEditorModel
+    save=(action "savePrivileges")
+    close=(action (mut relationPrivilegesToChange) null)
+    opened=relationPrivilegesToChange
+    processing=privilegesEditorModel.isSaving
+    treeRootText=privilegesTreeRootText}}
+{{/if}}

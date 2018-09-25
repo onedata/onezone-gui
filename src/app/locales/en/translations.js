@@ -39,11 +39,12 @@ import contentSpacesMembers from './components/content-spaces-members';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
 import groupLeaveModal from './components/group-leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
-import groupRemoveRelationModal from './components/group-remove-relation-modal';
+import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
 import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
 import groupInviteUsingTokenModal from './components/group-invite-using-token-modal';
+import membershipVisualiser from './components/membership-visualiser';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -92,11 +93,12 @@ let translations = {
     groupsHierarchyVisualiser,
     groupLeaveModal,
     groupRemoveModal,
-    groupRemoveRelationModal,
+    removeRelationModal,
     groupCreateRelativeModal,
     groupAddYourGroupModal,
     groupJoinUsingTokenModal,
     groupInviteUsingTokenModal,
+    membershipVisualiser,
   },
   services: {
     clientTokenActions,
