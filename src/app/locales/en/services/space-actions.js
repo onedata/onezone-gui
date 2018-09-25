@@ -9,4 +9,12 @@ export default {
   },
   spaceCreateSuccess: 'New space created successfully',
   spaceCreation: 'creating space',
+  joiningSpace: 'joining the space',
+  joinedSpaceSuccess: 'Space joined successfully',
+  removeGroupSuccess: 'Group "{{groupName}}" has been removed from space ' +
+    '"{{spaceName}}"',
+  removeUserSuccess: 'User "{{userName}}" has been removed from space ' +
+    '"{{spaceName}}"',
+  groupDeletion: 'group deletion',
+  userDeletion: 'user deletion',
 };

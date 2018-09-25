@@ -1,7 +1,7 @@
-export default {
-  members: 'Members',
-  groups: 'Groups',
-  users: 'Users',
+import _ from 'lodash';
+import privilegesAspectBase from '../mixins/privileges-aspect-base';
+
+export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {
     spaceManagement: 'Space management',
     dataManagement: 'Data management',
@@ -29,15 +29,10 @@ export default {
     space_invite_provider: 'Invite provider',
     space_remove_provider: 'Remove provider',
   },
-  spacePrivileges: 'Space privileges',
-  multiedit: 'Bulk edit',
-  inviteGroup: 'Invite group',
-  inviteUser: 'Invite user',
-  noSubgroupsStart: 'This space has no groups. To invite a group, ',
-  noSubgroupsInvite: 'generate an invitation token',
-  noSubgroupsEnd: ' and send it to the group owner.',
+  noGroupsStart: 'This space has no groups. To invite a group, ',
+  noGroupsInvite: 'generate an invitation token',
+  noGroupsEnd: ' and send it to the group owner.',
   noUsersStart: 'This space has no users. To invite a user, ',
   noUsersInvite: 'generate an invitation token',
   noUsersEnd: ' and send it to the user.',
-  batchEditModalSelectedItems: 'Selected items',
-};
+});

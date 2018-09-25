@@ -334,16 +334,7 @@ export default Service.extend({
    */
   reloadRecordList(entityId, listName) {
     const group = this.getLoadedGroupByEntityId(entityId);
-    if (group) {
-      const list = group.belongsTo(listName).value();
-      const hasMany = list ? list.hasMany('list').value() : null;
-      if (list) {
-        return list.reload().then(result => {
-          return hasMany ? list.hasMany('list').reload() : result;
-        });
-      }
-    }
-    return resolve();
+    return group ? group.reloadList(listName) : resolve();
   },
 
   /**

@@ -9,7 +9,7 @@
 
 import Mixin from '@ember/object/mixin';
 import { computed, get, observer } from '@ember/object';
-import { union } from '@ember/object/computed';
+import { union, reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -20,6 +20,7 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default Mixin.create({
   privilegeManager: service(),
@@ -62,18 +63,6 @@ export default Mixin.create({
   }),
 
   /**
-   * @type {string}
-   * @virtual
-   */
-  privilegesTranslationsPath: undefined,
-
-  /**
-   * @type {string}
-   * @virtual
-   */
-  privilegeGroupsTranslationsPath: undefined,
-
-  /**
    * @type {Ember.Array<PrivilegeRecordProxy>}
    */
   selectedUserRecordProxies: Object.freeze(A()),
@@ -94,19 +83,40 @@ export default Mixin.create({
   batchEditModalModel: Object.freeze({}),
 
   /**
-   * @type {Array<Action>}
+   * @type {GraphSingleModel}
    */
-  userActions: undefined,
+  memberToRemove: null,
 
   /**
-   * @type {Array<Action>}
+   * `group` or `user`
+   * @type {string}
    */
-  groupActions: undefined,
+  memberTypeToRemove: null,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  privilegesTranslationsPath: computed(
+    'i18nPrefix',
+    function privilegesTranslationsPath() {
+      return this.get('i18nPrefix') + '.privileges';
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  privilegeGroupsTranslationsPath: computed(
+    'i18nPrefix',
+    function privilegeGroupsTranslationsPath() {
+      return this.get('i18nPrefix') + '.privilegeGroups';
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  groupList: computed('record.hasViewPrivilege', function () {
+  groupList: computed('record.hasViewPrivilege', function groupList() {
     return PromiseArray.create({
       promise: this.get('record.hasViewPrivilege') !== false ?
         get(this.get('record'), 'groupList').then(sgl =>
@@ -118,7 +128,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<DS.ManyArray>}
    */
-  userList: computed('record.hasViewPrivilege', function () {
+  userList: computed('record.hasViewPrivilege', function userList() {
     return PromiseArray.create({
       promise: this.get('record.hasViewPrivilege') !== false ?
         get(this.get('record'), 'userList').then(sul =>
@@ -154,7 +164,7 @@ export default Mixin.create({
    */
   isAnySelectedRecordSaving: computed(
     'selectedRecordProxies.@each.saving',
-    function () {
+    function isAnySelectedRecordSaving() {
       return this.get('selectedRecordProxies').filterBy('saving', true).length > 0;
     }
   ),
@@ -165,7 +175,7 @@ export default Mixin.create({
   batchEditAvailable: computed(
     'selectedRecordProxies.length',
     'isAnySelectedRecordSaving',
-    function () {
+    function batchEditAvailable() {
       return this.get('selectedRecordProxies.length') > 0 &&
         !this.get('isAnySelectedRecordSaving');
     }
@@ -174,7 +184,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  inviteActions: computed(function () {
+  inviteActions: computed(function inviteActions() {
     return [{
       action: () => this.send('showInvitationToken', 'group'),
       title: this.t('inviteGroup'),
@@ -191,7 +201,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  batchEditAction: computed('batchEditAvailable', function () {
+  batchEditAction: computed('batchEditAvailable', function batchEditAction() {
     return {
       action: () => this.send('batchEdit'),
       title: this.t('multiedit'),
@@ -201,7 +211,60 @@ export default Mixin.create({
     };
   }),
 
-  recordObserver: observer('record', function () {
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  groupActions: computed(function groupActions() {
+    return [{
+      action: (...args) => this.send('showRemoveMemberModal', 'group', ...args),
+      title: this.t('removeThisMember'),
+      class: 'remove-group',
+      icon: 'close',
+    }];
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  userActions: computed(function userActions() {
+    return [{
+      action: (...args) => this.send('showRemoveMemberModal', 'user', ...args),
+      title: this.t('removeThisMember'),
+      class: 'remove-user',
+      icon: 'close',
+    }];
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<string>}
+   */
+  globalActionsTitle: computed(function globalActionsTitle() {
+    return this.t('members');
+  }),
+
+  /**
+   * @override 
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  globalActions: computed(
+    'inviteActions',
+    'batchEditAction',
+    function globalActions() {
+      const {
+        inviteActions,
+        batchEditAction,
+      } = this.getProperties('inviteActions', 'batchEditAction');
+      return [batchEditAction, ...inviteActions];
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  headerActions: reads('inviteActions'),
+
+  recordObserver: observer('record', function recordObserver() {
     // reset state after record change
     this.setProperties({
       visibleInvitationToken: undefined,
@@ -211,7 +274,7 @@ export default Mixin.create({
   listsObserver: observer(
     'groupList.content.[]',
     'userList.content.[]',
-    function () {
+    function listsObserver() {
       // reset state after lists change
       this.setProperties({
         selectedUserRecordProxies: A(),
@@ -318,6 +381,17 @@ export default Mixin.create({
     );
   },
 
+  /**
+   * Removes member. Should be implemented in component.
+   * @virtual
+   * @param {string} type type of member model
+   * @param {GraphSingleModel} member member record
+   * @return {Promise}
+   */
+  removeMember() {
+    return notImplementedReject();
+  },
+
   actions: {
     recordsSelected(type, records) {
       const {
@@ -367,6 +441,24 @@ export default Mixin.create({
     },
     hideInvitationToken() {
       this.set('visibleInvitationToken', null);
+    },
+    showRemoveMemberModal(type, recordProxy) {
+      this.setProperties({
+        memberToRemove: get(recordProxy, 'subject'),
+        memberTypeToRemove: type,
+      });
+    },
+    removeMember() {
+      this.set('isRemovingMember', true);
+      return this.removeMember(
+        this.get('memberTypeToRemove'),
+        this.get('memberToRemove')
+      ).finally(() =>
+        safeExec(this, 'setProperties', {
+          isRemovingMember: false,
+          memberToRemove: null,
+        })
+      );
     },
   },
 });
