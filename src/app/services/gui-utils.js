@@ -61,10 +61,10 @@ export default GuiUtils.extend(UserProxyMixin, {
 
   /**
    * @override
-   * @param {object|string} model
+   * @param {object|string} record
    * @returns {string}
    */
-  getRoutableIdFor(model) {
-    return modelRoutableId(model);
+  getRoutableIdFor(record) {
+    return modelRoutableId(record);
   },
 });

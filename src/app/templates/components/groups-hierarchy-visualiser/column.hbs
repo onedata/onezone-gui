@@ -4,7 +4,7 @@
   {{else if (eq column.relationType "children")}}
     {{tt this "childrenOfGroup" groupName=column.relatedGroup.name}}
   {{else if (eq column.relationType "startPoint")}}
-    {{column.model.content.[0].name}}
+    {{column.model.content.list.content.[0].name}}
   {{/if}}
 {{/truncated-string}}
 {{#perfect-scrollbar-element
@@ -30,7 +30,7 @@
       removeRelation=removeRelation}}
   {{/each}}
 {{/perfect-scrollbar-element}}
-{{#if (not column.model.isFulfilled)}}
+{{#if (or (not column.model.isFulfilled) column.model.isForbidden)}}
   <div class="column-loader">
     {{promise-proxy-container proxy=column.model}}
   </div>

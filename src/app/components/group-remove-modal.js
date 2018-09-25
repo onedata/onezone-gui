@@ -19,7 +19,7 @@ export default ProceedProcessModal.extend({
   /**
    * @override
    */
-  messageText: computed(function messageText() {
+  messageText: computed('group.name', function messageText() {
     return this.t('messageText', { groupName: this.get('group.name') });
   }),
 

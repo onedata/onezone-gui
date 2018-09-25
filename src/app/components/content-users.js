@@ -7,7 +7,6 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { not } from '@ember/object/computed';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
@@ -16,7 +15,7 @@ import { computed, set, get } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
-import _ from 'lodash';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 const animationTimeout = 333;
 
@@ -39,19 +38,13 @@ export default Component.extend(I18n, {
   user: undefined,
 
   /**
-   * @type {Ember.ComputedProperty<boolean>}
+   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
    */
-  _loadingLinkedAccounts: not('_linkedAccounts.isLoaded'),
-
-  /**
-   * @type {undefined|object}
-   */
-  _loadingLinkedAccountsError: undefined,
-
-  /**
-   * @type {undefined|DS.RecordArray<models/LinkedAccount>}
-   */
-  _linkedAccounts: undefined,
+  linkedAccountsProxy: computed(function linkedAccountsProxy() {
+    return PromiseObject.create({
+      promise: this.get('linkedAccountManager').getLinkedAccounts(),
+    });
+  }),
 
   /**
    * @type {undefined|AuthorizerInfo}
@@ -80,15 +73,11 @@ export default Component.extend(I18n, {
    * Object with mapping authorizerType -> authorizerInfo
    * @type {Ember.ComputedProperty<object>}
    */
-  _accountsAuthorizers: computed('_linkedAccounts.isLoaded', function () {
-    const _linkedAccounts = this.get('_linkedAccounts');
-    const accountsAuthorizers = {};
-    if (_linkedAccounts && _linkedAccounts.get('isLoaded')) {
-      _linkedAccounts.mapBy('idp').forEach(type =>
-        accountsAuthorizers[type] = _.find(authorizers, { type }) || {}
-      );
-    }
-    return accountsAuthorizers;
+  _accountsAuthorizers: computed(function () {
+    return authorizers.reduce((accountsAuthorizers, authorizer) => {
+      set(accountsAuthorizers, get(authorizer, 'type'), authorizer);
+      return accountsAuthorizers;
+    }, {});
   }),
 
   /**
@@ -98,15 +87,6 @@ export default Component.extend(I18n, {
     return this.get('authorizerManager').getAvailableAuthorizers()
       .filter(authorizer => authorizer.type !== 'basicAuth');
   }),
-
-  init() {
-    this._super(...arguments);
-    this.get('linkedAccountManager').getLinkedAccounts().then(linkedAccounts =>
-      safeExec(this, 'set', '_linkedAccounts', linkedAccounts)
-    ).catch(error =>
-      safeExec(this, 'set', '_loadingLinkedAccountsError', error)
-    );
-  },
 
   /**
    * Shows global info about save error.
@@ -177,13 +157,13 @@ export default Component.extend(I18n, {
         throw error;
       });
     },
-    saveLogin(login) {
+    saveAlias(alias) {
       const user = this.get('user');
-      const oldLogin = get(user, 'login');
-      set(user, 'login', login && login.length ? login : null);
+      const oldAlias = get(user, 'alias');
+      set(user, 'alias', alias && alias.length ? alias : null);
       return this._saveUser().catch((error) => {
-        // Restore old user login
-        set(user, 'login', oldLogin);
+        // Restore old user alias
+        set(user, 'alias', oldAlias);
         throw error;
       });
     },

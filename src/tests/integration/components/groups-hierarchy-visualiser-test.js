@@ -30,6 +30,18 @@ const RelationList = EmberObject.extend({
   }),
 
   length: reads('_list.length'),
+
+  hasMany() {
+    const model = this;
+    return {
+      ids() {
+        return get(model, '_list').mapBy('name');
+      },
+      reload() {
+        return get(model, 'list');
+      },
+    };
+  },
 });
 
 const GroupStub = EmberObject.extend({
@@ -37,6 +49,8 @@ const GroupStub = EmberObject.extend({
   membership: true,
   directMembership: true,
   _token: 'token1',
+
+  id: reads('name'),
 
   _childList: computed(function _childList() {
     return A();
@@ -63,6 +77,18 @@ const GroupStub = EmberObject.extend({
       })),
     });
   }),
+
+  belongsTo(relationName) {
+    const model = this;
+    return {
+      value() {
+        return get(model, `${relationName}.content`);
+      },
+      reload() {
+        return get(model, relationName);
+      },
+    };
+  },
 
   entityId: reads('name'),
 
@@ -101,7 +127,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
   beforeEach(function beforeEach() {
     registerService(this, 'i18n', I18nStub);
     registerService(this, 'navigation-state', Service.extend({
-      resourceCollectionContainsEntityId() {
+      resourceCollectionContainsId() {
         return resolve(true);
       },
     }));

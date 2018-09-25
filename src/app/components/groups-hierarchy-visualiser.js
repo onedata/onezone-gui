@@ -104,10 +104,10 @@
  *       null for children and parents types, and null for empty and startPoint.
  *       For children it is a parent group for those children, for parents it
  *       is a children group of those parents.
- *     * model - ProxyArray with groups. For empty type it should be an empty
- *       array, for startPoint it must contain an array with exactly one group,
- *       for children/parents there are no requirements - can contain many groups,
- *       or be an empty array.
+ *     * model - ProxyObject with with group-list model. For empty type it should
+ *       be a model with an empty array, for startPoint it must contain an array
+ *       with exactly one group, for children/parents there are no requirements -
+ *       can contain many groups, or be an empty array.
  * 
  * Flow:
  *   * GroupsHierarchyVisualiser component attaches its' own window resize
@@ -172,13 +172,16 @@ import { alias } from '@ember/object/computed';
 import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve, reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
-import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import { createEmptyColumnModel, default as Column } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
+import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
+import { getOwner } from '@ember/application';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -363,7 +366,7 @@ export default Component.extend(I18n, {
 
   /**
    * Privileges model for relation privileges editor
-   * @type {Ember.ComputedProperty<PrivilegesModelProxy|null>}
+   * @type {Ember.ComputedProperty<PrivilegeRecordProxy|null>}
    */
   privilegesEditorModel: computed(
     'relationPrivilegesToChange',
@@ -371,15 +374,22 @@ export default Component.extend(I18n, {
       const {
         relationPrivilegesToChange,
         privilegeManager,
-      } = this.getProperties('relationPrivilegesToChange', 'privilegeManager');
+        groupedPrivilegesFlags,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'privilegeManager',
+        'groupedPrivilegesFlags'
+      );
       if (relationPrivilegesToChange) {
-        return EmberObject.create({
-          modelGri: privilegeManager.generateGri(
-            'group',
-            get(relationPrivilegesToChange, 'parentGroup.entityId'),
-            'child',
-            get(relationPrivilegesToChange, 'childGroup.entityId'),
-          ),
+        const gri = privilegeManager.generateGri(
+          'group',
+          get(relationPrivilegesToChange, 'parentGroup.entityId'),
+          'child',
+          get(relationPrivilegesToChange, 'childGroup.entityId'),
+        );
+        return PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
+          griArray: [gri],
+          groupedPrivilegesFlags,
         });
       } else {
         return null;
@@ -394,6 +404,64 @@ export default Component.extend(I18n, {
   windowResizeHandler: computed(function windowResizeHandler() {
     return () => this.recalculateAvailableArea();
   }),
+
+  groupToLeaveObserver: observer(
+    'groupToLeave.directMembership',
+    function groupToLeaveObserver() {
+      const {
+        groupToLeave,
+        isLeavingGroup,
+      } = this.getProperties('groupToLeave', 'isLeavingGroup');
+      // if user left group without our action, close leave-group modal
+      if (
+        groupToLeave &&
+        !isLeavingGroup &&
+        !get(groupToLeave, 'directMembership')
+      ) {
+        this.set('groupToLeave', null);
+      }
+    }
+  ),
+
+  relationToRemoveObserver: observer(
+    'relationToRemove.exists',
+    function relationToRemoveObserver() {
+      const {
+        relationToRemove,
+        isRemovingRelation,
+      } = this.getProperties('relationToRemove', 'isRemovingRelation');
+      // if relation disappeard without our action, close remove-relation modal
+      if (
+        relationToRemove &&
+        !isRemovingRelation &&
+        !get(relationToRemove, 'exists')
+      ) {
+        this.set('relationToRemove', null);
+      }
+    }
+  ),
+
+  relationPrivilegesToChangeObserver: observer(
+    'relationPrivilegesToChange.{exists,parentGroup.canViewPrivileges}',
+    function relationPrivilegesToChangeObserver() {
+      const {
+        relationPrivilegesToChange,
+        isSavingRelationPrivileges,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'isSavingRelationPrivileges'
+      );
+      // if relation disappeard without action or user lost access to privileges
+      // information, close privileges-editor modal
+      if (
+        relationPrivilegesToChange &&
+        !isSavingRelationPrivileges &&
+        !get(relationPrivilegesToChange, 'canViewPrivileges')
+      ) {
+        this.set('relationPrivilegesToChange', null);
+      }
+    }
+  ),
 
   /**
    * Observes resetTrigger changes. Exact value of the resetTrigger
@@ -498,15 +566,18 @@ export default Component.extend(I18n, {
   loadGroupChildren(parentGroup) {
     let promise;
     if (get(parentGroup, 'hasViewPrivilege')) {
-      promise = get(parentGroup, 'childList')
-        .then(childList => get(childList, 'list'))
-        .then(groupsList => Promise.all(
-          groupsList.map(g => g.reload())
-        ).then(() => groupsList));
+      promise = parentGroup.belongsTo('childList').reload()
+        .then(childList => {
+          return childList.hasMany('list').reload()
+            .then(groupsList => Promise.all(
+              groupsList.map(g => g.reload())
+            ))
+            .then(() => childList);
+        });
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseArray.create({ promise });
+    return PromiseObject.create({ promise });
   },
 
   /**
@@ -517,14 +588,18 @@ export default Component.extend(I18n, {
   loadGroupParents(childGroup) {
     let promise;
     if (get(childGroup, 'hasViewPrivilege')) {
-      promise = get(childGroup, 'parentList')
-        .then(parentList => get(parentList, 'list'))
-        .then(list => Promise.all(
-          list.map(g => g.reload())).then(() => list));
+      promise = childGroup.belongsTo('parentList').reload()
+        .then(parentList => {
+          return parentList.hasMany('list').reload()
+            .then(list => Promise.all(
+              list.map(g => g.reload())
+            ))
+            .then(() => parentList);
+        });
     } else {
       promise = reject({ id: 'forbidden' });
     }
-    return PromiseArray.create({ promise });
+    return PromiseObject.create({ promise });
   },
 
   /**
@@ -532,9 +607,11 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<Ember.A<Group>>}
    */
   loadThisGroupAsArray() {
-    return PromiseArray.create({
+    return PromiseObject.create({
       promise: this.get('group').reload()
-        .then(groupProxy => A([groupProxy])),
+        .then(groupProxy => EmberObject.create({
+          list: PromiseArray.create({ promise: resolve(A([groupProxy])) }),
+        })),
     });
   },
 
@@ -574,7 +651,7 @@ export default Component.extend(I18n, {
       case 'children':
         return this.loadGroupChildren(relatedGroup);
       case 'empty':
-        return PromiseArray.create({ promise: resolve(A()) });
+        return createEmptyColumnModel();
     }
   },
 
@@ -588,13 +665,14 @@ export default Component.extend(I18n, {
       group,
       router,
     } = this.getProperties('navigationState', 'group', 'router');
-    const groupEntityId = get(group, 'entityId');
-    return navigationState.resourceCollectionContainsEntityId(groupEntityId)
+    const groupId = get(group, 'id');
+    return navigationState
+      .resourceCollectionContainsId(groupId)
       .then(contains => {
         if (!contains) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));
         }
-        return contains;
+        return !contains;
       });
   },
 
@@ -621,7 +699,7 @@ export default Component.extend(I18n, {
         }
         const modelPromise = relatedGroupReloadPromise
           .then(() => this.createColumnModel(column));
-        set(column, 'model', PromiseArray.create({ promise: modelPromise }));
+        set(column, 'model', PromiseObject.create({ promise: modelPromise }));
       });
   },
 
@@ -786,29 +864,14 @@ export default Component.extend(I18n, {
     savePrivileges() {
       const {
         privilegesEditorModel,
-        privilegeManager,
         privilegeActions,
       } = this.getProperties(
         'privilegesEditorModel',
-        'privilegeManager',
         'privilegeActions'
       );
-      const {
-        modifiedPrivileges,
-        model,
-      } = getProperties(privilegesEditorModel, 'modifiedPrivileges', 'model');
-      set(model, 'privileges', privilegeManager.treeToArray(modifiedPrivileges));
-
-      this.set('isSavingRelationPrivileges', true);
-      const promise = get(model, 'content').save()
-        .catch(error => {
-          get(model, 'content').rollbackAttributes();
-          throw error;
-        });
-      return privilegeActions.handleSave(promise)
+      return privilegeActions.handleSave(privilegesEditorModel.save())
         .finally(() =>
           safeExec(this, 'setProperties', {
-            isSavingRelationPrivileges: false,
             relationPrivilegesToChange: null,
           })
         );

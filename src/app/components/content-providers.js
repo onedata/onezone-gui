@@ -8,11 +8,11 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject } from '@ember/service';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
+import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
@@ -62,42 +62,30 @@ export default Component.extend({
   }),
 
   /**
-   * @type {Ember.ComputedProperty<object>}
+   * @type {boolean}
    */
-  _mapDefaultState: computed(
-    '_providers.@each.{latitude,longitude}',
-    '_mapCalculatedAreaPadding',
-    function () {
-      const {
-        _providers,
-        _mapCalculatedAreaPadding,
-      } = this.getProperties('_providers', '_mapCalculatedAreaPadding');
-      if (!_providers || get(_providers, 'length') === 0) {
-        return {
-          lat: 0,
-          lng: 0,
-          scale: 1,
-        };
-      } else {
-        const latitudes = _providers.map(p => get(p, 'latitude'));
-        const longitudes = _providers.map(p => get(p, 'longitude'));
-        const minLat = Math.min(...latitudes);
-        const maxLat = Math.max(...latitudes);
-        const minLng = Math.min(...longitudes);
-        const maxLng = Math.max(...longitudes);
-        const areaWidth = (maxLng - minLng) * _mapCalculatedAreaPadding;
-        const areaHeight = (maxLat - minLat) * _mapCalculatedAreaPadding;
-        const xScale = 360 / areaWidth;
-        const yScale = 180 / areaHeight;
-        const scale = Math.max(1, Math.min(xScale, yScale));
-        return {
-          lat: (minLat + maxLat) / 2,
-          lng: (minLng + maxLng) / 2,
-          scale,
-        };
-      }
-    }
-  ),
+  defaultMapStateGenerated: false,
+
+  /**
+   * @type {boolean}
+   */
+  _mapDefaultState: Object.freeze({
+    lat: 0,
+    lng: 0,
+    scale: 1,
+  }),
+
+  /**
+   * If true, page component has the mobile layout
+   * @type {boolean}
+   */
+  _mobileMode: false,
+
+  /**
+   * Window object (for testing purposes only)
+   * @type {Window}
+   */
+  _window: window,
 
   /**
    * Map state passed via query params
@@ -133,11 +121,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<PromiseObject<DS.RecordArray<Provider>>>>}
    */
-  _providersProxy: computed('providerList.list', function () {
-    return PromiseObject.create({
-      promise: this.get('providerList.list'),
-    });
-  }),
+  _providersProxy: reads('providerList.list'),
 
   /**
    * Array of all prviders
@@ -150,7 +134,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
   _clusteredProviders: computed(
-    '_providers',
+    '_providers.@each.{latitude,longitude}',
     '_mapState',
     function _getClusteredProviders() {
       const {
@@ -158,15 +142,12 @@ export default Component.extend({
         _mapState,
       } = this.getProperties('_providers', '_mapState');
       const squareSideLength = 15 / (_mapState.scale || 1);
+      scheduleOnce('afterRender', this, () =>
+        this.get('_window').dispatchEvent(new Event('providerPlaceRefresh'))
+      );
       return clusterizeProviders(_providers || [], squareSideLength, squareSideLength);
     }
   ),
-
-  /**
-   * If true, page component has the mobile layout
-   * @type {boolean}
-   */
-  _mobileMode: false,
 
   /**
    * Window resize event handler
@@ -176,11 +157,43 @@ export default Component.extend({
     return () => this._windowResized();
   }),
 
-  /**
-   * Window object (for testing purposes only)
-   * @type {Window}
-   */
-  _window: window,
+  mapDefaultStateObserver: observer(
+    '_mapCalculatedAreaPadding',
+    '_providersProxy.{isFulfilled,content.@each.latitude,content.@each.longitude}',
+    function mapDefaultStateObserver() {
+      const {
+        _mapCalculatedAreaPadding,
+        _providersProxy,
+        defaultMapStateGenerated,
+      } = this.getProperties(
+        '_mapCalculatedAreaPadding',
+        '_providersProxy',
+        'defaultMapStateGenerated',
+      );
+      if (!defaultMapStateGenerated && get(_providersProxy, 'isFulfilled')) {
+        const providers = get(_providersProxy, 'content');
+        if (get(providers, 'length') > 0) {
+          const latitudes = providers.map(p => get(p, 'latitude'));
+          const longitudes = providers.map(p => get(p, 'longitude'));
+          const minLat = Math.min(...latitudes);
+          const maxLat = Math.max(...latitudes);
+          const minLng = Math.min(...longitudes);
+          const maxLng = Math.max(...longitudes);
+          const areaWidth = (maxLng - minLng) * _mapCalculatedAreaPadding;
+          const areaHeight = (maxLat - minLat) * _mapCalculatedAreaPadding;
+          const xScale = 360 / areaWidth;
+          const yScale = 180 / areaHeight;
+          const scale = Math.max(1, Math.min(xScale, yScale));
+          this.set('_mapDefaultState', {
+            lat: (minLat + maxLat) / 2,
+            lng: (minLng + maxLng) / 2,
+            scale,
+          });
+        }
+        this.set('defaultMapStateGenerated', true);
+      }
+    }
+  ),
 
   init() {
     this._super(...arguments);
@@ -189,6 +202,7 @@ export default Component.extend({
       lng: 0,
       scale: 1,
     });
+    this.mapDefaultStateObserver();
   },
 
   didInsertElement() {

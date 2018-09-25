@@ -1,5 +1,5 @@
 /**
- * Permissions presenter and editor for a collection of models. Yields list
+ * Permissions presenter and editor for a collection of records. Yields list
  * when there are no items to present.
  *
  * @module components/collection-permissions
@@ -12,7 +12,6 @@ import Component from '@ember/component';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -23,7 +22,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.collectionPermissions',
 
   /**
-   * @type {Ember.A<PrivilegesModelProxy>}
+   * @type {Ember.A<PrivilegeRecordProxy>}
    * @virtual
    */
   proxyList: undefined,
@@ -39,13 +38,13 @@ export default Component.extend(I18n, {
    * Called after list item selection.
    * @virtual
    * @type {function}
-   * @param {Array<PrivilegesModelProxy>} modelsProxies array of selected models
+   * @param {Array<PrivilegeRecordProxy>} recordsProxies array of selected records
    * @returns {any}
    */
-  modelsSelected: notImplementedWarn,
+  recordsSelected: notImplementedWarn,
 
   /**
-   * Header of the models list.
+   * Header of the records list.
    * @virtual
    * @type {string}
    */
@@ -81,8 +80,8 @@ export default Component.extend(I18n, {
   /**
    * Callback responsible for privileges persistence.
    * @type {function}
-   * @param {PrivilegesModelProxy} modelProxy
-   * @returns {Promise<PrivilegesModelProxy>}
+   * @param {PrivilegeRecordProxy} recordProxy
+   * @returns {Promise<PrivilegeRecordProxy>}
    */
   save: notImplementedThrow,
 
@@ -92,15 +91,8 @@ export default Component.extend(I18n, {
   itemActions: undefined,
 
   actions: {
-    reset(modelProxy) {
-      if (modelProxy.get('modified')) {
-        const persistedPrivileges = modelProxy.get('persistedPrivileges');
-        modelProxy.setProperties({
-          modifiedPrivileges: persistedPrivileges,
-          overridePrivileges: _.assign({}, persistedPrivileges),
-          modified: false,
-        });
-      }
+    reset(recordProxy) {
+      recordProxy.resetModifications();
     },
   },
 });

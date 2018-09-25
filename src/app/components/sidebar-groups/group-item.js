@@ -158,8 +158,9 @@ export default Component.extend(I18n, {
       navigationState,
       router,
     } = this.getProperties('navigationState', 'router');
-    const groupEntityId = get(navigationState, 'activeResource.entityId');
-    return navigationState.resourceCollectionContainsEntityId(groupEntityId)
+    const groupId = get(navigationState, 'activeResource.id');
+    return navigationState
+      .resourceCollectionContainsId(groupId)
       .then(contains => {
         if (!contains) {
           next(() => router.transitionTo('onedata.sidebar', 'groups'));

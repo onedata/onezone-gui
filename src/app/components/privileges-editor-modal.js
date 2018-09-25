@@ -46,10 +46,10 @@ export default Component.extend(I18n, {
   privilegesTranslationsPath: undefined,
 
   /**
-   * Model with privileges.
-   * @type {PrivilegesModelProxy}
+   * Record proxy with privileges.
+   * @type {PrivilegeRecordProxy}
    */
-  modelProxy: Object.freeze({}),
+  recordProxy: Object.freeze({}),
 
   /**
    * @type {function}

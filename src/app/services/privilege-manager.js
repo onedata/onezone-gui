@@ -13,24 +13,24 @@ import _ from 'lodash';
 
 export default Service.extend({
   /**
-   * Generates privilege model GRI
+   * Generates privilege record GRI
    * @param {string} parentType `group` or `space`
-   * @param {string} parentModelEntityId
+   * @param {string} parentRecordEntityId
    * @param {string} memberType `group`, `child` or `user`
-   * @param {string} memberModelEntityId
+   * @param {string} memberRecordEntityId
    * @returns {string}
    */
   generateGri(
     parentType,
-    parentModelEntityId,
+    parentRecordEntityId,
     memberType,
-    memberModelEntityId
+    memberRecordEntityId
   ) {
     return gri({
       entityType: parentType,
-      entityId: parentModelEntityId,
+      entityId: parentRecordEntityId,
       aspect: memberType + '_privileges',
-      aspectId: memberModelEntityId,
+      aspectId: memberRecordEntityId,
     });
   },
 

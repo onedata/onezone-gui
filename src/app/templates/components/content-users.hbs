@@ -11,17 +11,16 @@
   </div>
 </div>
 <div class="content-row">
-  <h1>{{tt this "login"}}</h1>
+  <h1>{{tt this "alias"}}</h1>
   <div class="indented-row">
-    {{one-inline-editor value=user.login onSave=(action "saveLogin") class="login-editor"}}</div>
+    {{one-inline-editor value=user.alias onSave=(action "saveAlias") class="alias-editor"}}
   </div>
+</div>
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
   <ul class="indented-row linked-accounts-list">
-    {{#loading-container
-      isLoading=_loadingLinkedAccounts
-      errorReason=_loadingLinkedAccountsError}}
-      {{#each _linkedAccounts as |account|}}
+    {{#promise-proxy-container proxy=linkedAccountsProxy}}
+      {{#each linkedAccountsProxy.list as |account|}}
         <li class="linked-account full-social-icon content-row {{account.idp}}-account">
           {{login-box/social-box-list/social-box
             type=account.idp
@@ -61,6 +60,6 @@
             class="animated fast hide"}}
         </div>
       </li>
-    {{/loading-container}}
+    {{/promise-proxy-container}}
   </ul>
 </div>

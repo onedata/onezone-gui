@@ -84,7 +84,7 @@ export default Component.extend({
     } = this.getProperties('iconName', 'iconType');
     if (iconType === 'oneicon') {
       return iconName;
-    } else {
+    } else if (iconName && iconType) {
       return `/assets/images/auth-providers/${iconName}.${iconType}`;
     }
   }),
@@ -99,7 +99,7 @@ export default Component.extend({
       iconType,
     } = this.getProperties('_iconName', 'iconType');
     let style = '';
-    if (iconType !== 'oneicon') {
+    if (iconType !== 'oneicon' && _iconName) {
       style = `background-image: url(${_iconName});`;
     } else {
       style = '';

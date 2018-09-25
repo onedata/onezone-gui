@@ -19,12 +19,16 @@ export default ProceedProcessModal.extend({
   /**
    * @override
    */
-  messageText: computed(function messageText() {
-    return this.t('messageText', {
-      parentGroupName: this.get('parentGroup.name'),
-      childGroupName: this.get('childGroup.name'),
-    });
-  }),
+  messageText: computed(
+    'parentGroup.name',
+    'childGroup.name',
+    function messageText() {
+      return this.t('messageText', {
+        parentGroupName: this.get('parentGroup.name'),
+        childGroupName: this.get('childGroup.name'),
+      });
+    }
+  ),
 
   /**
    * @override
