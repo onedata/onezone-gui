@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed, get, getProperties } from '@ember/object';
+import { computed, observer, get, getProperties } from '@ember/object';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -12,6 +12,7 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 /**
  * @typedef {Object} MembershipPath
@@ -21,10 +22,13 @@ import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/s
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
+  classNameBindings: ['pathsLoadingProxy.isPending:loading'],
 
   store: service(),
   privilegeManager: service(),
   privilegeActions: service(),
+  spaceActions: service(),
+  groupActions: service(),
 
   /**
    * @override
@@ -65,6 +69,26 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isRemovingRelation: false,
+
+  /**
+   * @type {PromiseObject}
+   */
+  pathsLoadingProxy: null,
+
+  /**
+   * @type {*}
+   */
+  silentReloadError: null,
+
+  /**
+   * @type {Array<Membership>}
+   */
+  allNodes: null,
+
+  /**
+   * @type {boolean}
+   */
+  suppressNodesObserver: true,
 
   /**
    * @type {Ember.ComputedProperty<Ember.A>}
@@ -170,14 +194,93 @@ export default Component.extend(I18n, {
     }
   ),
 
+  allNodesObserver: observer(
+    'allNodes.@each.{intermediaries,directMembership,isForbidden,isDeleted}',
+    function allNodesObserver() {
+      if (!this.get('suppressNodesObserver')) {
+        this.loadPaths(true);
+      }
+    }
+  ),
+
+  relationToRemoveObserver: observer(
+    'relationToRemove.exists',
+    function relationToRemoveObserver() {
+      const {
+        relationToRemove,
+        isRemovingRelation,
+      } = this.getProperties('relationToRemove', 'isRemovingRelation');
+      // if relation disappeard without our action, close remove-relation modal
+      if (
+        relationToRemove &&
+        !isRemovingRelation &&
+        !get(relationToRemove, 'exists')
+      ) {
+        this.set('relationToRemove', null);
+      }
+    }
+  ),
+
+  relationPrivilegesToChangeObserver: observer(
+    'relationPrivilegesToChange.canViewPrivileges',
+    function relationPrivilegesToChangeObserver() {
+      const {
+        relationPrivilegesToChange,
+        isSavingRelationPrivileges,
+      } = this.getProperties(
+        'relationPrivilegesToChange',
+        'isSavingRelationPrivileges'
+      );
+      // if relation disappeard without action or user lost access to privileges
+      // information, close privileges-editor modal
+      if (
+        relationPrivilegesToChange &&
+        !isSavingRelationPrivileges &&
+        !get(relationPrivilegesToChange, 'canViewPrivileges')
+      ) {
+        this.set('relationPrivilegesToChange', null);
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
-    this.fetchMembership(this.getMembershipGri(this.get('targetRecord.gri')), true)
+    this.loadPaths();
+  },
+
+  fetchRootMembership() {
+    return this.fetchMembership(this.getMembershipGri(this.get('targetRecord.gri')), true)
       .then(rootMembership => safeExec(this, () => {
         this.set('rootMembership', rootMembership);
-        return this.findPaths();
+      }));
+  },
+
+  loadPaths(silent = false) {
+    this.set('suppressNodesObserver', true);
+    const promise = this.fetchRootMembership()
+      .then(() => this.findPaths(silent))
+      .then(({ allNodes, paths }) => safeExec(this, 'setProperties', {
+        paths,
+        allNodes,
+        silentReloadError: null,
       }))
-      .then((p) => this.set('paths', p));
+      .catch(error => {
+        safeExec(this, 'setProperties', {
+          paths: [],
+          allNodes: [],
+        });
+        if (silent) {
+          safeExec(this, 'set', 'silentReloadError', error);
+        }
+        throw error;
+      })
+      .finally(() => safeExec(this, 'set', 'suppressNodesObserver', false));
+    if (!silent) {
+      this.set('pathsLoadingProxy', PromiseObject.create({
+        promise,
+      }));
+    }
+    return promise;
   },
 
   getMembershipGri(recordGri) {
@@ -202,44 +305,58 @@ export default Component.extend(I18n, {
     }
   },
 
-  fetchGraphLevel(parentLevel, nodeParents, allNodes) {
+  fetchGraphLevel(parentLevel, nodeParents, allNodes, silent) {
     const newLevel = [];
     parentLevel.forEach(parentMembership => {
-      get(parentMembership, 'intermediaries').forEach(itermediaryGri => {
-        const intermediaryParents = nodeParents.get(itermediaryGri) || [];
-        if (!intermediaryParents.includes(parentMembership)) {
-          intermediaryParents.push(parentMembership);
-          nodeParents.set(itermediaryGri, intermediaryParents);
-          const membershipGri = this.getMembershipGri(itermediaryGri);
-          const promise = this.fetchMembership(membershipGri, !allNodes.has(itermediaryGri))
-            .then(membership => {
-              allNodes.set(itermediaryGri, membership);
-              return membership;
-            });
-          newLevel.push(promise);
-        }
-      });
+      if (
+        !get(parentMembership, 'isForbidden') &&
+        !get(parentMembership, 'isDeleted')
+      ) {
+        get(parentMembership, 'intermediaries').forEach(itermediaryGri => {
+          const intermediaryParents = nodeParents.get(itermediaryGri) || [];
+          if (!intermediaryParents.includes(parentMembership)) {
+            intermediaryParents.push(parentMembership);
+            nodeParents.set(itermediaryGri, intermediaryParents);
+            const membershipGri = this.getMembershipGri(itermediaryGri);
+            const promise = this.fetchMembership(membershipGri, !allNodes.has(itermediaryGri) || !silent)
+              .then(membership => {
+                allNodes.set(itermediaryGri, membership);
+                return membership;
+              });
+            newLevel.push(promise);
+          }
+        });
+      }
     });
     return Promise.all(newLevel);
   },
 
-  findPaths() {
+  findPaths(silent = false) {
     const allNodes = new Map();
     const rootNode = this.get('rootMembership');
     allNodes.set(this.get('targetRecord.gri'), rootNode);
     return this.findPathsForDeeperLevel(
       [rootNode],
       allNodes,
-      new Map()
-    ).then(paths => paths.map(path => ({
-      id: path.join('|'),
-      griPath: path,
-    })));
+      new Map(),
+      silent
+    ).then(paths => {
+      const allNodesArray = A();
+      allNodes.forEach(value => allNodesArray.pushObject(value));
+      allNodesArray.pushObject(rootNode);
+      return {
+        allNodes: allNodesArray,
+        paths: paths.map(path => ({
+          id: path.join('|'),
+          griPath: path,
+        })),
+      };
+    });
   },
 
-  findPathsForDeeperLevel(parentLevel, allNodes, nodeParents) {
+  findPathsForDeeperLevel(parentLevel, allNodes, nodeParents, silent) {
     const maxPathsNumber = this.get('maxPathsNumber');
-    return this.fetchGraphLevel(parentLevel, nodeParents, allNodes)
+    return this.fetchGraphLevel(parentLevel, nodeParents, allNodes, silent)
       .then(childLevel => {
         const paths = this.calculatePaths(allNodes, maxPathsNumber);
         if (paths.length >= maxPathsNumber || childLevel.length === 0) {
@@ -249,7 +366,8 @@ export default Component.extend(I18n, {
           return this.findPathsForDeeperLevel(
             childLevel,
             allNodes,
-            nodeParents
+            nodeParents,
+            silent
           );
         }
       });
@@ -264,8 +382,10 @@ export default Component.extend(I18n, {
       workingPaths = _.flatten(workingPaths.map(workingPath => {
         const lastNodeGri = workingPath[workingPath.length - 1];
         const lastNode = allNodes.get(lastNodeGri);
-        if (!lastNode) {
-          // node has not been fetched yet
+        if (
+          !lastNode || get(lastNode, 'isForbidden') || get(lastNode, 'isDeleted')
+        ) {
+          // node has not been fetched yet or is not available
           return [];
         }
         if (get(lastNode, 'directMembership')) {
@@ -298,25 +418,45 @@ export default Component.extend(I18n, {
     removeRelation() {
       const {
         relationToRemove,
-      } = this.getProperties('relationToRemove');
+        spaceActions,
+        groupActions,
+      } = this.getProperties(
+        'relationToRemove',
+        'spaceActions',
+        'groupActions'
+      );
+      const {
+        parentType,
+        childType,
+        parent,
+        child,
+      } = getProperties(
+        relationToRemove,
+        'parentType',
+        'childType',
+        'parent',
+        'child'
+      );
+      let promise;
+      if (parentType === 'space') {
+        promise = childType === 'group' ?
+          spaceActions.removeGroup(parent, child) :
+          spaceActions.removeUser(parent, child);
+      } else {
+        promise = childType === 'group' ?
+          groupActions.removeRelation(parent, child) :
+          groupActions.removeUser(parent, child);
+      }
       this.set('isRemovingRelation', true);
-      return Promise.resolve().then(() => 
-        safeExec(this, 'setProperties', {
-          isRemovingRelation: false,
-          relationToRemove: null,
+      return promise.then(() => 
+        safeExec(this, () => {
+          this.setProperties({
+            isRemovingRelation: false,
+            relationToRemove: null,
+          });
+          this.loadPaths();
         })
       );
-      // return groupActions.removeRelation(
-      //     get(relationToRemove, 'parent'),
-      //     get(relationToRemove, 'child')
-      //   )
-      //   .then(() => safeExec(this, 'reloadModel'))
-      //   .finally(() =>
-      //     safeExec(this, 'setProperties', {
-      //       isRemovingRelation: false,
-      //       relationToRemove: null,
-      //     })
-      //   );
     },
   },
 });

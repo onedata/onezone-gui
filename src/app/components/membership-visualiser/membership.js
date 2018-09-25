@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed, observer, get } from '@ember/object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -51,14 +51,27 @@ export default Component.extend(RecognizerMixin, {
   panStartScrollX: 0,
 
   /**
+   * @type {string}
+   */
+  lastFetchedPathId: null,
+
+  /**
    * @type {Ember.ComputedProperty<PromiseArray<Array<GraphSingleModel>>>}
    */
-  recordsProxy: computed('path.griPath', function recordsProxy() {
-    return PromiseArray.create({
-      promise: Promise.all(
-        this.get('path.griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
-      ),
-    });
+  recordsProxy: null,
+
+  pathIdObserver: observer('path.id', function pathIdObserver() {
+    const pathId = this.get('path.id');
+    if (this.get('lastFetchedPathId') !== pathId) {
+      this.setProperties({
+        lastFetchedPathId: pathId,
+        recordsProxy: PromiseArray.create({
+          promise: Promise.all(
+            this.get('path.griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
+          ),
+        }),
+      });
+    }
   }),
 
   /**
@@ -111,6 +124,11 @@ export default Component.extend(RecognizerMixin, {
     if (scrollContainer) {
       scrollContainer.scrollLeft(panStartScrollX - event.originalEvent.gesture.deltaX);
     }
+  },
+
+  init() {
+    this._super(...arguments);
+    this.pathIdObserver();
   },
   
   /**

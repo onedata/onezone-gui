@@ -1,4 +1,4 @@
-{{#promise-proxy-container proxy=recordsProxy}}
+{{#promise-proxy-container proxy=recordsProxy sizeClass="xs"}}
   {{#perfect-scrollbar-element suppressScrollY=true}}
     {{#each pathElements key="id" as |pathElement|}}
       {{#if (eq pathElement.type "block")}}

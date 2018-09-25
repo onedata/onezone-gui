@@ -1,9 +1,21 @@
 .membership-visualiser {
   $line-dot-size: 6px;
+  $row-height: $line-height-computed + 2 * $padding-large-vertical;
+
+  position: relative;
+  min-height: 100px;
+
+  &.loading {
+    pointer-events: none;
+    .membership {
+      opacity: 0.3
+    }
+  }
 
   .membership-element {
     display: inline-block;
     vertical-align: middle;
+    line-height: $row-height;
   }
   .membership-block {
     position: relative;
@@ -97,8 +109,8 @@
   }
   .membership {
     position: relative;
+    min-height: $row-height;
     border-bottom: 1px solid $main-border-color;
-    line-height: $line-height-computed + 2 * $padding-large-vertical;
     white-space: nowrap;
     &:last-child {
       border-bottom: 0;

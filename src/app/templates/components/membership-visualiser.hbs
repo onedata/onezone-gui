@@ -1,10 +1,18 @@
-{{#each paths key="id" as |path|}}
-  {{membership-visualiser/membership
-    pathStart=contextRecord
-    path=path
-    removeRelation=(action (mut relationToRemove))
-    modifyPrivileges=(action (mut relationPrivilegesToChange))}}
-{{/each}}
+
+{{#unless (or silentReloadError pathsLoadingProxy.isRejected)}}
+  {{#each paths key="id" as |path|}}
+    {{membership-visualiser/membership
+      pathStart=contextRecord
+      path=path
+      removeRelation=(action (mut relationToRemove))
+      modifyPrivileges=(action (mut relationPrivilegesToChange))}}
+  {{/each}}
+{{/unless}}
+{{#if silentReloadError}}
+  {{resource-load-error errorReason=silentReloadError}}
+{{else}}
+  {{promise-proxy-container proxy=pathsLoadingProxy}}
+{{/if}}
 {{remove-relation-modal
   opened=relationToRemove
   close=(action (mut relationToRemove) null)
