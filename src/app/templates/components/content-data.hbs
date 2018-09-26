@@ -11,7 +11,7 @@
         {{#map.position latitude=square.latitude longitude=square.longitude as |x y|}}
           {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
             {{#link-to "onedata.sidebar.content.aspect"
-              "providers"
+              "data"
               (model-routable-id square.providers.[0])
               "index"
               (query-params map_lat=_mapState.lat map_lng=_mapState.lng map_scale=_mapState.scale)}}
