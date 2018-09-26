@@ -3,11 +3,13 @@
     <span class="one-label">
       {{tt this "membership"}}
     </span>
-    {{!-- {{actions-toolbar isMinimized=true actionsArray=globalActions}} --}}
   </h1>
   <div class="form-group form-group-sm form-group-light search-group content-search">
     <div class="input-group with-icon-addon">
-      {{search-bar search=(action (mut searchString)) class="form-control"}}
+      {{search-bar
+        search=(action (mut searchString))
+        placeholder=(tt this "filter")
+        class="form-control"}}
       <div class="input-group-addon">
         {{one-icon icon="search"}}
       </div>
@@ -15,5 +17,8 @@
   </div>
 </div>
 {{#promise-proxy-container proxy=user}}
-  {{membership-visualiser contextRecord=user.content targetRecord=group}}
+  {{membership-visualiser
+    contextRecord=user.content
+    targetRecord=group
+    searchString=searchString}}
 {{/promise-proxy-container}}

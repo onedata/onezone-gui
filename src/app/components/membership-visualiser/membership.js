@@ -9,7 +9,8 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 
 export default Component.extend(RecognizerMixin, {
-  classNames: ['membership'],
+  classNames: ['membership', 'collapse-animation', 'collapse-medium'],
+  classNameBindings: ['isFilteredOut:collapse-hidden'],
   recognizers: 'pan',
 
   store: service(),
@@ -25,6 +26,21 @@ export default Component.extend(RecognizerMixin, {
    * @virtual
    */
   path: null,
+
+  /**
+   * @type {string}
+   * @virtual
+   */
+  searchString: '',
+
+  /**
+   * Redirects to record dedicated page
+   * @type {Function}
+   * @virtual
+   * @param {GraphSingleModel} record
+   * @returns {undefined}
+   */
+  view: notImplementedThrow,
 
   /**
    * Shows privileges editor
@@ -60,20 +76,6 @@ export default Component.extend(RecognizerMixin, {
    */
   recordsProxy: null,
 
-  pathIdObserver: observer('path.id', function pathIdObserver() {
-    const pathId = this.get('path.id');
-    if (this.get('lastFetchedPathId') !== pathId) {
-      this.setProperties({
-        lastFetchedPathId: pathId,
-        recordsProxy: PromiseArray.create({
-          promise: Promise.all(
-            this.get('path.griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
-          ),
-        }),
-      });
-    }
-  }),
-
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
@@ -108,6 +110,41 @@ export default Component.extend(RecognizerMixin, {
       return elements;
     } else {
       return [];
+    }
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isFilteredOut: computed(
+    'searchString',
+    'recordsProxy.@each.name',
+    function isFilteredOut() {
+      const {
+        searchString,
+        recordsProxy,
+      } = this.getProperties('searchString', 'recordsProxy');
+      if (!get(recordsProxy, 'isFulfilled')) {
+        return false;
+      } else {
+        const names = recordsProxy.mapBy('name');
+        const query = (searchString || '').toLowerCase();
+        return names.every(name => !name.toLowerCase().includes(query));
+      }
+    }
+  ),
+
+  pathIdObserver: observer('path.id', function pathIdObserver() {
+    const pathId = this.get('path.id');
+    if (this.get('lastFetchedPathId') !== pathId) {
+      this.setProperties({
+        lastFetchedPathId: pathId,
+        recordsProxy: PromiseArray.create({
+          promise: Promise.all(
+            this.get('path.griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
+          ),
+        }),
+      });
     }
   }),
 

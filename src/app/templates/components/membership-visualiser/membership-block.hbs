@@ -1,9 +1,27 @@
-{{#one-icon class="type-icon" icon=iconName}}
-  {{one-tooltip title=record.name}}
-{{/one-icon}}
+{{one-icon
+  class=(concat "type-icon actions-block-" elementId)
+  icon=iconName
+  mouseEnter=(action "changeIconHover" true)
+  mouseLeave=(action "changeIconHover" false)
+  click=(action "toggleActions" (not actionsOpened))}}
 {{#if showName}}
   {{#truncated-string class="record-name"}}{{record.name}}{{/truncated-string}}
-  {{#link-to "onedata.sidebar.content.aspect" (concat recordType "s") (model-routable-id record.id) "index"}}
-    {{one-icon class="link-icon" icon="link-external"}}
-  {{/link-to}}
 {{/if}}
+
+{{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
+{{#render-later triggerRender=actionsOpened}}
+  {{#one-webui-popover
+    class="block-actions"
+    popoverStyle="with-dropdown"
+    padding=false
+    triggerSelector=(concat ".actions-block-" elementId)
+    open=actionsOpened
+    onToggle=(action "toggleActions")}}
+    {{#click-outside action=(action "toggleActions" false) except-selector=(concat ".actions-block-" elementId)}}
+      {{actions-popover-content
+        actionsArray=blockActions
+        actionClicked=(action "toggleActions" false)
+        class="membership-visualiser-actions"}}
+    {{/click-outside}}
+  {{/one-webui-popover}}
+{{/render-later}}

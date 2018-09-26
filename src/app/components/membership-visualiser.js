@@ -25,6 +25,8 @@ export default Component.extend(I18n, {
   classNameBindings: ['pathsLoadingProxy.isPending:loading'],
 
   store: service(),
+  router: service(),
+  guiUtils: service(),
   privilegeManager: service(),
   privilegeActions: service(),
   spaceActions: service(),
@@ -50,9 +52,15 @@ export default Component.extend(I18n, {
   targetRecord: null,
 
   /**
+   * @type {string}
+   * @virtual
+   */
+  searchString: '',
+
+  /**
    * @type {number}
    */
-  maxPathsNumber: 5,
+  maxPathsNumber: 20,
 
   /**
    * Relation for privileges-editor-modal
@@ -400,6 +408,20 @@ export default Component.extend(I18n, {
   },
 
   actions: {
+    view(record) {
+      const {
+        router,
+        guiUtils,
+      } = this.getProperties('router', 'guiUtils');
+      const recordType = get(record, 'entityType');
+      const sidebarType = recordType + 's';
+      router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        sidebarType,
+        guiUtils.getRoutableIdFor(record),
+        'index',
+      );
+    },
     savePrivileges() {
       const {
         privilegesEditorModel,

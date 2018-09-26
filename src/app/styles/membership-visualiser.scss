@@ -1,6 +1,7 @@
 .membership-visualiser {
   $line-dot-size: 6px;
   $row-height: $line-height-computed + 2 * $padding-large-vertical;
+  $animation-time: 0.1s;
 
   position: relative;
   min-height: 100px;
@@ -28,7 +29,20 @@
       font-size: 1.7em;
     }
     .record-name {
-      margin-right: 2em;
+      margin-right: 0.8em;
+    }
+    .type-icon {
+      &::before {
+        transition: opacity $animation-time linear;
+        opacity: 1;
+      }
+      &::after {
+        content: $oneicon-settings;
+        position: absolute;
+        left: 0;
+        transition: opacity $animation-time linear;
+        opacity: 0;
+      }
     }
     &.group .type-icon {
       color: $color-one-yellow;
@@ -38,6 +52,15 @@
     }
     &.provider .type-icon {
       color: $color-one-mint;
+    }
+    .type-icon:hover, &.actions-opened .type-icon {
+      cursor: pointer;
+      &::after {
+        opacity: 1;
+      }
+      &::before {
+        opacity: 0;
+      }
     }
     .link-icon {
       @include vertical-align-middle();
@@ -51,23 +74,23 @@
     position: relative;
     width: 100px;
     height: 2 * $line-dot-size;
-    .line {
-      @include vertical-align-middle();
+    .line, .dot {
       position: absolute;
       left: 0;
-      height: 2px;
-      width: 100%;
+      transition: background-color $animation-time linear;
       background-color: $color-one-azure;
     }
+    .line {
+      @include vertical-align-middle();
+      height: 2px;
+      width: 100%;
+    }
     .dot {
-      position: absolute;
-      left: 0;
       top: 50%;
       transform: translateX(-50%) translateY(-50%);
       width: $line-dot-size;
       height: $line-dot-size;
       border-radius: 100%;
-      background-color: $color-one-azure;
     }
     .dot-right {
       left: initial;
@@ -79,7 +102,7 @@
         background-color: $color-one-blue-gray;
       }
       .actions-trigger {
-        display: block;
+        opacity: 1;
       }
     }
 
@@ -88,9 +111,10 @@
       @include absolute-align-middle-center();
       position: absolute;
       left: 50%;
-      display: none;
       color: $color-one-blue-gray;
       font-size: $trigger-size;
+      opacity: 0;
+      transition: opacity $animation-time linear;
       cursor: pointer;
       &:hover {
         color: $color-one-azure;
@@ -109,11 +133,18 @@
   }
   .membership {
     position: relative;
-    min-height: $row-height;
+    height: $row-height;
     border-bottom: 1px solid $main-border-color;
     white-space: nowrap;
     &:last-child {
       border-bottom: 0;
+    }
+    &.filtered-out {
+      display: none;
+    }
+    &.limit-info {
+      padding-left: 1em;
+      font-style: italic;
     }
     .ps-container {
       &.ps-active-x {

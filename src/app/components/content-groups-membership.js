@@ -15,6 +15,17 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentGroupsMembership',
 
   /**
+   * @type {Group}
+   * @virtual
+   */
+  group: null,
+
+  /**
+   * @type {string}
+   */
+  searchString: '',
+
+  /**
    * @type {PromiseObject<User>}
    */
   user: computed(function user() {
@@ -22,10 +33,4 @@ export default Component.extend(I18n, {
       promise: this.get('currentUser').getCurrentUserRecord(),
     });
   }),
-
-  /**
-   * @type {Group}
-   * @virtual
-   */
-  group: null,
 });

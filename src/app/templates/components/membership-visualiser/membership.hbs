@@ -4,7 +4,8 @@
       {{#if (eq pathElement.type "block")}}
         {{membership-visualiser/membership-block
           record=pathElement.record
-          showName=(not pathElement.startBlock)}}
+          showName=(not pathElement.startBlock)
+          view=(action view pathElement.record)}}
       {{else}}
         {{membership-visualiser/membership-relation
           relation=pathElement.relation

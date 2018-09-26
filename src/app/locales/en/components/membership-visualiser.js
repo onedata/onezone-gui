@@ -3,6 +3,13 @@ export default {
   user: 'user',
   group: 'group',
   space: 'space',
+  showingFirstNPaths: 'Showing first {{limit}} membership paths',
+  membershipBlock: {
+    viewUser: 'View user',
+    viewGroup: 'View group',
+    viewSpace: 'View space',
+    viewProvider: 'View provider',
+  },
   membershipRelation: {
     modifyPrivileges: 'Modify privileges',
     removeRelation: 'Remove relation',

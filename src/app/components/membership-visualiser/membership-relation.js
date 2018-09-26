@@ -49,6 +49,11 @@ export default Component.extend(I18n, {
   isHovered: false,
 
   /**
+   * @type {boolean}
+   */
+  actionsOpened: false,
+
+  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   actionsEnabled: computed('relation.childType', function actionsEnabled() {
