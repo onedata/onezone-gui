@@ -23,10 +23,6 @@ export default Route.extend(AuthenticatedRouteMixin, RedirectRoute, {
     return !/\/provider-redirect/.test(currentHash);
   },
 
-  beforeModel() {
-    return this._super(...arguments);
-  },
-
   model({ provider_id: providerId }) {
     return this.get('providerManager').getRecord(
       gri({
