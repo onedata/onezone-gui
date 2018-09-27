@@ -1,7 +1,7 @@
 /**
  * A content page for single selected provider
  *
- * @module components/content-provider
+ * @module components/content-data
  * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -18,7 +18,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 
 export default Component.extend({
-  classNames: ['content-providers'],
+  classNames: ['content-data'],
 
   providerManager: inject(),
   router: inject(),
@@ -233,7 +233,7 @@ export default Component.extend({
               const queryMapState = this._getQueryMapState();
               this.get('router').transitionTo(
                 'onedata.sidebar.content',
-                'providers',
+                'data',
                 'not-selected', { queryParams: queryMapState }
               );
             }
@@ -284,7 +284,7 @@ export default Component.extend({
       const queryParams = this._getQueryMapState();
       this.get('router').transitionTo(
         'onedata.sidebar.content',
-        'providers',
+        'data',
         this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
       );
     },
