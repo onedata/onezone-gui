@@ -57,7 +57,7 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   actionsEnabled: computed('relation.childType', function actionsEnabled() {
-    return this.get('relation.childType') !== 'space';
+    return this.get('relation') && this.get('relation.childType') !== 'space';
   }),
 
     /**

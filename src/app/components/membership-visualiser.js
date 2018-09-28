@@ -22,7 +22,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
-  classNameBindings: ['pathsLoadingProxy.isPending:loading'],
+  classNameBindings: ['pathsLoadingProxy.isPending:loading', 'isCondensed:condensed'],
 
   store: service(),
   router: service(),
@@ -56,6 +56,20 @@ export default Component.extend(I18n, {
    * @virtual
    */
   searchString: '',
+
+  /**
+   * Max number of blocks, that will be rendered in membership path.
+   * 0 means no limit.
+   * @type {number}
+   */
+  visibleBlocks: 0,
+
+  /**
+   * If true, paths will be rendered in more condensed and static way
+   * (without actions).
+   * @type {boolean}
+   */
+  isCondensed: false,
 
   /**
    * @type {number}
@@ -251,9 +265,18 @@ export default Component.extend(I18n, {
     }
   ),
 
+  recordObserver: observer(
+    'targetRecord',
+    'contextRecord',
+    function recordObserver() {
+      this.set('paths', []);
+      this.loadPaths();
+    }
+  ),
+
   init() {
     this._super(...arguments);
-    this.loadPaths();
+    this.recordObserver();
   },
 
   fetchRootMembership() {

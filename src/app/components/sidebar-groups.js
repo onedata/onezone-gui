@@ -51,6 +51,10 @@ export default TwoLevelSidebar.extend(I18n, {
    */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
+      id: 'index',
+      label: this.t('aspects.index'),
+      icon: 'overview',
+    }, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',

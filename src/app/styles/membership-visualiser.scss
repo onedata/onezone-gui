@@ -13,6 +13,21 @@
     }
   }
 
+  &.condensed {
+    .membership-relation {
+      width: 30px;
+    }
+    .membership-block {
+      max-width: 120px;
+      .type-icon {
+        pointer-events: none;
+      }
+    }
+    .membership-element {
+      pointer-events: none;
+    }
+  }
+
   .membership-element {
     display: inline-block;
     vertical-align: middle;
@@ -130,6 +145,10 @@
         z-index: -1;
       }
     }
+  }
+  .membership-more {
+    font-style: italic;
+    margin: 0 0.8em;
   }
   .membership {
     position: relative;

@@ -6,11 +6,14 @@
           record=pathElement.record
           showName=(not pathElement.startBlock)
           view=(action view pathElement.record)}}
-      {{else}}
+      {{else if (eq pathElement.type "relation")}}
         {{membership-visualiser/membership-relation
           relation=pathElement.relation
           modifyPrivileges=(action modifyPrivileges pathElement.relation)
           removeRelation=(action removeRelation pathElement.relation)}}
+      {{else if (eq pathElement.type "more")}}
+        {{membership-visualiser/membership-more
+          number=pathElement.number}}
       {{/if}}
     {{/each}}
   {{/perfect-scrollbar-element}}

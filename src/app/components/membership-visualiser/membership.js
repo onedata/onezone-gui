@@ -34,6 +34,13 @@ export default Component.extend(RecognizerMixin, {
   searchString: '',
 
   /**
+   * Max number of blocks, that will be rendered in membership path.
+   * 0 means no limit.
+   * @type {number}
+   */
+  visibleBlocks: 0,
+
+  /**
    * Redirects to record dedicated page
    * @type {Function}
    * @virtual
@@ -79,39 +86,61 @@ export default Component.extend(RecognizerMixin, {
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  pathElements: computed('recordsProxy.isFulfilled', function pathElements() {
-    const {
-      recordsProxy,
-      pathStart,
-    } = this.getProperties('recordsProxy', 'pathStart');
-    if (get(recordsProxy, 'isFulfilled')) {
-      let prevBlock = pathStart;
-      const elements = [{
-        id: 'block|' + get(pathStart, 'gri'),
-        type: 'block',
-        startBlock: true,
-        record: pathStart,
-      }];
-      recordsProxy.forEach(block => {
-        elements.push({
-          id: `relation|${get(prevBlock, 'gri')}|${get(block, 'gri')}`,
-          type: 'relation',
-          relation: MembershipRelation.create({
-            parent: block,
-            child: prevBlock,
-          }),
-        }, {
-          id: 'block|' + get(block, 'gri'),
-          type: 'block',
-          record: block,
+  pathElements: computed(
+    'recordsProxy.isFulfilled',
+    'visibleBlocks',
+    function pathElements() {
+      const {
+        recordsProxy,
+        pathStart,
+        visibleBlocks,
+      } = this.getProperties('recordsProxy', 'pathStart', 'visibleBlocks');
+      if (get(recordsProxy, 'isFulfilled')) {
+        const reversedRecords =
+          [pathStart].concat(get(recordsProxy, 'content')).reverse();
+        const blocks = [];
+        while (
+          (get(blocks, 'length') < visibleBlocks || visibleBlocks === 0) &&
+          get(reversedRecords, 'length') > 0
+        ) {
+          const blocksLength = get(blocks, 'length');
+          const reversedRecordsLength = get(reversedRecords, 'length');
+          if (blocksLength === visibleBlocks - 1 && reversedRecordsLength > 1) {
+            blocks.unshift({
+              id: 'more',
+              type: 'more',
+              number: reversedRecordsLength,
+            });
+          } else {
+            const record = reversedRecords.shift();
+            blocks.unshift({
+              id: 'block|' + get(record, 'gri'),
+              type: 'block',
+              record,
+              startBlock: reversedRecordsLength === 1,
+            });
+          }
+        }
+        let prevBlock = blocks[0];
+        const elements = [blocks[0]];
+        blocks.slice(1).forEach(block => {
+          const isPrevMore = get(prevBlock, 'type') === 'more';
+          elements.push({
+            id: `relation|${isPrevMore ? 'more' : get(prevBlock, 'record.gri')}|${get(block, 'record.gri')}`,
+            type: 'relation',
+            relation: isPrevMore ? null : MembershipRelation.create({
+              parent: get(block, 'record'),
+              child: get(prevBlock, 'record'),
+            }),
+          }, block);
+          prevBlock = block;
         });
-        prevBlock = block;
-      });
-      return elements;
-    } else {
-      return [];
+        return elements;
+      } else {
+        return [];
+      }
     }
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}

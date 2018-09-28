@@ -14,4 +14,7 @@ export default {
     modifyPrivileges: 'Modify privileges',
     removeRelation: 'Remove relation',
   },
+  membershipMore: {
+    nMore: '{{number}} more...',
+  },
 };
