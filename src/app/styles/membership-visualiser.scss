@@ -112,9 +112,25 @@
       right: 0;
       transform: translateX(50%) translateY(-50%);
     }
+    .relation-sign {
+      position: absolute;
+      bottom: 50%;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      border-color: $color-one-azure;
+      border-style: solid;
+      border-width: 0 2px 2px 0;
+      transform-origin: right bottom;
+      transform: rotate(-45deg);
+      transition: border-color $animation-time linear;
+    }
     &.hovered {
       .line, .dot {
         background-color: $color-one-blue-gray;
+      }
+      .relation-sign {
+        border-color: $color-one-blue-gray;
       }
       .actions-trigger {
         opacity: 1;
@@ -169,9 +185,51 @@
       &.ps-active-x {
         cursor: move;
       }
-      // moving horizontal scroll error fix
       & > .ps-scrollbar-x-rail {
+        // moving horizontal scroll error fix
         left: 0 !important;
+
+        z-index: 1;
+      }
+      &:hover > .ps-scrollbar-x-rail,
+      & > .ps-scrollbar-x-rail:hover,
+      &.ps-in-scrolling > .ps-scrollbar-x-rail {
+        background-color: transparent;
+        .ps-scrollbar-x {
+          height: 6px;
+        }
+      }
+    }
+    .ps-container.ps-active-x + .bar-nav {
+      display: block;
+    }
+    .bar-nav {
+      display: none;
+    }
+    .scroll-button {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      font-size: 1.5em;
+      .one-icon {
+        @include absolute-align-middle-center();
+      }
+    }
+    .scroll-left {
+      padding-right: 8px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9) 80%, transparent);
+      left: 0;
+      .one-icon {
+        margin-left: -4px;
+      }
+    }
+    .scroll-right {
+      padding-left: 8px;
+      background-image: linear-gradient(to left, rgba(255, 255, 255, 0.9) 80%, transparent);
+      right: 0;
+      .one-icon {
+        margin-left: 4px;
       }
     }
   }

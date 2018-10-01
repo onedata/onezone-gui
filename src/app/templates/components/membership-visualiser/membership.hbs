@@ -1,5 +1,7 @@
 {{#promise-proxy-container proxy=recordsProxy sizeClass="xs"}}
-  {{#perfect-scrollbar-element suppressScrollY=true}}
+  {{#perfect-scrollbar-element
+    suppressScrollY=true
+    onScroll=(action "scroll")}}
     {{#each pathElements key="id" as |pathElement|}}
       {{#if (eq pathElement.type "block")}}
         {{membership-visualiser/membership-block
@@ -17,4 +19,16 @@
       {{/if}}
     {{/each}}
   {{/perfect-scrollbar-element}}
+  <div class="bar-nav">
+    {{#if scrollLeftButton}}
+      <div class="scroll-button scroll-left" {{action "moveLeft"}}>
+        {{one-icon icon="arrow-left"}}
+      </div>
+    {{/if}}
+    {{#if scrollRightButton}}
+      <div class="scroll-button scroll-right" {{action "moveRight"}}>
+        {{one-icon icon="arrow-right"}}
+      </div>
+    {{/if}}
+  </div>
 {{/promise-proxy-container}}
