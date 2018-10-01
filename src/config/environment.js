@@ -30,7 +30,7 @@ module.exports = function (environment) {
       { id: 'providers', icon: 'provider', isDefault: true, allowIndex: true },
       { id: 'tokens', icon: 'tokens' },
       { id: 'spaces', icon: 'space' },
-      { id: 'groups', icon: 'groups' },
+      { id: 'groups', icon: 'groups', defaultAspect: 'members' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
