@@ -1,9 +1,7 @@
 import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { computed, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import RecognizerMixin from 'ember-gestures/mixins/recognizers';
@@ -11,8 +9,8 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 
 export default Component.extend(RecognizerMixin, {
-  classNames: ['membership', 'collapse-animation', 'collapse-medium'],
-  classNameBindings: ['isFilteredOut:collapse-hidden'],
+  classNames: ['membership'],
+  classNameBindings: ['isFilteredOut:filtered-out'],
   recognizers: 'pan',
 
   store: service(),
@@ -101,7 +99,7 @@ export default Component.extend(RecognizerMixin, {
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Array<GraphSingleModel>>>}
    */
-  recordsProxy: null,
+  recordsProxy: reads('path.model'),
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
@@ -165,37 +163,7 @@ export default Component.extend(RecognizerMixin, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isFilteredOut: computed(
-    'searchString',
-    'recordsProxy.@each.name',
-    function isFilteredOut() {
-      const {
-        searchString,
-        recordsProxy,
-      } = this.getProperties('searchString', 'recordsProxy');
-      if (!get(recordsProxy, 'isFulfilled')) {
-        return false;
-      } else {
-        const names = recordsProxy.mapBy('name');
-        const query = (searchString || '').toLowerCase();
-        return names.every(name => !name.toLowerCase().includes(query));
-      }
-    }
-  ),
-
-  pathIdObserver: observer('path.id', function pathIdObserver() {
-    const pathId = this.get('path.id');
-    if (this.get('lastFetchedPathId') !== pathId) {
-      this.setProperties({
-        lastFetchedPathId: pathId,
-        recordsProxy: PromiseArray.create({
-          promise: Promise.all(
-            this.get('path.griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
-          ),
-        }),
-      });
-    }
-  }),
+  isFilteredOut: reads('path.isFilteredOut'),
 
   panStart() {
     const scrollContainer = this.getScrollContainer();
@@ -212,30 +180,11 @@ export default Component.extend(RecognizerMixin, {
     }
   },
 
-  init() {
-    this._super(...arguments);
-    this.pathIdObserver();
-  },
-
   didInsertElement() {
     this._super(...arguments);
     this.get('recordsProxy').then(() => {
       next(() => safeExec(this, 'recalculateScrollButtonsVisibility'));
     });
-  },
-  
-  /**
-   * Loads record using given GRI
-   * @param {string} recordGri 
-   * @returns {Promise<GraphSingleModel>}
-   */
-  fetchRecordByGri(recordGri) {
-    const entityType = parseGri(recordGri).entityType;
-    return this.get('store').findRecord(entityType, recordGri)
-      .then(record => Promise.all([
-        record.get('groupList'),
-        record.get('userList'),
-      ]).then(() => record));
   },
 
   getScrollContainer() {

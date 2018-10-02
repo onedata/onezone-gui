@@ -38,7 +38,7 @@ import privilegesEditorModal from './components/privileges-editor-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
 import contentSpacesMembers from './components/content-spaces-members';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
-import groupLeaveModal from './components/group-leave-modal';
+import leaveModal from './components/leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
 import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
@@ -94,7 +94,7 @@ let translations = {
     invitationTokenPresenter,
     contentSpacesMembers,
     groupsHierarchyVisualiser,
-    groupLeaveModal,
+    leaveModal,
     groupRemoveModal,
     removeRelationModal,
     groupCreateRelativeModal,

@@ -1,6 +1,6 @@
 
 {{#unless (or silentReloadError pathsLoadingProxy.isRejected)}}
-  {{#each paths key="id" as |path|}}
+  {{#each sortedPaths key="id" as |path|}}
     {{membership-visualiser/membership
       pathStart=contextRecord
       path=path
@@ -22,13 +22,22 @@
   {{promise-proxy-container proxy=pathsLoadingProxy}}
 {{/if}}
 {{#unless isCondensed}}
-  {{remove-relation-modal
-    opened=relationToRemove
-    close=(action (mut relationToRemove) null)
-    proceed=(action "removeRelation")
-    processing=isRemovingRelation
-    parent=relationToRemove.parent
-    child=relationToRemove.child}}
+  {{#if (eq currentUser.userId relationToRemove.child.entityId)}}
+    {{leave-modal
+      opened=relationToRemove
+      close=(action (mut relationToRemove) null)
+      proceed=(action "removeRelation")
+      processing=isRemovingRelation
+      record=relationToRemove.parent}}
+  {{else}}
+    {{remove-relation-modal
+      opened=relationToRemove
+      close=(action (mut relationToRemove) null)
+      proceed=(action "removeRelation")
+      processing=isRemovingRelation
+      parent=relationToRemove.parent
+      child=relationToRemove.child}}
+  {{/if}}
   {{#if privilegesEditorModel}}
     {{privileges-editor-modal
       privilegesGroups=groupedPrivilegesFlags

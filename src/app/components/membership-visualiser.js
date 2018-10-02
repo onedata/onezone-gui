@@ -1,5 +1,6 @@
 import Component from '@ember/component';
-import { computed, observer, get, getProperties } from '@ember/object';
+import EmberObject, { computed, observer, get, getProperties, set } from '@ember/object';
+import { sort } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -13,12 +14,54 @@ import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
-/**
- * @typedef {Object} MembershipPath
- * @property {string} id
- * @property {Array<string>} griPath array of GRIs
- */
+const MembershipPath = EmberObject.extend({
+  store: service(),
+
+  griPath: Object.freeze([]),
+
+  isFilteredOut: false,
+
+  /**
+   * @type {string}
+   */
+  id: computed('griPath', function id() {
+    return this.get('griPath').join('|');
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel>>}
+   */
+  model: computed('griPath', function model() {
+    return PromiseArray.create({
+      promise: Promise.all(
+        this.get('griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
+      ),
+    });
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<string>>}
+   */
+  names: computed('model.content.@each.name', function names() {
+    return (this.get('model.content') || A()).mapBy('name');
+  }),
+
+  /**
+   * Loads record using given GRI
+   * @param {string} recordGri 
+   * @returns {Promise<GraphSingleModel>}
+   */
+  fetchRecordByGri(recordGri) {
+    const entityType = parseGri(recordGri).entityType;
+    return this.get('store').findRecord(entityType, recordGri)
+      .then(record => Promise.all([
+        record.get('groupList'),
+        record.get('userList'),
+      ]).then(() => record));
+  },
+});
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
@@ -31,6 +74,7 @@ export default Component.extend(I18n, {
   privilegeActions: service(),
   spaceActions: service(),
   groupActions: service(),
+  currentUser: service(),
 
   /**
    * @override
@@ -113,11 +157,21 @@ export default Component.extend(I18n, {
   suppressNodesObserver: true,
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A>}
+   * @type {Ember.ComputedProperty<Ember.A<MembershipPath>>}
    */
   paths: computed(function paths() {
     return A();
   }),
+
+  /**
+   * @type {Array<string>}
+   */
+  sortedPathsOrder: Object.freeze(['isFilteredOut']),
+
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<MembershipPath>>}
+   */
+  sortedPaths: sort('paths', 'sortedPathsOrder'),
 
   /**
    * 1-level-nested tree with privileges. It should group privileges
@@ -274,6 +328,28 @@ export default Component.extend(I18n, {
     }
   ),
 
+  filterObserver: observer('searchString', 'paths.@each.names', function filterObserver() {
+    const {
+      paths,
+      searchString,
+    } = this.getProperties('paths', 'searchString');
+    if (get(searchString, 'length') === 0) {
+      paths.forEach(path => set(path, 'isFilteredOut', false));
+    } else {
+      paths.forEach(path => {
+        let isFilteredOut;
+        if (get(path, 'model.isFulfilled')) {
+          const names = get(path, 'names');
+          const query = (searchString || '').toLowerCase();
+          isFilteredOut = names.every(name => !name.toLowerCase().includes(query));
+        } else {
+          isFilteredOut = true;
+        }
+        set(path, 'isFilteredOut', isFilteredOut);
+      });
+    }
+  }),
+
   init() {
     this._super(...arguments);
     this.recordObserver();
@@ -290,10 +366,23 @@ export default Component.extend(I18n, {
     this.set('suppressNodesObserver', true);
     const promise = this.fetchRootMembership()
       .then(() => this.findPaths(silent))
-      .then(({ allNodes, paths }) => safeExec(this, 'setProperties', {
-        paths,
-        allNodes,
-        silentReloadError: null,
+      .then(({ allNodes, paths }) => safeExec(this, () => {
+        const actualPaths = this.get('paths');
+        paths = paths.map(pathDef => {
+          const existingPath = actualPaths.findBy('id', get(pathDef, 'id'));
+          if (existingPath) {
+            return existingPath;
+          } else {
+            return MembershipPath.create(getOwner(this).ownerInjection(), {
+              griPath: get(pathDef, 'griPath'),
+            });
+          }
+        });
+        this.setProperties({
+          paths,
+          allNodes,
+          silentReloadError: null,
+        });
       }))
       .catch(error => {
         safeExec(this, 'setProperties', {

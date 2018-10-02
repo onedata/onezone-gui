@@ -546,7 +546,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
         return helper.clickGroupBoxActions($groupBox, ['.leave-group-action']);
       })
-      .then(() => click('.group-leave-modal .proceed'))
+      .then(() => click('.leave-modal .proceed'))
       .then(() => {
         expect(get(leftGroup, 'name')).to.equal('b2');
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');

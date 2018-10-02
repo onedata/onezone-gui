@@ -19,12 +19,12 @@ right column will always be before left in html --}}
     viewGroup=(action "viewGroup")}}
   {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
 {{/each}}
-{{group-leave-modal
+{{leave-modal
   opened=(and groupToLeave (not groupToLeave.isDeleted))
   close=(action (mut groupToLeave) null)
   proceed=(action "leaveGroup")
   processing=isLeavingGroup
-  group=groupToLeave}}
+  record=groupToLeave}}
 {{join-as-user-modal
   opened=(and groupToJoin (not groupToJoin.isDeleted))
   close=(action (mut groupToJoin) null)
