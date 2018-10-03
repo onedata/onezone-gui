@@ -17,4 +17,16 @@ export default {
   membershipMore: {
     nMore: '{{number}} more...',
   },
+  membership: {
+    descBeginning: '{{pathStartType}} "{{pathStartName}}" ',
+    descPathFirstElement: 'is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
+    descPathCentralElement: ', which is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
+    descSummary: ' All these relations make {{pathStartType}} "{{pathStartName}}" an indirect member of {{pathEndType}} "{{pathEndName}}".',
+    descSubgroupType: ' (subgroup)',
+    descSpaceSupportedBy: ', which is supported by provider {{elementName}}',
+    user: 'user',
+    group: 'group',
+    space: 'space',
+    provider: 'provider',
+  },
 };

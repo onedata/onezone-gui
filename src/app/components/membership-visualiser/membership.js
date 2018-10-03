@@ -7,13 +7,20 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import RecognizerMixin from 'ember-gestures/mixins/recognizers';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import _ from 'lodash';
 
-export default Component.extend(RecognizerMixin, {
+export default Component.extend(RecognizerMixin, I18n, {
   classNames: ['membership'],
   classNameBindings: ['isFilteredOut:filtered-out'],
   recognizers: 'pan',
 
   store: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.membershipVisualiser.membership',
 
   /**
    * @type {User|Group}
@@ -156,6 +163,69 @@ export default Component.extend(RecognizerMixin, {
         return elements;
       } else {
         return [];
+      }
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  membershipDescription: computed(
+    'recordsProxy.content.@each.{name,entityType}',
+    'pathStart.{name,entityType}',
+    function membershipDescription() {
+      const recordsProxy = this.get('recordsProxy');
+      if (get(recordsProxy, 'isFulfilled')) {
+        const pathStart = this.get('pathStart');
+        const elementsNumber = get(recordsProxy, 'length');
+        const pathStartType = this.t(get(pathStart, 'entityType'));
+        const pathStartName = get(pathStart, 'name');
+        let description = this.t('descBeginning', {
+          pathStartType: _.upperFirst(pathStartType),
+          pathStartName,
+        });
+        let nextTranslation = 'descPathFirstElement';
+        let prevElement = pathStart;
+        recordsProxy.forEach(element => {
+          let membershipType = '';
+          let elementType = get(element, 'entityType');
+          const elementName = get(element, 'name');
+          if (
+            elementType === 'group' &&
+            get(prevElement, 'entityType') === 'group'
+          ) {
+            membershipType = this.t('descSubgroupType');
+          }
+          if (elementType === 'provider') {
+            description += this.t('descSpaceSupportedBy', {
+              elementName,
+            });
+          }
+          elementType = this.t(elementType);
+          description += this.t(nextTranslation, {
+            membershipType,
+            elementType,
+            elementName,
+          });
+          prevElement = element;
+          nextTranslation = 'descPathCentralElement';
+        });
+        description += '.';
+
+        const lastElement = recordsProxy.objectAt(elementsNumber - 1);
+        const pathEndType = this.t(get(lastElement, 'entityType'));
+        const pathEndName = get(lastElement, 'name');
+        if (elementsNumber > 1) {
+          description += this.t('descSummary', {
+            pathStartType,
+            pathStartName,
+            pathEndType,
+            pathEndName,
+          });
+        }
+        return description;
+      } else {
+        return '';
       }
     }
   ),
