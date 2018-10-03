@@ -1,7 +1,9 @@
 {{#promise-proxy-container
   proxy=recordProxy.models
   isLoading=(and recordProxy.isLoading (not recordProxy.hasBeenLoaded))
-  isLoaded=(and recordProxy.hasBeenLoaded (not recordProxy.models.isRejected))}}
+  isLoaded=(and recordProxy.hasBeenLoaded (not recordProxy.models.isRejected))
+  isError=recordProxy.fetchError
+  errorReason=recordProxy.fetchError}}
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState

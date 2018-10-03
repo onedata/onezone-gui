@@ -24,6 +24,7 @@ export default {
     descSummary: ' All these relations make {{pathStartType}} "{{pathStartName}}" an indirect member of {{pathEndType}} "{{pathEndName}}".',
     descSubgroupType: ' (subgroup)',
     descSpaceSupportedBy: ', which is supported by provider {{elementName}}',
+    descSummaryProvider: 'All these relations allow {{pathStartType}} "{{pathStartName}}" to use provider "{{pathEndName}}".',
     user: 'user',
     group: 'group',
     space: 'space',

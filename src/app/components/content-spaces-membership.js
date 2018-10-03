@@ -17,7 +17,7 @@ export default Component.extend(MembershipAspectBase, I18n, {
   i18nPrefix: 'components.contentGroupsMembership',
 
   /**
-   * @type {Group}
+   * @type {Space}
    */
-  targetRecord: reads('group'),
+  targetRecord: reads('space'),
 });

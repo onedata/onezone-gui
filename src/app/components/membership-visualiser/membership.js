@@ -216,7 +216,9 @@ export default Component.extend(RecognizerMixin, I18n, {
         const pathEndType = this.t(get(lastElement, 'entityType'));
         const pathEndName = get(lastElement, 'name');
         if (elementsNumber > 1) {
-          description += this.t('descSummary', {
+          const translation = get(lastElement, 'entityType') === 'provider' ?
+            'descSummaryProvider' : 'descSummary';
+          description += this.t(translation, {
             pathStartType,
             pathStartName,
             pathEndType,

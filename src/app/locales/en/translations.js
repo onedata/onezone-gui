@@ -37,6 +37,7 @@ import collectionPermissions from './components/collection-permissions';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
 import contentSpacesMembers from './components/content-spaces-members';
+import contentSpacesMembership from './components/content-spaces-membership';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
 import leaveModal from './components/leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
@@ -93,6 +94,7 @@ let translations = {
     privilegesEditorModal,
     invitationTokenPresenter,
     contentSpacesMembers,
+    contentSpacesMembership,
     groupsHierarchyVisualiser,
     leaveModal,
     groupRemoveModal,

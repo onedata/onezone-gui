@@ -8,5 +8,6 @@ export default {
     index: 'Overview',
     providers: 'Providers',
     members: 'Members',
+    membership: 'Membership',
   },
 };

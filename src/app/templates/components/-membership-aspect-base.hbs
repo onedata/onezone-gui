@@ -16,9 +16,9 @@
     </div>
   </div>
 </div>
-{{#promise-proxy-container proxy=user}}
+{{#promise-proxy-container proxy=userProxy}}
   {{membership-visualiser
-    contextRecord=user.content
-    targetRecord=group
+    contextRecord=userProxy.content
+    targetRecord=targetRecord
     searchString=searchString}}
 {{/promise-proxy-container}}
