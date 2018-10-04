@@ -142,7 +142,6 @@ export default Component.extend(RecognizerMixin, I18n, {
               id: 'block|' + get(record, 'gri'),
               type: 'block',
               record,
-              startBlock: reversedRecordsLength === 1,
             });
           }
         }

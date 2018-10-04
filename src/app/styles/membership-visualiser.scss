@@ -35,13 +35,13 @@
   }
   .membership-block {
     position: relative;
-    padding-left: 2.5em;
+    padding-left: 3.2em;
     max-width: 250px;
     .type-icon {
       @include vertical-align-middle();
       position: absolute;
       left: $padding-xs-horizontal;
-      font-size: 1.7em;
+      font-size: 2.2em;
     }
     .record-name {
       margin-right: 0.8em;

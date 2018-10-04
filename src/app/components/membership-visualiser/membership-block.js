@@ -25,11 +25,6 @@ export default Component.extend(I18n, {
   recordType: reads('record.entityType'),
 
   /**
-   * @type {boolean}
-   */
-  showName: true,
-
-  /**
    * True if mouse is over block icon
    * @type {boolean}
    */

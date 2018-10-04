@@ -4,9 +4,8 @@
   mouseEnter=(action "changeIconHover" true)
   mouseLeave=(action "changeIconHover" false)
   click=(action "toggleActions" (not actionsOpened))}}
-{{#if showName}}
-  {{#truncated-string class="record-name"}}{{record.name}}{{/truncated-string}}
-{{/if}}
+
+{{#truncated-string class="record-name"}}{{record.name}}{{/truncated-string}}
 
 {{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
 {{#render-later triggerRender=actionsOpened}}
