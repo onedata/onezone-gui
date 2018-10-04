@@ -12,7 +12,10 @@ import _ from 'lodash';
 
 export default Component.extend(I18n, {
   classNames: ['membership'],
-  classNameBindings: ['isFilteredOut:filtered-out'],
+  classNameBindings: [
+    'isFilteredOut:filtered-out',
+    'showDescription:with-description',
+  ],
 
   store: service(),
 

@@ -11,6 +11,8 @@ export default {
     viewProvider: 'View provider',
   },
   membershipRelation: {
+    isMemberOf: 'is member of',
+    isSupportedBy: 'is supported by',
     modifyPrivileges: 'Modify privileges',
     removeRelation: 'Remove relation',
   },
