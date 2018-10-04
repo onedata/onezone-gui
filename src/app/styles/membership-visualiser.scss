@@ -168,9 +168,8 @@
   }
   .membership {
     position: relative;
-    height: $row-height;
+    min-height: $row-height;
     border-bottom: 1px solid $main-border-color;
-    white-space: nowrap;
     &:last-child {
       border-bottom: 0;
     }
@@ -182,22 +181,13 @@
       font-style: italic;
     }
     .ps-container {
+      white-space: nowrap;
+      position: relative;
       &.ps-active-x {
         cursor: move;
       }
       & > .ps-scrollbar-x-rail {
-        // moving horizontal scroll error fix
-        left: 0 !important;
-
         z-index: 1;
-      }
-      &:hover > .ps-scrollbar-x-rail,
-      & > .ps-scrollbar-x-rail:hover,
-      &.ps-in-scrolling > .ps-scrollbar-x-rail {
-        background-color: transparent;
-        .ps-scrollbar-x {
-          height: 6px;
-        }
       }
     }
     .ps-container.ps-active-x + .bar-nav {
@@ -209,7 +199,7 @@
     .scroll-button {
       position: absolute;
       top: 0;
-      bottom: 0;
+      height: $row-height;
       width: 40px;
       font-size: 1.5em;
       .one-icon {
@@ -231,6 +221,11 @@
       .one-icon {
         margin-left: 4px;
       }
+    }
+    .description {
+      padding: 0 $padding-small-horizontal $padding-large-vertical $padding-small-horizontal;
+      color: lighten($main-text-color, 20%);
+      font-size: 0.8em;
     }
   }
 }

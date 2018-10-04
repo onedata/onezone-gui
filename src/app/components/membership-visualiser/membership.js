@@ -4,16 +4,15 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import RecognizerMixin from 'ember-gestures/mixins/recognizers';
+
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 
-export default Component.extend(RecognizerMixin, I18n, {
+export default Component.extend(I18n, {
   classNames: ['membership'],
   classNameBindings: ['isFilteredOut:filtered-out'],
-  recognizers: 'pan',
 
   store: service(),
 
@@ -81,10 +80,10 @@ export default Component.extend(RecognizerMixin, I18n, {
   removeRelation: notImplementedThrow,
 
   /**
-   * Horizontal scroll state stored on pan gesture start
-   * @type {number}
+   * @virtual
+   * @type {boolean}
    */
-  panStartScrollX: 0,
+  showDescription: false,
 
   /**
    * If true, left scroll arrow button is visible.
@@ -97,11 +96,6 @@ export default Component.extend(RecognizerMixin, I18n, {
    * @type {boolean}
    */
   scrollRightButton: true,
-
-  /**
-   * @type {string}
-   */
-  lastFetchedPathId: null,
 
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Array<GraphSingleModel>>>}
@@ -236,21 +230,6 @@ export default Component.extend(RecognizerMixin, I18n, {
    */
   isFilteredOut: reads('path.isFilteredOut'),
 
-  panStart() {
-    const scrollContainer = this.getScrollContainer();
-    if (scrollContainer) {
-      this.set('panStartScrollX', scrollContainer.scrollLeft());
-    }
-  },
-
-  panMove(event) {
-    const panStartScrollX = this.get('panStartScrollX');
-    const scrollContainer = this.getScrollContainer();
-    if (scrollContainer) {
-      scrollContainer.scrollLeft(panStartScrollX - event.originalEvent.gesture.deltaX);
-    }
-  },
-
   didInsertElement() {
     this._super(...arguments);
     this.get('recordsProxy').then(() => {
@@ -272,6 +251,12 @@ export default Component.extend(RecognizerMixin, I18n, {
   },
 
   actions: {
+    pan(deltaX) {
+      const scrollContainer = this.getScrollContainer();
+      if (scrollContainer) {
+        scrollContainer.scrollLeft(scrollContainer.scrollLeft() + deltaX);
+      }
+    },
     scroll() {
       this.recalculateScrollButtonsVisibility();
     },

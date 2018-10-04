@@ -121,6 +121,12 @@ export default Component.extend(I18n, {
   maxPathsNumber: 20,
 
   /**
+   * If true, membership paths will have an additional text description.
+   * @type {boolean}
+   */
+  showDescription: false,
+
+  /**
    * Relation for privileges-editor-modal
    * @type {Utils/MembershipRelation|null}
    */

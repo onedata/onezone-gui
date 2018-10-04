@@ -8,7 +8,8 @@
       removeRelation=(action (mut relationToRemove))
       modifyPrivileges=(action (mut relationPrivilegesToChange))
       searchString=searchString
-      visibleBlocks=visibleBlocks}}
+      visibleBlocks=visibleBlocks
+      showDescription=showDescription}}
   {{/each}}
   {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
     <div class="membership limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">

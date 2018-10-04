@@ -15,4 +15,9 @@ export default Mixin.create(UserProxyMixin, {
    * @type {string}
    */
   searchString: '',
+
+  /**
+   * @type {boolean}
+   */
+  showDescription: false,
 });

@@ -16,9 +16,14 @@
     </div>
   </div>
 </div>
+<div class="row content-row">
+  <label class="inline-label">Show descriptions</label>
+  {{one-way-toggle checked=showDescription update=(action (mut showDescription))}}
+</div>
 {{#promise-proxy-container proxy=userProxy}}
   {{membership-visualiser
     contextRecord=userProxy.content
     targetRecord=targetRecord
-    searchString=searchString}}
+    searchString=searchString
+    showDescription=showDescription}}
 {{/promise-proxy-container}}
