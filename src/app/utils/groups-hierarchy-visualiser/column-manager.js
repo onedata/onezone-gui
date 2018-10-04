@@ -15,7 +15,7 @@
 
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { A } from '@ember/array';
-import { next, later } from '@ember/runloop';
+import { next, later, debounce } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import Column from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
@@ -65,13 +65,18 @@ export default EmberObject.extend({
   /**
    * Adds/removes columns to satisfy columnsNumber restriction
    */
-  columnsNumberObserver: observer('workspace.columnsNumber', function () {
-    this.addMissingColumns();
-    // Remove columns, that are outside screen
-    later(() => safeExec(this, () => {
-      this.removeUnnecessaryColumns();
-    }), this.get('workspace.animationTime'));
-  }),
+  columnsNumberObserver: observer(
+    'workspace.columnsNumber',
+    function columnsNumberObserver() {
+      this.addMissingColumns();
+      // Remove columns, that are outside screen
+      debounce(
+        this,
+        'removeColumnsAfterResize',
+        this.get('workspace.animationTime')
+      );
+    }
+  ),
 
   init() {
     this._super(...arguments);
@@ -120,7 +125,7 @@ export default EmberObject.extend({
       this.get('columns').pushObject(column);
       next(() => safeExec(this, 'moveColumns', -1));
       later(
-        () => safeExec(this, 'removeUnnecessaryColumns', false),
+        () => safeExec(this, 'removeUnnecessaryColumns', 'left'),
         this.get('workspace.animationTime')
       );
     }
@@ -171,18 +176,39 @@ export default EmberObject.extend({
 
   /**
    * Removes columns, that exceed allowed number of columns
-   * @param {boolean} fromRightSide if true, removes columns right-to-left, otherwise left-to-right
+   * @param {boolean} mode possible values:
+   *   * `right` - removes columns right-to-left,
+   *   * `left` - removes columns left-to-right,
+   *   * `emptyFirst` - removes left empty columns and then columns right-to-left
    * @returns {undefined}
    */
-  removeUnnecessaryColumns(fromRightSide = true) {
+  removeUnnecessaryColumns(mode = 'right') {
     const columns = this.get('columns');
     while (get(columns, 'length') > this.get('workspace.columnsNumber')) {
-      if (fromRightSide) {
-        columns.popObject();
-      } else {
-        columns.shiftObject();
+      switch (mode) {
+        case 'right':
+          columns.popObject();
+          break;
+        case 'left':
+          columns.shiftObject();
+          break;
+        case 'emptyFirst':
+          if (get(columns.objectAt(0), 'groupBoxes.length') === 0) {
+            columns.shiftObject();
+          } else {
+            columns.popObject();
+          }
+          break;
       }
     }
+  },
+
+  /**
+   * Removes columns, that are outside screen after window resize
+   * @return {undefined}
+   */
+  removeColumnsAfterResize() {
+    this.removeUnnecessaryColumns('emptyFirst');
   },
 
   /**
