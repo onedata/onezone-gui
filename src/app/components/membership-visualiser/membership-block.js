@@ -1,3 +1,13 @@
+/**
+ * A component, that shows one block in membership path. Is used internally by
+ * membership-visualiser component.
+ *
+ * @module components/membership-visualiser/membership-block
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
@@ -15,6 +25,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.membershipVisualiser.membershipBlock',
 
   /**
+   * Model represented by block.
    * @type {GraphSingleModel}
    */
   record: null,
@@ -37,6 +48,7 @@ export default Component.extend(I18n, {
   isIconHovered: false,
 
   /**
+   * If true, block actions are opened.
    * @type {boolean}
    */
   actionsOpened: false,
@@ -52,7 +64,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  viewAction: computed('recordType', function viewAction() {
+  viewAction: computed('recordType', 'view', function viewAction() {
     return {
       action: () => this.get('view')(),
       title: this.t('view' + _.upperFirst(this.get('recordType'))),
@@ -60,7 +72,7 @@ export default Component.extend(I18n, {
       icon: 'overview',
     };
   }),
-  
+
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */

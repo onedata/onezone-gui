@@ -1,3 +1,13 @@
+/**
+ * A component, that render line between two blocks in a path. Is used internally by
+ * membership-visualiser component.
+ *
+ * @module components/membership-visualiser/membership-relation
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
@@ -60,7 +70,7 @@ export default Component.extend(I18n, {
     return this.get('relation') && this.get('relation.childType') !== 'space';
   }),
 
-    /**
+  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   modifyPrivilegesAction: computed(function modifyPrivilegesAction() {

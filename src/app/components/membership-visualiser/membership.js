@@ -1,10 +1,19 @@
+/**
+ * A component, that shows one membership entry. Is used internally by
+ * membership-visualiser component.
+ *
+ * @module components/membership-visualiser/membership
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -101,7 +110,7 @@ export default Component.extend(I18n, {
   scrollRightButton: true,
 
   /**
-   * @type {Ember.ComputedProperty<PromiseArray<Array<GraphSingleModel>>>}
+   * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel>>}
    */
   recordsProxy: reads('path.model'),
 
@@ -118,14 +127,15 @@ export default Component.extend(I18n, {
         visibleBlocks,
       } = this.getProperties('recordsProxy', 'pathStart', 'visibleBlocks');
       if (get(recordsProxy, 'isFulfilled')) {
-        const reversedRecords =
-          [pathStart].concat(get(recordsProxy, 'content')).reverse();
+        // Path is built from the end to the beginning, because some of the first
+        // elements can by joined into one "more" block at the end.
+        const reversedRecords = [pathStart].concat(get(recordsProxy, 'content')).reverse();
         const blocks = [];
+        let blocksLength = 0;
         while (
-          (get(blocks, 'length') < visibleBlocks || visibleBlocks === 0) &&
+          (blocksLength < visibleBlocks || visibleBlocks === 0) &&
           get(reversedRecords, 'length') > 0
         ) {
-          const blocksLength = get(blocks, 'length');
           const reversedRecordsLength = get(reversedRecords, 'length');
           if (blocksLength === visibleBlocks - 1 && reversedRecordsLength > 1) {
             blocks.unshift({
@@ -141,14 +151,17 @@ export default Component.extend(I18n, {
               record,
             });
           }
+          blocksLength++;
         }
         let prevBlock = blocks[0];
         const elements = [blocks[0]];
         blocks.slice(1).forEach(block => {
           const isPrevMore = get(prevBlock, 'type') === 'more';
           elements.push({
-            id: `relation|${isPrevMore ? 'more' : get(prevBlock, 'record.gri')}|${get(block, 'record.gri')}`,
+            id: `relation|${isPrevMore ? 'more' : get(prevBlock, 'record.gri')}|` +
+              `${get(block, 'record.gri')}`,
             type: 'relation',
+            // there is no logical relation with block "more" - null
             relation: isPrevMore ? null : MembershipRelation.create({
               parent: get(block, 'record'),
               child: get(prevBlock, 'record'),
@@ -249,7 +262,8 @@ export default Component.extend(I18n, {
     const detectionEpsilon = 3;
     this.setProperties({
       scrollLeftButton: element.scrollLeft > detectionEpsilon,
-      scrollRightButton: element.offsetWidth + element.scrollLeft < element.scrollWidth - detectionEpsilon,
+      scrollRightButton: element.offsetWidth + element.scrollLeft < element.scrollWidth -
+        detectionEpsilon,
     });
   },
 
