@@ -120,6 +120,13 @@ const MembershipPath = EmberObject.extend({
   }),
 
   /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  concatenatedNames: computed('names', function concatenatedNames() {
+    return this.get('names').join('');
+  }),
+
+  /**
    * Loads record using given GRI
    * @param {string} recordGri 
    * @returns {Promise<GraphSingleModel>}
@@ -246,7 +253,11 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<string>}
    */
-  sortedPathsOrder: Object.freeze(['isFilteredOut']),
+  sortedPathsOrder: Object.freeze([
+    'isFilteredOut',
+    'griPath.length',
+    'concatenatedNames',
+  ]),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<MembershipPath>>}
