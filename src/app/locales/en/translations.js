@@ -2,7 +2,7 @@ import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
 import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
-import providers from './tabs/providers';
+import data from './tabs/data';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
@@ -14,7 +14,7 @@ import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
-import sidebarProviders from './components/sidebar-providers';
+import sidebarData from './components/sidebar-data';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
@@ -58,7 +58,7 @@ import guiUtils from './services/gui-utils';
 
 let translations = {
   tabs: {
-    providers,
+    data,
     tokens,
     spaces,
     groups,
@@ -71,7 +71,7 @@ let translations = {
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
-    sidebarProviders,
+    sidebarData,
     sidebarGroups,
     contentSpacesEmpty,
     contentSpacesIndex,

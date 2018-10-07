@@ -26,8 +26,7 @@ module.exports = function (environment) {
      * - [defaultAspect]: string
      */
     'onedataTabs': [
-      { id: 'data', icon: 'folder', allowIndex: true },
-      { id: 'providers', icon: 'provider', isDefault: true, allowIndex: true },
+      { id: 'data', icon: 'folder', isDefault: true, allowIndex: true },
       { id: 'tokens', icon: 'tokens' },
       { id: 'spaces', icon: 'space' },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },

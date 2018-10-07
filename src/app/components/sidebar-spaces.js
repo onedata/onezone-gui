@@ -1,7 +1,7 @@
 /**
  * A sidebar for providers (extension of ``two-level-sidebar``)
  *
- * @module components/sidebar-providers
+ * @module components/sidebar-spaces
  * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

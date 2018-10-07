@@ -507,12 +507,19 @@ export default Component.extend(I18n, {
     const columns = get(columnManager, 'columns');
 
     if (columnsNumber > 0) {
+      // Actual first column, which is empty
+      const actualFirstColumn = columns.objectAt(0);
       // Load start-point column (with one group from `group` field)
       const startPointColumn = this.createColumn('startPoint');
-      columnManager.replaceColumn(columns.objectAt(0), startPointColumn);
 
-      // If there is enough space, load also children of that group
-      if (columnsNumber > 1) {
+      if (columnsNumber >= 3) {
+        const parentsColumn = this.createColumn('parents', group);
+        columnManager.replaceColumn(actualFirstColumn, parentsColumn);
+        columnManager.insertColumnAfter(startPointColumn, parentsColumn);
+      } else {
+        columnManager.replaceColumn(actualFirstColumn, startPointColumn);
+      }
+      if (columnsNumber >= 2) {
         columnManager.insertColumnAfter(
           this.createColumn('children', group),
           startPointColumn
