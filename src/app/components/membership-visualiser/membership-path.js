@@ -16,6 +16,11 @@ export default Component.extend(RecognizerMixin, {
   recognizers: 'pan',
 
   /**
+   * @type {Array<Object>}
+   */
+  pathElements: undefined,
+
+  /**
    * @virtual
    * @type {function}
    * @param {number} deltaX
