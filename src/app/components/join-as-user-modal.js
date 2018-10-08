@@ -37,7 +37,7 @@ export default ProceedProcessModal.extend({
    * @override
    */
   headerText: computed('modelType', function headerText() {
-    return this.t('headerText', { modelType: this.get('modelType') });
+    return this.t('headerText', { modelType: this.t(this.get('modelType')) });
   }),
 
   /**

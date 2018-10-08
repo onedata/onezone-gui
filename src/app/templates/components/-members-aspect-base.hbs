@@ -12,13 +12,6 @@
       {{actions-toolbar isMinimized=true actionsArray=headerActions}}
     </h1>
   </div>
-  {{#if visibleInvitationToken}}
-    {{invitation-token-presenter
-      tokenProxy=invitationTokenProxy
-      tokenType=visibleInvitationToken
-      generateToken=(action "generateInvitationToken")
-      close=(action "hideInvitationToken")}}
-  {{/if}}
 {{/sticky-element}}
 {{#loading-container
   isLoading=(or groupList.isPending userList.isPending)
@@ -45,7 +38,7 @@
           truncate=false}}
           <span class="one-label">
             {{tt this "noGroupsStart"}}
-            <a {{action "showInvitationToken" "group"}}>{{tt this "noGroupsInvite"}}</a>
+            <a {{action (mut inviteTokenModalType) "group"}}>{{tt this "noGroupsInvite"}}</a>
             {{tt this "noGroupsEnd"}}
           </span>
         {{/listItem.header}}
@@ -74,7 +67,7 @@
           truncate=false}}
           <span class="one-label">
             {{tt this "noUsersStart"}}
-            <a {{action "showInvitationToken" "user"}}>{{tt this "noUsersInvite"}}</a>
+            <a {{action (mut inviteTokenModalType) "user"}}>{{tt this "noUsersInvite"}}</a>
             {{tt this "noUsersEnd"}}
           </span>
         {{/listItem.header}}
@@ -92,6 +85,13 @@
   opened=batchEditActive
   processing=batchEditModalModel.isSaving
   treeRootText=(tt this "batchEditModalSelectedItems")}}
+{{join-as-user-modal
+  opened=joinAsUserModalVisible
+  close=(action (mut joinAsUserModalVisible) false)
+  proceed=(action "join")
+  processing=isJoiningAsUser
+  modelType=record.entityType
+  model=record}}
 {{group-create-relative-modal
   opened=createChildGroupModalVisible
   close=(action (mut createChildGroupModalVisible) false)
@@ -106,6 +106,11 @@
   processing=isAddingYourGroup
   relatedRecord=record
   relation=(if (eq record.entityType "group") "child" "member")}}
+{{invite-using-token-modal
+  opened=inviteTokenModalType
+  close=(action (mut inviteTokenModalType) null)
+  tokenType=inviteTokenModalType
+  record=record}}
 {{remove-relation-modal
   opened=(and memberToRemove (not memberToRemove.isDeleted))
   close=(action (mut memberToRemove) null)

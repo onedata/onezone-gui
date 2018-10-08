@@ -123,6 +123,24 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins user to an existing space (without token)
+   * @param {Space} space
+   * @returns {Promise} A promise, which resolves to space if it has
+   * been joined successfully.
+   */
+  joinSpaceAsUser(space) {
+    return this.get('spaceManager').joinSpaceAsUser(get(space, 'entityId'))
+      .then(spaceRecord => {
+        this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
+        return spaceRecord;
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Creates member group for specified space
    * @param {Space} space 
    * @param {Object} groupRepresentation

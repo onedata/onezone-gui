@@ -7,9 +7,10 @@ export default {
   remove: 'Remove',
   removeThisMember: 'Remove this member',
   multiedit: 'Bulk edit',
-  inviteGroup: 'Invite group',
-  inviteUser: 'Invite user',
   batchEditModalSelectedItems: 'Selected items',
   createChildGroup: 'Create new group',
   addYourGroup: 'Add one of your groups',
+  join: 'Join',
+  inviteGroupUsingToken: 'Invite group using token',
+  inviteUserUsingToken: 'Invite user using token',
 };

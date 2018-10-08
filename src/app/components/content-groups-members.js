@@ -90,4 +90,15 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     } = this.getProperties('groupActionsService', 'group');
     return groupActionsService.addChild(parentGroup, group);
   },
+
+  /**
+   * @override
+   */
+  join() {
+    const {
+      group,
+      groupActionsService,
+    } = this.getProperties('group', 'groupActionsService');
+    return groupActionsService.joinGroupAsUser(group);
+  },
 });

@@ -69,6 +69,38 @@ export default Service.extend({
   },
 
   /**
+   * Joins user to a space without token
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  joinSpaceAsUser(entityId) {
+    const space = this.getLoadedSpaceByEntityId(entityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'space',
+            entityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        space ? space.reload() : resolve(),
+        this.reloadUserList(entityId).catch(ignoreForbiddenError),
+        this.get('providerManager').reloadList(),
+      ]));
+  },
+
+  /**
    * Creates member group for specified space
    * @param {string} spaceEntityId 
    * @param {Object} childGroupRepresentation
@@ -126,6 +158,7 @@ export default Service.extend({
    */
   removeUserFromSpace(spaceEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
+    const space = this.getLoadedSpaceByEntityId(spaceEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
       'space',
       spaceEntityId,
@@ -137,6 +170,7 @@ export default Service.extend({
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
+          space ? space.reload().catch(ignoreForbiddenError) : resolve(),
         ])),
       ])
     );

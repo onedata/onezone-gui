@@ -13,7 +13,6 @@ import { union, reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { reject } from 'rsvp';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
@@ -43,16 +42,6 @@ export default Mixin.create({
    * @virtual
    */
   groupedPrivilegesFlags: undefined,
-
-  /**
-   * @type {string|undefined}
-   */
-  visibleInvitationToken: undefined,
-
-  /**
-   * @type {PromiseObject<string>}
-   */
-  invitationTokenProxy: undefined,
 
   /**
    * @type {Object}
@@ -112,6 +101,23 @@ export default Mixin.create({
    * @type {boolean}
    */
   isAddingYourGroup: false,
+
+  /**
+   * @type {boolean}
+   */
+  joinAsUserModalVisible: false,
+
+  /**
+   * @type {boolean}
+   */
+  isJoiningAsUser: false,
+
+  /**
+   * Positive value will show invite-using-token-modal. Possible values:
+   * 'user', 'group', null
+   * @type {string|null}
+   */
+  inviteTokenModalType: null,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -202,23 +208,6 @@ export default Mixin.create({
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  inviteActions: computed(function inviteActions() {
-    return [{
-      action: () => this.send('showInvitationToken', 'group'),
-      title: this.t('inviteGroup'),
-      class: 'invite-group',
-      icon: 'group-invite',
-    }, {
-      action: () => this.send('showInvitationToken', 'user'),
-      title: this.t('inviteUser'),
-      class: 'invite-user',
-      icon: 'user-add',
-    }];
-  }),
-
-  /**
    * @type {Ember.ComputedProperty<Action>}
    */
   batchEditAction: computed('batchEditAvailable', function batchEditAction() {
@@ -258,7 +247,7 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  groupListActions: computed(function () {
+  groupListActions: computed(function groupListActions() {
     return [{
       action: () => this.set('createChildGroupModalVisible', true),
       title: this.t('createChildGroup'),
@@ -269,7 +258,39 @@ export default Mixin.create({
       title: this.t('addYourGroup'),
       class: 'add-your-group-action',
       icon: 'group-invite',
+    }, {
+      action: () => this.set('inviteTokenModalType', 'group'),
+      title: this.t('inviteGroupUsingToken'),
+      class: 'invite-group-using-token-action',
+      icon: 'join-plug',
     }];
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  joinAsUserAction: computed(function joinAsUserAction() {
+    return {
+      action: () => this.set('joinAsUserModalVisible', true),
+      title: this.t('join'),
+      class: 'join-action',
+      icon: 'add-filled',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  userListActions: computed('record.directMembership', function userListActions() {
+    const directMembership = this.get('record.directMembership');
+    const actions = directMembership ? [] : [this.get('joinAsUserAction')];
+    actions.push({
+      action: () => this.set('inviteTokenModalType', 'user'),
+      title: this.t('inviteUserUsingToken'),
+      class: 'invite-user-using-token-action',
+      icon: 'join-plug',
+    });
+    return actions;
   }),
 
   /**
@@ -285,14 +306,12 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(
-    'inviteActions',
     'batchEditAction',
     function globalActions() {
       const {
-        inviteActions,
         batchEditAction,
-      } = this.getProperties('inviteActions', 'batchEditAction');
-      return [batchEditAction, ...inviteActions];
+      } = this.getProperties('batchEditAction');
+      return [batchEditAction];
     }
   ),
 
@@ -307,6 +326,15 @@ export default Mixin.create({
       visibleInvitationToken: undefined,
     });
   }),
+
+  directMembershipObserver: observer(
+    'record.directMembership',
+    function directMembershipObserver() {
+      if (this.get('record.directMembership') && !this.get('isJoiningAsUser')) {
+        this.set('joinAsUserModalVisible', false);
+      }
+    }
+  ),
 
   listsObserver: observer(
     'groupList.content.[]',
@@ -328,20 +356,6 @@ export default Mixin.create({
   userListObserver: observer('userList.[]', function userListObserver() {
     this.preparePermissionListProxy('user');
   }),
-
-  /**
-   * Loads new invitation token for selected subject
-   * @param {string} subject `user` or `group`
-   * @returns {PromiseObject<string>}
-   */
-  loadInvitationToken(subject) {
-    return this.set(
-      'invitationTokenProxy',
-      PromiseObject.create({
-        promise: this.get('record').getInviteToken(subject),
-      })
-    );
-  },
 
   /**
    * Generates privilege record GRI for given subject record
@@ -449,6 +463,15 @@ export default Mixin.create({
     return notImplementedReject();
   },
 
+  /**
+   * Joins user directly to the record. Should be implemented in component.
+   * @virtual
+   * @return {Promise}
+   */
+  join() {
+    return notImplementedReject();
+  },
+
   actions: {
     recordsSelected(type, records) {
       const {
@@ -489,16 +512,6 @@ export default Mixin.create({
           this.get('selectedRecordProxies').invoke('reloadRecords');
         }));
     },
-    showInvitationToken(subject) {
-      this.loadInvitationToken(subject);
-      this.set('visibleInvitationToken', subject);
-    },
-    generateInvitationToken() {
-      this.loadInvitationToken(this.get('visibleInvitationToken'));
-    },
-    hideInvitationToken() {
-      this.set('visibleInvitationToken', null);
-    },
     showRemoveMemberModal(type, recordProxy) {
       this.setProperties({
         memberToRemove: get(recordProxy, 'subject'),
@@ -522,7 +535,7 @@ export default Mixin.create({
       this.createChildGroup(name).finally(() => 
         safeExec(this, 'setProperties', {
           isCreatingChildGroup: false,
-          createChildGroupModalVisible: null,
+          createChildGroupModalVisible: false,
         })
       );
     },
@@ -531,7 +544,16 @@ export default Mixin.create({
       this.addMemberGroup(group).finally(() => 
         safeExec(this, 'setProperties', {
           isAddingYourGroup: false,
-          addYourGroupModalVisible: null,
+          addYourGroupModalVisible: false,
+        })
+      );
+    },
+    join() {
+      this.set('isJoiningAsUser', true);
+      this.join().finally(() => 
+        safeExec(this, 'setProperties', {
+          isJoiningAsUser: false,
+          joinAsUserModalVisible: false,
         })
       );
     },

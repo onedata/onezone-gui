@@ -235,6 +235,7 @@ export default Service.extend({
    */
   removeUserFromGroup(groupEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
+    const group = this.getLoadedGroupByEntityId(groupEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
       'group',
       groupEntityId,
@@ -244,6 +245,7 @@ export default Service.extend({
       Promise.all([
         this.reloadUserList(groupEntityId).catch(ignoreForbiddenError),
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          group ? group.reload().catch(ignoreForbiddenError) : resolve(),
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),

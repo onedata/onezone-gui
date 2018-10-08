@@ -35,7 +35,6 @@ import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-sub
 import contentGroupsJoinSpace from './components/content-groups-join-space';
 import collectionPermissions from './components/collection-permissions';
 import privilegesEditorModal from './components/privileges-editor-modal';
-import invitationTokenPresenter from './components/invitation-token-presenter';
 import contentSpacesMembers from './components/content-spaces-members';
 import contentSpacesMembership from './components/content-spaces-membership';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
@@ -45,7 +44,7 @@ import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
 import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
-import groupInviteUsingTokenModal from './components/group-invite-using-token-modal';
+import inviteUsingTokenModal from './components/invite-using-token-modal';
 import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
 
@@ -92,7 +91,6 @@ let translations = {
     contentGroupsJoinSpace,
     collectionPermissions,
     privilegesEditorModal,
-    invitationTokenPresenter,
     contentSpacesMembers,
     contentSpacesMembership,
     groupsHierarchyVisualiser,
@@ -102,7 +100,7 @@ let translations = {
     groupCreateRelativeModal,
     groupAddYourGroupModal,
     groupJoinUsingTokenModal,
-    groupInviteUsingTokenModal,
+    inviteUsingTokenModal,
     joinAsUserModal,
     membershipVisualiser,
   },

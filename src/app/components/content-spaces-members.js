@@ -81,4 +81,15 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
     } = this.getProperties('spaceActions', 'space');
     return spaceActions.addMemberGroup(space, group);
   },
+
+  /**
+   * @override
+   */
+  join() {
+    const {
+      space,
+      spaceActions,
+    } = this.getProperties('space', 'spaceActions');
+    return spaceActions.joinSpaceAsUser(space);
+  },
 });
