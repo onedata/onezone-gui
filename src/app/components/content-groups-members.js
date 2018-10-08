@@ -68,4 +68,26 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
       groupActionsService.removeChildGroup(group, member) :
       groupActionsService.removeUser(group, member);
   },
+
+  /**
+   * @override
+   */
+  createChildGroup(name) {
+    const {
+      groupActionsService,
+      group,
+    } = this.getProperties('groupActionsService', 'group');
+    return groupActionsService.createChild(group, { name });
+  },
+
+  /**
+   * @override
+   */
+  addMemberGroup(group) {
+    const {
+      groupActionsService,
+      group: parentGroup,
+    } = this.getProperties('groupActionsService', 'group');
+    return groupActionsService.addChild(parentGroup, group);
+  },
 });

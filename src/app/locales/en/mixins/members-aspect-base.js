@@ -10,4 +10,6 @@ export default {
   inviteGroup: 'Invite group',
   inviteUser: 'Invite user',
   batchEditModalSelectedItems: 'Selected items',
+  createChildGroup: 'Create new group',
+  addYourGroup: 'Add one of your groups',
 };

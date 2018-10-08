@@ -17,4 +17,6 @@ export default {
     '"{{spaceName}}"',
   groupDeletion: 'group deletion',
   userDeletion: 'user deletion',
+  createMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been created successfully',
+  memberGroupCreation: 'member group creation',
 };

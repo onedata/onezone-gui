@@ -123,6 +123,53 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Creates member group for specified space
+   * @param {Space} space 
+   * @param {Object} groupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroup(space, groupRepresentation) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager
+      .createMemberGroup(get(space, 'entityId'), groupRepresentation)
+      .then(() => {
+        globalNotify.success(this.t('createMemberGroupSuccess', {
+          memberGroupName: get(groupRepresentation, 'name'),
+        }));
+      }).catch(error => {
+        globalNotify.backendError(this.t('memberGroupCreation'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Adds existing group to space
+   * @param {Space} space 
+   * @param {Group} group
+   * @return {Promise}
+   */
+  addMemberGroup(space, group) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager.addMemberGroup(
+      get(space, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('addMemberGroupSuccess', {
+        memberGroupName: get(group, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('memberGroupAddition'), error);
+      throw error;
+    });
+  },
+
+  /**
    * Removes group from space
    * @param {Space} space 
    * @param {Group} group

@@ -59,4 +59,26 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       spaceActions.removeGroup(space, member) :
       spaceActions.removeUser(space, member);
   },
+
+  /**
+   * @override
+   */
+  createChildGroup(name) {
+    const {
+      spaceActions,
+      space,
+    } = this.getProperties('spaceActions', 'space');
+    return spaceActions.createMemberGroup(space, { name });
+  },
+
+  /**
+   * @override
+   */
+  addMemberGroup(group) {
+    const {
+      spaceActions,
+      space,
+    } = this.getProperties('spaceActions', 'space');
+    return spaceActions.addMemberGroup(space, group);
+  },
 });

@@ -88,6 +88,11 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<Action>}
    */
+  collectionActions: undefined,
+
+  /**
+   * @type {Array<Action>}
+   */
   itemActions: undefined,
 
   actions: {

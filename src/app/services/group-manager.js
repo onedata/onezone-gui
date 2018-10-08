@@ -167,12 +167,18 @@ export default Service.extend({
    * @returns {Promise<Space>}
    */
   joinSpaceAsGroup(group, token) {
+    const {
+      providerManager,
+      spaceManager,
+    } = this.getProperties('providerManager', 'spaceManager');
     return group.joinSpace(token)
       .then(space =>
         Promise.all([
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          space.belongsTo('groupList').reload(true),
+          this.reloadSpaceList(get(group, 'entityId')).catch(ignoreForbiddenError),
+          providerManager.reloadList(),
+          spaceManager.reloadList(),
+          spaceManager.reloadGroupList(get(space, 'entityId'))
+            .catch(ignoreForbiddenError),
         ]).then(() => space)
       );
   },
@@ -184,14 +190,17 @@ export default Service.extend({
    * @returns {Promise<Group>} parent group
    */
   joinGroupAsGroup(childGroup, token) {
+    const childEntityId = get(childGroup, 'entityId');
     return childGroup.joinGroup(token)
       .then(parentGroup =>
         Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          this.reloadChildList(get(parentGroup, 'entityId')),
-          this.reloadParentList(get(childGroup, 'entityId')),
+          this.reloadChildList(get(parentGroup, 'entityId'))
+            .catch(ignoreForbiddenError),
+          this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+          this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         ]).then(() => parentGroup)
       );
   },
@@ -214,6 +223,7 @@ export default Service.extend({
         this.get('spaceManager').reloadList(),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
       ])
     );
   },
@@ -256,6 +266,7 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
@@ -333,6 +344,7 @@ export default Service.extend({
       return Promise.all([
         this.reloadList(),
         this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(futureChildEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
       ]);
     });
@@ -396,5 +408,15 @@ export default Service.extend({
    */
   reloadUserList(entityId) {
     return this.reloadRecordList(entityId, 'userList');
+  },
+
+  /**
+   * Reloads uspaceList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadSpaceList(entityId) {
+    return this.reloadRecordList(entityId, 'spaceList');
   },
 });

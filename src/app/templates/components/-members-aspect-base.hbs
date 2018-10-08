@@ -34,6 +34,7 @@
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
       save=(action "saveOne")
+      collectionActions=groupListActions
       itemActions=groupActions as |list|}}
       {{#list.item as |listItem|}}
         {{#listItem.header
@@ -62,6 +63,7 @@
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
       save=(action "saveOne")
+      collectionActions=userListActions
       itemActions=userActions as |list|}}
       {{#list.item as |listItem|}}
         {{#listItem.header
@@ -90,6 +92,20 @@
   opened=batchEditActive
   processing=batchEditModalModel.isSaving
   treeRootText=(tt this "batchEditModalSelectedItems")}}
+{{group-create-relative-modal
+  opened=createChildGroupModalVisible
+  close=(action (mut createChildGroupModalVisible) false)
+  proceed=(action "createChildGroup")
+  processing=isCreatingChildGroup
+  relatedRecord=record
+  relation=(if (eq record.entityType "group") "child" "member")}}
+{{group-add-your-group-modal
+  opened=addYourGroupModalVisible
+  close=(action (mut addYourGroupModalVisible) false)
+  proceed=(action "addYourGroup")
+  processing=isAddingYourGroup
+  relatedRecord=record
+  relation=(if (eq record.entityType "group") "child" "member")}}
 {{remove-relation-modal
   opened=(and memberToRemove (not memberToRemove.isDeleted))
   close=(action (mut memberToRemove) null)

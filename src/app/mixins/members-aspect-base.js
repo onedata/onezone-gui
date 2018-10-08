@@ -94,6 +94,26 @@ export default Mixin.create({
   memberTypeToRemove: null,
 
   /**
+   * @type {boolean}
+   */
+  createChildGroupModalVisible: false,
+
+  /**
+   * @type {boolean}
+   */
+  isCreatingChildGroup: false,
+
+  /**
+   * @type {boolean}
+   */
+  addYourGroupModalVisible: false,
+
+  /**
+   * @type {boolean}
+   */
+  isAddingYourGroup: false,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   privilegesTranslationsPath: computed(
@@ -232,6 +252,23 @@ export default Mixin.create({
       title: this.t('removeThisMember'),
       class: 'remove-user',
       icon: 'close',
+    }];
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  groupListActions: computed(function () {
+    return [{
+      action: () => this.set('createChildGroupModalVisible', true),
+      title: this.t('createChildGroup'),
+      class: 'create-child-group-action',
+      icon: 'add-filled',
+    }, {
+      action: () => this.set('addYourGroupModalVisible', true),
+      title: this.t('addYourGroup'),
+      class: 'add-your-group-action',
+      icon: 'group-invite',
     }];
   }),
 
@@ -392,6 +429,26 @@ export default Mixin.create({
     return notImplementedReject();
   },
 
+  /**
+   * Creates child group. Should be implemented in component.
+   * @virtual
+   * @param {string} name group name
+   * @return {Promise}
+   */
+  createChildGroup() {
+    return notImplementedReject();
+  },
+
+  /**
+   * Adds child group. Should be implemented in component.
+   * @virtual
+   * @param {Group} group
+   * @return {Promise}
+   */
+  addMemberGroup(/* group */) {
+    return notImplementedReject();
+  },
+
   actions: {
     recordsSelected(type, records) {
       const {
@@ -457,6 +514,24 @@ export default Mixin.create({
         safeExec(this, 'setProperties', {
           isRemovingMember: false,
           memberToRemove: null,
+        })
+      );
+    },
+    createChildGroup(name) {
+      this.set('isCreatingChildGroup', true);
+      this.createChildGroup(name).finally(() => 
+        safeExec(this, 'setProperties', {
+          isCreatingChildGroup: false,
+          createChildGroupModalVisible: null,
+        })
+      );
+    },
+    addYourGroup(group) {
+      this.set('isAddingYourGroup', true);
+      this.addMemberGroup(group).finally(() => 
+        safeExec(this, 'setProperties', {
+          isAddingYourGroup: false,
+          addYourGroupModalVisible: null,
         })
       );
     },

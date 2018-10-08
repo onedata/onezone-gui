@@ -11,11 +11,14 @@ import Service, { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   store: inject(),
   currentUser: inject(),
   providerManager: inject(),
+  groupManager: inject(),
+  onedataGraph: inject(),
   onedataGraphUtils: inject(),
 
   /**
@@ -66,6 +69,57 @@ export default Service.extend({
   },
 
   /**
+   * Creates member group for specified space
+   * @param {string} spaceEntityId 
+   * @param {Object} childGroupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroup(spaceEntityId, childGroupRepresentation) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => this.get('onedataGraph').request({
+        gri: gri({
+          entityType: 'space',
+          entityId: spaceEntityId,
+          aspect: 'group',
+          scope: 'auto',
+        }),
+        operation: 'create',
+        data: childGroupRepresentation,
+        authHint: ['asUser', get(user, 'entityId')],
+      }).then(() => {
+        return Promise.all([
+          this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        ]);
+      }));
+  },
+
+  /**
+   * Adds group to the members of a space
+   * @param {string} spaceEntityId 
+   * @param {string} groupEntityId
+   * @return {Promise}
+   */
+  addMemberGroup(spaceEntityId, groupEntityId) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'space',
+        entityId: spaceEntityId,
+        aspect: 'group',
+        aspectId: groupEntityId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    }).then(() => {
+      return Promise.all([
+        this.reloadParentList(groupEntityId).catch(ignoreForbiddenError),
+        this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.get('groupManager').reloadSpaceList(groupEntityId)
+          .catch(ignoreForbiddenError),
+      ]);
+    });
+  },
+
+  /**
    * @param {string} spaceEntityId 
    * @param {string} userEntityId
    * @returns {Promise}
@@ -104,6 +158,8 @@ export default Service.extend({
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
+        this.get('groupManager').reloadSpaceList(groupEntityId)
+          .catch(ignoreForbiddenError),
       ])
     );
   },

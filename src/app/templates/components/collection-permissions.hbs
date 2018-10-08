@@ -3,7 +3,14 @@
   class=(concat subjectType "-list")
   selectionChanged=recordsSelected
   as |list|}}
-  {{list.header title=listHeader searchVisible=proxyList.length}}
+  {{#list.header title=listHeader searchVisible=false}}
+    {{actions-toolbar
+      isMinimized=true
+      toolbarClasses=""
+      toolbarToggleClasses="btn-menu-toggle"
+      dropdownPlacement="auto"
+      actionsArray=collectionActions}}
+  {{/list.header}}
   {{#each proxyList key="subject" as |recordProxy|}}
     {{#list.item selectionValue=recordProxy as |listItem|}}
       {{#listItem.header
