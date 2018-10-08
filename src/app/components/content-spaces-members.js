@@ -1,5 +1,5 @@
 /**
- * A privileges aspect of space.
+ * A members aspect of space.
  *
  * @module components/content-spaces-members
  * @author Michal Borzecki
@@ -13,12 +13,12 @@ import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
-import layout from 'onezone-gui/templates/components/-privileges-aspect-base';
+import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
+import layout from 'onezone-gui/templates/components/-members-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   layout,
-  classNames: ['privileges-aspect-base', 'content-spaces-members'],
+  classNames: ['members-aspect-base', 'content-spaces-members'],
 
   i18n: service(),
   navigationState: service(),

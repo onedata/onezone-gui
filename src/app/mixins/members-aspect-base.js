@@ -1,7 +1,7 @@
 /**
- * Base functionality for privileges aspects of application.
+ * Base functionality for members aspects of application.
  *
- * @module mixins/privileges-aspect-base
+ * @module mixins/members-aspect-base
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -320,7 +320,7 @@ export default Mixin.create({
       subjectId = parseGri(get(subjectRecord, 'id')).entityId;
     } catch (error) {
       console.error(
-        'mixin:privileges-aspect-base: getPrivilegesGriForRecord: ' +
+        'mixin:members-aspect-base: getPrivilegesGriForRecord: ' +
         'error parsing GRI: ',
         error
       );
