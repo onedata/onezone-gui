@@ -9,12 +9,14 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
+import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,
@@ -23,6 +25,8 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   i18n: service(),
   navigationState: service(),
   groupActionsService: service('groupActions'),
+  groupManager: service(),
+  globalNotify: service(),
   router: service(),
 
   /**
@@ -67,6 +71,43 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     return type === 'group' ?
       groupActionsService.removeChildGroup(group, member) :
       groupActionsService.removeUser(group, member);
+  },
+
+  /**
+   * @override
+   */
+  removeMembers(members) {
+    const {
+      groupManager,
+      globalNotify,
+      group,
+    } = this.getProperties(
+      'groupManager',
+      'globalNotify',
+      'group'
+    );
+
+    const groupEntityId = get(group, 'entityId');
+    const promise = Promise.all(members.map(member => {
+      const memberEntityId = get(member, 'entityId');
+      if (get(member, 'entityType') === 'user') {
+        return groupManager.removeUserFromGroup(
+          groupEntityId,
+          memberEntityId
+        );
+      } else {
+        return groupManager.removeGroupFromGroup(
+          groupEntityId,
+          memberEntityId
+        );
+      }
+    }));
+    return promise.then(() => {
+      globalNotify.success(this.t('removeMembersSuccess'));
+    }).catch(error => {
+      globalNotify.backendError(this.t('membersDeletion'), error);
+      throw error;
+    });
   },
 
   /**

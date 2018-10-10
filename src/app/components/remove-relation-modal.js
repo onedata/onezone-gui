@@ -8,9 +8,11 @@
  */
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
-import { computed, get } from '@ember/object';
+import { computed, get, getProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
+import { isArray } from '@ember/array';
+import _ from 'lodash';
 
 export default ProceedProcessModal.extend({
   /**
@@ -35,9 +37,16 @@ export default ProceedProcessModal.extend({
     'parentType',
     'childType',
     function headerText() {
+      let {
+        childType,
+        parentType,
+      } = this.getProperties('childType', 'parentType');
+      if (childType.includes('And')) {
+        childType = 'members';
+      }
       return this.t('headerText', {
-        childType: this.get('childType'),
-        parentType: this.get('parentType'),
+        childType: this.t('header' + _.upperFirst(childType)),
+        parentType: this.t('header' + _.upperFirst(parentType)),
       });
     }
   ),
@@ -52,22 +61,34 @@ export default ProceedProcessModal.extend({
       const {
         parent,
         child,
+        childrenNumber,
         parentType,
         childType,
-      } = this.getProperties('parent', 'child', 'parentType', 'childType');
+      } = this.getProperties(
+        'parent',
+        'child',
+        'childrenNumber',
+        'parentType',
+        'childType'
+      );
       const parentName = get(parent || {}, 'name');
-      const childName = get(child || {}, 'name');
+      let childName;
+      if (isArray(child)) {
+        childName = get(child[0], 'name');
+      } else {
+        childName = get(child || {}, 'name');
+      }
       let message = this.t('areYouSure', {
-        parentType: this.t(parentType),
-        parentName,
-        childType: this.t(childType),
-        childName,
+        parent: this.t(parentType, { name: parentName }),
+        child: this.t(childType, Object.assign({ name: childName }, childrenNumber)),
       });
       message += '<br><br><strong class="text-danger">';
       if (childType === 'user') {
         message += this.t('operationCauseUser', { childName });
-      } else {
+      } else if (childType === 'group') {
         message += this.t('operationCauseMembers');
+      } else {
+        message += this.t('operationCauseMulti');
       }
       if (parentType !== 'space') {
         message += this.t('allInherited', { parentType, parentName });
@@ -85,11 +106,58 @@ export default ProceedProcessModal.extend({
   parentType: reads('parent.entityType'),
 
   /**
-   * @type {Ember.ComputedProperty<string>}
+   * @type {Ember.ComputedProperty<object>}
    */
-  childType: computed('parent.entityType', 'child.entityType', function () {
+  childrenNumber: computed(
+    'child.entityType,@each.entityType',
+    function childrenNumber() {
+      let child = this.get('child');
+      const childrenTypes = {
+        users: 0,
+        sharedUsers: 0,
+        groups: 0,
+      };
+      if (!child) {
+        return childrenTypes;
+      } else {
+        if (!isArray(child)) {
+          child = [child];
+        }
+        child.mapBy('entityType')
+          .forEach(type => childrenTypes[_.camelCase(type) + 's']++);
+        childrenTypes['users'] += childrenTypes['sharedUsers'];
+        delete childrenTypes['sharedUsers'];
+        return childrenTypes;
+      }
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<string|object>}
+   */
+  childType: computed('parent.entityType', 'childrenNumber', function () {
     const parentType = this.get('parent.entityType');
-    const childType = this.get('child.entityType');
-    return parentType === 'group' && childType === 'group' ? 'subgroup' : childType;
+    const childrenNumber = this.get('childrenNumber');
+    const {
+      users,
+      groups,
+    } = getProperties(childrenNumber, 'users', 'groups');
+    if (users + groups === 1) {
+      if (users) {
+        return 'user';
+      } else {
+        return parentType === 'group' && groups ? 'subgroup' : 'group';
+      }
+    } else {
+      let type = users ? (users === 1 ? 'user' : 'users') : '';
+      type += users && groups ? 'And' : '';
+      let groupsPart =
+        groups ? (parentType === 'group' ? 'subgroup' : 'group') : '';
+      if (groups > 1) {
+        groupsPart += 's';
+      }
+      type += type ? _.upperFirst(groupsPart) : groupsPart;
+      return type;
+    }
   }),
 });

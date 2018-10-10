@@ -9,7 +9,7 @@
 
 import Mixin from '@ember/object/mixin';
 import { computed, get, observer } from '@ember/object';
-import { union, reads } from '@ember/object/computed';
+import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -20,6 +20,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
+import { isArray } from '@ember/array';
 
 export default Mixin.create({
   privilegeManager: service(),
@@ -221,6 +222,25 @@ export default Mixin.create({
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  removeSelectedAction: computed(
+    'batchEditAvailable',
+    function removeSelectedAction() {
+      return {
+        action: () => this.set(
+          'memberToRemove',
+          this.get('selectedRecordProxies').mapBy('subject')
+        ),
+        title: this.t('removeSelected'),
+        class: 'remove-selected-action',
+        icon: 'close',
+        disabled: !this.get('batchEditAvailable'),
+      };
+    }
+  ),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   groupActions: computed(function groupActions() {
@@ -307,18 +327,20 @@ export default Mixin.create({
    */
   globalActions: computed(
     'batchEditAction',
+    'removeSelectedAction',
     function globalActions() {
       const {
         batchEditAction,
-      } = this.getProperties('batchEditAction');
-      return [batchEditAction];
+        removeSelectedAction,
+      } = this.getProperties('batchEditAction', 'removeSelectedAction');
+      return [batchEditAction, removeSelectedAction];
     }
   ),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  headerActions: reads('inviteActions'),
+  headerActions: collect('removeSelectedAction'),
 
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
@@ -444,6 +466,16 @@ export default Mixin.create({
   },
 
   /**
+   * Removes members. Should be implemented in component.
+   * @virtual
+   * @param {Array<GraphSingleModel>} members
+   * @return {Promise}
+   */
+  removeMembers() {
+    return notImplementedReject();
+  },
+
+  /**
    * Creates child group. Should be implemented in component.
    * @virtual
    * @param {string} name group name
@@ -520,10 +552,14 @@ export default Mixin.create({
     },
     removeMember() {
       this.set('isRemovingMember', true);
-      return this.removeMember(
-        this.get('memberTypeToRemove'),
-        this.get('memberToRemove')
-      ).finally(() =>
+      let promise;
+      const memberToRemove = this.get('memberToRemove');
+      if (isArray(memberToRemove)) {
+        promise = this.removeMembers(this.get('memberToRemove'));
+      } else {
+        promise = this.removeMember(memberToRemove, this.get('memberToRemove'));
+      }
+      return promise.finally(() =>
         safeExec(this, 'setProperties', {
           isRemovingMember: false,
           memberToRemove: null,

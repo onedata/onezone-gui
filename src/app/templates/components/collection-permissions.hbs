@@ -3,7 +3,7 @@
   class=(concat subjectType "-list")
   selectionChanged=recordsSelected
   as |list|}}
-  {{#list.header title=listHeader searchVisible=false}}
+  {{#list.header title=listHeader searchVisible=proxyList.length withPlaceForDots=true}}
     {{actions-toolbar
       isMinimized=true
       toolbarClasses=""

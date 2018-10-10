@@ -9,12 +9,14 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
+import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   layout,
@@ -23,6 +25,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   i18n: service(),
   navigationState: service(),
   spaceActions: service(),
+  spaceManager: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -58,6 +62,43 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
     return type === 'group' ?
       spaceActions.removeGroup(space, member) :
       spaceActions.removeUser(space, member);
+  },
+
+    /**
+   * @override
+   */
+  removeMembers(members) {
+    const {
+      spaceManager,
+      globalNotify,
+      space,
+    } = this.getProperties(
+      'spaceManager',
+      'globalNotify',
+      'space'
+    );
+
+    const spaceEntityId = get(space, 'entityId');
+    const promise = Promise.all(members.map(member => {
+      const memberEntityId = get(member, 'entityId');
+      if (get(member, 'entityType') === 'user') {
+        return spaceManager.removeUserFromSpace(
+          spaceEntityId,
+          memberEntityId
+        );
+      } else {
+        return spaceManager.removeGroupFromSpace(
+          spaceEntityId,
+          memberEntityId
+        );
+      }
+    }));
+    return promise.then(() => {
+      globalNotify.success(this.t('removeMembersSuccess'));
+    }).catch(error => {
+      globalNotify.backendError(this.t('membersDeletion'), error);
+      throw error;
+    });
   },
 
   /**

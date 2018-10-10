@@ -13,4 +13,7 @@ export default {
   join: 'Join',
   inviteGroupUsingToken: 'Invite group using token',
   inviteUserUsingToken: 'Invite user using token',
+  removeSelected: 'Remove selected',
+  removeMembersSuccess: 'Members has been removed',
+  membersDeletion: 'members deletion',
 };
