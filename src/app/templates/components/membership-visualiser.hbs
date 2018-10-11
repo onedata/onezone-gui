@@ -11,8 +11,8 @@
       showDescription=showDescription}}
   {{/each}}
   {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
-    <div class="membership limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
-      <span class="membership-element">{{tt this "showingFirstNPaths" limit=paths.length}}</span>
+    <div class="membership-row limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
+      <span class="membership-row-element">{{tt this "showingFirstNPaths" limit=paths.length}}</span>
     </div>
   {{/if}}
 {{/unless}}

@@ -916,11 +916,16 @@ export default Component.extend(I18n, {
       const {
         privilegesEditorModel,
         privilegeActions,
+        relationPrivilegesToChange,
       } = this.getProperties(
         'privilegesEditorModel',
-        'privilegeActions'
+        'privilegeActions',
+        'relationPrivilegesToChange'
       );
       return privilegeActions.handleSave(privilegesEditorModel.save())
+        .then(() => {
+          get(relationPrivilegesToChange, 'parent').reload();
+        })
         .finally(() =>
           safeExec(this, 'setProperties', {
             relationPrivilegesToChange: null,

@@ -16,7 +16,7 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
-  classNames: ['membership-element', 'membership-block'],
+  classNames: ['membership-row-element', 'membership-block'],
   classNameBindings: ['recordType', 'actionsOpened'],
 
   /**

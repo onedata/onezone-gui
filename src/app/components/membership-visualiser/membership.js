@@ -20,7 +20,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 
 export default Component.extend(I18n, {
-  classNames: ['membership'],
+  classNames: ['membership-row', 'membership'],
   classNameBindings: [
     'isFilteredOut:filtered-out',
     'showDescription:with-description',
@@ -40,7 +40,7 @@ export default Component.extend(I18n, {
   pathStart: null,
 
   /**
-   * @type {MembershipPath}
+   * @type {Utils/MembershipVisualiser/MembershipPath}
    * @virtual
    */
   path: null,
@@ -113,6 +113,11 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel>>}
    */
   recordsProxy: reads('path.model'),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isFilteredOut: reads('path.isFilteredOut'),
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
@@ -240,11 +245,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  isFilteredOut: reads('path.isFilteredOut'),
 
   didInsertElement() {
     this._super(...arguments);

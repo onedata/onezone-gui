@@ -10,11 +10,12 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import { collect } from '@ember/object/computed';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
-  classNames: ['membership-element', 'membership-relation'],
+  classNames: ['membership-row-element', 'membership-relation'],
   classNameBindings: ['isHovered:hovered'],
 
   /**
@@ -73,53 +74,41 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  modifyPrivilegesAction: computed(function modifyPrivilegesAction() {
-    return {
-      action: () => this.get('modifyPrivileges')(),
-      title: this.t('modifyPrivileges'),
-      class: 'modify-privileges-action',
-      icon: 'permissions',
-    };
-  }),
+  modifyPrivilegesAction: computed(
+    'relation.canViewPrivileges',
+    function modifyPrivilegesAction() {
+      return {
+        action: () => this.get('modifyPrivileges')(),
+        title: this.t('modifyPrivileges'),
+        class: 'modify-privileges-action',
+        icon: 'permissions',
+        disabled: !this.get('relation.canViewPrivileges'),
+      };
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  removeRelationAction: computed(function removeRelationAction() {
-    return {
-      action: () => this.get('removeRelation')(),
-      title: this.t('removeRelation'),
-      class: 'remove-relation-action',
-      icon: 'close',
-    };
-  }),
+  removeRelationAction: computed(
+    'relation.exists',
+    function removeRelationAction() {
+      return {
+        action: () => this.get('removeRelation')(),
+        title: this.t('removeRelation'),
+        class: 'remove-relation-action',
+        icon: 'close',
+        disabled: !this.get('relation.exists'),
+      };
+    }
+  ),
 
   /**
    * Relation actions
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  relationActions: computed(
-    'modifyPrivilegesAction',
-    'removeRelationAction',
-    'relation.canViewPrivileges',
-    function relationActions() {
-      const {
-        modifyPrivilegesAction,
-        removeRelationAction,
-      } = this.getProperties(
-        'modifyPrivilegesAction',
-        'removeRelationAction',
-      );
-      const canViewPrivileges = this.get('relation.canViewPrivileges');
-      const actions = [];
-      if (canViewPrivileges) {
-        actions.push(modifyPrivilegesAction);
-      }
-      actions.push(removeRelationAction);
-      return actions;
-    }
-  ),
-
+  relationActions: collect('modifyPrivilegesAction', 'removeRelationAction'),
+  
   mouseEnter() {
     this.changeHover(true);
   },
