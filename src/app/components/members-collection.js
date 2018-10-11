@@ -1,8 +1,8 @@
 /**
- * Permissions presenter and editor for a collection of records. Yields list
- * when there are no items to present.
+ * Renders list of members with additional features specified by `aspect` property.
+ * Yields list when there are no items to present.
  *
- * @module components/collection-permissions
+ * @module components/members-collection
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -19,7 +19,13 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.collectionPermissions',
+  i18nPrefix: 'components.membersCollection',
+
+  /**
+   * One of: privileges, memberships
+   * @type {string}
+   */
+  aspect: 'privileges',
 
   /**
    * @type {Ember.A<PrivilegeRecordProxy>}

@@ -16,4 +16,8 @@ export default {
   removeSelected: 'Remove selected',
   removeMembersSuccess: 'Members has been removed',
   membersDeletion: 'members deletion',
+  direct: 'Direct',
+  effective: 'Effective',
+  privilegesAspect: 'Privileges',
+  membershipsAspect: 'Memberships',
 };

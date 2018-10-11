@@ -1,20 +1,22 @@
 {{#unless (or silentReloadError pathsLoadingProxy.isRejected)}}
-  {{#each sortedPaths key="id" as |path|}}
-    {{membership-visualiser/membership
-      pathStart=contextRecord
-      path=path
-      view=(action "view")
-      removeRelation=(action (mut relationToRemove))
-      modifyPrivileges=(action (mut relationPrivilegesToChange))
-      searchString=searchString
-      visibleBlocks=visibleBlocks
-      showDescription=showDescription}}
-  {{/each}}
-  {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
-    <div class="membership limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
-      <span class="membership-element">{{tt this "showingFirstNPaths" limit=paths.length}}</span>
-    </div>
-  {{/if}}
+  <div class="memberships">
+    {{#each sortedPaths key="id" as |path|}}
+      {{membership-visualiser/membership
+        pathStart=contextRecord
+        path=path
+        view=(action "view")
+        removeRelation=(action (mut relationToRemove))
+        modifyPrivileges=(action (mut relationPrivilegesToChange))
+        searchString=searchString
+        visibleBlocks=visibleBlocks
+        showDescription=showDescription}}
+    {{/each}}
+    {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
+      <div class="membership limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
+        <span class="membership-element">{{tt this "showingFirstNPaths" limit=paths.length}}</span>
+      </div>
+    {{/if}}
+  </div>
 {{/unless}}
 {{#if silentReloadError}}
   {{resource-load-error errorReason=silentReloadError}}

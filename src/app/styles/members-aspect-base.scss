@@ -19,13 +19,40 @@
     margin-left: 65px;
   }
 
+  .membership-visualiser {
+    margin: $padding-large-horizontal;
+    .membership:last-child {
+      border-bottom: 0;
+    }
+  }
+
   .item-modified-header .one-label {
     font-weight: bold;
+  }
+
+  .show-descriptions-toggle {
+    display: inline-block;
+    white-space: nowrap;
+    .one-way-toggle {
+      margin-right: $padding-xs-horizontal;
+    }
+    label {
+      margin-bottom: 0;
+    }
   }
 
   @media (min-width: $screen-sm-min) {
     .item-modified-header {
       padding-right: 230px;
+    }
+    .view-mode-selector {
+      margin-right: $padding-base-horizontal;
+    }
+    .view-tools {
+      line-height: 35px;
+      > * {
+        vertical-align: bottom;
+      }
     }
   }
 
@@ -33,6 +60,12 @@
     .privileges-tree-editor {
       margin-left: $padding-large-horizontal;
       margin-top: 0;
+    }
+    .view-mode-selector {
+      margin-bottom: $padding-base-vertical;
+    }
+    .view-tools {
+      margin: 0 $padding-small-horizontal;
     }
   }
 }

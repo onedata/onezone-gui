@@ -2,22 +2,77 @@
   <div class="row content-row header-row hidden-xs has-border">
     <h1 class="with-menu">
       <span class="one-label">
-        {{tt this "members"}}
+        {{tt this "members"}}<button {{action (mut viewToolsVisible) (not viewToolsVisible)}}>Pokaż wincyj</button>
       </span>
       <div class="btn-toolbar with-place-for-dots">
-        {{#bs-button size="sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}
-          {{tt this "multiedit"}}
-        {{/bs-button}}
+        {{#if (eq aspect "privileges")}}
+          {{#bs-button size="sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}
+            {{tt this "multiedit"}}
+          {{/bs-button}}
+        {{/if}}
       </div>
       {{actions-toolbar isMinimized=true actionsArray=headerActions}}
     </h1>
   </div>
+  {{#if viewToolsVisible}}
+    <div class="view-tools row content-row has-border">
+      {{#bs-button-group
+        value=onlyDirect
+        class="direct-selector view-mode-selector"
+        type="radio"
+        justified=media.isMobile
+        onChange=(action (mut onlyDirect)) as |bg|
+      }}
+        <div class="btn-group" role="group">
+          {{#bg.button type="default" class="btn-sm btn-direct" value=true}}
+            {{tt this "direct"}}
+            {{one-tooltip title="Direct" triggerEvents="hover"}}
+          {{/bg.button}}
+        </div>
+        <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-effecitve" value=false}}
+            {{tt this "effective"}}
+            {{one-tooltip title="Effective" triggerEvents="hover"}}
+          {{/bg.button}}
+        </div>
+      {{/bs-button-group}}
+      {{#bs-button-group
+        value=aspect
+        class="mode-selector view-mode-selector"
+        type="radio"
+        justified=media.isMobile
+        onChange=(action (mut aspect)) as |bg|
+      }}
+        <div class="btn-group" role="group">
+          {{#bg.button type="default" class="btn-sm btn-direct" value="privileges"}}
+            {{tt this "privilegesAspect"}}
+            {{one-tooltip title="Direct" triggerEvents="hover"}}
+          {{/bg.button}}
+        </div>
+        <div class="btn-group" role="group">
+          {{#bg.button type="default" class="btn-sm btn-effecitve" value="memberships"}}
+            {{tt this "membershipsAspect"}}
+            {{one-tooltip title="Effective" triggerEvents="hover"}}
+          {{/bg.button}}
+        </div>
+      {{/bs-button-group}}
+      {{#if (eq aspect "memberships")}}
+        <div class="show-descriptions-toggle">
+          {{one-way-toggle inputId="members-show-descriptions" checked=showDescription update=(action (mut showDescription))}}
+          <label for="members-show-descriptions" class="inline-label">Show descriptions</label>
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
 {{/sticky-element}}
 {{#loading-container
   isLoading=(or groupList.isPending userList.isPending)
   errorReason=(or groupList.reason userList.reason)}}
   <div class="row">
-    {{#collection-permissions
+    {{#members-collection
+      aspect=aspect
+      showDescription=showDescription
+      contextRecord=record
       proxyList=proxyGroupRecordList
       subjectType="group"
       recordsSelected=(action "recordsSelected" "group")
@@ -43,10 +98,13 @@
           </span>
         {{/listItem.header}}
       {{/list.item}}
-    {{/collection-permissions}}
+    {{/members-collection}}
   </div>
   <div class="row">
-    {{#collection-permissions
+    {{#members-collection
+      aspect=aspect
+      showDescription=showDescription
+      contextRecord=record
       proxyList=proxyUserRecordList
       subjectType="user"
       recordsSelected=(action "recordsSelected" "user")
@@ -72,7 +130,7 @@
           </span>
         {{/listItem.header}}
       {{/list.item}}
-    {{/collection-permissions}}
+    {{/members-collection}}
   </div>
 {{/loading-container}}
 {{privileges-editor-modal

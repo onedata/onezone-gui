@@ -272,7 +272,7 @@ export default EmberObject.extend({
    * @param {boolean} reloadRecords if true, records will be reloaded after save
    * @returns {Promise}
    */
-  save(reloadRecords = false) {
+  save(reloadRecords = true) {
     let promise;
     if (!this.get('isModified')) {
       promise = resolve();

@@ -67,12 +67,19 @@
               {{tt this "reset"}}
             {{/bs-button}}
           </div>
-          {{privileges-tree-editor
-            privilegesGroups=groupedPrivilegesFlags
-            privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-            privilegesTranslationsPath=privilegesTranslationsPath
-            recordProxy=recordProxy
-            editionEnabled=(not recordProxy.isSaving)}}
+          {{#if (eq aspect "privileges")}}
+            {{privileges-tree-editor
+              privilegesGroups=groupedPrivilegesFlags
+              privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+              privilegesTranslationsPath=privilegesTranslationsPath
+              recordProxy=recordProxy
+              editionEnabled=(not recordProxy.isSaving)}}
+          {{else if (eq aspect "memberships")}}
+            {{membership-visualiser
+              contextRecord=recordProxy.subject
+              targetRecord=contextRecord
+              showDescription=showDescription}}
+          {{/if}}
         {{/render-later}}
       {{/listItem.content}}
     {{/list.item}}

@@ -25,6 +25,7 @@ import { isArray } from '@ember/array';
 export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
+  media: service(),
 
   /**
    * @type {DS.Model}
@@ -51,6 +52,16 @@ export default Mixin.create({
     user: 'user',
     group: 'group',
   }),
+
+  /**
+   * @type {boolean}
+   */
+  onlyDirect: true,
+
+  /**
+   * @type {string}
+   */
+  aspect: 'privileges',
 
   /**
    * @type {Ember.Array<PrivilegeRecordProxy>}
@@ -121,6 +132,16 @@ export default Mixin.create({
   inviteTokenModalType: null,
 
   /**
+   * @type {boolean}
+   */
+  viewToolsVisible: false,
+  
+  /**
+   * @type {boolean}
+   */
+  showDescription: false,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   privilegesTranslationsPath: computed(
@@ -177,6 +198,11 @@ export default Mixin.create({
   proxyUserRecordList: computed(function proxyUserRecordList() {
     return A();
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<PrivilegeRecordProxy>>}
+   */
+  recordProxies: union('proxyGroupRecordList', 'proxyUserRecordList'),
 
   /**
    * @type {Ember.ComputedProperty<Array<PrivilegeRecordProxy>>}
@@ -326,14 +352,21 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(
+    'aspect',
     'batchEditAction',
     'removeSelectedAction',
     function globalActions() {
       const {
+        aspect,
         batchEditAction,
         removeSelectedAction,
-      } = this.getProperties('batchEditAction', 'removeSelectedAction');
-      return [batchEditAction, removeSelectedAction];
+      } = this.getProperties('aspect', 'batchEditAction', 'removeSelectedAction');
+      const actions = [];
+      if (aspect === 'privileges') {
+        actions.push(batchEditAction);
+      }
+      actions.push(removeSelectedAction);
+      return actions;
     }
   ),
 
@@ -377,6 +410,14 @@ export default Mixin.create({
 
   userListObserver: observer('userList.[]', function userListObserver() {
     this.preparePermissionListProxy('user');
+  }),
+
+  aspectObserver: observer('aspect', function aspectObserver() {
+    this.get('recordProxies').forEach(recordProxy => {
+      if (get(recordProxy, 'isModified')) {
+        recordProxy.resetModifications();
+      }
+    });
   }),
 
   /**
@@ -505,6 +546,9 @@ export default Mixin.create({
   },
 
   actions: {
+    changeAspect(aspect) {
+      this.set('aspect', String(aspect));
+    },
     recordsSelected(type, records) {
       const {
         proxyGroupRecordList,

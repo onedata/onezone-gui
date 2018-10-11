@@ -33,7 +33,7 @@ import contentGroupsMembership from './components/content-groups-membership';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
-import collectionPermissions from './components/collection-permissions';
+import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
 import contentSpacesMembership from './components/content-spaces-membership';
@@ -89,7 +89,7 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
-    collectionPermissions,
+    membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
     contentSpacesMembership,
