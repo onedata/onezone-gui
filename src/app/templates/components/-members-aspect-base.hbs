@@ -5,8 +5,8 @@
         {{tt this "members"}}<button {{action (mut viewToolsVisible) (not viewToolsVisible)}}>Pokaż wincyj</button>
       </span>
       <div class="btn-toolbar with-place-for-dots">
-        {{#if (eq aspect "privileges")}}
-          {{#bs-button size="sm" onClick=(action "batchEdit") disabled=(not batchEditAvailable)}}
+        {{#if batchEditAvailable}}
+          {{#bs-button size="sm" onClick=(action "batchEdit") disabled=(not batchEditEnabled)}}
             {{tt this "multiedit"}}
           {{/bs-button}}
         {{/if}}

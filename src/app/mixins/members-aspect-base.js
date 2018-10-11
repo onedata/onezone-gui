@@ -225,25 +225,37 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  batchEditAvailable: computed(
+  batchEditAvailable: computed('aspect', 'onlyDirect', function () {
+    const {
+      aspect,
+      onlyDirect,
+    } = this.getProperties('aspect', 'onlyDirect');
+    return aspect === 'privileges' && onlyDirect;
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  batchEditEnabled: computed(
     'selectedRecordProxies.length',
     'isAnySelectedRecordSaving',
-    function batchEditAvailable() {
+    function batchEditEnabled() {
       return this.get('selectedRecordProxies.length') > 0 &&
         !this.get('isAnySelectedRecordSaving');
     }
   ),
+  
 
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  batchEditAction: computed('batchEditAvailable', function batchEditAction() {
+  batchEditAction: computed('batchEditEnabled', function batchEditAction() {
     return {
       action: () => this.send('batchEdit'),
       title: this.t('multiedit'),
       class: 'batch-edit',
       icon: 'rename',
-      disabled: !this.get('batchEditAvailable'),
+      disabled: !this.get('batchEditEnabled'),
     };
   }),
 
@@ -251,7 +263,7 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Action>}
    */
   removeSelectedAction: computed(
-    'batchEditAvailable',
+    'batchEditEnabled',
     function removeSelectedAction() {
       return {
         action: () => this.set(
@@ -261,7 +273,7 @@ export default Mixin.create({
         title: this.t('removeSelected'),
         class: 'remove-selected-action',
         icon: 'close',
-        disabled: !this.get('batchEditAvailable'),
+        disabled: !this.get('batchEditEnabled'),
       };
     }
   ),
@@ -352,17 +364,21 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(
-    'aspect',
     'batchEditAction',
+    'batchEditAvailable',
     'removeSelectedAction',
     function globalActions() {
       const {
-        aspect,
+        batchEditAvailable,
         batchEditAction,
         removeSelectedAction,
-      } = this.getProperties('aspect', 'batchEditAction', 'removeSelectedAction');
+      } = this.getProperties(
+        'batchEditAvailable',
+        'batchEditAction',
+        'removeSelectedAction'
+      );
       const actions = [];
-      if (aspect === 'privileges') {
+      if (batchEditAvailable) {
         actions.push(batchEditAction);
       }
       actions.push(removeSelectedAction);

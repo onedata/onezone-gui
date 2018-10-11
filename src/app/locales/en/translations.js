@@ -29,14 +29,12 @@ import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsMembers from './components/content-groups-members';
-import contentGroupsMembership from './components/content-groups-membership';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
-import contentSpacesMembership from './components/content-spaces-membership';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
 import leaveModal from './components/leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
@@ -85,14 +83,12 @@ let translations = {
     contentGroupsEmpty,
     contentGroupsIndex,
     contentGroupsMembers,
-    contentGroupsMembership,
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
-    contentSpacesMembership,
     groupsHierarchyVisualiser,
     leaveModal,
     groupRemoveModal,
