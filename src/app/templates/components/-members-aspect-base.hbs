@@ -2,7 +2,7 @@
   <div class="row content-row header-row hidden-xs has-border">
     <h1 class="with-menu">
       <span class="one-label">
-        {{tt this "members"}}<button {{action (mut viewToolsVisible) (not viewToolsVisible)}}>Pokaż wincyj</button>
+        {{tt this "members"}}<button {{action (mut viewToolsVisible) (not viewToolsVisible)}}>{{tt this (if viewToolsVisible "hideViewOptions" "showViewOptions")}}</button>
       </span>
       <div class="btn-toolbar with-place-for-dots">
         {{#if batchEditAvailable}}

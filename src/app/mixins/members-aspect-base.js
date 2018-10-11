@@ -245,6 +245,18 @@ export default Mixin.create({
     }
   ),
   
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  viewOptionsAction: computed('viewToolsVisible', function viewOptionsAction() {
+    const viewToolsVisible = this.get('viewToolsVisible');
+    return {
+      action: () => this.toggleProperty('viewToolsVisible'),
+      title: this.t(viewToolsVisible ? 'hideViewOptions' : 'showViewOptions'),
+      class: 'view-options-action',
+      icon: 'no-view',
+    };
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -364,20 +376,23 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(
+    'viewOptionsAction',
     'batchEditAction',
     'batchEditAvailable',
     'removeSelectedAction',
     function globalActions() {
       const {
+        viewOptionsAction,
         batchEditAvailable,
         batchEditAction,
         removeSelectedAction,
       } = this.getProperties(
+        'viewOptionsAction',
         'batchEditAvailable',
         'batchEditAction',
         'removeSelectedAction'
       );
-      const actions = [];
+      const actions = [viewOptionsAction];
       if (batchEditAvailable) {
         actions.push(batchEditAction);
       }

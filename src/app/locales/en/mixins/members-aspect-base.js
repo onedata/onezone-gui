@@ -20,4 +20,6 @@ export default {
   effective: 'Effective',
   privilegesAspect: 'Privileges',
   membershipsAspect: 'Memberships',
+  showViewOptions: 'Show view options',
+  hideViewOptions: 'Hide view options',
 };
