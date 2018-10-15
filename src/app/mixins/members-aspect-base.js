@@ -26,6 +26,7 @@ export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
   media: service(),
+  appStorage: service(),
 
   /**
    * @type {DS.Model}
@@ -251,7 +252,7 @@ export default Mixin.create({
   viewOptionsAction: computed('viewToolsVisible', function viewOptionsAction() {
     const viewToolsVisible = this.get('viewToolsVisible');
     return {
-      action: () => this.toggleProperty('viewToolsVisible'),
+      action: () => this.send('toogleViewTools'),
       title: this.t(viewToolsVisible ? 'hideViewOptions' : 'showViewOptions'),
       class: 'view-options-action',
       icon: 'no-view',
@@ -451,6 +452,21 @@ export default Mixin.create({
     });
   }),
 
+  init() {
+    this._super(...arguments);
+    const appStorage = this.get('appStorage');
+    let viewToolsVisible =
+      appStorage.getData('membersAspectBaseMixin.viewToolsVisible');
+    if (viewToolsVisible === undefined) {
+      viewToolsVisible = false;
+      appStorage.setData(
+        'membersAspectBaseMixin.viewToolsVisible',
+        viewToolsVisible
+      );
+    }
+    this.set('viewToolsVisible', viewToolsVisible);
+  },
+
   /**
    * Generates privilege record GRI for given subject record
    * @param {DS.Model} subjectRecord
@@ -577,6 +593,13 @@ export default Mixin.create({
   },
 
   actions: {
+    toogleViewTools() {
+      this.toggleProperty('viewToolsVisible');
+      this.get('appStorage').setData(
+        'membersAspectBaseMixin.viewToolsVisible',
+        this.get('viewToolsVisible')
+      );
+    },
     changeAspect(aspect) {
       this.set('aspect', String(aspect));
     },

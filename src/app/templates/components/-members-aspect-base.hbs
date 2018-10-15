@@ -6,7 +6,7 @@
         {{#one-icon
           icon="settings"
           class=(concat-classes "view-tools-toggle" (if viewToolsVisible "active"))
-          click=(action (mut viewToolsVisible) (not viewToolsVisible))}}
+          click=(action "toogleViewTools")}}
           {{one-tooltip title=(tt this (if viewToolsVisible "hideViewOptions" "showViewOptions"))}}
         {{/one-icon}}
       </span>
