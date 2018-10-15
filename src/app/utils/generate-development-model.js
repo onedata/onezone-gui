@@ -99,21 +99,31 @@ export default function generateDevelopmentModel(store) {
         )
         .then(() => listRecords);
     })
-    // add groups, users and privileges to groups
+    // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords[types.indexOf('group')].get('list')
       .then(records =>
         Promise.all(records.map(record =>
-          attachSharedUsersGroupsToModel(
-            store, record, 'group', sharedUsers, groups
-          )
+          Promise.all([
+            attachSharedUsersGroupsToModel(
+              store, record, 'group', sharedUsers, groups
+            ),
+            attachMembershipsToModel(
+              store, record, 'group', groups
+            ),
+          ])
         ))
       )
       .then(() => listRecords[types.indexOf('space')].get('list')
         .then(records =>
           Promise.all(records.map(record =>
-            attachSharedUsersGroupsToModel(
-              store, record, 'space', sharedUsers, groups
-            )
+            Promise.all([
+              attachSharedUsersGroupsToModel(
+                store, record, 'space', sharedUsers, groups
+              ),
+              attachMembershipsToModel(
+                store, record, 'space', groups
+              ),
+            ])
           ))
         )
       )
@@ -261,6 +271,25 @@ function attachSharedUsersGroupsToModel(
       record.set('userList', list);
       return record.save();
     });
+}
+
+function attachMembershipsToModel(
+  store,
+  record,
+  modelType,
+  groups
+) {
+  return store.createRecord('membership', {
+    id: gri({
+      entityType: modelType,
+      entityId: get(record, 'entityId'),
+      aspect: 'eff_user_membership',
+      aspectId: USER_ID,
+      scope: 'private',
+    }),
+    intermediaries: groups.mapBy('id'),
+    directMembership: true,
+  }).save();
 }
 
 function createPrivilegesForModel(

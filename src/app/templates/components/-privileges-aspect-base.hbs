@@ -29,7 +29,7 @@
       subjectType="group"
       recordsSelected=(action "recordsSelected" "group")
       listHeader=(tt this "groups")
-      itemIcon="group"
+      itemIcon="groups"
       groupedPrivilegesFlags=groupedPrivilegesFlags
       privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
       privilegesTranslationsPath=privilegesTranslationsPath
@@ -90,13 +90,11 @@
   opened=batchEditActive
   processing=batchEditModalModel.isSaving
   treeRootText=(tt this "batchEditModalSelectedItems")}}
-{{proceed-process-modal
+{{remove-relation-modal
   opened=(and memberToRemove (not memberToRemove.isDeleted))
   close=(action (mut memberToRemove) null)
   proceed=(action "removeMember")
   processing=isRemovingMember
-  modalClass="remove-member"
-  headerText=(tt this "removeMemberHeader")
-  messageText=(tt this "removeMemberAreYouSure" modelName=model.name memberName=memberToRemove.name)
-  proceedButtonText=(tt this "remove")}}
+  parent=record
+  child=memberToRemove}}
 {{yield}}

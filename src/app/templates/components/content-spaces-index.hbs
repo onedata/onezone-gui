@@ -20,8 +20,8 @@
 </div>
 
 <div class="row content-row">
-  <div class="one-tile-container text-center">
-    {{#one-tile title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
+  <div class="one-tile-container">
+    {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
       {{#loading-container
         isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
       }}
@@ -43,7 +43,20 @@
         {{/if}}
       {{/loading-container}}
     {{/one-tile}}
-
+    {{#one-tile
+      isScalable=true
+      title=(tt this "tileMembershipTitle")
+      aspect="membership"
+      as |tile|}}
+      {{#promise-proxy-container proxy=userProxy}}
+        {{membership-visualiser
+          contextRecord=userProxy.content
+          targetRecord=space
+          maxPathsNumber=4
+          visibleBlocks=(if tile.sizeClass 4 2)
+          isCondensed=true}}
+      {{/promise-proxy-container}}
+    {{/one-tile}}
     {{yield}}
   </div>
 </div>

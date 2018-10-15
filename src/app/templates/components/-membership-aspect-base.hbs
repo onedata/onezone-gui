@@ -1,0 +1,29 @@
+<div class="row content-row header-row hidden-xs has-border">
+  <h1 class="with-menu">
+    <span class="one-label">
+      {{tt this "membership"}}
+    </span>
+  </h1>
+  <div class="form-group form-group-sm form-group-light search-group content-search">
+    <div class="input-group with-icon-addon">
+      {{search-bar
+        search=(action (mut searchString))
+        placeholder=(tt this "filter")
+        class="form-control"}}
+      <div class="input-group-addon">
+        {{one-icon icon="search"}}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row content-row">
+  <label class="inline-label">Show descriptions</label>
+  {{one-way-toggle checked=showDescription update=(action (mut showDescription))}}
+</div>
+{{#promise-proxy-container proxy=userProxy}}
+  {{membership-visualiser
+    contextRecord=userProxy.content
+    targetRecord=targetRecord
+    searchString=searchString
+    showDescription=showDescription}}
+{{/promise-proxy-container}}

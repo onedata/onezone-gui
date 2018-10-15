@@ -13,7 +13,7 @@
     removeRelation=removeRelation}}
 {{/if}}
 
-{{one-icon class="box-icon" icon="group"}}
+{{one-icon class="box-icon" icon="groups"}}
 
 {{!-- optimization: rendering editor only when needed --}}
 {{#if isRenaming}}
@@ -50,7 +50,7 @@
     {{/render-later}}
   {{/one-icon}}
 {{/if}}
-{{#if groupBox.group.membership}}
+{{#if groupBox.group.isEffectiveMember}}
   {{one-icon
     icon="settings-circle-filled"
     class=(concat "actions-trigger group-actions-trigger actions-group-" elementId)

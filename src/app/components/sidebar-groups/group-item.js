@@ -99,6 +99,27 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinAsSubgroupAction: computed(function () {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-as-subgroup'
+      ),
+      title: this.t('joinAsSubgroup'),
+      class: 'join-as-subgroup-action',
+      icon: 'join-plug',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   leaveAction: computed(function () {
     return {
       action: () => this.send('showLeaveModal'),
@@ -126,23 +147,27 @@ export default Component.extend(I18n, {
   itemActions: computed(
     'renameAction',
     'joinSpaceAction',
+    'joinAsSubgroupAction',
     'removeAction',
     'leaveAction',
     function () {
       const {
         renameAction,
         joinSpaceAction,
+        joinAsSubgroupAction,
         removeAction,
         leaveAction,
       } = this.getProperties(
         'renameAction',
         'joinSpaceAction',
+        'joinAsSubgroupAction',
         'removeAction',
         'leaveAction'
       );
       return [
         renameAction,
         joinSpaceAction,
+        joinAsSubgroupAction,
         leaveAction,
         removeAction,
       ];

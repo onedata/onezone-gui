@@ -35,7 +35,7 @@ const RelationList = EmberObject.extend({
     const model = this;
     return {
       ids() {
-        return get(model, '_list').mapBy('name');
+        return get(model, '_list').mapBy('id');
       },
       reload() {
         return get(model, 'list');
@@ -45,12 +45,15 @@ const RelationList = EmberObject.extend({
 });
 
 const GroupStub = EmberObject.extend({
+  entityType: 'group',
   hasViewPrivilege: true,
-  membership: true,
+  isEffectiveMember: true,
   directMembership: true,
   _token: 'token1',
 
-  id: reads('name'),
+  id: computed('name', function id() {
+    return `group.${this.get('name')}.instance:auto`;
+  }),
 
   _childList: computed(function _childList() {
     return A();
@@ -536,7 +539,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
         return helper.clickGroupBoxActions($groupBox, ['.leave-group-action']);
       })
-      .then(() => click('.group-leave-modal .proceed'))
+      .then(() => click('.leave-modal .proceed'))
       .then(() => {
         expect(get(leftGroup, 'name')).to.equal('b2');
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
@@ -571,7 +574,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
         return helper.clickRelationActions($groupBox, '.remove-relation-action');
       })
-      .then(() => click('.group-remove-relation-modal .proceed'))
+      .then(() => click('.remove-relation-modal .proceed'))
       .then(() => {
         expect(get(parentGroup, 'name')).to.equal('a1');
         expect(get(childGroup, 'name')).to.equal('b2');
