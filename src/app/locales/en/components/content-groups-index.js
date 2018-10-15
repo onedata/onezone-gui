@@ -1,3 +1,3 @@
 export default {
-  tileMembershipTitle: 'Membership',
+  tileMembershipTitle: 'Your membership',
 };

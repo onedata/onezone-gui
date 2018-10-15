@@ -108,7 +108,7 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   relationActions: collect('modifyPrivilegesAction', 'removeRelationAction'),
-  
+
   mouseEnter() {
     this.changeHover(true);
   },

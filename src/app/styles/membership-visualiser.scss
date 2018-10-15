@@ -14,13 +14,23 @@
   }
 
   &.condensed {
+    font-size: 0.9em;
     .membership-relation {
-      width: 30px;
+      width: 10px;
+      .dot {
+        display: none;
+      }
     }
     .membership-block {
       max-width: 120px;
       .type-icon {
         pointer-events: none;
+      }
+      &:first-child, &:last-child {
+        .record-name {
+          width: 0;
+          margin: 0;
+        }
       }
     }
     .membership-row-element {
@@ -35,7 +45,7 @@
   }
   .membership-block {
     position: relative;
-    padding-left: 3.2em;
+    padding-left: 3em;
     max-width: 250px;
     .type-icon {
       @include vertical-align-middle();
