@@ -17,7 +17,9 @@
         disableToggleIcon=itemActions.length
         class=(if recordProxy.isModified "item-modified-header")}}
         <span class="item-icon-container">
-          {{one-icon class="item-icon" icon=itemIcon}}
+          {{one-icon
+            class="item-icon"
+            icon=(if (eq subjectType "user") "user" (oneicon-name-translator "group" recordProxy.subject.type))}}
           {{one-tooltip
             title=recordProxy.subject.name
             placement="top"

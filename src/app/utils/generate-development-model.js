@@ -227,6 +227,7 @@ function createGroupsRecords(store) {
     return store.createRecord('group', {
       name: `group${index}`,
       scope: 'private',
+      type: 'team',
       directMembership: true,
       canViewPrivileges: true,
     }).save();

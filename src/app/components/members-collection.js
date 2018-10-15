@@ -57,13 +57,6 @@ export default Component.extend(I18n, {
   listHeader: undefined,
 
   /**
-   * Name of icon used for each list entry.
-   * @virtual
-   * @type {string}
-   */
-  itemIcon: undefined,
-
-  /**
    * 1-level-nested tree with privileges. It should group privileges
    * into categories.
    * @type {Object}
