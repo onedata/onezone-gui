@@ -2,7 +2,13 @@
   <div class="row content-row header-row hidden-xs has-border">
     <h1 class="with-menu">
       <span class="one-label">
-        {{tt this "members"}}<button {{action (mut viewToolsVisible) (not viewToolsVisible)}}>{{tt this (if viewToolsVisible "hideViewOptions" "showViewOptions")}}</button>
+        {{tt this "members"}}
+        {{#one-icon
+          icon="settings"
+          class=(concat-classes "view-tools-toggle" (if viewToolsVisible "active"))
+          click=(action (mut viewToolsVisible) (not viewToolsVisible))}}
+          {{one-tooltip title=(tt this (if viewToolsVisible "hideViewOptions" "showViewOptions"))}}
+        {{/one-icon}}
       </span>
       <div class="btn-toolbar with-place-for-dots">
         {{#if batchEditAvailable}}
