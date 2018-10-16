@@ -3,7 +3,7 @@ export default {
   user: 'user',
   group: 'group',
   space: 'space',
-  showingFirstNPaths: 'Showing first {{limit}} membership paths',
+  showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
     viewGroup: 'View group',

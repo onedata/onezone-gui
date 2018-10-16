@@ -92,9 +92,8 @@ describe('Integration | Component | membership visualiser', function () {
       contextRecord=user
       targetRecord=groups.[0]}}`);
     return wait().then(() => {
-      // includes limit-info row
-      expect(this.$('.membership')).to.have.length(4);
-      expect(this.$('.membership.limit-info')).to.exist;
+      expect(this.$('.membership')).to.have.length(3);
+      expect(this.$('.limit-info')).to.exist;
     });
   });
 

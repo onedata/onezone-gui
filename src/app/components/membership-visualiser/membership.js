@@ -20,7 +20,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 
 export default Component.extend(I18n, {
-  classNames: ['membership'],
+  classNames: ['membership-row', 'membership'],
   classNameBindings: [
     'isFilteredOut:filtered-out',
     'showDescription:with-description',
@@ -40,7 +40,7 @@ export default Component.extend(I18n, {
   pathStart: null,
 
   /**
-   * @type {MembershipPath}
+   * @type {Utils/MembershipVisualiser/MembershipPath}
    * @virtual
    */
   path: null,
@@ -115,6 +115,11 @@ export default Component.extend(I18n, {
   recordsProxy: reads('path.model'),
 
   /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isFilteredOut: reads('path.isFilteredOut'),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
   pathElements: computed(
@@ -129,7 +134,7 @@ export default Component.extend(I18n, {
       if (get(recordsProxy, 'isFulfilled')) {
         // Path is built from the end to the beginning, because some of the first
         // elements can by joined into one "more" block at the end.
-        const reversedRecords = [pathStart].concat(get(recordsProxy, 'content')).reverse();
+        const reversedRecords = get(recordsProxy, 'content').slice(0).reverse();
         const blocks = [];
         let blocksLength = 0;
         while (
@@ -153,6 +158,11 @@ export default Component.extend(I18n, {
           }
           blocksLength++;
         }
+        blocks.unshift({
+          id: 'block|' + get(pathStart, 'gri'),
+          type: 'block',
+          record: pathStart,
+        });
         let prevBlock = blocks[0];
         const elements = [blocks[0]];
         blocks.slice(1).forEach(block => {
@@ -240,11 +250,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  isFilteredOut: reads('path.isFilteredOut'),
 
   didInsertElement() {
     this._super(...arguments);

@@ -8,38 +8,47 @@
 
   &.loading {
     pointer-events: none;
-    .membership {
+    .membership-row {
       opacity: 0.3
     }
   }
 
   &.condensed {
+    font-size: 0.9em;
     .membership-relation {
-      width: 30px;
+      width: 10px;
+      .dot {
+        display: none;
+      }
     }
     .membership-block {
       max-width: 120px;
       .type-icon {
         pointer-events: none;
       }
+      &:first-child, &:last-child {
+        .record-name {
+          width: 0;
+          margin: 0;
+        }
+      }
     }
-    .membership-element {
+    .membership-row-element {
       pointer-events: none;
     }
   }
 
-  .membership-element {
+  .membership-row-element {
     display: inline-block;
     vertical-align: middle;
     line-height: $row-height;
   }
   .membership-block {
     position: relative;
-    padding-left: 3.2em;
+    padding-left: 3em;
     max-width: 250px;
     .type-icon {
       @include vertical-align-middle();
-      position: absolute;
       left: $padding-xs-horizontal;
       font-size: 2.2em;
     }
@@ -79,7 +88,6 @@
     }
     .link-icon {
       @include vertical-align-middle();
-      position: absolute;
       right: $padding-xs-horizontal;
       font-size: 1em;
       color: $color-one-azure;
@@ -144,8 +152,6 @@
     .actions-trigger {
       $trigger-size: 22px;
       @include absolute-align-middle-center();
-      position: absolute;
-      left: 50%;
       color: $color-one-blue-gray;
       font-size: $trigger-size;
       opacity: 0;
@@ -182,7 +188,7 @@
     font-style: italic;
     margin: 0 0.8em;
   }
-  .membership {
+  .membership-row {
     position: relative;
     min-height: $row-height;
     border-bottom: 1px solid $main-border-color;
