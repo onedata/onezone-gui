@@ -2,8 +2,12 @@
   hasCheckboxes=true
   class=(concat subjectType "-list")
   selectionChanged=recordsSelected
+  isListCollapsed=(unbound (and (gt collapseForNumber 0) (gt proxyList.length collapseForNumber)))
   as |list|}}
-  {{#list.header title=listHeader searchVisible=proxyList.length withPlaceForDots=true}}
+  {{#list.header
+    title=(concat listHeader " (" proxyList.length ")")
+    searchVisible=proxyList.length
+    withPlaceForDots=true}}
     {{actions-toolbar
       isMinimized=true
       toolbarClasses=""

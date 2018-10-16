@@ -41,6 +41,13 @@ export default Component.extend(I18n, {
   subjectType: undefined,
 
   /**
+   * If greater than 0, autocollapses list on init if number of records is over
+   * `collapseForNumber`. If equal to 0, list is never autocollapsed.
+   * @type {number}
+   */
+  collapseForNumber: 0,
+
+  /**
    * Called after list item selection.
    * @virtual
    * @type {function}
