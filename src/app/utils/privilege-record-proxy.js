@@ -102,6 +102,12 @@ export default EmberObject.extend({
   modifiedPrivileges: Object.freeze({}),
 
   /**
+   * If true, then records should be neither modified nor saved.
+   * @type {boolean}
+   */
+  isReadOnly: false,
+
+  /**
    * If true, then modifiedPrivileges differ from effectivePrivilegesSnapshot.
    * Recalculated by updateModificationState method.
    * @type {boolean}

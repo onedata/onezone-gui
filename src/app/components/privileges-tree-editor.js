@@ -46,9 +46,15 @@ export default Component.extend({
 
   /**
    * If false, edition will be not available.
-   * @type {boolean}
+   * @type {Ember.ComputedProperty<boolean>}
    */
-  editionEnabled: true,
+  editionEnabled: computed(
+    'recordProxy.{isSaving,isReadOnly}',
+    function editionEnabled() {
+      return !this.get('recordProxy.isSaving') &&
+        !this.get('recordProxy.isReadOnly');
+    }
+  ),
 
   /**
    * First overridePrivileges.
