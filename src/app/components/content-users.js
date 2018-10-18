@@ -12,6 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
 import { computed, set, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -37,15 +38,6 @@ export default Component.extend(I18n, {
   user: undefined,
 
   /**
-   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
-   */
-  linkedAccountsProxy: computed(function linkedAccountsProxy() {
-    return PromiseObject.create({
-      promise: this.get('linkedAccountManager').getLinkedAccounts(),
-    });
-  }),
-
-  /**
    * @type {undefined|AuthorizerInfo}
    */
   _selectedAuthorizer: undefined,
@@ -68,6 +60,20 @@ export default Component.extend(I18n, {
    */
   _isProvidersDropdownVisible: false,
 
+  /**
+   * @type {ComputedProperty<LinkedAccountList>}
+   */
+  linkedAccountsList: reads('linkedAccountsProxy.content.list'),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
+   */
+  linkedAccountsProxy: computed(function linkedAccountsProxy() {
+    return PromiseObject.create({
+      promise: this.get('linkedAccountManager').getLinkedAccounts(),
+    });
+  }),
+
   identityProviders: computed(function identityProviders() {
     return this.get('authorizerManager').getAvailableAuthorizers();
   }),
@@ -85,17 +91,22 @@ export default Component.extend(I18n, {
     }
   }),
 
-  accountsInfo: computed('_linkedAccounts.[]', 'identityProviders', function accounts() {
+  /**
+   * @type {ComputedProperty<Array<Object>>} `[ { account, authorizer } ]`
+   */
+  accountsInfo: computed('linkedAccountsList.[]', 'identityProviders', function accounts() {
     const {
-      _linkedAccounts,
+      linkedAccountsList,
       identityProviders,
-    } = this.getProperties('_linkedAccounts', 'identityProviders');
-    return _linkedAccounts.map(linkedAccount => ({
-      account: linkedAccount,
-      authorizer: identityProviders.find(idp =>
-        idp.id === get(linkedAccount, 'idp')
-      ),
-    }));
+    } = this.getProperties('linkedAccountsList', 'identityProviders');
+    if (linkedAccountsList) {
+      return linkedAccountsList.map(linkedAccount => ({
+        account: linkedAccount,
+        authorizer: identityProviders.find(idp =>
+          idp.id === get(linkedAccount, 'idp')
+        ),
+      }));
+    }
   }),
 
   /**

@@ -19,9 +19,7 @@
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
   <ul class="indented-row linked-accounts-list">
-    {{#loading-container
-      isLoading=_loadingLinkedAccounts
-      errorReason=_loadingLinkedAccountsError}}
+    {{#promise-proxy-container proxy=linkedAccountsProxy}}
       {{#each accountsInfo as |accountInfo|}}
         <li class="linked-account full-social-icon content-row {{accountInfo.account.idp}}-account">
           {{login-box/social-box-list/social-box

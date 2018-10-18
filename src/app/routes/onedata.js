@@ -8,13 +8,15 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
 import { Promise } from 'rsvp';
+import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
 
-export default OnedataRoute.extend({
-  currentUser: inject(),
+export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
+  currentUser: service(),
+  globalNotify: service(),
 
   model() {
     let currentUser = this.get('currentUser');
@@ -30,5 +32,14 @@ export default OnedataRoute.extend({
       });
       creatingAppModel.catch(reject);
     });
+  },
+
+  setupController(controller) {
+    this._super(...arguments);
+    const errors = this.consumeAuthenticationError();
+    controller.setProperties(errors);
+    if (errors.authenticationErrorReason) {
+      controller.set('authenticationErrorOpened', true);
+    }
   },
 });
