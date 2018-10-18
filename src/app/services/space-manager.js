@@ -143,7 +143,6 @@ export default Service.extend({
       operation: 'create',
     }).then(() => {
       return Promise.all([
-        this.reloadParentList(groupEntityId).catch(ignoreForbiddenError),
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.get('groupManager').reloadSpaceList(groupEntityId)
           .catch(ignoreForbiddenError),

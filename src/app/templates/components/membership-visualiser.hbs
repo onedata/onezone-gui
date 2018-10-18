@@ -24,21 +24,23 @@
   {{promise-proxy-container proxy=pathsLoadingProxy}}
 {{/if}}
 {{#unless isCondensed}}
-  {{#if (eq currentUser.userId relationToRemove.child.entityId)}}
-    {{leave-modal
-      opened=relationToRemove
-      close=(action (mut relationToRemove) null)
-      proceed=(action "removeRelation")
-      processing=isRemovingRelation
-      record=relationToRemove.parent}}
-  {{else}}
-    {{remove-relation-modal
-      opened=relationToRemove
-      close=(action (mut relationToRemove) null)
-      proceed=(action "removeRelation")
-      processing=isRemovingRelation
-      parent=relationToRemove.parent
-      child=relationToRemove.child}}
+  {{#if relationToRemove}}
+    {{#if (eq currentUser.userId relationToRemove.child.entityId)}}
+      {{leave-modal
+        opened=relationToRemove
+        close=(action (mut relationToRemove) null)
+        proceed=(action "removeRelation")
+        processing=isRemovingRelation
+        record=relationToRemove.parent}}
+    {{else}}
+      {{remove-relation-modal
+        opened=relationToRemove
+        close=(action (mut relationToRemove) null)
+        proceed=(action "removeRelation")
+        processing=isRemovingRelation
+        parent=relationToRemove.parent
+        child=relationToRemove.child}}
+    {{/if}}
   {{/if}}
   {{#if privilegesEditorModel}}
     {{privileges-editor-modal

@@ -7,7 +7,7 @@ export default {
   remove: 'Remove',
   removeThisMember: 'Remove this member',
   multiedit: 'Bulk edit',
-  batchEditModalSelectedItems: 'Selected items',
+  batchPrivilegesEditModalSelectedItems: 'Selected items',
   createChildGroup: 'Create new group',
   addYourGroup: 'Add one of your groups',
   join: 'Join',

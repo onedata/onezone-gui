@@ -30,7 +30,7 @@
             {{#truncated-string class="account-type"}}
               {{get (get _accountsAuthorizers account.idp) "name"}}
             {{/truncated-string}}
-            {{#each account.emailList as |email|}}
+            {{#each account.emails as |email|}}
               {{#truncated-string class="account-email"}}
                 {{email}}
               {{/truncated-string}}

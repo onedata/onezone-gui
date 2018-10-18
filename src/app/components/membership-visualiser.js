@@ -466,8 +466,13 @@ export default Component.extend(I18n, {
       entityType,
       entityId,
     } = getProperties(this.get('contextRecord'), 'entityType', 'entityId');
+    const targetEntityType = this.get('targetRecord.entityType');
+    let aspectType = entityType;
+    if (entityType === 'group' && targetEntityType === 'group') {
+      aspectType = 'child';
+    }
     return gri(_.assign(parseGri(recordGri), {
-      aspect: `eff_${entityType}_membership`,
+      aspect: `eff_${aspectType}_membership`,
       aspectId: entityId,
       scope: 'private',
     }));
@@ -500,21 +505,24 @@ export default Component.extend(I18n, {
    * @returns {promise<Array<Membership>>}
    */
   fetchGraphLevel(parentLevel, allNodesMap, silent) {
+    const contextRecordEntityId = this.get('contextRecord.entityId');
     const newLevel = [];
     parentLevel.forEach(parentMembership => {
       if (!get(parentMembership, 'isForbidden') &&
         !get(parentMembership, 'isDeleted')) {
-        get(parentMembership, 'intermediaries').forEach(itermediaryGri => {
-          const membershipGri = this.getMembershipGri(itermediaryGri);
-          if (!allNodesMap.has(itermediaryGri)) {
-            allNodesMap.set(itermediaryGri, null);
-            const fetchSilent = !allNodesMap.has(itermediaryGri) || !silent;
-            const promise = this.fetchMembership(membershipGri, fetchSilent)
-              .then(membership => {
-                allNodesMap.set(itermediaryGri, membership);
-                return membership;
-              });
-            newLevel.push(promise);
+        get(parentMembership, 'intermediaries').forEach(intermediaryGri => {
+          if (parseGri(intermediaryGri).entityId !== contextRecordEntityId) {
+            const membershipGri = this.getMembershipGri(intermediaryGri);
+            if (!allNodesMap.has(intermediaryGri)) {
+              allNodesMap.set(intermediaryGri, null);
+              const fetchSilent = !allNodesMap.has(intermediaryGri) || !silent;
+              const promise = this.fetchMembership(membershipGri, fetchSilent)
+                .then(membership => {
+                  allNodesMap.set(intermediaryGri, membership);
+                  return membership;
+                });
+              newLevel.push(promise);
+            }
           }
         });
       }

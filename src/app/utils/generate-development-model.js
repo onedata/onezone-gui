@@ -238,7 +238,7 @@ function createLinkedAccount(store) {
   return Promise.all(LINKED_ACCOUNT_TYPES.map(idp =>
     store.createRecord('linkedAccount', {
       idp,
-      emailList: A([
+      emails: A([
         `email1@${idp}.com`,
         `email2@${idp}.com`,
       ]),

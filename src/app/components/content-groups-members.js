@@ -42,7 +42,7 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   /**
    * @override
    */
-  privilegeGriAspects: Object.freeze({
+  griAspects: Object.freeze({
     user: 'user',
     group: 'child',
   }),
@@ -90,7 +90,7 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     const groupEntityId = get(group, 'entityId');
     const promise = Promise.all(members.map(member => {
       const memberEntityId = get(member, 'entityId');
-      if (get(member, 'entityType') === 'user') {
+      if (['user', 'shared-user'].includes(get(member, 'entityType'))) {
         return groupManager.removeUserFromGroup(
           groupEntityId,
           memberEntityId

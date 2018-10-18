@@ -12,9 +12,6 @@ import { computed, get, observer } from '@ember/object';
 import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { reject } from 'rsvp';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
@@ -49,7 +46,7 @@ export default Mixin.create({
   /**
    * @type {Object}
    */
-  privilegeGriAspects: Object.freeze({
+  griAspects: Object.freeze({
     user: 'user',
     group: 'group',
   }),
@@ -67,33 +64,27 @@ export default Mixin.create({
   /**
    * @type {Ember.Array<PrivilegeRecordProxy>}
    */
-  selectedUserRecordProxies: Object.freeze(A()),
+  selectedUsersProxies: Object.freeze(A()),
 
   /**
    * @type {Ember.Array<PrivilegeRecordProxy>}
    */
-  selectedGroupRecordProxies: Object.freeze(A()),
+  selectedGroupsProxies: Object.freeze(A()),
 
   /**
    * @type {boolean}
    */
-  batchEditActive: false,
+  batchPrivilegesEditActive: false,
 
   /**
    * @type {PrivilegeRecordProxy}
    */
-  batchEditModalModel: Object.freeze({}),
+  batchPrivilegesEditModalModel: Object.freeze({}),
 
   /**
    * @type {GraphSingleModel}
    */
   memberToRemove: null,
-
-  /**
-   * `group` or `user`
-   * @type {string}
-   */
-  memberTypeToRemove: null,
 
   /**
    * @type {boolean}
@@ -140,7 +131,7 @@ export default Mixin.create({
   /**
    * @type {boolean}
    */
-  showDescription: false,
+  showMembershipDescription: false,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -163,85 +154,47 @@ export default Mixin.create({
   ),
 
   /**
-   * @type {Ember.ComputedProperty<DS.ManyArray>}
-   */
-  groupList: computed('record.hasViewPrivilege', function groupList() {
-    return PromiseArray.create({
-      promise: this.get('record.hasViewPrivilege') !== false ?
-        get(this.get('record'), 'groupList').then(sgl =>
-          sgl ? get(sgl, 'list') : A()
-        ) : reject({ id: 'forbidden' }),
-    });
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<DS.ManyArray>}
-   */
-  userList: computed('record.hasViewPrivilege', function userList() {
-    return PromiseArray.create({
-      promise: this.get('record.hasViewPrivilege') !== false ?
-        get(this.get('record'), 'userList').then(sul =>
-          sul ? get(sul, 'list') : A()
-        ) : reject({ id: 'forbidden' }),
-    });
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Ember.A<PrivilegeRecordProxy>>}
-   */
-  proxyGroupRecordList: computed(function proxyGroupRecordList() {
-    return A();
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Ember.A<PrivilegeRecordProxy>>}
-   */
-  proxyUserRecordList: computed(function proxyUserRecordList() {
-    return A();
-  }),
-
-  /**
    * @type {Ember.ComputedProperty<Array<PrivilegeRecordProxy>>}
    */
-  recordProxies: union('proxyGroupRecordList', 'proxyUserRecordList'),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<PrivilegeRecordProxy>>}
-   */
-  selectedRecordProxies: union(
-    'selectedUserRecordProxies',
-    'selectedGroupRecordProxies'
+  selectedMembersProxies: union(
+    'selectedUsersProxies',
+    'selectedGroupsProxies',
   ),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   isAnySelectedRecordSaving: computed(
-    'selectedRecordProxies.@each.saving',
+    'selectedMembersProxies.@each.saving',
     function isAnySelectedRecordSaving() {
-      return this.get('selectedRecordProxies').filterBy('saving', true).length > 0;
+      return this.get('selectedMembersProxies')
+        .filter(memberProxy => get(memberProxy, 'privilegesProxy.saving')).length > 0;
     }
   ),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  batchEditAvailable: computed('aspect', 'onlyDirect', function () {
+  batchPrivilegesEditAvailable: computed(
+    'aspect',
+    'onlyDirect',
+    function batchPrivilegesEditAvailable() {
     const {
-      aspect,
-      onlyDirect,
-    } = this.getProperties('aspect', 'onlyDirect');
-    return aspect === 'privileges' && onlyDirect;
-  }),
+        aspect,
+        onlyDirect,
+      } = this.getProperties('aspect', 'onlyDirect');
+      return aspect === 'privileges' && onlyDirect;
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  batchEditEnabled: computed(
-    'selectedRecordProxies.length',
+  batchPrivilegesEditEnabled: computed(
+    'selectedMembersProxies.length',
     'isAnySelectedRecordSaving',
-    function batchEditEnabled() {
-      return this.get('selectedRecordProxies.length') > 0 &&
+    function batchPrivilegesEditEnabled() {
+      return this.get('selectedMembersProxies.length') &&
         !this.get('isAnySelectedRecordSaving');
     }
   ),
@@ -262,13 +215,13 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  batchEditAction: computed('batchEditEnabled', function batchEditAction() {
+  batchPrivilegesEditAction: computed('batchPrivilegesEditEnabled', function batchPrivilegesEditAction() {
     return {
-      action: () => this.send('batchEdit'),
+      action: () => this.send('batchPrivilegesEdit'),
       title: this.t('multiedit'),
       class: 'batch-edit',
       icon: 'rename',
-      disabled: !this.get('batchEditEnabled'),
+      disabled: !this.get('batchPrivilegesEditEnabled'),
     };
   }),
 
@@ -276,17 +229,17 @@ export default Mixin.create({
    * @type {Ember.ComputedProperty<Action>}
    */
   removeSelectedAction: computed(
-    'batchEditEnabled',
+    'batchPrivilegesEditEnabled',
     function removeSelectedAction() {
       return {
         action: () => this.set(
           'memberToRemove',
-          this.get('selectedRecordProxies').mapBy('subject')
+          this.get('selectedMembersProxies').mapBy('member')
         ),
         title: this.t('removeSelected'),
         class: 'remove-selected-action',
         icon: 'close',
-        disabled: !this.get('batchEditEnabled'),
+        disabled: !this.get('batchPrivilegesEditEnabled'),
       };
     }
   ),
@@ -296,7 +249,7 @@ export default Mixin.create({
    */
   groupActions: computed(function groupActions() {
     return [{
-      action: (...args) => this.send('showRemoveMemberModal', 'group', ...args),
+      action: member => this.set('memberToRemove', member),
       title: this.t('removeThisMember'),
       class: 'remove-group',
       icon: 'close',
@@ -308,7 +261,7 @@ export default Mixin.create({
    */
   userActions: computed(function userActions() {
     return [{
-      action: (...args) => this.send('showRemoveMemberModal', 'user', ...args),
+      action: member => this.set('memberToRemove', member),
       title: this.t('removeThisMember'),
       class: 'remove-user',
       icon: 'close',
@@ -378,24 +331,24 @@ export default Mixin.create({
    */
   globalActions: computed(
     'viewOptionsAction',
-    'batchEditAction',
-    'batchEditAvailable',
+    'batchPrivilegesEditAction',
+    'batchPrivilegesEditAvailable',
     'removeSelectedAction',
     function globalActions() {
       const {
         viewOptionsAction,
-        batchEditAvailable,
-        batchEditAction,
+        batchPrivilegesEditAvailable,
+        batchPrivilegesEditAction,
         removeSelectedAction,
       } = this.getProperties(
         'viewOptionsAction',
-        'batchEditAvailable',
-        'batchEditAction',
+        'batchPrivilegesEditAvailable',
+        'batchPrivilegesEditAction',
         'removeSelectedAction'
       );
       const actions = [viewOptionsAction];
-      if (batchEditAvailable) {
-        actions.push(batchEditAction);
+      if (batchPrivilegesEditAvailable) {
+        actions.push(batchPrivilegesEditAction);
       }
       actions.push(removeSelectedAction);
       return actions;
@@ -410,7 +363,11 @@ export default Mixin.create({
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
     this.setProperties({
-      visibleInvitationToken: undefined,
+      memberToRemove: null,
+      createChildGroupModalVisible: false,
+      addYourGroupModalVisible: false,
+      joinAsUserModalVisible: false,
+      inviteTokenModalType: null,
     });
   }),
 
@@ -423,37 +380,29 @@ export default Mixin.create({
     }
   ),
 
-  listsObserver: observer(
-    'groupList.content.[]',
-    'userList.content.[]',
-    function listsObserver() {
-      // reset state after lists change
-      this.setProperties({
-        selectedUserRecordProxies: A(),
-        selectedGroupRecordProxies: A(),
-        batchEditActive: false,
-      });
+  selectionObserver: observer(
+    'selectedMembersProxies.[]',
+    function selectionObserver() {
+      // Selection can change due to update of the members list (some of selected
+      // records disappeared). In that case batch privileges editor has incorrect
+      // values and should be closed.
+      this.set('batchPrivilegesEditActive', false);
     }
   ),
 
-  groupListObserver: observer('groupList.[]', function groupListObserver() {
-    this.preparePermissionListProxy('group');
-  }),
-
-  userListObserver: observer('userList.[]', function userListObserver() {
-    this.preparePermissionListProxy('user');
-  }),
-
-  aspectObserver: observer('aspect', function aspectObserver() {
-    this.get('recordProxies').forEach(recordProxy => {
-      if (get(recordProxy, 'isModified')) {
-        recordProxy.resetModifications();
-      }
+  onlyDirectObserver: observer('onlyDirect', function onlyDirectObserver() {
+    // Members scope change reloads lists (including selection), so selection state
+    // should be cleared out
+    this.setProperties({
+      selectedUsersProxies: A(),
+      selectedGroupsProxies: A(),
     });
   }),
 
   init() {
     this._super(...arguments);
+
+    // Restore remembered view tools visibility
     const appStorage = this.get('appStorage');
     let viewToolsVisible =
       appStorage.getData('membersAspectBaseMixin.viewToolsVisible');
@@ -468,74 +417,15 @@ export default Mixin.create({
   },
 
   /**
-   * Generates privilege record GRI for given subject record
-   * @param {DS.Model} subjectRecord
-   * @param {string} type `group` or `user`
-   * @returns {string}
-   */
-  getPrivilegesGriForRecord(subjectRecord, type) {
-    const modelType = this.get('modelType');
-    let recordId, subjectId;
-    try {
-      recordId = parseGri(this.get('record.id')).entityId;
-      subjectId = parseGri(get(subjectRecord, 'id')).entityId;
-    } catch (error) {
-      console.error(
-        'mixin:members-aspect-base: getPrivilegesGriForRecord: ' +
-        'error parsing GRI: ',
-        error
-      );
-      return '';
-    }
-    return this.get('privilegeManager').generateGri(
-      modelType,
-      recordId,
-      this.get(`privilegeGriAspects.${type}`),
-      subjectId
-    );
-  },
-
-  /**
-   * Prepares list of container objects for privileges records
-   * @param {string} subjectType `user` or `group`
-   * @returns {Ember.A<EmberObject>}
-   */
-  preparePermissionListProxy(subjectType) {
-    const subjectListName = `${subjectType}List`;
-    const subjectList = this.get(subjectListName);
-    const proxyListName = `proxy${_.upperFirst(subjectType)}RecordList`;
-    const proxyList = this.get(proxyListName);
-    let newProxyList;
-
-    if (get(subjectList, 'isFulfilled')) {
-      newProxyList = A(subjectList.map(subject => {
-        let recordProxy = proxyList.findBy('subject', subject);
-        if (!recordProxy) {
-          const recordGri = this.getPrivilegesGriForRecord(subject, subjectType);
-          return PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
-            groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
-            griArray: [recordGri],
-            subject,
-          });
-        }
-        return recordProxy;
-      }));
-    } else {
-      newProxyList = A();
-    }
-    this.set(proxyListName, newProxyList);
-  },
-
-  /**
    * Loads all data necessary for creating batch edit model
    * @returns {PrivilegeRecordProxy}
    */
-  loadBatchEditModel() {
-    const selectedRecordProxies = this.get('selectedRecordProxies');
+  loadBatchPrivilegesEditModel() {
+    const selectedMembersProxies = this.get('selectedMembersProxies');
     this.set(
-      'batchEditModalModel',
+      'batchPrivilegesEditModalModel',
       PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
-        griArray: _.flatten(selectedRecordProxies.mapBy('griArray')),
+        griArray: _.flatten(selectedMembersProxies.map(proxy => get(proxy, 'privilegesProxy.griArray'))),
         sumPrivileges: true,
         groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
       })
@@ -549,7 +439,7 @@ export default Mixin.create({
    * @param {GraphSingleModel} member member record
    * @return {Promise}
    */
-  removeMember() {
+  removeMember(/* type, member */) {
     return notImplementedReject();
   },
 
@@ -559,7 +449,7 @@ export default Mixin.create({
    * @param {Array<GraphSingleModel>} members
    * @return {Promise}
    */
-  removeMembers() {
+  removeMembers(/* members */) {
     return notImplementedReject();
   },
 
@@ -569,7 +459,7 @@ export default Mixin.create({
    * @param {string} name group name
    * @return {Promise}
    */
-  createChildGroup() {
+  createChildGroup(/* name */) {
     return notImplementedReject();
   },
 
@@ -604,49 +494,29 @@ export default Mixin.create({
       this.set('aspect', String(aspect));
     },
     recordsSelected(type, records) {
-      const {
-        proxyGroupRecordList,
-        proxyUserRecordList,
-      } = this.getProperties('proxyGroupRecordList', 'proxyUserRecordList');
-      let originList, targetListName;
-      if (type === 'user') {
-        originList = proxyUserRecordList;
-        targetListName = 'selectedUserRecordProxies';
-      } else {
-        originList = proxyGroupRecordList;
-        targetListName = 'selectedGroupRecordProxies';
-      }
-      records = records.filter(m => originList.includes(m));
+      let targetListName = type === 'user' ?
+        'selectedUsersProxies' : 'selectedGroupsProxies';
       this.set(targetListName, A(records));
     },
-    batchEdit() {
-      this.loadBatchEditModel();
-      this.set('batchEditActive', true);
+    batchPrivilegesEdit() {
+      this.loadBatchPrivilegesEditModel();
+      this.set('batchPrivilegesEditActive', true);
     },
-    batchEditClose() {
-      this.set('batchEditActive', false);
+    batchPrivilegesEditClose() {
+      this.set('batchPrivilegesEditActive', false);
     },
-    saveOne(recordProxy) {
-      return this.get('privilegeActions')
-        .handleSave(recordProxy.save(true))
-        .then(() => recordProxy);
-    },
-    saveBatch() {
+    batchPrivilegesSave() {
       const {
         privilegeActions,
-        batchEditModalModel,
-      } = this.getProperties('privilegeActions', 'batchEditModalModel');
-      return privilegeActions.handleSave(batchEditModalModel.save())
+        batchPrivilegesEditModalModel,
+      } = this.getProperties('privilegeActions', 'batchPrivilegesEditModalModel');
+      return privilegeActions.handleSave(batchPrivilegesEditModalModel.save())
         .finally(() => safeExec(this, () => {
-          this.set('batchEditActive', false);
-          this.get('selectedRecordProxies').invoke('reloadRecords');
+          this.set('batchPrivilegesEditActive', false);
+          this.get('selectedMembersProxies').forEach(memberProxy =>
+            get(memberProxy, 'privilegesProxy').reloadRecords()
+          );
         }));
-    },
-    showRemoveMemberModal(type, recordProxy) {
-      this.setProperties({
-        memberToRemove: get(recordProxy, 'subject'),
-        memberTypeToRemove: type,
-      });
     },
     removeMember() {
       this.set('isRemovingMember', true);
@@ -655,7 +525,9 @@ export default Mixin.create({
       if (isArray(memberToRemove)) {
         promise = this.removeMembers(this.get('memberToRemove'));
       } else {
-        promise = this.removeMember(memberToRemove, this.get('memberToRemove'));
+        const type = get(memberToRemove, 'entityType') === 'group' ?
+          'group' : 'user';
+        promise = this.removeMember(type, this.get('memberToRemove'));
       }
       return promise.finally(() =>
         safeExec(this, 'setProperties', {

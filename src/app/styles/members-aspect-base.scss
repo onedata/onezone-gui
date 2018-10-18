@@ -66,6 +66,11 @@
     }
   }
 
+  // override default "disabled" style of the tree field labels
+  .one-dynamic-tree .one-tree .one-tree-list > li .one-tree-item-content .node-text.disabled {
+    opacity: 1;
+  }
+
   @media (min-width: $screen-sm-min) {
     .item-modified-header {
       padding-right: 230px;

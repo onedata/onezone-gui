@@ -19,4 +19,6 @@ export default {
   userDeletion: 'user deletion',
   createMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been created successfully',
   memberGroupCreation: 'member group creation',
+  addMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been added successfully',
+  memberGroupAddition: 'member group addition',
 };

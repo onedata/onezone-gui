@@ -104,6 +104,10 @@ const GroupStub = EmberObject.extend({
   },
 });
 
+GroupStub.relationshipNames = {
+  belongsTo: ['childList', 'parentList'],
+};
+
 class FakeWindow {
   constructor() {
     this.resizeHandler = () => {};
