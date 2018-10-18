@@ -2,7 +2,7 @@ import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
 import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
-import providers from './tabs/providers';
+import data from './tabs/data';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
@@ -14,7 +14,7 @@ import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
-import sidebarProviders from './components/sidebar-providers';
+import sidebarData from './components/sidebar-data';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
@@ -27,8 +27,9 @@ import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
+import contentGroupsIndex from './components/content-groups-index';
 import contentGroupsMembers from './components/content-groups-members';
-import contentGroupsParents from './components/content-groups-parents';
+import contentGroupsMembership from './components/content-groups-membership';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
@@ -36,14 +37,17 @@ import collectionPermissions from './components/collection-permissions';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import invitationTokenPresenter from './components/invitation-token-presenter';
 import contentSpacesMembers from './components/content-spaces-members';
+import contentSpacesMembership from './components/content-spaces-membership';
 import groupsHierarchyVisualiser from './components/groups-hierarchy-visualiser';
-import groupLeaveModal from './components/group-leave-modal';
+import leaveModal from './components/leave-modal';
 import groupRemoveModal from './components/group-remove-modal';
-import groupRemoveRelationModal from './components/group-remove-relation-modal';
+import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
 import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
 import groupInviteUsingTokenModal from './components/group-invite-using-token-modal';
+import joinAsUserModal from './components/join-as-user-modal';
+import membershipVisualiser from './components/membership-visualiser';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -54,7 +58,7 @@ import guiUtils from './services/gui-utils';
 
 let translations = {
   tabs: {
-    providers,
+    data,
     tokens,
     spaces,
     groups,
@@ -67,7 +71,7 @@ let translations = {
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
-    sidebarProviders,
+    sidebarData,
     sidebarGroups,
     contentSpacesEmpty,
     contentSpacesIndex,
@@ -80,8 +84,9 @@ let translations = {
     contentGroupsJoin,
     contentGroupsNew,
     contentGroupsEmpty,
+    contentGroupsIndex,
     contentGroupsMembers,
-    contentGroupsParents,
+    contentGroupsMembership,
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
@@ -89,14 +94,17 @@ let translations = {
     privilegesEditorModal,
     invitationTokenPresenter,
     contentSpacesMembers,
+    contentSpacesMembership,
     groupsHierarchyVisualiser,
-    groupLeaveModal,
+    leaveModal,
     groupRemoveModal,
-    groupRemoveRelationModal,
+    removeRelationModal,
     groupCreateRelativeModal,
     groupAddYourGroupModal,
     groupJoinUsingTokenModal,
     groupInviteUsingTokenModal,
+    joinAsUserModal,
+    membershipVisualiser,
   },
   services: {
     clientTokenActions,

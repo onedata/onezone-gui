@@ -10,6 +10,7 @@ right column will always be before left in html --}}
     modifyPrivileges=(action (mut relationPrivilegesToChange))
     renameGroup=(action "renameGroup")
     leaveGroup=(action (mut groupToLeave))
+    joinGroup=(action (mut groupToJoin))
     removeGroup=(action (mut groupToRemove))
     createRelativeGroup=(action "showCreateRelativeModal")
     addYourGroup=(action "showAddYourGroupModal")
@@ -18,46 +19,53 @@ right column will always be before left in html --}}
     viewGroup=(action "viewGroup")}}
   {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
 {{/each}}
-{{group-leave-modal
-  opened=groupToLeave
+{{leave-modal
+  opened=(and groupToLeave (not groupToLeave.isDeleted))
   close=(action (mut groupToLeave) null)
   proceed=(action "leaveGroup")
   processing=isLeavingGroup
-  group=groupToLeave}}
+  record=groupToLeave}}
+{{join-as-user-modal
+  opened=(and groupToJoin (not groupToJoin.isDeleted))
+  close=(action (mut groupToJoin) null)
+  proceed=(action "joinGroup")
+  processing=isJoiningGroup
+  modelType="group"
+  model=groupToJoin}}
 {{group-remove-modal
-  opened=groupToRemove
+  opened=(and groupToRemove (or isRemovingGroup (not groupToRemove.isDeleted)))
   close=(action (mut groupToRemove) null)
   proceed=(action "removeGroup")
   processing=isRemovingGroup
   group=groupToRemove}}
-{{group-remove-relation-modal
+{{remove-relation-modal
   opened=relationToRemove
   close=(action (mut relationToRemove) null)
   proceed=(action "removeRelation")
   processing=isRemovingRelation
-  parentGroup=relationToRemove.parentGroup
-  childGroup=relationToRemove.childGroup}}
+  parent=relationToRemove.parent
+  child=relationToRemove.child}}
 {{group-create-relative-modal
-  opened=groupToCreateRelative
+  opened=(and groupToCreateRelative (or isCreatingRelativeGroup (not groupToCreateRelative.isDeleted)))
   close=(action (mut groupToCreateRelative) null)
   proceed=(action "createRelative")
   processing=isCreatingRelativeGroup
   relatedGroup=groupToCreateRelative
   relation=newRelativeGroupType}}
 {{group-add-your-group-modal
-  opened=groupToAddYourGroup
+  opened=(and groupToAddYourGroup (or isAddingYourGroup (not groupToAddYourGroup.isDeleted)))
   close=(action (mut groupToAddYourGroup) null)
   proceed=(action "addYourGroup")
   processing=isAddingYourGroup
   relatedGroup=groupToAddYourGroup
   relation=addYourGroupType}}
 {{group-join-using-token-modal
-  opened=groupConsumingToken
+  opened=(and groupConsumingToken (or isGroupConsumingToken (not groupConsumingToken.isDeleted)))
   close=(action (mut groupConsumingToken) null)
   proceed=(action "joinUsingToken")
   processing=isGroupConsumingToken}}
 {{group-invite-using-token-modal
-  opened=invitingGroupUsingToken
+  opened=(and invitingGroupUsingToken (not invitingGroupUsingToken.isDeleted))
   close=(action (mut invitingGroupUsingToken) null)
   group=invitingGroupUsingToken}}
 {{#if privilegesEditorModel}}
@@ -65,10 +73,10 @@ right column will always be before left in html --}}
     privilegesGroups=groupedPrivilegesFlags
     privilegeGroupsTranslationsPath="components.contentGroupsMembers.privilegeGroups"
     privilegesTranslationsPath="components.contentGroupsMembers.privileges"
-    modelProxy=privilegesEditorModel
+    recordProxy=privilegesEditorModel
     save=(action "savePrivileges")
     close=(action (mut relationPrivilegesToChange) null)
     opened=relationPrivilegesToChange
-    processing=isSavingRelationPrivileges
+    processing=privilegesEditorModel.isSaving
     treeRootText=privilegesTreeRootText}}
 {{/if}}

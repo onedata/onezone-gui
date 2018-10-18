@@ -1,36 +1,36 @@
 {{#one-collapsible-list
   hasCheckboxes=true
   class=(concat subjectType "-list")
-  selectionChanged=modelsSelected
+  selectionChanged=recordsSelected
   as |list|}}
   {{list.header title=listHeader searchVisible=proxyList.length}}
-  {{#each proxyList key="subject" as |modelProxy|}}
-    {{#list.item selectionValue=modelProxy as |listItem|}}
+  {{#each proxyList key="subject" as |recordProxy|}}
+    {{#list.item selectionValue=recordProxy as |listItem|}}
       {{#listItem.header
         disableToggleIcon=itemActions.length
-        class=(if modelProxy.modified "item-modified-header")}}
+        class=(if recordProxy.isModified "item-modified-header")}}
         <span class="item-icon-container">
           {{one-icon class="item-icon" icon=itemIcon}}
           {{one-tooltip
-            title=modelProxy.subject.name
+            title=recordProxy.subject.name
             placement="top"
             arrowPlacement="left"
             triggerEvents="hover"
           }}
         </span>
         <span class="one-label">
-          {{modelProxy.subject.name}}
+          {{recordProxy.subject.name}}
         </span>
-        {{#if modelProxy.modified}}
+        {{#if recordProxy.isModified}}
           <div class="btn-toolbar hidden-xs">
             {{#one-spin-button
-              action=(action save modelProxy)
+              action=(action save recordProxy)
               class="btn btn-sm btn-primary"}}
               {{tt this "save"}}
             {{/one-spin-button}}
             {{#bs-button size="sm" type="danger"
-              disabled=modelProxy.saving
-              onClick=(action "reset" modelProxy)}}
+              disabled=recordProxy.isSaving
+              onClick=(action "reset" recordProxy)}}
               {{tt this "reset"}}
             {{/bs-button}}
           </div>
@@ -42,21 +42,21 @@
             toolbarToggleClasses="btn-menu-toggle"
             dropdownPlacement="auto"
             actionsArray=itemActions
-            actionsArg=modelProxy}}
+            actionsArg=recordProxy}}
         {{/if}}
       {{/listItem.header}}
       {{#listItem.content}}
         {{#render-later triggerRender=listItem.isActive}}
           <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
             {{#bs-button size="sm" type="primary"
-              disabled=(or modelProxy.saving (not modelProxy.modified))
-              onClick=(action save modelProxy)}}
+              disabled=(or recordProxy.saving (not recordProxy.isModified))
+              onClick=(action save recordProxy)}}
               {{tt this "save"}}
             {{/bs-button}}
             
             {{#bs-button size="sm" type="danger"
-              disabled=(or modelProxy.saving (not modelProxy.modified))
-              onClick=(action "reset" modelProxy)}}
+              disabled=(or recordProxy.saving (not recordProxy.isModified))
+              onClick=(action "reset" recordProxy)}}
               {{tt this "reset"}}
             {{/bs-button}}
           </div>
@@ -64,8 +64,8 @@
             privilegesGroups=groupedPrivilegesFlags
             privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
             privilegesTranslationsPath=privilegesTranslationsPath
-            modelProxy=modelProxy
-            editionEnabled=(not modelProxy.saving)}}
+            recordProxy=recordProxy
+            editionEnabled=(not recordProxy.isSaving)}}
         {{/render-later}}
       {{/listItem.content}}
     {{/list.item}}

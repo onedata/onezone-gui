@@ -9,16 +9,15 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { next } from '@ember/runloop';
+import layout from 'onezone-gui/templates/components/-privileges-aspect-base';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
+  layout,
   classNames: ['privileges-aspect-base', 'content-groups-members'],
 
   i18n: service(),
@@ -50,131 +49,23 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   modelType: 'group',
 
   /**
-   * @type {Group}
+   * @override
    */
-  groupToRemove: null,
-
-  /**
-   * @type {SharedUser}
-   */
-  userToRemove: null,
-
-  /**
-   * @type {boolean}
-   */
-  isRemoving: false,
+  record: reads('group'),
 
   /**
    * @override
    */
-  model: reads('group'),
-
-  /**
-   * @override
-   */
-  privilegesTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privileges';
-  }),
-
-  /**
-   * @override
-   */
-  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privilegeGroups';
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<string>}
-   */
-  globalActionsTitle: computed(function () {
-    return this.t('groupMembers');
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  globalActions: computed('inviteActions', 'batchEditAction', function () {
+  removeMember(type, member) {
     const {
-      inviteActions,
-      batchEditAction,
-    } = this.getProperties('inviteActions', 'batchEditAction');
-    return [batchEditAction, ...inviteActions];
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  headerActions: reads('inviteActions'),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  groupActions: computed(function () {
-    return [{
-      action: (...args) => this.send('showRemoveModal', 'group', ...args),
-      title: this.t('removeGroup'),
-      class: 'remove-group',
-      icon: 'close',
-    }];
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  userActions: computed(function () {
-    return [{
-      action: (...args) => this.send('showRemoveModal', 'user', ...args),
-      title: this.t('removeUser'),
-      class: 'remove-user',
-      icon: 'close',
-    }];
-  }),
-
-  actions: {
-    showRemoveModal(type, modelProxy) {
-      this.set(type + 'ToRemove', get(modelProxy, 'subject'));
-    },
-    hideRemoveModal(type) {
-      this.set(type + 'ToRemove', null);
-    },
-    remove(type) {
-      const model = this.get(type + 'ToRemove');
-      const {
-        groupActionsService,
-        group,
-        router,
-        navigationState,
-      } = this.getProperties(
-        'groupActionsService',
-        'group',
-        'router',
-        'navigationState',
-      );
-      this.set('isRemoving', true);
-      const promise = type === 'group' ?
-        groupActionsService.removeChildGroup(group, model) :
-        groupActionsService.removeUser(group, model);
-      return promise
-        .then(() => {
-          // detect if user/subgroup removing removed also group
-          // that is actually viewed
-          return get(get(navigationState, 'activeResourceCollection'), 'list')
-            .then(groupList => {
-              const groupEntityId = get(group, 'entityId');
-              const availableEntityIds = groupList.map(g => get(g, 'entityId'));
-              if (availableEntityIds.indexOf(groupEntityId) === -1) {
-                next(() => router.transitionTo('onedata.sidebar', 'groups'));
-              }
-            });
-        })
-        .finally(() => {
-          safeExec(this, 'setProperties', {
-            isRemoving: false,
-            [type + 'ToRemove']: null,
-          });
-        });
-    },
+      groupActionsService,
+      group,
+    } = this.getProperties(
+      'groupActionsService',
+      'group',
+    );
+    return type === 'group' ?
+      groupActionsService.removeChildGroup(group, member) :
+      groupActionsService.removeUser(group, member);
   },
 });

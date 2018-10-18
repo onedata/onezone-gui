@@ -5,7 +5,12 @@ import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { set } from '@ember/object';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService, lookupService } from '../../../helpers/stub-service';
-import ArrayProxy from '@ember/array/proxy';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { A } from '@ember/array';
+import { resolve } from 'rsvp';
+import wait from 'ember-test-helpers/wait';
+import { createEmptyColumnModel } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
 describe(
   'Integration | Component | groups hierarchy visualiser/column',
@@ -43,17 +48,24 @@ describe(
     it('shows group name in header for startPoint type', function () {
       const column = EmberObject.create({
         relationType: 'startPoint',
-        model: ArrayProxy.create({
-          content: [EmberObject.create({
-            name: 'testname',
-          })],
-          isFulfilled: true,
+        model: PromiseObject.create({
+          promise: resolve(EmberObject.create({
+            list: PromiseArray.create({
+              promise: resolve(A([
+                EmberObject.create({
+                  name: 'testname',
+                }),
+              ])),
+            }),
+          })),
         }),
       });
 
       this.set('column', column);
       this.render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      expect(this.$('.column-header').text()).to.contain('testname');
+      return wait(() => {
+        expect(this.$('.column-header').text()).to.contain('testname');
+      });
     });
 
     it('shows group name in header for children type', function () {
@@ -62,10 +74,7 @@ describe(
         relatedGroup: EmberObject.create({
           name: 'testname',
         }),
-        model: ArrayProxy.create({
-          content: [],
-          isFulfilled: true,
-        }),
+        model: createEmptyColumnModel(),
       });
 
       this.set('column', column);
@@ -80,10 +89,7 @@ describe(
         relatedGroup: EmberObject.create({
           name: 'testname',
         }),
-        model: ArrayProxy.create({
-          content: [],
-          isFulfilled: true,
-        }),
+        model: createEmptyColumnModel(),
       });
 
       this.set('column', column);

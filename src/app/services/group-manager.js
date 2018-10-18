@@ -78,8 +78,40 @@ export default Service.extend({
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
+          this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
         ]).then(() => group))
       );
+  },
+
+  /**
+   * Joins user to a group without token
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  joinGroupAsUser(entityId) {
+    const group = this.getLoadedGroupByEntityId(entityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'group',
+            entityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        group ? group.reload() : resolve(),
+        this.reloadUserList(entityId).catch(ignoreForbiddenError),
+      ]));
   },
 
   /**
@@ -268,6 +300,7 @@ export default Service.extend({
           entityType: 'group',
           entityId: parentEntityId,
           aspect: 'child',
+          scope: 'auto',
         }),
         operation: 'create',
         data: childGroupRepresentation,
@@ -293,6 +326,7 @@ export default Service.extend({
         entityId: groupEntityId,
         aspect: 'child',
         aspectId: futureChildEntityId,
+        scope: 'auto',
       }),
       operation: 'create',
     }).then(() => {
@@ -329,18 +363,9 @@ export default Service.extend({
    * @param {string} listName e.g. `childList`
    * @returns {Promise}
    */
-  reloadModelList(entityId, listName) {
+  reloadRecordList(entityId, listName) {
     const group = this.getLoadedGroupByEntityId(entityId);
-    if (group) {
-      const list = group.belongsTo(listName).value();
-      const hasMany = list ? list.hasMany('list').value() : null;
-      if (list) {
-        return list.reload().then(result => {
-          return hasMany ? list.hasMany('list').reload() : result;
-        });
-      }
-    }
-    return resolve();
+    return group ? group.reloadList(listName) : resolve();
   },
 
   /**
@@ -350,7 +375,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadParentList(entityId) {
-    return this.reloadModelList(entityId, 'parentList');
+    return this.reloadRecordList(entityId, 'parentList');
   },
 
   /**
@@ -360,7 +385,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadChildList(entityId) {
-    return this.reloadModelList(entityId, 'childList');
+    return this.reloadRecordList(entityId, 'childList');
   },
 
   /**
@@ -370,6 +395,6 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadUserList(entityId) {
-    return this.reloadModelList(entityId, 'userList');
+    return this.reloadRecordList(entityId, 'userList');
   },
 });

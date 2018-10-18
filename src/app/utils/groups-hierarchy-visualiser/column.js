@@ -32,6 +32,7 @@ import { resolve } from 'rsvp';
 import GroupBox from 'onezone-gui/utils/groups-hierarchy-visualiser/group-box';
 import ColumnSeparator from 'onezone-gui/utils/groups-hierarchy-visualiser/column-separator';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 
@@ -147,10 +148,10 @@ export default EmberObject.extend({
    */
   model: computed({
     get() {
-      return PromiseArray.create({ promise: resolve(A()) });
+      return createEmptyColumnModel();
     },
     set(key, value) {
-      return value ? value : PromiseArray.create({ promise: resolve(A()) });
+      return value ? value : createEmptyColumnModel();
     },
   }),
 
@@ -178,13 +179,23 @@ export default EmberObject.extend({
    * Array of group boxes, that have a left line
    * @type {Ember.ComputedProperty<Ember.A<Utils/GroupHierarchyVisualiser/GroupBox>>}
    */
-  groupBoxesWithLeftLines: filterBy('sortedGroupBoxes', 'isLeftLineVisible', true),
+  groupBoxesWithLeftLines: computed(
+    'sortedGroupBoxes.@each.isLeftLineVisible',
+    'parentsRelationGroupBox.isLeftLineVisible',
+    function groupBoxesWithLeftLines() {
+      return A(this.get('sortedGroupBoxes').filterBy('isLeftLineVisible', true));
+    }),
 
   /**
    * Array of group boxes, that have a right line
    * @type {Ember.ComputedProperty<Ember.A<Utils/GroupHierarchyVisualiser/GroupBox>>}
    */
-  groupBoxesWithRightLines: filterBy('sortedGroupBoxes', 'isRightLineVisible', true),
+  groupBoxesWithRightLines: computed(
+    'sortedGroupBoxes.@each.isRightLineVisible',
+    'childrenRelationGroupBox.isRightLineVisible',
+    function groupBoxesWithRightLines() {
+      return A(this.get('sortedGroupBoxes').filterBy('isRightLineVisible', true));
+    }),
 
   /**
    * X position of group box (relative to column)
@@ -341,9 +352,12 @@ export default EmberObject.extend({
     true
   ),
 
-  modelObserver: observer('model.content.[]', function modelObserver() {
-    next(() => safeExec(this, 'recalculateGroupBoxes'));
-  }),
+  modelObserver: observer(
+    'model.content.list.content.[]',
+    function modelObserver() {
+      next(() => safeExec(this, 'recalculateGroupBoxes'));
+    }
+  ),
 
   /**
    * Sets hover state for right line, when opposite side left line has been
@@ -441,7 +455,7 @@ export default EmberObject.extend({
    * @returns {undefined}
    */
   recalculateGroupBoxes() {
-    const incomingGroups = this.get('model.content') || A();
+    const incomingGroups = this.get('model.content.list.content') || A();
     const existingGroupBoxes = this.get('groupBoxes')
       .filter(groupBox => incomingGroups.indexOf(get(groupBox, 'group') !== -1));
     const existingGroups = existingGroupBoxes.map(groupBox =>
@@ -510,3 +524,11 @@ export default EmberObject.extend({
     }
   },
 });
+
+export function createEmptyColumnModel() {
+  return PromiseObject.create({
+    promise: resolve(EmberObject.create({
+      list: PromiseArray.create({ promise: resolve(A()) }),
+    })),
+  });
+}

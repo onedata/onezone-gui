@@ -99,31 +99,41 @@ export default function generateDevelopmentModel(store) {
         )
         .then(() => listRecords);
     })
-    // add groups, users and privileges to groups
+    // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords[types.indexOf('group')].get('list')
-      .then(models =>
-        Promise.all(models.map(model =>
-          attachSharedUsersGroupsToModel(
-            store, model, 'group', sharedUsers, groups
-          )
+      .then(records =>
+        Promise.all(records.map(record =>
+          Promise.all([
+            attachSharedUsersGroupsToModel(
+              store, record, 'group', sharedUsers, groups
+            ),
+            attachMembershipsToModel(
+              store, record, 'group', groups
+            ),
+          ])
         ))
       )
       .then(() => listRecords[types.indexOf('space')].get('list')
-        .then(models =>
-          Promise.all(models.map(model =>
-            attachSharedUsersGroupsToModel(
-              store, model, 'space', sharedUsers, groups
-            )
+        .then(records =>
+          Promise.all(records.map(record =>
+            Promise.all([
+              attachSharedUsersGroupsToModel(
+                store, record, 'space', sharedUsers, groups
+              ),
+              attachMembershipsToModel(
+                store, record, 'space', groups
+              ),
+            ])
           ))
         )
       )
       .then(() => Promise.all(['space', 'group'].map(modelType => {
         return listRecords[types.indexOf(modelType)].get('list')
-          .then(models =>
-            Promise.all(models.map(model =>
+          .then(records =>
+            Promise.all(records.map(record =>
               createPrivilegesForModel(
                 store,
-                model,
+                record,
                 modelType,
                 sharedUsers,
                 groups,
@@ -243,29 +253,48 @@ function createSharedUsersRecords(store) {
 
 function attachSharedUsersGroupsToModel(
   store,
-  model,
+  record,
   modelType,
   sharedUsers,
   groups
 ) {
   return createListRecord(store, 'group', groups)
-    .then(list => model.set(modelType === 'group' ? 'childList' : 'groupList', list))
+    .then(list => record.set(modelType === 'group' ? 'childList' : 'groupList', list))
     .then(() => {
       if (modelType === 'group') {
         return createListRecord(store, 'group', groups)
-          .then(list => model.set('parentList', list));
+          .then(list => record.set('parentList', list));
       }
     })
     .then(() => createListRecord(store, 'sharedUser', sharedUsers))
     .then(list => {
-      model.set('userList', list);
-      return model.save();
+      record.set('userList', list);
+      return record.save();
     });
+}
+
+function attachMembershipsToModel(
+  store,
+  record,
+  modelType,
+  groups
+) {
+  return store.createRecord('membership', {
+    id: gri({
+      entityType: modelType,
+      entityId: get(record, 'entityId'),
+      aspect: 'eff_user_membership',
+      aspectId: USER_ID,
+      scope: 'private',
+    }),
+    intermediaries: groups.mapBy('id'),
+    directMembership: true,
+  }).save();
 }
 
 function createPrivilegesForModel(
   store,
-  model,
+  record,
   modelType,
   sharedUsers,
   groups,
@@ -273,27 +302,27 @@ function createPrivilegesForModel(
 ) {
   return Promise.all([
     createPrivilegesRecords(
-      store, model, modelType, sharedUsers, privilegesFlags, 'user'
+      store, record, modelType, sharedUsers, privilegesFlags, 'user'
     ),
     createPrivilegesRecords(
-      store, model, modelType, groups, privilegesFlags, 'group'
+      store, record, modelType, groups, privilegesFlags, 'group'
     ),
   ]);
 }
 
 function createPrivilegesRecords(
   store,
-  model,
+  record,
   modelType,
   sharedArray,
   privilegesArray,
   privilegesType
 ) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
-  const modelGri = get(model, 'gri');
-  let modelId, subjectId;
+  const recordGri = get(record, 'gri');
+  let recordId, subjectId;
   try {
-    modelId = parseGri(modelGri).entityId;
+    recordId = parseGri(recordGri).entityId;
   } catch (e) {
     return Promise.resolve([]);
   }
@@ -308,7 +337,7 @@ function createPrivilegesRecords(
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
       entityType: modelType,
-      entityId: modelId,
+      entityId: recordId,
       aspect,
       aspectId: subjectId,
     });

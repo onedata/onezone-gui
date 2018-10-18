@@ -8,8 +8,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { getProperties, computed, get } from '@ember/object';
-import { reads, and } from '@ember/object/computed';
+import { getProperties, computed } from '@ember/object';
+import { reads, and, collect } from '@ember/object/computed';
 import { next } from '@ember/runloop';
 import { htmlSafe } from '@ember/string';
 import { inject as service } from '@ember/service';
@@ -57,7 +57,7 @@ export default Component.extend(I18n, {
    * Shows privileges editor
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   modifyPrivileges: notImplementedThrow,
@@ -66,7 +66,7 @@ export default Component.extend(I18n, {
    * Triggers relation removing
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,
@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
   hovered: reads('line.hovered'),
 
   /**
-   * @type {Ember.ComputedProperty<Utils/GroupHierarchyVisualiser/Relation>}
+   * @type {Ember.ComputedProperty<Utils/MembershipRelation>}
    */
   relation: reads('line.relation'),
 
@@ -102,14 +102,18 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  modifyPrivilegesAction: computed(function modifyPrivilegesAction() {
-    return {
-      action: () => this.get('modifyPrivileges')(this.get('relation')),
-      title: this.t('modifyPrivileges'),
-      class: 'modify-privileges-action',
-      icon: 'permissions',
-    };
-  }),
+  modifyPrivilegesAction: computed(
+    'relation.parent.canViewPrivileges',
+    function modifyPrivilegesAction() {
+      return {
+        action: () => this.get('modifyPrivileges')(this.get('relation')),
+        title: this.t('modifyPrivileges'),
+        class: 'modify-privileges-action',
+        icon: 'permissions',
+        disabled: !this.get('relation.parent.canViewPrivileges'),
+      };
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -127,31 +131,7 @@ export default Component.extend(I18n, {
    * Relation actions
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  relationActions: computed(
-    'modifyPrivilegesAction',
-    'removeRelationAction',
-    'relation.parentGroup.canViewPrivileges',
-    function relationActions() {
-      const {
-        modifyPrivilegesAction,
-        removeRelationAction,
-        relation,
-      } = this.getProperties(
-        'modifyPrivilegesAction',
-        'removeRelationAction',
-        'relation',
-      );
-      const parentGroup = get(relation, 'parentGroup');
-      const canViewPrivileges = parentGroup ?
-        get(parentGroup, 'canViewPrivileges') : false;
-      const actions = [];
-      if (canViewPrivileges) {
-        actions.push(modifyPrivilegesAction);
-      }
-      actions.push(removeRelationAction);
-      return actions;
-    }
-  ),
+  relationActions: collect('modifyPrivilegesAction', 'removeRelationAction'),
 
   mouseEnter() {
     this.changeHover(true);

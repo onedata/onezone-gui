@@ -7,13 +7,15 @@
   {{#modal.header}}
     <h1>{{tt this "inviteUsingToken"}}</h1>
   {{/modal.header}}
-  {{#modal.body class="text-center"}}
+  {{#modal.body}}
     {{#promise-proxy-container proxy=tokenProxy sizeClass="sm"}}
       <p class="input-top-description">{{tt this "passGeneratedToken"}}</p>
       <textarea class="token-textarea invitation-token form-control" rows="4" readonly>{{tokenProxy.content}}</textarea>
-      <a class="clickable btn-get-token" {{action "generateToken"}}>
-        {{tt this "generateToken"}}
-      </a>
+      <p class="text-right">
+        <a class="clickable btn-get-token" {{action "generateToken"}}>
+          {{tt this "generateToken"}}
+        </a>
+      </p>
     {{/promise-proxy-container}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}

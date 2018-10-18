@@ -9,6 +9,7 @@
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
 import { computed } from '@ember/object';
+import { htmlSafe } from '@ember/string';
 
 export default ProceedProcessModal.extend({
   /**
@@ -19,8 +20,19 @@ export default ProceedProcessModal.extend({
   /**
    * @override
    */
-  messageText: computed(function messageText() {
-    return this.t('messageText', { groupName: this.get('group.name') });
+  modalIcon: 'sign-warning-rounded',
+
+  /**
+   * @override
+   */
+  messageText: computed('group.name', function messageText() {
+    const groupName = this.get('group.name');
+    return htmlSafe(
+      this.t('areYouSure', { groupName }) +
+      '<br><br><strong class="text-danger">' +
+      this.t('mayCause', { groupName }) +
+      '</strong>'
+    );
   }),
 
   /**

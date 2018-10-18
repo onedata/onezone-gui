@@ -30,13 +30,30 @@ const RelationList = EmberObject.extend({
   }),
 
   length: reads('_list.length'),
+
+  hasMany() {
+    const model = this;
+    return {
+      ids() {
+        return get(model, '_list').mapBy('id');
+      },
+      reload() {
+        return get(model, 'list');
+      },
+    };
+  },
 });
 
 const GroupStub = EmberObject.extend({
+  entityType: 'group',
   hasViewPrivilege: true,
-  membership: true,
+  isEffectiveMember: true,
   directMembership: true,
   _token: 'token1',
+
+  id: computed('name', function id() {
+    return `group.${this.get('name')}.instance:auto`;
+  }),
 
   _childList: computed(function _childList() {
     return A();
@@ -63,6 +80,18 @@ const GroupStub = EmberObject.extend({
       })),
     });
   }),
+
+  belongsTo(relationName) {
+    const model = this;
+    return {
+      value() {
+        return get(model, `${relationName}.content`);
+      },
+      reload() {
+        return get(model, relationName);
+      },
+    };
+  },
 
   entityId: reads('name'),
 
@@ -101,7 +130,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
   beforeEach(function beforeEach() {
     registerService(this, 'i18n', I18nStub);
     registerService(this, 'navigation-state', Service.extend({
-      resourceCollectionContainsEntityId() {
+      resourceCollectionContainsId() {
         return resolve(true);
       },
     }));
@@ -155,7 +184,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
   });
 
   it(
-    'renders three columns - one startPoint, one children and one empty',
+    'renders three columns - one startPoint, one parents and one children',
     function () {
       this.render(hbs `
         <div style={{containerStyle}}>
@@ -166,9 +195,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         .then(() => {
           const $columns = this.$('.column');
           expect($columns).to.have.length(3);
-          expect($columns.eq(0)).to.have.class('empty');
-          expect($columns.eq(1)).to.have.class('children');
-          expect($columns.eq(2)).to.have.class('startPoint');
+          expect($columns.eq(0)).to.have.class('children');
+          expect($columns.eq(1)).to.have.class('startPoint');
+          expect($columns.eq(2)).to.have.class('parents');
         });
     }
   );
@@ -194,6 +223,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
   });
 
   it('allows to expand and hide parents relation', function () {
+    this.set('containerSize.width', 750);
+    this.set('containerStyle', getContainerStyle(this.get('containerSize')));
     this.render(hbs `
       <div style={{containerStyle}}>
         {{groups-hierarchy-visualiser group=group workspace=workspace}}
@@ -262,9 +293,6 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());
-        return helper.clickRelation(null, 'startPoint', 'a1', 'parents');
-      })
-      .then(() => {
         [
           'z1',
           'z2',
@@ -301,9 +329,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());
-        return helper.clickRelation(null, 'startPoint', 'a1', 'parents');
+        return helper.clickRelation('a1', 'children', 'b1', 'children');
       })
-      .then(() => expect(helper.getColumn(null, 'empty')).to.not.exist);
+      .then(() => expect(helper.getColumn('a1', 'parents')).to.not.exist);
   });
 
   it('sorts groups by name', function () {
@@ -323,11 +351,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
           Number.parseFloat($groupBox2.get(0).style.top) -
           Number.parseFloat($groupBox1.get(0).style.top)
         ).to.be.gt(0);
-        return helper.clickRelation(null, 'startPoint', 'a1', 'parents');
-      })
-      .then(() => {
-        const $groupBox1 = helper.getGroupBox('a1', 'parents', 'z1');
-        const $groupBox2 = helper.getGroupBox('a1', 'parents', 'z2');
+        $groupBox1 = helper.getGroupBox('a1', 'parents', 'z1');
+        $groupBox2 = helper.getGroupBox('a1', 'parents', 'z2');
         expect(
           Number.parseFloat($groupBox2.get(0).style.top) -
           Number.parseFloat($groupBox1.get(0).style.top)
@@ -404,9 +429,6 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());
-        return helper.clickRelation(null, 'startPoint', 'a1', 'parents');
-      })
-      .then(() => {
         const $childGroupBox = helper.getGroupBox(null, 'startPoint', 'a1');
         return helper.clickGroupBoxActions($childGroupBox, [
           '.add-parent-group-action',
@@ -517,7 +539,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
         return helper.clickGroupBoxActions($groupBox, ['.leave-group-action']);
       })
-      .then(() => click('.group-leave-modal .proceed'))
+      .then(() => click('.leave-modal .proceed'))
       .then(() => {
         expect(get(leftGroup, 'name')).to.equal('b2');
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
@@ -552,7 +574,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
         return helper.clickRelationActions($groupBox, '.remove-relation-action');
       })
-      .then(() => click('.group-remove-relation-modal .proceed'))
+      .then(() => click('.remove-relation-modal .proceed'))
       .then(() => {
         expect(get(parentGroup, 'name')).to.equal('a1');
         expect(get(childGroup, 'name')).to.equal('b2');
@@ -609,9 +631,6 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());
-        return helper.clickRelation(null, 'startPoint', 'a1', 'parents');
-      })
-      .then(() => {
         const $groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
         return helper.clickGroupBoxActions($groupBox, [
           '.add-parent-group-action',

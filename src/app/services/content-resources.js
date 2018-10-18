@@ -26,8 +26,6 @@ export default Service.extend({
   getModelFor(type, id) {
     switch (type) {
       case 'data':
-        return this.get('spaceManager').getRecord(id);
-      case 'providers':
         return this.get('providerManager').getRecord(id);
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();

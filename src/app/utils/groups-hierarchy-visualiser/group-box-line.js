@@ -48,12 +48,12 @@ export default EmberObject.extend({
   actionsEnabled: undefined,
 
   /**
-   * @type {Utils/GroupHierarchyVisualiser/Relation}
+   * @type {Utils/MembershipRelation}
    */
   relation: undefined,
 
   /**
-   * @type {Utils/GroupHierarchyVisualiser/Column}
+   * @type {Utils/MembershipRelation}
    */
   column: reads('groupBox.column'),
 
