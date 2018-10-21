@@ -1,19 +1,23 @@
-<div class="relation-description">
-  {{#if (eq relation.parentType "provider")}}
-    {{tt this "isSupportedBy"}}
-  {{else}}
-    {{tt this "isMemberOf"}}
-  {{/if}}
-</div>
+{{#if relation}}
+  <div class="relation-description">
+    {{#if (eq relation.parentType "provider")}}
+      {{tt this "isSupportedBy"}}
+    {{else}}
+      {{tt this "isMemberOf"}}
+    {{/if}}
+  </div>
+{{/if}}
 
 <div class="line"></div>
 <div class="dot dot-left"></div>
 <div class="relation-sign"></div>
 
-{{one-icon
-  class=(concat "actions-trigger actions-relation-" elementId)
-  icon="settings-circle-filled"
-  click=(action "toggleActions" (not actionsOpened))}}
+{{#if relation}}
+  {{one-icon
+    class=(concat "actions-trigger actions-relation-" elementId)
+    icon="settings-circle-filled"
+    click=(action "toggleActions" (not actionsOpened))}}
+{{/if}}
 
 {{!-- optimization: rendering actions popover on user click instead of rendering it on init --}}
 {{#render-later triggerRender=actionsOpened}}

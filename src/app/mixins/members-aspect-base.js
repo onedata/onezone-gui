@@ -127,7 +127,7 @@ export default Mixin.create({
    * @type {boolean}
    */
   viewToolsVisible: false,
-  
+
   /**
    * @type {boolean}
    */
@@ -179,7 +179,7 @@ export default Mixin.create({
     'aspect',
     'onlyDirect',
     function batchPrivilegesEditAvailable() {
-    const {
+      const {
         aspect,
         onlyDirect,
       } = this.getProperties('aspect', 'onlyDirect');
@@ -198,7 +198,7 @@ export default Mixin.create({
         !this.get('isAnySelectedRecordSaving');
     }
   ),
-  
+
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
@@ -257,6 +257,11 @@ export default Mixin.create({
   }),
 
   /**
+   * @type {Array<Action>}
+   */
+  effectiveGroupActions: Object.freeze([]),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   userActions: computed(function userActions() {
@@ -267,6 +272,11 @@ export default Mixin.create({
       icon: 'close',
     }];
   }),
+
+  /**
+   * @type {Array<Action>}
+   */
+  effectiveUserActions: Object.freeze([]),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
@@ -368,6 +378,8 @@ export default Mixin.create({
       addYourGroupModalVisible: false,
       joinAsUserModalVisible: false,
       inviteTokenModalType: null,
+      selectedUsersProxies: A(),
+      selectedGroupsProxies: A(),
     });
   }),
 
@@ -403,17 +415,16 @@ export default Mixin.create({
     this._super(...arguments);
 
     // Restore remembered view tools visibility
-    const appStorage = this.get('appStorage');
     let viewToolsVisible =
-      appStorage.getData('membersAspectBaseMixin.viewToolsVisible');
-    if (viewToolsVisible === undefined) {
-      viewToolsVisible = false;
-      appStorage.setData(
+      localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
+    if (viewToolsVisible === null) {
+      viewToolsVisible = 'false';
+      localStorage.setItem(
         'membersAspectBaseMixin.viewToolsVisible',
         viewToolsVisible
       );
     }
-    this.set('viewToolsVisible', viewToolsVisible);
+    this.set('viewToolsVisible', viewToolsVisible === 'true');
   },
 
   /**
@@ -425,7 +436,9 @@ export default Mixin.create({
     this.set(
       'batchPrivilegesEditModalModel',
       PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
-        griArray: _.flatten(selectedMembersProxies.map(proxy => get(proxy, 'privilegesProxy.griArray'))),
+        griArray: _.flatten(selectedMembersProxies
+          .map(proxy => get(proxy, 'privilegesProxy.griArray'))
+        ),
         sumPrivileges: true,
         groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
       })
@@ -439,7 +452,7 @@ export default Mixin.create({
    * @param {GraphSingleModel} member member record
    * @return {Promise}
    */
-  removeMember(/* type, member */) {
+  removeMember( /* type, member */ ) {
     return notImplementedReject();
   },
 
@@ -449,7 +462,7 @@ export default Mixin.create({
    * @param {Array<GraphSingleModel>} members
    * @return {Promise}
    */
-  removeMembers(/* members */) {
+  removeMembers( /* members */ ) {
     return notImplementedReject();
   },
 
@@ -459,7 +472,7 @@ export default Mixin.create({
    * @param {string} name group name
    * @return {Promise}
    */
-  createChildGroup(/* name */) {
+  createChildGroup( /* name */ ) {
     return notImplementedReject();
   },
 
@@ -469,7 +482,7 @@ export default Mixin.create({
    * @param {Group} group
    * @return {Promise}
    */
-  addMemberGroup(/* group */) {
+  addMemberGroup( /* group */ ) {
     return notImplementedReject();
   },
 
@@ -485,9 +498,9 @@ export default Mixin.create({
   actions: {
     toogleViewTools() {
       this.toggleProperty('viewToolsVisible');
-      this.get('appStorage').setData(
+      localStorage.setItem(
         'membersAspectBaseMixin.viewToolsVisible',
-        this.get('viewToolsVisible')
+        String(this.get('viewToolsVisible'))
       );
     },
     changeAspect(aspect) {
@@ -538,7 +551,7 @@ export default Mixin.create({
     },
     createChildGroup(name) {
       this.set('isCreatingChildGroup', true);
-      this.createChildGroup(name).finally(() => 
+      this.createChildGroup(name).finally(() =>
         safeExec(this, 'setProperties', {
           isCreatingChildGroup: false,
           createChildGroupModalVisible: false,
@@ -547,7 +560,7 @@ export default Mixin.create({
     },
     addYourGroup(group) {
       this.set('isAddingYourGroup', true);
-      this.addMemberGroup(group).finally(() => 
+      this.addMemberGroup(group).finally(() =>
         safeExec(this, 'setProperties', {
           isAddingYourGroup: false,
           addYourGroupModalVisible: false,
@@ -556,7 +569,7 @@ export default Mixin.create({
     },
     join() {
       this.set('isJoiningAsUser', true);
-      this.join().finally(() => 
+      this.join().finally(() =>
         safeExec(this, 'setProperties', {
           isJoiningAsUser: false,
           joinAsUserModalVisible: false,

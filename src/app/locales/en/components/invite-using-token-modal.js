@@ -8,6 +8,6 @@ export default {
   copyTokenError: 'Cannot copy the invitation token to clipboard, please copy it manually',
   group: 'group',
   user: 'user',
-  userReceiver: 'user', 
+  userReceiver: 'user',
   groupReceiver: 'owner of group',
 };

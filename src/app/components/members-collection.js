@@ -38,7 +38,7 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {GraphSingleModel}
    */
-  record: undefined,  
+  record: undefined,
 
   /**
    * @virtual
@@ -128,7 +128,17 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<Action>}
    */
-  itemActions: undefined,
+  itemActions: Object.freeze([]),
+
+  /**
+   * @type {Array<Action>}
+   */
+  effectiveItemActions: Object.freeze([]),
+
+  /**
+   * @type {boolean}
+   */
+  isListCollapsed: undefined,
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -199,14 +209,23 @@ export default Component.extend(I18n, {
         onlyDirect,
         subjectType,
         currentUser,
+        isListCollapsed,
+        collapseForNumber,
       } = this.getProperties(
         'membersList',
         'membersProxyList',
         'groupedPrivilegesFlags',
         'onlyDirect',
         'subjectType',
-        'currentUser'
+        'currentUser',
+        'isListCollapsed',
+        'collapseForNumber'
       );
+
+      if (isListCollapsed === undefined && collapseForNumber &&
+        get(membersList, 'length') > collapseForNumber) {
+        this.set('isListCollapsed', true);
+      }
 
       // Create ordered list of members. Records should be sorted by name except
       // current user record - it should be always at the top.
@@ -238,8 +257,7 @@ export default Component.extend(I18n, {
         if (get(proxy, 'privilegesProxy.direct') !== onlyDirect) {
           const privilegesGri = this.getPrivilegesGriForMember(member);
           const privilegesProxy = PrivilegeRecordProxy.create(
-            getOwner(this).ownerInjection(),
-            {
+            getOwner(this).ownerInjection(), {
               groupedPrivilegesFlags,
               griArray: [privilegesGri],
               direct: onlyDirect,
@@ -325,6 +343,9 @@ export default Component.extend(I18n, {
       return this.get('privilegeActions')
         .handleSave(get(memberProxy, 'privilegesProxy').save(true))
         .then(() => memberProxy);
+    },
+    listCollapsed(isCollapsed) {
+      this.set('isListCollapsed', isCollapsed);
     },
   },
 });

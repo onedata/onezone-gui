@@ -80,7 +80,10 @@ export default ProceedProcessModal.extend({
       }
       let message = this.t('areYouSure', {
         parent: this.t(parentType, { name: parentName }),
-        child: this.t(childType, Object.assign({ name: childName }, childrenNumber)),
+        child: this.t(
+          childType,
+          Object.assign({ name: childName }, childrenNumber)
+        ),
       });
       message += '<br><br><strong class="text-danger">';
       if (childType === 'user') {

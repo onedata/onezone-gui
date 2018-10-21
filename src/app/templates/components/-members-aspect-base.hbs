@@ -4,7 +4,7 @@
       <span class="one-label">
         {{tt this "members"}}
         {{#one-icon
-          icon="settings"
+          icon="arrow-circle-down"
           class=(concat-classes "view-tools-toggle" (if viewToolsVisible "active"))
           click=(action "toogleViewTools")}}
           {{one-tooltip title=(tt this (if viewToolsVisible "hideViewOptions" "showViewOptions"))}}
@@ -82,7 +82,8 @@
     privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
     privilegesTranslationsPath=privilegesTranslationsPath
     collectionActions=groupListActions
-    itemActions=groupActions as |list|}}
+    itemActions=groupActions
+    effectiveItemActions=effectiveGroupActions as |list|}}
     {{#list.item as |listItem|}}
       {{#listItem.header
         class="text-center"
@@ -113,7 +114,8 @@
     privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
     privilegesTranslationsPath=privilegesTranslationsPath
     collectionActions=userListActions
-    itemActions=userActions as |list|}}
+    itemActions=userActions
+    effectiveItemActions=effectiveUserActions as |list|}}
     {{#list.item as |listItem|}}
       {{#listItem.header
         class="text-center"

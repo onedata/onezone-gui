@@ -11,7 +11,7 @@
 import EmberObject, { computed } from '@ember/object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { A } from '@ember/array';
 
@@ -72,6 +72,9 @@ export default EmberObject.extend({
    * @returns {Promise<GraphSingleModel>}
    */
   fetchRecordByGri(recordGri) {
+    if (!recordGri) {
+      return resolve(null);
+    }
     const entityType = parseGri(recordGri).entityType;
     return this.get('store').findRecord(entityType, recordGri)
       .then(record => Promise.all([

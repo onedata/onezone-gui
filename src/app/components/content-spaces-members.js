@@ -64,7 +64,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       spaceActions.removeUser(space, member);
   },
 
-    /**
+  /**
    * @override
    */
   removeMembers(members) {

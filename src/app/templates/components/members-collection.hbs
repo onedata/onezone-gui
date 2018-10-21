@@ -3,7 +3,9 @@
     hasCheckboxes=true
     class=(concat subjectType "-list")
     selectionChanged=recordsSelected
-    isListCollapsed=(unbound (and (gt collapseForNumber 0) (gt membersList.length collapseForNumber)))
+    isListCollapsed=isListCollapsed
+    listCollapsed=(action "listCollapsed")
+    resetSelectionTrigger=membersList
     as |list|}}
     {{#list.header
       title=(concat listHeader " (" membersList.length ")")
@@ -17,7 +19,9 @@
         actionsArray=collectionActions}}
     {{/list.header}}
     {{#each membersProxyList key="id" as |memberProxy|}}
-      {{#list.item selectionValue=memberProxy as |listItem|}}
+      {{#list.item 
+        selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembersList))) null memberProxy)
+        as |listItem|}}
         {{#listItem.header
           disableToggleIcon=itemActions.length
           class=(if memberProxy.privilegesProxy.isModified "item-modified-header")}}
@@ -34,10 +38,13 @@
           </span>
           <span class="one-label">
             {{memberProxy.member.name}}
+          </span>
+          <span class="labels-container">
             {{#if memberProxy.isYou}}
-              <strong>
-                ({{tt this "you"}})
-              </strong>
+              <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
+            {{/if}}
+            {{#if (and (not onlyDirect) (contains memberProxy.member directMembersList))}}
+              <span class="space"></span><span class="label label-info">{{tt this "direct"}}</span>
             {{/if}}
           </span>
           {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
@@ -54,13 +61,13 @@
               {{/bs-button}}
             </div>
           {{/if}}
-          {{#if itemActions.length}}
+          {{#if (get (if (contains memberProxy.member directMembersList) itemActions effectiveItemAction) "length")}}
             {{actions-toolbar
               isMinimized=true
               toolbarClasses=""
               toolbarToggleClasses="btn-menu-toggle"
               dropdownPlacement="auto"
-              actionsArray=itemActions
+              actionsArray=(if (contains memberProxy.member directMembersList) itemActions effectiveItemAction)
               actionsArg=memberProxy.member}}
           {{/if}}
         {{/listItem.header}}

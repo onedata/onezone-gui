@@ -14,6 +14,15 @@
     }
   }
 
+  .one-collapsible-list-item-header {
+    padding-right: 150px;
+  }
+
+  .labels-container {
+    @include vertical-align-middle();
+    right: 50px;
+  }
+
   .privileges-tree-editor {
     margin: $padding-large-horizontal;
     margin-left: 65px;
@@ -43,26 +52,12 @@
 
   .view-tools-toggle {
     position: relative;
-    top: 0.15em;
-    font-size: 1em;
-    color: $color-one-mint;
-    border: 1px solid $color-one-mint;
-    border-radius: $border-radius-base;
-    // fix for border alignment
-    padding-left: 1px;
-    &::before {
-      margin: -1px;
-    }
+    top: -0.1em;
+    display: inline-block;
+    font-size: 1.7em;
+    vertical-align: middle;
     &.active {
-      color: $color-one-white;
-      background-color: $color-one-mint;
-      &:hover {
-        background-color: lighten($color-one-mint, 15%);
-        border-color: lighten($color-one-mint, 15%);
-      }
-    }
-    &:hover {
-      background-color: lighten($color-one-mint, 40%);
+      transform: scaleY(-1);
     }
   }
 

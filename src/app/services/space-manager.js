@@ -145,7 +145,7 @@ export default Service.extend({
       return Promise.all([
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.get('groupManager').reloadSpaceList(groupEntityId)
-          .catch(ignoreForbiddenError),
+        .catch(ignoreForbiddenError),
       ]);
     });
   },
@@ -192,7 +192,7 @@ export default Service.extend({
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('groupManager').reloadSpaceList(groupEntityId)
-          .catch(ignoreForbiddenError),
+        .catch(ignoreForbiddenError),
       ])
     );
   },

@@ -178,7 +178,7 @@ export default Service.extend({
           providerManager.reloadList(),
           spaceManager.reloadList(),
           spaceManager.reloadGroupList(get(space, 'entityId'))
-            .catch(ignoreForbiddenError),
+          .catch(ignoreForbiddenError),
         ]).then(() => space)
       );
   },
@@ -198,7 +198,7 @@ export default Service.extend({
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
           this.reloadChildList(get(parentGroup, 'entityId'))
-            .catch(ignoreForbiddenError),
+          .catch(ignoreForbiddenError),
           this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
           this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         ]).then(() => parentGroup)
