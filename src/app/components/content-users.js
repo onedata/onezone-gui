@@ -12,8 +12,8 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
 import { computed, set, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import authorizers from 'onezone-gui/utils/authorizers';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
@@ -36,15 +36,6 @@ export default Component.extend(I18n, {
    * @type {models/user}
    */
   user: undefined,
-
-  /**
-   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
-   */
-  linkedAccountsProxy: computed(function linkedAccountsProxy() {
-    return PromiseObject.create({
-      promise: this.get('linkedAccountManager').getLinkedAccounts(),
-    });
-  }),
 
   /**
    * @type {undefined|AuthorizerInfo}
@@ -70,22 +61,52 @@ export default Component.extend(I18n, {
   _isProvidersDropdownVisible: false,
 
   /**
-   * Object with mapping authorizerType -> authorizerInfo
-   * @type {Ember.ComputedProperty<object>}
+   * @type {ComputedProperty<LinkedAccountList>}
    */
-  _accountsAuthorizers: computed(function () {
-    return authorizers.reduce((accountsAuthorizers, authorizer) => {
-      set(accountsAuthorizers, get(authorizer, 'type'), authorizer);
-      return accountsAuthorizers;
-    }, {});
+  linkedAccountsList: reads('linkedAccountsProxy.content.list'),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
+   */
+  linkedAccountsProxy: computed(function linkedAccountsProxy() {
+    return PromiseObject.create({
+      promise: this.get('linkedAccountManager').getLinkedAccounts(),
+    });
+  }),
+
+  identityProviders: computed(function identityProviders() {
+    return this.get('authorizerManager').getAvailableAuthorizers();
   }),
 
   /**
-   * @type {Array<AuthorizerInfo>}
+   * Array of auth providers for powerselect
+   * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  _availableAuthorizers: computed(function () {
-    return this.get('authorizerManager').getAvailableAuthorizers()
-      .filter(authorizer => authorizer.type !== 'basicAuth');
+  authorizersForSelect: computed('identityProviders.[]', function () {
+    const supportedAuthorizers = this.get('identityProviders');
+    if (supportedAuthorizers) {
+      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
+    } else {
+      return [];
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<Array<Object>>} `[ { account, authorizer } ]`
+   */
+  accountsInfo: computed('linkedAccountsList.[]', 'identityProviders', function accounts() {
+    const {
+      linkedAccountsList,
+      identityProviders,
+    } = this.getProperties('linkedAccountsList', 'identityProviders');
+    if (linkedAccountsList) {
+      return linkedAccountsList.map(linkedAccount => ({
+        account: linkedAccount,
+        authorizer: identityProviders.find(idp =>
+          idp.id === get(linkedAccount, 'idp')
+        ),
+      }));
+    }
   }),
 
   /**
@@ -197,11 +218,11 @@ export default Component.extend(I18n, {
     },
     authorizerSelected(authorizer) {
       this.set('_selectedAuthorizer', authorizer);
-      return this.get('onezoneServer').getLoginEndpoint({
-          idp: authorizer.type,
-          linkAccount: true,
-          redirectUrl: window.location.toString(),
-        }).then(data =>
+      return this.get('onezoneServer').getLoginEndpoint(
+          authorizer.id,
+          true,
+          window.location.toString(),
+        ).then(data =>
           handleLoginEndpoint(data, () =>
             this._authEndpointError({
               message: this.t('authEndpointConfError'),

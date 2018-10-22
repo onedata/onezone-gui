@@ -29,16 +29,16 @@ const linkedAccountManagerStub = Service.extend({
 const authorizerManagerStub = Service.extend({
   getAvailableAuthorizers() {
     return [{
-        type: 'google',
-        name: 'Google+',
-        iconType: 'oneicon',
-        iconName: 'social-google',
+        id: 'google',
+        displayName: 'Google+',
+        iconPath: '/test/social-google.svg',
+        iconBackgroundColor: '#fff',
       },
       {
-        type: 'github',
-        name: 'GitHub',
-        iconType: 'oneicon',
-        iconName: 'social-github',
+        id: 'github',
+        displayName: 'GitHub',
+        iconPath: '/test/social-github.svg',
+        iconBackgroundColor: '#123',
       },
     ];
   },
@@ -78,15 +78,14 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders linked account', function (done) {
+  it('renders linked account', function () {
     this.render(hbs `{{content-users user=user}}`);
-    wait().then(() => {
-      expect(this.$('.google-account')).to.exist;
-      expect(this.$('.google-account .account-type').text().trim())
+    return wait().then(() => {
+      expect(this.$('.google-account'), 'google-account').to.exist;
+      expect(this.$('.google-account .account-type', 'Google+ text').text().trim())
         .to.equal('Google+');
-      expect(this.$('.google-account .account-email').text().trim())
+      expect(this.$('.google-account .account-email', 'email text').text().trim())
         .to.equal('one@one.one');
-      done();
     });
   });
 

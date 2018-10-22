@@ -7,6 +7,7 @@
  */
 
 import Component from '@ember/component';
+import { get } from '@ember/object';
 import RSVP from 'rsvp';
 
 export default Component.extend({
@@ -58,7 +59,7 @@ export default Component.extend({
   actions: {
     authenticate(socialBox) {
       socialBox.set('active', true);
-      this.get('authenticate')(socialBox.get('type')).finally(() => {
+      this.get('authenticate')(get(socialBox, 'authId')).finally(() => {
         socialBox.set('active', false);
       });
     },

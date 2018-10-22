@@ -9,11 +9,9 @@
 
 import { inject } from '@ember/service';
 import LoginBox from 'onedata-gui-common/components/login-box';
+import AuthenticationErrorMessage from 'onedata-gui-common/mixins/authentication-error-message';
 
-// TODO
-// const I18N_PREFIX = 'components.loginBox.';
-
-export default LoginBox.extend({
+export default LoginBox.extend(AuthenticationErrorMessage, {
   i18n: inject(),
   onedataConnection: inject(),
 
