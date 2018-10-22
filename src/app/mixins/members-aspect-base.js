@@ -23,7 +23,6 @@ export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
   media: service(),
-  appStorage: service(),
 
   /**
    * @type {DS.Model}
@@ -132,6 +131,16 @@ export default Mixin.create({
    * @type {boolean}
    */
   showMembershipDescription: false,
+
+  /**
+   * @type {Array<Action>}
+   */
+  effectiveGroupActions: Object.freeze([]),
+
+  /**
+   * @type {Array<Action>}
+   */
+  effectiveUserActions: Object.freeze([]),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -257,11 +266,6 @@ export default Mixin.create({
   }),
 
   /**
-   * @type {Array<Action>}
-   */
-  effectiveGroupActions: Object.freeze([]),
-
-  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   userActions: computed(function userActions() {
@@ -272,11 +276,6 @@ export default Mixin.create({
       icon: 'close',
     }];
   }),
-
-  /**
-   * @type {Array<Action>}
-   */
-  effectiveUserActions: Object.freeze([]),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}

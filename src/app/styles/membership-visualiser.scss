@@ -21,16 +21,18 @@
         display: none;
       }
     }
-    .membership-block {
-      max-width: 120px;
-      .type-icon {
-        pointer-events: none;
-      }
+    .long-path .membership-block {
       &:first-child, &:last-child {
         .record-name {
           width: 0;
           margin: 0;
         }
+      }
+    }
+    .membership-block {
+      max-width: 110px;
+      .type-icon {
+        pointer-events: none;
       }
     }
     .membership-row-element {

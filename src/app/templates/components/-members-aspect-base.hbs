@@ -61,7 +61,7 @@
       {{#if (eq aspect "memberships")}}
         <div class="show-descriptions-toggle">
           {{one-way-toggle inputId="members-show-descriptions" checked=showMembershipDescription update=(action (mut showMembershipDescription))}}
-          <label for="members-show-descriptions" class="inline-label">Show descriptions</label>
+          <label for="members-show-descriptions" class="inline-label">{{tt this "showDescriptions"}}</label>
         </div>
       {{/if}}
     </div>

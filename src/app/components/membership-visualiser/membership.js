@@ -10,8 +10,7 @@
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
+import { reads, gt } from '@ember/object/computed';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
@@ -24,9 +23,8 @@ export default Component.extend(I18n, {
   classNameBindings: [
     'isFilteredOut:filtered-out',
     'showDescription:with-description',
+    'longPath',
   ],
-
-  store: service(),
 
   /**
    * @override
@@ -118,6 +116,12 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   isFilteredOut: reads('path.isFilteredOut'),
+
+  /**
+   * True when path is an effective (indirect) path.
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  longPath: gt('recordsProxy.length', 1),
 
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
