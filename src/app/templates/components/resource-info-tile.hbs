@@ -1,0 +1,25 @@
+{{#one-tile title=(tt this "title") isLink=false class="resource-info-tile"}}
+  <table class="table table-condensed">
+    <tbody>
+      <tr>
+        <td class="property-name">{{tt this "name"}}</td>
+        {{#truncated-string tagName="td" class="property-value name"}}{{record.name}}{{/truncated-string}}
+      </tr>
+      <tr>
+        <td class="property-name">{{tt this "id"}}</td>
+        <td class="property-value id">{{one-clipboard-line size="sm" value=record.entityId showText=false}}</td>
+      </tr>
+      <tr>
+        <td class="property-name">{{tt this "creator"}}</td>
+        {{#truncated-string tagName="td" class="property-value creator"}}
+          {{one-icon icon=(oneicon-name-translator "resourceInfo" record.info.creatorType)}}
+          {{record.info.creatorName}}
+        {{/truncated-string}}
+      </tr>
+      <tr>
+        <td class="property-name">{{tt this "creationTime"}}</td>
+        <td class="property-value creation-time">{{creationTime}}</td>
+      </tr>
+    </tbody>
+  </table>
+{{/one-tile}}

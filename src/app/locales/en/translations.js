@@ -45,6 +45,7 @@ import groupJoinUsingTokenModal from './components/group-join-using-token-modal'
 import inviteUsingTokenModal from './components/invite-using-token-modal';
 import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
+import resourceInfoTile from './components/resource-info-tile';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -99,6 +100,7 @@ let translations = {
     inviteUsingTokenModal,
     joinAsUserModal,
     membershipVisualiser,
+    resourceInfoTile,
   },
   services: {
     clientTokenActions,

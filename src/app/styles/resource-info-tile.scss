@@ -1,0 +1,28 @@
+.resource-info-tile {
+  .table {
+    table-layout: fixed;
+    tr {
+      .property-name {
+        padding-left: 0;
+      }
+      td {
+        padding-top: 2 * $table-condensed-cell-padding;
+        padding-bottom: 2 * $table-condensed-cell-padding;
+        border-top: 0;
+      }
+    }
+  }
+  .property-name {
+    width: 75px;
+    font-family: 'Open Sans Semibold';
+  }
+  .creator {
+    position: relative;
+    padding-left: 2em;
+    .one-icon {
+      @include vertical-align-middle();
+      left: 0;
+      font-size: 1.7em;
+    }
+  }
+}

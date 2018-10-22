@@ -21,6 +21,7 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
+    {{resource-info-tile record=space}}
     {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
       {{#loading-container
         isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))

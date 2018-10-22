@@ -25,6 +25,13 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    */
   supportSizes: attr('object'),
 
+  /**
+   * Information about space. Available fields:
+   * creatorType, creatorName, creationTime
+   * @type {Object}
+   */
+  info: attr('object'),
+
   membership: belongsTo('membership'),
 
   providerList: belongsTo('providerList'),
