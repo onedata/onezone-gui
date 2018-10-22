@@ -8,16 +8,15 @@
 <div class="row content-row">
   {{#promise-proxy-container proxy=user}}
     <div class="one-tile-container">
+      {{resource-info-tile record=group}}
       {{#one-tile
-        isScalable=true
         title=(tt this "tileMembershipTitle")
-        aspect="membership"
-        as |tile|}}
+        aspect="members"}}
         {{membership-visualiser
           contextRecord=user.content
           targetRecord=group
           maxPathsNumber=4
-          visibleBlocks=(if tile.sizeClass 4 2)
+          visibleBlocks=2
           isCondensed=true}}
       {{/one-tile}}
     </div>

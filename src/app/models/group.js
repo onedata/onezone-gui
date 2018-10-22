@@ -24,6 +24,13 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   directMembership: attr('boolean', { defaultValue: false }),
   canViewPrivileges: attr('boolean', { defaultValue: false }),
 
+  /**
+   * Information about space. Available fields:
+   * creatorType, creatorName, creationTime
+   * @type {Object}
+   */
+  info: attr('object'),
+
   membership: belongsTo('membership'),
 
   parentList: belongsTo('groupList'),
