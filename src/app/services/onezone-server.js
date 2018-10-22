@@ -15,7 +15,9 @@ export default Service.extend({
   /**
    * Fetch a URL to login endpoint.
    *
-   * @param {String} identityProvider One of id providers, eg. google, dropbox
+   * @param {String} idp One of id providers, eg. google, dropbox
+   * @param {boolean} linkAccount If true - get URL to link existing account
+   * @param {redirectUrl} redirectUrl url to redirect to after login/link
    * @returns {Promise} A backend operation completion:
    * - ``resolve(object: data)`` when successfully fetched the endpoint
    *   - ``data.method`` (string)
@@ -23,9 +25,11 @@ export default Service.extend({
    *   - ``data.formData`` (object|undefined)
    * - ``reject(object: error)`` on failure
    */
-  getLoginEndpoint(identityProvider) {
+  getLoginEndpoint(idp, linkAccount, redirectUrl) {
     return this.get('onedataRpc').request('getLoginEndpoint', {
-      idp: identityProvider,
+      idp,
+      linkAccount,
+      redirectUrl,
     });
   },
 

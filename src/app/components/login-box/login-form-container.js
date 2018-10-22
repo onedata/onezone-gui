@@ -207,8 +207,9 @@ export default LoginFormConainer.extend({
         .then(data => {
           handleLoginEndpoint(data, () => {
             this._authEndpointError({
-              message: this.get('i18n').t(I18N_PREFIX +
-                'authEndpointConfError'),
+              message: this.get('i18n').t(
+                I18N_PREFIX + 'authEndpointConfError'
+              ),
             });
             authenticationSuccess();
           });
