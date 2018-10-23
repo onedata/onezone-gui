@@ -4,7 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
-import RSVP from 'rsvp';
+import { resolve } from 'rsvp';
 
 describe('Integration | Component | login box/social box list', function () {
   setupComponentTest('login-box/social-box-list', {
@@ -37,33 +37,31 @@ describe('Integration | Component | login box/social box list', function () {
     });
   });
 
-  it('shows clickable basicAuth auth provider', function (done) {
+  it('shows clickable onepanel auth provider', function (done) {
     const basicAuthSpy = sinon.spy();
     this.on('basicAuthSpy', basicAuthSpy);
     this.set('supportedAuthorizers', [{
-      type: 'basicAuth',
-      iconType: 'oneicon',
+      id: 'onepanel',
+      iconPath: '/custom/onepanel.svg',
     }]);
     this.render(hbs `{{login-box/social-box-list
       supportedAuthorizers=supportedAuthorizers
       usernameLoginClick=(action "basicAuthSpy")}}
     `);
-    expect(this.$('.login-icon-box.username')).to.exist;
-    click('.login-icon-box.username').then(() => {
+    expect(this.$('.login-icon-box.onepanel')).to.exist;
+    click('.login-icon-box.onepanel').then(() => {
       expect(basicAuthSpy).to.be.calledOnce;
       done();
     });
   });
 
   it('shows clickable custom auth providers', function (done) {
-    const authenticateSpy = sinon.spy(() => new RSVP.Promise((resolve) => resolve));
+    const authenticateSpy = sinon.spy(() => resolve());
     this.on('authenticateSpy', authenticateSpy);
     this.set('supportedAuthorizers', [{
-      type: 'provider1',
-      iconType: 'oneicon',
+      id: 'provider1',
     }, {
-      type: 'provider2',
-      iconType: 'oneicon',
+      id: 'provider2',
     }]);
     this.render(hbs `{{login-box/social-box-list
       supportedAuthorizers=supportedAuthorizers

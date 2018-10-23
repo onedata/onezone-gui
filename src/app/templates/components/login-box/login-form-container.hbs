@@ -21,12 +21,13 @@
   <div class="authorizers-select-container animated fast">
     <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>
     {{login-box/social-box-list
-        supportedAuthorizers=_authorizersForButtons 
-        isLoading=isLoading 
-        authenticate=(action "authenticate")
-        usernameLoginClick=(action "usernameLoginToggle")
-        showMoreButton=_showMoreProvidersButton
-        showMoreClick=(action "showMoreClick")}}
+      supportedAuthorizers=_authorizersForButtons 
+      isLoading=isLoading 
+      authenticate=(action "authenticate")
+      usernameLoginClick=(action "usernameLoginToggle")
+      showMoreButton=_showMoreProvidersButton
+      showMoreClick=(action "showMoreClick")
+    }}
     {{#authorizers-dropdown
       class="animated fast hide"
       authorizers=_authorizersForSelect
@@ -34,7 +35,8 @@
       selectedAuthorizer=selectedAuthorizer
       activeAuthorizer=_activeAuthorizer
       placeholder=(t "components.loginBox.loginFormContainer.findProviderPlaceholder")
-      disabled=_activeAuthorizer}}
+      disabled=_activeAuthorizer
+    }}
       <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.loginWith"}}</div>
     {{/authorizers-dropdown}}
     {{#if loginNotification}}

@@ -11,15 +11,11 @@ describe('Integration | Component | login box/social box list/social box',
       integration: true,
     });
 
-    it('renders as box with oneicon', function () {
-      this.render(hbs `{{login-box/social-box-list/social-box iconName="example"}}`);
-      expect(this.$('.oneicon-example')).to.exist;
-    });
-
     it('renders as box with svg image', function () {
       this.render(hbs `{{login-box/social-box-list/social-box
-        iconType="svg"
-        iconName="example"}}
+        authId="example"
+        iconPath="/assets/images/auth-providers/example.svg"
+      }}
       `);
       expect(this.$('.social-icon-image').attr('style'))
         .to.contain('/assets/images/auth-providers/example.svg');
@@ -31,7 +27,7 @@ describe('Integration | Component | login box/social box list/social box',
     });
 
     it('adds authorizer type as a class to box', function () {
-      this.render(hbs `{{login-box/social-box-list/social-box type="example"}}`);
+      this.render(hbs `{{login-box/social-box-list/social-box authId="example"}}`);
       expect(this.$('.login-icon-box.example')).to.exist;
     });
 
