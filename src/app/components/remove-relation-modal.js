@@ -109,6 +109,11 @@ export default ProceedProcessModal.extend({
   parentType: reads('parent.entityType'),
 
   /**
+   * Object: {
+   *   users: <number>,
+   *   groups: <number>,
+   * } - contains info about number of passed children.
+   * sharedUser is treated as user.
    * @type {Ember.ComputedProperty<object>}
    */
   childrenNumber: computed(
@@ -136,7 +141,11 @@ export default ProceedProcessModal.extend({
   ),
 
   /**
-   * @type {Ember.ComputedProperty<string|object>}
+   * Child type created according to aggregated types of all passed
+   * children (calculated in childrenNumber property).
+   * It is in format: '[user[s]][AndGroup[s]]'. 'Group' can be also 'Subgroup'.
+   * When there are no users: '[sub]group[s]'
+   * @type {Ember.ComputedProperty<string>}
    */
   childType: computed('parent.entityType', 'childrenNumber', function () {
     const parentType = this.get('parent.entityType');

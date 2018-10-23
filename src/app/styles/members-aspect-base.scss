@@ -14,7 +14,7 @@
     }
   }
 
-  .one-collapsible-list-item-header {
+  .member-item .one-collapsible-list-item-header {
     padding-right: 150px;
   }
 
@@ -52,12 +52,18 @@
 
   .view-tools-toggle {
     position: relative;
-    top: -0.1em;
+    top: -2px;
     display: inline-block;
+    width: 30px;
+    height: 30px;
+    transform: none;
+    background-image: url($root-url + 'assets/images/arrow-circle-down.svg');
+    background-size: 30px;
     font-size: 1.7em;
     vertical-align: middle;
+    transition: transform 0.2s linear;
     &.active {
-      transform: scaleY(-1);
+      transform: rotate(180deg);
     }
   }
 

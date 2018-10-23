@@ -19,7 +19,8 @@
         actionsArray=collectionActions}}
     {{/list.header}}
     {{#each membersProxyList key="id" as |memberProxy|}}
-      {{#list.item 
+      {{#list.item
+        class="member-item"
         selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembersList))) null memberProxy)
         as |listItem|}}
         {{#listItem.header

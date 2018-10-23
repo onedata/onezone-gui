@@ -421,7 +421,7 @@ export default Mixin.create({
     this.set('viewToolsVisible', viewToolsVisible === 'true');
   },
 
-    /**
+  /**
    * Removes member. Should be implemented in component.
    * @virtual
    * @param {string} type type of member model

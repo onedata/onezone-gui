@@ -161,6 +161,8 @@ export default Component.extend(I18n, {
                 record,
               });
             } else {
+              // empty block means, that this part of path cannot be fetched
+              // due to the lack of privileges
               blocks.unshift({
                 id: 'forbidden',
                 type: 'forbidden',
