@@ -62,7 +62,9 @@ export default Component.extend(I18n, {
     'opened',
     'tokenType',
     function tokenLoadingObserver() {
-      this.loadToken();
+      if (this.get('opened')) {
+        this.loadToken();
+      }
     }
   ),
 

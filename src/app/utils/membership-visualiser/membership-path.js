@@ -2,7 +2,7 @@
  * Object used internally by membership-visualiser component. Acts as a container
  * for records, which create membership path.
  * 
- * @module components/membership-visualiser
+ * @module utils/membership-visualiser/membership-path
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
