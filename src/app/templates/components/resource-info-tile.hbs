@@ -7,7 +7,13 @@
       </tr>
       <tr>
         <td class="property-name">{{tt this "id"}}</td>
-        <td class="property-value id">{{one-clipboard-line size="sm" value=record.entityId showText=false}}</td>
+        <td class="property-value id">
+          {{one-clipboard-line
+            size="sm"
+            value=record.entityId
+            showText=false
+            btnType="success"}}
+        </td>
       </tr>
       <tr>
         <td class="property-name">{{tt this "creator"}}</td>

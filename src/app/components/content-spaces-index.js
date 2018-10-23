@@ -30,6 +30,7 @@ export default Component.extend(
     currentUser: inject(),
     globalNotify: inject(),
     router: inject(),
+    guiUtils: inject(),
 
     /**
      * @override 
@@ -116,9 +117,37 @@ export default Component.extend(
     ),
 
     /**
-     * @type {PromiseArray<models/Provider>}
+     * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
      */
     providersProxy: reads('space.providerList.list'),
+
+    /**
+     * @type {Ember.ComputedProperty<Provider>}
+     */
+    dataProviderProxy: reads('providersProxy.firstObject'),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<any>>}
+     */
+    dataProviderRoute: computed('dataProviderProxy', function dataProviderRoute() {
+      const {
+        guiUtils,
+        dataProviderProxy,
+      } = this.getProperties('guiUtils', 'dataProviderProxy');
+      return dataProviderProxy ? [
+        'provider-redirect',
+        guiUtils.getRoutableIdFor(dataProviderProxy),
+      ] : [];
+    }),
+
+    /**
+     * @type {Ember.ComputedProperty<Object>}
+     */
+    dataProviderRouteParams: computed('space', function dataProviderRouteParams() {
+      return {
+        space_id: this.get('guiUtils').getRoutableIdFor(this.get('space')),
+      };
+    }),
 
     init() {
       this._super(...arguments);

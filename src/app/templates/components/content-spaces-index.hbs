@@ -22,6 +22,19 @@
 <div class="row content-row">
   <div class="one-tile-container">
     {{resource-info-tile record=space}}
+    {{#if dataProviderProxy}}
+      {{#one-tile
+        class="text-center"
+        title=(tt this "tileDataTitle")
+        route=dataProviderRoute
+        routeQueryParams=dataProviderRouteParams
+        moreText=(tt this "browseFiles")}}
+        <figure class="main-figure">
+          <img class="main-image" src="assets/images/space-data.svg">
+          {{#truncated-string tagName="span" class="one-label"}}{{dataProviderProxy.name}}{{/truncated-string}}
+        </figure>
+      {{/one-tile}}
+    {{/if}}
     {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
       {{#loading-container
         isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
@@ -40,7 +53,6 @@
             <img class="main-image" src="assets/images/space-get-support.svg">
             <span class="one-label">{{tt this "getSupport"}}</span>  
           </figure>
-          
         {{/if}}
       {{/loading-container}}
     {{/one-tile}}
