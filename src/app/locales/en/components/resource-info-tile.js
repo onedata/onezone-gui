@@ -4,4 +4,5 @@ export default {
   id: 'ID',
   creator: 'Creator',
   creationTime: 'Created',
+  changingName: 'changing name',
 };

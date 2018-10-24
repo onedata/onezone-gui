@@ -21,7 +21,12 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
-    {{resource-info-tile record=space}}
+    {{#resource-info-tile record=space}}
+      <tr>
+        <td class="property-name">{{tt this "sharedDirectories"}}</td>
+        <td class="property-value creation-time">{{space.info.sharedDirectories}}</td>
+      </tr>
+    {{/resource-info-tile}}
     {{#if dataProviderProxy}}
       {{#one-tile
         class="text-center"

@@ -16,4 +16,5 @@ export default {
   tileMembershipTitle: 'Your membership',
   getSupport: 'Get support',
   browseFiles: 'Browse files',
+  sharedDirectories: 'Shared dirs',
 };
