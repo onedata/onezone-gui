@@ -1,13 +1,7 @@
-<div class="row content-row header-row">
+<div class="row content-row header-row hidden-xs">
   <h1 class="normal-case with-menu">
-    {{one-inline-editor
-      value=space.name
-      onSave=(action "saveSpaceName")
-      class="one-label name-editor short"
-      editHint=(tt this "editSpaceNameHint")
-      isInToolbar=true
-    }}
-    {{actions-toolbar actionsArray=globalActions}}
+    {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
+    {{actions-toolbar actionsArray=globalActions isMinimized=true}}
   </h1>
   {{#one-switchable-popover-modal
     triggersConfiguration=leaveSpaceModalTriggers
