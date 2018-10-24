@@ -16,6 +16,9 @@
 
   .member-item .one-collapsible-list-item-header {
     padding-right: 150px;
+    .btn-toolbar {
+      margin-right: 100px;
+    }
   }
 
   .labels-container {
@@ -35,8 +38,13 @@
     }
   }
 
-  .item-modified-header .one-label {
-    font-weight: bold;
+  .member-item .item-modified-header {
+    @media (min-width: $screen-sm-min) {
+      padding-right: 250px;
+    }
+    .one-label {
+      font-weight: bold;
+    }
   }
 
   .show-descriptions-toggle {
