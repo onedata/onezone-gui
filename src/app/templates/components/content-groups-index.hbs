@@ -11,7 +11,8 @@
       {{resource-info-tile record=group}}
       {{#one-tile
         title=(tt this "tileMembershipTitle")
-        aspect="members"}}
+        aspect="members"
+        routeQueryParams=membershipTileQueryParams}}
         {{membership-visualiser
           contextRecord=user.content
           targetRecord=group

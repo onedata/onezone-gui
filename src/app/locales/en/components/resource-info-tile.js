@@ -3,6 +3,6 @@ export default {
   name: 'Name',
   id: 'ID',
   creator: 'Creator',
-  creationTime: 'Created',
+  createdAt: 'Created at',
   changingName: 'changing name',
 };

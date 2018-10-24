@@ -57,7 +57,8 @@
     {{/one-tile}}
     {{#one-tile
       title=(tt this "tileMembershipTitle")
-      aspect="members"}}
+      aspect="members"
+      routeQueryParams=membershipTileQueryParams}}
       {{#promise-proxy-container proxy=userProxy}}
         {{membership-visualiser
           contextRecord=userProxy.content

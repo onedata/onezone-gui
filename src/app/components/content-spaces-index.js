@@ -49,6 +49,14 @@ export default Component.extend(
     leaveSpaceModalTriggers: '',
 
     /**
+     * Query params passed to link-to in membership tile.
+     * @type {Object}
+     */
+    membershipTileQueryParams: Object.freeze({
+      aspect: 'memberships',
+    }),
+
+    /**
      * @type {Ember.ComputedProperty<string>}
      */
     globalActionsTitle: computed(function () {

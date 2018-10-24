@@ -23,6 +23,7 @@ export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
   media: service(),
+  navigationState: service(),
 
   /**
    * @type {DS.Model}
@@ -408,17 +409,29 @@ export default Mixin.create({
   init() {
     this._super(...arguments);
 
-    // Restore remembered view tools visibility
-    let viewToolsVisible =
-      localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
-    if (viewToolsVisible === null) {
-      viewToolsVisible = 'false';
+    const queryParamsAspect = this.get('navigationState.queryParams.aspect');
+    if (['memberships', 'privileges'].includes(queryParamsAspect)) {
+      this.setProperties({
+        aspect: queryParamsAspect,
+        viewToolsVisible: true,
+      });
       localStorage.setItem(
         'membersAspectBaseMixin.viewToolsVisible',
-        viewToolsVisible
+        true
       );
+    } else {
+      // Restore remembered view tools visibility
+      let viewToolsVisible =
+        localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
+      if (viewToolsVisible === null) {
+        viewToolsVisible = 'false';
+        localStorage.setItem(
+          'membersAspectBaseMixin.viewToolsVisible',
+          viewToolsVisible
+        );
+      }
+      this.set('viewToolsVisible', viewToolsVisible === 'true');
     }
-    this.set('viewToolsVisible', viewToolsVisible === 'true');
   },
 
   /**

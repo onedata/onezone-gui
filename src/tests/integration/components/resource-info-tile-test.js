@@ -16,7 +16,7 @@ describe('Integration | Component | resource info tile', function() {
       info: {
         creatorType: 'user',
         creatorName: 'Victor Warren',
-        creationTime: 1540163240,
+        createdAt: 1540163240,
       },
     });
     this.set('record', record);

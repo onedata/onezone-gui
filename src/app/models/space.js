@@ -27,7 +27,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   /**
    * Information about space. Available fields:
-   * creatorType, creatorName, creationTime
+   * creatorType, creatorName, createdAt
    * @type {Object}
    */
   info: attr('object'),

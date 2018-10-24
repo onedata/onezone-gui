@@ -86,8 +86,8 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  creationTime: computed('record.info.creationTime', function creationTime() {
-    const timestamp = this.get('record.info.creationTime');
+  createdAt: computed('record.info.createdAt', function createdAt() {
+    const timestamp = this.get('record.info.createdAt');
     return moment.unix(timestamp).format('D MMM YYYY H:mm:ss');
   }),
 
