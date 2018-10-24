@@ -56,17 +56,20 @@ export default Mixin.create({
   onlyDirect: true,
 
   /**
+   * One of: privileges, memberships
    * @type {string}
    */
   aspect: 'privileges',
 
   /**
-   * @type {Ember.Array<PrivilegeRecordProxy>}
+   * Contains users selected on list
+   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
    */
   selectedUsersProxies: Object.freeze(A()),
 
   /**
-   * @type {Ember.Array<PrivilegeRecordProxy>}
+   * Contains groups selected on list
+   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
    */
   selectedGroupsProxies: Object.freeze(A()),
 
@@ -163,7 +166,7 @@ export default Mixin.create({
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<PrivilegeRecordProxy>>}
+   * @type {Ember.ComputedProperty<Array<Utils/MembersList/ItemProxy>>}
    */
   selectedMembersProxies: union(
     'selectedUsersProxies',
@@ -371,15 +374,7 @@ export default Mixin.create({
 
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
-    this.setProperties({
-      memberToRemove: null,
-      createChildGroupModalVisible: false,
-      addYourGroupModalVisible: false,
-      joinAsUserModalVisible: false,
-      inviteTokenModalType: null,
-      selectedUsersProxies: A(),
-      selectedGroupsProxies: A(),
-    });
+    this.reset();
   }),
 
   directMembershipObserver: observer(
@@ -424,24 +419,6 @@ export default Mixin.create({
       );
     }
     this.set('viewToolsVisible', viewToolsVisible === 'true');
-  },
-
-  /**
-   * Loads all data necessary for creating batch edit model
-   * @returns {PrivilegeRecordProxy}
-   */
-  loadBatchPrivilegesEditModel() {
-    const selectedMembersProxies = this.get('selectedMembersProxies');
-    this.set(
-      'batchPrivilegesEditModalModel',
-      PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
-        griArray: _.flatten(selectedMembersProxies
-          .map(proxy => get(proxy, 'privilegesProxy.griArray'))
-        ),
-        sumPrivileges: true,
-        groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
-      })
-    );
   },
 
   /**
@@ -492,6 +469,40 @@ export default Mixin.create({
    */
   join() {
     return notImplementedReject();
+  },
+
+  /**
+   * Resets component state
+   * @returns {undefined}
+   */
+  reset() {
+    this.setProperties({
+      memberToRemove: null,
+      createChildGroupModalVisible: false,
+      addYourGroupModalVisible: false,
+      joinAsUserModalVisible: false,
+      inviteTokenModalType: null,
+      selectedUsersProxies: A(),
+      selectedGroupsProxies: A(),
+    });
+  },
+
+  /**
+   * Loads all data necessary for creating batch edit model
+   * @returns {PrivilegeRecordProxy}
+   */
+  loadBatchPrivilegesEditModel() {
+    const selectedMembersProxies = this.get('selectedMembersProxies');
+    this.set(
+      'batchPrivilegesEditModalModel',
+      PrivilegeRecordProxy.create(getOwner(this).ownerInjection(), {
+        griArray: _.flatten(selectedMembersProxies
+          .map(proxy => get(proxy, 'privilegesProxy.griArray'))
+        ),
+        sumPrivileges: true,
+        groupedPrivilegesFlags: this.get('groupedPrivilegesFlags'),
+      })
+    );
   },
 
   actions: {

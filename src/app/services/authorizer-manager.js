@@ -8,44 +8,16 @@
  */
 
 import Service from '@ember/service';
-import { inject } from '@ember/service';
-import authorizers from 'onezone-gui/utils/authorizers';
+import { inject as service } from '@ember/service';
 
 export default Service.extend({
-  onedataConnection: inject(),
-
-  /**
-   * Returns array of authorizers types supported by backend
-   * @return {Array<string>}
-   */
-  getAvailableAuthorizersTypes() {
-    return this.get('onedataConnection.identityProviders');
-  },
+  onedataConnection: service(),
 
   /**
    * Returns array of authorizers info objects supported by backend
    * @return {Array<AuthorizerInfo>}
    */
   getAvailableAuthorizers() {
-    const predefinedAuthorizersTypes = authorizers.map(auth => auth.type);
-    const availableTypes = this.getAvailableAuthorizersTypes();
-    const authorizersInfo = [];
-    predefinedAuthorizersTypes.forEach((auth, index) => {
-      if (availableTypes.indexOf(auth) > -1) {
-        authorizersInfo.push(authorizers[index]);
-      }
-    });
-    availableTypes.forEach((auth) => {
-      if (predefinedAuthorizersTypes.indexOf(auth) === -1) {
-        // default configuration for unknown authorizer
-        authorizersInfo.push({
-          type: auth,
-          name: auth.capitalize(),
-          iconType: 'oneicon',
-          iconName: 'key',
-        });
-      }
-    });
-    return authorizersInfo;
+    return this.get('onedataConnection.identityProviders');
   },
 });

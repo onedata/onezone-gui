@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import EmberObject, { observer, get, set, computed } from '@ember/object';
+import { observer, get, set, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -21,6 +21,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { reject } from 'rsvp';
 import { A } from '@ember/array';
 import _ from 'lodash';
+import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -41,37 +42,15 @@ export default Component.extend(I18n, {
   record: undefined,
 
   /**
+   * `aspect` part of gri used to generate gri for privileges records.
    * @virtual
    * @type {string}
    */
   griAspect: undefined,
 
   /**
-   * Is calculated by `membersListObserver`
-   * @type {Object}
-   */
-  membersProxyList: Object.freeze([]),
-
-  /**
-   * One of: privileges, memberships
-   * @type {string}
-   */
-  aspect: 'privileges',
-
-  /**
-   * If true, only direct members of the record will be visible
-   * @type {boolean}
-   */
-  onlyDirect: true,
-
-  /**
-   * If true, membership-visualiser component will show path descriptions
-   * @type {boolean}
-   */
-  showMembershipDescription: false,
-
-  /**
    * Type of model, which permissions are processed.
+   * One of: user, group
    * @virtual
    * @type {string}
    */
@@ -111,14 +90,40 @@ export default Component.extend(I18n, {
   /**
    * Path to the translations with privilege groups names.
    * @type {string}
+   * @virtual
    */
   privilegeGroupsTranslationsPath: undefined,
 
   /**
    * Path to the translations with privileges names.
    * @type {string}
+   * @virtual
    */
   privilegesTranslationsPath: undefined,
+
+  /**
+   * Is calculated by `membersListObserver`
+   * @type {Array<Utils/MembersList/ItemProxy>}
+   */
+  membersProxyList: Object.freeze([]),
+
+  /**
+   * One of: privileges, memberships
+   * @type {string}
+   */
+  aspect: 'privileges',
+
+  /**
+   * If true, only direct members of the record will be visible
+   * @type {boolean}
+   */
+  onlyDirect: true,
+
+  /**
+   * If true, membership-visualiser component will show path descriptions
+   * @type {boolean}
+   */
+  showMembershipDescription: false,
 
   /**
    * @type {Array<Action>}
@@ -246,7 +251,7 @@ export default Component.extend(I18n, {
         let proxy = membersProxyList.findBy('member', member);
         // If proxy has not been generated for that member, create new empty proxy.
         if (!proxy) {
-          proxy = EmberObject.create({
+          proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
             privilegesProxy: {},

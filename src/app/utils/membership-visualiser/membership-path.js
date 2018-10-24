@@ -2,7 +2,7 @@
  * Object used internally by membership-visualiser component. Acts as a container
  * for records, which create membership path.
  * 
- * @module components/membership-visualiser
+ * @module utils/membership-visualiser/membership-path
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -42,7 +42,7 @@ export default EmberObject.extend({
   }),
 
   /**
-   * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel>>}
+   * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel|null>>}
    */
   model: computed('griPath', function model() {
     return PromiseArray.create({
@@ -69,10 +69,12 @@ export default EmberObject.extend({
   /**
    * Loads record using given GRI
    * @param {string} recordGri 
-   * @returns {Promise<GraphSingleModel>}
+   * @returns {Promise<GraphSingleModel|null>}
    */
   fetchRecordByGri(recordGri) {
     if (!recordGri) {
+      // empty recordGri means, that record should be ommitted while loading
+      // path elements (e.g. due to lack of privileges to fetch them).
       return resolve(null);
     }
     const entityType = parseGri(recordGri).entityType;

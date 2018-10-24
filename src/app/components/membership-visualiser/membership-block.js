@@ -20,7 +20,7 @@ export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-block'],
   classNameBindings: ['recordType', 'actionsOpened'],
 
-  oneiconNameTranslator: service(),
+  oneiconAlias: service(),
 
   /**
    * @override
@@ -88,11 +88,11 @@ export default Component.extend(I18n, {
   iconName: computed('recordType', 'record.type', function iconName() {
     const {
       recordType,
-      oneiconNameTranslator,
-    } = this.getProperties('recordType', 'oneiconNameTranslator');
+      oneiconAlias,
+    } = this.getProperties('recordType', 'oneiconAlias');
     switch (recordType) {
       case 'group':
-        return oneiconNameTranslator.getName('group', this.get('record.type'));
+        return oneiconAlias.getName('group', this.get('record.type'));
       default:
         return recordType;
     }

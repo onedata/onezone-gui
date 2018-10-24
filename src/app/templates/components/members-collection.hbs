@@ -19,7 +19,8 @@
         actionsArray=collectionActions}}
     {{/list.header}}
     {{#each membersProxyList key="id" as |memberProxy|}}
-      {{#list.item 
+      {{#list.item
+        class="member-item"
         selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembersList))) null memberProxy)
         as |listItem|}}
         {{#listItem.header
@@ -28,7 +29,7 @@
           <span class="item-icon-container">
             {{one-icon
               class="item-icon"
-              icon=(if (eq subjectType "group") (oneicon-name-translator "group" memberProxy.member.type) "user")}}
+              icon=(if (eq subjectType "group") (oneicon-alias memberProxy.member.type) "user")}}
             {{one-tooltip
               title=memberProxy.member.name
               placement="top"
