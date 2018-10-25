@@ -5,4 +5,5 @@ export default {
   creator: 'Creator',
   createdAt: 'Created at',
   changingName: 'changing name',
+  unknown: 'Unknown',
 };

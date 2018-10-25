@@ -12,13 +12,17 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, set, get, getProperties } from '@ember/object';
 import moment from 'moment';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 import { inject as service } from '@ember/service';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
 
   globalNotify: service(),
+  store: service(),
 
   /**
    * @override
@@ -51,12 +55,11 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   creatorName: computed(
-    'record.info.{creatorName,creatorType}',
+    'record.info.creatorType',
+    'creatorProxy.name',
     function creatorName() {
-      const {
-        creatorName: name,
-        creatorType: type,
-      } = getProperties(this.get('record.info'), 'creatorName', 'creatorType');
+      const type = this.get('record.info.creatorType');
+      const name = this.get('creatorProxy.name');
       switch (type) {
         case 'null':
         case 'nobody':
@@ -70,15 +73,65 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * @type {Ember.ComputedProperty<ObjectProxy<User|Provider>>}
+   */
+  creatorProxy: computed(
+    'record.{entityType,entityId,info.creatorId}',
+    function creatorProxy() {
+      const record = this.get('record');
+      const {
+        entityType,
+        entityId,
+      } = getProperties(record, 'entityType', 'entityId');
+      const {
+        creatorId,
+        creatorType,
+      } = getProperties(get(record, 'info'), 'creatorId', 'creatorType');
+      let creatorEntityType;
+      switch (creatorType) {
+        case 'provider':
+        case 'user':
+          creatorEntityType = creatorType;
+          break;
+      }
+      let promise;
+      if (creatorEntityType) {
+        const creatorGri = gri({
+          entityType: creatorEntityType,
+          entityId: creatorId,
+          aspect: 'instance',
+          scope: 'shared',
+        });
+        promise = this.get('store').findRecord(creatorEntityType, creatorGri, {
+          _meta: {
+            authHint: ['through' + _.upperFirst(entityType), entityId],
+          },
+        }).catch(error => {
+          console.warn('resource-info-tile: cannot fetch creator record.', error);
+          if (error && get(error, 'id') === 'notFound') {
+            return null;
+          } else {
+            throw error;
+          }
+        });
+      } else {
+        promise = resolve(null);
+      }
+      return PromiseObject.create({
+        promise,
+      });
+    }
+  ),
+
+  /**
    * @type {Ember.ComputedProperty<boolean>}
    */
   isSpecialCreator: computed(
-    'record.info.{creatorName,creatorType}',
+    'record.info.creatorType',
+    'creatorProxy.name',
     function creatorName() {
-      const {
-        creatorName: name,
-        creatorType: type,
-      } = getProperties(this.get('record.info'), 'creatorName', 'creatorType');
+      const type = this.get('record.info.creatorType');
+      const name = this.get('creatorProxy.name');
       return ['null', 'nobody', 'root'].includes(type) || !name;
     }
   ),
