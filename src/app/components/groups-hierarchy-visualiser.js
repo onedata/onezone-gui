@@ -311,7 +311,7 @@ export default Component.extend(I18n, {
   isGroupConsumingToken: false,
 
   /**
-   * Group for group-invite-using-token-modal
+   * Group for invite-using-token-modal
    * @type {Group|null}
    */
   invitingGroupUsingToken: null,

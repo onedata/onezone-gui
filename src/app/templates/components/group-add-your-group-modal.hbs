@@ -10,8 +10,9 @@
   proceedDisabled=proceedDisabled}}
   <p class="input-top-description">
     {{tt this "message"
-      relation=relation
-      groupName=relatedGroup.name}}
+      relation=(tt this relation)
+      recordType=(tt this relatedRecord.entityType)
+      recordName=relatedRecord.name}}
   </p>
   <div class="dropdown-container">
     {{#promise-proxy-container proxy=availableGroups sizeClass="sm"}}

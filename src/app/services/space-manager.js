@@ -11,11 +11,14 @@ import Service, { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   store: inject(),
   currentUser: inject(),
   providerManager: inject(),
+  groupManager: inject(),
+  onedataGraph: inject(),
   onedataGraphUtils: inject(),
 
   /**
@@ -66,12 +69,95 @@ export default Service.extend({
   },
 
   /**
+   * Joins user to a space without token
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  joinSpaceAsUser(entityId) {
+    const space = this.getLoadedSpaceByEntityId(entityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'space',
+            entityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        space ? space.reload() : resolve(),
+        this.reloadUserList(entityId).catch(ignoreForbiddenError),
+        this.get('providerManager').reloadList(),
+      ]));
+  },
+
+  /**
+   * Creates member group for specified space
+   * @param {string} spaceEntityId 
+   * @param {Object} childGroupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroup(spaceEntityId, childGroupRepresentation) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => this.get('onedataGraph').request({
+        gri: gri({
+          entityType: 'space',
+          entityId: spaceEntityId,
+          aspect: 'group',
+          scope: 'auto',
+        }),
+        operation: 'create',
+        data: childGroupRepresentation,
+        authHint: ['asUser', get(user, 'entityId')],
+      }).then(() => {
+        return Promise.all([
+          this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        ]);
+      }));
+  },
+
+  /**
+   * Adds group to the members of a space
+   * @param {string} spaceEntityId 
+   * @param {string} groupEntityId
+   * @return {Promise}
+   */
+  addMemberGroup(spaceEntityId, groupEntityId) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'space',
+        entityId: spaceEntityId,
+        aspect: 'group',
+        aspectId: groupEntityId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    }).then(() => {
+      return Promise.all([
+        this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.get('groupManager').reloadSpaceList(groupEntityId)
+        .catch(ignoreForbiddenError),
+      ]);
+    });
+  },
+
+  /**
    * @param {string} spaceEntityId 
    * @param {string} userEntityId
    * @returns {Promise}
    */
   removeUserFromSpace(spaceEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
+    const space = this.getLoadedSpaceByEntityId(spaceEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
       'space',
       spaceEntityId,
@@ -83,6 +169,7 @@ export default Service.extend({
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
+          space ? space.reload().catch(ignoreForbiddenError) : resolve(),
         ])),
       ])
     );
@@ -104,6 +191,8 @@ export default Service.extend({
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
+        this.get('groupManager').reloadSpaceList(groupEntityId)
+        .catch(ignoreForbiddenError),
       ])
     );
   },

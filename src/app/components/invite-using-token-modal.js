@@ -1,7 +1,7 @@
 /**
- * Shows modal presenting group invitation token from passed group
+ * Shows modal presenting group/user invitation token for passed record.
  *
- * @module components/group-invite-using-token-modal
+ * @module components/invite-using-token-modal
  * @author Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -23,7 +23,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.groupInviteUsingTokenModal',
+  i18nPrefix: 'components.inviteUsingTokenModal',
 
   /**
    * If true, modal is opened
@@ -41,30 +41,45 @@ export default Component.extend(I18n, {
   close: notImplementedThrow,
 
   /**
-   * Group for which invitation token will be generated
+   * Record for which invitation token will be generated
    * @type {Group}
    * @virtual
    */
-  group: undefined,
+  record: undefined,
+
+  /**
+   * One of 'user', 'group', null
+   * @type {string|null}
+   */
+  tokenType: 'group',
 
   /**
    * @type {PromiseObject<string>}
    */
   tokenProxy: undefined,
 
-  openedObserver: observer('opened', function openedObserver() {
-    this.loadToken();
-  }),
+  tokenLoadingObserver: observer(
+    'opened',
+    'tokenType',
+    function tokenLoadingObserver() {
+      if (this.get('opened')) {
+        this.loadToken();
+      }
+    }
+  ),
 
   /**
    * Loads token
    * @returns {undefined}
    */
   loadToken() {
-    const group = this.get('group');
-    this.set('tokenProxy', group ?
+    const {
+      record,
+      tokenType,
+    } = this.getProperties('record', 'tokenType');
+    this.set('tokenProxy', (record && tokenType) ?
       PromiseObject.create({
-        promise: group.getInviteToken('group'),
+        promise: record.getInviteToken(tokenType),
       }) : null
     );
   },

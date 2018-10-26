@@ -6,7 +6,7 @@ import EmberObject from '@ember/object';
 
 const icons = {
   user: 'user',
-  group: 'groups',
+  group: 'team',
   space: 'space',
   provider: 'provider',
 };
@@ -32,6 +32,7 @@ describe(
       it(`renders icon for ${modelType}`, function () {
         this.set('record', EmberObject.create({
           entityType: modelType,
+          type: 'team',
         }));
         this.render(hbs `{{membership-visualiser/membership-block record=record}}`);
         expect(this.$(`.oneicon-${icons[modelType]}`)).to.exist;

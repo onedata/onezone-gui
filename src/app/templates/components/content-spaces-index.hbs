@@ -44,16 +44,14 @@
       {{/loading-container}}
     {{/one-tile}}
     {{#one-tile
-      isScalable=true
       title=(tt this "tileMembershipTitle")
-      aspect="membership"
-      as |tile|}}
+      aspect="members"}}
       {{#promise-proxy-container proxy=userProxy}}
         {{membership-visualiser
           contextRecord=userProxy.content
           targetRecord=space
           maxPathsNumber=4
-          visibleBlocks=(if tile.sizeClass 4 2)
+          visibleBlocks=2
           isCondensed=true}}
       {{/promise-proxy-container}}
     {{/one-tile}}

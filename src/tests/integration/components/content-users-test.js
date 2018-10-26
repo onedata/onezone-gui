@@ -18,7 +18,7 @@ const linkedAccountManagerStub = Service.extend({
         promise: resolve([
           EmberObject.create({
             idp: 'google',
-            emailList: ['one@one.one'],
+            emails: ['one@one.one'],
           }),
         ]),
       }),

@@ -44,7 +44,7 @@ import EmberObject, { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { Promise, resolve } from 'rsvp';
+import { Promise, resolve, reject } from 'rsvp';
 import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
 import _ from 'lodash';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -100,6 +100,12 @@ export default EmberObject.extend({
    * @type {Object}
    */
   modifiedPrivileges: Object.freeze({}),
+
+  /**
+   * If true, then records should be neither modified nor saved.
+   * @type {boolean}
+   */
+  isReadOnly: false,
 
   /**
    * If true, then modifiedPrivileges differ from effectivePrivilegesSnapshot.
@@ -227,9 +233,13 @@ export default EmberObject.extend({
    */
   reloadRecords() {
     const promiseArray = PromiseArray.create({
-      promise: Promise.all(this.get('griArray').map(gri =>
-        this.get('store').findRecord('privilege', gri, { reload: true })
-      )),
+      promise: Promise.all(this.get('griArray').map(gri => {
+        if (!gri) {
+          return reject('Incorrect privileges record id.');
+        } else {
+          return this.get('store').findRecord('privilege', gri, { reload: true });
+        }
+      })),
     });
     this.set('records', promiseArray);
     promiseArray.then(() => {
@@ -272,7 +282,7 @@ export default EmberObject.extend({
    * @param {boolean} reloadRecords if true, records will be reloaded after save
    * @returns {Promise}
    */
-  save(reloadRecords = false) {
+  save(reloadRecords = true) {
     let promise;
     if (!this.get('isModified')) {
       promise = resolve();

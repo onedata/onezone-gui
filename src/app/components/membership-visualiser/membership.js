@@ -10,8 +10,7 @@
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
+import { reads, gt } from '@ember/object/computed';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
@@ -24,9 +23,8 @@ export default Component.extend(I18n, {
   classNameBindings: [
     'isFilteredOut:filtered-out',
     'showDescription:with-description',
+    'longPath',
   ],
-
-  store: service(),
 
   /**
    * @override
@@ -120,6 +118,12 @@ export default Component.extend(I18n, {
   isFilteredOut: reads('path.isFilteredOut'),
 
   /**
+   * True when path is an effective (indirect) path.
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  longPath: gt('recordsProxy.length', 1),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
   pathElements: computed(
@@ -150,11 +154,20 @@ export default Component.extend(I18n, {
             });
           } else {
             const record = reversedRecords.shift();
-            blocks.unshift({
-              id: 'block|' + get(record, 'gri'),
-              type: 'block',
-              record,
-            });
+            if (record) {
+              blocks.unshift({
+                id: 'block|' + get(record, 'gri'),
+                type: 'block',
+                record,
+              });
+            } else {
+              // empty block means, that this part of path cannot be fetched
+              // due to the lack of privileges
+              blocks.unshift({
+                id: 'forbidden',
+                type: 'forbidden',
+              });
+            }
           }
           blocksLength++;
         }
@@ -166,16 +179,16 @@ export default Component.extend(I18n, {
         let prevBlock = blocks[0];
         const elements = [blocks[0]];
         blocks.slice(1).forEach(block => {
-          const isPrevMore = get(prevBlock, 'type') === 'more';
+          const isPrevBlock = get(prevBlock, 'type') === 'block';
+          const isThisBlock = get(block, 'type') === 'block';
           elements.push({
-            id: `relation|${isPrevMore ? 'more' : get(prevBlock, 'record.gri')}|` +
-              `${get(block, 'record.gri')}`,
+            id: this.getPathRelationId(prevBlock, block),
             type: 'relation',
-            // there is no logical relation with block "more" - null
-            relation: isPrevMore ? null : MembershipRelation.create({
-              parent: get(block, 'record'),
-              child: get(prevBlock, 'record'),
-            }),
+            relation: !isPrevBlock || !isThisBlock ?
+              null : MembershipRelation.create({
+                parent: get(block, 'record'),
+                child: get(prevBlock, 'record'),
+              }),
           }, block);
           prevBlock = block;
         });
@@ -270,6 +283,14 @@ export default Component.extend(I18n, {
       scrollRightButton: element.offsetWidth + element.scrollLeft < element.scrollWidth -
         detectionEpsilon,
     });
+  },
+
+  getPathRelationId(prevBlock, block) {
+    const leftBlockId = get(prevBlock, 'type') !== 'block' ?
+      get(prevBlock, 'type') : get(prevBlock, 'record.gri');
+    const rightBlockId = get(block, 'type') !== 'block' ?
+      get(prevBlock, 'type') : get(prevBlock, 'record.gri');
+    return `relation|${leftBlockId}|` + `${rightBlockId}`;
   },
 
   actions: {

@@ -31,7 +31,7 @@
             {{#truncated-string class="account-type"}}
               {{accountInfo.authorizer.displayName}}
             {{/truncated-string}}
-            {{#each accountInfo.account.emailList as |email|}}
+            {{#each accountInfo.account.emails as |email|}}
               {{#truncated-string class="account-email"}}
                 {{email}}
               {{/truncated-string}}

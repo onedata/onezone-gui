@@ -13,7 +13,7 @@
     removeRelation=removeRelation}}
 {{/if}}
 
-{{one-icon class="box-icon" icon="groups"}}
+{{one-icon class="box-icon" icon=(oneicon-alias groupBox.group.type)}}
 
 {{!-- optimization: rendering editor only when needed --}}
 {{#if isRenaming}}

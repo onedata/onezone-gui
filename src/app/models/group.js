@@ -29,6 +29,8 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   parentList: belongsTo('groupList'),
   childList: belongsTo('groupList'),
   userList: belongsTo('sharedUserList'),
+  effChildList: belongsTo('groupList'),
+  effUserList: belongsTo('sharedUserList'),
   spaceList: belongsTo('spaceList'),
 
   /**
@@ -36,6 +38,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @type {Ember.ComputedProperty<GroupList>}
    */
   groupList: alias('childList'),
+
+  /**
+   * Alias to make access to the group/user members compatible with the space model
+   * @type {Ember.ComputedProperty<GroupList>}
+   */
+  effGroupList: alias('effChildList'),
 
   /**
    * True if user is an effective member of that group

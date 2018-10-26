@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import privilegesAspectBase from '../mixins/privileges-aspect-base';
+import privilegesAspectBase from '../mixins/members-aspect-base';
 
 export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {

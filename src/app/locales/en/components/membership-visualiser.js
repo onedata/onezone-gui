@@ -19,6 +19,9 @@ export default {
   membershipMore: {
     nMore: '{{number}} more...',
   },
+  membershipForbidden: {
+    notAllowed: 'You don\'t have privileges to view the full membership path',
+  },
   membership: {
     descBeginning: '{{pathStartType}} "{{pathStartName}}" ',
     descPathFirstElement: 'is a member{{membershipType}} of {{elementType}} "{{elementName}}"',

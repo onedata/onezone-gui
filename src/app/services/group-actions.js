@@ -395,7 +395,7 @@ export default Service.extend(I18n, {
   /**
    * Adds child to specified parent group
    * @param {Group} group 
-   * @param {Object} futureChild
+   * @param {Group} futureChild
    * @return {Promise}
    */
   addChild(group, futureChild) {

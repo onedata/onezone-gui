@@ -12,5 +12,5 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 
 export default Model.extend(GraphSingleModelMixin, {
   idp: attr('string'),
-  emailList: attr('array'),
+  emails: attr('array'),
 });

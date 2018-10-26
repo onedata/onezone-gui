@@ -104,6 +104,10 @@ const GroupStub = EmberObject.extend({
   },
 });
 
+GroupStub.relationshipNames = {
+  belongsTo: ['childList', 'parentList'],
+};
+
 class FakeWindow {
   constructor() {
     this.resizeHandler = () => {};
@@ -599,7 +603,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         ]);
       })
       .then(() =>
-        expect($('.group-invite-using-token-modal .invitation-token').text().trim())
+        expect($('.invite-using-token-modal .invitation-token').text().trim())
         .to.equal('token1')
       );
   });

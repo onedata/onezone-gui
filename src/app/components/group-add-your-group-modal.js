@@ -56,11 +56,11 @@ export default Component.extend(I18n, {
   proceed: notImplementedThrow,
 
   /**
-   * Group to which another group will be added
-   * @type {Group}
+   * Record to which another group will be added
+   * @type {GraphSingleModel}
    * @virtual
    */
-  relatedGroup: undefined,
+  relatedRecord: undefined,
 
   /**
    * Selected group will be with `group` in relation specified by this field.

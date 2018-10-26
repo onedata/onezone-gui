@@ -11,5 +11,7 @@
   {{else if (eq pathElement.type "more")}}
     {{membership-visualiser/membership-more
       number=pathElement.number}}
+  {{else if (eq pathElement.type "forbidden")}}
+    {{membership-visualiser/membership-forbidden}}
   {{/if}}
 {{/each}}

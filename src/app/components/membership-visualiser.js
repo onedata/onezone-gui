@@ -466,8 +466,13 @@ export default Component.extend(I18n, {
       entityType,
       entityId,
     } = getProperties(this.get('contextRecord'), 'entityType', 'entityId');
+    const targetEntityType = this.get('targetRecord.entityType');
+    let aspectType = entityType;
+    if (entityType === 'group' && targetEntityType === 'group') {
+      aspectType = 'child';
+    }
     return gri(_.assign(parseGri(recordGri), {
-      aspect: `eff_${entityType}_membership`,
+      aspect: `eff_${aspectType}_membership`,
       aspectId: entityId,
       scope: 'private',
     }));
@@ -500,26 +505,36 @@ export default Component.extend(I18n, {
    * @returns {promise<Array<Membership>>}
    */
   fetchGraphLevel(parentLevel, allNodesMap, silent) {
+    const contextRecordEntityId = this.get('contextRecord.entityId');
     const newLevel = [];
     parentLevel.forEach(parentMembership => {
       if (!get(parentMembership, 'isForbidden') &&
         !get(parentMembership, 'isDeleted')) {
-        get(parentMembership, 'intermediaries').forEach(itermediaryGri => {
-          const membershipGri = this.getMembershipGri(itermediaryGri);
-          if (!allNodesMap.has(itermediaryGri)) {
-            allNodesMap.set(itermediaryGri, null);
-            const fetchSilent = !allNodesMap.has(itermediaryGri) || !silent;
-            const promise = this.fetchMembership(membershipGri, fetchSilent)
-              .then(membership => {
-                allNodesMap.set(itermediaryGri, membership);
-                return membership;
-              });
-            newLevel.push(promise);
+        get(parentMembership, 'intermediaries').forEach(intermediaryGri => {
+          if (parseGri(intermediaryGri).entityId !== contextRecordEntityId) {
+            const membershipGri = this.getMembershipGri(intermediaryGri);
+            if (!allNodesMap.has(intermediaryGri)) {
+              const fetchReload = !allNodesMap.has(intermediaryGri) || !silent;
+              allNodesMap.set(intermediaryGri, null);
+              const promise = this.fetchMembership(membershipGri, fetchReload)
+                .catch(error => {
+                  if (error && get(error, 'id') === 'forbidden') {
+                    return null;
+                  } else {
+                    throw error;
+                  }
+                })
+                .then(membership => {
+                  allNodesMap.set(intermediaryGri, membership);
+                  return membership;
+                });
+              newLevel.push(promise);
+            }
           }
         });
       }
     });
-    return Promise.all(newLevel);
+    return Promise.all(newLevel).then(level => level.filter(x => x));
   },
 
   /**
@@ -598,17 +613,19 @@ export default Component.extend(I18n, {
       workingPaths = _.flatten(workingPaths.map(workingPath => {
         const lastNodeGri = workingPath[workingPath.length - 1];
         const lastNode = allNodesMap.get(lastNodeGri);
-        if (!lastNode || get(lastNode, 'isForbidden') ||
-          get(lastNode, 'isDeleted')) {
-          // node has not been fetched yet or is not available
+        if (lastNode && get(lastNode, 'isDeleted')) {
           return [];
+        } else if (!lastNode || get(lastNode, 'isForbidden')) {
+          donePaths.push(workingPath.concat([null]).reverse());
+          return [];
+        } else {
+          if (get(lastNode, 'directMembership')) {
+            donePaths.push(workingPath.slice(0).reverse());
+          }
+          return get(lastNode, 'intermediaries')
+            .filter(intermediaryGri => !workingPath.includes(intermediaryGri))
+            .map(intermediaryGri => workingPath.concat([intermediaryGri]));
         }
-        if (get(lastNode, 'directMembership')) {
-          donePaths.push(workingPath.slice(0).reverse());
-        }
-        return get(lastNode, 'intermediaries')
-          .filter(intermediaryGri => !workingPath.includes(intermediaryGri))
-          .map(intermediaryGri => workingPath.concat([intermediaryGri]));
       }));
     }
     return donePaths;

@@ -4,15 +4,15 @@
   proceed=(action "create")
   processing=processing
   modalClass="group-create-relative-modal"
-  headerText=(tt this "createRelativeGroup" relation=relation)
+  headerText=(tt this "createRelativeGroup" relation=(tt this relation))
   proceedButtonClass="btn btn-primary proceed"
   proceedButtonText=(tt this "create")
   proceedDisabled=proceedDisabled
   onShown=(action "onShown")}}
   <p class="input-top-description">
     {{tt this "enterRelativeGroupName"
-      relation=relation
-      groupName=relatedGroup.name}}
+      relation=(tt this relation)
+      groupName=relatedRecord.name}}
   </p>
   <input
     value={{newGroupName}}
