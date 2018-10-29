@@ -31,6 +31,7 @@ export default Component.extend(
     globalNotify: inject(),
     router: inject(),
     guiUtils: inject(),
+    media: inject(),
 
     /**
      * @override 

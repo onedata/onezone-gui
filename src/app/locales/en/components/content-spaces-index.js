@@ -13,6 +13,7 @@ export default {
   tileDataTitle: 'Data',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
+  tileProvidersMapTitle: 'Providers map',
   getSupport: 'Get support',
   browseFiles: 'Browse files',
   sharedDirectories: 'Shared dirs',
