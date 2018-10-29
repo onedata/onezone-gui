@@ -60,19 +60,7 @@
     {{#if space.hasViewPrivilege}}
       {{resource-members-tile record=space}}
     {{/if}}
-    {{#one-tile
-      title=(tt this "tileMembershipTitle")
-      aspect="members"
-      routeQueryParams=membershipTileQueryParams}}
-      {{#promise-proxy-container proxy=userProxy}}
-        {{membership-visualiser
-          contextRecord=userProxy.content
-          targetRecord=space
-          maxPathsNumber=4
-          visibleBlocks=2
-          isCondensed=true}}
-      {{/promise-proxy-container}}
-    {{/one-tile}}
+    {{resource-membership-tile record=space}}
     {{yield}}
   </div>
 </div>

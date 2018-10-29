@@ -29,14 +29,6 @@ export default Component.extend(I18n, {
   group: undefined,
 
   /**
-   * Query params passed to link-to in membership tile.
-   * @type {Object}
-   */
-  membershipTileQueryParams: Object.freeze({
-    aspect: 'memberships',
-  }),
-
-  /**
    * @type {PromiseObject<User>}
    */
   user: computed(function user() {

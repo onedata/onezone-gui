@@ -13,7 +13,6 @@ export default {
   tileDataTitle: 'Data',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
-  tileMembershipTitle: 'Your membership',
   getSupport: 'Get support',
   browseFiles: 'Browse files',
   sharedDirectories: 'Shared dirs',

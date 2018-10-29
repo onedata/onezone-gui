@@ -2,7 +2,7 @@
  * Default content for single space - overview of space aspects
  *
  * @module components/content-spaces-index
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -47,14 +47,6 @@ export default Component.extend(
      * @type {string}
      */
     leaveSpaceModalTriggers: '',
-
-    /**
-     * Query params passed to link-to in membership tile.
-     * @type {Object}
-     */
-    membershipTileQueryParams: Object.freeze({
-      aspect: 'memberships',
-    }),
 
     /**
      * @type {Ember.ComputedProperty<string>}
