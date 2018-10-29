@@ -9,6 +9,9 @@
   {{#promise-proxy-container proxy=user}}
     <div class="one-tile-container">
       {{resource-info-tile record=group}}
+      {{#if group.hasViewPrivilege}}
+        {{resource-members-tile record=group}}
+      {{/if}}
       {{#one-tile
         title=(tt this "tileMembershipTitle")
         aspect="members"

@@ -34,27 +34,32 @@
         </figure>
       {{/one-tile}}
     {{/if}}
-    {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
-      {{#loading-container
-        isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
-      }}
-        {{#if isSupported}}
-          <div class="support-chart-container absolute-align-middle-center full-width">
-            {{space-providers-support-chart
-              space=space
-              providersColors=providersColors
-              forceMobile=true
-              hideLegend=true
-            }}
-          </div>
-        {{else}}
-          <figure class="main-figure">
-            <img class="main-image" src="assets/images/space-get-support.svg">
-            <span class="one-label">{{tt this "getSupport"}}</span>  
-          </figure>
-        {{/if}}
-      {{/loading-container}}
-    {{/one-tile}}
+    {{#if space.hasViewPrivilege}}
+      {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
+        {{#loading-container
+          isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
+        }}
+          {{#if isSupported}}
+            <div class="support-chart-container absolute-align-middle-center full-width">
+              {{space-providers-support-chart
+                space=space
+                providersColors=providersColors
+                forceMobile=true
+                hideLegend=true
+              }}
+            </div>
+          {{else}}
+            <figure class="main-figure">
+              <img class="main-image" src="assets/images/space-get-support.svg">
+              <span class="one-label">{{tt this "getSupport"}}</span>  
+            </figure>
+          {{/if}}
+        {{/loading-container}}
+      {{/one-tile}}
+    {{/if}}
+    {{#if space.hasViewPrivilege}}
+      {{resource-members-tile record=space}}
+    {{/if}}
     {{#one-tile
       title=(tt this "tileMembershipTitle")
       aspect="members"

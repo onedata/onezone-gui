@@ -1,0 +1,22 @@
+.resource-members-tile {
+  .members-counter-row {
+    display: flex;
+    margin-top: $padding-base-vertical;
+    margin-bottom: $padding-large-vertical;
+    justify-content: space-between;
+  }
+  .members-counter {
+    position: relative;
+    min-width: 100px;
+    padding: $padding-large-vertical $padding-small-horizontal;
+    padding-left: 50px;
+    border-radius: $border-radius-base;
+    background-color: rgba(lighten($color-one-blue-gray, 49%), 0.8);
+    color: $color-one-blue-gray;
+    .one-icon {
+      @include vertical-align-middle();
+      left: 15px;
+      font-size: 2.3em;
+    }
+  }
+}

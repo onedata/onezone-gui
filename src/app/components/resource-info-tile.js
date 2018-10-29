@@ -103,8 +103,10 @@ export default Component.extend(I18n, {
           scope: 'shared',
         });
         promise = this.get('store').findRecord(creatorEntityType, creatorGri, {
-          _meta: {
-            authHint: ['through' + _.upperFirst(entityType), entityId],
+          adapterOptions: {
+            _meta: {
+              authHint: ['through' + _.upperFirst(entityType), entityId],
+            },
           },
         }).catch(error => {
           console.warn('resource-info-tile: cannot fetch creator record.', error);

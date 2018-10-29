@@ -9,6 +9,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { computed } from '@ember/object';
+import { equal } from '@ember/object/computed';
 import _ from 'lodash';
 
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
@@ -16,6 +17,7 @@ import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/invit
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   name: attr('string'),
+  scope: attr('string'),
   canViewPrivileges: attr('boolean', { defaultValue: false }),
   directMembership: attr('boolean', { defaultValue: false }),
 
@@ -41,6 +43,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   userList: belongsTo('sharedUserList'),
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('sharedUserList'),
+
+  /**
+   * True, if user has a "View group" privilege
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasViewPrivilege: equal('scope', 'private'),
 
   //#region utils
 
