@@ -8,7 +8,7 @@ import { resolve } from 'rsvp';
 import { registerService } from '../../helpers/stub-service';
 import wait from 'ember-test-helpers/wait';
 
-describe('Integration | Component | resource info tile', function() {
+describe('Integration | Component | resource info tile', function () {
   setupComponentTest('resource-info-tile', {
     integration: true,
   });
@@ -28,7 +28,7 @@ describe('Integration | Component | resource info tile', function() {
     registerService(this, 'store', storeStub);
   });
 
-  it('renders record info', function() {
+  it('renders record info', function () {
     const record = EmberObject.create({
       entityId: 'recordId',
       name: 'recordName',
@@ -39,7 +39,7 @@ describe('Integration | Component | resource info tile', function() {
       },
     });
     this.set('record', record);
-    this.render(hbs`{{resource-info-tile record=record}}`);
+    this.render(hbs `{{resource-info-tile record=record}}`);
     return wait().then(() => {
       expect(this.$('.resource-name')).to.contain(get(record, 'name'));
       expect(this.$('.id input')).to.have.value(get(record, 'entityId'));

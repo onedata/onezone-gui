@@ -1,7 +1,8 @@
 {{#one-tile
   title=(tt this "title")
   aspect="members"
-  routeQueryParams=queryParams}}
+  routeQueryParams=queryParams
+  class="resource-membership-tile"}}
   {{#promise-proxy-container proxy=userProxy}}
     {{membership-visualiser
       contextRecord=userProxy.content

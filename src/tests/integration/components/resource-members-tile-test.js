@@ -18,7 +18,7 @@ describe('Integration | Component | resource members tile', function () {
       effGroupList: resolve({ length: 3 }),
       effUserList: resolve({ length: 4 }),
     }));
-    this.render(hbs`{{resource-members-tile record=record}}`);
+    this.render(hbs `{{resource-members-tile record=record}}`);
     return wait().then(() => {
       expect(this.$('.direct-groups-counter').text()).to.contain('1');
       expect(this.$('.direct-users-counter').text()).to.contain('2');
