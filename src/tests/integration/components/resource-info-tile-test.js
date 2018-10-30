@@ -35,7 +35,7 @@ describe('Integration | Component | resource info tile', function () {
       info: {
         creatorType: 'user',
         creatorId: 'abc',
-        createdAt: 1540163240,
+        creationTime: 1540163240,
       },
     });
     this.set('record', record);
@@ -45,7 +45,6 @@ describe('Integration | Component | resource info tile', function () {
       expect(this.$('.id input')).to.have.value(get(record, 'entityId'));
       expect(this.$('.creator .one-icon')).to.have.class('oneicon-user');
       expect(this.$('.creator')).to.contain('user1');
-      expect(this.$('.creation-time')).to.contain('22 Oct 2018 1:07:20');
     });
   });
 });

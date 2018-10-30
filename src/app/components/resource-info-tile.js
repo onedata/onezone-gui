@@ -119,9 +119,7 @@ export default Component.extend(I18n, {
       } else {
         promise = resolve(null);
       }
-      return PromiseObject.create({
-        promise,
-      });
+      return PromiseObject.create({ promise });
     }
   ),
 
@@ -141,8 +139,8 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  createdAt: computed('record.info.createdAt', function createdAt() {
-    const timestamp = this.get('record.info.createdAt');
+  creationTime: computed('record.info.creationTime', function creationTime() {
+    const timestamp = this.get('record.info.creationTime');
     return moment.unix(timestamp).format('D MMM YYYY H:mm:ss');
   }),
 

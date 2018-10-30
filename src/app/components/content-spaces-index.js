@@ -128,7 +128,7 @@ export default Component.extend(
     dataProviderProxy: reads('providersProxy.firstObject'),
 
     /**
-     * @type {Ember.ComputedProperty<Array<any>>}
+     * @type {Ember.ComputedProperty<Array<string>>}
      */
     dataProviderRoute: computed('dataProviderProxy', function dataProviderRoute() {
       const {

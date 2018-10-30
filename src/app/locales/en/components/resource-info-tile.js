@@ -3,7 +3,7 @@ export default {
   name: 'Name',
   id: 'ID',
   creator: 'Creator',
-  createdAt: 'Created at',
+  creationTime: 'Created at',
   changingName: 'changing name',
   unknown: 'Unknown',
 };

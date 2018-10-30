@@ -29,7 +29,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   /**
    * Information about space. Available fields:
-   * creatorType, creatorName, createdAt
+   * creatorType, creatorName, creationTime, sharedDirectories
    * @type {Object}
    */
   info: attr('object'),
@@ -45,7 +45,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   effUserList: belongsTo('sharedUserList'),
 
   /**
-   * True, if user has a "View group" privilege
+   * True, if user has a "View space" privilege
    * @type {Ember.ComputedProperty<boolean>}
    */
   hasViewPrivilege: equal('scope', 'private'),

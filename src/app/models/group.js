@@ -25,8 +25,8 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   canViewPrivileges: attr('boolean', { defaultValue: false }),
 
   /**
-   * Information about space. Available fields:
-   * creatorType, creatorName, createdAt
+   * Information about group. Available fields:
+   * creatorType, creatorName, creationTime
    * @type {Object}
    */
   info: attr('object'),

@@ -542,8 +542,9 @@ export default Mixin.create({
       next(() => safeExec(this, () => {
         const memberIdToExpand = this.get('memberIdToExpand');
         if (memberIdToExpand) {
-          const memberItemHeader =
-          this.$(`.member-${memberIdToExpand} .one-collapsible-list-item-header`);
+          const memberItemHeader = this.$(
+            `.member-${memberIdToExpand} .one-collapsible-list-item-header`
+          );
           if (get(memberItemHeader, 'length')) {
             memberItemHeader.click();
             this.set('memberIdToExpand', null);
