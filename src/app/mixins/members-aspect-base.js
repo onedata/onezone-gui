@@ -18,6 +18,7 @@ import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
+import { next } from '@ember/runloop';
 
 export default Mixin.create({
   privilegeManager: service(),
@@ -538,15 +539,17 @@ export default Mixin.create({
       this.set('aspect', String(aspect));
     },
     recordsLoaded() {
-      const memberIdToExpand = this.get('memberIdToExpand');
-      if (memberIdToExpand) {
-        const memberItemHeader =
+      next(() => safeExec(this, () => {
+        const memberIdToExpand = this.get('memberIdToExpand');
+        if (memberIdToExpand) {
+          const memberItemHeader =
           this.$(`.member-${memberIdToExpand} .one-collapsible-list-item-header`);
-        if (get(memberItemHeader, 'length')) {
-          memberItemHeader.click();
-          this.set('memberIdToExpand', null);
+          if (get(memberItemHeader, 'length')) {
+            memberItemHeader.click();
+            this.set('memberIdToExpand', null);
+          }
         }
-      }
+      }));
     },
     recordsSelected(type, records) {
       let targetListName = type === 'user' ?
