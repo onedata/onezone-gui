@@ -6,4 +6,5 @@ export default {
   creationTime: 'Created at',
   changingName: 'changing name',
   unknown: 'Unknown',
+  administrator: 'Administrator',
 };

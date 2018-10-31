@@ -212,6 +212,14 @@ function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     return store.createRecord('space', {
       name: `Space ${index}`,
+      scope: 'private',
+      directMembership: true,
+      canViewPrivileges: true,
+      info: {
+        creatorType: 'root',
+        creationTime: 1540995468,
+        sharedDirectories: 0,
+      },
     }).save();
   }));
 }
