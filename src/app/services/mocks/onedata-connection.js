@@ -9,11 +9,9 @@
  */
 
 import OnedataConnection from 'onedata-gui-websocket-client/services/mocks/onedata-connection';
-import authorizers from 'onezone-gui/utils/authorizers-mock';
 
 export default OnedataConnection.extend({
   zoneName: 'Hello world',
-  identityProviders: Object.freeze(authorizers),
   brandSubtitle: 'Isolated zone',
   loginNotification: '',
 });

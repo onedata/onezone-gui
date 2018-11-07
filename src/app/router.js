@@ -18,6 +18,9 @@ const Router = EmberRouter.extend({
 
 Router.map(function () {
   this.route('provider-redirect', { path: 'provider-redirect/:provider_id' });
+  this.route('test', function () {
+    this.route('login');
+  });
   onedataRouterSetup(Router, this);
 });
 
