@@ -78,8 +78,40 @@ export default Service.extend({
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
+          this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
         ]).then(() => group))
       );
+  },
+
+  /**
+   * Joins user to a group without token
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  joinGroupAsUser(entityId) {
+    const group = this.getLoadedGroupByEntityId(entityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'group',
+            entityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        group ? group.reload() : resolve(),
+        this.reloadUserList(entityId).catch(ignoreForbiddenError),
+      ]));
   },
 
   /**
@@ -135,12 +167,18 @@ export default Service.extend({
    * @returns {Promise<Space>}
    */
   joinSpaceAsGroup(group, token) {
+    const {
+      providerManager,
+      spaceManager,
+    } = this.getProperties('providerManager', 'spaceManager');
     return group.joinSpace(token)
       .then(space =>
         Promise.all([
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          space.belongsTo('groupList').reload(true),
+          this.reloadSpaceList(get(group, 'entityId')).catch(ignoreForbiddenError),
+          providerManager.reloadList(),
+          spaceManager.reloadList(),
+          spaceManager.reloadGroupList(get(space, 'entityId'))
+          .catch(ignoreForbiddenError),
         ]).then(() => space)
       );
   },
@@ -152,14 +190,17 @@ export default Service.extend({
    * @returns {Promise<Group>} parent group
    */
   joinGroupAsGroup(childGroup, token) {
+    const childEntityId = get(childGroup, 'entityId');
     return childGroup.joinGroup(token)
       .then(parentGroup =>
         Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
-          this.reloadChildList(get(parentGroup, 'entityId')),
-          this.reloadParentList(get(childGroup, 'entityId')),
+          this.reloadChildList(get(parentGroup, 'entityId'))
+          .catch(ignoreForbiddenError),
+          this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+          this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         ]).then(() => parentGroup)
       );
   },
@@ -182,6 +223,7 @@ export default Service.extend({
         this.get('spaceManager').reloadList(),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
       ])
     );
   },
@@ -193,6 +235,7 @@ export default Service.extend({
    */
   removeUserFromGroup(groupEntityId, userEntityId) {
     const currentUser = this.get('currentUser');
+    const group = this.getLoadedGroupByEntityId(groupEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
       'group',
       groupEntityId,
@@ -202,6 +245,7 @@ export default Service.extend({
       Promise.all([
         this.reloadUserList(groupEntityId).catch(ignoreForbiddenError),
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          group ? group.reload().catch(ignoreForbiddenError) : resolve(),
           this.reloadList(),
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
@@ -224,6 +268,7 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
@@ -268,6 +313,7 @@ export default Service.extend({
           entityType: 'group',
           entityId: parentEntityId,
           aspect: 'child',
+          scope: 'auto',
         }),
         operation: 'create',
         data: childGroupRepresentation,
@@ -293,12 +339,14 @@ export default Service.extend({
         entityId: groupEntityId,
         aspect: 'child',
         aspectId: futureChildEntityId,
+        scope: 'auto',
       }),
       operation: 'create',
     }).then(() => {
       return Promise.all([
         this.reloadList(),
         this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
+        this.reloadSpaceList(futureChildEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
       ]);
     });
@@ -329,18 +377,9 @@ export default Service.extend({
    * @param {string} listName e.g. `childList`
    * @returns {Promise}
    */
-  reloadModelList(entityId, listName) {
+  reloadRecordList(entityId, listName) {
     const group = this.getLoadedGroupByEntityId(entityId);
-    if (group) {
-      const list = group.belongsTo(listName).value();
-      const hasMany = list ? list.hasMany('list').value() : null;
-      if (list) {
-        return list.reload().then(result => {
-          return hasMany ? list.hasMany('list').reload() : result;
-        });
-      }
-    }
-    return resolve();
+    return group ? group.reloadList(listName) : resolve();
   },
 
   /**
@@ -350,7 +389,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadParentList(entityId) {
-    return this.reloadModelList(entityId, 'parentList');
+    return this.reloadRecordList(entityId, 'parentList');
   },
 
   /**
@@ -360,7 +399,7 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadChildList(entityId) {
-    return this.reloadModelList(entityId, 'childList');
+    return this.reloadRecordList(entityId, 'childList');
   },
 
   /**
@@ -370,6 +409,16 @@ export default Service.extend({
    * @returns {Promise}
    */
   reloadUserList(entityId) {
-    return this.reloadModelList(entityId, 'userList');
+    return this.reloadRecordList(entityId, 'userList');
+  },
+
+  /**
+   * Reloads spaceList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadSpaceList(entityId) {
+    return this.reloadRecordList(entityId, 'spaceList');
   },
 });

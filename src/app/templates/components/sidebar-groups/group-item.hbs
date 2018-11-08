@@ -1,4 +1,4 @@
-{{one-icon class="sidebar-item-icon" icon="group"}}
+{{one-icon class="sidebar-item-icon" icon=(oneicon-alias item.type)}}
 {{one-inline-editor
   isEditing=isRenaming
   value=item.name
@@ -13,12 +13,12 @@
   dropdownPlacement="auto"
   actionsArray=itemActions}}
 
-{{group-leave-modal
+{{leave-modal
   opened=leaveGroupModalOpen
   close=(action "closeLeaveModal")
   proceed=(action "leave")
   processing=isLeaving
-  group=group}}
+  record=group}}
 
 {{group-remove-modal
   opened=removeGroupModalOpen

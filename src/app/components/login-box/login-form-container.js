@@ -8,17 +8,17 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { notEmpty, gt, reads } from '@ember/object/computed';
+import { notEmpty, gt, reads, not, equal } from '@ember/object/computed';
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-const I18N_PREFIX = 'components.loginBox.loginFormContainer.';
 const ANIMATION_TIMEOUT = 333;
 
-export default LoginFormConainer.extend({
+export default LoginFormConainer.extend(I18n, {
   classNames: ['login-form-container'],
 
   i18n: inject(),
@@ -27,6 +27,17 @@ export default LoginFormConainer.extend({
   onezoneServer: inject(),
   onedataConnection: inject(),
   navigationState: inject(),
+  router: inject(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.loginBox.loginFormContainer',
+
+  /**
+   * @type {boolean}
+   */
+  testMode: equal('router.currentRouteName', 'test.login'),
 
   /**
    * Authorizer selected in dropdown
@@ -38,7 +49,7 @@ export default LoginFormConainer.extend({
    * If true, component is waiting for data to load.
    * @type {boolean}
    */
-  isLoading: false,
+  isLoading: not('supportedAuthorizers.isFulfilled'),
 
   /**
    * Selected auth provider.
@@ -72,10 +83,11 @@ export default LoginFormConainer.extend({
 
   /**
    * Array of all suported authorizers
-   * @type {Array<AuthorizerInfo>}
+   * @type {PromiseArray<AuthorizerInfo>}
    */
-  supportedAuthorizers: computed(function () {
-    return this.get('authorizerManager').getAvailableAuthorizers();
+  supportedAuthorizers: computed('testMode', function supportedAuthorizers() {
+    return this.get('authorizerManager')
+      .getAvailableAuthorizers(this.get('testMode'));
   }),
 
   /**
@@ -163,7 +175,7 @@ export default LoginFormConainer.extend({
    */
   _authEndpointError(error) {
     this.get('globalNotify').backendError('authentication', {
-      message: this.get('i18n').t(I18N_PREFIX + 'authEndpointError') +
+      message: this.t('authEndpointError') +
         (error.message ? ' - ' + error.message : '.'),
     });
   },
@@ -200,21 +212,24 @@ export default LoginFormConainer.extend({
         supportedAuthorizers,
         authenticationSuccess,
         onezoneServer,
+        testMode,
       } = this.getProperties(
         'supportedAuthorizers',
         'authenticationSuccess',
-        'onezoneServer'
+        'onezoneServer',
+        'testMode',
       );
 
       const authorizer = _.find(supportedAuthorizers, { type: authorizerName });
       this.set('_activeAuthorizer', authorizer);
-
-      return onezoneServer.getLoginEndpoint(authorizerName)
+      const loginEndpointPromise = testMode ?
+        onezoneServer.getTestLoginEndpoint(authorizerName) :
+        onezoneServer.getLoginEndpoint(authorizerName);
+      return loginEndpointPromise
         .then(data => {
           handleLoginEndpoint(data, () => {
             this._authEndpointError({
-              message: this.get('i18n').t(I18N_PREFIX +
-                'authEndpointConfError'),
+              message: this.t('authEndpointConfError'),
             });
             authenticationSuccess();
           });

@@ -65,6 +65,9 @@ export default Service.extend(I18n, {
       // TODO: instead that, always scroll to sidebar position on changing
       // sidebar chosen item
       $('.col-sidebar').scrollTop(0);
-    }).catch(error => globalNotify.backendError(this.t('tokenCreation'), error));
+    }).catch(error => {
+      globalNotify.backendError(this.t('tokenCreation'), error);
+      throw error;
+    });
   },
 });

@@ -66,7 +66,7 @@ export default Component.extend(I18n, {
   },
 
   _goToProvider(providerId, spaceId) {
-    const path = spaceId ? `#/onedata/data/${spaceId}` : null;
+    const path = spaceId ? `/#/onedata/data/${spaceId}` : null;
     return this.get('onezoneServer').getProviderRedirectUrl(providerId, path)
       .then(data => {
         if (data.url) {

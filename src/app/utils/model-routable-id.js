@@ -1,5 +1,5 @@
 /**
- * Returns id for passed model, that can be used for routing purposes
+ * Returns id for passed record, that can be used for routing purposes
  * (inside link-to helper, transitionTo function, etc).
  *
  * @module utils/model-routable-id
@@ -12,17 +12,17 @@ import { get } from '@ember/object';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 /**
- * @param {object|string} model 
+ * @param {object|string} record 
  * @returns {string}
  */
-export default function modelRoutableId(model) {
+export default function modelRoutableId(record) {
   let entityId = null;
-  model = model || {};
-  const modelId = typeof model === 'string' ? model : get(model, 'id');
+  record = record || {};
+  const recordId = typeof record === 'string' ? record : get(record, 'id');
   try {
-    const parsedGri = parseGri(modelId);
+    const parsedGri = parseGri(recordId);
     // client_token is treated exceptionally because it has 
-    // non standard model representation provided by backend
+    // non standard record representation provided by backend
     entityId = parsedGri.aspect === 'client_token' ?
       parsedGri.aspectId : parsedGri.entityId;
   } catch (err) {

@@ -15,13 +15,13 @@ export default Service.extend({
   /**
    * Fetches collection of all linked accounts
    * 
-   * @return {Promise<DS.RecordArray<models/LinkedAccount>>} resolves to an array
-   * of linked accounts
+   * @return {Promise<DS.RecordArray<models/LinkedAccountList>>} resolves to
+   * an array of linked accounts
    */
   getLinkedAccounts() {
     return this.get('currentUser').getCurrentUserRecord().then((user) =>
       user.get('linkedAccountList').then((linkedAccountList) =>
-        linkedAccountList.get('list')
+        linkedAccountList.get('list').then(() => linkedAccountList)
       )
     );
   },

@@ -9,21 +9,24 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { next } from '@ember/runloop';
+import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
+import layout from 'onezone-gui/templates/components/-members-aspect-base';
+import { Promise } from 'rsvp';
 
-export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
-  classNames: ['privileges-aspect-base', 'content-groups-members'],
+export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
+  layout,
+  classNames: ['members-aspect-base', 'content-groups-members'],
 
   i18n: service(),
   navigationState: service(),
   groupActionsService: service('groupActions'),
+  groupManager: service(),
+  globalNotify: service(),
   router: service(),
 
   /**
@@ -39,7 +42,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  privilegeGriAspects: Object.freeze({
+  griAspects: Object.freeze({
     user: 'user',
     group: 'child',
   }),
@@ -50,131 +53,93 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   modelType: 'group',
 
   /**
-   * @type {Group}
+   * @override
    */
-  groupToRemove: null,
-
-  /**
-   * @type {SharedUser}
-   */
-  userToRemove: null,
-
-  /**
-   * @type {boolean}
-   */
-  isRemoving: false,
+  record: reads('group'),
 
   /**
    * @override
    */
-  model: reads('group'),
-
-  /**
-   * @override
-   */
-  privilegesTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privileges';
-  }),
-
-  /**
-   * @override
-   */
-  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privilegeGroups';
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<string>}
-   */
-  globalActionsTitle: computed(function () {
-    return this.t('groupMembers');
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  globalActions: computed('inviteActions', 'batchEditAction', function () {
+  removeMember(type, member) {
     const {
-      inviteActions,
-      batchEditAction,
-    } = this.getProperties('inviteActions', 'batchEditAction');
-    return [batchEditAction, ...inviteActions];
-  }),
+      groupActionsService,
+      group,
+    } = this.getProperties(
+      'groupActionsService',
+      'group',
+    );
+    return type === 'group' ?
+      groupActionsService.removeChildGroup(group, member) :
+      groupActionsService.removeUser(group, member);
+  },
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @override
    */
-  headerActions: reads('inviteActions'),
+  removeMembers(members) {
+    const {
+      groupManager,
+      globalNotify,
+      group,
+    } = this.getProperties(
+      'groupManager',
+      'globalNotify',
+      'group'
+    );
+
+    const groupEntityId = get(group, 'entityId');
+    const promise = Promise.all(members.map(member => {
+      const memberEntityId = get(member, 'entityId');
+      if (['user', 'shared-user'].includes(get(member, 'entityType'))) {
+        return groupManager.removeUserFromGroup(
+          groupEntityId,
+          memberEntityId
+        );
+      } else {
+        return groupManager.removeGroupFromGroup(
+          groupEntityId,
+          memberEntityId
+        );
+      }
+    }));
+    return promise.then(() => {
+      globalNotify.success(this.t('removeMembersSuccess'));
+    }).catch(error => {
+      globalNotify.backendError(this.t('membersDeletion'), error);
+      throw error;
+    });
+  },
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @override
    */
-  groupActions: computed(function () {
-    return [{
-      action: (...args) => this.send('showRemoveModal', 'group', ...args),
-      title: this.t('removeGroup'),
-      class: 'remove-group',
-      icon: 'close',
-    }];
-  }),
+  createChildGroup(name) {
+    const {
+      groupActionsService,
+      group,
+    } = this.getProperties('groupActionsService', 'group');
+    return groupActionsService.createChild(group, { name });
+  },
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @override
    */
-  userActions: computed(function () {
-    return [{
-      action: (...args) => this.send('showRemoveModal', 'user', ...args),
-      title: this.t('removeUser'),
-      class: 'remove-user',
-      icon: 'close',
-    }];
-  }),
+  addMemberGroup(group) {
+    const {
+      groupActionsService,
+      group: parentGroup,
+    } = this.getProperties('groupActionsService', 'group');
+    return groupActionsService.addChild(parentGroup, group);
+  },
 
-  actions: {
-    showRemoveModal(type, modelProxy) {
-      this.set(type + 'ToRemove', get(modelProxy, 'subject'));
-    },
-    hideRemoveModal(type) {
-      this.set(type + 'ToRemove', null);
-    },
-    remove(type) {
-      const model = this.get(type + 'ToRemove');
-      const {
-        groupActionsService,
-        group,
-        router,
-        navigationState,
-      } = this.getProperties(
-        'groupActionsService',
-        'group',
-        'router',
-        'navigationState',
-      );
-      this.set('isRemoving', true);
-      const promise = type === 'group' ?
-        groupActionsService.removeChildGroup(group, model) :
-        groupActionsService.removeUser(group, model);
-      return promise
-        .then(() => {
-          // detect if user/subgroup removing removed also group
-          // that is actually viewed
-          return get(get(navigationState, 'activeResourceCollection'), 'list')
-            .then(groupList => {
-              const groupEntityId = get(group, 'entityId');
-              const availableEntityIds = groupList.map(g => get(g, 'entityId'));
-              if (availableEntityIds.indexOf(groupEntityId) === -1) {
-                next(() => router.transitionTo('onedata.sidebar', 'groups'));
-              }
-            });
-        })
-        .finally(() => {
-          safeExec(this, 'setProperties', {
-            isRemoving: false,
-            [type + 'ToRemove']: null,
-          });
-        });
-    },
+  /**
+   * @override
+   */
+  join() {
+    const {
+      group,
+      groupActionsService,
+    } = this.getProperties('group', 'groupActionsService');
+    return groupActionsService.joinGroupAsUser(group);
   },
 });

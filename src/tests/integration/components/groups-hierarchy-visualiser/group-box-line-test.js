@@ -44,7 +44,7 @@ describe(
         actionsEnabled: true,
         hovered: false,
         relation: {
-          parentGroup: {
+          parent: {
             canViewPrivileges: true,
           },
         },
@@ -81,7 +81,7 @@ describe(
     });
 
     it(
-      'does not show "modify privileges" action if canViewPrivileges is false',
+      'disables "modify privileges" action if canViewPrivileges is false',
       function () {
         const line = EmberObject.create({
           x: 100,
@@ -90,7 +90,7 @@ describe(
           actionsEnabled: true,
           hovered: true,
           relation: {
-            parentGroup: {
+            parent: {
               canViewPrivileges: false,
             },
           },
@@ -100,7 +100,7 @@ describe(
         this.render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
         return click(this.$('.group-box-line .actions-trigger')[0]).then(() => {
           const $popover = $('body .webui-popover.in');
-          expect($popover.find('.modify-privileges-action')).to.not.exist;
+          expect($popover.find('.disabled > .modify-privileges-action')).to.exist;
         });
       }
     );
@@ -113,7 +113,7 @@ describe(
         actionsEnabled: true,
         hovered: true,
         relation: {
-          parentGroup: {
+          parent: {
             canViewPrivileges: true,
           },
         },

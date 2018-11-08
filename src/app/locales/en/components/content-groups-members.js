@@ -1,7 +1,7 @@
-export default {
-  members: 'Members',
-  groups: 'Groups',
-  users: 'Users',
+import _ from 'lodash';
+import privilegesAspectBase from '../mixins/members-aspect-base';
+
+export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {
     groupManagement: 'Group management',
     groupHierarchyManagement: 'Group hierarchy management',
@@ -28,25 +28,10 @@ export default {
     group_create_handle_service: 'Create handle service',
     group_leave_handle_service: 'Leave handle service',
   },
-  groupMembers: 'Group members',
-  multiedit: 'Bulk edit',
-  inviteGroup: 'Invite group',
-  inviteUser: 'Invite user',
-  removeGroup: 'Remove this member',
-  removeUser: 'Remove this member',
-  removeGroupHeader: 'Remove member',
-  removeUserHeader: 'Remove member',
-  removeGroupAreYouSure: '"{{groupName}}" will no longer be a member of ' +
-    '"{{parentGroupName}}". Are you sure?',
-  removeUserAreYouSure: '"{{userName}}" will no longer be a member of ' +
-    '"{{parentGroupName}}". Are you sure?',
-  cancel: 'Cancel',
-  remove: 'Remove',
-  noSubgroupsStart: 'This group has no subgroups. To invite a subgroup, ',
-  noSubgroupsInvite: 'generate an invitation token',
-  noSubgroupsEnd: ' and send it to the subgroup owner.',
+  noGroupsStart: 'This group has no subgroups. To invite a subgroup, ',
+  noGroupsInvite: 'generate an invitation token',
+  noGroupsEnd: ' and send it to the subgroup owner.',
   noUsersStart: 'This group has no users. To invite a user, ',
   noUsersInvite: 'generate an invitation token',
   noUsersEnd: ' and send it to the user.',
-  batchEditModalSelectedItems: 'Selected items',
-};
+});

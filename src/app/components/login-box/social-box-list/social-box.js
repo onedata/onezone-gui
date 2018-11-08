@@ -111,6 +111,20 @@ export default Component.extend({
     return link && link.length !== 0;
   }),
 
+  init() {
+    this._super(...arguments);
+    const {
+      aStyle,
+      socialIconStyle,
+    } = this.getProperties('aStyle', 'socialIconStyle');
+    if (typeof aStyle === 'string') {
+      this.set('aStyle', htmlSafe(aStyle));
+    }
+    if (typeof socialIconStyle === 'string') {
+      this.set('socialIconStyle', htmlSafe(socialIconStyle));
+    }
+  },
+
   actions: {
     clicked() {
       const {

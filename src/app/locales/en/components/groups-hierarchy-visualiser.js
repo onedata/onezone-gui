@@ -4,6 +4,7 @@ export default {
     viewGroup: 'View group',
     rename: 'Rename',
     leave: 'Leave',
+    join: 'Join',
     remove: 'Remove',
     addChildGroup: 'Add child group',
     addParentGroup: 'Add parent group',

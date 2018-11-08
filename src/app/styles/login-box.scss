@@ -62,7 +62,7 @@
   .social-icon-image {
     width: 100%;
     height: 100%;
-    background-size: 40px 40px;
+    background-size: 50px 50px;
     background-repeat: no-repeat;
     background-position: center center;
   }
@@ -158,14 +158,17 @@
     max-width: 400px;
     margin: 0 auto;
   }
-
-  .authorizers-select-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin-bottom: 30px;
+  .basicauth-login-form-container {
     &.fadeOut {
+      position: absolute;
+    }
+  }
+  .authorizers-select-container {
+    &.fadeOut {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: -1;
     }
     .authorizers-dropdown {
@@ -211,6 +214,7 @@
   }
 
   .login-notification {
+    position: absolute;
     padding: $padding-base-horizontal;
     margin: 80px auto $padding-base-vertical 0;
     background-color: rgba($color-one-blue-gray, 0.3);
@@ -224,5 +228,20 @@
       left: 50%;
       transform: translateX(-50%);
     }
+  }
+
+  .test-mode-notification {
+    background-color: rgba($color-one-warning, 0.5);
+    border: 1px solid darken($color-one-warning, 3%);
+    a {
+      &:hover, &:active {
+        color: darken($color-one-mint, 10%);
+      }
+    }
+  }
+
+  .no-login-methods {
+    margin-top: $padding-large-horizontal;
+    text-align: center;
   }
 }

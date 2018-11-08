@@ -88,7 +88,10 @@ export default Service.extend(I18n, {
         );
         return group;
       })
-      .catch(error => globalNotify.backendError(this.t('groupCreation'), error));
+      .catch(error => {
+        globalNotify.backendError(this.t('groupCreation'), error);
+        throw error;
+      });
   },
 
   /**
@@ -106,6 +109,25 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Joins user to an existing group (without token)
+   * @param {Group} group
+   * @returns {Promise} A promise, which resolves to group if it has
+   * been joined successfully.
+   */
+  joinGroupAsUser(group) {
+    return this.get('groupManager').joinGroupAsUser(get(group, 'entityId'))
+      .then(groupRecord => {
+        this.get('globalNotify').info(this.t('joinedGroupSuccess'));
+        return groupRecord;
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningGroup'), error);
+        throw error;
       });
   },
 
@@ -183,6 +205,7 @@ export default Service.extend(I18n, {
       .catch(error => {
         group.rollbackAttributes();
         globalNotify.backendError(this.t('groupDeletion'), error);
+        throw error;
       });
   },
 
@@ -204,6 +227,7 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         globalNotify.backendError(this.t('groupLeaving'), error);
+        throw error;
       });
   },
 
@@ -247,6 +271,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('groupDeletion'), error);
+      throw error;
     });
   },
 
@@ -271,6 +296,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('userDeletion'), error);
+      throw error;
     });
   },
 
@@ -294,6 +320,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('groupLeaving'), error);
+      throw error;
     });
   },
 
@@ -315,6 +342,7 @@ export default Service.extend(I18n, {
         }));
       }).catch(error => {
         globalNotify.backendError(this.t('parentGroupCreation'), error);
+        throw error;
       });
   },
 
@@ -336,6 +364,7 @@ export default Service.extend(I18n, {
         }));
       }).catch(error => {
         globalNotify.backendError(this.t('childGroupCreation'), error);
+        throw error;
       });
   },
 
@@ -359,13 +388,14 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('parentGroupAddition'), error);
+      throw error;
     });
   },
 
   /**
    * Adds child to specified parent group
    * @param {Group} group 
-   * @param {Object} futureChild
+   * @param {Group} futureChild
    * @return {Promise}
    */
   addChild(group, futureChild) {
@@ -382,6 +412,7 @@ export default Service.extend(I18n, {
       }));
     }).catch(error => {
       globalNotify.backendError(this.t('childGroupAddition'), error);
+      throw error;
     });
   },
 
@@ -408,6 +439,7 @@ export default Service.extend(I18n, {
       })))
       .catch(error => {
         globalNotify.backendError(this.t('groupLeaving'), error);
+        throw error;
       });
   },
 });

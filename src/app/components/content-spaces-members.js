@@ -1,5 +1,5 @@
 /**
- * A privileges aspect of space.
+ * A members aspect of space.
  *
  * @module components/content-spaces-members
  * @author Michal Borzecki
@@ -9,20 +9,24 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import PrivilegesAspectBase from 'onezone-gui/mixins/privileges-aspect-base';
-import layout from 'onezone-gui/templates/components/-privileges-aspect-base';
+import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
+import layout from 'onezone-gui/templates/components/-members-aspect-base';
+import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   layout,
-  classNames: ['privileges-aspect-base', 'content-spaces-members'],
+  classNames: ['members-aspect-base', 'content-spaces-members'],
 
   i18n: service(),
   navigationState: service(),
+  spaceActions: service(),
+  spaceManager: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -42,44 +46,91 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  model: reads('space'),
+  record: reads('space'),
 
   /**
    * @override
    */
-  privilegesTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privileges';
-  }),
-
-  /**
-   * @override
-   */
-  privilegeGroupsTranslationsPath: computed('i18nPrefix', function () {
-    return this.get('i18nPrefix') + '.privilegeGroups';
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<string>}
-   */
-  globalActionsTitle: computed(function () {
-    return this.t('spacePrivileges');
-  }),
-
-  /**
-   * @override 
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  globalActions: computed('inviteActions', 'batchEditAction', function () {
+  removeMember(type, member) {
     const {
-      inviteActions,
-      batchEditAction,
-    } = this.getProperties('inviteActions', 'batchEditAction');
-    return [batchEditAction, ...inviteActions];
-  }),
+      spaceActions,
+      space,
+    } = this.getProperties(
+      'spaceActions',
+      'space',
+    );
+    return type === 'group' ?
+      spaceActions.removeGroup(space, member) :
+      spaceActions.removeUser(space, member);
+  },
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @override
    */
-  headerActions: reads('inviteActions'),
+  removeMembers(members) {
+    const {
+      spaceManager,
+      globalNotify,
+      space,
+    } = this.getProperties(
+      'spaceManager',
+      'globalNotify',
+      'space'
+    );
+
+    const spaceEntityId = get(space, 'entityId');
+    const promise = Promise.all(members.map(member => {
+      const memberEntityId = get(member, 'entityId');
+      if (get(member, 'entityType') === 'user') {
+        return spaceManager.removeUserFromSpace(
+          spaceEntityId,
+          memberEntityId
+        );
+      } else {
+        return spaceManager.removeGroupFromSpace(
+          spaceEntityId,
+          memberEntityId
+        );
+      }
+    }));
+    return promise.then(() => {
+      globalNotify.success(this.t('removeMembersSuccess'));
+    }).catch(error => {
+      globalNotify.backendError(this.t('membersDeletion'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * @override
+   */
+  createChildGroup(name) {
+    const {
+      spaceActions,
+      space,
+    } = this.getProperties('spaceActions', 'space');
+    return spaceActions.createMemberGroup(space, { name });
+  },
+
+  /**
+   * @override
+   */
+  addMemberGroup(group) {
+    const {
+      spaceActions,
+      space,
+    } = this.getProperties('spaceActions', 'space');
+    return spaceActions.addMemberGroup(space, group);
+  },
+
+  /**
+   * @override
+   */
+  join() {
+    const {
+      space,
+      spaceActions,
+    } = this.getProperties('space', 'spaceActions');
+    return spaceActions.joinSpaceAsUser(space);
+  },
 });

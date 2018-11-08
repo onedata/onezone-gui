@@ -14,7 +14,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default TwoLevelSidebar.extend(I18n, {
   layout,
-
   classNames: ['sidebar-groups'],
 
   /**
@@ -50,15 +49,16 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
-  secondLevelItems: computed(function getSecondLevelItems() {
+  secondLevelItems: computed(function secondLevelItems() {
+    // TODO uncomment overview
     return [{
+      //   id: 'index',
+      //   label: this.t('aspects.index'),
+      //   icon: 'overview',
+      // }, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',
-    }, {
-      id: 'parents',
-      label: this.t('aspects.parents'),
-      icon: 'parents',
     }, {
       id: 'hierarchy',
       label: this.t('aspects.hierarchy'),

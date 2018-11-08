@@ -9,15 +9,36 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
-  onedataConnection: service(),
+  onezoneServer: service(),
+
+  /**
+   * @type {PromiseArray<Array<AuthorizerInfo>>|undefined}
+   */
+  testAuthorizersProxy: undefined,
+
+  /**
+   * @type {PromiseArray<Array<AuthorizerInfo>>|undefined}
+   */
+  authorizersProxy: undefined,
 
   /**
    * Returns array of authorizers info objects supported by backend
+   * @param {boolean} testMode
    * @return {Array<AuthorizerInfo>}
    */
-  getAvailableAuthorizers() {
-    return this.get('onedataConnection.identityProviders');
+  getAvailableAuthorizers(testMode = false) {
+    const proxyName = testMode ? 'testAuthorizersProxy' : 'authorizersProxy';
+    const existingProxy = this.get(proxyName);
+    if (existingProxy) {
+      return existingProxy;
+    } else {
+      return this.set(proxyName, PromiseArray.create({
+        promise: this.get('onezoneServer').getSupportedIdPs(testMode)
+          .then(({ idps }) => idps),
+      }));
+    }
   },
 });

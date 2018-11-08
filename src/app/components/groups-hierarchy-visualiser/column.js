@@ -120,6 +120,15 @@ export default Component.extend(I18n, {
   leaveGroup: notImplementedThrow,
 
   /**
+   * Triggers joining group (as user)
+   * @type {Function}
+   * @virtual
+   * @param {Group} group
+   * @returns {undefined}
+   */
+  joinGroup: notImplementedThrow,
+
+  /**
    * Triggers group removing
    * @type {Function}
    * @virtual
@@ -132,7 +141,7 @@ export default Component.extend(I18n, {
    * Shows privileges editor
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   modifyPrivileges: notImplementedThrow,
@@ -141,7 +150,7 @@ export default Component.extend(I18n, {
    * Triggers relation removing
    * @type {Function}
    * @virtual
-   * @param {Utils/GroupHierarchyVisualiser/Relation} relation
+   * @param {Utils/MembershipRelation} relation
    * @returns {undefined}
    */
   removeRelation: notImplementedThrow,

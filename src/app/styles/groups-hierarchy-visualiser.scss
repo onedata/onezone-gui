@@ -17,30 +17,6 @@
   width: 100%;
   overflow: hidden;
 
-  .group-box {
-    position: absolute;
-    padding: $padding-base-vertical $padding-small-horizontal;
-    padding-left: 30px + $padding-small-horizontal;
-    border: $line-height solid $box-border-color;
-    border-radius: $border-radius-large;
-    background-color: $color-one-white;
-    opacity: 1;
-    transition: top $animation-time / 2 linear, left $animation-time linear, opacity $animation-time linear;
-    font-size: 0.9em;
-
-    &:hover, &.hovered {
-      box-shadow: 0 0 2px 2px rgba($box-border-active-color, 0.4);
-      border-color: $box-border-active-color;
-    }
-
-    .box-icon {
-      @include vertical-align-middle();
-      position: absolute;
-      left: $padding-small-horizontal;
-      font-size: 1.8em;
-    }
-  }
-
   .actions-trigger {
     $trigger-size: 22px;
     position: absolute;
@@ -66,6 +42,28 @@
   }
 
   .group-box {
+    position: absolute;
+    padding: $padding-base-vertical $padding-small-horizontal;
+    padding-left: 30px + $padding-small-horizontal;
+    border: $line-height solid $box-border-color;
+    border-radius: $border-radius-large;
+    background-color: $color-one-white;
+    opacity: 1;
+    transition: top $animation-time / 2 linear, left $animation-time linear, opacity $animation-time linear;
+    font-size: 0.9em;
+
+    &:hover, &.hovered {
+      box-shadow: 0 0 2px 2px rgba($box-border-active-color, 0.4);
+      border-color: $box-border-active-color;
+    }
+
+    .box-icon {
+      @include vertical-align-middle();
+      position: absolute;
+      left: $padding-small-horizontal;
+      font-size: 1.8em;
+    }
+
     &.active {
       border-color: $color-one-azure;
     }
@@ -105,6 +103,12 @@
 
     &.actions-opened .group-actions-trigger {
       color: $actions-trigger-active-color;
+    }
+
+    @media(max-width: $screen-xs-max) {
+      .group-actions-trigger {
+        display: block;
+      }
     }
   }
 

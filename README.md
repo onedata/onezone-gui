@@ -71,6 +71,22 @@ To find all broken symbolic links (those that point to nothing):
 ```
 <br />
 
+Development
+-----------
+
+For development with one-env, please start oz-worker from sources, then build
+this project to the source dir, eg.:
+
+```
+ember build --environment=development-backend --output-path=/Users/kliput/Onedata/env-develop-oz/oz-worker-18.07/_build/default/rel/oz_worker/data/gui_static --watch
+```
+
+and start rsync watcher in one-env:
+
+```
+./onenv watch zone
+```
+
 Support
 -------
 

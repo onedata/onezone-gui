@@ -7,15 +7,15 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { not } from '@ember/object/computed';
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
 import { computed, set, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
-import _ from 'lodash';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 const animationTimeout = 333;
 
@@ -36,21 +36,6 @@ export default Component.extend(I18n, {
    * @type {models/user}
    */
   user: undefined,
-
-  /**
-   * @type {Ember.ComputedProperty<boolean>}
-   */
-  _loadingLinkedAccounts: not('_linkedAccounts.isLoaded'),
-
-  /**
-   * @type {undefined|object}
-   */
-  _loadingLinkedAccountsError: undefined,
-
-  /**
-   * @type {undefined|DS.RecordArray<models/LinkedAccount>}
-   */
-  _linkedAccounts: undefined,
 
   /**
    * @type {undefined|AuthorizerInfo}
@@ -75,6 +60,20 @@ export default Component.extend(I18n, {
    */
   _isProvidersDropdownVisible: false,
 
+  /**
+   * @type {ComputedProperty<LinkedAccountList>}
+   */
+  linkedAccountsList: reads('linkedAccountsProxy.content.list'),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseObject<LinkedAccountList>>}
+   */
+  linkedAccountsProxy: computed(function linkedAccountsProxy() {
+    return PromiseObject.create({
+      promise: this.get('linkedAccountManager').getLinkedAccounts(),
+    });
+  }),
+
   identityProviders: computed(function identityProviders() {
     return this.get('authorizerManager').getAvailableAuthorizers();
   }),
@@ -92,25 +91,23 @@ export default Component.extend(I18n, {
     }
   }),
 
-  accountsInfo: computed('_linkedAccounts.[]', 'identityProviders', function accounts() {
+  /**
+   * @type {ComputedProperty<Array<Object>>} `[ { account, authorizer } ]`
+   */
+  accountsInfo: computed('linkedAccountsList.[]', 'identityProviders', function accounts() {
     const {
-      _linkedAccounts,
+      linkedAccountsList,
       identityProviders,
-    } = this.getProperties('_linkedAccounts', 'identityProviders');
-    return _linkedAccounts.map(linkedAccount => ({
-      account: linkedAccount,
-      authorizer: _.find(identityProviders, { id: get(linkedAccount, 'idp') }),
-    }));
+    } = this.getProperties('linkedAccountsList', 'identityProviders');
+    if (linkedAccountsList) {
+      return linkedAccountsList.map(linkedAccount => ({
+        account: linkedAccount,
+        authorizer: identityProviders.find(idp =>
+          idp.id === get(linkedAccount, 'idp')
+        ),
+      }));
+    }
   }),
-
-  init() {
-    this._super(...arguments);
-    this.get('linkedAccountManager').getLinkedAccounts().then(linkedAccounts =>
-      safeExec(this, 'set', '_linkedAccounts', linkedAccounts)
-    ).catch(error =>
-      safeExec(this, 'set', '_loadingLinkedAccountsError', error)
-    );
-  },
 
   /**
    * Shows global info about save error.
@@ -181,13 +178,13 @@ export default Component.extend(I18n, {
         throw error;
       });
     },
-    saveLogin(login) {
+    saveAlias(alias) {
       const user = this.get('user');
-      const oldLogin = get(user, 'login');
-      set(user, 'login', login && login.length ? login : null);
+      const oldAlias = get(user, 'alias');
+      set(user, 'alias', alias && alias.length ? alias : null);
       return this._saveUser().catch((error) => {
-        // Restore old user login
-        set(user, 'login', oldLogin);
+        // Restore old user alias
+        set(user, 'alias', oldAlias);
         throw error;
       });
     },
@@ -221,11 +218,11 @@ export default Component.extend(I18n, {
     },
     authorizerSelected(authorizer) {
       this.set('_selectedAuthorizer', authorizer);
-      return this.get('onezoneServer').getLoginEndpoint({
-          idp: authorizer.id,
-          linkAccount: true,
-          redirectUrl: window.location.toString(),
-        }).then(data =>
+      return this.get('onezoneServer').getLoginEndpoint(
+          authorizer.id,
+          true,
+          window.location.toString(),
+        ).then(data =>
           handleLoginEndpoint(data, () =>
             this._authEndpointError({
               message: this.t('authEndpointConfError'),

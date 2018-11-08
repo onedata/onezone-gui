@@ -2,7 +2,7 @@
 
 // Project-specific styles
 @import 'authorizers-dropdown';
-@import 'content-providers';
+@import 'content-data';
 @import 'content-users';
 @import 'content-tokens';
 @import 'login-box';
@@ -10,12 +10,12 @@
 @import 'content-spaces-providers';
 @import 'content-spaces-index';
 @import 'content-groups-hierarchy';
-@import 'privileges-aspect-base';
-@import 'invitation-token-presenter';
+@import 'members-aspect-base';
 @import 'privileges-tree-editor';
 @import 'privileges-editor-modal';
 @import 'groups-hierarchy-visualiser';
 @import 'group-add-your-group-modal';
+@import 'membership-visualiser';
 
 // FIXME: move to local content-users.scss
 

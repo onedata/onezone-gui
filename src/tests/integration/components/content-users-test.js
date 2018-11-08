@@ -9,17 +9,20 @@ import Service from '@ember/service';
 import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 const linkedAccountManagerStub = Service.extend({
   getLinkedAccounts() {
-    const accounts = [
-      EmberObject.create({
-        idp: 'google',
-        emailList: ['one@one.one'],
+    return resolve(EmberObject.create({
+      list: PromiseArray.create({
+        promise: resolve([
+          EmberObject.create({
+            idp: 'google',
+            emails: ['one@one.one'],
+          }),
+        ]),
       }),
-    ];
-    accounts.isLoaded = true;
-    return resolve(accounts);
+    }));
   },
 });
 
@@ -52,7 +55,7 @@ describe('Integration | Component | content users', function () {
 
     const MOCKED_USER = EmberObject.create({
       name: 'some name',
-      login: 'some login',
+      alias: 'some alias',
     });
     this.set('user', MOCKED_USER);
   });
@@ -66,11 +69,11 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders login', function (done) {
+  it('renders alias', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.login-editor').text().trim())
-        .to.equal(this.get('user.login'));
+      expect(this.$('.alias-editor').text().trim())
+        .to.equal(this.get('user.alias'));
       done();
     });
   });
@@ -107,20 +110,20 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change login', function (done) {
+  it('allows to change alias', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
-    const newLogin = 'testLogin';
+    const newAlias = 'testAlias';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.login-editor .one-label').then(() => {
-        fillIn('.login-editor input', newLogin).then(() => {
-          click('.login-editor .save-icon').then(() => {
+      click('.alias-editor .one-label').then(() => {
+        fillIn('.alias-editor input', newAlias).then(() => {
+          click('.alias-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.login-editor').text().trim())
-              .to.equal(user.get('login'));
-            expect(user.get('login')).to.equal(newLogin);
+            expect(this.$('.alias-editor').text().trim())
+              .to.equal(user.get('alias'));
+            expect(user.get('alias')).to.equal(newAlias);
             done();
           });
         });

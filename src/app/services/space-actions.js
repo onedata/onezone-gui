@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 
@@ -90,7 +90,10 @@ export default Service.extend(I18n, {
             sidebarContainer[0].clientHeight);
         });
       })
-      .catch(error => globalNotify.backendError(this.t('spaceCreation'), error));
+      .catch(error => {
+        globalNotify.backendError(this.t('spaceCreation'), error);
+        throw error;
+      });
   },
 
   /**
@@ -102,6 +105,9 @@ export default Service.extend(I18n, {
     const guiUtils = this.get('guiUtils');
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.joinSpace(token))
+      .then(spaceRecord =>
+        spaceRecord.reloadList('userList').then(() => spaceRecord)
+      )
       .then(spaceRecord => {
         this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
         return this.get('router').transitionTo(
@@ -112,6 +118,122 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+        throw error;
       });
+  },
+
+  /**
+   * Joins user to an existing space (without token)
+   * @param {Space} space
+   * @returns {Promise} A promise, which resolves to space if it has
+   * been joined successfully.
+   */
+  joinSpaceAsUser(space) {
+    return this.get('spaceManager').joinSpaceAsUser(get(space, 'entityId'))
+      .then(spaceRecord => {
+        this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
+        return spaceRecord;
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Creates member group for specified space
+   * @param {Space} space 
+   * @param {Object} groupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroup(space, groupRepresentation) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager
+      .createMemberGroup(get(space, 'entityId'), groupRepresentation)
+      .then(() => {
+        globalNotify.success(this.t('createMemberGroupSuccess', {
+          memberGroupName: get(groupRepresentation, 'name'),
+        }));
+      }).catch(error => {
+        globalNotify.backendError(this.t('memberGroupCreation'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Adds existing group to space
+   * @param {Space} space 
+   * @param {Group} group
+   * @return {Promise}
+   */
+  addMemberGroup(space, group) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager.addMemberGroup(
+      get(space, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('addMemberGroupSuccess', {
+        memberGroupName: get(group, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('memberGroupAddition'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Removes group from space
+   * @param {Space} space 
+   * @param {Group} group
+   * @returns {Promise}
+   */
+  removeGroup(space, group) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager.removeGroupFromSpace(
+      get(space, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeGroupSuccess', {
+        spaceName: get(space, 'name'),
+        groupName: get(group, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('groupDeletion'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Removes user from space
+   * @param {Space} space 
+   * @param {User} user
+   * @returns {Promise}
+   */
+  removeUser(space, user) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager.removeUserFromSpace(
+      get(space, 'entityId'),
+      get(user, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeUserSuccess', {
+        spaceName: get(space, 'name'),
+        userName: get(user, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('userDeletion'), error);
+      throw error;
+    });
   },
 });
