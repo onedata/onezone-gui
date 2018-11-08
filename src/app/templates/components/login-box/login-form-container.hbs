@@ -17,9 +17,14 @@
   </div>
   {{#if _hasAuthorizersForSelect}}
     <div class="authorizers-select-container animated fast">
-      {{#if authFor}}      
-        <h2>
-          {{t "components.loginBox.loginFormContainer.authorizeFor"}} {{authFor}}
+      {{#if authFor}}
+        <h2 style="margin-bottom: 4px;">
+          <span>{{authForName}}</span>
+        </h2>
+        <h2 style="padding-bottom: 15px;">
+          <span style="color: rgba(255,255,255,0.7); font-size: 0.9em;">
+            {{authForHostname}}
+          </span>
         </h2>
       {{/if}}
       <h2>{{t "components.loginBox.loginFormContainer.dropdownSubtitle"}}</h2>

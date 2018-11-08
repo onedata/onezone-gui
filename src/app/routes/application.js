@@ -21,6 +21,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   clearDevelopmentModel: clearLocalStorageModel,
 
   beforeModel(transition) {
+    this._super(...arguments);
     this.set('navigationState.queryParams', get(transition, 'queryParams'));
   },
 });

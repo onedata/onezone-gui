@@ -12,8 +12,6 @@ export default {
   fetchProvidersFailedUnknown: 'unknown reason',
   authEndpointError: 'Getting authentication endpoint failed',
   authEndpointConfError: 'Authorization configuration is invalid, please contact system administrator',
-  // FIXME: another text
-  authorizeFor: 'Go to the Onepanel of',
   noLoginMethods: 'There are no login methods configured.',
   loginTestMode: 'This is the test login page - based on test.auth.config - used for login simulation and diagnostics.',
   goBackToMainPage: 'Go back to the main page.',
