@@ -15,7 +15,8 @@ import { get } from '@ember/object';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   developmentModelConfig: Object.freeze({
-    clearOnReload: false,
+    // FIXME: development mode
+    clearOnReload: true,
   }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,

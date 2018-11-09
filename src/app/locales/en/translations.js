@@ -3,6 +3,7 @@ import onedataCommonTranslations from './onedata-gui-common';
 import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
 import data from './tabs/data';
+import clusters from './tabs/clusters';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
@@ -60,6 +61,7 @@ let translations = {
     spaces,
     groups,
     users,
+    clusters,
   },
   components: {
     loginBox,

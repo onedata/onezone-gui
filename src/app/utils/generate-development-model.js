@@ -29,7 +29,7 @@ const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
-const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
+const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster'];
 const names = ['one', 'two', 'three'];
 
 const privileges = {
@@ -178,6 +178,9 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createGroupsRecords(store, additionalInfo);
     case 'linkedAccount':
       return createLinkedAccount(store, additionalInfo);
+    case 'cluster':
+      var cc = createClusterRecords(store, additionalInfo);
+      return cc;
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -244,6 +247,29 @@ function createLinkedAccount(store) {
       ]),
     }).save()
   ));
+}
+
+function createClusterRecords(store) {
+  try {
+    return Promise.all([{
+        name: 'PL-Grid',
+        hostname: 'onedata.plgrid.pl',
+        onepanelProxy: true,
+      },
+      {
+        name: 'Cyfronet',
+        hostname: 'oneprovider.cyfronet.pl',
+        onepanelProxy: false,
+      },
+      {
+        name: 'PCSS',
+        hostname: 'oneprovider.pcss.pl',
+        onepanelProxy: true,
+      },
+    ].map(c => store.createRecord('cluster', c).save()));
+  } catch (error) {
+    window.alert(error);
+  }
 }
 
 function createSharedUsersRecords(store) {
