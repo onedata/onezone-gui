@@ -23,7 +23,7 @@
     {{/resource-info-tile}}
     {{#if dataProviderProxy}}
       {{#one-tile
-        class="text-center"
+        class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
         route=dataProviderRoute
         routeQueryParams=dataProviderRouteParams
@@ -35,7 +35,10 @@
       {{/one-tile}}
     {{/if}}
     {{#if space.hasViewPrivilege}}
-      {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
+      {{#one-tile
+        class="text-center resource-support-tile"
+        title=(tt this "tileProvidersTitle")
+        aspect=(if isSupported "providers" "support")}}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
         }}
@@ -56,7 +59,11 @@
           {{/if}}
         {{/loading-container}}
       {{/one-tile}}
-      {{#one-tile sizeClass="x2" title=(tt this "tileProvidersMapTitle") aspect=(if isSupported "providers" "support")}}
+      {{#one-tile
+        class="resource-map-tile"
+        sizeClass="x2"
+        title=(tt this "tileProvidersMapTitle")
+        aspect=(if isSupported "providers" "support")}}
         <div class="map-container">
           {{#one-atlas class="space-providers-atlas" as |atlas|}}
             {{#each providersProxy as |provider|}}

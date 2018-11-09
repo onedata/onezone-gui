@@ -10,7 +10,9 @@
         </tr>
         <tr>
           <td class="property-name">{{tt this "creator"}}</td>
-          {{#truncated-string tagName="td" class=(concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special"))}}
+          {{#truncated-string
+            tagName="td"
+            class=(concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special"))}}
             {{#if creatorIcon}}
               {{one-icon icon=creatorIcon}}
             {{/if}}
