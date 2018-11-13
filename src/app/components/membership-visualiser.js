@@ -79,7 +79,11 @@ import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-p
 
 export default Component.extend(I18n, {
   classNames: ['membership-visualiser'],
-  classNameBindings: ['pathsLoadingProxy.isPending:loading', 'isCondensed:condensed'],
+  classNameBindings: [
+    'pathsLoadingProxy.isPending:loading',
+    'isCondensed:condensed',
+    'hasOnlyDirectPath:only-direct',
+  ],
 
   store: service(),
   router: service(),
@@ -205,6 +209,15 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Ember.A<Utils/MembershipVisualiser/MembershipPath>>}
    */
   sortedPaths: sort('paths', 'sortedPathsOrder'),
+
+  /**
+   * If true then there is only one path, which represents a direct membership
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasOnlyDirectPath: computed('paths.[]', function hasOnlyDirectPath() {
+    const paths = this.get('paths');
+    return get(paths, 'length') === 1 && get(paths[0], 'griPath.length') === 1;
+  }),
 
   /**
    * 1-level-nested tree with privileges. It should group privileges

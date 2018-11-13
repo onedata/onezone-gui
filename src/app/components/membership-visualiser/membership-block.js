@@ -18,7 +18,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-block'],
-  classNameBindings: ['recordType', 'actionsOpened'],
+  classNameBindings: ['recordTypeClass', 'actionsOpened'],
 
   oneiconAlias: service(),
 
@@ -63,6 +63,14 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   view: notImplementedThrow,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  recordTypeClass: computed('recordType', function recordTypeClass() {
+    const recordType = this.get('recordType');
+    return recordType ? `record-${recordType}` : '';
+  }),
 
   /**
    * @type {Ember.ComputedProperty<Action>}

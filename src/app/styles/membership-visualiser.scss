@@ -17,6 +17,7 @@
     font-size: 0.9em;
     .membership-relation {
       width: 10px;
+      pointer-events: none;
       .dot {
         display: none;
       }
@@ -34,9 +35,6 @@
       .type-icon {
         pointer-events: none;
       }
-    }
-    .membership-row-element {
-      pointer-events: none;
     }
   }
 
@@ -74,13 +72,13 @@
         opacity: 0;
       }
     }
-    &.group .type-icon {
+    &.record-group .type-icon {
       color: $color-one-yellow;
     }
-    &.space .type-icon {
+    &.record-space .type-icon {
       color: $color-one-azure;
     }
-    &.provider .type-icon {
+    &.record-provider .type-icon {
       color: $color-one-mint;
     }
     .type-icon:hover, &.actions-opened .type-icon {

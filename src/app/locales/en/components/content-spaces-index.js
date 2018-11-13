@@ -10,8 +10,11 @@ export default {
   changingDefaultSpace: 'changing default space',
   leavingSpace: 'leaving space',
   spaceLeftSuccess: 'Space left successfully',
+  tileDataTitle: 'Data',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
-  tileMembershipTitle: 'Your membership',
+  tileProvidersMapTitle: 'Providers map',
   getSupport: 'Get support',
+  browseFiles: 'Browse files',
+  sharedDirectories: 'Shared dirs',
 };

@@ -10,17 +10,10 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
-export default Component.extend(I18n, {
-  i18n: service(),
+export default Component.extend({
   currentUser: service(),
-
-  /**
-   * @override
-   */
-  i18nPrefix: 'components.contentGroupsIndex',
 
   /**
    * @type {Group}
