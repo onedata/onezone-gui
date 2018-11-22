@@ -4,13 +4,16 @@
 <div class="row content-row no-border">
   <ul class="one-list">
     <li class="one-list-item"><strong>Type:</strong> {{cluster.type}}</li>
-    <li class="one-list-item"><strong>Service ID:</strong> {{cluster.serviceId}}</li>
-    <li class="one-list-item"><strong>Domain:</strong> {{cluster.domain}}</li>
-    <li class="one-list-item"><strong>Onepanel proxy:</strong> <span>{{one-way-toggle checked=cluster.onepanelProxy isReadOnly=true}}</span></li>
+    <li class="one-list-item"><strong>Service ID:</strong> {{one-clipboard-line class="light" value=cluster.serviceId}}</li>
     <li class="one-list-item">
-      <a href={{onepanelHref}} class="btn btn-primary btn-sm">
+      <strong>Domain:</strong> {{one-clipboard-line value=cluster.domain}}
+      <a href={{onepanelHref}} class="btn btn-primary btn-sm btn-go-to-onepanel">
         Go to Onepanel
       </a>
+    </li>
+    <li class="one-list-item"><strong>Onepanel proxy:</strong> <span>{{one-way-toggle checked=cluster.onepanelProxy isReadOnly=true}}</span></li>
+    <li class="one-list-item">
+      
     </li>
   </ul>  
 </div>
