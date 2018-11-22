@@ -1,1 +1,5 @@
-{{yield}}
+<ul>
+  <li>name: {{cluster.name}}</li>
+  <li>hostname: <a href={{concat "https://" cluster.hostname ":9443" }}>{{cluster.hostname}}</a></li>
+  <li>onepanelProxy: {{cluster.onepanelProxy}}</li>
+</ul>

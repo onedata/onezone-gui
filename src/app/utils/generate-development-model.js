@@ -179,8 +179,7 @@ function createEntityRecords(store, type, names, additionalInfo) {
     case 'linkedAccount':
       return createLinkedAccount(store, additionalInfo);
     case 'cluster':
-      var cc = createClusterRecords(store, additionalInfo);
-      return cc;
+      return createClusterRecords(store, additionalInfo);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -250,26 +249,22 @@ function createLinkedAccount(store) {
 }
 
 function createClusterRecords(store) {
-  try {
-    return Promise.all([{
-        name: 'PL-Grid',
-        hostname: 'onedata.plgrid.pl',
-        onepanelProxy: true,
-      },
-      {
-        name: 'Cyfronet',
-        hostname: 'oneprovider.cyfronet.pl',
-        onepanelProxy: false,
-      },
-      {
-        name: 'PCSS',
-        hostname: 'oneprovider.pcss.pl',
-        onepanelProxy: true,
-      },
-    ].map(c => store.createRecord('cluster', c).save()));
-  } catch (error) {
-    window.alert(error);
-  }
+  return Promise.all([{
+      name: 'PL-Grid',
+      hostname: 'onedata.plgrid.pl',
+      onepanelProxy: true,
+    },
+    {
+      name: 'Cyfronet',
+      hostname: 'oneprovider.cyfronet.pl',
+      onepanelProxy: false,
+    },
+    {
+      name: 'PCSS',
+      hostname: 'oneprovider.pcss.pl',
+      onepanelProxy: true,
+    },
+  ].map(c => store.createRecord('cluster', c).save()));
 }
 
 function createSharedUsersRecords(store) {

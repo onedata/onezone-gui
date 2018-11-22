@@ -8,38 +8,18 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { resolve } from 'rsvp';
+import { get } from '@ember/object';
 
 export default Service.extend({
   currentUser: service(),
+  store: service(),
 
   getClusters() {
     return this.get('currentUser').getCurrentUserRecord()
-      .get('clusterList');
+      .then(user => get(user, 'clusterList'));
   },
 
-  // FIXME: backend model
-  mockgetClusters() {
-    return resolve({
-      list: [{
-          id: 'mock-cluster-zone-id',
-          name: 'PL-Grid',
-          hostname: 'onedata.plgrid.pl',
-          onepanelProxy: true,
-        },
-        {
-          id: 'mock-cluster-p-cyfronet-id',
-          name: 'Cyfronet',
-          hostname: 'oneprovider.cyfronet.pl',
-          onepanelProxy: false,
-        },
-        {
-          id: 'mock-cluster-p-pcss-id',
-          name: 'PCSS',
-          hostname: 'oneprovider.pcss.pl',
-          onepanelProxy: true,
-        },
-      ],
-    });
+  getRecord(id) {
+    return this.get('store').findRecord('cluster', id);
   },
 });

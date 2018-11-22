@@ -36,6 +36,7 @@ export default Model.extend(GraphSingleModelMixin, {
   providerList: belongsTo('providerList'),
   clientTokenList: belongsTo('clientTokenList'),
   linkedAccountList: belongsTo('linkedAccountList'),
+  clusterList: belongsTo('clusterList'),
 
   //#region Non-store User operations
 

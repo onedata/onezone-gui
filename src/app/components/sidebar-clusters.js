@@ -52,4 +52,8 @@ export default TwoLevelSidebar.extend(I18n, {
   secondLevelItems: computed(function secondLevelItems() {
     return [];
   }),
+
+  init() {
+    this._super(...arguments);
+  },
 });
