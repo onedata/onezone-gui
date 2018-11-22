@@ -29,11 +29,6 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
-  firstLevelItemIcon: 'menu-clusters',
-
-  /**
-   * @override
-   */
   sidebarType: 'clusters',
 
   /**

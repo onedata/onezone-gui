@@ -250,18 +250,24 @@ function createLinkedAccount(store) {
 
 function createClusterRecords(store) {
   return Promise.all([{
+      type: 'onezone',
       name: 'PL-Grid',
-      hostname: 'onedata.plgrid.pl',
+      serviceId: 'dsijfodhf9dehyucdf9s0yf8de9f',
+      domain: 'onedata.plgrid.pl',
       onepanelProxy: true,
     },
     {
+      type: 'oneprovider',
       name: 'Cyfronet',
-      hostname: 'oneprovider.cyfronet.pl',
+      serviceId: 'dsjfu9etwr34r5478rt42r5246f',
+      domain: 'oneprovider.cyfronet.pl',
       onepanelProxy: false,
     },
     {
+      type: 'oneprovider',
       name: 'PCSS',
-      hostname: 'oneprovider.pcss.pl',
+      serviceId: 'dd2kmofieryt78r32783r443e9f',
+      domain: 'oneprovider.pcss.pl',
       onepanelProxy: true,
     },
   ].map(c => store.createRecord('cluster', c).save()));

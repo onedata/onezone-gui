@@ -10,7 +10,9 @@ import attr from 'ember-data/attr';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export default Model.extend(GraphSingleModelMixin, {
+  type: attr('string'),
+  serviceId: attr('string'),
   name: attr('string'),
-  hostname: attr('string'),
+  domain: attr('string'),
   onepanelProxy: attr('boolean'),
 });
