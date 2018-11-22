@@ -1,7 +1,16 @@
-<ul>
-  <li>type: {{cluster.type}}</li>
-  <li>serviceId: {{cluster.serviceId}}</li>
-  <li>name: {{cluster.name}}</li>
-  <li>domain: <a href={{onepanelHref}}>{{cluster.domain}}</a></li>
-  <li>onepanelProxy: {{cluster.onepanelProxy}}</li>
-</ul>
+<div class="row content-row header-row">
+  <h1>{{cluster.name}}</h1>
+</div>
+<div class="row content-row no-border">
+  <ul class="one-list">
+    <li class="one-list-item"><strong>Type:</strong> {{cluster.type}}</li>
+    <li class="one-list-item"><strong>Service ID:</strong> {{cluster.serviceId}}</li>
+    <li class="one-list-item"><strong>Domain:</strong> {{cluster.domain}}</li>
+    <li class="one-list-item"><strong>Onepanel proxy:</strong> <span>{{one-way-toggle checked=cluster.onepanelProxy isReadOnly=true}}</span></li>
+    <li class="one-list-item">
+      <a href={{onepanelHref}} class="btn btn-primary btn-sm">
+        Go to Onepanel
+      </a>
+    </li>
+  </ul>  
+</div>
