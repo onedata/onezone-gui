@@ -4,6 +4,8 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
 export default Component.extend({
+  classNames: ['content-clusters-index'],
+
   onedataConnection: service(),
 
   /**
