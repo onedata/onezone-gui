@@ -33,6 +33,7 @@ import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
+import contentClustersAdd from './components/content-clusters-add';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -48,6 +49,7 @@ import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
 
 import spaceActions from './services/space-actions';
+import clusterActions from './services/cluster-actions';
 import groupActions from './services/group-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
@@ -88,6 +90,7 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
+    contentClustersAdd,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
@@ -106,6 +109,7 @@ let translations = {
     clientTokenActions,
     clientTokenManager,
     spaceActions,
+    clusterActions,
     groupActions,
     privilegeActions,
     guiUtils,

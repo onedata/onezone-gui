@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with clusters tab.
+ * Provides data and operations for routes and components assoctiated with clusters tab.
  *
  * @module services/cluster-manager
  * @author Jakub Liput
@@ -9,10 +9,12 @@
 
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   currentUser: service(),
   store: service(),
+  onedataGraph: service(),
 
   getClusters() {
     return this.get('currentUser').getCurrentUserRecord()
@@ -21,5 +23,18 @@ export default Service.extend({
 
   getRecord(id) {
     return this.get('store').findRecord('cluster', id);
+  },
+
+  getOnezoneRegistrationToken() {
+    const userId = this.get('currentUser.userId');
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'provider',
+        aspect: 'provider_registration_token',
+      }),
+      operation: 'create',
+      data: { userId },
+      subscribe: false,
+    }).then(({ data }) => data);
   },
 });

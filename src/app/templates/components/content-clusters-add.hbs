@@ -1,0 +1,20 @@
+{{#content-info
+  class="scroll-breakpoint-600"
+  header=(tt this "header")
+  text=(tt this "description")
+  imagePath="assets/images/cluster-register-provider.svg"
+}}
+  {{#promise-proxy-container proxy=tokenProxy}}
+    <div class="token-row">
+      <textarea class="token-textarea form-control" rows=5>{{token}}</textarea>
+      <div class="text-center">
+        {{#copy-button
+          class="btn btn-primary"
+          clipboardTarget=".token-textarea"
+        }}
+          {{one-icon icon="clipboard-copy"}} {{tt this "copy"}}
+        {{/copy-button}}
+      </div>
+    </div>
+  {{/promise-proxy-container}}
+{{/content-info}}

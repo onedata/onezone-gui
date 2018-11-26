@@ -18,6 +18,7 @@ export default SidebarResources.extend({
   clientTokenActions: inject(),
   currentUser: inject(),
   spaceManager: inject(),
+  clusterActions: inject(),
   spaceActions: inject(),
   groupManager: inject(),
   groupActions: inject(),
@@ -55,6 +56,8 @@ export default SidebarResources.extend({
    */
   getButtonsFor(type) {
     switch (type) {
+      case 'clusters':
+        return this.get('clusterActions.buttons');
       case 'tokens':
         return this.get('clientTokenActions.actionButtons');
       case 'spaces':
