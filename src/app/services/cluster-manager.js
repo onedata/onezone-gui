@@ -35,6 +35,6 @@ export default Service.extend({
       operation: 'create',
       data: { userId },
       subscribe: false,
-    }).then(({ data }) => data);
+    });
   },
 });

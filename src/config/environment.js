@@ -5,7 +5,7 @@ module.exports = function (environment) {
   let ENV = {
     'modulePrefix': 'onezone-gui',
     environment,
-    'rootURL': '/',
+    'rootURL': null,
     'locationType': 'hash',
     'EmberENV': {
       FEATURES: {
