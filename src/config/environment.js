@@ -27,10 +27,10 @@ module.exports = function (environment) {
      */
     'onedataTabs': [
       { id: 'data', icon: 'folder', isDefault: true, allowIndex: true },
-      { id: 'clusters', icon: 'menu-clusters' },
-      { id: 'tokens', icon: 'tokens' },
       { id: 'spaces', icon: 'space' },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
+      { id: 'tokens', icon: 'tokens' },
+      { id: 'clusters', icon: 'menu-clusters' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',

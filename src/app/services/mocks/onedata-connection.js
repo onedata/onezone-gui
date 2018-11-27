@@ -14,5 +14,4 @@ export default OnedataConnection.extend({
   zoneName: 'Hello world',
   brandSubtitle: 'Isolated zone',
   loginNotification: '',
-  onepanelRedirectPath: '/#/onezone-login?token=23903289',
 });

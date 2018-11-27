@@ -2,9 +2,12 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: ['content-clusters-index'],
+
+  i18nPrefix: 'components.contentClustersIndex',
 
   onedataConnection: service(),
 
@@ -14,9 +17,14 @@ export default Component.extend({
    */
   cluster: undefined,
 
-  onepanelRedirectPath: reads('onedataConnection.onepanelRedirectPath'),
+  clusterId: reads('cluster.entityId'),
 
-  onepanelHref: computed('cluster.domain', 'onepanelRedirectPath', function onepanelHref() {
-    return `https://${this.get('cluster.domain')}:9443${this.get('onepanelRedirectPath')}`;
+  onepanelPathAbbrev: computed('cluster.type', function onepanelPathAbbrev() {
+    return this.get('cluster.type') === 'oneprovider' ? 'opp' : 'ozp';
   }),
+
+  onepanelHref: computed('onepanelPathAbbrev', 'clusterId',
+    function onepanelHref() {
+      return `${location.origin}/${this.get('onepanelPathAbbrev')}/${this.get('clusterId')}/i`;
+    }),
 });
