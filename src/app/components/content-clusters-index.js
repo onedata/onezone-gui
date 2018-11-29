@@ -9,8 +9,6 @@ export default Component.extend(I18n, {
 
   i18nPrefix: 'components.contentClustersIndex',
 
-  onedataConnection: service(),
-
   /**
    * @virtual
    * @type {models/Cluster}
@@ -18,6 +16,8 @@ export default Component.extend(I18n, {
   cluster: undefined,
 
   clusterId: reads('cluster.entityId'),
+
+  // FIXME: should the Go to onepanel button be removed? if not - use common href etc.
 
   onepanelPathAbbrev: computed('cluster.type', function onepanelPathAbbrev() {
     return this.get('cluster.type') === 'oneprovider' ? 'opp' : 'ozp';
