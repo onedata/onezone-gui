@@ -1,0 +1,14 @@
+{{#one-tile
+  title=(tt this "title")
+  aspect="members"
+  routeQueryParams=queryParams
+  class="resource-membership-tile"}}
+  {{#promise-proxy-container proxy=userProxy}}
+    {{membership-visualiser
+      contextRecord=userProxy.content
+      targetRecord=record
+      maxPathsNumber=4
+      visibleBlocks=2
+      isCondensed=true}}
+  {{/promise-proxy-container}}
+{{/one-tile}}

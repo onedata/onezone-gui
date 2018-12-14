@@ -1,13 +1,7 @@
-<div class="row content-row header-row">
+<div class="row content-row header-row hidden-xs">
   <h1 class="normal-case with-menu">
-    {{one-inline-editor
-      value=space.name
-      onSave=(action "saveSpaceName")
-      class="one-label name-editor short"
-      editHint=(tt this "editSpaceNameHint")
-      isInToolbar=true
-    }}
-    {{actions-toolbar actionsArray=globalActions}}
+    {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
+    {{actions-toolbar actionsArray=globalActions isMinimized=true}}
   </h1>
   {{#one-switchable-popover-modal
     triggersConfiguration=leaveSpaceModalTriggers
@@ -21,40 +15,78 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
-    {{#one-tile class="text-center" title=(tt this "tileProvidersTitle") aspect=(if isSupported "providers" "support")}}
-      {{#loading-container
-        isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
-      }}
-        {{#if isSupported}}
-          <div class="support-chart-container absolute-align-middle-center full-width">
-            {{space-providers-support-chart
-              space=space
-              providersColors=providersColors
-              forceMobile=true
-              hideLegend=true
-            }}
-          </div>
-        {{else}}
-          <figure class="main-figure">
-            <img class="main-image" src={{root-url "assets/images/space-get-support.svg"}}>
-            <span class="one-label">{{tt this "getSupport"}}</span>  
-          </figure>
-          
-        {{/if}}
-      {{/loading-container}}
-    {{/one-tile}}
-    {{#one-tile
-      title=(tt this "tileMembershipTitle")
-      aspect="members"}}
-      {{#promise-proxy-container proxy=userProxy}}
-        {{membership-visualiser
-          contextRecord=userProxy.content
-          targetRecord=space
-          maxPathsNumber=4
-          visibleBlocks=2
-          isCondensed=true}}
-      {{/promise-proxy-container}}
-    {{/one-tile}}
+    {{#resource-info-tile record=space}}
+      <tr>
+        <td class="property-name">{{tt this "sharedDirectories"}}</td>
+        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
+      </tr>
+    {{/resource-info-tile}}
+    {{#if dataProviderProxy}}
+      {{#one-tile
+        class="text-center resource-browse-tile"
+        title=(tt this "tileDataTitle")
+        route=dataProviderRoute
+        routeQueryParams=dataProviderRouteParams
+        moreText=(tt this "browseFiles")}}
+        <figure class="main-figure">
+          <img class="main-image" src="assets/images/space-data.svg">
+          {{#truncated-string tagName="span" class="one-label"}}{{dataProviderProxy.name}}{{/truncated-string}}
+        </figure>
+      {{/one-tile}}
+    {{/if}}
+    {{#if space.hasViewPrivilege}}
+      {{#one-tile
+        class="text-center resource-support-tile"
+        title=(tt this "tileProvidersTitle")
+        aspect=(if isSupported "providers" "support")}}
+        {{#loading-container
+          isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
+        }}
+          {{#if isSupported}}
+            <div class="support-chart-container absolute-align-middle-center full-width">
+              {{space-providers-support-chart
+                space=space
+                providersColors=providersColors
+                forceMobile=true
+                hideLegend=true
+              }}
+            </div>
+          {{else}}
+            <figure class="main-figure">
+              <img class="main-image" src="assets/images/space-get-support.svg">
+              <span class="one-label">{{tt this "getSupport"}}</span>  
+            </figure>
+          {{/if}}
+        {{/loading-container}}
+      {{/one-tile}}
+      {{#one-tile
+        class="resource-map-tile"
+        sizeClass="x2"
+        title=(tt this "tileProvidersMapTitle")
+        aspect=(if isSupported "providers" "support")}}
+        <div class="map-container">
+          {{#one-atlas class="space-providers-atlas" as |atlas|}}
+            {{#each providersProxy as |provider|}}
+              {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+                {{#position.point}}
+                  {{provider-place
+                    provider=provider
+                    atlasWidth=atlas.width
+                    circleSizeScale=2
+                    circleColor=(get providersColors provider.entityId)
+                    hint=provider.name
+                    renderDrop=false}}
+                {{/position.point}}
+              {{/atlas.position}}
+            {{/each}}
+          {{/one-atlas}}
+        </div>
+      {{/one-tile}}
+    {{/if}}
+    {{#if space.hasViewPrivilege}}
+      {{resource-members-tile record=space}}
+    {{/if}}
+    {{resource-membership-tile record=space}}
     {{yield}}
   </div>
 </div>

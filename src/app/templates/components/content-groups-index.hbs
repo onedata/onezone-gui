@@ -1,5 +1,5 @@
 <div class="row content-row header-row hidden-xs has-border">
-  <h1 class="with-menu">
+  <h1 class="with-menu normal-case">
     <span class="one-label">
       {{group.name}}
     </span>
@@ -8,18 +8,11 @@
 <div class="row content-row">
   {{#promise-proxy-container proxy=user}}
     <div class="one-tile-container">
-      {{#one-tile
-        isScalable=true
-        title=(tt this "tileMembershipTitle")
-        aspect="membership"
-        as |tile|}}
-        {{membership-visualiser
-          contextRecord=user.content
-          targetRecord=group
-          maxPathsNumber=4
-          visibleBlocks=(if tile.sizeClass 4 2)
-          isCondensed=true}}
-      {{/one-tile}}
+      {{resource-info-tile record=group}}
+      {{#if group.hasViewPrivilege}}
+        {{resource-members-tile record=group}}
+      {{/if}}
+      {{resource-membership-tile record=group}}
     </div>
   {{/promise-proxy-container}}
 </div>

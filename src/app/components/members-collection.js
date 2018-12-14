@@ -12,6 +12,7 @@ import Component from '@ember/component';
 import { observer, get, set, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -22,6 +23,7 @@ import { reject } from 'rsvp';
 import { A } from '@ember/array';
 import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -62,6 +64,13 @@ export default Component.extend(I18n, {
    * @type {number}
    */
   collapseForNumber: 0,
+
+  /**
+   * Called when members are loaded and rendered
+   * @type {function}
+   * @returns {any}
+   */
+  membersLoaded: notImplementedIgnore,
 
   /**
    * Called after list item selection.
@@ -274,6 +283,9 @@ export default Component.extend(I18n, {
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
+      if (get(membersList, 'isFulfilled')) {
+        scheduleOnce('afterRender', this, 'membersLoaded');
+      }
     }
   ),
 

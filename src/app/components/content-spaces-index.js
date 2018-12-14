@@ -2,7 +2,7 @@
  * Default content for single space - overview of space aspects
  *
  * @module components/content-spaces-index
- * @author Jakub Liput
+ * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -30,6 +30,8 @@ export default Component.extend(
     currentUser: inject(),
     globalNotify: inject(),
     router: inject(),
+    guiUtils: inject(),
+    media: inject(),
 
     /**
      * @override 
@@ -116,9 +118,37 @@ export default Component.extend(
     ),
 
     /**
-     * @type {PromiseArray<models/Provider>}
+     * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
      */
     providersProxy: reads('space.providerList.list'),
+
+    /**
+     * @type {Ember.ComputedProperty<Provider>}
+     */
+    dataProviderProxy: reads('providersProxy.firstObject'),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<string>>}
+     */
+    dataProviderRoute: computed('dataProviderProxy', function dataProviderRoute() {
+      const {
+        guiUtils,
+        dataProviderProxy,
+      } = this.getProperties('guiUtils', 'dataProviderProxy');
+      return dataProviderProxy ? [
+        'provider-redirect',
+        guiUtils.getRoutableIdFor(dataProviderProxy),
+      ] : [];
+    }),
+
+    /**
+     * @type {Ember.ComputedProperty<Object>}
+     */
+    dataProviderRouteParams: computed('space', function dataProviderRouteParams() {
+      return {
+        space_id: this.get('guiUtils').getRoutableIdFor(this.get('space')),
+      };
+    }),
 
     init() {
       this._super(...arguments);

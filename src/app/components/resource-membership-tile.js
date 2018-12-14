@@ -1,0 +1,44 @@
+/**
+ * Shows information about user membership for given record. It is a tile
+ * component ready to place in overview page.
+ *
+ * @module components/resource-membership-tile
+ * @author Michal Borzecki
+ * @copyright (C) 2018 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
+import Component from '@ember/component';
+import { computed } from '@ember/object';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
+import { inject as service } from '@ember/service';
+
+export default Component.extend(I18n, UserProxyMixin, {
+  tagName: '',
+
+  currentUser: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.resourceMembershipTile',
+
+  /**
+   * @virtual
+   * @type {GraphSingleModel}
+   * E.g. group or space
+   */
+  record: undefined,
+
+  /**
+   * Query params passed to link-to in tile.
+   * @type {Object}
+   */
+  queryParams: computed('currentUser.userId', function queryParams() {
+    return {
+      aspect: 'memberships',
+      member: this.get('currentUser.userId'),
+    };
+  }),
+});

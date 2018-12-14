@@ -105,7 +105,10 @@ export default function generateDevelopmentModel(store) {
         Promise.all(records.map(record =>
           Promise.all([
             attachSharedUsersGroupsToModel(
-              store, record, 'group', sharedUsers, groups
+              store, record, 'group', false, sharedUsers, groups
+            ),
+            attachSharedUsersGroupsToModel(
+              store, record, 'group', true, sharedUsers, groups
             ),
             attachMembershipsToModel(
               store, record, 'group', groups
@@ -118,7 +121,10 @@ export default function generateDevelopmentModel(store) {
           Promise.all(records.map(record =>
             Promise.all([
               attachSharedUsersGroupsToModel(
-                store, record, 'space', sharedUsers, groups
+                store, record, 'space', false, sharedUsers, groups
+              ),
+              attachSharedUsersGroupsToModel(
+                store, record, 'space', true, sharedUsers, groups
               ),
               attachMembershipsToModel(
                 store, record, 'space', groups
@@ -214,6 +220,14 @@ function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     return store.createRecord('space', {
       name: `Space ${index}`,
+      scope: 'private',
+      directMembership: true,
+      canViewPrivileges: true,
+      info: {
+        creatorType: 'root',
+        creationTime: 1540995468,
+        sharedDirectories: 0,
+      },
     }).save();
   }));
 }
@@ -283,11 +297,18 @@ function attachSharedUsersGroupsToModel(
   store,
   record,
   modelType,
+  isEffective,
   sharedUsers,
   groups
 ) {
   return createListRecord(store, 'group', groups)
-    .then(list => record.set(modelType === 'group' ? 'childList' : 'groupList', list))
+    .then(list => {
+      let listName = modelType === 'group' ? 'childList' : 'groupList';
+      if (isEffective) {
+        listName = 'eff' + _.upperFirst(listName);
+      }
+      return record.set(listName, list);
+    })
     .then(() => {
       if (modelType === 'group') {
         return createListRecord(store, 'group', groups)
@@ -296,7 +317,8 @@ function attachSharedUsersGroupsToModel(
     })
     .then(() => createListRecord(store, 'sharedUser', sharedUsers))
     .then(list => {
-      record.set('userList', list);
+      const listName = isEffective ? 'effUserList' : 'userList';
+      record.set(listName, list);
       return record.save();
     });
 }

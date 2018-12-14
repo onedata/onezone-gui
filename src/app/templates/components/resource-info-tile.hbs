@@ -1,0 +1,40 @@
+{{#one-tile title=(tt this "title") isLink=false class="resource-info-tile"}}
+  {{#promise-proxy-container proxy=creatorProxy}}
+    <table class="table table-condensed">
+      <tbody>
+        <tr>
+          <td class="property-name">{{tt this "name"}}</td>
+          <td class="property-value">
+            {{one-inline-editor value=record.name onSave=(action "saveName") class="resource-name"}}
+          </td>
+        </tr>
+        <tr>
+          <td class="property-name">{{tt this "creator"}}</td>
+          {{#truncated-string
+            tagName="td"
+            class=(concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special"))}}
+            {{#if creatorIcon}}
+              {{one-icon icon=creatorIcon}}
+            {{/if}}
+            {{creatorName}}
+          {{/truncated-string}}
+        </tr>
+        <tr>
+          <td class="property-name">{{tt this "creationTime"}}</td>
+          <td class="property-value creation-time">{{creationTime}}</td>
+        </tr>
+        {{yield}}
+        <tr>
+          <td class="property-name">{{tt this "id"}}</td>
+          <td class="property-value id">
+            {{one-clipboard-line
+              size="sm"
+              value=record.entityId
+              showText=false
+              btnType="success"}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  {{/promise-proxy-container}}
+{{/one-tile}}

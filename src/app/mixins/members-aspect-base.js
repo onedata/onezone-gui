@@ -8,7 +8,7 @@
  */
 
 import Mixin from '@ember/object/mixin';
-import { computed, get, observer } from '@ember/object';
+import { computed, get, getProperties, observer } from '@ember/object';
 import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
@@ -18,11 +18,13 @@ import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
+import { next } from '@ember/runloop';
 
 export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
   media: service(),
+  navigationState: service(),
 
   /**
    * @type {DS.Model}
@@ -400,6 +402,7 @@ export default Mixin.create({
     // Members scope change reloads lists (including selection), so selection state
     // should be cleared out
     this.setProperties({
+      memberIdToExpand: null,
       selectedUsersProxies: A(),
       selectedGroupsProxies: A(),
     });
@@ -408,17 +411,35 @@ export default Mixin.create({
   init() {
     this._super(...arguments);
 
-    // Restore remembered view tools visibility
-    let viewToolsVisible =
-      localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
-    if (viewToolsVisible === null) {
-      viewToolsVisible = 'false';
+    const {
+      aspect,
+      member,
+    } = getProperties(this.get('navigationState.queryParams'), 'aspect', 'member');
+
+    this.set('memberIdToExpand', member);
+
+    if (['memberships', 'privileges'].includes(aspect)) {
+      this.setProperties({
+        aspect,
+        viewToolsVisible: true,
+      });
       localStorage.setItem(
         'membersAspectBaseMixin.viewToolsVisible',
-        viewToolsVisible
+        true
       );
+    } else {
+      // Restore remembered view tools visibility
+      let viewToolsVisible =
+        localStorage.getItem('membersAspectBaseMixin.viewToolsVisible');
+      if (viewToolsVisible === null) {
+        viewToolsVisible = 'false';
+        localStorage.setItem(
+          'membersAspectBaseMixin.viewToolsVisible',
+          viewToolsVisible
+        );
+      }
+      this.set('viewToolsVisible', viewToolsVisible === 'true');
     }
-    this.set('viewToolsVisible', viewToolsVisible === 'true');
   },
 
   /**
@@ -484,6 +505,7 @@ export default Mixin.create({
       inviteTokenModalType: null,
       selectedUsersProxies: A(),
       selectedGroupsProxies: A(),
+      memberIdToExpand: null,
     });
   },
 
@@ -515,6 +537,20 @@ export default Mixin.create({
     },
     changeAspect(aspect) {
       this.set('aspect', String(aspect));
+    },
+    recordsLoaded() {
+      next(() => safeExec(this, () => {
+        const memberIdToExpand = this.get('memberIdToExpand');
+        if (memberIdToExpand) {
+          const memberItemHeader = this.$(
+            `.member-${memberIdToExpand} .one-collapsible-list-item-header`
+          );
+          if (get(memberItemHeader, 'length')) {
+            memberItemHeader.click();
+            this.set('memberIdToExpand', null);
+          }
+        }
+      }));
     },
     recordsSelected(type, records) {
       let targetListName = type === 'user' ?

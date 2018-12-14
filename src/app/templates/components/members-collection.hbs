@@ -20,7 +20,7 @@
     {{/list.header}}
     {{#each membersProxyList key="id" as |memberProxy|}}
       {{#list.item
-        class="member-item"
+        class=(concat-classes "member-item" (concat "member-" memberProxy.member.entityId))
         selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembersList))) null memberProxy)
         as |listItem|}}
         {{#listItem.header
