@@ -21,7 +21,8 @@ export default Component.extend({
     'onepanelPathAbbrev',
     'clusterId',
     function onepanelHref() {
-      return `${location.origin}/${this.get('onepanelPathAbbrev')}/${this.get('clusterId')}/i`;
+      const clusterId = this.get('clusterId');
+      return `${location.origin}/${this.get('onepanelPathAbbrev')}/${clusterId}/i#/clusters/${clusterId}`;
     }),
 
   init() {
