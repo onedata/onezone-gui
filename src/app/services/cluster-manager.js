@@ -29,7 +29,8 @@ export default Service.extend({
     const userId = this.get('currentUser.userId');
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'provider',
+        entityType: 'user',
+        entityId: 'self',
         aspect: 'provider_registration_token',
       }),
       operation: 'create',
