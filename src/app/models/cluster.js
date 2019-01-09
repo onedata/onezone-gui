@@ -31,7 +31,7 @@ export default Model.extend(GraphSingleModelMixin, {
     if (this.get('type') === 'oneprovider') {
       return this.get('provider.content.domain');
     } else {
-      return location.hostname;
+      return this.get('onedataConnection.zoneDomain');
     }
   }),
 
