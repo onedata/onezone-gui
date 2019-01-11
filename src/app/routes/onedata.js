@@ -9,7 +9,7 @@
  */
 
 import { inject as service } from '@ember/service';
-
+import { get } from '@ember/object';
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
 import { Promise } from 'rsvp';
 import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
@@ -19,6 +19,11 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   globalNotify: service(),
 
   model() {
+    const applicationController = this.controllerFor('application');
+    const redirectUrl = get(applicationController, 'redirectUrl');
+    if (redirectUrl) {
+      window.location = redirectUrl;
+    }
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
       let creatingAppModel = this._super(...arguments);
