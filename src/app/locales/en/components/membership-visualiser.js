@@ -25,6 +25,8 @@ export default {
   membership: {
     descBeginning: '{{pathStartType}} "{{pathStartName}}" ',
     descPathFirstElement: 'is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
+    descPathIsEffectiveMember: 'is an effective member of {{elementType}} "{{elementName}}", however you do not have privileges to view the details of this membership',
+    descPathCentralIsEffectiveMember: ', which is an effective member of {{elementType}} "{{elementName}}", however you do not have privileges to view the details of this membership',
     descPathCentralElement: ', which is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
     descSummary: ' All these relations make {{pathStartType}} "{{pathStartName}}" an indirect member of {{pathEndType}} "{{pathEndName}}".',
     descSubgroupType: ' (subgroup)',
