@@ -16,6 +16,6 @@ export default Model.extend(GraphSingleModelMixin, {
   name: computed('token', function () {
     const token = this.get('token');
     return token &&
-      token.slice(0, 3) + '...' + token.slice(token.length - 12, token.length);
+      token.slice(0, 3) + '...' + token.slice(token.length - 14, token.length);
   }),
 });
