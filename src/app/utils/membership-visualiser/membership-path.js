@@ -56,14 +56,16 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<Array<string>>}
    */
   names: computed('model.content.@each.name', function names() {
-    return (this.get('model.content') || A()).mapBy('name');
+    return (this.get('model.content') || A())
+      .map(x => x ? x : {})
+      .mapBy('name');
   }),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
   concatenatedNames: computed('names', function concatenatedNames() {
-    return this.get('names').join('');
+    return this.get('names').map(n => n ? n : 'undefined').join('-');
   }),
 
   /**
