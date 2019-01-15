@@ -23,7 +23,8 @@
                 renderDrop=(and (contains selectedProvider square.providers) (not isWhileDraggingMap))
                 selectedProvider=selectedProvider
                 popoverPlacement="horizontal"
-                providerSelectedAction=(action "providerSelected")}}
+                providerSelectedAction=(action "providerSelected")
+                doubleClick=(action "goToProvider" square.providers.[0])}}
             {{/link-to}}
           {{/if}}
         {{/map.position}}

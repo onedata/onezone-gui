@@ -115,7 +115,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number>}
    */
   _providerCircleScale: computed('_mapState.scale', function () {
-    return 1.4 + this.get('_mapState.scale') / 6;
+    return 1 + this.get('_mapState.scale') / 6;
   }),
 
   /**
@@ -287,6 +287,18 @@ export default Component.extend({
         'data',
         this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
       );
+    },
+    goToProvider(provider) {
+      const {
+        router,
+        guiUtils,
+      } = this.getProperties('router', 'guiUtils');
+      if (get(provider, 'status') !== 'offline') {
+        router.transitionTo(
+          'provider-redirect',
+          guiUtils.getRoutableIdFor(provider)
+        );
+      }
     },
   },
 });
