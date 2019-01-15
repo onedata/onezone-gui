@@ -26,6 +26,7 @@ export default LoginFormConainer.extend(I18n, {
   authorizerManager: inject(),
   onezoneServer: inject(),
   onedataConnection: inject(),
+  navigationState: inject(),
   router: inject(),
 
   /**
@@ -129,6 +130,19 @@ export default LoginFormConainer.extend(I18n, {
     } else {
       return [];
     }
+  }),
+
+  // FIXME: use of this flag is temporary, cookie maybe?
+  authFor: computed('navigationState.queryParams.auth_for', function authFor() {
+    return this.get('navigationState.queryParams.auth_for');
+  }),
+
+  authForName: computed('authFor', function authForName() {
+    return this.get('authFor').split(';')[0];
+  }),
+
+  authForHostname: computed('authFor', function authForHostname() {
+    return this.get('authFor').split(';')[1];
   }),
 
   /**

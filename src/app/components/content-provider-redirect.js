@@ -8,11 +8,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { reads } from '@ember/object/computed';
 import Component from '@ember/component';
 import { inject } from '@ember/service';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
@@ -47,37 +46,18 @@ export default Component.extend(I18n, {
    */
   _window: window,
 
-  /**
-   * @type {string}
-   */
-  providerId: reads('provider.entityId'),
-
   init() {
     this._super(...arguments);
-    const {
-      providerId,
-      spaceId,
-    } = this.getProperties('providerId', 'spaceId');
-    if (providerId) {
-      this._goToProvider(providerId, spaceId);
-    } else {
-      safeExec(this, 'set', 'error', this.t('noProviderId'));
-    }
+    this._goToProvider(this.get('spaceId'));
   },
 
-  _goToProvider(providerId, spaceId) {
-    const path = spaceId ? `/#/onedata/data/${spaceId}` : null;
-    return this.get('onezoneServer').getProviderRedirectUrl(providerId, path)
-      .then(data => {
-        if (data.url) {
-          this.get('_window').location = data.url;
-        } else {
-          safeExec(this, 'set', 'error', this.t('noUrlServer'));
-        }
-      })
-      .catch(error => {
-        safeExec(this, 'set', 'error', error);
-      })
-      .finally(() => safeExec(this, 'set', 'isLoading', false));
+  _goToProvider(spaceId) {
+    const path = spaceId ? `onedata/data/${spaceId}` : '';
+    const clusterId =
+      parseGri(this.get('provider').belongsTo('cluster').id()).entityId;
+
+    const _window = this.get('_window');
+
+    _window.location = `/op/${clusterId}/i/#/${path}`;
   },
 });

@@ -25,6 +25,7 @@ export default Model.extend(GraphSingleModelMixin, {
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),
   domain: attr('string'),
+  cluster: belongsTo('cluster'),
 
   spaceList: belongsTo('space-list'),
 

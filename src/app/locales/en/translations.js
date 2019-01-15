@@ -3,6 +3,7 @@ import onedataCommonTranslations from './onedata-gui-common';
 import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
 import data from './tabs/data';
+import clusters from './tabs/clusters';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
@@ -31,6 +32,9 @@ import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
+import contentClustersAdd from './components/content-clusters-add';
+import contentClustersEmpty from './components/content-clusters-empty';
+import contentClustersIndex from './components/content-clusters-index';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -49,6 +53,7 @@ import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 
 import spaceActions from './services/space-actions';
+import clusterActions from './services/cluster-actions';
 import groupActions from './services/group-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
@@ -62,6 +67,7 @@ let translations = {
     spaces,
     groups,
     users,
+    clusters,
   },
   components: {
     loginBox,
@@ -87,6 +93,9 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
+    contentClustersAdd,
+    contentClustersEmpty,
+    contentClustersIndex,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
@@ -108,6 +117,7 @@ let translations = {
     clientTokenActions,
     clientTokenManager,
     spaceActions,
+    clusterActions,
     groupActions,
     privilegeActions,
     guiUtils,

@@ -1,0 +1,41 @@
+<div class="row content-row header-row">
+  <h1>{{cluster.name}}</h1>
+</div>
+
+{{!-- FIXME: mobile mode --}}
+{{!-- FIXME: make common structure for listing --}}
+<div class="item-table-cell item-table-content-cell">
+  <div class="row content-row">
+    <span class="item-table-key">{{tt this "type"}}</span>
+    <span class="item-table-value">{{cluster.type}}</span>
+  </div>
+  {{#if (eq cluster.type "oneprovider")}}
+    <div class="row content-row">
+      {{one-clipboard-line size="sm" label=(tt this "serviceId") value=cluster.serviceId}}
+    </div>
+  {{/if}}
+  <div class="row content-row">
+    {{one-clipboard-line size="sm" label=(tt this "domain") value=cluster.domain}}
+    <a href={{onepanelHref}} class="btn btn-primary btn-sm btn-go-to-onepanel">
+      {{tt this "goToOnepanel"}}
+    </a>
+  </div>
+  <div class="row content-row">
+    <span class="item-table-key">{{tt this "onepanelProxy"}}</span>
+    <span class="item-table-value">{{one-way-toggle checked=cluster.onepanelProxy isReadOnly=false}}</span>
+  </div>
+</div>
+
+{{!-- 
+<div class="row content-row no-border">
+  <ul class="one-list">
+    <li class="one-list-item">
+      
+      
+    </li>
+    <li class="one-list-item"></li>
+    <li class="one-list-item">
+      
+    </li>
+  </ul>  
+</div> --}}

@@ -17,6 +17,7 @@ export default Service.extend({
   currentUser: inject(),
   spaceManager: inject(),
   groupManager: inject(),
+  clusterManager: inject(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -27,6 +28,8 @@ export default Service.extend({
     switch (type) {
       case 'data':
         return this.get('providerManager').getRecord(id);
+      case 'clusters':
+        return this.get('clusterManager').getRecord(id);
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':

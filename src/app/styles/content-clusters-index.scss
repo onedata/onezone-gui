@@ -1,0 +1,24 @@
+.content-clusters-index {
+  .content-row {
+    position: relative;
+  }
+  .clipboard-line {
+    padding-right: 200px;
+    .clipboard-line-label {
+      width: 120px;
+    }
+  }
+  .item-table-key {
+    display: inline-block;
+    width: 120px;
+    font-family: 'Open Sans Semibold';
+  }
+  .item-table-value {
+    position: relative;
+  }
+  .btn-go-to-onepanel {
+    position: absolute;
+    @include vertical-align-middle();
+    right: 0;
+  }
+}

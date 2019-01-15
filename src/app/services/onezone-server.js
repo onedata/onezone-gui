@@ -8,6 +8,7 @@
  */
 
 import { default as Service, inject } from '@ember/service';
+import { reject } from 'rsvp';
 
 export default Service.extend({
   onedataRpc: inject(),
@@ -52,6 +53,7 @@ export default Service.extend({
     });
   },
 
+  // FIXME: deprecated method
   /**
    * Fetch a URL to provider.
    *
@@ -62,11 +64,12 @@ export default Service.extend({
    *   - ``data.url`` (string)
    * - ``reject(object: error)`` on failure
    */
-  getProviderRedirectUrl(providerId, path) {
-    return this.get('onedataRpc').request('getProviderRedirectURL', {
-      providerId,
-      path,
-    });
+  getProviderRedirectUrl( /* providerId, path */ ) {
+    return reject('Obsolete method, redirect to Onezone serving Oneprovider GUI');
+    // return this.get('onedataRpc').request('getProviderRedirectURL', {
+    //   providerId,
+    //   path,
+    // });
   },
 
   /**

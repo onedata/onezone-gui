@@ -18,7 +18,7 @@
 </div>
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
-  <ul class="indented-row linked-accounts-list">
+  <ul class="indented-row linked-accounts-list">`
     {{#promise-proxy-container proxy=linkedAccountsProxy}}
       {{#each accountsInfo as |accountInfo|}}
         <li class="linked-account full-social-icon content-row {{accountInfo.account.idp}}-account">
@@ -40,11 +40,15 @@
         </li>
       {{/each}}
       <li class="linked-account full-social-icon content-row add-account">
-        {{login-box/social-box-list/social-box
+        {{#login-box/social-box-list/social-box
           authId="add"
-          iconPath="/assets/images/account-add-filled.svg"
+          socialIconStyle=""
           aStyle=""
-          click=(action "toggleAuthorizersDropdown")}}
+          class="social-box-linked-account"
+          click=(action "toggleAuthorizersDropdown")
+        }}
+          <span class="plus-icon">+</span>
+        {{/login-box/social-box-list/social-box}}
         <div class="account-description">
           <div class="show-dropdown-description animated fast" {{action "toggleAuthorizersDropdown"}}>
             {{tt this "addAccount"}}

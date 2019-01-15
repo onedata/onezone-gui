@@ -31,9 +31,20 @@ describe('Integration | Component | content provider redirect', function () {
   });
 
   it('fetches provider redirect URL immediately and uses it', function (done) {
-    const provider = { entityId: 'test1' };
+    const provider = {
+      entityId: 'test1',
+      belongsTo(relName) {
+        if (relName === 'cluster') {
+          return {
+            id: () => 'clusters.12345.instance:protected',
+          };
+        } else {
+          throw new Error('mock error - only cluster is supported');
+        }
+      },
+    };
     const onezoneServer = lookupService(this, 'onezone-server');
-    const url = 'http://example.com';
+    const url = '/op/12345/i/#/';
     const getProviderRedirectUrl = sinon.stub(
       onezoneServer,
       'getProviderRedirectUrl'
