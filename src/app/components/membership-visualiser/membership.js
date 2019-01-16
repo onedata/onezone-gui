@@ -218,30 +218,56 @@ export default Component.extend(I18n, {
         });
         let nextTranslation = 'descPathFirstElement';
         let prevElement = pathStart;
-        recordsProxy.forEach(element => {
-          let membershipType = '';
-          let elementType = get(element, 'entityType');
-          const elementName = get(element, 'name');
-          if (
-            elementType === 'group' &&
-            get(prevElement, 'entityType') === 'group'
-          ) {
-            membershipType = this.t('descSubgroupType');
-          }
-          if (elementType === 'provider') {
-            description += this.t('descSpaceSupportedBy', {
+        for (let i = 0; i < elementsNumber; i++) {
+          const element = recordsProxy.objectAt(i);
+          if (!element) {
+            let nonEmptyElement, j;
+            for (j = i + 1; j < elementsNumber; j++) {
+              const thisElement = recordsProxy.objectAt(j);
+              if (thisElement) {
+                nonEmptyElement = thisElement;
+                break;
+              }
+            }
+            const translation = i == 0 || (i >= 2 && !recordsProxy.objectAt(i - 2)) ?
+              'descPathIsEffectiveMember' : 'descPathCentralIsEffectiveMember';
+            description += this.t(translation, {
+              elementType: get(nonEmptyElement, 'entityType'),
+              elementName: get(nonEmptyElement, 'name'),
+            });
+            i = j;
+            if (i < elementsNumber - 1) {
+              description += '. ' + this.t('descBeginning', {
+                pathStartType: _.upperFirst(this.t(get(nonEmptyElement, 'entityType'))),
+                pathStartName: get(nonEmptyElement, 'name'),
+              });
+              nextTranslation = 'descPathFirstElement';
+            }
+          } else {
+            let membershipType = '';
+            let elementType = get(element, 'entityType');
+            const elementName = get(element, 'name');
+            if (
+              elementType === 'group' &&
+              get(prevElement, 'entityType') === 'group'
+            ) {
+              membershipType = this.t('descSubgroupType');
+            }
+            if (elementType === 'provider') {
+              description += this.t('descSpaceSupportedBy', {
+                elementName,
+              });
+            }
+            elementType = this.t(elementType);
+            description += this.t(nextTranslation, {
+              membershipType,
+              elementType,
               elementName,
             });
+            prevElement = element;
+            nextTranslation = 'descPathCentralElement';
           }
-          elementType = this.t(elementType);
-          description += this.t(nextTranslation, {
-            membershipType,
-            elementType,
-            elementName,
-          });
-          prevElement = element;
-          nextTranslation = 'descPathCentralElement';
-        });
+        }
         description += '.';
 
         const lastElement = recordsProxy.objectAt(elementsNumber - 1);

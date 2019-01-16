@@ -19,6 +19,7 @@ export default Service.extend(I18n, {
   guiUtils: inject(),
   groupManager: inject(),
   globalNotify: inject(),
+  currentUser: inject(),
 
   i18nPrefix: 'services.groupActions',
 
@@ -285,11 +286,25 @@ export default Service.extend(I18n, {
     const {
       groupManager,
       globalNotify,
-    } = this.getProperties('groupManager', 'globalNotify');
+      currentUser,
+    } = this.getProperties('groupManager', 'globalNotify', 'currentUser');
     return groupManager.removeUserFromGroup(
       get(group, 'entityId'),
       get(user, 'entityId')
-    ).then(() => {
+    ).catch((error) => {
+      if (get(currentUser, 'userId') === get(user, 'entityId')) {
+        return groupManager.leaveGroup(get(group, 'id')).catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+      } else {
+        throw error;
+      }
+    }).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
         groupName: get(group, 'name'),
         userName: get(user, 'name'),
@@ -442,4 +457,6 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
+
+
 });
