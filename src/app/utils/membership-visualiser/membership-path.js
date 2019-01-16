@@ -57,7 +57,7 @@ export default EmberObject.extend({
    */
   names: computed('model.content.@each.name', function names() {
     return (this.get('model.content') || A())
-      .map(x => x ? x : {})
+      .map(x => x || {})
       .mapBy('name');
   }),
 
@@ -65,7 +65,7 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<string>}
    */
   concatenatedNames: computed('names', function concatenatedNames() {
-    return this.get('names').map(n => n ? n : 'undefined').join('-');
+    return this.get('names').map(n => n || '#').join('-');
   }),
 
   /**

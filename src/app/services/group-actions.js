@@ -293,7 +293,14 @@ export default Service.extend(I18n, {
       get(user, 'entityId')
     ).catch((error) => {
       if (get(currentUser, 'userId') === get(user, 'entityId')) {
-        return groupManager.leaveGroup(get(group, 'id'));
+        return groupManager.leaveGroup(get(group, 'id')).catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
       } else {
         throw error;
       }
@@ -450,4 +457,6 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
+
+
 });
