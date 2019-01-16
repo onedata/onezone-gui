@@ -30,13 +30,13 @@ export default _.merge({}, privilegesAspectBase, {
     space_schedule_eviction: 'Schedule eviction',
     space_cancel_eviction: 'Cancel eviction',
 
-    space_invite_user: 'Invite user',
+    space_add_user: 'Add user',
     space_remove_user: 'Remove user',
 
     space_add_group: 'Add group',
     space_remove_group: 'Remove group',
 
-    space_invite_provider: 'Invite provider',
+    space_add_provider: 'Add provider',
     space_remove_provider: 'Remove provider',
   },
   noGroupsStart: 'This space has no groups. To invite a group, ',
