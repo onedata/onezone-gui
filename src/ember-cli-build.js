@@ -1,6 +1,7 @@
 /* eslint-env node */
 'use strict';
 
+var fs = require('fs');
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const defineSassColors = require('./lib/onedata-gui-common/addon/utils/define-sass-colors');
 const defineSassBreakpoints = require(
@@ -62,6 +63,21 @@ module.exports = function (defaults) {
 
   defineSassColors(app, colors);
   defineSassBreakpoints(app, breakpointValues);
+
+  // Generate app-config.json for environment that is used.
+  // Currently app-config.json is always overwritten on build.
+  var onedataAppConfig = {
+    debug: !app.isProduction,
+  };
+  fs.writeFile(
+    'public/app-config.json',
+    JSON.stringify(onedataAppConfig),
+    function (err) {
+      if (err) {
+        return console.error('Error on writing app-config.json: ' + err);
+      }
+    }
+  );
 
   // Use `app.import` to add additional libraries to the generated
   // output files.

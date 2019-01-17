@@ -19,7 +19,7 @@ export default _.merge({}, privilegesAspectBase, {
     group_remove_child: 'Remove child group',
     group_add_parent: 'Add parent group',
     group_leave_parent: 'Leave parent group',
-    group_invite_user: 'Invite user',
+    group_add_user: 'Add user',
     group_remove_user: 'Remove user',
     group_add_space: 'Add space',
     group_leave_space: 'Leave space',
