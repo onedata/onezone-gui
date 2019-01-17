@@ -12,7 +12,9 @@
   "scripts": {
     "build": "ember build",
     "start": "ember server",
-    "test": "ember test"
+    "test": "ember test",
+    "deps": "npm install --no-package-lock && bower install",
+    "clean": "rm -rf tmp dist rel node_modules bower_components .sass-cache tests/test-results.xml"
   },
   "devDependencies": {
     "basictable": "git+https://github.com/kliput/basictable.git#f26107155103dbe7e924a3c9e150022087106cb4",
@@ -76,7 +78,7 @@
     "ember-simple-auth": "1.4.2",
     "ember-sinon": "1.0.1",
     "ember-source": "2.18.2",
-    "ember-spin-button": "git+https://github.com/kliput/ember-spin-button.git#4ff0f820b2eafd00775bc81e408898f657112fd3",
+    "ember-spin-button": "git+https://github.com/kliput/ember-spin-button.git#0b6427903ee7cc5e7ce7115367c66dd94e9e2a2f",
     "ember-spin-spinner": "0.3.3",
     "ember-sticky-element": "0.2.2",
     "ember-truth-helpers": "2.0.0",
@@ -86,6 +88,7 @@
     "loader.js": "4.6.0",
     "perfect-scrollbar": "0.8.1",
     "round10": "1.0.3",
+    "sass": "1.16.0",
     "sinon": "4.2.0",
     "sinon-chai": "2.14.0"
   },

@@ -7,9 +7,6 @@ module.exports = function (environment) {
     environment,
     'rootURL': null,
     'locationType': 'hash',
-    'sassOptions': {
-      implementation: require('node-sass'),
-    },
     'EmberENV': {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
