@@ -8,8 +8,9 @@
  */
 
 import Controller from '@ember/controller';
+import { alias } from '@ember/object/computed';
 
 export default Controller.extend({
-  queryParams: ['redirectUrl'],
-  redirectUrl: null,
+  queryParams: ['redirect_url'],
+  redirectUrl: alias('redirect_url'),
 });
