@@ -30,9 +30,7 @@ export default Component.extend({
     this.redirectToOnepanel(this.get('aspect'));
   },
 
-  // FIXME: the-cluster should be this cluster id when implemented in onepanel
-  redirectToOnepanel(aspect) {
-    window.location =
-      `${this.get('onepanelHref')}#/onedata/clusters/the-cluster/${aspect}`;
+  redirectToOnepanel() {
+    window.location = this.get('onepanelHref');
   },
 });
