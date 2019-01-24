@@ -33,4 +33,10 @@ export default Component.extend(I18n, createDataProxyMixin('token'), {
   fetchToken() {
     return this.get('clusterManager').getOnezoneRegistrationToken();
   },
+
+  actions: {
+    generateToken() {
+      this.updateTokenProxy();
+    },
+  },
 });
