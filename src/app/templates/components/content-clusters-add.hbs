@@ -4,7 +4,7 @@
   text=(tt this "description")
   imagePath="assets/images/cluster-register-provider.svg"
 }}
-  {{#promise-proxy-container proxy=tokenProxy}}
+  {{#promise-proxy-container proxy=tokenProxy absoluteCentered=false}}
     <div class="token-row">
       <textarea class="token-textarea form-control" rows=5>{{token}}</textarea>
       <div class="text-center">

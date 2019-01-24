@@ -13,8 +13,13 @@ import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 
 export default Component.extend(I18n, createDataProxyMixin('token'), {
+  classNames: ['content-clusters-add'],
+
   clusterManager: service(),
 
+  /**
+   * @override
+   */
   i18nPrefix: 'components.contentClustersAdd',
 
   init() {
