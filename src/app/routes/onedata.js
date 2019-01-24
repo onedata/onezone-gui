@@ -18,11 +18,13 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
 
-  model() {
-    const applicationController = this.controllerFor('application');
-    const redirectUrl = get(applicationController, 'redirectUrl');
+  model(params, transition) {
+    const redirectUrl = get(transition, 'queryParams.redirect_url');
     if (redirectUrl) {
-      window.location = redirectUrl;
+      // Only redirect url in actual domain is acceptable (to not redirect
+      // to some external, possibly malicious pages).
+      window.location = window.location.origin + redirectUrl;
+      return new Promise(() => {});
     }
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
