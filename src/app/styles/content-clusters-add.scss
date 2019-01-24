@@ -1,0 +1,10 @@
+.content-clusters-add {
+  .spinner-container {
+    // min-height to hold spinner
+    height: 96px;
+  }
+  .generate-token {
+    margin-top: -5px;
+    margin-bottom: $padding-large-vertical;
+  }
+}
