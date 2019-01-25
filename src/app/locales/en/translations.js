@@ -53,7 +53,6 @@ import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 
 import spaceActions from './services/space-actions';
-import clusterActions from './services/cluster-actions';
 import groupActions from './services/group-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
@@ -117,7 +116,6 @@ let translations = {
     clientTokenActions,
     clientTokenManager,
     spaceActions,
-    clusterActions,
     groupActions,
     privilegeActions,
     guiUtils,
