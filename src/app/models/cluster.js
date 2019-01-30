@@ -22,7 +22,7 @@ export default Model.extend(GraphSingleModelMixin, {
   name: computed('type', 'provider.content.name', function name() {
     if (this.get('type') === 'oneprovider') {
       return this.get('provider.content.name');
-    } else {
+    } else if (this.get('type') === 'onezone') {
       return this.get('onedataConnection.zoneName');
     }
   }),
@@ -30,7 +30,7 @@ export default Model.extend(GraphSingleModelMixin, {
   domain: computed('type', 'provider.content.domain', function domain() {
     if (this.get('type') === 'oneprovider') {
       return this.get('provider.content.domain');
-    } else {
+    } else if (this.get('type') === 'onezone') {
       return this.get('onedataConnection.zoneDomain');
     }
   }),
