@@ -58,6 +58,6 @@ export default Component.extend(I18n, {
 
     const _window = this.get('_window');
 
-    _window.location = `/op/${clusterId}/i/#/${path}`;
+    _window.location = `/op/${clusterId}/i#/${path}`;
   },
 });

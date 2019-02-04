@@ -44,7 +44,7 @@ describe('Integration | Component | content provider redirect', function () {
       },
     };
     const onezoneServer = lookupService(this, 'onezone-server');
-    const url = '/op/12345/i/#/';
+    const url = '/op/12345/i#/';
     const getProviderRedirectUrl = sinon.stub(
       onezoneServer,
       'getProviderRedirectUrl'
