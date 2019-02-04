@@ -264,23 +264,26 @@ function createLinkedAccount(store) {
 
 function createClusterRecords(store) {
   return Promise.all([{
+      id: 'onezone',
       type: 'onezone',
       name: 'PL-Grid',
-      serviceId: 'dsijfodhf9dehyucdf9s0yf8de9f',
+      serviceId: 'onezone',
       domain: 'onedata.plgrid.pl',
       onepanelProxy: true,
     },
     {
+      id: 'oneprovider-1',
       type: 'oneprovider',
       name: 'Cyfronet',
-      serviceId: 'dsjfu9etwr34r5478rt42r5246f',
+      serviceId: 'service-oneprovider-1',
       domain: 'oneprovider.cyfronet.pl',
       onepanelProxy: false,
     },
     {
+      id: 'oneprovider-1',
       type: 'oneprovider',
       name: 'PCSS',
-      serviceId: 'dd2kmofieryt78r32783r443e9f',
+      serviceId: 'service-oneprovider-1',
       domain: 'oneprovider.pcss.pl',
       onepanelProxy: true,
     },
