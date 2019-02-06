@@ -479,12 +479,12 @@ export default Component.extend(I18n, {
       entityType,
       entityId,
     } = getProperties(this.get('contextRecord'), 'entityType', 'entityId');
-    const targetEntityType = this.get('targetRecord.entityType');
+    const parsedRecordGri = parseGri(recordGri);
     let aspectType = entityType;
-    if (entityType === 'group' && targetEntityType === 'group') {
+    if (entityType === 'group' && get(parsedRecordGri, 'entityType') === 'group') {
       aspectType = 'child';
     }
-    return gri(_.assign(parseGri(recordGri), {
+    return gri(_.assign(parsedRecordGri, {
       aspect: `eff_${aspectType}_membership`,
       aspectId: entityId,
       scope: 'private',
