@@ -15,14 +15,14 @@ import { get } from '@ember/object';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   developmentModelConfig: Object.freeze({
-    // FIXME: development mode
     clearOnReload: false,
   }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
 
   beforeModel(transition) {
-    this._super(...arguments);
+    const result = this._super(...arguments);
     this.set('navigationState.queryParams', get(transition, 'queryParams'));
+    return result;
   },
 });
