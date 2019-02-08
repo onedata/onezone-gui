@@ -18,7 +18,7 @@
 </div>
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
-  <ul class="indented-row linked-accounts-list">`
+  <ul class="indented-row linked-accounts-list">
     {{#promise-proxy-container proxy=linkedAccountsProxy}}
       {{#each accountsInfo as |accountInfo|}}
         <li class="linked-account full-social-icon content-row {{accountInfo.account.idp}}-account">
