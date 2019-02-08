@@ -280,10 +280,10 @@ function createClusterRecords(store) {
       onepanelProxy: false,
     },
     {
-      id: 'oneprovider-1',
+      id: 'oneprovider-2',
       type: 'oneprovider',
       name: 'PCSS',
-      serviceId: 'service-oneprovider-1',
+      serviceId: 'service-oneprovider-2',
       domain: 'oneprovider.pcss.pl',
       onepanelProxy: true,
     },
