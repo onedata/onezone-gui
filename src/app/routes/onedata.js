@@ -17,6 +17,15 @@ import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentic
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
+  globalGuiResources: service(),
+
+  beforeModel() {
+    const result = this._super(...arguments);
+
+    this.get('globalGuiResources').initializeGlobalObject();
+    
+    return result;
+  },
 
   model(params, transition) {
     const redirectUrl = get(transition, 'queryParams.redirect_url');
