@@ -59,4 +59,8 @@ export default OnedataSidebarContentRoute.extend(RedirectRoute, {
   checkComeFromOtherRoute(currentHash) {
     return !/\/onedata\/clusters\/.+?\/.+/.test(currentHash);
   },
+
+  beforeModel() {
+    return this._super(...arguments);
+  },
 });
