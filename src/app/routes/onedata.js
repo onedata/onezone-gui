@@ -21,10 +21,12 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   model(params, transition) {
     const redirectUrl = get(transition, 'queryParams.redirect_url');
     if (redirectUrl) {
-      // Only redirect url in actual domain is acceptable (to not redirect
-      // to some external, possibly malicious pages).
-      window.location = window.location.origin + redirectUrl;
-      return new Promise(() => {});
+      return new Promise(() => {
+        sessionStorage.setItem('redirectFromOnezone', true);
+        // Only redirect url in actual domain is acceptable (to not redirect
+        // to some external, possibly malicious pages).
+        window.location = window.location.origin + redirectUrl;
+      });
     }
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
