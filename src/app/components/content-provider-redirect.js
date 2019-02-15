@@ -60,7 +60,7 @@ export default Component.extend(I18n, {
    * @returns {Promise<boolean>}
    */
   checkIsProviderAvailable() {
-    return checkImg(`https://${this.get('provider.domain')}/assets/images/dir.png`);
+    return checkImg(`https://${this.get('provider.domain')}/favicon.ico`);
   },
 
   _goToProvider(spaceId) {

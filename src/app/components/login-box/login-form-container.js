@@ -132,19 +132,6 @@ export default LoginFormConainer.extend(I18n, {
     }
   }),
 
-  // FIXME: use of this flag is temporary, cookie maybe?
-  authFor: computed('navigationState.queryParams.auth_for', function authFor() {
-    return this.get('navigationState.queryParams.auth_for');
-  }),
-
-  authForName: computed('authFor', function authForName() {
-    return this.get('authFor').split(';')[0];
-  }),
-
-  authForHostname: computed('authFor', function authForHostname() {
-    return this.get('authFor').split(';')[1];
-  }),
-
   /**
    * Powerselect item matcher used by its search engine.
    * @param {AuthorizerInfo} authorizer 
