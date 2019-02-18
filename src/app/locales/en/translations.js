@@ -7,6 +7,7 @@ import clusters from './tabs/clusters';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
+import harvesters from './tabs/harvesters';
 import users from './tabs/users';
 
 import loginBox from './components/login-box';
@@ -67,6 +68,7 @@ let translations = {
     groups,
     users,
     clusters,
+    harvesters,
   },
   components: {
     loginBox,

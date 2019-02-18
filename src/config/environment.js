@@ -31,6 +31,7 @@ module.exports = function (environment) {
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
       { id: 'clusters', icon: 'cluster', defaultAspect: 'overview', allowIndex: false },
+      { id: 'harvesters', icon: 'folder', defaultAspect: 'plugin' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
