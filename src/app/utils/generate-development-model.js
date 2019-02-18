@@ -12,8 +12,8 @@ import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise } from 'rsvp';
-import { get } from '@ember/object';
+import { Promise, resolve } from 'rsvp';
+import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -84,8 +84,9 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all([providers, spaces])
-        .then(([providerList, spaceList]) =>
+      const clusters = listRecords[types.indexOf('cluster')].get('list');
+      return Promise.all([providers, spaces, clusters])
+        .then(([providerList, spaceList, clusterList]) =>
           Promise.all(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
@@ -96,6 +97,18 @@ export default function generateDevelopmentModel(store) {
               return space.save();
             });
           }))
+          .then(() => Promise.all(clusterList.map(cluster => {
+            if (get(cluster, 'type') === 'oneprovider') {
+              set(
+                cluster,
+                'provider',
+                providerList.findBy('entityId', get(cluster, 'entityId'))
+              );
+              return cluster.save();
+            } else {
+              return resolve();
+            }
+          })))
         )
         .then(() => listRecords);
     })
@@ -205,13 +218,17 @@ function createListRecord(store, type, records) {
 function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
+    const providerId = `oneprovider-${index + 1}`;
+    const id = `provider.${providerId}.instance:protected`;
     return store.createRecord('provider', {
+      id,
+      gri: id,
       name: `Provider ${index}`,
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
-      online: [true, false][index % 2],
-      host: `10.0.0.${index + 1}`,
+      online: [true, false][index % 3],
+      host: `${providerId}.local-onedata.org`,
     }).save();
   }));
 }
@@ -264,28 +281,48 @@ function createLinkedAccount(store) {
 
 function createClusterRecords(store) {
   return Promise.all([{
-      id: 'onezone',
+      id: 'cluster.onezone.instance:protected',
+      gri: 'cluster.onezone.instance:protected',
+      build: 'lol',
+      version: '19.02.0',
       type: 'onezone',
       name: 'PL-Grid',
-      serviceId: 'onezone',
-      domain: 'onedata.plgrid.pl',
       onepanelProxy: true,
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
     },
     {
-      id: 'oneprovider-1',
+      id: 'cluster.oneprovider-1.instance:protected',
+      gri: 'cluster.oneprovider-1.instance:protected',
+      build: 'lol1',
+      version: '19.02.0',
       type: 'oneprovider',
       name: 'Cyfronet',
-      serviceId: 'service-oneprovider-1',
-      domain: 'oneprovider.cyfronet.pl',
       onepanelProxy: false,
+      provider: 'provider.oneprovider-1.instance:protected',
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
     },
     {
-      id: 'oneprovider-2',
+      id: 'cluster.oneprovider-2.instance:protected',
+      gri: 'cluster.oneprovider-2.instance:protected',
+      build: 'lol2',
+      version: '19.02.0',
       type: 'oneprovider',
       name: 'PCSS',
-      serviceId: 'service-oneprovider-2',
-      domain: 'oneprovider.pcss.pl',
       onepanelProxy: true,
+      provider: 'provider.oneprovider-2.instance:protected',
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
     },
   ].map(c => store.createRecord('cluster', c).save()));
 }

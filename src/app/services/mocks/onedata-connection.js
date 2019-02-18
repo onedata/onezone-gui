@@ -12,6 +12,8 @@ import OnedataConnection from 'onedata-gui-websocket-client/services/mocks/oneda
 
 export default OnedataConnection.extend({
   zoneName: 'Hello world',
+  zoneDomain: location.hostname,
+  serviceVersion: '19.02.9',
   brandSubtitle: 'Isolated zone',
   loginNotification: '',
 });
