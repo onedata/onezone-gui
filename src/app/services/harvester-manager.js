@@ -58,7 +58,7 @@ export default Service.extend({
         aspect: 'query',
         scope: 'private',
       }),
-      operation: 'get',
+      operation: 'create',
       data: requestData,
       subscribe: false,
     });

@@ -32,7 +32,7 @@ export default Service.extend({
         'activeResourceType',
         'activeResourceId'
       );
-      if (activeResourceType === 'harvester' && activeResourceId) {
+      if (activeResourceType === 'harvesters' && activeResourceId) {
         return activeResourceId;
       }
     }
