@@ -52,6 +52,7 @@ import membershipVisualiser from './components/membership-visualiser';
 import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
+import sidebarHarvesters from './components/sidebar-harvesters';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -113,6 +114,7 @@ let translations = {
     resourceInfoTile,
     resourceMembersTile,
     resourceMembershipTile,
+    sidebarHarvesters,
   },
   services: {
     clientTokenActions,

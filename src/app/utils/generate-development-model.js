@@ -27,9 +27,10 @@ const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
+const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
-const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster'];
+const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster', 'harvester'];
 const names = ['one', 'two', 'three'];
 
 const privileges = {
@@ -186,6 +187,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createLinkedAccount(store, additionalInfo);
     case 'cluster':
       return createClusterRecords(store, additionalInfo);
+    case 'harvester':
+      return createHarvesterRecords(store, additionalInfo);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -288,6 +291,24 @@ function createClusterRecords(store) {
       onepanelProxy: true,
     },
   ].map(c => store.createRecord('cluster', c).save()));
+}
+
+function createHarvesterRecords(store) {
+  return Promise.all(_.range(NUMBER_OF_HARVESTERS).map((index) => {
+    return store.createRecord('harvester', {
+      name: `Harvester ${index}`,
+      scope: 'private',
+      endpoint: '127.0.0.1:9300',
+      directMembership: true,
+      canViewPrivileges: true,
+      config: {
+        pluginPath: '/harvesters/h1/index.html',
+      },
+      info: {
+        creationTime: 1540995468,
+      },
+    }).save();
+  }));
 }
 
 function createSharedUsersRecords(store) {

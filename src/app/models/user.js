@@ -1,7 +1,7 @@
 /**
  * @module models/user
- * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -37,6 +37,7 @@ export default Model.extend(GraphSingleModelMixin, {
   clientTokenList: belongsTo('clientTokenList'),
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
+  harvesterList: belongsTo('harvesterList'),
 
   //#region Non-store User operations
 

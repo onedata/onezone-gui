@@ -2,7 +2,7 @@
  * Defines oprations related to harvester management.
  * 
  * @module services/harvester-manager
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -13,6 +13,27 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   onedataGraph: service(),
+  currentUser: service(),
+  store: service(),
+
+  /**
+   * Fetches collection of all harvesters
+   * @returns {Promise<DS.RecordArray<Harvester>>}
+   */
+  getHarvesters() {
+    return this.get('currentUser')
+      .getCurrentUserRecord()
+      .then(user => user.get('harvesterList'));
+  },
+
+  /**
+   * Returns harvester with specified id
+   * @param {string} id
+   * @return {Promise<Harvester>}
+   */
+  getRecord(id) {
+    return this.get('store').findRecord('harvester', id);
+  },
 
   /**
    * Performs request to elasticsearch
