@@ -50,6 +50,10 @@ export default TwoLevelSidebar.extend(I18n, {
       label: this.t('aspects.plugin'),
       icon: 'overview',
     }, {
+      id: 'config',
+      label: this.t('aspects.config'),
+      icon: 'settings',
+    }, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',

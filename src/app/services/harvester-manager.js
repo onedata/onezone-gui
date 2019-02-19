@@ -95,10 +95,15 @@ export default Service.extend({
   /**
    * Gets harvester configuration
    * @param {string} harvesterId
-   * @returns {Promise<Object>}
+   * @returns {Promise<HarvesterConfiguration>}
    */
-  getConfig(/* harvesterId */) {
-    // FIXME: implement
-    throw new Error('getConfig() is not implemented');
+  getConfig(harvesterId) {
+    const store = this.get('store');
+    return store.findRecord('harvesterConfiguration', gri({
+      entityType: 'harvester',
+      entityId: harvesterId,
+      aspect: 'config',
+      scope: 'private',
+    }));
   },
 });

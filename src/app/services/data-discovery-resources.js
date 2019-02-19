@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { getProperties, computed } from '@ember/object';
+import { get, getProperties, computed } from '@ember/object';
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { reject } from 'rsvp';
@@ -66,9 +66,8 @@ export default Service.extend({
     if (!harvesterId) {
       return reject('Harvester ID is not specified.');
     } else {
-      // FIXME return parts of the configuration, that should be consumed by
-      // plugin, not the whole config
-      return harvesterManager.getConfig(harvesterId);
+      return harvesterManager.getConfig(harvesterId)
+        .then(config => get(config, 'configuration.guiPluginConfig'));
     }
   },
 });
