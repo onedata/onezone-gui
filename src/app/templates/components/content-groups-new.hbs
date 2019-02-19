@@ -15,7 +15,6 @@
         value={{groupName}}
         oninput={{action (mut groupName) value="target.value"}}
         onkeydown={{invoke-on-enter contentInfo.buttonAction}}
-        disabled={{isWorking}}
         placeholder={{tt this "groupName"}}
         disabled={{contentInfo.actionInProgress}}
         class="form-control new-group-name"

@@ -24,6 +24,7 @@ export default SidebarResources.extend({
   groupActions: inject(),
   clusterManager: inject(),
   harvesterManager: inject(),
+  harvesterActions: inject(),
 
   /**
    * @param {string} type
@@ -67,6 +68,8 @@ export default SidebarResources.extend({
         return this.get('spaceActions.buttons');
       case 'groups':
         return this.get('groupActions.buttons');
+      case 'harvesters':
+        return this.get('harvesterActions.buttons');
       default:
         return [];
     }

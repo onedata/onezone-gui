@@ -53,12 +53,14 @@ import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 import sidebarHarvesters from './components/sidebar-harvesters';
+import contentHarvestersNew from './components/content-harvesters-new';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
+import harvesterActions from './services/harvester-actions';
 import guiUtils from './services/gui-utils';
 
 let translations = {
@@ -115,6 +117,7 @@ let translations = {
     resourceMembersTile,
     resourceMembershipTile,
     sidebarHarvesters,
+    contentHarvestersNew,
   },
   services: {
     clientTokenActions,
@@ -122,6 +125,7 @@ let translations = {
     spaceActions,
     groupActions,
     privilegeActions,
+    harvesterActions,
     guiUtils,
   },
 };

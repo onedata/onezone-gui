@@ -15,7 +15,6 @@
         value={{spaceName}}
         oninput={{action (mut spaceName) value="target.value"}}
         onkeydown={{invoke-on-enter contentInfo.buttonAction}}
-        disabled={{isWorking}}
         placeholder={{tt this "spaceName"}}
         disabled={{contentInfo.actionInProgress}}
         class="form-control new-space-name"

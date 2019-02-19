@@ -29,7 +29,7 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
-  firstLevelItemIcon: 'group',
+  firstLevelItemIcon: 'light-bulb',
 
   /**
    * @override
