@@ -11,6 +11,8 @@ import Service, { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { next } from '@ember/runloop';
+import $ from 'jquery';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -42,4 +44,45 @@ export default Service.extend(I18n, {
       action: () => router.transitionTo('onedata.sidebar.content', 'harvesters', 'new'),
     };
   }),
+
+  /**
+   * Creates new harvester
+   * @returns {Promise} A promise, which resolves to new harvester if it has
+   * been created successfully.
+   */
+  createHarvester({ name, endpoint }) {
+    const {
+      globalNotify,
+      harvesterManager,
+      router,
+      guiUtils,
+    } = this.getProperties(
+      'globalNotify',
+      'harvesterManager',
+      'router',
+      'guiUtils'
+    );
+    return harvesterManager.createRecord({
+      name,
+      endpoint,
+    }).then(harvester => {
+      globalNotify.success(this.t('harvesterCreateSuccess'));
+      next(() =>
+        router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          'harvesters',
+          guiUtils.getRoutableIdFor(harvester),
+          'index',
+        ).then(() => {
+          const sidebarContainer = $('.col-sidebar');
+          $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+            sidebarContainer[0].clientHeight);
+        })
+      );
+      return harvester;
+    }).catch(error => {
+      globalNotify.backendError(this.t('harvesterCreation'), error);
+      throw error;
+    });
+  },
 });

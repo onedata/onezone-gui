@@ -7,8 +7,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service from '@ember/service';
-import { inject as service } from '@ember/service';
+import Service, { inject as service } from '@ember/service';
+import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
@@ -33,6 +33,34 @@ export default Service.extend({
    */
   getRecord(id) {
     return this.get('store').findRecord('harvester', id);
+  },
+
+  /**
+   * Creates new harvester
+   * @returns {Promise<Harvester>}
+   */
+  createRecord({ name, endpoint }) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => {
+        return this.get('store').createRecord('harvester', {
+            name,
+            endpoint,
+            _meta: {
+              authHint: ['asUser', get(user, 'entityId')],
+            },
+          })
+          .save()
+          .then(harvester => this.reloadList().then(() => harvester));
+      });
+  },
+
+  /**
+   * Reloads harvester list
+   * @returns {Promise<HarvesterList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('harvesterList').reload(true));
   },
 
   /**

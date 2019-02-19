@@ -40,7 +40,7 @@ export default Component.extend(I18n, {
         harvesterName,
         elasticsearchEndpoint,
         harvesterActions,
-      } = this.getProperties('groupName', 'groupActions');
+      } = this.getProperties('groupName', 'groupActions', 'harvesterActions');
       return harvesterActions.createHarvester({
         name: harvesterName,
         endpoint: elasticsearchEndpoint,
