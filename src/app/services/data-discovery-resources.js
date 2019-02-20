@@ -67,7 +67,7 @@ export default Service.extend({
       return reject('Harvester ID is not specified.');
     } else {
       return harvesterManager.getConfig(harvesterId)
-        .then(config => get(config, 'configuration.guiPluginConfig'));
+        .then(config => get(config, 'configuration'));
     }
   },
 });

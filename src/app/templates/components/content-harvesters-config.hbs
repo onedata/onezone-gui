@@ -5,3 +5,14 @@
     </span>
   </h1>
 </div>
+<div class="row content-row">
+  {{#promise-proxy-container proxy=harvesterConfigRecord}}
+    {{json-editor value=harvesterConfig onChange=(action "onConfigChange")}}
+    {{#one-spin-button
+      disabled=(or (not isHarvesterConfigModified) (not isHarvesterConfigValid))
+      class="btn btn-primary"
+      action=(action "onSave")}}
+      {{tt this "save"}}
+    {{/one-spin-button}}
+  {{/promise-proxy-container}}
+</div>

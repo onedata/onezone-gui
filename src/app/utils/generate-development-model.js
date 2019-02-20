@@ -336,15 +336,42 @@ function createHarvesterRecords(store) {
       name: `Harvester ${index}`,
       scope: 'private',
       endpoint: '127.0.0.1:9300',
+      guiPluginPath: '/harvesters/h1/index.html',
       directMembership: true,
       canViewPrivileges: true,
-      config: {
-        pluginPath: '/harvesters/h1/index.html',
-      },
       info: {
         creationTime: 1540995468,
       },
-    }).save();
+    }).save().then(record => 
+      store.createRecord('harvesterConfiguration', {
+        id: gri({
+          entityType: 'harvester',
+          entityId: get(record, 'entityId'),
+          aspect: 'config',
+          scope: 'private',
+        }),
+        configuration: {
+          typeMapping: [
+            { id: 'type0', name: 'Type 0' },
+            { id: 'type1', name: 'Type 1' },
+            { id: 'type2', name: 'Type 2' },
+            { id: 'type3', name: 'Type 3' },
+            { id: 'type4', name: 'Type 4' },
+            { id: 'type5', name: 'Type 5' },
+          ],
+          accessTypeMapping: [
+            { id: 0, name: 'Public' },
+            { id: 1, name: 'Private' },
+          ],
+          publisherMapping: [
+            { id: 'publisher0', name: 'Publisher 0' },
+            { id: 'publisher1', name: 'Publisher 1' },
+            { id: 'publisher2', name: 'Publisher 2' },
+            { id: 'publisher3', name: 'Publisher 3' },
+          ],
+        },
+      }).save().then(() => record)
+    );
   }));
 }
 

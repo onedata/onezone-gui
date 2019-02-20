@@ -10,6 +10,7 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { Promise } from 'rsvp';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -72,23 +73,31 @@ export default Service.extend({
    * @returns {Promise<any>} request result
    */
   esRequest(harvesterId, method, path, body) {
-    const onedataGraph = this.get('onedataGraph');
+    // const onedataGraph = this.get('onedataGraph');
 
-    const requestData = {
-      method,
-      path,
-      body,
-    };
-    return onedataGraph.request({
-      gri: gri({
-        entityType: 'harvester',
-        entityId: harvesterId,
-        aspect: 'query',
-        scope: 'private',
-      }),
-      operation: 'create',
-      data: requestData,
-      subscribe: false,
+    // const requestData = {
+    //   method,
+    //   path,
+    //   body,
+    // };
+    // return onedataGraph.request({
+    //   gri: gri({
+    //     entityType: 'harvester',
+    //     entityId: harvesterId,
+    //     aspect: 'query',
+    //     scope: 'private',
+    //   }),
+    //   operation: 'create',
+    //   data: requestData,
+    //   subscribe: false,
+    // });
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        method,
+        url: 'http://localhost:9200' + path,
+        data: body,
+        contentType: 'application/json; charset=UTF-8',
+      }).then(resolve, reject);
     });
   },
 

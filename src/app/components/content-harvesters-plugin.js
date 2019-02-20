@@ -23,5 +23,5 @@ export default Component.extend({
    * Relative path to plugin application
    * @type {Ember.ComputedProperty<string>}
    */
-  pluginPath: reads('harvester.config.pluginPath'),
+  pluginPath: reads('harvester.guiPluginPath'),
 });
