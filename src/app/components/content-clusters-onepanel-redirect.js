@@ -9,6 +9,8 @@ export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
 
   globalNotify: service(),
+  i18n: service(),
+  alert: service(),
 
   /**
    * @virtual
@@ -37,16 +39,22 @@ export default Component.extend({
   }),
 
   redirectToOnepanel() {
-    return checkImg(`https://${this.get('cluster.domain')}:9443/favicon.ico`)
+    const origin = `https://${this.get('cluster.domain')}:9443`;
+    return checkImg(`${origin}/favicon.ico`)
       .then(isAvailable => {
         if (isAvailable) {
           window.location = this.get('onepanelHref');
         } else {
-          // FIXME: design of not available domain and text
-          this.get('globalNotify').backendError('reading cluster endpoint');
-          throw new Error(
-            'Selected cluster domain is not available for your web browser.'
-          );
+          const i18n = this.get('i18n');
+          this.get('alert').error(null, {
+            componentName: 'alerts/endpoint-error',
+            header: i18n.t('components.alerts.endpointError.headerPrefix') +
+              ' ' +
+              i18n.t('components.alerts.endpointError.onepanel'),
+            url: origin,
+            serverType: 'onepanel',
+          });
+          throw { type: 'endpoint-error' };
         }
       });
   },

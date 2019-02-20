@@ -21,6 +21,9 @@ export default Component.extend(I18n, {
 
   onezoneServer: service(),
   globalNotify: service(),
+  i18n: service(),
+  alert: service(),
+  router: service(),
 
   /**
    * @override 
@@ -56,11 +59,15 @@ export default Component.extend(I18n, {
     });
   }),
 
+  oneproviderOrigin: computed('provider.domain', function oneproviderOrigin() {
+    return `https://${this.get('provider.domain')}`;
+  }),
+
   /**
    * @returns {Promise<boolean>}
    */
   checkIsProviderAvailable() {
-    return checkImg(`https://${this.get('provider.domain')}/favicon.ico`);
+    return checkImg(`${this.get('oneproviderOrigin')}/favicon.ico`);
   },
 
   _goToProvider(spaceId) {
@@ -73,11 +80,18 @@ export default Component.extend(I18n, {
           const _window = this.get('_window');
           _window.location = `/op/${clusterId}/i#/${path}`;
         } else {
-          // FIXME: design of not available domain and text
-          this.get('globalNotify').backendError('reading Oneprovider endpoint');
-          throw new Error(
-            'Selected Oneprovider domain is not available for your web browser.'
-          );
+          const i18n = this.get('i18n');
+          this.get('alert').error(null, {
+            componentName: 'alerts/endpoint-error',
+            header: i18n.t('components.alerts.endpointError.headerPrefix') +
+              ' ' +
+              i18n.t('components.alerts.endpointError.onepanel'),
+            url: this.get('oneproviderOrigin'),
+            serverType: 'oneprovider',
+          });
+          // FIXME: should redirect to providers map
+          this.get('router').transitionTo('onedata.sidebar', 'data');
+          throw { type: 'endpoint-error' };
         }
       });
   },
