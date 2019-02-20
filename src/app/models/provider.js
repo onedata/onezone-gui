@@ -20,7 +20,6 @@ export default Model.extend(GraphSingleModelMixin, {
   // TODO: add array transform
   // urls: attr('array'),
   // clientName: attr('string'),
-  redirectionPoint: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),

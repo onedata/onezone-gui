@@ -6,7 +6,7 @@ import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 
 const OnezoneServerStub = Service.extend({
   getProviderRedirectUrl() {
@@ -51,8 +51,10 @@ describe('Integration | Component | content provider redirect', function () {
     ).returns(Promise.resolve({ url }));
     const fakeWindow = {};
     this.setProperties({ provider, fakeWindow });
+    this.on('checkIsProviderAvailable', () => resolve(true));
 
-    this.render(hbs `{{content-provider-redirect 
+    this.render(hbs `{{content-provider-redirect
+      checkIsProviderAvailable=(action "checkIsProviderAvailable")
       provider=provider
       _window=fakeWindow
     }}`);

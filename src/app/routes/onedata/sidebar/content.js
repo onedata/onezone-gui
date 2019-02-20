@@ -5,7 +5,7 @@
  *
  * @module routes/onedata/sidebar/content
  * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,7 @@ import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sideba
 import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
+import RedirectRoute from 'onedata-gui-common/mixins/routes/redirect';
 
 /**
  * Finds GRI in griIds using pure entityId.
@@ -32,7 +33,7 @@ function findGri(griIds, entityId) {
   return recordId;
 }
 
-export default OnedataSidebarContentRoute.extend({
+export default OnedataSidebarContentRoute.extend(RedirectRoute, {
   /**
    * @override
    */
@@ -41,5 +42,25 @@ export default OnedataSidebarContentRoute.extend({
       collection.hasMany('list').ids() :
       get(collection, 'list').map(record => get(record, 'id'));
     return findGri(griIds, resourceId);
+  },
+
+  /**
+   * @override
+   */
+  isRedirectingTransition(transition) {
+    const params = get(transition, 'params');
+    const sidebarParams = params['onedata.sidebar'];
+    return Boolean(sidebarParams && sidebarParams.type === 'clusters');
+  },
+
+  /**
+   * @override 
+   */
+  checkComeFromOtherRoute(currentHash) {
+    return !/\/onedata\/clusters\/.+?\/.+/.test(currentHash);
+  },
+
+  beforeModel() {
+    return this._super(...arguments);
   },
 });

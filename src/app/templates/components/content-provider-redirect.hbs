@@ -6,7 +6,7 @@
     class="md"
   }}
 {{else}}
-  {{loading-container isLoading=true absoluteCentered=true}}
+  {{promise-proxy-container proxy=goToProviderProxy absoluteCentered=true}}
 {{/if}}
 
 {{yield}}

@@ -4,7 +4,7 @@
  * record
  * @module onezone-gui/routes/onedata
  * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -30,10 +30,12 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   model(params, transition) {
     const redirectUrl = get(transition, 'queryParams.redirect_url');
     if (redirectUrl) {
-      // Only redirect url in actual domain is acceptable (to not redirect
-      // to some external, possibly malicious pages).
-      window.location = window.location.origin + redirectUrl;
-      return new Promise(() => {});
+      return new Promise(() => {
+        sessionStorage.setItem('redirectFromOnezone', 'true');
+        // Only redirect url in actual domain is acceptable (to not redirect
+        // to some external, possibly malicious pages).
+        window.location = window.location.origin + redirectUrl;
+      });
     }
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
