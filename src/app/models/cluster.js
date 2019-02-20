@@ -9,35 +9,51 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { computed } from '@ember/object';
+import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
+import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
+import { resolve } from 'rsvp';
 
-export default Model.extend(GraphSingleModelMixin, {
-  onedataConnection: service(),
+export default Model.extend(
+  GraphSingleModelMixin,
+  createDataProxyMixin('name'),
+  createDataProxyMixin('domain'), {
+    onedataConnection: service(),
 
-  type: attr('string'),
-  provider: belongsTo('provider'),
-  onepanelProxy: attr('boolean'),
+    type: attr('string'),
+    provider: belongsTo('provider'),
+    onepanelProxy: attr('boolean'),
 
-  name: computed('type', 'provider.content.name', function name() {
-    if (this.get('type') === 'oneprovider') {
-      return this.get('provider.content.name');
-    } else if (this.get('type') === 'onezone') {
-      return this.get('onedataConnection.zoneName');
-    }
-  }),
+    /**
+     * @override
+     */
+    fetchName() {
+      if (this.get('type') === 'oneprovider') {
+        return this.get('provider')
+          .then(provider => get(provider, 'name'));
+      } else {
+        return resolve(this.get('onedataConnection.zoneName'));
+      }
+    },
 
-  domain: computed('type', 'provider.content.domain', function domain() {
-    if (this.get('type') === 'oneprovider') {
-      return this.get('provider.content.domain');
-    } else if (this.get('type') === 'onezone') {
-      return this.get('onedataConnection.zoneDomain');
-    }
-  }),
+    /**
+     * @override
+     */
+    fetchDomain() {
+      if (this.get('type') === 'oneprovider') {
+        return this.get('provider')
+          .then(provider => get(provider, 'domain'));
+      } else {
+        return resolve(this.get('onedataConnection.zoneDomain'));
+      }
+    },
 
-  init() {
-    this._super(...arguments);
-    // force get provider to have fields like name and domain
-    this.get('provider');
-  },
-});
+    init() {
+      this._super(...arguments);
+      this.on('didLoad', () => {
+        this.updateNameProxy();
+        this.updateDomainProxy();
+      });
+    },
+  }
+);

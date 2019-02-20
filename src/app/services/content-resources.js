@@ -29,7 +29,14 @@ export default Service.extend({
       case 'data':
         return this.get('providerManager').getRecord(id);
       case 'clusters':
-        return this.get('clusterManager').getRecord(id);
+        // cluster record is ready, when we have domain and name resolved
+        return this.get('clusterManager').getRecord(id)
+          .then(cluster => {
+            return Promise.all([
+              cluster.updateDomainProxy(),
+              cluster.updateNameProxy(),
+            ]).then(() => cluster);
+          });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':
