@@ -10,6 +10,14 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { Promise } from 'rsvp';
+
+function loadClusterRecord(cluster) {
+  return Promise.all([
+    cluster.updateDomainProxy(),
+    cluster.updateNameProxy(),
+  ]).then(() => cluster);
+}
 
 export default Service.extend({
   currentUser: service(),
@@ -22,7 +30,8 @@ export default Service.extend({
   },
 
   getRecord(id) {
-    return this.get('store').findRecord('cluster', id);
+    return this.get('store').findRecord('cluster', id)
+      .then(cluster => loadClusterRecord(cluster));
   },
 
   getOnezoneRegistrationToken() {

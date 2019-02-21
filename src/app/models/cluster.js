@@ -9,7 +9,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { get } from '@ember/object';
+import { get, observer } from '@ember/object';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { resolve } from 'rsvp';
@@ -48,12 +48,24 @@ export default Model.extend(
       }
     },
 
+    reloadProviderProperties: observer('provider.{name,domain}', function reloadProviderProperties() {
+      this.loadAsyncProperties();
+    }),
+
     init() {
       this._super(...arguments);
-      this.on('didLoad', () => {
-        this.updateNameProxy();
-        this.updateDomainProxy();
-      });
+      if (this.get('isLoaded')) {
+        this.reloadProviderProperties();
+      } else {
+        this.on('didLoad', () => {
+          this.reloadProviderProperties();
+        });
+      }
+    },
+
+    loadAsyncProperties() {
+      this.updateNameProxy();
+      this.updateDomainProxy();
     },
   }
 );

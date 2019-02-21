@@ -3,7 +3,7 @@
  *
  * @module services/content-resources
  * @author Jakub Liput
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -30,13 +30,7 @@ export default Service.extend({
         return this.get('providerManager').getRecord(id);
       case 'clusters':
         // cluster record is ready, when we have domain and name resolved
-        return this.get('clusterManager').getRecord(id)
-          .then(cluster => {
-            return Promise.all([
-              cluster.updateDomainProxy(),
-              cluster.updateNameProxy(),
-            ]).then(() => cluster);
-          });
+        return this.get('clusterManager').getRecord(id);
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':
