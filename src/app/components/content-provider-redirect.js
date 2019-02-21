@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -71,12 +71,13 @@ export default Component.extend(I18n, {
   },
 
   _goToProvider(spaceId) {
+    const provider = this.get('provider');
     return this.checkIsProviderAvailable()
       .then(isAvailable => {
         if (isAvailable) {
           const path = spaceId ? `onedata/data/${spaceId}` : '';
           const clusterId =
-            parseGri(this.get('provider').belongsTo('cluster').id()).entityId;
+            parseGri(provider.belongsTo('cluster').id()).entityId;
           const _window = this.get('_window');
           _window.location = `/op/${clusterId}/i#/${path}`;
         } else {
@@ -90,8 +91,12 @@ export default Component.extend(I18n, {
             serverType: 'oneprovider',
           });
           // FIXME: should redirect to providers map
-          this.get('router').transitionTo('onedata.sidebar', 'data');
-          throw { type: 'endpoint-error' };
+          this.get('router').transitionTo(
+            'onedata.sidebar.content',
+            'data',
+            get(provider, 'entityId')
+          );
+          throw { isOnedataCustomError: true, type: 'endpoint-error' };
         }
       });
   },
