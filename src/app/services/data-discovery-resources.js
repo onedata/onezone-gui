@@ -22,18 +22,18 @@ export default Service.extend({
    * @type {Ember.ComputedProperty<string|undefined>}
    */
   harvesterId: computed(
-    'navigationState.{activeResourceType,activeResourceId}',
+    'navigationState.{activeResourceType,activeResource}',
     function harvesterId() {
       const {
         activeResourceType,
-        activeResourceId,
+        activeResource,
       } = getProperties(
         this.get('navigationState'),
         'activeResourceType',
-        'activeResourceId'
+        'activeResource'
       );
-      if (activeResourceType === 'harvesters' && activeResourceId) {
-        return activeResourceId;
+      if (activeResourceType === 'harvesters' && activeResource) {
+        return get(activeResource, 'entityId');
       }
     }
   ),

@@ -352,22 +352,22 @@ function createHarvesterRecords(store) {
         }),
         configuration: {
           typeMapping: [
-            { id: 'type0', name: 'Type 0' },
-            { id: 'type1', name: 'Type 1' },
-            { id: 'type2', name: 'Type 2' },
-            { id: 'type3', name: 'Type 3' },
-            { id: 'type4', name: 'Type 4' },
-            { id: 'type5', name: 'Type 5' },
+            { id: 0, name: 'Type 0' },
+            { id: 1, name: 'Type 1' },
+            { id: 2, name: 'Type 2' },
+            { id: 3, name: 'Type 3' },
+            { id: 4, name: 'Type 4' },
+            { id: 5, name: 'Type 5' },
           ],
           accessTypeMapping: [
             { id: 0, name: 'Public' },
             { id: 1, name: 'Private' },
           ],
           publisherMapping: [
-            { id: 'publisher0', name: 'Publisher 0' },
-            { id: 'publisher1', name: 'Publisher 1' },
-            { id: 'publisher2', name: 'Publisher 2' },
-            { id: 'publisher3', name: 'Publisher 3' },
+            { id: 0, name: 'Publisher 0' },
+            { id: 1, name: 'Publisher 1' },
+            { id: 2, name: 'Publisher 2' },
+            { id: 3, name: 'Publisher 3' },
           ],
         },
       }).save().then(() => record)
