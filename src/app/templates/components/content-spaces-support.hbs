@@ -7,7 +7,7 @@
 </div>
 
 <div class="row content-row">
-  {{#bs-tab class="only-tab-bar" as |tab|}}
+  {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
     {{#tab.pane title=(tt this "requestSupport.tabName")}}
       {{content-spaces-support/request-support
         copySuccess=(action "copySuccess")
