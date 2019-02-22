@@ -351,6 +351,10 @@ function createHarvesterRecords(store) {
           scope: 'private',
         }),
         configuration: {
+          studyIdTypeMapping: [
+            { id: 'registryId', name: 'Registry ID'},
+            { id: 'founderId', name: 'Founder ID' },
+          ],
           typeMapping: [
             { id: 0, name: 'Type 0' },
             { id: 1, name: 'Type 1' },
