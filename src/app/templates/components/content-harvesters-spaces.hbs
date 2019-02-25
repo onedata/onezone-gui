@@ -1,0 +1,43 @@
+<div class="row content-row header-row hidden-xs has-border">
+  <h1>
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+  </h1>
+</div>
+<div class="row">
+  {{#promise-proxy-container proxy=spacesProxy}}
+    {{#one-collapsible-list as |list|}}
+      {{#each spacesProxy key="id" as |space|}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header isCollapsible=false}}
+            <span class="item-icon-container">
+              {{one-icon class="item-icon" icon="space"}}
+              {{one-tooltip
+                title=space.name
+                placement="top"
+                arrowPlacement="left"
+                triggerEvents="hover"
+              }}
+            </span>
+            <span class="one-label">{{space.name}}</span>
+            {{actions-toolbar
+              isMinimized=true
+              toolbarClasses=""
+              toolbarToggleClasses="btn-menu-toggle"
+              dropdownPlacement="auto"
+              actionsArray=spaceActions
+              actionsArg=space}}
+          {{/listItem.header}}
+        {{/list.item}}
+      {{/each}}
+    {{/one-collapsible-list}}
+  {{/promise-proxy-container}}
+</div>
+{{content-harvesters-spaces/remove-space-modal
+  opened=(and spaceToRemove (not spaceToRemove.isDeleted))
+  close=(action (mut spaceToRemove) null)
+  proceed=(action "removeSpace")
+  processing=isRemovingSpace
+  space=spaceToRemove
+  harvester=harvester}}

@@ -11,9 +11,11 @@ import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { Promise, resolve } from 'rsvp';
+import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
   onedataGraph: service(),
+  onedataGraphUtils: service(),
   currentUser: service(),
   store: service(),
 
@@ -62,6 +64,22 @@ export default Service.extend({
   reloadList() {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.belongsTo('harvesterList').reload(true));
+  },
+
+  /**
+   * @param {string} harvesterEntityId 
+   * @param {string} spaceEntityId
+   * @returns {Promise}
+   */
+  removeSpaceFromHarvester(harvesterEntityId, spaceEntityId) {
+    return this.get('onedataGraphUtils').leaveRelation(
+      'harvester',
+      harvesterEntityId,
+      'space',
+      spaceEntityId
+    ).then(() =>
+      this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError),
+    );
   },
 
   /**

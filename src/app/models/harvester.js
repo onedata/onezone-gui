@@ -34,11 +34,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   membership: belongsTo('membership'),
 
-  // members of this space
+  // members of this harvester
   groupList: belongsTo('groupList'),
   userList: belongsTo('sharedUserList'),
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('sharedUserList'),
+  spaceList: belongsTo('spaceList'),
 
   /**
    * True, if user has a "View space" privilege

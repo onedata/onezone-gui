@@ -3,6 +3,7 @@ export default {
   aspects: {
     plugin: 'Data discovery',
     config: 'Configuration',
+    spaces: 'Spaces',
     members: 'Members',
     notFound: 'Index not found',
   },

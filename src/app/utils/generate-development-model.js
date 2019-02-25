@@ -47,7 +47,7 @@ const perProviderSize = Math.pow(1024, 4);
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers, groups;
+  let sharedUsers, groups, spaces;
 
   // create shared users
   return createSharedUsersRecords(store)
@@ -60,6 +60,8 @@ export default function generateDevelopmentModel(store) {
           .then(records => {
             if (type === 'group') {
               groups = records;
+            } else if (type === 'space') {
+              spaces = records;
             }
             return createListRecord(store, type, records);
           })
@@ -143,6 +145,24 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
+            ])
+          ))
+        )
+      )
+      .then(() => listRecords[types.indexOf('harvester')].get('list')
+        .then(records =>
+          Promise.all(records.map(record =>
+            Promise.all([
+              attachSharedUsersGroupsToModel(
+                store, record, 'harvester', false, sharedUsers, groups
+              ),
+              attachSharedUsersGroupsToModel(
+                store, record, 'harvester', true, sharedUsers, groups
+              ),
+              attachMembershipsToModel(
+                store, record, 'harvester', groups
+              ),
+              attachSpacesToModel(store, record, spaces),
             ])
           ))
         )
@@ -432,6 +452,14 @@ function attachMembershipsToModel(
     intermediaries: groups.mapBy('id'),
     directMembership: true,
   }).save();
+}
+
+function attachSpacesToModel(store, record, spaces) {
+  return createListRecord(store, 'space', spaces)
+    .then(list => {
+      record.set('spaceList', list);
+      return record.save();
+    });
 }
 
 function createPrivilegesForModel(

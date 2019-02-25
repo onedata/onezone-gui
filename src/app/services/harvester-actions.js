@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { next } from '@ember/runloop';
@@ -81,7 +81,32 @@ export default Service.extend(I18n, {
       );
       return harvester;
     }).catch(error => {
-      globalNotify.backendError(this.t('harvesterCreation'), error);
+      globalNotify.backendError(this.t('harvesterCreating'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Removes space form harvester
+   * @param {Model.Harvester} harvester 
+   * @param {Model.Space} space
+   * @returns {Promise}
+   */
+  removeSpaceFromHarvester(harvester, space) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.removeSpaceFromHarvester(
+      get(harvester, 'entityId'),
+      get(space, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeSpaceFromHarvesterSuccess', {
+        harvesterName: get(harvester, 'name'),
+        spaceName: get(space, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('removingSpaceFromHarvester'), error);
       throw error;
     });
   },
