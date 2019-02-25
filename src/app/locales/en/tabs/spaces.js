@@ -6,6 +6,7 @@ export default {
     members: 'Space members',
     membership: 'Membership',
     support: 'Get support',
+    joinHarvester: 'Join harvester',
     notFound: 'Space not found',
   },
 };

@@ -2,13 +2,14 @@
  * A first-level item component for spaces sidebar
  *
  * @module components/sidebar-spaces/space-item
- * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, collect } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import _ from 'lodash';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
@@ -19,6 +20,12 @@ import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 export default Component.extend(I18n, HasDefaultSpace, {
   tagName: '',
 
+  router: service(),
+  guiUtils: service(),
+
+  /**
+   * @override
+   */
   i18nPrefix: 'components.sidebarSpaces.spaceItem',
 
   /**
@@ -96,4 +103,30 @@ export default Component.extend(I18n, HasDefaultSpace, {
    * @type {Ember.ComputedProperty<string>}
    */
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  joinHarvesterAction: computed(function joinHarvesterAction() {
+    const {
+      router,
+      guiUtils,
+      space,
+    } = this.getProperties('router', 'guiUtils', 'space');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(space),
+        'join-harvester'
+      ),
+      title: this.t('joinHarvester'),
+      class: 'join-harvester-action',
+      icon: 'space-join',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Action>>}
+   */
+  itemActions: collect('joinHarvesterAction'),
 });

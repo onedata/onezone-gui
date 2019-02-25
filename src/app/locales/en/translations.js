@@ -24,6 +24,7 @@ import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
@@ -89,6 +90,7 @@ let translations = {
     contentSpacesJoin,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
     contentGroupsNew,

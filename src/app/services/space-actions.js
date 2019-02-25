@@ -11,6 +11,7 @@ import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
+import { next } from '@ember/runloop';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -141,6 +142,32 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins space to a harvester using token
+   * @param {Model.Space} space 
+   * @param {string} token
+   * @returns {Promise<Harvester>}
+   */
+  joinHarvesterAsSpace(space, token) {
+    const {
+      globalNotify,
+      spaceManager,
+    } = this.getProperties('globalNotify', 'spaceManager');
+    return spaceManager.joinHarvesterAsSpace(space, token)
+      .then(harvester => {
+        globalNotify.success(this.t('joinSpaceToHarvesterSuccess', {
+          spaceName: get(space, 'name'),
+          harvesterName: get(harvester, 'name'),
+        }));
+        next(() => this.redirectToSpace(space));
+        return harvester;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningSpaceToHarvester'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Creates member group for specified space
    * @param {Space} space 
    * @param {Object} groupRepresentation
@@ -235,5 +262,24 @@ export default Service.extend(I18n, {
       globalNotify.backendError(this.t('userDeletion'), error);
       throw error;
     });
+  },
+
+  /**
+   * Redirects to space page
+   * @param {Model.Space} space
+   * @param {string} aspect
+   * @returns {Promise}
+   */
+  redirectToSpace(space, aspect = 'index') {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    return router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      guiUtils.getRoutableIdFor(space),
+      aspect,
+    );
   },
 });

@@ -10,7 +10,7 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -114,5 +114,35 @@ export default Service.extend({
       aspect: 'config',
       scope: 'private',
     }));
+  },
+
+  /**
+   * Returns already loaded harvester by entityId (or undefined if not loaded)
+   * @param {string} entityId harvester entityId
+   * @returns {Model.Harvester|undefined}
+   */
+  getLoadedHarvesterByEntityId(entityId) {
+    return this.get('store').peekAll('harvester').findBy('entityId', entityId);
+  },
+
+  /**
+   * Reloads selected list from space identified by entityId.
+   * @param {string} entityId space entityId
+   * @param {string} listName e.g. `childList`
+   * @returns {Promise}
+   */
+  reloadModelList(entityId, listName) {
+    const harvester = this.getLoadedHarvesterByEntityId(entityId);
+    return harvester ? harvester.reloadList(listName) : resolve();
+  },
+
+  /**
+   * Reloads spaceList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadSpaceList(entityId) {
+    return this.reloadModelList(entityId, 'spaceList');
   },
 });

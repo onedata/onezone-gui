@@ -198,6 +198,23 @@ export default Service.extend({
   },
 
   /**
+   * Joins space to a harvester using token
+   * @param {Model.Space} space 
+   * @param {string} token
+   * @returns {Promise<Model.Harvester>}
+   */
+  joinHarvesterAsSpace(space, token) {
+    const {
+      harvesterManager,
+    } = this.getProperties('harvesterManager');
+    return space.joinHarvester(token)
+      .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId')) // TODO
+        .catch(ignoreForbiddenError)
+        .then(() => space)
+      );
+  },
+
+  /**
    * Returns already loaded space by entityId (or undefined if not loaded)
    * @param {string} entityId space entityId
    * @returns {Space|undefined}

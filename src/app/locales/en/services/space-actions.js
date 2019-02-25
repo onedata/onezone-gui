@@ -21,4 +21,6 @@ export default {
   memberGroupCreation: 'member group creation',
   addMemberGroupSuccess: 'Member group "{{memberGroupName}}" has been added successfully',
   memberGroupAddition: 'member group addition',
+  joinSpaceToHarvesterSuccess: 'Successfully joined space "{{spaceName}}" to harvester "{{harvesterName}}"',
+  joiningSpaceToHarvester: 'joining space to harvester',
 };
