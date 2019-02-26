@@ -40,10 +40,15 @@ export default Component.extend(I18n, {
         harvesterName,
         elasticsearchEndpoint,
         harvesterActions,
-      } = this.getProperties('groupName', 'groupActions', 'harvesterActions');
+      } = this.getProperties(
+        'elasticsearchEndpoint',
+        'harvesterName',
+        'harvesterActions'
+      );
       return harvesterActions.createHarvester({
         name: harvesterName,
         endpoint: elasticsearchEndpoint,
+        plugin: 'elasticsearch_plugin',
       });
     },
   },

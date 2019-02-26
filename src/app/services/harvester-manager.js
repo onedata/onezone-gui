@@ -26,7 +26,10 @@ export default Service.extend({
   getHarvesters() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('harvesterList'));
+      .then(user => user.get('harvesterList'))
+      .then(harvesterList =>
+        get(harvesterList, 'list').then(() => harvesterList)
+      );
   },
 
   /**
@@ -42,12 +45,13 @@ export default Service.extend({
    * Creates new harvester
    * @returns {Promise<Harvester>}
    */
-  createRecord({ name, endpoint }) {
+  createRecord({ name, endpoint, plugin }) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => {
         return this.get('store').createRecord('harvester', {
             name,
             endpoint,
+            plugin,
             _meta: {
               authHint: ['asUser', get(user, 'entityId')],
             },
@@ -83,40 +87,64 @@ export default Service.extend({
   },
 
   /**
+   * @param {string} harvesterEntityId 
+   * @param {string} spaceEntityId
+   * @returns {Promise}
+   */
+  addSpaceToHarvester(harvesterEntityId, spaceEntityId) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'harvester',
+        entityId: harvesterEntityId,
+        aspect: 'space',
+        aspectId: spaceEntityId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    }).then(() => {
+      return Promise.all([
+        this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError),
+      ]);
+    });
+  },
+
+  /**
    * Performs request to elasticsearch
    * @param {string} harvesterId
    * @param {string} method
+   * @param {string} type
    * @param {string} path
    * @param {any} body
    * @returns {Promise<any>} request result
    */
-  esRequest(harvesterId, method, path, body) {
-    // const onedataGraph = this.get('onedataGraph');
+  esRequest(harvesterId, method, type, path, body) {
+    const onedataGraph = this.get('onedataGraph');
 
-    // const requestData = {
-    //   method,
-    //   path,
-    //   body,
-    // };
-    // return onedataGraph.request({
-    //   gri: gri({
-    //     entityType: 'harvester',
-    //     entityId: harvesterId,
-    //     aspect: 'query',
-    //     scope: 'private',
-    //   }),
-    //   operation: 'create',
-    //   data: requestData,
-    //   subscribe: false,
-    // });
-    return new Promise((resolve, reject) => {
-      $.ajax({
-        method,
-        url: 'http://localhost:9200' + path,
-        data: body,
-        contentType: 'application/json; charset=UTF-8',
-      }).then(resolve, reject);
+    const requestData = {
+      method,
+      type,
+      path,
+      body,
+    };
+    return onedataGraph.request({
+      gri: gri({
+        entityType: 'harvester',
+        entityId: harvesterId,
+        aspect: 'query',
+        scope: 'private',
+      }),
+      operation: 'create',
+      data: requestData,
+      subscribe: false,
     });
+    // return new Promise((resolve, reject) => {
+    //   $.ajax({
+    //     method,
+    //     url: 'http://localhost:9200' + path,
+    //     data: body,
+    //     contentType: 'application/json; charset=UTF-8',
+    //   }).then(resolve, reject);
+    // });
   },
 
   /**

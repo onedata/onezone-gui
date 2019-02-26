@@ -7,4 +7,7 @@ export default {
     proceed: 'Remove',
     cancel: 'Cancel',
   },
+  harvesterSpaces: 'Harvester spaces',
+  addYourSpace: 'Add one of your spaces',
+  inviteSpaceUsingToken: 'Invite space using token',
 };

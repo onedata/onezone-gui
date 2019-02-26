@@ -64,7 +64,7 @@ export default Component.extend(I18n, {
     function configObserver() {
       const isHarvesterConfigModified = this.get('isHarvesterConfigModified');
       if (!isHarvesterConfigModified) {
-        let config = this.get('harvesterConfigRecord.configuration');
+        let config = this.get('harvesterConfigRecord.config');
         config = JSON.stringify(config || {}, null, 2);
         this.set('harvesterConfig', config);
       }
@@ -94,7 +94,7 @@ export default Component.extend(I18n, {
         'harvesterConfigRecord',
         'globalNotify'
       );
-      harvesterConfigRecord.set('configuration', JSON.parse(harvesterConfig));
+      harvesterConfigRecord.set('config', JSON.parse(harvesterConfig));
       return get(harvesterConfigRecord, 'content').save().then(() => {
         globalNotify.success(this.t('saveSuccess'));
         safeExec(this, () => {

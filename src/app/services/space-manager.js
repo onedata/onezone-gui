@@ -17,6 +17,7 @@ export default Service.extend({
   store: inject(),
   currentUser: inject(),
   providerManager: inject(),
+  harvesterManager: inject(),
   groupManager: inject(),
   onedataGraph: inject(),
   onedataGraphUtils: inject(),
@@ -204,9 +205,7 @@ export default Service.extend({
    * @returns {Promise<Model.Harvester>}
    */
   joinHarvesterAsSpace(space, token) {
-    const {
-      harvesterManager,
-    } = this.getProperties('harvesterManager');
+    const harvesterManager = this.get('harvesterManager');
     return space.joinHarvester(token)
       .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId')) // TODO
         .catch(ignoreForbiddenError)

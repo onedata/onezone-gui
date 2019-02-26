@@ -26,6 +26,24 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   config: attr('object'),
 
   /**
+   * Elasticsearch endpoint
+   * @type {string}
+   */
+  endpoint: attr('string'),
+
+  /**
+   * @type {string}
+   */
+  plugin: attr('string'),
+
+  /**
+   * Harvester GUI plugin path
+   * @type {Object}
+   */
+  // guiPluginPath: attr('string'),
+  guiPluginPath: '/harvester_gui/index.html',
+
+  /**
    * Information about harvester. Available fields:
    * creationTime
    * @type {Object}

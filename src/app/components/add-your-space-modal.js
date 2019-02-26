@@ -1,13 +1,13 @@
 /**
- * Shows modal, that allows to choose one of available groups
+ * Shows modal, that allows to choose one of available spaces
  *
- * @module components/group-add-your-group-modal
+ * @module components/add-your-space-modal
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed, get, getProperties } from '@ember/object';
+import { get, computed, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import layout from 'onezone-gui/templates/components/select-model-modal';
@@ -17,42 +17,38 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 export default SelectModelModal.extend({
   layout,
 
-  groupManager: service(),
+  spaceManager: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.groupAddYourGroupModal',
+  i18nPrefix: 'components.addYourSpaceModal',
 
   /**
-   * @override
-   */
-  recordIcon: 'group',
-
-  /**
-   * @override
-   */
-  modalClass: 'group-add-your-group-modal',
-
-  /**
-   * @override
-   */
-  headerText: computedT('addYourGroup'),
-
-  /**
-   * Record to which another group will be added
-   * @type {GraphSingleModel}
    * @virtual
+   * @type {string}
+   */
+  relation: undefined,
+
+  /**
+   * @override
+   */
+  recordIcon: 'space',
+
+  /**
+   * @override
+   */
+  modalClass: 'add-your-space-modal',
+
+  /**
+   * @type {Object}
    */
   relatedRecord: undefined,
 
   /**
-   * Selected group will be with `group` in relation specified by this field.
-   * One of `child`, `parent`.
-   * @type {string}
-   * @virtual
+   * @override
    */
-  relation: 'child',
+  headerText: computedT('addYourSpace'),
 
   /**
    * @override
@@ -85,33 +81,10 @@ export default SelectModelModal.extend({
   /**
    * @override
    */
-  recordsForDropdown: computed(
-    'records.content.[]',
-    'relatedRecord',
-    function recordsForDropdown() {
-      const {
-        records,
-        relatedRecord,
-      } = this.getProperties('records', 'relatedRecord');
-      if (get(records, 'isFulfilled')) {
-        return get(records, 'content')
-          .filter(group => group !== relatedRecord)
-          .sort((g1, g2) =>
-            get(g1, 'name').localeCompare(get(g2, 'name'))
-          );
-      } else {
-        return [];
-      }
-    }
-  ),
-
-  /**
-   * @override
-   */
   loadRecords() {
     this.set('records', PromiseArray.create({
-      promise: this.get('groupManager').getGroups()
-        .then(groupList => get(groupList, 'list')),
+      promise: this.get('spaceManager').getSpaces()
+        .then(spaceList => get(spaceList, 'list')),
     }));
   },
 });

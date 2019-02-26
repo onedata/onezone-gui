@@ -16,5 +16,5 @@ export default Model.extend(GraphSingleModelMixin, {
    * Contains configuration of the related harvester
    * @type {Object}
    */
-  configuration: attr('object'),
+  config: attr('object'),
 });
