@@ -12,9 +12,8 @@ export default {
   },
   requestSupport: {
     tabName: 'Request support',
-    desc1: 'Request storage support for this space from existing provider.',
-    desc2: 'Pass the token below to the administrator of the preferred ' +
-      'storage provider (e.g. via email).',
+    desc1: 'Request storage support for this space from an existing Oneprovider.',
+    desc2: 'Pass the token below to the administrator of the Oneprovider of your choice (e.g. via email).',
     desc3: 'Each token can only be used once.',
   },
   exposeData: {
@@ -25,7 +24,7 @@ export default {
       'this space to access the data set.',
   },
   deployProvider: {
-    tabName: 'Deploy your own provider',
+    tabName: 'Deploy your own Oneprovider',
     desc1: 'Deploy your own Oneprovider service and automatically support ' +
       'this space using your storage.',
   },
