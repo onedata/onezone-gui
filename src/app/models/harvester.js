@@ -43,6 +43,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   // guiPluginPath: attr('string'),
   guiPluginPath: '/harvester_gui/index.html',
 
+  entryTypeField: attr('string'),
+
+  acceptedEntryTypes: attr('array'),
+
+  defaultEntryType: attr('string'),
+
   /**
    * Information about harvester. Available fields:
    * creationTime

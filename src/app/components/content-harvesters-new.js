@@ -49,6 +49,8 @@ export default Component.extend(I18n, {
         name: harvesterName,
         endpoint: elasticsearchEndpoint,
         plugin: 'elasticsearch_plugin',
+        entryTypeField: 'type',
+        acceptedEntryTypes: ['study', 'data_object'],
       });
     },
   },

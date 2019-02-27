@@ -43,21 +43,20 @@ export default Service.extend({
 
   /**
    * Creates new harvester
+   * @param {Object} harvester
    * @returns {Promise<Harvester>}
    */
-  createRecord({ name, endpoint, plugin }) {
+  createRecord(harvester) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => {
-        return this.get('store').createRecord('harvester', {
-            name,
-            endpoint,
-            plugin,
+        return this.get('store').createRecord(
+          'harvester',
+          Object.assign({}, harvester, {
             _meta: {
               authHint: ['asUser', get(user, 'entityId')],
             },
           })
-          .save()
-          .then(harvester => this.reloadList().then(() => harvester));
+        ).save().then(harvester => this.reloadList().then(() => harvester));
       });
   },
 
