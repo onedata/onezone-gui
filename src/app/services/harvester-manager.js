@@ -17,6 +17,7 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   currentUser: service(),
+  groupManager: service(),
   store: service(),
 
   /**
@@ -100,11 +101,136 @@ export default Service.extend({
         scope: 'auto',
       }),
       operation: 'create',
-    }).then(() => {
-      return Promise.all([
-        this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError),
-      ]);
-    });
+    }).then(() =>
+      this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError)
+    );
+  },
+
+  /**
+   * @param {string} harvesterEntityId 
+   * @param {string} groupEntityId
+   * @returns {Promise}
+   */
+  removeGroupFromHarvester(harvesterEntityId, groupEntityId) {
+    return this.get('onedataGraphUtils').leaveRelation(
+      'harvester',
+      harvesterEntityId,
+      'group',
+      groupEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadList(),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} harvesterEntityId 
+   * @param {string} userEntityId
+   * @returns {Promise}
+   */
+  removeUserFromHarvester(harvesterEntityId, userEntityId) {
+    const currentUser = this.get('currentUser');
+    const harvester = this.getLoadedHarvesterByEntityId(harvesterEntityId);
+    return this.get('onedataGraphUtils').leaveRelation(
+      'harvester',
+      harvesterEntityId,
+      'user',
+      userEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
+        currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          this.reloadList(),
+          harvester ? harvester.reload().catch(ignoreForbiddenError) : resolve(),
+        ])),
+      ])
+    );
+  },
+
+  /**
+   * Creates member group for specified harvester
+   * @param {string} harvesterEntityId 
+   * @param {Object} childGroupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroupForHarvester(harvesterEntityId, childGroupRepresentation) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => this.get('onedataGraph').request({
+        gri: gri({
+          entityType: 'harvester',
+          entityId: harvesterEntityId,
+          aspect: 'group',
+          scope: 'auto',
+        }),
+        operation: 'create',
+        data: childGroupRepresentation,
+        authHint: ['asUser', get(user, 'entityId')],
+      }).then(() => {
+        return Promise.all([
+          this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+          this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+          this.get('groupManager').reloadList(),
+        ]);
+      }));
+  },
+
+  /**
+   * Adds group to the members of a harvester
+   * @param {string} harvesterEntityId 
+   * @param {string} groupEntityId
+   * @return {Promise}
+   */
+  addMemberGroupToHarvester(harvesterEntityId, groupEntityId) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'harvester',
+        entityId: harvesterEntityId,
+        aspect: 'group',
+        aspectId: groupEntityId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    }).then(() => Promise.all([
+        this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+      ])
+    );
+  },
+
+  /**
+   * Joins user to a harvester without token
+   * @param {string} harvesterEntityId
+   * @returns {Promise}
+   */
+  joinHarvesterAsUser(harvesterEntityId) {
+    const harvester = this.getLoadedHarvesterByEntityId(harvesterEntityId);
+    const {
+      currentUser,
+      onedataGraph,
+    } = this.getProperties('currentUser', 'onedataGraph');
+    return currentUser.getCurrentUserRecord()
+      .then(user =>
+        onedataGraph.request({
+          gri: gri({
+            entityType: 'harvester',
+            entityId: harvesterEntityId,
+            aspect: 'user',
+            aspectId: get(user, 'entityId'),
+            scope: 'private',
+          }),
+          operation: 'create',
+          subscribe: false,
+        })
+      )
+      .then(() => Promise.all([
+        harvester ? harvester.reload() : resolve(),
+        this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
+      ]));
   },
 
   /**
@@ -200,5 +326,45 @@ export default Service.extend({
    */
   reloadSpaceList(entityId) {
     return this.reloadModelList(entityId, 'spaceList');
+  },
+
+  /**
+   * Reloads groupList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadGroupList(entityId) {
+    return this.reloadModelList(entityId, 'groupList');
+  },
+
+  /**
+   * Reloads effGroupList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadEffGroupList(entityId) {
+    return this.reloadModelList(entityId, 'effGroupList');
+  },
+
+  /**
+   * Reloads userList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadUserList(entityId) {
+    return this.reloadModelList(entityId, 'userList');
+  },
+
+  /**
+   * Reloads effUserList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadEffUserList(entityId) {
+    return this.reloadModelList(entityId, 'effUserList');
   },
 });

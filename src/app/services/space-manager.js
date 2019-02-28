@@ -97,6 +97,7 @@ export default Service.extend({
       .then(() => Promise.all([
         space ? space.reload() : resolve(),
         this.reloadUserList(entityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
         this.get('providerManager').reloadList(),
       ]));
   },
@@ -122,6 +123,8 @@ export default Service.extend({
       }).then(() => {
         return Promise.all([
           this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+          this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
+          this.get('groupManager').reloadList(),
         ]);
       }));
   },
@@ -145,6 +148,7 @@ export default Service.extend({
     }).then(() => {
       return Promise.all([
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.get('groupManager').reloadSpaceList(groupEntityId)
         .catch(ignoreForbiddenError),
       ]);
@@ -167,6 +171,7 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadUserList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(spaceEntityId).catch(ignoreForbiddenError),
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
           this.reloadList(),
           this.get('providerManager').reloadList(),
@@ -190,6 +195,7 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('groupManager').reloadSpaceList(groupEntityId)
@@ -244,6 +250,16 @@ export default Service.extend({
   },
 
   /**
+   * Reloads effGroupList of space identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadEffGroupList(entityId) {
+    return this.reloadModelList(entityId, 'effGroupList');
+  },
+
+  /**
    * Reloads userList of space identified by entityId. If list has not been
    * fetched, nothing is reloaded
    * @param {string} entityId group entityId
@@ -251,5 +267,15 @@ export default Service.extend({
    */
   reloadUserList(entityId) {
     return this.reloadModelList(entityId, 'userList');
+  },
+
+  /**
+   * Reloads effUserList of space identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadEffUserList(entityId) {
+    return this.reloadModelList(entityId, 'effUserList');
   },
 });

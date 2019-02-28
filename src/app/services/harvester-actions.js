@@ -134,4 +134,125 @@ export default Service.extend(I18n, {
       throw error;
     });
   },
+
+  /**
+   * Removes group from space
+   * @param {Model.Harvester} harvester 
+   * @param {Model.Group} group
+   * @returns {Promise}
+   */
+  removeGroupFromHarvester(harvester, group) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.removeGroupFromHarvester(
+      get(harvester, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeGroupSuccess', {
+        harvesterName: get(harvester, 'name'),
+        groupName: get(group, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('deletingGroup'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Removes user from harvester
+   * @param {Model.Harvester} harvester 
+   * @param {Model.User} user
+   * @returns {Promise}
+   */
+  removeUserFromHarvester(harvester, user) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.removeUserFromHarvester(
+      get(harvester, 'entityId'),
+      get(user, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('removeUserSuccess', {
+        spaceName: get(harvester, 'name'),
+        userName: get(user, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('removingUser'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Creates member group for specified harvester
+   * @param {Model.Harvester} harvester 
+   * @param {Object} groupRepresentation
+   * @return {Promise}
+   */
+  createMemberGroupForHarvester(harvester, groupRepresentation) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager
+      .createMemberGroupForHarvester(
+        get(harvester, 'entityId'),
+        groupRepresentation
+      ).then(() => {
+        globalNotify.success(this.t('createMemberGroupSuccess', {
+          memberGroupName: get(groupRepresentation, 'name'),
+        }));
+      }).catch(error => {
+        globalNotify.backendError(this.t('creatingMemberGroup'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Adds existing group to harvetser
+   * @param {Model.Harvester} harvester
+   * @param {Model.Group} group
+   * @return {Promise}
+   */
+  addMemberGroupToHarvester(harvester, group) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.addMemberGroupToHarvester(
+      get(harvester, 'entityId'),
+      get(group, 'entityId')
+    ).then(() => {
+      globalNotify.success(this.t('addMemberGroupSuccess', {
+        memberGroupName: get(group, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('addingMemberGroup'), error);
+      throw error;
+    });
+  },
+
+  /**
+   * Joins user to an existing harvester (without token)
+   * @param {Model.Harvester} harvester
+   * @returns {Promise} A promise, which resolves to harvester if it has
+   * been joined successfully.
+   */
+  joinHarvesterAsUser(harvester) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.joinHarvesterAsUser(get(harvester, 'entityId'))
+      .then(harvesterRecord => {
+        globalNotify.info(this.t('joinedHarvesterSuccess'));
+        return harvesterRecord;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningHarvester'), error);
+        throw error;
+      });
+  },
 });

@@ -56,6 +56,7 @@ import sidebarHarvesters from './components/sidebar-harvesters';
 import contentHarvestersNew from './components/content-harvesters-new';
 import contentHarvestersConfig from './components/content-harvesters-config';
 import contentHarvestersSpaces from './components/content-harvesters-spaces';
+import contentHarvestersMembers from './components/content-harvesters-members';
 import addYourSpaceModal from './components/add-your-space-modal';
 
 import spaceActions from './services/space-actions';
@@ -123,6 +124,7 @@ let translations = {
     contentHarvestersNew,
     contentHarvestersConfig,
     contentHarvestersSpaces,
+    contentHarvestersMembers,
     addYourSpaceModal,
   },
   services: {
