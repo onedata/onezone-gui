@@ -34,7 +34,7 @@ export default Component.extend({
       return `${location.origin}/${this.get('onepanelPathAbbrev')}/${clusterId}/i#/clusters/${clusterId}`;
     }),
 
-  redirectProxy: computed(function redirectProxy() {
+  redirectProxy: computed('cluster.domain', function redirectProxy() {
     return PromiseObject.create({ promise: this.redirectToOnepanel() });
   }),
 
