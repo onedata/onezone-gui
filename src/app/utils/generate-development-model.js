@@ -372,7 +372,7 @@ function createHarvesterRecords(store) {
         }),
         configuration: {
           studyIdTypeMapping: [
-            { id: 'registryId', name: 'Registry ID'},
+            { id: 11, name: 'Trial Registry ID'},
             { id: 'founderId', name: 'Founder ID' },
           ],
           typeMapping: [

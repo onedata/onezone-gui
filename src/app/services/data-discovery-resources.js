@@ -11,6 +11,7 @@ import { get, getProperties, computed } from '@ember/object';
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { reject } from 'rsvp';
+import _ from 'lodash';
 
 export default Service.extend({
   navigationState: service(),
@@ -67,7 +68,7 @@ export default Service.extend({
       return reject('Harvester ID is not specified.');
     } else {
       return harvesterManager.getConfig(harvesterId)
-        .then(config => get(config, 'configuration'));
+        .then(config => _.cloneDeep(get(config, 'config')));
     }
   },
 });

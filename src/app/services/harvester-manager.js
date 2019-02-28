@@ -111,17 +111,15 @@ export default Service.extend({
    * Performs request to elasticsearch
    * @param {string} harvesterId
    * @param {string} method
-   * @param {string} type
    * @param {string} path
    * @param {any} body
    * @returns {Promise<any>} request result
    */
-  esRequest(harvesterId, method, type, path, body) {
+  esRequest(harvesterId, method, path, body) {
     const onedataGraph = this.get('onedataGraph');
 
     const requestData = {
       method,
-      type,
       path,
       body,
     };
@@ -135,6 +133,19 @@ export default Service.extend({
       operation: 'create',
       data: requestData,
       subscribe: false,
+    }).then(response => {
+      const { code, body } = response;
+      if (code >= 200 && code < 300) {
+        let results = {};
+        try {
+          results = JSON.parse(body);
+        } catch (e) {
+          throw new Error('Malformed Elasticsearch response');
+        }
+        return results;
+      } else {
+        throw new Error('Request failure. Error details: ' + JSON.stringify(response));
+      }
     });
     // return new Promise((resolve, reject) => {
     //   $.ajax({
