@@ -62,6 +62,22 @@ export default Service.extend({
   },
 
   /**
+   * Joins user to a harvester using given token
+   * @param {string} token
+   * @returns {Promise<Model.Harvester>}
+   */
+  joinHarvester(token) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.joinHarvester(token)
+        .then(harvester => Promise.all([
+          this.reloadList(),
+          this.reloadUserList(get(harvester, 'entityId')).catch(ignoreForbiddenError),
+          this.reloadEffUserList(get(harvester, 'entityId')).catch(ignoreForbiddenError),
+        ]).then(() => harvester))
+      );
+  },
+
+  /**
    * Reloads harvester list
    * @returns {Promise<HarvesterList>}
    */

@@ -29,7 +29,7 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<SidebarButtonDefinition>>}
    */
-  buttons: collect('btnCreate'),
+  buttons: collect('btnCreate', 'btnJoin'),
 
   /**
    * @type {Ember.ComputedProperty<SidebarButtonDefinition>}
@@ -42,6 +42,20 @@ export default Service.extend(I18n, {
       tip: this.t('btnCreate.hint'),
       class: 'create-harvester-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'harvesters', 'new'),
+    };
+  }),
+
+  /**
+   * @type {Ember.Computed<SidebarButtonDefinition>}
+   */
+  btnJoin: computed(function btnJoin() {
+    const router = this.get('router');
+    return {
+      icon: 'join-plug',
+      title: this.t('btnJoin.title'),
+      tip: this.t('btnJoin.hint'),
+      class: 'join-harvester-btn',
+      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters', 'join'),
     };
   }),
 
@@ -83,6 +97,44 @@ export default Service.extend(I18n, {
         globalNotify.backendError(this.t('harvesterCreating'), error);
         throw error;
       });
+  },
+
+  /**
+   * Joins to existing harvester using token
+   * @param {string} token
+   * @returns {Promise<Model.Harvester>} A promise, which resolves to harvester
+   * if it has been joined successfully.
+   */
+  joinHarvester(token) {
+    return this.get('harvesterManager').joinHarvester(token)
+      .then(harvester => {
+        this.get('globalNotify').info(this.t('joinedHarvesterSuccess'));
+        this.redirectToHarvester(harvester);
+        return harvester;
+      })
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningHarvester'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Redirects to harvester page
+   * @param {Model.Harvester} harvester
+   * @param {string} aspect
+   * @returns {Promise}
+   */
+  redirectToHarvester(harvester, aspect = 'plugin') {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    return router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'harvesters',
+      guiUtils.getRoutableIdFor(harvester),
+      aspect
+    );
   },
 
   /**
