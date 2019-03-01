@@ -1,9 +1,9 @@
 /**
- * Shows modal asking about group deletion.
+ * Shows modal asking for deleting harvester.
  *
- * @module components/group-remove-modal
+ * @module components/harvester-remove-modal
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,10 +13,10 @@ export default RecordRemoveModal.extend({
   /**
    * @override
    */
-  i18nPrefix: 'components.groupRemoveModal',
+  i18nPrefix: 'components.harvesterRemoveModal',
 
   /**
    * @override
    */
-  modalClass: 'group-remove-modal',
+  modalClass: 'harvester-remove-modal',
 });

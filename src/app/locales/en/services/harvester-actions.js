@@ -23,4 +23,8 @@ export default {
   addingMemberGroup: 'adding member group',
   joiningHarvester: 'joining the harvester',
   joinedHarvesterSuccess: 'Harvester joined successfully',
+  removeHarvesterSuccess: 'Harvester "{{harvesterName}}" has been removed',
+  removingHarvester: 'removing harvester',
+  leaveHarvesterSuccess: 'Harvester "{{harvesterName}}" left successfully',
+  leavingHarvester: 'leaving harvester',
 };

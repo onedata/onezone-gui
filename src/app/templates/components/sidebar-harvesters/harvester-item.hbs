@@ -1,4 +1,4 @@
-{{one-icon class="sidebar-item-icon" icon=(oneicon-alias item.type)}}
+{{one-icon class="sidebar-item-icon" icon="light-bulb"}}
 {{one-inline-editor
   isEditing=isRenaming
   value=item.name
@@ -14,15 +14,15 @@
   actionsArray=itemActions}}
 
 {{leave-modal
-  opened=leaveGroupModalOpen
+  opened=isLeaveModalOpened
   close=(action "closeLeaveModal")
   proceed=(action "leave")
   processing=isLeaving
-  record=group}}
+  record=harvester}}
 
-{{group-remove-modal
-  opened=removeGroupModalOpen
+{{harvester-remove-modal
+  opened=isRemoveModalOpened
   close=(action "closeRemoveModal")
   proceed=(action "remove")
   processing=isRemoving
-  record=group}}
+  record=harvester}}

@@ -6,7 +6,9 @@ export default _.merge({}, proceedProcessModal, {
   areYouSure: 'Are you sure you want to leave {{recordType}} "{{recordName}}"?',
   mayCauseGroup: 'This operation might cause you to lose access to groups, spaces or providers inherited from the {{recordType}} "{{recordName}}".',
   mayCauseSpace: 'This operation might cause you to lose access to {{recordType}}&nbsp;"{{recordName}}".',
+  mayCauseHarvester: 'This operation might cause you to lose access to metadata gathered from spaces connected to harvester&nbsp;"{{recordName}}".',
   group: 'group',
   space: 'space',
+  harvester: 'harvester',
   proceed: 'Leave',
 });

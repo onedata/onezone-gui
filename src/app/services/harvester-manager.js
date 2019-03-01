@@ -78,6 +78,38 @@ export default Service.extend({
   },
 
   /**
+   * Removes user from a harvester
+   * @param {string} harvesterEntityId
+   * @returns {Promise}
+   */
+  leaveHarvester(harvesterEntityId) {
+    const harvester = this.getLoadedHarvesterByEntityId(harvesterEntityId);
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.leaveHarvester(harvesterEntityId))
+      .then(destroyResult => {
+        return Promise.all([
+          this.reloadList(),
+          harvester ? Promise.all([
+            harvester.reload().catch(ignoreForbiddenError),
+            this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
+            this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
+          ]) : resolve(),
+        ]).then(() => destroyResult);
+      });
+  },
+
+  /**
+   * Removes harvester
+   * @param {string} id
+   * @returns {Promise}
+   */
+  removeHarvester(id) {
+    return this.getRecord(id, false)
+      .then(record => record.destroyRecord())
+      .then(destroyResult => this.reloadList().then(() => destroyResult));
+  },
+
+  /**
    * Reloads harvester list
    * @returns {Promise<HarvesterList>}
    */

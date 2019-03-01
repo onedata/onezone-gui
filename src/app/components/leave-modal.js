@@ -1,15 +1,16 @@
 /**
- * Shows modal asking about group/space leaving.
+ * Shows modal asking about group/space/harvester leaving.
  *
  * @module components/leave-modal
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
 import { computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
+import _ from 'lodash';
 
 export default ProceedProcessModal.extend({
   /**
@@ -36,16 +37,15 @@ export default ProceedProcessModal.extend({
    */
   messageText: computed('record.{name,recordType}', function messageText() {
     const recordName = this.get('record.name');
-    const recordType = this.t(this.get('record.entityType'));
+    const recordType = this.get('record.entityType');
     const recordTypeI18n = this.t(recordType);
     return htmlSafe(
       this.t('areYouSure', { recordName, recordType: recordTypeI18n }) +
       '<br><br><strong class="text-danger">' +
-      this.t(recordType === 'space' ? 'mayCauseSpace' : 'mayCauseGroup', {
+      this.t('mayCause' + _.upperFirst(recordType), {
         recordName,
         recordType: recordTypeI18n,
-      }) +
-      '</strong>'
+      }) + '</strong>'
     );
   }),
 

@@ -44,6 +44,11 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-harvesters/harvester-item',
+
+  /**
+   * @override
+   */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
       id: 'plugin',

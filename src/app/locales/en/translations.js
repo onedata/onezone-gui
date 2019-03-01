@@ -60,6 +60,7 @@ import contentHarvestersConfig from './components/content-harvesters-config';
 import contentHarvestersSpaces from './components/content-harvesters-spaces';
 import contentHarvestersMembers from './components/content-harvesters-members';
 import addYourSpaceModal from './components/add-your-space-modal';
+import harvesterRemoveModal from './components/harvester-remove-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -130,6 +131,7 @@ let translations = {
     contentHarvestersSpaces,
     contentHarvestersMembers,
     addYourSpaceModal,
+    harvesterRemoveModal,
   },
   services: {
     clientTokenActions,

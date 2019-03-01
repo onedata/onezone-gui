@@ -5,4 +5,10 @@ export default {
     spaces: 'Spaces',
     members: 'Members',
   },
+  harvesterItem: {
+    rename: 'Rename',
+    leave: 'Leave',
+    remove: 'Remove',
+    persistingHarvester: 'persisting harvester',
+  },
 };
