@@ -159,6 +159,32 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins group to a harvester using token
+   * @param {Model.Group} group 
+   * @param {string} token
+   * @returns {Promise<Harvester>}
+   */
+  joinHarvesterAsGroup(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinHarvesterAsGroup(group, token)
+      .then(harvester => {
+        globalNotify.success(this.t('joinHarvesterAsGroupSuccess', {
+          groupName: get(group, 'name'),
+          harvesterName: get(harvester, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return harvester;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningHarvesterAsGroup'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Joins group as a subgroup
    * @param {Group} group 
    * @param {string} token

@@ -35,4 +35,6 @@ export default {
   childGroupAddition: 'child group addition',
   addChildGroupSuccess: 'Child group "{{childGroupName}}" has been added successfully',
   removeRelationSuccess: 'Relation between "{{parentGroupName}}" and "{{childGroupName}}" has been removed',
+  joinHarvesterAsGroupSuccess: 'Successfully joined harvester "{{harvesterName}}" as group "{{groupName}}"',
+  joiningHarvesterAsGroup: 'joining harvester',
 };

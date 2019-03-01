@@ -34,6 +34,7 @@ import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
+import contentGroupsJoinHarvester from './components/content-groups-join-harvester';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import membersCollection from './components/members-collection';
@@ -102,6 +103,7 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
+    contentGroupsJoinHarvester,
     contentClustersAdd,
     contentClustersEmpty,
     membersCollection,

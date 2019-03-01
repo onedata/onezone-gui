@@ -8,6 +8,7 @@ export default {
   groupItem: {
     rename: 'Rename',
     joinSpace: 'Join space',
+    joinHarvester: 'Join harvester',
     joinAsSubgroup: 'Join as subgroup',
     leave: 'Leave',
     remove: 'Remove',

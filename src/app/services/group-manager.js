@@ -23,6 +23,7 @@ export default Service.extend({
   currentUser: service(),
   spaceManager: service(),
   providerManager: service(),
+  harvesterManager: service(),
 
   /**
    * Fetches collection of all groups
@@ -183,6 +184,26 @@ export default Service.extend({
           .catch(ignoreForbiddenError),
         ]).then(() => space)
       );
+  },
+
+  /**
+   * Joins group to a harvester using token
+   * @param {Model.Group} group 
+   * @param {string} token
+   * @returns {Promise<Harvester>}
+   */
+  joinHarvesterAsGroup(group, token) {
+    const harvesterManager = this.get('harvesterManager');
+    return group.joinHarvester(token)
+      .then(harvester => {
+        const harvesterEntityId = get(harvester, 'entityId');
+        return Promise.all([
+          harvesterManager.reloadGroupList(harvesterEntityId)
+          .catch(ignoreForbiddenError),
+          harvesterManager.reloadEffGroupList(harvesterEntityId)
+          .catch(ignoreForbiddenError),
+        ]).then(() => harvester);
+      });
   },
 
   /**
