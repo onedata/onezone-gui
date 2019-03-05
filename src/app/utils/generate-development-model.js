@@ -99,12 +99,22 @@ export default function generateDevelopmentModel(store) {
           }))
           .then(() => Promise.all(clusterList.map(cluster => {
             if (get(cluster, 'type') === 'oneprovider') {
+              const clusterProvider =
+                providerList.findBy('entityId', get(cluster, 'entityId'));
               set(
                 cluster,
                 'provider',
-                providerList.findBy('entityId', get(cluster, 'entityId'))
+                clusterProvider
               );
-              return cluster.save();
+              return cluster.save()
+                .then(() => {
+                  set(
+                    clusterProvider,
+                    'cluster',
+                    cluster
+                  );
+                  return clusterProvider.save();
+                });
             } else {
               return resolve();
             }

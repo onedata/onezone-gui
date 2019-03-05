@@ -3,7 +3,7 @@
  *
  * @module utils/generate-shell-command
  * @author Jakub Liput
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,21 +11,30 @@ function _onezoneUrl(windowLocation = window.location) {
   return windowLocation.origin.toString();
 }
 
-function _curlCommand(url, token, suffix = '') {
+function _curlCommand(url, token, onezoneRegistrationToken, suffix = '') {
   if (!url || !token) {
     return undefined;
   }
   token = token.replace(/'/g, '\\\'');
-  let onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
-  return `curl ${url} | sh -s '${onezoneUrl}' '${token}' ${suffix}`;
+  const onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
+  return `curl ${url} | sh -s '${onezoneUrl}' '${onezoneRegistrationToken}' '${token}' ${suffix}`;
 }
 
 const GENERATORS = {
-  onedatify({ token }) {
-    return _curlCommand('https://get.onedata.org/onedatify.sh', token);
+  onedatify({ token, onezoneRegistrationToken }) {
+    return _curlCommand(
+      'https://get.onedata.org/onedatify.sh',
+      token,
+      onezoneRegistrationToken
+    );
   },
-  oneprovider({ token }) {
-    return _curlCommand('https://get.onedata.org/onedatify.sh', token, 'noimport');
+  oneprovider({ token, onezoneRegistrationToken }) {
+    return _curlCommand(
+      'https://get.onedata.org/onedatify.sh',
+      token,
+      onezoneRegistrationToken,
+      'noimport'
+    );
   },
 };
 

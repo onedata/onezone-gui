@@ -8,14 +8,15 @@
  */
 
 import Component from '@ember/component';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(UserProxyMixin, I18n, {
-  currentUser: inject(),
-  globalNotify: inject(),
+  currentUser: service(),
+  globalNotify: service(),
+  clusterManager: service(),
 
   i18nPrefix: 'components.contentSpacesSupport',
 
@@ -35,16 +36,31 @@ export default Component.extend(UserProxyMixin, I18n, {
     if (!this.get('supportTokenProxy')) {
       this._updateSupportToken();
     }
+    if (!this.get('onezoneRegistrationTokenProxy')) {
+      this._updateOnezoneRegistrationToken();
+    }
   },
 
   _getNewSupportToken() {
     return this.get('space').getInviteToken('provider');
   },
 
+  _getNewOnezoneRegistrationToken() {
+    return this.get('clusterManager').getOnezoneRegistrationToken();
+  },
+
   _updateSupportToken() {
     const promise = this._getNewSupportToken();
     return this.set(
       'supportTokenProxy',
+      PromiseObject.create({ promise })
+    );
+  },
+
+  _updateOnezoneRegistrationToken() {
+    const promise = this._getNewOnezoneRegistrationToken();
+    return this.set(
+      'onezoneRegistrationTokenProxy',
       PromiseObject.create({ promise })
     );
   },

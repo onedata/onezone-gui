@@ -13,6 +13,7 @@ import notImplementedReject from 'onedata-gui-common/utils/not-implemented-rejec
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import { computed } from '@ember/object';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { Promise } from 'rsvp';
 
 export default Component.extend({
   /**
@@ -49,6 +50,12 @@ export default Component.extend({
   tokenProxy: undefined,
 
   /**
+   * @virtual
+   * @type {PromiseObject<string>}
+   */
+  onezoneRegistrationTokenProxy: undefined,
+
+  /**
    * Selector for input for copying to clipboard
    * @type {Ember.ComputedProperty<string>}
    */
@@ -60,17 +67,25 @@ export default Component.extend({
    * Proxy for generated provider setup command
    * @type {Ember.ComputedProperty<PromiseObject<string>>}
    */
-  commandProxy: computed('commandType', 'tokenProxy.promise', function () {
-    const tokenPromise = this.get('tokenProxy.promise');
-    const commandType = this.get('commandType');
-    if (commandType && tokenPromise) {
-      return PromiseObject.create({
-        promise: tokenPromise.then(token =>
-          generateShellCommand(commandType, { token })
-        ),
-      });
-    }
-  }),
+  commandProxy: computed(
+    'commandType',
+    'tokenProxy.promise',
+    'onezoneRegistrationTokenProxy.promise',
+    function commandProxy() {
+      const tokensPromise =
+        Promise.all([
+          this.get('tokenProxy.promise'),
+          this.get('onezoneRegistrationTokenProxy.promise'),
+        ]);
+      const commandType = this.get('commandType');
+      if (commandType && tokensPromise) {
+        return PromiseObject.create({
+          promise: tokensPromise.then(([token, onezoneRegistrationToken]) =>
+            generateShellCommand(commandType, { token, onezoneRegistrationToken })
+          ),
+        });
+      }
+    }),
 
   actions: {
     copySuccess() {
