@@ -51,7 +51,7 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {boolean}
    */
-  addYourSpaceModalVisible: false,
+  addYourSpaceModalOpened: false,
 
   /**
    * @type {boolean}
@@ -90,7 +90,7 @@ export default Component.extend(I18n, GlobalActions, {
    */
   addYourSpaceAction: computed(function addYourSpaceAction() {
     return {
-      action: () => this.set('addYourSpaceModalVisible', true),
+      action: () => this.set('addYourSpaceModalOpened', true),
       title: this.t('addYourSpace'),
       class: 'add-your-space-action',
       icon: 'group-invite',
@@ -148,7 +148,7 @@ export default Component.extend(I18n, GlobalActions, {
       harvesterActions.addSpaceToHarvester(harvester, space).finally(() =>
         safeExec(this, 'setProperties', {
           isAddingYourSpace: false,
-          addYourSpaceModalVisible: false,
+          addYourSpaceModalOpened: false,
         })
       );
     },

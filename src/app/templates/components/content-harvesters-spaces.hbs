@@ -31,6 +31,20 @@
               actionsArg=space}}
           {{/listItem.header}}
         {{/list.item}}
+      {{else}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header
+            isCollapsible=false
+            class="text-center"}}
+            <span class="one-label">
+              {{tt this "noSpacesStart"}}
+              <a {{action (mut addYourSpaceModalOpened) true}}>{{tt this "noSpacesAdd"}}</a>
+              {{tt this "noSpacesOr"}}
+              <a {{action (mut isInviteUsingTokenModalOpened) true}}>{{tt this "noSpacesInvite"}}</a>
+              {{tt this "noSpacesEnd"}}
+            </span>
+          {{/listItem.header}}
+        {{/list.item}}
       {{/each}}
     {{/one-collapsible-list}}
   {{/promise-proxy-container}}
@@ -43,8 +57,8 @@
   space=spaceToRemove
   harvester=harvester}}
 {{add-your-space-modal
-  opened=addYourSpaceModalVisible
-  close=(action (mut addYourSpaceModalVisible) false)
+  opened=addYourSpaceModalOpened
+  close=(action (mut addYourSpaceModalOpened) false)
   proceed=(action "addYourSpace")
   processing=isAddingYourSpace
   relatedRecord=harvester
