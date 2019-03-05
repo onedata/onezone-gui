@@ -101,6 +101,12 @@ module.exports = function (defaults) {
 
   BOWER_ASSETS.forEach(path => app.import(app.bowerDirectory + '/' + path));
 
+  const NODE_ASSETS = [
+    'input-tokenizer/tokenizer.min.js',
+  ];
+
+  NODE_ASSETS.forEach(path => app.import(`node_modules/${path}`));
+
   const VENDOR_ASSETS = [
     'chartist-plugin-legend/chartist-plugin-legend.js',
   ];

@@ -6,6 +6,13 @@
   </h1>
 </div>
 <div class="row content-row">
+  {{one-input-tokenizer
+    tokens=entryTypes
+    tokensChanged=(action "entryTypesChanged")
+    placeholder="blablabla"
+    isBusy=false
+    separators=entryTypesSeparators
+  }}
   {{#promise-proxy-container proxy=harvesterConfigRecord}}
     {{json-editor value=harvesterConfig onChange=(action "onConfigChange")}}
     {{#one-spin-button
