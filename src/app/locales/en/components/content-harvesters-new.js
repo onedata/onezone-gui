@@ -1,7 +1,7 @@
 export default {
-  header: 'Create new index',
-  description: 'Enter a name and an Elasticsearch service location below to create new&nbsp;index',
-  harvesterName: 'Index name',
+  header: 'Create new harvester',
+  description: 'Enter a name and an Elasticsearch service location below to create new&nbsp;harvester',
+  harvesterName: 'harvester name',
   elasticsearchEndpoint: 'Elasticsearch service location',
-  create: 'Create new index',
+  create: 'Create new harvester',
 };
