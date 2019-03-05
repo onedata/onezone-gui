@@ -13,7 +13,6 @@ import notImplementedReject from 'onedata-gui-common/utils/not-implemented-rejec
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import { computed } from '@ember/object';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { Promise } from 'rsvp';
 
 export default Component.extend({
   /**
@@ -29,7 +28,7 @@ export default Component.extend({
    * @virtual
    * @type {function} returns Promise
    */
-  getToken: notImplementedReject,
+  getTokens: notImplementedReject,
 
   /**
    * @virtual
@@ -39,21 +38,9 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Function}
+   * @type {PromiseObject<Object>} `{ supportToken, onezoneRegistrationToken }`
    */
-  copyError: notImplementedThrow,
-
-  /**
-   * @virtual
-   * @type {PromiseObject<string>}
-   */
-  tokenProxy: undefined,
-
-  /**
-   * @virtual
-   * @type {PromiseObject<string>}
-   */
-  onezoneRegistrationTokenProxy: undefined,
+  tokensProxy: undefined,
 
   /**
    * Selector for input for copying to clipboard
@@ -69,19 +56,19 @@ export default Component.extend({
    */
   commandProxy: computed(
     'commandType',
-    'tokenProxy.promise',
-    'onezoneRegistrationTokenProxy.promise',
+    'tokensProxy.content.{supportToken,onezoneRegistrationToken}',
     function commandProxy() {
-      const tokensPromise =
-        Promise.all([
-          this.get('tokenProxy.promise'),
-          this.get('onezoneRegistrationTokenProxy.promise'),
-        ]);
-      const commandType = this.get('commandType');
-      if (commandType && tokensPromise) {
+      const {
+        tokensProxy,
+        commandType,
+      } = this.getProperties('tokensProxy', 'commandType');
+      if (commandType && tokensProxy) {
         return PromiseObject.create({
-          promise: tokensPromise.then(([token, onezoneRegistrationToken]) =>
-            generateShellCommand(commandType, { token, onezoneRegistrationToken })
+          promise: tokensProxy.then(({ supportToken, onezoneRegistrationToken }) =>
+            generateShellCommand(commandType, {
+              supportToken,
+              onezoneRegistrationToken,
+            })
           ),
         });
       }
@@ -94,11 +81,11 @@ export default Component.extend({
     copyError() {
       return this.get('copyError')(...arguments);
     },
-    getToken() {
-      return this.get('getToken')(...arguments)
+    getTokens() {
+      return this.get('getTokens')(...arguments)
         .catch(error => {
           console.error(
-            `component:add-space-storage:-tab-base: getToken action failed: ${error && error.message || error}`
+            `component:add-space-storage:-tab-base: getTokens action failed: ${error && error.message || error}`
           );
         });
     },

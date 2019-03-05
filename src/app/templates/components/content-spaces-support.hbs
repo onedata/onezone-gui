@@ -9,30 +9,28 @@
 <div class="row content-row">
   {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
     {{#tab.pane title=(tt this "requestSupport.tabName")}}
+      {{!-- TODO: always fetching registration token once - make lazy loading of command tabs--}}
       {{content-spaces-support/request-support
         copySuccess=(action "copySuccess")
         copyError=(action "copyError")
-        getToken=(action "getNewSupportToken")
-        tokenProxy=supportTokenProxy
-        onezoneRegistrationTokenProxy=onezoneRegistrationTokenProxy
+        getNewSupportToken=(action "getNewSupportToken")
+        supportTokenProxy=supportTokenProxy
       }}
     {{/tab.pane}}
     {{#tab.pane title=(tt this "deployProvider.tabName")}}
       {{content-spaces-support/deploy-provider
         copySuccess=(action "copySuccess")
         copyError=(action "copyError")
-        getToken=(action "getNewSupportToken")
-        tokenProxy=supportTokenProxy
-        onezoneRegistrationTokenProxy=onezoneRegistrationTokenProxy
+        getTokens=(action "getNewTokens")
+        tokensProxy=lazyTokensProxy
       }}
     {{/tab.pane}}
     {{#tab.pane title=(tt this "exposeData.tabName")}}
       {{content-spaces-support/expose-data
         copySuccess=(action "copySuccess")
         copyError=(action "copyError")
-        getToken=(action "getNewSupportToken")
-        tokenProxy=supportTokenProxy
-        onezoneRegistrationTokenProxy=onezoneRegistrationTokenProxy
+        getTokens=(action "getNewTokens")
+        tokensProxy=lazyTokensProxy
       }}
     {{/tab.pane}}
   {{/bs-tab}}

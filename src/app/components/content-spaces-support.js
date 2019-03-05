@@ -10,80 +10,78 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
+import { hash } from 'rsvp';
+import { computed } from '@ember/object';
 
-export default Component.extend(UserProxyMixin, I18n, {
-  currentUser: service(),
-  globalNotify: service(),
-  clusterManager: service(),
+export default Component.extend(
+  UserProxyMixin,
+  I18n,
+  createDataProxyMixin('supportToken'),
+  createDataProxyMixin('tokens'), {
+    currentUser: service(),
+    globalNotify: service(),
+    clusterManager: service(),
 
-  i18nPrefix: 'components.contentSpacesSupport',
+    i18nPrefix: 'components.contentSpacesSupport',
 
-  /**
-   * @type {models/Space}
-   */
-  space: undefined,
+    /**
+     * @type {models/Space}
+     */
+    space: undefined,
 
-  /**
-   * Resolves with support token, can be updated with `_updateSupportToken`
-   * @type {PromiseObject<string>}
-   */
-  supportTokenProxy: undefined,
+    lazyTokensProxy: computed('tokensProxy', function lazyTokensProxy() {
+      return this.getTokensProxy();
+    }),
 
-  init() {
-    this._super(...arguments);
-    if (!this.get('supportTokenProxy')) {
-      this._updateSupportToken();
-    }
-    if (!this.get('onezoneRegistrationTokenProxy')) {
-      this._updateOnezoneRegistrationToken();
-    }
-  },
-
-  _getNewSupportToken() {
-    return this.get('space').getInviteToken('provider');
-  },
-
-  _getNewOnezoneRegistrationToken() {
-    return this.get('clusterManager').getOnezoneRegistrationToken();
-  },
-
-  _updateSupportToken() {
-    const promise = this._getNewSupportToken();
-    return this.set(
-      'supportTokenProxy',
-      PromiseObject.create({ promise })
-    );
-  },
-
-  _updateOnezoneRegistrationToken() {
-    const promise = this._getNewOnezoneRegistrationToken();
-    return this.set(
-      'onezoneRegistrationTokenProxy',
-      PromiseObject.create({ promise })
-    );
-  },
-
-  actions: {
-    getNewSupportToken() {
-      return this._updateSupportToken();
+    init() {
+      this._super(...arguments);
+      if (!this.get('tokensProxy')) {
+        this.updateTokensProxy();
+      }
     },
 
     /**
-     * @param {string} type one of: token, command
-     * @returns {undefined}
+     * @override
      */
-    copySuccess(type) {
-      this.get('globalNotify').info(this.t(`copy.${type}.success`));
+    fetchSupportToken() {
+      return this.get('space').getInviteToken('provider');
     },
 
     /**
-     * @param {string} type one of: token, command
-     * @returns {undefined}
+     * @override
      */
-    copyError(type) {
-      this.get('globalNotify').info(this.t(`copy.${type}.error`));
+    fetchTokens() {
+      return hash({
+        supportToken: this.updateSupportTokenProxy(),
+        onezoneRegistrationToken: this.get('clusterManager').getOnezoneRegistrationToken(),
+      });
     },
-  },
-});
+
+    actions: {
+      getNewSupportToken() {
+        return this.updateSupportTokenProxy();
+      },
+
+      getNewTokens() {
+        return this.updateTokensProxy();
+      },
+
+      /**
+       * @param {string} type one of: token, command
+       * @returns {undefined}
+       */
+      copySuccess(type) {
+        this.get('globalNotify').info(this.t(`copy.${type}.success`));
+      },
+
+      /**
+       * @param {string} type one of: token, command
+       * @returns {undefined}
+       */
+      copyError(type) {
+        this.get('globalNotify').info(this.t(`copy.${type}.error`));
+      },
+    },
+  });

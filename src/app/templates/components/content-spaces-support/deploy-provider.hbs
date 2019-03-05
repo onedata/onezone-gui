@@ -7,12 +7,15 @@
     <div class="row content-row no-border">
       {{content-spaces-support/-os-supported}}
     </div>
+  </div>
+  <img class="col-image col-image-support hidden-xs hidden-sm col-md-5 col-lg-4" src={{root-url "assets/images/space-support-deploy.svg"}}>
+  <div class="col-xs-12">
     <div class="row content-row no-border">
       <div class="inner-row-content">
         <h5>{{t "components.contentSpacesSupport.tabsCommon.command"}}</h5>
         <div class="row loadable-row lg">
           {{#promise-proxy-container proxy=commandProxy}}
-            <textarea class="token-textarea deploy-provider-command no-resize form-control" rows="7" readonly>{{commandProxy.content}}</textarea>
+            <textarea class="token-textarea deploy-provider-command no-resize form-control" rows="9" readonly>{{commandProxy.content}}</textarea>
             {{#copy-button
               success=(action "copySuccess" "command")
               error=(action "copyError" "command")
@@ -22,7 +25,7 @@
               {{one-icon icon="clipboard-copy"}}
               {{t "components.contentSpacesSupport.tabsCommon.copy"}}
             {{/copy-button}}
-            <a class="clickable btn-get-token pull-right" {{action "getToken"}}>
+            <a class="clickable btn-get-token pull-right" {{action "getTokens"}}>
               {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
             </a>
           {{/promise-proxy-container}}
@@ -30,6 +33,5 @@
       </div>
     </div>
   </div>
-  <img class="col-image hidden-xs hidden-sm col-md-5 col-lg-4" src={{root-url "assets/images/space-support-deploy.svg"}}>
 </div>
 

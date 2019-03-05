@@ -1,4 +1,5 @@
 export default {
+  menuItem: 'Clusters',
   aspects: {
     index: 'Cluster',
     overview: 'Overview',

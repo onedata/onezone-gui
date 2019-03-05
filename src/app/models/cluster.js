@@ -30,7 +30,7 @@ export default Model.extend(
     fetchName() {
       if (this.get('type') === 'oneprovider') {
         return this.get('provider')
-          .then(provider => get(provider, 'name'));
+          .then(provider => provider && get(provider, 'name'));
       } else {
         return resolve(this.get('onedataConnection.zoneName'));
       }
@@ -42,7 +42,7 @@ export default Model.extend(
     fetchDomain() {
       if (this.get('type') === 'oneprovider') {
         return this.get('provider')
-          .then(provider => get(provider, 'domain'));
+          .then(provider => provider && get(provider, 'domain'));
       } else {
         return resolve(this.get('onedataConnection.zoneDomain'));
       }

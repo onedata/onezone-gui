@@ -1,4 +1,5 @@
 export default {
+  menuItem: 'Groups',
   aspects: {
     index: 'Overview',
     members: 'Members',

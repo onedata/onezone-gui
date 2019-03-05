@@ -8,9 +8,9 @@
     <h1>{{tt this "inviteUsingToken" modelType=(tt this tokenType)}}</h1>
   {{/modal.header}}
   {{#modal.body}}
-    {{#promise-proxy-container proxy=tokenProxy sizeClass="sm"}}
+    {{#promise-proxy-container proxy=tokensProxy sizeClass="sm"}}
       <p class="input-top-description">{{tt this "passGeneratedToken" tokenReceiver=(tt this (concat tokenType "Receiver"))}}</p>
-      <textarea class="token-textarea invitation-token form-control" rows="4" readonly>{{tokenProxy.content}}</textarea>
+      <textarea class="token-textarea invitation-token form-control" rows="4" readonly>{{tokensProxy.content}}</textarea>
       <p class="text-right">
         <a class="clickable btn-get-token" {{action "generateToken"}}>
           {{tt this "generateToken"}}
@@ -22,9 +22,9 @@
     {{#bs-button onClick=close}}
       {{tt this "close"}}
     {{/bs-button}}
-    {{#if tokenProxy.isFulfilled}}
+    {{#if tokensProxy.isFulfilled}}
       {{#copy-button
-        disabled=(not tokenProxy.isFulfilled)
+        disabled=(not tokensProxy.isFulfilled)
         success=(action "copyTokenSuccess")
         error=(action "copyTokenError")
         class="btn btn-primary"

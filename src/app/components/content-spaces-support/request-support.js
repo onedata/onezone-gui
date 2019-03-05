@@ -13,4 +13,16 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 export default TabBase.extend(I18n, {
   classNames: ['request-support-tab'],
   i18nPrefix: 'components.contentSpacesSupport.requestSupport',
+
+  /**
+   * @virtual
+   * @type {Function}
+   */
+  getNewSupportToken: undefined,
+
+  actions: {
+    getNewSupportToken() {
+      return this.get('getNewSupportToken')();
+    },
+  },
 });
