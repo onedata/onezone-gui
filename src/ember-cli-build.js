@@ -103,6 +103,7 @@ module.exports = function (defaults) {
 
   const NODE_ASSETS = [
     'input-tokenizer/tokenizer.min.js',
+    'cleave.js/dist/cleave.min.js',
   ];
 
   NODE_ASSETS.forEach(path => app.import(`node_modules/${path}`));
