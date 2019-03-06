@@ -16,9 +16,12 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import _ from 'lodash';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { resolve } from 'rsvp';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   tagName: '',
+
+  i18n: service(),
 
   /**
    * If true, modal is opened
