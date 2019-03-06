@@ -8,30 +8,32 @@
   buttonDisabled=(or (not harvesterName) (not elasticsearchEndpoint))
   as |contentInfo|
 }}
-  <div class="row">
-    <div class="col-xs-12">
-      <div class="form-group">
-        <input
-          id="new-harvester-name"
-          value={{harvesterName}}
-          oninput={{action (mut harvesterName) value="target.value"}}
-          onkeydown={{invoke-on-enter contentInfo.buttonAction}}
-          placeholder={{tt this "harvesterName"}}
-          disabled={{contentInfo.actionInProgress}}
-          class="form-control new-harvester-name"
-        >
-      </div>
-      <div class="form-group">
-        <input
-          id="elasticsearch-endpoint"
-          value={{elasticsearchEndpoint}}
-          oninput={{action (mut elasticsearchEndpoint) value="target.value"}}
-          onkeydown={{invoke-on-enter contentInfo.buttonAction}}
-          placeholder={{tt this "elasticsearchEndpoint"}}
-          disabled={{contentInfo.actionInProgress}}
-          class="form-control elasticsearch-endpoint"
-        >
+  {{#promise-proxy-container proxy=pluginsListProxy}}
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="form-group">
+          <input
+            id="new-harvester-name"
+            value={{harvesterName}}
+            oninput={{action (mut harvesterName) value="target.value"}}
+            onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+            placeholder={{tt this "harvesterName"}}
+            disabled={{contentInfo.actionInProgress}}
+            class="form-control new-harvester-name"
+          >
+        </div>
+        <div class="form-group">
+          <input
+            id="elasticsearch-endpoint"
+            value={{elasticsearchEndpoint}}
+            oninput={{action (mut elasticsearchEndpoint) value="target.value"}}
+            onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+            placeholder={{tt this "elasticsearchEndpoint"}}
+            disabled={{contentInfo.actionInProgress}}
+            class="form-control elasticsearch-endpoint"
+          >
+        </div>
       </div>
     </div>
-  </div>
+  {{/promise-proxy-container}}
 {{/content-info}}

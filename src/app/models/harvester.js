@@ -20,12 +20,6 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   directMembership: attr('boolean', { defaultValue: false }),
 
   /**
-   * Harvester configuration
-   * @type {Object}
-   */
-  config: attr('object'),
-
-  /**
    * Elasticsearch endpoint
    * @type {string}
    */

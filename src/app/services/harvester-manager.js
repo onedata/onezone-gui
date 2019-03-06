@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -36,10 +37,11 @@ export default Service.extend({
   /**
    * Returns harvester with specified id
    * @param {string} id
+   * @param {boolean} backgroundReload
    * @return {Promise<Harvester>}
    */
-  getRecord(id) {
-    return this.get('store').findRecord('harvester', id);
+  getRecord(id, backgroundReload = true) {
+    return this.get('store').findRecord('harvester', id, { backgroundReload });
   },
 
   /**
@@ -344,6 +346,25 @@ export default Service.extend({
       aspect: 'config',
       scope: 'private',
     }));
+  },
+
+  /**
+   * Gets available harvester plugins list
+   * @returns {PromiseArray<string>}
+   */
+  getPluginsList() {
+    const onedataGraph = this.get('onedataGraph');
+    return PromiseArray.create({
+      promise: onedataGraph.request({
+        gri: gri({
+          entityType: 'harvester',
+          aspect: 'all_plugins',
+          scope: 'private',
+        }),
+        operation: 'get',
+        subscribe: false,
+      }).then(({ allPlugins }) => allPlugins),
+    });
   },
 
   /**

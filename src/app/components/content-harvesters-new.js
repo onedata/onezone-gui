@@ -10,9 +10,11 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   harvesterActions: service(),
+  harvesterManager: service(),
 
   /**
    * @override
@@ -28,6 +30,13 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   elasticsearchEndpoint: '',
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseArray<string>>}
+   */
+  pluginsListProxy: computed(function pluginsList() {
+    return this.get('harvesterManager').getPluginsList();
+  }),
 
   didInsertElement() {
     this._super(...arguments);
