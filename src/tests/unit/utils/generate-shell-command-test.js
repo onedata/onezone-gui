@@ -9,7 +9,7 @@ describe('Unit | Utility | generate shell command', function () {
     const onezoneRegistrationToken = 'some_reg_token';
 
     let result = generateShellCommand('onedatify', {
-      token: supportToken,
+      supportToken,
       onezoneRegistrationToken,
     });
     expect(result).to.match(/curl/);
