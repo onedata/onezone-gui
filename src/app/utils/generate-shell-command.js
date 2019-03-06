@@ -14,7 +14,7 @@ function _onezoneUrl(windowLocation = window.location) {
 function _curlCommand(url, supportToken, onezoneRegistrationToken, suffix = '') {
   supportToken = supportToken.replace(/'/g, '\\\'');
   const onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
-  return `curl ${url} | sh -s '${onezoneUrl}' '${onezoneRegistrationToken}' '${supportToken}' ${suffix}`;
+  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${onezoneRegistrationToken}' --token '${supportToken}' ${suffix}`;
 }
 
 const GENERATORS = {
@@ -22,15 +22,15 @@ const GENERATORS = {
     return _curlCommand(
       'https://get.onedata.org/onedatify.sh',
       supportToken,
-      onezoneRegistrationToken
+      onezoneRegistrationToken,
+      '--import'
     );
   },
   oneprovider({ supportToken, onezoneRegistrationToken }) {
     return _curlCommand(
       'https://get.onedata.org/onedatify.sh',
       supportToken,
-      onezoneRegistrationToken,
-      'noimport'
+      onezoneRegistrationToken
     );
   },
 };
