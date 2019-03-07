@@ -23,6 +23,9 @@ export default Model.extend(
     type: attr('string'),
     provider: belongsTo('provider'),
     onepanelProxy: attr('boolean'),
+    workerVersion: attr('object'),
+    onepanelVersion: attr('object'),
+    info: attr('object'),
 
     /**
      * @override

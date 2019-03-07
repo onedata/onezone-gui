@@ -14,6 +14,7 @@ export default OnedataConnection.extend({
   zoneName: 'Hello world',
   zoneDomain: location.hostname,
   serviceVersion: '19.02.9',
+  serviceBuildVersion: 'm-23493894y7238',
   brandSubtitle: 'Isolated zone',
   loginNotification: '',
 });

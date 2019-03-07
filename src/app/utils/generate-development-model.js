@@ -303,6 +303,16 @@ function createClusterRecords(store) {
         creatorId: '',
         creationTime: 1550156285,
       },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
     },
     {
       id: 'cluster.oneprovider-1.instance:protected',
@@ -318,6 +328,16 @@ function createClusterRecords(store) {
         creatorId: '',
         creationTime: 1550156285,
       },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
     },
     {
       id: 'cluster.oneprovider-2.instance:protected',
@@ -332,6 +352,16 @@ function createClusterRecords(store) {
         creatorType: 'root',
         creatorId: '',
         creationTime: 1550156285,
+      },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
       },
     },
   ].map(c => store.createRecord('cluster', c).save()));
