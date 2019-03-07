@@ -1,0 +1,22 @@
+.harvester-configuration {
+  .type-name-editor {
+    margin: -($input-height-base - $line-height-computed) / 2 0;
+    max-width: 400px;
+  }
+  .schema-editor {
+    margin: $padding-large-vertical;
+  }
+  .remove-type {
+    @include vertical-align-middle();
+    right: 50px;
+    font-size: 2em;
+    &:hover {
+      color: $color-one-danger;
+    }
+  }
+  .type-labels-container {
+    @include vertical-align-middle();
+    right: 90px;
+    line-height: 0;
+  }
+}

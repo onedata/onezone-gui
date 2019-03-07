@@ -356,7 +356,7 @@ function createHarvesterRecords(store) {
       name: `Harvester ${index}`,
       scope: 'private',
       endpoint: '127.0.0.1:9300',
-      guiPluginPath: '/harvesters/h1/index.html',
+      guiPluginHttpLocation: '/harvesters/h1/index.html',
       directMembership: true,
       canViewPrivileges: true,
       info: {

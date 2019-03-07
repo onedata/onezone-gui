@@ -76,22 +76,7 @@ export default Component.extend(I18n, {
     this.configObserver();
   },
 
-  didInsertElement() {
-    this._super(...arguments);
-    new window.Cleave('#gui-plugin-path', {
-      prefix: '/var/www',
-      onValueChanged: ({ target: { value } }) => this.set('guiPluginPath', value),
-    });
-  },
-
   actions: {
-    onConfigChange(config) {
-      this.setProperties({
-        harvesterConfig: get(config, 'value'),
-        isHarvesterConfigModified: true,
-        isHarvesterConfigValid: get(config, 'isValid'),
-      });
-    },
     onSave() {
       const {
         harvesterConfig,

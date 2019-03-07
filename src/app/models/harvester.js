@@ -35,11 +35,14 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @type {Object}
    */
   // guiPluginPath: attr('string'),
-  guiPluginPath: '/harvester_gui/index.html',
+  guiPluginPath: '/var/www/cos',
+
+  guiPluginHttpLocation: '/harvester_gui/index.html',
 
   entryTypeField: attr('string'),
 
-  acceptedEntryTypes: attr('array'),
+  // acceptedEntryTypes: attr('array'),
+  acceptedEntryTypes: [{name:'type1', schema: {a: 1}}],
 
   defaultEntryType: attr('string'),
 

@@ -1,0 +1,20 @@
+{{harvester-configuration/metadata-types
+  mode=mode
+  typeField=harvester.entryTypeField
+  acceptedTypes=harvester.acceptedEntryTypes
+  defaultType=harvester.defaultEntryType
+  onChange=(action "onTypesChange")}}
+{{harvester-configuration/gui-plugin
+  path=harvester.guiPluginPath
+  configuration=guiPluginConfiguration
+  mode=mode
+  pathPrefix=guiPluginPathPrefix
+  onChange=(action "onGuiPluginChange")}}
+{{#unless (eq mode "view")}}
+  {{#one-spin-button
+    disabled=(or (not isHarvesterConfigModified) (not isHarvesterConfigValid))
+    class="btn btn-primary"
+    action=(action "onSave")}}
+    {{tt this (if (eq mode "edit") "save" "create")}}
+  {{/one-spin-button}}
+{{/unless}}

@@ -1,0 +1,22 @@
+<h1>{{tt this "header"}}</h1>
+<div class="form-group">
+  <label>{{tt this "path"}}</label>
+  {{#if (eq mode "view")}}
+    <span class="gui-plugin-path">{{dataToDisplay.path}}</span>
+  {{else}}
+    <input
+      id={{concat elementId "-gui-plugin-path"}}
+      type="text"
+      disabled={{disabled}}
+      class="form-control gui-plugin-path">
+  {{/if}}
+</div>
+<div class="form-group">
+  <label for={{concat elementId "-configuration"}}>{{tt this "configuration"}}</label>
+  {{json-editor
+    inputId=(concat elementId "-configuration")
+    value=dataToDisplay.configuration
+    disabled=disabled
+    readonly=(eq mode "view")
+    onChange=(action "onConfigurationChange")}}
+</div>

@@ -1,0 +1,79 @@
+<h1>{{tt this "header"}}</h1>
+<div class="form-group">
+  <label for={{concat elementId "-type-field"}}>{{tt this "typeField"}}</label>
+  {{#if (eq mode "view")}}
+    <span class="type-field">{{dataToDisplay.typeField}}</span>
+  {{else}}
+    <input
+      id={{concat elementId "-type-field"}}
+      type="text"
+      value={{dataToDisplay.typeField}}
+      oninput={{action "onTypeFieldChange" value="target.value"}}
+      disabled={{disabled}}
+      class="form-control type-field">
+  {{/if}}
+</div>
+<div class="form-group">
+  <label>{{tt this "types"}}</label>
+  {{#one-collapsible-list as |list|}}
+    {{#each dataToDisplay.acceptedTypes as |type|}}
+      {{#list.item as |listItem|}}
+        {{#listItem.header isCollapsible=(not type.isCreating)}}
+          {{#if type.isCreating}}
+            {{one-inline-editor
+              value=type.name
+              isEditing=true
+              onEdit=(action "onCancelNewTypeEdition" type)
+              onSave=(action "onNewTypeNameChange" type)
+              class="type-name-editor"}}
+          {{else}}
+            {{type.name}}
+            {{one-icon icon="checkbox-filled-x" class="remove-type" click=(action "removeType" type)}}
+            {{#if type.schema}}
+              <span class="type-labels-container">
+                <span class="label {{if type.isValid "label-info" "label-danger"}}">{{tt this "schema"}}</span>
+              </span>
+            {{/if}}
+          {{/if}}
+        {{/listItem.header}}
+        {{#unless type.isCreating}}
+          {{#listItem.content}}
+            <div class="schema-editor">
+              <label for={{concat elementId type.name "-schema"}}>{{tt this "schema"}}:</label>
+              {{json-editor
+                inputId=(concat elementId type.name "-schema")
+                value=type.schema
+                acceptEmptyString=true
+                disabled=disabled
+                readonly=(not-eq mode "create")
+                onChange=(action "onTypeSchemaChange" type)}}
+            </div>
+          {{/listItem.content}}
+        {{/unless}}
+      {{/list.item}}
+    {{/each}}
+  {{/one-collapsible-list}}
+  {{#bs-button
+    type="default"
+    size="sm"
+    disabled=(not allowAddingNewType)
+    onClick=(action "addType")}}
+    {{one-icon icon="add-filled"}}{{tt this "add"}}
+  {{/bs-button}}
+</div>
+<div class="form-group">
+  <label>{{tt this "defaultType"}}</label>
+  {{#if (eq mode "view")}}
+    {{type.name}}
+  {{else}}
+    {{#power-select
+      options=defaultTypeOptions
+      selected=dataToDisplay.defaultType
+      onchange=(action "onDefaultTypeChange")
+      searchEnabled=false
+      renderInPlace=true
+      as |type|}}
+      {{type.name}}
+    {{/power-select}}
+  {{/if}}
+</div>
