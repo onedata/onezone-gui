@@ -42,6 +42,11 @@ describe('Integration | Component | content provider redirect', function () {
           throw new Error('mock error - only cluster is supported');
         }
       },
+      cluster: resolve({
+        workerVersion: {
+          release: '19.02',
+        },
+      }),
     };
     const onezoneServer = lookupService(this, 'onezone-server');
     const url = '/op/12345/i#/';
@@ -51,7 +56,8 @@ describe('Integration | Component | content provider redirect', function () {
     ).returns(Promise.resolve({ url }));
     const fakeWindow = {};
     this.setProperties({ provider, fakeWindow });
-    this.on('checkIsProviderAvailable', () => resolve(true));
+    this.on(
+      'checkIsProviderAvailable', () => resolve(true));
 
     this.render(hbs `{{content-provider-redirect
       checkIsProviderAvailable=(action "checkIsProviderAvailable")
@@ -60,7 +66,8 @@ describe('Integration | Component | content provider redirect', function () {
     }}`);
 
     const $contentProviderRedirect = this.$('.content-provider-redirect');
-    expect($contentProviderRedirect).to.exist;
+    expect(
+      $contentProviderRedirect).to.exist;
 
     wait().then(() => {
       expect(getProviderRedirectUrl).to.be.invokedOnce;
