@@ -293,8 +293,6 @@ function createClusterRecords(store) {
   return Promise.all([{
       id: 'cluster.onezone.instance:protected',
       gri: 'cluster.onezone.instance:protected',
-      build: 'lol',
-      version: '19.02.0',
       type: 'onezone',
       name: 'PL-Grid',
       onepanelProxy: true,
@@ -317,8 +315,6 @@ function createClusterRecords(store) {
     {
       id: 'cluster.oneprovider-1.instance:protected',
       gri: 'cluster.oneprovider-1.instance:protected',
-      build: 'lol1',
-      version: '19.02.0',
       type: 'oneprovider',
       name: 'Cyfronet',
       onepanelProxy: false,
@@ -329,7 +325,7 @@ function createClusterRecords(store) {
         creationTime: 1550156285,
       },
       workerVersion: {
-        release: '19.02.0',
+        release: '18.02.*',
         gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
         build: '176-g36e2f56',
       },
@@ -342,8 +338,6 @@ function createClusterRecords(store) {
     {
       id: 'cluster.oneprovider-2.instance:protected',
       gri: 'cluster.oneprovider-2.instance:protected',
-      build: 'lol2',
-      version: '19.02.0',
       type: 'oneprovider',
       name: 'PCSS',
       onepanelProxy: true,

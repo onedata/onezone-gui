@@ -15,6 +15,9 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
+import { Promise } from 'rsvp';
+
+const oldOneproviderVersion = '18.02.*';
 
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
@@ -75,11 +78,27 @@ export default Component.extend(I18n, {
     return this.checkIsProviderAvailable()
       .then(isAvailable => {
         if (isAvailable) {
-          const path = spaceId ? `onedata/data/${spaceId}` : '';
-          const clusterId =
-            parseGri(provider.belongsTo('cluster').id()).entityId;
-          const _window = this.get('_window');
-          _window.location = `/op/${clusterId}/i#/${path}`;
+          return get(provider, 'cluster')
+            .then(providerCluster => {
+              const _window = this.get('_window');
+              const path = spaceId ? `onedata/data/${spaceId}` : '';
+              if (get(providerCluster, 'workerVersion.release') ===
+                oldOneproviderVersion) {
+                return this.get('onezoneServer')
+                  .getProviderRedirectUrl(get(provider, 'id'), path)
+                  .then(({ url }) => {
+                    return new Promise(() => {
+                      _window.location = url;
+                    });
+                  });
+              } else {
+                const clusterId =
+                  parseGri(provider.belongsTo('cluster').id()).entityId;
+                return new Promise(() => {
+                  _window.location = `/op/${clusterId}/i#/${path}`;
+                });
+              }
+            });
         } else {
           const i18n = this.get('i18n');
           this.get('alert').error(null, {
