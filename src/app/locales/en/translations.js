@@ -9,6 +9,8 @@ import spaces from './tabs/spaces';
 import groups from './tabs/groups';
 import users from './tabs/users';
 
+import noClusterPermissions from './errors/no-cluster-permissions';
+
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
 import contentTokensEmpty from './components/content-tokens-empty';
@@ -66,6 +68,9 @@ let translations = {
     groups,
     users,
     clusters,
+  },
+  errors: {
+    noClusterPermissions,
   },
   components: {
     loginBox,

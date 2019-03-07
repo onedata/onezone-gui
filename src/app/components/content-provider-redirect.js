@@ -90,7 +90,6 @@ export default Component.extend(I18n, {
             url: this.get('oneproviderOrigin'),
             serverType: 'oneprovider',
           });
-          // FIXME: should redirect to providers map
           this.get('router').transitionTo(
             'onedata.sidebar.content',
             'data',
