@@ -9,7 +9,6 @@
  */
 
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
 import { Promise } from 'rsvp';
 import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
@@ -18,16 +17,41 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
 
-  model(params, transition) {
-    const redirectUrl = get(transition, 'queryParams.redirect_url');
+  beforeModel() {
+    const redirectUrl = sessionStorage.getItem('redirectUrl');
     if (redirectUrl) {
+      sessionStorage.removeItem('redirectUrl');
       return new Promise(() => {
-        sessionStorage.setItem('redirectFromOnezone', 'true');
-        // Only redirect url in actual domain is acceptable (to not redirect
-        // to some external, possibly malicious pages).
-        window.location = window.location.origin + redirectUrl;
+        const authRedirect = sessionStorage.getItem('authRedirect');
+        if (authRedirect) {
+          sessionStorage.removeItem('authRedirect');
+          const urlMatch = redirectUrl.match(/\/(ozp|opp)\/(.*?)\//);
+          const clusterId = urlMatch && urlMatch[2];
+          if (clusterId) {
+            this.transitionTo(
+              'onedata.sidebar.content.aspect',
+              'clusters',
+              clusterId,
+              'authentication-error'
+            );
+            // TODO: better handle for OP redirection loop (which is rare)
+          } else {
+            throw {
+              isOnedataCustomError: true,
+              type: 'redirection-loop',
+            };
+          }
+        } else {
+          
+          // Only redirect url in actual domain is acceptable (to not redirect
+          // to some external, possibly malicious pages).
+          window.location = window.location.origin + redirectUrl;
+        }
       });
     }
+  },
+
+  model() {
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
       let creatingAppModel = this._super(...arguments);
