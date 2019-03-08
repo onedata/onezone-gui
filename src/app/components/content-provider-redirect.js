@@ -105,7 +105,7 @@ export default Component.extend(I18n, {
             componentName: 'alerts/endpoint-error',
             header: i18n.t('components.alerts.endpointError.headerPrefix') +
               ' ' +
-              i18n.t('components.alerts.endpointError.onepanel'),
+              i18n.t('components.alerts.endpointError.oneprovider'),
             url: this.get('oneproviderOrigin'),
             serverType: 'oneprovider',
           });

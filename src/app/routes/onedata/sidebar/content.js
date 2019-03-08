@@ -14,6 +14,8 @@ import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
 import RedirectRoute from 'onedata-gui-common/mixins/routes/redirect';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { underscore } from '@ember/string';
 
 /**
  * Finds GRI in griIds using pure entityId.
@@ -62,5 +64,22 @@ export default OnedataSidebarContentRoute.extend(RedirectRoute, {
 
   beforeModel() {
     return this._super(...arguments);
+  },
+
+  /**
+   * @override
+   */
+  findOutResourceId(resourceId, resourceType) {
+    const entityType = underscore(resourceType).replace(/s$/, '');
+    if (entityType) {
+      return gri({
+        entityId: resourceId,
+        entityType,
+        aspect: 'instance',
+        scope: 'protected',
+      });
+    } else {
+      return null;
+    }
   },
 });
