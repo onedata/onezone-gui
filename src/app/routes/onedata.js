@@ -18,6 +18,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   globalNotify: service(),
 
   beforeModel() {
+    const superResult = this._super(...arguments);
     const redirectUrl = sessionStorage.getItem('redirectUrl');
     if (redirectUrl) {
       sessionStorage.removeItem('redirectUrl');
@@ -42,13 +43,14 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
             };
           }
         } else {
-          
+
           // Only redirect url in actual domain is acceptable (to not redirect
           // to some external, possibly malicious pages).
           window.location = window.location.origin + redirectUrl;
         }
       });
     }
+    return superResult;
   },
 
   model() {
