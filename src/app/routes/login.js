@@ -1,5 +1,6 @@
 /**
- * FIXME: docs
+ * When we reach this route and authRedirect flag is set, clear it, because
+ * we reached login route which was intended.
  * 
  * @module routes/login
  * @author Jakub Liput
