@@ -237,7 +237,7 @@ function createProvidersRecords(store) {
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
-      online: [true, false][index % 3],
+      online: [true, false][index % 2],
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));

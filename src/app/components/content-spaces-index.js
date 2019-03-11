@@ -8,9 +8,9 @@
  */
 
 import Component from '@ember/component';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, set } from '@ember/object';
+import { get, computed, set } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
@@ -18,6 +18,7 @@ import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend(
   I18n,
@@ -27,11 +28,11 @@ export default Component.extend(
   ProvidersColors, {
     classNames: ['content-spaces-index'],
 
-    currentUser: inject(),
-    globalNotify: inject(),
-    router: inject(),
-    guiUtils: inject(),
-    media: inject(),
+    currentUser: service(),
+    globalNotify: service(),
+    router: service(),
+    guiUtils: service(),
+    media: service(),
 
     /**
      * @override 
@@ -125,7 +126,15 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Provider>}
      */
-    dataProviderProxy: reads('providersProxy.firstObject'),
+    dataProviderProxy: computed('space.providerList.list', function dataProviderProxy() {
+      const promise = this.get('space.providerList')
+        .then(providerList => {
+          return get(providerList, 'list').find(provider => {
+            return get(provider, 'online');
+          });
+        });
+      return PromiseObject.create({ promise });
+    }),
 
     /**
      * @type {Ember.ComputedProperty<Array<string>>}
@@ -135,7 +144,7 @@ export default Component.extend(
         guiUtils,
         dataProviderProxy,
       } = this.getProperties('guiUtils', 'dataProviderProxy');
-      return dataProviderProxy ? [
+      return get(dataProviderProxy, 'content') ? [
         'provider-redirect',
         guiUtils.getRoutableIdFor(dataProviderProxy),
       ] : [];

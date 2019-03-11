@@ -21,7 +21,7 @@
         <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
       </tr>
     {{/resource-info-tile}}
-    {{#if dataProviderProxy}}
+    {{#if (and dataProviderProxy.isFulfilled dataProviderProxy.content)}}
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
