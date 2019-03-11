@@ -35,7 +35,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @type {Object}
    */
   // guiPluginPath: attr('string'),
-  guiPluginPath: '/harvester_gui/index.html',
+  guiPluginPath: 'harvester_gui/index.html',
 
   entryTypeField: attr('string'),
 
