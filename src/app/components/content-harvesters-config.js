@@ -45,11 +45,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isHarvesterConfigValid: true,
-
-  /**
-   * @type {Array<string>}
-   */
-  entryTypesSeparators: Object.freeze([',', ';']),
   
   /**
    * @type {Ember.ComputedProperty<PromiseObject<Model.HarvesterConfiguration>>}
@@ -108,9 +103,6 @@ export default Component.extend(I18n, {
       }).catch(error => {
         globalNotify.backendError(this.t('savingConfiguration', error));
       });
-    },
-    entryTypesChanged(entryTypes) {
-      this.set('entryTypes', entryTypes);
     },
   },
 });

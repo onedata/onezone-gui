@@ -100,7 +100,7 @@ export default Component.extend(I18n, {
     } = this.getProperties('recordType', 'oneiconAlias');
     switch (recordType) {
       case 'group':
-        return oneiconAlias.getName(recordType, this.get('record.type'));
+        return oneiconAlias.getName(this.get('record.type'));
       case 'harvester':
         return 'light-bulb';
       default:
