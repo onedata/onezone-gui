@@ -1,9 +1,1 @@
-{{!-- FIXME: to discuss text and consider changing it to some kind of error
-state, because it causes problems when we refresh the page --}}
-
-{{content-info
-  class="scroll-breakpoint-600"
-  header="Cluster authentication error"
-  text="The cluster cannot be reached because the authentication has failed. Please contact system adminstrator."
-  imagePath="assets/images/no-connection.svg"
-}}
+{{content-clusters-authentication-error cluster=model.resource}}

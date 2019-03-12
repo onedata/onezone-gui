@@ -36,6 +36,7 @@ import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-sub
 import contentGroupsJoinSpace from './components/content-groups-join-space';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
+import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -98,6 +99,7 @@ let translations = {
     contentGroupsJoinSpace,
     contentClustersAdd,
     contentClustersEmpty,
+    contentClustersAuthenticationError,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
