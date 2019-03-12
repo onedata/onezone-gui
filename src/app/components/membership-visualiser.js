@@ -93,6 +93,7 @@ export default Component.extend(I18n, {
   privilegeActions: service(),
   spaceActions: service(),
   groupActions: service(),
+  harvesterActions: service(),
   currentUser: service(),
 
   /**
@@ -685,10 +686,12 @@ export default Component.extend(I18n, {
         relationToRemove,
         spaceActions,
         groupActions,
+        harvesterActions,
       } = this.getProperties(
         'relationToRemove',
         'spaceActions',
-        'groupActions'
+        'groupActions',
+        'harvesterActions'
       );
       const {
         parentType,
@@ -703,14 +706,24 @@ export default Component.extend(I18n, {
         'child'
       );
       let promise;
-      if (parentType === 'space') {
-        promise = childType === 'group' ?
-          spaceActions.removeGroup(parent, child) :
-          spaceActions.removeUser(parent, child);
-      } else {
-        promise = childType === 'group' ?
-          groupActions.removeRelation(parent, child) :
-          groupActions.removeUser(parent, child);
+      switch (parentType) {
+        case 'space':
+          promise = childType === 'group' ?
+            spaceActions.removeGroup(parent, child) :
+            spaceActions.removeUser(parent, child);
+          break;
+        case 'group':
+          promise = childType === 'group' ?
+            groupActions.removeRelation(parent, child) :
+            groupActions.removeUser(parent, child);
+          break;
+        case 'harvester':
+          promise = childType === 'group' ?
+            harvesterActions.removeGroupFromHarvester(parent, child) :
+            harvesterActions.removeUserFromHarvester(parent, child);
+          break;
+        default:
+          promise = resolve();
       }
       this.set('isRemovingRelation', true);
       return promise

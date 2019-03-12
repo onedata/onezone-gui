@@ -38,6 +38,6 @@ export default {
     group: 'group',
     space: 'space',
     provider: 'provider',
-    harvester: 'harvster',
+    harvester: 'harvester',
   },
 };
