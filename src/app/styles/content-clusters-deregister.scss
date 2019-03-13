@@ -1,0 +1,22 @@
+.content-clusters-deregister {
+  // TODO: this can be reused in future as common style
+  .btn-toolbar-deregister {
+    margin-top: $padding-large-vertical;
+    text-align: center;
+    .btn {
+      float: none;
+    }
+  }
+  .row-understand-notice {
+    text-align: center;
+    .one-checkbox-understand {
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .text-understand {
+      display: inline-block;
+      vertical-align: middle;
+      color: $color-one-red;
+    }
+  }
+}

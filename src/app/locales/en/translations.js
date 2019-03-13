@@ -15,6 +15,7 @@ import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
 import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
+import contentClustersEndpointError from './components/content-clusters-endpoint-error';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarData from './components/sidebar-data';
@@ -37,6 +38,7 @@ import contentGroupsJoinSpace from './components/content-groups-join-space';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
+import contentClustersDeregister from './components/content-clusters-deregister';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -100,6 +102,8 @@ let translations = {
     contentClustersAdd,
     contentClustersEmpty,
     contentClustersAuthenticationError,
+    contentClustersEndpointError,
+    contentClustersDeregister,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,

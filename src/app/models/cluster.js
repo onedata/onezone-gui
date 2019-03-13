@@ -9,23 +9,59 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { get, observer } from '@ember/object';
+import { get, computed, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { resolve } from 'rsvp';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
 
 export default Model.extend(
   GraphSingleModelMixin,
+  OneproviderClusterInfoMixin,
   createDataProxyMixin('name'),
   createDataProxyMixin('domain'), {
     onedataConnection: service(),
+    onedataGraph: service(),
 
     type: attr('string'),
     provider: belongsTo('provider'),
     onepanelProxy: attr('boolean'),
     workerVersion: attr('object'),
     onepanelVersion: attr('object'),
+    canViewPrivateData: attr('boolean'),
+
+    /**
+     * Fields:
+     * - creationTime (unix timestamp number)
+     */
     info: attr('object'),
+
+    creationTime: reads('info.creationTime'),
+
+    standaloneOrigin: computed('domain', function standaloneOrigin() {
+      return `https://${this.get('domain')}:9443`;
+    }),
+
+    oneproviderEntityId: computed(function oneproviderEntityId() {
+      return parseGri(this.belongsTo('provider').id()).entityId;
+    }),
+
+    reloadProviderProperties: observer('provider.{name,domain}', function reloadProviderProperties() {
+      this.loadAsyncProperties();
+    }),
+
+    init() {
+      this._super(...arguments);
+      if (this.get('isLoaded')) {
+        this.reloadProviderProperties();
+      } else {
+        this.on('didLoad', () => {
+          this.reloadProviderProperties();
+        });
+      }
+    },
 
     /**
      * @override
@@ -48,21 +84,6 @@ export default Model.extend(
           .then(provider => provider && get(provider, 'domain'));
       } else {
         return resolve(this.get('onedataConnection.zoneDomain'));
-      }
-    },
-
-    reloadProviderProperties: observer('provider.{name,domain}', function reloadProviderProperties() {
-      this.loadAsyncProperties();
-    }),
-
-    init() {
-      this._super(...arguments);
-      if (this.get('isLoaded')) {
-        this.reloadProviderProperties();
-      } else {
-        this.on('didLoad', () => {
-          this.reloadProviderProperties();
-        });
       }
     },
 

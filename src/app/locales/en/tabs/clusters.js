@@ -4,5 +4,7 @@ export default {
     index: 'Cluster',
     overview: 'Overview',
     notFound: 'Cluster not found',
+    authenticationError: 'Authentication error',
+    deregister: 'Deregister',
   },
 };

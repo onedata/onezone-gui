@@ -39,7 +39,7 @@ export default Component.extend({
   }),
 
   redirectToOnepanel() {
-    const origin = `https://${this.get('cluster.domain')}:9443`;
+    const origin = this.get('cluster.standaloneOrigin');
     return checkImg(`${origin}/favicon.ico`)
       .then(isAvailable => {
         if (isAvailable) {
@@ -54,7 +54,11 @@ export default Component.extend({
             url: origin,
             serverType: 'onepanel',
           });
-          throw { isOnedataCustomError: true, type: 'endpoint-error' };
+          throw {
+            isOnedataCustomError: true,
+            type: 'endpoint-error',
+            cluster: this.get('cluster'),
+          };
         }
       });
   },
