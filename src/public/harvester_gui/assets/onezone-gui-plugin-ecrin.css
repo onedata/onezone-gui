@@ -8862,6 +8862,9 @@ html, body, body > .ember-view {
   font-family: "Open Sans Semibold";
   font-size: 1.3em;
 }
+.content-index .query-parameters {
+  margin-top: 100px;
+}
 
 .one-checkbox {
   display: inline-block;
@@ -8948,6 +8951,35 @@ html, body, body > .ember-view {
 
 .query-parameters .form-group {
   margin-bottom: 12px;
+}
+.query-parameters .data-object-filters-toggle {
+  cursor: pointer;
+}
+.query-parameters .data-object-filters {
+  margin-top: 12px;
+  transition: border-color 0.2s linear, margin-top 0.2s linear;
+}
+.query-parameters .data-object-filters.collapsed {
+  border-color: transparent;
+  box-shadow: none;
+  margin-top: 0;
+}
+@media (min-width: 768px) {
+  .query-parameters .study-filters {
+    width: calc(100% - 105px);
+  }
+  .query-parameters .find-button {
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+  }
+}
+@media (max-width: 767px) {
+  .query-parameters .data-object-filters-toggle {
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+  }
 }
 
 .query-results {
@@ -9051,6 +9083,10 @@ html, body, body > .ember-view {
 }
 .query-results .load-more {
   margin-top: 12px;
+}
+.query-results .total-records-number {
+  margin-bottom: 12px;
+  font-family: "Open Sans Semibold";
 }
 
 .alert-promise-error {

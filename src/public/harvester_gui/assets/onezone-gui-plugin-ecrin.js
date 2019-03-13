@@ -923,7 +923,7 @@
 
   _exports.default = _default;
 });
-;define("onezone-gui-plugin-ecrin/components/content-index", ["exports", "onezone-gui-plugin-ecrin/mixins/i18n"], function (_exports, _i18n) {
+;define("onezone-gui-plugin-ecrin/components/content-index", ["exports", "onezone-gui-plugin-ecrin/mixins/i18n", "onezone-gui-plugin-ecrin/utils/query-params"], function (_exports, _i18n, _queryParams) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
@@ -934,14 +934,49 @@
   var _default = Ember.Component.extend(_i18n.default, {
     classNames: ['content-index'],
     router: Ember.inject.service(),
+    configuration: Ember.inject.service(),
 
     /**
      * @override
      */
     i18nPrefix: 'components.contentIndex',
+
+    /**
+    * @type {Array<string>}
+    */
+    modeOptions: Object.freeze(['specificStudy', 'studyCharact', 'viaPubPaper']),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<Object>>}
+     */
+    studyIdTypeMapping: Ember.computed.reads('configuration.studyIdTypeMapping'),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<Object>>}
+     */
+    typeFilterOptions: Ember.computed.reads('configuration.typeMapping'),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<Object>>}
+     */
+    accessTypeFilterOptions: Ember.computed.reads('configuration.accessTypeMapping'),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<Object>>}
+     */
+    publisherFilterOptions: Ember.computed.reads('configuration.publisherMapping'),
+
+    /**
+     * @type {Ember.ComputedProperty<Utils.QueryParams>}
+     */
+    queryParams: Ember.computed(function queryParams() {
+      return _queryParams.default.create();
+    }),
     actions: {
       find: function find() {
-        this.get('router').transitionTo('query');
+        this.get('router').transitionTo('query', {
+          queryParams: this.get('queryParams.queryParams')
+        });
       }
     }
   });
@@ -986,6 +1021,13 @@
      * @type {Ember.ComputedProperty<string>}
      */
     mode: Ember.computed.reads('queryParams.mode'),
+
+    /**
+     * Number of records, that fulfills query conditions. -1 means, that results are
+     * not available.
+     * @type {number}
+     */
+    queryResultsNumber: -1,
 
     /**
      * @type {Ember.ComputedProperty<Utils.ReplacingChunksArray>}
@@ -1036,25 +1078,20 @@
       return this.extractResultsFromResponse(promise, startFromIndex);
     },
     extractResultsFromResponse: function extractResultsFromResponse(promise, startFromIndex) {
+      var _this = this;
+
       return promise.then(function (results) {
         if (results) {
-          // if is an array of documents
-          if (results.hits !== undefined) {
-            results = results.hits.hits;
-            results.forEach(function (doc, i) {
-              doc.index = {
-                index: (startFromIndex.index || 0) + i,
-                id: Ember.get(doc, '_source.' + Ember.get(doc, '_source.type') + '_payload.id')
-              };
-            });
-            return results;
-          } else {
-            results.index = {
-              index: 0,
-              id: Ember.get(results, '_source.' + Ember.get(results, '_source.type') + '_payload.id')
+          _this.set('queryResultsNumber', Ember.get(results, 'total'));
+
+          results = Ember.get(results, 'results.hits.hits');
+          results.forEach(function (doc, i) {
+            doc.index = {
+              index: (startFromIndex.index || 0) + i,
+              id: Ember.get(doc, '_source.' + Ember.get(doc, '_source.type') + '_payload.id')
             };
-            return [results];
-          }
+          });
+          return results;
         } else {
           return [];
         }
@@ -1134,7 +1171,12 @@
         });
       }
 
-      return elasticsearch.post('_search', body);
+      return elasticsearch.post('_search', body).then(function (results) {
+        return {
+          results: results,
+          total: Ember.get(results, 'hits.total')
+        };
+      });
     },
     fetchStudyCharact: function fetchStudyCharact(startFromIndex, size) {
       var _this$getProperties2 = this.getProperties('elasticsearch', 'queryParams'),
@@ -1167,10 +1209,15 @@
         }
       }
 
-      return elasticsearch.post('_search', body);
+      return elasticsearch.post('_search', body).then(function (results) {
+        return {
+          results: results,
+          total: Ember.get(results, 'hits.total')
+        };
+      });
     },
     fetchViaPubPaper: function fetchViaPubPaper(startFromIndex, size) {
-      var _this = this;
+      var _this2 = this;
 
       var _this$getProperties3 = this.getProperties('elasticsearch', 'queryParams'),
           elasticsearch = _this$getProperties3.elasticsearch,
@@ -1238,7 +1285,7 @@
 
           relatedStudiesIds = _lodash.default.uniq(relatedStudiesIds);
 
-          var studyBody = _this.constructQueryBodyBase('study', undefined, size);
+          var studyBody = _this2.constructQueryBodyBase('study', undefined, size);
 
           Ember.get(studyBody, 'query.bool.filter').push({
             terms: {
@@ -1249,12 +1296,13 @@
             var hitsNumber = Ember.get(results, 'hits.total');
 
             if (hitsNumber < size && !noStudyIdsLeft) {
-              return _this.fetchViaPubPaper({
+              return _this2.fetchViaPubPaper({
                 index: (Ember.get(startFromIndex, 'index') || -1) + hitsNumber,
                 id: relatedStudiesIds[Ember.get(relatedStudiesIds, 'length') - 1]
-              }, size - hitsNumber).then(function (nextResults) {
+              }, size - hitsNumber).then(function (_ref2) {
                 var _EmberGet;
 
+                var nextResults = _ref2.results;
                 Ember.set(results, 'hits.total', hitsNumber + Ember.get(nextResults, 'hits.total'));
 
                 (_EmberGet = Ember.get(results, 'hits.hits')).push.apply(_EmberGet, _toConsumableArray(Ember.get(nextResults, 'hits.hits')));
@@ -1264,6 +1312,11 @@
             } else {
               return results;
             }
+          }).then(function (results) {
+            return {
+              results: results,
+              total: -1
+            };
           });
         } else {
           return null;
@@ -1271,28 +1324,31 @@
       });
     },
     find: function find() {
-      var _this2 = this;
+      var _this3 = this;
 
-      this.set('queryResults', _replacingChunksArray.default.create({
-        fetch: function fetch() {
-          return _this2.fetchResults.apply(_this2, arguments);
-        },
-        startIndex: 0,
-        endIndex: 50,
-        indexMargin: 24,
-        sortFun: function sortFun(a, b) {
-          var ai = Ember.get(a, 'index.index');
-          var bi = Ember.get(b, 'index.index');
+      this.setProperties({
+        queryResults: _replacingChunksArray.default.create({
+          fetch: function fetch() {
+            return _this3.fetchResults.apply(_this3, arguments);
+          },
+          startIndex: 0,
+          endIndex: 50,
+          indexMargin: 24,
+          sortFun: function sortFun(a, b) {
+            var ai = Ember.get(a, 'index.index');
+            var bi = Ember.get(b, 'index.index');
 
-          if (ai < bi) {
-            return -1;
-          } else if (ai > bi) {
-            return 1;
-          } else {
-            return 0;
+            if (ai < bi) {
+              return -1;
+            } else if (ai > bi) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
-        }
-      }));
+        }),
+        queryResultsNumber: -1
+      });
     },
     actions: {
       parameterChanged: function parameterChanged(fieldName, newValue) {
@@ -1899,6 +1955,11 @@
     queryParams: undefined,
 
     /**
+     * @type {boolean}
+     */
+    areDataObjectFiltersVisible: true,
+
+    /**
      * @type {Array<string>}
      */
     modeOptions: Object.freeze(['specificStudy', 'studyCharact', 'viaPubPaper']),
@@ -1921,7 +1982,12 @@
     /**
      * @type {Ember.ComputedProperty<Array<Object>>}
      */
-    publisherFilterOptions: Ember.computed.reads('configuration.publisherMapping')
+    publisherFilterOptions: Ember.computed.reads('configuration.publisherMapping'),
+    actions: {
+      toggleDataObjectFilters: function toggleDataObjectFilters() {
+        this.toggleProperty('areDataObjectFiltersVisible');
+      }
+    }
   });
 
   _exports.default = _default;
@@ -1947,6 +2013,12 @@
      * @virtual
      */
     results: undefined,
+
+    /**
+     * @virtual
+     * @type {number}
+     */
+    totalResultsNumber: undefined,
 
     /**
      * @virtual
@@ -2116,6 +2188,11 @@
     accessTypeMapping: Ember.computed.reads('configuration.accessTypeMapping'),
 
     /**
+     * @type {Ember.ComputedProperty<Array<Object>>}
+     */
+    publisherMapping: Ember.computed.reads('configuration.publisherMapping'),
+
+    /**
      * @type {Ember.ComputedProperty<Object>}
      */
     doParams: Ember.computed.reads('queryParams.activeDoParams'),
@@ -2204,7 +2281,8 @@
         var _EmberGetProperties = Ember.getProperties(doParams, 'typeFilter', 'accessTypeFilter', 'parsedYearFilter', 'publisherFilter'),
             typeFilter = _EmberGetProperties.typeFilter,
             accessTypeFilter = _EmberGetProperties.accessTypeFilter,
-            parsedYearFilter = _EmberGetProperties.parsedYearFilter;
+            parsedYearFilter = _EmberGetProperties.parsedYearFilter,
+            publisherFilter = _EmberGetProperties.publisherFilter;
 
         var body = {
           sort: {
@@ -2274,6 +2352,14 @@
             }
           });
           body.query.bool.filter.push(filter);
+        }
+
+        if (publisherFilter && Ember.get(publisherFilter, 'length')) {
+          body.query.bool.filter.push({
+            terms: {
+              'data_object_payload.managing_organization.id': publisherFilter.mapBy('id')
+            }
+          });
         }
 
         fetchInnerRecordsProxy = _promiseObject.default.create({
@@ -3316,18 +3402,20 @@
   var _default = _emberI18n.default;
   _exports.default = _default;
 });
-;define("onezone-gui-plugin-ecrin/locales/en/components/content-index", ["exports"], function (_exports) {
+;define("onezone-gui-plugin-ecrin/locales/en/components/content-index", ["exports", "onezone-gui-plugin-ecrin/locales/en/components/query-parameters", "lodash"], function (_exports, _queryParameters, _lodash) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.default = void 0;
-  var _default = {
+
+  var _default = _lodash.default.assign({}, _queryParameters.default, {
     title: 'The Clinical Studies Data Objects Index',
     subtitle: 'Discover the datasets &amp; documents',
     find: 'Find'
-  };
+  });
+
   _exports.default = _default;
 });
 ;define("onezone-gui-plugin-ecrin/locales/en/components/content-query", ["exports"], function (_exports) {
@@ -3378,6 +3466,8 @@
   });
   _exports.default = void 0;
   var _default = {
+    hideDataObjectFilters: 'Hide data object filters',
+    showDataObjectFilters: 'Show data object filters',
     search: 'Search',
     selectMode: 'Select mode',
     studyIdType: 'Study ID type',
@@ -3409,6 +3499,7 @@
   });
   _exports.default = void 0;
   var _default = {
+    results: 'Results',
     result: {
       relatedStudies: 'Related studies',
       loadMore: 'Load more',
@@ -3562,9 +3653,12 @@
   var _default = Ember.Route.extend({
     configuration: Ember.inject.service(),
     beforeModel: function beforeModel() {
-      this._super.apply(this, arguments);
+      var result = this._super.apply(this, arguments);
 
-      return this.get('configuration').reloadConfiguration();
+      var configuration = this.get('configuration');
+      return Ember.RSVP.Promise.all([configuration.reloadConfiguration(), configuration.reloadAvailableEsValues()]).then(function () {
+        return result;
+      });
     }
   });
 
@@ -3716,16 +3810,17 @@
   });
   _exports.default = void 0;
 
-  /**
-   * Exposes configuration of this application
-   *
-   * @module services/configuration
-   * @author Michał Borzęcki
-   * @copyright (C) 2019 ACK CYFRONET AGH
-   * @license This software is released under the MIT license cited in 'LICENSE.txt'.
-   */
+  function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+  function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+  function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+  function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
   var _default = Ember.Service.extend({
     onezoneGuiResources: Ember.inject.service(),
+    elasticsearch: Ember.inject.service(),
 
     /**
      * @type {Object|undefined}
@@ -3749,8 +3844,9 @@
 
     /**
      * @type {Ember.ComputedProperty<Array<Object>>}
+     * Set by reloadAvailableEsValues()
      */
-    publisherMapping: Ember.computed.reads('configuration.publisherMapping'),
+    publisherMapping: undefined,
 
     /**
      * (Re)loads configuration object
@@ -3768,6 +3864,47 @@
         return (0, _safeMethodExecution.default)(_this, function () {
           _this.set('configuration', undefined);
         });
+      });
+    },
+
+    /**
+     * (Re)loads available values stored in elasticsearch
+     * @returns {Promise}
+     */
+    reloadAvailableEsValues: function reloadAvailableEsValues() {
+      var _this2 = this;
+
+      var elasticsearch = this.get('elasticsearch');
+      var fetchPublishers = elasticsearch.post('_search', {
+        size: 0,
+        aggs: {
+          publishers: {
+            composite: {
+              sources: [{
+                name: {
+                  terms: {
+                    field: 'data_object_payload.managing_organization.name'
+                  }
+                }
+              }, {
+                id: {
+                  terms: {
+                    field: 'data_object_payload.managing_organization.id'
+                  }
+                }
+              }],
+              size: 9999
+            }
+          }
+        }
+      });
+      return Ember.RSVP.Promise.all([fetchPublishers]).then(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 1),
+            publishersResult = _ref2[0];
+
+        var publishers = Ember.get(publishersResult, 'aggregations.publishers.buckets').mapBy('key').uniqBy('id');
+
+        _this2.set('publisherMapping', publishers);
       });
     }
   });
@@ -3989,8 +4126,8 @@
   _exports.default = void 0;
 
   var _default = Ember.HTMLBars.template({
-    "id": "JYhqw+dq",
-    "block": "{\"symbols\":[],\"statements\":[[7,\"div\"],[11,\"class\",\"ecrin-logo\"],[9],[10],[0,\"\\n\"],[7,\"h1\"],[9],[1,[27,\"tt\",[[22,0,[]],\"title\"],null],false],[10],[0,\"\\n\"],[7,\"h2\"],[9],[1,[27,\"tt\",[[22,0,[]],\"subtitle\"],null],false],[10],[0,\"\\n\"],[4,\"bs-button\",null,[[\"type\",\"onClick\"],[\"primary\",[27,\"action\",[[22,0,[]],\"find\"],null]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"find\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"]],\"hasEval\":false}",
+    "id": "qqMahCMC",
+    "block": "{\"symbols\":[\"studyIdType\",\"mode\"],\"statements\":[[7,\"div\"],[11,\"class\",\"ecrin-logo\"],[9],[10],[0,\"\\n\"],[7,\"h1\"],[9],[1,[27,\"tt\",[[22,0,[]],\"title\"],null],false],[10],[0,\"\\n\"],[7,\"h2\"],[9],[1,[27,\"tt\",[[22,0,[]],\"subtitle\"],null],false],[10],[0,\"\\n\"],[7,\"form\"],[11,\"class\",\"form query-parameters row text-left\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-5 col-centered\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"selectMode\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"mode\"]],[23,[\"modeOptions\"]],[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"mode\"]]],null]],null],false]],{\"statements\":[[0,\"          \"],[1,[27,\"tt\",[[22,0,[]],[27,\"concat\",[\"modes.\",[22,2,[]]],null]],null],false],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"      \"],[10],[0,\"\\n    \"],[10],[0,\"\\n\"],[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"specificStudy\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyIdType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"studyIdType\"]],[23,[\"studyIdTypeMapping\"]],[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"studyIdType\"]]],null]],null],false]],{\"statements\":[[0,\"            \"],[1,[22,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-id-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyId\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"study-id-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyId\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"studyId\"]]],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n      \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"studyCharact\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-title-contains-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTitleContains\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"study-title-contains-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTitleContains\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"studyTitleContains\"]]],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-topics-include-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTopicsInclude\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"study-topics-include-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTopicsInclude\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"studyTopicsInclude\"]]],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n      \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"viaPubPaper\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"doi-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"doi\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"doi-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"doi\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"doi\"]]],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"data-object-title-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"dataObjectTitle\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"data-object-title-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"dataObjectTitle\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"mut\",[[23,[\"queryParams\",\"dataObjectTitle\"]]],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n      \"],[10],[0,\"\\n    \"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"parameters\":[]}],[0,\"  \"],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[4,\"bs-button\",null,[[\"type\",\"onClick\"],[\"primary\",[27,\"action\",[[22,0,[]],\"find\"],null]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"find\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"]],\"hasEval\":false}",
     "meta": {
       "moduleName": "onezone-gui-plugin-ecrin/templates/components/content-index.hbs"
     }
@@ -4007,8 +4144,8 @@
   _exports.default = void 0;
 
   var _default = Ember.HTMLBars.template({
-    "id": "trqT5feK",
-    "block": "{\"symbols\":[\"&default\"],\"statements\":[[1,[27,\"query-parameters\",null,[[\"queryParams\",\"onChange\",\"onFind\",\"onClearAll\",\"onFilter\"],[[23,[\"queryParams\"]],[27,\"action\",[[22,0,[]],\"parameterChanged\"],null],[27,\"action\",[[22,0,[]],\"find\"],null],[27,\"action\",[[22,0,[]],\"clearAll\"],null],[27,\"action\",[[22,0,[]],\"filter\"],null]]]],false],[0,\"\\n\"],[1,[27,\"query-results\",null,[[\"results\",\"queryParams\"],[[23,[\"queryResults\"]],[23,[\"queryParams\"]]]]],false],[0,\"\\n\"],[14,1],[0,\"\\n\"]],\"hasEval\":false}",
+    "id": "rJX/02Ix",
+    "block": "{\"symbols\":[\"&default\"],\"statements\":[[1,[27,\"query-parameters\",null,[[\"queryParams\",\"onChange\",\"onFind\",\"onClearAll\",\"onFilter\"],[[23,[\"queryParams\"]],[27,\"action\",[[22,0,[]],\"parameterChanged\"],null],[27,\"action\",[[22,0,[]],\"find\"],null],[27,\"action\",[[22,0,[]],\"clearAll\"],null],[27,\"action\",[[22,0,[]],\"filter\"],null]]]],false],[0,\"\\n\"],[1,[27,\"query-results\",null,[[\"totalResultsNumber\",\"results\",\"queryParams\"],[[23,[\"queryResultsNumber\"]],[23,[\"queryResults\"]],[23,[\"queryParams\"]]]]],false],[0,\"\\n\"],[14,1],[0,\"\\n\"]],\"hasEval\":false}",
     "meta": {
       "moduleName": "onezone-gui-plugin-ecrin/templates/components/content-query.hbs"
     }
@@ -4141,8 +4278,8 @@
   _exports.default = void 0;
 
   var _default = Ember.HTMLBars.template({
-    "id": "fu221bua",
-    "block": "{\"symbols\":[\"publisherFilter\",\"accessTypeFilter\",\"typeFilter\",\"studyIdType\",\"mode\"],\"statements\":[[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n    \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"selectMode\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"mode\"]],[23,[\"modeOptions\"]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"mode\"],null],false]],{\"statements\":[[0,\"      \"],[1,[27,\"tt\",[[22,0,[]],[27,\"concat\",[\"modes.\",[22,5,[]]],null]],null],false],[0,\"\\n\"]],\"parameters\":[5]},null],[0,\"  \"],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"specificStudy\"],null]],null,{\"statements\":[[0,\"  \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyIdType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"studyIdType\"]],[23,[\"studyIdTypeMapping\"]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyIdType\"],null],false]],{\"statements\":[[0,\"        \"],[1,[22,4,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[4]},null],[0,\"    \"],[10],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-id-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyId\"],null],false],[10],[0,\"\\n      \"],[7,\"input\"],[11,\"id\",\"study-id-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyId\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyId\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n    \"],[10],[0,\"\\n  \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"studyCharact\"],null]],null,{\"statements\":[[0,\"  \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n\"],[0,\"  \"],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-title-contains-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTitleContains\"],null],false],[10],[0,\"\\n      \"],[7,\"input\"],[11,\"id\",\"study-title-contains-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTitleContains\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyTitleContains\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n    \"],[10],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-topics-include-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTopicsInclude\"],null],false],[10],[0,\"\\n      \"],[7,\"input\"],[11,\"id\",\"study-topics-include-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTopicsInclude\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyTopicsInclude\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n    \"],[10],[0,\"\\n  \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"viaPubPaper\"],null]],null,{\"statements\":[[0,\"  \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"doi-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"doi\"],null],false],[10],[0,\"\\n      \"],[7,\"input\"],[11,\"id\",\"doi-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"doi\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"doi\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n    \"],[10],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-6 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"data-object-title-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"dataObjectTitle\"],null],false],[10],[0,\"\\n      \"],[7,\"input\"],[11,\"id\",\"data-object-title-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"dataObjectTitle\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"dataObjectTitle\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n    \"],[10],[0,\"\\n  \"],[10],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"parameters\":[]}],[4,\"bs-button\",null,[[\"type\",\"onClick\"],[\"primary\",[23,[\"onFind\"]]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"find\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n    \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"typeFilterOptions\"]],[23,[\"queryParams\",\"typeFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"typeFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[22,3,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"  \"],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n    \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByAccessType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"accessTypeFilterOptions\"]],[23,[\"queryParams\",\"accessTypeFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"accessTypeFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[22,2,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[2]},null],[0,\"  \"],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n    \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"year-filter-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByYear\"],null],false],[10],[0,\"\\n    \"],[7,\"input\"],[11,\"id\",\"year-filter-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"yearFilter\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"yearFilter\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n  \"],[10],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n    \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByPublisher\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"publisherFilterOptions\"]],[23,[\"queryParams\",\"publisherFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"publisherFilter\"],null]]],{\"statements\":[[0,\"      \"],[1,[22,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[4,\"bs-button\",null,[[\"type\",\"onClick\"],[\"default\",[23,[\"onFilter\"]]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"filter\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"]],\"hasEval\":false}",
+    "id": "/jE9dCPm",
+    "block": "{\"symbols\":[\"acc\",\"accItem\",\"publisherFilter\",\"accessTypeFilter\",\"typeFilter\",\"studyIdType\",\"mode\"],\"statements\":[[7,\"div\"],[11,\"class\",\"relative\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"row study-filters\"],[9],[0,\"\\n    \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n      \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"selectMode\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"mode\"]],[23,[\"modeOptions\"]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"mode\"],null],false]],{\"statements\":[[0,\"        \"],[1,[27,\"tt\",[[22,0,[]],[27,\"concat\",[\"modes.\",[22,7,[]]],null]],null],false],[0,\"\\n\"]],\"parameters\":[7]},null],[0,\"    \"],[10],[0,\"\\n\"],[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"specificStudy\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyIdType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select\",null,[[\"selected\",\"options\",\"onchange\",\"searchEnabled\"],[[23,[\"queryParams\",\"studyIdType\"]],[23,[\"studyIdTypeMapping\"]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyIdType\"],null],false]],{\"statements\":[[0,\"          \"],[1,[22,6,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[6]},null],[0,\"      \"],[10],[0,\"\\n      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-id-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyId\"],null],false],[10],[0,\"\\n        \"],[7,\"input\"],[11,\"id\",\"study-id-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyId\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyId\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n      \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"studyCharact\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-title-contains-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTitleContains\"],null],false],[10],[0,\"\\n        \"],[7,\"input\"],[11,\"id\",\"study-title-contains-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTitleContains\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyTitleContains\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n      \"],[10],[0,\"\\n      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"study-topics-include-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"studyTopicsInclude\"],null],false],[10],[0,\"\\n        \"],[7,\"input\"],[11,\"id\",\"study-topics-include-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"studyTopicsInclude\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"studyTopicsInclude\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n      \"],[10],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[4,\"if\",[[27,\"eq\",[[23,[\"queryParams\",\"mode\"]],\"viaPubPaper\"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"doi-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"doi\"],null],false],[10],[0,\"\\n        \"],[7,\"input\"],[11,\"id\",\"doi-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"doi\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"doi\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n      \"],[10],[0,\"\\n      \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-4 form-group\"],[9],[0,\"\\n        \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"data-object-title-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"dataObjectTitle\"],null],false],[10],[0,\"\\n        \"],[7,\"input\"],[11,\"id\",\"data-object-title-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"dataObjectTitle\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"dataObjectTitle\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n      \"],[10],[0,\"\\n    \"]],\"parameters\":[]},null]],\"parameters\":[]}]],\"parameters\":[]}],[0,\"  \"],[10],[0,\"\\n  \"],[4,\"bs-button\",null,[[\"type\",\"class\",\"onClick\"],[\"primary\",\"pull-right find-button\",[23,[\"onFind\"]]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"find\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"],[10],[0,\"\\n\"],[7,\"div\"],[11,\"class\",\"row relative\"],[9],[0,\"\\n  \"],[7,\"div\"],[11,\"class\",\"col-xs-12\"],[9],[0,\"\\n  \"],[7,\"a\"],[11,\"class\",\"data-object-filters-toggle\"],[9],[0,\"\\n    \"],[1,[27,\"tt\",[[22,0,[]],[27,\"if\",[[23,[\"areDataObjectFiltersVisible\"]],\"hideDataObjectFilters\",\"showDataObjectFilters\"],null]],null],false],[0,\"\\n  \"],[3,\"action\",[[22,0,[]],\"toggleDataObjectFilters\"]],[10],[0,\"\\n  \"],[10],[0,\"\\n\"],[10],[0,\"\\n\"],[4,\"bs-accordion\",null,[[\"selected\"],[[23,[\"areDataObjectFiltersVisible\"]]]],{\"statements\":[[4,\"component\",[[27,\"-assert-implicit-component-helper-argument\",[[22,1,[\"item\"]],\"expected `acc.item` to be a contextual component but found a string. Did you mean `(component acc.item)`? ('onezone-gui-plugin-ecrin/templates/components/query-parameters.hbs' @ L86:C5) \"],null]],[[\"class\",\"value\"],[[27,\"concat\",[\"data-object-filters\",[27,\"if\",[[23,[\"areDataObjectFiltersVisible\"]],\" expanded\",\" collapsed\"],null]],null],true]],{\"statements\":[[4,\"component\",[[27,\"-assert-implicit-component-helper-argument\",[[22,2,[\"body\"]],\"expected `accItem.body` to be a contextual component but found a string. Did you mean `(component accItem.body)`? ('onezone-gui-plugin-ecrin/templates/components/query-parameters.hbs' @ L87:C7) \"],null]],null,{\"statements\":[[0,\"      \"],[7,\"div\"],[11,\"class\",\"row\"],[9],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"typeFilterOptions\"]],[23,[\"queryParams\",\"typeFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"typeFilter\"],null]]],{\"statements\":[[0,\"            \"],[1,[22,5,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[5]},null],[0,\"        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByAccessType\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"accessTypeFilterOptions\"]],[23,[\"queryParams\",\"accessTypeFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"accessTypeFilter\"],null]]],{\"statements\":[[0,\"            \"],[1,[22,4,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[4]},null],[0,\"        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[11,\"for\",\"year-filter-input\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByYear\"],null],false],[10],[0,\"\\n          \"],[7,\"input\"],[11,\"id\",\"year-filter-input\"],[11,\"class\",\"form-control\"],[12,\"value\",[23,[\"queryParams\",\"yearFilter\"]]],[12,\"oninput\",[27,\"action\",[[22,0,[]],[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"yearFilter\"],null]],[[\"value\"],[\"target.value\"]]]],[11,\"type\",\"text\"],[9],[10],[0,\"\\n        \"],[10],[0,\"\\n        \"],[7,\"div\"],[11,\"class\",\"col-xs-12 col-sm-3 form-group\"],[9],[0,\"\\n          \"],[7,\"label\"],[11,\"class\",\"control-label\"],[9],[1,[27,\"tt\",[[22,0,[]],\"filterByPublisher\"],null],false],[10],[0,\"\\n\"],[4,\"power-select-multiple\",null,[[\"options\",\"selected\",\"closeOnSelect\",\"onchange\"],[[23,[\"publisherFilterOptions\"]],[23,[\"queryParams\",\"publisherFilter\"]],false,[27,\"action\",[[22,0,[]],[23,[\"onChange\"]],\"publisherFilter\"],null]]],{\"statements\":[[0,\"            \"],[1,[22,3,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"        \"],[10],[0,\"\\n      \"],[10],[0,\"\\n      \"],[4,\"bs-button\",null,[[\"type\",\"class\",\"onClick\"],[\"default\",\"pull-right\",[23,[\"onFilter\"]]]],{\"statements\":[[1,[27,\"tt\",[[22,0,[]],\"filter\"],null],false]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[2]},null]],\"parameters\":[1]},null]],\"hasEval\":false}",
     "meta": {
       "moduleName": "onezone-gui-plugin-ecrin/templates/components/query-parameters.hbs"
     }
@@ -4159,8 +4296,8 @@
   _exports.default = void 0;
 
   var _default = Ember.HTMLBars.template({
-    "id": "cQxIPh9K",
-    "block": "{\"symbols\":[\"acc\",\"result\",\"accItem\",\"&default\"],\"statements\":[[7,\"div\"],[11,\"class\",\"data-start-row\"],[12,\"style\",[21,\"firstRowStyle\"]],[9],[10],[0,\"\\n\"],[4,\"bs-accordion\",null,[[\"onChange\"],[[27,\"action\",[[22,0,[]],\"resultExpanded\"],null]]],{\"statements\":[[4,\"each\",[[23,[\"results\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\"],[11,\"class\",\"data-row\"],[12,\"data-row-id\",[22,2,[\"index\",\"id\"]]],[9],[0,\"\\n\"],[4,\"component\",[[27,\"-assert-implicit-component-helper-argument\",[[22,1,[\"item\"]],\"expected `acc.item` to be a contextual component but found a string. Did you mean `(component acc.item)`? ('onezone-gui-plugin-ecrin/templates/components/query-results.hbs' @ L5:C9) \"],null]],[[\"value\"],[[22,2,[\"index\",\"id\"]]]],{\"statements\":[[0,\"        \"],[1,[27,\"query-results/result\",null,[[\"item\",\"result\",\"isExpanded\",\"queryParams\"],[[22,3,[]],[22,2,[]],[27,\"eq\",[[22,2,[\"index\",\"id\"]],[23,[\"expandedResultId\"]]],null],[23,[\"queryParams\"]]]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"    \"],[10],[0,\"\\n\"]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[1,[27,\"loading-container\",null,[[\"isLoading\",\"errorReason\",\"sizeClass\",\"spinnerBlockClass\"],[[23,[\"bottomLoading\"]],[23,[\"results\",\"error\"]],\"sm\",\"horizontal-align-middle\"]]],false],[0,\"\\n\"],[14,4],[0,\"\\n\"]],\"hasEval\":false}",
+    "id": "fo9qfzx3",
+    "block": "{\"symbols\":[\"acc\",\"result\",\"accItem\",\"&default\"],\"statements\":[[4,\"unless\",[[27,\"eq\",[[23,[\"totalResultsNumber\"]],-1],null]],null,{\"statements\":[[0,\"  \"],[7,\"div\"],[11,\"class\",\"total-records-number\"],[9],[0,\"\\n    \"],[1,[27,\"tt\",[[22,0,[]],\"results\"],null],false],[0,\": \"],[7,\"span\"],[11,\"class\",\"one-label\"],[9],[1,[21,\"totalResultsNumber\"],false],[10],[0,\"\\n  \"],[10],[0,\"\\n\"]],\"parameters\":[]},null],[7,\"div\"],[11,\"class\",\"data-start-row\"],[12,\"style\",[21,\"firstRowStyle\"]],[9],[10],[0,\"\\n\"],[4,\"bs-accordion\",null,[[\"onChange\"],[[27,\"action\",[[22,0,[]],\"resultExpanded\"],null]]],{\"statements\":[[4,\"each\",[[23,[\"results\"]]],null,{\"statements\":[[0,\"    \"],[7,\"div\"],[11,\"class\",\"data-row\"],[12,\"data-row-id\",[22,2,[\"index\",\"id\"]]],[9],[0,\"\\n\"],[4,\"component\",[[27,\"-assert-implicit-component-helper-argument\",[[22,1,[\"item\"]],\"expected `acc.item` to be a contextual component but found a string. Did you mean `(component acc.item)`? ('onezone-gui-plugin-ecrin/templates/components/query-results.hbs' @ L10:C9) \"],null]],[[\"value\"],[[22,2,[\"index\",\"id\"]]]],{\"statements\":[[0,\"        \"],[1,[27,\"query-results/result\",null,[[\"item\",\"result\",\"isExpanded\",\"queryParams\"],[[22,3,[]],[22,2,[]],[27,\"eq\",[[22,2,[\"index\",\"id\"]],[23,[\"expandedResultId\"]]],null],[23,[\"queryParams\"]]]]],false],[0,\"\\n\"]],\"parameters\":[3]},null],[0,\"    \"],[10],[0,\"\\n\"]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[1,[27,\"loading-container\",null,[[\"isLoading\",\"errorReason\",\"sizeClass\",\"spinnerBlockClass\"],[[23,[\"bottomLoading\"]],[23,[\"results\",\"error\"]],\"sm\",\"horizontal-align-middle\"]]],false],[0,\"\\n\"],[14,4],[0,\"\\n\"]],\"hasEval\":false}",
     "meta": {
       "moduleName": "onezone-gui-plugin-ecrin/templates/components/query-results.hbs"
     }
