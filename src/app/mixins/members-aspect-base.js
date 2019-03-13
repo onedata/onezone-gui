@@ -18,7 +18,7 @@ import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
-import { next } from '@ember/runloop';
+import { next, scheduleOnce } from '@ember/runloop';
 
 export default Mixin.create({
   privilegeManager: service(),
@@ -376,7 +376,7 @@ export default Mixin.create({
 
   recordObserver: observer('record', function recordObserver() {
     // reset state after record change
-    this.reset();
+    scheduleOnce('afterRender', this, 'reset');
   }),
 
   directMembershipObserver: observer(
@@ -556,6 +556,11 @@ export default Mixin.create({
       let targetListName = type === 'user' ?
         'selectedUsersProxies' : 'selectedGroupsProxies';
       this.set(targetListName, A(records));
+      // there are issues in refreshing state in recalculating
+      // `removeSelectedAction` property, where `batchPrivilegesEditEnabled`
+      // is a dependency. Due to that issue value of `batchPrivilegesEditEnabled`
+      // is refreshed manually below.
+      this.get('batchPrivilegesEditEnabled');
     },
     batchPrivilegesEdit() {
       this.loadBatchPrivilegesEditModel();

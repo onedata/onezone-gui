@@ -12,10 +12,9 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+// import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
-
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
@@ -65,24 +64,6 @@ export default Component.extend(I18n, {
     return checkImg(`https://${this.get('provider.domain')}/favicon.ico`);
   },
 
-  // _goToProvider(spaceId) {
-  //   return this.checkIsProviderAvailable()
-  //     .then(isAvailable => {
-  //       if (isAvailable) {
-  //         const path = spaceId ? `onedata/data/${spaceId}` : '';
-  //         const clusterId =
-  //           parseGri(this.get('provider').belongsTo('cluster').id()).entityId;
-  //         const _window = this.get('_window');
-  //         _window.location = `/op/${clusterId}/i#/${path}`;
-  //       } else {
-  //         // FIXME: design of not available domain and text
-  //         this.get('globalNotify').backendError('reading Oneprovider endpoint');
-  //         throw new Error(
-  //           'Selected Oneprovider domain is not available for your web browser.'
-  //         );
-  //       }
-  //     });
-  // },
   _goToProvider(providerId, spaceId) {
     const path = spaceId ? `/#/onedata/data/${spaceId}` : null;
     return this.get('onezoneServer').getProviderRedirectUrl(providerId, path)

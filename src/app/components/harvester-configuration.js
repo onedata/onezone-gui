@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import EmberObject, { computed, observer } from '@ember/object';
+import { computed } from '@ember/object';
 import { and, reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

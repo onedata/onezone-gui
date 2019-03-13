@@ -9,9 +9,9 @@ export default _.merge({}, privilegesAspectBase, {
     spaceManagement: 'Space management',
   },
   privileges: {
-    harvester_view: 'View space',
-    harvester_update: 'Modify space',
-    harvester_delete: 'Remove space',
+    harvester_view: 'View harvester',
+    harvester_update: 'Modify harvester',
+    harvester_delete: 'Remove harvester',
     harvester_view_privileges: 'View privileges',
     harvester_set_privileges: 'Set privileges',
 

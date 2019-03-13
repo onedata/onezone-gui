@@ -273,7 +273,7 @@ export default Service.extend(I18n, {
       get(user, 'entityId')
     ).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
-        spaceName: get(harvester, 'name'),
+        harvesterName: get(harvester, 'name'),
         userName: get(user, 'name'),
       }));
     }).catch(error => {

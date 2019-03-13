@@ -38,7 +38,7 @@
             class="text-center"}}
             <span class="one-label">
               {{tt this "noSpacesStart"}}
-              <a {{action (mut addYourSpaceModalOpened) true}}>{{tt this "noSpacesAdd"}}</a>
+              <a {{action (mut isAddYourSpaceModalOpened) true}}>{{tt this "noSpacesAdd"}}</a>
               {{tt this "noSpacesOr"}}
               <a {{action (mut isInviteUsingTokenModalOpened) true}}>{{tt this "noSpacesInvite"}}</a>
               {{tt this "noSpacesEnd"}}
@@ -57,8 +57,8 @@
   space=spaceToRemove
   harvester=harvester}}
 {{add-your-space-modal
-  opened=addYourSpaceModalOpened
-  close=(action (mut addYourSpaceModalOpened) false)
+  opened=isAddYourSpaceModalOpened
+  close=(action (mut isAddYourSpaceModalOpened) false)
   proceed=(action "addYourSpace")
   processing=isAddingYourSpace
   relatedRecord=harvester

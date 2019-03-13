@@ -65,7 +65,6 @@ export default Service.extend({
     return this.get('onedataRpc').request('getSupportedIdPs', { testMode });
   },
 
-
   getProviderRedirectUrl(providerId, path) {
     return this.get('onedataRpc').request('getProviderRedirectURL', {
       providerId,

@@ -42,7 +42,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   entryTypeField: attr('string'),
 
   // acceptedEntryTypes: attr('array'),
-  acceptedEntryTypes: [{name:'type1', schema: {a: 1}}],
+  acceptedEntryTypes: Object.freeze([{name:'type1', schema: {a: 1}}]),
 
   defaultEntryType: attr('string'),
 

@@ -113,7 +113,7 @@ export default Component.extend(I18n, {
       ),
       title: this.t('joinHarvester'),
       class: 'join-harvester-action',
-      icon: 'space-join',
+      icon: 'light-bulb',
     };
   }),
 
