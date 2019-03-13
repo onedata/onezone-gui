@@ -39,13 +39,6 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   guiPluginHttpLocation: '/harvester_gui/index.html',
 
-  entryTypeField: attr('string'),
-
-  // acceptedEntryTypes: attr('array'),
-  acceptedEntryTypes: Object.freeze([{name:'type1', schema: {a: 1}}]),
-
-  defaultEntryType: attr('string'),
-
   /**
    * Information about harvester. Available fields:
    * creationTime
@@ -61,6 +54,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('sharedUserList'),
   spaceList: belongsTo('spaceList'),
+  indexList: belongsTo('indexList'),
 
   /**
    * True, if user has a "View space" privilege

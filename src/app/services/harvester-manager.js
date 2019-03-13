@@ -368,6 +368,24 @@ export default Service.extend({
   },
 
   /**
+   * Loads gui plugin manifest.json file
+   * @param {string} harvesterEntityId
+   * @returns {Promise<Object>} manifest file content
+   */
+  getGuiPluginManifest(harvesterEntityId) {
+    this.getRecord(harvesterEntityId, false).then(harvester => {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          dataSourceType: 'json',
+          url: get(harvester, 'guiPluginHttpLocation') + '/manifest.json',
+          success: resolve,
+          error: (jqXHR, type, details) => reject({ type, details }),
+        });
+      });
+    });
+  },
+
+  /**
    * Returns already loaded harvester by entityId (or undefined if not loaded)
    * @param {string} entityId harvester entityId
    * @returns {Model.Harvester|undefined}
