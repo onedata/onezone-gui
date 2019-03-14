@@ -1,8 +1,22 @@
 export default {
+  generalHeader: 'General',
+  guiPluginHeader: 'GUI plugin',
   general: {
-    header: 'General',
-    endpoint: 'Endpoint',
-    plugin: 'Plugin',
+    fields: {
+      name: {
+        label: 'Name',
+      },
+      plugin: {
+        label: 'Plugin',
+      },
+      endpoint: {
+        label: 'Endpoint',
+      },
+    },
+    edit: 'Edit',
+    cancel: 'Cancel',
+    save: 'Save',
+    create: 'Create',
   },
   metadataTypes: {
     header: 'Metadata types',

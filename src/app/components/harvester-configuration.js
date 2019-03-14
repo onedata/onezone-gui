@@ -4,10 +4,16 @@ import { and, reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
+const tabs = [
+  'general',
+  'gui-plugin',
+];
+
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration'],
 
   i18n: service(),
+  navigationState: service(),
   onedataConnection: service(),
 
   /**
@@ -45,6 +51,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isGuiPluginSectionValid: false,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  activeTab: 'harv-config-general-tab',
   
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -78,6 +89,14 @@ export default Component.extend(I18n, {
     'isTypesSectionValid',
     'isGuiPluginSectionValid'
   ),
+
+  init() {
+    this._super(...arguments);
+    const activeTab = this.get('navigationState.queryParams.tab');
+    if (tabs.includes(activeTab)) {
+      this.set('activeTab', `harv-config-${activeTab}-tab`);
+    }
+  },
 
   actions: {
     onGeneralChange(values, isValid) {

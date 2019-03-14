@@ -1,0 +1,29 @@
+{{#promise-proxy-container proxy=pluginTypes}}
+  {{#bs-form
+    submitOnEnter=false
+    class=(concat-classes "col-xs-12 col-sm-10 col-md-8" (unless (eq mode "create") "col-lg-6") "col-centered form-horizontal")
+    as |form|}}
+    {{one-form-fields
+      bsForm=form
+      fields=currentFields
+      formValues=formValues
+      inputChanged=(action "inputChanged")
+      onFocusOut=(action "focusOut")
+      disabled=disabled
+      layoutConfig=formLayoutConfig}}
+    <div class="row">
+      <div class={{formLayoutConfig.formSubmitColumns}}>
+        {{#if (eq mode "view")}}
+          {{#bs-button type="default" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+        {{else}}
+          {{#one-spin-button type="submit" class="btn btn-primary" disabled=(not isValid) action=(action "submit")}}
+            {{tt this (if (eq mode "create") "create" "save")}}  
+          {{/one-spin-button}}
+          {{#if (eq mode "edit")}}
+            {{#bs-button type="default" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
+          {{/if}}
+        {{/if}}
+      </div>
+    </div>
+  {{/bs-form}}
+{{/promise-proxy-container}}

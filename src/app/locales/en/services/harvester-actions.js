@@ -27,4 +27,6 @@ export default {
   removingHarvester: 'removing harvester',
   leaveHarvesterSuccess: 'Harvester "{{harvesterName}}" left successfully',
   leavingHarvester: 'leaving harvester',
+  updateHarvesterSuccess: 'Harvester has been updated successfully',
+  updatingHarvester: 'updating harvester',
 };

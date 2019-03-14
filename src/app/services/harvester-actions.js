@@ -69,32 +69,41 @@ export default Service.extend(I18n, {
     const {
       globalNotify,
       harvesterManager,
-      router,
-      guiUtils,
     } = this.getProperties(
       'globalNotify',
-      'harvesterManager',
-      'router',
-      'guiUtils'
+      'harvesterManager'
     );
     return harvesterManager.createRecord(harvester)
       .then(harvester => {
         globalNotify.success(this.t('harvesterCreateSuccess'));
         next(() =>
-          router.transitionTo(
-            'onedata.sidebar.content.aspect',
-            'harvesters',
-            guiUtils.getRoutableIdFor(harvester),
-            'index',
-          ).then(() => {
-            const sidebarContainer = $('.col-sidebar');
-            $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-              sidebarContainer[0].clientHeight);
-          })
+          this.redirectToHarvester(harvester, 'config', { tab: 'gui-plugin' })
+            .then(() => {
+              const sidebarContainer = $('.col-sidebar');
+              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+                sidebarContainer[0].clientHeight);
+            })
         );
         return harvester;
       }).catch(error => {
         globalNotify.backendError(this.t('harvesterCreating'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Updates harvester
+   * @param {Model.Harvester} harvester
+   * @returns {Promise}
+   */
+  updateHarvester(harvester) {
+    const globalNotify = this.get('globalNotify');
+    return harvester.save()
+      .then(() => {
+        globalNotify.success(this.t('updateHarvesterSuccess'));
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('updatingHarvester'), error);
         throw error;
       });
   },
@@ -144,18 +153,26 @@ export default Service.extend(I18n, {
    * Redirects to harvester page
    * @param {Model.Harvester} harvester
    * @param {string} aspect
+   * @param {Object} queryParams
    * @returns {Promise}
    */
-  redirectToHarvester(harvester, aspect = 'plugin') {
+  redirectToHarvester(harvester, aspect = 'plugin', queryParams = undefined) {
     const {
       router,
       guiUtils,
     } = this.getProperties('router', 'guiUtils');
+    let options = undefined;
+    if (queryParams) {
+      options = {
+        queryParams,
+      };
+    }
     return router.transitionTo(
       'onedata.sidebar.content.aspect',
       'harvesters',
       guiUtils.getRoutableIdFor(harvester),
-      aspect
+      aspect,
+      options
     );
   },
 
