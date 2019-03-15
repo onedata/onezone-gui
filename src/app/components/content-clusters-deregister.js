@@ -38,7 +38,7 @@ export default Component.extend(
       'cluster.creationTime',
       function clusterCreationTimeText() {
         const creationTime = this.get('cluster.creationTime');
-        return dateFormat([creationTime], { format: 'report' });
+        return dateFormat([creationTime], { format: 'dateWithMinutes' });
       }
     ),
 
@@ -91,7 +91,7 @@ export default Component.extend(
         'onedata.sidebar.content.aspect',
         'clusters',
         get(cluster, 'entityId'),
-        'index'
+        'provider'
       );
     },
 

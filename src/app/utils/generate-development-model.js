@@ -296,6 +296,7 @@ function createClusterRecords(store) {
       type: 'onezone',
       name: 'PL-Grid',
       onepanelProxy: true,
+      canViewPrivateData: true,
       info: {
         creatorType: 'root',
         creatorId: '',
@@ -319,6 +320,7 @@ function createClusterRecords(store) {
       name: 'Cyfronet',
       onepanelProxy: false,
       provider: 'provider.oneprovider-1.instance:protected',
+      canViewPrivateData: true,
       info: {
         creatorType: 'root',
         creatorId: '',
@@ -342,6 +344,7 @@ function createClusterRecords(store) {
       name: 'PCSS',
       onepanelProxy: true,
       provider: 'provider.oneprovider-2.instance:protected',
+      canViewPrivateData: false,
       info: {
         creatorType: 'root',
         creatorId: '',

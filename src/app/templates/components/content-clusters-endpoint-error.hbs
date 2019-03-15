@@ -11,7 +11,12 @@
       </li>
       <li>
         {{tt this "liTryAgain1"}}
-        {{#link-to "onedata.sidebar.content.aspect" "clusters" clusterEntityId "hosts"}}
+        {{#link-to
+          "onedata.sidebar.content.aspect"
+          "clusters"
+          clusterEntityId
+          "overview"
+        }}
           {{tt this "liTryAgainLink"}}
         {{/link-to}}
         {{tt this "liTryAgain2"}}.

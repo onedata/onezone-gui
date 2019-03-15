@@ -1,40 +1,51 @@
-{{!-- FIXME: real image --}}
 {{#content-info
   class="scroll-breakpoint-700"
   header=(tt this "header")
-  text=(tt this "text")  
-  imagePath="https://media2.giphy.com/media/1hiVNxD34TpC0/giphy.gif?cid=3640f6095c87db1d5855554f414cb1ec"
+  text=(tt this "text")
+  imagePath="assets/images/cluster-deregister-provider.svg"
 }}
   {{#if statsProxy.isFulfilled}}
     <div class="row row-cluster-oneprovider-stats">
-      <p>
+      <p class="text-center">
         {{tt this "statsPrefix"}}
-        <strong>{{oneproviderName}}</strong>
+        <strong>{{oneproviderName}}</strong>:
       </p>
-      <ul class="info info-condensed">
-        <li class="li-spaces-count">{{tt this "statsSupportedSpaces"}}: {{stats.spacesCount}}</li>
-        <li class="li-groups-count">{{tt this "statsEffectiveGroups"}}: {{stats.groupsCount}}</li>
-        <li class="li-users-count">{{tt this "statsEffectiveUsers"}}: {{stats.usersCount}}</li>
-        <li class="li-creation-time-count">{{tt this "statsActiveSince"}}: {{clusterCreationTimeText}}</li>
-      </ul>  
+      <div class="row">
+        <div class="col-xs-9 col-centered">
+          <div class="col-xs-12 col-sm-6">
+            <ul class="info info-condensed info-gray">
+              <li class="li-spaces-count">{{tt this "statsSupportedSpaces"}}: {{stats.spacesCount}}</li>
+              <li class="li-groups-count">{{tt this "statsEffectiveGroups"}}: {{stats.groupsCount}}</li>
+            </ul>
+          </div>
+          <div class="col-xs-12 col-sm-6">
+            <ul class="info info-condensed info-gray continue-col">
+              <li class="li-users-count">{{tt this "statsEffectiveUsers"}}: {{stats.usersCount}}</li>
+              <li class="li-creation-time-count">{{tt this "statsActiveSince"}}: {{clusterCreationTimeText}}</li>
+            </ul>
+          </div>          
+        </div>
+      </div>
     </div>
   {{/if}}
-  <div class="row row-understand-notice">
-    {{one-checkbox 
-      class="danger one-checkbox-danger one-checkbox-understand"
-      checked=understandChecked
-      update=(action (mut understandChecked))
-    }}
-    <div class="text-understand">
-      {{tt this "textUnderstand"}}
+  <div class="row content-row no-border row-understand-notice">
+    <div class="col-xs-9 col-centered">
+      {{one-checkbox 
+        class="danger one-checkbox-danger one-checkbox-understand"
+        checked=understandChecked
+        update=(action (mut understandChecked))
+      }}
+      <div class="text-understand" {{action (mut understandChecked) (not understandChecked)}}>
+        {{tt this "textUnderstand"}}
+      </div>
     </div>
   </div>
   <div class="btn-toolbar btn-toolbar-deregister">
-    {{#bs-button class="btn btn-sm" type="info" onClick=(action "cancel")}}
+    {{#bs-button class="btn" type="info" onClick=(action "cancel")}}
       {{tt this "cancel"}}
     {{/bs-button}}
     {{#one-spin-button
-      class="btn btn-sm btn-danger btn-deregister"
+      class="btn btn-danger btn-deregister"
       action=(action "deregister")
       disabled=(not understandChecked)
     }}

@@ -94,20 +94,23 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Object>>} `[ { account, authorizer } ]`
    */
-  accountsInfo: computed('linkedAccountsList.[]', 'identityProviders', function accounts() {
-    const {
-      linkedAccountsList,
-      identityProviders,
-    } = this.getProperties('linkedAccountsList', 'identityProviders');
-    if (linkedAccountsList) {
-      return linkedAccountsList.map(linkedAccount => ({
-        account: linkedAccount,
-        authorizer: identityProviders.find(idp =>
-          idp.id === get(linkedAccount, 'idp')
-        ),
-      }));
-    }
-  }),
+  accountsInfo: computed(
+    'linkedAccountsList.@each.{idp,emails}',
+    'identityProviders.@each.{iconPath,id,iconBackgroundColor,displayName}',
+    function accountsInfo() {
+      const {
+        linkedAccountsList,
+        identityProviders,
+      } = this.getProperties('linkedAccountsList', 'identityProviders');
+      if (linkedAccountsList) {
+        return linkedAccountsList.map(linkedAccount => ({
+          account: linkedAccount,
+          authorizer: identityProviders.find(idp =>
+            idp.id === get(linkedAccount, 'idp')
+          ),
+        }));
+      }
+    }),
 
   /**
    * Shows global info about save error.

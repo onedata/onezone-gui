@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -9,8 +9,7 @@ export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
 
   globalNotify: service(),
-  i18n: service(),
-  alert: service(),
+  router: service(),
 
   /**
    * @virtual
@@ -45,20 +44,16 @@ export default Component.extend({
         if (isAvailable) {
           window.location = this.get('onepanelHref');
         } else {
-          const i18n = this.get('i18n');
-          this.get('alert').error(null, {
-            componentName: 'alerts/endpoint-error',
-            header: i18n.t('components.alerts.endpointError.headerPrefix') +
-              ' ' +
-              i18n.t('components.alerts.endpointError.onepanel'),
-            url: origin,
-            serverType: 'onepanel',
-          });
-          throw {
-            isOnedataCustomError: true,
-            type: 'endpoint-error',
-            cluster: this.get('cluster'),
-          };
+          const {
+            router,
+            cluster,
+          } = this.getProperties('router', 'cluster');
+          return router.transitionTo(
+            'onedata.sidebar.content.aspect',
+            'clusters',
+            get(cluster, 'entityId'),
+            'endpoint-error'
+          );
         }
       });
   },

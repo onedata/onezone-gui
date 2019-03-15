@@ -43,6 +43,7 @@ export default Mixin.create({
           aspect,
         }),
         operation: 'get',
+        subscribe: false,
       });
     }
   },

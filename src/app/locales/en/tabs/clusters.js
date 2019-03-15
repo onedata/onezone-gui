@@ -4,7 +4,8 @@ export default {
     index: 'Cluster',
     overview: 'Overview',
     notFound: 'Cluster not found',
-    authenticationError: 'Authentication error',
+    authenticationError: 'Cluster authentication error',
+    endpointError: 'No connection to Onepanel',
     deregister: 'Deregister',
   },
 };

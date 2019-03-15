@@ -11,10 +11,14 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reads } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: 'content-clusters-endpoint-error',
   i18nPrefix: 'components.contentClustersEndpointError',
+
+  alert: service(),
+  i18n: service(),
 
   /**
    * @virtual
@@ -24,4 +28,16 @@ export default Component.extend(I18n, {
   standaloneOnepanelUrl: reads('cluster.standaloneOrigin'),
 
   clusterEntityId: reads('cluster.entityId'),
+
+  didInsertElement() {
+    const i18n = this.get('i18n');
+    this.get('alert').error(null, {
+      componentName: 'alerts/endpoint-error',
+      header: i18n.t('components.alerts.endpointError.headerPrefix') +
+        ' ' +
+        i18n.t('components.alerts.endpointError.onepanel'),
+      url: origin,
+      serverType: 'onepanel',
+    });
+  },
 });
