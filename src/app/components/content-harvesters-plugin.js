@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
+import { computed } from '@ember/object';
 
 export default Component.extend({
   classNames: ['content-harvesters-plugin'],
@@ -23,5 +23,7 @@ export default Component.extend({
    * Relative path to plugin application
    * @type {Ember.ComputedProperty<string>}
    */
-  pluginPath: reads('harvester.guiPluginHttpLocation'),
+  pluginPath: computed('harvester.guiPluginHttpLocation', function pluginPath() {
+    return this.get('harvester.guiPluginHttpLocation') + '/index.html';
+  }),
 });

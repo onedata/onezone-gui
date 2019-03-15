@@ -25,5 +25,5 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {string}
    */
-  guiPluginIndexName: attr('string'),
+  guiIndex: attr('string'),
 });

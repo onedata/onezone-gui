@@ -369,17 +369,21 @@ export default Service.extend({
 
   /**
    * Loads gui plugin manifest.json file
-   * @param {string} harvesterEntityId
-   * @returns {Promise<Object>} manifest file content
+   * @param {string} harvesterId
+   * @returns {Promise} manifest file content
    */
-  getGuiPluginManifest(harvesterEntityId) {
-    this.getRecord(harvesterEntityId, false).then(harvester => {
+  getGuiPluginManifest(harvesterId) {
+    return this.getRecord(harvesterId, false).then(harvester => {
       return new Promise((resolve, reject) => {
         $.ajax({
-          dataSourceType: 'json',
+          dataType: 'json',
           url: get(harvester, 'guiPluginHttpLocation') + '/manifest.json',
           success: resolve,
-          error: (jqXHR, type, details) => reject({ type, details }),
+          error: (xhr, type, details) => reject({
+            status: get(xhr, 'status'),
+            type,
+            details,
+          }),
         });
       });
     });

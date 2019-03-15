@@ -32,6 +32,20 @@ export default {
     header: 'GUI plugin',
     path: 'Path',
     configuration: 'Configuration',
+
+    pluginIndex: 'GUI Plugin index',
+    harvesterIndex: 'Harvester index',
+    notAssigned: 'Not assigned',
+    assignMethods: {
+      create: 'Create new index',
+      choose: 'Use existing index',
+      unassigned: 'Leave unassigned',
+    },
+    validationErrors: {
+      nameUsedByExistingIndex: 'This name is already used by existing index',
+      nameUsedToCreateAnotherIndex: 'This name is already used to create another index',
+      isAlreadyAssigned: 'This index is already assigned',
+    },
   },
   save: 'Save',
   create: 'Create',

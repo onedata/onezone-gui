@@ -24,3 +24,10 @@
 .harvester-configuration-general {
   min-height: 100px;
 }
+
+.harvester-configuration-gui-plugin {
+  .not-assigned {
+    color: $main-text-color-disabled;
+    font-style: italic;
+  }
+}
