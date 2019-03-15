@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
@@ -20,10 +20,12 @@ import _ from 'lodash';
 export default Component.extend({
   classNames: ['content-data'],
 
-  providerManager: inject(),
-  router: inject(),
-  guiUtils: inject(),
-  navigationState: inject(),
+  providerManager: service(),
+  router: service(),
+  guiUtils: service(),
+  navigationState: service(),
+  alert: service(),
+  appStorage: service(),
 
   /**
    * Selected (active) provider
@@ -211,6 +213,7 @@ export default Component.extend({
       _window,
       _windowResizeHandler,
     } = this.getProperties('_window', '_windowResizeHandler');
+    this.checkOneproviderAuthenticationError();
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
     const thisElement = this.$()[0];
@@ -270,6 +273,21 @@ export default Component.extend({
    */
   _getQueryMapState() {
     return _.mapKeys(this.get('_mapState') || {}, (v, k) => 'map_' + k);
+  },
+
+  checkOneproviderAuthenticationError() {
+    const appStorage = this.get('appStorage');
+    if (appStorage.getData('oneproviderAuthenticationError')) {
+      appStorage.removeData('oneproviderAuthenticationError', undefined);
+      const {
+        i18n,
+        alert: alertService,
+      } = this.getProperties('i18n', 'alert');
+      alertService.error(null, {
+        componentName: 'alerts/oneprovider-authentication-error',
+        header: i18n.t('components.alerts.oneproviderAuthenticationError.header'),
+      });
+    }
   },
 
   actions: {

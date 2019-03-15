@@ -56,6 +56,8 @@ import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 
+import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
+
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import privilegeActions from './services/privilege-actions';
@@ -76,6 +78,9 @@ let translations = {
     noClusterPermissions,
   },
   components: {
+    alerts: {
+      oneproviderAuthenticationError,
+    },
     loginBox,
     contentTokens,
     contentTokensEmpty,

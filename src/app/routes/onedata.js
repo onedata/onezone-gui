@@ -16,6 +16,7 @@ import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentic
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
+  appStorage: service(),
 
   beforeModel() {
     const superResult = this._super(...arguments);
@@ -26,16 +27,22 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
         const authRedirect = sessionStorage.getItem('authRedirect');
         if (authRedirect) {
           sessionStorage.removeItem('authRedirect');
-          const urlMatch = redirectUrl.match(/\/(ozp|opp)\/(.*?)\//);
+          const urlMatch = redirectUrl.match(/\/(op|ozp|opp)\/(.*?)\//);
+          const guiType = urlMatch && urlMatch[1];
           const clusterId = urlMatch && urlMatch[2];
-          if (clusterId) {
-            this.transitionTo(
+          if (guiType === 'op') {
+            this.get('appStorage').setData('oneproviderAuthenticationError', '1');
+            return this.transitionTo(
+              'onedata.sidebar.index',
+              'data'
+            );
+          } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
+            return this.transitionTo(
               'onedata.sidebar.content.aspect',
               'clusters',
               clusterId,
               'authentication-error'
             );
-            // TODO: better handle for OP redirection loop (which is rare)
           } else {
             throw {
               isOnedataCustomError: true,
@@ -43,7 +50,6 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
             };
           }
         } else {
-
           // Only redirect url in actual domain is acceptable (to not redirect
           // to some external, possibly malicious pages).
           window.location = window.location.origin + redirectUrl;
