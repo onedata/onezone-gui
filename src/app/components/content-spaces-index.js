@@ -128,11 +128,11 @@ export default Component.extend(
      */
     dataProviderProxy: computed('space.providerList.list', function dataProviderProxy() {
       const promise = this.get('space.providerList')
-        .then(providerList => {
-          return get(providerList, 'list').find(provider => {
-            return get(provider, 'online');
-          });
-        });
+        .then(providerList =>
+          get(providerList, 'list').then(list =>
+            list.find(provider => get(provider, 'online'))
+          )
+        );
       return PromiseObject.create({ promise });
     }),
 
@@ -199,7 +199,8 @@ export default Component.extend(
       return this.get('currentUser').getCurrentUserRecord()
         .then(user => user.setDefaultSpaceId(spaceId))
         .catch(error =>
-          this.get('globalNotify').backendError(this.t('changingDefaultSpace'), error)
+          this.get('globalNotify').backendError(this.t('changingDefaultSpace'),
+            error)
         );
     },
 
