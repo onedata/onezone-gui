@@ -76,7 +76,7 @@ export default OnedataSidebarContentRoute.extend(RedirectRoute, {
         entityId: resourceId,
         entityType,
         aspect: 'instance',
-        scope: 'protected',
+        scope: 'auto',
       });
     } else {
       return null;
