@@ -4,7 +4,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { Promise } from 'rsvp';
+// import { Promise } from 'rsvp';
 import Messages from 'ember-cp-validations/validators/messages';
 
 export default Component.extend(I18n, {
@@ -61,21 +61,21 @@ export default Component.extend(I18n, {
    */
   harvesterIndicesProxy: computed('harvester', function harvesterIndices() {
     // FIXME use backend
-    // return PromiseArray.create({
-    //   promise: get(this.get('harvester'), 'indexList')
-    //     .then(indexList => get(indexList, 'list')),
-    // });
     return PromiseArray.create({
-      promise: Promise.resolve([{
-        id: '1',
-        name: 'study1',
-        guiIndex: 'study',
-      }, {
-        id: '1',
-        name: 'do1',
-        guiIndex: 'dta_object',
-      }]),
+      promise: get(this.get('harvester'), 'indexList')
+        .then(indexList => get(indexList, 'list')),
     });
+    // return PromiseArray.create({
+    //   promise: Promise.resolve([{
+    //     id: '1',
+    //     name: 'study1',
+    //     guiIndex: 'study',
+    //   }, {
+    //     id: '1',
+    //     name: 'do1',
+    //     guiIndex: 'dta_object',
+    //   }]),
+    // });
   }),
 
   indicesMapping: computed(

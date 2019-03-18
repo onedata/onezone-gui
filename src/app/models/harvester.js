@@ -37,7 +37,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   // guiPluginPath: attr('string'),
   guiPluginPath: '/var/www/cos',
 
-  guiPluginHttpLocation: '/harvester_gui',
+  guiPluginHttpLocation: 'harvester_gui',
   
   /**
    * Information about harvester. Available fields:

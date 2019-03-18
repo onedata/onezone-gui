@@ -355,8 +355,8 @@ function createHarvesterRecords(store) {
     return store.createRecord('harvester', {
       name: `Harvester ${index}`,
       scope: 'private',
-      endpoint: '127.0.0.1:9300',
-      guiPluginHttpLocation: '/harvesters/h1/index.html',
+      plugin: 'elasticsearch_plugin',
+      endpoint: '127.0.0.1:9200',
       directMembership: true,
       canViewPrivileges: true,
       info: {
@@ -395,7 +395,17 @@ function createHarvesterRecords(store) {
           ],
         },
       }).save().then(() => record)
-    );
+    ).then(record => {
+      return Promise.all(_.range(3).map((index) => {
+        return store.createRecord('index', {
+          name: `Index ${index}`,
+          schema: {},
+        }).save();
+      }))
+      .then((records => createListRecord(store, 'index', records)))
+      .then(listRecord => record.set('indexList', listRecord))
+      .then(() => record);
+    });
   }));
 }
 
