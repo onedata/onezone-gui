@@ -49,7 +49,7 @@ describe('Integration | Component | content provider redirect', function () {
       }),
     };
     const onezoneServer = lookupService(this, 'onezone-server');
-    const url = '/op/12345/i#/';
+    const url = '/opw/12345/i#/';
     const getProviderRedirectUrl = sinon.stub(
       onezoneServer,
       'getProviderRedirectUrl'
@@ -66,8 +66,7 @@ describe('Integration | Component | content provider redirect', function () {
     }}`);
 
     const $contentProviderRedirect = this.$('.content-provider-redirect');
-    expect(
-      $contentProviderRedirect).to.exist;
+    expect($contentProviderRedirect).to.exist;
 
     wait().then(() => {
       expect(getProviderRedirectUrl).to.be.invokedOnce;

@@ -95,7 +95,7 @@ export default Component.extend(I18n, {
                 const clusterId =
                   parseGri(provider.belongsTo('cluster').id()).entityId;
                 return new Promise(() => {
-                  _window.location = `/op/${clusterId}/i#/${path}`;
+                  _window.location = `/opw/${clusterId}/i#/${path}`;
                 });
               }
             });
