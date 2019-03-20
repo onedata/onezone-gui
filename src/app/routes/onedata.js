@@ -12,51 +12,22 @@ import { inject as service } from '@ember/service';
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
 import { Promise } from 'rsvp';
 import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
+import { get } from '@ember/object';
+import { resolve } from 'rsvp';
 
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
   appStorage: service(),
 
-  beforeModel() {
+  beforeModel(transition) {
     const superResult = this._super(...arguments);
-    const redirectUrl = sessionStorage.getItem('redirectUrl');
-    if (redirectUrl) {
-      sessionStorage.removeItem('redirectUrl');
-      return new Promise(() => {
-        const authRedirect = sessionStorage.getItem('authRedirect');
-        if (authRedirect) {
-          sessionStorage.removeItem('authRedirect');
-          const urlMatch = redirectUrl.match(/\/(opw|ozp|opp)\/(.*?)\//);
-          const guiType = urlMatch && urlMatch[1];
-          const clusterId = urlMatch && urlMatch[2];
-          if (guiType === 'op') {
-            this.get('appStorage').setData('oneproviderAuthenticationError', '1');
-            return this.transitionTo(
-              'onedata.sidebar.index',
-              'data'
-            );
-          } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
-            return this.transitionTo(
-              'onedata.sidebar.content.aspect',
-              'clusters',
-              clusterId,
-              'authentication-error'
-            );
-          } else {
-            throw {
-              isOnedataCustomError: true,
-              type: 'redirection-loop',
-            };
-          }
-        } else {
-          // Only redirect url in actual domain is acceptable (to not redirect
-          // to some external, possibly malicious pages).
-          window.location = window.location.origin + redirectUrl;
-        }
-      });
+    if (get(transition, 'isAborted')) {
+      return superResult;
+    } else {
+      return this.handleRedirection().then(() => superResult);
     }
-    return superResult;
+
   },
 
   model() {
@@ -81,6 +52,47 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
     controller.setProperties(errors);
     if (errors.authenticationErrorReason) {
       controller.set('authenticationErrorOpened', true);
+    }
+  },
+
+  handleRedirection() {
+    const redirectUrl = sessionStorage.getItem('redirectUrl');
+    if (redirectUrl) {
+      sessionStorage.removeItem('redirectUrl');
+      return new Promise(() => {
+        const authRedirect = sessionStorage.getItem('authRedirect');
+        if (authRedirect) {
+          sessionStorage.removeItem('authRedirect');
+          const urlMatch = redirectUrl.match(/\/(opw|ozp|opp)\/(.*?)\//);
+          const guiType = urlMatch && urlMatch[1];
+          const clusterId = urlMatch && urlMatch[2];
+          if (guiType === 'opw') {
+            this.get('appStorage').setData('oneproviderAuthenticationError', '1');
+            return this.transitionTo(
+              'onedata.sidebar.index',
+              'data'
+            );
+          } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
+            return this.transitionTo(
+              'onedata.sidebar.content.aspect',
+              'clusters',
+              clusterId,
+              'authentication-error'
+            );
+          } else {
+            throw {
+              isOnedataCustomError: true,
+              type: 'redirection-loop',
+            };
+          }
+        } else {
+          // Only redirect url in actual domain is acceptable (to not redirect
+          // to some external, possibly malicious pages).
+          window.location = window.location.origin + redirectUrl;
+        }
+      });
+    } else {
+      return resolve();
     }
   },
 });
