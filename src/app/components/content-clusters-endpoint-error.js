@@ -17,7 +17,7 @@ export default Component.extend(I18n, {
   classNames: 'content-clusters-endpoint-error',
   i18nPrefix: 'components.contentClustersEndpointError',
 
-  alert: service(),
+  alertService: service('alert'),
   i18n: service(),
 
   /**
@@ -30,13 +30,17 @@ export default Component.extend(I18n, {
   clusterEntityId: reads('cluster.entityId'),
 
   didInsertElement() {
-    const i18n = this.get('i18n');
-    this.get('alert').error(null, {
+    const {
+      i18n,
+      alertService,
+      standaloneOnepanelUrl,
+    } = this.getProperties('i18n', 'alertService', 'standaloneOnepanelUrl');
+    alertService.error(null, {
       componentName: 'alerts/endpoint-error',
       header: i18n.t('components.alerts.endpointError.headerPrefix') +
         ' ' +
         i18n.t('components.alerts.endpointError.onepanel'),
-      url: origin,
+      url: standaloneOnepanelUrl,
       serverType: 'onepanel',
     });
   },
