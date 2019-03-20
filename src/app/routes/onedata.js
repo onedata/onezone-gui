@@ -27,7 +27,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
         const authRedirect = sessionStorage.getItem('authRedirect');
         if (authRedirect) {
           sessionStorage.removeItem('authRedirect');
-          const urlMatch = redirectUrl.match(/\/(op|ozp|opp)\/(.*?)\//);
+          const urlMatch = redirectUrl.match(/\/(opw|ozp|opp)\/(.*?)\//);
           const guiType = urlMatch && urlMatch[1];
           const clusterId = urlMatch && urlMatch[2];
           if (guiType === 'op') {
