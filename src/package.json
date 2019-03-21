@@ -23,7 +23,6 @@
     "chai-as-promised": "7.1.1",
     "chai-jquery": "2.0.0",
     "chartist-plugin-legend": "0.6.1",
-    "cleave.js": "1.4.7",
     "color": "2.0.1",
     "contrast": "1.0.1",
     "ember-ajax": "3.0.0",
