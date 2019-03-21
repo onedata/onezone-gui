@@ -14,10 +14,8 @@
       color: $color-one-danger;
     }
   }
-  .type-labels-container {
-    @include vertical-align-middle();
-    right: 90px;
-    line-height: 0;
+  .index-editor-input {
+    width: 50%;
   }
 }
 
@@ -29,5 +27,13 @@
   .not-assigned {
     color: $main-text-color-disabled;
     font-style: italic;
+  }
+  .index-info {
+    form {
+      margin: 0;
+    }
+    .form-group {
+      margin-bottom: 0;
+    }
   }
 }

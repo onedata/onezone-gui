@@ -369,4 +369,27 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
+  
+  /**
+   * Removes index
+   * @param {Model.Index} index
+   * @returns {Promise}
+   */
+  removeIndex(index) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.removeIndex(get(index, 'gri'))
+      .then(() => {
+        globalNotify.success(this.t(
+          'removeIndexSuccess', { indexName: get(index, 'name') }
+        ));
+      })
+      .catch(error => {
+        index.rollbackAttributes();
+        globalNotify.backendError(this.t('removingIndex'), error);
+        throw error;
+      });
+  },
 });

@@ -29,4 +29,6 @@ export default {
   leavingHarvester: 'leaving harvester',
   updateHarvesterSuccess: 'Harvester has been updated successfully',
   updatingHarvester: 'updating harvester',
+  removeIndexSuccess: 'Index "{{indexName}}" has been removed',
+  removingIndex: 'removing index',
 };

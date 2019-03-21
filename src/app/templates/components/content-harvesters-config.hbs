@@ -6,11 +6,8 @@
   </h1>
 </div>
 <div class="row content-row">
-  {{#promise-proxy-container proxy=harvesterConfigRecord}}
-    {{harvester-configuration
-      harvester=harvester
-      guiPluginConfiguration=harvesterConfig
-      onSave=(action "onSave")
-      mode="create"}}
-  {{/promise-proxy-container}}
+  {{harvester-configuration
+    harvester=harvester
+    onSave=(action "onSave")
+    mode="create"}}
 </div>

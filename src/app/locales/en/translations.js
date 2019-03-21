@@ -58,6 +58,7 @@ import contentHarvestersNew from './components/content-harvesters-new';
 import contentHarvestersJoin from './components/content-harvesters-join';
 import contentHarvestersConfig from './components/content-harvesters-config';
 import contentHarvestersSpaces from './components/content-harvesters-spaces';
+import contentHarvestersIndices from './components/content-harvesters-indices';
 import contentHarvestersMembers from './components/content-harvesters-members';
 import contentHarvestersEmpty from './components/content-harvesters-empty';
 import addYourSpaceModal from './components/add-your-space-modal';
@@ -131,6 +132,7 @@ let translations = {
     contentHarvestersJoin,
     contentHarvestersConfig,
     contentHarvestersSpaces,
+    contentHarvestersIndices,
     contentHarvestersMembers,
     contentHarvestersEmpty,
     addYourSpaceModal,

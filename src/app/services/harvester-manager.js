@@ -13,6 +13,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -390,6 +391,38 @@ export default Service.extend({
   },
 
   /**
+   * Creates index for specified harvester
+   * @param {string} harvesterEntityId 
+   * @param {Object} indexRepresentation
+   * @param {boolean} [reloadList=true]
+   * @return {Promise}
+   */
+  createIndex(harvesterEntityId, indexRepresentation, reloadList = true) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: 'harvester',
+        entityId: harvesterEntityId,
+        aspect: 'index',
+      }),
+      operation: 'create',
+      data: indexRepresentation,
+    }).then(() => reloadList ? this.reloadIndexList(harvesterEntityId): resolve());
+  },
+
+  /**
+   * Removes index
+   * @param {string} indexGri 
+   * @return {Promise}
+   */
+  removeIndex(indexGri) {
+    const harvesterEntityId = parseGri(indexGri).entityId;
+    return this.get('onedataGraph').request({
+      gri: indexGri,
+      operation: 'delete',
+    }).then(() => this.reloadIndexList(harvesterEntityId));
+  },
+
+  /**
    * Returns already loaded harvester by entityId (or undefined if not loaded)
    * @param {string} entityId harvester entityId
    * @returns {Model.Harvester|undefined}
@@ -457,5 +490,15 @@ export default Service.extend({
    */
   reloadEffUserList(entityId) {
     return this.reloadModelList(entityId, 'effUserList');
+  },
+
+  /**
+   * Reloads indexList of harvester identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId harvester entityId
+   * @returns {Promise}
+   */
+  reloadIndexList(entityId) {
+    return this.reloadModelList(entityId, 'indexList');
   },
 });

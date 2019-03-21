@@ -33,12 +33,16 @@ export default {
     path: 'Path',
     configuration: 'Configuration',
 
+    edit: 'Edit',
+    cancel: 'Cancel',
+    save: 'Save',
+    indicesHeader: 'Indices',
     pluginIndex: 'GUI Plugin index',
     harvesterIndex: 'Harvester index',
     notAssigned: 'Not assigned',
     assignMethods: {
       create: 'Create new index',
-      choose: 'Use existing index',
+      reuse: 'Use existing index',
       unassigned: 'Leave unassigned',
     },
     validationErrors: {
@@ -46,6 +50,8 @@ export default {
       nameUsedToCreateAnotherIndex: 'This name is already used to create another index',
       isAlreadyAssigned: 'This index is already assigned',
     },
+    indicesUpdating: 'indices updating',
+    indicesUpdateSuccess: 'Indices has been update successfully',
   },
   save: 'Save',
   create: 'Create',

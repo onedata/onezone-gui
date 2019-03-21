@@ -6,12 +6,29 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 // import { Promise } from 'rsvp';
 import Messages from 'ember-cp-validations/validators/messages';
+import { hash, Promise } from 'rsvp';
+import { A } from '@ember/array';
+import { isNone } from '@ember/utils';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+
+function catchPromiseError(promise, model) {
+  return promise.then(result => ({
+    success: true,
+    result,
+    model,
+  })).catch(error => ({
+    success: false,
+    error,
+    model,
+  }));
+}
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration-gui-plugin'],
 
   i18n: service(),
   harvesterManager: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -22,7 +39,7 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {string}
    */
-  mode: 'edit',
+  mode: 'view',
 
   /**
    * @virtual
@@ -34,6 +51,11 @@ export default Component.extend(I18n, {
    * @type {PromiseObject}
    */
   manifestProxy: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isSaving: false,
 
   validationMassages: computed(function validationMassages() {
     return Messages.create();
@@ -49,7 +71,7 @@ export default Component.extend(I18n, {
       if (Array.isArray(indices)) {
         return indices.filter(index =>
           index && typeof get(index, 'name') === 'string'
-        );
+        ).uniqBy('name');
       } else {
         return [];
       }
@@ -69,18 +91,18 @@ export default Component.extend(I18n, {
     //   promise: Promise.resolve([{
     //     id: '1',
     //     name: 'study1',
-    //     guiIndex: 'study',
+    //     guiPluginName: 'study',
     //   }, {
     //     id: '1',
     //     name: 'do1',
-    //     guiIndex: 'dta_object',
+    //     guiPluginName: 'dta_object',
     //   }]),
     // });
   }),
 
   indicesMapping: computed(
     'guiPluginIndices.@each.name',
-    'harvesterIndicesProxy.content.@each.guiIndex',
+    'harvesterIndicesProxy.content.@each.guiPluginName',
     function indicesMapping() {
       const {
         guiPluginIndices,
@@ -90,7 +112,7 @@ export default Component.extend(I18n, {
         get(guiPluginIndices, 'length') > 0) {
         return guiPluginIndices.reduce((mapping, index) => {
           const name = get(index, 'name');
-          set(mapping, name, harvesterIndicesProxy.findBy('guiIndex', name));
+          set(mapping, name, harvesterIndicesProxy.findBy('guiPluginName', name));
           return mapping;
         }, {});
       } else {
@@ -100,11 +122,27 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isValid: computed('guiIndicesErrors', 'guiPluginIndices', function isValid() {
+    const {
+      guiIndicesErrors,
+      guiPluginIndices,
+    } = this.getProperties('guiIndicesErrors', 'guiPluginIndices');
+    let valid = true;
+    guiPluginIndices.forEach(guiIndex => {
+      const guiIndexName = get(guiIndex, 'name');
+      valid = valid && !get(guiIndicesErrors, guiIndexName);
+    });
+    return valid;
+  }),
+
+  /**
    * @type {Array<string>}
    */
   assignIndexMethods: Object.freeze([
     'create',
-    'choose',
+    'reuse',
     'unassigned',
   ]),
 
@@ -120,30 +158,76 @@ export default Component.extend(I18n, {
     }
   ),
 
-  /**
-   * @type {EmberObject}
-   */
-  selectedAssignMethods: undefined,
+  harvesterIndicesObserver: observer('harvesterIndicesProxy.[]', function () {
+    const {
+      harvesterIndicesProxy,
+      guiPluginIndices,
+      selectedIndices,
+    } = this.getProperties(
+      'harvesterIndicesProxy',
+      'selectedIndices',
+      'guiPluginIndices'
+    );
+    guiPluginIndices.forEach(guiIndex => {
+      const guiIndexName = get(guiIndex, 'name');
+      const selectedIndex = get(selectedIndices, guiIndexName);
+      if (selectedIndex && !harvesterIndicesProxy.includes(selectedIndex)) {
+        set(selectedIndices, guiIndexName, undefined);
+      }
+    });
+  }),
+
+  modeObserver: observer('mode', function modeObserver() {
+    if (this.get('mode') === 'edit') {
+      const {
+        guiPluginIndices,
+        selectedAssignMethods,
+        selectedIndices,
+        indicesMapping,
+      } = this.getProperties(
+        'selectedIndices',
+        'selectedAssignMethods',
+        'guiPluginIndices',
+        'indicesMapping'
+      );
+      guiPluginIndices.forEach(guiIndex => {
+        const guiIndexName = get(guiIndex, 'name');
+        const assignedIndex = get(indicesMapping, guiIndexName);
+        if (assignedIndex) {
+          set(selectedAssignMethods, guiIndexName, 'reuse');
+          set(selectedIndices, guiIndexName, assignedIndex);
+        }
+      });
+    }
+  }),
 
   /**
    * @type {EmberObject}
    */
-  selectedIndices: undefined,
+  selectedAssignMethods: Object.freeze({}),
 
   /**
    * @type {EmberObject}
    */
-  createIndicesNames: undefined,
+  selectedIndices: Object.freeze({}),
 
   /**
    * @type {EmberObject}
    */
-  guiIndicesErrors: undefined,
+  createIndicesNames: Object.freeze({}),
+
+  /**
+   * @type {EmberObject}
+   */
+  guiIndicesErrors: Object.freeze({}),
 
   init() {
     this._super(...arguments);
     this.loadManifest();
     this.guiPluginIndicesObsever();
+    this.get('harvesterIndicesProxy').then(() => {
+      this.modeObserver();
+    });
   },
 
   generateDataObjectForGuiIndices(intialValue) {
@@ -219,7 +303,7 @@ export default Component.extend(I18n, {
           createNames.push(get(createIndicesNames, guiIndexName).trim());
           break;
         }
-        case 'choose': {
+        case 'reuse': {
           alreadySelected.push(get(selectedIndices, guiIndexName));
           break;
         }
@@ -250,7 +334,7 @@ export default Component.extend(I18n, {
           }
           break;
         }
-        case 'choose': {
+        case 'reuse': {
           value = get(selectedIndices, guiIndexName);
           if (alreadySelected.indexOf(value) !==
             alreadySelected.lastIndexOf(value)) {
@@ -279,7 +363,162 @@ export default Component.extend(I18n, {
     return errors;
   },
 
+  getIndicesToSave() {
+    const {
+      guiPluginIndices,
+      selectedAssignMethods,
+      selectedIndices,
+      createIndicesNames,
+      harvesterIndicesProxy,
+    } = this.getProperties(
+      'guiPluginIndices',
+      'selectedAssignMethods',
+      'selectedIndices',
+      'createIndicesNames',
+      'harvesterIndicesProxy'
+    );
+    const indicesToCreate = A();
+    const indicesToUpdate = A();
+    guiPluginIndices.forEach(guiIndex => {
+      const guiIndexName = get(guiIndex, 'name');
+      const assignMethod = get(selectedAssignMethods, guiIndexName);
+      switch (assignMethod) {
+        case 'create': {
+          let schema = get(guiIndex, 'schema');
+          if (isNone(schema) || schema === '') {
+            schema = '';
+          } else if (typeof schema !== 'string') {
+            schema = JSON.stringify(schema, null, 2);
+          }
+          indicesToCreate.pushObject({
+            name: get(createIndicesNames, guiIndexName),
+            schema,
+            guiPluginName: guiIndexName,
+          }); 
+        }
+        /* fallthrough */
+        case 'unassigned':
+          harvesterIndicesProxy.forEach(index => {
+            if (get(index, 'guiPluginName') === guiIndexName) {
+              // FIXME
+              // set(index, 'guiPluginName', '');
+              indicesToUpdate.addObject(index);
+            }
+          });
+          break;
+        case 'reuse': {
+          const selectedIndex = get(selectedIndices, guiIndexName);
+          harvesterIndicesProxy.without(selectedIndex).forEach(index => {
+            if (get(index, 'guiPluginName') === guiIndexName) {
+              // FIXME
+              // set(index, 'guiPluginName', '');
+              indicesToUpdate.addObject(index);
+            }
+          });
+          if (get(selectedIndex, 'guiPluginName') !== guiIndexName) {
+            set(selectedIndex, 'guiPluginName', guiIndexName);
+            indicesToUpdate.addObject(selectedIndex);
+          }
+          break;
+        }
+      }
+    });
+    return {
+      indicesToCreate,
+      indicesToUpdate,
+    };
+  },
+
   actions: {
+    edit() {
+      this.set('mode', 'edit');
+    },
+    cancel() {
+      this.set('mode', 'view');
+    },
+    save() {
+      const {
+        harvester,
+        harvesterManager,
+        selectedAssignMethods,
+        selectedIndices,
+        globalNotify,
+      } = this.getProperties(
+        'harvester',
+        'harvesterManager',
+        'selectedAssignMethods',
+        'selectedIndices',
+        'globalNotify'
+      );
+      const {
+        indicesToCreate,
+        indicesToUpdate,
+      } = this.getIndicesToSave();
+      const harvesterEntityId = get(harvester, 'entityId');
+      const createPromises = Promise.all(indicesToCreate.map(index =>
+        catchPromiseError(harvesterManager.createIndex(
+          harvesterEntityId,
+          index,
+          false
+        ), index)
+      ));
+      const updatePromises = Promise.all(indicesToUpdate.map(index =>
+        catchPromiseError(index.save(), index)
+      ));
+      return hash({
+        createPromises,
+        updatePromises,
+      }).then(({ createPromises, updatePromises }) => {
+        let listReloadError;
+        return harvesterManager.reloadIndexList(harvesterEntityId)
+          .catch(error => listReloadError = error)
+          .then(() => {
+            const createErrors = createPromises.filterBy('success', false);
+            const updateErrors = updatePromises.filterBy('success', false);
+            let errorsToShow = [];
+            if (listReloadError) {
+              errorsToShow.push({
+                error: 'update index list error',
+                details: listReloadError,
+              });
+            }
+            createErrors.forEach(error => {
+              errorsToShow.push({
+                error: 'create index error',
+                indexName: get(error, 'model.name'),
+                details: get(error, 'error'),
+              });
+            });
+            updateErrors.forEach(error => {
+              errorsToShow.push({
+                error: 'update index error',
+                indexName: get(error, 'model.name'),
+                details: get(error, 'error'),
+              });
+            });
+            safeExec(this, () => {
+              if (get(createErrors, 'length') + get(updateErrors, 'length') === 0) {
+                this.set('mode', 'view');
+              } else {
+                const indicesMapping = this.get('indicesMapping');
+                indicesToCreate.forEach(({ guiPluginName }) => {
+                  const createError = createErrors
+                    .find(er => get(er, 'model.guiPluginName') === guiPluginName);
+                  if (!createError) {
+                    set(selectedAssignMethods, guiPluginName, 'reuse');
+                    set(selectedIndices, guiPluginName, get(indicesMapping, guiPluginName));
+                  }
+                });
+              }
+            });
+            if (get(errorsToShow, 'length')) {
+              globalNotify.backendError(this.t('indicesUpdating'), errorsToShow);
+            } else {
+              globalNotify.success(this.t('indicesUpdateSuccess'));
+            }
+          });
+      });
+    },
     changeAssignMethod(guiIndexName, assignMethod) {
       this.set(`selectedAssignMethods.${guiIndexName}`, assignMethod);
       this.validateGuiIndices();

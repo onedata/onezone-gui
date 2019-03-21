@@ -3,6 +3,7 @@ export default {
     plugin: 'Data discovery',
     config: 'Configuration',
     spaces: 'Spaces',
+    indices: 'Indices',
     members: 'Members',
   },
   harvesterItem: {

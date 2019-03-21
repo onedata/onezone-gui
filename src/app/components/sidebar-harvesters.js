@@ -59,6 +59,10 @@ export default TwoLevelSidebar.extend(I18n, {
       label: this.t('aspects.config'),
       icon: 'settings',
     }, {
+      id: 'indices',
+      label: this.t('aspects.indices'),
+      icon: 'search',
+    }, {
       id: 'spaces',
       label: this.t('aspects.spaces'),
       icon: 'space',

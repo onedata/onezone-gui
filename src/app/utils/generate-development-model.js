@@ -399,7 +399,7 @@ function createHarvesterRecords(store) {
       return Promise.all(_.range(3).map((index) => {
         return store.createRecord('index', {
           name: `Index ${index}`,
-          schema: {},
+          schema: '',
         }).save();
       }))
       .then((records => createListRecord(store, 'index', records)))

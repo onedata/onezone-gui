@@ -1,0 +1,59 @@
+<div class="row content-row header-row hidden-xs has-border">
+  <h1 class="with-menu">
+    <span class="one-label">
+      {{tt this "header"}}
+    </span>
+    {{actions-toolbar isMinimized=true actionsArray=globalActions}}
+  </h1>
+</div>
+<div class="row">
+  {{#promise-proxy-container proxy=dataProxy}}
+    {{#one-collapsible-list as |list|}}
+      {{#each indicesProxy key="id" as |index|}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header disableToggleIcon=true}}
+            <span class="item-icon-container">
+              {{one-icon class="item-icon" icon="search"}}
+              {{one-tooltip
+                title=index.name
+                placement="top"
+                arrowPlacement="left"
+                triggerEvents="hover"
+              }}
+            </span>
+            <span class="one-label">{{index.name}}</span>
+            {{#if (contains index.guiPluginName guiPluginIndicesNamesProxy)}}
+              <span class="index-labels-container">
+                <span class="label label-info">{{tt this "usedByGui"}}</span>
+              </span>
+            {{/if}}
+            {{actions-toolbar
+              isMinimized=true
+              toolbarClasses=""
+              toolbarToggleClasses="btn-menu-toggle"
+              dropdownPlacement="auto"
+              actionsArray=indexActions
+              actionsArg=index}}
+          {{/listItem.header}}
+          {{#listItem.content}}
+            {{index.schema}}
+          {{/listItem.content}}
+        {{/list.item}}
+      {{else}}
+        {{#list.item as |listItem|}}
+          {{#listItem.header
+            isCollapsible=false
+            class="text-center"}}
+            <span class="one-label">No indices</span>
+          {{/listItem.header}}
+        {{/list.item}}
+      {{/each}}
+    {{/one-collapsible-list}}
+  {{/promise-proxy-container}}
+</div>
+{{content-harvesters-indices/remove-index-modal
+  opened=(and indexToRemove (not indexToRemove.isDeleted))
+  close=(action (mut indexToRemove) null)
+  proceed=(action "removeIndex")
+  processing=isRemovingIndex
+  index=indexToRemove}}

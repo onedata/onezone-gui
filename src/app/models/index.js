@@ -20,10 +20,10 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {Object}
    */
-  schema: attr('object'),
+  schema: attr('string'),
 
   /**
    * @type {string}
    */
-  guiIndex: attr('string'),
+  guiPluginName: attr('string'),
 });

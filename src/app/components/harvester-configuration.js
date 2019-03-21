@@ -55,7 +55,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  activeTab: 'harv-config-general-tab',
+  activeTab: 'harv-config-gui-plugin-tab',
   
   /**
    * @type {Ember.ComputedProperty<string>}

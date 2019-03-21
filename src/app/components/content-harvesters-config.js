@@ -46,34 +46,34 @@ export default Component.extend(I18n, {
    */
   isHarvesterConfigValid: true,
   
-  /**
-   * @type {Ember.ComputedProperty<PromiseObject<Model.HarvesterConfiguration>>}
-   */
-  harvesterConfigRecord: computed('harvester', function () {
-    const {
-      harvesterManager,
-      harvester,
-    } = this.getProperties('harvesterManager', 'harvester');
-    return PromiseObject.create({
-      promise: harvesterManager.getConfig(get(harvester, 'entityId')),
-    });
-  }),
+  // /**
+  //  * @type {Ember.ComputedProperty<PromiseObject<Model.HarvesterConfiguration>>}
+  //  */
+  // harvesterConfigRecord: computed('harvester', function () {
+  //   const {
+  //     harvesterManager,
+  //     harvester,
+  //   } = this.getProperties('harvesterManager', 'harvester');
+  //   return PromiseObject.create({
+  //     promise: harvesterManager.getConfig(get(harvester, 'entityId')),
+  //   });
+  // }),
 
-  configObserver: observer(
-    'harvesterConfigRecord.configuration',
-    function configObserver() {
-      const isHarvesterConfigModified = this.get('isHarvesterConfigModified');
-      if (!isHarvesterConfigModified) {
-        let config = this.get('harvesterConfigRecord.config');
-        config = JSON.stringify(config || {}, null, 2);
-        this.set('harvesterConfig', config);
-      }
-    }
-  ),
+  // configObserver: observer(
+  //   'harvesterConfigRecord.configuration',
+  //   function configObserver() {
+  //     const isHarvesterConfigModified = this.get('isHarvesterConfigModified');
+  //     if (!isHarvesterConfigModified) {
+  //       let config = this.get('harvesterConfigRecord.config');
+  //       config = JSON.stringify(config || {}, null, 2);
+  //       this.set('harvesterConfig', config);
+  //     }
+  //   }
+  // ),
 
   init() {
     this._super(...arguments);
-    this.configObserver();
+    // this.configObserver();
   },
 
   actions: {

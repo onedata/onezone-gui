@@ -1,0 +1,10 @@
+.content-harvesters-indices {
+  .one-collapsible-list .list-header-row {
+    padding-right: 140px;
+  }
+  .index-labels-container {
+    @include vertical-align-middle();
+    right: 55px;
+    line-height: 0;
+  }
+}
