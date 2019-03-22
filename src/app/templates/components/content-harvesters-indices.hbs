@@ -36,7 +36,9 @@
               actionsArg=index}}
           {{/listItem.header}}
           {{#listItem.content}}
-            {{index.schema}}
+            <div class="index-details-container">
+              <textarea class="schema-textarea form-control" rows="10" disabled="disabled">{{index.schema}}</textarea>
+            </div>
           {{/listItem.content}}
         {{/list.item}}
       {{else}}

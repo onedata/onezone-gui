@@ -7,4 +7,11 @@
     right: 55px;
     line-height: 0;
   }
+  .index-details-container {
+    margin: $padding-large-horizontal;
+    .schema-textarea {
+      font-family: monospace;
+      resize: none;
+    }
+  }
 }
