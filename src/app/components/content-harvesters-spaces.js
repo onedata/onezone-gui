@@ -46,6 +46,16 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {boolean}
    */
+  isCreateSpaceModalOpened: false,
+
+  /**
+   * @type {boolean}
+   */
+  isCreatingSpace: false,
+
+  /**
+   * @type {boolean}
+   */
   isInviteUsingTokenModalOpened: false,
 
   /**
@@ -88,6 +98,18 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  createSpaceAction: computed(function createSpaceAction() {
+    return {
+      action: () => this.set('isCreateSpaceModalOpened', true),
+      title: this.t('createNewSpace'),
+      class: 'create-new-space-action',
+      icon: 'add-filled',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   addYourSpaceAction: computed(function addYourSpaceAction() {
     return {
       action: () => this.set('isAddYourSpaceModalOpened', true),
@@ -113,7 +135,11 @@ export default Component.extend(I18n, GlobalActions, {
    * @override 
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  globalActions: collect('addYourSpaceAction', 'inviteSpaceUsingTokenAction'),
+  globalActions: collect(
+    'createSpaceAction',
+    'addYourSpaceAction',
+    'inviteSpaceUsingTokenAction'
+  ),
 
   /**
    * @override 
@@ -138,6 +164,20 @@ export default Component.extend(I18n, GlobalActions, {
             spaceToRemove: null,
           })
         );
+    },
+    createSpace(name) {
+      const {
+        harvester,
+        harvesterActions,
+      } = this.getProperties('harvester', 'harvesterActions');
+
+      this.set('isCreatingSpace', true);
+      harvesterActions.createSpace(harvester, { name }).finally(() =>
+        safeExec(this, 'setProperties', {
+          isCreatingSpace: false,
+          isCreateSpaceModalOpened: false,
+        })
+      );
     },
     addYourSpace(space) {
       this.set('isAddingYourSpace', true);

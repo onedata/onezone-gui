@@ -250,6 +250,30 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Creates new space in harvester
+   * @param {Models.Harvester} harvester 
+   * @param {Object} spaceRepresentation
+   * @return {Promise}
+   */
+  createSpace(harvester, spaceRepresentation) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.createSpace(
+      get(harvester, 'entityId'),
+      spaceRepresentation
+    ).then(() => {
+      globalNotify.success(this.t('createSpaceSuccess', {
+        spaceName: get(spaceRepresentation, 'name'),
+      }));
+    }).catch(error => {
+      globalNotify.backendError(this.t('creatingSpace'), error);
+      throw error;
+    });
+  },
+
+  /**
    * Removes group from space
    * @param {Model.Harvester} harvester 
    * @param {Model.Group} group

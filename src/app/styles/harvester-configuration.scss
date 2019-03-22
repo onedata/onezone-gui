@@ -28,6 +28,14 @@
     color: $main-text-color-disabled;
     font-style: italic;
   }
+  .indices-table {
+    table-layout: fixed;
+    &:not(.bt) {
+      .index-info {
+        width: 60%;
+      }
+    }
+  }
   .index-info {
     form {
       margin: 0;

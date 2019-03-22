@@ -21,8 +21,8 @@ export default _.merge({}, privilegesAspectBase, {
     harvester_add_group: 'Add group',
     harvester_remove_group: 'Remove group',
 
-    harvester_add_space: 'Add provider',
-    harvester_remove_space: 'Remove provider',
+    harvester_add_space: 'Add space',
+    harvester_remove_space: 'Remove space',
   },
   noGroupsStart: 'This harvester has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',

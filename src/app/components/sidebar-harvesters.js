@@ -55,21 +55,21 @@ export default TwoLevelSidebar.extend(I18n, {
       label: this.t('aspects.plugin'),
       icon: 'overview',
     }, {
-      id: 'config',
-      label: this.t('aspects.config'),
-      icon: 'settings',
+      id: 'spaces',
+      label: this.t('aspects.spaces'),
+      icon: 'space',
     }, {
       id: 'indices',
       label: this.t('aspects.indices'),
       icon: 'search',
     }, {
-      id: 'spaces',
-      label: this.t('aspects.spaces'),
-      icon: 'space',
-    }, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',
+    }, {
+      id: 'config',
+      label: this.t('aspects.config'),
+      icon: 'settings',
     }];
   }),
 });
