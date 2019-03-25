@@ -1,4 +1,7 @@
 .content-harvesters-indices {
+  .schema-textarea {
+    font-family: monospace;
+  }
   .one-collapsible-list .list-header-row {
     padding-right: 140px;
   }
@@ -15,7 +18,6 @@
   .index-details-container {
     margin: $padding-large-horizontal;
     .schema-textarea {
-      font-family: monospace;
       resize: none;
     }
   }

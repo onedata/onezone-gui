@@ -82,7 +82,6 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<PromiseArray<Model.Index>>}
    */
   harvesterIndicesProxy: computed('harvester', function harvesterIndices() {
-    // FIXME use backend
     return PromiseArray.create({
       promise: get(this.get('harvester'), 'indexList')
         .then(indexList => get(indexList, 'list')),
@@ -400,8 +399,7 @@ export default Component.extend(I18n, {
         case 'unassigned':
           harvesterIndicesProxy.forEach(index => {
             if (get(index, 'guiPluginName') === guiIndexName) {
-              // FIXME
-              // set(index, 'guiPluginName', '');
+              set(index, 'guiPluginName', '');
               indicesToUpdate.addObject(index);
             }
           });
@@ -410,8 +408,7 @@ export default Component.extend(I18n, {
           const selectedIndex = get(selectedIndices, guiIndexName);
           harvesterIndicesProxy.without(selectedIndex).forEach(index => {
             if (get(index, 'guiPluginName') === guiIndexName) {
-              // FIXME
-              // set(index, 'guiPluginName', '');
+              set(index, 'guiPluginName', '');
               indicesToUpdate.addObject(index);
             }
           });
@@ -496,6 +493,7 @@ export default Component.extend(I18n, {
                 details: get(error, 'error'),
               });
             });
+            updateErrors.forEach(({ model }) => model.rollbackAttributes());
             safeExec(this, () => {
               if (get(createErrors, 'length') + get(updateErrors, 'length') === 0) {
                 this.set('mode', 'view');

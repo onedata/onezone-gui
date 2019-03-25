@@ -369,6 +369,29 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
+
+  /**
+   * Creates index
+   * @param {Model.Harvester} harvester
+   * @param {Object} indexRepresentation
+   * @returns {Promise}
+   */
+  createIndex(harvester, indexRepresentation) {
+    const {
+      harvesterManager,
+      globalNotify,
+    } = this.getProperties('harvesterManager', 'globalNotify');
+    return harvesterManager.createIndex(
+      get(harvester, 'entityId'),
+      indexRepresentation
+    ).then(() => {
+      globalNotify.success(this.t('createIndexSuccess'));
+    })
+    .catch(error => {
+      globalNotify.backendError(this.t('creatingIndex'), error);
+      throw error;
+    });
+  },
   
   /**
    * Removes index

@@ -8,9 +8,8 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
