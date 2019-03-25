@@ -9,7 +9,6 @@
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
@@ -108,23 +107,6 @@ export default Component.extend(I18n, GlobalActions, {
   globalActionsTitle: computed(function globalActionsTitle() {
     return this.t('harvesterIndices');
   }),
-
-  /**
-   * @type {Ember.ComputedProperty<Action>}
-   */
-  removeIndexAction: computed(function removeSpaceAction() {
-    return {
-      action: index => this.set('indexToRemove', index),
-      title: this.t('removeThisIndex'),
-      class: 'remove-index',
-      icon: 'close',
-    };
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  indexActions: collect('removeIndexAction'),
 
   actions: {
     removeIndex() {

@@ -1,0 +1,38 @@
+{{#listItem.header disableToggleIcon=true}}
+  <span class="item-icon-container">
+    {{one-icon class="item-icon" icon="search"}}
+    {{one-tooltip
+      title=index.name
+      placement="top"
+      arrowPlacement="left"
+      triggerEvents="hover"
+    }}
+  </span>
+  {{#if isRenaming}}
+    {{one-inline-editor
+      value=index.name
+      isEditing=true
+      onEdit=(action (mut isRenaming) false)
+      onSave=(action "onNameChange")
+      class="index-name-editor"}}
+  {{else}}
+    <span class="one-label">{{index.name}}</span>
+  {{/if}}
+  {{#if (contains index.guiPluginName guiPluginIndicesNames)}}
+    <span class="index-labels-container">
+      <span class="label label-info">{{tt this "usedByGui"}}</span>
+    </span>
+  {{/if}}
+  {{actions-toolbar
+    isMinimized=true
+    toolbarClasses=""
+    toolbarToggleClasses="btn-menu-toggle"
+    dropdownPlacement="auto"
+    actionsArray=indexActions
+    actionsArg=index}}
+{{/listItem.header}}
+{{#listItem.content}}
+  <div class="index-details-container">
+    <textarea class="schema-textarea form-control" rows="10" disabled="disabled">{{index.schema}}</textarea>
+  </div>
+{{/listItem.content}}

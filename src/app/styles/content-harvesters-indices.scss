@@ -2,6 +2,11 @@
   .one-collapsible-list .list-header-row {
     padding-right: 140px;
   }
+  .index-name-editor {
+    display: inline-block;
+    margin: -($input-height-base - $line-height-computed) / 2 0;
+    width: calc(100% - 3em);
+  }
   .index-labels-container {
     @include vertical-align-middle();
     right: 55px;
