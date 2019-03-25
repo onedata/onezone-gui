@@ -139,37 +139,6 @@ export default Service.extend({
   },
 
   /**
-   * Creates space in harvester
-   * @param {string} harvesterEntityId 
-   * @param {Object} spaceRepresentation
-   * @return {Promise}
-   */
-  createSpace(harvesterEntityId, spaceRepresentation) {
-    const {
-      spaceManager,
-      currentUser,
-      onedataGraph,
-    } = this.getProperties('spaceManager', 'currentUser', 'onedataGraph');
-    return currentUser.getCurrentUserRecord()
-      .then(user => onedataGraph.request({
-        gri: gri({
-          entityType: 'harvester',
-          entityId: harvesterEntityId,
-          aspect: 'space',
-          scope: 'auto',
-        }),
-        operation: 'create',
-        data: spaceRepresentation,
-        authHint: ['asUser', get(user, 'entityId')],
-      }).then(() => {
-        return Promise.all([
-          spaceManager.reloadList(),
-          this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError),
-        ]);
-      }));
-  },
-
-  /**
    * @param {string} harvesterEntityId 
    * @param {string} spaceEntityId
    * @returns {Promise}

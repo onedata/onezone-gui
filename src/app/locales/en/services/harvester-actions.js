@@ -11,8 +11,6 @@ export default {
   harvesterCreateSuccess: 'New harvester created successfully',
   removeSpaceFromHarvesterSuccess: 'Space "{{spaceName}}" has been successfully removed from harvester "{{harvesterName}}"',
   removingSpaceFromHarvester: 'removing space from harvester',
-  createSpaceSuccess: 'Space "{{spaceName}}" created successfully',
-  creatingSpace: 'creating space',
   addSpaceToHarvesterSuccess: 'Space "{{spaceName}}" has been added successfully to harvester "{{harvesterName}}"',
   addingSpaceToHarvester: 'adding space to harvester',
   removeGroupSuccess: 'Group "{{groupName}}" has been removed from harvester "{{harvesterName}}"',
