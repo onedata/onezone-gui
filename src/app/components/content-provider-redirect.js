@@ -88,14 +88,14 @@ export default Component.extend(I18n, {
                   .getProviderRedirectUrl(get(provider, 'id'), path)
                   .then(({ url }) => {
                     return new Promise(() => {
-                      _window.location = url;
+                      _window.location.replace(url);
                     });
                   });
               } else {
                 const clusterId =
                   parseGri(provider.belongsTo('cluster').id()).entityId;
                 return new Promise(() => {
-                  _window.location = `/opw/${clusterId}/i#/${path}`;
+                  _window.location.replace(`/opw/${clusterId}/i#/${path}`);
                 });
               }
             });
