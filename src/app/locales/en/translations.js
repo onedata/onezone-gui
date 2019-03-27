@@ -39,6 +39,7 @@ import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
 import contentClustersDeregister from './components/content-clusters-deregister';
+import contentClustersMembers from './components/content-clusters-members';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -60,6 +61,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
+import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
@@ -109,6 +111,7 @@ let translations = {
     contentClustersAuthenticationError,
     contentClustersEndpointError,
     contentClustersDeregister,
+    contentClustersMembers,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,
@@ -131,6 +134,7 @@ let translations = {
     clientTokenManager,
     spaceActions,
     groupActions,
+    clusterActions,
     privilegeActions,
     guiUtils,
   },

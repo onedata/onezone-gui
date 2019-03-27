@@ -16,9 +16,11 @@ import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mix
 import { resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
+import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
 
 export default Model.extend(
   GraphSingleModelMixin,
+  InvitingModelMixin,
   OneproviderClusterInfoMixin,
   createDataProxyMixin('name'),
   createDataProxyMixin('domain'), {
@@ -31,6 +33,12 @@ export default Model.extend(
     workerVersion: attr('object'),
     onepanelVersion: attr('object'),
     canViewPrivateData: attr('boolean'),
+
+    // members of this cluster
+    groupList: belongsTo('groupList'),
+    userList: belongsTo('sharedUserList'),
+    effGroupList: belongsTo('groupList'),
+    effUserList: belongsTo('sharedUserList'),
 
     /**
      * Fields:

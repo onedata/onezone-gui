@@ -11,6 +11,7 @@ export default _.merge({}, proceedProcessModal, {
   onlyParent: '{{parentType}}&nbsp;"{{parentName}}".',
   proceed: 'Remove',
   space: 'space&nbsp;"{{name}}"',
+  cluster: 'cluster',
   group: 'group&nbsp;"{{name}}"',
   subgroup: 'subgroup&nbsp;"{{name}}"',
   user: 'user&nbsp;"{{name}}"',
@@ -33,4 +34,5 @@ export default _.merge({}, proceedProcessModal, {
   headerGroups: 'groups',
   headerSubgroups: 'subgroups',
   headerMembers: 'members',
+  headerCluster: 'cluster',
 });

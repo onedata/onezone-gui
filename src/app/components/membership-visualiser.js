@@ -67,7 +67,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { resolve, Promise } from 'rsvp';
+import { resolve, reject, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
@@ -92,6 +92,7 @@ export default Component.extend(I18n, {
   privilegeActions: service(),
   spaceActions: service(),
   groupActions: service(),
+  clusterActions: service(),
   currentUser: service(),
 
   /**
@@ -680,10 +681,12 @@ export default Component.extend(I18n, {
         relationToRemove,
         spaceActions,
         groupActions,
+        clusterActions,
       } = this.getProperties(
         'relationToRemove',
         'spaceActions',
-        'groupActions'
+        'groupActions',
+        'clusterActions'
       );
       const {
         parentType,
@@ -698,14 +701,24 @@ export default Component.extend(I18n, {
         'child'
       );
       let promise;
-      if (parentType === 'space') {
-        promise = childType === 'group' ?
-          spaceActions.removeGroup(parent, child) :
-          spaceActions.removeUser(parent, child);
-      } else {
-        promise = childType === 'group' ?
-          groupActions.removeRelation(parent, child) :
-          groupActions.removeUser(parent, child);
+      switch (parentType) {
+        case 'space':
+          promise = childType === 'group' ?
+            spaceActions.removeGroup(parent, child) :
+            spaceActions.removeUser(parent, child);
+          break;
+        case 'group':
+          promise = childType === 'group' ?
+            groupActions.removeRelation(parent, child) :
+            groupActions.removeUser(parent, child);
+          break;
+        case 'cluster':
+          promise = childType === 'group' ?
+            clusterActions.removeMemberGroupFromCluster(parent, child) :
+            clusterActions.removeMemberUserFromCluster(parent, child);
+          break;
+        default:
+          promise = reject('membership-visualiser: cannot remove, unknown relation');
       }
       this.set('isRemovingRelation', true);
       return promise
