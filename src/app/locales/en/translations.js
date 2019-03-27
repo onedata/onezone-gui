@@ -35,11 +35,13 @@ import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
+import contentGroupsJoinCluster from './components/content-groups-join-cluster';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
 import contentClustersDeregister from './components/content-clusters-deregister';
 import contentClustersMembers from './components/content-clusters-members';
+import contentClustersJoin from './components/content-clusters-join';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -106,12 +108,14 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
+    contentGroupsJoinCluster,
     contentClustersAdd,
     contentClustersEmpty,
     contentClustersAuthenticationError,
     contentClustersEndpointError,
     contentClustersDeregister,
     contentClustersMembers,
+    contentClustersJoin,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,

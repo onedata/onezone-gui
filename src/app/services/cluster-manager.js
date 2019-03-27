@@ -45,6 +45,22 @@ export default Service.extend({
       .then(user => user.belongsTo('clusterList').reload(true));
   },
 
+  /**
+   * Joins user to a cluster using given token
+   * @param {string} token
+   * @returns {Promise<Cluster>}
+   */
+  joinCluster(token) {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.joinCluster(token)
+        .then(cluster => Promise.all([
+          this.reloadList(),
+          this.reloadUserList(get(cluster, 'entityId')).catch(ignoreForbiddenError),
+          this.reloadEffUserList(get(cluster, 'entityId')).catch(ignoreForbiddenError),
+        ]).then(() => cluster))
+      );
+  },
+
   getOnezoneRegistrationToken() {
     const userId = this.get('currentUser.userId');
     return this.get('onedataGraph').request({
