@@ -148,7 +148,7 @@ export default Component.extend({
         this.get('_window').dispatchEvent(new Event('providerPlaceRefresh'))
       );
       return clusterizeProviders(_providers || [], squareSideLength,
-      squareSideLength);
+        squareSideLength);
     }
   ),
 
@@ -292,6 +292,17 @@ export default Component.extend({
     }
   },
 
+  transitionToProviderRedirect(provider) {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    return router.transitionTo(
+      'provider-redirect',
+      guiUtils.getRoutableIdFor(provider)
+    );
+  },
+
   actions: {
     mapViewportChanged(event) {
       this.set('_mapState', {
@@ -309,15 +320,8 @@ export default Component.extend({
       );
     },
     goToProvider(provider) {
-      const {
-        router,
-        guiUtils,
-      } = this.getProperties('router', 'guiUtils');
-      if (get(provider, 'status') !== 'offline') {
-        router.transitionTo(
-          'provider-redirect',
-          guiUtils.getRoutableIdFor(provider)
-        );
+      if (get(provider, 'online') === true) {
+        return this.transitionToProviderRedirect(provider);
       }
     },
   },

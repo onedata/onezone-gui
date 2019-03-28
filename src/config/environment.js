@@ -30,7 +30,12 @@ module.exports = function (environment) {
       { id: 'spaces', icon: 'space' },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
-      { id: 'clusters', icon: 'cluster', defaultAspect: 'overview', allowIndex: false },
+      {
+        id: 'clusters',
+        icon: 'cluster',
+        defaultAspect: 'overview',
+        allowIndex: false,
+      },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
@@ -47,6 +52,7 @@ module.exports = function (environment) {
     'i18n': {
       defaultLocale: 'en',
     },
+    'legacyOneproviderVersion': '18.02.*',
     'APP': {
       // Here you can pass flags/options to your application instance
       // when it is created

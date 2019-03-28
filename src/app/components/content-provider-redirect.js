@@ -16,8 +16,11 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise } from 'rsvp';
+import config from 'ember-get-config';
 
-const oldOneproviderVersion = '18.02.*';
+const {
+  legacyOneproviderVersion,
+} = config;
 
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
@@ -73,48 +76,70 @@ export default Component.extend(I18n, {
     return checkImg(`${this.get('oneproviderOrigin')}/favicon.ico`);
   },
 
+  showEndpointErrorModal() {
+    const i18n = this.get('i18n');
+    this.get('alert').error(null, {
+      componentName: 'alerts/endpoint-error',
+      header: i18n.t('components.alerts.endpointError.headerPrefix') +
+        ' ' +
+        i18n.t('components.alerts.endpointError.oneprovider'),
+      url: this.get('oneproviderOrigin'),
+      serverType: 'oneprovider',
+    });
+  },
+
+  transitionToProviderOnMap(provider) {
+    this.get('router').transitionTo(
+      'onedata.sidebar.content',
+      'data',
+      get(provider, 'entityId')
+    );
+  },
+
+  throwEndpointError() {
+    throw { isOnedataCustomError: true, type: 'endpoint-error' };
+  },
+
+  resolveIsProviderVersionLegacy(provider) {
+    return get(provider, 'cluster')
+      .then(providerCluster => {
+        return get(providerCluster, 'workerVersion.release') ===
+          legacyOneproviderVersion;
+      });
+  },
+
+  redirectToProvider(provider, spaceId) {
+    const _window = this.get('_window');
+    const path = spaceId ? `onedata/data/${spaceId}` : '';
+    return this.resolveIsProviderVersionLegacy(provider).then(isLegacy => {
+      if (isLegacy) {
+        return this.get('onezoneServer')
+          .getProviderRedirectUrl(get(provider, 'id'), path)
+          .then(({ url }) => {
+            return new Promise(() => {
+              _window.location = url;
+            });
+          });
+      } else {
+        const clusterId =
+          parseGri(provider.belongsTo('cluster').id()).entityId;
+        return new Promise(() => {
+          _window.location = `/opw/${clusterId}/i#/${path}`;
+        });
+      }
+    });
+  },
+
   _goToProvider(spaceId) {
     const provider = this.get('provider');
     return this.checkIsProviderAvailable()
       .then(isAvailable => {
         if (isAvailable) {
-          return get(provider, 'cluster')
-            .then(providerCluster => {
-              const _window = this.get('_window');
-              const path = spaceId ? `onedata/data/${spaceId}` : '';
-              if (get(providerCluster, 'workerVersion.release') ===
-                oldOneproviderVersion) {
-                return this.get('onezoneServer')
-                  .getProviderRedirectUrl(get(provider, 'id'), path)
-                  .then(({ url }) => {
-                    return new Promise(() => {
-                      _window.location = url;
-                    });
-                  });
-              } else {
-                const clusterId =
-                  parseGri(provider.belongsTo('cluster').id()).entityId;
-                return new Promise(() => {
-                  _window.location = `/opw/${clusterId}/i#/${path}`;
-                });
-              }
-            });
+          return this.redirectToProvider(provider, spaceId);
         } else {
-          const i18n = this.get('i18n');
-          this.get('alert').error(null, {
-            componentName: 'alerts/endpoint-error',
-            header: i18n.t('components.alerts.endpointError.headerPrefix') +
-              ' ' +
-              i18n.t('components.alerts.endpointError.oneprovider'),
-            url: this.get('oneproviderOrigin'),
-            serverType: 'oneprovider',
-          });
-          this.get('router').transitionTo(
-            'onedata.sidebar.content',
-            'data',
-            get(provider, 'entityId')
-          );
-          throw { isOnedataCustomError: true, type: 'endpoint-error' };
+          this.showEndpointErrorModal();
+          this.transitionToProviderOnMap(provider);
+          this.throwEndpointError();
         }
       });
   },
