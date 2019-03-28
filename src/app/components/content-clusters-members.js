@@ -16,7 +16,7 @@ import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
-
+import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,

@@ -54,7 +54,14 @@ describe('Integration | Component | content provider redirect', function () {
       onezoneServer,
       'getProviderRedirectUrl'
     ).returns(Promise.resolve({ url }));
-    const fakeWindow = {};
+    let locationUrl;
+    const fakeWindow = {
+      location: {
+        replace(url) {
+          locationUrl = url;
+        },
+      },
+    };
     this.setProperties({ provider, fakeWindow });
     this.on(
       'checkIsProviderAvailable', () => resolve(true));
@@ -70,7 +77,7 @@ describe('Integration | Component | content provider redirect', function () {
 
     wait().then(() => {
       expect(getProviderRedirectUrl).to.be.invokedOnce;
-      expect(fakeWindow.location).to.equal(url);
+      expect(locationUrl).to.equal(url);
       done();
     });
   });
