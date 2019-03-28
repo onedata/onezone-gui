@@ -35,6 +35,12 @@
         width: 60%;
       }
     }
+    &.bt tbody tr td {
+      position: relative;
+      &:before {
+        width: auto;
+      }
+    }
   }
   .index-info {
     form {
