@@ -74,6 +74,7 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
 
@@ -108,8 +109,8 @@ export default Component.extend(I18n, {
   contextRecord: null,
 
   /**
-   * Group, space or provider
-   * @type {Group|Space|Provider}
+   * Group, space, cluster or provider
+   * @type {Group|Space|Cluster|Provider}
    * @virtual
    */
   targetRecord: null,
@@ -228,8 +229,15 @@ export default Component.extend(I18n, {
   groupedPrivilegesFlags: computed(
     'relationPrivilegesToChange.parentType',
     function groupedPrivilegesFlags() {
-      return this.get('relationPrivilegesToChange.parentType') === 'space' ?
-        spaceFlags : groupFlags;
+      switch (this.get('relationPrivilegesToChange.parentType')) {
+        case 'space':
+          return spaceFlags;
+        case 'group':
+          return groupFlags;
+        case 'cluster':
+        default:
+          return clusterFlags; 
+      }
     }
   ),
 
@@ -240,8 +248,7 @@ export default Component.extend(I18n, {
     'relationPrivilegesToChange.parentType',
     function privilegeGroupsTranslationsPath() {
       const modelName =
-        this.get('relationPrivilegesToChange.parentType') === 'space' ?
-        'Space' : 'Group';
+        _.upperFirst(this.get('relationPrivilegesToChange.parentType'));
       return `components.content${modelName}sMembers.privilegeGroups`;
     }
   ),
@@ -253,8 +260,7 @@ export default Component.extend(I18n, {
     'relationPrivilegesToChange.parentType',
     function privilegesTranslationsPath() {
       const modelName =
-        this.get('relationPrivilegesToChange.parentType') === 'space' ?
-        'Space' : 'Group';
+        _.upperFirst(this.get('relationPrivilegesToChange.parentType'));
       return `components.content${modelName}sMembers.privileges`;
     }
   ),

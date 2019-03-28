@@ -33,6 +33,9 @@ export default Model.extend(
     workerVersion: attr('object'),
     onepanelVersion: attr('object'),
     canViewPrivateData: attr('boolean'),
+    canViewPrivileges: attr('boolean', { defaultValue: false }),
+    directMembership: attr('boolean', { defaultValue: false }),
+    
 
     // members of this cluster
     groupList: belongsTo('groupList'),

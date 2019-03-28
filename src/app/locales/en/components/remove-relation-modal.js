@@ -11,7 +11,7 @@ export default _.merge({}, proceedProcessModal, {
   onlyParent: '{{parentType}}&nbsp;"{{parentName}}".',
   proceed: 'Remove',
   space: 'space&nbsp;"{{name}}"',
-  cluster: 'cluster',
+  cluster: 'cluster&nbsp;"{{name}}"',
   group: 'group&nbsp;"{{name}}"',
   subgroup: 'subgroup&nbsp;"{{name}}"',
   user: 'user&nbsp;"{{name}}"',
