@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with user linked accounts.
+ * Provides data for routes and components associated with user linked accounts.
  *
  * @module services/linked-account-manager
  * @author Michal Borzecki

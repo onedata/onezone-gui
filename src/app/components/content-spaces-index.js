@@ -126,15 +126,16 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Provider>}
      */
-    dataProviderProxy: computed('space.providerList.list', function dataProviderProxy() {
-      const promise = this.get('space.providerList')
-        .then(providerList =>
-          get(providerList, 'list').then(list =>
-            list.find(provider => get(provider, 'online'))
-          )
-        );
-      return PromiseObject.create({ promise });
-    }),
+    dataProviderProxy: computed('space.providerList.list.[]',
+      function dataProviderProxy() {
+        const promise = this.get('space.providerList')
+          .then(providerList =>
+            get(providerList, 'list').then(list =>
+              list.find(provider => get(provider, 'online'))
+            )
+          );
+        return PromiseObject.create({ promise });
+      }),
 
     /**
      * @type {Ember.ComputedProperty<Array<string>>}

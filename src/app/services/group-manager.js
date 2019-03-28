@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with groups tab.
+ * Provides data for routes and components associated with groups tab.
  *
  * @module services/group-manager
  * @author Michal Borzecki

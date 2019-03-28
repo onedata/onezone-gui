@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with tokens tab.
+ * Provides data for routes and components associated with tokens tab.
  *
  * @module services/client-token-manager
  * @author Michal Borzecki, Jakub Liput

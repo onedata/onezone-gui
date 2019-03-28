@@ -10,8 +10,10 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import { reads } from '@ember/object/computed';
+import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, ErrorCheckViewMixin, {
   classNames: ['content-clusters-authentication-error'],
 
   router: service(),
@@ -21,19 +23,45 @@ export default Component.extend(I18n, {
    */
   cluster: undefined,
 
+  clusterEntityId: reads('cluster.entityId'),
+
   /**
    * @override
    */
   i18nPrefix: 'components.contentClustersAuthenticationError',
 
+  /**
+   * @override
+   */
+  resourceId: reads('cluster.entityId'),
+
+  /**
+   * @override
+   */
+  checkErrorType: 'clusterAuthentication',
+
+  /**
+   * @override
+   */
+  checkError() {
+    return Boolean(sessionStorage.getItem('authRedirect'));
+  },
+
+  /**
+   * @override
+   */
+  redirectToIndex() {
+    return this.get('router').transitionTo(
+      'onedata.sidebar.content.aspect',
+      'clusters',
+      this.get('clusterEntityId'),
+      'index'
+    );
+  },
+
   actions: {
     tryAgain() {
-      return this.get('router').transitionTo(
-        'onedata.sidebar.content.aspect',
-        'clusters',
-        this.get('cluster.entityId'),
-        'index'
-      );
+      return this.redirectToIndex();
     },
   },
 });

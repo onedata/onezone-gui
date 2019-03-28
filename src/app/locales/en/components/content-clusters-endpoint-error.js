@@ -2,7 +2,7 @@ import endpointErrorTranslations from '../onedata-gui-common/components/alerts/e
 
 export default {
   header: `${endpointErrorTranslations.headerPrefix} ${endpointErrorTranslations.onepanel}`,
-  liMakeSure1: 'Make sure this Oneprovider is online – you may want to open the',
+  liMakeSure1: 'Make sure this Oneprovider cluster is online – you may want to open the',
   liMakeSureLink: 'emergency Onepanel interface',
   liTryAgain1: 'You can',
   liTryAgainLink: 'try again',

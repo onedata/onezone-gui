@@ -1,5 +1,5 @@
 /**
- * Provides data and operations for routes and components assoctiated with clusters tab.
+ * Provides data and operations for routes and components associated with clusters tab.
  *
  * @module services/cluster-manager
  * @author Jakub Liput
