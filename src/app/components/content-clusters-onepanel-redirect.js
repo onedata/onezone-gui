@@ -14,6 +14,7 @@ import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
+import { Promise } from 'rsvp';
 
 export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
@@ -47,12 +48,26 @@ export default Component.extend({
     return PromiseObject.create({ promise: this.redirectToOnepanel() });
   }),
 
-  redirectToOnepanel() {
+  checkOnepanelAvailability() {
     const origin = this.get('cluster.standaloneOrigin');
-    return checkImg(`${origin}/favicon.ico`)
+    return checkImg(`${origin}/favicon.ico`);
+  },
+
+  redirectToOnepanelApp() {
+    window.location = this.get('onepanelHref');
+  },
+
+  redirectToOnepanel() {
+    return this.checkOnepanelAvailability()
       .then(isAvailable => {
         if (isAvailable) {
-          window.location = this.get('onepanelHref');
+          return new Promise((resolve, reject) => {
+            try {
+              this.redirectToOnepanelApp();
+            } catch (error) {
+              reject(error);
+            }
+          });
         } else {
           const {
             router,
