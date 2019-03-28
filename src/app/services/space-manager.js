@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with spaces tab
+ * Provides data for routes and components associated with spaces tab
  *
  * @module services/space-manager
  * @author Jakub Liput

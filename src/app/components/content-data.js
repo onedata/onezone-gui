@@ -147,7 +147,8 @@ export default Component.extend({
       scheduleOnce('afterRender', this, () =>
         this.get('_window').dispatchEvent(new Event('providerPlaceRefresh'))
       );
-      return clusterizeProviders(_providers || [], squareSideLength, squareSideLength);
+      return clusterizeProviders(_providers || [], squareSideLength,
+      squareSideLength);
     }
   ),
 
@@ -226,7 +227,8 @@ export default Component.extend({
       safeExec(this, () => {
         const dragStartXY = this.get('dragStartXY');
         this.set('dragStartXY', {});
-        if (dragStartXY.x === event.clientX && dragStartXY.y === event.clientY) {
+        if (dragStartXY.x === event.clientX && dragStartXY.y === event
+          .clientY) {
           const target = $(event.target);
           if (!this.get('_mobileMode')) {
             const ignoredElements =
@@ -278,7 +280,7 @@ export default Component.extend({
   checkOneproviderAuthenticationError() {
     const appStorage = this.get('appStorage');
     if (appStorage.getData('oneproviderAuthenticationError')) {
-      appStorage.removeData('oneproviderAuthenticationError', undefined);
+      appStorage.removeData('oneproviderAuthenticationError');
       const {
         i18n,
         alert: alertService,

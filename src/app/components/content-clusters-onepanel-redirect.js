@@ -1,9 +1,19 @@
+/**
+ * Redirect to Onepanel GUI (hosted on Onezone domain) on component load
+ * 
+ * @module components/content-clusters-onepanel-redirect
+ * @author Jakub Liput
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
+import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 
 export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
@@ -13,7 +23,7 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {object} cluster item
+   * @type {models/Cluster} cluster item
    */
   cluster: undefined,
 
@@ -57,6 +67,8 @@ export default Component.extend({
             router,
             cluster,
           } = this.getProperties('router', 'cluster');
+          new DisabledErrorCheckList('clusterEndpoint')
+            .disableErrorCheckFor(get(cluster, 'entityId'));
           return router.transitionTo(
             'onedata.sidebar.content.aspect',
             'clusters',

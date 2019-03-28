@@ -1,36 +1,40 @@
-{{#content-info
-  class="scroll-breakpoint-700"
-  header=(tt this "header")
-  imagePath="assets/images/no-connection.svg"
-}}
-  <p class="lead">
-    <ul class="info">
-      <li>
-        {{tt this "liMakeSure1"}}
-        <a href={{standaloneOnepanelUrl}}>{{tt this "liMakeSureLink"}}</a>.
-      </li>
-      <li>
-        {{tt this "liTryAgain1"}}
-        {{#link-to
-          "onedata.sidebar.content.aspect"
-          "clusters"
-          clusterEntityId
-          "overview"
-        }}
-          {{tt this "liTryAgainLink"}}
-        {{/link-to}}
-        {{tt this "liTryAgain2"}}.
-      </li>
-      <li>
-        {{tt this "liDeregister1"}}
-        {{#link-to
-          "onedata.sidebar.content.aspect"
-          "clusters"
-          clusterEntityId
-          "deregister"
-          class="text-danger"
-        }}{{tt this "liDeregisterLink"}}{{/link-to}}.
-      </li>
-    </ul>
-  </p>
-{{/content-info}}
+{{#promise-proxy-container proxy=tryErrorCheckProxy}}
+  {{#content-info
+    class="scroll-breakpoint-700"
+    header=(tt this "header")
+    imagePath="assets/images/no-connection.svg"
+  }}
+    <p class="lead">
+      <ul class="info">
+        <li>
+          {{tt this "liMakeSure1"}}
+          <a href={{standaloneOnepanelUrl}}>{{tt this "liMakeSureLink"}}</a>.
+        </li>
+        <li>
+          {{tt this "liTryAgain1"}}
+          {{#link-to
+            "onedata.sidebar.content.aspect"
+            "clusters"
+            clusterEntityId
+            "overview"
+          }}
+            {{tt this "liTryAgainLink"}}
+          {{/link-to}}
+          {{tt this "liTryAgain2"}}.
+        </li>
+        {{#if (eq cluster.type "oneprovider")}}
+          <li>
+            {{tt this "liDeregister1"}}
+            {{#link-to
+              "onedata.sidebar.content.aspect"
+              "clusters"
+              clusterEntityId
+              "deregister"
+              class="text-danger"
+            }}{{tt this "liDeregisterLink"}}{{/link-to}}.
+          </li>
+        {{/if}}
+      </ul>
+    </p>
+  {{/content-info}}
+{{/promise-proxy-container}}

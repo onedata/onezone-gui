@@ -14,6 +14,7 @@ import { Promise } from 'rsvp';
 import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
 import { get } from '@ember/object';
 import { resolve } from 'rsvp';
+import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
@@ -73,6 +74,8 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
               'data'
             );
           } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
+            new DisabledErrorCheckList('clusterAuthentication')
+              .disableErrorCheckFor(clusterId);
             return this.transitionTo(
               'onedata.sidebar.content.aspect',
               'clusters',

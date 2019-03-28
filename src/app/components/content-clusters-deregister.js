@@ -1,3 +1,12 @@
+/**
+ * View where some Oneprovider can be deregistered from Onezone
+ * 
+ * @module components/content-clusters-deregister
+ * @author Jakub Liput
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -72,13 +81,18 @@ export default Component.extend(
     },
 
     afterDeregister() {
-      this.get('globalNotify').success(this.t('deregisterSuccess'));
-      this.get('cluster').deleteRecord();
-      return this.get('router').transitionTo('onedata.sidebar', 'clusters');
+      const {
+        globalNotify,
+        cluster,
+        router,
+      } = this.getProperties('globalNotify', 'cluster', 'router');
+      globalNotify.success(this.t('deregisterSuccess'));
+      cluster.deleteRecord();
+      return router.transitionTo('onedata.sidebar', 'clusters');
     },
 
     handleDeregisterError(error) {
-      this.get('globalNotify').backendError('deregistering', error);
+      this.get('globalNotify').backendError(this.t('deregistering'), error);
       throw error;
     },
 

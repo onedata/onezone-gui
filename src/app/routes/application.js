@@ -21,6 +21,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
 
+  // FIXME: after onedata-gui-common update, remove this queryParams setting
   beforeModel(transition) {
     const result = this._super(...arguments);
     this.set('navigationState.queryParams', get(transition, 'queryParams'));
