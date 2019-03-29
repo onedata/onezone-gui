@@ -20,6 +20,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
   appStorage: service(),
+  navigationState: service(),
 
   beforeModel(transition) {
     const superResult = this._super(...arguments);
@@ -57,9 +58,10 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   },
 
   handleRedirection() {
-    const redirectUrl = sessionStorage.getItem('redirectUrl');
+    const queryParams = this.get('navigationState.queryParams');
+    const redirectUrl = get(queryParams, 'redirect_url');
     if (redirectUrl) {
-      sessionStorage.removeItem('redirectUrl');
+      delete queryParams.redirect_url;
       return new Promise(() => {
         const authRedirect = sessionStorage.getItem('authRedirect');
         if (authRedirect) {
