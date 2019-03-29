@@ -5,6 +5,7 @@ export default {
   add: 'Add',
   space: 'space',
   group: 'group',
+  cluster: 'cluster',
   child: 'child',
   parent: 'parent',
   member: 'member',

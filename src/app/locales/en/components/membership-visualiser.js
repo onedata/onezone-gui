@@ -3,12 +3,14 @@ export default {
   user: 'user',
   group: 'group',
   space: 'space',
+  cluster: 'cluster',
   showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
     viewGroup: 'View group',
     viewSpace: 'View space',
     viewProvider: 'View provider',
+    viewCluster: 'View cluster',
   },
   membershipRelation: {
     isMemberOf: 'is member of',
@@ -36,5 +38,6 @@ export default {
     group: 'group',
     space: 'space',
     provider: 'provider',
+    cluster: 'cluster',
   },
 };

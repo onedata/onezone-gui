@@ -8,6 +8,20 @@ import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
 
+class FakeWindow {
+  constructor() {
+    this.location = {
+      _str: '',
+      replace(val) {
+        this._str = val;
+      },
+      toString() {
+        return this._str;
+      },
+    };
+  }
+}
+
 const OnezoneServerStub = Service.extend({
   getProviderRedirectUrl() {
     throw new Error('not implemented');
@@ -62,7 +76,7 @@ describe('Integration | Component | content provider redirect', function () {
         onezoneServer,
         'getProviderRedirectUrl'
       ).resolves({ url: legacyUrl });
-      const fakeWindow = {};
+      const fakeWindow = new FakeWindow();
       this.setProperties({ provider, fakeWindow });
       this.on('checkIsProviderAvailable', () => resolve(true));
 
@@ -77,7 +91,7 @@ describe('Integration | Component | content provider redirect', function () {
 
       wait().then(() => {
         expect(getProviderRedirectUrl).to.be.invokedOnce;
-        expect(fakeWindow.location).to.equal(url);
+        expect(fakeWindow.location.toString()).to.equal(url);
         done();
       });
     });
@@ -106,7 +120,7 @@ describe('Integration | Component | content provider redirect', function () {
         'getProviderRedirectUrl'
       ).resolves({ url: legacyUrl });
 
-      const fakeWindow = {};
+      const fakeWindow = new FakeWindow();
       this.setProperties({ provider, fakeWindow });
       this.on('checkIsProviderAvailable', () => resolve(true));
 
@@ -118,7 +132,7 @@ describe('Integration | Component | content provider redirect', function () {
 
       wait().then(() => {
         expect(getProviderRedirectUrl).to.be.invokedOnce;
-        expect(fakeWindow.location).to.equal(legacyUrl);
+        expect(fakeWindow.location.toString()).to.equal(legacyUrl);
         done();
       });
     });

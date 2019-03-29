@@ -9,6 +9,7 @@ export default {
     rename: 'Rename',
     joinSpace: 'Join space',
     joinAsSubgroup: 'Join as subgroup',
+    joinCluster: 'Join cluster',
     leave: 'Leave',
     remove: 'Remove',
     groupPersistence: 'group persistence',

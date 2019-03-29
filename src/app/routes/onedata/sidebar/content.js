@@ -13,7 +13,6 @@ import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sideba
 import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
-import RedirectRoute from 'onedata-gui-common/mixins/routes/redirect';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { underscore } from '@ember/string';
 
@@ -35,7 +34,7 @@ function findGri(griIds, entityId) {
   return recordId;
 }
 
-export default OnedataSidebarContentRoute.extend(RedirectRoute, {
+export default OnedataSidebarContentRoute.extend({
   /**
    * @override
    */
@@ -44,22 +43,6 @@ export default OnedataSidebarContentRoute.extend(RedirectRoute, {
       collection.hasMany('list').ids() :
       get(collection, 'list').map(record => get(record, 'id'));
     return findGri(griIds, resourceId);
-  },
-
-  /**
-   * @override
-   */
-  isRedirectingTransition(transition) {
-    const params = get(transition, 'params');
-    const sidebarParams = params['onedata.sidebar'];
-    return Boolean(sidebarParams && sidebarParams.type === 'clusters');
-  },
-
-  /**
-   * @override 
-   */
-  checkComeFromOtherRoute(currentHash) {
-    return !/\/onedata\/clusters\/.+?\/.+/.test(currentHash);
   },
 
   beforeModel() {

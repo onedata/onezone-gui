@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { computed, get, set } from '@ember/object';
 import { next } from '@ember/runloop';
-import { reads } from '@ember/object/computed';
+import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
@@ -120,6 +120,27 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinClusterAction: computed(function joinClusterAction() {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-cluster'
+      ),
+      title: this.t('joinCluster'),
+      class: 'join-cluster-action',
+      icon: 'cluster',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   leaveAction: computed(function () {
     return {
       action: () => this.send('showLeaveModal'),
@@ -144,34 +165,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  itemActions: computed(
+  itemActions: collect(
     'renameAction',
     'joinSpaceAction',
     'joinAsSubgroupAction',
+    'joinClusterAction',
     'removeAction',
-    'leaveAction',
-    function () {
-      const {
-        renameAction,
-        joinSpaceAction,
-        joinAsSubgroupAction,
-        removeAction,
-        leaveAction,
-      } = this.getProperties(
-        'renameAction',
-        'joinSpaceAction',
-        'joinAsSubgroupAction',
-        'removeAction',
-        'leaveAction'
-      );
-      return [
-        renameAction,
-        joinSpaceAction,
-        joinAsSubgroupAction,
-        leaveAction,
-        removeAction,
-      ];
-    }
+    'leaveAction'
   ),
 
   /**

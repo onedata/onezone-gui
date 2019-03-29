@@ -101,12 +101,20 @@ export default Model.extend(GraphSingleModelMixin, {
     return this._leaveRelation('group', groupId);
   },
 
+  leaveCluster(groupId) {
+    return this._leaveRelation('cluster', groupId);
+  },
+
   joinSpace(token) {
     return this._joinRelation('space', token);
   },
 
   joinGroup(token) {
     return this._joinRelation('group', token);
+  },
+
+  joinCluster(token) {
+    return this._joinRelation('cluster', token);
   },
 
   _leaveRelation(aspect, relationId) {

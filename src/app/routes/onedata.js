@@ -93,7 +93,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
         } else {
           // Only redirect url in actual domain is acceptable (to not redirect
           // to some external, possibly malicious pages).
-          window.location = window.location.origin + redirectUrl;
+          window.location.replace(window.location.origin + redirectUrl);
         }
       });
     } else {

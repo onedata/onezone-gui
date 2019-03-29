@@ -17,6 +17,8 @@ export default {
   joinGroupAsSubgroupSuccess: 'Successfully joined group "{{parentGroupName}}" ' +
     'as group "{{groupName}}"',
   joiningGroupAsSubgroup: 'joining group as subgroup',
+  joinClusterAsGroupSuccess: 'Successfully joined cluster "{{clusterName}}" as group "{{groupName}}"',
+  joiningClusterAsGroup: 'joining cluster',
   deleteGroupSuccess: 'Group "{{groupName}}" has been removed',
   groupDeletion: 'group deletion',
   leaveGroupSuccess: 'Group "{{groupName}}" left successfully',

@@ -39,9 +39,19 @@ export default Component.extend({
   onepanelHref: computed(
     'onepanelPathAbbrev',
     'clusterId',
+    'aspect',
     function onepanelHref() {
-      const clusterId = this.get('clusterId');
-      return `${location.origin}/${this.get('onepanelPathAbbrev')}/${clusterId}/i#/clusters/${clusterId}`;
+      const {
+        clusterId,
+        onepanelPathAbbrev,
+        aspect,
+      } = this.getProperties('clusterId', 'onepanelPathAbbrev', 'aspect');
+      let href =
+        `${location.origin}/${onepanelPathAbbrev}/${clusterId}/i#/onedata/clusters/${clusterId}`;
+      if (aspect) {
+        href += `/${aspect}`;
+      }
+      return href;
     }),
 
   redirectProxy: computed('cluster.domain', function redirectProxy() {
@@ -54,7 +64,7 @@ export default Component.extend({
   },
 
   redirectToOnepanelApp() {
-    window.location = this.get('onepanelHref');
+    window.location.replace(this.get('onepanelHref'));
   },
 
   redirectToOnepanel() {

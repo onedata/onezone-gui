@@ -188,6 +188,32 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins group to a cluster using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Models.Cluster>}
+   */
+  joinClusterAsGroup(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinClusterAsGroup(group, token)
+      .then(cluster => {
+        globalNotify.success(this.t('joinClusterAsGroupSuccess', {
+          groupName: get(group, 'name'),
+          clusterName: get(cluster, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return cluster;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningClusterAsGroup'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Deletes group
    * @param {Group} group
    * @returns {Promise}
