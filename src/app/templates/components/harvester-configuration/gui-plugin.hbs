@@ -1,12 +1,5 @@
 {{#promise-proxy-container proxy=manifestProxy}}
   {{harvester-configuration/gui-indices manifest=manifestProxy.content harvester=harvester}}
 {{/promise-proxy-container}}
-{{!-- <div class="form-group">
-  <label for={{concat elementId "-configuration"}}>{{tt this "configuration"}}</label>
-  {{json-editor
-    inputId=(concat elementId "-configuration")
-    value=dataToDisplay.configuration
-    disabled=disabled
-    readonly=(eq mode "view")
-    onChange=(action "onConfigurationChange")}}
-</div> --}}
+{{harvester-configuration/gui-json-config harvester=harvester}}
+

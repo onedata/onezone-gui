@@ -17,37 +17,43 @@
   .index-editor-input {
     width: 50%;
   }
+
+  .harvester-configuration-gui-plugin {
+    .not-assigned {
+      color: $main-text-color-disabled;
+      font-style: italic;
+    }
+    .indices-table {
+      table-layout: fixed;
+      &:not(.bt) {
+        .index-info {
+          width: 60%;
+        }
+      }
+      &.bt tbody tr td {
+        position: relative;
+        &:before {
+          width: auto;
+        }
+      }
+    }
+    .index-info {
+      form {
+        margin: 0;
+      }
+      .form-group {
+        margin-bottom: 0;
+      }
+    }
+    @media (max-width: $screen-xs-max) {
+      h1 {
+        padding: 0 0 $padding-small-vertical 0;
+      }
+    }
+  }
 }
 
 .harvester-configuration-general {
   min-height: 100px;
 }
 
-.harvester-configuration-gui-plugin {
-  .not-assigned {
-    color: $main-text-color-disabled;
-    font-style: italic;
-  }
-  .indices-table {
-    table-layout: fixed;
-    &:not(.bt) {
-      .index-info {
-        width: 60%;
-      }
-    }
-    &.bt tbody tr td {
-      position: relative;
-      &:before {
-        width: auto;
-      }
-    }
-  }
-  .index-info {
-    form {
-      margin: 0;
-    }
-    .form-group {
-      margin-bottom: 0;
-    }
-  }
-}

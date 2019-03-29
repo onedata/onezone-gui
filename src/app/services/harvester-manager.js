@@ -337,14 +337,14 @@ export default Service.extend({
 
   /**
    * Gets harvester configuration
-   * @param {string} harvesterId
+   * @param {string} harvesterEntityId
    * @returns {Promise<HarvesterConfiguration>}
    */
-  getConfig(harvesterId) {
+  getConfig(harvesterEntityId) {
     const store = this.get('store');
     return store.findRecord('harvesterConfiguration', gri({
       entityType: 'harvester',
-      entityId: harvesterId,
+      entityId: harvesterEntityId,
       aspect: 'config',
       scope: 'private',
     }));

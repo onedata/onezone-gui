@@ -10,6 +10,7 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import { computed } from '@ember/object';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
@@ -17,4 +18,13 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {Object}
    */
   config: attr('object'),
+
+  /**
+   * Stringified, human-readable representation of config
+   * @type {Ember.ComputedProperty<string>}
+   */
+  stringifiedConfig: computed('config', function stringifiedConfig() {
+    const config = this.get('config');
+    return JSON.stringify(config, null, 2);
+  }),
 });

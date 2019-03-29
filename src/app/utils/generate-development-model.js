@@ -370,7 +370,7 @@ function createHarvesterRecords(store) {
           aspect: 'config',
           scope: 'private',
         }),
-        configuration: {
+        config: {
           studyIdTypeMapping: [
             { id: 11, name: 'Trial Registry ID'},
             { id: 'founderId', name: 'Founder ID' },
