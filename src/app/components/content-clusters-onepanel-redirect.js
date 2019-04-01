@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';

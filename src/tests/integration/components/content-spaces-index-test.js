@@ -7,7 +7,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import Service from '@ember/service';
-import { registerService, lookupService } from '../../helpers/stub-service';
+import { registerService } from '../../helpers/stub-service';
 import { get } from '@ember/object';
 
 const GuiUtils = Service.extend({
