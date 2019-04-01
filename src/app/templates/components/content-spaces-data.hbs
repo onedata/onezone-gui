@@ -1,0 +1,7 @@
+{{#promise-proxy-container proxy=providerProxy}}
+  {{content-provider-redirect
+    spaceId=model.resource
+    provider=providerProxy.content
+    transitionToProviderOnMap=(action "transitionAfterFailure")
+  }}
+{{/promise-proxy-container}}

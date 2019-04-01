@@ -1,7 +1,7 @@
 /**
  * A first-level item component for providers sidebar
  *
- * @module components/sidebar-data/provider-item
+ * @module components/sidebar-providers/provider-item
  * @author Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -23,7 +23,7 @@ export default Component.extend(I18n, UserProxyMixin, {
 
   currentUser: service(),
 
-  i18nPrefix: 'components.sidebarData.providerItem',
+  i18nPrefix: 'components.sidebarProviders.providerItem',
 
   /**
    * Provider item

@@ -91,7 +91,7 @@ export default Component.extend(I18n, {
   transitionToProviderOnMap(provider) {
     this.get('router').transitionTo(
       'onedata.sidebar.content',
-      'data',
+      'providers',
       get(provider, 'entityId')
     );
   },

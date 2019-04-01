@@ -85,7 +85,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
       const guiUtils = this.get('guiUtils');
       return this.get('router').transitionTo(
         'onedata.sidebar.content',
-        'data',
+        'providers',
         guiUtils.getRoutableIdFor(provider)
       );
     },

@@ -11,8 +11,8 @@ function po(val) {
   return PromiseObject.create({ promise: resolve(val) });
 }
 
-describe('Integration | Component | content data', function () {
-  setupComponentTest('content-data', {
+describe('Integration | Component | content providers', function () {
+  setupComponentTest('content-providers', {
     integration: true,
   });
 
@@ -36,7 +36,7 @@ describe('Integration | Component | content data', function () {
         transitionToProviderRedirect,
       });
 
-      this.render(hbs `{{content-data
+      this.render(hbs `{{content-providers
         providerList=providerList
         transitionToProviderRedirect=transitionToProviderRedirect
       }}`);
