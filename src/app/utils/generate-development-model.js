@@ -229,7 +229,7 @@ function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     const providerId = `oneprovider-${index + 1}`;
-    const id = `provider.${providerId}.instance:protected`;
+    const id = `provider.${providerId}.instance:auto`;
     return store.createRecord('provider', {
       id,
       gri: id,
@@ -290,9 +290,12 @@ function createLinkedAccount(store) {
 }
 
 function createClusterRecords(store) {
+  const onezoneId = clusterInstanceGri('onezone');
+  const oneprovider1Id = clusterInstanceGri('oneprovider-1');
+  const oneprovider2Id = clusterInstanceGri('oneprovider-2');
   return Promise.all([{
-      id: 'cluster.onezone.instance:protected',
-      gri: 'cluster.onezone.instance:protected',
+      id: onezoneId,
+      gri: onezoneId,
       type: 'onezone',
       name: 'PL-Grid',
       onepanelProxy: true,
@@ -314,12 +317,12 @@ function createClusterRecords(store) {
       },
     },
     {
-      id: 'cluster.oneprovider-1.instance:protected',
-      gri: 'cluster.oneprovider-1.instance:protected',
+      id: oneprovider1Id,
+      gri: oneprovider1Id,
       type: 'oneprovider',
       name: 'Cyfronet',
       onepanelProxy: false,
-      provider: 'provider.oneprovider-1.instance:protected',
+      provider: 'provider.oneprovider-1.instance:auto',
       canViewPrivateData: true,
       info: {
         creatorType: 'root',
@@ -338,12 +341,12 @@ function createClusterRecords(store) {
       },
     },
     {
-      id: 'cluster.oneprovider-2.instance:protected',
-      gri: 'cluster.oneprovider-2.instance:protected',
+      id: oneprovider2Id,
+      gri: oneprovider2Id,
       type: 'oneprovider',
       name: 'PCSS',
       onepanelProxy: true,
-      provider: 'provider.oneprovider-2.instance:protected',
+      provider: 'provider.oneprovider-2.instance:auto',
       canViewPrivateData: false,
       info: {
         creatorType: 'root',
@@ -470,4 +473,13 @@ function createPrivilegesRecords(
     });
     return store.createRecord('privilege', recordData).save();
   }));
+}
+
+function clusterInstanceGri(entityId) {
+  return gri({
+    entityType: 'cluster',
+    entityId,
+    aspect: 'instance',
+    scope: 'auto',
+  });
 }
