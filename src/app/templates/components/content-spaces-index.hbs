@@ -15,12 +15,6 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
-    {{#resource-info-tile record=space}}
-      <tr>
-        <td class="property-name">{{tt this "sharedDirectories"}}</td>
-        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
-      </tr>
-    {{/resource-info-tile}}
     {{#if (and dataProviderProxy.isFulfilled dataProviderProxy.content)}}
       {{#one-tile
         class="text-center resource-browse-tile"
@@ -34,6 +28,12 @@
         </figure>
       {{/one-tile}}
     {{/if}}
+    {{#resource-info-tile record=space}}
+      <tr>
+        <td class="property-name">{{tt this "sharedDirectories"}}</td>
+        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
+      </tr>
+    {{/resource-info-tile}}
     {{#if space.hasViewPrivilege}}
       {{#one-tile
         class="text-center resource-support-tile"

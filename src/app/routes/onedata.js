@@ -73,7 +73,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
             this.get('appStorage').setData('oneproviderAuthenticationError', '1');
             return this.transitionTo(
               'onedata.sidebar.index',
-              'data'
+              'providers'
             );
           } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
             new DisabledErrorCheckList('clusterAuthentication')

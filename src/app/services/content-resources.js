@@ -26,7 +26,7 @@ export default Service.extend({
    */
   getModelFor(type, id) {
     switch (type) {
-      case 'data':
+      case 'providers':
         return this.get('providerManager').getRecord(id);
       case 'clusters':
         // cluster record is ready, when we have domain and name resolved

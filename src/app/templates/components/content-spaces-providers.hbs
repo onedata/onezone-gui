@@ -37,7 +37,7 @@
                   {{#each providersProxy.content as |provider|}}
                     {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
                       {{#position.point}}
-                        {{#link-to "onedata.sidebar.content.aspect" "data" (model-routable-id provider) "index"}}
+                        {{#link-to "onedata.sidebar.content.aspect" "providers" (model-routable-id provider) "index"}}
                           {{provider-place
                             provider=provider
                             atlasWidth=atlas.width
