@@ -13,7 +13,7 @@ import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { resolve } from 'rsvp';
+import { hash, resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
@@ -58,20 +58,22 @@ export default Model.extend(
       return parseGri(this.belongsTo('provider').id()).entityId;
     }),
 
-    reloadProviderProperties: observer(
+    reloadAsyncProperties: observer(
       'provider.{name,domain}',
       function reloadProviderProperties() {
-        this.loadAsyncProperties();
+        return this.loadAsyncProperties();
       }
     ),
 
     init() {
       this._super(...arguments);
+      // TODO: this does not work properly with localstorage adapter
+      // so some views can be broken (undefined name and domain)
       if (this.get('isLoaded')) {
-        this.reloadProviderProperties();
+        this.reloadAsyncProperties();
       } else {
-        this.on('didLoad', () => {
-          this.reloadProviderProperties();
+        this.on('ready', () => {
+          this.reloadAsyncProperties();
         });
       }
     },
@@ -101,8 +103,10 @@ export default Model.extend(
     },
 
     loadAsyncProperties() {
-      this.updateNameProxy();
-      this.updateDomainProxy();
+      return hash({
+        name: this.updateNameProxy(),
+        domain: this.updateDomainProxy(),
+      });
     },
   }
 );

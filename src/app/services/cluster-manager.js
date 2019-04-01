@@ -14,10 +14,7 @@ import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 function loadClusterRecord(cluster) {
-  return Promise.all([
-    cluster.updateDomainProxy(),
-    cluster.updateNameProxy(),
-  ]).then(() => cluster);
+  return cluster.loadAsyncProperties().then(() => cluster);
 }
 
 export default Service.extend({
