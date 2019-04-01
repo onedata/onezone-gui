@@ -91,11 +91,11 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   formLayoutConfig: computed('mode', function formLayoutConfig() {
     if (this.get('mode') === 'create') {
       return {
-        formLabelColumns: 'col-xs-12 col-sm-3',
-        formInputColumns: 'col-xs-12 col-sm-9',
+        formLabelColumns: 'col-xs-12 col-sm-3 col-md-2',
+        formInputColumns: 'col-xs-12 col-sm-9 col-md-10',
         formSubmitColumns: 'col-xs-12 text-center',
-        formToggleLabelColumns: 'col-xs-6 col-sm-3',
-        formToggleInputColumns: 'col-xs-6 col-sm-9',
+        formToggleLabelColumns: 'col-xs-6 col-sm-3 col-md-2',
+        formToggleInputColumns: 'col-xs-6 col-sm-9 col-md-10',
       };
     } else {
       return layoutConfig;

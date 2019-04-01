@@ -32,7 +32,14 @@ export default {
     header: 'GUI plugin',
     path: 'Path',
     configuration: 'Configuration',
-
+    guiUpload: {
+      header: 'GUI plugin upload',
+      browse: 'Browse',
+      upload: 'Upload',
+      guiUploadSuccess: 'GUI plugin has been uploaded successfully',
+      guiUploading: 'gui plugin uploading',
+      percentDone: '{{percent}}% done...',
+    },
     guiIndices: {
       edit: 'Edit',
       cancel: 'Cancel',

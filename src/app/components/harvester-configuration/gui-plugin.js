@@ -55,6 +55,8 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-
+    reloadManifest() {
+      this.loadManifest();
+    },
   },
 });
