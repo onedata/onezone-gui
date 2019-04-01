@@ -21,6 +21,7 @@ export default Component.extend({
 
   globalNotify: service(),
   router: service(),
+  guiUtils: service(),
 
   /**
    * @virtual
@@ -82,13 +83,15 @@ export default Component.extend({
           const {
             router,
             cluster,
-          } = this.getProperties('router', 'cluster');
+            guiUtils,
+          } = this.getProperties('router', 'cluster', 'guiUtils');
+          const clusterRoutableId = guiUtils.getRoutableIdFor(cluster);
           new DisabledErrorCheckList('clusterEndpoint')
-            .disableErrorCheckFor(get(cluster, 'entityId'));
+            .disableErrorCheckFor(clusterRoutableId);
           return router.transitionTo(
             'onedata.sidebar.content.aspect',
             'clusters',
-            get(cluster, 'entityId'),
+            clusterRoutableId,
             'endpoint-error'
           );
         }

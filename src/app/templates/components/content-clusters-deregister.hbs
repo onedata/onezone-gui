@@ -2,7 +2,7 @@
   class="scroll-breakpoint-700"
   header=(tt this "header")
   textTemplate="components/-content-clusters-deregister-text"
-  imagePath="assets/images/cluster-deregister-provider.svg"
+  imagePath=(root-url "assets/images/cluster-deregister-provider.svg")
 }}
   {{#if statsProxy.isFulfilled}}
     <div class="row row-cluster-oneprovider-stats">
@@ -14,14 +14,28 @@
         <div class="col-xs-9 col-centered">
           <div class="col-xs-12 col-sm-6">
             <ul class="info info-condensed info-gray">
-              <li class="li-spaces-count">{{tt this "statsSupportedSpaces"}}: {{stats.spacesCount}}</li>
-              <li class="li-groups-count">{{tt this "statsEffectiveGroups"}}: {{stats.groupsCount}}</li>
+              <li class="li-spaces-count">
+                {{tt this "statsSupportedSpaces"}}: <span class="spaces-count-number">{{stats.spacesCount}}</span>
+              </li>
+              <li class="li-groups-count">
+                {{tt this "statsEffectiveGroups"}}: <span class="groups-count-number">{{stats.groupsCount}}</span>
+              </li>
             </ul>
           </div>
           <div class="col-xs-12 col-sm-6">
             <ul class="info info-condensed info-gray continue-col">
-              <li class="li-users-count">{{tt this "statsEffectiveUsers"}}: {{stats.usersCount}}</li>
-              <li class="li-creation-time-count">{{tt this "statsActiveSince"}}: {{clusterCreationTimeText}}</li>
+              <li class="li-users-count">
+                {{tt this "statsEffectiveUsers"}}:
+                <span class="users-count-number">
+                  {{stats.usersCount}}
+                </span>
+              </li>
+              <li class="li-creation-time-count">
+                {{tt this "statsActiveSince"}}:
+                <span class="active-since-date">
+                  {{clusterCreationTimeText}}
+                </span>
+              </li>
             </ul>
           </div>          
         </div>

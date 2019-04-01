@@ -2,7 +2,7 @@
   {{#content-info
     class="scroll-breakpoint-700"
     header=(tt this "header")
-    imagePath="assets/images/no-connection.svg"
+    imagePath=(root-url "assets/images/no-connection.svg")
   }}
     <p class="lead">
       <ul class="info">
@@ -15,7 +15,7 @@
           {{#link-to
             "onedata.sidebar.content.aspect"
             "clusters"
-            clusterEntityId
+            (model-routable-id cluster)
             "overview"
           }}
             {{tt this "liTryAgainLink"}}

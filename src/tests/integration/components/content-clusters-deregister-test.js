@@ -106,7 +106,14 @@ describe('Integration | Component | content clusters deregister', function () {
 
       return wait().then(() => {
         expect($('.row-cluster-oneprovider-stats')).to.exist;
-        expect($('.li-creation-time-count').text()).to.match(/13 Mar 2019/);
+        expect($('.li-creation-time-count .active-since-date').text())
+          .to.match(/13 Mar 2019/);
+        expect($('.li-spaces-count .spaces-count-number').text())
+          .to.match(/4/);
+        expect($('.li-groups-count .groups-count-number').text())
+          .to.match(/3/);
+        expect($('.li-users-count .users-count-number').text())
+          .to.match(/2/);
       });
     }
   );

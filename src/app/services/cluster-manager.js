@@ -59,6 +59,11 @@ export default Service.extend({
       );
   },
 
+  /**
+   * Get token that allows to register Oneprovider in Onezone.
+   * We get resource called `provider_registration_token`.
+   * @returns {Promise<string>} resolves the token
+   */
   getOnezoneRegistrationToken() {
     const userId = this.get('currentUser.userId');
     return this.get('onedataGraph').request({

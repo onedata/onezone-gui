@@ -22,6 +22,7 @@ export default Component.extend(
   createDataProxyMixin('stats'), {
     classNames: ['content-clusters-deregister'],
 
+    guiUtils: service(),
     globalNotify: service(),
     router: service(),
 
@@ -88,7 +89,9 @@ export default Component.extend(
       } = this.getProperties('globalNotify', 'cluster', 'router');
       globalNotify.success(this.t('deregisterSuccess'));
       cluster.deleteRecord();
-      return router.transitionTo('onedata.sidebar', 'clusters');
+      // ignore transition aborted and other transition erors (they are not fatal)
+      // use it just for waiting for promise resolve
+      return router.transitionTo('onedata.sidebar', 'clusters').catch(() => {});
     },
 
     handleDeregisterError(error) {
@@ -100,11 +103,12 @@ export default Component.extend(
       const {
         cluster,
         router,
-      } = this.getProperties('cluster', 'router');
+        guiUtils,
+      } = this.getProperties('cluster', 'router', 'guiUtils');
       return router.transitionTo(
         'onedata.sidebar.content.aspect',
         'clusters',
-        get(cluster, 'entityId'),
+        guiUtils.getRoutableIdFor(cluster),
         'provider'
       );
     },

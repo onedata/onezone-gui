@@ -30,6 +30,7 @@ export default Component.extend(I18n, {
   i18n: service(),
   alert: service(),
   router: service(),
+  guiUtils: service(),
 
   /**
    * @override 
@@ -89,10 +90,14 @@ export default Component.extend(I18n, {
   },
 
   transitionToProviderOnMap(provider) {
-    this.get('router').transitionTo(
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    router.transitionTo(
       'onedata.sidebar.content',
       'providers',
-      get(provider, 'entityId')
+      guiUtils.getRoutableIdFor(provider)
     );
   },
 

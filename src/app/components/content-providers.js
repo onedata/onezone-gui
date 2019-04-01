@@ -24,7 +24,7 @@ export default Component.extend({
   router: service(),
   guiUtils: service(),
   navigationState: service(),
-  alert: service(),
+  alertService: service('alert'),
   appStorage: service(),
 
   /**
@@ -283,8 +283,8 @@ export default Component.extend({
       appStorage.removeData('oneproviderAuthenticationError');
       const {
         i18n,
-        alert: alertService,
-      } = this.getProperties('i18n', 'alert');
+        alertService,
+      } = this.getProperties('i18n', 'alertService');
       alertService.error(null, {
         componentName: 'alerts/oneprovider-authentication-error',
         header: i18n.t('components.alerts.oneproviderAuthenticationError.header'),

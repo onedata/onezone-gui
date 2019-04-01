@@ -68,7 +68,9 @@
     {{#if space.hasViewPrivilege}}
       {{resource-members-tile record=space}}
     {{/if}}
-    {{resource-membership-tile record=space}}
+    {{#if showResourceMembershipTile}}
+      {{resource-membership-tile record=space}}
+    {{/if}}
     {{yield}}
   </div>
 </div>

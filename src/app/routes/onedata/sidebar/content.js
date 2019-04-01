@@ -45,10 +45,6 @@ export default OnedataSidebarContentRoute.extend({
     return findGri(griIds, resourceId);
   },
 
-  beforeModel() {
-    return this._super(...arguments);
-  },
-
   /**
    * @override
    */

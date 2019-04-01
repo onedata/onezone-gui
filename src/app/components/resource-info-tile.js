@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
 
   globalNotify: service(),
   store: service(),
+  i18n: service(),
 
   /**
    * @override

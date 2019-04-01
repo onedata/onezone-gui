@@ -1,7 +1,7 @@
 {{#content-info
   class="scroll-breakpoint-700"
   header=(tt this "header")
-  imagePath="assets/images/group-join-cluster.svg"
+  imagePath=(root-url "assets/images/group-join-cluster.svg")
   text=(tt this "text" groupName=group.name)
   buttonLabel=(tt this "joinButton")
   buttonAction=(action "joinCluster" token)

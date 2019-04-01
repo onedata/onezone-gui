@@ -33,6 +33,7 @@ export default Component.extend(
     router: service(),
     guiUtils: service(),
     media: service(),
+    i18n: service(),
 
     /**
      * @override 
@@ -49,6 +50,11 @@ export default Component.extend(
      * @type {string}
      */
     leaveSpaceModalTriggers: '',
+
+    /**
+     * @type {boolean}
+     */
+    showResourceMembershipTile: true,
 
     /**
      * @type {Ember.ComputedProperty<string>}
@@ -78,9 +84,10 @@ export default Component.extend(
      */
     toggleDefaultSpaceAction: computed('isDefaultSpace', function () {
       const isDefaultSpace = this.get('isDefaultSpace');
+      const title = this.t('toggleDefault');
       return {
         action: () => this.send('toggleDefaultSpace'),
-        title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
+        title,
         class: 'btn-toggle-default-space',
         buttonStyle: 'default',
         icon: isDefaultSpace ? 'home' : 'home-outline',
@@ -131,7 +138,7 @@ export default Component.extend(
         const promise = this.get('space.providerList')
           .then(providerList =>
             get(providerList, 'list').then(list =>
-              list.find(provider => get(provider, 'online'))
+              list.findBy('online')
             )
           );
         return PromiseObject.create({ promise });
@@ -140,16 +147,18 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Array<string>>}
      */
-    dataProviderRoute: computed('dataProviderProxy', function dataProviderRoute() {
-      const {
-        guiUtils,
-        dataProviderProxy,
-      } = this.getProperties('guiUtils', 'dataProviderProxy');
-      return get(dataProviderProxy, 'content') ? [
-        'provider-redirect',
-        guiUtils.getRoutableIdFor(dataProviderProxy),
-      ] : [];
-    }),
+    dataProviderRoute: computed('dataProviderProxy.content',
+      function dataProviderRoute() {
+        const {
+          guiUtils,
+          dataProviderProxy,
+        } = this.getProperties('guiUtils', 'dataProviderProxy');
+        return get(dataProviderProxy, 'content') ? [
+          'provider-redirect',
+          guiUtils.getRoutableIdFor(dataProviderProxy),
+        ] : [];
+      }
+    ),
 
     /**
      * @type {Ember.ComputedProperty<Object>}
