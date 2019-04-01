@@ -35,7 +35,6 @@ export default Model.extend(
     canViewPrivateData: attr('boolean'),
     canViewPrivileges: attr('boolean', { defaultValue: false }),
     directMembership: attr('boolean', { defaultValue: false }),
-    
 
     // members of this cluster
     groupList: belongsTo('groupList'),
@@ -59,9 +58,12 @@ export default Model.extend(
       return parseGri(this.belongsTo('provider').id()).entityId;
     }),
 
-    reloadProviderProperties: observer('provider.{name,domain}', function reloadProviderProperties() {
-      this.loadAsyncProperties();
-    }),
+    reloadProviderProperties: observer(
+      'provider.{name,domain}',
+      function reloadProviderProperties() {
+        this.loadAsyncProperties();
+      }
+    ),
 
     init() {
       this._super(...arguments);

@@ -47,7 +47,8 @@ export default EmberObject.extend({
   model: computed('griPath', function model() {
     return PromiseArray.create({
       promise: Promise.all(
-        this.get('griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
+        this.get('griPath')
+        .map(recordGri => this.fetchRecordByGri(recordGri)),
       ),
     });
   }),

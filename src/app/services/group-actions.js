@@ -58,7 +58,11 @@ export default Service.extend(I18n, {
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
       class: 'join-group-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'groups', 'join'),
+      action: () => router.transitionTo(
+        'onedata.sidebar.content',
+        'groups',
+        'join'
+      ),
     };
   }),
 
@@ -483,6 +487,4 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
-
-
 });

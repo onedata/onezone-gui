@@ -34,7 +34,9 @@ describe(
           entityType: modelType,
           type: 'team',
         }));
-        this.render(hbs `{{membership-visualiser/membership-block record=record}}`);
+        this.render(hbs `
+          {{membership-visualiser/membership-block record=record}}
+        `);
         expect(this.$(`.oneicon-${icons[modelType]}`)).to.exist;
       });
     });

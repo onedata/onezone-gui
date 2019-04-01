@@ -64,7 +64,10 @@ export default Component.extend({
       } = this.getProperties('tokensProxy', 'commandType');
       if (commandType && tokensProxy) {
         return PromiseObject.create({
-          promise: tokensProxy.then(({ supportToken, onezoneRegistrationToken }) =>
+          promise: tokensProxy.then(({
+              supportToken,
+              onezoneRegistrationToken,
+            }) =>
             generateShellCommand(commandType, {
               supportToken,
               onezoneRegistrationToken,

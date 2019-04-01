@@ -56,7 +56,8 @@ export default Service.extend({
         .then(cluster => Promise.all([
           this.reloadList(),
           this.reloadUserList(get(cluster, 'entityId')).catch(ignoreForbiddenError),
-          this.reloadEffUserList(get(cluster, 'entityId')).catch(ignoreForbiddenError),
+          this.reloadEffUserList(get(cluster, 'entityId'))
+          .catch(ignoreForbiddenError),
         ]).then(() => cluster))
       );
   },

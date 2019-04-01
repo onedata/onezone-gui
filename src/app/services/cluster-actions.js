@@ -1,3 +1,12 @@
+/**
+ * A service which provides clusters manipulation functions ready to use for gui
+ *
+ * @module services/cluster-actions
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import ClusterActions from 'onedata-gui-common/services/cluster-actions';
 import { get } from '@ember/object';
 import { inject as service } from '@ember/service';

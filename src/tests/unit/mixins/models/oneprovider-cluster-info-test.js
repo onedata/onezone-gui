@@ -35,7 +35,8 @@ describe('Unit | Mixin | models/oneprovider cluster info', function () {
     });
     return subject.get('oneproviderSpaces')
       .then(resource => {
-        expect(resource).to.deep.equal(genResource(oneproviderEntityId, 'spaces'));
+        expect(resource)
+          .to.deep.equal(genResource(oneproviderEntityId, 'spaces'));
       });
   });
 

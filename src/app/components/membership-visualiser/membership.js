@@ -238,7 +238,10 @@ export default Component.extend(I18n, {
             i = j;
             if (i < elementsNumber - 1) {
               description += '. ' + this.t('descBeginning', {
-                pathStartType: _.upperFirst(this.t(get(nonEmptyElement, 'entityType'))),
+                pathStartType: _.upperFirst(
+                  this.t(get(nonEmptyElement,
+                    'entityType'))
+                ),
                 pathStartName: get(nonEmptyElement, 'name'),
               });
               nextTranslation = 'descPathFirstElement';
@@ -306,8 +309,8 @@ export default Component.extend(I18n, {
     const detectionEpsilon = 3;
     this.setProperties({
       scrollLeftButton: element.scrollLeft > detectionEpsilon,
-      scrollRightButton: element.offsetWidth + element.scrollLeft < element.scrollWidth -
-        detectionEpsilon,
+      scrollRightButton: element.offsetWidth + element.scrollLeft <
+        element.scrollWidth - detectionEpsilon,
     });
   },
 

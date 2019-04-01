@@ -236,7 +236,7 @@ export default Component.extend(I18n, {
           return groupFlags;
         case 'cluster':
         default:
-          return clusterFlags; 
+          return clusterFlags;
       }
     }
   ),

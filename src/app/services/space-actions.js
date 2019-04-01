@@ -53,7 +53,11 @@ export default Service.extend(I18n, {
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
       class: 'join-space-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'join'),
+      action: () => router.transitionTo(
+        'onedata.sidebar.content',
+        'spaces',
+        'join'
+      ),
     };
   }),
 

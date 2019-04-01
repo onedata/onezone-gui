@@ -55,7 +55,8 @@ export default Component.extend(
     fetchTokens() {
       return hash({
         supportToken: this.updateSupportTokenProxy(),
-        onezoneRegistrationToken: this.get('clusterManager').getOnezoneRegistrationToken(),
+        onezoneRegistrationToken: this.get('clusterManager')
+          .getOnezoneRegistrationToken(),
       });
     },
 
