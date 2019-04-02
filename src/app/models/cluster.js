@@ -10,7 +10,7 @@ import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import { get, computed, observer } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, equal } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { hash, resolve } from 'rsvp';
@@ -35,6 +35,7 @@ export default Model.extend(
     canViewPrivateData: attr('boolean'),
     canViewPrivileges: attr('boolean', { defaultValue: false }),
     directMembership: attr('boolean', { defaultValue: false }),
+    scope: attr('string'),
 
     // members of this cluster
     groupList: belongsTo('groupList'),
@@ -57,6 +58,12 @@ export default Model.extend(
     oneproviderEntityId: computed(function oneproviderEntityId() {
       return parseGri(this.belongsTo('provider').id()).entityId;
     }),
+
+    /**
+     * True, if user has a "View cluster" privilege
+     * @type {Ember.ComputedProperty<boolean>}
+     */
+    hasViewPrivilege: equal('scope', 'private'),
 
     reloadAsyncProperties: observer(
       'provider.{name,domain}',
