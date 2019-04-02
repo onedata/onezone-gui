@@ -14,6 +14,7 @@ import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import GuiPluginManifest from 'onezone-gui/utils/harvester-configuration/gui-plugin-manifest';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -372,22 +373,11 @@ export default Service.extend({
   /**
    * Loads gui plugin manifest.json file
    * @param {string} harvesterId
-   * @returns {Promise} manifest file content
+   * @returns {utils.harvesterConfiguration.GuiPluginManifest} manifest file
    */
   getGuiPluginManifest(harvesterId) {
-    return this.getRecord(harvesterId, false).then(harvester => {
-      return new Promise((resolve, reject) => {
-        $.ajax({
-          dataType: 'json',
-          url: get(harvester, 'guiPluginHttpLocation') + '/manifest.json',
-          success: resolve,
-          error: (xhr, type, details) => reject({
-            status: get(xhr, 'status'),
-            type,
-            details,
-          }),
-        });
-      });
+    return GuiPluginManifest.create({
+      harvester: this.getRecord(harvesterId, false),
     });
   },
 

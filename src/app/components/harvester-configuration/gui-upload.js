@@ -44,7 +44,13 @@ export default Component.extend(I18n, {
    * @type {Function}
    * @returns {undefined}
    */
-  onGuiUploaded: notImplementedIgnore,
+  onGuiUploadStart: notImplementedIgnore,
+
+  /**
+   * @type {Function}
+   * @returns {undefined}
+   */
+  onGuiUploadEnd: notImplementedIgnore,
   
   actions: {
     browse() {
@@ -61,7 +67,16 @@ export default Component.extend(I18n, {
         selectedFile,
         globalNotify,
         harvester,
-      } = this.getProperties('selectedFile', 'globalNotify', 'harvester');
+        onGuiUploadStart,
+      } = this.getProperties(
+        'selectedFile',
+        'globalNotify',
+        'harvester',
+        'onGuiUploadStart'
+      );
+      this.set('isUploading', true);
+      onGuiUploadStart();
+
       const uploader = Uploader.create({
         url: `/hrv/${get(harvester, 'entityId')}/gui-upload`,
         ajaxSettings: {
@@ -71,13 +86,10 @@ export default Component.extend(I18n, {
         },
       });
       uploader.on('progress', ({ percent }) => safeExec(this, () => {
-        this.set('uploadProgress', percent);
+        this.set('uploadProgress', percent.toFixed(1));
       }));
       return new Promise((resolve, reject) => {
         uploader.on('didUpload', () => {
-          safeExec(this, () => {
-            this.get('onGuiUploaded')();
-          });
           globalNotify.success(this.t('guiUploadSuccess'));
           resolve();
         });
@@ -91,6 +103,7 @@ export default Component.extend(I18n, {
           isUploading: false,
           uploadProgress: 0,
         });
+        this.get('onGuiUploadEnd')();
       }));
     },
   },

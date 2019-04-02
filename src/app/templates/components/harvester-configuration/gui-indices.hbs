@@ -1,78 +1,88 @@
-<div class="pull-right">
-  {{#if (eq mode "view")}}
-    {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
-  {{else}}
-    {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
-    {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
-      {{tt this "save"}}  
-    {{/one-spin-button}}
-  {{/if}}
-</div>
+{{#if manifestProxy.manifest}}
+  <div class="pull-right">
+    {{#if (eq mode "view")}}
+      {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+    {{else}}
+      {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
+      {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
+        {{tt this "save"}}  
+      {{/one-spin-button}}
+    {{/if}}
+  </div>
+{{/if}}
 <h1>{{tt this "indicesHeader"}}</h1>
-{{#promise-proxy-container proxy=harvesterIndicesProxy}}
-  {{#basic-table class="table table-striped indices-table dropdown-table-rows"}}
-    <thead>
-      <tr>
-        <th>{{tt this "pluginIndex"}}</th>
-        <th class="index-info">{{tt this "harvesterIndex"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each guiPluginIndices as |guiPluginIndex|}}
-        <tr class={{if (contains guiPluginIndex expandedIndices) "active"}}>
-          <td class="row-header" {{action (action "indicesRowHeaderClick" guiPluginIndex) on="click"}}>{{guiPluginIndex.name}}</td>
-          <td class="index-info">
-            <div>
-              {{#if (eq mode "edit")}}
-                {{#bs-form class="row form-horizontal without-labels" as |bsForm|}}
-                  {{#power-select
-                    tagName="div"
-                    class="col-xs-12 col-sm-6"
-                    options=assignIndexMethods
-                    selected=(get selectedAssignMethods guiPluginIndex.name)
-                    onchange=(action "changeAssignMethod" guiPluginIndex.name)
-                    searchEnabled=false
-                    renderInPlace=true
-                    as |assignMethod|}}
-                    {{tt this (concat "assignMethods." assignMethod)}}
-                  {{/power-select}}
-                  {{#bsForm.group
-                    class=(concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input"))
-                    validation=(if (get guiIndicesErrors guiPluginIndex.name) "error" "success")}}
-                    {{#if (eq (get selectedAssignMethods guiPluginIndex.name) "create")}}
-                      <input
-                        value={{get createIndicesNames guiPluginIndex.name}}
-                        oninput={{action (action "changeAssignValue" guiPluginIndex.name) value="target.value"}}
-                        class="form-control">
-                    {{else if (eq (get selectedAssignMethods guiPluginIndex.name) "reuse")}}
+{{#promise-proxy-container proxy=manifestProxy}}
+  {{#if isUploadingGui}}
+    <p class="text-warning">{{tt this "waitingForUpload"}}</p>
+  {{else if (eq manifestProxy.manifest null)}}
+    <p>{{tt this "manifestUnavailable"}}</p>
+  {{else}}
+    {{#promise-proxy-container proxy=harvesterIndicesProxy}}
+      {{#basic-table class="table table-striped indices-table dropdown-table-rows"}}
+        <thead>
+          <tr>
+            <th>{{tt this "pluginIndex"}}</th>
+            <th class="index-info">{{tt this "harvesterIndex"}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each guiPluginIndices as |guiPluginIndex|}}
+            <tr class={{if (contains guiPluginIndex expandedIndices) "active"}}>
+              <td class="row-header" {{action (action "indicesRowHeaderClick" guiPluginIndex) on="click"}}>{{guiPluginIndex.name}}</td>
+              <td class="index-info">
+                <div>
+                  {{#if (eq mode "edit")}}
+                    {{#bs-form class="row form-horizontal without-labels" as |bsForm|}}
                       {{#power-select
                         tagName="div"
-                        options=harvesterIndicesProxy
-                        selected=(get selectedIndices guiPluginIndex.name)
-                        onchange=(action "changeAssignValue" guiPluginIndex.name)
+                        class="col-xs-12 col-sm-6"
+                        options=assignIndexMethods
+                        selected=(get selectedAssignMethods guiPluginIndex.name)
+                        onchange=(action "changeAssignMethod" guiPluginIndex.name)
                         searchEnabled=false
                         renderInPlace=true
-                        as |index|}}
-                        {{index.name}}
+                        as |assignMethod|}}
+                        {{tt this (concat "assignMethods." assignMethod)}}
                       {{/power-select}}
+                      {{#bsForm.group
+                        class=(concat-classes "col-xs-12 col-sm-6" (if (not-eq (get selectedAssignMethods guiPluginIndex.name) "create") "dropdown-input"))
+                        validation=(if (get guiIndicesErrors guiPluginIndex.name) "error" "success")}}
+                        {{#if (eq (get selectedAssignMethods guiPluginIndex.name) "create")}}
+                          <input
+                            value={{get createIndicesNames guiPluginIndex.name}}
+                            oninput={{action (action "changeAssignValue" guiPluginIndex.name) value="target.value"}}
+                            class="form-control">
+                        {{else if (eq (get selectedAssignMethods guiPluginIndex.name) "reuse")}}
+                          {{#power-select
+                            tagName="div"
+                            options=harvesterIndicesProxy
+                            selected=(get selectedIndices guiPluginIndex.name)
+                            onchange=(action "changeAssignValue" guiPluginIndex.name)
+                            searchEnabled=false
+                            renderInPlace=true
+                            as |index|}}
+                            {{index.name}}
+                          {{/power-select}}
+                        {{/if}}
+                        <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
+                      {{/bsForm.group}}
+                      {{!-- {{#unless (eq (get selectedAssignMethods guiPluginIndex.name) "unassigned")}}
+                        {{get guiIndicesErrors guiPluginIndex.name}}
+                      {{/unless}} --}}
+                    {{/bs-form}}
+                  {{else}}
+                    {{#if (get indicesMapping guiPluginIndex.name)}}
+                      {{#truncated-string class="assigned-index-name"}}{{get (get indicesMapping guiPluginIndex.name) "name"}}{{/truncated-string}}
+                    {{else}}
+                      <span class="unspecified">{{tt this "notAssigned"}}</span>
                     {{/if}}
-                    <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
-                  {{/bsForm.group}}
-                  {{!-- {{#unless (eq (get selectedAssignMethods guiPluginIndex.name) "unassigned")}}
-                    {{get guiIndicesErrors guiPluginIndex.name}}
-                  {{/unless}} --}}
-                {{/bs-form}}
-              {{else}}
-                {{#if (get indicesMapping guiPluginIndex.name)}}
-                  {{#truncated-string class="assigned-index-name"}}{{get (get indicesMapping guiPluginIndex.name) "name"}}{{/truncated-string}}
-                {{else}}
-                  <span class="not-assigned">{{tt this "notAssigned"}}</span>
-                {{/if}}
-              {{/if}}
-            </div>
-          </td>
-        </tr>
-      {{/each}}
-    </tbody>
-  {{/basic-table}}
+                  {{/if}}
+                </div>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      {{/basic-table}}
+    {{/promise-proxy-container}}
+  {{/if}}
 {{/promise-proxy-container}}

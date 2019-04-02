@@ -1,6 +1,7 @@
 import Component from '@ember/component';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import Messages from 'ember-cp-validations/validators/messages';
@@ -49,7 +50,7 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Object}
    */
-  manifest: undefined,
+  manifestProxy: undefined,
 
   /**
    * @type {boolean}
@@ -63,16 +64,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
-  guiPluginIndices: computed('manifest', function guiPluginIndices() {
-    const indices = this.get('manifest.onedata.indices');
-    if (Array.isArray(indices)) {
-      return indices.filter(index =>
-        index && typeof get(index, 'name') === 'string'
-      ).uniqBy('name');
-    } else {
-      return [];
-    }
-  }),
+  guiPluginIndices: reads('manifestProxy.indices'),
 
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Model.Index>>}

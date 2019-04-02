@@ -1,5 +1,13 @@
-{{harvester-configuration/gui-upload harvester=harvester onGuiUploaded=(action "reloadManifest")}}
-{{#promise-proxy-container proxy=manifestProxy}}
-  {{harvester-configuration/gui-indices manifest=manifestProxy.content harvester=harvester}}
-{{/promise-proxy-container}}
-{{harvester-configuration/gui-json-config harvester=harvester}}
+{{harvester-configuration/gui-upload
+  harvester=harvester
+  onGuiUploadStart=(action "guiUploadStart")
+  onGuiUploadEnd=(action "guiUploadEnd")}}
+{{harvester-configuration/gui-info
+  manifestProxy=manifestProxy
+  isUploadingGui=isUploadingGui}}
+{{harvester-configuration/gui-indices
+  manifestProxy=manifestProxy
+  harvester=harvester
+  isUploadingGui=isUploadingGui}}
+{{harvester-configuration/gui-json-config
+  harvester=harvester}}

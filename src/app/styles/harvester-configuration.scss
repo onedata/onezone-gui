@@ -1,7 +1,11 @@
 .harvester-configuration {
+  .unspecified {
+    color: $main-text-color-disabled;
+    font-style: italic;
+  }
   .harvester-configuration-gui-upload {
     .upload-form {
-      margin-top: 0;
+      margin: ($line-height-computed / 2) 0;
       padding: 0;
     }
     .upload-gui-input {
@@ -56,10 +60,6 @@
   }
 
   .harvester-configuration-gui-plugin {
-    .not-assigned {
-      color: $main-text-color-disabled;
-      font-style: italic;
-    }
     .indices-table {
       table-layout: fixed;
       &:not(.bt) {

@@ -1,8 +1,8 @@
 import Component from '@ember/component';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration-gui-plugin'],
@@ -27,6 +27,11 @@ export default Component.extend(I18n, {
    */
   manifestProxy: undefined,
 
+  /**
+   * @type {boolean}
+   */
+  isUploadingGui: false,
+
   init() {
     this._super(...arguments);
     this.loadManifest();
@@ -40,23 +45,20 @@ export default Component.extend(I18n, {
       harvesterManager,
       harvester,
     } = this.getProperties('harvesterManager', 'harvester');
-    const proxy = PromiseObject.create({
-      promise: harvesterManager.getGuiPluginManifest(get(harvester, 'id'))
-        .catch(error => {
-          if (get(error, 'status') === 404) {
-            return null;
-          } else {
-            throw error;
-          }
-        }),
-    });
+    const proxy = harvesterManager.getGuiPluginManifest(get(harvester, 'id'));
     this.set('manifestProxy', proxy);
     return proxy;
   },
 
   actions: {
-    reloadManifest() {
-      this.loadManifest();
+    guiUploadStart() {
+      this.set('isUploadingGui', true);
+    },
+    guiUploadEnd() {
+      safeExec(this, () => {
+        this.set('isUploadingGui', false);
+        this.loadManifest();
+      });
     },
   },
 });

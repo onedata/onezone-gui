@@ -93,18 +93,12 @@ export default Component.extend(I18n, GlobalActions, {
         harvesterManager,
         harvester,
       } = this.getProperties('harvesterManager', 'harvester');
+      const guiPluginManifest =
+        harvesterManager.getGuiPluginManifest(get(harvester, 'id'));
       return PromiseArray.create({
-        promise: harvesterManager.getGuiPluginManifest(get(harvester, 'id'))
-          .then(result => {
-            const indices = get(result, 'onedata.indices');
-            if (Array.isArray(indices)) {
-              return indices.filter(index =>
-                index && typeof get(index, 'name') === 'string'
-              ).uniqBy('name').mapBy('name');
-            } else {
-              return [];
-            }
-          }).catch(() => []),
+        promise: guiPluginManifest
+          .then(() => get(guiPluginManifest, 'indices').mapBy('name'))
+          .catch(() => []),
       });
     }
   ),

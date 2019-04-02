@@ -40,7 +40,18 @@ export default {
       guiUploading: 'gui plugin uploading',
       percentDone: '{{percent}}% done...',
     },
+    guiInfo: {
+      header: 'Current GUI plugin',
+      status: 'Status',
+      uploading: 'uploading',
+      uploaded: 'uploaded',
+      cannotLoadManifest: 'cannot load manifest',
+      version: 'Version',
+      unknown: 'unknown',
+    },
     guiIndices: {
+      waitingForUpload: 'Waiting for GUI plugin to upload...',
+      manifestUnavailable: 'GUI plugin manifest file is unavailable. Upload correct GUI plugin to set up indices.',
       edit: 'Edit',
       cancel: 'Cancel',
       save: 'Save',
