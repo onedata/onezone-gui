@@ -12,7 +12,7 @@ export default {
   inviteUserUsingToken: 'Invite user using token',
   removeSelected: 'Remove selected',
   removeMembersSuccess: 'Members has been removed',
-  membersDeletion: 'members deletion',
+  membersDeletion: 'deleting members',
   direct: 'Direct',
   effective: 'Effective',
   privilegesAspect: 'Privileges',

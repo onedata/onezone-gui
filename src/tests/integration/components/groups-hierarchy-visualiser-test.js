@@ -780,7 +780,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       .then(() => {
         const $columns = helper.getAllColumns();
         $nonEmptyColumnsAfter = $columns.filter(':not(.empty)');
-        expect($nonEmptyColumnsAfter.length).to.be.lt($nonEmptyColumnsBefore.length);
+        expect($nonEmptyColumnsAfter.length)
+          .to.be.lt($nonEmptyColumnsBefore.length);
       });
   });
 });

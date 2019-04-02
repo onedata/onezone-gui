@@ -26,11 +26,16 @@ module.exports = function (environment) {
      * - [defaultAspect]: string
      */
     'onedataTabs': [
-      { id: 'data', icon: 'folder', isDefault: true, allowIndex: true },
-      { id: 'spaces', icon: 'space' },
+      { id: 'spaces', icon: 'folder', isDefault: true },
+      { id: 'providers', icon: 'provider', allowIndex: true },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
-      { id: 'clusters', icon: 'cluster', defaultAspect: 'overview', allowIndex: false },
+      {
+        id: 'clusters',
+        icon: 'cluster',
+        defaultAspect: 'overview',
+        allowIndex: false,
+      },
       { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
     ],
     'layoutConfig': {
@@ -48,6 +53,7 @@ module.exports = function (environment) {
     'i18n': {
       defaultLocale: 'en',
     },
+    'legacyOneproviderVersion': '18.02.*',
     'APP': {
       // Here you can pass flags/options to your application instance
       // when it is created

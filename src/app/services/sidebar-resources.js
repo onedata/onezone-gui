@@ -32,7 +32,7 @@ export default SidebarResources.extend({
    */
   getCollectionFor(type) {
     switch (type) {
-      case 'data':
+      case 'providers':
         return this.get('providerManager').getProviders();
       case 'clusters':
         return this.get('clusterManager').getClusters();

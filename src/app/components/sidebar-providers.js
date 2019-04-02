@@ -1,7 +1,7 @@
 /**
  * A sidebar for data providers (extension of ``two-level-sidebar``)
  *
- * @module components/sidebar-data
+ * @module components/sidebar-providers
  * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -13,7 +13,7 @@ import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
 export default TwoLevelSidebar.extend({
   layout,
 
-  classNames: ['sidebar-data'],
+  classNames: ['sidebar-providers'],
 
   /**
    * @override
@@ -28,10 +28,10 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-data/provider-item',
+  firstLevelItemComponent: 'sidebar-providers/provider-item',
 
   /**
    * @override
    */
-  sidebarType: 'data',
+  sidebarType: 'providers',
 });

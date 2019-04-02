@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with groups tab.
+ * Provides data for routes and components associated with groups tab.
  *
  * @module services/group-manager
  * @author Michal Borzecki
@@ -22,6 +22,7 @@ export default Service.extend({
   onedataGraphUtils: service(),
   currentUser: service(),
   spaceManager: service(),
+  clusterManager: service(),
   providerManager: service(),
   harvesterManager: service(),
 
@@ -228,6 +229,27 @@ export default Service.extend({
           this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         ]).then(() => parentGroup)
       );
+  },
+
+  /**
+   * Joins group to a cluster using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Cluster>}
+   */
+  joinClusterAsGroup(group, token) {
+    const clusterManager = this.get('clusterManager');
+    return group.joinCluster(token)
+      .then(cluster => {
+        const clusterEntityId = get(cluster, 'entityId');
+        return Promise.all([
+          clusterManager.reloadList(),
+          clusterManager.reloadGroupList(clusterEntityId)
+          .catch(ignoreForbiddenError),
+          clusterManager.reloadEffGroupList(clusterEntityId)
+          .catch(ignoreForbiddenError),
+        ]).then(() => cluster);
+      });
   },
 
   /**

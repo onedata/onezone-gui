@@ -1,7 +1,7 @@
 /**
  * A content page for single selected provider
  *
- * @module components/content-data
+ * @module components/content-providers
  * @author Jakub Liput, Michal Borzecki
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
 import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
@@ -18,12 +18,14 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 
 export default Component.extend({
-  classNames: ['content-data'],
+  classNames: ['content-providers'],
 
-  providerManager: inject(),
-  router: inject(),
-  guiUtils: inject(),
-  navigationState: inject(),
+  providerManager: service(),
+  router: service(),
+  guiUtils: service(),
+  navigationState: service(),
+  alertService: service('alert'),
+  appStorage: service(),
 
   /**
    * Selected (active) provider
@@ -145,7 +147,8 @@ export default Component.extend({
       scheduleOnce('afterRender', this, () =>
         this.get('_window').dispatchEvent(new Event('providerPlaceRefresh'))
       );
-      return clusterizeProviders(_providers || [], squareSideLength, squareSideLength);
+      return clusterizeProviders(_providers || [], squareSideLength,
+        squareSideLength);
     }
   ),
 
@@ -211,6 +214,7 @@ export default Component.extend({
       _window,
       _windowResizeHandler,
     } = this.getProperties('_window', '_windowResizeHandler');
+    this.checkOneproviderAuthenticationError();
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
     const thisElement = this.$()[0];
@@ -223,7 +227,8 @@ export default Component.extend({
       safeExec(this, () => {
         const dragStartXY = this.get('dragStartXY');
         this.set('dragStartXY', {});
-        if (dragStartXY.x === event.clientX && dragStartXY.y === event.clientY) {
+        if (dragStartXY.x === event.clientX && dragStartXY.y === event
+          .clientY) {
           const target = $(event.target);
           if (!this.get('_mobileMode')) {
             const ignoredElements =
@@ -233,7 +238,7 @@ export default Component.extend({
               const queryMapState = this._getQueryMapState();
               this.get('router').transitionTo(
                 'onedata.sidebar.content',
-                'data',
+                'providers',
                 'not-selected', { queryParams: queryMapState }
               );
             }
@@ -272,6 +277,32 @@ export default Component.extend({
     return _.mapKeys(this.get('_mapState') || {}, (v, k) => 'map_' + k);
   },
 
+  checkOneproviderAuthenticationError() {
+    const appStorage = this.get('appStorage');
+    if (appStorage.getData('oneproviderAuthenticationError')) {
+      appStorage.removeData('oneproviderAuthenticationError');
+      const {
+        i18n,
+        alertService,
+      } = this.getProperties('i18n', 'alertService');
+      alertService.error(null, {
+        componentName: 'alerts/oneprovider-authentication-error',
+        header: i18n.t('components.alerts.oneproviderAuthenticationError.header'),
+      });
+    }
+  },
+
+  transitionToProviderRedirect(provider) {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    return router.transitionTo(
+      'provider-redirect',
+      guiUtils.getRoutableIdFor(provider)
+    );
+  },
+
   actions: {
     mapViewportChanged(event) {
       this.set('_mapState', {
@@ -284,20 +315,13 @@ export default Component.extend({
       const queryParams = this._getQueryMapState();
       this.get('router').transitionTo(
         'onedata.sidebar.content',
-        'data',
+        'providers',
         this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
       );
     },
     goToProvider(provider) {
-      const {
-        router,
-        guiUtils,
-      } = this.getProperties('router', 'guiUtils');
-      if (get(provider, 'status') !== 'offline') {
-        router.transitionTo(
-          'provider-redirect',
-          guiUtils.getRoutableIdFor(provider)
-        );
+      if (get(provider, 'online') === true) {
+        return this.transitionToProviderRedirect(provider);
       }
     },
   },

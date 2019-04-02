@@ -11,7 +11,6 @@ import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
 import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
-import { get } from '@ember/object';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   developmentModelConfig: Object.freeze({
@@ -19,10 +18,4 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
-
-  beforeModel(transition) {
-    const result = this._super(...arguments);
-    this.set('navigationState.queryParams', get(transition, 'queryParams'));
-    return result;
-  },
 });

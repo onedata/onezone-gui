@@ -82,10 +82,12 @@ describe('Integration | Component | content users', function () {
     this.render(hbs `{{content-users user=user}}`);
     return wait().then(() => {
       expect(this.$('.google-account'), 'google-account').to.exist;
-      expect(this.$('.google-account .account-type', 'Google+ text').text().trim())
-        .to.equal('Google+');
-      expect(this.$('.google-account .account-email', 'email text').text().trim())
-        .to.equal('one@one.one');
+      expect(
+        this.$('.google-account .account-type', 'Google+ text').text().trim()
+      ).to.equal('Google+');
+      expect(
+        this.$('.google-account .account-email', 'email text').text().trim()
+      ).to.equal('one@one.one');
     });
   });
 

@@ -1,5 +1,5 @@
 export default {
-  menuItem: 'Data',
+  menuItem: 'Providers',
   aspects: {
     index: 'Provider overview',
     notFound: 'Provider not found',

@@ -78,7 +78,8 @@ describe('Integration | Component | content spaces providers', function () {
     return wait().then(() => {
       expect(this.$('.space-providers-list'), 'providers list').to.exist;
       expect(this.$('.space-providers-atlas'), 'providers atlas').to.exist;
-      expect(this.$('.space-providers-support-chart'), 'support chart').to.exist;
+      expect(this.$('.space-providers-support-chart'), 'support chart')
+        .to.exist;
     });
   });
 });

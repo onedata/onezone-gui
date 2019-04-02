@@ -9,34 +9,32 @@
  */
 
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
 import OnedataRoute from 'onedata-gui-common/routes/onedata';
 import { Promise } from 'rsvp';
 import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentication-error-handler';
+import { get } from '@ember/object';
+import { resolve } from 'rsvp';
+import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
   globalGuiResources: service(),
+  appStorage: service(),
+  navigationState: service(),
 
-  beforeModel() {
-    const result = this._super(...arguments);
-
+  beforeModel(transition) {
+    const superResult = this._super(...arguments);
     this.get('globalGuiResources').initializeGlobalObject();
-    
-    return result;
+    if (get(transition, 'isAborted')) {
+      return superResult;
+    } else {
+      return this.handleRedirection().then(() => superResult);
+    }
+
   },
 
-  model(params, transition) {
-    const redirectUrl = get(transition, 'queryParams.redirect_url');
-    if (redirectUrl) {
-      return new Promise(() => {
-        sessionStorage.setItem('redirectFromOnezone', 'true');
-        // Only redirect url in actual domain is acceptable (to not redirect
-        // to some external, possibly malicious pages).
-        window.location = window.location.origin + redirectUrl;
-      });
-    }
+  model() {
     let currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
       let creatingAppModel = this._super(...arguments);
@@ -58,6 +56,50 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
     controller.setProperties(errors);
     if (errors.authenticationErrorReason) {
       controller.set('authenticationErrorOpened', true);
+    }
+  },
+
+  handleRedirection() {
+    const queryParams = this.get('navigationState.queryParams');
+    const redirectUrl = get(queryParams, 'redirect_url');
+    if (redirectUrl) {
+      delete queryParams.redirect_url;
+      return new Promise(() => {
+        const authRedirect = sessionStorage.getItem('authRedirect');
+        if (authRedirect) {
+          sessionStorage.removeItem('authRedirect');
+          const urlMatch = redirectUrl.match(/\/(opw|ozp|opp)\/(.*?)\//);
+          const guiType = urlMatch && urlMatch[1];
+          const clusterId = urlMatch && urlMatch[2];
+          if (guiType === 'opw') {
+            this.get('appStorage').setData('oneproviderAuthenticationError', '1');
+            return this.transitionTo(
+              'onedata.sidebar.index',
+              'providers'
+            );
+          } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
+            new DisabledErrorCheckList('clusterAuthentication')
+              .disableErrorCheckFor(clusterId);
+            return this.transitionTo(
+              'onedata.sidebar.content.aspect',
+              'clusters',
+              clusterId,
+              'authentication-error'
+            );
+          } else {
+            throw {
+              isOnedataCustomError: true,
+              type: 'redirection-loop',
+            };
+          }
+        } else {
+          // Only redirect url in actual domain is acceptable (to not redirect
+          // to some external, possibly malicious pages).
+          window.location.replace(window.location.origin + redirectUrl);
+        }
+      });
+    } else {
+      return resolve();
     }
   },
 });

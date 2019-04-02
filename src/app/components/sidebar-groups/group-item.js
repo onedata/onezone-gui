@@ -141,6 +141,27 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinClusterAction: computed(function joinClusterAction() {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-cluster'
+      ),
+      title: this.t('joinCluster'),
+      class: 'join-cluster-action',
+      icon: 'cluster',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   leaveAction: computed(function () {
     return {
       action: () => this.send('showLeaveModal'),
@@ -170,6 +191,7 @@ export default Component.extend(I18n, {
     'joinSpaceAction',
     'joinHarvesterAction',
     'joinAsSubgroupAction',
+    'joinClusterAction',
     'removeAction',
     'leaveAction'
   ),

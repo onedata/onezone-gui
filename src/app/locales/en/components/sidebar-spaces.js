@@ -7,6 +7,7 @@ export default {
   },
   aspects: {
     index: 'Overview',
+    data: 'Data',
     providers: 'Providers',
     members: 'Members',
     membership: 'Membership',

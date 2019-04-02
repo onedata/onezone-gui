@@ -4,7 +4,7 @@
     <div class="row">
       {{#each distributions as |dist|}}
         <div class="support-os">
-          <img src={{root-url "assets/images/os-logo/{{dist.id}}.svg"}}>
+          <img src={{root-url (concat "assets/images/os-logo/" dist.id ".svg")}}>
           <div class="support-os-name">{{dist.name}}</div>
         </div>
       {{/each}}

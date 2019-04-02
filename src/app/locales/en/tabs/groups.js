@@ -8,6 +8,7 @@ export default {
     joinAsSubgroup: 'Join as subgroup',
     joinSpace: 'Join space',
     joinHarvester: 'Join harvester',
+    joinCluster: 'Join cluster',
     notFound: 'Group not found',
   },
 };

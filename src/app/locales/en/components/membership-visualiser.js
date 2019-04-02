@@ -4,6 +4,7 @@ export default {
   group: 'group',
   space: 'space',
   harvester: 'harvester',
+  cluster: 'cluster',
   showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
@@ -11,6 +12,7 @@ export default {
     viewSpace: 'View space',
     viewProvider: 'View provider',
     viewHarvester: 'View harvester',
+    viewCluster: 'View cluster',
   },
   membershipRelation: {
     isMemberOf: 'is member of',
@@ -39,5 +41,6 @@ export default {
     space: 'space',
     provider: 'provider',
     harvester: 'harvester',
+    cluster: 'cluster',
   },
 };

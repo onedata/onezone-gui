@@ -106,6 +106,10 @@ export default Model.extend(GraphSingleModelMixin, {
     return this._leaveRelation('harvester', groupId);
   },
 
+  leaveCluster(groupId) {
+    return this._leaveRelation('cluster', groupId);
+  },
+
   joinSpace(token) {
     return this._joinRelation('space', token);
   },
@@ -116,6 +120,10 @@ export default Model.extend(GraphSingleModelMixin, {
 
   joinHarvester(token) {
     return this._joinRelation('harvester', token);
+  },
+
+  joinCluster(token) {
+    return this._joinRelation('cluster', token);
   },
 
   _leaveRelation(aspect, relationId) {

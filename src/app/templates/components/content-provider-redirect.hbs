@@ -1,12 +1,3 @@
-{{#if error}}
-  {{application-error
-    message=(tt this "error" providerName=provider.name)
-    error=error
-    messageType="internal"
-    class="md"
-  }}
-{{else}}
-  {{promise-proxy-container proxy=goToProviderProxy absoluteCentered=true}}
-{{/if}}
+{{promise-proxy-container proxy=goToProviderProxy absoluteCentered=true}}
 
 {{yield}}

@@ -67,7 +67,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
-import { resolve, Promise } from 'rsvp';
+import { resolve, reject, Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
@@ -75,6 +75,7 @@ import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
+import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
 
@@ -94,6 +95,7 @@ export default Component.extend(I18n, {
   spaceActions: service(),
   groupActions: service(),
   harvesterActions: service(),
+  clusterActions: service(),
   currentUser: service(),
 
   /**
@@ -109,8 +111,8 @@ export default Component.extend(I18n, {
   contextRecord: null,
 
   /**
-   * Group, space or provider
-   * @type {Group|Space|Provider}
+   * Group, space, cluster or provider
+   * @type {Group|Space|Cluster|Provider}
    * @virtual
    */
   targetRecord: null,
@@ -236,6 +238,9 @@ export default Component.extend(I18n, {
           return groupFlags;
         case 'harvester':
           return harvesterFlags;
+        case 'cluster':
+        default:
+          return clusterFlags;
       }
     }
   ),
@@ -687,11 +692,13 @@ export default Component.extend(I18n, {
         spaceActions,
         groupActions,
         harvesterActions,
+        clusterActions,
       } = this.getProperties(
         'relationToRemove',
         'spaceActions',
         'groupActions',
-        'harvesterActions'
+        'harvesterActions',
+        'clusterActions'
       );
       const {
         parentType,
@@ -722,8 +729,13 @@ export default Component.extend(I18n, {
             harvesterActions.removeGroupFromHarvester(parent, child) :
             harvesterActions.removeUserFromHarvester(parent, child);
           break;
+        case 'cluster':
+          promise = childType === 'group' ?
+            clusterActions.removeMemberGroupFromCluster(parent, child) :
+            clusterActions.removeMemberUserFromCluster(parent, child);
+          break;
         default:
-          promise = resolve();
+          promise = reject('membership-visualiser: cannot remove, unknown relation');
       }
       this.set('isRemovingRelation', true);
       return promise

@@ -102,12 +102,22 @@ export default function generateDevelopmentModel(store) {
           }))
           .then(() => Promise.all(clusterList.map(cluster => {
             if (get(cluster, 'type') === 'oneprovider') {
+              const clusterProvider =
+                providerList.findBy('entityId', get(cluster, 'entityId'));
               set(
                 cluster,
                 'provider',
-                providerList.findBy('entityId', get(cluster, 'entityId'))
+                clusterProvider
               );
-              return cluster.save();
+              return cluster.save()
+                .then(() => {
+                  set(
+                    clusterProvider,
+                    'cluster',
+                    cluster
+                  );
+                  return clusterProvider.save();
+                });
             } else {
               return resolve();
             }
@@ -242,7 +252,7 @@ function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     const providerId = `oneprovider-${index + 1}`;
-    const id = `provider.${providerId}.instance:protected`;
+    const id = `provider.${providerId}.instance:auto`;
     return store.createRecord('provider', {
       id,
       gri: id,
@@ -250,7 +260,7 @@ function createProvidersRecords(store) {
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
-      online: [true, false][index % 3],
+      online: [true, false][index % 2],
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));
@@ -303,48 +313,78 @@ function createLinkedAccount(store) {
 }
 
 function createClusterRecords(store) {
+  const onezoneId = clusterInstanceGri('onezone');
+  const oneprovider1Id = clusterInstanceGri('oneprovider-1');
+  const oneprovider2Id = clusterInstanceGri('oneprovider-2');
   return Promise.all([{
-      id: 'cluster.onezone.instance:protected',
-      gri: 'cluster.onezone.instance:protected',
-      build: 'lol',
-      version: '19.02.0',
+      id: onezoneId,
+      gri: onezoneId,
       type: 'onezone',
       name: 'PL-Grid',
       onepanelProxy: true,
+      canViewPrivateData: true,
       info: {
         creatorType: 'root',
         creatorId: '',
         creationTime: 1550156285,
       },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
     },
     {
-      id: 'cluster.oneprovider-1.instance:protected',
-      gri: 'cluster.oneprovider-1.instance:protected',
-      build: 'lol1',
-      version: '19.02.0',
+      id: oneprovider1Id,
+      gri: oneprovider1Id,
       type: 'oneprovider',
       name: 'Cyfronet',
       onepanelProxy: false,
-      provider: 'provider.oneprovider-1.instance:protected',
+      provider: 'provider.oneprovider-1.instance:auto',
+      canViewPrivateData: true,
       info: {
         creatorType: 'root',
         creatorId: '',
         creationTime: 1550156285,
       },
+      workerVersion: {
+        release: '18.02.*',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
     },
     {
-      id: 'cluster.oneprovider-2.instance:protected',
-      gri: 'cluster.oneprovider-2.instance:protected',
-      build: 'lol2',
-      version: '19.02.0',
+      id: oneprovider2Id,
+      gri: oneprovider2Id,
       type: 'oneprovider',
       name: 'PCSS',
       onepanelProxy: true,
-      provider: 'provider.oneprovider-2.instance:protected',
+      provider: 'provider.oneprovider-2.instance:auto',
+      canViewPrivateData: false,
       info: {
         creatorType: 'root',
         creatorId: '',
         creationTime: 1550156285,
+      },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
       },
     },
   ].map(c => store.createRecord('cluster', c).save()));
@@ -523,4 +563,13 @@ function createPrivilegesRecords(
     });
     return store.createRecord('privilege', recordData).save();
   }));
+}
+
+function clusterInstanceGri(entityId) {
+  return gri({
+    entityType: 'cluster',
+    entityId,
+    aspect: 'instance',
+    scope: 'auto',
+  });
 }

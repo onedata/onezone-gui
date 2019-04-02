@@ -13,7 +13,8 @@ import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sideba
 import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
-import RedirectRoute from 'onedata-gui-common/mixins/routes/redirect';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { underscore } from '@ember/string';
 
 /**
  * Finds GRI in griIds using pure entityId.
@@ -33,7 +34,7 @@ function findGri(griIds, entityId) {
   return recordId;
 }
 
-export default OnedataSidebarContentRoute.extend(RedirectRoute, {
+export default OnedataSidebarContentRoute.extend({
   /**
    * @override
    */
@@ -47,20 +48,17 @@ export default OnedataSidebarContentRoute.extend(RedirectRoute, {
   /**
    * @override
    */
-  isRedirectingTransition(transition) {
-    const params = get(transition, 'params');
-    const sidebarParams = params['onedata.sidebar'];
-    return Boolean(sidebarParams && sidebarParams.type === 'clusters');
-  },
-
-  /**
-   * @override 
-   */
-  checkComeFromOtherRoute(currentHash) {
-    return !/\/onedata\/clusters\/.+?\/.+/.test(currentHash);
-  },
-
-  beforeModel() {
-    return this._super(...arguments);
+  findOutResourceId(resourceId, resourceType) {
+    const entityType = underscore(resourceType).replace(/s$/, '');
+    if (entityType) {
+      return gri({
+        entityId: resourceId,
+        entityType,
+        aspect: 'instance',
+        scope: 'auto',
+      });
+    } else {
+      return null;
+    }
   },
 });

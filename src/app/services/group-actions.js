@@ -58,7 +58,11 @@ export default Service.extend(I18n, {
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
       class: 'join-group-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'groups', 'join'),
+      action: () => router.transitionTo(
+        'onedata.sidebar.content',
+        'groups',
+        'join'
+      ),
     };
   }),
 
@@ -209,6 +213,32 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         globalNotify.backendError(this.t('joiningGroupAsSubgroup'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Joins group to a cluster using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Models.Cluster>}
+   */
+  joinClusterAsGroup(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinClusterAsGroup(group, token)
+      .then(cluster => {
+        globalNotify.success(this.t('joinClusterAsGroupSuccess', {
+          groupName: get(group, 'name'),
+          clusterName: get(cluster, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return cluster;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningClusterAsGroup'), error);
         throw error;
       });
   },
@@ -483,6 +513,4 @@ export default Service.extend(I18n, {
         throw error;
       });
   },
-
-
 });

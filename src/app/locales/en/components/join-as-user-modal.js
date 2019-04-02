@@ -8,4 +8,5 @@ export default _.merge({}, proceedProcessModal, {
   space: 'space',
   group: 'group',
   harvester: 'harvester',
+  cluster: 'cluster',
 });

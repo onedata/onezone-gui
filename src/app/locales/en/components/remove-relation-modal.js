@@ -12,6 +12,7 @@ export default _.merge({}, proceedProcessModal, {
   proceed: 'Remove',
   harvester: 'harvester&nbsp;"{{name}}"',
   space: 'space&nbsp;"{{name}}"',
+  cluster: 'cluster&nbsp;"{{name}}"',
   group: 'group&nbsp;"{{name}}"',
   subgroup: 'subgroup&nbsp;"{{name}}"',
   user: 'user&nbsp;"{{name}}"',
@@ -35,4 +36,5 @@ export default _.merge({}, proceedProcessModal, {
   headerGroups: 'groups',
   headerSubgroups: 'subgroups',
   headerMembers: 'members',
+  headerCluster: 'cluster',
 });

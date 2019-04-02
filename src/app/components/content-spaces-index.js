@@ -8,9 +8,9 @@
  */
 
 import Component from '@ember/component';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, set } from '@ember/object';
+import { get, computed, set } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
@@ -18,6 +18,7 @@ import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 export default Component.extend(
   I18n,
@@ -27,11 +28,12 @@ export default Component.extend(
   ProvidersColors, {
     classNames: ['content-spaces-index'],
 
-    currentUser: inject(),
-    globalNotify: inject(),
-    router: inject(),
-    guiUtils: inject(),
-    media: inject(),
+    currentUser: service(),
+    globalNotify: service(),
+    router: service(),
+    guiUtils: service(),
+    media: service(),
+    i18n: service(),
 
     /**
      * @override 
@@ -48,6 +50,11 @@ export default Component.extend(
      * @type {string}
      */
     leaveSpaceModalTriggers: '',
+
+    /**
+     * @type {boolean}
+     */
+    showResourceMembershipTile: true,
 
     /**
      * @type {Ember.ComputedProperty<string>}
@@ -77,9 +84,10 @@ export default Component.extend(
      */
     toggleDefaultSpaceAction: computed('isDefaultSpace', function () {
       const isDefaultSpace = this.get('isDefaultSpace');
+      const title = this.t('toggleDefault');
       return {
         action: () => this.send('toggleDefaultSpace'),
-        title: this.t(isDefaultSpace ? 'unsetDefault' : 'setDefault'),
+        title,
         class: 'btn-toggle-default-space',
         buttonStyle: 'default',
         icon: isDefaultSpace ? 'home' : 'home-outline',
@@ -125,21 +133,32 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Provider>}
      */
-    dataProviderProxy: reads('providersProxy.firstObject'),
+    dataProviderProxy: computed('space.providerList.list.[]',
+      function dataProviderProxy() {
+        const promise = this.get('space.providerList')
+          .then(providerList =>
+            get(providerList, 'list').then(list =>
+              list.findBy('online')
+            )
+          );
+        return PromiseObject.create({ promise });
+      }),
 
     /**
      * @type {Ember.ComputedProperty<Array<string>>}
      */
-    dataProviderRoute: computed('dataProviderProxy', function dataProviderRoute() {
-      const {
-        guiUtils,
-        dataProviderProxy,
-      } = this.getProperties('guiUtils', 'dataProviderProxy');
-      return dataProviderProxy ? [
-        'provider-redirect',
-        guiUtils.getRoutableIdFor(dataProviderProxy),
-      ] : [];
-    }),
+    dataProviderRoute: computed('dataProviderProxy.content',
+      function dataProviderRoute() {
+        const {
+          guiUtils,
+          dataProviderProxy,
+        } = this.getProperties('guiUtils', 'dataProviderProxy');
+        return get(dataProviderProxy, 'content') ? [
+          'provider-redirect',
+          guiUtils.getRoutableIdFor(dataProviderProxy),
+        ] : [];
+      }
+    ),
 
     /**
      * @type {Ember.ComputedProperty<Object>}
@@ -190,7 +209,8 @@ export default Component.extend(
       return this.get('currentUser').getCurrentUserRecord()
         .then(user => user.setDefaultSpaceId(spaceId))
         .catch(error =>
-          this.get('globalNotify').backendError(this.t('changingDefaultSpace'), error)
+          this.get('globalNotify').backendError(this.t('changingDefaultSpace'),
+            error)
         );
     },
 

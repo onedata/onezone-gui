@@ -53,6 +53,23 @@ export default Service.extend({
   },
 
   /**
+   * Fetch a URL to provider.
+   *
+   * @param {String} providerId
+   * @param {String} path
+   * @returns {Promise} A backend operation completion:
+   * - ``resolve(object: data)`` when successfully fetched the redirect URL
+   *   - ``data.url`` (string)
+   * - ``reject(object: error)`` on failure
+   */
+  getProviderRedirectUrl(providerId, path) {
+    return this.get('onedataRpc').request('getProviderRedirectURL', {
+      providerId,
+      path,
+    });
+  },
+
+  /**
    * Fetch supported authorizers.
    *
    * @param {boolean} testMode
@@ -63,12 +80,5 @@ export default Service.extend({
    */
   getSupportedIdPs(testMode) {
     return this.get('onedataRpc').request('getSupportedIdPs', { testMode });
-  },
-
-  getProviderRedirectUrl(providerId, path) {
-    return this.get('onedataRpc').request('getProviderRedirectURL', {
-      providerId,
-      path,
-    });
   },
 });

@@ -10,6 +10,7 @@ export default {
     joinSpace: 'Join space',
     joinHarvester: 'Join harvester',
     joinAsSubgroup: 'Join as subgroup',
+    joinCluster: 'Join cluster',
     leave: 'Leave',
     remove: 'Remove',
     groupPersistence: 'group persistence',

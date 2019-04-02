@@ -1,18 +1,31 @@
+/**
+ * Redirect to Onepanel GUI (hosted on Onezone domain) on component load
+ * 
+ * @module components/content-clusters-onepanel-redirect
+ * @author Jakub Liput
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
+import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
+import { Promise } from 'rsvp';
 
 export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
 
   globalNotify: service(),
+  router: service(),
+  guiUtils: service(),
 
   /**
    * @virtual
-   * @type {object} cluster item
+   * @type {models/Cluster} cluster item
    */
   cluster: undefined,
 
@@ -27,25 +40,59 @@ export default Component.extend({
   onepanelHref: computed(
     'onepanelPathAbbrev',
     'clusterId',
+    'aspect',
     function onepanelHref() {
-      const clusterId = this.get('clusterId');
-      return `${location.origin}/${this.get('onepanelPathAbbrev')}/${clusterId}/i#/clusters/${clusterId}`;
+      const {
+        clusterId,
+        onepanelPathAbbrev,
+        aspect,
+      } = this.getProperties('clusterId', 'onepanelPathAbbrev', 'aspect');
+      let href =
+        `${location.origin}/${onepanelPathAbbrev}/${clusterId}/i#/onedata/clusters/${clusterId}`;
+      if (aspect) {
+        href += `/${aspect}`;
+      }
+      return href;
     }),
 
-  redirectProxy: computed(function redirectProxy() {
+  redirectProxy: computed('cluster.domain', function redirectProxy() {
     return PromiseObject.create({ promise: this.redirectToOnepanel() });
   }),
 
+  checkOnepanelAvailability() {
+    const origin = this.get('cluster.standaloneOrigin');
+    return checkImg(`${origin}/favicon.ico`);
+  },
+
+  redirectToOnepanelApp() {
+    window.location.replace(this.get('onepanelHref'));
+  },
+
   redirectToOnepanel() {
-    return checkImg(`https://${this.get('cluster.domain')}:9443/favicon.ico`)
+    return this.checkOnepanelAvailability()
       .then(isAvailable => {
         if (isAvailable) {
-          window.location = this.get('onepanelHref');
+          return new Promise((resolve, reject) => {
+            try {
+              this.redirectToOnepanelApp();
+            } catch (error) {
+              reject(error);
+            }
+          });
         } else {
-          // FIXME: design of not available domain and text
-          this.get('globalNotify').backendError('reading cluster endpoint');
-          throw new Error(
-            'Selected cluster domain is not available for your web browser.'
+          const {
+            router,
+            cluster,
+            guiUtils,
+          } = this.getProperties('router', 'cluster', 'guiUtils');
+          const clusterRoutableId = guiUtils.getRoutableIdFor(cluster);
+          new DisabledErrorCheckList('clusterEndpoint')
+            .disableErrorCheckFor(clusterRoutableId);
+          return router.transitionTo(
+            'onedata.sidebar.content.aspect',
+            'clusters',
+            clusterRoutableId,
+            'endpoint-error'
           );
         }
       });

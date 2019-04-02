@@ -25,7 +25,9 @@ describe('Unit | Utility | generate development model', function () {
             stubsToCheck.push(save);
             const list = A();
             list.save = () => Promise.resolve();
-            this.set('list', PromiseObject.create({ promise: Promise.resolve(list) }));
+            this.set('list', PromiseObject.create({
+              promise: Promise.resolve(list),
+            }));
           },
           save() {},
         })
@@ -49,8 +51,8 @@ describe('Unit | Utility | generate development model', function () {
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',
         'privilege',
       ].forEach(modelName =>
-        expect(createRecord, `createRecord for ${modelName}`).to.be.calledWith(
-          modelName, sinon.match.object)
+        expect(createRecord, `createRecord for ${modelName}`)
+        .to.be.calledWith(modelName, sinon.match.object)
       );
       stubsToCheck.forEach(stub => expect(stub).to.be.called);
       done();

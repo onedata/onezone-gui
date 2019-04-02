@@ -167,7 +167,14 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, { computed, get, getProperties, set, setProperties, observer } from '@ember/object';
+import EmberObject, {
+  computed,
+  get,
+  getProperties,
+  set,
+  setProperties,
+  observer,
+} from '@ember/object';
 import { alias } from '@ember/object/computed';
 import { A } from '@ember/array';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -176,7 +183,10 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve, reject } from 'rsvp';
 import ColumnManager from 'onezone-gui/utils/groups-hierarchy-visualiser/column-manager';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
-import { createEmptyColumnModel, default as Column } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
+import {
+  createEmptyColumnModel,
+  default as Column,
+} from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
