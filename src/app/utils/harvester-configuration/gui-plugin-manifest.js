@@ -48,7 +48,7 @@ export default PromiseObject.extend({
       return new Promise((resolve, reject) => {
         $.ajax({
           dataType: 'json',
-          url: get(harvester, 'guiPluginHttpLocation') + '/manifest.json',
+          url: get(harvester, 'guiPluginPath') + '/manifest.json',
           success: resolve,
           error: (xhr, type, details) => reject({
             status: get(xhr, 'status'),

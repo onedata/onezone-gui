@@ -6,6 +6,7 @@ import Uploader from 'ember-uploader/uploaders/uploader';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { Promise } from 'rsvp';
+import getGuiAuthToken from 'onedata-gui-websocket-client/utils/get-gui-auth-token';
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration-gui-upload'],
@@ -76,28 +77,29 @@ export default Component.extend(I18n, {
       );
       this.set('isUploading', true);
       onGuiUploadStart();
-
-      const uploader = Uploader.create({
-        url: `/hrv/${get(harvester, 'entityId')}/gui-upload`,
-        ajaxSettings: {
-          headers: {
-            
+      return getGuiAuthToken().then(token => {
+        const uploader = Uploader.create({
+          url: `/hrv/${get(harvester, 'entityId')}/gui-upload`,
+          ajaxSettings: {
+            headers: {
+              'X-Auth-Token': token,
+            },
           },
-        },
-      });
-      uploader.on('progress', ({ percent }) => safeExec(this, () => {
-        this.set('uploadProgress', percent.toFixed(1));
-      }));
-      return new Promise((resolve, reject) => {
-        uploader.on('didUpload', () => {
-          globalNotify.success(this.t('guiUploadSuccess'));
-          resolve();
         });
-        uploader.on('didError', (jqXHR, textStatus, error) => {
-          globalNotify.backendError(this.t('guiUploading'), error);
-          reject();
+        uploader.on('progress', ({ percent }) => safeExec(this, () => {
+          this.set('uploadProgress', percent.toFixed(1));
+        }));
+        return new Promise((resolve, reject) => {
+          uploader.on('didUpload', () => {
+            globalNotify.success(this.t('guiUploadSuccess'));
+            resolve();
+          });
+          uploader.on('didError', (jqXHR, textStatus, error) => {
+            globalNotify.backendError(this.t('guiUploading'), error);
+            reject();
+          });
+          uploader.upload(selectedFile);
         });
-        uploader.upload(selectedFile);
       }).finally(() => safeExec(this, () => {
         this.setProperties({
           isUploading: false,

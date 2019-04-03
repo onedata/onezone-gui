@@ -9,6 +9,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { equal } from '@ember/object/computed';
+import { computed } from '@ember/object';
 
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
@@ -31,13 +32,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   plugin: attr('string'),
 
   /**
-   * Harvester GUI plugin path
-   * @type {Object}
+   * @type {Ember.ComputedProperty<string>}
    */
-  // guiPluginPath: attr('string'),
-  guiPluginPath: '/var/www/cos',
-
-  guiPluginHttpLocation: 'harvester_gui',
+  guiPluginPath: computed('entityId', function guiPluginPath() {
+    const entityId = this.get('entityId');
+    return `/hrv/${entityId}`;
+  }),
   
   /**
    * Information about harvester. Available fields:

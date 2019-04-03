@@ -289,12 +289,13 @@ export default Service.extend({
   /**
    * Performs request to elasticsearch
    * @param {string} harvesterId
+   * @param {string} indexId
    * @param {string} method
    * @param {string} path
    * @param {any} body
    * @returns {Promise<any>} request result
    */
-  esRequest(harvesterId, method, path, body) {
+  esRequest({ harvesterId, indexId, method, path, body }) {
     const onedataGraph = this.get('onedataGraph');
 
     const requestData = {
@@ -307,6 +308,7 @@ export default Service.extend({
         entityType: 'harvester',
         entityId: harvesterId,
         aspect: 'query',
+        aspectId: indexId,
         scope: 'private',
       }),
       operation: 'create',
@@ -326,14 +328,6 @@ export default Service.extend({
         throw new Error('Request failure. Error details: ' + JSON.stringify(response));
       }
     });
-    // return new Promise((resolve, reject) => {
-    //   $.ajax({
-    //     method,
-    //     url: 'http://localhost:9200' + path,
-    //     data: body,
-    //     contentType: 'application/json; charset=UTF-8',
-    //   }).then(resolve, reject);
-    // });
   },
 
   /**
@@ -346,7 +340,7 @@ export default Service.extend({
     return store.findRecord('harvesterConfiguration', gri({
       entityType: 'harvester',
       entityId: harvesterEntityId,
-      aspect: 'config',
+      aspect: 'gui_plugin_config',
       scope: 'private',
     }));
   },

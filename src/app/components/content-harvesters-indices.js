@@ -254,6 +254,9 @@ export default Component.extend(I18n, GlobalActions, {
         'createIndexData'
       );
       const indexRepresentation = getProperties(createIndexData, 'name', 'schema');
+      if (get(indexRepresentation, 'schema') === '') {
+        delete indexRepresentation.schema;
+      }
       set(indexRepresentation, 'guiPluginName', '');
       return harvesterActions.createIndex(harvester, indexRepresentation)
         .then(() => safeExec(this, () => {

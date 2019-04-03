@@ -23,7 +23,8 @@ export default Component.extend({
    * Relative path to plugin application
    * @type {Ember.ComputedProperty<string>}
    */
-  pluginPath: computed('harvester.guiPluginHttpLocation', function pluginPath() {
-    return this.get('harvester.guiPluginHttpLocation') + '/index.html';
+  pluginPath: computed('harvester.guiPluginPath', function pluginPath() {
+    const guiPluginPath = this.get('harvester.guiPluginPath');
+    return `${guiPluginPath}/index.html`;
   }),
 });

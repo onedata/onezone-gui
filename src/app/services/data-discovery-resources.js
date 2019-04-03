@@ -8,23 +8,25 @@
  */
 
 import { get, getProperties, computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 import _ from 'lodash';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
 
   /**
-   * Actual harvester ID, that should be used as a context for all data discovery
+   * Actual harvester, that should be used as a context for all data discovery
    * related requests
-   * @type {Ember.ComputedProperty<string|undefined>}
+   * @type {Ember.ComputedProperty<models.Harvester|undefined>}
    */
-  harvesterId: computed(
+  harvester: computed(
     'navigationState.{activeResourceType,activeResource}',
-    function harvesterId() {
+    function harvester() {
       const {
         activeResourceType,
         activeResource,
@@ -34,24 +36,63 @@ export default Service.extend({
         'activeResource'
       );
       if (activeResourceType === 'harvesters' && activeResource) {
-        return get(activeResource, 'entityId');
+        return activeResource;
       }
     }
   ),
 
   /**
+   * @type {Ember.ComputedProperty<string|null>}
+   */
+  harvesterId: reads('harvester.entityId'),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseArray<models.Index>>}
+   */
+  harvesterIndices: computed('harvester', function harvesterIndices() {
+    const harvester = this.get('harvester');
+    let promise;
+    if (!harvester) {
+      promise = resolve([]);
+    } else {
+      promise = get(harvester, 'indexList')
+        .then(indexList => get(indexList, 'list'));
+    }
+    return PromiseArray.create({
+      promise,
+    });
+  }),
+
+  /**
+   * @param {Object} requestOptions
+   * @param {string} requestOptions.indexName
    * @returns {Promise<any>} resolves to request result
    */
-  esRequest() {
+  esRequest(requestOptions) {
     const {
       harvesterId,
       harvesterManager,
-    } = this.getProperties('harvesterId', 'harvesterManager');
+      harvesterIndices,
+    } = this.getProperties(
+      'harvesterId',
+      'harvesterManager',
+      'harvesterIndices'
+    );
 
     if (!harvesterId) {
-      return reject('Harvester ID is not specified.');
+      return reject('Harvester is not specified.');
     } else {
-      return harvesterManager.esRequest(harvesterId, ...arguments);
+      const indexName = get(requestOptions, 'indexName');
+      return harvesterIndices.then(indices => {
+        const index = indices.findBy('guiPluginName', indexName);
+        if (!index) {
+          throw new Error(`Cannot find index "${indexName}".`);
+        } else {
+          const indexId = get(index, 'aspectId');
+          requestOptions = _.assign({ harvesterId, indexId }, requestOptions);
+          return harvesterManager.esRequest(requestOptions);
+        }
+      });
     }
   },
 
