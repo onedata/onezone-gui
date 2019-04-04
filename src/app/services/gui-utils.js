@@ -9,7 +9,6 @@
 
 import GuiUtils from 'onedata-gui-common/services/gui-utils';
 import { computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
@@ -52,7 +51,22 @@ export default GuiUtils.extend(UserProxyMixin, {
   /**
    * @override
    */
-  guiVersion: reads('onedataConnection.serviceVersion'),
+  guiVersion: computed(
+    'onedataConnection.{serviceVersion,serviceBuildVersion}',
+    function guiVersion() {
+      const serviceVersion = this.get('onedataConnection.serviceVersion');
+      let serviceBuildVersion = this.get('onedataConnection.serviceBuildVersion');
+      if (serviceBuildVersion === 'unknown') {
+        serviceBuildVersion = null;
+      }
+      let displayVersion = serviceVersion;
+      if (serviceBuildVersion) {
+        displayVersion +=
+          ` (${this.get('i18n').t('components.brandInfo.build')}: ${serviceBuildVersion})`;
+      }
+      return displayVersion;
+    },
+  ),
 
   /**
    * @override

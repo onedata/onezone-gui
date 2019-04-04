@@ -10,18 +10,10 @@
 import Route from '@ember/routing/route';
 import { inject as service } from '@ember/service';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
-import RedirectRoute from 'onedata-gui-common/mixins/routes/redirect';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
-export default Route.extend(AuthenticatedRouteMixin, RedirectRoute, {
+export default Route.extend(AuthenticatedRouteMixin, {
   providerManager: service(),
-
-  /** 
-   * @override
-   */
-  checkComeFromOtherRoute(currentHash) {
-    return !/\/provider-redirect/.test(currentHash);
-  },
 
   model({ provider_id: providerId }) {
     return this.get('providerManager').getRecord(

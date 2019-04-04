@@ -185,19 +185,23 @@ export default Component.extend(I18n, {
     }
   ),
 
-  clickHandlerObserver: observer('isExpanded', 'relationIsFulfilled', function clickHandlerObserver() {
-    const {
-      isExpanded,
-      relationIsFulfilled,
-      clickHandler,
-    } = this.getProperties('isExpanded', 'relationIsFulfilled', 'clickHandler');
-    const handler = (isExpanded || relationIsFulfilled) ?
-      clickHandler : undefined;
-    this.setProperties({
-      click: handler,
-      clickable: !!handler,
-    });
-  }),
+  clickHandlerObserver: observer(
+    'isExpanded',
+    'relationIsFulfilled',
+    function clickHandlerObserver() {
+      const {
+        isExpanded,
+        relationIsFulfilled,
+        clickHandler,
+      } = this.getProperties('isExpanded', 'relationIsFulfilled', 'clickHandler');
+      const handler = (isExpanded || relationIsFulfilled) ?
+        clickHandler : undefined;
+      this.setProperties({
+        click: handler,
+        clickable: !!handler,
+      });
+    }
+  ),
 
   init() {
     this._super(...arguments);

@@ -1,5 +1,5 @@
 /**
- * Provides data for routes and components assoctiated with providers tab
+ * Provides data for routes and components associated with providers tab
  *
  * @module services/provider-manager
  * @author Jakub Liput, Michal Borzecki

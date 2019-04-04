@@ -47,7 +47,8 @@ export default EmberObject.extend({
   model: computed('griPath', function model() {
     return PromiseArray.create({
       promise: Promise.all(
-        this.get('griPath').map(recordGri => this.fetchRecordByGri(recordGri)),
+        this.get('griPath')
+        .map(recordGri => this.fetchRecordByGri(recordGri)),
       ),
     });
   }),
@@ -56,14 +57,16 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<Array<string>>}
    */
   names: computed('model.content.@each.name', function names() {
-    return (this.get('model.content') || A()).mapBy('name');
+    return (this.get('model.content') || A())
+      .map(x => x || {})
+      .mapBy('name');
   }),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
   concatenatedNames: computed('names', function concatenatedNames() {
-    return this.get('names').join('');
+    return this.get('names').map(n => n || '#').join('-');
   }),
 
   /**

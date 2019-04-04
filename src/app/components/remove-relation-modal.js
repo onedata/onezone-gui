@@ -93,7 +93,7 @@ export default ProceedProcessModal.extend({
       } else {
         message += this.t('operationCauseMulti');
       }
-      if (parentType !== 'space') {
+      if (parentType === 'group') {
         message += this.t('allInherited', { parentType, parentName });
       } else {
         message += this.t('onlyParent', { parentType, parentName });

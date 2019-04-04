@@ -237,7 +237,8 @@ export default EmberObject.extend({
         if (!gri) {
           return reject('Incorrect privileges record id.');
         } else {
-          return this.get('store').findRecord('privilege', gri, { reload: true });
+          return this.get('store')
+            .findRecord('privilege', gri, { reload: true });
         }
       })),
     });

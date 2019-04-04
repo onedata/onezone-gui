@@ -9,8 +9,21 @@
 
 import TabBase from 'onezone-gui/components/content-spaces-support/-tab-base';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default TabBase.extend(I18n, {
   classNames: ['request-support-tab'],
   i18nPrefix: 'components.contentSpacesSupport.requestSupport',
+
+  /**
+   * @virtual
+   * @type {Function}
+   */
+  getNewSupportToken: notImplementedReject,
+
+  actions: {
+    getNewSupportToken() {
+      return this.get('getNewSupportToken')();
+    },
+  },
 });

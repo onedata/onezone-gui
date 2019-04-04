@@ -28,7 +28,7 @@ export default Component.extend({
    * @virtual
    * @type {function} returns Promise
    */
-  getToken: notImplementedReject,
+  getTokens: notImplementedReject,
 
   /**
    * @virtual
@@ -38,15 +38,9 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Function}
+   * @type {PromiseObject<Object>} `{ supportToken, onezoneRegistrationToken }`
    */
-  copyError: notImplementedThrow,
-
-  /**
-   * @virtual
-   * @type {PromiseObject<string>}
-   */
-  tokenProxy: undefined,
+  tokensProxy: undefined,
 
   /**
    * Selector for input for copying to clipboard
@@ -60,17 +54,28 @@ export default Component.extend({
    * Proxy for generated provider setup command
    * @type {Ember.ComputedProperty<PromiseObject<string>>}
    */
-  commandProxy: computed('commandType', 'tokenProxy.promise', function () {
-    const tokenPromise = this.get('tokenProxy.promise');
-    const commandType = this.get('commandType');
-    if (commandType && tokenPromise) {
-      return PromiseObject.create({
-        promise: tokenPromise.then(token =>
-          generateShellCommand(commandType, { token })
-        ),
-      });
-    }
-  }),
+  commandProxy: computed(
+    'commandType',
+    'tokensProxy.content.{supportToken,onezoneRegistrationToken}',
+    function commandProxy() {
+      const {
+        tokensProxy,
+        commandType,
+      } = this.getProperties('tokensProxy', 'commandType');
+      if (commandType && tokensProxy) {
+        return PromiseObject.create({
+          promise: tokensProxy.then(({
+              supportToken,
+              onezoneRegistrationToken,
+            }) =>
+            generateShellCommand(commandType, {
+              supportToken,
+              onezoneRegistrationToken,
+            })
+          ),
+        });
+      }
+    }),
 
   actions: {
     copySuccess() {
@@ -79,11 +84,11 @@ export default Component.extend({
     copyError() {
       return this.get('copyError')(...arguments);
     },
-    getToken() {
-      return this.get('getToken')(...arguments)
+    getTokens() {
+      return this.get('getTokens')(...arguments)
         .catch(error => {
           console.error(
-            `component:add-space-storage:-tab-base: getToken action failed: ${error && error.message || error}`
+            `component:add-space-storage:-tab-base: getTokens action failed: ${error && error.message || error}`
           );
         });
     },

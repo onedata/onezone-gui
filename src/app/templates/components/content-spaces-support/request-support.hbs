@@ -5,12 +5,15 @@
       <p>{{tt this "desc2"}}</p>
       <p>{{tt this "desc3"}}</p>
     </div>
+  </div>
+  <img class="col-image col-image-support hidden-xs hidden-sm col-md-5 col-lg-4" src={{root-url "assets/images/space-support-request.svg"}}>
+  <div class="col-xs-12">
     <div class="row content-row no-border">
       <div class="inner-row-content">
         <h5>{{t "components.contentSpacesSupport.tabsCommon.token"}}</h5>
         <div class="row loadable-row lg">
-          {{#promise-proxy-container proxy=tokenProxy}}
-            <textarea class="token-textarea support-token form-control" rows="4" readonly>{{tokenProxy.content}}</textarea>
+          {{#promise-proxy-container proxy=supportTokenProxy}}
+            <textarea class="token-textarea support-token no-resize form-control" rows="6" readonly>{{supportTokenProxy.content}}</textarea>
             {{#copy-button
               success=(action "copySuccess" "token")
               error=(action "copyError" "token")
@@ -20,7 +23,7 @@
               {{one-icon icon="clipboard-copy"}}
               {{t "components.contentSpacesSupport.tabsCommon.copy"}}
             {{/copy-button}}
-            <a class="clickable btn-get-token pull-right" {{action "getToken"}}>
+            <a class="clickable btn-get-token pull-right" {{action "getNewSupportToken"}}>
               {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
             </a>
           {{/promise-proxy-container}}
@@ -28,5 +31,4 @@
       </div>
     </div>
   </div>
-  <img class="col-image hidden-xs hidden-sm col-md-5 col-lg-4" src="assets/images/space-support-request.svg">
 </div>

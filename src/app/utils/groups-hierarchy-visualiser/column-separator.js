@@ -86,8 +86,10 @@ export default EmberObject.extend({
         hasCentralLine,
       } = this.getProperties('column', 'hasCentralLine');
       if (hasCentralLine) {
-        return get(column, 'groupBoxesWithRightLines.firstObject.rightLine.absoluteY') -
-          get(column, 'scrollTop') + this.get('workspace.lineWidth');
+        return get(
+          column,
+          'groupBoxesWithRightLines.firstObject.rightLine.absoluteY'
+        ) - get(column, 'scrollTop') + this.get('workspace.lineWidth');
       }
     }
   ),
@@ -106,8 +108,10 @@ export default EmberObject.extend({
         hasCentralLine,
       } = this.getProperties('column', 'hasCentralLine');
       if (hasCentralLine) {
-        return get(column, 'groupBoxesWithRightLines.lastObject.rightLine.absoluteY') -
-          get(column, 'scrollTop') + 2 * this.get('workspace.lineWidth');
+        return get(
+          column,
+          'groupBoxesWithRightLines.lastObject.rightLine.absoluteY'
+        ) - get(column, 'scrollTop') + 2 * this.get('workspace.lineWidth');
       }
     }
   ),

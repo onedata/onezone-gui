@@ -3,7 +3,7 @@
  *
  * @module services/content-resources
  * @author Jakub Liput
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -17,6 +17,7 @@ export default Service.extend({
   currentUser: inject(),
   spaceManager: inject(),
   groupManager: inject(),
+  clusterManager: inject(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -25,8 +26,11 @@ export default Service.extend({
    */
   getModelFor(type, id) {
     switch (type) {
-      case 'data':
+      case 'providers':
         return this.get('providerManager').getRecord(id);
+      case 'clusters':
+        // cluster record is ready, when we have domain and name resolved
+        return this.get('clusterManager').getRecord(id);
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':

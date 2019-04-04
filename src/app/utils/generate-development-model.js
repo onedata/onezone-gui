@@ -12,8 +12,8 @@ import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise } from 'rsvp';
-import { get } from '@ember/object';
+import { Promise, resolve } from 'rsvp';
+import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -29,7 +29,7 @@ const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
-const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount'];
+const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster'];
 const names = ['one', 'two', 'three'];
 
 const privileges = {
@@ -84,8 +84,9 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all([providers, spaces])
-        .then(([providerList, spaceList]) =>
+      const clusters = listRecords[types.indexOf('cluster')].get('list');
+      return Promise.all([providers, spaces, clusters])
+        .then(([providerList, spaceList, clusterList]) =>
           Promise.all(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
@@ -96,6 +97,28 @@ export default function generateDevelopmentModel(store) {
               return space.save();
             });
           }))
+          .then(() => Promise.all(clusterList.map(cluster => {
+            if (get(cluster, 'type') === 'oneprovider') {
+              const clusterProvider =
+                providerList.findBy('entityId', get(cluster, 'entityId'));
+              set(
+                cluster,
+                'provider',
+                clusterProvider
+              );
+              return cluster.save()
+                .then(() => {
+                  set(
+                    clusterProvider,
+                    'cluster',
+                    cluster
+                  );
+                  return clusterProvider.save();
+                });
+            } else {
+              return resolve();
+            }
+          })))
         )
         .then(() => listRecords);
     })
@@ -184,6 +207,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createGroupsRecords(store, additionalInfo);
     case 'linkedAccount':
       return createLinkedAccount(store, additionalInfo);
+    case 'cluster':
+      return createClusterRecords(store, additionalInfo);
     default:
       return Promise.all(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -203,13 +228,17 @@ function createListRecord(store, type, records) {
 function createProvidersRecords(store) {
   return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
+    const providerId = `oneprovider-${index + 1}`;
+    const id = `provider.${providerId}.instance:auto`;
     return store.createRecord('provider', {
+      id,
+      gri: id,
       name: `Provider ${index}`,
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
       online: [true, false][index % 2],
-      host: `10.0.0.${index + 1}`,
+      host: `${providerId}.local-onedata.org`,
     }).save();
   }));
 }
@@ -258,6 +287,84 @@ function createLinkedAccount(store) {
       ]),
     }).save()
   ));
+}
+
+function createClusterRecords(store) {
+  const onezoneId = clusterInstanceGri('onezone');
+  const oneprovider1Id = clusterInstanceGri('oneprovider-1');
+  const oneprovider2Id = clusterInstanceGri('oneprovider-2');
+  return Promise.all([{
+      id: onezoneId,
+      gri: onezoneId,
+      type: 'onezone',
+      name: 'PL-Grid',
+      onepanelProxy: true,
+      canViewPrivateData: true,
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
+    },
+    {
+      id: oneprovider1Id,
+      gri: oneprovider1Id,
+      type: 'oneprovider',
+      name: 'Cyfronet',
+      onepanelProxy: false,
+      provider: 'provider.oneprovider-1.instance:auto',
+      canViewPrivateData: true,
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
+      workerVersion: {
+        release: '18.02.*',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
+    },
+    {
+      id: oneprovider2Id,
+      gri: oneprovider2Id,
+      type: 'oneprovider',
+      name: 'PCSS',
+      onepanelProxy: true,
+      provider: 'provider.oneprovider-2.instance:auto',
+      canViewPrivateData: false,
+      info: {
+        creatorType: 'root',
+        creatorId: '',
+        creationTime: 1550156285,
+      },
+      workerVersion: {
+        release: '19.02.0',
+        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+        build: '176-g36e2f56',
+      },
+      onepanelVersion: {
+        release: '18.02.0-rc13',
+        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+        build: '161-g344737f',
+      },
+    },
+  ].map(c => store.createRecord('cluster', c).save()));
 }
 
 function createSharedUsersRecords(store) {
@@ -366,4 +473,13 @@ function createPrivilegesRecords(
     });
     return store.createRecord('privilege', recordData).save();
   }));
+}
+
+function clusterInstanceGri(entityId) {
+  return gri({
+    entityType: 'cluster',
+    entityId,
+    aspect: 'instance',
+    scope: 'auto',
+  });
 }

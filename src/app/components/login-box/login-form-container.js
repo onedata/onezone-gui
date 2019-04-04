@@ -9,24 +9,24 @@
  */
 
 import { notEmpty, gt, reads, not, equal } from '@ember/object/computed';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
-import LoginFormConainer from 'onedata-gui-common/components/login-box/login-form-container';
+import LoginFormContainer from 'onedata-gui-common/components/login-box/login-form-container';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const ANIMATION_TIMEOUT = 333;
 
-export default LoginFormConainer.extend(I18n, {
+export default LoginFormContainer.extend(I18n, {
   classNames: ['login-form-container'],
 
-  i18n: inject(),
-  globalNotify: inject(),
-  authorizerManager: inject(),
-  onezoneServer: inject(),
-  onedataConnection: inject(),
-  router: inject(),
+  i18n: service(),
+  globalNotify: service(),
+  authorizerManager: service(),
+  onezoneServer: service(),
+  onedataConnection: service(),
+  router: service(),
 
   /**
    * @override

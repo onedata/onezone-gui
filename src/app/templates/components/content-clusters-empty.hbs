@@ -1,0 +1,16 @@
+{{#content-info
+  class="scroll-breakpoint-500"
+  header=(tt this "title")
+  text=(tt this "text")
+}}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{#link-to "onedata.sidebar.content" "clusters" "add"}}
+          {{tt this "liAddLink"}}
+        {{/link-to}}
+        {{tt this "liAddDescription"}}
+      </li>
+    </ul>
+  </p>
+{{/content-info}}

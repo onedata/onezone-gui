@@ -11,7 +11,7 @@
     padding: $padding-large-vertical $padding-small-horizontal;
     padding-left: 50px;
     border-radius: $border-radius-base;
-    background-color: rgba(lighten($color-one-blue-gray, 49%), 0.8);
+    background-color: $color-one-light-blue;
     color: $color-one-blue-gray;
     .one-icon {
       @include vertical-align-middle();

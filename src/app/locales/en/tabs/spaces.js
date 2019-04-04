@@ -1,4 +1,5 @@
 export default {
+  menuItem: 'Data',
   aspects: {
     index: 'Space overview',
     providers: 'Space providers',

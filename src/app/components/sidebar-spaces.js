@@ -50,17 +50,25 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
 
   secondLevelItems: computed(function getSecondLevelItems() {
     return [{
-      id: 'index',
-      label: this.t('aspects.index'),
-      icon: 'overview',
-    }, {
-      id: 'providers',
-      label: this.t('aspects.providers'),
-      icon: 'provider',
-    }, {
-      id: 'members',
-      label: this.t('aspects.members'),
-      icon: 'group',
-    }];
+        id: 'index',
+        label: this.t('aspects.index'),
+        icon: 'overview',
+      },
+      // TODO: data aspect currently disabled as it is not finished for production
+      // {
+      //   id: 'data',
+      //   label: this.t('aspects.data'),
+      //   icon: 'folder',
+      // },
+      {
+        id: 'providers',
+        label: this.t('aspects.providers'),
+        icon: 'provider',
+      }, {
+        id: 'members',
+        label: this.t('aspects.members'),
+        icon: 'group',
+      },
+    ];
   }),
 });

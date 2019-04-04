@@ -1,0 +1,26 @@
+.content-providers {
+  position: absolute;
+  @include fill-container();
+  @media (max-width: $screen-xs-max) {
+    .provider-place-drop {
+      .drop-title-bar {
+        padding: $padding-base-vertical $padding-base-horizontal;
+      }
+      .btn-container {
+        text-align: center;
+      }
+      .row-btn {
+        &:not(:last-of-type) {
+            padding-bottom: 8px;
+        }
+        .btn {
+            display: inline-block;
+            padding: $padding-base-vertical $padding-large-horizontal;
+            font-size: 100%;
+            width: 280px;
+        }
+      }
+      
+    }
+  }
+}

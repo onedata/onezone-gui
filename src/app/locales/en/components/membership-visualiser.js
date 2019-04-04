@@ -3,12 +3,14 @@ export default {
   user: 'user',
   group: 'group',
   space: 'space',
+  cluster: 'cluster',
   showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
     viewGroup: 'View group',
     viewSpace: 'View space',
     viewProvider: 'View provider',
+    viewCluster: 'View cluster',
   },
   membershipRelation: {
     isMemberOf: 'is member of',
@@ -25,6 +27,8 @@ export default {
   membership: {
     descBeginning: '{{pathStartType}} "{{pathStartName}}" ',
     descPathFirstElement: 'is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
+    descPathIsEffectiveMember: 'is an effective member of {{elementType}} "{{elementName}}", however you do not have privileges to view the details of this membership',
+    descPathCentralIsEffectiveMember: ', which is an effective member of {{elementType}} "{{elementName}}", however you do not have privileges to view the details of this membership',
     descPathCentralElement: ', which is a member{{membershipType}} of {{elementType}} "{{elementName}}"',
     descSummary: ' All these relations make {{pathStartType}} "{{pathStartName}}" an indirect member of {{pathEndType}} "{{pathEndName}}".',
     descSubgroupType: ' (subgroup)',
@@ -34,5 +38,6 @@ export default {
     group: 'group',
     space: 'space',
     provider: 'provider',
+    cluster: 'cluster',
   },
 };

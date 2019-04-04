@@ -14,11 +14,11 @@ describe('Integration | Component | login box/social box list/social box',
     it('renders as box with svg image', function () {
       this.render(hbs `{{login-box/social-box-list/social-box
         authId="example"
-        iconPath="/assets/images/auth-providers/example.svg"
+        iconPath="/ozw/onezone/assets/images/auth-providers/example.svg"
       }}
       `);
       expect(this.$('.social-icon-image').attr('style'))
-        .to.contain('/assets/images/auth-providers/example.svg');
+        .to.contain('/ozw/onezone/assets/images/auth-providers/example.svg');
     });
 
     it('renders spinner in active state', function () {

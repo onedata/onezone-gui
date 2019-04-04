@@ -229,15 +229,18 @@ export default Mixin.create({
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  batchPrivilegesEditAction: computed('batchPrivilegesEditEnabled', function batchPrivilegesEditAction() {
-    return {
-      action: () => this.send('batchPrivilegesEdit'),
-      title: this.t('multiedit'),
-      class: 'batch-edit',
-      icon: 'rename',
-      disabled: !this.get('batchPrivilegesEditEnabled'),
-    };
-  }),
+  batchPrivilegesEditAction: computed(
+    'batchPrivilegesEditEnabled',
+    function batchPrivilegesEditAction() {
+      return {
+        action: () => this.send('batchPrivilegesEdit'),
+        title: this.t('multiedit'),
+        class: 'batch-edit',
+        icon: 'rename',
+        disabled: !this.get('batchPrivilegesEditEnabled'),
+      };
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Action>}

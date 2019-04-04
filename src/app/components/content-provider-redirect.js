@@ -8,16 +8,29 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { reads } from '@ember/object/computed';
 import Component from '@ember/component';
-import { inject } from '@ember/service';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { get, computed } from '@ember/object';
+import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import checkImg from 'onedata-gui-common/utils/check-img';
+import { Promise } from 'rsvp';
+import config from 'ember-get-config';
+
+const {
+  legacyOneproviderVersion,
+} = config;
 
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
 
-  onezoneServer: inject(),
+  onezoneServer: service(),
+  globalNotify: service(),
+  i18n: service(),
+  alert: service(),
+  router: service(),
+  guiUtils: service(),
 
   /**
    * @override 
@@ -47,37 +60,92 @@ export default Component.extend(I18n, {
    */
   _window: window,
 
-  /**
-   * @type {string}
-   */
-  providerId: reads('provider.entityId'),
+  goToProviderProxy: computed('spaceId', function goToProviderProxy() {
+    return PromiseObject.create({
+      promise: this._goToProvider(this.get('spaceId')),
+    });
+  }),
 
-  init() {
-    this._super(...arguments);
-    const {
-      providerId,
-      spaceId,
-    } = this.getProperties('providerId', 'spaceId');
-    if (providerId) {
-      this._goToProvider(providerId, spaceId);
-    } else {
-      safeExec(this, 'set', 'error', this.t('noProviderId'));
-    }
+  oneproviderOrigin: computed('provider.domain', function oneproviderOrigin() {
+    return `https://${this.get('provider.domain')}`;
+  }),
+
+  /**
+   * @returns {Promise<boolean>}
+   */
+  checkIsProviderAvailable() {
+    return checkImg(`${this.get('oneproviderOrigin')}/favicon.ico`);
   },
 
-  _goToProvider(providerId, spaceId) {
-    const path = spaceId ? `/#/onedata/data/${spaceId}` : null;
-    return this.get('onezoneServer').getProviderRedirectUrl(providerId, path)
-      .then(data => {
-        if (data.url) {
-          this.get('_window').location = data.url;
+  showEndpointErrorModal() {
+    const i18n = this.get('i18n');
+    this.get('alert').error(null, {
+      componentName: 'alerts/endpoint-error',
+      header: i18n.t('components.alerts.endpointError.headerPrefix') +
+        ' ' +
+        i18n.t('components.alerts.endpointError.oneprovider'),
+      url: this.get('oneproviderOrigin'),
+      serverType: 'oneprovider',
+    });
+  },
+
+  transitionToProviderOnMap(provider) {
+    const {
+      router,
+      guiUtils,
+    } = this.getProperties('router', 'guiUtils');
+    router.transitionTo(
+      'onedata.sidebar.content',
+      'providers',
+      guiUtils.getRoutableIdFor(provider)
+    );
+  },
+
+  throwEndpointError() {
+    throw { isOnedataCustomError: true, type: 'endpoint-error' };
+  },
+
+  resolveIsProviderVersionLegacy(provider) {
+    return get(provider, 'cluster')
+      .then(providerCluster => {
+        return get(providerCluster, 'workerVersion.release') ===
+          legacyOneproviderVersion;
+      });
+  },
+
+  redirectToProvider(provider, spaceId) {
+    const _window = this.get('_window');
+    const path = spaceId ? `onedata/data/${spaceId}` : '';
+    return this.resolveIsProviderVersionLegacy(provider).then(isLegacy => {
+      if (isLegacy) {
+        return this.get('onezoneServer')
+          .getProviderRedirectUrl(get(provider, 'id'), path)
+          .then(({ url }) => {
+            return new Promise(() => {
+              _window.location.replace(url);
+            });
+          });
+      } else {
+        const clusterId =
+          parseGri(provider.belongsTo('cluster').id()).entityId;
+        return new Promise(() => {
+          _window.location.replace(`/opw/${clusterId}/i#/${path}`);
+        });
+      }
+    });
+  },
+
+  _goToProvider(spaceId) {
+    const provider = this.get('provider');
+    return this.checkIsProviderAvailable()
+      .then(isAvailable => {
+        if (isAvailable) {
+          return this.redirectToProvider(provider, spaceId);
         } else {
-          safeExec(this, 'set', 'error', this.t('noUrlServer'));
+          this.showEndpointErrorModal();
+          this.transitionToProviderOnMap(provider);
+          this.throwEndpointError();
         }
-      })
-      .catch(error => {
-        safeExec(this, 'set', 'error', error);
-      })
-      .finally(() => safeExec(this, 'set', 'isLoading', false));
+      });
   },
 });

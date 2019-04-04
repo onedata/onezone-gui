@@ -37,7 +37,7 @@
                   {{#each providersProxy.content as |provider|}}
                     {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
                       {{#position.point}}
-                        {{#link-to "onedata.sidebar.content.aspect" "data" (model-routable-id provider) "index"}}
+                        {{#link-to "onedata.sidebar.content.aspect" "providers" (model-routable-id provider) "index"}}
                           {{provider-place
                             provider=provider
                             atlasWidth=atlas.width
@@ -74,7 +74,7 @@
     {{content-info
       header=(tt this "noSupport.header")
       text=(tt this "noSupport.text")
-      imagePath="assets/images/space-get-support.svg"
+      imagePath=(root-url "assets/images/space-get-support.svg")
       buttonLabel=(tt this "addStorage")
       class="no-support scroll-breakpoint-600"
       buttonAction=(action "openAddStorage")

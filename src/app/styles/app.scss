@@ -1,10 +1,8 @@
 @import 'onedata-gui-common';
 
-$large-social-box-size: 50px;
-
 // Project-specific styles
 @import 'authorizers-dropdown';
-@import 'content-data';
+@import 'content-providers';
 @import 'content-users';
 @import 'content-tokens';
 @import 'login-box';
@@ -18,6 +16,7 @@ $large-social-box-size: 50px;
 @import 'groups-hierarchy-visualiser';
 @import 'group-add-your-group-modal';
 @import 'membership-visualiser';
-@import 'resource-info-tile';
 @import 'resource-members-tile';
 @import 'resource-membership-tile';
+@import 'content-clusters-add';
+@import 'content-clusters-deregister';

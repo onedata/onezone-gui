@@ -2,12 +2,16 @@
 'use strict';
 
 var EmberApp = require('ember-cli/lib/broccoli/ember-app');
-const defineSassColors = require('./lib/onedata-gui-common/addon/utils/define-sass-colors');
+const defineSassColors = require(
+  './lib/onedata-gui-common/addon/utils/define-sass-colors'
+);
+const writeAppConfig = require('./lib/onedata-gui-common/addon/utils/write-app-config');
 const defineSassBreakpoints = require(
   './lib/onedata-gui-common/addon/utils/define-sass-breakpoints'
 );
 const colors = require('./lib/onedata-gui-common/addon/colors').default;
-const breakpointValues = require('./lib/onedata-gui-common/addon/breakpoint-values').default;
+const breakpointValues =
+  require('./lib/onedata-gui-common/addon/breakpoint-values').default;
 
 module.exports = function (defaults) {
   var app = new EmberApp(defaults, {
@@ -59,6 +63,8 @@ module.exports = function (defaults) {
       },
     },
   });
+
+  writeAppConfig(app);
 
   defineSassColors(app, colors);
   defineSassBreakpoints(app, breakpointValues);

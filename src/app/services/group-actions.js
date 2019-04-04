@@ -19,6 +19,7 @@ export default Service.extend(I18n, {
   guiUtils: inject(),
   groupManager: inject(),
   globalNotify: inject(),
+  currentUser: inject(),
 
   i18nPrefix: 'services.groupActions',
 
@@ -57,7 +58,11 @@ export default Service.extend(I18n, {
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
       class: 'join-group-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'groups', 'join'),
+      action: () => router.transitionTo(
+        'onedata.sidebar.content',
+        'groups',
+        'join'
+      ),
     };
   }),
 
@@ -187,6 +192,32 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Joins group to a cluster using token
+   * @param {Group} group 
+   * @param {string} token
+   * @returns {Promise<Models.Cluster>}
+   */
+  joinClusterAsGroup(group, token) {
+    const {
+      globalNotify,
+      groupManager,
+    } = this.getProperties('globalNotify', 'groupManager');
+    return groupManager.joinClusterAsGroup(group, token)
+      .then(cluster => {
+        globalNotify.success(this.t('joinClusterAsGroupSuccess', {
+          groupName: get(group, 'name'),
+          clusterName: get(cluster, 'name'),
+        }));
+        next(() => this.redirectToGroup(group));
+        return cluster;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningClusterAsGroup'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Deletes group
    * @param {Group} group
    * @returns {Promise}
@@ -285,11 +316,25 @@ export default Service.extend(I18n, {
     const {
       groupManager,
       globalNotify,
-    } = this.getProperties('groupManager', 'globalNotify');
+      currentUser,
+    } = this.getProperties('groupManager', 'globalNotify', 'currentUser');
     return groupManager.removeUserFromGroup(
       get(group, 'entityId'),
       get(user, 'entityId')
-    ).then(() => {
+    ).catch((error) => {
+      if (get(currentUser, 'userId') === get(user, 'entityId')) {
+        return groupManager.leaveGroup(get(group, 'id')).catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+      } else {
+        throw error;
+      }
+    }).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
         groupName: get(group, 'name'),
         userName: get(user, 'name'),

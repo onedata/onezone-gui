@@ -5,7 +5,7 @@
  *
  * @module routes/onedata/sidebar/content
  * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,8 @@ import OnedataSidebarContentRoute from 'onedata-gui-common/routes/onedata/sideba
 import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { underscore } from '@ember/string';
 
 /**
  * Finds GRI in griIds using pure entityId.
@@ -41,5 +43,22 @@ export default OnedataSidebarContentRoute.extend({
       collection.hasMany('list').ids() :
       get(collection, 'list').map(record => get(record, 'id'));
     return findGri(griIds, resourceId);
+  },
+
+  /**
+   * @override
+   */
+  findOutResourceId(resourceId, resourceType) {
+    const entityType = underscore(resourceType).replace(/s$/, '');
+    if (entityType) {
+      return gri({
+        entityId: resourceId,
+        entityType,
+        aspect: 'instance',
+        scope: 'auto',
+      });
+    } else {
+      return null;
+    }
   },
 });

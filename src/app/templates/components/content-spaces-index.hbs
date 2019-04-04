@@ -15,13 +15,7 @@
 
 <div class="row content-row">
   <div class="one-tile-container">
-    {{#resource-info-tile record=space}}
-      <tr>
-        <td class="property-name">{{tt this "sharedDirectories"}}</td>
-        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
-      </tr>
-    {{/resource-info-tile}}
-    {{#if dataProviderProxy}}
+    {{#if (and dataProviderProxy.isFulfilled dataProviderProxy.content)}}
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
@@ -34,6 +28,12 @@
         </figure>
       {{/one-tile}}
     {{/if}}
+    {{#resource-info-tile record=space}}
+      <tr>
+        <td class="property-name">{{tt this "sharedDirectories"}}</td>
+        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
+      </tr>
+    {{/resource-info-tile}}
     {{#if space.hasViewPrivilege}}
       {{#one-tile
         class="text-center resource-support-tile"
@@ -59,34 +59,18 @@
           {{/if}}
         {{/loading-container}}
       {{/one-tile}}
-      {{#one-tile
+      {{providers-map-tile
         class="resource-map-tile"
-        sizeClass="x2"
-        title=(tt this "tileProvidersMapTitle")
-        aspect=(if isSupported "providers" "support")}}
-        <div class="map-container">
-          {{#one-atlas class="space-providers-atlas" as |atlas|}}
-            {{#each providersProxy as |provider|}}
-              {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
-                {{#position.point}}
-                  {{provider-place
-                    provider=provider
-                    atlasWidth=atlas.width
-                    circleSizeScale=2
-                    circleColor=(get providersColors provider.entityId)
-                    hint=provider.name
-                    renderDrop=false}}
-                {{/position.point}}
-              {{/atlas.position}}
-            {{/each}}
-          {{/one-atlas}}
-        </div>
-      {{/one-tile}}
+        providersProxy=providersProxy
+        aspect=(if isSupported "providers" "support")
+        title=(tt this "tileProvidersMapTitle")}}
     {{/if}}
     {{#if space.hasViewPrivilege}}
       {{resource-members-tile record=space}}
     {{/if}}
-    {{resource-membership-tile record=space}}
+    {{#if showResourceMembershipTile}}
+      {{resource-membership-tile record=space}}
+    {{/if}}
     {{yield}}
   </div>
 </div>
