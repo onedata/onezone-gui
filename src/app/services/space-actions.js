@@ -95,7 +95,11 @@ export default Service.extend(I18n, {
         });
       })
       .catch(error => {
-        globalNotify.backendError(this.t('spaceCreation'), error);
+        if (error && get(error, 'name') === 'TransitionAborted') {
+          console.warn('Transition aborted occured when creating new space');
+        } else {
+          globalNotify.backendError(this.t('spaceCreation'), error);
+        }
         throw error;
       });
   },
