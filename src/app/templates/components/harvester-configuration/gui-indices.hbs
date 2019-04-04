@@ -74,7 +74,7 @@
                     {{#if (get indicesMapping guiPluginIndex.name)}}
                       {{#truncated-string class="assigned-index-name"}}{{get (get indicesMapping guiPluginIndex.name) "name"}}{{/truncated-string}}
                     {{else}}
-                      <span class="unspecified">{{tt this "notAssigned"}}</span>
+                      <img class="warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}> <span class="unspecified">{{tt this "notAssigned"}}</span>
                     {{/if}}
                   {{/if}}
                 </div>

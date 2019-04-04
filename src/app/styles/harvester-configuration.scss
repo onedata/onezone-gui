@@ -3,6 +3,10 @@
     color: $main-text-color-disabled;
     font-style: italic;
   }
+  .warning-icon {
+    height: 22px;
+    margin-right: 5px;
+  }
   .harvester-configuration-gui-upload {
     .upload-form {
       margin: ($line-height-computed / 2) 0;
