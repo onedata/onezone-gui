@@ -5,7 +5,7 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import Messages from 'ember-cp-validations/validators/messages';
-import { hash, Promise } from 'rsvp';
+import { hash, Promise, reject } from 'rsvp';
 import { A } from '@ember/array';
 import { isNone } from '@ember/utils';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -69,12 +69,17 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Model.Index>>}
    */
-  harvesterIndicesProxy: computed('harvester', function harvesterIndices() {
-    return PromiseArray.create({
-      promise: get(this.get('harvester'), 'indexList')
-        .then(indexList => get(indexList, 'list')),
-    });
-  }),
+  harvesterIndicesProxy: computed(
+    'harvester.hasViewPrivilege',
+    function harvesterIndices() {
+      const harvester = this.get('harvester');
+      return PromiseArray.create({
+        promise:get(harvester, 'hasViewPrivilege') !== false ?
+          get(harvester, 'indexList').then(list => list ? get(list, 'list') : A()) :
+          reject({ id: 'forbidden' }),
+      });
+    }
+  ),
 
   indicesMapping: computed(
     'guiPluginIndices.@each.name',
@@ -174,6 +179,7 @@ export default Component.extend(I18n, {
           set(selectedIndices, guiIndexName, assignedIndex);
         }
       });
+      this.validateGuiIndices();
     }
   }),
 

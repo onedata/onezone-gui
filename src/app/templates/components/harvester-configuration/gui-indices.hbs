@@ -1,4 +1,4 @@
-{{#if manifestProxy.manifest}}
+{{#if (and manifestProxy.manifest harvesterIndicesProxy.isFulfilled)}}
   <div class="pull-right">
     {{#if (eq mode "view")}}
       {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}

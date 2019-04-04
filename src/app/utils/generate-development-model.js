@@ -407,7 +407,7 @@ function createHarvesterRecords(store) {
         id: gri({
           entityType: 'harvester',
           entityId: get(record, 'entityId'),
-          aspect: 'config',
+          aspect: 'gui_plugin_config',
           scope: 'private',
         }),
         config: {

@@ -15,6 +15,8 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import { reject } from 'rsvp';
+import { A } from '@ember/array';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -61,10 +63,12 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Model.Space>>}
    */
-  spacesProxy: computed('harvester', function spacesProxy() {
+  spacesProxy: computed('harvester.hasViewPrivilege', function spacesProxy() {
     const harvester = this.get('harvester');
     return PromiseArray.create({
-      promise: get(harvester, 'spaceList').then(sl => get(sl, 'list')),
+      promise: get(harvester, 'hasViewPrivilege') !== false ?
+        get(harvester, 'spaceList').then(sl => sl ? get(sl, 'list') : A()) :
+        reject({ id: 'forbidden' }),
     });
   }),
 

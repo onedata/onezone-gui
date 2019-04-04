@@ -39,7 +39,7 @@
       </div>
     {{/form.group}}
     {{#form.group class="text-center"}}
-      {{#if indicesProxy.length}}
+      {{#if (or indicesProxy.length (not dataProxy.isFulfilled))}}
         {{#bs-button type="default" onClick=(action (mut isCreateIndexFormVisible) false)}}
           {{tt this "createIndexForm.cancel"}}
         {{/bs-button}}

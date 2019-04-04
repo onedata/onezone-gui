@@ -161,12 +161,9 @@ export default Service.extend(I18n, {
       router,
       guiUtils,
     } = this.getProperties('router', 'guiUtils');
-    let options = undefined;
-    if (queryParams) {
-      options = {
-        queryParams,
-      };
-    }
+    const options = {
+      queryParams: queryParams || {},
+    };
     return router.transitionTo(
       'onedata.sidebar.content.aspect',
       'harvesters',

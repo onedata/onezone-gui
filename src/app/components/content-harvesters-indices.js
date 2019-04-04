@@ -15,8 +15,9 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import { Promise } from 'rsvp';
+import { Promise, reject } from 'rsvp';
 import Messages from 'ember-cp-validations/validators/messages';
+import { A } from '@ember/array';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-indices'],
@@ -126,10 +127,12 @@ export default Component.extend(I18n, GlobalActions, {
   /**
    * @type {Ember.ComputedProperty<PromiseArray<Model.Index>>}
    */
-  indicesProxy: computed('harvester', function spacesProxy() {
+  indicesProxy: computed('harvester.hasViewPrivilege', function spacesProxy() {
     const harvester = this.get('harvester');
     return PromiseArray.create({
-      promise: get(harvester, 'indexList').then(list => get(list, 'list')),
+      promise: get(harvester, 'hasViewPrivilege') !== false ?
+        get(harvester, 'indexList').then(list => list ? get(list, 'list') : A()) :
+        reject({ id: 'forbidden' }),
     });
   }),
 
@@ -179,6 +182,7 @@ export default Component.extend(I18n, GlobalActions, {
         isFulfilled,
         length,
       } = getProperties(indicesProxy, 'isFulfilled', 'length');
+      indicesProxy.forEach(idx => idx.getIndexProgress());
       if (isFulfilled && !length && !isCreateIndexFormVisible) {
         this.set('isCreateIndexFormVisible', true);
       }

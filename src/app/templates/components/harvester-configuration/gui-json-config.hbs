@@ -1,13 +1,15 @@
-<div class="pull-right">
-  {{#if (eq mode "view")}}
-    {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
-  {{else}}
-    {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
-    {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
-      {{tt this "save"}}  
-    {{/one-spin-button}}
-  {{/if}}
-</div>
+{{#if configurationProxy.isFulfilled}}
+  <div class="pull-right">
+    {{#if (eq mode "view")}}
+      {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+    {{else}}
+      {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
+      {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
+        {{tt this "save"}}  
+      {{/one-spin-button}}
+    {{/if}}
+  </div>
+{{/if}}
 <h1>{{tt this "header"}}</h1>
 {{#promise-proxy-container proxy=configurationProxy}}
   {{json-editor

@@ -391,6 +391,7 @@ export default Service.extend({
       }),
       operation: 'create',
       data: indexRepresentation,
+      subscribe: false,
     }).then(() => reloadList ? this.reloadIndexList(harvesterEntityId): resolve());
   },
 

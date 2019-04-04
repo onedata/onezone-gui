@@ -70,7 +70,7 @@ export default {
         isAlreadyAssigned: 'This index is already assigned',
       },
       indicesUpdating: 'indices updating',
-      indicesUpdateSuccess: 'Indices has been update successfully',
+      indicesUpdateSuccess: 'Indices has been updated successfully',
     },
     guiJsonConfig: {
       header: 'Injected configuration',
