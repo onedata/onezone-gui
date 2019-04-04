@@ -157,6 +157,20 @@ export default Service.extend({
       ]));
   },
 
+  leaveCluster(clusterEntityId) {
+    const cluster = this.getLoadedClusterByEntityId(clusterEntityId);
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.leaveCluster(clusterEntityId))
+      .then(() =>
+        Promise.all([
+          this.reloadUserList(clusterEntityId).catch(ignoreForbiddenError),
+          this.reloadEffUserList(clusterEntityId).catch(ignoreForbiddenError),
+          this.reloadList(),
+          cluster ? cluster.reload().catch(ignoreForbiddenError) : resolve(),
+        ])
+      );
+  },
+
   /**
    * @param {string} clusterEntityId 
    * @param {string} userEntityId
@@ -187,6 +201,28 @@ export default Service.extend({
    * @param {string} groupEntityId
    * @returns {Promise}
    */
+  leaveClusterAsGroup(clusterEntityId, groupEntityId) {
+    return this.get('onedataGraphUtils').leaveRelation(
+      'group',
+      groupEntityId,
+      'cluster',
+      clusterEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadGroupList(clusterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(clusterEntityId).catch(ignoreForbiddenError),
+        this.reloadUserList(clusterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(clusterEntityId).catch(ignoreForbiddenError),
+        this.reloadList(),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} clusterEntityId 
+   * @param {string} groupEntityId
+   * @returns {Promise}
+   */
   removeMemberGroupFromCluster(clusterEntityId, groupEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
       'cluster',
@@ -197,6 +233,7 @@ export default Service.extend({
       Promise.all([
         this.reloadGroupList(clusterEntityId).catch(ignoreForbiddenError),
         this.reloadEffGroupList(clusterEntityId).catch(ignoreForbiddenError),
+        this.reloadUserList(clusterEntityId).catch(ignoreForbiddenError),
         this.reloadEffUserList(clusterEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
       ])
