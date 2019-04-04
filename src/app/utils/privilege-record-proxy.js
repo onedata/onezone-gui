@@ -229,9 +229,10 @@ export default EmberObject.extend({
 
   /**
    * Reloads all records according to specified griArray
+   * @param {boolean} forceReset
    * @returns {PromiseArray<Privilege>}
    */
-  reloadRecords() {
+  reloadRecords(forceReset = false) {
     const promiseArray = PromiseArray.create({
       promise: Promise.all(this.get('griArray').map(gri => {
         if (!gri) {
@@ -243,6 +244,12 @@ export default EmberObject.extend({
       })),
     });
     this.set('records', promiseArray);
+    promiseArray.catch(error => {
+      if (forceReset) {
+        safeExec(this, 'resetModifications');
+      }
+      throw error;
+    });
     promiseArray.then(() => {
       safeExec(this, 'resetModifications');
     });
@@ -318,7 +325,7 @@ export default EmberObject.extend({
     promise.then(() => {
       safeExec(this, () => {
         if (reloadRecords) {
-          return this.reloadRecords();
+          return this.reloadRecords(true);
         }
       });
     });

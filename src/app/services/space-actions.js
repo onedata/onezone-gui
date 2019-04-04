@@ -127,6 +127,26 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Leave space
+   * @param {models.Space} space
+   * @returns {Promise}
+   */
+  leaveSpace(space) {
+    const {
+      spaceManager,
+      globalNotify,
+    } = this.getProperties('spaceManager', 'globalNotify');
+    return spaceManager.leaveSpace(get(space, 'entityId'))
+      .then(() => {
+        globalNotify.success(this.t('spaceLeftSuccess'));
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('leavingSpace'), error);
+        throw error;
+      });
+  },
+
+  /**
    * Joins user to an existing space (without token)
    * @param {Space} space
    * @returns {Promise} A promise, which resolves to space if it has
@@ -202,10 +222,22 @@ export default Service.extend(I18n, {
       spaceManager,
       globalNotify,
     } = this.getProperties('spaceManager', 'globalNotify');
+    const spaceEntityId = get(space, 'entityId');
+    const groupEntityId = get(group, 'entityId');
     return spaceManager.removeGroupFromSpace(
-      get(space, 'entityId'),
-      get(group, 'entityId')
-    ).then(() => {
+      spaceEntityId,
+      groupEntityId
+    ).catch(error => {
+      return spaceManager.leaveSpaceAsGroup(spaceEntityId, groupEntityId)
+        .catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+    }).then(() => {
       globalNotify.success(this.t('removeGroupSuccess', {
         spaceName: get(space, 'name'),
         groupName: get(group, 'name'),
@@ -226,11 +258,25 @@ export default Service.extend(I18n, {
     const {
       spaceManager,
       globalNotify,
-    } = this.getProperties('spaceManager', 'globalNotify');
+      currentUser,
+    } = this.getProperties('spaceManager', 'globalNotify', 'currentUser');
     return spaceManager.removeUserFromSpace(
       get(space, 'entityId'),
       get(user, 'entityId')
-    ).then(() => {
+    ).catch(error => {
+      if (get(currentUser, 'userId') === get(user, 'entityId')) {
+        return spaceManager.leaveSpace(get(space, 'entityId')).catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+      } else {
+        throw error;
+      }
+    }).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
         spaceName: get(space, 'name'),
         userName: get(user, 'name'),

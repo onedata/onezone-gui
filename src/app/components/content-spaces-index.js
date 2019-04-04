@@ -30,6 +30,7 @@ export default Component.extend(
 
     currentUser: service(),
     globalNotify: service(),
+    spaceActions: service(),
     router: service(),
     guiUtils: service(),
     media: service(),
@@ -216,18 +217,7 @@ export default Component.extend(
 
     actions: {
       leave() {
-        const spaceId = this.get('spaceId');
-        return this.get('currentUser').getCurrentUserRecord()
-          .then(user =>
-            user.leaveSpace(spaceId)
-          )
-          .then(() => {
-            this.get('globalNotify').info(this.t('spaceLeftSuccess'));
-            this.get('router').transitionTo('onedata.sidebar.index');
-          })
-          .catch(error =>
-            this.get('globalNotify').backendError(this.t('leavingSpace'), error)
-          );
+        return this.get('spaceActions').leaveSpace(this.get('space'));
       },
       saveSpaceName(name) {
         const space = this.get('space');

@@ -101,8 +101,8 @@ export default Model.extend(GraphSingleModelMixin, {
     return this._leaveRelation('group', groupId);
   },
 
-  leaveCluster(groupId) {
-    return this._leaveRelation('cluster', groupId);
+  leaveCluster(clusterId) {
+    return this._leaveRelation('cluster', clusterId);
   },
 
   joinSpace(token) {
