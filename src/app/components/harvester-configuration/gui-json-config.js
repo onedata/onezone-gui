@@ -5,7 +5,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { isNone } from '@ember/utils';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { not, and, promise } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration-gui-json-config'],
@@ -31,6 +31,18 @@ export default Component.extend(I18n, {
   harvester: undefined,
 
   /**
+   * @virtual
+   * @type {utils.harvesterConfiguration.GuiPluginManifest}
+   */
+  manifestProxy: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isUploadingGui: false,
+
+  /**
    * @type {boolean}
    */
   isSaving: false,
@@ -49,15 +61,35 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<PromiseObject<models.HarvesterConfiguration>>}
    */
-  configurationProxy: computed(function configurationProxy() {
+  configurationProxy: promise.object(computed(function configurationProxy() {
     const {
       harvester, 
       harvesterManager,
     } = this.getProperties('harvester', 'harvesterManager');
-    return PromiseObject.create({
-      promise: harvesterManager.getConfig(get(harvester, 'entityId')),
-    });
-  }),
+    return harvesterManager.getConfig(get(harvester, 'entityId'));
+  })),
+
+  /**
+   * @type {Ember.ComputedProperty<Object|undefined>}
+   */
+  defaultConfiguration: reads('manifestProxy.defaultGuiConfigurationStringified'),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isUseDefaultsEnabled: and(
+    not('isUploadingGui'),
+    not('isSaving'),
+    'defaultConfiguration'
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<PromiseAray>}
+   */
+  dataLoadingProxy: promise.array(promise.all(
+    'configurationProxy',
+    'manifestProxy'
+  )),
 
   modeObserver: observer('mode', function modeObserver() {
     this.updateEditorValue();
@@ -81,9 +113,9 @@ export default Component.extend(I18n, {
     } = this.getProperties('mode', 'configurationProxy');
     let editorValue;
     if (mode === 'view') {
-      editorValue = reads('configurationProxy.stringifiedConfig');
+      editorValue = reads('configurationProxy.guiPluginConfigStringified');
     } else if (value === undefined) {
-      editorValue = get(configurationProxy, 'stringifiedConfig');
+      editorValue = get(configurationProxy, 'guiPluginConfigStringified');
     } else {
       editorValue = value;
     }
@@ -99,6 +131,10 @@ export default Component.extend(I18n, {
   actions: {
     edit() {
       this.set('mode', 'edit');
+    },
+    useDefaults() {
+      const defaultConfiguration = this.get('defaultConfiguration');
+      this.updateEditorValue(defaultConfiguration, true);
     },
     cancel() {
       this.set('mode', 'view');
@@ -126,8 +162,8 @@ export default Component.extend(I18n, {
         }
       }
 
-      const oldConfig = get(configuration, 'config');
-      set(configuration, 'config', newConfig);
+      const oldConfig = get(configuration, 'guiPluginConfig');
+      set(configuration, 'guiPluginConfig', newConfig);
       return configuration.save()
         .then(() => {
           globalNotify.info(this.t('configurationSaveSuccess'));
@@ -136,7 +172,7 @@ export default Component.extend(I18n, {
           });
         })
         .catch(error => {
-          set(configuration, 'config', oldConfig);
+          set(configuration, 'guiPluginConfig', oldConfig);
           globalNotify.backendError(this.t('savingConfiguration'), error);
         })
         .finally(() => {

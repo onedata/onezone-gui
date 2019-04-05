@@ -35,6 +35,24 @@ export default PromiseObject.extend({
     }
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<Object|undefined>}
+   */
+  defaultGuiConfiguration: reads('manifest.onedata.defaultGuiConfiguration'),
+
+  /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   */
+  defaultGuiConfigurationStringified: computed(
+    'defaultGuiConfiguration',
+    function defaultGuiConfigurationStringified() {
+      const defaultGuiConfiguration = this.get('defaultGuiConfiguration');
+      if (defaultGuiConfiguration !== undefined) {
+        return JSON.stringify(defaultGuiConfiguration, null, 2);
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
     this.loadManifest();

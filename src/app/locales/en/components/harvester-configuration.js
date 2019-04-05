@@ -75,6 +75,8 @@ export default {
     guiJsonConfig: {
       header: 'Injected configuration',
       edit: 'Edit',
+      useDefaults: 'Use defaults',
+      noDefaults: 'GUI plugin manifest does not provide any default configuration',
       cancel: 'Cancel',
       save: 'Save',
       configurationSaveSuccess: 'Configuration has been saved successfully',

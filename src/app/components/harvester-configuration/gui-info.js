@@ -14,7 +14,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.harvesterConfiguration.guiPlugin.guiInfo',
 
   /**
-   * @type {PromiseObject}
+   * @type {utils.harvesterConfiguration.GuiPluginManifest}
    */
   manifestProxy: undefined,
 

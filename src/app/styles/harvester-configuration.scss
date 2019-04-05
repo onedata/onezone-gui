@@ -101,10 +101,13 @@
         }
       }
     }
-    @media (max-width: $screen-xs-max) {
-      h1 {
-        padding: 0 0 $padding-small-vertical 0;
+    h1 {
+      padding: 0 0 $padding-small-vertical 0;
+      .header-buttons {
+        margin-bottom: $padding-small-vertical;
       }
+    }
+    @media (max-width: $screen-xs-max) {
       .index-info {
         .form-group {
           margin-top: $padding-small-vertical;

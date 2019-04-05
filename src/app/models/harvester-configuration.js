@@ -14,17 +14,20 @@ import { computed } from '@ember/object';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
-   * Contains configuration of the related harvester
+   * Contains configuration of the related harvester gui plugin
    * @type {Object}
    */
-  config: attr('object'),
+  guiPluginConfig: attr('object'),
 
   /**
    * Stringified, human-readable representation of config
    * @type {Ember.ComputedProperty<string>}
    */
-  stringifiedConfig: computed('config', function stringifiedConfig() {
-    const config = this.get('config');
-    return JSON.stringify(config, null, 2);
-  }),
+  guiPluginConfigStringified: computed(
+    'guiPluginConfig',
+    function guiPluginConfigStringified() {
+      const guiPluginConfig = this.get('guiPluginConfig');
+      return JSON.stringify(guiPluginConfig, null, 2);
+    }
+  ),
 });

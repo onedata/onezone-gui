@@ -48,7 +48,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Object}
+   * @type {utils.harvesterConfiguration.GuiPluginManifest}
    */
   manifestProxy: undefined,
 

@@ -1,17 +1,25 @@
-{{#if configurationProxy.isFulfilled}}
-  <div class="pull-right">
-    {{#if (eq mode "view")}}
-      {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
-    {{else}}
-      {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
-      {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
-        {{tt this "save"}}  
-      {{/one-spin-button}}
-    {{/if}}
-  </div>
-{{/if}}
-<h1>{{tt this "header"}}</h1>
-{{#promise-proxy-container proxy=configurationProxy}}
+<h1>
+  <span class="one-label">{{tt this "header"}}</span>
+  {{#if dataLoadingProxy.isFulfilled}}
+    <div class="pull-right header-buttons">
+      {{#if (eq mode "view")}}
+        {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
+      {{else}}
+        {{#bs-button type="default" size="sm" onClick=(action "useDefaults") disabled=(not isUseDefaultsEnabled)}}
+          {{#if (and (not isSaving) (not defaultConfiguration))}}
+            {{one-tooltip title=(tt this "noDefaults")}}
+          {{/if}}
+          {{tt this "useDefaults"}}
+        {{/bs-button}}
+        {{#bs-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/bs-button}}
+        {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
+          {{tt this "save"}}  
+        {{/one-spin-button}}
+      {{/if}}
+    </div>
+  {{/if}}
+</h1>
+{{#promise-proxy-container proxy=dataLoadingProxy}}
   {{json-editor
     value=editorValue
     disabled=isSaving
