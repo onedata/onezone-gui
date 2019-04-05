@@ -6,7 +6,4 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-3619 Porting login page components from oz-gui-detault
-* VFS-3676 Support for Graph API push messages (update/delete)
-* VFS-3883 Porting recent improvements in common components and utils from op-gui-default
-* VFS-3547 Prototype of Providers view (using backend mock)
+* VFS-4596 Unified GUI first version

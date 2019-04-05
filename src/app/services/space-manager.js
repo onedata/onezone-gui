@@ -70,6 +70,26 @@ export default Service.extend({
   },
 
   /**
+   * Removes user from a space
+   * @param {string} entityId
+   * @returns {Promise}
+   */
+  leaveSpace(entityId) {
+    const space = this.getLoadedSpaceByEntityId(entityId);
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.leaveSpace(entityId))
+      .then(destroyResult => {
+        return Promise.all([
+          this.reloadList(),
+          space ? space.reload().catch(ignoreForbiddenError) : resolve(),
+          this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
+          this.reloadUserList(entityId).catch(ignoreForbiddenError),
+          this.get('providerManager').reloadList(),
+        ]).then(() => destroyResult);
+      });
+  },
+
+  /**
    * Joins user to a space without token
    * @param {string} entityId
    * @returns {Promise}
@@ -177,6 +197,28 @@ export default Service.extend({
           this.get('providerManager').reloadList(),
           space ? space.reload().catch(ignoreForbiddenError) : resolve(),
         ])),
+      ])
+    );
+  },
+
+  /**
+   * @param {string} spaceEntityId 
+   * @param {string} groupEntityId
+   * @returns {Promise}
+   */
+  leaveSpaceAsGroup(spaceEntityId, groupEntityId) {
+    return this.get('onedataGraphUtils').leaveRelation(
+      'group',
+      groupEntityId,
+      'space',
+      spaceEntityId
+    ).then(() =>
+      Promise.all([
+        this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadList(),
+        this.get('providerManager').reloadList(),
+        this.get('groupManager').reloadSpaceList(groupEntityId)
+        .catch(ignoreForbiddenError),
       ])
     );
   },

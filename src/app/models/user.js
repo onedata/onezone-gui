@@ -102,12 +102,12 @@ export default Model.extend(GraphSingleModelMixin, {
     return this._leaveRelation('group', groupId);
   },
 
-  leaveHarvester(groupId) {
-    return this._leaveRelation('harvester', groupId);
+  leaveHarvester(harvesterId) {
+    return this._leaveRelation('harvester', harvesterId);
   },
 
-  leaveCluster(groupId) {
-    return this._leaveRelation('cluster', groupId);
+  leaveCluster(clusterId) {
+    return this._leaveRelation('cluster', clusterId);
   },
 
   joinSpace(token) {

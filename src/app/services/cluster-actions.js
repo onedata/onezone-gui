@@ -14,6 +14,7 @@ import { inject as service } from '@ember/service';
 export default ClusterActions.extend({
   clusterManager: service(),
   globalNotify: service(),
+  currentUser: service(),
   guiUtils: service(),
 
   /**
@@ -112,10 +113,22 @@ export default ClusterActions.extend({
       clusterManager,
       globalNotify,
     } = this.getProperties('clusterManager', 'globalNotify');
+    const clusterEntityId = get(cluster, 'entityId');
+    const groupEntityId = get(group, 'entityId');
     return clusterManager.removeMemberGroupFromCluster(
       get(cluster, 'entityId'),
       get(group, 'entityId')
-    ).then(() => {
+    ).catch(error => {
+      return clusterManager.leaveClusterAsGroup(clusterEntityId, groupEntityId)
+        .catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+    }).then(() => {
       globalNotify.success(this.t('removeGroupSuccess', {
         clusterName: get(cluster, 'name'),
         groupName: get(group, 'name'),
@@ -136,11 +149,27 @@ export default ClusterActions.extend({
     const {
       clusterManager,
       globalNotify,
-    } = this.getProperties('clusterManager', 'globalNotify');
+      currentUser,
+    } = this.getProperties('clusterManager', 'globalNotify', 'currentUser');
+    const clusterEntityId = get(cluster, 'entityId');
+    const userEntityId = get(user, 'entityId');
     return clusterManager.removeMemberUserFromCluster(
-      get(cluster, 'entityId'),
-      get(user, 'entityId')
-    ).then(() => {
+      clusterEntityId,
+      userEntityId
+    ).catch(error => {
+      if (get(currentUser, 'userId') === userEntityId) {
+        return clusterManager.leaveCluster(clusterEntityId).catch(error2 => {
+          if (get(error2 || {}, 'id') !== 'forbidden') {
+            console.error(error);
+            throw error2;
+          } else {
+            throw error;
+          }
+        });
+      } else {
+        throw error;
+      }
+    }).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
         clusterName: get(cluster, 'name'),
         userName: get(user, 'name'),

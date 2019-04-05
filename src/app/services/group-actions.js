@@ -318,15 +318,17 @@ export default Service.extend(I18n, {
       groupManager,
       globalNotify,
     } = this.getProperties('groupManager', 'globalNotify');
+    const parentEntityId = get(parent, 'entityId');
+    const childEntityId = get(child, 'entityId');
     return groupManager.removeGroupFromGroup(
-      get(parent, 'entityId'),
-      get(child, 'entityId')
-    ).then(() => {
-      globalNotify.success(this.t('removeSubgroupSuccess', {
-        parentGroupName: get(parent, 'name'),
-        childGroupName: get(child, 'name'),
-      }));
-    }).catch(error => {
+      parentEntityId,
+      childEntityId
+    ).catch(() =>
+      groupManager.leaveGroupAsGroup(parentEntityId, childEntityId)
+    ).then(() => globalNotify.success(this.t('removeSubgroupSuccess', {
+      parentGroupName: get(parent, 'name'),
+      childGroupName: get(child, 'name'),
+    }))).catch(error => {
       globalNotify.backendError(this.t('groupDeletion'), error);
       throw error;
     });
