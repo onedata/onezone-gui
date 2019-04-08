@@ -65,7 +65,9 @@ export default Service.extend({
    */
   reloadList() {
     return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.belongsTo('spaceList').reload(true));
+      .then(user => user.belongsTo('spaceList').reload(true))
+      .then(spaceList => get(spaceList, 'list'))
+      .then(list => list.reload());
   },
 
   /**
