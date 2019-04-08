@@ -61,4 +61,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   hasViewPrivilege: equal('scope', 'private'),
+
+  /**
+   * True if user is an effective member of that harvester
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isEffectiveMember: computed('scope', function isEffectiveMember() {
+    return ['private', 'protected'].includes(this.get('scope'));
+  }),
 });

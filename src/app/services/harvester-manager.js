@@ -10,7 +10,7 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { Promise, resolve } from 'rsvp';
+import { Promise, resolve, reject } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -165,18 +165,48 @@ export default Service.extend({
    * @returns {Promise}
    */
   removeGroupFromHarvester(harvesterEntityId, groupEntityId) {
-    return this.get('onedataGraphUtils').leaveRelation(
-      'harvester',
-      harvesterEntityId,
-      'group',
-      groupEntityId
-    ).then(() =>
-      Promise.all([
+    const {
+      onedataGraphUtils,
+      groupManager,
+    } = this.getProperties('onedataGraphUtils', 'groupManager');
+    const harvester = this.getLoadedHarvesterByEntityId(harvesterEntityId);
+    const group = groupManager.getLoadedGroupByEntityId(groupEntityId);
+    const isEffMemberOfHarvester =
+      !harvester || get(harvester, 'isEffectiveMember');
+    const isEffMemberOfGroup = !group || get(group, 'isEffectiveMember');
+    if (!isEffMemberOfHarvester && !isEffMemberOfGroup) {
+      return reject({ id: 'forbidden' });
+    } else {
+      const leavePromise = isEffMemberOfGroup ?
+        onedataGraphUtils.leaveRelation(
+          'group',
+          groupEntityId,
+          'harvester',
+          harvesterEntityId,
+        ) : reject(null);
+      return leavePromise.catch(leaveError => {
+        const removePromise = isEffMemberOfHarvester ?
+        onedataGraphUtils.leaveRelation(
+          'harvester',
+          harvesterEntityId,
+          'group',
+          groupEntityId,
+        ) : reject(null);
+        return removePromise.catch(removeError => {
+          const meaningfulErrors = [leaveError, removeError]
+            .without(null).rejectBy('id', 'forbidden');
+          if (meaningfulErrors[1]) {
+            console.error(meaningfulErrors[1]);
+          }
+          throw meaningfulErrors[0] || { id: 'forbidden' };
+        });
+      }).then(() => Promise.all([
         this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
         this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
-      ])
-    );
+      ]));
+    }
   },
 
   /**
