@@ -32,7 +32,16 @@
     actionsArg=index}}
 {{/listItem.header}}
 {{#listItem.content}}
-  <div class="index-details-container">
-    <textarea class="schema-textarea form-control" rows="10" disabled="disabled">{{index.schema}}</textarea>
-  </div>
+  {{#bs-tab
+    class="bs-tab-onedata bs-tab-modern"
+    as |tab|}}
+    {{#tab.pane elementId=(concat elementId "-progress-tab") title=(tt this "harvestingProgress")}}
+      {{#render-later triggerRender=listItem.isActive}}
+        {{content-harvesters-indices/progress-table index=index harvester=harvester}}
+      {{/render-later}}
+    {{/tab.pane}}
+    {{#tab.pane elementId=(concat elementId "-schema-tab") title=(tt this "schema")}}
+      <textarea class="schema-textarea form-control" rows="10" readonly="readonly">{{index.schema}}</textarea>
+    {{/tab.pane}}
+  {{/bs-tab}}
 {{/listItem.content}}

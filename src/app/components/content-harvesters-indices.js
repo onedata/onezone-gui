@@ -182,7 +182,6 @@ export default Component.extend(I18n, GlobalActions, {
         isFulfilled,
         length,
       } = getProperties(indicesProxy, 'isFulfilled', 'length');
-      indicesProxy.forEach(idx => idx.getIndexProgress());
       if (isFulfilled && !length && !isCreateIndexFormVisible) {
         this.set('isCreateIndexFormVisible', true);
       }

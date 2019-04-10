@@ -1,9 +1,16 @@
 .content-harvesters-indices {
   .schema-textarea {
     font-family: monospace;
+    resize: none;
   }
   .one-collapsible-list .list-header-row {
     padding-right: 140px;
+  }
+  .one-collapsible-list-item-header.opened {
+    border-bottom: 0;
+  }
+  .one-collapsible-list-item-content.opened {
+    max-height: 4000px;
   }
   .index-name-editor {
     display: inline-block;
@@ -19,6 +26,169 @@
     margin: $padding-large-horizontal;
     .schema-textarea {
       resize: none;
+    }
+  }
+  .nav-tabs {
+    padding: 0 $padding-large-horizontal;
+    background-color: $collapsible-list-item-header-opened;
+  }
+  .tab-content {
+    background-color: $main-content-hover-background;
+  }
+  .content-harvesters-indices-progress-table {
+    $table-breakpoint: 1200px;
+    $space-name-width: 120px;
+    $dot-size: 50px;
+
+    min-height: 160px;
+    position: relative;
+
+    @media (min-width: $table-breakpoint + 1) {
+      $labels-font-size: 90%;
+
+      .progress-table-container {
+        width: calc(100% - #{$space-name-width});
+        margin-left: $space-name-width;
+        overflow-x: auto;
+        overflow-y: visible;
+      }
+
+      .table {
+        width: initial;
+        max-width: initial;
+        margin-left: 30px;
+        margin-bottom: 60px;
+        .space-name {
+          position: absolute;
+          top: auto;
+          left: 0;
+          transform: translateY(0.5em);
+          padding-right: $padding-base-vertical;
+          padding-left: 0;
+          width: $space-name-width;
+          height: $dot-size * 1.5;
+          min-width: $space-name-width;
+          overflow: hidden;
+          text-align: right;
+          font-size: $labels-font-size;
+          word-break: break-all;
+        }
+      }
+      
+      .provider-name {
+        transform: translateX(-40%) rotate(-45deg);
+        transform-origin: right center;
+        overflow: hidden;
+        word-break: break-all;
+        line-height: 1;
+        text-align: right;
+        font-size: $labels-font-size;
+      }
+      .dot-cell {
+        height: $dot-size * 1.5;
+        width: $dot-size * 1.5;
+      }
+      td {
+        max-width: $dot-size * 1.75;
+        width: $dot-size * 1.75;
+        min-width: $dot-size * 1.75;
+      }
+    }
+
+    @media (max-width: $table-breakpoint) {
+      .table {
+        width: 100%;
+        font-size: 100%;
+        margin-bottom: -$table-cell-padding;
+        .progress-dot {
+          left: initial;
+          right: 0;
+          transform: translateY(-50%);
+        }
+        tbody {
+          tr, tr.active {
+            td {
+              &.row-header {
+                padding: $table-cell-padding 3em $table-cell-padding 0;
+                &::before {
+                  width: auto;
+                  right: 0;
+                }
+              }
+              &.dot-cell {
+                &::before {
+                  width: calc(100% - #{$dot-size * 1.5});
+                  line-height: $dot-size * 1.5 - 2 * $table-cell-padding;
+                  font-weight: normal;
+                  white-space: nowrap;
+                  text-align: left;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
+            }
+          }
+        }
+      }
+      .space-name {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+        font-family: 'Open Sans Semibold';
+      }
+      tr.active td {
+        padding: $table-cell-padding 0;
+      }
+    }
+
+    .table {
+      table-layout: fixed;
+    }
+
+    // Chrome hack
+    .table:not(.bt) .space-name {
+      position: absolute;
+    }
+
+    td {
+      border: 0;
+    }
+
+    .dot-cell {
+      position: relative;
+    }
+
+    .provider-names td {
+      padding: 0 0 0 0;
+    }
+    .progress-dot {
+      @include absolute-align-middle-center();
+      width: $dot-size;
+      height: $dot-size;
+      border-radius: 100%;
+      text-align: center;
+      line-height: $dot-size;
+      color: $color-one-white;
+      font-family: 'Open Sans Semibold';
+      &.danger {
+        background-color: $color-one-danger;
+      }
+      &.warning {
+        background-color: $color-one-warning;
+      }
+      &.success {
+        background-color: $color-one-success;
+      }
+      &.not-supported {
+        opacity: 0.1;
+        background-size: contain;
+        background-image: url($root-url + 'images/x-circle-empty.svg');
+        background-repeat: no-repeat;
+        background-position: right center;
+      }
     }
   }
 }

@@ -12,6 +12,7 @@ import attr from 'ember-data/attr';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
+import { computed } from '@ember/object';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
@@ -30,13 +31,18 @@ export default Model.extend(GraphSingleModelMixin, {
   guiPluginName: attr('string'),
 
   /**
-   * @returns {models.IndexProgress}
+   * @type {Ember.ComputedProperty<models.IndexProgress>}
    */
-  getIndexProgress() {
-    const progressGri = gri(_.assign(
-      { aspect: 'index_progress', scope: 'private' },
-      this.getProperties('entityType', 'entityId', 'aspectId'))
-    );
-    return this.get('store').findRecord('index-progress', progressGri);
-  },
+  progress: computed(
+    'entityType',
+    'entityId',
+    'aspectId',
+    function indexProgress() {
+      const progressGri = gri(_.assign(
+        { aspect: 'index_progress', scope: 'private' },
+        this.getProperties('entityType', 'entityId', 'aspectId'))
+      );
+      return this.get('store').findRecord('index-progress', progressGri);
+    }
+  ),
 });

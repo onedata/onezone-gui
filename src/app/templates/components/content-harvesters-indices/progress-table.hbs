@@ -1,0 +1,52 @@
+
+{{#promise-proxy-container proxy=dataLoadingProxy}}
+  {{#if progressData.length}}
+    <div class="progress-table-container">
+      {{#basic-table breakpoint=breakpoint class="table dropdown-table-rows"}}
+        <thead>
+          <tr class="hidden">
+            <th class="space-name"></th>
+            {{#each providers as |provider|}}
+              <th class="provider-name">{{provider.name}}</th>
+            {{/each}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each progressData as |spaceProgress|}}
+            <tr class={{if (contains spaceProgress.space expandedRows) "active"}}>
+              <td class="space-name row-header" {{action (action "rowHeaderClick" spaceProgress.space) on="click"}}>
+                <span>
+                  {{#unless isTableCollapsed}}
+                    {{one-tooltip title=spaceProgress.space.name}}
+                  {{/unless}}
+                  {{spaceProgress.space.name}}
+                </span>
+              </td>
+              {{#each spaceProgress.progress as |providerProgress|}}
+                <td class="dot-cell">
+                  <div class="progress-dot {{if providerProgress.isSupported providerProgress.valueClass "not-supported"}}">
+                    {{#if providerProgress.isSupported}}
+                      {{providerProgress.percent}}%
+                    {{else}}
+                      {{one-tooltip title=(tt this "noData" spaceName=spaceProgress.space.name providerName=providerProgress.provider.name)}}
+                    {{/if}}
+                  </div>
+                </td>
+              {{/each}}
+            </tr>
+          {{/each}}
+          <tr class="provider-names">
+            <td class="space-name"></td>
+            {{#each providers as |provider|}}
+              <td class="provider-name">{{provider.name}}</td>
+            {{/each}}
+          </tr>
+        </tbody>
+      {{/basic-table}}
+    </div>
+  {{else}}
+    <p class="nothing-to-harvest text-center absolute-align-middle-center">
+      {{tt this "nothingToHarvest"}}
+    </p>
+  {{/if}}
+{{/promise-proxy-container}}
