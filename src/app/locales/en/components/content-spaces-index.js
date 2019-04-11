@@ -7,8 +7,6 @@ export default {
   editSpaceNameHint: 'Change space name',
   toggleDefault: 'Toggle default space',
   changingDefaultSpace: 'changing default space',
-  leavingSpace: 'leaving space',
-  spaceLeftSuccess: 'Space left successfully',
   tileDataTitle: 'Data',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
