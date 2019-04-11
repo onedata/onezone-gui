@@ -16,6 +16,8 @@ import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
+export const sessionExpiredCookie = 'sessionExpired';
+
 /**
  * Maps: state number => state name (eg. 2 => connecting) of ReconnectorState
  */
@@ -27,6 +29,7 @@ const stateNames = Object.keys(ReconnectorState).reduce((prev, key) => {
 export default Component.extend(I18n, {
   onedataWebsocketErrorHandler: service(),
   globalNotify: service(),
+  session: service(),
 
   /**
    * @override
@@ -153,13 +156,23 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   reconnectFailure(error) {
+    const globalNotify = this.get('globalNotify');
+    globalNotify.warning(this.t('connectionFailed'));
+    safeExec(this, 'set', 'lastError', error);
+
+    if (isInvalidSessionError(error)) {
+      this.handleInvalidSessionReconnectFailure(error);
+    } else {
+      this.handleCommonReconnectFailure(error);
+    }
+  },
+
+  handleCommonReconnectFailure( /* error */ ) {
     const {
       currentAttempt,
       maxAttempts,
-      globalNotify,
-    } = this.getProperties('currentAttempt', 'maxAttempts', 'globalNotify');
-    globalNotify.warning(this.t('connectionFailed'));
-    safeExec(this, 'set', 'lastError', error);
+    } = this.getProperties('currentAttempt', 'maxAttempts');
+
     if (currentAttempt >= maxAttempts) {
       this.set('currentAttempt', maxAttempts);
       this.setReconnectorState(ReconnectorState.timeout);
@@ -167,6 +180,17 @@ export default Component.extend(I18n, {
       this.setReconnectorState(ReconnectorState.waiting);
       this.scheduleNextAttempt();
     }
+  },
+
+  handleInvalidSessionReconnectFailure() {
+    const {
+      session,
+      cookies,
+    } = this.getProperties('session', 'cookies');
+    // must use cookies, because after invalidation,
+    // the app is reloaded by ember-simple-auth
+    cookies.write(sessionExpiredCookie, '1', { path: '/' });
+    return session.invalidate();
   },
 
   /**
@@ -233,3 +257,8 @@ export default Component.extend(I18n, {
     },
   },
 });
+
+export function isInvalidSessionError(error) {
+  return error && error.isOnedataCustomError &&
+    error.type === 'fetch-token-error' && error.reason === 'unauthorized';
+}
