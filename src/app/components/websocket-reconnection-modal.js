@@ -30,6 +30,7 @@ export default Component.extend(I18n, {
   onedataWebsocketErrorHandler: service(),
   globalNotify: service(),
   session: service(),
+  cookies: service(),
 
   /**
    * @override
@@ -82,6 +83,18 @@ export default Component.extend(I18n, {
    * @type {number}
    */
   reconnectorState: reads('onedataWebsocketErrorHandler.reconnectorState'),
+
+  /**
+   * @type {CloseEvent}
+   */
+  currentCloseEvent: reads('onedataWebsocketErrorHandler.currentCloseEvent'),
+
+  /**
+   * @type {boolean}
+   */
+  currentOpeningCompleted: reads(
+    'onedataWebsocketErrorHandler.currentOpeningCompleted'
+  ),
 
   /**
    * @type {boolean}
@@ -147,7 +160,7 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   close() {
-    this.setReconnectorState(ReconnectorState.closed);
+    this.get('onedataWebsocketErrorHanlder').resetState();
   },
 
   /**

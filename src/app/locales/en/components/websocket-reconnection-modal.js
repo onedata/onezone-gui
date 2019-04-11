@@ -3,7 +3,7 @@ export default {
   textWaitingIntro: 'The connection to Onezone server has been lost.',
   textWaitingAttempting: 'Attempting to estabilish WebSocket connection',
   textWaitingTry: '(try {{currentAttempt}} of {{maxAttempts}})',
-  textWaitingTimeout: 'Automatic reconnection failed – try connect with the button below or refresh the page.',
+  textWaitingTimeout: 'Automatic reconnection failed – try to connect with the button below or reload the page.',
   textNextAttempt: 'Next attempt in',
   seconds: 'seconds',
   second: 'second',

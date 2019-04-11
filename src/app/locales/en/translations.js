@@ -59,6 +59,7 @@ import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
+import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -134,6 +135,7 @@ let translations = {
     resourceMembersTile,
     resourceMembershipTile,
     websocketReconnectionModal,
+    fatalConnectionErrorModal,
   },
   services: {
     clientTokenActions,
