@@ -115,10 +115,10 @@ export default Component.extend(I18n, {
 
   redirectToProvider(provider, spaceId, isLegacy) {
     const _window = this.get('_window');
-    const path = spaceId ? `onedata/data/${spaceId}` : '';
+    const path = spaceId ? `/#/onedata/data/${spaceId}` : '';
     if (isLegacy) {
       return this.get('onezoneServer')
-        .getProviderRedirectUrl(get(provider, 'id'), path)
+        .getProviderRedirectUrl(get(provider, 'entityId'), path)
         .then(({ url }) => {
           return new Promise(() => {
             _window.location.replace(url);
