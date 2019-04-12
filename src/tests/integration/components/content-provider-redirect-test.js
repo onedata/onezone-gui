@@ -77,11 +77,12 @@ describe('Integration | Component | content provider redirect', function () {
         'getProviderRedirectUrl'
       ).resolves({ url: legacyUrl });
       const fakeWindow = new FakeWindow();
-      this.setProperties({ provider, fakeWindow });
-      this.on('checkIsProviderAvailable', () => resolve(true));
+      const checkIsProviderAvailable = sinon.stub().resolves(true);
+
+      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
 
       this.render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=(action "checkIsProviderAvailable")
+        checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
         _window=fakeWindow
       }}`);
@@ -121,16 +122,18 @@ describe('Integration | Component | content provider redirect', function () {
       ).resolves({ url: legacyUrl });
 
       const fakeWindow = new FakeWindow();
-      this.setProperties({ provider, fakeWindow });
-      this.on('checkIsProviderAvailable', () => resolve(true));
+      const checkIsProviderAvailable = sinon.stub().resolves(false);
+
+      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
 
       this.render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=(action "checkIsProviderAvailable")
+        checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
         _window=fakeWindow
       }}`);
 
       wait().then(() => {
+        expect(checkIsProviderAvailable).to.be.notCalled;
         expect(getProviderRedirectUrl).to.be.invokedOnce;
         expect(fakeWindow.location.toString()).to.equal(legacyUrl);
         done();

@@ -15,7 +15,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 import config from 'ember-get-config';
 
 const {
@@ -113,39 +113,39 @@ export default Component.extend(I18n, {
       });
   },
 
-  redirectToProvider(provider, spaceId) {
+  redirectToProvider(provider, spaceId, isLegacy) {
     const _window = this.get('_window');
     const path = spaceId ? `onedata/data/${spaceId}` : '';
-    return this.resolveIsProviderVersionLegacy(provider).then(isLegacy => {
-      if (isLegacy) {
-        return this.get('onezoneServer')
-          .getProviderRedirectUrl(get(provider, 'id'), path)
-          .then(({ url }) => {
-            return new Promise(() => {
-              _window.location.replace(url);
-            });
+    if (isLegacy) {
+      return this.get('onezoneServer')
+        .getProviderRedirectUrl(get(provider, 'id'), path)
+        .then(({ url }) => {
+          return new Promise(() => {
+            _window.location.replace(url);
           });
-      } else {
-        const clusterId =
-          parseGri(provider.belongsTo('cluster').id()).entityId;
-        return new Promise(() => {
-          _window.location.replace(`/opw/${clusterId}/i#/${path}`);
         });
-      }
-    });
+    } else {
+      const clusterId =
+        parseGri(provider.belongsTo('cluster').id()).entityId;
+      return new Promise(() => {
+        _window.location.replace(`/opw/${clusterId}/i#/${path}`);
+      });
+    }
   },
 
   _goToProvider(spaceId) {
     const provider = this.get('provider');
-    return this.checkIsProviderAvailable()
+    return this.resolveIsProviderVersionLegacy(provider).then(isLegacy => {
+      (isLegacy ? resolve(true) : this.checkIsProviderAvailable())
       .then(isAvailable => {
         if (isAvailable) {
-          return this.redirectToProvider(provider, spaceId);
+          return this.redirectToProvider(provider, spaceId, isLegacy);
         } else {
           this.showEndpointErrorModal();
           this.transitionToProviderOnMap(provider);
           this.throwEndpointError();
         }
       });
+    });
   },
 });
