@@ -43,23 +43,17 @@ export default Component.extend(I18n, {
   _location: location,
 
   /**
-   * Number of automatic (scheduled) reconnect attempt; resetted on modal show.
+   * Number of automatic (scheduled) reconnect attempt; reset on modal show.
    * @type {Number}
    */
   currentAttempt: 0,
 
   /**
-   * Max numbers of automatic reconnect attempts, after which reconnection
+   * Max number of automatic reconnect attempts, after which reconnection
    * will be invoked only with button.
    * @type {Number}
    */
   maxAttempts: 10,
-
-  /**
-   * Last error thrown by connection method. Currently not used.
-   * @type {any}
-   */
-  lastError: null,
 
   /**
    * How many seconds longer each attempt should wait relative to previous.
@@ -148,7 +142,6 @@ export default Component.extend(I18n, {
    */
   open() {
     safeExec(this, 'setProperties', {
-      lastError: null,
       currentAttempt: 0,
       secondsRemaining: 0,
     });
@@ -171,7 +164,6 @@ export default Component.extend(I18n, {
   reconnectFailure(error) {
     const globalNotify = this.get('globalNotify');
     globalNotify.warning(this.t('connectionFailed'));
-    safeExec(this, 'set', 'lastError', error);
 
     if (isInvalidSessionError(error)) {
       this.handleInvalidSessionReconnectFailure(error);
@@ -241,7 +233,7 @@ export default Component.extend(I18n, {
 
   /**
    * Start reconnection procedure
-   * @returns {Promise} resolves wher reconnected sucessfully
+   * @returns {Promise} resolves when reconnected sucessfully
    */
   reconnectAttempt() {
     this.setReconnectorState(ReconnectorState.connecting);

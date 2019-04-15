@@ -28,13 +28,31 @@ export default Component.extend(I18n, {
 
   _location: location,
 
+  /**
+   * Globally set current error of WebSocket connection.
+   * @type {ComputedProperty<string|undefined>}
+   */
   error: reads('onedataWebsocketErrorHandler.currentError'),
 
+  /**
+   * Show this modal only when the global WS connection error is set.
+   * @type {ComputedProperty<boolean>}
+   */
   opened: notEmpty('error'),
 
+  /**
+   * If the error that was thrown on WS connection is known to us,
+   * show some additional info. It's one of translation keys found in
+   * `components.fatalConnectionErrorModal.specialReason`.
+   * @type {ComputedProperty<string|undefined>}
+   */
   specialReason: computed('error', function specialReason() {
     const isSafari = (this.get('browser.browser.browserCode') === 'safari');
     const error = this.get('error');
+    // In old versions of Safari, you can enter the website with invalid
+    // certificate (not added to trusted), but then the WebSocket connection
+    // cannot be estabilished. In that case, Safari closes the connection before
+    // it's opened. In this case we show some explanation to user.
     if (error && error.isCustomOnedataError &&
       error.type === closedBeforeOpenCode && isSafari) {
       return 'safariCert';
