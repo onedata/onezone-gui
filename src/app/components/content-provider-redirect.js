@@ -44,10 +44,16 @@ export default Component.extend(I18n, {
   provider: undefined,
 
   /**
-   * @virutal optional
+   * @virtual optional
    * @type {string}
    */
   spaceId: undefined,
+
+  /**
+   * @virtual optional
+   * @type {string} one of: data, shares, transfers
+   */
+  resourceType: undefined,
 
   /**
    * @type {boolean}
@@ -60,9 +66,13 @@ export default Component.extend(I18n, {
    */
   _window: window,
 
-  goToProviderProxy: computed('spaceId', function goToProviderProxy() {
+  goToProviderProxy: computed('spaceId', 'resourceType', function goToProviderProxy() {
+    const {
+      spaceId,
+      resourceType,
+    } = this.getProperties('spaceId', 'resourceType');
     return PromiseObject.create({
-      promise: this._goToProvider(this.get('spaceId')),
+      promise: this._goToProvider(spaceId, resourceType),
     });
   }),
 
@@ -113,12 +123,17 @@ export default Component.extend(I18n, {
       });
   },
 
-  redirectToProvider(provider, spaceId, isLegacy) {
+  redirectToProvider({ provider, spaceId, resourceType, isLegacy = false }) {
     const _window = this.get('_window');
-    const path = spaceId ? `/#/onedata/data/${spaceId}` : '';
+    const _resourceType = resourceType || spaceId && 'data';
+    const path = (spaceId || _resourceType) ?
+      `#/onedata/${_resourceType}/${spaceId}` :
+      '#/';
     if (isLegacy) {
       return this.get('onezoneServer')
-        .getProviderRedirectUrl(get(provider, 'entityId'), path)
+        // legacy services needs a leading / because redirector does not
+        // work when path starts with /
+        .getProviderRedirectUrl(get(provider, 'entityId'), `/${path}`)
         .then(({ url }) => {
           return new Promise(() => {
             _window.location.replace(url);
@@ -128,18 +143,23 @@ export default Component.extend(I18n, {
       const clusterId =
         parseGri(provider.belongsTo('cluster').id()).entityId;
       return new Promise(() => {
-        _window.location.replace(`/opw/${clusterId}/i#/${path}`);
+        _window.location.replace(`/opw/${clusterId}/i${path}`);
       });
     }
   },
 
-  _goToProvider(spaceId) {
+  _goToProvider(spaceId, resourceType) {
     const provider = this.get('provider');
     return this.resolveIsProviderVersionLegacy(provider).then(isLegacy => {
       (isLegacy ? resolve(true) : this.checkIsProviderAvailable())
       .then(isAvailable => {
         if (isAvailable) {
-          return this.redirectToProvider(provider, spaceId, isLegacy);
+          return this.redirectToProvider({
+            provider,
+            resourceType,
+            spaceId,
+            isLegacy,
+          });
         } else {
           this.showEndpointErrorModal();
           this.transitionToProviderOnMap(provider);

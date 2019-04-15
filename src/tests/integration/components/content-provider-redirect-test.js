@@ -49,8 +49,8 @@ describe('Integration | Component | content provider redirect', function () {
     registerService(this, 'alert', AlertStub);
   });
 
-  it('redirect to Oneprovider hosted in Onezone URL',
-    function (done) {
+  it('redirects to Oneprovider hosted in Onezone URL',
+    function () {
       const clusterEntityId = '12345';
       const provider = {
         entityId: 'test1',
@@ -90,10 +90,9 @@ describe('Integration | Component | content provider redirect', function () {
       const $contentProviderRedirect = this.$('.content-provider-redirect');
       expect($contentProviderRedirect).to.exist;
 
-      wait().then(() => {
+      return wait().then(() => {
         expect(getProviderRedirectUrl).to.be.invokedOnce;
         expect(fakeWindow.location.toString()).to.equal(url);
-        done();
       });
     });
 
