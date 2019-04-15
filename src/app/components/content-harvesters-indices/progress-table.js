@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
     'index',
     function indexProgressProxy() {
       const index = this.get('index');
-      return get(index, 'progress');
+      return index.getProgress();
     }
   )),
 
@@ -290,8 +290,21 @@ export default Component.extend(I18n, {
       const {
         _window,
         windowResizeHandler,
-      } = this.getProperties('_window', 'windowResizeHandler');
+        indexProgressProxy,
+      } = this.getProperties(
+        '_window',
+        'windowResizeHandler',
+        'indexProgressProxy'
+      );
       $(_window).off('resize', windowResizeHandler);
+      
+      const {
+        content: indexProgress,
+        isFulfilled: isIndexProgressProxyFulfilled,
+      } = getProperties(indexProgressProxy, 'content', 'isFulfilled');
+      if (isIndexProgressProxyFulfilled) {
+        indexProgress.unloadRecord();
+      }
     } finally {
       this._super(...arguments);
     }
