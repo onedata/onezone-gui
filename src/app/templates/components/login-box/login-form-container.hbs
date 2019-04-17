@@ -42,6 +42,7 @@
 {{else if (not isLoading)}}
   <p class="no-login-methods">{{tt this "noLoginMethods"}}</p>
 {{/if}}
+
 {{#if sessionHasExpired}}
   <div class="login-notification login-notification-sesion-expired login-notification-warning">
     <div class="inline-icon-container session-expired-icon-container">

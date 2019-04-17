@@ -13,4 +13,7 @@ export default {
   reload: 'Reload the page',
   connectedSuccessfully: 'Connection restored successfully',
   connectionFailed: 'Connection failed',
+  specialText: {
+    safariCert: 'It may be caused by either server unavailability or invalid SSL certificate (eg. it\'s self-signed).',
+  },
 };

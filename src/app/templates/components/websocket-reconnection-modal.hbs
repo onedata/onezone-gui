@@ -3,6 +3,9 @@
   open=opened
   keyboard=false
   backdropClose=false
+  onShown=(action "modalShown")
+  onHidden=(action "modalHidden")
+  transitionDuration=modalTransitionDuration
   as |modal|
 }}
   {{#modal.header}}
@@ -15,6 +18,9 @@
     {{#if (or (eq state "waiting") (eq state "connecting"))}}
       <p class="p-info-attempt-pending">
         {{tt this "textWaitingIntro"}}
+        {{#if specialText}}
+          {{tt this (concat "specialText." specialText)}}
+        {{/if}}
         {{!-- below must be in single line, because of dot at the end --}}
         {{tt this "textWaitingAttempting"}}{{#if (lt currentAttempt maxAttempts)}} {{tt this "textWaitingTry" currentAttempt=currentAttempt maxAttempts=maxAttempts}}{{/if}}.
       </p>

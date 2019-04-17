@@ -11,6 +11,7 @@ import OnedataWebsocketErrorHandler from 'onedata-gui-websocket-client/services/
 import {
   GOING_AWAY,
 } from 'onedata-gui-websocket-client/utils/websocket-close-event-codes';
+import { inject as service } from '@ember/service';
 
 export const ReconnectorState = Object.freeze({
   closed: 0,
@@ -21,9 +22,9 @@ export const ReconnectorState = Object.freeze({
   error: 5,
 });
 
-export const closedBeforeOpenCode = 'websocket-closed-before-open';
-
 export default OnedataWebsocketErrorHandler.extend({
+  session: service(),
+
   /**
    * Global state accessible by reconnector.
    * Set in init.
@@ -71,18 +72,15 @@ export default OnedataWebsocketErrorHandler.extend({
       console.debug(
         'service:onedata-websocket-error-handler#abnormalClose: GOING_AWAY code, ignoring'
       );
-    } else if (!openingCompleted) {
-      this.errorOccured({
-        isOnedataCustomError: true,
-        type: closedBeforeOpenCode,
-        closeEvent,
-      });
-    } else {
-      this.resetState();
+    } else if (!this.get('currentError')) {
+      const reconnectorState = this.get('reconnectorState');
+      if (reconnectorState === ReconnectorState.closed) {
+        this.set('reconnectorState', ReconnectorState.init);
+      }
       this.setProperties({
-        reconnectorState: ReconnectorState.init,
         currentCloseEvent: closeEvent,
         currentOpeningCompleted: openingCompleted,
+        currentError: null,
       });
     }
   },
@@ -92,10 +90,34 @@ export default OnedataWebsocketErrorHandler.extend({
    */
   errorOccured(errorEvent) {
     console.warn(
-      `service:onedata-websocket-error-handler#abnormalClose: WS error: ${errorEvent && errorEvent.toString()}`
+      `service:onedata-websocket-error-handler#errorOccured: WS error: ${errorEvent && errorEvent.toString()}`
     );
-    this.resetState();
-    this.set('currentError', errorEvent || {});
+    if (!this.get('currentCloseEvent')) {
+      this.resetState();
+      this.set('currentError', errorEvent || {});
+    }
+  },
+
+  /**
+   * @override
+   */
+  reconnect() {
+    const isAuthenticated = this.get('session.isAuthenticated');
+    return this.forceCloseConnection()
+      .then(() =>
+        this.initWebSocketConnection(isAuthenticated ? 'authenticated' : 'anonymous')
+      );
+  },
+
+  /**
+   * @override
+   */
+  reconnect() {
+    const isAuthenticated = this.get('session.isAuthenticated');
+    return this.forceCloseConnection()
+      .then(() =>
+        this.initWebSocketConnection(isAuthenticated ? 'authenticated' : 'anonymous')
+      );
   },
 
   resetState() {

@@ -15,6 +15,7 @@ import { computed, observer } from '@ember/object';
 import { Promise } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { later } from '@ember/runloop';
 
 export const sessionExpiredCookie = 'sessionExpired';
 
@@ -31,6 +32,7 @@ export default Component.extend(I18n, {
   globalNotify: service(),
   session: service(),
   cookies: service(),
+  browser: service(),
 
   /**
    * @override
@@ -74,6 +76,18 @@ export default Component.extend(I18n, {
   attemptInterval: null,
 
   /**
+   * Flag that is set to true when modal is fully visible and after animation
+   * @type {boolean}
+   */
+  isModalShown: false,
+
+  /**
+   * Transition duration for modal (see bs-modal docs)
+   * @type {Number}
+   */
+  modalTransitionDuration: 300,
+
+  /**
    * @type {number}
    */
   reconnectorState: reads('onedataWebsocketErrorHandler.reconnectorState'),
@@ -105,11 +119,35 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * Key of translation for additional info about error that can be found in:
+   * `components.websocketReconnectionModal.specialText`.
+   * @type {ComputedProperty<string|undefined>}
+   */
+  specialText: computed(
+    'browser.browser.browserCode',
+    'currentOpeningCompleted',
+    function specialText() {
+      const isSafari = (this.get('browser.browser.browserCode') === 'safari');
+      const isAuthenticated = this.get('session.isAuthenticated');
+      if (isSafari && !isAuthenticated && !this.get('currentOpeningCompleted')) {
+        return 'safariCert';
+      }
+    }
+  ),
+
+  /**
    * Starts reconnection procedure when external `reconnectorState` changes
    */
-  watchInitState: observer('reconnectorState', function watchInitState() {
-    if (this.get('reconnectorState') === ReconnectorState.init) {
-      this.open();
+  watchReconnectorState: observer('reconnectorState', function watchReconnectorState() {
+    switch (this.get('reconnectorState')) {
+      case ReconnectorState.init:
+        this.onReconnectorInit();
+        break;
+      case ReconnectorState.closed:
+        this.onReconnectorClose();
+        break;
+      default:
+        break;
     }
   }),
 
@@ -138,22 +176,43 @@ export default Component.extend(I18n, {
   /**
    * Use this method to cause modal to open, reset counters and start
    * reconnection procedure.
-   * @returns {undefined}
+   * @returns {Promise} startNextAttempt promise
    */
-  open() {
+  onReconnectorInit() {
     safeExec(this, 'setProperties', {
       currentAttempt: 0,
       secondsRemaining: 0,
     });
-    this.startNextAttempt();
+    return this.startNextAttempt();
+  },
+
+  onReconnectorClose() {
+    const attemptInterval = this.get('attemptInterval');
+    if (attemptInterval) {
+      clearInterval(attemptInterval);
+      this.set(attemptInterval, null);
+    }
   },
 
   /**
    * Use this method to change global state and close the modal.
-   * @returns {undefined}
+   * Respects modal animation time.
+   * @returns {Promise} resolves after state is changed to closed
    */
   close() {
-    this.get('onedataWebsocketErrorHanlder').resetState();
+    const isModalShown = this.get('isModalShown');
+    const modalTransitionDuration = this.get('modalTransitionDuration');
+    return new Promise((resolve, reject) => {
+      later(() => {
+        try {
+          this.get('onedataWebsocketErrorHandler')
+            .resetState();
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      }, isModalShown ? 0 : modalTransitionDuration);
+    });
   },
 
   /**
@@ -259,6 +318,12 @@ export default Component.extend(I18n, {
       return new Promise(() => {
         this.get('_location').reload();
       });
+    },
+    modalShown() {
+      safeExec(this, 'set', 'isModalShown', true);
+    },
+    modalHidden() {
+      safeExec(this, 'set', 'isModalShown', false);
     },
   },
 });
