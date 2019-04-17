@@ -11,7 +11,6 @@ import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
 import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
-import { resolve } from 'rsvp';
 import { inject as service } from '@ember/service';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
@@ -32,6 +31,6 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
           type: 'cannot-init-websocket',
         };
       })
-      .then(() => resolve(superResult));
+      .then(() => superResult);
   },
 });

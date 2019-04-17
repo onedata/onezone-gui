@@ -109,17 +109,6 @@ export default OnedataWebsocketErrorHandler.extend({
       );
   },
 
-  /**
-   * @override
-   */
-  reconnect() {
-    const isAuthenticated = this.get('session.isAuthenticated');
-    return this.forceCloseConnection()
-      .then(() =>
-        this.initWebSocketConnection(isAuthenticated ? 'authenticated' : 'anonymous')
-      );
-  },
-
   resetState() {
     this.setProperties({
       reconnectorState: ReconnectorState.closed,
