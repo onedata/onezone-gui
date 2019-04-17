@@ -11,6 +11,7 @@ import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
 import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
+import { inject as service } from '@ember/service';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   developmentModelConfig: Object.freeze({
@@ -18,4 +19,18 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
+
+  onedataWebsocket: service(),
+
+  beforeModel() {
+    const superResult = this._super(...arguments);
+    return this.get('onedataWebsocket.webSocketInitializedProxy')
+      .catch(() => {
+        throw {
+          isOnedataCustomError: true,
+          type: 'cannot-init-websocket',
+        };
+      })
+      .then(() => superResult);
+  },
 });
