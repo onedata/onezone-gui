@@ -10,6 +10,7 @@ import groups from './tabs/groups';
 import users from './tabs/users';
 
 import noClusterPermissions from './errors/no-cluster-permissions';
+import cannotInitWebsocket from './errors/cannot-init-websocket';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
@@ -58,6 +59,8 @@ import membershipVisualiser from './components/membership-visualiser';
 import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
+import websocketReconnectionModal from './components/websocket-reconnection-modal';
+import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -80,6 +83,7 @@ let translations = {
   },
   errors: {
     noClusterPermissions,
+    cannotInitWebsocket,
   },
   components: {
     alerts: {
@@ -132,6 +136,8 @@ let translations = {
     resourceInfoTile,
     resourceMembersTile,
     resourceMembershipTile,
+    websocketReconnectionModal,
+    fatalConnectionErrorModal,
   },
   services: {
     clientTokenActions,

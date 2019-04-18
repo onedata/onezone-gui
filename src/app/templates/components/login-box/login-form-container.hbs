@@ -42,11 +42,22 @@
 {{else if (not isLoading)}}
   <p class="no-login-methods">{{tt this "noLoginMethods"}}</p>
 {{/if}}
+
+{{#if sessionHasExpired}}
+  <div class="login-notification login-notification-sesion-expired login-notification-warning">
+    <div class="inline-icon-container session-expired-icon-container">
+      {{one-icon icon="menu-recent" class="session-expired-icon"}}  
+    </div>
+    {{tt this "sessionExpired"}}.
+  </div>
+{{/if}}
 {{#if testMode}}
-  <div class="login-notification test-mode-notification">
+  <div class="login-notification test-mode-notification login-notification-warning">
     <span>{{tt this "loginTestMode"}}</span><br>
     {{#link-to "login"}}{{tt this "goBackToMainPage"}}{{/link-to}}
   </div>
 {{else if (and loginNotification (not isLoading))}}
-  <div class="login-notification">{{loginNotification}}</div>
+  <div class="login-notification login-notification-admin-message">
+    {{loginNotification}}
+  </div>
 {{/if}}
