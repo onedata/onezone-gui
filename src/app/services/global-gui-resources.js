@@ -9,9 +9,13 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
+import { set, getProperties } from '@ember/object';
+import { resolve } from 'rsvp';
 
 export default Service.extend({
   dataDiscoveryResources: service(),
+  currentUser: service(),
+  router: service(),
 
   /**
    * @type {string}
@@ -29,6 +33,11 @@ export default Service.extend({
    * @type {Window}
    */
   _window: window,
+
+  /**
+   * @type {Location}
+   */
+  _location: location,
 
   /**
    * Creates global object and attaches it to the Window object
@@ -59,9 +68,56 @@ export default Service.extend({
       globalObject,
     } = this.getProperties('dataDiscoveryResources', 'globalObject');
 
-    globalObject.dataDiscovery = {
+    set(globalObject, 'dataDiscovery', {
       esRequest: (...args) => dataDiscoveryResources.esRequest(...args),
       configRequest: (...args) => dataDiscoveryResources.configRequest(...args),
-    };
+      userRequest: () => this.getCurrentUser(),
+      loginUrlRequest: () => this.getLoginUrl(),
+    });
+  },
+
+  /**
+   * Returns object containing info about current user. If there is no active
+   * session, promise will resolve to null.
+   * @returns {Promise<Object>}
+   */
+  getCurrentUser() {
+    const currentUser = this.get('currentUser');
+    return currentUser.getCurrentUserRecord().then(
+      user => {
+        const {
+          entityId,
+          name,
+          alias,
+        } = getProperties(user, 'entityId', 'name', 'alias');
+        // Info about user should be restricted to few field to protect private,
+        // internal data of Onedata
+        return {
+          id: entityId,
+          name,
+          alias,
+        };
+      },
+      () => null,
+    );
+  },
+
+  /**
+   * Returns url to login page
+   * @returns {Promise<string>}
+   */
+  getLoginUrl() {
+    const {
+      router,
+      _location,
+    } = this.getProperties('router', '_location');
+
+    const {
+      origin,
+      pathname,
+    } = getProperties(_location, 'origin', 'pathname');
+
+    const url = origin + pathname + router.urlFor('login');
+    return resolve(url);
   },
 });
