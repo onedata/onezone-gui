@@ -18,6 +18,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
+  router: service(),
 
   /**
    * Actual harvester, that should be used as a context for all data discovery
@@ -80,7 +81,7 @@ export default Service.extend({
     );
 
     if (!harvesterId) {
-      return reject('Harvester is not specified.');
+      return reject('Harvester ID is not specified.');
     } else {
       const indexName = get(requestOptions, 'indexName');
       return harvesterIndices.then(indices => {
@@ -111,5 +112,16 @@ export default Service.extend({
       return harvesterManager.getConfig(harvesterId)
         .then(config => _.cloneDeep(get(config, 'guiPluginConfig')));
     }
+  },
+
+  /**
+   * @returns {Promise<string>} resolves to gui plugin mode. One of:
+   *  - `public` (public access outside Onezone layout)
+   *  - `internal` (access via harvester page inside Onezone layout)
+   */
+  viewModeRequest() {
+    const router = this.get('router');
+    const mode = router.isActive('public-harvester') ? 'public' : 'internal';
+    return resolve(mode);
   },
 });

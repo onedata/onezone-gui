@@ -32,6 +32,11 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   plugin: attr('string'),
 
   /**
+   * @type {boolean}
+   */
+  public: attr('boolean', { defaultValue: false }),
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   guiPluginPath: computed('entityId', function guiPluginPath() {

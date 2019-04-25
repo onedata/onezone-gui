@@ -12,6 +12,12 @@ export default {
       endpoint: {
         label: 'Endpoint',
       },
+      public: {
+        label: 'Public',
+      },
+      publicUrl: {
+        label: 'Public URL',
+      },
     },
     edit: 'Edit',
     cancel: 'Cancel',

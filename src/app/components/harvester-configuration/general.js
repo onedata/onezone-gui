@@ -20,7 +20,7 @@ const {
   layoutConfig,
 } = config;
 
-const fieldDefinitions = [{
+const viewCreateFieldDefinitions = [{
   name: 'name',
   type: 'text',
 }, {
@@ -32,13 +32,30 @@ const fieldDefinitions = [{
   type: 'text',
 }];
 
+const viewEditFieldDefinitions = [{
+  name: 'public',
+  type: 'checkbox',
+  defaultValue: false,
+}];
+
+const publicUrlFieldDefinition = [{
+  name: 'publicUrl',
+  type: 'clipboard-line',
+}];
+
 const allPrefixes = [
   'view',
+  'create',
   'edit',
+  'publicUrl',
 ];
 
 const validationsProto = {};
-fieldDefinitions.forEach((field) => {
+viewCreateFieldDefinitions.forEach((field) => {
+  const validators = createFieldValidator(field);
+  validationsProto[`allFieldsValues.create.${field.name}`] = validators;
+});
+viewCreateFieldDefinitions.concat(viewEditFieldDefinitions).forEach((field) => {
   const validators = createFieldValidator(field);
   validationsProto[`allFieldsValues.edit.${field.name}`] = validators;
 });
@@ -49,6 +66,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   i18n: service(),
   harvesterManager: service(),
   harvesterActions: service(),
+  router: service(),
 
   /**
    * @override
@@ -72,18 +90,33 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   disabled: false,
 
   /**
+   * @type {Location}
+   */
+  _location: location,
+
+  /**
    * @override
    */
-  currentFieldsPrefix: computed('mode', function currentFieldsPrefix() {
-    const mode = this.get('mode');
-    switch (mode) {
-      case 'view':
-        return ['view'];
-      case 'edit':
-      case 'create':
-        return ['edit'];
+  currentFieldsPrefix: computed(
+    'mode',
+    'allFieldsValues.edit.public',
+    function currentFieldsPrefix() {
+      const mode = this.get('mode');
+      const isPublic = this.get('allFieldsValues.edit.public');
+      switch (mode) {
+        case 'view':
+        case 'edit': {
+          const prefixes = [mode];
+          if (isPublic) {
+            prefixes.push('publicUrl');
+          }
+          return prefixes;
+        }
+        case 'create':
+          return ['create'];
+      }
     }
-  }),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Object>}
@@ -106,20 +139,43 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * @type {Ember.ComputedProperty<Array<FieldType>>}
    */
   viewFields: computed(function viewFields() {
-    return fieldDefinitions.map(field => this.preprocessField(field, 'view', true));
+    return viewCreateFieldDefinitions.concat(viewEditFieldDefinitions)
+      .map(field => this.preprocessField(field, 'view', true));
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   */
+  createFields: computed(function createFields() {
+    return viewCreateFieldDefinitions
+      .map(field => this.preprocessField(field, 'create'));
   }),
 
   /**
    * @type {Ember.ComputedProperty<Array<FieldType>>}
    */
   editFields: computed(function editFields() {
-    return fieldDefinitions.map(field => this.preprocessField(field, 'edit'));
+    return viewCreateFieldDefinitions.concat(viewEditFieldDefinitions)
+      .map(field => this.preprocessField(field, 'edit'));
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   */
+  publicUrlField: computed(function publicUrlField() {
+    return publicUrlFieldDefinition
+      .map(field => this.preprocessField(field, 'publicUrl'));
   }),
 
   /**
    * @override
    */
-  allFields: union('viewFields', 'editFields'),
+  allFields: union(
+    'viewFields',
+    'createFields',
+    'editFields',
+    'publicUrlField'
+  ),
 
   /**
    * @override
@@ -138,6 +194,29 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     return this.get('harvesterManager').getPluginsList();
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<string|null>}
+   */
+  publicUrlValue: computed('harvester.entityId', function publicUrlValue() {
+    const harvesterEntityId = this.get('harvester.entityId');
+    if (harvesterEntityId) {
+      const {
+        router,
+        _location,
+      } = this.getProperties('router', '_location');
+  
+      const {
+        origin,
+        pathname,
+      } = getProperties(_location, 'origin', 'pathname');
+  
+      return origin + pathname +
+        router.urlFor('public-harvester', harvesterEntityId);
+    } else {
+      return null;
+    }
+  }),
+
   harvesterObserver: observer(
     'harvester.{name,plugin,endpoint}',
     function harvesterObserver() {
@@ -145,12 +224,19 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         harvester,
         allFields,
         allFieldsValues,
-      } = this.getProperties('harvester', 'allFields', 'allFieldsValues');
+        publicUrlValue,
+      } = this.getProperties(
+        'harvester',
+        'allFields',
+        'allFieldsValues',
+        'publicUrlValue'
+      );
       if (harvester) {
         [
           'name',
           'plugin',
           'endpoint',
+          'public',
         ].forEach(valueName => {
           const value = get(harvester, valueName);
 
@@ -166,6 +252,10 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
           set(viewField, 'defaultValue', value);
           set(allFieldsValues, viewFieldName, value);
         });
+        const publicUrlFieldName = 'publicUrl.publicUrl';
+        const publicUrlField = allFields.findBy('name', publicUrlFieldName);
+        set(publicUrlField, 'defaultValue', publicUrlValue);
+        set(allFieldsValues, publicUrlFieldName, publicUrlValue);
       }
     }
   ),
@@ -178,7 +268,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     } = this.getProperties('mode', 'pluginTypes', 'allFields');
     if (mode === 'create') {
       set(
-        allFields.findBy('name', 'edit.plugin'),
+        allFields.findBy('name', 'create.plugin'),
         'defaultValue',
         pluginTypes.objectAt(0) || undefined
       );
@@ -193,7 +283,9 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         label: type,
         value: type,
       }));
-      set(this.get('allFields').findBy('name', 'edit.plugin'), 'options', options);
+      const allFields = this.get('allFields');
+      set(allFields.findBy('name', 'create.plugin'), 'options', options);
+      set(allFields.findBy('name', 'edit.plugin'), 'options', options);
 
       this.prepareFields();
       this.harvesterObserver();
@@ -256,7 +348,10 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         'harvesterActions'
       );
       const valueNames = ['name', 'plugin', 'endpoint'];
-      const values = getProperties(get(formValues, 'edit'), ...valueNames);
+      if (mode === 'edit') {
+        valueNames.push('public');
+      }
+      const values = getProperties(get(formValues, mode), ...valueNames);
       
       this.set('disabled', true);
       let promise;

@@ -15,7 +15,6 @@ import { resolve } from 'rsvp';
 export default Service.extend({
   dataDiscoveryResources: service(),
   currentUser: service(),
-  router: service(),
 
   /**
    * @type {string}
@@ -71,8 +70,9 @@ export default Service.extend({
     set(globalObject, 'dataDiscovery', {
       esRequest: (...args) => dataDiscoveryResources.esRequest(...args),
       configRequest: (...args) => dataDiscoveryResources.configRequest(...args),
+      viewModeRequest: () => dataDiscoveryResources.viewModeRequest(),
       userRequest: () => this.getCurrentUser(),
-      loginUrlRequest: () => this.getLoginUrl(),
+      onezoneUrlRequest: () => this.getOnezoneUrl(),
     });
   },
 
@@ -103,21 +103,17 @@ export default Service.extend({
   },
 
   /**
-   * Returns url to login page
+   * Returns url to Onezone
    * @returns {Promise<string>}
    */
-  getLoginUrl() {
-    const {
-      router,
-      _location,
-    } = this.getProperties('router', '_location');
-
+  getOnezoneUrl() {
+    const _location = this.get('_location');
     const {
       origin,
       pathname,
     } = getProperties(_location, 'origin', 'pathname');
 
-    const url = origin + pathname + router.urlFor('login');
+    const url = origin + pathname;
     return resolve(url);
   },
 });

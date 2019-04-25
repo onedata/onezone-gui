@@ -7,10 +7,9 @@ import { get, set, setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 
 const RouterService = Service.extend({
-  urlFor(routeName) {
-    if (routeName === 'login') {
-      return '#/login';
-    }
+  routeName: 'public-harvester',
+  isActive(routeName) {
+    return routeName === this.get('routeName');
   },
 });
 
@@ -27,6 +26,9 @@ const DataDiscoveryResourcesService = Service.extend({
   },
   configRequest() {
     this.set('configRequestCalled', true);
+  },
+  viewModeRequest() {
+    this.set('viewModeRequestCalled', true);
   },
 });
 
@@ -75,6 +77,19 @@ describe('Unit | Service | global gui resources', function () {
     expect(get(dataDiscoveryResources, 'configRequestCalled')).to.be.true;
   });
 
+  it('injects viewModeRequest into data-discovery scope', function () {
+    const service = this.subject();
+    setupService(service);
+    service.initializeGlobalObject();
+    const viewModeRequest =
+      get(service, '_window.onezoneGuiResources.dataDiscovery.viewModeRequest');
+    viewModeRequest();
+
+    const dataDiscoveryResources =
+      lookupService(this, 'data-discovery-resources');
+    expect(get(dataDiscoveryResources, 'viewModeRequestCalled')).to.be.true;
+  });
+
   it(
     'injects info about no logged in user into data-discovery scope',
     function () {
@@ -112,14 +127,14 @@ describe('Unit | Service | global gui resources', function () {
     }
   );
 
-  it('injects info about login url into data-discovery scope', function () {
+  it('injects info about onezone url into data-discovery scope', function () {
     const service = this.subject();
     setupService(service);
     service.initializeGlobalObject();
-    const loginUrlRequest =
-      get(service, '_window.onezoneGuiResources.dataDiscovery.loginUrlRequest');
-    expect(loginUrlRequest).to.exist;
-    return loginUrlRequest()
-      .then(value => expect(value).to.equal('https://abcdef.com/ghi#/login'));
+    const onezoneUrlRequest =
+      get(service, '_window.onezoneGuiResources.dataDiscovery.onezoneUrlRequest');
+    expect(onezoneUrlRequest).to.exist;
+    return onezoneUrlRequest()
+      .then(value => expect(value).to.equal('https://abcdef.com/ghi'));
   });
 });

@@ -19,13 +19,11 @@ import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-chec
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
   globalNotify: service(),
-  globalGuiResources: service(),
   appStorage: service(),
   navigationState: service(),
 
   beforeModel(transition) {
     const superResult = this._super(...arguments);
-    this.get('globalGuiResources').initializeGlobalObject();
     if (get(transition, 'isAborted')) {
       return superResult;
     } else {
