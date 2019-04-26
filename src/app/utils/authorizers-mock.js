@@ -26,7 +26,7 @@ export default [{
     iconPath: iconPrefix + 'onepanel.svg',
     id: 'onepanel',
     iconBackgroundColor: '#4BD187',
-    displayName: 'Onepanel account',
+    displayName: 'your login & password',
   },
   {
     iconPath: iconPrefix + 'indigo.svg',
