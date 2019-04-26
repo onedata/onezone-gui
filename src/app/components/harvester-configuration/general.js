@@ -27,12 +27,13 @@ const viewCreateFieldDefinitions = [{
   name: 'plugin',
   type: 'dropdown',
   options: [],
-}, {
-  name: 'endpoint',
-  type: 'text',
 }];
 
 const viewEditFieldDefinitions = [{
+  name: 'endpoint',
+  type: 'text',
+  optional: true,
+}, {
   name: 'public',
   type: 'checkbox',
   defaultValue: false,
@@ -218,7 +219,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   }),
 
   harvesterObserver: observer(
-    'harvester.{name,plugin,endpoint}',
+    'harvester.{name,plugin,endpoint,public}',
     function harvesterObserver() {
       const {
         harvester,
@@ -279,9 +280,9 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   init() {
     this._super(...arguments);
     this.get('pluginTypes').then(pluginTypes => safeExec(this, () => {
-      const options = pluginTypes.map(type => ({
-        label: type,
-        value: type,
+      const options = pluginTypes.map(({ id, name }) => ({
+        label: name,
+        value: id,
       }));
       const allFields = this.get('allFields');
       set(allFields.findBy('name', 'create.plugin'), 'options', options);
@@ -347,11 +348,14 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         'harvester',
         'harvesterActions'
       );
-      const valueNames = ['name', 'plugin', 'endpoint'];
+      const valueNames = ['name', 'plugin'];
       if (mode === 'edit') {
-        valueNames.push('public');
+        valueNames.push('endpoint', 'public');
       }
       const values = getProperties(get(formValues, mode), ...valueNames);
+      if (!get(values, 'endpoint')) {
+        set(values, 'endpoint', null);
+      }
       
       this.set('disabled', true);
       let promise;

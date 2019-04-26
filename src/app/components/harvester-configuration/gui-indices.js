@@ -366,7 +366,7 @@ export default Component.extend(I18n, {
         case 'unassigned':
           harvesterIndicesProxy.forEach(index => {
             if (get(index, 'guiPluginName') === guiIndexName) {
-              set(index, 'guiPluginName', '');
+              set(index, 'guiPluginName', null);
               indicesToUpdate.addObject(index);
             }
           });
@@ -375,7 +375,7 @@ export default Component.extend(I18n, {
           const selectedIndex = get(selectedIndices, guiIndexName);
           harvesterIndicesProxy.without(selectedIndex).forEach(index => {
             if (get(index, 'guiPluginName') === guiIndexName) {
-              set(index, 'guiPluginName', '');
+              set(index, 'guiPluginName', null);
               indicesToUpdate.addObject(index);
             }
           });

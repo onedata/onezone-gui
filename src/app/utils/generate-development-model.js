@@ -396,9 +396,10 @@ function createHarvesterRecords(store) {
       name: `Harvester ${index}`,
       scope: 'private',
       plugin: 'elasticsearch_plugin',
-      endpoint: '127.0.0.1:9200',
+      endpoint: undefined,
       directMembership: true,
       canViewPrivileges: true,
+      public: false,
       info: {
         creationTime: 1540995468,
       },

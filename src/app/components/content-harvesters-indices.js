@@ -260,7 +260,7 @@ export default Component.extend(I18n, GlobalActions, {
       if (get(indexRepresentation, 'schema') === '') {
         delete indexRepresentation.schema;
       }
-      set(indexRepresentation, 'guiPluginName', '');
+      set(indexRepresentation, 'guiPluginName', null);
       return harvesterActions.createIndex(harvester, indexRepresentation)
         .then(() => safeExec(this, () => {
           this.set('isCreateIndexFormVisible', false);
