@@ -185,6 +185,7 @@ function createUserRecord(store, listRecords) {
       const userRecord = store.createRecord('user', {
         id: userGri(USER_ID),
         name: USERNAME,
+        basicAuthEnabled: true,
         login: USER_LOGIN,
         defaultSpaceId,
       });

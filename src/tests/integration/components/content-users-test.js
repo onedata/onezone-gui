@@ -56,6 +56,7 @@ describe('Integration | Component | content users', function () {
     const MOCKED_USER = EmberObject.create({
       name: 'some name',
       alias: 'some alias',
+      basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
   });
@@ -132,4 +133,22 @@ describe('Integration | Component | content users', function () {
       });
     });
   });
+
+  it('renders password section for user with basicAuth enabled', function () {
+    this.render(hbs `{{content-users user=user}}`);
+    return wait().then(() => {
+      expect(this.$('.change-password-row .one-inline-editor')).to.exist;
+    });
+  });
+
+  it(
+    'does not render password section for user with basicAuth disabled',
+    function () {
+      this.set('user.basicAuthEnabled', false);
+      this.render(hbs `{{content-users user=user}}`);
+      return wait().then(() => {
+        expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
+      });
+    }
+  );
 });

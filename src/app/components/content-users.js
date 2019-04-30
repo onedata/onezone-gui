@@ -16,6 +16,7 @@ import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { htmlSafe } from '@ember/template';
 
 const animationTimeout = 333;
 
@@ -26,6 +27,7 @@ export default Component.extend(I18n, {
   linkedAccountManager: inject(),
   authorizerManager: inject(),
   onezoneServer: inject(),
+  userActions: inject(),
 
   /**
    * @override
@@ -59,6 +61,23 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   _isProvidersDropdownVisible: false,
+
+  /**
+   * @type {boolean}
+   */
+  isChangingPassword: false,
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showPasswordSection: reads('user.basicAuthEnabled'),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  passwordString: computed(function passwordString() {
+    return htmlSafe('&#9679;'.repeat(5));
+  }),
 
   /**
    * @type {ComputedProperty<LinkedAccountList>}
@@ -190,6 +209,25 @@ export default Component.extend(I18n, {
         set(user, 'alias', oldAlias);
         throw error;
       });
+    },
+    startPasswordChange() {
+      this.set('isChangingPassword', true);
+    },
+    stopPasswordChange() {
+      this.set('isChangingPassword', false);
+    },
+    saveNewPassword({currentPassword, newPassword}) {
+      const {
+        userActions,
+        user,
+      } = this.getProperties('userActions', 'user');
+      return userActions
+        .changeUserPassword(user, currentPassword, newPassword)
+        .then(() => {
+          safeExec(this, () => {
+            this.set('isChangingPassword', false);
+          });
+        });
     },
     toggleAuthorizersDropdown() {
       const {
