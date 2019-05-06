@@ -23,15 +23,7 @@
                 </span>
               </td>
               {{#each spaceProgress.progress as |providerProgress|}}
-                <td class="dot-cell">
-                  <div class="progress-dot {{if providerProgress.isSupported providerProgress.valueClass "not-supported"}}">
-                    {{#if providerProgress.isSupported}}
-                      {{providerProgress.percent}}%
-                    {{else}}
-                      {{one-tooltip title=(tt this "noData" spaceName=spaceProgress.space.name providerName=providerProgress.provider.name)}}
-                    {{/if}}
-                  </div>
-                </td>
+                {{content-harvesters-indices/progress-table-cell progress=providerProgress}}
               {{/each}}
             </tr>
           {{/each}}

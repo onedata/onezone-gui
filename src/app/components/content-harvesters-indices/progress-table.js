@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { promise, array } from 'ember-awesome-macros';
-import { computed, get, getProperties } from '@ember/object';
+import { computed, get, getProperties, setProperties } from '@ember/object';
 import { A } from '@ember/array';
 import { Promise, reject } from 'rsvp';
 import { inject as service } from '@ember/service';
@@ -247,26 +247,23 @@ export default Component.extend(I18n, {
             const data = get(indexProgress, get(space, 'entityId'));
             const providerEntityId = get(provider, 'entityId');
             const isSupported = _.keys(data).includes(providerEntityId);
-            let percent, valueClass;
-            if (isSupported) {
-              const providerProgress = get(data, providerEntityId);
-              percent = Math.floor((100 * providerProgress.objectAt(0)) /
-                providerProgress.objectAt(1));
-              percent = Math.min(100, Math.abs(percent));
-              if (percent < 50) {
-                valueClass = 'danger';
-              } else if (percent < 100) {
-                valueClass = 'warning';
-              } else {
-                valueClass = 'success';
-              }
-            }
-            return {
-              provider,
+
+            const progress = {
               isSupported,
-              percent,
-              valueClass,
+              provider,
+              space,
             };
+            if (isSupported) {
+              const providerData = get(data, providerEntityId);
+              setProperties(progress, getProperties(
+                providerData,
+                'currentSeq',
+                'maxSeq',
+                'lastUpdate',
+                'error'
+              ));
+            }
+            return progress;
           }),
         }));
       } else {

@@ -84,7 +84,7 @@
         text-align: right;
         font-size: $labels-font-size;
       }
-      .dot-cell {
+      .progress-table-cell {
         height: $dot-size * 1.5;
         width: $dot-size * 1.5;
       }
@@ -115,7 +115,7 @@
                   right: 0;
                 }
               }
-              &.dot-cell {
+              &.progress-table-cell {
                 &::before {
                   width: calc(100% - #{$dot-size * 1.5});
                   line-height: $dot-size * 1.5 - 2 * $table-cell-padding;
@@ -157,7 +157,7 @@
       border: 0;
     }
 
-    .dot-cell {
+    .progress-table-cell {
       position: relative;
     }
 

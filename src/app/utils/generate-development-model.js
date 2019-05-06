@@ -18,6 +18,7 @@ import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privi
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import moment from 'moment';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -47,7 +48,7 @@ const perProviderSize = Math.pow(1024, 4);
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers, groups, spaces;
+  let sharedUsers, groups, spaces, providers, harvesters;
 
   // create shared users
   return createSharedUsersRecords(store)
@@ -58,10 +59,19 @@ export default function generateDevelopmentModel(store) {
         types.map(type =>
           createEntityRecords(store, type, names)
           .then(records => {
-            if (type === 'group') {
-              groups = records;
-            } else if (type === 'space') {
-              spaces = records;
+            switch (type) {
+              case 'group':
+                groups = records;
+                break;
+              case 'space':
+                spaces = records;
+                break;
+              case 'provider':
+                providers = records;
+                break;
+              case 'harvester':
+                harvesters = records;
+                break;
             }
             return createListRecord(store, type, records);
           })
@@ -193,6 +203,10 @@ export default function generateDevelopmentModel(store) {
           );
       })))
       .then(() => listRecords)
+    )
+    .then(listRecords =>
+      attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
+        .then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
 }
@@ -439,6 +453,13 @@ function createHarvesterRecords(store) {
     ).then(record => {
       return Promise.all(_.range(3).map((index) => {
         return store.createRecord('index', {
+          id: gri({
+            entityType: 'harvester',
+            entityId: get(record, 'entityId'),
+            aspect: 'index',
+            aspectId: 'index' + index,
+            scope: 'private',
+          }),
           name: `Index ${index}`,
           schema: '',
         }).save();
@@ -573,4 +594,55 @@ function clusterInstanceGri(entityId) {
     aspect: 'instance',
     scope: 'auto',
   });
+}
+
+function attachProgressToHarvesterIndices(
+  store,
+  harvesters,
+  spaces,
+  providers
+) {
+  const harvestersNumber = get(harvesters, 'length');
+  const perHarvesterSeq = 100;
+  const maxSeq = perHarvesterSeq * harvestersNumber;
+  const lastUpdate = moment().unix();
+  return Promise.all(harvesters.map((harvester, harvesterIndex) => {
+    const harvesterEntityId = get(harvester, 'entityId');
+    return get(harvester, 'indexList')
+      .then(indexList => get(indexList, 'list'))
+      .then(indices => {
+        const indicesNumber = get(indices, 'length');
+        const perIndexSeq = Math.ceil(perHarvesterSeq / indicesNumber);
+        return Promise.all(indices.map((index, indexIndex) => {
+          const indexEntityId = get(index, 'aspectId');
+          const currentSeq = harvesterIndex * perHarvesterSeq +
+            Math.min((indexIndex + 1) * perIndexSeq, perHarvesterSeq);
+          const indexProgress = {};
+          spaces.forEach(space => {
+            const spaceProgress = {};
+            const spaceEntityId = get(space, 'entityId');
+            set(indexProgress, spaceEntityId, spaceProgress);
+            providers.forEach(provider => {
+              const providerEntityId = get(provider, 'entityId');
+              set(spaceProgress, providerEntityId, {
+                maxSeq,
+                currentSeq,
+                lastUpdate,
+                error: null,
+              });
+            });
+          });
+          return store.createRecord('indexProgress', {
+            id: gri({
+              entityType: 'harvester',
+              entityId: harvesterEntityId,
+              aspect: 'index_progress',
+              aspectId: indexEntityId,
+              scope: 'private',
+            }),
+            indexProgress,
+          }).save();
+        }));
+      });
+  }));
 }

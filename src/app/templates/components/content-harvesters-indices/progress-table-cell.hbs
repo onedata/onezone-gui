@@ -1,0 +1,7 @@
+<div class={{progressDotClassNames}}>
+  {{#if isSupported}}
+    {{percent}}%
+  {{else}}
+    {{one-tooltip title=(tt this "noData" spaceName=space.name providerName=provider.name)}}
+  {{/if}}
+</div>
