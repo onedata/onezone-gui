@@ -1,8 +1,9 @@
 export default {
   profile: 'Profile',
   name: 'Name',
-  alias: 'Alias',
+  login: 'Login',
   password: 'Password',
+  setLoginFirst: 'Please set you login first.',
   linkedAccounts: 'Linked accounts',
   userDataPersistence: 'user data persistence',
   addAccount: 'Add account...',

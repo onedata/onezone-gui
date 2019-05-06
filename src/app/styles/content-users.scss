@@ -67,7 +67,7 @@
       font-size: 150px;
       vertical-align: middle;
     }
-    .name-editor, .alias-editor, .password-editor-trigger {
+    .name-editor, .login-editor, .password-editor-trigger {
       display: inline-block;
       vertical-align: middle;
       max-width: 270px;
@@ -83,6 +83,9 @@
     .user-image {
       display: none;
     }
+  }
+  .password-editor-trigger.no-login {
+    pointer-events: none;
   }
   .change-password-row {
     @media (min-width: $screen-sm-min) {

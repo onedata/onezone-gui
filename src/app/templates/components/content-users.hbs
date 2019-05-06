@@ -11,27 +11,35 @@
   </div>
 </div>
 <div class="content-row">
-  <h1>{{tt this "alias"}}</h1>
+  <h1>{{tt this "login"}}</h1>
   <div class="indented-row">
-    {{one-inline-editor value=user.alias onSave=(action "saveAlias") class="alias-editor"}}
+    {{one-inline-editor value=user.login onSave=(action "saveLogin") class="login-editor"}}
   </div>
 </div>
 {{#if showPasswordSection}}
   <div class="content-row">
     <h1>{{tt this "password"}}</h1>
     <div class="indented-row change-password-row {{if isChangingPassword "is-changing-password"}}">
-      {{#if isChangingPassword}}
-        {{user-credentials-form
-          centered=false
-          showCancel=true
-          verifyCurrentPassword=user.hasPassword
-          changingPassword=isChangingPassword
-          submit=(action "saveNewPassword")
-          cancel=(action "stopPasswordChange")}}
+      {{#if user.login}}
+        {{#if isChangingPassword}}
+          {{user-credentials-form
+            centered=false
+            showCancel=true
+            verifyCurrentPassword=user.hasPassword
+            changingPassword=isChangingPassword
+            submit=(action "saveNewPassword")
+            cancel=(action "stopPasswordChange")}}
+        {{else}}
+          {{one-inline-editor
+            value=passwordString
+            class="password-editor-trigger"
+            onEdit=(action "startPasswordChange")}}
+        {{/if}}
       {{else}}
         {{one-inline-editor
-          value=passwordString class="password-editor-trigger"
-          onEdit=(action "startPasswordChange")}}
+          class="password-editor-trigger no-login"
+          staticPlaceholder=(tt this "setLoginFirst")
+          isEditing=false}}
       {{/if}}
     </div>
   </div>

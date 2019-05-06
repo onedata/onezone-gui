@@ -2,8 +2,8 @@
  * A content page with user account details
  *
  * @module components/content-users
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reject } from 'rsvp';
 import { inject } from '@ember/service';
-import { computed, set, get } from '@ember/object';
+import { computed, set, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
@@ -129,7 +129,16 @@ export default Component.extend(I18n, {
           ),
         }));
       }
-    }),
+    }
+  ),
+
+  userLoginObserver: observer('user.login', function userLoginObserver() {
+    const login = this.get('user.login');
+    if (!login) {
+      // If login has been cleared out, password change is impossible.
+      this.set('isChangingPassword', false);
+    }
+  }),
 
   /**
    * Shows global info about save error.
@@ -200,13 +209,13 @@ export default Component.extend(I18n, {
         throw error;
       });
     },
-    saveAlias(alias) {
+    saveLogin(login) {
       const user = this.get('user');
-      const oldAlias = get(user, 'alias');
-      set(user, 'alias', alias && alias.length ? alias : null);
+      const oldLogin = get(user, 'login');
+      set(user, 'login', login && login.length ? login : null);
       return this._saveUser().catch((error) => {
-        // Restore old user alias
-        set(user, 'alias', oldAlias);
+        // Restore old user login
+        set(user, 'login', oldLogin);
         throw error;
       });
     },

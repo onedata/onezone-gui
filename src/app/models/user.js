@@ -20,7 +20,7 @@ export default Model.extend(GraphSingleModelMixin, {
   isCollection: true,
 
   name: attr('string'),
-  alias: attr('string'),
+  login: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
 

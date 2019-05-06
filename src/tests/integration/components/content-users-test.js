@@ -55,7 +55,7 @@ describe('Integration | Component | content users', function () {
 
     const MOCKED_USER = EmberObject.create({
       name: 'some name',
-      alias: 'some alias',
+      login: 'some login',
       basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
@@ -70,11 +70,11 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders alias', function (done) {
+  it('renders login', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.alias-editor').text().trim())
-        .to.equal(this.get('user.alias'));
+      expect(this.$('.login-editor').text().trim())
+        .to.equal(this.get('user.login'));
       done();
     });
   });
@@ -113,20 +113,20 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change alias', function (done) {
+  it('allows to change login', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
-    const newAlias = 'testAlias';
+    const newLogin = 'testLogin';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.alias-editor .one-label').then(() => {
-        fillIn('.alias-editor input', newAlias).then(() => {
-          click('.alias-editor .save-icon').then(() => {
+      click('.login-editor .one-label').then(() => {
+        fillIn('.login-editor input', newLogin).then(() => {
+          click('.login-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.alias-editor').text().trim())
-              .to.equal(user.get('alias'));
-            expect(user.get('alias')).to.equal(newAlias);
+            expect(this.$('.login-editor').text().trim())
+              .to.equal(user.get('login'));
+            expect(user.get('login')).to.equal(newLogin);
             done();
           });
         });
