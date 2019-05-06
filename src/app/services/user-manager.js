@@ -32,9 +32,9 @@ export default Service.extend({
       operation: 'update',
       subscribe: false,
       data: {
-        oldPassword,
+        oldPassword: oldPassword || null,
         newPassword,
       },
-    });
+    }); 
   },
 });

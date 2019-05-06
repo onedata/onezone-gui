@@ -186,6 +186,7 @@ function createUserRecord(store, listRecords) {
         id: userGri(USER_ID),
         name: USERNAME,
         basicAuthEnabled: true,
+        hasPassword: false,
         login: USER_LOGIN,
         defaultSpaceId,
       });

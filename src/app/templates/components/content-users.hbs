@@ -24,6 +24,7 @@
         {{user-credentials-form
           centered=false
           showCancel=true
+          verifyCurrentPassword=user.hasPassword
           changingPassword=isChangingPassword
           submit=(action "saveNewPassword")
           cancel=(action "stopPasswordChange")}}

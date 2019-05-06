@@ -22,6 +22,7 @@ export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   alias: attr('string'),
   basicAuthEnabled: attr('boolean'),
+  hasPassword: attr('boolean'),
 
   /**
    * Entity ID of default space ID for user.
