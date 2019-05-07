@@ -25,6 +25,7 @@ export default Component.extend(
     guiUtils: service(),
     globalNotify: service(),
     router: service(),
+    clusterManager: service(),
 
     /**
      * @override
@@ -76,9 +77,14 @@ export default Component.extend(
     },
 
     deregister() {
-      const cluster = this.get('cluster');
+      const {
+        cluster,
+        clusterManager,
+      } = this.getProperties('cluster', 'clusterManager');
       return get(cluster, 'provider')
-        .then(provider => provider.destroyRecord());
+        .then(provider => provider.destroyRecord())
+        .then(() => clusterManager.getClusters())
+        .then(clusterList => clusterList.reload());
     },
 
     afterDeregister() {
