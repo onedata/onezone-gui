@@ -17,8 +17,8 @@ export default {
     desc3: 'Each token can only be used once.',
   },
   exposeData: {
-    tabName: 'Expose existing data collection',
-    desc1: 'Expose storage with an existing data set through this space.',
+    tabName: 'Expose existing data set',
+    desc1: 'Deploy your own Oneprovider service and expose your storage with existing data through this space.',
     desc2: 'Existing directories and files structure will be ' +
       'automatically discovered and synchronized, allowing any member of ' +
       'this space to access the data set.',
