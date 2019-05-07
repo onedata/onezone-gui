@@ -32,7 +32,6 @@ export default Model.extend(
     onepanelProxy: attr('boolean'),
     workerVersion: attr('object'),
     onepanelVersion: attr('object'),
-    canViewPrivateData: attr('boolean'),
     canViewPrivileges: attr('boolean', { defaultValue: false }),
     directMembership: attr('boolean', { defaultValue: false }),
     scope: attr('string'),
@@ -50,6 +49,8 @@ export default Model.extend(
     info: attr('object'),
 
     creationTime: reads('info.creationTime'),
+
+    canViewPrivateData: equal('scope', 'private'),
 
     standaloneOrigin: computed('domain', function standaloneOrigin() {
       return `https://${this.get('domain')}:9443`;
