@@ -1,5 +1,5 @@
 export default {
-  formSubtitle: 'using your login & password',
+  formSubtitle: 'using your username & password',
   formSubtitleTip: 'This sign-in method is available for administrators and special users ' +
     'created via Onepanel administrative interface. Regular users must sign in via social or ' +
     'institutional accounts, which can be found in previous menu.',
