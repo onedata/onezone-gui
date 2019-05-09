@@ -3,7 +3,7 @@ export default {
   fullName: 'Full name',
   username: 'Username',
   usernameNoBasicAuthHint: 'A human-readable identifier, unique across the system, e.g. "johndoe13". Makes it easier for other users to find you.',
-  usernameWithBasicAuthHint: 'A human-readable identifier, unique across the system, e.g. "johndoe13". Makes it easier for other users to find you and can be used for signing in with password.',
+  usernameWithBasicAuthHint: 'A human-readable identifier, unique across the system, e.g. "johndoe13". Makes it easier for other users to find you and can be used along with password for authenticating.',
   password: 'Password',
   setUsernameFirst: 'Please set you username first.',
   linkedAccounts: 'Linked accounts',
