@@ -1,6 +1,6 @@
 export default {
   profile: 'Profile',
-  displayName: 'Name',
+  fullName: 'Full name',
   username: 'Username',
   password: 'Password',
   setUsernameFirst: 'Please set you username first.',

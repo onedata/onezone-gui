@@ -4,10 +4,10 @@
   </h1>
 </div>
 <div class="content-row">
-  <h1>{{tt this "displayName"}}</h1>
+  <h1>{{tt this "fullName"}}</h1>
   <div class="indented-row">
     {{one-icon icon="user-profile" class="user-image"}}
-    {{one-inline-editor value=user.displayName onSave=(action "saveDisplayName") class="display-name-editor"}}
+    {{one-inline-editor value=user.fullName onSave=(action "saveFullName") class="full-name-editor"}}
   </div>
 </div>
 <div class="content-row">

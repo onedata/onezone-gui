@@ -18,7 +18,7 @@ export default Model.extend(GraphSingleModelMixin, {
   onedataGraph: inject(),
   onedataGraphUtils: inject(),
 
-  displayName: attr('string'),
+  fullName: attr('string'),
   username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
@@ -40,7 +40,7 @@ export default Model.extend(GraphSingleModelMixin, {
   clusterList: belongsTo('clusterList'),
 
   
-  name: alias('displayName'),
+  name: alias('fullName'),
 
   //#region Non-store User operations
 

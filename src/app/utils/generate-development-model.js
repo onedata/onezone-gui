@@ -184,7 +184,7 @@ function createUserRecord(store, listRecords) {
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
         id: userGri(USER_ID),
-        displayName: USERNAME,
+        fullName: USERNAME,
         basicAuthEnabled: true,
         hasPassword: false,
         username: USER_LOGIN,

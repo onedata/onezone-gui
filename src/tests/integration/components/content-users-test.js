@@ -54,18 +54,18 @@ describe('Integration | Component | content users', function () {
     registerService(this, 'authorizerManager', authorizerManagerStub);
 
     const MOCKED_USER = EmberObject.create({
-      displayName: 'some name',
+      fullName: 'some name',
       username: 'some login',
       basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
   });
 
-  it('renders display name', function (done) {
+  it('renders full name', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.display-name-editor').text().trim())
-        .to.equal(this.get('user.displayName'));
+      expect(this.$('.full-name-editor').text().trim())
+        .to.equal(this.get('user.fullName'));
       done();
     });
   });
@@ -99,13 +99,13 @@ describe('Integration | Component | content users', function () {
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.display-name-editor .one-label').then(() => {
-        fillIn('.display-name-editor input', newName).then(() => {
-          click('.display-name-editor .save-icon').then(() => {
+      click('.full-name-editor .one-label').then(() => {
+        fillIn('.full-name-editor input', newName).then(() => {
+          click('.full-name-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.display-name-editor').text().trim())
-              .to.equal(user.get('displayName'));
-            expect(user.get('displayName')).to.equal(newName);
+            expect(this.$('.full-name-editor').text().trim())
+              .to.equal(user.get('fullName'));
+            expect(user.get('fullName')).to.equal(newName);
             done();
           });
         });

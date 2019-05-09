@@ -11,10 +11,10 @@ import { alias } from '@ember/object/computed';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export default Model.extend(GraphSingleModelMixin, {
-  displayName: attr('string'),
+  fullName: attr('string'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  name: alias('displayName'),
+  name: alias('fullName'),
 });

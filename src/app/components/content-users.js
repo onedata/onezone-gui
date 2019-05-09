@@ -17,6 +17,14 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { htmlSafe } from '@ember/template';
+import config from 'ember-get-config';
+
+const {
+  validationConfig: {
+    minNameLength,
+    maxNameLength,
+  },
+} = config;
 
 const animationTimeout = 333;
 
@@ -196,23 +204,30 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    saveDisplayName(displayName) {
-      const user = this.get('user');
-      if (!displayName || !displayName.length) {
+    saveFullName(fullName) {
+      const fullNameLength = (fullName && fullName.length) || 0;
+      if (fullNameLength < minNameLength || fullNameLength > maxNameLength) {
         return reject();
       }
-      const oldDisplayName = get(user, 'displayName');
-      set(user, 'displayName', displayName);
+
+      const user = this.get('user');
+      const oldFullName = get(user, 'fullName');
+      set(user, 'fullName', fullName);
       return this._saveUser().catch((error) => {
-        // Restore old user display name
-        set(user, 'displayName', oldDisplayName);
+        // Restore old user full name
+        set(user, 'fullName', oldFullName);
         throw error;
       });
     },
     saveUsername(username) {
+      const usernameLength = (username && username.length) || 0;
+      if (usernameLength < minNameLength || usernameLength > maxNameLength) {
+        return reject();
+      }
+
       const user = this.get('user');
       const oldUsername = get(user, 'username');
-      set(user, 'username', username && username.length ? username : null);
+      set(user, 'username', username);
       return this._saveUser().catch((error) => {
         // Restore old username
         set(user, 'username', oldUsername);
