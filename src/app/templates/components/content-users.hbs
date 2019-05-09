@@ -11,7 +11,7 @@
   </div>
 </div>
 <div class="content-row">
-  <h1>{{tt this "username"}}</h1>
+  <h1><span class="one-label">{{tt this "username"}}</span> {{one-label-tip title=(tt this (if user.basicAuthEnabled "usernameWithBasicAuthHint" "usernameNoBasicAuthHint"))}}</h1>
   <div class="indented-row">
     {{one-inline-editor value=user.username onSave=(action "saveUsername") class="username-editor"}}
   </div>
