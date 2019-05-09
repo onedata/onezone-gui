@@ -1,7 +1,7 @@
 {{one-icon-tagged
-  class=(concat "sidebar-item-icon" (unless item.online " item-error"))
+  class=(concat "sidebar-item-icon" (if offline " item-error"))
   icon="provider"
-  tagIcon=(unless item.online "x")
+  tagIcon=(if offline "x")
   shadowType="none"
 }}
 {{#truncated-string class="after-icon before-status"}}

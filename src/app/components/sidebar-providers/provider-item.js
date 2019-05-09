@@ -8,9 +8,9 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { computed } from '@ember/object';
+import { not } from '@ember/object/computed';
 import Component from '@ember/component';
-import { get } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { inject as service } from '@ember/service';
 
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
@@ -42,7 +42,7 @@ export default Component.extend(I18n, UserProxyMixin, {
    */
   providerId: reads('provider.entityId'),
 
-  online: reads('provider.online'),
+  offline: not('provider.online'),
 
   /**
    * Icon class based on item status
