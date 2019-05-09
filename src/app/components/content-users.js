@@ -9,7 +9,6 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { reject } from 'rsvp';
 import { inject } from '@ember/service';
 import { computed, set, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -17,14 +16,6 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { htmlSafe } from '@ember/template';
-import config from 'ember-get-config';
-
-const {
-  validationConfig: {
-    minNameLength,
-    maxNameLength,
-  },
-} = config;
 
 const animationTimeout = 333;
 
@@ -205,14 +196,9 @@ export default Component.extend(I18n, {
 
   actions: {
     saveFullName(fullName) {
-      const fullNameLength = (fullName && fullName.length) || 0;
-      if (fullNameLength < minNameLength || fullNameLength > maxNameLength) {
-        return reject();
-      }
-
       const user = this.get('user');
       const oldFullName = get(user, 'fullName');
-      set(user, 'fullName', fullName);
+      set(user, 'fullName', fullName || '');
       return this._saveUser().catch((error) => {
         // Restore old user full name
         set(user, 'fullName', oldFullName);
@@ -220,14 +206,9 @@ export default Component.extend(I18n, {
       });
     },
     saveUsername(username) {
-      const usernameLength = (username && username.length) || 0;
-      if (usernameLength < minNameLength || usernameLength > maxNameLength) {
-        return reject();
-      }
-
       const user = this.get('user');
       const oldUsername = get(user, 'username');
-      set(user, 'username', username);
+      set(user, 'username', username || '');
       return this._saveUser().catch((error) => {
         // Restore old username
         set(user, 'username', oldUsername);
