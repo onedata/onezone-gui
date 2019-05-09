@@ -461,7 +461,7 @@ function createHarvesterRecords(store) {
             scope: 'private',
           }),
           name: `Index ${index}`,
-          schema: '',
+          schema: '{}',
         }).save();
       }))
       .then((records => createListRecord(store, 'index', records)))

@@ -4,13 +4,12 @@ import { computed, get, getProperties, setProperties } from '@ember/object';
 import { A } from '@ember/array';
 import { Promise, reject } from 'rsvp';
 import { inject as service } from '@ember/service';
-import { debounce, scheduleOnce } from '@ember/runloop';
 import _ from 'lodash';
-import $ from 'jquery';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, WindowResizeHandler, {
   classNames: ['content-harvesters-indices-progress-table'],
 
   currentUser: service(),
@@ -42,21 +41,6 @@ export default Component.extend(I18n, {
    * @type {number}
    */
   breakpoint: 1200,
-
-  /**
-   * @type {Window}
-   */
-  _window: window,
-
-  /**
-   * Window resize handler.
-   * @type {Function}
-   */
-  windowResizeHandler: computed(function windowResizeHandler() {
-    return () => {
-      debounce(this, this.windowResized, 100);
-    };
-  }),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A>}
@@ -211,6 +195,17 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * @type {Ember.ComputedProperty<null>}
+   */
+  basicTableSetupTrigger: computed(
+    'spaces',
+    'providers',
+    function basicTableSetupTrigger() {
+      return null;
+    }
+  ),
+
+  /**
    * Progress data ready to render. Format:
    * [
    *   {
@@ -272,29 +267,9 @@ export default Component.extend(I18n, {
     }
   ),
 
-  didInsertElement() {
-    this._super(...arguments);
-    const {
-      _window,
-      windowResizeHandler,
-    } = this.getProperties('_window', 'windowResizeHandler');
-    $(_window).on('resize', windowResizeHandler);
-    scheduleOnce('afterRender', this, 'windowResized');
-  },
-
   willDestroyElement() {
     try {
-      const {
-        _window,
-        windowResizeHandler,
-        indexProgressProxy,
-      } = this.getProperties(
-        '_window',
-        'windowResizeHandler',
-        'indexProgressProxy'
-      );
-      $(_window).off('resize', windowResizeHandler);
-      
+      const indexProgressProxy = this.get('indexProgressProxy');
       const {
         content: indexProgress,
         isFulfilled: isIndexProgressProxyFulfilled,
@@ -307,7 +282,10 @@ export default Component.extend(I18n, {
     }
   },
 
-  windowResized() {
+  /**
+   * @override
+   */
+  onWindowResize() {
     const {
       _window,
       breakpoint,

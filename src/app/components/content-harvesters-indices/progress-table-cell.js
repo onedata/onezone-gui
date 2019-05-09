@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { computed, getProperties } from '@ember/object';
+import { computed, observer, getProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, {
@@ -43,6 +43,19 @@ export default Component.extend(I18n, {
    * `
    */
   progress: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  isTableCollapsed: false,
+
+  /**
+   * @type {boolean}
+   * 
+   * If true, popover with additional info will be visible
+   */
+  isMoreInfoVisible: false,
 
   /**
    * @type {Ember.ComputedProperty<models.Space>}
@@ -90,6 +103,10 @@ export default Component.extend(I18n, {
     }
   ),
 
+  lastUpdate: computed('progress.lastUpdate', function lastUpdate() {
+    const lastUpdateTimestamp = this.get('progress.lastUpdate');
+  }),
+
   /**
    * @type {Ember.ComputedProperty<string>}
    */
@@ -111,4 +128,29 @@ export default Component.extend(I18n, {
       return classes.join(' ');
     }
   ),
+
+  isTableCollapsedObserver: observer(
+    'isTableCollapsed',
+    function isTableCollapsedObserver() {
+      const isMoreInfoVisible = this.get('isMoreInfoVisible');
+
+      // Close popovers on table transform to prevent showing popovers for
+      // collapsed items
+      if (isMoreInfoVisible) {
+        this.set('isMoreInfoVisible', false);
+      }
+    }
+  ),
+
+  willDestroyElement() {
+    this._super(...arguments);
+  },
+
+  actions: {
+    toggleMoreInfo(isVisible) {
+      if (isVisible !== this.get('isMoreInfoVisible')) {
+        this.set('isMoreInfoVisible', isVisible);
+      }
+    },
+  },
 });

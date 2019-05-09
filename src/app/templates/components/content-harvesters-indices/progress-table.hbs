@@ -2,7 +2,7 @@
 {{#promise-proxy-container proxy=dataLoadingProxy}}
   {{#if progressData.length}}
     <div class="progress-table-container">
-      {{#basic-table breakpoint=breakpoint class="table dropdown-table-rows"}}
+      {{#basic-table breakpoint=breakpoint setupTrigger=basicTableSetupTrigger class="table dropdown-table-rows"}}
         <thead>
           <tr class="hidden">
             <th class="space-name"></th>
@@ -23,7 +23,9 @@
                 </span>
               </td>
               {{#each spaceProgress.progress as |providerProgress|}}
-                {{content-harvesters-indices/progress-table-cell progress=providerProgress}}
+                {{content-harvesters-indices/progress-table-cell
+                  progress=providerProgress
+                  isTableCollapsed=isTableCollapsed}}
               {{/each}}
             </tr>
           {{/each}}

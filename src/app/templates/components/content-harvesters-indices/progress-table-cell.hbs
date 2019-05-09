@@ -1,7 +1,22 @@
-<div class={{progressDotClassNames}}>
+<div
+  class={{concat progressDotClassNames " more-info-trigger-" elementId}}
+  {{action "toggleMoreInfo" (not isMoreInfoVisible)}}>
   {{#if isSupported}}
     {{percent}}%
   {{else}}
     {{one-tooltip title=(tt this "noData" spaceName=space.name providerName=provider.name)}}
   {{/if}}
+</div>
+<div>
+  {{#render-later triggerRender=isMoreInfoVisible}}
+    {{#one-webui-popover
+      class="progress-more-info"
+      triggerSelector=(concat ".more-info-trigger-" elementId)
+      open=isMoreInfoVisible
+      as |popover|}}
+      {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat ".more-info-trigger-" elementId)}}
+        Last update
+      {{/click-outside}}
+    {{/one-webui-popover}}
+  {{/render-later}}
 </div>

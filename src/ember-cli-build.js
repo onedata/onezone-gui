@@ -83,8 +83,6 @@ module.exports = function (defaults) {
   // along with the exports of each module as its value.
 
   const BOWER_ASSETS = [
-    'basictable/jquery.basictable.min.js',
-    'basictable/basictable.css',
     'webui-popover/dist/jquery.webui-popover.css',
     'webui-popover/dist/jquery.webui-popover.js',
   ];
