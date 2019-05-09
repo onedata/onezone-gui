@@ -192,3 +192,16 @@
     }
   }
 }
+
+.progress-more-info.one-webui-popover {
+  max-width: 200px;
+  word-break: break-all;
+  .description-items {
+    padding-left: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .last-update {
+    word-break: normal;
+  }
+}

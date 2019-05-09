@@ -13,6 +13,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed, observer, getProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import moment from 'moment';
 
 export default Component.extend(I18n, {
   tagName: 'td',
@@ -65,7 +66,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<models.Provider>}
    */
-  provider: reads('progress.space'),
+  provider: reads('progress.provider'),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -103,9 +104,22 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   * 
+   * Last index update time converted from unix timestamp to readable format
+   */
   lastUpdate: computed('progress.lastUpdate', function lastUpdate() {
     const lastUpdateTimestamp = this.get('progress.lastUpdate');
+    if (lastUpdateTimestamp) {
+      return moment.unix(lastUpdateTimestamp).format('YYYY-MM-DD, HH:mm:ss');
+    }
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   */
+  error: reads('progress.error'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -113,15 +127,21 @@ export default Component.extend(I18n, {
   progressDotClassNames: computed(
     'isSupported',
     'percent',
+    'error',
     function valueClass() {
       const {
         isSupported,
         percent,
-      } = this.getProperties('isSupported', 'percent');
+        error,
+      } = this.getProperties('isSupported', 'percent', 'error');
 
       const classes = ['progress-dot'];
       if (isSupported) {
-        classes.push(percent < 100 ? 'warning' : 'success');
+        if (error) {
+          classes.push('danger');
+        } else {
+          classes.push(percent < 100 ? 'warning' : 'success');
+        }
       } else {
         classes.push('not-supported');
       }

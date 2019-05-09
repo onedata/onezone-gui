@@ -26,6 +26,11 @@ export default {
     nothingToHarvest: 'There is no data to harvest. Set up files metadata in connected spaces or attach another space to start harvesting process.',
   },
   progressTableCell: {
-    noData: 'There is no data to harvest or space "{{spaceName}}" is not supported by provider "{{providerName}}".',
+    space: 'Space',
+    provider: 'Provider',
+    progress: 'Progress',
+    lastUpdate: 'Last update',
+    error: 'Error',
+    notSupported: 'Space not supported',
   },
 };
