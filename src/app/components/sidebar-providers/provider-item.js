@@ -42,6 +42,8 @@ export default Component.extend(I18n, UserProxyMixin, {
    */
   providerId: reads('provider.entityId'),
 
+  online: reads('provider.online'),
+
   /**
    * Icon class based on item status
    * @type {Ember.ComputedProperty<string>}
