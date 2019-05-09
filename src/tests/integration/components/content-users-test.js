@@ -54,27 +54,27 @@ describe('Integration | Component | content users', function () {
     registerService(this, 'authorizerManager', authorizerManagerStub);
 
     const MOCKED_USER = EmberObject.create({
-      name: 'some name',
-      login: 'some login',
+      displayName: 'some name',
+      username: 'some login',
       basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
   });
 
-  it('renders user name', function (done) {
+  it('renders display name', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.name-editor').text().trim())
-        .to.equal(this.get('user.name'));
+      expect(this.$('.display-name-editor').text().trim())
+        .to.equal(this.get('user.displayName'));
       done();
     });
   });
 
-  it('renders login', function (done) {
+  it('renders username', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.login-editor').text().trim())
-        .to.equal(this.get('user.login'));
+      expect(this.$('.username-editor').text().trim())
+        .to.equal(this.get('user.username'));
       done();
     });
   });
@@ -92,20 +92,20 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change user name', function (done) {
+  it('allows to change display name', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newName = 'testName';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.name-editor .one-label').then(() => {
-        fillIn('.name-editor input', newName).then(() => {
-          click('.name-editor .save-icon').then(() => {
+      click('.display-name-editor .one-label').then(() => {
+        fillIn('.display-name-editor input', newName).then(() => {
+          click('.display-name-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.name-editor').text().trim())
-              .to.equal(user.get('name'));
-            expect(user.get('name')).to.equal(newName);
+            expect(this.$('.display-name-editor').text().trim())
+              .to.equal(user.get('displayName'));
+            expect(user.get('displayName')).to.equal(newName);
             done();
           });
         });
@@ -113,20 +113,20 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change login', function (done) {
+  it('allows to change username', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
-    const newLogin = 'testLogin';
+    const newUsername = 'testUsername';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.login-editor .one-label').then(() => {
-        fillIn('.login-editor input', newLogin).then(() => {
-          click('.login-editor .save-icon').then(() => {
+      click('.username-editor .one-label').then(() => {
+        fillIn('.username-editor input', newUsername).then(() => {
+          click('.username-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.login-editor').text().trim())
-              .to.equal(user.get('login'));
-            expect(user.get('login')).to.equal(newLogin);
+            expect(this.$('.username-editor').text().trim())
+              .to.equal(user.get('username'));
+            expect(user.get('username')).to.equal(newUsername);
             done();
           });
         });

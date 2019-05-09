@@ -1,7 +1,7 @@
 /**
  * @module models/user
- * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -9,6 +9,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { inject } from '@ember/service';
 import { camelize } from '@ember/string';
+import { alias } from '@ember/object/computed';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -17,10 +18,8 @@ export default Model.extend(GraphSingleModelMixin, {
   onedataGraph: inject(),
   onedataGraphUtils: inject(),
 
-  isCollection: true,
-
-  name: attr('string'),
-  login: attr('string'),
+  displayName: attr('string'),
+  username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
 
@@ -39,6 +38,9 @@ export default Model.extend(GraphSingleModelMixin, {
   clientTokenList: belongsTo('clientTokenList'),
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
+
+  
+  name: alias('displayName'),
 
   //#region Non-store User operations
 

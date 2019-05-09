@@ -104,7 +104,7 @@ export default Component.extend(I18n, {
   authorizersForSelect: computed('identityProviders.[]', function () {
     const supportedAuthorizers = this.get('identityProviders');
     if (supportedAuthorizers) {
-      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
+      return supportedAuthorizers.filter(auth => auth.id !== 'basicAuth');
     } else {
       return [];
     }
@@ -132,10 +132,10 @@ export default Component.extend(I18n, {
     }
   ),
 
-  userLoginObserver: observer('user.login', function userLoginObserver() {
-    const login = this.get('user.login');
-    if (!login) {
-      // If login has been cleared out, password change is impossible.
+  usernameObserver: observer('user.username', function usernameObserver() {
+    const username = this.get('user.username');
+    if (!username) {
+      // If username has been cleared out, password change is impossible.
       this.set('isChangingPassword', false);
     }
   }),
@@ -196,26 +196,26 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    saveName(name) {
+    saveDisplayName(displayName) {
       const user = this.get('user');
-      if (!name || !name.length) {
+      if (!displayName || !displayName.length) {
         return reject();
       }
-      const oldName = get(user, 'name');
-      set(user, 'name', name);
+      const oldDisplayName = get(user, 'displayName');
+      set(user, 'displayName', displayName);
       return this._saveUser().catch((error) => {
-        // Restore old user name
-        set(user, 'name', oldName);
+        // Restore old user display name
+        set(user, 'displayName', oldDisplayName);
         throw error;
       });
     },
-    saveLogin(login) {
+    saveUsername(username) {
       const user = this.get('user');
-      const oldLogin = get(user, 'login');
-      set(user, 'login', login && login.length ? login : null);
+      const oldUsername = get(user, 'username');
+      set(user, 'username', username && username.length ? username : null);
       return this._saveUser().catch((error) => {
-        // Restore old user login
-        set(user, 'login', oldLogin);
+        // Restore old username
+        set(user, 'username', oldUsername);
         throw error;
       });
     },
@@ -254,7 +254,6 @@ export default Component.extend(I18n, {
       if (this.get('_isProvidersDropdownVisible')) {
         this._animateHide(dropdownDesc);
         this._animateShow(authDropdown, true);
-        this.$('.login-username').focus();
         this.set('_formAnimationTimeoutId',
           setTimeout(() => dropdownDesc.addClass('hide'), _animationTimeout)
         );

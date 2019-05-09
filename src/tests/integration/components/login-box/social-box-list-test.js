@@ -37,19 +37,19 @@ describe('Integration | Component | login box/social box list', function () {
     });
   });
 
-  it('shows clickable onepanel auth provider', function (done) {
+  it('shows clickable basicAuth', function (done) {
     const basicAuthSpy = sinon.spy();
     this.on('basicAuthSpy', basicAuthSpy);
     this.set('supportedAuthorizers', [{
-      id: 'onepanel',
-      iconPath: '/custom/onepanel.svg',
+      id: 'basicAuth',
+      iconPath: '/custom/basicauth.svg',
     }]);
     this.render(hbs `{{login-box/social-box-list
       supportedAuthorizers=supportedAuthorizers
       usernameLoginClick=(action "basicAuthSpy")}}
     `);
-    expect(this.$('.login-icon-box.onepanel')).to.exist;
-    click('.login-icon-box.onepanel').then(() => {
+    expect(this.$('.login-icon-box.basicAuth')).to.exist;
+    click('.login-icon-box.basicAuth').then(() => {
       expect(basicAuthSpy).to.be.calledOnce;
       done();
     });

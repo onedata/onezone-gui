@@ -184,10 +184,10 @@ function createUserRecord(store, listRecords) {
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
         id: userGri(USER_ID),
-        name: USERNAME,
+        displayName: USERNAME,
         basicAuthEnabled: true,
         hasPassword: false,
-        login: USER_LOGIN,
+        username: USER_LOGIN,
         defaultSpaceId,
       });
       listRecords.forEach(lr =>
