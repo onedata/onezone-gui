@@ -74,8 +74,9 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<string>}
    */
-  passwordString: computed(function passwordString() {
-    return htmlSafe('&#9679;'.repeat(5));
+  passwordString: computed('user.hasPassword', function passwordString() {
+    const hasPassword = this.get('user.hasPassword');
+    return hasPassword ? htmlSafe('&#9679;'.repeat(5)) : undefined;
   }),
 
   /**
