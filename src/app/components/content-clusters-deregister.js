@@ -65,7 +65,7 @@ export default Component.extend(
      */
     fetchStats() {
       const cluster = this.get('cluster');
-      if (get(cluster, 'canViewPrivateData')) {
+      if (get(cluster, 'hasViewPrivilege')) {
         return this.getOneproviderClusterResourceStats(cluster);
       } else {
         return reject();
@@ -81,10 +81,7 @@ export default Component.extend(
         cluster,
         clusterManager,
       } = this.getProperties('cluster', 'clusterManager');
-      return get(cluster, 'provider')
-        .then(provider => provider.destroyRecord())
-        .then(() => clusterManager.getClusters())
-        .then(clusterList => clusterList.reload());
+      return clusterManager.deregisterOneproviderCluster(cluster);
     },
 
     afterDeregister() {

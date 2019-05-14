@@ -53,8 +53,6 @@ export default Model.extend(
 
     creationTime: reads('info.creationTime'),
 
-    canViewPrivateData: equal('scope', 'private'),
-
     standaloneOrigin: computed('domain', function standaloneOrigin() {
       return domainToOrigin(this.get('domain'));
     }),
