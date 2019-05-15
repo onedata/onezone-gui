@@ -10,9 +10,6 @@ export default {
   harvesterSpaces: 'Harvester spaces',
   addYourSpace: 'Add one of your spaces',
   inviteSpaceUsingToken: 'Invite space using token',
-  noSpacesStart: 'This harvester has no spaces. You can',
-  noSpacesAdd: ' add ',
-  noSpacesOr: 'or',
-  noSpacesInvite: ' invite ',
-  noSpacesEnd: 'some existing space.',
+  noSpaces: 'This harvester does not acquire metadata from any space. To start indexing process, add a space.',
+
 };
