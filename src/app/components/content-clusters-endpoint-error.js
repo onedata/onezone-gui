@@ -12,7 +12,6 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import checkImg from 'onedata-gui-common/utils/check-img';
 import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
 
 export default Component.extend(I18n, ErrorCheckViewMixin, {
@@ -46,8 +45,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    * @override
    */
   checkError() {
-    const origin = this.get('cluster.standaloneOrigin');
-    return checkImg(`${origin}/favicon.ico`).then(check => !check);
+    return this.get('cluster').updateIsOnlineProxy().then(online => !online);
   },
 
   /**

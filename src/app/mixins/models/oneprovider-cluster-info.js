@@ -14,7 +14,7 @@ import { reject } from 'rsvp';
 
 export default Mixin.create({
   // virtual: type
-  // virtual: canViewPrivateData
+  // virtual: hasViewPrivilege
   // virtual: oneproviderEntityId
   // virtual: onedataGraph
 
@@ -25,11 +25,11 @@ export default Mixin.create({
   getOneproviderClusterInfo(aspect) {
     const {
       type,
-      canViewPrivateData,
-    } = this.getProperties('type', 'canViewPrivateData');
+      hasViewPrivilege,
+    } = this.getProperties('type', 'hasViewPrivilege');
     if (type !== 'oneprovider') {
       return reject('mixin:oneprovider-cluster-info: cluster type is not oneprovider');
-    } else if (!canViewPrivateData) {
+    } else if (!hasViewPrivilege) {
       return reject('mixin:oneprovider-cluster-info: forbidden');
     } else {
       const {
@@ -50,7 +50,7 @@ export default Mixin.create({
 });
 
 function computedOneproviderClusterInfo(aspect) {
-  return computed('canViewPrivateData', 'type', function () {
+  return computed('hasViewPrivilege', 'type', function () {
     return this.getOneproviderClusterInfo(aspect);
   });
 }

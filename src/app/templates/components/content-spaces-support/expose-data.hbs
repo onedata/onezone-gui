@@ -1,14 +1,18 @@
 <div class="row">
-  <div class="col-xs-12 col-md-7 col-lg-8">
-    <div class="row content-row no-border">
-      <p>{{tt this "desc1"}}</p>
-      <p>{{tt this "desc2"}}</p>
+  <div class="col-xs-12">
+    <div class="row content-row no-border relative">
+      <div class="col-xs-12 col-md-5 col-lg-6">
+        <p>{{tt this "desc1"}}</p>
+        <p>{{tt this "desc2"}}</p>
+      </div>
+      <div class="hidden-xs hidden-sm col-md-7 col-lg-6 col-vertical-middle-absolute-right">
+        <img class="image-support" src={{root-url "assets/images/space-support-expose.svg"}}>
+      </div>
     </div>
     <div class="row content-row no-border">
       {{content-spaces-support/-os-supported}}
     </div>
   </div>
-  <img class="col-image col-image-support hidden-xs hidden-sm col-md-5 col-lg-4" src={{root-url "assets/images/space-support-expose.svg"}}>
   <div class="col-xs-12">
     <div class="row content-row no-border">
       <div class="inner-row-content">

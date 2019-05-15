@@ -1,4 +1,9 @@
-{{one-icon class="sidebar-item-icon" icon="provider"}} 
+{{one-icon-tagged
+  class=(concat "sidebar-item-icon" (if offline " item-error"))
+  icon="provider"
+  tagIcon=(if offline "x")
+  shadowType="none"
+}}
 {{#truncated-string class="after-icon before-status"}}
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
