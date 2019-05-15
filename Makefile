@@ -7,9 +7,6 @@ all: build_dev
 
 rel: build_prod
 
-publish_pkg: rel
-	./bamboos/scripts/publish_gui_pkg_docker.sh
-
 deps:
 	cd $(SRC_DIR) && npm install
 	cd $(SRC_DIR) && bower install --allow-root
