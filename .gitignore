@@ -70,3 +70,6 @@ typings/
 
 # ES Lint (currently we force developers to use only JSHint)
 .eslintrc.js
+
+gui_static.tar.gz
+gui_static

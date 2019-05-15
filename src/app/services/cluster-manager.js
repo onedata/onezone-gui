@@ -299,4 +299,16 @@ export default Service.extend({
   reloadEffUserList(entityId) {
     return this.reloadModelList(entityId, 'effUserList');
   },
+
+  /**
+   * Deregisters Oneprovider cluster from Onezone
+   * @param {models/Cluster} cluster cluster which must be "oneprovider" type
+   * @returns {Promise<models/ClusterList>}
+   */
+  deregisterOneproviderCluster(cluster) {
+    return get(cluster, 'provider')
+      .then(provider => provider.destroyRecord())
+      .then(() => this.getClusters())
+      .then(clusterList => clusterList.reload());
+  },
 });

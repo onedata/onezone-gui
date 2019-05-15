@@ -1,7 +1,7 @@
 /**
  * @module models/cluster
  * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -17,13 +17,16 @@ import { hash, resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
+import checkImg from 'onedata-gui-common/utils/check-img';
+import { Promise } from 'rsvp';
 
 export default Model.extend(
   GraphSingleModelMixin,
   InvitingModelMixin,
   OneproviderClusterInfoMixin,
   createDataProxyMixin('name'),
-  createDataProxyMixin('domain'), {
+  createDataProxyMixin('domain'),
+  createDataProxyMixin('isOnline'), {
     onedataConnection: service(),
     onedataGraph: service(),
 
@@ -32,7 +35,6 @@ export default Model.extend(
     onepanelProxy: attr('boolean'),
     workerVersion: attr('object'),
     onepanelVersion: attr('object'),
-    canViewPrivateData: attr('boolean'),
     canViewPrivileges: attr('boolean', { defaultValue: false }),
     directMembership: attr('boolean', { defaultValue: false }),
     scope: attr('string'),
@@ -52,7 +54,7 @@ export default Model.extend(
     creationTime: reads('info.creationTime'),
 
     standaloneOrigin: computed('domain', function standaloneOrigin() {
-      return `https://${this.get('domain')}:9443`;
+      return domainToOrigin(this.get('domain'));
     }),
 
     oneproviderEntityId: computed(function oneproviderEntityId() {
@@ -109,6 +111,24 @@ export default Model.extend(
       }
     },
 
+    /**
+     * @override
+     */
+    fetchIsOnline() {
+      if (this.get('isLoaded')) {
+        return this._fetchIsOnline();
+      } else {
+        return new Promise((resolve, reject) => {
+          this.on('didLoad', () => this._fetchIsOnline().then(resolve, reject));
+        });
+      }
+    },
+
+    _fetchIsOnline() {
+      return this.getDomainProxy()
+        .then(domain => checkImg(`${domainToOrigin(domain)}/favicon.ico`));
+    },
+
     loadAsyncProperties() {
       return hash({
         name: this.updateNameProxy(),
@@ -117,3 +137,7 @@ export default Model.extend(
     },
   }
 );
+
+function domainToOrigin(domain) {
+  return `https://${domain}:9443`;
+}

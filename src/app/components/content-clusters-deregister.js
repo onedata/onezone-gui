@@ -25,6 +25,7 @@ export default Component.extend(
     guiUtils: service(),
     globalNotify: service(),
     router: service(),
+    clusterManager: service(),
 
     /**
      * @override
@@ -64,7 +65,7 @@ export default Component.extend(
      */
     fetchStats() {
       const cluster = this.get('cluster');
-      if (get(cluster, 'canViewPrivateData')) {
+      if (get(cluster, 'hasViewPrivilege')) {
         return this.getOneproviderClusterResourceStats(cluster);
       } else {
         return reject();
@@ -76,9 +77,11 @@ export default Component.extend(
     },
 
     deregister() {
-      const cluster = this.get('cluster');
-      return get(cluster, 'provider')
-        .then(provider => provider.destroyRecord());
+      const {
+        cluster,
+        clusterManager,
+      } = this.getProperties('cluster', 'clusterManager');
+      return clusterManager.deregisterOneproviderCluster(cluster);
     },
 
     afterDeregister() {
