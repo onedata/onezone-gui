@@ -14,6 +14,7 @@ export default {
     messageText: 'Are you sure you want to remove index "{{indexName}}"?',
     proceed: 'Remove',
     cancel: 'Cancel',
+    removeHarvestedData: 'Remove harvested data',
   },
   indexEntry: {
     usedByGui: 'Used by GUI',

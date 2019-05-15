@@ -7,16 +7,56 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import RecordRemoveModal from 'onezone-gui/components/record-remove-modal';
+import Component from '@ember/component';
+import { observer } from '@ember/object';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 
-export default RecordRemoveModal.extend({
+export default Component.extend(I18n, {
   /**
    * @override
    */
   i18nPrefix: 'components.harvesterRemoveModal',
 
   /**
-   * @override
+   * @virtual
+   * @type {models.Harvester}
    */
-  modalClass: 'harvester-remove-modal',
+  record: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isRemoveDataChecked: false,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {boolean}
+   */
+  opened: false,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {Function}
+   */
+  close: notImplementedThrow,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {Function}
+   */
+  proceed: notImplementedThrow,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {boolean}
+   */
+  processing: false,
+
+  openedObserver: observer('opened', function openedObserver() {
+    const opened = this.get('opened');
+    if (!opened) {
+      this.set('isRemoveDataChecked', false);
+    }
+  }),
 });

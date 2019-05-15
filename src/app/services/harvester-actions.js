@@ -176,14 +176,15 @@ export default Service.extend(I18n, {
   /**
    * Removes harvester
    * @param {Model.Harvester} harvester
+   * @param {boolean} removeData
    * @returns {Promise}
    */
-  removeHarvester(harvester) {
+  removeHarvester(harvester, removeData) {
     const {
       harvesterManager,
       globalNotify,
     } = this.getProperties('harvesterManager', 'globalNotify');
-    return harvesterManager.removeHarvester(get(harvester, 'id'))
+    return harvesterManager.removeHarvester(get(harvester, 'id'), removeData)
       .then(() => {
         globalNotify.success(this.t(
           'removeHarvesterSuccess', { harvesterName: get(harvester, 'name') }
@@ -393,14 +394,15 @@ export default Service.extend(I18n, {
   /**
    * Removes index
    * @param {Model.Index} index
+   * @param {boolean} removeData
    * @returns {Promise}
    */
-  removeIndex(index) {
+  removeIndex(index, removeData) {
     const {
       harvesterManager,
       globalNotify,
     } = this.getProperties('harvesterManager', 'globalNotify');
-    return harvesterManager.removeIndex(get(index, 'gri'))
+    return harvesterManager.removeIndex(get(index, 'gri'), removeData)
       .then(() => {
         globalNotify.success(this.t(
           'removeIndexSuccess', { indexName: get(index, 'name') }

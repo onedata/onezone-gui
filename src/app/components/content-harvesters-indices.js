@@ -266,13 +266,13 @@ export default Component.extend(I18n, GlobalActions, {
           this.set('isCreateIndexFormVisible', false);
         }));
     },
-    removeIndex() {
+    removeIndex(removeData) {
       const {
         harvesterActions,
         indexToRemove,
       } = this.getProperties('harvesterActions', 'indexToRemove');
       this.set('isRemovingIndex', true);
-      return harvesterActions.removeIndex(indexToRemove)
+      return harvesterActions.removeIndex(indexToRemove, removeData)
         .finally(() =>
           safeExec(this, 'setProperties', {
             isRemovingIndex: false,

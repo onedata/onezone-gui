@@ -165,13 +165,13 @@ export default Component.extend(I18n, {
     closeRemoveModal() {
       this.set('isRemoveModalOpened', false);
     },
-    remove() {
+    remove(removeData) {
       const {
         harvester,
         harvesterActions,
       } = this.getProperties('harvester', 'harvesterActions');
       this.set('isRemoving', true);
-      return harvesterActions.removeHarvester(harvester)
+      return harvesterActions.removeHarvester(harvester, removeData)
         .then(() => this.redirectOnHarvesterRemove())
         .finally(() => {
           safeExec(this, 'setProperties', {

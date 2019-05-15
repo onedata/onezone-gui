@@ -106,10 +106,27 @@ export default Service.extend({
   /**
    * Removes harvester
    * @param {string} id
+   * @param {boolean} removeData
    * @returns {Promise}
    */
-  removeHarvester(id) {
+  removeHarvester(id, removeData) {
+    const onedataGraph = this.get('onedataGraph');
     return this.getRecord(id, false)
+      .then(record => {
+        const parsedGri = get(record, 'parsedGri');
+        let promise = resolve();
+        if (removeData) {
+          const dataGri = 
+            gri(Object.assign({}, parsedGri, { aspect: 'metadata' }));
+          promise = promise.then(() =>
+            onedataGraph.request({
+              gri: dataGri,
+              operation: 'delete',
+            })
+          );
+        }
+        return promise.then(() => record);
+      })
       .then(record => record.destroyRecord())
       .then(destroyResult => this.reloadList().then(() => destroyResult));
   },
@@ -427,15 +444,31 @@ export default Service.extend({
 
   /**
    * Removes index
-   * @param {string} indexGri 
+   * @param {string} indexGri
+   * @param {boolean} removeData
    * @return {Promise}
    */
-  removeIndex(indexGri) {
-    const harvesterEntityId = parseGri(indexGri).entityId;
-    return this.get('onedataGraph').request({
-      gri: indexGri,
-      operation: 'delete',
-    }).then(() => this.reloadIndexList(harvesterEntityId));
+  removeIndex(indexGri, removeData) {
+    const onedataGraph = this.get('onedataGraph');
+    const parsedIndexGri = parseGri(indexGri);
+    const harvesterEntityId = get(parsedIndexGri, 'entityId');
+    let promise = resolve();
+    if (removeData) {
+      const dataGri = 
+        gri(Object.assign({}, parsedIndexGri, { aspect: 'index_metadata' }));
+      promise = promise.then(() =>
+        onedataGraph.request({
+          gri: dataGri,
+          operation: 'delete',
+        })
+      );
+    }
+    return promise
+      .then(() => onedataGraph.request({
+        gri: indexGri,
+        operation: 'delete',
+      }))
+      .then(() => this.reloadIndexList(harvesterEntityId));
   },
 
   /**

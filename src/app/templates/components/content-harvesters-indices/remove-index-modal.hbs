@@ -1,0 +1,20 @@
+{{#proceed-process-modal
+  modalClass="remove-index-modal"
+  modalIcon="sign-warning-rounded"
+  i18nPrefix="components.contentHarvestersIndices.removeIndexModal"
+  opened=opened
+  close=close
+  proceed=(action proceed isRemoveDataChecked)
+  processing=processing}}
+  <p>{{tt this "messageText" indexName=index.name}}</p>
+  <div class="row content-row no-border row-understand-notice">
+    {{one-checkbox 
+      class="danger one-checkbox-danger one-checkbox-understand"
+      checked=isRemoveDataChecked
+      update=(action (mut isRemoveDataChecked))
+    }}
+    <div class="text-understand" {{action (mut isRemoveDataChecked) (not isRemoveDataChecked)}}>
+      {{tt this "removeHarvestedData"}}
+    </div>
+  </div>
+{{/proceed-process-modal}}

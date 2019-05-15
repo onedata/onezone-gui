@@ -7,24 +7,18 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
-import { computed } from '@ember/object';
+import Component from '@ember/component';
+import { observer } from '@ember/object';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 
-export default ProceedProcessModal.extend({
+export default Component.extend(I18n, {
+  tagName: '',
+
   /**
    * @override
    */
   i18nPrefix: 'components.contentHarvestersIndices.removeIndexModal',
-
-  /**
-   * @override
-   */
-  modalClass: 'remove-index-modal',
-
-  /**
-   * @override
-   */
-  modalIcon: 'sign-warning-rounded',
 
   /**
    * @type {Models.Index}
@@ -33,11 +27,38 @@ export default ProceedProcessModal.extend({
   index: null,
 
   /**
-   * @override
+   * @type {boolean}
    */
-  messageText: computed('index.name', function messageText() {
-    return this.t('messageText', {
-      indexName: this.get('index.name'),
-    });
+  isRemoveDataChecked: false,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {boolean}
+   */
+  opened: false,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {Function}
+   */
+  close: notImplementedThrow,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {Function}
+   */
+  proceed: notImplementedThrow,
+
+  /**
+   * Field passed to proceed-process-modal
+   * @type {boolean}
+   */
+  processing: false,
+
+  openedObserver: observer('opened', function openedObserver() {
+    const opened = this.get('opened');
+    if (!opened) {
+      this.set('isRemoveDataChecked', false);
+    }
   }),
 });
