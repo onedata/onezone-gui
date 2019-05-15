@@ -1,10 +1,13 @@
-<div
+<svg
   class={{concat progressDotClassNames " more-info-trigger-" elementId}}
+  viewBox="0 0 100 100"
   {{action "toggleMoreInfo" (not isMoreInfoVisible)}}>
   {{#if isSupported}}
-    {{percent}}%
+    <circle class="donut-ring" cx="50" cy="50" r="50"></circle>
+    <circle class="donut-segment" cx="50" cy="50" r="50" stroke-dasharray={{chartDasharray}}></circle>
+    <text x="50%" y="50%" class="chart-text">{{percent}}%</text>
   {{/if}}
-</div>
+</svg>
 <div>
   {{#render-later triggerRender=isMoreInfoVisible}}
     {{#one-webui-popover
@@ -14,15 +17,15 @@
       as |popover|}}
       {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat ".more-info-trigger-" elementId)}}
         <ul class="description-items">
-          <li><strong>{{tt this "space"}}: </strong> <span class="space-name">{{space.name}}</span></li>
-          <li><strong>{{tt this "provider"}}: </strong> <span class="provider-name">{{provider.name}}</span></li>
+          <li><strong>{{tt this "space"}}:</strong> <span class="space-name">{{space.name}}</span></li>
+          <li><strong>{{tt this "provider"}}:</strong> <span class="provider-name">{{provider.name}}</span></li>
           <li>
-            <strong>{{tt this "progress"}}: </strong>
+            <strong>{{tt this "progress"}}:</strong>
             <span class="harvesting-progress">
               {{#if isSupported}}
                 {{percent}}%
               {{else}}
-                {{tt this "notsupported"}}
+                {{tt this "notSupported"}}
               {{/if}}
             </span>
           </li>

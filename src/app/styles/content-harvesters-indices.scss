@@ -89,9 +89,9 @@
         width: $dot-size * 1.5;
       }
       td {
-        max-width: $dot-size * 1.75;
-        width: $dot-size * 1.75;
-        min-width: $dot-size * 1.75;
+        max-width: $dot-size * 1.7;
+        width: $dot-size * 1.7;
+        min-width: $dot-size * 1.7;
       }
     }
 
@@ -173,14 +173,30 @@
       line-height: $dot-size;
       color: $color-one-white;
       font-family: 'Open Sans Semibold';
-      &.danger {
-        background-color: $color-one-danger;
+      .donut-ring, .donut-segment {
+        fill: transparent;
+        stroke-width: 33;
       }
-      &.warning {
-        background-color: $color-one-warning;
+      .donut-ring {
+        stroke: $color-one-gray-sand;
       }
-      &.success {
-        background-color: $color-one-success;
+      .donut-segment {
+        stroke-dashoffset: 78.5398;
+      }
+      .chart-text {
+        font-family: 'Open Sans';
+        font-size: 1.6em;
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      &.danger .donut-segment {
+        stroke: $color-one-danger;
+      }
+      &.warning .donut-segment {
+        stroke: $color-one-warning;
+      }
+      &.success .donut-segment {
+        stroke: $color-one-success;
       }
       &.not-supported {
         opacity: 0.1;
@@ -201,7 +217,7 @@
     margin: 0;
     list-style-type: none;
   }
-  .last-update {
+  .harvesting-progress, .last-update {
     word-break: normal;
   }
 }

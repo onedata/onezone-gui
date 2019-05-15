@@ -149,6 +149,16 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  chartDasharray: computed('percent', function chartDasharray() {
+    const percent = this.get('percent');
+    const circleCoord = percent * Math.PI;
+    const maxCircleCoord = 100 * Math.PI;
+    return `${circleCoord} ${maxCircleCoord - circleCoord}`;
+  }),
+
   isTableCollapsedObserver: observer(
     'isTableCollapsed',
     function isTableCollapsedObserver() {
