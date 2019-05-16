@@ -13,20 +13,19 @@
       class="scroll-breakpoint-800 preserve-header"
       header=(tt this "harvesterSpaces")
       text=(tt this "noSpaces")}}
-      <p class="text-center">
+      <div class="action-buttons">
         {{#bs-button
           class="btn btn-primary btn-content-info btn-add-your-space"
           onClick=(action (mut isAddYourSpaceModalOpened) true)}}
           {{tt this "addYourSpace"}}
         {{/bs-button}}
-      </p>
-      <p class="text-center">
+        &#32;
         {{#bs-button
           class="btn btn-primary btn-content-info btn-invite-space"
           onClick=(action (mut isInviteUsingTokenModalOpened) true)}}
           {{tt this "inviteSpaceUsingToken"}}
         {{/bs-button}}
-      </p>
+      </div>
     {{/content-info}}
   {{else}}
     <div class="row">

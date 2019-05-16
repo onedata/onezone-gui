@@ -1,0 +1,7 @@
+.content-harvesters-spaces {
+  .action-buttons {
+    text-align: center;
+    letter-spacing: $padding-small-vertical;
+    line-height: 1.3 * $line-height-computed + 3 * $padding-base-vertical
+  }
+}
