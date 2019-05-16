@@ -1,5 +1,5 @@
 export default {
-  getSupportHeader: 'Get support',
+  addSupportHeader: 'Add support',
   leadText: 'To store data, you need to belong to a space that is supported by ' +
     'at least one provider. There are three ways to achieve this:',
   space: 'space',

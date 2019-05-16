@@ -1,9 +1,9 @@
 export default {
   header: 'Providers',
-  addStorage: 'Get support',
+  addStorage: 'Add support',
   space: 'space',
   noSupport: {
-    header: 'Get support',
+    header: 'Add support',
     text: 'To store data, the space must be supported by at least one provider. ',
   },
 };
