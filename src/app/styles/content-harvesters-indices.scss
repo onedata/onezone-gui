@@ -4,13 +4,29 @@
     resize: none;
   }
   .one-collapsible-list .list-header-row {
-    padding-right: 140px;
+    padding-right: 170px;
   }
-  .one-collapsible-list-item-header.opened {
-    border-bottom: 0;
+  .one-collapsible-list-item-header {
+    &.opened {
+      border-bottom: 0;
+    }
+    &:hover, &.popover-active {
+      .id-presenter-trigger {
+        display: block;
+      }
+    }
   }
   .one-collapsible-list-item-content.opened {
     max-height: 4000px;
+  }
+  .id-presenter-trigger {
+    @include vertical-align-middle();
+    right: 60px;
+    font-size: 1.3em;
+    display: none;
+    @media (max-width: $screen-xs-max) {
+      display: block;
+    }
   }
   .index-name-editor {
     display: inline-block;
@@ -19,7 +35,7 @@
   }
   .index-labels-container {
     @include vertical-align-middle();
-    right: 55px;
+    right: 90px;
     line-height: 0;
   }
   .index-details-container {
@@ -46,7 +62,7 @@
     @media (min-width: $table-breakpoint + 1) {
       $labels-font-size: 90%;
 
-      .progress-table-container {
+      .progress-table-container.table-layout {
         width: calc(100% - #{$space-name-width});
         margin-left: $space-name-width;
         overflow-x: auto;
@@ -148,6 +164,11 @@
       table-layout: fixed;
     }
 
+    .visible-stats-label {
+      margin-right: 0;
+      margin-left: $padding-xs-horizontal;
+    }
+
     // Chrome hack
     .table:not(.bt) .space-name {
       position: absolute;
@@ -159,6 +180,9 @@
 
     .progress-table-cell {
       position: relative;
+      &.inactive {
+        opacity: 0.4;
+      }
     }
 
     .provider-names td {
@@ -206,6 +230,21 @@
         background-position: right center;
       }
     }
+    .progress-table-container.list-layout {
+      .progress-row {
+        position: relative;
+        line-height: $dot-size;
+        padding-left: $dot-size + $padding-base-horizontal;
+      }
+      .progress-table-cell {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: $dot-size;
+        width: $dot-size;
+      }
+    }
   }
 }
 
@@ -219,5 +258,11 @@
   }
   .harvesting-progress, .last-update {
     word-break: normal;
+  }
+}
+
+.index-id-info.one-webui-popover {
+  .form-group:last-child {
+    margin-bottom: 0;
   }
 }

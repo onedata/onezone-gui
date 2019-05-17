@@ -17,6 +17,11 @@ export default {
     removeHarvestedData: 'Remove harvested data',
   },
   indexEntry: {
+    externalId: 'External index ID',
+    externalIdTooltipHasEndpoint: 'Identifier of this index in the external indexing service: {{endpoint}}',
+    externalIdTooltipNoEndpoint: 'Identifier of this index in the external indexing service',
+    internalId: 'Internal index ID',
+    internalIdTooltip: 'Identifier of this index recognized in Onezone\'s REST API',
     usedByGui: 'Used by GUI',
     remove: 'Remove',
     rename: 'Rename',
@@ -25,13 +30,20 @@ export default {
   },
   progressTable: {
     nothingToHarvest: 'There is no data to harvest. Set up files metadata in connected spaces or attach another space to start harvesting process.',
+    showArchival: 'Show archival spaces / providers',
+    showArchivalTooltip: 'Shows harvesting progress for spaces or providers that are no longer linked to this harvester',
+    active: 'Active',
+    all: 'All',
   },
   progressTableCell: {
     space: 'Space',
     provider: 'Provider',
+    status: 'Status',
+    active: 'active',
+    inactive: 'inactive',
     progress: 'Progress',
     lastUpdate: 'Last update',
     error: 'Error',
-    notSupported: 'Space not supported',
+    notSupported: 'space not supported',
   },
 };

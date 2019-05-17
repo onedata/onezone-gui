@@ -12,12 +12,13 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed, observer, getProperties } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, not } from '@ember/object/computed';
 import moment from 'moment';
 
 export default Component.extend(I18n, {
   tagName: 'td',
   classNames: ['progress-table-cell'],
+  classNameBindings: ['isActive:active:inactive'],
 
   i18n: service(),
 
@@ -38,6 +39,7 @@ export default Component.extend(I18n, {
    *   isSupported: boolean,
    *   currentSeq?: number,
    *   maxSeq?: number,
+   *   offline: boolean,
    *   lastUpdate?: number,
    *   error?: string,
    * }
@@ -72,6 +74,11 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   isSupported: reads('progress.isSupported'),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isActive: not('progress.offline'),
 
   /**
    * @type {Ember.ComputedProperty<number>}
@@ -171,10 +178,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  willDestroyElement() {
-    this._super(...arguments);
-  },
 
   actions: {
     toggleMoreInfo(isVisible) {

@@ -25,7 +25,7 @@ const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
 const NUMBER_OF_SHARED_USERS = 3;
 const NUMBER_OF_PROVIDERS = 3;
-const NUMBER_OF_SPACES = 3;
+const NUMBER_OF_SPACES = 2;
 const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
@@ -462,6 +462,7 @@ function createHarvesterRecords(store) {
           }),
           name: `Index ${index}`,
           schema: '{}',
+          pluginIndexId: `index${index}`,
         }).save();
       }))
       .then((records => createListRecord(store, 'index', records)))
@@ -617,11 +618,11 @@ function attachProgressToHarvesterIndices(
           const indexEntityId = get(index, 'aspectId');
           const currentSeq = harvesterIndex * perHarvesterSeq +
             Math.min((indexIndex + 1) * perIndexSeq, perHarvesterSeq);
-          const indexProgress = {};
+          const indexStats = {};
           spaces.forEach(space => {
             const spaceProgress = {};
             const spaceEntityId = get(space, 'entityId');
-            set(indexProgress, spaceEntityId, spaceProgress);
+            set(indexStats, spaceEntityId, spaceProgress);
             providers.forEach(provider => {
               const providerEntityId = get(provider, 'entityId');
               set(spaceProgress, providerEntityId, {
@@ -629,18 +630,19 @@ function attachProgressToHarvesterIndices(
                 currentSeq,
                 lastUpdate,
                 error: null,
+                offline: true,
               });
             });
           });
-          return store.createRecord('indexProgress', {
+          return store.createRecord('indexStat', {
             id: gri({
               entityType: 'harvester',
               entityId: harvesterEntityId,
-              aspect: 'index_progress',
+              aspect: 'index_stats',
               aspectId: indexEntityId,
               scope: 'private',
             }),
-            indexProgress,
+            indexStats,
           }).save();
         }));
       });

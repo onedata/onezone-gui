@@ -1,42 +1,65 @@
-
 {{#promise-proxy-container proxy=dataLoadingProxy}}
-  {{#if progressData.length}}
-    <div class="progress-table-container">
-      {{#basic-table breakpoint=breakpoint setupTrigger=basicTableSetupTrigger class="table dropdown-table-rows"}}
-        <thead>
-          <tr class="hidden">
-            <th class="space-name"></th>
-            {{#each providers as |provider|}}
-              <th class="provider-name">{{provider.name}}</th>
-            {{/each}}
-          </tr>
-        </thead>
-        <tbody>
-          {{#each progressData as |spaceProgress|}}
-            <tr class={{if (contains spaceProgress.space expandedRows) "active"}}>
-              <td class="space-name row-header" {{action (action "rowHeaderClick" spaceProgress.space) on="click"}}>
-                <span>
-                  {{#unless isTableCollapsed}}
-                    {{one-tooltip title=spaceProgress.space.name}}
-                  {{/unless}}
-                  {{spaceProgress.space.name}}
-                </span>
-              </td>
-              {{#each spaceProgress.progress as |providerProgress|}}
-                {{content-harvesters-indices/progress-table-cell
-                  progress=providerProgress
-                  isTableCollapsed=isTableCollapsed}}
+  <div class="clearfix">
+    <div class="pull-right">
+      {{one-way-toggle inputId=(concat elementId "-visible-stats") checked=(not showOnlyActive) update=(action "showArchivalChanged")}}
+      <label for={{concat elementId "-visible-stats"}} class="inline-label visible-stats-label">
+        {{tt this "showArchival"}}
+        {{one-label-tip title=(tt this "showArchivalTooltip")}}
+      </label>
+    </div>
+  </div>
+  {{#if (if showOnlyActive activeProgressData.length progressData.length)}}
+    <div class="progress-table-container {{if useTableLayout "table-layout" "list-layout"}}">
+      {{#if useTableLayout}}
+        {{#basic-table breakpoint=breakpoint setupTrigger=basicTableSetupTrigger class="table dropdown-table-rows"}}
+          <thead>
+            <tr class="hidden">
+              <th class="space-name"></th>
+              {{#each (if showOnlyActive activeProgressProviders providers) as |provider|}}
+                <th class="provider-name">{{provider.name}}</th>
               {{/each}}
             </tr>
-          {{/each}}
-          <tr class="provider-names">
-            <td class="space-name"></td>
-            {{#each providers as |provider|}}
-              <td class="provider-name">{{provider.name}}</td>
+          </thead>
+          <tbody>
+            {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
+              <tr class={{if (contains spaceProgress.space expandedRows) "active"}}>
+                <td class="space-name row-header" {{action (action "rowHeaderClick" spaceProgress.space) on="click"}}>
+                  <span>
+                    {{#unless isTableCollapsed}}
+                      {{one-tooltip title=spaceProgress.space.name}}
+                    {{/unless}}
+                    {{spaceProgress.space.name}}
+                  </span>
+                </td>
+                {{#each spaceProgress.progress as |providerProgress|}}
+                  {{content-harvesters-indices/progress-table-cell
+                    progress=providerProgress
+                    isTableCollapsed=isTableCollapsed}}
+                {{/each}}
+              </tr>
             {{/each}}
-          </tr>
-        </tbody>
-      {{/basic-table}}
+            <tr class="provider-names">
+              <td class="space-name"></td>
+              {{#each (if showOnlyActive activeProgressProviders providers) as |provider|}}
+                <td class="provider-name">{{provider.name}}</td>
+              {{/each}}
+            </tr>
+          </tbody>
+        {{/basic-table}}
+      {{else}}
+        {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
+          {{#each spaceProgress.progress as |progress|}}
+            {{#unless (or progress.offline (not progress.isSupported))}}
+              <div class="row content-row progress-row">
+                {{#truncated-string}}{{progress.space.name}} - {{progress.provider.name}}{{/truncated-string}}
+                {{content-harvesters-indices/progress-table-cell
+                  tagName="div"
+                  progress=progress}}
+              </div>
+            {{/unless}}
+          {{/each}}
+        {{/each}}
+      {{/if}}
     </div>
   {{else}}
     <p class="nothing-to-harvest text-center absolute-align-middle-center">

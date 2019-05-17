@@ -1,7 +1,7 @@
 /**
- * Index progress model
+ * Index stats model
  * 
- * @module models/index-progress
+ * @module models/index-stat
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -24,6 +24,7 @@ export default Model.extend(GraphSingleModelMixin, {
    *       maxSeq: number,
    *       lastUpdate: number, // last index update timestamp
    *       error: string | null, // last operation error
+   *       offline: boolean,
    *     },
    *     provider2Id: {...},
    *     ...
@@ -33,5 +34,5 @@ export default Model.extend(GraphSingleModelMixin, {
    * }
    * `
    */
-  indexProgress: attr('object'),
+  indexStats: attr('object'),
 });

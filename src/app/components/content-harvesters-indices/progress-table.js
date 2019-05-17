@@ -14,6 +14,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
   currentUser: service(),
   i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -43,6 +44,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
   breakpoint: 1200,
 
   /**
+   * @type {boolean}
+   */
+  showOnlyActive: true,
+
+  /**
    * @type {Ember.ComputedProperty<Ember.A>}
    */
   expandedRows: computed(function expandedRows() {
@@ -50,13 +56,13 @@ export default Component.extend(I18n, WindowResizeHandler, {
   }),
 
   /**
-   * @type {Ember.ComputedProperty<PromiseObject<models.IndexProgress>>}
+   * @type {Ember.ComputedProperty<PromiseObject<models.IndexStat>>}
    */
   indexProgressProxy: promise.object(computed(
     'index',
     function indexProgressProxy() {
       const index = this.get('index');
-      return index.getProgress();
+      return index.getStats();
     }
   )),
 
@@ -125,7 +131,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {Ember.ComputedProperty<Array<models.Space>>}
    */
   spaces: array.sort(computed(
-    'indexProgressProxy.indexProgress',
+    'indexProgressProxy.indexStats',
     'spacesProxy.@each.name',
     function spaces() {
       const {
@@ -134,11 +140,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
       } = this.getProperties('indexProgressProxy', 'spacesProxy');
       const {
         isFulfilled: indexProxyIsFulfilled,
-        indexProgress,
-      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexProgress');
+        indexStats,
+      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
       const spacesProxyIsFulfilled = get(spacesProxy, 'isFulfilled');
       if (indexProxyIsFulfilled && spacesProxyIsFulfilled) {
-        return _.keys(indexProgress)
+        return _.keys(indexStats)
           .map(spaceEntityId => spacesProxy.findBy('entityId', spaceEntityId))
           .without(undefined);
       } else {
@@ -151,7 +157,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {Ember.ComputedProperty<Array<models.Provider|Object>>}
    */
   providers: computed(
-    'indexProgressProxy.indexProgress',
+    'indexProgressProxy.indexStats',
     'providersProxy.@each.name',
     'clusterProvidersProxy.@each.name',
     function providers() {
@@ -166,14 +172,14 @@ export default Component.extend(I18n, WindowResizeHandler, {
       );
       const {
         isFulfilled: indexProxyIsFulfilled,
-        indexProgress,
-      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexProgress');
+        indexStats,
+      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
       const providersProxyIsFulfilled = get(providersProxy, 'isFulfilled');
       const clusterProvidersProxyIsFulfilled =
         get(clusterProvidersProxy, 'isFulfilled');
       if (indexProxyIsFulfilled && providersProxyIsFulfilled &&
         clusterProvidersProxyIsFulfilled) {
-        const providerIds = _.uniq(_.flatten(_.values(indexProgress).map(val => _.keys(val))));
+        const providerIds = _.uniq(_.flatten(_.values(indexStats).map(val => _.keys(val))));
         const providers = [], providerMocks = [];
         providerIds.forEach(providerId => {
           const provider = providersProxy.findBy('entityId', providerId) ||
@@ -195,13 +201,32 @@ export default Component.extend(I18n, WindowResizeHandler, {
   ),
 
   /**
+   * @type {Ember.ComputedProperty<Array<models.Provider>>}
+   */
+  activeProgressProviders: computed('progressData', function activeProgressProviders() {
+    const {
+      providers,
+      progressData,
+    } = this.getProperties('providers', 'progressData');
+
+    const activeProviders = 
+      _.flatten(progressData.map(({ progress }) => progress))
+        .rejectBy('offline')
+        .mapBy('provider')
+        .uniq();
+    return providers.filter(provider => activeProviders.includes(provider));
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<null>}
    */
   basicTableSetupTrigger: computed(
     'spaces',
     'providers',
+    'activeProgressData',
+    'showOnlyActive',
     function basicTableSetupTrigger() {
-      return null;
+      return {};
     }
   ),
 
@@ -210,12 +235,20 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * [
    *   {
    *     space: models.Space,
-   *     progress: {
-   *       provider: models.Provider|{ name: string, entityId: string },
-   *       isSupported: boolean, // is space supported by that provider
-   *       percent: undefined|number, // int 0-100
-   *       valueClass: undefined|string, // one of 'danger', 'warning', 'success'
-   *     },
+   *     progress: [
+   *       {
+   *         space: models.Space,
+   *         provider: models.Provider|{ name: string, entityId: string },
+   *         isSupported: boolean, // is space supported by that provider
+   *         currentSeq: number,
+   *         maxSeq: number,
+   *         offline: boolean,
+   *         lastUpdate: number,
+   *         error: string|null
+   *       },
+   *       {...},
+   *       ...
+   *     ]
    *   },
    *   {...},
    *   ...
@@ -235,11 +268,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
           spaces,
           providers,
         } = this.getProperties('indexProgressProxy', 'spaces', 'providers');
-        const indexProgress = get(indexProgressProxy, 'indexProgress');
+        const indexStats = get(indexProgressProxy, 'indexStats');
         return spaces.map(space => ({
           space,
           progress: providers.map(provider => {
-            const data = get(indexProgress, get(space, 'entityId'));
+            const data = get(indexStats, get(space, 'entityId'));
             const providerEntityId = get(provider, 'entityId');
             const isSupported = _.keys(data).includes(providerEntityId);
 
@@ -254,6 +287,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
                 providerData,
                 'currentSeq',
                 'maxSeq',
+                'offline',
                 'lastUpdate',
                 'error'
               ));
@@ -264,6 +298,55 @@ export default Component.extend(I18n, WindowResizeHandler, {
       } else {
         return [];
       }
+    }
+  ),
+
+  /**
+   * Progress data narrowed to active entities.
+   * @type {Ember.ComputedProperty<Array<Object>>}
+   */
+  activeProgressData: computed(
+    'activeProgressProviders',
+    function activeProgressData() {
+      const {
+        progressData,
+        activeProgressProviders,
+      } = this.getProperties('progressData', 'activeProgressProviders');
+      return progressData
+        .filter(({ progress }) => progress.isAny('offline', false))
+        .map(spaceProgress => {
+          const progress = get(spaceProgress, 'progress')
+            .filter(({ provider }) => activeProgressProviders.includes(provider));
+          return Object.assign({}, spaceProgress, { progress });
+        });
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  useTableLayout: computed(
+    'progressData',
+    'activeProgressData',
+    'showOnlyActive',
+    function useTableLayout() {
+      const {
+        progressData,
+        activeProgressData,
+        showOnlyActive,
+      } = this.getProperties(
+        'progressData',
+        'activeProgressData',
+        'showOnlyActive'
+      );
+      const data = showOnlyActive ? activeProgressData : progressData;
+      let meaningfulData = 
+        _.flatten(data.mapBy('progress'))
+        .filterBy('isSupported');
+      if (showOnlyActive) {
+        meaningfulData = meaningfulData.rejectBy('offline');
+      }
+      return get(meaningfulData, 'length') > 4;
     }
   ),
 
@@ -303,6 +386,9 @@ export default Component.extend(I18n, WindowResizeHandler, {
       } else {
         expandedRows.addObject(space);
       }
+    },
+    showArchivalChanged(showArchival) {
+      this.set('showOnlyActive', !showArchival);
     },
   },
 });

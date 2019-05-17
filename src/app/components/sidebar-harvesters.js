@@ -61,7 +61,7 @@ export default TwoLevelSidebar.extend(I18n, {
     }, {
       id: 'indices',
       label: this.t('aspects.indices'),
-      icon: 'search',
+      icon: 'index',
     }, {
       id: 'members',
       label: this.t('aspects.members'),

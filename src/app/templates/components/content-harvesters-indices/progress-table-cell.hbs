@@ -19,6 +19,7 @@
         <ul class="description-items">
           <li><strong>{{tt this "space"}}:</strong> <span class="space-name">{{space.name}}</span></li>
           <li><strong>{{tt this "provider"}}:</strong> <span class="provider-name">{{provider.name}}</span></li>
+          <li><strong>{{tt this "status"}}:</strong> <span class="status">{{tt this (if isActive "active" "inactive")}}</span></li>
           <li>
             <strong>{{tt this "progress"}}:</strong>
             <span class="harvesting-progress">

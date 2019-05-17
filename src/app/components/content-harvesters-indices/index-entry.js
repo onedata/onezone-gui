@@ -41,6 +41,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Models.Harvester}
+   */
+  harvester: undefined,
+
+  /**
+   * @virtual
    * @type {Array<string>}
    */
   guiPluginIndicesNames: undefined,
@@ -56,6 +62,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isRenaming: false,
+
+  /**
+   * @type {boolean}
+   */
+  isIdPresenterVisible: false,
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -109,6 +120,9 @@ export default Component.extend(I18n, {
             throw error;
           });
       }
+    },
+    idPresenterToggled(isOpened) {
+      this.set('isIdPresenterVisible', isOpened);
     },
   },
 });

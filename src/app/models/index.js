@@ -30,13 +30,18 @@ export default Model.extend(GraphSingleModelMixin, {
   guiPluginName: attr('string'),
 
   /**
-   * @returns {Promise<models.IndexProgress>}
+   * @type {string}
    */
-  getProgress() {
-    const progressGri = gri(_.assign(
-      { aspect: 'index_progress', scope: 'private' },
+  pluginIndexId: attr('string'),
+
+  /**
+   * @returns {Promise<models.IndexStat>}
+   */
+  getStats() {
+    const statsGri = gri(_.assign(
+      { aspect: 'index_stats', scope: 'private' },
       this.getProperties('entityType', 'entityId', 'aspectId'))
     );
-    return this.get('store').findRecord('index-progress', progressGri);
+    return this.get('store').findRecord('indexStat', statsGri);
   },
 });

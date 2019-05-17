@@ -1,6 +1,6 @@
-{{#listItem.header disableToggleIcon=true}}
+{{#listItem.header disableToggleIcon=true class=(if isIdPresenterVisible "popover-active")}}
   <span class="item-icon-container">
-    {{one-icon class="item-icon" icon="search"}}
+    {{one-icon class="item-icon" icon="index"}}
     {{one-tooltip
       title=index.name
       placement="top"
@@ -23,6 +23,31 @@
       <span class="label label-info">{{tt this "usedByGui"}}</span>
     </span>
   {{/if}}
+  {{one-icon icon="sign-info-rounded" class="id-presenter-trigger"}}
+  {{#one-webui-popover
+    class="index-id-info"
+    triggerSelector=(concat "#" parentView.elementId " .id-presenter-trigger")
+    onToggle=(action "idPresenterToggled")
+    as |popover|}}
+    <div class="form-group">
+      <label class="control-label">{{tt this "internalId"}}:
+      {{one-label-tip title=(tt this "internalIdTooltip")}}</label>
+      {{one-clipboard-line
+        size="sm"
+        value=index.aspectId
+        showText=false
+        btnType="default"}}
+    </div>
+    <div class="form-group">
+      <label class="control-label">{{tt this "externalId"}}:
+      {{one-label-tip title=(tt this (if harvester.endpoint "externalIdTooltipHasEndpoint" "externalIdTooltipNoEndpoint") endpoint=harvester.endpoint)}}</label>
+      {{one-clipboard-line
+        size="sm"
+        value=index.pluginIndexId
+        showText=false
+        btnType="default"}}
+    </div>
+  {{/one-webui-popover}}
   {{actions-toolbar
     isMinimized=true
     toolbarClasses=""
