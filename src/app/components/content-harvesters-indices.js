@@ -257,6 +257,7 @@ export default Component.extend(I18n, GlobalActions, {
         'createIndexData'
       );
       const indexRepresentation = getProperties(createIndexData, 'name', 'schema');
+      set(indexRepresentation, 'guiPluginName', null);
       if (get(indexRepresentation, 'schema') === '') {
         delete indexRepresentation.schema;
       }

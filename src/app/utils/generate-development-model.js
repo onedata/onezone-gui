@@ -630,7 +630,7 @@ function attachProgressToHarvesterIndices(
                 currentSeq,
                 lastUpdate,
                 error: null,
-                offline: true,
+                archival: true,
               });
             });
           });

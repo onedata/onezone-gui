@@ -11,6 +11,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   harvesterActions: service(),
@@ -40,7 +41,13 @@ export default Component.extend(I18n, {
 
   didInsertElement() {
     this._super(...arguments);
-    this.$('#new-harvester-name').focus();
+    this.get('pluginsListProxy').then(() => {
+      scheduleOnce(
+        'afterRender',
+        this,
+        () => this.$('.field-create-name').focus()
+      );
+    });
   },
 
   actions: {

@@ -24,7 +24,7 @@ export default Model.extend(GraphSingleModelMixin, {
    *       maxSeq: number,
    *       lastUpdate: number, // last index update timestamp
    *       error: string | null, // last operation error
-   *       offline: boolean,
+   *       archival: boolean,
    *     },
    *     provider2Id: {...},
    *     ...

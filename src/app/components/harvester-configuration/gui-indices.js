@@ -325,7 +325,6 @@ export default Component.extend(I18n, {
     });
 
     this.set('guiIndicesErrors', errors);
-    console.log(errors);
     return errors;
   },
 

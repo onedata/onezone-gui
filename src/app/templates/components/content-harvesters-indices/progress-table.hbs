@@ -49,7 +49,7 @@
       {{else}}
         {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
           {{#each spaceProgress.progress as |progress|}}
-            {{#unless (or progress.offline (not progress.isSupported))}}
+            {{#unless (or (and showOnlyActive progress.archival) (not progress.isSupported))}}
               <div class="row content-row progress-row">
                 {{#truncated-string}}{{progress.space.name}} - {{progress.provider.name}}{{/truncated-string}}
                 {{content-harvesters-indices/progress-table-cell

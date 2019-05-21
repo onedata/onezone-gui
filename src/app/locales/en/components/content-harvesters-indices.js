@@ -34,6 +34,7 @@ export default {
     showArchivalTooltip: 'Shows harvesting progress for spaces or providers that are no longer linked to this harvester',
     active: 'Active',
     all: 'All',
+    notAccessible: 'not accessible',
   },
   progressTableCell: {
     space: 'Space',

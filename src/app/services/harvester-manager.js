@@ -356,7 +356,7 @@ export default Service.extend({
         entityId: harvesterId,
         aspect: 'query',
         aspectId: indexId,
-        scope: 'private',
+        scope: 'auto',
       }),
       operation: 'create',
       data: requestData,

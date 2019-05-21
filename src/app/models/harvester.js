@@ -34,7 +34,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   /**
    * @type {boolean}
    */
-  public: attr('boolean', { defaultValue: false }),
+  public: attr('boolean'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -59,6 +59,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('sharedUserList'),
   spaceList: belongsTo('spaceList'),
+  effProviderList: belongsTo('providerList'),
   indexList: belongsTo('indexList'),
 
   /**

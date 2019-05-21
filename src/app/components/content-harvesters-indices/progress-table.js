@@ -2,7 +2,7 @@ import Component from '@ember/component';
 import { promise, array } from 'ember-awesome-macros';
 import { computed, get, getProperties, setProperties } from '@ember/object';
 import { A } from '@ember/array';
-import { Promise, reject } from 'rsvp';
+import { reject } from 'rsvp';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -83,39 +83,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {Ember.ComputedProperty<PromiseArray<models.Provider>>}
    */
   providersProxy: promise.array(computed(function providersProxy() {
-    const currentUser = this.get('currentUser');
-    return currentUser.getCurrentUserRecord()
-      .then(user => get(user, 'providerList'))
-      .then(providerList => get(providerList, 'list'));
+    const harvester = this.get('harvester');
+    return get(harvester, 'hasViewPrivilege') !== false ?
+      get(harvester, 'effProviderList').then(sl => sl ? get(sl, 'list') : A()) :
+      reject({ id: 'forbidden' });
   })),
-
-  /**
-   * @type {Ember.ComputedProperty<PromiseArray<models.Cluster>>}
-   */
-  clustersProxy: promise.array(computed(function clustersProxy() {
-    const currentUser = this.get('currentUser');
-    return currentUser.getCurrentUserRecord()
-      .then(user => get(user, 'clusterList'))
-      .then(clusterList => get(clusterList, 'list'));
-  })),
-
-  /**
-   * @type {Ember.ComputedProperty<PromiseArray<models.Provider>>}
-   */
-  clusterProvidersProxy: promise.array(computed(
-    'clustersProxy.[]',
-    function clusterProvidersProxy() {
-      const clustersProxy = this.get('clustersProxy');
-      if (get(clustersProxy, 'isSettled')) {
-        return Promise.all(clustersProxy
-          .filterBy('type', 'oneprovider')
-          .map(cluster => get(cluster, 'provider'))
-        );
-      } else {
-        return new Promise(() => {});
-      }
-    }
-  )),
 
   /**
    * @type {Ember.ComputedProperty<PromiseArray>}
@@ -123,12 +95,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
   dataLoadingProxy: promise.array(promise.all(
     'indexProgressProxy',
     'spacesProxy',
-    'providersProxy',
-    'clusterProvidersProxy'
+    'providersProxy'
   )),
 
   /**
-   * @type {Ember.ComputedProperty<Array<models.Space>>}
+   * @type {Ember.ComputedProperty<Array<models.Space|Object>>}
    */
   spaces: array.sort(computed(
     'indexProgressProxy.indexStats',
@@ -144,9 +115,20 @@ export default Component.extend(I18n, WindowResizeHandler, {
       } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
       const spacesProxyIsFulfilled = get(spacesProxy, 'isFulfilled');
       if (indexProxyIsFulfilled && spacesProxyIsFulfilled) {
-        return _.keys(indexStats)
-          .map(spaceEntityId => spacesProxy.findBy('entityId', spaceEntityId))
-          .without(undefined);
+        const spaceEntityIds = _.keys(indexStats);
+        const spaces = [], spaceMocks = [];
+        spaceEntityIds.forEach(spaceEntityId => {
+          const space = spacesProxy.findBy('entityId', spaceEntityId);
+          if (space) {
+            spaces.push(space);
+          } else {
+            spaceMocks.push({
+              entityId: spaceEntityId,
+              name: 'Space#' + spaceEntityId.slice(0, 6) + ' (' + this.tt('notAccessible') + ')',
+            });
+          }
+        });
+        return spaces.sortBy('name').concat(spaceMocks.sortBy('name'));
       } else {
         return [];
       }
@@ -159,37 +141,30 @@ export default Component.extend(I18n, WindowResizeHandler, {
   providers: computed(
     'indexProgressProxy.indexStats',
     'providersProxy.@each.name',
-    'clusterProvidersProxy.@each.name',
     function providers() {
       const {
         indexProgressProxy,
         providersProxy,
-        clusterProvidersProxy,
       } = this.getProperties(
         'indexProgressProxy',
-        'providersProxy',
-        'clusterProvidersProxy'
+        'providersProxy'
       );
       const {
         isFulfilled: indexProxyIsFulfilled,
         indexStats,
       } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
       const providersProxyIsFulfilled = get(providersProxy, 'isFulfilled');
-      const clusterProvidersProxyIsFulfilled =
-        get(clusterProvidersProxy, 'isFulfilled');
-      if (indexProxyIsFulfilled && providersProxyIsFulfilled &&
-        clusterProvidersProxyIsFulfilled) {
+      if (indexProxyIsFulfilled && providersProxyIsFulfilled) {
         const providerIds = _.uniq(_.flatten(_.values(indexStats).map(val => _.keys(val))));
         const providers = [], providerMocks = [];
         providerIds.forEach(providerId => {
-          const provider = providersProxy.findBy('entityId', providerId) ||
-            clusterProvidersProxy.findBy('entityId', providerId);
+          const provider = providersProxy.findBy('entityId', providerId);
           if (provider) {
             providers.push(provider);
           } else {
             providerMocks.push({
               entityId: providerId,
-              name: 'Provider#' + providerId.slice(0, 6),
+              name: 'Provider#' + providerId.slice(0, 6) + ' (' + this.tt('notAccessible') + ')',
             });
           }
         });
@@ -211,7 +186,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
     const activeProviders = 
       _.flatten(progressData.map(({ progress }) => progress))
-        .rejectBy('offline')
+        .rejectBy('archival')
         .mapBy('provider')
         .uniq();
     return providers.filter(provider => activeProviders.includes(provider));
@@ -242,7 +217,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
    *         isSupported: boolean, // is space supported by that provider
    *         currentSeq: number,
    *         maxSeq: number,
-   *         offline: boolean,
+   *         archival: boolean,
    *         lastUpdate: number,
    *         error: string|null
    *       },
@@ -287,7 +262,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
                 providerData,
                 'currentSeq',
                 'maxSeq',
-                'offline',
+                'archival',
                 'lastUpdate',
                 'error'
               ));
@@ -313,7 +288,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
         activeProgressProviders,
       } = this.getProperties('progressData', 'activeProgressProviders');
       return progressData
-        .filter(({ progress }) => progress.isAny('offline', false))
+        .filter(({ progress }) => progress.isAny('archival', false))
         .map(spaceProgress => {
           const progress = get(spaceProgress, 'progress')
             .filter(({ provider }) => activeProgressProviders.includes(provider));
@@ -344,7 +319,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
         _.flatten(data.mapBy('progress'))
         .filterBy('isSupported');
       if (showOnlyActive) {
-        meaningfulData = meaningfulData.rejectBy('offline');
+        meaningfulData = meaningfulData.rejectBy('archival');
       }
       return get(meaningfulData, 'length') > 4;
     }

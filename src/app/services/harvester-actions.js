@@ -77,7 +77,7 @@ export default Service.extend(I18n, {
       .then(harvester => {
         globalNotify.success(this.t('harvesterCreateSuccess'));
         next(() =>
-          this.redirectToHarvester(harvester, 'config', { tab: 'gui-plugin' })
+          this.redirectToHarvester(harvester, 'config')
             .then(() => {
               const sidebarContainer = $('.col-sidebar');
               $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -

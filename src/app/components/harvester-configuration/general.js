@@ -268,10 +268,11 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       allFields,
     } = this.getProperties('mode', 'pluginTypes', 'allFields');
     if (mode === 'create') {
+      const defaultPlugin = pluginTypes.objectAt(0);
       set(
         allFields.findBy('name', 'create.plugin'),
         'defaultValue',
-        pluginTypes.objectAt(0) || undefined
+        defaultPlugin ? get(defaultPlugin, 'id') : undefined
       );
     }
     this.resetFormValues(allPrefixes);

@@ -11,10 +11,12 @@ import Route from '@ember/routing/route';
 import { get, setProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { reject } from 'rsvp';
 
 export default Route.extend({
   harvesterManager: service(),
   navigationState: service(),
+  currentUser: service(),
 
   model({ harvester_id: harvesterId }) {
     return this.get('harvesterManager').getRecord(
@@ -24,7 +26,19 @@ export default Route.extend({
         aspect: 'instance',
         scope: 'auto',
       })
-    );
+    )
+    .then(harvester => {
+      const isUserSignedIn = Boolean(this.get('currentUser.userId'));
+      const isPublic = harvester.get('public');
+      // Public may by true, false or undefined. True and false are obvious.
+      // Undefined is when user is not a member of harvester, but it is public,
+      // so can be fetched by everyone.
+      if (isUserSignedIn && isPublic === false) {
+        return reject({ id: 'forbidden' });
+      } else {
+        return harvester;
+      }
+    });
   },
 
   afterModel(model) {

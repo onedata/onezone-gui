@@ -39,7 +39,7 @@ export default Component.extend(I18n, {
    *   isSupported: boolean,
    *   currentSeq?: number,
    *   maxSeq?: number,
-   *   offline: boolean,
+   *   archival: boolean,
    *   lastUpdate?: number,
    *   error?: string,
    * }
@@ -78,7 +78,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isActive: not('progress.offline'),
+  isActive: not('progress.archival'),
 
   /**
    * @type {Ember.ComputedProperty<number>}
