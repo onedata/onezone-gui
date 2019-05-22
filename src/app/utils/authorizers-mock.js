@@ -23,10 +23,10 @@
 const iconPrefix = '/ozw/onezone/assets/images/auth-providers/';
 
 export default [{
-    iconPath: iconPrefix + 'onepanel.svg',
-    id: 'onepanel',
+    iconPath: iconPrefix + 'basicauth.svg',
+    id: 'basicAuth',
     iconBackgroundColor: '#4BD187',
-    displayName: 'Onepanel account',
+    displayName: 'your username & password',
   },
   {
     iconPath: iconPrefix + 'indigo.svg',
@@ -73,12 +73,6 @@ export default [{
     id: 'facebook',
     iconBackgroundColor: '#5B87C5',
     displayName: 'Facebook',
-  },
-  {
-    iconPath: iconPrefix + 'onepanel.svg',
-    id: 'onepanel',
-    iconBackgroundColor: '#5FC489',
-    displayName: 'Onepanel',
   },
   {
     iconPath: iconPrefix + 'egi.svg',

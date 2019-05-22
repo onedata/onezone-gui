@@ -54,26 +54,27 @@ describe('Integration | Component | content users', function () {
     registerService(this, 'authorizerManager', authorizerManagerStub);
 
     const MOCKED_USER = EmberObject.create({
-      name: 'some name',
-      alias: 'some alias',
+      fullName: 'some name',
+      username: 'some login',
+      basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
   });
 
-  it('renders user name', function (done) {
+  it('renders full name', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.name-editor').text().trim())
-        .to.equal(this.get('user.name'));
+      expect(this.$('.full-name-editor').text().trim())
+        .to.equal(this.get('user.fullName'));
       done();
     });
   });
 
-  it('renders alias', function (done) {
+  it('renders username', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     wait().then(() => {
-      expect(this.$('.alias-editor').text().trim())
-        .to.equal(this.get('user.alias'));
+      expect(this.$('.username-editor').text().trim())
+        .to.equal(this.get('user.username'));
       done();
     });
   });
@@ -91,20 +92,20 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change user name', function (done) {
+  it('allows to change display name', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newName = 'testName';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.name-editor .one-label').then(() => {
-        fillIn('.name-editor input', newName).then(() => {
-          click('.name-editor .save-icon').then(() => {
+      click('.full-name-editor .one-label').then(() => {
+        fillIn('.full-name-editor input', newName).then(() => {
+          click('.full-name-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.name-editor').text().trim())
-              .to.equal(user.get('name'));
-            expect(user.get('name')).to.equal(newName);
+            expect(this.$('.full-name-editor').text().trim())
+              .to.equal(user.get('fullName'));
+            expect(user.get('fullName')).to.equal(newName);
             done();
           });
         });
@@ -112,24 +113,42 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change alias', function (done) {
+  it('allows to change username', function (done) {
     this.render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
-    const newAlias = 'testAlias';
+    const newUsername = 'testUsername';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
     wait().then(() => {
-      click('.alias-editor .one-label').then(() => {
-        fillIn('.alias-editor input', newAlias).then(() => {
-          click('.alias-editor .save-icon').then(() => {
+      click('.username-editor .one-label').then(() => {
+        fillIn('.username-editor input', newUsername).then(() => {
+          click('.username-editor .save-icon').then(() => {
             expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.alias-editor').text().trim())
-              .to.equal(user.get('alias'));
-            expect(user.get('alias')).to.equal(newAlias);
+            expect(this.$('.username-editor').text().trim())
+              .to.equal(user.get('username'));
+            expect(user.get('username')).to.equal(newUsername);
             done();
           });
         });
       });
     });
   });
+
+  it('renders password section for user with basicAuth enabled', function () {
+    this.render(hbs `{{content-users user=user}}`);
+    return wait().then(() => {
+      expect(this.$('.change-password-row .one-inline-editor')).to.exist;
+    });
+  });
+
+  it(
+    'does not render password section for user with basicAuth disabled',
+    function () {
+      this.set('user.basicAuthEnabled', false);
+      this.render(hbs `{{content-users user=user}}`);
+      return wait().then(() => {
+        expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
+      });
+    }
+  );
 });

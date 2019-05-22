@@ -1,5 +1,5 @@
 export default {
-  loginUsing: 'Login using ',
+  signInUsing: 'Sign in using ',
   showMore: 'Show all identity providers',
-  fetchProvidersFailed: 'Server error - fetching login providers failed',
+  fetchProvidersFailed: 'Server error - fetching sign-in providers failed',
 };

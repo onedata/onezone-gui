@@ -69,6 +69,7 @@ import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
+import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 
 let translations = {
@@ -144,6 +145,7 @@ let translations = {
     groupActions,
     clusterActions,
     privilegeActions,
+    userActions,
     guiUtils,
   },
 };
