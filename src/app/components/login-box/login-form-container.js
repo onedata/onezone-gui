@@ -125,7 +125,7 @@ export default LoginFormContainer.extend(I18n, {
   _authorizersForSelect: computed('supportedAuthorizers.[]', function () {
     const supportedAuthorizers = this.get('supportedAuthorizers');
     if (supportedAuthorizers) {
-      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
+      return supportedAuthorizers.filter(auth => auth.id !== 'basicAuth');
     } else {
       return [];
     }
