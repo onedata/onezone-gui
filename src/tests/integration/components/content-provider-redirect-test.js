@@ -49,8 +49,8 @@ describe('Integration | Component | content provider redirect', function () {
     registerService(this, 'alert', AlertStub);
   });
 
-  it('redirect to Oneprovider hosted in Onezone URL',
-    function (done) {
+  it('redirects to Oneprovider hosted in Onezone URL',
+    function () {
       const clusterEntityId = '12345';
       const provider = {
         entityId: 'test1',
@@ -77,11 +77,12 @@ describe('Integration | Component | content provider redirect', function () {
         'getProviderRedirectUrl'
       ).resolves({ url: legacyUrl });
       const fakeWindow = new FakeWindow();
-      this.setProperties({ provider, fakeWindow });
-      this.on('checkIsProviderAvailable', () => resolve(true));
+      const checkIsProviderAvailable = sinon.stub().resolves(true);
+
+      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
 
       this.render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=(action "checkIsProviderAvailable")
+        checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
         _window=fakeWindow
       }}`);
@@ -89,10 +90,9 @@ describe('Integration | Component | content provider redirect', function () {
       const $contentProviderRedirect = this.$('.content-provider-redirect');
       expect($contentProviderRedirect).to.exist;
 
-      wait().then(() => {
+      return wait().then(() => {
         expect(getProviderRedirectUrl).to.be.invokedOnce;
         expect(fakeWindow.location.toString()).to.equal(url);
-        done();
       });
     });
 
@@ -121,16 +121,18 @@ describe('Integration | Component | content provider redirect', function () {
       ).resolves({ url: legacyUrl });
 
       const fakeWindow = new FakeWindow();
-      this.setProperties({ provider, fakeWindow });
-      this.on('checkIsProviderAvailable', () => resolve(true));
+      const checkIsProviderAvailable = sinon.stub().resolves(false);
+
+      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
 
       this.render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=(action "checkIsProviderAvailable")
+        checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
         _window=fakeWindow
       }}`);
 
       wait().then(() => {
+        expect(checkIsProviderAvailable).to.be.notCalled;
         expect(getProviderRedirectUrl).to.be.invokedOnce;
         expect(fakeWindow.location.toString()).to.equal(legacyUrl);
         done();

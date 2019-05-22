@@ -4,7 +4,7 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
 import { A } from '@ember/array';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 describe('Unit | Utility | generate development model', function () {
@@ -19,6 +19,7 @@ describe('Unit | Utility | generate development model', function () {
         .extend({
           id: 'sth.7g35du7c.instance',
           gri: 'sth.7g35du7c.instance',
+          entityId: '7g35du7c',
           init() {
             const save = sinon.stub(this, 'save');
             save.resolves(this);
@@ -30,6 +31,9 @@ describe('Unit | Utility | generate development model', function () {
             }));
           },
           save() {},
+          then(callback) {
+            return resolve(callback(this));
+          },
         })
         .create(properties);
     }

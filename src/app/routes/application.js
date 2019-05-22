@@ -2,8 +2,8 @@
  * Injects function for generating development model for onezone-gui
  *
  * @module routes/application
- * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -15,6 +15,7 @@ import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model'
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   globalGuiResources: service(),
+  onedataWebsocket: service(),
 
   developmentModelConfig: Object.freeze({
     clearOnReload: false,
@@ -24,10 +25,18 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
 
   beforeModel() {
     const superResult = this._super(...arguments);
+    return this.get('onedataWebsocket.webSocketInitializedProxy')
+      .catch(() => {
+        throw {
+          isOnedataCustomError: true,
+          type: 'cannot-init-websocket',
+        };
+      })
+      .then(() => {
+        const globalGuiResources = this.get('globalGuiResources');
+        globalGuiResources.initializeGlobalObject();
 
-    const globalGuiResources = this.get('globalGuiResources');
-    globalGuiResources.initializeGlobalObject();
-    
-    return superResult;
+        return superResult;
+      });
   },
 });

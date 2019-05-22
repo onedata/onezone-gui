@@ -62,7 +62,7 @@ export default Service.extend({
    *   - ``data.url`` (string)
    * - ``reject(object: error)`` on failure
    */
-  getProviderRedirectUrl(providerId, path) {
+  getProviderRedirectUrl(providerId, path = '/') {
     return this.get('onedataRpc').request('getProviderRedirectURL', {
       providerId,
       path,

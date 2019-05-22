@@ -29,7 +29,7 @@ describe('Unit | Mixin | models/oneprovider cluster info', function () {
     );
     const subject = ModelsOneproviderClusterInfoObject.create({
       type: 'oneprovider',
-      canViewPrivateData: true,
+      hasViewPrivilege: true,
       oneproviderEntityId,
       onedataGraph,
     });
@@ -52,7 +52,7 @@ describe('Unit | Mixin | models/oneprovider cluster info', function () {
     );
     const subject = ModelsOneproviderClusterInfoObject.create({
       type: 'onezone',
-      canViewPrivateData: true,
+      hasViewPrivilege: true,
       oneproviderEntityId,
       onedataGraph,
     });
@@ -65,7 +65,7 @@ describe('Unit | Mixin | models/oneprovider cluster info', function () {
       });
   });
 
-  it('rejects spaces list if canViewPrivateData is false', function () {
+  it('rejects spaces list if hasViewPrivilege is false', function () {
     const oneproviderEntityId = 'opeid';
     const onedataGraph = {
       request() {
@@ -77,7 +77,7 @@ describe('Unit | Mixin | models/oneprovider cluster info', function () {
     );
     const subject = ModelsOneproviderClusterInfoObject.create({
       type: 'oneprovider',
-      canViewPrivateData: false,
+      hasViewPrivilege: false,
       oneproviderEntityId,
       onedataGraph,
     });

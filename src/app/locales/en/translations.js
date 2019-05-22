@@ -11,6 +11,7 @@ import harvesters from './tabs/harvesters';
 import users from './tabs/users';
 
 import noClusterPermissions from './errors/no-cluster-permissions';
+import cannotInitWebsocket from './errors/cannot-init-websocket';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
@@ -72,6 +73,8 @@ import contentHarvestersEmpty from './components/content-harvesters-empty';
 import addYourSpaceModal from './components/add-your-space-modal';
 import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
+import websocketReconnectionModal from './components/websocket-reconnection-modal';
+import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -96,6 +99,7 @@ let translations = {
   },
   errors: {
     noClusterPermissions,
+    cannotInitWebsocket,
   },
   components: {
     alerts: {
@@ -161,6 +165,8 @@ let translations = {
     addYourSpaceModal,
     harvesterRemoveModal,
     harvesterConfiguration,
+    websocketReconnectionModal,
+    fatalConnectionErrorModal,
   },
   services: {
     clientTokenActions,

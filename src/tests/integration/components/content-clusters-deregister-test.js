@@ -77,11 +77,11 @@ describe('Integration | Component | content clusters deregister', function () {
   );
 
   it(
-    'shows statistics info when cluster has canViewPrivateData',
+    'shows statistics info when cluster has hasViewPrivilege',
     function () {
       this.set('cluster', {
         creationTime: moment('2019-03-13 12:00').unix(),
-        canViewPrivateData: true,
+        hasViewPrivilege: true,
       });
       const deregister = sinon.stub().resolves();
       const afterDeregister = sinon.spy();

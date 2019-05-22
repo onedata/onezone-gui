@@ -15,4 +15,5 @@ export default {
   noLoginMethods: 'There are no login methods configured.',
   loginTestMode: 'This is the test login page - based on test.auth.config - used for login simulation and diagnostics.',
   goBackToMainPage: 'Go back to the main page.',
+  sessionExpired: 'Your session has expired',
 };

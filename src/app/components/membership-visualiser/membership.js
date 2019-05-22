@@ -12,6 +12,7 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { next } from '@ember/runloop';
+import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
@@ -25,6 +26,8 @@ export default Component.extend(I18n, {
     'showDescription:with-description',
     'longPath',
   ],
+
+  currentUser: service(),
 
   /**
    * @override
@@ -108,6 +111,11 @@ export default Component.extend(I18n, {
   scrollRightButton: true,
 
   /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  currentUserId: reads('currentUser.userId'),
+
+  /**
    * @type {Ember.ComputedProperty<PromiseArray<GraphSingleModel>>}
    */
   recordsProxy: reads('path.model'),
@@ -134,7 +142,13 @@ export default Component.extend(I18n, {
         recordsProxy,
         pathStart,
         visibleBlocks,
-      } = this.getProperties('recordsProxy', 'pathStart', 'visibleBlocks');
+        currentUserId,
+      } = this.getProperties(
+        'recordsProxy',
+        'pathStart',
+        'visibleBlocks',
+        'currentUserId'
+      );
       if (get(recordsProxy, 'isFulfilled')) {
         // Path is built from the end to the beginning, because some of the first
         // elements can by joined into one "more" block at the end.
@@ -181,13 +195,17 @@ export default Component.extend(I18n, {
         blocks.slice(1).forEach(block => {
           const isPrevBlock = get(prevBlock, 'type') === 'block';
           const isThisBlock = get(block, 'type') === 'block';
+          const child = get(prevBlock, 'record');
+          const isChildCurrentUser = get(child, 'entityType') === 'user' &&
+            get(child, 'entityId') === currentUserId;
           elements.push({
             id: this.getPathRelationId(prevBlock, block),
             type: 'relation',
             relation: !isPrevBlock || !isThisBlock ?
               null : MembershipRelation.create({
                 parent: get(block, 'record'),
-                child: get(prevBlock, 'record'),
+                child,
+                isChildCurrentUser,
               }),
           }, block);
           prevBlock = block;
