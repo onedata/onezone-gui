@@ -2,20 +2,20 @@
  * A content page with user account details
  *
  * @module components/content-users
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { reject } from 'rsvp';
 import { inject } from '@ember/service';
-import { computed, set, get } from '@ember/object';
+import { computed, set, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { htmlSafe } from '@ember/template';
 
 const animationTimeout = 333;
 
@@ -26,6 +26,7 @@ export default Component.extend(I18n, {
   linkedAccountManager: inject(),
   authorizerManager: inject(),
   onezoneServer: inject(),
+  userActions: inject(),
 
   /**
    * @override
@@ -61,6 +62,24 @@ export default Component.extend(I18n, {
   _isProvidersDropdownVisible: false,
 
   /**
+   * @type {boolean}
+   */
+  isChangingPassword: false,
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showPasswordSection: reads('user.basicAuthEnabled'),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  passwordString: computed('user.hasPassword', function passwordString() {
+    const hasPassword = this.get('user.hasPassword');
+    return hasPassword ? htmlSafe('&#9679;'.repeat(5)) : undefined;
+  }),
+
+  /**
    * @type {ComputedProperty<LinkedAccountList>}
    */
   linkedAccountsList: reads('linkedAccountsProxy.content.list'),
@@ -85,7 +104,7 @@ export default Component.extend(I18n, {
   authorizersForSelect: computed('identityProviders.[]', function () {
     const supportedAuthorizers = this.get('identityProviders');
     if (supportedAuthorizers) {
-      return supportedAuthorizers.filter(auth => auth.id !== 'onepanel');
+      return supportedAuthorizers.filter(auth => auth.id !== 'basicAuth');
     } else {
       return [];
     }
@@ -110,7 +129,16 @@ export default Component.extend(I18n, {
           ),
         }));
       }
-    }),
+    }
+  ),
+
+  usernameObserver: observer('user.username', function usernameObserver() {
+    const username = this.get('user.username');
+    if (!username) {
+      // If username has been cleared out, password change is impossible.
+      this.set('isChangingPassword', false);
+    }
+  }),
 
   /**
    * Shows global info about save error.
@@ -168,28 +196,44 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    saveName(name) {
+    saveFullName(fullName) {
       const user = this.get('user');
-      if (!name || !name.length) {
-        return reject();
-      }
-      const oldName = get(user, 'name');
-      set(user, 'name', name);
+      const oldFullName = get(user, 'fullName');
+      set(user, 'fullName', fullName || '');
       return this._saveUser().catch((error) => {
-        // Restore old user name
-        set(user, 'name', oldName);
+        // Restore old user full name
+        set(user, 'fullName', oldFullName);
         throw error;
       });
     },
-    saveAlias(alias) {
+    saveUsername(username) {
       const user = this.get('user');
-      const oldAlias = get(user, 'alias');
-      set(user, 'alias', alias && alias.length ? alias : null);
+      const oldUsername = get(user, 'username');
+      set(user, 'username', username || '');
       return this._saveUser().catch((error) => {
-        // Restore old user alias
-        set(user, 'alias', oldAlias);
+        // Restore old username
+        set(user, 'username', oldUsername);
         throw error;
       });
+    },
+    startPasswordChange() {
+      this.set('isChangingPassword', true);
+    },
+    stopPasswordChange() {
+      this.set('isChangingPassword', false);
+    },
+    saveNewPassword({currentPassword, newPassword}) {
+      const {
+        userActions,
+        user,
+      } = this.getProperties('userActions', 'user');
+      return userActions
+        .changeUserPassword(user, currentPassword, newPassword)
+        .then(() => {
+          safeExec(this, () => {
+            this.set('isChangingPassword', false);
+          });
+        });
     },
     toggleAuthorizersDropdown() {
       const {
@@ -207,7 +251,6 @@ export default Component.extend(I18n, {
       if (this.get('_isProvidersDropdownVisible')) {
         this._animateHide(dropdownDesc);
         this._animateShow(authDropdown, true);
-        this.$('.login-username').focus();
         this.set('_formAnimationTimeoutId',
           setTimeout(() => dropdownDesc.addClass('hide'), _animationTimeout)
         );

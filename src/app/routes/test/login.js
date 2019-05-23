@@ -24,6 +24,6 @@ export default Route.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   titleToken: computed(function titleToken() {
-    return this.t('login');
+    return this.t('signIn');
   }),
 });

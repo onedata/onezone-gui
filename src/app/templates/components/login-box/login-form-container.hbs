@@ -35,12 +35,12 @@
         placeholder=(t "components.loginBox.loginFormContainer.findProviderPlaceholder")
         disabled=_activeAuthorizer
       }}
-        <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.loginWith"}}</div>
+        <div class="dropdown-label">{{t "components.loginBox.loginFormContainer.signInWith"}}</div>
       {{/authorizers-dropdown}}
     </div>
   {{/if}}
 {{else if (not isLoading)}}
-  <p class="no-login-methods">{{tt this "noLoginMethods"}}</p>
+  <p class="no-login-methods">{{tt this "noSignInMethods"}}</p>
 {{/if}}
 
 {{#if sessionHasExpired}}
@@ -53,7 +53,7 @@
 {{/if}}
 {{#if testMode}}
   <div class="login-notification test-mode-notification login-notification-warning">
-    <span>{{tt this "loginTestMode"}}</span><br>
+    <span>{{tt this "signInTestMode"}}</span><br>
     {{#link-to "login"}}{{tt this "goBackToMainPage"}}{{/link-to}}
   </div>
 {{else if (and loginNotification (not isLoading))}}

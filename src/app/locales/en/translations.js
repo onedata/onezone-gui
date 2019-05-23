@@ -85,6 +85,7 @@ import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
 import harvesterActions from './services/harvester-actions';
+import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 
 let translations = {
@@ -176,6 +177,7 @@ let translations = {
     clusterActions,
     privilegeActions,
     harvesterActions,
+    userActions,
     guiUtils,
   },
 };

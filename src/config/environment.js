@@ -53,6 +53,10 @@ module.exports = function (environment) {
     'i18n': {
       defaultLocale: 'en',
     },
+    'validationConfig': {
+      minNameLength: 2,
+      maxNameLength: 50,
+    },
     'legacyOneproviderVersion': '18.02.*',
     'APP': {
       // Here you can pass flags/options to your application instance

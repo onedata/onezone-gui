@@ -15,8 +15,8 @@
                 authId=authorizer.id
                 iconPath=authorizer.iconPath
                 iconBackgroundColor=authorizer.iconBackgroundColor
-                tip=(concat (t "components.loginBox.socialBoxList.loginUsing") authorizer.displayName)
-                action=(action (if (eq authorizer.id "onepanel") "usernameBoxClick" "authenticate"))
+                tip=(concat (t "components.loginBox.socialBoxList.signInUsing") authorizer.displayName)
+                action=(action (if (eq authorizer.id "basicAuth") "usernameBoxClick" "authenticate"))
               }}
             {{/each}}
             {{#if showMoreButton}}

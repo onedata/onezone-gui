@@ -4,18 +4,45 @@
   </h1>
 </div>
 <div class="content-row">
-  <h1>{{tt this "name"}}</h1>
+  <h1>{{tt this "fullName"}}</h1>
   <div class="indented-row">
     {{one-icon icon="user-profile" class="user-image"}}
-    {{one-inline-editor value=user.name onSave=(action "saveName") class="name-editor"}}
+    {{one-inline-editor value=user.fullName onSave=(action "saveFullName") class="full-name-editor"}}
   </div>
 </div>
 <div class="content-row">
-  <h1>{{tt this "alias"}}</h1>
+  <h1><span class="one-label">{{tt this "username"}}</span> {{one-label-tip title=(tt this (if user.basicAuthEnabled "usernameWithBasicAuthHint" "usernameNoBasicAuthHint"))}}</h1>
   <div class="indented-row">
-    {{one-inline-editor value=user.alias onSave=(action "saveAlias") class="alias-editor"}}
+    {{one-inline-editor value=user.username onSave=(action "saveUsername") class="username-editor"}}
   </div>
 </div>
+{{#if showPasswordSection}}
+  <div class="content-row">
+    <h1>{{tt this "password"}}</h1>
+    <div class="indented-row change-password-row {{if isChangingPassword "is-changing-password"}}">
+      {{#if user.username}}
+        {{#if isChangingPassword}}
+          {{user-credentials-form
+            centered=false
+            verifyCurrentPassword=user.hasPassword
+            changingPassword=isChangingPassword
+            submit=(action "saveNewPassword")
+            cancel=(action "stopPasswordChange")}}
+        {{else}}
+          {{one-inline-editor
+            value=passwordString
+            class="password-editor-trigger"
+            onEdit=(action "startPasswordChange")}}
+        {{/if}}
+      {{else}}
+        {{one-inline-editor
+          class="password-editor-trigger no-username"
+          staticPlaceholder=(tt this "setUsernameFirst")
+          isEditing=false}}
+      {{/if}}
+    </div>
+  </div>
+{{/if}}
 <div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
   <ul class="indented-row linked-accounts-list">
