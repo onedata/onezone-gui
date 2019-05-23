@@ -5,7 +5,7 @@ export default {
     providers: 'Space providers',
     members: 'Space members',
     membership: 'Membership',
-    support: 'Get support',
+    support: 'Add support',
     notFound: 'Space not found',
   },
 };

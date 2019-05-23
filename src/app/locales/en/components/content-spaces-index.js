@@ -11,7 +11,7 @@ export default {
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',
   tileProvidersMapTitle: 'Providers map',
-  getSupport: 'Get support',
+  addSupport: 'Add support',
   browseFiles: 'Browse files',
   sharedDirectories: 'Shared dirs',
 };

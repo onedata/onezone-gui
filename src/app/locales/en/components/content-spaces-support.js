@@ -1,5 +1,5 @@
 export default {
-  header: 'Get support',
+  header: 'Add support',
   copy: {
     token: {
       success: 'The support token has been copied to clipboard',

@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5425 Service Pack 3 for unified GUI
 * VFS-5425 Changed HTTP WebSocket authorization to handshake authorization
 * VFS-5411 Added password change
 * VFS-5424 Changed Docker image build to contain .tar.gz package
