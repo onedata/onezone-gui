@@ -15,12 +15,18 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import { get, computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { get } from '@ember/object';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import bindElementTop from 'onedata-gui-common/utils/bind-element-top';
+import $ from 'jquery';
 
 export default Component.extend(
-  createDataProxyMixin('provider'), {
-    router: service(),
+  createDataProxyMixin('initialProvidersList'), {
+    classNames: ['content-spaces-data'],
+
+    globalNotify: service(),
 
     /**
      * @virtual
@@ -28,33 +34,73 @@ export default Component.extend(
      */
     space: undefined,
 
+    selectedProvider: undefined,
+
+    providerListIsLoaded: false,
+
+    contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
+
+    fileBrowserData: computed(
+      'space.{name}',
+      function iframeData() {
+        return {
+          space: this.get('space'),
+          spaceName: this.get('space.name'),
+        };
+      }
+    ),
+
+    iframeActions: computed(
+      function iframeActions() {
+        return {
+          hello: (message) => {
+            return this.get('globalNotify').info(message);
+          },
+        };
+      }
+    ),
+
+    fileId: 'mock_file_id',
+
     init() {
       this._super(...arguments);
-      this.updateProviderProxy();
+      // FIXME: make providers tabbed selector
+      this.get('initialProvidersListProxy').then(list => {
+        safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
+      });
+      setTimeout(() => {
+        this.set('fileId', 'Two');
+      }, 4000);
+    },
+
+    didInsertElement() {
+      this._super(...arguments);
+      const updatePosition = bindElementTop({
+        $topElement: this.$('.content-spaces-data-header'),
+        $leftElement: $('.col-sidebar'),
+        $innerElement: this.$('.content-spaces-data-content'),
+      });
+      $(window).on('resize', updatePosition);
+      this.set('updatePosition', updatePosition);
+    },
+
+    willDestroyElement() {
+      this._super(...arguments);
+      $(window).off('resize', this.get('updatePosition'));
     },
 
     /**
      * @override
+     * @returns {Promise}
      */
-    fetchProvider() {
+    fetchInitialProvidersList() {
       return this.get('space.providerList')
-        .then(providerList =>
-          get(providerList, 'list').then(list =>
-            list.find(provider => get(provider, 'online'))
-          )
-        );
+        .then(providerList => get(providerList, 'list'));
     },
 
     actions: {
-      transitionAfterFailure() {
-        const {
-          router,
-          space,
-        } = this.getProperties('router', 'space');
-        router.transitionTo(
-          'onedata.sidebar.content.index',
-          space,
-        );
+      hello(message) {
+        this.get('globalNotify').info(message);
       },
     },
   });

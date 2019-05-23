@@ -1,0 +1,7 @@
+{{#loading-container alwaysRender=true isLoading=iframeIsLoading errorReason=iframeError}}
+  <iframe
+    class="one-embedded-component-iframe {{iframeClass}} {{if (or iframeIsLoading iframeError) "hidden"}}"
+    src={{src}}
+    onload={{action "__iframeOnLoad"}}
+  ></iframe>
+{{/loading-container}}
