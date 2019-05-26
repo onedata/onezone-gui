@@ -1,0 +1,25 @@
+{{#content-info
+  class="scroll-breakpoint-700"
+  header=(tt this "title")
+  imagePath=(root-url "assets/images/group-new.svg")
+  text=(tt this "text")
+  buttonLabel=(tt this "createButton")
+  buttonAction=(action "createGroup" groupName)
+  buttonDisabled=(not groupName)
+  as |contentInfo|
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      <input
+        id="new-group-name"
+        value={{groupName}}
+        oninput={{action (mut groupName) value="target.value"}}
+        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        disabled={{isWorking}}
+        placeholder={{tt this "groupName"}}
+        disabled={{contentInfo.actionInProgress}}
+        class="form-control new-group-name"
+      >
+    </div>
+  </div>
+{{/content-info}}

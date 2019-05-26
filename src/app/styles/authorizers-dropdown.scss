@@ -1,0 +1,42 @@
+.authorizers-dropdown-element .ember-power-select-option, 
+.authorizers-dropdown .ember-power-select-trigger {
+  position: relative;
+  padding-left: 50px;
+  color: $main-text-color;
+  .social-box {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 25px;
+    margin: 0 10px;
+    .login-icon-box {
+      display: block;
+      height: 25px;
+      width: 25px;
+      
+      font-size: 18px;
+      .social-icon-image {
+        background-size: 20px 20px;
+      }
+      .one-icon {
+        line-height: 25px;
+      }
+      .spin-spinner {
+        //alignment fix
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+.ember-basic-dropdown-content.authorizers-dropdown-element {
+  position: fixed;
+  font-size: 10pt;
+  &.ember-basic-dropdown--transitioned-in {
+    position: absolute;
+  }
+  .ember-power-select-options[role="listbox"] {
+    max-height: 200px;
+  }
+}

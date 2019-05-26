@@ -1,0 +1,13 @@
+<p class="support-os-head">{{t "components.contentSpacesSupport.tabsCommon.distributionsSupported"}}</p>
+<div class="row">
+  <div class="col-xs-8 col-sm-12 col-centered text-center">
+    <div class="row">
+      {{#each distributions as |dist|}}
+        <div class="support-os">
+          <img src={{root-url (concat "assets/images/os-logo/" dist.id ".svg")}}>
+          <div class="support-os-name">{{dist.name}}</div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

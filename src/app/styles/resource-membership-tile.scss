@@ -1,0 +1,41 @@
+.resource-membership-tile {
+  .only-direct {
+    height: 100%;
+    .membership-row {
+      @include vertical-align-middle();
+      width: 100%;
+      padding-bottom: 20px;
+      text-align: center;
+    }
+    .membership-row-element {
+      line-height: initial;
+    }
+    .type-icon {
+      position: initial;
+      font-size: 60pt;
+    }
+    .record-name {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      max-width: 70px;
+      margin-right: 0;
+      transform: translateX(-50%);
+    }
+    .membership-block {
+      padding-left: 0;
+      margin-right: 0;
+      max-width: initial;
+    }
+    .membership-relation {
+      width: 30px;
+    }
+    .relation-sign {
+      width: 12px;
+      height: 12px;
+    }
+    .record-space .type-icon {
+      padding: 0 $padding-base-horizontal;
+    }
+  }
+}

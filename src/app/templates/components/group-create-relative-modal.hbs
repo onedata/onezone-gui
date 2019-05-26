@@ -1,0 +1,24 @@
+{{#proceed-process-modal
+  opened=opened
+  close=close
+  proceed=(action "create")
+  processing=processing
+  modalClass="group-create-relative-modal"
+  headerText=(tt this "createRelativeGroup" relation=(tt this relation))
+  proceedButtonClass="btn btn-primary proceed"
+  proceedButtonText=(tt this "create")
+  proceedDisabled=proceedDisabled
+  onShown=(action "onShown")}}
+  <p class="input-top-description">
+    {{tt this "enterRelativeGroupName"
+      relation=(tt this relation)
+      groupName=relatedRecord.name}}
+  </p>
+  <input
+    value={{newGroupName}}
+    oninput={{action (mut newGroupName) value="target.value"}}
+    onkeydown={{invoke-on-enter (action "redirectToSubmit")}}
+    placeholder={{tt this "newGroupNamePlaceholder" relation=relation}}
+    disabled={{processing}}
+    class="form-control modal-input create-relative-group-name">
+{{/proceed-process-modal}}

@@ -1,0 +1,34 @@
+{{one-icon-tagged
+  class=(concat "sidebar-item-icon" (if offline " item-error"))
+  icon="provider"
+  tagIcon=(if offline "x")
+  shadowType="none"
+}}
+{{#truncated-string class="after-icon before-status"}}
+  {{name-conflict item=item tagName="span" class="one-label"}}
+{{/truncated-string}}
+{{#if (or _spaceIdsLoaded _spacesLoaded)}}
+  {{#status-toolbar as |toolbar|}}
+    {{#if isDefaultProvider}}
+      {{toolbar.icon
+        icon="home"
+        hint=(tt this "defaultProviderHint")
+      }}
+    {{/if}}
+    {{#if _spaceIdsLoaded}}
+      {{toolbar.icon 
+        icon="space"
+        innerText=_spaces.length
+        hint=(tt this "spaceCountHint" count=_spaces.length)
+      }}
+    {{/if}}
+    {{#if _spacesLoaded}}
+      {{toolbar.icon
+        icon="provider"
+        outerText=_totalSupportSizeHumanReadable
+        hint=(tt this "totalSupportHint" size=_totalSupportSizeHumanReadable)
+      }}
+    {{/if}}
+  {{/status-toolbar}}
+{{/if}}
+

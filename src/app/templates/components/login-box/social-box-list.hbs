@@ -1,0 +1,36 @@
+<div class="row buttons-list">
+  <div class="col-xs-12 col-centered">
+    <div class="row row-centered">
+      {{#if isLoading}}
+        <div class="spinner-container">
+          {{spin-spinner scale=1 lines=12 length=20 width=10}}
+        </div>
+      {{else}}
+        {{#if errorMessage}}
+          {{t "components.loginBox.socialBoxList.fetchProvidersFailed"}}: {{errorMessage}}
+        {{else}}
+          <div>
+            {{#each supportedAuthorizers as |authorizer|}}
+              {{login-box/social-box-list/social-box 
+                authId=authorizer.id
+                iconPath=authorizer.iconPath
+                iconBackgroundColor=authorizer.iconBackgroundColor
+                tip=(concat (t "components.loginBox.socialBoxList.signInUsing") authorizer.displayName)
+                action=(action (if (eq authorizer.id "basicAuth") "usernameBoxClick" "authenticate"))
+              }}
+            {{/each}}
+            {{#if showMoreButton}}
+              {{login-box/social-box-list/social-box 
+                authId="more"
+                socialIconStyle=""
+                iconBackgroundColor="#fff"
+                action=(action "showMoreClick")
+                tip=(t "components.loginBox.socialBoxList.showMore")
+              }}
+            {{/if}}
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </div>
+</div>

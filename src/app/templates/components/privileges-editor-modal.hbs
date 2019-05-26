@@ -1,0 +1,25 @@
+{{#proceed-process-modal
+  opened=opened
+  close=close
+  proceed=save
+  processing=processing
+  modalClass="privileges-editor-modal"
+  headerText=(tt this "header")
+  proceedButtonClass="btn btn-primary proceed"
+  proceedButtonText=(tt this "save")
+  proceedDisabled=(not recordProxy.isLoaded)
+  textCenter=false}}
+  <div class="tree-container">
+    {{#if recordProxy.isLoaded}}
+      <div class="batch-edit-tree-title hidden-xs">
+        {{one-icon icon="group"}}
+        <span class="one-label">{{treeRootText}}</span>
+      </div>
+    {{/if}}
+    {{privileges-tree-editor
+      privilegesGroups=privilegesGroups
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
+      recordProxy=recordProxy}}
+  </div>
+{{/proceed-process-modal}}

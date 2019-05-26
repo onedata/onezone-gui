@@ -1,0 +1,57 @@
+{{#unless (or silentReloadError pathsLoadingProxy.isRejected)}}
+  <div class="memberships">
+    {{#each sortedPaths key="id" as |path|}}
+      {{membership-visualiser/membership
+        pathStart=contextRecord
+        path=path
+        view=(action "view")
+        removeRelation=(action (mut relationToRemove))
+        modifyPrivileges=(action (mut relationPrivilegesToChange))
+        searchString=searchString
+        visibleBlocks=visibleBlocks
+        showDescription=showDescription}}
+    {{/each}}
+    {{#if (and (gte paths.length maxPathsNumber) (not isCondensed))}}
+      <div class="membership-row limit-info collapse-animation collapse-medium {{if searchString "collapse-hidden"}}">
+        <span class="membership-row-element">{{tt this "showingFirstNPaths" limit=paths.length}}</span>
+      </div>
+    {{/if}}
+  </div>
+{{/unless}}
+{{#if silentReloadError}}
+  {{resource-load-error errorReason=silentReloadError}}
+{{else}}
+  {{promise-proxy-container proxy=pathsLoadingProxy}}
+{{/if}}
+{{#unless isCondensed}}
+  {{#if relationToRemove}}
+    {{#if (eq currentUser.userId relationToRemove.child.entityId)}}
+      {{leave-modal
+        opened=relationToRemove
+        close=(action (mut relationToRemove) null)
+        proceed=(action "removeRelation")
+        processing=isRemovingRelation
+        record=relationToRemove.parent}}
+    {{else}}
+      {{remove-relation-modal
+        opened=relationToRemove
+        close=(action (mut relationToRemove) null)
+        proceed=(action "removeRelation")
+        processing=isRemovingRelation
+        parent=relationToRemove.parent
+        child=relationToRemove.child}}
+    {{/if}}
+  {{/if}}
+  {{#if privilegesEditorModel}}
+    {{privileges-editor-modal
+      privilegesGroups=groupedPrivilegesFlags
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
+      recordProxy=privilegesEditorModel
+      save=(action "savePrivileges")
+      close=(action (mut relationPrivilegesToChange) null)
+      opened=relationPrivilegesToChange
+      processing=privilegesEditorModel.isSaving
+      treeRootText=privilegesTreeRootText}}
+  {{/if}}
+{{/unless}}

@@ -1,0 +1,33 @@
+.login-box {
+  .zone-image {
+    position: relative;
+    right: -13px;
+    height: 80px;
+    background-size: contain;
+    background-image: url($root-url + 'images/oneworld.svg');
+    background-repeat: no-repeat;
+    background-position: right center;
+  }
+
+  .zone-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 23px;
+    font-size: 14pt;
+    text-align: left;
+    text-transform: uppercase;
+    line-height: 100%;
+  }
+
+  .zone-name {
+    word-break: break-word;
+  }
+
+  .zone-subtitle {
+    font-size: 0.8em;
+    opacity: 0.8;
+    word-break: break-word;
+  }
+}

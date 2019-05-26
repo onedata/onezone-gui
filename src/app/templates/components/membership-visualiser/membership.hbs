@@ -1,0 +1,29 @@
+{{#promise-proxy-container proxy=recordsProxy sizeClass="xs"}}
+  {{#perfect-scrollbar-element
+    suppressScrollY=true
+    onScroll=(action "scroll")}}
+    {{membership-visualiser/membership-path
+      pathElements=pathElements
+      modifyPrivileges=modifyPrivileges
+      removeRelation=removeRelation
+      view=view
+      onPan=(action "pan")}}
+  {{/perfect-scrollbar-element}}
+  <div class="bar-nav">
+    {{#if scrollLeftButton}}
+      <div class="scroll-button scroll-left" {{action "moveLeft"}}>
+        {{one-icon icon="arrow-left"}}
+      </div>
+    {{/if}}
+    {{#if scrollRightButton}}
+      <div class="scroll-button scroll-right" {{action "moveRight"}}>
+        {{one-icon icon="arrow-right"}}
+      </div>
+    {{/if}}
+  </div>
+  {{#if showDescription}}
+    <div class="description">
+      {{membershipDescription}}
+    </div>
+  {{/if}}
+{{/promise-proxy-container}}

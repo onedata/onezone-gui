@@ -1,0 +1,18 @@
+<div class="row content-row header-row hidden-xs has-border">
+  <h1 class="with-menu normal-case">
+    <span class="one-label">
+      {{group.name}}
+    </span>
+  </h1>
+</div>
+<div class="row content-row">
+  {{#promise-proxy-container proxy=user}}
+    <div class="one-tile-container">
+      {{resource-info-tile record=group}}
+      {{#if group.hasViewPrivilege}}
+        {{resource-members-tile record=group}}
+      {{/if}}
+      {{resource-membership-tile record=group}}
+    </div>
+  {{/promise-proxy-container}}
+</div>

@@ -1,0 +1,28 @@
+{{one-icon class="sidebar-item-icon" icon=(oneicon-alias item.type)}}
+{{one-inline-editor
+  isEditing=isRenaming
+  value=item.name
+  showEmptyInfo=false
+  onSave=(action "rename")
+  editOnClick=false
+  onEdit=(action "toggleRename")
+  class="one-label name-editor"
+  click=(action "editorClick")}}
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="auto"
+  actionsArray=itemActions}}
+
+{{leave-modal
+  opened=leaveGroupModalOpen
+  close=(action "closeLeaveModal")
+  proceed=(action "leave")
+  processing=isLeaving
+  record=group}}
+
+{{group-remove-modal
+  opened=removeGroupModalOpen
+  close=(action "closeRemoveModal")
+  proceed=(action "remove")
+  processing=isRemoving
+  group=group}}

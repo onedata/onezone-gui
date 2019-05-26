@@ -1,0 +1,25 @@
+{{#content-info
+  class="scroll-breakpoint-700"
+  header=(tt this "title")
+  imagePath=(root-url "assets/images/space-new.svg")
+  text=(tt this "text")
+  buttonLabel=(tt this "createButton")
+  buttonAction=(action "createSpace" spaceName)
+  buttonDisabled=(not spaceName)
+  as |contentInfo|
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      <input
+        id="new-space-name"
+        value={{spaceName}}
+        oninput={{action (mut spaceName) value="target.value"}}
+        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        disabled={{isWorking}}
+        placeholder={{tt this "spaceName"}}
+        disabled={{contentInfo.actionInProgress}}
+        class="form-control new-space-name"
+      >
+    </div>
+  </div>
+{{/content-info}}

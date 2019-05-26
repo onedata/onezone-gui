@@ -1,0 +1,23 @@
+.content-groups-hierarchy {
+  .hierarchy-search {
+    position: absolute;
+    right: 0;
+    display: inline-block;
+    width: 200px;
+    font-family: 'Open Sans';
+  }
+
+  .ghv-outer-container {
+    position: absolute;
+    // -1px for top border
+    top: 2 * $onedata-logo-margin-top + $onedata-logo-height - 1px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-top: 1px solid $main-border-color;
+
+    @media (max-width: $screen-xs-max) {
+      top: 0;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{{#promise-proxy-container
+  proxy=recordProxy.models
+  isLoading=(and recordProxy.isLoading (not recordProxy.hasBeenLoaded))
+  isLoaded=(and recordProxy.hasBeenLoaded (not recordProxy.models.isRejected))
+  isError=recordProxy.fetchError
+  errorReason=recordProxy.fetchError}}
+  {{one-dynamic-tree
+    class="border-dashed"
+    definition=initialTreeState
+    compareValues=recordProxy.effectivePrivilegesSnapshot
+    overrideValues=recordProxy.effectivePrivilegesSnapshot
+    disabledFieldsPaths=treeDisabledPaths
+    valuesChanged=(action "treeValuesChanged")}}
+  {{yield}}
+{{/promise-proxy-container}}

@@ -1,0 +1,27 @@
+.content-spaces-providers {
+  .row-space-providers-support-chart .inner-row-content {
+    padding-top: $padding-large-vertical;
+    padding-left: $padding-large-horizontal;
+    padding-right: $padding-large-horizontal;
+  }
+  .row-space-providers-support-chart {
+    // currently the map is too high because of ocean
+    position: relative;
+    top: -100px;
+  }
+  @media (max-width: $screen-xs-max) {
+    .row-space-providers-support-chart {
+      top: 0;
+    }
+  }
+  @media (min-width: $screen-sm-min) and (max-width: 850px) {
+    .row-space-providers-support-chart {
+      top: -200px;
+    }
+  }
+  .col-space-provider-atlas-chart {
+    @media (min-width: $screen-md-min) {
+      padding-left: $padding-large-horizontal;
+    }
+  }
+}
