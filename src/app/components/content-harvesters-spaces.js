@@ -17,6 +17,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { reject } from 'rsvp';
 import { A } from '@ember/array';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -126,9 +127,7 @@ export default Component.extend(I18n, GlobalActions, {
    * @override 
    * @type {Ember.ComputedProperty<string>}
    */
-  globalActionsTitle: computed(function globalActionsTitle() {
-    return this.t('harvesterSpaces');
-  }),
+  globalActionsTitle: computedT('harvesterSpaces'),
 
   actions: {
     removeSpace() {

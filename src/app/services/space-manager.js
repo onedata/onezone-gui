@@ -257,7 +257,7 @@ export default Service.extend({
   joinHarvesterAsSpace(space, token) {
     const harvesterManager = this.get('harvesterManager');
     return space.joinHarvester(token)
-      .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId')) // TODO
+      .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId'))
         .catch(ignoreForbiddenError)
         .then(() => space)
       );

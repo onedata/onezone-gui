@@ -1,3 +1,12 @@
+/**
+ * Harvester configuration section responsible for gui plugin info display.
+ *
+ * @module components/harvester-configuration/gui-info
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { get, computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

@@ -1,8 +1,11 @@
+const indexIdTooltip = 'Identifier of this index in Onezone\'s REST API and the external indexing service';
+
 export default {
   header: 'Indices',
   harvesterIndices: 'Harvester indices',
   create: 'Create new index',
   createNewIndex: 'Create new index',
+  noIndices: 'No indices',
   createIndexForm: {
     name: 'Name',
     schema: 'Schema',
@@ -17,11 +20,9 @@ export default {
     removeHarvestedData: 'Remove harvested data',
   },
   indexEntry: {
-    externalId: 'External index ID',
-    externalIdTooltipHasEndpoint: 'Identifier of this index in the external indexing service: {{endpoint}}',
-    externalIdTooltipNoEndpoint: 'Identifier of this index in the external indexing service',
-    internalId: 'Internal index ID',
-    internalIdTooltip: 'Identifier of this index recognized in Onezone\'s REST API',
+    indexId: 'Index ID',
+    indexIdTooltipHasEndpoint: indexIdTooltip + ': {{endpoint}}',
+    indexIdTooltipNoEndpoint: indexIdTooltip,
     usedByGui: 'Used by GUI',
     remove: 'Remove',
     rename: 'Rename',

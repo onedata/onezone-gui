@@ -1,3 +1,12 @@
+/**
+ * Container object that deals with harvester gui plugin manifest.
+ * 
+ * @module utils/harvester-configuration/gui-plugin-manifest
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { get, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';

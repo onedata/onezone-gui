@@ -23,7 +23,7 @@
           <tbody>
             {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
               <tr class={{if (contains spaceProgress.space expandedRows) "active"}}>
-                <td class="space-name row-header" {{action (action "rowHeaderClick" spaceProgress.space) on="click"}}>
+                <td class="space-name row-header" {{action "rowHeaderClick" spaceProgress.space}}>
                   <span>
                     {{#unless isTableCollapsed}}
                       {{one-tooltip title=spaceProgress.space.name}}
@@ -62,7 +62,7 @@
       {{/if}}
     </div>
   {{else}}
-    <p class="nothing-to-harvest text-center absolute-align-middle-center">
+    <p class="nothing-to-harvest text-center">
       {{tt this "nothingToHarvest"}}
     </p>
   {{/if}}

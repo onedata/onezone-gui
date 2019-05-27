@@ -51,6 +51,9 @@
   .tab-content {
     background-color: $main-content-hover-background;
   }
+  .nothing-to-harvest {
+    margin-top: 40px;
+  }
   .content-harvesters-indices-progress-table {
     $table-breakpoint: 1200px;
     $space-name-width: 120px;
@@ -88,6 +91,7 @@
           text-align: right;
           font-size: $labels-font-size;
           word-break: break-all;
+          line-height: 1;
         }
       }
       
@@ -154,6 +158,7 @@
         text-overflow: ellipsis;
         text-align: left;
         font-family: 'Open Sans Semibold';
+        white-space: nowrap;
       }
       tr.active td {
         padding: $table-cell-padding 0;
@@ -205,6 +210,7 @@
         stroke: $color-one-gray-sand;
       }
       .donut-segment {
+        // 100 * PI / 4
         stroke-dashoffset: 78.5398;
       }
       .chart-text {

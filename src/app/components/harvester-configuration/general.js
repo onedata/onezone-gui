@@ -1,3 +1,12 @@
+/**
+ * Harvester configuration section responsible general harvester options.
+ *
+ * @module components/harvester-configuration/general
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import OneForm from 'onedata-gui-common/components/one-form';
 import { inject as service } from '@ember/service';
 import EmberObject, {
@@ -15,6 +24,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import config from 'ember-get-config';
+import { scheduleOnce } from '@ember/runloop';
 
 const {
   layoutConfig,
@@ -293,6 +303,21 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       this.harvesterObserver();
       next(() => this.modeObserver());
     }));
+  },
+
+  didInsertElement() {
+    this._super(...arguments);
+
+    const mode = this.get('mode');
+    if (mode !== 'view') {
+      this.get('pluginTypes').then(() => {
+        scheduleOnce(
+          'afterRender',
+          this,
+          () => this.$(`.field-${mode}-name`).focus()
+        );
+      });
+    }
   },
 
   /**

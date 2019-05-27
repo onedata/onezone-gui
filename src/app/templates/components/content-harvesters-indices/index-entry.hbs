@@ -30,20 +30,12 @@
     onToggle=(action "idPresenterToggled")
     as |popover|}}
     <div class="form-group">
-      <label class="control-label">{{tt this "internalId"}}:
-      {{one-label-tip title=(tt this "internalIdTooltip")}}</label>
+      <label class="control-label">{{tt this "indexId"}}:
+        {{one-label-tip title=(tt this (if harvester.endpoint "indexIdTooltipHasEndpoint" "indexIdTooltipNoEndpoint") endpoint=harvester.endpoint)}}
+      </label>
       {{one-clipboard-line
         size="sm"
         value=index.aspectId
-        showText=false
-        btnType="default"}}
-    </div>
-    <div class="form-group">
-      <label class="control-label">{{tt this "externalId"}}:
-      {{one-label-tip title=(tt this (if harvester.endpoint "externalIdTooltipHasEndpoint" "externalIdTooltipNoEndpoint") endpoint=harvester.endpoint)}}</label>
-      {{one-clipboard-line
-        size="sm"
-        value=index.pluginIndexId
         showText=false
         btnType="default"}}
     </div>

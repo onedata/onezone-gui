@@ -5,7 +5,7 @@
   }
   .warning-icon {
     height: 22px;
-    margin-right: 5px;
+    margin-right: $padding-xs-horizontal;
   }
   .harvester-configuration-gui-upload {
     .upload-form {
@@ -43,24 +43,6 @@
         float: left;
       }
     }
-  }
-  .type-name-editor {
-    margin: -($input-height-base - $line-height-computed) / 2 0;
-    max-width: 400px;
-  }
-  .schema-editor {
-    margin: $padding-large-vertical;
-  }
-  .remove-type {
-    @include vertical-align-middle();
-    right: 50px;
-    font-size: 2em;
-    &:hover {
-      color: $color-one-danger;
-    }
-  }
-  .index-editor-input {
-    width: 50%;
   }
 
   .harvester-configuration-gui-plugin {

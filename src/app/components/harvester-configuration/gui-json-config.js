@@ -1,3 +1,12 @@
+/**
+ * Harvester configuration section responsible for gui plugin JSON config setup.
+ *
+ * @module components/harvester-configuration/gui-json-config
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';

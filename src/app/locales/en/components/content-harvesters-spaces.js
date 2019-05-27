@@ -11,5 +11,4 @@ export default {
   addYourSpace: 'Add one of your spaces',
   inviteSpaceUsingToken: 'Invite space using token',
   noSpaces: 'This harvester does not acquire metadata from any space. To start indexing process, add a space.',
-
 };

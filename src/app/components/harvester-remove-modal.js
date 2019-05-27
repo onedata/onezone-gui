@@ -59,4 +59,10 @@ export default Component.extend(I18n, {
       this.set('isRemoveDataChecked', false);
     }
   }),
+
+  actions: {
+    changeRemoveDataChecked(value) {
+      this.set('isRemoveDataChecked', value);
+    },
+  },
 });

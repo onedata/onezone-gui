@@ -30,11 +30,6 @@ export default Model.extend(GraphSingleModelMixin, {
   guiPluginName: attr('string'),
 
   /**
-   * @type {string}
-   */
-  pluginIndexId: attr('string'),
-
-  /**
    * @returns {Promise<models.IndexStat>}
    */
   getStats() {

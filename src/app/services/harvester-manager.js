@@ -40,10 +40,10 @@ export default Service.extend({
   /**
    * Returns harvester with specified id
    * @param {string} id
-   * @param {boolean} backgroundReload
+   * @param {boolean} [backgroundReload=false]
    * @return {Promise<Harvester>}
    */
-  getRecord(id, backgroundReload = true) {
+  getRecord(id, backgroundReload = false) {
     return this.get('store').findRecord('harvester', id, { backgroundReload });
   },
 

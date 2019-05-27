@@ -25,7 +25,7 @@ const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
 const NUMBER_OF_SHARED_USERS = 3;
 const NUMBER_OF_PROVIDERS = 3;
-const NUMBER_OF_SPACES = 2;
+const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
@@ -464,7 +464,6 @@ function createHarvesterRecords(store) {
           }),
           name: `Index ${index}`,
           schema: '{}',
-          pluginIndexId: `index${index}`,
         }).save();
       }))
       .then((records => createListRecord(store, 'index', records)))

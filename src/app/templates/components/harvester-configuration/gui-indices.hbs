@@ -5,7 +5,7 @@
       {{#if (eq mode "view")}}
         {{#bs-button type="default" size="sm" onClick=(action "edit")}}{{tt this "edit"}}{{/bs-button}}
       {{else}}
-        {{#bs-button type="default" size="sm" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
+        {{#bs-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/bs-button}}
         {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
           {{tt this "save"}}  
         {{/one-spin-button}}
@@ -30,7 +30,7 @@
         <tbody>
           {{#each guiPluginIndices as |guiPluginIndex|}}
             <tr class={{if (contains guiPluginIndex expandedIndices) "active"}}>
-              <td class="row-header" {{action (action "indicesRowHeaderClick" guiPluginIndex) on="click"}}>{{guiPluginIndex.name}}</td>
+              <td class="row-header" {{action (action "indicesRowHeaderClick" guiPluginIndex)}}>{{guiPluginIndex.name}}</td>
               <td class="index-info">
                 <div>
                   {{#if (eq mode "edit")}}
@@ -43,6 +43,7 @@
                         onchange=(action "changeAssignMethod" guiPluginIndex.name)
                         searchEnabled=false
                         renderInPlace=true
+                        disabled=isSaving
                         as |assignMethod|}}
                         {{tt this (concat "assignMethods." assignMethod)}}
                       {{/power-select}}
@@ -53,7 +54,8 @@
                           <input
                             value={{get createIndicesNames guiPluginIndex.name}}
                             oninput={{action (action "changeAssignValue" guiPluginIndex.name) value="target.value"}}
-                            class="form-control">
+                            class="form-control"
+                            disabled={{isSaving}}>
                         {{else if (eq (get selectedAssignMethods guiPluginIndex.name) "reuse")}}
                           {{#power-select
                             tagName="div"
@@ -62,15 +64,13 @@
                             onchange=(action "changeAssignValue" guiPluginIndex.name)
                             searchEnabled=false
                             renderInPlace=true
+                            disabled=isSaving
                             as |index|}}
                             {{index.name}}
                           {{/power-select}}
                         {{/if}}
                         <div class="form-message">{{get guiIndicesErrors guiPluginIndex.name}}</div>
                       {{/bsForm.group}}
-                      {{!-- {{#unless (eq (get selectedAssignMethods guiPluginIndex.name) "unassigned")}}
-                        {{get guiIndicesErrors guiPluginIndex.name}}
-                      {{/unless}} --}}
                     {{/bs-form}}
                   {{else}}
                     {{#if (get indicesMapping guiPluginIndex.name)}}

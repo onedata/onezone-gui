@@ -13,7 +13,7 @@
       checked=isRemoveDataChecked
       update=(action (mut isRemoveDataChecked))
     }}
-    <div class="text-understand" {{action (mut isRemoveDataChecked) (not isRemoveDataChecked)}}>
+    <div class="text-understand" {{action "changeRemoveDataChecked" (not isRemoveDataChecked)}}>
       {{tt this "removeHarvestedData"}}
     </div>
   </div>

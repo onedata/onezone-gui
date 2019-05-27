@@ -1,3 +1,13 @@
+/**
+ * Harvester configuration section responsible for managing indices connected
+ * to gui plugin.
+ *
+ * @module components/harvester-configuration/gui-indices
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
@@ -57,6 +67,45 @@ export default Component.extend(I18n, {
    */
   isSaving: false,
 
+    /**
+   * @type {EmberObject}
+   */
+  selectedAssignMethods: Object.freeze({}),
+
+  /**
+   * @type {EmberObject}
+   */
+  selectedIndices: Object.freeze({}),
+
+  /**
+   * @type {EmberObject}
+   */
+  createIndicesNames: Object.freeze({}),
+
+  /**
+   * @type {EmberObject}
+   */
+  guiIndicesErrors: Object.freeze({}),
+
+  /**
+   * @type {Array<string>}
+   */
+  assignIndexMethods: Object.freeze([
+    'create',
+    'reuse',
+    'unassigned',
+  ]),
+
+  /**
+   * @type {Ember.ComputedProperty<Ember.A>}
+   */
+  expandedIndices: computed(function expandedIndices() {
+    return A(); 
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<ember-cp-validations.validators.Messages>}
+   */
   validationMassages: computed(function validationMassages() {
     return Messages.create();
   }),
@@ -81,6 +130,9 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<PromiseArray<Model.Index>>}
+   */
   indicesMapping: computed(
     'guiPluginIndices.@each.name',
     'harvesterIndicesProxy.content.@each.guiPluginName',
@@ -118,18 +170,9 @@ export default Component.extend(I18n, {
     return valid;
   }),
 
-  /**
-   * @type {Array<string>}
-   */
-  assignIndexMethods: Object.freeze([
-    'create',
-    'reuse',
-    'unassigned',
-  ]),
-
-  guiPluginIndicesObsever: observer(
+  guiPluginIndicesObserver: observer(
     'guiPluginIndices',
-    function guiPluginIndicesObsever() {
+    function guiPluginIndicesObserver() {
       this.setProperties({
         selectedAssignMethods: this.generateDataObjectForGuiIndices(() => 'create'),
         selectedIndices: this.generateDataObjectForGuiIndices(() => undefined),
@@ -183,36 +226,9 @@ export default Component.extend(I18n, {
     }
   }),
 
-  /**
-   * @type {EmberObject}
-   */
-  selectedAssignMethods: Object.freeze({}),
-
-  /**
-   * @type {EmberObject}
-   */
-  selectedIndices: Object.freeze({}),
-
-  /**
-   * @type {EmberObject}
-   */
-  createIndicesNames: Object.freeze({}),
-
-  /**
-   * @type {EmberObject}
-   */
-  guiIndicesErrors: Object.freeze({}),
-
-  /**
-   * @type {Ember.ComputedProperty<Ember.A>}
-   */
-  expandedIndices: computed(function expandedIndices() {
-    return A(); 
-  }),
-
   init() {
     this._super(...arguments);
-    this.guiPluginIndicesObsever();
+    this.guiPluginIndicesObserver();
     this.get('harvesterIndicesProxy').then(() => {
       this.modeObserver();
     });
@@ -233,10 +249,10 @@ export default Component.extend(I18n, {
   },
 
   getErrorMessage(type, customMessage = false) {
-    const messages = this.get('validationMassages');
     if (customMessage) {
       return this.t(`validationErrors.${type}`);
     } else {
+      const messages = this.get('validationMassages');
       return messages.getMessageFor(type, {
         description: get(messages, 'defaultDescription'),
       });
@@ -413,6 +429,7 @@ export default Component.extend(I18n, {
         'selectedIndices',
         'globalNotify'
       );
+      this.set('isSaving', true);
       const {
         indicesToCreate,
         indicesToUpdate,
@@ -474,6 +491,7 @@ export default Component.extend(I18n, {
                   }
                 });
               }
+              this.set('isSaving', false);
             });
             if (get(errorsToShow, 'length')) {
               globalNotify.backendError(this.t('indicesUpdating'), errorsToShow);

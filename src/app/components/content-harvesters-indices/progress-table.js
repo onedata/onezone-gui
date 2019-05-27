@@ -1,3 +1,12 @@
+/**
+ * A component that shows progress of harvesting for given index.
+ *
+ * @module components/content-harvesters-indices/progress-table
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { promise, array } from 'ember-awesome-macros';
 import { computed, get, getProperties, setProperties } from '@ember/object';
