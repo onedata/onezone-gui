@@ -16,7 +16,7 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {Object}
    * 
    * Object in format:
-   * `
+   * ```
    * {
    *   space1Id: {
    *     provider1Id: {
@@ -32,7 +32,7 @@ export default Model.extend(GraphSingleModelMixin, {
    *   space2Id: {...},
    *   ...
    * }
-   * `
+   * ```
    */
   indexStats: attr('object'),
 });

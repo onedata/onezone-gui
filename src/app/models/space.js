@@ -66,13 +66,14 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @returns {Promise<Model.Harvester>}
    */
   joinHarvester(token) {
-    return this._joinRelation('harvester', token);
+    return this.joinRelation('harvester', token);
   },
 
-  _joinRelation(entityType, token) {
+  joinRelation(entityType, token) {
     return this.get('onedataGraphUtils').joinRelation(
       entityType,
-      token, ['asSpace', this.get('entityId')]
+      token,
+      ['asSpace', this.get('entityId')]
     ).then(({ gri }) =>
       this.get('store').findRecord(entityType, gri)
     );

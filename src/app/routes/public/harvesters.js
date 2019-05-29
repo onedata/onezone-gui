@@ -1,7 +1,7 @@
 /**
  * Shows gui plugin of public harvester.
  * 
- * @module routes/public-harvester
+ * @module routes/public/harvesters
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -16,7 +16,6 @@ import { reject } from 'rsvp';
 export default Route.extend({
   harvesterManager: service(),
   navigationState: service(),
-  currentUser: service(),
 
   model({ harvester_id: harvesterId }) {
     return this.get('harvesterManager').getRecord(
@@ -28,7 +27,8 @@ export default Route.extend({
       })
     )
     .then(harvester => {
-      const isUserSignedIn = Boolean(this.get('currentUser.userId'));
+      const publicModel = this.modelFor('public');
+      const isUserSignedIn = get(publicModel, 'isUserSignedIn');
       const isPublic = harvester.get('public');
       // Public may by true, false or undefined. True and false are obvious.
       // Undefined is when user is not a member of harvester, but it is public,

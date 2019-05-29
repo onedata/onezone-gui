@@ -36,6 +36,8 @@ export default {
     active: 'Active',
     all: 'All',
     notAccessible: 'not accessible',
+    lastActivity: 'Last activity',
+    changes: 'changes',
   },
   progressTableCell: {
     space: 'Space',

@@ -74,11 +74,14 @@ export default Service.extend({
   joinHarvester(token) {
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => user.joinHarvester(token)
-        .then(harvester => Promise.all([
-          this.reloadList(),
-          this.reloadUserList(get(harvester, 'entityId')).catch(ignoreForbiddenError),
-          this.reloadEffUserList(get(harvester, 'entityId')).catch(ignoreForbiddenError),
-        ]).then(() => harvester))
+        .then(harvester => {
+          const harvesterEntityId = get(harvester, 'entityId');
+          return Promise.all([
+            this.reloadList(),
+            this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
+            this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
+          ]).then(() => harvester);
+        })
       );
   },
 
@@ -258,8 +261,13 @@ export default Service.extend({
    * @return {Promise}
    */
   createMemberGroupForHarvester(harvesterEntityId, childGroupRepresentation) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => this.get('onedataGraph').request({
+    const {
+      currentUser,
+      onedataGraph,
+      groupManager,
+    } = this.getProperties('currentUser', 'onedataGraph', 'groupManager');
+    return currentUser.getCurrentUserRecord()
+      .then(user => onedataGraph.request({
         gri: gri({
           entityType: 'harvester',
           entityId: harvesterEntityId,
@@ -273,7 +281,7 @@ export default Service.extend({
         return Promise.all([
           this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
           this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
-          this.get('groupManager').reloadList(),
+          groupManager.reloadList(),
         ]);
       }));
   },
@@ -378,13 +386,13 @@ export default Service.extend({
   },
 
   /**
-   * Gets harvester configuration
+   * Gets harvester GUI plugin configuration
    * @param {string} harvesterEntityId
-   * @returns {Promise<HarvesterConfiguration>}
+   * @returns {Promise<HarvesterConfigurationGuiPLuginConfig>}
    */
-  getConfig(harvesterEntityId) {
+  getGuiPluginConfig(harvesterEntityId) {
     const store = this.get('store');
-    return store.findRecord('harvesterConfiguration', gri({
+    return store.findRecord('harvesterGuiPluginConfig', gri({
       entityType: 'harvester',
       entityId: harvesterEntityId,
       aspect: 'gui_plugin_config',

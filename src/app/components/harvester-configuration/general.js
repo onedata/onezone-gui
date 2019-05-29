@@ -37,13 +37,12 @@ const viewCreateFieldDefinitions = [{
   name: 'plugin',
   type: 'dropdown',
   options: [],
+}, {
+  name: 'endpoint',
+  type: 'text',
 }];
 
 const viewEditFieldDefinitions = [{
-  name: 'endpoint',
-  type: 'text',
-  optional: true,
-}, {
   name: 'public',
   type: 'checkbox',
   defaultValue: false,
@@ -222,7 +221,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       } = getProperties(_location, 'origin', 'pathname');
   
       return origin + pathname +
-        router.urlFor('public-harvester', harvesterEntityId);
+        router.urlFor('public.harvesters', harvesterEntityId);
     } else {
       return null;
     }
@@ -249,7 +248,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
           'endpoint',
           'public',
         ].forEach(valueName => {
-          const value = get(harvester, valueName);
+          let value = get(harvester, valueName);
 
           const editorFieldName = `edit.${valueName}`;
           const editorField = allFields.findBy('name', editorFieldName);
@@ -260,6 +259,13 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
 
           const viewFieldName = `view.${valueName}`;
           const viewField = allFields.findBy('name', viewFieldName);
+          // Plugin static field needs human-readable string
+          if (valueName === 'plugin') {
+            value = get(
+              (get(editorField, 'options').findBy('value', value) || {}),
+              'label'
+            );
+          }
           set(viewField, 'defaultValue', value);
           set(allFieldsValues, viewFieldName, value);
         });
@@ -374,14 +380,11 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         'harvester',
         'harvesterActions'
       );
-      const valueNames = ['name', 'plugin'];
+      const valueNames = ['name', 'plugin', 'endpoint'];
       if (mode === 'edit') {
-        valueNames.push('endpoint', 'public');
+        valueNames.push('public');
       }
       const values = getProperties(get(formValues, mode), ...valueNames);
-      if (!get(values, 'endpoint')) {
-        set(values, 'endpoint', null);
-      }
       
       this.set('disabled', true);
       let promise;

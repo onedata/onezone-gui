@@ -8,8 +8,8 @@
  */
 
 import Component from '@ember/component';
-import { promise, array } from 'ember-awesome-macros';
-import { computed, get, getProperties, setProperties } from '@ember/object';
+import { promise, array, subtract } from 'ember-awesome-macros';
+import { computed, observer, get, getProperties, setProperties } from '@ember/object';
 import { A } from '@ember/array';
 import { reject } from 'rsvp';
 import { inject as service } from '@ember/service';
@@ -17,6 +17,8 @@ import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
+import moment from 'moment';
+import { scheduleOnce, next } from '@ember/runloop';
 
 export default Component.extend(I18n, WindowResizeHandler, {
   classNames: ['content-harvesters-indices-progress-table'],
@@ -58,11 +60,26 @@ export default Component.extend(I18n, WindowResizeHandler, {
   showOnlyActive: true,
 
   /**
+   * @type {number}
+   */
+  currentSeqSum: null,
+
+  /**
+   * @type {number}
+   */
+  previousSeqSum: null,
+
+  /**
    * @type {Ember.ComputedProperty<Ember.A>}
    */
   expandedRows: computed(function expandedRows() {
     return A(); 
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<number>}
+   */
+  changesCounter: subtract('currentSeqSum', 'previousSeqSum'),
 
   /**
    * @type {Ember.ComputedProperty<PromiseObject<models.IndexStat>>}
@@ -286,6 +303,34 @@ export default Component.extend(I18n, WindowResizeHandler, {
   ),
 
   /**
+   * @type {Ember.ComputedProperty<string|null>}
+   */
+  lastUpdateTime: computed('progressData', function lastUpdateTime() {
+    const progressData = this.get('progressData');
+    let lastUpdate = 0;
+    progressData.forEach(({ progress }) =>
+      progress
+        .filter(({ lastUpdate }) => lastUpdate)
+        .mapBy('lastUpdate')
+        .forEach(lu => {
+          if (lu > lastUpdate) {
+            lastUpdate = lu;
+          }
+        })
+    );
+    if (lastUpdate) {
+      lastUpdate = moment.unix(lastUpdate);
+      if (lastUpdate.isSame(moment(), 'day')) {
+        return lastUpdate.format('HH:mm:ss');
+      } else {
+        return lastUpdate.format('YYYY-MM-DD, HH:mm:ss');
+      }
+    } else {
+      return null;
+    }
+  }),
+
+  /**
    * Progress data narrowed to active entities.
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
@@ -334,6 +379,10 @@ export default Component.extend(I18n, WindowResizeHandler, {
     }
   ),
 
+  progressDataObserver: observer('progressData', function progressDataObserver() {
+    scheduleOnce('afterRender', this, 'recalculateChanges');
+  }),
+
   willDestroyElement() {
     try {
       const indexProgressProxy = this.get('indexProgressProxy');
@@ -360,6 +409,32 @@ export default Component.extend(I18n, WindowResizeHandler, {
     safeExec(this, () => {
       this.set('isTableCollapsed', get(_window, 'innerWidth') <= breakpoint);
     });
+  },
+
+  recalculateChanges() {
+    const {
+      progressData,
+      currentSeqSum,
+    } = this.getProperties('progressData', 'currentSeqSum');
+    let sum = 0;
+    progressData.forEach(({ progress }) =>
+      progress
+        .filter(({ currentSeq }) => typeof currentSeq === 'number')
+        .mapBy('currentSeq')
+        .forEach(currentSeq => {
+          sum += currentSeq;
+        })
+    );
+    this.setProperties({
+      currentSeqSum: sum,
+      previousSeqSum: currentSeqSum,
+    });
+    if (this.get('element')) {
+      this.$('.activity-indicator').removeClass('pulse-green');
+      next(() => {
+        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-green'));
+      });
+    }
   },
 
   actions: {

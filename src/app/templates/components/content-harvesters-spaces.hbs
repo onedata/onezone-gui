@@ -1,16 +1,18 @@
-<div class="row content-row header-row hidden-xs">
-  <h1 class="with-menu">
-    <span class="one-label">
-      {{tt this "header"}}
-    </span>
-    {{actions-toolbar isMinimized=true actionsArray=globalActions}}
-  </h1>
-</div>
+{{#unless (eq spacesProxy.length 0)}}
+  <div class="row content-row header-row hidden-xs">
+    <h1 class="with-menu">
+      <span class="one-label">
+        {{tt this "header"}}
+      </span>
+      {{actions-toolbar isMinimized=true actionsArray=globalActions}}
+    </h1>
+  </div>
+{{/unless}}
 {{#promise-proxy-container proxy=spacesProxy}}
   {{#if (eq spacesProxy.length 0)}}
     {{#content-info
       imagePath=(root-url "assets/images/harvester-space-new.svg")
-      class="scroll-breakpoint-800 preserve-header"
+      class="scroll-breakpoint-800"
       header=(tt this "harvesterSpaces")
       text=(tt this "noSpaces")}}
       <div class="action-buttons">

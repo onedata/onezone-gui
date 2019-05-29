@@ -7,7 +7,7 @@ import { get, set, setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 
 const RouterService = Service.extend({
-  routeName: 'public-harvester',
+  routeName: 'public.harvesters',
   isActive(routeName) {
     return routeName === this.get('routeName');
   },
@@ -91,7 +91,7 @@ describe('Unit | Service | global gui resources', function () {
   });
 
   it(
-    'injects info about no logged in user into data-discovery scope',
+    'injects info about no signed in user into data-discovery scope',
     function () {
       const service = this.subject();
       setupService(service);
@@ -104,13 +104,13 @@ describe('Unit | Service | global gui resources', function () {
   );
 
   it(
-    'injects info about logged in user into data-discovery scope',
+    'injects info about signed in user into data-discovery scope',
     function () {
       const currentUser = lookupService(this, 'current-user');
       set(currentUser, 'currentUser', resolve({
         entityId: '123', 
-        name: 'abc',
-        alias: 'def',
+        fullName: 'abc',
+        username: 'def',
       }));
 
       const service = this.subject();
@@ -121,8 +121,8 @@ describe('Unit | Service | global gui resources', function () {
       expect(userRequest).to.exist;
       return userRequest().then(value => expect(value).to.deep.equal({
         id: '123', 
-        name: 'abc',
-        alias: 'def',
+        fullName: 'abc',
+        username: 'def',
       }));
     }
   );

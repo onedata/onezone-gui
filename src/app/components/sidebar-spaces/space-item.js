@@ -107,7 +107,7 @@ export default Component.extend(I18n, HasDefaultSpace, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  addToHarvesterAction: computed(function addToHarvesterAction() {
+  joinToHarvesterAction: computed(function joinToHarvesterAction() {
     const {
       router,
       guiUtils,
@@ -119,7 +119,7 @@ export default Component.extend(I18n, HasDefaultSpace, {
         guiUtils.getRoutableIdFor(space),
         'join-harvester'
       ),
-      title: this.t('addToHarvester'),
+      title: this.t('joinToHarvester'),
       class: 'add-to-harvester-action',
       icon: 'light-bulb',
     };
@@ -128,5 +128,5 @@ export default Component.extend(I18n, HasDefaultSpace, {
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  itemActions: collect('addToHarvesterAction'),
+  itemActions: collect('joinToHarvesterAction'),
 });

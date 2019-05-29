@@ -68,14 +68,14 @@ export default Component.extend(I18n, {
   isValid: true,
 
   /**
-   * @type {Ember.ComputedProperty<PromiseObject<models.HarvesterConfiguration>>}
+   * @type {Ember.ComputedProperty<PromiseObject<models.HarvesterGuiPluginConfig>>}
    */
   configurationProxy: promise.object(computed(function configurationProxy() {
     const {
       harvester, 
       harvesterManager,
     } = this.getProperties('harvester', 'harvesterManager');
-    return harvesterManager.getConfig(get(harvester, 'entityId'));
+    return harvesterManager.getGuiPluginConfig(get(harvester, 'entityId'));
   })),
 
   /**

@@ -16,6 +16,7 @@ import { Promise, resolve } from 'rsvp';
 import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -37,6 +38,7 @@ const names = ['one', 'two', 'three'];
 const privileges = {
   space: spacePrivilegesFlags,
   group: groupPrivilegesFlags,
+  harvester: harvesterPrivilegesFlags,
 };
 
 const perProviderSize = Math.pow(1024, 4);
@@ -187,7 +189,7 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => Promise.all(['space', 'group'].map(modelType => {
+      .then(() => Promise.all(['space', 'group', 'harvester'].map(modelType => {
         return listRecords[types.indexOf(modelType)].get('list')
           .then(records =>
             Promise.all(records.map(record =>
@@ -420,7 +422,7 @@ function createHarvesterRecords(store) {
         creationTime: 1540995468,
       },
     }).save().then(record => 
-      store.createRecord('harvesterConfiguration', {
+      store.createRecord('harvesterGuiPluginConfig', {
         id: gri({
           entityType: 'harvester',
           entityId: get(record, 'entityId'),
@@ -466,7 +468,7 @@ function createHarvesterRecords(store) {
           schema: '{}',
         }).save();
       }))
-      .then((records => createListRecord(store, 'index', records)))
+      .then(records => createListRecord(store, 'index', records))
       .then(listRecord => record.set('indexList', listRecord))
       .then(() => record);
     });
@@ -631,7 +633,7 @@ function attachProgressToHarvesterIndices(
                 currentSeq,
                 lastUpdate,
                 error: null,
-                archival: true,
+                archival: false,
               });
             });
           });

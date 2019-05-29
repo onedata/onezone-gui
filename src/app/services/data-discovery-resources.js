@@ -57,7 +57,9 @@ export default Service.extend({
       promise = resolve([]);
     } else {
       promise = get(harvester, 'indexList')
-        .then(indexList => get(indexList, 'list'));
+        .then(indexList => indexList ?
+          get(indexList, 'list') : reject({ id: 'forbidden' })
+        );
     }
     return PromiseArray.create({
       promise,
@@ -109,7 +111,7 @@ export default Service.extend({
     if (!harvesterId) {
       return reject('Harvester ID is not specified.');
     } else {
-      return harvesterManager.getConfig(harvesterId)
+      return harvesterManager.getGuiPluginConfig(harvesterId)
         .then(config => _.cloneDeep(get(config, 'guiPluginConfig')));
     }
   },
@@ -121,7 +123,7 @@ export default Service.extend({
    */
   viewModeRequest() {
     const router = this.get('router');
-    const mode = router.isActive('public-harvester') ? 'public' : 'internal';
+    const mode = router.isActive('public.harvesters') ? 'public' : 'internal';
     return resolve(mode);
   },
 });

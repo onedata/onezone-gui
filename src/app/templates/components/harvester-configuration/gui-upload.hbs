@@ -1,5 +1,5 @@
 <h1>{{tt this "header"}}</h1>
-<input type="file" class="upload-gui-input" accept=".tar.gz" onchange={{action "fileChange"}}>
+<input type="file" class="upload-gui-input" accept=".gz" onchange={{action "fileChange"}}>
 <form class="row upload-form">
   <div class="col-xs-12 col-sm-5">
     <input class="form-control file-name-input input-sm" type="text" readonly="readonly" value={{selectedFile.name}} {{action "browse"}}>

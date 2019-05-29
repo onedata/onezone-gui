@@ -7,10 +7,10 @@ export default {
   },
   groupItem: {
     rename: 'Rename',
-    joinSpace: 'Join space',
-    joinHarvester: 'Join harvester',
+    joinSpace: 'Join to space',
+    joinHarvester: 'Join to harvester',
     joinAsSubgroup: 'Join as subgroup',
-    joinCluster: 'Join cluster',
+    joinCluster: 'Join to cluster',
     leave: 'Leave',
     remove: 'Remove',
     groupPersistence: 'group persistence',

@@ -57,31 +57,39 @@
   .content-harvesters-indices-progress-table {
     $table-breakpoint: 1200px;
     $space-name-width: 120px;
-    $dot-size: 50px;
+    $dot-size: 65px;
 
-    min-height: 160px;
+    min-height: 120px;
     position: relative;
+
+    .progress-table-container.list-layout {
+      .progress-row:last-child {
+        margin-bottom: -$padding-base-vertical;
+      }
+    }
 
     @media (min-width: $table-breakpoint + 1) {
       $labels-font-size: 90%;
 
-      .progress-table-container.table-layout {
-        width: calc(100% - #{$space-name-width});
-        margin-left: $space-name-width;
-        overflow-x: auto;
-        overflow-y: visible;
+      .progress-table-container {
+        &.table-layout {
+          width: calc(100% - #{$space-name-width});
+          margin-left: $space-name-width;
+          overflow-x: auto;
+          overflow-y: visible;
+        }
       }
 
       .table {
         width: initial;
         max-width: initial;
         margin-left: 30px;
-        margin-bottom: 60px;
+        margin-bottom: 80px;
         .space-name {
           position: absolute;
           top: auto;
           left: 0;
-          transform: translateY(0.5em);
+          transform: translateY(20px);
           padding-right: $padding-base-vertical;
           padding-left: 0;
           width: $space-name-width;
@@ -167,6 +175,9 @@
 
     .table {
       table-layout: fixed;
+      & > tbody > tr > td.active {
+        background-color: inherit;
+      }
     }
 
     .visible-stats-label {
@@ -250,6 +261,18 @@
         height: $dot-size;
         width: $dot-size;
       }
+    }
+    .last-update-info {
+      margin-bottom: $padding-base-vertical;
+    }
+    .visible-stats-label {
+      .one-icon {
+        margin-left: 3px;
+        vertical-align: middle;
+      }
+    }
+    .pulse-green {
+      @extend .pulse-mint;
     }
   }
 }

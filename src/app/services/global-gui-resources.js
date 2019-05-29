@@ -87,15 +87,15 @@ export default Service.extend({
       user => {
         const {
           entityId,
-          name,
-          alias,
-        } = getProperties(user, 'entityId', 'name', 'alias');
+          fullName,
+          username,
+        } = getProperties(user, 'entityId', 'fullName', 'username');
         // Info about user should be restricted to few field to protect private,
         // internal data of Onedata
         return {
           id: entityId,
-          name,
-          alias,
+          fullName,
+          username,
         };
       },
       () => null,
