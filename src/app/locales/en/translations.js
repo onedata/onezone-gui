@@ -10,7 +10,6 @@ import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
 import users from './tabs/users';
 
-import noClusterPermissions from './errors/no-cluster-permissions';
 import cannotInitWebsocket from './errors/cannot-init-websocket';
 
 import loginBox from './components/login-box';
@@ -100,7 +99,6 @@ let translations = {
     harvesters,
   },
   errors: {
-    noClusterPermissions,
     cannotInitWebsocket,
   },
   components: {
