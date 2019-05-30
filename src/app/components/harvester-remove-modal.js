@@ -54,8 +54,7 @@ export default Component.extend(I18n, {
   processing: false,
 
   openedObserver: observer('opened', function openedObserver() {
-    const opened = this.get('opened');
-    if (!opened) {
+    if (!this.get('opened')) {
       this.set('isRemoveDataChecked', false);
     }
   }),

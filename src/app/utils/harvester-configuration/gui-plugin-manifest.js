@@ -16,7 +16,7 @@ import { Promise } from 'rsvp';
 export default PromiseObject.extend({
   /**
    * @virtual
-   * @type {Promise<models.Harvester>}
+   * @type {PromiseObject<models.Harvester>}
    */
   harvester: undefined,
 

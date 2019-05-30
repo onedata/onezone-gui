@@ -20,7 +20,7 @@
             {{tt this (if (eq mode "create") "create" "save")}}  
           {{/one-spin-button}}
           {{#if (eq mode "edit")}}
-            {{#bs-button type="default" onClick=(action "cancel")}}{{tt this "cancel"}}{{/bs-button}}
+            {{#bs-button type="default" onClick=(action "cancel") disabled=disabled}}{{tt this "cancel"}}{{/bs-button}}
           {{/if}}
         {{/if}}
       </div>

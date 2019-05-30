@@ -79,7 +79,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
     );
 
     const harvesterEntityId = get(harvester, 'entityId');
-    const promise = Promise.all(members.map(member => {
+    return Promise.all(members.map(member => {
       const memberEntityId = get(member, 'entityId');
       if (get(member, 'entityType') === 'user') {
         return harvesterManager.removeUserFromHarvester(
@@ -92,8 +92,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
           memberEntityId
         );
       }
-    }));
-    return promise.then(() => {
+    }))
+    .then(() => {
       globalNotify.success(this.t('removeMembersSuccess'));
     }).catch(error => {
       globalNotify.backendError(this.t('membersDeletion'), error);

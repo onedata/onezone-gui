@@ -1,5 +1,5 @@
 {{#if isGuiAvailable}}
-  <iframe src={{pluginPath}} class="plugin-frame hidden" onload={{action "pluginLoaded"}}></iframe>
+  <iframe src={{pluginPath}} class="plugin-frame {{if isGuiLoading "hidden"}}" onload={{action "pluginLoaded"}}></iframe>
 {{else if (not checkingGuiAvailability)}}
   {{#content-info
     class="scroll-breakpoint-500"
@@ -8,13 +8,11 @@
   }}
   {{#unless isPublic}}
     <p class="lead text-center">
-      
-        {{tt this "errorPleaseVisit"}}
-        {{#link-to "onedata.sidebar.content.aspect" "config" (query-params tab="gui-plugin")}}
-          {{tt this "errorGuiPluginTab"}}
-        {{/link-to}}
-        {{tt this "errorToSetup"}}
-      
+      {{tt this "errorPleaseVisit"}}
+      {{#link-to "onedata.sidebar.content.aspect" "config" (query-params options="tab.gui-plugin-tab")}}
+        {{tt this "errorGuiPluginTab"}}
+      {{/link-to}}
+      {{tt this "errorToSetup"}}
     </p>
     {{/unless}}
   {{/content-info}}

@@ -18,6 +18,12 @@ export default ProceedProcessModal.extend({
   modalIcon: 'sign-warning-rounded',
 
   /**
+   * @virtual
+   * @type {Object}
+   */
+  record: undefined,
+
+  /**
    * @override
    */
   messageText: computed('record.name', function messageText() {

@@ -254,7 +254,7 @@ export default Service.extend({
    * @param {string} token
    * @returns {Promise<Model.Harvester>}
    */
-  joinHarvesterAsSpace(space, token) {
+  joinSpaceToHarvester(space, token) {
     const harvesterManager = this.get('harvesterManager');
     return space.joinHarvester(token)
       .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId'))

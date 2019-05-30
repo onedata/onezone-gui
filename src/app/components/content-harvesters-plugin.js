@@ -12,9 +12,12 @@ import { computed } from '@ember/object';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: ['content-harvesters-plugin'],
+
+  dataDiscoveryResources: service(),
 
   /**
    * @override
@@ -49,6 +52,12 @@ export default Component.extend(I18n, {
   isGuiLoading: false,
 
   /**
+   * @type {Function}
+   * Ajax function reference (for testing purposes only)
+   */
+  _ajax: $.ajax,
+
+  /**
    * Relative path to plugin application
    * @type {Ember.ComputedProperty<string>}
    */
@@ -59,10 +68,13 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    const pluginPath = this.get('pluginPath');
+    const {
+      pluginPath,
+      _ajax,
+    } = this.getProperties('pluginPath', '_ajax');
 
     // Check if gui plugin index.html is accessible
-    $.ajax(pluginPath, {
+    _ajax(pluginPath, {
       method: 'HEAD',
     }).then(
       () => safeExec(this, () => this.setProperties({
@@ -80,7 +92,17 @@ export default Component.extend(I18n, {
   actions: {
     pluginLoaded() {
       this.set('isGuiLoading', false);
-      this.$('.plugin-frame').removeClass('hidden');
+      const iframe = this.$('.plugin-frame')[0];
+
+      // attaching handler to intercept click events
+      const pluginBody = iframe.contentDocument.body;
+      pluginBody.addEventListener('click', (event) => {
+        const newEvent = new event.constructor(event.type, event);
+        iframe.dispatchEvent(newEvent);
+      });
+      
+      // attaching gui plugin appProxy
+      iframe.appProxy = this.get('dataDiscoveryResources').createAppProxyObject();
     },
   },
 });

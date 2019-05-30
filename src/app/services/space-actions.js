@@ -171,12 +171,12 @@ export default Service.extend(I18n, {
    * @param {string} token
    * @returns {Promise<Harvester>}
    */
-  joinHarvesterAsSpace(space, token) {
+  joinSpaceToHarvester(space, token) {
     const {
       globalNotify,
       spaceManager,
     } = this.getProperties('globalNotify', 'spaceManager');
-    return spaceManager.joinHarvesterAsSpace(space, token)
+    return spaceManager.joinSpaceToHarvester(space, token)
       .then(harvester => {
         globalNotify.success(this.t('joinSpaceToHarvesterSuccess', {
           spaceName: get(space, 'name'),

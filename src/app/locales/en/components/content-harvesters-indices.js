@@ -38,6 +38,7 @@ export default {
     notAccessible: 'not accessible',
     lastActivity: 'Last activity',
     changes: 'changes',
+    unknown: 'unknown',
   },
   progressTableCell: {
     space: 'Space',

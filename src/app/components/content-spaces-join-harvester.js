@@ -42,7 +42,7 @@ export default Component.extend(I18n, {
         space,
         spaceActions,
       } = this.getProperties('space', 'spaceActions');
-      return spaceActions.joinHarvesterAsSpace(space, token);
+      return spaceActions.joinSpaceToHarvester(space, token);
     },
   },
 });

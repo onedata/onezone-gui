@@ -216,7 +216,10 @@ export default Service.extend({
           const meaningfulErrors = [leaveError, removeError]
             .without(null).rejectBy('id', 'forbidden');
           if (meaningfulErrors[1]) {
-            console.error(meaningfulErrors[1]);
+            console.error(
+              'service:harvester-manager.removeGroupFromHarvester:',
+              meaningfulErrors[1]
+            );
           }
           throw meaningfulErrors[0] || { id: 'forbidden' };
         });
@@ -350,7 +353,7 @@ export default Service.extend({
    * @param {any} body
    * @returns {Promise<any>} request result
    */
-  esRequest({ harvesterId, indexId, method, path, body }) {
+  dataRequest({ harvesterId, indexId, method, path, body }) {
     const onedataGraph = this.get('onedataGraph');
 
     const requestData = {

@@ -106,7 +106,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<ember-cp-validations.validators.Messages>}
    */
-  validationMassages: computed(function validationMassages() {
+  validationMessages: computed(function validationMessages() {
     return Messages.create();
   }),
 
@@ -252,7 +252,7 @@ export default Component.extend(I18n, {
     if (customMessage) {
       return this.t(`validationErrors.${type}`);
     } else {
-      const messages = this.get('validationMassages');
+      const messages = this.get('validationMessages');
       return messages.getMessageFor(type, {
         description: get(messages, 'defaultDescription'),
       });

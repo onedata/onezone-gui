@@ -18,6 +18,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
+  currentUser: service(),
   router: service(),
 
   /**
@@ -67,11 +68,24 @@ export default Service.extend({
   }),
 
   /**
+   * @returns {Object}
+   */
+  createAppProxyObject() {
+    return {
+      dataRequest: (...args) => this.dataRequest(...args),
+      configRequest: (...args) => this.configRequest(...args),
+      viewModeRequest: () => this.viewModeRequest(),
+      userRequest: () => this.getCurrentUser(),
+      onezoneUrlRequest: () => this.getOnezoneUrl(),
+    };
+  },
+
+  /**
    * @param {Object} requestOptions
    * @param {string} requestOptions.indexName
    * @returns {Promise<any>} resolves to request result
    */
-  esRequest(requestOptions) {
+  dataRequest(requestOptions) {
     const {
       harvesterId,
       harvesterManager,
@@ -93,7 +107,7 @@ export default Service.extend({
         } else {
           const indexId = get(index, 'aspectId');
           requestOptions = _.assign({ harvesterId, indexId }, requestOptions);
-          return harvesterManager.esRequest(requestOptions);
+          return harvesterManager.dataRequest(requestOptions);
         }
       });
     }
@@ -125,5 +139,46 @@ export default Service.extend({
     const router = this.get('router');
     const mode = router.isActive('public.harvesters') ? 'public' : 'internal';
     return resolve(mode);
+  },
+
+  /**
+   * Returns object containing info about current user. If there is no active
+   * session, promise will resolve to null.
+   * @returns {Promise<Object>}
+   */
+  getCurrentUser() {
+    const currentUser = this.get('currentUser');
+    return currentUser.getCurrentUserRecord().then(
+      user => {
+        const {
+          entityId,
+          fullName,
+          username,
+        } = getProperties(user, 'entityId', 'fullName', 'username');
+        // Info about user should be restricted to few field to protect private,
+        // internal data of Onedata
+        return {
+          id: entityId,
+          fullName,
+          username,
+        };
+      },
+      () => null,
+    );
+  },
+
+  /**
+   * Returns url to Onezone
+   * @returns {Promise<string>}
+   */
+  getOnezoneUrl() {
+    const _location = this.get('_location');
+    const {
+      origin,
+      pathname,
+    } = getProperties(_location, 'origin', 'pathname');
+
+    const url = origin + pathname;
+    return resolve(url);
   },
 });

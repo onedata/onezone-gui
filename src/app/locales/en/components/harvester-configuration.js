@@ -41,7 +41,7 @@ export default {
       status: 'Status',
       uploading: 'uploading',
       uploaded: 'uploaded',
-      cannotLoadManifest: 'cannot load manifest',
+      cannotLoadManifest: 'cannot load manifest - upload correct GUI plugin',
       version: 'Version',
       unknown: 'unknown',
     },

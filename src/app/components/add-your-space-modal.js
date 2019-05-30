@@ -27,6 +27,7 @@ export default SelectModelModal.extend({
   /**
    * @virtual
    * @type {string}
+   * One of: sourceFor
    */
   relation: undefined,
 

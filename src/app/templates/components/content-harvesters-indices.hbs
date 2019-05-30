@@ -11,10 +11,10 @@
   {{#bs-form class="form-horizontal col-md-10 col-lg-8 col-centered" as |form|}}
     {{#form.group validation=(if (get createIndexFormChangedFields "name") (if (get createIndexFormErrors "name") "error" "success"))}}
       <div class="row">
-        <label for={{concat elementId "-new-index-name"}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.name"}}:</label>
+        <label for={{newIndexNameInputId}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.name"}}:</label>
         <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
           <input
-            id={{concat elementId "-new-index-name"}}
+            id={{newIndexNameInputId}}
             value={{createIndexData.name}}
             oninput={{action (action "changeNewIndexValue" "name") value="target.value"}}
             onblur={{action "focusOutNewIndexField" "name"}}
@@ -26,10 +26,10 @@
     {{/form.group}}
     {{#form.group validation=(if (get createIndexFormChangedFields "name") "success")}}
       <div class="row">
-        <label for={{concat elementId "-new-index-schema"}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.schema"}}:</label>
+        <label for={{newIndexSchemaInputId}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.schema"}}:</label>
         <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
           <textarea
-            id={{concat elementId "-new-index-schema"}}
+            id={{newIndexSchemaInputId}}
             value={{createIndexData.schema}}
             oninput={{action (action "changeNewIndexValue" "schema") value="target.value"}}
             onblur={{action "focusOutNewIndexField" "schema"}}
@@ -69,7 +69,7 @@
         {{#list.item as |listItem|}}
           {{#listItem.header
             isCollapsible=false
-            class="text-center"}}
+            class="text-center no-indices"}}
             <span class="one-label">{{tt this "noIndices"}}</span>
           {{/listItem.header}}
         {{/list.item}}

@@ -14,7 +14,6 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
-  globalGuiResources: service(),
   onedataWebsocket: service(),
 
   developmentModelConfig: Object.freeze({
@@ -32,11 +31,6 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
           type: 'cannot-init-websocket',
         };
       })
-      .then(() => {
-        const globalGuiResources = this.get('globalGuiResources');
-        globalGuiResources.initializeGlobalObject();
-
-        return superResult;
-      });
+      .then(() => superResult);
   },
 });

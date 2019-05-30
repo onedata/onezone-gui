@@ -131,11 +131,11 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * Loads groups for dropdown
+   * Loads records for dropdown
    * @returns {undefined}
    */
   loadRecords() {
-    return PromiseArray.create({ promise: resolve([]) });
+    this.set('records', PromiseArray.create({ promise: resolve([]) }));
   },
 
   actions: {

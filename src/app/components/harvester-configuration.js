@@ -9,18 +9,15 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import { or, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-
-const tabs = [
-  'general',
-  'gui-plugin',
-];
 
 export default Component.extend(I18n, {
   classNames: ['harvester-configuration'],
 
   i18n: service(),
   navigationState: service(),
+  router: service(),
 
   /**
    * @override
@@ -35,13 +32,15 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  activeTab: 'harv-config-general-tab',
+  activeTab: or('options.tab', raw('general-tab')),
 
-  init() {
-    this._super(...arguments);
-    const activeTab = this.get('navigationState.queryParams.tab');
-    if (tabs.includes(activeTab)) {
-      this.set('activeTab', `harv-config-${activeTab}-tab`);
-    }
+  actions: {
+    onTabChange(tab) {
+      this.get('router').transitionTo('onedata.sidebar.content.aspect', {
+        queryParams: {
+          options: 'tab.' + tab,
+        },
+      });
+    },
   },
 });
