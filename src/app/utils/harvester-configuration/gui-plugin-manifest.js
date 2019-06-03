@@ -18,7 +18,7 @@ export default PromiseObject.extend({
    * @virtual
    * @type {PromiseObject<models.Harvester>}
    */
-  harvester: undefined,
+  harvesterProxy: undefined,
 
   /**
    * @type {Ember.ComputedProperty<Object>}
@@ -71,7 +71,7 @@ export default PromiseObject.extend({
    * @returns {Promise<Object>}
    */
   loadManifest() {
-    const promise = this.get('harvester').then(harvester => {
+    const promise = this.get('harvesterProxy').then(harvester => {
       return new Promise((resolve, reject) => {
         $.ajax({
           dataType: 'json',

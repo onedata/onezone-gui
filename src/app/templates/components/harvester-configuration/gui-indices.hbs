@@ -1,5 +1,6 @@
 <h1>
   <span class="one-label">{{tt this "indicesHeader"}}</span>
+  {{one-label-tip title=(tt this "sectionHint")}}
   {{#if (and manifestProxy.manifest harvesterIndicesProxy.isFulfilled)}}
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}

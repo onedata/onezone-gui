@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -66,15 +66,32 @@ export default Component.extend(I18n, {
     return `${guiPluginPath}/index.html`;
   }),
 
+  harvesterObserver: observer('harvester', function () {
+    this.checkGuiPluginAvailability();
+  }),
+
   init() {
     this._super(...arguments);
+    this.harvesterObserver();
+  },
+
+  /**
+   * Check if GUI plugin is available
+   * @returns {Promise}
+   */
+  checkGuiPluginAvailability() {
     const {
       pluginPath,
       _ajax,
     } = this.getProperties('pluginPath', '_ajax');
 
-    // Check if gui plugin index.html is accessible
-    _ajax(pluginPath, {
+    this.setProperties({
+      checkingGuiAvailability: true,
+      isGuiAvailable: undefined,
+      isGuiLoading: false,
+    });
+
+    return _ajax(pluginPath, {
       method: 'HEAD',
     }).then(
       () => safeExec(this, () => this.setProperties({
@@ -91,18 +108,20 @@ export default Component.extend(I18n, {
 
   actions: {
     pluginLoaded() {
-      this.set('isGuiLoading', false);
-      const iframe = this.$('.plugin-frame')[0];
+      if (!this.get('checkingGuiAvailability')) {
+        this.set('isGuiLoading', false);
+        const iframe = this.$('.plugin-frame')[0];
 
-      // attaching handler to intercept click events
-      const pluginBody = iframe.contentDocument.body;
-      pluginBody.addEventListener('click', (event) => {
-        const newEvent = new event.constructor(event.type, event);
-        iframe.dispatchEvent(newEvent);
-      });
-      
-      // attaching gui plugin appProxy
-      iframe.appProxy = this.get('dataDiscoveryResources').createAppProxyObject();
+        // attaching handler to intercept click events
+        const pluginBody = iframe.contentDocument.body;
+        pluginBody.addEventListener('click', (event) => {
+          const newEvent = new event.constructor(event.type, event);
+          iframe.dispatchEvent(newEvent);
+        });
+
+        // attaching gui plugin appProxy
+        iframe.appProxy = this.get('dataDiscoveryResources').createAppProxyObject();
+      }
     },
   },
 });

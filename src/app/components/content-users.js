@@ -222,7 +222,7 @@ export default Component.extend(I18n, {
     stopPasswordChange() {
       this.set('isChangingPassword', false);
     },
-    saveNewPassword({currentPassword, newPassword}) {
+    saveNewPassword({ currentPassword, newPassword }) {
       const {
         userActions,
         user,

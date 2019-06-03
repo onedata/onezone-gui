@@ -33,10 +33,8 @@ export default Model.extend(GraphSingleModelMixin, {
    * @returns {Promise<models.IndexStat>}
    */
   getStats() {
-    const statsGri = gri(_.assign(
-      { aspect: 'index_stats', scope: 'private' },
-      this.getProperties('entityType', 'entityId', 'aspectId'))
-    );
+    const statsGri = gri(_.assign({ aspect: 'index_stats', scope: 'private' },
+      this.getProperties('entityType', 'entityId', 'aspectId')));
     return this.get('store').findRecord('indexStat', statsGri);
   },
 });

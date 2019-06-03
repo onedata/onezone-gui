@@ -57,7 +57,7 @@
   .content-harvesters-indices-progress-table {
     $table-breakpoint: 1200px;
     $space-name-width: 120px;
-    $dot-size: 65px;
+    $chart-size: 65px;
 
     min-height: 120px;
     position: relative;
@@ -93,7 +93,7 @@
           padding-right: $padding-base-vertical;
           padding-left: 0;
           width: $space-name-width;
-          height: $dot-size * 1.5;
+          height: $chart-size * 1.5;
           min-width: $space-name-width;
           overflow: hidden;
           text-align: right;
@@ -113,13 +113,13 @@
         font-size: $labels-font-size;
       }
       .progress-table-cell {
-        height: $dot-size * 1.5;
-        width: $dot-size * 1.5;
+        height: $chart-size * 1.5;
+        width: $chart-size * 1.5;
       }
       td {
-        max-width: $dot-size * 1.7;
-        width: $dot-size * 1.7;
-        min-width: $dot-size * 1.7;
+        max-width: $chart-size * 1.7;
+        width: $chart-size * 1.7;
+        min-width: $chart-size * 1.7;
       }
     }
 
@@ -128,7 +128,7 @@
         width: 100%;
         font-size: 100%;
         margin-bottom: -$table-cell-padding;
-        .progress-dot {
+        .progress-chart {
           left: initial;
           right: 0;
           transform: translateY(-50%);
@@ -145,8 +145,8 @@
               }
               &.progress-table-cell {
                 &::before {
-                  width: calc(100% - #{$dot-size * 1.5});
-                  line-height: $dot-size * 1.5 - 2 * $table-cell-padding;
+                  width: calc(100% - #{$chart-size * 1.5});
+                  line-height: $chart-size * 1.5 - 2 * $table-cell-padding;
                   font-weight: normal;
                   white-space: nowrap;
                   text-align: left;
@@ -204,13 +204,13 @@
     .provider-names td {
       padding: 0 0 0 0;
     }
-    .progress-dot {
+    .progress-chart {
       @include absolute-align-middle-center();
-      width: $dot-size;
-      height: $dot-size;
+      width: $chart-size;
+      height: $chart-size;
       border-radius: 100%;
       text-align: center;
-      line-height: $dot-size;
+      line-height: $chart-size;
       color: $color-one-white;
       font-family: 'Open Sans Semibold';
       .donut-ring, .donut-segment {
@@ -250,16 +250,16 @@
     .progress-table-container.list-layout {
       .progress-row {
         position: relative;
-        line-height: $dot-size;
-        padding-left: $dot-size + $padding-base-horizontal;
+        line-height: $chart-size;
+        padding-left: $chart-size + $padding-base-horizontal;
       }
       .progress-table-cell {
         position: absolute;
         left: 0;
         top: 50%;
         transform: translateY(-50%);
-        height: $dot-size;
-        width: $dot-size;
+        height: $chart-size;
+        width: $chart-size;
       }
     }
     .last-update-info {

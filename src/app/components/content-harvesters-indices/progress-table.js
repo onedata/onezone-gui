@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { promise, array, subtract } from 'ember-awesome-macros';
+import { promise, subtract } from 'ember-awesome-macros';
 import { computed, observer, get, getProperties, setProperties } from '@ember/object';
 import { A } from '@ember/array';
 import { reject } from 'rsvp';
@@ -48,7 +48,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {boolean}
    */
   isTableCollapsed: false,
-  
+
   /**
    * @type {number}
    */
@@ -73,7 +73,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {Ember.ComputedProperty<Ember.A>}
    */
   expandedRows: computed(function expandedRows() {
-    return A(); 
+    return A();
   }),
 
   /**
@@ -96,8 +96,8 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {Ember.ComputedProperty<PromiseArray<models.Space>>}
    */
   spacesProxy: promise.array(computed(
-    'harvester',
-    function harvesterSpacesProxy() {
+    'harvester.{hasViewPrivilege,spaceList.list}',
+    function spacesProxy() {
       const harvester = this.get('harvester');
       return get(harvester, 'hasViewPrivilege') !== false ?
         get(harvester, 'spaceList').then(sl => sl ? get(sl, 'list') : A()) :
@@ -108,12 +108,15 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @type {Ember.ComputedProperty<PromiseArray<models.Provider>>}
    */
-  providersProxy: promise.array(computed(function providersProxy() {
-    const harvester = this.get('harvester');
-    return get(harvester, 'hasViewPrivilege') !== false ?
-      get(harvester, 'effProviderList').then(sl => sl ? get(sl, 'list') : A()) :
-      reject({ id: 'forbidden' });
-  })),
+  providersProxy: promise.array(computed(
+    'harvester.{hasViewPrivilege,effProviderList.list}',
+    function providersProxy() {
+      const harvester = this.get('harvester');
+      return get(harvester, 'hasViewPrivilege') !== false ?
+        get(harvester, 'effProviderList').then(sl => sl ? get(sl, 'list') : A()) :
+        reject({ id: 'forbidden' });
+    }
+  )),
 
   /**
    * @type {Ember.ComputedProperty<PromiseArray>}
@@ -127,39 +130,17 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @type {Ember.ComputedProperty<Array<models.Space|Object>>}
    */
-  spaces: array.sort(computed(
+  spaces: computed(
     'indexProgressProxy.indexStats',
     'spacesProxy.@each.name',
     function spaces() {
-      const {
-        indexProgressProxy,
-        spacesProxy,
-      } = this.getProperties('indexProgressProxy', 'spacesProxy');
-      const {
-        isFulfilled: indexProxyIsFulfilled,
-        indexStats,
-      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
-      const spacesProxyIsFulfilled = get(spacesProxy, 'isFulfilled');
-      if (indexProxyIsFulfilled && spacesProxyIsFulfilled) {
-        const spaceEntityIds = _.keys(indexStats);
-        const spaces = [], spaceMocks = [];
-        spaceEntityIds.forEach(spaceEntityId => {
-          const space = spacesProxy.findBy('entityId', spaceEntityId);
-          if (space) {
-            spaces.push(space);
-          } else {
-            spaceMocks.push({
-              entityId: spaceEntityId,
-              name: 'Space#' + spaceEntityId.slice(0, 6) + ' (' + this.tt('notAccessible') + ')',
-            });
-          }
-        });
-        return spaces.sortBy('name').concat(spaceMocks.sortBy('name'));
-      } else {
-        return [];
-      }
+      return this.getStatsDescriptionRecords(
+        'spacesProxy',
+        'Space',
+        indexStats => _.keys(indexStats)
+      );
     }
-  ), ['name:asc']),
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Array<models.Provider|Object>>}
@@ -168,36 +149,15 @@ export default Component.extend(I18n, WindowResizeHandler, {
     'indexProgressProxy.indexStats',
     'providersProxy.@each.name',
     function providers() {
-      const {
-        indexProgressProxy,
-        providersProxy,
-      } = this.getProperties(
-        'indexProgressProxy',
-        'providersProxy'
+      return this.getStatsDescriptionRecords(
+        'providersProxy',
+        'Provider',
+        indexStats => _.uniq(
+          _.flatten(
+            _.values(indexStats).map(val => _.keys(val))
+          )
+        )
       );
-      const {
-        isFulfilled: indexProxyIsFulfilled,
-        indexStats,
-      } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
-      const providersProxyIsFulfilled = get(providersProxy, 'isFulfilled');
-      if (indexProxyIsFulfilled && providersProxyIsFulfilled) {
-        const providerIds = _.uniq(_.flatten(_.values(indexStats).map(val => _.keys(val))));
-        const providers = [], providerMocks = [];
-        providerIds.forEach(providerId => {
-          const provider = providersProxy.findBy('entityId', providerId);
-          if (provider) {
-            providers.push(provider);
-          } else {
-            providerMocks.push({
-              entityId: providerId,
-              name: 'Provider#' + providerId.slice(0, 6) + ' (' + this.tt('notAccessible') + ')',
-            });
-          }
-        });
-        return providers.sortBy('name').concat(providerMocks.sortBy('name'));
-      } else {
-        return [];
-      }
     }
   ),
 
@@ -210,11 +170,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
       progressData,
     } = this.getProperties('providers', 'progressData');
 
-    const activeProviders = 
+    const activeProviders =
       _.flatten(progressData.map(({ progress }) => progress))
-        .rejectBy('archival')
-        .mapBy('provider')
-        .uniq();
+      .rejectBy('archival')
+      .mapBy('provider')
+      .uniq();
     return providers.filter(provider => activeProviders.includes(provider));
   }),
 
@@ -310,13 +270,13 @@ export default Component.extend(I18n, WindowResizeHandler, {
     let lastUpdate = 0;
     progressData.forEach(({ progress }) =>
       progress
-        .filter(({ lastUpdate }) => lastUpdate)
-        .mapBy('lastUpdate')
-        .forEach(lu => {
-          if (lu > lastUpdate) {
-            lastUpdate = lu;
-          }
-        })
+      .filter(({ lastUpdate }) => lastUpdate)
+      .mapBy('lastUpdate')
+      .forEach(lu => {
+        if (lu > lastUpdate) {
+          lastUpdate = lu;
+        }
+      })
     );
     if (lastUpdate) {
       lastUpdate = moment.unix(lastUpdate);
@@ -369,7 +329,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
         'showOnlyActive'
       );
       const data = showOnlyActive ? activeProgressData : progressData;
-      let meaningfulData = 
+      let meaningfulData =
         _.flatten(data.mapBy('progress'))
         .filterBy('isSupported');
       if (showOnlyActive) {
@@ -401,14 +361,48 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @override
    */
-  onWindowResize() {
-    const {
-      _window,
-      breakpoint,
-    } = this.getProperties('_window', 'breakpoint');
+  onWindowResize(event) {
+    const window = event.target;
+    const breakpoint = this.get('breakpoint');
+
     safeExec(this, () => {
-      this.set('isTableCollapsed', get(_window, 'innerWidth') <= breakpoint);
+      this.set('isTableCollapsed', get(window, 'innerWidth') <= breakpoint);
     });
+  },
+
+  /**
+   * @param {string} proxyName 
+   * @param {string} recordTypeName 
+   * @param {Function} extractIdsFun 
+   * @returns {Array<Object>}
+   */
+  getStatsDescriptionRecords(proxyName, recordTypeName, extractIdsFun) {
+    const indexProgressProxy = this.get('indexProgressProxy');
+    const recordsProxy = this.get(proxyName);
+    const {
+      isFulfilled: indexProxyIsFulfilled,
+      indexStats,
+    } = getProperties(indexProgressProxy, 'isFulfilled', 'indexStats');
+    const recordsProxyIsFulfilled = get(recordsProxy, 'isFulfilled');
+    if (indexProxyIsFulfilled && recordsProxyIsFulfilled) {
+      const recordIds = extractIdsFun(indexStats);
+      const records = [];
+      const recordMocks = [];
+      recordIds.forEach(recordId => {
+        const record = recordsProxy.findBy('entityId', recordId);
+        if (record) {
+          records.push(record);
+        } else {
+          recordMocks.push({
+            entityId: recordId,
+            name: `${recordTypeName}#${recordId.slice(0, 6)} (${this.tt('notAccessible')})`,
+          });
+        }
+      });
+      return records.sortBy('name').concat(recordMocks.sortBy('name'));
+    } else {
+      return [];
+    }
   },
 
   recalculateChanges() {
@@ -419,11 +413,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
     let sum = 0;
     progressData.forEach(({ progress }) =>
       progress
-        .filter(({ currentSeq }) => typeof currentSeq === 'number')
-        .mapBy('currentSeq')
-        .forEach(currentSeq => {
-          sum += currentSeq;
-        })
+      .filter(({ currentSeq }) => typeof currentSeq === 'number')
+      .mapBy('currentSeq')
+      .forEach(currentSeq => {
+        sum += currentSeq;
+      })
     );
     this.setProperties({
       currentSeqSum: sum,

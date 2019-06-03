@@ -131,7 +131,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  progressDotClassNames: computed(
+  progressChartClassNames: computed(
     'isSupported',
     'percent',
     'error',
@@ -142,7 +142,7 @@ export default Component.extend(I18n, {
         error,
       } = this.getProperties('isSupported', 'percent', 'error');
 
-      const classes = ['progress-dot'];
+      const classes = ['progress-chart'];
       if (isSupported) {
         if (error) {
           classes.push('danger');

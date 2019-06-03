@@ -37,6 +37,7 @@ export default Component.extend(I18n, {
   manifestProxy: undefined,
 
   /**
+   * @virtual
    * @type {boolean}
    */
   isUploadingGui: false,

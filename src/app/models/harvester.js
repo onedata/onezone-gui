@@ -43,7 +43,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
     const entityId = this.get('entityId');
     return `/hrv/${entityId}`;
   }),
-  
+
   /**
    * Information about harvester. Available fields:
    * creationTime

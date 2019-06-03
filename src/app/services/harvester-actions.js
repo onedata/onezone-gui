@@ -41,7 +41,8 @@ export default Service.extend(I18n, {
       title: this.t('btnCreate.title'),
       tip: this.t('btnCreate.hint'),
       class: 'create-harvester-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters', 'new'),
+      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters',
+        'new'),
     };
   }),
 
@@ -55,7 +56,8 @@ export default Service.extend(I18n, {
       title: this.t('btnJoin.title'),
       tip: this.t('btnJoin.hint'),
       class: 'join-harvester-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters', 'join'),
+      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters',
+        'join'),
     };
   }),
 
@@ -78,11 +80,11 @@ export default Service.extend(I18n, {
         globalNotify.success(this.t('harvesterCreateSuccess'));
         next(() =>
           this.redirectToHarvester(harvester, 'config')
-            .then(() => {
-              const sidebarContainer = $('.col-sidebar');
-              $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-                sidebarContainer[0].clientHeight);
-            })
+          .then(() => {
+            const sidebarContainer = $('.col-sidebar');
+            $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
+              sidebarContainer[0].clientHeight);
+          })
         );
         return harvester;
       }).catch(error => {
@@ -380,17 +382,17 @@ export default Service.extend(I18n, {
       globalNotify,
     } = this.getProperties('harvesterManager', 'globalNotify');
     return harvesterManager.createIndex(
-      get(harvester, 'entityId'),
-      indexRepresentation
-    ).then(() => {
-      globalNotify.success(this.t('createIndexSuccess'));
-    })
-    .catch(error => {
-      globalNotify.backendError(this.t('creatingIndex'), error);
-      throw error;
-    });
+        get(harvester, 'entityId'),
+        indexRepresentation
+      ).then(() => {
+        globalNotify.success(this.t('createIndexSuccess'));
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('creatingIndex'), error);
+        throw error;
+      });
   },
-  
+
   /**
    * Removes index
    * @param {Model.Index} index

@@ -23,81 +23,81 @@ describe('Unit | Service | data discovery resources', function () {
   setupTest('service:data-discovery-resources', {});
 
   beforeEach(function () {
-    registerService(this, 'router', RouterService);
-    registerService(this, 'current-user', CurrentUserService);
-    registerService(this, 'navigation-state', Service);
-    registerService(this, 'harvester-manager', HarvesterManager);
-  }),
+      registerService(this, 'router', RouterService);
+      registerService(this, 'current-user', CurrentUserService);
+      registerService(this, 'navigation-state', Service);
+      registerService(this, 'harvester-manager', HarvesterManager);
+    }),
 
-  it('constructs properly structured appProxy object', function () {
-    const service = this.subject();
+    it('constructs properly structured appProxy object', function () {
+      const service = this.subject();
 
-    const appProxy = service.createAppProxyObject();
+      const appProxy = service.createAppProxyObject();
 
-    [
-      'dataRequest',
-      'configRequest',
-      'viewModeRequest',
-      'userRequest',
-      'onezoneUrlRequest',
-    ].forEach(fieldName => expect(appProxy[fieldName]).to.be.a('function'));
-  });
+      [
+        'dataRequest',
+        'configRequest',
+        'viewModeRequest',
+        'userRequest',
+        'onezoneUrlRequest',
+      ].forEach(fieldName => expect(appProxy[fieldName]).to.be.a('function'));
+    });
 
   it(
-    'injects rejected gui configuration response when haravester is not defined',
-    function () {
+      'injects rejected gui configuration response when haravester is not defined',
+      function () {
+        const service = this.subject();
+
+        const appProxy = service.createAppProxyObject();
+
+        let errorOccurred = false;
+        return appProxy.configRequest()
+          .catch(() => errorOccurred = true)
+          .then(() => expect(errorOccurred).to.be.true);
+      }
+    ),
+
+    it('injects gui configuration when haravester is defined', function () {
       const service = this.subject();
+      const navigationState = lookupService(this, 'navigation-state');
+      const harvesterManager = lookupService(this, 'harvester-manager');
+      setProperties(navigationState, {
+        activeResourceType: 'harvesters',
+        activeResource: {
+          entityId: 'someId',
+        },
+      });
+      const config = { a: 1 };
+      sinon.stub(harvesterManager, 'getGuiPluginConfig')
+        .returns(resolve({ guiPluginConfig: config }));
 
       const appProxy = service.createAppProxyObject();
 
       let errorOccurred = false;
       return appProxy.configRequest()
         .catch(() => errorOccurred = true)
-        .then(() => expect(errorOccurred).to.be.true);
-    }
-  ),
+        .then(config => {
+          expect(errorOccurred).to.be.false;
+          expect(config).to.deep.equal(config);
+        });
+    }),
 
-  it('injects gui configuration when haravester is defined', function () {
-    const service = this.subject();
-    const navigationState = lookupService(this, 'navigation-state');
-    const harvesterManager = lookupService(this, 'harvester-manager');
-    setProperties(navigationState, {
-      activeResourceType: 'harvesters',
-      activeResource: {
-        entityId: 'someId',
-      },
+    it('injects info about no signed in user into appProxy', function () {
+      const service = this.subject();
+      const currentUser = lookupService(this, 'current-user');
+      sinon.stub(currentUser, 'getCurrentUserRecord')
+        .returns(reject());
+
+      const appProxy = service.createAppProxyObject();
+
+      return appProxy.userRequest().then(value => expect(value).to.be.null);
     });
-    const config = { a: 1 };
-    sinon.stub(harvesterManager, 'getGuiPluginConfig')
-      .returns(resolve({ guiPluginConfig: config }));
-
-    const appProxy = service.createAppProxyObject();
-
-    let errorOccurred = false;
-    return appProxy.configRequest()
-      .catch(() => errorOccurred = true)
-      .then(config => {
-        expect(errorOccurred).to.be.false;
-        expect(config).to.deep.equal(config);
-      });
-  }),
-
-  it('injects info about no signed in user into appProxy', function () {
-    const service = this.subject();
-    const currentUser = lookupService(this, 'current-user');
-    sinon.stub(currentUser, 'getCurrentUserRecord')
-      .returns(reject());
-
-    const appProxy = service.createAppProxyObject();
-
-    return appProxy.userRequest().then(value => expect(value).to.be.null);
-  });
 
   it('injects info about signed in user into appProxy', function () {
     const service = this.subject();
     const currentUser = lookupService(this, 'current-user');
     const user = Object.freeze({
-      entityId: '123', 
+      entityId: '123',
       fullName: 'abc',
       username: 'def',
     });
@@ -107,7 +107,7 @@ describe('Unit | Service | data discovery resources', function () {
     const appProxy = service.createAppProxyObject();
 
     return appProxy.userRequest().then(value => expect(value).to.deep.equal({
-      id: user.entityId, 
+      id: user.entityId,
       fullName: user.fullName,
       username: user.username,
     }));

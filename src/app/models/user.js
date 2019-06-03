@@ -40,7 +40,6 @@ export default Model.extend(GraphSingleModelMixin, {
   clusterList: belongsTo('clusterList'),
   harvesterList: belongsTo('harvesterList'),
 
-  
   name: alias('fullName'),
 
   //#region Non-store User operations

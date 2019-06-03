@@ -1,4 +1,7 @@
-<h1>{{tt this "header"}}</h1>
+<h1>
+  <span class="one-label">{{tt this "header"}}</span>
+  {{one-label-tip title=(tt this "sectionHint")}}
+</h1>
 <input type="file" class="upload-gui-input" accept=".gz" onchange={{action "fileChange"}}>
 <form class="row upload-form">
   <div class="col-xs-12 col-sm-5">

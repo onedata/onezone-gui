@@ -32,7 +32,15 @@ const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 
-const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster', 'harvester'];
+const types = [
+  'space',
+  'group',
+  'provider',
+  'clientToken',
+  'linkedAccount',
+  'cluster',
+  'harvester',
+];
 const names = ['one', 'two', 'three'];
 
 const privileges = {
@@ -208,7 +216,7 @@ export default function generateDevelopmentModel(store) {
     )
     .then(listRecords =>
       attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
-        .then(() => listRecords)
+      .then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
 }
@@ -414,14 +422,14 @@ function createHarvesterRecords(store) {
       name: `Harvester ${index}`,
       scope: 'private',
       plugin: 'elasticsearch_plugin',
-      endpoint: undefined,
+      endpoint: '127.0.0.1:9200',
       directMembership: true,
       canViewPrivileges: true,
       public: false,
       info: {
         creationTime: 1540995468,
       },
-    }).save().then(record => 
+    }).save().then(record =>
       store.createRecord('harvesterGuiPluginConfig', {
         id: gri({
           entityType: 'harvester',
@@ -431,7 +439,7 @@ function createHarvesterRecords(store) {
         }),
         config: {
           studyIdTypeMapping: [
-            { id: 11, name: 'Trial Registry ID'},
+            { id: 11, name: 'Trial Registry ID' },
             { id: 'founderId', name: 'Founder ID' },
           ],
           typeMapping: [
@@ -456,21 +464,21 @@ function createHarvesterRecords(store) {
       }).save().then(() => record)
     ).then(record => {
       return Promise.all(_.range(3).map((index) => {
-        return store.createRecord('index', {
-          id: gri({
-            entityType: 'harvester',
-            entityId: get(record, 'entityId'),
-            aspect: 'index',
-            aspectId: 'index' + index,
-            scope: 'private',
-          }),
-          name: `Index ${index}`,
-          schema: '{}',
-        }).save();
-      }))
-      .then(records => createListRecord(store, 'index', records))
-      .then(listRecord => record.set('indexList', listRecord))
-      .then(() => record);
+          return store.createRecord('index', {
+            id: gri({
+              entityType: 'harvester',
+              entityId: get(record, 'entityId'),
+              aspect: 'index',
+              aspectId: 'index' + index,
+              scope: 'private',
+            }),
+            name: `Index ${index}`,
+            schema: '{}',
+          }).save();
+        }))
+        .then(records => createListRecord(store, 'index', records))
+        .then(listRecord => record.set('indexList', listRecord))
+        .then(() => record);
     });
   }));
 }

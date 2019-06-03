@@ -50,7 +50,7 @@ export default Component.extend(I18n, {
    * @type {Array<string>}
    */
   guiPluginIndicesNames: undefined,
-  
+
   /**
    * @virtual
    * @type {Function}

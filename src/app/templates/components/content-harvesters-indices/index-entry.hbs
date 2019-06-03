@@ -1,4 +1,4 @@
-{{#listItem.header disableToggleIcon=true class=(if isIdPresenterVisible "popover-active")}}
+{{#listItem.header disableToggleIcon=true class=(concat-classes "index-entry" (if isIdPresenterVisible "popover-active"))}}
   <span class="item-icon-container">
     {{one-icon class="item-icon" icon="index"}}
     {{one-tooltip

@@ -1,5 +1,6 @@
 <h1>
   <span class="one-label">{{tt this "header"}}</span>
+  {{one-label-tip title=(tt this "sectionHint")}}
   {{#if dataLoadingProxy.isFulfilled}}
     <div class="pull-right header-buttons">
       {{#if (eq mode "view")}}

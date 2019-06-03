@@ -149,14 +149,14 @@ export default Component.extend(
     globalActionsTitle: computed(function globalActionsTitle() {
       return this.t('harvesterIndices');
     }),
-    
+
     isCreateIndexFormVisibleObserver: observer(
       'isCreateIndexFormVisible',
       function isCreateIndexFormVisibleObserver() {
-      if (this.get('isCreateIndexFormVisible')) {
-        this.resetCreateIndexForm();
-      }
-    }),
+        if (this.get('isCreateIndexFormVisible')) {
+          this.resetCreateIndexForm();
+        }
+      }),
 
     indicesProxyObserver: observer(
       'indicesProxy.length',

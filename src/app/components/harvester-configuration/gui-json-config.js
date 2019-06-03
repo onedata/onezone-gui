@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
    */
   configurationProxy: promise.object(computed(function configurationProxy() {
     const {
-      harvester, 
+      harvester,
       harvesterManager,
     } = this.getProperties('harvester', 'harvesterManager');
     return harvesterManager.getGuiPluginConfig(get(harvester, 'entityId'));
@@ -190,7 +190,7 @@ export default Component.extend(I18n, {
           });
         });
     },
-    configurationChange({value, isValid}) {
+    configurationChange({ value, isValid }) {
       this.updateEditorValue(value, isValid);
     },
   },

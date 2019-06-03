@@ -72,8 +72,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   joinRelation(entityType, token) {
     return this.get('onedataGraphUtils').joinRelation(
       entityType,
-      token,
-      ['asSpace', this.get('entityId')]
+      token, ['asSpace', this.get('entityId')]
     ).then(({ gri }) =>
       this.get('store').findRecord(entityType, gri)
     );

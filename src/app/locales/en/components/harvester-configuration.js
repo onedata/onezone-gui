@@ -8,12 +8,15 @@ export default {
       },
       plugin: {
         label: 'Plugin',
+        tip: 'Onezone plugin used to integrate with an external harvesting service (e.g. Elasticsearch). Can provide persistence and analytics for harvested metadata.',
       },
       endpoint: {
         label: 'Endpoint',
+        tip: 'Location of the harvesting service (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.',
       },
       public: {
         label: 'Public',
+        tip: 'If enabled, anyone with the public link can browse the harvested metadata or use the REST API for queries.',
       },
       publicUrl: {
         label: 'Public URL',
@@ -28,8 +31,10 @@ export default {
     header: 'GUI plugin',
     path: 'Path',
     configuration: 'Configuration',
+    aboutGuiPlugin: 'GUI plugin is a self-contained web application that allows to query and visualize harvested metadata in a customizable way. After uploading, it is embedded into the Onezone interface. It communicates with the underlying harvesting service through Onezone. The plugin can be customized in the configuration section below.',
     guiUpload: {
       header: 'GUI plugin upload',
+      sectionHint: 'GUI plugin should be a standalone, static web application compressed in tar.gz format. Only plugins that are whitelisted are accepted.',
       browse: 'Browse',
       upload: 'Upload',
       guiUploadSuccess: 'GUI plugin has been uploaded successfully',
@@ -46,6 +51,7 @@ export default {
       unknown: 'unknown',
     },
     guiIndices: {
+      sectionHint: 'A mapping between indices needed by the GUI plugin and real indices that are a part of this harvester. Onezone will proxy GUI plugin communication to the harvesting service according to that settings.',
       waitingForUpload: 'Waiting for GUI plugin to upload...',
       manifestUnavailable: 'GUI plugin manifest file is unavailable. Upload correct GUI plugin to set up indices.',
       edit: 'Edit',
@@ -67,8 +73,12 @@ export default {
       },
       indicesUpdating: 'indices updating',
       indicesUpdateSuccess: 'Indices has been updated successfully',
+      listReloadError: 'update index list error',
+      createError: 'create index error',
+      updateError: 'update index error',
     },
     guiJsonConfig: {
+      sectionHint: 'Custom JSON configuration which allows to pass extra data needed to adjust the GUI plugin.',
       header: 'Injected configuration',
       edit: 'Edit',
       useDefaults: 'Use defaults',

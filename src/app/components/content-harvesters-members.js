@@ -80,25 +80,25 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
 
     const harvesterEntityId = get(harvester, 'entityId');
     return Promise.all(members.map(member => {
-      const memberEntityId = get(member, 'entityId');
-      if (get(member, 'entityType') === 'user') {
-        return harvesterManager.removeUserFromHarvester(
-          harvesterEntityId,
-          memberEntityId
-        );
-      } else {
-        return harvesterManager.removeGroupFromHarvester(
-          harvesterEntityId,
-          memberEntityId
-        );
-      }
-    }))
-    .then(() => {
-      globalNotify.success(this.t('removeMembersSuccess'));
-    }).catch(error => {
-      globalNotify.backendError(this.t('membersDeletion'), error);
-      throw error;
-    });
+        const memberEntityId = get(member, 'entityId');
+        if (get(member, 'entityType') === 'user') {
+          return harvesterManager.removeUserFromHarvester(
+            harvesterEntityId,
+            memberEntityId
+          );
+        } else {
+          return harvesterManager.removeGroupFromHarvester(
+            harvesterEntityId,
+            memberEntityId
+          );
+        }
+      }))
+      .then(() => {
+        globalNotify.success(this.t('removeMembersSuccess'));
+      }).catch(error => {
+        globalNotify.backendError(this.t('membersDeletion'), error);
+        throw error;
+      });
   },
 
   /**

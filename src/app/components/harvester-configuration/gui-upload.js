@@ -61,7 +61,7 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   onGuiUploadEnd: notImplementedIgnore,
-  
+
   actions: {
     browse() {
       this.$('.upload-gui-input').click();

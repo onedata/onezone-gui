@@ -1,4 +1,5 @@
-const indexIdTooltip = 'Identifier of this index in Onezone\'s REST API and the external indexing service';
+const indexIdTooltip =
+  'Identifier of this index in Onezone\'s REST API and the external indexing service';
 
 export default {
   header: 'Indices',

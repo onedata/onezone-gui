@@ -19,26 +19,26 @@ export default Route.extend({
 
   model({ harvester_id: harvesterId }) {
     return this.get('harvesterManager').getRecord(
-      gri({
-        entityType: 'harvester',
-        entityId: harvesterId,
-        aspect: 'instance',
-        scope: 'auto',
-      })
-    )
-    .then(harvester => {
-      const publicModel = this.modelFor('public');
-      const isUserSignedIn = get(publicModel, 'isUserSignedIn');
-      const isPublic = harvester.get('public');
-      // Public may by true, false or undefined. True and false are obvious.
-      // Undefined is when user is not a member of harvester, but it is public,
-      // so can be fetched by everyone.
-      if (isUserSignedIn && isPublic === false) {
-        return reject({ id: 'forbidden' });
-      } else {
-        return harvester;
-      }
-    });
+        gri({
+          entityType: 'harvester',
+          entityId: harvesterId,
+          aspect: 'instance',
+          scope: 'auto',
+        })
+      )
+      .then(harvester => {
+        const publicModel = this.modelFor('public');
+        const isUserSignedIn = get(publicModel, 'isUserSignedIn');
+        const isPublic = harvester.get('public');
+        // Public may by true, false or undefined. True and false are obvious.
+        // Undefined is when user is not a member of harvester, but it is public,
+        // so can be fetched by everyone.
+        if (isUserSignedIn && isPublic === false) {
+          return reject({ id: 'forbidden' });
+        } else {
+          return harvester;
+        }
+      });
   },
 
   afterModel(model) {

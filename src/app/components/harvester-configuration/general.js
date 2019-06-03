@@ -1,5 +1,5 @@
 /**
- * Harvester configuration section responsible general harvester options.
+ * Harvester configuration section responsible for general harvester options.
  *
  * @module components/harvester-configuration/general
  * @author Michał Borzęcki
@@ -17,7 +17,7 @@ import EmberObject, {
   getProperties,
   setProperties,
 } from '@ember/object';
-import { union } from '@ember/object/computed';
+import { union, reads } from '@ember/object/computed';
 import { buildValidations } from 'ember-cp-validations';
 import createFieldValidator from 'onedata-gui-common/utils/create-field-validator';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -37,18 +37,21 @@ const viewCreateFieldDefinitions = [{
   name: 'plugin',
   type: 'dropdown',
   options: [],
+  tip: true,
 }, {
   name: 'endpoint',
   type: 'text',
+  tip: true,
 }];
 
 const viewEditFieldDefinitions = [{
   name: 'public',
   type: 'checkbox',
   defaultValue: false,
+  tip: true,
 }];
 
-const publicUrlFieldDefinition = [{
+const publicUrlFieldDefinitions = [{
   name: 'publicUrl',
   type: 'clipboard-line',
 }];
@@ -115,13 +118,14 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       const isPublic = this.get('allFieldsValues.edit.public');
       switch (mode) {
         case 'view':
-        case 'edit': {
-          const prefixes = [mode];
-          if (isPublic) {
-            prefixes.push('publicUrl');
+        case 'edit':
+          {
+            const prefixes = [mode];
+            if (isPublic) {
+              prefixes.push('publicUrl');
+            }
+            return prefixes;
           }
-          return prefixes;
-        }
         case 'create':
           return ['create'];
       }
@@ -173,7 +177,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * @type {Ember.ComputedProperty<Array<FieldType>>}
    */
   publicUrlField: computed(function publicUrlField() {
-    return publicUrlFieldDefinition
+    return publicUrlFieldDefinitions
       .map(field => this.preprocessField(field, 'publicUrl'));
   }),
 
@@ -200,9 +204,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * Available harvester plugins list
    * @returns {Ember.ComputedProperty<PromiseArray<string>>}
    */
-  pluginTypes: computed(function pluginTypes() {
-    return this.get('harvesterManager').getPluginsList();
-  }),
+  pluginsListProxy: reads('harvesterManager.pluginsListProxy'),
 
   /**
    * @type {Ember.ComputedProperty<string|null>}
@@ -214,12 +216,12 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         router,
         _location,
       } = this.getProperties('router', '_location');
-  
+
       const {
         origin,
         pathname,
       } = getProperties(_location, 'origin', 'pathname');
-  
+
       return origin + pathname +
         router.urlFor('public.harvesters', harvesterEntityId);
     } else {
@@ -280,24 +282,26 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   modeObserver: observer('mode', function modeObserver() {
     const {
       mode,
-      pluginTypes,
+      pluginsListProxy,
       allFields,
-    } = this.getProperties('mode', 'pluginTypes', 'allFields');
-    if (mode === 'create') {
-      const defaultPlugin = pluginTypes.objectAt(0);
-      set(
-        allFields.findBy('name', 'create.plugin'),
-        'defaultValue',
-        defaultPlugin ? get(defaultPlugin, 'id') : undefined
-      );
-    }
-    this.resetFormValues(allPrefixes);
+    } = this.getProperties('mode', 'pluginsListProxy', 'allFields');
+    pluginsListProxy.then(pluginsList => safeExec(this, () => {
+      if (mode === 'create') {
+        const defaultPlugin = pluginsList.objectAt(0);
+        set(
+          allFields.findBy('name', 'create.plugin'),
+          'defaultValue',
+          defaultPlugin ? get(defaultPlugin, 'id') : undefined
+        );
+      }
+      this.resetFormValues(allPrefixes);
+    }));
   }),
 
   init() {
     this._super(...arguments);
-    this.get('pluginTypes').then(pluginTypes => safeExec(this, () => {
-      const options = pluginTypes.map(({ id, name }) => ({
+    this.get('pluginsListProxy').then(pluginsList => safeExec(this, () => {
+      const options = pluginsList.map(({ id, name }) => ({
         label: name,
         value: id,
       }));
@@ -316,7 +320,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
 
     const mode = this.get('mode');
     if (mode !== 'view') {
-      this.get('pluginTypes').then(() => {
+      this.get('pluginsListProxy').then(() => {
         scheduleOnce(
           'afterRender',
           this,
@@ -332,8 +336,8 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * @param {string} prefix Field prefix
    * @param {boolean} isStatic Should field be static
    * @returns {object} prepared field
-  */
-   preprocessField(field, prefix, isStatic = false) {
+   */
+  preprocessField(field, prefix, isStatic = false) {
     field = EmberObject.create(field);
     const {
       name,
@@ -385,20 +389,21 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         valueNames.push('public');
       }
       const values = getProperties(get(formValues, mode), ...valueNames);
-      
+
       this.set('disabled', true);
       let promise;
       switch (mode) {
-        case 'edit': {
-          const oldValues = getProperties(harvester, ...valueNames);
-          setProperties(harvester, values);
-          promise = harvesterActions.updateHarvester(harvester)
+        case 'edit':
+          {
+            const oldValues = getProperties(harvester, ...valueNames);
+            setProperties(harvester, values);
+            promise = harvesterActions.updateHarvester(harvester)
             .then(() => safeExec(this, () => {
               this.set('mode', 'view');
             }))
             .catch(() => setProperties(harvester, oldValues));
-          break;
-        }
+            break;
+          }
         case 'create':
           promise = harvesterActions.createHarvester(values);
       }
