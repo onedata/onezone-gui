@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5476 Refactoring of token/origin endpoints and unfied GUI URL
 * VFS-5425 Service Pack 3 for unified GUI
 * VFS-5425 Changed HTTP WebSocket authorization to handshake authorization
 * VFS-5411 Added password change
