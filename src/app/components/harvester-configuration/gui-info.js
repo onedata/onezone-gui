@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
         isUploadingGui,
       } = this.getProperties('manifestProxy', 'isUploadingGui');
       const guiVersion = get(manifestProxy, 'version');
-      if (isUploadingGui || !guiVersion) {
+      if (isUploadingGui || guiVersion === undefined) {
         return {
           class: 'unspecified',
           version: this.t('unknown'),

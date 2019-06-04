@@ -99,7 +99,7 @@ export default Component.extend(I18n, {
           maxSeq,
         } = getProperties(progress, 'currentSeq', 'maxSeq');
         if (maxSeq === 0) {
-          return 100;
+          return 0;
         } else {
           const percent = Math.floor(Math.abs(currentSeq / maxSeq) * 100);
           // abs and min functions in case of incorrect max and current values

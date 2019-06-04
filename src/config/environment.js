@@ -30,13 +30,13 @@ module.exports = function (environment) {
       { id: 'providers', icon: 'provider', allowIndex: true },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
+      { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
       {
         id: 'clusters',
         icon: 'cluster',
         defaultAspect: 'overview',
         allowIndex: false,
       },
-      { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',

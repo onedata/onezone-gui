@@ -20,6 +20,7 @@ export default Service.extend(I18n, {
   harvesterManager: service(),
   globalNotify: service(),
   guiUtils: service(),
+  currentUser: service(),
 
   /**
    * @override
@@ -284,11 +285,28 @@ export default Service.extend(I18n, {
     const {
       harvesterManager,
       globalNotify,
-    } = this.getProperties('harvesterManager', 'globalNotify');
+      currentUser,
+    } = this.getProperties('harvesterManager', 'globalNotify', 'currentUser');
+    const userEntityId = get(user, 'entityId');
+    const harvesterEntityId = get(harvester, 'entityId');
     return harvesterManager.removeUserFromHarvester(
-      get(harvester, 'entityId'),
-      get(user, 'entityId')
-    ).then(() => {
+      harvesterEntityId,
+      userEntityId
+    ).catch((errorRemove) => {
+      if (get(currentUser, 'userId') === userEntityId) {
+        return harvesterManager.leaveHarvester(harvesterEntityId)
+          .catch(errorLeave => {
+            if (get(errorLeave || {}, 'id') !== 'forbidden') {
+              console.error(errorRemove);
+              throw errorLeave;
+            } else {
+              throw errorRemove;
+            }
+          });
+      } else {
+        throw errorRemove;
+      }
+    }).then(() => {
       globalNotify.success(this.t('removeUserSuccess', {
         harvesterName: get(harvester, 'name'),
         userName: get(user, 'name'),
