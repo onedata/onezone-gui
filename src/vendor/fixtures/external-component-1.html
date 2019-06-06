@@ -7,9 +7,9 @@
   <title>External Component 1</title>
 </head>
 <body>
-  Test 1
+  <span>External Component 1</span>
   <script>
-    window.externalData.actions.hello('world');
+    frameElement.appProxy.callParent('hello', frameElement.appProxy.iprop);
   </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
  * It will share common object with it's child window via element's
  * `appProxy` property.
  * 
- * @module components/one-embedded-component-container
+ * @module components/one-embedded-container
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -17,7 +17,7 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend({
-  classNames: ['one-embedded-component-container'],
+  classNames: ['one-embedded-container'],
   classNameBindings: ['iframeIsLoading:is-loading'],
 
   guiUtils: service(),
@@ -77,6 +77,7 @@ export default Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
+    // allow to inject iframeElement for test purposes
     const iframeElement = this.set(
       'iframeElement',
       this.$('iframe.one-embedded-component-iframe')
@@ -113,7 +114,7 @@ export default Component.extend({
       return actionFun.bind(this)(...args);
     } else {
       throw new Error(
-        `component:one-embedded-component-container: no such action: ${method}`
+        `component:one-embedded-container: no such action: ${method}`
       );
     }
   },

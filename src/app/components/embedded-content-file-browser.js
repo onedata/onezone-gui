@@ -1,8 +1,8 @@
-import OneEmbeddedComponentContainer from 'onezone-gui/components/one-embedded-component-container';
-import layout from 'onezone-gui/templates/components/one-embedded-component-container';
+import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
+import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 
-export default OneEmbeddedComponentContainer.extend({
+export default OneEmbeddedContainer.extend({
   layout,
 
   globalNotify: service(),
