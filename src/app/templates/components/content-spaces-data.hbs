@@ -1,5 +1,4 @@
-{{!-- FIXME: solve this loading container --}}
-{{!-- {{#promise-proxy-container proxy=initialProvidersListProxy}} --}}
+{{#promise-proxy-container proxy=initialProvidersListProxy}}
   <div class="row content-row header-row hidden-xs content-spaces-data-header">
     <h1 class="normal-case">
       {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
@@ -7,11 +6,9 @@
   </div>
   <div class="row content-row content-spaces-data-content">
     {{embedded-content-file-browser
-      class="fit-container"
-      iframeClass="fit-container"
       baseUrl=contentIframeBaseUrl
       spaceId=space.entityId
       fileId=fileId
     }}
   </div>
-{{!-- {{/promise-proxy-container}} --}}
+{{/promise-proxy-container}}

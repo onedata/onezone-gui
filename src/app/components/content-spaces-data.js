@@ -15,11 +15,10 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { get, computed } from '@ember/object';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import bindElementTop from 'onedata-gui-common/utils/bind-element-top';
 import $ from 'jquery';
 
 export default Component.extend(
@@ -29,64 +28,63 @@ export default Component.extend(
     globalNotify: service(),
 
     /**
+     * Space selected in sidebar to show its data using one of available
+     * Oneproviders.
      * @virtual
-     * @type {Space}
+     * @type {models.Space}
      */
     space: undefined,
 
+    /**
+     * Opened directory's file entity ID.
+     * Currently mocked value.
+     * @virtual
+     */
+    fileId: 'mock_file_id',
+
+    /**
+     * One of the Oneproviders that support `space` which will be used
+     * to show file browser.
+     * @virtual
+     * @type {models.Provider}
+     */
     selectedProvider: undefined,
 
+    /**
+     * Iframe is fixed-positioned to sidebar and header of data space content.
+     * Invoking this function cause iframe position to be updated.
+     * @type {Function}
+     */
+    updateIframePosition: undefined,
+
+    /**
+     * Will be set to true when supporting Oneproviders data is loaded.
+     * @type {boolean}
+     */
     providerListIsLoaded: false,
 
+    /**
+     * `baseUrl` property for embedded component container.
+     * It is URL with path to selected Oneprovider served web application.
+     * @type {ComputedProperty<string>}
+     */
     contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
-
-    fileBrowserData: computed(
-      'space.{name}',
-      function iframeData() {
-        return {
-          space: this.get('space'),
-          spaceName: this.get('space.name'),
-        };
-      }
-    ),
-
-    iframeActions: computed(
-      function iframeActions() {
-        return {
-          hello: (message) => {
-            return this.get('globalNotify').info(message);
-          },
-        };
-      }
-    ),
-
-    fileId: 'mock_file_id',
 
     init() {
       this._super(...arguments);
-      // FIXME: make providers tabbed selector
+      // TODO: this should be selected using tabbed selector
       this.get('initialProvidersListProxy').then(list => {
         safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
       });
+      // TODO: to remove - testing purposes
       setTimeout(() => {
         this.set('fileId', 'Two');
       }, 4000);
     },
 
-    didInsertElement() {
-      this._super(...arguments);
-      const updatePosition = bindElementTop({
-        $topElement: this.$('.content-spaces-data-header'),
-        $leftElement: $('.col-sidebar'),
-        $innerElement: this.$('.content-spaces-data-content'),
-      });
-      $(window).on('resize', updatePosition);
-      this.set('updatePosition', updatePosition);
-    },
-
     willDestroyElement() {
       this._super(...arguments);
-      $(window).off('resize', this.get('updatePosition'));
+      $(window).off('resize', this.get('updateIframePosition'));
     },
 
     /**

@@ -1,6 +1,6 @@
 /**
  * An iframe for embedding `one-embedded-component`s.
- * It provides integration between two Ember applications.
+ * It provides integration between two web applications.
  * It will share common object with it's child window via element's
  * `appProxy` property.
  * 
@@ -15,10 +15,15 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import { computed, observer } from '@ember/object';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import {
+  sharedObjectName,
+  setSharedProperty,
+  sharedDataPropertyName,
+} from 'onedata-gui-common/utils/one-embedded-common';
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
-  classNameBindings: ['iframeIsLoading:is-loading'],
+  classNameBindings: ['iframeIsLoading:is-loading', 'fitContainer:fit-container'],
 
   guiUtils: service(),
 
@@ -44,6 +49,13 @@ export default Component.extend({
   iframeClass: '',
 
   /**
+   * Name of component from the remote app, that is exposed using URL
+   * @virtual
+   * @type {string}
+   */
+  embeddedComponentName: undefined,
+
+  /**
    * Set by iframe onload event.
    * @type {boolean}
    */
@@ -62,8 +74,18 @@ export default Component.extend({
    */
   iframeElement: undefined,
 
-  src: computed('baseUrl', function src() {
-    return `${this.get('baseUrl')}#/onedata/components/content-file-browser`;
+  /**
+   * If true, the iframe will be absolutely positioned with 100% width and height
+   * @type {boolean}
+   */
+  fitContainer: true,
+
+  src: computed('baseUrl', 'embeddedComponentName', function src() {
+    const {
+      baseUrl,
+      embeddedComponentName,
+    } = this.getProperties('baseUrl', 'embeddedComponentName');
+    return `${baseUrl}#/onedata/components/${embeddedComponentName}`;
   }),
 
   srcChanged: observer('src', function srcChanged() {
@@ -80,29 +102,32 @@ export default Component.extend({
     // allow to inject iframeElement for test purposes
     const iframeElement = this.set(
       'iframeElement',
-      this.$('iframe.one-embedded-component-iframe')
-    )[0];
-    iframeElement.appProxy = {
-      parentInfo: {
-        onezoneVersionDetails: this.get('guiUtils.softwareVersionDetails'),
-      },
+      this.$('iframe.one-embedded-component-iframe')[0]
+    );
+    iframeElement[sharedObjectName] = {
       callParent: this.callParent.bind(this),
       propertyChanged: notImplementedIgnore,
+      [sharedDataPropertyName]: {
+        parentInfo: {
+          onezoneVersionDetails: this.get('guiUtils.softwareVersionDetails'),
+        },
+      },
     };
     const iframeInjectedProperties = this.get('iframeInjectedProperties');
-    iframeInjectedProperties.forEach(property => {
+    iframeInjectedProperties.forEach(propertyName => {
       const observerFun = function () {
-        iframeElement.appProxy[property] = this.get(property);
-        iframeElement.appProxy.propertyChanged(property);
+        const sharedObject = iframeElement[sharedObjectName];
+        setSharedProperty(sharedObject, propertyName, this.get(propertyName));
+        sharedObject.propertyChanged(propertyName);
       };
       observerFun.bind(this)();
-      this.addObserver(property, this, observerFun);
+      this.addObserver(propertyName, this, observerFun);
     });
   },
 
   willDestroyElement() {
     try {
-      this.element.appProxy = undefined;
+      this.get('iframeElement')[sharedObjectName] = undefined;
     } finally {
       this._super(...arguments);
     }
@@ -121,9 +146,9 @@ export default Component.extend({
 
   actions: {
     willDestroyEmbeddedComponent() {
-      this.element.appProxy = undefined;
+      this.get('iframeElement')[sharedObjectName] = undefined;
     },
-    __iframeOnLoad() {
+    iframeOnLoad() {
       try {
         // test for properly loaded iframe content - it should throw on security
         // error
