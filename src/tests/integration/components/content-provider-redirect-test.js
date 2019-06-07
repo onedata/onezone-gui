@@ -54,15 +54,7 @@ describe('Integration | Component | content provider redirect', function () {
       const clusterEntityId = '12345';
       const provider = {
         entityId: 'test1',
-        belongsTo(relName) {
-          if (relName === 'cluster') {
-            return {
-              id: () => `clusters.${clusterEntityId}.instance:protected`,
-            };
-          } else {
-            throw new Error('mock error - only cluster is supported');
-          }
-        },
+        onezoneHostedBaseUrl: '/opw/12345/i',
         cluster: resolve({
           workerVersion: {
             release: '19.02',
