@@ -1,4 +1,4 @@
 export default {
-  header: 'Oneprovider authentication error',
+  header: 'Oneprovider authorization error',
   text: 'If the problem persists, please contact the system administrator.',
 };
