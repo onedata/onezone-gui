@@ -145,31 +145,6 @@ export default Component.extend(
         return PromiseObject.create({ promise });
       }),
 
-    /**
-     * @type {Ember.ComputedProperty<Array<string>>}
-     */
-    dataProviderRoute: computed('dataProviderProxy.content',
-      function dataProviderRoute() {
-        const {
-          guiUtils,
-          dataProviderProxy,
-        } = this.getProperties('guiUtils', 'dataProviderProxy');
-        return get(dataProviderProxy, 'content') ? [
-          'provider-redirect',
-          guiUtils.getRoutableIdFor(dataProviderProxy),
-        ] : [];
-      }
-    ),
-
-    /**
-     * @type {Ember.ComputedProperty<Object>}
-     */
-    dataProviderRouteParams: computed('space', function dataProviderRouteParams() {
-      return {
-        space_id: this.get('guiUtils').getRoutableIdFor(this.get('space')),
-      };
-    }),
-
     init() {
       this._super(...arguments);
       next(() => {

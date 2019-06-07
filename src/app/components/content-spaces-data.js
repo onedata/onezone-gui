@@ -15,15 +15,29 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import EmberObject, { get, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import $ from 'jquery';
+
+const OneproviderTabItem = EmberObject.extend({
+  /**
+   * @virtual
+   * @type {models.Provider}
+   */
+  provider: undefined,
+
+  id: reads('provider.entityId'),
+  name: reads('provider.name'),
+  icon: 'provider',
+  class: computed('provider.online', function _class() {
+    return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
+  }),
+});
 
 export default Component.extend(
   createDataProxyMixin('initialProvidersList'), {
-    classNames: ['content-spaces-data'],
+    classNames: ['content-spaces-data', 'absolute-flex-content'],
 
     globalNotify: service(),
 
@@ -51,13 +65,6 @@ export default Component.extend(
     selectedProvider: undefined,
 
     /**
-     * Iframe is fixed-positioned to sidebar and header of data space content.
-     * Invoking this function cause iframe position to be updated.
-     * @type {Function}
-     */
-    updateIframePosition: undefined,
-
-    /**
      * Will be set to true when supporting Oneproviders data is loaded.
      * @type {boolean}
      */
@@ -69,6 +76,32 @@ export default Component.extend(
      * @type {ComputedProperty<string>}
      */
     contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
+
+    providers: reads('space.providerList.list'),
+
+    // TODO: handle deletion of currently selected provider
+    selectedProviderItem: computed(
+      'selectedProvider',
+      'providerItems',
+      function selectedProviderItem() {
+        const {
+          providerItems,
+          selectedProvider,
+        } = this.getProperties('providerItems', 'selectedProvider');
+        const providerEntityId = get(selectedProvider, 'entityId');
+        return providerItems.findBy('id', providerEntityId);
+      }
+    ),
+
+    providerItems: computed(
+      'providers.[]',
+      function providerItems() {
+        const list = this.get('space.providerList.list');
+        if (list) {
+          return list.map(provider => OneproviderTabItem.create({ provider }));
+        }
+      }
+    ),
 
     init() {
       this._super(...arguments);
@@ -82,11 +115,6 @@ export default Component.extend(
       }, 4000);
     },
 
-    willDestroyElement() {
-      this._super(...arguments);
-      $(window).off('resize', this.get('updateIframePosition'));
-    },
-
     /**
      * @override
      * @returns {Promise}
@@ -97,6 +125,16 @@ export default Component.extend(
     },
 
     actions: {
+      selectedProviderChanged(providerItem) {
+        const providerEntityId = get(providerItem, 'id');
+        const provider = this.get('providers').findBy('entityId', providerEntityId);
+        if (provider) {
+          this.set('selectedProvider', provider);
+        } else {
+          // TODO: show error if cannot find the selected provider on list
+          return false;
+        }
+      },
       hello(message) {
         this.get('globalNotify').info(message);
       },

@@ -78,7 +78,7 @@ export default Component.extend({
    * If true, the iframe will be absolutely positioned with 100% width and height
    * @type {boolean}
    */
-  fitContainer: true,
+  fitContainer: false,
 
   src: computed('baseUrl', 'embeddedComponentName', function src() {
     const {
@@ -150,9 +150,24 @@ export default Component.extend({
     },
     iframeOnLoad() {
       try {
+        const iframeElement = this.get('iframeElement');
+
         // test for properly loaded iframe content - it should throw on security
         // error
-        this.element.contentWindow;
+        iframeElement.contentWindow;
+
+        // attaching handler to intercept click events
+        const pluginBody = iframeElement.contentDocument.body;
+        // NOTE: this could be also resolved by setting rootEventType to 'click'
+        // in ember-basic-dropdown 2.0, but our version of ember-power-select
+        // uses version 1.1.2 and does not pass rootEvenType
+        ['click', 'mousedown'].forEach(eventName => {
+          pluginBody.addEventListener(eventName, (event) => {
+            const newEvent = new event.constructor(event.type, event);
+            iframeElement.dispatchEvent(newEvent);
+          });
+        });
+
         safeExec(this, () => {
           this.setProperties({
             iframeIsLoading: false,
