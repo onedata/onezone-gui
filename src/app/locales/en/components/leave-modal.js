@@ -10,8 +10,10 @@ export default _.merge({}, proceedProcessModal, {
   mayCauseGroup: 'This operation might cause you to lose access to groups, spaces or providers inherited from the {{recordType}} "{{recordName}}".',
   mayCauseSpace: mayCauseGeneric,
   mayCauseCluster: mayCauseGeneric,
+  mayCauseHarvester: 'This operation might cause you to lose access to metadata gathered from spaces connected to harvester&nbsp;"{{recordName}}".',
   group: 'group',
   space: 'space',
+  harvester: 'harvester',
   cluster: 'cluster',
   proceed: 'Leave',
 });

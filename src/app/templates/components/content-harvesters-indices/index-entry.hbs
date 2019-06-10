@@ -1,0 +1,64 @@
+{{#listItem.header disableToggleIcon=true class=(concat-classes "index-entry" (if isIdPresenterVisible "popover-active"))}}
+  <span class="item-icon-container">
+    {{one-icon class="item-icon" icon="index"}}
+    {{one-tooltip
+      title=index.name
+      placement="top"
+      arrowPlacement="left"
+      triggerEvents="hover"
+    }}
+  </span>
+  {{#if isRenaming}}
+    {{one-inline-editor
+      value=index.name
+      isEditing=true
+      onEdit=(action (mut isRenaming) false)
+      onSave=(action "onNameChange")
+      class="index-name-editor"}}
+  {{else}}
+    <span class="one-label">{{index.name}}</span>
+  {{/if}}
+  {{#if (contains index.guiPluginName guiPluginIndicesNames)}}
+    <span class="index-labels-container">
+      <span class="label label-info">{{tt this "usedByGui"}}</span>
+    </span>
+  {{/if}}
+  {{one-icon icon="sign-info-rounded" class="id-presenter-trigger"}}
+  {{#one-webui-popover
+    class="index-id-info"
+    triggerSelector=(concat "#" parentView.elementId " .id-presenter-trigger")
+    onToggle=(action "idPresenterToggled")
+    as |popover|}}
+    <div class="form-group">
+      <label class="control-label">{{tt this "indexId"}}:
+        {{one-label-tip title=(tt this (if harvester.endpoint "indexIdTooltipHasEndpoint" "indexIdTooltipNoEndpoint") endpoint=harvester.endpoint)}}
+      </label>
+      {{one-clipboard-line
+        size="sm"
+        value=index.aspectId
+        showText=false
+        btnType="default"}}
+    </div>
+  {{/one-webui-popover}}
+  {{actions-toolbar
+    isMinimized=true
+    toolbarClasses=""
+    toolbarToggleClasses="btn-menu-toggle"
+    dropdownPlacement="auto"
+    actionsArray=indexActions
+    actionsArg=index}}
+{{/listItem.header}}
+{{#listItem.content}}
+  {{#bs-tab
+    class="bs-tab-onedata bs-tab-modern"
+    as |tab|}}
+    {{#tab.pane elementId=(concat parentView.elementId "-progress-tab") title=(tt this "harvestingProgress")}}
+      {{#render-later triggerRender=listItem.isActive}}
+        {{content-harvesters-indices/progress-table index=index harvester=harvester}}
+      {{/render-later}}
+    {{/tab.pane}}
+    {{#tab.pane elementId=(concat parentView.elementId "-schema-tab") title=(tt this "schema")}}
+      <textarea class="schema-textarea form-control" rows="10" readonly="readonly">{{index.schema}}</textarea>
+    {{/tab.pane}}
+  {{/bs-tab}}
+{{/listItem.content}}

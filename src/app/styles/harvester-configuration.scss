@@ -1,0 +1,109 @@
+.harvester-configuration {
+  .unspecified {
+    color: $main-text-color-disabled;
+    font-style: italic;
+  }
+  .warning-icon {
+    height: 22px;
+    margin-right: $padding-xs-horizontal;
+  }
+  .harvester-configuration-gui-upload {
+    .upload-form {
+      margin: ($line-height-computed / 2) 0;
+      padding: 0;
+    }
+    .upload-gui-input {
+      position: absolute;
+      visibility: hidden;
+      width: 0;
+      height: 0;
+    }
+    .file-name-input {
+      margin-bottom: $padding-small-vertical;
+    }
+    .upload-buttons {
+      line-height: $input-height-small;
+      @media (min-width: $screen-sm-min) {
+        padding-left: $padding-xs-horizontal;
+      }
+      @media (max-width: $screen-xs-max) {
+        text-align: right;
+      }
+      .btn {
+        vertical-align: baseline;
+      }
+    }
+    .upload-progress {
+      font-size: 9pt;
+      color: $color-one-light-gray;
+      @media (min-width: $screen-sm-min) {
+        margin-left: $padding-xs-horizontal;
+      }
+      @media (max-width: $screen-xs-max) {
+        float: left;
+      }
+    }
+  }
+
+  .harvester-configuration-gui-plugin {
+    .indices-table {
+      table-layout: fixed;
+      &:not(.bt) {
+        .index-info {
+          width: 60%;
+        }
+      }
+      &.bt tbody tr {
+        &.active td {
+          background-color: $color-one-semiwhite;
+        }
+        td {
+          position: relative;
+          &:before {
+            width: auto;
+            margin-bottom: $padding-small-vertical;
+          }
+        }
+      }
+    }
+    .index-info {
+      form {
+        margin: 0;
+        padding: 0;
+      }
+      .form-group {
+        margin-bottom: 0;
+      }
+    }
+    @media (min-width: $screen-sm-min) {
+      .index-info {
+        .form-group {
+          width: calc(50% - #{$padding-xs-horizontal});
+          margin-left: $padding-xs-horizontal;
+        }
+      }
+    }
+    h1 {
+      padding: 0 0 $padding-small-vertical 0;
+      .header-buttons {
+        margin-bottom: $padding-small-vertical;
+      }
+    }
+    @media (max-width: $screen-xs-max) {
+      .index-info {
+        .form-group {
+          margin-top: $padding-small-vertical;
+        }
+      }
+    }
+  }
+  .harvester-configuration-general {
+    min-height: 100px;
+    @media (max-width: $screen-xs-max) {
+      .form {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}

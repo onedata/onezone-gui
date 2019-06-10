@@ -83,13 +83,17 @@ module.exports = function (defaults) {
   // along with the exports of each module as its value.
 
   const BOWER_ASSETS = [
-    'basictable/jquery.basictable.min.js',
-    'basictable/basictable.css',
     'webui-popover/dist/jquery.webui-popover.css',
     'webui-popover/dist/jquery.webui-popover.js',
   ];
 
   BOWER_ASSETS.forEach(path => app.import(app.bowerDirectory + '/' + path));
+
+  const NODE_ASSETS = [
+    'input-tokenizer/tokenizer.min.js',
+  ];
+
+  NODE_ASSETS.forEach(path => app.import(`node_modules/${path}`));
 
   const VENDOR_ASSETS = [
     'chartist-plugin-legend/chartist-plugin-legend.js',

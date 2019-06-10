@@ -1,0 +1,22 @@
+{{#if isGuiAvailable}}
+  <iframe src={{pluginPath}} class="plugin-frame {{if isGuiLoading "hidden"}}" onload={{action "pluginLoaded"}}></iframe>
+{{else if (not checkingGuiAvailability)}}
+  {{#content-info
+    class="scroll-breakpoint-500"
+    header=(tt this "errorHeader")
+    text=(tt this "errorBadConfiguration")
+  }}
+  {{#unless isPublic}}
+    <p class="lead text-center">
+      {{tt this "errorPleaseVisit"}}
+      {{#link-to "onedata.sidebar.content.aspect" "config" (query-params options="tab.gui-plugin-tab")}}
+        {{tt this "errorGuiPluginTab"}}
+      {{/link-to}}
+      {{tt this "errorToSetup"}}
+    </p>
+    {{/unless}}
+  {{/content-info}}
+{{/if}}
+{{#if (or checkingGuiAvailability isGuiLoading)}}
+  {{spin-spinner-block sizeClass="md" class="absolute-middle-centered"}}
+{{/if}}

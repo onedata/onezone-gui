@@ -24,6 +24,7 @@ export default Service.extend({
   spaceManager: service(),
   clusterManager: service(),
   providerManager: service(),
+  harvesterManager: service(),
 
   /**
    * Fetches collection of all groups
@@ -80,6 +81,7 @@ export default Service.extend({
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
           this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
+          this.reloadEffUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
         ]).then(() => group))
       );
   },
@@ -112,6 +114,7 @@ export default Service.extend({
       .then(() => Promise.all([
         group ? group.reload() : resolve(),
         this.reloadUserList(entityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
       ]));
   },
 
@@ -185,6 +188,26 @@ export default Service.extend({
   },
 
   /**
+   * Joins group to a harvester using token
+   * @param {Model.Group} group 
+   * @param {string} token
+   * @returns {Promise<Harvester>}
+   */
+  joinHarvesterAsGroup(group, token) {
+    const harvesterManager = this.get('harvesterManager');
+    return group.joinHarvester(token)
+      .then(harvester => {
+        const harvesterEntityId = get(harvester, 'entityId');
+        return Promise.all([
+          harvesterManager.reloadGroupList(harvesterEntityId)
+          .catch(ignoreForbiddenError),
+          harvesterManager.reloadEffGroupList(harvesterEntityId)
+          .catch(ignoreForbiddenError),
+        ]).then(() => harvester);
+      });
+  },
+
+  /**
    * Joins group as a subgroup
    * @param {Group} childGroup 
    * @param {string} token
@@ -199,6 +222,8 @@ export default Service.extend({
           this.get('providerManager').reloadList(),
           this.get('spaceManager').reloadList(),
           this.reloadChildList(get(parentGroup, 'entityId'))
+          .catch(ignoreForbiddenError),
+          this.reloadEffChildList(get(parentGroup, 'entityId'))
           .catch(ignoreForbiddenError),
           this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
           this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
@@ -244,6 +269,7 @@ export default Service.extend({
         this.get('providerManager').reloadList(),
         this.get('spaceManager').reloadList(),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+        this.reloadEffChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
         this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
       ])
@@ -266,6 +292,7 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadUserList(groupEntityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(groupEntityId).catch(ignoreForbiddenError),
         currentUser.runIfThisUser(userEntityId, () => Promise.all([
           group ? group.reload().catch(ignoreForbiddenError) : resolve(),
           this.reloadList(),
@@ -292,6 +319,7 @@ export default Service.extend({
         this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
         this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+        this.reloadEffChildList(parentEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('spaceManager').reloadList(),
@@ -344,6 +372,7 @@ export default Service.extend({
         return Promise.all([
           this.reloadList(),
           this.reloadChildList(parentEntityId).catch(ignoreForbiddenError),
+          this.reloadEffChildList(parentEntityId).catch(ignoreForbiddenError),
         ]);
       }));
   },
@@ -370,6 +399,7 @@ export default Service.extend({
         this.reloadParentList(futureChildEntityId).catch(ignoreForbiddenError),
         this.reloadSpaceList(futureChildEntityId).catch(ignoreForbiddenError),
         this.reloadChildList(groupEntityId).catch(ignoreForbiddenError),
+        this.reloadEffChildList(groupEntityId).catch(ignoreForbiddenError),
       ]);
     });
   },
@@ -425,6 +455,16 @@ export default Service.extend({
   },
 
   /**
+   * Reloads effChildList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadEffChildList(entityId) {
+    return this.reloadRecordList(entityId, 'effChildList');
+  },
+
+  /**
    * Reloads userList of group identified by entityId. If list has not been
    * fetched, nothing is reloaded
    * @param {string} entityId group entityId
@@ -432,6 +472,16 @@ export default Service.extend({
    */
   reloadUserList(entityId) {
     return this.reloadRecordList(entityId, 'userList');
+  },
+
+  /**
+   * Reloads effUserList of group identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadEffUserList(entityId) {
+    return this.reloadRecordList(entityId, 'effUserList');
   },
 
   /**

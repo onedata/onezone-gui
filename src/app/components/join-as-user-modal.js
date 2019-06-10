@@ -45,7 +45,7 @@ export default ProceedProcessModal.extend({
    */
   messageText: computed('modelType', 'model.name', function messageText() {
     return this.t('messageText', {
-      modelType: this.get('modelType'),
+      modelType: this.t(this.get('modelType')),
       modelName: this.get('model.name'),
     });
   }),
