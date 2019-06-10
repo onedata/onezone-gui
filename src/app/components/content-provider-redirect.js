@@ -17,6 +17,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise, resolve } from 'rsvp';
 import config from 'ember-get-config';
+import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 
 const {
   legacyOneproviderVersion,
@@ -143,7 +144,7 @@ export default Component.extend(I18n, {
       const clusterId =
         parseGri(provider.belongsTo('cluster').id()).entityId;
       return new Promise(() => {
-        _window.location.replace(`/opw/${clusterId}/i${path}`);
+        _window.location.replace(`/${oneproviderAbbrev}/${clusterId}/i${path}`);
       });
     }
   },
