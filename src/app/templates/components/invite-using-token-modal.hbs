@@ -10,7 +10,7 @@
   {{#modal.body}}
     {{#promise-proxy-container proxy=tokenProxy sizeClass="sm"}}
       <p class="input-top-description">{{tt this "passGeneratedToken" tokenReceiver=(tt this (concat tokenType "Receiver"))}}</p>
-      <textarea class="token-textarea invitation-token form-control" rows="4" readonly>{{tokenProxy.content}}</textarea>
+      <textarea class="token-textarea invitation-token form-control no-resize" rows="5" readonly>{{tokenProxy.content}}</textarea>
       <p class="text-right">
         <a class="clickable btn-get-token" {{action "generateToken"}}>
           {{tt this "generateToken"}}

@@ -1,0 +1,298 @@
+.content-harvesters-indices {
+  .schema-textarea {
+    font-family: monospace;
+    resize: none;
+  }
+  .one-collapsible-list .list-header-row {
+    padding-right: 170px;
+  }
+  .one-collapsible-list-item-header {
+    &.opened {
+      border-bottom: 0;
+    }
+    &:hover, &.popover-active {
+      .id-presenter-trigger {
+        display: block;
+      }
+    }
+  }
+  .one-collapsible-list-item-content.opened {
+    max-height: 4000px;
+  }
+  .id-presenter-trigger {
+    @include vertical-align-middle();
+    right: 60px;
+    font-size: 1.3em;
+    display: none;
+    @media (max-width: $screen-xs-max) {
+      display: block;
+    }
+  }
+  .index-name-editor {
+    display: inline-block;
+    margin: -($input-height-base - $line-height-computed) / 2 0;
+    width: calc(100% - 3em);
+  }
+  .index-labels-container {
+    @include vertical-align-middle();
+    right: 90px;
+    line-height: 0;
+  }
+  .index-details-container {
+    margin: $padding-large-horizontal;
+    .schema-textarea {
+      resize: none;
+    }
+  }
+  .nav-tabs {
+    padding: 0 $padding-large-horizontal;
+    background-color: $collapsible-list-item-header-opened;
+  }
+  .tab-content {
+    background-color: $main-content-hover-background;
+  }
+  .nothing-to-harvest {
+    margin-top: 40px;
+  }
+  .content-harvesters-indices-progress-table {
+    $table-breakpoint: 1200px;
+    $space-name-width: 120px;
+    $chart-size: 65px;
+
+    min-height: 120px;
+    position: relative;
+
+    .progress-table-container.list-layout {
+      .progress-row:last-child {
+        margin-bottom: -$padding-base-vertical;
+      }
+    }
+
+    @media (min-width: $table-breakpoint + 1) {
+      $labels-font-size: 90%;
+
+      .progress-table-container {
+        &.table-layout {
+          width: calc(100% - #{$space-name-width});
+          margin-left: $space-name-width;
+          overflow-x: auto;
+          overflow-y: visible;
+        }
+      }
+
+      .table {
+        width: initial;
+        max-width: initial;
+        margin-left: 30px;
+        margin-bottom: 80px;
+        .space-name {
+          position: absolute;
+          top: auto;
+          left: 0;
+          transform: translateY(20px);
+          padding-right: $padding-base-vertical;
+          padding-left: 0;
+          width: $space-name-width;
+          height: $chart-size * 1.5;
+          min-width: $space-name-width;
+          overflow: hidden;
+          text-align: right;
+          font-size: $labels-font-size;
+          word-break: break-all;
+          line-height: 1;
+        }
+      }
+      
+      .provider-name {
+        transform: translateX(-40%) rotate(-45deg);
+        transform-origin: right center;
+        overflow: hidden;
+        word-break: break-all;
+        line-height: 1;
+        text-align: right;
+        font-size: $labels-font-size;
+      }
+      .progress-table-cell {
+        height: $chart-size * 1.5;
+        width: $chart-size * 1.5;
+      }
+      td {
+        max-width: $chart-size * 1.7;
+        width: $chart-size * 1.7;
+        min-width: $chart-size * 1.7;
+      }
+    }
+
+    @media (max-width: $table-breakpoint) {
+      .table {
+        width: 100%;
+        font-size: 100%;
+        margin-bottom: -$table-cell-padding;
+        .progress-chart {
+          left: initial;
+          right: 0;
+          transform: translateY(-50%);
+        }
+        tbody {
+          tr, tr.active {
+            td {
+              &.row-header {
+                padding: $table-cell-padding 3em $table-cell-padding 0;
+                &::before {
+                  width: auto;
+                  right: 0;
+                }
+              }
+              &.progress-table-cell {
+                &::before {
+                  width: calc(100% - #{$chart-size * 1.5});
+                  line-height: $chart-size * 1.5 - 2 * $table-cell-padding;
+                  font-weight: normal;
+                  white-space: nowrap;
+                  text-align: left;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
+            }
+          }
+        }
+      }
+      .space-name {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+        font-family: 'Open Sans Semibold';
+        white-space: nowrap;
+      }
+      tr.active td {
+        padding: $table-cell-padding 0;
+      }
+    }
+
+    .table {
+      table-layout: fixed;
+      & > tbody > tr > td.active {
+        background-color: inherit;
+      }
+    }
+
+    .visible-stats-label {
+      margin-right: 0;
+      margin-left: $padding-xs-horizontal;
+    }
+
+    // Chrome hack
+    .table:not(.bt) .space-name {
+      position: absolute;
+    }
+
+    td {
+      border: 0;
+    }
+
+    .progress-table-cell {
+      position: relative;
+      &.inactive {
+        opacity: 0.4;
+      }
+    }
+
+    .provider-names td {
+      padding: 0 0 0 0;
+    }
+    .progress-chart {
+      @include absolute-align-middle-center();
+      width: $chart-size;
+      height: $chart-size;
+      border-radius: 100%;
+      text-align: center;
+      line-height: $chart-size;
+      color: $color-one-white;
+      font-family: 'Open Sans Semibold';
+      .donut-ring, .donut-segment {
+        fill: transparent;
+        stroke-width: 33;
+      }
+      .donut-ring {
+        stroke: $color-one-gray-sand;
+      }
+      .donut-segment {
+        // 100 * PI / 4
+        stroke-dashoffset: 78.5398;
+      }
+      .chart-text {
+        font-family: 'Open Sans';
+        font-size: 1.6em;
+        text-anchor: middle;
+        dominant-baseline: middle;
+      }
+      &.danger .donut-segment {
+        stroke: $color-one-danger;
+      }
+      &.warning .donut-segment {
+        stroke: $color-one-warning;
+      }
+      &.success .donut-segment {
+        stroke: $color-one-success;
+      }
+      &.not-supported {
+        opacity: 0.1;
+        background-size: contain;
+        background-image: url($root-url + 'images/x-circle-empty.svg');
+        background-repeat: no-repeat;
+        background-position: right center;
+      }
+    }
+    .progress-table-container.list-layout {
+      .progress-row {
+        position: relative;
+        line-height: $chart-size;
+        padding-left: $chart-size + $padding-base-horizontal;
+      }
+      .progress-table-cell {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: $chart-size;
+        width: $chart-size;
+      }
+    }
+    .last-update-info {
+      margin-bottom: $padding-base-vertical;
+      margin-right: $padding-base-horizontal;
+    }
+    .visible-stats-label {
+      .one-icon {
+        margin-left: 3px;
+        vertical-align: middle;
+      }
+    }
+    .pulse-green {
+      @extend .pulse-mint;
+    }
+  }
+}
+
+.progress-more-info.one-webui-popover {
+  max-width: 200px;
+  word-break: break-all;
+  .description-items {
+    padding-left: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .harvesting-progress, .last-update {
+    word-break: normal;
+  }
+}
+
+.index-id-info.one-webui-popover {
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+}

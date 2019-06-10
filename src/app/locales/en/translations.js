@@ -7,6 +7,7 @@ import clusters from './tabs/clusters';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
+import harvesters from './tabs/harvesters';
 import users from './tabs/users';
 
 import cannotInitWebsocket from './errors/cannot-init-websocket';
@@ -26,6 +27,7 @@ import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
@@ -35,6 +37,7 @@ import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
 import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
 import contentGroupsJoinSpace from './components/content-groups-join-space';
+import contentGroupsJoinHarvester from './components/content-groups-join-harvester';
 import contentGroupsJoinCluster from './components/content-groups-join-cluster';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
@@ -58,6 +61,18 @@ import membershipVisualiser from './components/membership-visualiser';
 import resourceInfoTile from './components/resource-info-tile';
 import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
+import sidebarHarvesters from './components/sidebar-harvesters';
+import contentHarvestersNew from './components/content-harvesters-new';
+import contentHarvestersJoin from './components/content-harvesters-join';
+import contentHarvestersConfig from './components/content-harvesters-config';
+import contentHarvestersSpaces from './components/content-harvesters-spaces';
+import contentHarvestersIndices from './components/content-harvesters-indices';
+import contentHarvestersMembers from './components/content-harvesters-members';
+import contentHarvestersEmpty from './components/content-harvesters-empty';
+import contentHarvestersPlugin from './components/content-harvesters-plugin';
+import addYourSpaceModal from './components/add-your-space-modal';
+import harvesterRemoveModal from './components/harvester-remove-modal';
+import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 
@@ -69,6 +84,7 @@ import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
 import clientTokenActions from './services/client-token-actions';
 import clientTokenManager from './services/client-token-manager';
+import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 
@@ -80,6 +96,7 @@ let translations = {
     groups,
     users,
     clusters,
+    harvesters,
   },
   errors: {
     cannotInitWebsocket,
@@ -103,6 +120,7 @@ let translations = {
     contentSpacesJoin,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
     contentGroupsNew,
@@ -111,6 +129,7 @@ let translations = {
     contentGroupsHierarchy,
     contentGroupsJoinAsSubgroup,
     contentGroupsJoinSpace,
+    contentGroupsJoinHarvester,
     contentGroupsJoinCluster,
     contentClustersAdd,
     contentClustersEmpty,
@@ -135,6 +154,18 @@ let translations = {
     resourceInfoTile,
     resourceMembersTile,
     resourceMembershipTile,
+    sidebarHarvesters,
+    contentHarvestersNew,
+    contentHarvestersJoin,
+    contentHarvestersConfig,
+    contentHarvestersSpaces,
+    contentHarvestersIndices,
+    contentHarvestersMembers,
+    contentHarvestersEmpty,
+    contentHarvestersPlugin,
+    addYourSpaceModal,
+    harvesterRemoveModal,
+    harvesterConfiguration,
     websocketReconnectionModal,
     fatalConnectionErrorModal,
   },
@@ -145,6 +176,7 @@ let translations = {
     groupActions,
     clusterActions,
     privilegeActions,
+    harvesterActions,
     userActions,
     guiUtils,
   },

@@ -74,6 +74,10 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
     return this._joinRelation('group', token);
   },
 
+  joinHarvester(token) {
+    return this._joinRelation('harvester', token);
+  },
+
   joinCluster(token) {
     return this._joinRelation('cluster', token);
   },

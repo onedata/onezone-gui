@@ -30,6 +30,7 @@ module.exports = function (environment) {
       { id: 'providers', icon: 'provider', allowIndex: true },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
+      { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
       {
         id: 'clusters',
         icon: 'cluster',
