@@ -27,10 +27,10 @@ const OneproviderTabItem = EmberObject.extend({
    */
   provider: undefined,
 
+  icon: 'provider',
   id: reads('provider.entityId'),
   name: reads('provider.name'),
-  icon: 'provider',
-  class: computed('provider.online', function _class() {
+  elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
 });
