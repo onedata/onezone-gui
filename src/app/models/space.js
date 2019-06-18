@@ -11,11 +11,14 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { computed } from '@ember/object';
 import { equal } from '@ember/object/computed';
 import _ from 'lodash';
+import { inject as service } from '@ember/service';
 
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
+  onedataGraphUtils: service(),
+
   name: attr('string'),
   scope: attr('string'),
   canViewPrivileges: attr('boolean', { defaultValue: false }),
@@ -57,4 +60,21 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   }),
 
   //#endregion
+
+  /**
+   * @param {string} token
+   * @returns {Promise<Model.Harvester>}
+   */
+  joinHarvester(token) {
+    return this.joinRelation('harvester', token);
+  },
+
+  joinRelation(entityType, token) {
+    return this.get('onedataGraphUtils').joinRelation(
+      entityType,
+      token, ['asSpace', this.get('entityId')]
+    ).then(({ gri }) =>
+      this.get('store').findRecord(entityType, gri)
+    );
+  },
 });

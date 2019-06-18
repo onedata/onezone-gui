@@ -1,8 +1,8 @@
 /**
- * Shows modal asking about group/space leaving.
+ * Shows modal asking about group/space/harvester leaving.
  *
  * @module components/leave-modal
- * @author Michal Borzecki
+ * @author Michał Borzęcki
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -37,7 +37,7 @@ export default ProceedProcessModal.extend({
    */
   messageText: computed('record.{name,recordType}', function messageText() {
     const recordName = this.get('record.name');
-    const recordType = this.t(this.get('record.entityType'));
+    const recordType = this.get('record.entityType');
     const recordTypeI18n = this.t(recordType);
     return htmlSafe(
       this.t('areYouSure', { recordName, recordType: recordTypeI18n }) +
@@ -45,8 +45,7 @@ export default ProceedProcessModal.extend({
       this.t('mayCause' + _.upperFirst(recordType), {
         recordName,
         recordType: recordTypeI18n,
-      }) +
-      '</strong>'
+      }) + '</strong>'
     );
   }),
 

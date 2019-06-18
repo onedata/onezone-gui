@@ -23,6 +23,8 @@ export default SidebarResources.extend({
   groupManager: inject(),
   groupActions: inject(),
   clusterManager: inject(),
+  harvesterManager: inject(),
+  harvesterActions: inject(),
 
   /**
    * @param {string} type
@@ -40,6 +42,8 @@ export default SidebarResources.extend({
         return this.get('spaceManager').getSpaces();
       case 'groups':
         return this.get('groupManager').getGroups();
+      case 'harvesters':
+        return this.get('harvesterManager').getHarvesters();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
           return Promise.resolve({ list: A([user]) });
@@ -64,6 +68,8 @@ export default SidebarResources.extend({
         return this.get('spaceActions.buttons');
       case 'groups':
         return this.get('groupActions.buttons');
+      case 'harvesters':
+        return this.get('harvesterActions.buttons');
       default:
         return [];
     }

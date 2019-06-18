@@ -7,8 +7,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { onezoneAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 export const defaultIconBackgroundColor = '#333';
-export const defaultIconPath = '/ozw/onezone/assets/images/auth-providers/default.svg';
+export const defaultIconPath =
+  `/${onezoneAbbrev}/onezone/assets/images/auth-providers/default.svg`;
 export const darkFgColor = '#555C73';
 export const lightFgColor = '#FFF';
 

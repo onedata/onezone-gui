@@ -7,6 +7,7 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
+import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 
 class FakeWindow {
   constructor() {
@@ -62,7 +63,7 @@ describe('Integration | Component | content provider redirect', function () {
         }),
       };
       const onezoneServer = lookupService(this, 'onezone-server');
-      const url = `/opw/${clusterEntityId}/i#/`;
+      const url = `/${oneproviderAbbrev}/${clusterEntityId}/i#/`;
       const legacyUrl = 'https://test-test-provider-1.com';
       const getProviderRedirectUrl = sinon.stub(
         onezoneServer,

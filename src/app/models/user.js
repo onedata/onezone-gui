@@ -38,8 +38,8 @@ export default Model.extend(GraphSingleModelMixin, {
   clientTokenList: belongsTo('clientTokenList'),
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
+  harvesterList: belongsTo('harvesterList'),
 
-  
   name: alias('fullName'),
 
   //#region Non-store User operations
@@ -105,6 +105,10 @@ export default Model.extend(GraphSingleModelMixin, {
     return this._leaveRelation('group', groupId);
   },
 
+  leaveHarvester(harvesterId) {
+    return this._leaveRelation('harvester', harvesterId);
+  },
+
   leaveCluster(clusterId) {
     return this._leaveRelation('cluster', clusterId);
   },
@@ -115,6 +119,10 @@ export default Model.extend(GraphSingleModelMixin, {
 
   joinGroup(token) {
     return this._joinRelation('group', token);
+  },
+
+  joinHarvester(token) {
+    return this._joinRelation('harvester', token);
   },
 
   joinCluster(token) {

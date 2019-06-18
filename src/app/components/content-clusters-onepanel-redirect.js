@@ -15,6 +15,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 import { Promise } from 'rsvp';
+import { onepanelAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 
 export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
@@ -33,22 +34,16 @@ export default Component.extend({
 
   clusterType: reads('cluster.type'),
 
-  onepanelPathAbbrev: computed('clusterType', function onepanelPathAbbrev() {
-    return this.get('clusterType') === 'oneprovider' ? 'opp' : 'ozp';
-  }),
-
   onepanelHref: computed(
-    'onepanelPathAbbrev',
     'clusterId',
     'aspect',
     function onepanelHref() {
       const {
         clusterId,
-        onepanelPathAbbrev,
         aspect,
-      } = this.getProperties('clusterId', 'onepanelPathAbbrev', 'aspect');
+      } = this.getProperties('clusterId', 'aspect');
       let href =
-        `${location.origin}/${onepanelPathAbbrev}/${clusterId}/i#/onedata/clusters/${clusterId}`;
+        `${location.origin}/${onepanelAbbrev}/${clusterId}/i#/onedata/clusters/${clusterId}`;
       if (aspect) {
         href += `/${aspect}`;
       }

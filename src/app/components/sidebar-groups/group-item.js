@@ -99,6 +99,27 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  joinHarvesterAction: computed(function joinHarvesterAction() {
+    const {
+      router,
+      guiUtils,
+      group,
+    } = this.getProperties('router', 'guiUtils', 'group');
+    return {
+      action: () => router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        guiUtils.getRoutableIdFor(group),
+        'join-harvester'
+      ),
+      title: this.t('joinHarvester'),
+      class: 'join-harvester-action',
+      icon: 'light-bulb',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   joinAsSubgroupAction: computed(function () {
     const {
       router,
@@ -168,6 +189,7 @@ export default Component.extend(I18n, {
   itemActions: collect(
     'renameAction',
     'joinSpaceAction',
+    'joinHarvesterAction',
     'joinAsSubgroupAction',
     'joinClusterAction',
     'removeAction',

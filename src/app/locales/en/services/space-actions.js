@@ -23,4 +23,6 @@ export default {
   memberGroupAddition: 'member group addition',
   leavingSpace: 'leaving space',
   spaceLeftSuccess: 'Space left successfully',
+  joinSpaceToHarvesterSuccess: 'Successfully joined space "{{spaceName}}" to harvester "{{harvesterName}}"',
+  joiningSpaceToHarvester: 'joining space to harvester',
 };

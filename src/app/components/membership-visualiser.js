@@ -74,6 +74,7 @@ import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
@@ -93,6 +94,7 @@ export default Component.extend(I18n, {
   privilegeActions: service(),
   spaceActions: service(),
   groupActions: service(),
+  harvesterActions: service(),
   clusterActions: service(),
   currentUser: service(),
 
@@ -234,6 +236,8 @@ export default Component.extend(I18n, {
           return spaceFlags;
         case 'group':
           return groupFlags;
+        case 'harvester':
+          return harvesterFlags;
         case 'cluster':
         default:
           return clusterFlags;
@@ -687,11 +691,13 @@ export default Component.extend(I18n, {
         relationToRemove,
         spaceActions,
         groupActions,
+        harvesterActions,
         clusterActions,
       } = this.getProperties(
         'relationToRemove',
         'spaceActions',
         'groupActions',
+        'harvesterActions',
         'clusterActions'
       );
       const {
@@ -717,6 +723,11 @@ export default Component.extend(I18n, {
           promise = childType === 'group' ?
             groupActions.removeRelation(parent, child) :
             groupActions.removeUser(parent, child);
+          break;
+        case 'harvester':
+          promise = childType === 'group' ?
+            harvesterActions.removeGroupFromHarvester(parent, child) :
+            harvesterActions.removeUserFromHarvester(parent, child);
           break;
         case 'cluster':
           promise = childType === 'group' ?

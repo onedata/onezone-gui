@@ -17,6 +17,7 @@ export default Service.extend({
   store: inject(),
   currentUser: inject(),
   providerManager: inject(),
+  harvesterManager: inject(),
   groupManager: inject(),
   onedataGraph: inject(),
   onedataGraphUtils: inject(),
@@ -118,6 +119,7 @@ export default Service.extend({
       .then(() => Promise.all([
         space ? space.reload() : resolve(),
         this.reloadUserList(entityId).catch(ignoreForbiddenError),
+        this.reloadEffUserList(entityId).catch(ignoreForbiddenError),
         this.get('providerManager').reloadList(),
       ]));
   },
@@ -143,6 +145,8 @@ export default Service.extend({
       }).then(() => {
         return Promise.all([
           this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+          this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
+          this.get('groupManager').reloadList(),
         ]);
       }));
   },
@@ -166,6 +170,7 @@ export default Service.extend({
     }).then(() => {
       return Promise.all([
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.get('groupManager').reloadSpaceList(groupEntityId)
         .catch(ignoreForbiddenError),
       ]);
@@ -234,12 +239,28 @@ export default Service.extend({
     ).then(() =>
       Promise.all([
         this.reloadGroupList(spaceEntityId).catch(ignoreForbiddenError),
+        this.reloadEffGroupList(spaceEntityId).catch(ignoreForbiddenError),
         this.reloadList(),
         this.get('providerManager').reloadList(),
         this.get('groupManager').reloadSpaceList(groupEntityId)
         .catch(ignoreForbiddenError),
       ])
     );
+  },
+
+  /**
+   * Joins space to a harvester using token
+   * @param {Model.Space} space 
+   * @param {string} token
+   * @returns {Promise<Model.Harvester>}
+   */
+  joinSpaceToHarvester(space, token) {
+    const harvesterManager = this.get('harvesterManager');
+    return space.joinHarvester(token)
+      .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId'))
+        .catch(ignoreForbiddenError)
+        .then(() => space)
+      );
   },
 
   /**
@@ -270,6 +291,16 @@ export default Service.extend({
    */
   reloadGroupList(entityId) {
     return this.reloadModelList(entityId, 'groupList');
+  },
+
+  /**
+   * Reloads effGroupList of space identified by entityId. If list has not been
+   * fetched, nothing is reloaded
+   * @param {string} entityId group entityId
+   * @returns {Promise}
+   */
+  reloadEffGroupList(entityId) {
+    return this.reloadModelList(entityId, 'effGroupList');
   },
 
   /**

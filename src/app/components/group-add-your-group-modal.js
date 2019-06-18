@@ -1,22 +1,21 @@
 /**
- * Shows modal asking for new relative group name.
+ * Shows modal, that allows to choose one of available groups
  *
- * @module components/group-create-relative-modal
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @module components/group-add-your-group-modal
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
+import { computed, get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
-import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import _ from 'lodash';
+import layout from 'onezone-gui/templates/components/select-model-modal';
+import SelectModelModal from 'onezone-gui/components/select-model-modal';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
-export default Component.extend(I18n, {
-  tagName: '',
+export default SelectModelModal.extend({
+  layout,
 
   groupManager: service(),
 
@@ -26,34 +25,19 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.groupAddYourGroupModal',
 
   /**
-   * If true, modal is opened
-   * @type {boolean}
-   * @virtual
+   * @override
    */
-  opened: false,
+  recordIcon: 'group',
 
   /**
-   * If true, modal cannot be closed and proceed button has active spinner
-   * @type {boolean}
-   * @virtual
+   * @override
    */
-  processing: false,
+  modalClass: 'group-add-your-group-modal',
 
   /**
-   * Action called to close modal
-   * @type {function}
-   * @virtual
-   * @returns {*}
+   * @override
    */
-  close: notImplementedThrow,
-
-  /**
-   * Action called to proceed
-   * @type {function}
-   * @virtual
-   * @returns {*}
-   */
-  proceed: notImplementedThrow,
+  headerText: computedT('addYourGroup'),
 
   /**
    * Record to which another group will be added
@@ -71,30 +55,47 @@ export default Component.extend(I18n, {
   relation: 'child',
 
   /**
-   * @type {PromiseArray<Group>}
+   * @override
    */
-  availableGroups: undefined,
-
-  /**
-   * Selected group
-   * @type {Group}
-   */
-  selectedGroup: null,
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Group>>}
-   */
-  groupsForDropdown: computed(
-    'availableGroups.content.[]',
-    'relatedGroup',
-    function groupsForDropdown() {
+  messageText: computed(
+    'relatedRecord.{name,entityType}',
+    'relation',
+    function messageText() {
       const {
-        availableGroups,
-        relatedGroup,
-      } = this.getProperties('availableGroups', 'relatedGroup');
-      if (get(availableGroups, 'isFulfilled')) {
-        return get(availableGroups, 'content')
-          .filter(group => group !== relatedGroup)
+        relation,
+        relatedRecord,
+      } = this.getProperties('relation', 'relatedRecord');
+      const {
+        name,
+        entityType,
+      } = getProperties(relatedRecord, 'name', 'entityType');
+      return this.t('message', {
+        relation: this.t(relation),
+        recordType: this.t(entityType),
+        recordName: name,
+      });
+    }
+  ),
+
+  /**
+   * @override
+   */
+  proceedButtonText: computedT('add'),
+
+  /**
+   * @override
+   */
+  recordsForDropdown: computed(
+    'records.content.[]',
+    'relatedRecord',
+    function recordsForDropdown() {
+      const {
+        records,
+        relatedRecord,
+      } = this.getProperties('records', 'relatedRecord');
+      if (get(records, 'isFulfilled')) {
+        return get(records, 'content')
+          .filter(group => group !== relatedRecord)
           .sort((g1, g2) =>
             get(g1, 'name').localeCompare(get(g2, 'name'))
           );
@@ -105,43 +106,12 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * If true, proceed button is disabled
-   * @type {Ember.ComputedProperty<boolean<}
+   * @override
    */
-  proceedDisabled: computed(
-    'processing',
-    'selectedGroup',
-    function proceedDisabled() {
-      const {
-        processing,
-        selectedGroup,
-      } = this.getProperties('processing', 'selectedGroup');
-      return processing || !selectedGroup;
-    }
-  ),
-
-  openedObserver: observer('opened', function openedObserver() {
-    this.set('selectedGroup', null);
-    this.loadGroups();
-  }),
-
-  /**
-   * Loads groups for dropdown
-   * @returns {undefined}
-   */
-  loadGroups() {
-    this.set('availableGroups', PromiseArray.create({
+  loadRecords() {
+    this.set('records', PromiseArray.create({
       promise: this.get('groupManager').getGroups()
         .then(groupList => get(groupList, 'list')),
     }));
-  },
-
-  actions: {
-    add() {
-      return this.get('proceed')(this.get('selectedGroup'));
-    },
-    groupMatcher(provider, term) {
-      return _.includes(get(provider, 'name'), term) ? 1 : -1;
-    },
   },
 });
