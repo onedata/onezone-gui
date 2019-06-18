@@ -1,0 +1,13 @@
+{{#content-info
+  class="scroll-breakpoint-800"
+  header=(tt this "header")
+  imagePath="assets/images/harvester-new.svg"
+  text=(tt this "description")
+  as |contentInfo|
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      {{harvester-configuration/general mode="create"}}
+    </div>
+  </div>
+{{/content-info}}

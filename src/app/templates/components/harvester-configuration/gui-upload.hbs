@@ -1,0 +1,19 @@
+<h1>
+  <span class="one-label">{{tt this "header"}}</span>
+  {{one-label-tip title=(tt this "sectionHint")}}
+</h1>
+<input type="file" class="upload-gui-input" accept=".gz" onchange={{action "fileChange"}}>
+<form class="row upload-form">
+  <div class="col-xs-12 col-sm-5">
+    <input class="form-control file-name-input input-sm" type="text" readonly="readonly" value={{selectedFile.name}} {{action "browse"}}>
+  </div>
+  <div class="col-xs-12 col-sm-7 upload-buttons">
+    {{#bs-button onClick=(action "browse") size="sm" class="browse-button"}}{{tt this "browse"}}{{/bs-button}}
+    {{#one-spin-button action=(action "upload") class="btn btn-sm btn-primary upload-button" disabled=(not selectedFile)}}
+      {{tt this "upload"}}
+    {{/one-spin-button}}
+    {{#if isUploading}}
+      <span class="upload-progress">{{tt this "percentDone" percent=uploadProgress}}</span>
+    {{/if}}
+  </div>
+</form>

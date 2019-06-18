@@ -1,0 +1,29 @@
+{{#content-info
+  class="scroll-breakpoint-500"
+  header=(tt this "title")
+  text=(tt this "text")
+}}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{#link-to "onedata.sidebar.content" "harvesters" "new"}}
+          {{tt this "aCreateHarvester"}}
+        {{/link-to}}
+        {{tt this "pCreateHarvester"}}
+      </li>
+      <li>
+        {{tt this "pJoinHarvester"}}
+        {{#link-to "onedata.sidebar.content" "harvesters" "join"}}
+          {{tt this "aJoinHarvester"}}
+        {{/link-to}}
+      </li>
+      <li>
+        {{tt this "p1JoinGroup"}}
+        {{#link-to "onedata.sidebar.content" "groups" "join"}}
+          {{tt this "aJoinGroup"}}
+        {{/link-to}}
+        {{tt this "p2JoinGroup"}}
+      </li>
+    </ul>  
+  </p>
+{{/content-info}}

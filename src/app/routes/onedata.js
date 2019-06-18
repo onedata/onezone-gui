@@ -15,6 +15,7 @@ import AuthenticationErrorHandlerMixin from 'onedata-gui-common/mixins/authentic
 import { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
+import { onepanelAbbrev, oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 
 export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   currentUser: service(),
@@ -66,16 +67,18 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
         const authRedirect = sessionStorage.getItem('authRedirect');
         if (authRedirect) {
           sessionStorage.removeItem('authRedirect');
-          const urlMatch = redirectUrl.match(/\/(opw|ozp|opp)\/(.*?)\//);
-          const guiType = urlMatch && urlMatch[1];
+          const urlMatch = redirectUrl.match(
+            new RegExp(`/(${oneproviderAbbrev}|${onepanelAbbrev})/(.*?)/`)
+          );
+          const guiAbbrev = urlMatch && urlMatch[1];
           const clusterId = urlMatch && urlMatch[2];
-          if (guiType === 'opw') {
+          if (guiAbbrev === oneproviderAbbrev) {
             this.get('appStorage').setData('oneproviderAuthenticationError', '1');
             return this.transitionTo(
               'onedata.sidebar.index',
               'providers'
             );
-          } else if ((guiType === 'ozp' || guiType === 'opp') && clusterId) {
+          } else if (guiAbbrev === onepanelAbbrev && clusterId) {
             new DisabledErrorCheckList('clusterAuthentication')
               .disableErrorCheckFor(clusterId);
             return this.transitionTo(

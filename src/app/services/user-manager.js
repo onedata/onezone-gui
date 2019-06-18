@@ -35,6 +35,6 @@ export default Service.extend({
         oldPassword: oldPassword || null,
         newPassword,
       },
-    }); 
+    });
   },
 });

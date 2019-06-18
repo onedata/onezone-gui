@@ -3,6 +3,7 @@ export default {
   user: 'user',
   group: 'group',
   space: 'space',
+  harvester: 'harvester',
   cluster: 'cluster',
   showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
@@ -10,6 +11,7 @@ export default {
     viewGroup: 'View group',
     viewSpace: 'View space',
     viewProvider: 'View provider',
+    viewHarvester: 'View harvester',
     viewCluster: 'View cluster',
   },
   membershipRelation: {
@@ -38,6 +40,7 @@ export default {
     group: 'group',
     space: 'space',
     provider: 'provider',
+    harvester: 'harvester',
     cluster: 'cluster',
   },
 };

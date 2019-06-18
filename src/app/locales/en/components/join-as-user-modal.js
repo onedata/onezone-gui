@@ -7,5 +7,6 @@ export default _.merge({}, proceedProcessModal, {
   proceed: 'Join',
   space: 'space',
   group: 'group',
+  harvester: 'harvester',
   cluster: 'cluster',
 });

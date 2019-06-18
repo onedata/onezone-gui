@@ -1,0 +1,12 @@
+{{#bs-tab
+  activeId=activeTab
+  onChange=(action "onTabChange")
+  class="bs-tab-onedata bs-tab-modern"
+  as |tab|}}
+  {{#tab.pane elementId="general-tab" title=(tt this "generalHeader")}}
+    {{harvester-configuration/general harvester=harvester}}
+  {{/tab.pane}}
+  {{#tab.pane elementId="gui-plugin-tab" title=(tt this "guiPluginHeader")}}
+    {{harvester-configuration/gui-plugin harvester=harvester}}
+  {{/tab.pane}}
+{{/bs-tab}}

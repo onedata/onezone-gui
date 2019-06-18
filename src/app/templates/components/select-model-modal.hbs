@@ -1,0 +1,35 @@
+{{#proceed-process-modal
+  opened=opened
+  close=close
+  proceed=(action "proceed")
+  processing=processing
+  modalClass=(concat-classes "select-model-modal" modalClass)
+  headerText=headerText
+  proceedButtonClass=(or proceedButtonClass "btn btn-primary proceed")
+  proceedButtonText=proceedButtonText
+  proceedDisabled=proceedDisabled}}
+  <p class="input-top-description">
+    {{messageText}}
+  </p>
+  <div class="dropdown-container">
+    {{#promise-proxy-container proxy=records sizeClass="sm"}}
+      {{#power-select
+        options=recordsForDropdown
+        selected=selectedRecord
+        onchange=(action (mut selectedRecord))
+        matcher=(action "recordMatcher")
+        searchEnabled=true
+        renderInPlace=true
+        placeholder=dropdownPlaceholder
+        as |record|
+      }}
+        <div class="option-container">
+          {{#truncated-string}}
+            {{one-icon icon=recordIcon}}
+            <span class="text record-name">{{record.name}}</span>
+          {{/truncated-string}}
+        </div>
+      {{/power-select}}
+    {{/promise-proxy-container}}
+  </div>
+{{/proceed-process-modal}}
