@@ -1,10 +1,20 @@
 {{#promise-proxy-container proxy=initialProvidersListProxy}}
-  <div class="row content-row header-row hidden-xs content-spaces-data-header">
-    <h1 class="normal-case">
-      {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
-    </h1>
+  <div class="row content-header-section">
+    <div class="row content-row header-row hidden-xs content-spaces-data-header">
+      <h1 class="normal-case">
+        {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
+      </h1>
+    </div>
+    <div class="row row-content-tab-bar">
+      {{one-tab-bar
+        class="space-providers-tab-bar"
+        items=providerItems
+        selectedItem=selectedProviderItem
+        selectedItemChanged=(action "selectedProviderChanged")
+      }}
+    </div>
   </div>
-  <div class="row content-row content-spaces-data-content">
+  <div class="row absolute-flex-content-child-stretch content-spaces-data-content">
     {{embedded-content-file-browser
       baseUrl=contentIframeBaseUrl
       spaceId=space.entityId

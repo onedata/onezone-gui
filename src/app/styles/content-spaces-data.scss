@@ -1,0 +1,13 @@
+.content-spaces-data {  
+  .provider-online .one-icon {
+    color: $color-one-success;
+  }
+  .provider-offline .one-icon {
+    color: $color-one-danger;
+  }
+  .one-tab-bar .tab-bar-li .inline-icon-container {
+    // a hack to make provider icon to be more to the left and everything
+    // to be more centered - because the icon has internal padding
+    margin-left: -10px;
+  }
+}

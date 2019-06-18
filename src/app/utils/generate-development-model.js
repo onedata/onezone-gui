@@ -28,6 +28,11 @@ const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
+const PROVIDER_NAMES = ['Kraków', 'Paris', 'Lisbon'].concat(
+  _.range(3, NUMBER_OF_PROVIDERS).map(i =>
+    `${i - 3}. Provider${i % 2 ? ' with long name' : ''}`
+  )
+);
 
 const types = ['space', 'group', 'provider', 'clientToken', 'linkedAccount', 'cluster'];
 const names = ['one', 'two', 'three'];
@@ -235,7 +240,7 @@ function createProvidersRecords(store) {
     return store.createRecord('provider', {
       id,
       gri: id,
-      name: `Provider ${index}`,
+      name: PROVIDER_NAMES[index],
       latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
         sign,
       longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
