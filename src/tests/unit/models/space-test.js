@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupModelTest } from 'ember-mocha';
+import Service from '@ember/service';
 
 import { registerService } from '../../helpers/stub-service';
 import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
@@ -12,6 +13,7 @@ describe('Unit | Model | space', function () {
 
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
+    registerService(this, 'onedata-graph-utils', Service);
   });
 
   it('has getInviteToken method', function () {

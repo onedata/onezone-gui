@@ -11,6 +11,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import { onezoneAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+
 /**
  * @typedef {Object} AuthorizerInfo
  * @property {string} type
@@ -20,7 +22,7 @@
  * (without extension)
  */
 
-const iconPrefix = '/ozw/onezone/assets/images/auth-providers/';
+const iconPrefix = `/${onezoneAbbrev}/onezone/assets/images/auth-providers/`;
 
 export default [{
     iconPath: iconPrefix + 'basicauth.svg',

@@ -1,0 +1,43 @@
+<svg
+  class={{concat progressChartClassNames " more-info-trigger-" elementId}}
+  viewBox="0 0 100 100"
+  {{action "toggleMoreInfo" (not isMoreInfoVisible)}}>
+  {{#if isSupported}}
+    <circle class="donut-ring" cx="50" cy="50" r="50"></circle>
+    <circle class="donut-segment" cx="50" cy="50" r="50" stroke-dasharray={{chartDasharray}}></circle>
+    <text x="50%" y="50%" class="chart-text">{{percent}}%</text>
+  {{/if}}
+</svg>
+<div>
+  {{#render-later triggerRender=isMoreInfoVisible}}
+    {{#one-webui-popover
+      class="progress-more-info"
+      triggerSelector=(concat ".more-info-trigger-" elementId)
+      open=isMoreInfoVisible
+      as |popover|}}
+      {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat ".more-info-trigger-" elementId)}}
+        <ul class="description-items">
+          <li><strong>{{tt this "space"}}:</strong> <span class="space-name">{{space.name}}</span></li>
+          <li><strong>{{tt this "provider"}}:</strong> <span class="provider-name">{{provider.name}}</span></li>
+          <li><strong>{{tt this "status"}}:</strong> <span class="status">{{tt this (if isActive "active" "inactive")}}</span></li>
+          <li>
+            <strong>{{tt this "progress"}}:</strong>
+            <span class="harvesting-progress">
+              {{#if isSupported}}
+                {{percent}}%
+              {{else}}
+                {{tt this "notSupported"}}
+              {{/if}}
+            </span>
+          </li>
+          {{#if lastUpdate}}
+            <li><strong>{{tt this "lastUpdate"}}:</strong> <span class="last-update">{{lastUpdate}}</span></li>
+          {{/if}}
+          {{#if error}}
+            <li class="text-danger"><strong>{{tt this "error"}}:</strong> <span class="last-error">{{error}}</span></li>
+          {{/if}}
+        </ul>
+      {{/click-outside}}
+    {{/one-webui-popover}}
+  {{/render-later}}
+</div>

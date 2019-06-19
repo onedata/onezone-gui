@@ -16,7 +16,8 @@ describe('Integration | Component | content providers', function () {
     integration: true,
   });
 
-  it('invokes transition to provider-redirect on double click if provider status is online',
+  it(
+    'invokes transition to provider-redirect on double click if provider status is online',
     function () {
       const providerId = 'id1';
       const list = [

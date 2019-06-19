@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import { onezoneDefaultRootPath } from 'onedata-gui-common/utils/onedata-urls';
 
 describe('Integration | Component | login box/social box list/social box',
   function () {
@@ -12,13 +13,17 @@ describe('Integration | Component | login box/social box list/social box',
     });
 
     it('renders as box with svg image', function () {
+      const iconPath = this.set(
+        'iconPath',
+        `${onezoneDefaultRootPath}/assets/images/auth-providers/example.svg`
+      );
       this.render(hbs `{{login-box/social-box-list/social-box
         authId="example"
-        iconPath="/ozw/onezone/assets/images/auth-providers/example.svg"
+        iconPath=iconPath
       }}
       `);
       expect(this.$('.social-icon-image').attr('style'))
-        .to.contain('/ozw/onezone/assets/images/auth-providers/example.svg');
+        .to.contain(iconPath);
     });
 
     it('renders spinner in active state', function () {

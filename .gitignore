@@ -51,6 +51,7 @@ crashlytics-build.properties
 # docker image artefact
 docker-build-list.json
 docker-build-report.txt
+gui-config.sh
 
 # compiled app
 rel
