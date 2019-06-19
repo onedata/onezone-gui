@@ -15,7 +15,8 @@ import { inject as service } from '@ember/service';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   developmentModelConfig: Object.freeze({
-    clearOnReload: false,
+    // FIXME: development code
+    clearOnReload: true,
   }),
   generateDevelopmentModel,
   clearDevelopmentModel: clearLocalStorageModel,
