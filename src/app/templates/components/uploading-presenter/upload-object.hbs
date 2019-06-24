@@ -1,0 +1,16 @@
+{{uploading-presenter/upload-object-info
+  bytesUploaded=objectState.bytesUploaded
+  objectSize=objectState.objectSize
+  objectName=objectState.objectName
+  objectType=objectState.objectType
+  nestingLevel=objectState.nestingLevel
+  status=objectState.status
+  isExpanded=isExpanded
+  onToggleExpand=(action "toggleExpand")}}
+{{#render-later triggerRender=triggerChildrenRender}}
+  {{#bs-collapse collapsed=(not isExpanded)}}
+    {{#each objectState.children as |child|}}
+      {{uploading-presenter/upload-object objectState=child}}
+    {{/each}}
+  {{/bs-collapse}}
+{{/render-later}}

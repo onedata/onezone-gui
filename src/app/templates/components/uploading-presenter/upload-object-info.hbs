@@ -1,0 +1,28 @@
+<div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
+<div class="upload-object-nesting-container">
+  <div class="upload-object-heading-row {{if isExpandable "clickable"}}" {{action "toggleExpand" value="target" on="click"}}>
+    {{one-icon class=(concat objectType "-icon upload-object-icon") icon=objectIcon}}
+    {{#truncated-string class="upload-object-name"}}{{objectName}}{{/truncated-string}}
+    <div class="upload-object-icons">
+      {{#if (eq status "failed")}}
+        {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
+          {{one-tooltip title=(tt this "uploadingFailedTip")}}
+        {{/one-icon}}
+      {{/if}}
+      {{#if isExpandable}}
+        {{one-icon class=(concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")) icon="arrow-up"}}
+      {{/if}}
+    </div>
+    <div class="upload-object-progress-info">
+      {{bytes-to-string bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string objectSize}}
+    </div>
+    {{one-icon
+      class="upload-object-cancel"
+      icon="checkbox-x"
+      click=(action onCancel)}}
+  </div>
+  <div class="progress upload-object-progress-bar">
+    <div class="progress-bar {{progressBarContextClass}}" role="progressbar" style={{progressBarWidthStyle}}></div>
+    {{one-tooltip title=(concat progress "%") delayShow=200}}
+  </div>
+</div>

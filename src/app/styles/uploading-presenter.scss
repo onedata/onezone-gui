@@ -1,0 +1,93 @@
+.uploading-presenter {
+  font-family: Open Sans Semibold;
+
+  .up-upload-object-info {
+    display: flex;
+    padding: $padding-base-vertical $padding-base-horizontal 0 $padding-base-horizontal;
+    border-bottom: 1px solid $main-border-color;
+    font-size: 90%;
+  }
+
+  .upload-object-nesting-container {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .upload-object-heading-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: $padding-base-vertical;
+    overflow: auto;
+  }
+
+  .upload-object-icon {
+    font-size: 1.65em;
+    margin-right: 4px;
+
+    &.file-icon {
+      color: $color-file;
+    }
+
+    &.directory-icon {
+      color: $color-directory;
+    }
+  }
+
+  .upload-object-name {
+    padding-right: $padding-xs-horizontal;
+  }
+
+  .upload-object-icons {
+    flex-grow: 1;
+    margin-right: $padding-xs-horizontal;
+    white-space: nowrap;
+    
+    .one-icon {
+      vertical-align: middle;
+    }
+  }
+
+  .upload-object-expanded-icon {
+    position: relative;
+    top: -0.2em;
+    display: inline-block;
+    font-size: 0.7em;
+    font-weight: bold;
+    transform: rotate(0deg);
+    transition: transform .2s ease;
+    &.expanded {
+      transform: rotate(180deg);
+    }
+  }
+
+  .upload-object-error-icon {
+    font-size: 1.4em;
+  }
+
+  .upload-object-progress-info {
+    white-space: nowrap;
+    font-size: 0.8em;
+    color: $color-one-light-gray;
+  }
+  
+  .upload-object-cancel {
+    margin-left: $padding-xs-horizontal;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: $color-one-light-gray;
+
+    &:hover {
+      color: $color-one-danger;
+    }
+  }
+
+  .upload-object-progress-bar {
+    margin-bottom: $padding-large-vertical;
+    height: 4px;
+    background-color: $color-one-semiwhite;
+
+    .progress-bar {
+      box-shadow: none;
+    }
+  }
+}
