@@ -1,29 +1,30 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
-import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
-import { A } from '@ember/array';
+import { reads } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
 
+  uploadingManager: service(),
+
   /**
-   * TODO: remove
+   * @type {Utils.UploadingObjectState|null}
    */
-  testData: computed(function () {
-    const file1 = UploadingObjectState.create({
-      objectPath: 'dir1/test.txt',
-      objectType: 'file',
-      objectSize: 1024,
-      bytesUploaded: 120,
-      state: 'uploading',
-    });
-    const dir1 = UploadingObjectState.create({
-      objectPath: 'dir1',
-      objectType: 'directory',
-      children: A([file1]),
-    });
-    return UploadingObjectState.create({
-      children: A([dir1]),
-    });
-  }),
+  expandedUpload: null,
+
+  /**
+   * @type {Array<Utils.UploadingObjectState>}
+   */
+  uploadObjects: reads('uploadingManager.uploadRootObjects'),
+
+  actions: {
+    toggleExpand(uploadObject) {
+      const expandedUpload = this.get('expandedUpload');
+      if (expandedUpload === uploadObject) {
+        this.set('expandedUpload', null);
+      } else {
+        this.set('expandedUpload', uploadObject);
+      }
+    },
+  },
 });

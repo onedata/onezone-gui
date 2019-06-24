@@ -1,6 +1,6 @@
 <div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
-<div class="upload-object-nesting-container">
-  <div class="upload-object-heading-row {{if isExpandable "clickable"}}" {{action "toggleExpand" value="target" on="click"}}>
+<div class="upload-object-nesting-container" {{action "toggleExpand" value="target" on="click"}}>
+  <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
     {{one-icon class=(concat objectType "-icon upload-object-icon") icon=objectIcon}}
     {{#truncated-string class="upload-object-name"}}{{objectName}}{{/truncated-string}}
     <div class="upload-object-icons">
@@ -10,14 +10,14 @@
         {{/one-icon}}
       {{/if}}
       {{#if isExpandable}}
-        {{one-icon class=(concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")) icon="arrow-up"}}
+        {{one-icon class=(concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")) icon="arrow-down"}}
       {{/if}}
     </div>
     <div class="upload-object-progress-info">
       {{bytes-to-string bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string objectSize}}
     </div>
     {{one-icon
-      class="upload-object-cancel"
+      class="upload-object-cancel cancel-action"
       icon="checkbox-x"
       click=(action onCancel)}}
   </div>

@@ -11,8 +11,6 @@ export default Component.extend(I18n, {
   classNames: ['up-upload-object-info'],
   classNameBindings: ['isExpanded:expanded'],
 
-  ignoreTouchAction: true,
-
   /**
    * @override
    */
@@ -68,6 +66,13 @@ export default Component.extend(I18n, {
   nestingLevel: 0,
 
   /**
+   * Object upload progress (in percents 0-100).
+   * @virtual
+   * @type {number}
+   */
+  progress: undefined,
+
+  /**
    * Callback called when "Cancel" button is clicked
    * @virtual
    * @type {Function}
@@ -112,24 +117,6 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   isExpandable: equal('objectType', 'directory'),
-
-  /**
-   * Object upload progress (in percents 0-100).
-   * @type {Ember.ComputedProperty<number>}
-   */
-  progress: computed('objectSize', 'bytesUploaded', function progress() {
-    const {
-      objectSize,
-      bytesUploaded,
-    } = this.getProperties('objectSize', 'bytesUploaded');
-    if (objectSize === 0 && bytesUploaded === 0) {
-      return 100;
-    } else if (!objectSize || !bytesUploaded ) {
-      return 0;
-    } else {
-      return Math.floor((bytesUploaded / objectSize) * 100);
-    }
-  }),
 
   /**
    * Class defining color of progress bar (depending on status)

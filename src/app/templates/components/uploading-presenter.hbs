@@ -1,2 +1,6 @@
-{{uploading-presenter/upload-object-root-list uploadObjects=testData.children}}
-
+{{#each uploadObjects as |uploadObject|}}
+  {{uploading-presenter/single-upload
+    uploadObject=uploadObject
+    isExpanded=(eq expandedUpload uploadObject)
+    onToggleExpand=(action "toggleExpand" uploadObject)}}
+{{/each}}

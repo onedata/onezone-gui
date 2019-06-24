@@ -1,0 +1,10 @@
+{{uploading-presenter/upload-summary-header
+  progress=uploadObject.progress
+  numberOfFiles=uploadObject.numberOfFiles
+  onToggleExpand=(action "toggleExpand")
+  onCancel=(action "cancel")}}
+{{#render-later triggerRender=triggerChildrenRender}}
+  {{#bs-collapse collapsed=(not isExpanded)}}
+    {{uploading-presenter/upload-object-root-list uploadObjects=uploadObject.children}}
+  {{/bs-collapse}}
+{{/render-later}}

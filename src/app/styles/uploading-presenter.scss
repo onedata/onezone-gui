@@ -1,9 +1,70 @@
 .uploading-presenter {
+  position: fixed;
+  right: $padding-small-vertical;
+  bottom: $padding-small-vertical;
+  width: 400px;
   font-family: Open Sans Semibold;
+
+  .up-single-upload {
+    margin-bottom: $padding-small-vertical;
+    background-color: $color-one-white;
+    border: 1px solid $main-border-color;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .up-upload-summary-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 70px;
+    padding: 0 1.25 * $padding-large-horizontal;
+  }
+
+  .upload-summary-header-progress-bar {
+    @include fill-container();
+
+    position: absolute;
+    margin: 0;
+    height: initial;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: initial;
+
+    .progress-bar {
+      box-shadow: none;
+      background-color: $color-one-light-blue;
+    }
+  }
+
+  .upload-summary-header-text {
+    flex-grow: 1;
+    text-transform: uppercase;
+  }
+  
+  .upload-summary-header-cancel {
+    font-size: 1.7em;
+  }
+
+  .upload-summary-header-text, .upload-summary-header-icons {
+    z-index: 1;
+  }
+
+  .up-upload-object-root-list {
+    position: relative;
+    height: 250px;
+    border-top: 1px solid $main-border-color;
+
+    > .ps-container {
+      position: relative;
+      height: 100%;
+    }
+  }
 
   .up-upload-object-info {
     display: flex;
-    padding: $padding-base-vertical $padding-base-horizontal 0 $padding-base-horizontal;
+    padding: $padding-base-vertical 1.25 * $padding-large-horizontal 0 1.25 * $padding-large-horizontal;
     border-bottom: 1px solid $main-border-color;
     font-size: 90%;
   }
@@ -16,7 +77,7 @@
   .upload-object-heading-row {
     display: flex;
     align-items: center;
-    margin-bottom: $padding-base-vertical;
+    margin-bottom: 2 * $padding-small-vertical;
     overflow: auto;
   }
 
@@ -48,8 +109,6 @@
   }
 
   .upload-object-expanded-icon {
-    position: relative;
-    top: -0.2em;
     display: inline-block;
     font-size: 0.7em;
     font-weight: bold;
@@ -73,6 +132,10 @@
   .upload-object-cancel {
     margin-left: $padding-xs-horizontal;
     font-size: 1.5em;
+  }
+
+  .cancel-action {
+    vertical-align: middle;
     font-weight: bold;
     color: $color-one-light-gray;
 

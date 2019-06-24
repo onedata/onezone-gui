@@ -1,0 +1,16 @@
+<div class="progress upload-summary-header-progress-bar">
+  <div class="progress-bar" role="progressbar" style={{progressBarWidthStyle}}></div>
+</div>
+<div class="upload-summary-header-text">
+  {{#if (gt numberOfFiles 1)}}
+    {{tt this "uploadingNFiles" numberOfFiles=numberOfFiles}}
+  {{else}}
+    {{tt this "uploading1File"}}
+  {{/if}}
+</div>
+<div class="upload-summary-header-icons">
+  {{one-icon
+    class="upload-summary-header-cancel cancel-action"
+    icon="checkbox-x"
+    click=(action onCancel)}}
+</div>
