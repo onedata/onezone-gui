@@ -1,5 +1,7 @@
 {{#perfect-scrollbar-element}}
   {{#each uploadObjects as |uploadObject|}}
-    {{uploading-presenter/upload-object objectState=uploadObject}}
+    {{uploading-presenter/upload-object
+      uploadObject=uploadObject
+      onCancel=(action onCancel uploadObject)}}
   {{/each}}
 {{/perfect-scrollbar-element}}

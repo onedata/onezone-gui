@@ -1,16 +1,28 @@
 import Component from '@ember/component';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { inject as service } from '@ember/service';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend({
   classNames: ['up-upload-object'],
   classNameBindings: ['isExpanded:expanded'],
 
+  uploadingManager: service(),
+
   /**
    * @virtual
    * @type {Utils.UploadingObjectState}
    */
-  objectState: undefined,
+  uploadObject: undefined,
+
+  /**
+   * Callback called when "Cancel" button is clicked
+   * @virtual
+   * @type {Function}
+   * @returns {undefined}
+   */
+  onCancel: notImplementedIgnore,
 
   /**
    * Property used to trigger children rendering when necessary

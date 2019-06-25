@@ -1,5 +1,6 @@
 import EmberObject, { computed, get } from '@ember/object';
 import { conditional, equal, sum, lt, not, and, array, raw, writable } from 'ember-awesome-macros';
+import _ from 'lodash';
 
 export default EmberObject.extend({
   /**
@@ -28,12 +29,12 @@ export default EmberObject.extend({
 
   /**
    * @virtual
-   * @type {Ember.A<Utils.UploadingObjectState>|null}
+   * @type {Utils.UploadingObjectState|null}
    */
   parent: undefined,
 
   /**
-   * Nested objects (if this object is a directory)
+   * Nested objects (1 level deep) (if this object is a directory)
    * @virtual
    * @type {Ember.A<Utils.UploadingObjectState>}
    */
@@ -113,6 +114,17 @@ export default EmberObject.extend({
   ),
 
   /**
+   * @type {Utils.UploadingObjectState|null}
+   */
+  root: computed('objectType', 'parent.root', function () {
+    if (this.get('objectType') === 'root') {
+      return this;
+    } else {
+      return this.get('parent.root');
+    }
+  }),
+
+  /**
    * One of `uploading`, `uploaded`, `partiallyUploading`, `failed`.
    * `partiallyUploading` is used for directories, that have both
    * uploading/uploaded and failed files.
@@ -183,8 +195,13 @@ export default EmberObject.extend({
    */
   cancel() {
     const parent = this.get('parent');
-    if (!parent) {
-      get(parent, 'children').removeObject(this);
+    if (parent) {
+      const parentChildren = get(parent, 'children');
+      parentChildren.removeObject(this);
+      if (!get(parentChildren, 'length') && get(parent, 'type') !== 'root') {
+        // Cancel parent if it does not contain any file
+        parent.cancel();
+      }
     }
   },
 
@@ -206,6 +223,24 @@ export default EmberObject.extend({
       const nestedRelativePath =
         relativePath.substring(thisLevelPathPart.length + 1);
       return objectOnPath.getFile(nestedRelativePath);
+    }
+  },
+
+  /**
+   * Returns all nested files (at any level od nesting). Is not a computed
+   * property to enforce recomputation only on demand.
+   * @returns {Array<Utils.UploadingObjectState>}
+   */
+  getAllNestedFiles() {
+    const children = this.get('children');
+    if (children) {
+      const directFiles = children.filterBy('type', 'file');
+      const indirectFiles = _.flatten(
+        children.rejectBy('type', 'file').invoke('getAllNestedFiles')
+      );
+      return directFiles.concat(indirectFiles);
+    } else {
+      return [];
     }
   },
 });

@@ -156,7 +156,7 @@ export default Component.extend(I18n, {
         onToggleExpand,
         objectType,
       } = this.getProperties('onToggleExpand', 'objectType');
-      if (!$(event.target).closest('.upload-object-cancel').length &&
+      if (!$(event.target).closest('.cancel-action').length &&
         objectType === 'directory') {
         onToggleExpand();
       }

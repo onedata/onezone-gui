@@ -1,17 +1,20 @@
 {{uploading-presenter/upload-object-info
-  bytesUploaded=objectState.bytesUploaded
-  objectSize=objectState.objectSize
-  objectName=objectState.objectName
-  objectType=objectState.objectType
-  nestingLevel=objectState.nestingLevel
-  status=objectState.status
-  progress=objectState.progress
+  bytesUploaded=uploadObject.bytesUploaded
+  objectSize=uploadObject.objectSize
+  objectName=uploadObject.objectName
+  objectType=uploadObject.objectType
+  nestingLevel=uploadObject.nestingLevel
+  status=uploadObject.status
+  progress=uploadObject.progress
   isExpanded=isExpanded
-  onToggleExpand=(action "toggleExpand")}}
+  onToggleExpand=(action "toggleExpand")
+  onCancel=onCancel}}
 {{#render-later triggerRender=triggerChildrenRender}}
   {{#bs-collapse collapsed=(not isExpanded)}}
-    {{#each objectState.children as |child|}}
-      {{uploading-presenter/upload-object objectState=child}}
+    {{#each uploadObject.children as |child|}}
+      {{uploading-presenter/upload-object
+        uploadObject=child
+        onCancel=onCancel}}
     {{/each}}
   {{/bs-collapse}}
 {{/render-later}}

@@ -3,6 +3,7 @@ import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { htmlSafe } from '@ember/string';
+import $ from 'jquery';
 
 export default Component.extend(I18n, {
   classNames: ['up-upload-summary-header'],
@@ -46,7 +47,9 @@ export default Component.extend(I18n, {
     return htmlSafe(`width: ${this.get('progress')}%`);
   }),
 
-  click() {
-    this.get('onToggleExpand')();
+  click(event) {
+    if (!$(event.target).closest('.cancel-action').length) {
+      this.get('onToggleExpand')();
+    }
   },
 });

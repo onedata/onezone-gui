@@ -2,9 +2,12 @@ import Component from '@ember/component';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { inject as service } from '@ember/service';
 
 export default Component.extend({
   classNames: ['up-single-upload'],
+
+  uploadingManager: service(),
 
   /**
    * @virtual
@@ -48,8 +51,8 @@ export default Component.extend({
         onToggleExpand();
       }
     },
-    cancel() {
-
+    cancel(uploadObject) {
+      this.get('uploadingManager').cancelUpload(uploadObject);
     },
   },
 });
