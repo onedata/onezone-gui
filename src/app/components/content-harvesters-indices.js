@@ -105,6 +105,24 @@ export default Component.extend(
     }),
 
     /**
+     * Property dedicated for name field (due to the lack of other fields,
+     * so the hbs can be simplified). true == error, false == value ok,
+     * undefined == value not changed (no feedback)
+     * @type {Ember.ComputedProperty<boolean|undefined>}
+     */
+    hasNameErrorToShow: computed(
+      'createIndexFormChangedFields.name',
+      'createIndexFormErrors.name',
+      function showNameError() {
+        if (this.get('createIndexFormChangedFields.name')) {
+          return Boolean(this.get('createIndexFormErrors.name'));
+        } else {
+          return undefined;
+        }
+      }
+    ),
+
+    /**
      * @type {Ember.ComputedProperty<PromiseArray>}
      */
     dataProxy: computed(
