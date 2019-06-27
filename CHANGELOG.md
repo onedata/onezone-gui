@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-5402 Updated common libraries
+* VFS-5519 Fixed not visible block with service version in Safari
 * VFS-5476 Refactoring of token/origin endpoints and unfied GUI URL
 * VFS-5219 Data discovery functionality
 * VFS-5425 Service Pack 3 for unified GUI
