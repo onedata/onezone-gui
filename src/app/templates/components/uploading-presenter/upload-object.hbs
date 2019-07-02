@@ -4,17 +4,20 @@
   objectName=uploadObject.objectName
   objectType=uploadObject.objectType
   nestingLevel=uploadObject.nestingLevel
+  nestingStyle=nestingStyle
   status=uploadObject.status
   progress=uploadObject.progress
   isExpanded=isExpanded
   onToggleExpand=(action "toggleExpand")
-  onCancel=onCancel}}
+  onCancel=(action onCancel uploadObject)}}
 {{#render-later triggerRender=triggerChildrenRender}}
   {{#bs-collapse collapsed=(not isExpanded)}}
     {{#each uploadObject.children as |child|}}
       {{uploading-presenter/upload-object
+        nestingStyle=nestingStyle
         uploadObject=child
-        onCancel=onCancel}}
+        onCancel=onCancel
+        onExpand=(action "childrenExpanded" child)}}
     {{/each}}
   {{/bs-collapse}}
 {{/render-later}}

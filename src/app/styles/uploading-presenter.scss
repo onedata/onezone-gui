@@ -69,6 +69,11 @@
     font-size: 90%;
   }
 
+  .upload-object-nesting-space {
+    flex-shrink: 0;
+    transition: width .3s ease, max-width .3s ease;
+  }
+
   .upload-object-nesting-container {
     flex-grow: 1;
     min-width: 0;

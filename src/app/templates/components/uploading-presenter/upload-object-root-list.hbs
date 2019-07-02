@@ -1,7 +1,9 @@
 {{#perfect-scrollbar-element}}
   {{#each uploadObjects as |uploadObject|}}
     {{uploading-presenter/upload-object
+      nestingStyle=nestingStyle
       uploadObject=uploadObject
-      onCancel=(action onCancel uploadObject)}}
+      onCancel=(action onCancel)
+      onExpand=(action "childrenExpanded" uploadObject)}}
   {{/each}}
 {{/perfect-scrollbar-element}}

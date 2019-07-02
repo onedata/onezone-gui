@@ -1,6 +1,6 @@
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { equal } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -66,6 +66,12 @@ export default Component.extend(I18n, {
   nestingLevel: 0,
 
   /**
+   * @virtual
+   * @type {Object}
+   */
+  nestingStyle: undefined,
+
+  /**
    * Object upload progress (in percents 0-100).
    * @virtual
    * @type {number}
@@ -93,8 +99,19 @@ export default Component.extend(I18n, {
    */
   nestingSpaceWidthStyle: computed(
     'nestingLevel',
+    'nestingStyle',
     function nestingSpaceWidthStyle() {
-      return htmlSafe(`width: ${this.get('nestingLevel') * 15}px`);
+      const {
+        nestingLevel,
+        nestingStyle,
+      } = this.getProperties('nestingLevel', 'nestingStyle');
+      const {
+        px,
+        percent,
+      } = getProperties(nestingStyle, 'px', 'percent');
+      return htmlSafe(
+        `width: ${nestingLevel * px}px; max-width: ${nestingLevel * percent}%;`
+      );
     }
   ),
 
