@@ -37,7 +37,11 @@ const OneproviderTabItem = EmberObject.extend({
 
 export default Component.extend(
   createDataProxyMixin('initialProvidersList'), {
-    classNames: ['content-spaces-data', 'absolute-flex-content'],
+    classNames: [
+      'content-spaces-data',
+      'absolute-flex-content',
+      'no-pointer-events',
+    ],
 
     globalNotify: service(),
 

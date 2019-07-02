@@ -1,4 +1,7 @@
-.content-spaces-data {  
+.content-spaces-data {
+  > *:not(.content-spaces-data-content) {
+    pointer-events: auto;
+  }
   .provider-online .one-icon {
     color: $color-one-success;
   }

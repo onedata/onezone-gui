@@ -234,9 +234,9 @@ export default EmberObject.extend({
   getAllNestedFiles() {
     const children = this.get('children');
     if (children) {
-      const directFiles = children.filterBy('type', 'file');
+      const directFiles = children.filterBy('objectType', 'file');
       const indirectFiles = _.flatten(
-        children.rejectBy('type', 'file').invoke('getAllNestedFiles')
+        children.rejectBy('objectType', 'file').invoke('getAllNestedFiles')
       );
       return directFiles.concat(indirectFiles);
     } else {

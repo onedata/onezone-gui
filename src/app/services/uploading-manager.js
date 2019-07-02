@@ -1,51 +1,75 @@
-import Service from '@ember/service';
-import { computed, get, getProperties, set, setProperties } from '@ember/object';
-import { raw, writable } from 'ember-awesome-macros';
+import Service, { inject as service } from '@ember/service';
+import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
 import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
 import { A } from '@ember/array';
 
 export default Service.extend({
+  embeddedIframeManager: service(),
+
   uploadRootObjects: computed(function uploadObjects() {
     return A();
   }),
 
-  /**
-   * @type {Ember.ComputedProperty<Object>}
-   */
-  dataForOneproviders: writable(raw({})),
+  embeddedIframesObserver: observer(
+    'embeddedIframeManager.embeddedIframes.[]',
+    function embeddedIframesObserver() {
+      const embeddedIframes = this.get('embeddedIframeManager.embeddedIframes');
+      embeddedIframes
+        .filterBy('iframeType', 'oneprovider')
+        .reject(embIframe =>
+          get(embIframe, 'callParentCallbacks.updateUploadProgress')
+        )
+        .forEach(embIframe => {
+          const {
+            relatedData: oneprovider,
+            callParentCallbacks,
+          } = getProperties(embIframe, 'relatedData', 'callParentCallbacks');
+          setProperties(callParentCallbacks, {
+            updateUploadProgress: (data) =>
+              this.updateUploadProgress(Object.assign({ oneprovider }, data)),
+            addNewUpload: (data) =>
+              this.addNewUpload(Object.assign({ oneprovider }, data)),
+          });
+        });
+    }
+  ),
 
   init() {
     this._super(...arguments);
-    const oneprovider = { entityId: 'prov1' };
-    const uploadId = 1;
-    this.addNewUpload({
-      oneprovider,
-      uploadId,
-      files: [{
+    setTimeout(() => {
+      const oneprovider = this.get('embeddedIframeManager.embeddedIframes.firstObject.relatedData');
+      const uploadId = 1;
+      this.addNewUpload({
+        oneprovider,
+        uploadId,
+        files: [{
+          path: 'test/doc.txt',
+          size: 1024,
+        }],
+      });
+      this.updateUploadProgress({
+        oneprovider,
+        uploadId,
         path: 'test/doc.txt',
-        size: 1024,
-      }],
-    });
-    this.updateUploadProgress({
-      oneprovider,
-      uploadId,
-      path: 'test/doc.txt',
-      bytesUploaded: 700,
-    });
-    this.addNewUpload({
-      oneprovider,
-      uploadId: 2,
-      files: [{
-        path: 'test/doc.txt',
-        size: 1024,
-      }],
-    });
-    this.updateUploadProgress({
-      oneprovider,
-      uploadId: 2,
-      path: 'test/doc.txt',
-      bytesUploaded: 400,
-    });
+        bytesUploaded: 700,
+      });
+      // this.addNewUpload({
+      //   oneprovider,
+      //   uploadId: 2,
+      //   files: [{
+      //     path: 'test/doc.txt',
+      //     size: 1024,
+      //   }],
+      // });
+      // this.updateUploadProgress({
+      //   oneprovider,
+      //   uploadId: 2,
+      //   path: 'test/doc.txt',
+      //   bytesUploaded: 400,
+      // });
+    }, 2000);
+    // const oneprovider = { entityId: 'prov1' };
+    
   },
 
   /**
@@ -54,16 +78,18 @@ export default Service.extend({
    */
   cancelUpload(uploadObject) {
     const uploadRootObjects = this.get('uploadRootObjects');
+    let uploadObjectRoot;
     if (get(uploadObject, 'objectType') === 'root') {
+      uploadObjectRoot = uploadObject;
       uploadRootObjects.removeObject(uploadObject);
     } else {
+      uploadObjectRoot = get(uploadObject, 'root');
       uploadObject.cancel();
-      const uploadObjectRoot = get(uploadObject, 'root');
       if (get(uploadObjectRoot, 'children.length') === 0) {
         uploadRootObjects.removeObject(uploadObjectRoot);
       }
     }
-    this.updateDataForOneproviders();
+    this.updateDataForOneprovider(get(uploadObjectRoot, 'oneprovider'));
   },
 
   /**
@@ -96,35 +122,39 @@ export default Service.extend({
   }) {
     const uploadObject = this.findUploadObject(oneprovider, uploadId, path);
     if (uploadObject) {
-      setProperties(uploadObject, {
-        bytesUploaded,
-        error,
-      });
+      if (bytesUploaded !== undefined) {
+        set(uploadObject, 'bytesUploaded', bytesUploaded);
+      }
+      if (error !== undefined) {
+        set(uploadObject, 'error', error);
+      }
     }
   },
 
   /**
+   * @param {Models.Provider} oneprovider
    * @returns {undefined}
    */
-  updateDataForOneproviders() {
-    const uploadRootObjects = this.get('uploadRootObjects');
-    const dataForOneproviders = {};
-    uploadRootObjects.forEach(uploadRootObject => {
-      const {
-        oneprovider,
-        uploadId,
-      } = getProperties(uploadRootObject, 'oneprovider', 'uploadId');
-      const oneproviderId = get(oneprovider, 'entityId');
-      const oneproviderData = get(dataForOneproviders, oneproviderId) || {};
-      set(dataForOneproviders, oneproviderId, oneproviderData);
+  updateDataForOneprovider(oneprovider) {
+    const embeddedIframe = this.getEmbeddedIframe(oneprovider);
+    if (embeddedIframe) {
+      const uploadRootObjects = this.get('uploadRootObjects');
 
-      oneproviderData[uploadId] = {
-        files: uploadRootObject
-          .getAllNestedFiles()
-          .map(uploadObject => ({ path: get(uploadObject, 'objectPath') })),
-      };
-    });
-    this.set('dataForOneproviders', dataForOneproviders);
+      const oneproviderData = {};
+      uploadRootObjects
+        .filterBy('oneprovider', oneprovider)
+        .forEach(uploadRootObject => {
+          const uploadId = get(uploadRootObject, 'uploadId');
+          oneproviderData[uploadId] = {
+            files: uploadRootObject
+              .getAllNestedFiles()
+              .map(uploadObject => ({ path: get(uploadObject, 'objectPath') })),
+          };
+        });
+        
+      embeddedIframe.setSharedProperty('uploadingFiles', oneproviderData);
+      this.setOwnershipOfEmbeddedIframe(oneprovider);
+    }
   },
 
   /**
@@ -142,7 +172,7 @@ export default Service.extend({
       uploadId,
     });
     this.get('uploadRootObjects').addObject(root);
-    this.updateDataForOneproviders();
+    this.updateDataForOneprovider(oneprovider);
   },
 
   createTreeSchemaFromFileList(files) {
@@ -209,5 +239,35 @@ export default Service.extend({
     }
 
     return uploadObject;
+  },
+
+  getEmbeddedIframe(oneprovider) {
+    return this.get('embeddedIframeManager.embeddedIframes')
+      .find(embIframe =>
+        get(embIframe, 'iframeType') === 'oneprovider' &&
+        get(embIframe, 'relatedData') === oneprovider
+      );
+  },
+
+  setOwnershipOfEmbeddedIframe(oneprovider) {
+    const embeddedIframe = this.getEmbeddedIframe(oneprovider);
+    if (embeddedIframe) {
+      const uploadRootObjects = this.get('uploadRootObjects');
+      const oneproviderHasUpload = uploadRootObjects
+        .filterBy('oneprovider', oneprovider)
+        .isAny('isUploading');
+      
+      const owners = get(embeddedIframe, 'owners');
+      const existingOwnership = owners.findBy('ownerReference', this);
+      if (oneproviderHasUpload) {
+        if (!existingOwnership) {
+          owners.pushObject(EmberObject.create({
+            ownerReference: this,
+          }));
+        }
+      } else {
+        owners.removeObject(existingOwnership);
+      }
+    }
   },
 });
