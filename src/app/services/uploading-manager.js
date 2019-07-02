@@ -36,6 +36,7 @@ export default Service.extend({
 
   init() {
     this._super(...arguments);
+    this.embeddedIframesObserver();
     setTimeout(() => {
       const oneprovider = this.get('embeddedIframeManager.embeddedIframes.firstObject.relatedData');
       const uploadId = 1;
