@@ -40,6 +40,8 @@ module.exports = function (environment) {
       {
         id: 'uploads',
         icon: 'browser-upload',
+        sticky: true,
+        visibilityCondition: 'uploadingManager.hasUploads',
       },
     ],
     'layoutConfig': {

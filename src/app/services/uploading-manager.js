@@ -1,5 +1,6 @@
 import Service, { inject as service } from '@ember/service';
 import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
+import { gt } from '@ember/object/computed';
 import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
 import { A } from '@ember/array';
 
@@ -25,6 +26,8 @@ export default Service.extend({
   uploadingProviders: computed(function uploadingProviders() {
     return A();
   }),
+
+  hasUploads: gt('uploadingProviders.length', 0),
 
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
