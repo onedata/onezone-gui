@@ -1,9 +1,10 @@
 import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
+import { conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
+  classNameBindings: ['floatingMode:floating'],
 
   uploadingManager: service(),
 
@@ -13,9 +14,18 @@ export default Component.extend({
   expandedUpload: null,
 
   /**
+   * @type {boolean}
+   */
+  floatingMode: false,
+
+  /**
    * @type {Array<Utils.UploadingObjectState>}
    */
-  uploadObjects: reads('uploadingManager.uploadRootObjects'),
+  uploadObjects: conditional(
+    'floatingMode',
+    'uploadingManager.floatingUploads',
+    'uploadingManager.uploadRootObjects'
+  ),
 
   actions: {
     toggleExpand(uploadObject) {

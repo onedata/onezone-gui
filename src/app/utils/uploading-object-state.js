@@ -1,5 +1,5 @@
 import EmberObject, { computed, get } from '@ember/object';
-import { conditional, equal, sum, lt, not, and, array, raw, writable } from 'ember-awesome-macros';
+import { conditional, equal, sum, array, raw, writable } from 'ember-awesome-macros';
 import _ from 'lodash';
 
 export default EmberObject.extend({
@@ -61,7 +61,10 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<number>|number}
    */
   objectSize: writable(
-    sum(array.mapBy('children', raw('objectSize')))
+    sum(array.mapBy(
+      array.rejectBy('children', raw('isCancelled')),
+      raw('objectSize')
+    ))
   ),
 
   /**
@@ -71,19 +74,34 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<number>|number}
    */
   bytesUploaded: writable(
-    sum(array.mapBy('children', raw('bytesUploaded')))
+    sum(array.mapBy(
+      array.rejectBy('children', raw('isCancelled')),
+      raw('bytesUploaded')
+    ))
   ),
 
   /**
-   * True if object is uploading, false otherwise (e.g. when error occurred or
-   * upload finished successfully).
+   * True if object is cancelled, false otherwise. Should be overridden with
+   * a boolean if objectType is `file`.
+   * @virtual
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isUploading: conditional(
+  isCancelled: writable(conditional(
     equal('objectType', raw('file')),
-    and(not('error'), lt('bytesUploaded', 'objectSize')),
+    raw(false),
+    array.isEvery('children', raw('isCancelled'))
+  )),
+
+  /**
+   * True if object is uploading. Should be overridden with a boolean if
+   * objectType is `file`.
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isUploading: writable(conditional(
+    equal('objectType', raw('file')),
+    raw(true),
     array.isAny('children', raw('isUploading'))
-  ),
+  )),
 
   /**
    * Object name (extracted from object path)
@@ -109,7 +127,7 @@ export default EmberObject.extend({
    */
   numberOfFiles: conditional(
     equal('objectType', raw('file')),
-    raw(1),
+    conditional('isCancelled', raw(0), raw(1)),
     sum(array.mapBy('children', raw('numberOfFiles')))
   ),
 
@@ -134,6 +152,7 @@ export default EmberObject.extend({
   state: computed(
     'objectType',
     'isUploading',
+    'isCancelled',
     'objectSize',
     'bytesUploaded',
     'children.@each.{state}',
@@ -141,12 +160,14 @@ export default EmberObject.extend({
       const {
         objectType,
         isUploading,
+        isCancelled,
         objectSize,
         bytesUploaded,
         children,
       } = this.getProperties(
         'objectType',
         'isUploading',
+        'isCancelled',
         'objectSize',
         'bytesUploaded',
         'children'
@@ -164,6 +185,8 @@ export default EmberObject.extend({
             return 'partiallyUploading';
           }
         }
+      } else if (isCancelled) {
+        return 'cancelled';
       } else if (bytesUploaded < objectSize) {
         return 'failed';
       } else {
@@ -178,11 +201,12 @@ export default EmberObject.extend({
    */
   progress: computed('objectSize', 'bytesUploaded', function progress() {
     const {
+      state,
       objectSize,
       bytesUploaded,
-    } = this.getProperties('objectSize', 'bytesUploaded');
+    } = this.getProperties('state', 'objectSize', 'bytesUploaded');
     if (objectSize === 0 && bytesUploaded === 0) {
-      return 100;
+      return state === 'uploaded' ? 100 : 0;
     } else if (!objectSize || !bytesUploaded ) {
       return 0;
     } else {
@@ -194,14 +218,20 @@ export default EmberObject.extend({
    * @returns {undefined}
    */
   cancel() {
-    const parent = this.get('parent');
-    if (parent) {
-      const parentChildren = get(parent, 'children');
-      parentChildren.removeObject(this);
-      if (!get(parentChildren, 'length') && get(parent, 'type') !== 'root') {
-        // Cancel parent if it does not contain any file
-        parent.cancel();
+    const {
+      objectType,
+      children,
+      state,
+    } = this.getProperties('objectType', 'children', 'state');
+    if (objectType === 'file') {
+      if (state !== 'uploaded') {
+        this.setProperties({
+          isCancelled: true,
+          isUploading: false,
+        });
       }
+    } else {
+      children.invoke('cancel');
     }
   },
 

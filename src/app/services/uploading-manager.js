@@ -10,6 +10,10 @@ export default Service.extend({
     return A();
   }),
 
+  floatingUploads: computed(function floatingUploads() {
+    return A();
+  }),
+
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
     function embeddedIframesObserver() {
@@ -54,23 +58,7 @@ export default Service.extend({
         path: 'test/doc.txt',
         bytesUploaded: 700,
       });
-      // this.addNewUpload({
-      //   oneprovider,
-      //   uploadId: 2,
-      //   files: [{
-      //     path: 'test/doc.txt',
-      //     size: 1024,
-      //   }],
-      // });
-      // this.updateUploadProgress({
-      //   oneprovider,
-      //   uploadId: 2,
-      //   path: 'test/doc.txt',
-      //   bytesUploaded: 400,
-      // });
     }, 2000);
-    // const oneprovider = { entityId: 'prov1' };
-    
   },
 
   /**
@@ -78,18 +66,15 @@ export default Service.extend({
    * @returns {undefined}
    */
   cancelUpload(uploadObject) {
-    const uploadRootObjects = this.get('uploadRootObjects');
-    let uploadObjectRoot;
-    if (get(uploadObject, 'objectType') === 'root') {
-      uploadObjectRoot = uploadObject;
-      uploadRootObjects.removeObject(uploadObject);
-    } else {
-      uploadObjectRoot = get(uploadObject, 'root');
-      uploadObject.cancel();
-      if (get(uploadObjectRoot, 'children.length') === 0) {
-        uploadRootObjects.removeObject(uploadObjectRoot);
-      }
+    const floatingUploads = this.get('floatingUploads');
+    const uploadObjectRoot = get(uploadObject, 'objectType') === 'root' ?
+      uploadObject : get(uploadObject, 'root');
+    
+    uploadObject.cancel();
+    if (get(uploadObjectRoot, 'isCancelled')) {
+      floatingUploads.removeObject(uploadObjectRoot);
     }
+
     this.updateDataForOneprovider(get(uploadObjectRoot, 'oneprovider'));
   },
 
@@ -111,7 +96,9 @@ export default Service.extend({
    * @param {Models.Provider} updateData.oneprovider
    * @param {number} updateData.uploadId
    * @param {string} updateData.path
+   * @param {number} updateData.bytesUploaded
    * @param {boolean} updateData.error
+   * @param {boolean} updateData.success
    * @returns {Utils.UploadingObjectState|null}
    */
   updateUploadProgress({
@@ -120,6 +107,7 @@ export default Service.extend({
     path,
     bytesUploaded,
     error,
+    success,
   }) {
     const uploadObject = this.findUploadObject(oneprovider, uploadId, path);
     if (uploadObject) {
@@ -127,7 +115,18 @@ export default Service.extend({
         set(uploadObject, 'bytesUploaded', bytesUploaded);
       }
       if (error !== undefined) {
-        set(uploadObject, 'error', error);
+        setProperties(uploadObject, {
+          error,
+          isUploading: false,
+        });
+      }
+      if (success === true) {
+        setProperties(uploadObject, {
+          success,
+          error: undefined,
+          isCancelled: false,
+          isUploading: false,
+        });
       }
     }
   },
@@ -144,11 +143,13 @@ export default Service.extend({
       const oneproviderData = {};
       uploadRootObjects
         .filterBy('oneprovider', oneprovider)
+        .rejectBy('isCancelled')
         .forEach(uploadRootObject => {
           const uploadId = get(uploadRootObject, 'uploadId');
           oneproviderData[uploadId] = {
             files: uploadRootObject
               .getAllNestedFiles()
+              .rejectBy('isCancelled')
               .map(uploadObject => ({ path: get(uploadObject, 'objectPath') })),
           };
         });
@@ -166,13 +167,19 @@ export default Service.extend({
    * @returns {undefined}
    */
   addNewUpload({ oneprovider, uploadId, files }) {
+    const {
+      uploadRootObjects,
+      floatingUploads,
+    } = this.getProperties('uploadRootObjects', 'floatingUploads');
+
     const rootTreeSchema = this.createTreeSchemaFromFileList(files);
     const root = this.createUploadObjectFromTree(rootTreeSchema);
     setProperties(root, {
       oneprovider,
       uploadId,
     });
-    this.get('uploadRootObjects').addObject(root);
+    uploadRootObjects.addObject(root);
+    floatingUploads.addObject(root);
     this.updateDataForOneprovider(oneprovider);
   },
 

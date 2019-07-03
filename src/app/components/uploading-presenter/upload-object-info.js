@@ -1,7 +1,7 @@
 
 import Component from '@ember/component';
 import { computed, getProperties } from '@ember/object';
-import { equal } from '@ember/object/computed';
+import { equal, and } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -9,7 +9,10 @@ import $ from 'jquery';
 
 export default Component.extend(I18n, {
   classNames: ['up-upload-object-info'],
-  classNameBindings: ['isExpanded:expanded'],
+  classNameBindings: [
+    'isExpanded:expanded',
+    'uploadObject.isCancelled:cancelled',
+  ],
 
   /**
    * @override
@@ -17,39 +20,10 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.uploadingPresenter.uploadObjectInfo',
 
   /**
-   * Object name without path
    * @virtual
-   * @type {string}
+   * @type {Utils.UploadingObjectState}
    */
-  objectName: undefined,
-
-  /**
-   * One of `file`, `directory`
-   * @virtual
-   * @type {string}
-   */
-  objectType: undefined,
-
-  /**
-   * One of `uploading`, `uploaded`, `partiallyUploading`, `failed`
-   * @virtual
-   * @type {string}
-   */
-  status: undefined,
-
-  /**
-   * Size (in bytes) of uploading object
-   * @virtual
-   * @type {number}
-   */
-  objectSize: undefined,
-
-  /**
-   * Always is <= `objectSize`
-   * @virtual
-   * @type {number}
-   */
-  bytesUploaded: undefined,
+  uploadObject: undefined,
 
   /**
    * True if object has expanded list of nested objects
@@ -59,24 +33,10 @@ export default Component.extend(I18n, {
   isObjectExpanded: undefined,
 
   /**
-   * Represents how deep in upload directory tree is this object. 0 means root
-   * @virtual
-   * @type {number}
-   */
-  nestingLevel: 0,
-
-  /**
    * @virtual
    * @type {Object}
    */
   nestingStyle: undefined,
-
-  /**
-   * Object upload progress (in percents 0-100).
-   * @virtual
-   * @type {number}
-   */
-  progress: undefined,
 
   /**
    * Callback called when "Cancel" button is clicked
@@ -98,13 +58,11 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<HtmlSafe>}
    */
   nestingSpaceWidthStyle: computed(
-    'nestingLevel',
+    'uploadObject.nestingLevel',
     'nestingStyle',
     function nestingSpaceWidthStyle() {
-      const {
-        nestingLevel,
-        nestingStyle,
-      } = this.getProperties('nestingLevel', 'nestingStyle');
+      const nestingLevel = this.get('uploadObject.nestingLevel');
+      const nestingStyle = this.get('nestingStyle');
       const {
         px,
         percent,
@@ -119,8 +77,8 @@ export default Component.extend(I18n, {
    * Object icon name according to passed `objectType`.
    * @type {Ember.ComputedProperty<string>}
    */
-  objectIcon: computed('objectType', function objectIcon() {
-    switch (this.get('objectType')) {
+  objectIcon: computed('uploadObject.objectType', function objectIcon() {
+    switch (this.get('uploadObject.objectType')) {
       case 'directory':
         return 'browser-directory';
       case 'file':
@@ -133,17 +91,22 @@ export default Component.extend(I18n, {
    * If true, object upload is allowed to be expanded and list subobjects
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isExpandable: equal('objectType', 'directory'),
+  isExpandable: equal('uploadObject.objectType', 'directory'),
+
+  /**
+   * @type {Ember.ComptedProperty<boolean>}
+   */
+  isCancelledDirectory: and('isExpandable', 'uploadObject.isCancelled'),
 
   /**
    * Class defining color of progress bar (depending on status)
    * @type {Ember.ComputedProperty<string>}
    */
   progressBarContextClass: computed(
-    'status',
+    'uploadObject.status',
     function progressBarContextClass() {
       let cssClass = 'progress-bar-';
-      switch (this.get('status')) {
+      switch (this.get('uploadObject.status')) {
         case 'failed':
           cssClass += 'danger';
           break;
@@ -163,18 +126,20 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<HtmlSafe>}
    */
-  progressBarWidthStyle: computed('progress', function progressBarWidthStyle() {
-    return htmlSafe(`width: ${this.get('progress')}%`);
-  }),
+  progressBarWidthStyle: computed(
+    'uploadObject.progress',
+    function progressBarWidthStyle() {
+      return htmlSafe(`width: ${this.get('uploadObject.progress')}%`);
+    }
+  ),
 
   actions: {
     toggleExpand() {
       const {
         onToggleExpand,
-        objectType,
-      } = this.getProperties('onToggleExpand', 'objectType');
-      if (!$(event.target).closest('.cancel-action').length &&
-        objectType === 'directory') {
+        isExpandable,
+      } = this.getProperties('onToggleExpand', 'isExpandable');
+      if (!$(event.target).closest('.cancel-action').length && isExpandable) {
         onToggleExpand();
       }
     },

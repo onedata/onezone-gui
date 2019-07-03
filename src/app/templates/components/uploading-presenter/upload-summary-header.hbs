@@ -9,8 +9,10 @@
   {{/if}}
 </div>
 <div class="upload-summary-header-icons">
-  {{one-icon
+  {{#one-icon
     class="upload-summary-header-cancel cancel-action"
-    icon="checkbox-x"
+    icon="ban-left"
     click=(action onCancel)}}
+    {{one-tooltip title=(tt this "cancel")}}
+  {{/one-icon}}
 </div>

@@ -53,12 +53,12 @@
 
   .up-upload-object-root-list {
     position: relative;
-    height: 250px;
+    max-height: 33vh;
     border-top: 1px solid $main-border-color;
 
     > .ps-container {
       position: relative;
-      height: 100%;
+      max-height: inherit;
     }
   }
 
@@ -67,6 +67,16 @@
     padding: $padding-base-vertical 1.25 * $padding-large-horizontal 0 1.25 * $padding-large-horizontal;
     border-bottom: 1px solid $main-border-color;
     font-size: 90%;
+
+    &.cancelled {
+      .upload-object-nesting-container {
+        opacity: 0.5;
+      }
+      
+      .cancel-action {
+        color: $color-one-danger;
+      }
+    }
   }
 
   .upload-object-nesting-space {
