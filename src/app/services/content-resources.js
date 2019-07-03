@@ -9,7 +9,7 @@
 
 import { inject as service } from '@ember/service';
 import Service from '@ember/service';
-import { Promise } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 
 export default Service.extend({
   providerManager: service(),
@@ -19,6 +19,7 @@ export default Service.extend({
   groupManager: service(),
   clusterManager: service(),
   harvesterManager: service(),
+  uploadingManager: service(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -42,8 +43,16 @@ export default Service.extend({
         return this.get('groupManager').getRecord(id);
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
+      case 'uploads':
+        if (id === 'all') {
+          return resolve(null);
+        } else {
+          const provider = this.get('uploadingManager.uploadingProviders')
+            .findBy('id', id);
+          return provider ? resolve(provider) : reject();
+        }
       default:
-        return Promise.reject('No such model type: ' + type);
+        return reject('No such model type: ' + type);
     }
   },
 });

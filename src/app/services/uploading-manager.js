@@ -5,12 +5,24 @@ import { A } from '@ember/array';
 
 export default Service.extend({
   embeddedIframeManager: service(),
+  router: service(),
+
+  areFloatingUploadsVisible: computed(
+    'router.currentURL',
+    function areFloatingUploadsVisible() {
+      return !this.get('router').isActive('onedata.sidebar', 'uploads');
+    }
+  ),
 
   uploadRootObjects: computed(function uploadObjects() {
     return A();
   }),
 
   floatingUploads: computed(function floatingUploads() {
+    return A();
+  }),
+
+  uploadingProviders: computed(function uploadingProviders() {
     return A();
   }),
 
@@ -170,7 +182,12 @@ export default Service.extend({
     const {
       uploadRootObjects,
       floatingUploads,
-    } = this.getProperties('uploadRootObjects', 'floatingUploads');
+      uploadingProviders,
+    } = this.getProperties(
+      'uploadRootObjects',
+      'floatingUploads',
+      'uploadingProviders'
+    );
 
     const rootTreeSchema = this.createTreeSchemaFromFileList(files);
     const root = this.createUploadObjectFromTree(rootTreeSchema);
@@ -178,6 +195,7 @@ export default Service.extend({
       oneprovider,
       uploadId,
     });
+    uploadingProviders.addObject(oneprovider);
     uploadRootObjects.addObject(root);
     floatingUploads.addObject(root);
     this.updateDataForOneprovider(oneprovider);

@@ -8,6 +8,7 @@ import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
+import uploads from './tabs/uploads';
 import users from './tabs/users';
 
 import cannotInitWebsocket from './errors/cannot-init-websocket';
@@ -98,6 +99,7 @@ let translations = {
     users,
     clusters,
     harvesters,
+    uploads,
   },
   errors: {
     cannotInitWebsocket,

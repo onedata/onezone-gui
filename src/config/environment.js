@@ -37,6 +37,10 @@ module.exports = function (environment) {
         defaultAspect: 'overview',
         allowIndex: false,
       },
+      {
+        id: 'uploads',
+        icon: 'browser-upload',
+      },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',

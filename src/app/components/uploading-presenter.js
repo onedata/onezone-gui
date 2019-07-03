@@ -1,10 +1,13 @@
 import Component from '@ember/component';
-import { conditional } from 'ember-awesome-macros';
+import { conditional, and, not } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
-  classNameBindings: ['floatingMode:floating'],
+  classNameBindings: [
+    'floatingMode:floating',
+    'isHidden:hidden',
+  ],
 
   uploadingManager: service(),
 
@@ -19,7 +22,15 @@ export default Component.extend({
   floatingMode: false,
 
   /**
-   * @type {Array<Utils.UploadingObjectState>}
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isHidden: and(
+    not('uploadingManager.areFloatingUploadsVisible'),
+    'floatingMode'
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
    */
   uploadObjects: conditional(
     'floatingMode',
