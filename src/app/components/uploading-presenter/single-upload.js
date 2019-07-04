@@ -3,10 +3,11 @@ import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
+import $ from 'jquery';
 
 export default Component.extend({
   classNames: ['up-single-upload'],
-
+  
   uploadingManager: service(),
 
   /**
@@ -14,6 +15,12 @@ export default Component.extend({
    * @type {Array<Utils.UploadingObjectState>}
    */
   uploadObject: undefined,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
+  minimizeTargetSelector: undefined,
 
   /**
    * @virtual
@@ -54,5 +61,33 @@ export default Component.extend({
     cancel(uploadObject) {
       this.get('uploadingManager').cancelUpload(uploadObject);
     },
+    minimize() {
+      const minimizeTargetSelector = this.get('minimizeTargetSelector');
+      if (minimizeTargetSelector) {
+        const target = $(minimizeTargetSelector);
+        if (target) {
+          const {
+            top: targetTop,
+            left: targetLeft,
+          } = target.offset();
+          const {
+            top: uploadTop,
+            left: uploadLeft,
+          } = this.$().offset();
+          const deltaTop = targetTop + target.outerHeight() / 2 - uploadTop - this.$().outerHeight();
+          const deltaLeft = targetLeft + target.outerWidth() / 2 - uploadLeft - this.$().outerWidth() / 2;
+          this.$().css({
+            bottom: -deltaTop,
+            left: deltaLeft,
+            transform: 'scaleX(0)',
+            opacity: 0.2,
+          }).animate({
+            height: 0,
+          }, 350, function () {
+            $(this).css({ display: 'none' });
+          });
+        }
+      }
+    },  
   },
 });

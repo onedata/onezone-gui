@@ -1,12 +1,21 @@
 import Service, { inject as service } from '@ember/service';
 import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
-import { gt } from '@ember/object/computed';
 import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
 import { A } from '@ember/array';
+import { array, gt, raw } from 'ember-awesome-macros';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
-export default Service.extend({
+export default Service.extend(I18n, {
   embeddedIframeManager: service(),
   router: service(),
+  i18n: service(),
+  providerManager: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'services.uploadingManager',
 
   areFloatingUploadsVisible: computed(
     'router.currentURL',
@@ -23,11 +32,30 @@ export default Service.extend({
     return A();
   }),
 
-  uploadingProviders: computed(function uploadingProviders() {
+  uploadingOneproviders: array.uniq(array.mapBy('uploadRootObjects', raw('oneprovider'))),
+
+  /**
+   * @type {Ember.ComputedProperty<EmberObject>}
+   */
+  allProvidersProviderAbstraction: computed(
+    function allProvidersProviderAbstraction() {
+      return EmberObject.create({
+        id: gri({
+          entityType: 'provider',
+          entityId: 'all',
+        }),
+        entityId: 'all',
+        isAllOneproviders: true,
+        name: this.t('allOneproviders'),
+      });
+    }
+  ),
+
+  sidebarOneproviders: computed(function sidebarOneproviders() {
     return A();
   }),
 
-  hasUploads: gt('uploadingProviders.length', 0),
+  hasUploads: gt('uploadingOneproviders.length', raw(0)),
 
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
@@ -53,27 +81,50 @@ export default Service.extend({
     }
   ),
 
+  uploadingOneprovidersObserver: observer(
+    'uploadingOneproviders.[]',
+    function uploadingOneprovidersObserver() {
+      const {
+        uploadingOneproviders,
+        allProvidersProviderAbstraction,
+        sidebarOneproviders,
+      } = this.getProperties(
+        'uploadingOneproviders',
+        'allProvidersProviderAbstraction',
+        'sidebarOneproviders'
+      );
+      sidebarOneproviders.clear();
+      if (get(uploadingOneproviders, 'length')) {
+        sidebarOneproviders.pushObject(allProvidersProviderAbstraction);
+        sidebarOneproviders.pushObjects(uploadingOneproviders);
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
     this.embeddedIframesObserver();
-    setTimeout(() => {
-      const oneprovider = this.get('embeddedIframeManager.embeddedIframes.firstObject.relatedData');
-      const uploadId = 1;
-      this.addNewUpload({
-        oneprovider,
-        uploadId,
-        files: [{
+    this.uploadingOneprovidersObserver();
+    this.get('providerManager').getProviders().then(l => l.get('list')).then(list => list.objectAt(0)).then(oneprovider => {
+      // setTimeout(() => {
+        const uploadId = 1;
+        this.addNewUpload({
+          oneprovider,
+          uploadId,
+          files: [{
+            path: 'test/doc.txt',
+            size: 1024,
+          }],
+        });
+        this.updateUploadProgress({
+          oneprovider,
+          uploadId,
           path: 'test/doc.txt',
-          size: 1024,
-        }],
-      });
-      this.updateUploadProgress({
-        oneprovider,
-        uploadId,
-        path: 'test/doc.txt',
-        bytesUploaded: 700,
-      });
-    }, 2000);
+          bytesUploaded: 700,
+        });
+      // }, 2000);
+    });
+    
   },
 
   /**
@@ -185,11 +236,9 @@ export default Service.extend({
     const {
       uploadRootObjects,
       floatingUploads,
-      uploadingProviders,
     } = this.getProperties(
       'uploadRootObjects',
       'floatingUploads',
-      'uploadingProviders'
     );
 
     const rootTreeSchema = this.createTreeSchemaFromFileList(files);
@@ -198,7 +247,6 @@ export default Service.extend({
       oneprovider,
       uploadId,
     });
-    uploadingProviders.addObject(oneprovider);
     uploadRootObjects.addObject(root);
     floatingUploads.addObject(root);
     this.updateDataForOneprovider(oneprovider);

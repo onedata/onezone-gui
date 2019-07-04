@@ -97,7 +97,7 @@ export default Component.extend({
       }
     },
     childrenExpanded(child, expandedLevels) {
-      this.get('childrenLevelsExpanded')[get(child, 'path')] = expandedLevels;
+      this.get('childrenLevelsExpanded')[get(child, 'objectPath')] = expandedLevels;
       this.childrenLevelsExpandedChanged();
     },
   },

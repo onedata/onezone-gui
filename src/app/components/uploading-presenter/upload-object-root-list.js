@@ -55,7 +55,8 @@ export default Component.extend({
 
   actions: {
     childrenExpanded(child, expandedLevels) {
-      this.get('childrenLevelsExpanded')[get(child, 'path')] = expandedLevels;
+      this.get('childrenLevelsExpanded')[get(child, 'objectPath')] =
+        expandedLevels;
       scheduleOnce('afterRender', this, 'recalculateMaxExpandedLevel');
     },
   },

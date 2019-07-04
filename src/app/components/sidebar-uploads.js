@@ -28,6 +28,11 @@ export default TwoLevelSidebar.extend({
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-uploads/upload-item',
+
+  /**
+   * @override
+   */
   sidebarType: 'uploads',
 
   /**

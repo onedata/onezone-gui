@@ -1,6 +1,8 @@
 import Component from '@ember/component';
-import { conditional, and, not } from 'ember-awesome-macros';
+import { computed } from '@ember/object';
+import { conditional, and, not, array, raw } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
+import { A } from '@ember/array';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
@@ -12,14 +14,30 @@ export default Component.extend({
   uploadingManager: service(),
 
   /**
-   * @type {Utils.UploadingObjectState|null}
+   * @virtual
+   * @type {Models.Provider}
    */
-  expandedUpload: null,
+  oneprovider: undefined,
 
   /**
+   * @virtual
    * @type {boolean}
    */
   floatingMode: false,
+
+  /**
+   * @virtual
+   * @type {string}
+   * Used only if `floatingMode` is true.
+   */
+  minimizeTargetSelector: undefined,
+
+  /**
+   * @type {Ember.ComputedProperty<Utils.UploadingObjectState>}
+   */
+  expandedUploads: computed(function expandedUploads() {
+    return A();
+  }),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -38,13 +56,30 @@ export default Component.extend({
     'uploadingManager.uploadRootObjects'
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
+   */
+  filteredUploadObjects: conditional(
+    'oneprovider',
+    array.filterBy('uploadObjects', raw('oneprovider'), 'oneprovider'),
+    'uploadObjects'
+  ),
+
   actions: {
     toggleExpand(uploadObject) {
-      const expandedUpload = this.get('expandedUpload');
-      if (expandedUpload === uploadObject) {
-        this.set('expandedUpload', null);
+      const {
+        expandedUploads,
+        floatingMode,
+      } = this.getProperties('expandedUploads', 'floatingMode');
+
+      const isExpanded = expandedUploads.includes(uploadObject);
+      if (isExpanded) {
+        expandedUploads.removeObject(uploadObject);
       } else {
-        this.set('expandedUpload', uploadObject);
+        if (floatingMode) {
+          expandedUploads.clear();
+        }
+        expandedUploads.addObject(uploadObject);
       }
     },
   },

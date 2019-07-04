@@ -89,6 +89,7 @@ import clientTokenManager from './services/client-token-manager';
 import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
+import uploadingManager from './services/uploading-manager';
 
 let translations = {
   tabs: {
@@ -183,6 +184,7 @@ let translations = {
     harvesterActions,
     userActions,
     guiUtils,
+    uploadingManager,
   },
 };
 

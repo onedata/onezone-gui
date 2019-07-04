@@ -1,6 +1,7 @@
-{{#each uploadObjects as |uploadObject|}}
+{{#each filteredUploadObjects as |uploadObject|}}
   {{uploading-presenter/single-upload
     uploadObject=uploadObject
-    isExpanded=(eq expandedUpload uploadObject)
+    minimizeTargetSelector=minimizeTargetSelector
+    isExpanded=(contains uploadObject expandedUploads)
     onToggleExpand=(action "toggleExpand" uploadObject)}}
 {{/each}}

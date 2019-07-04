@@ -47,7 +47,7 @@ export default SidebarResources.extend({
         return this.get('harvesterManager').getHarvesters();
       case 'uploads':
         return resolve({
-          list: this.get('uploadingManager.uploadingProviders'),
+          list: this.get('uploadingManager.sidebarOneproviders'),
         });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
@@ -77,6 +77,17 @@ export default SidebarResources.extend({
         return this.get('harvesterActions.buttons');
       default:
         return [];
+    }
+  },
+
+  /**
+   * @override
+   */
+  getItemsSortingFor(resourceType) {
+    if (resourceType === 'uploads') {
+      return ['isAllOneproviders:desc', 'name'];
+    } else {
+      return this._super(...arguments);
     }
   },
 });

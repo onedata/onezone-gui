@@ -43,14 +43,11 @@ export default Service.extend({
         return this.get('groupManager').getRecord(id);
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
-      case 'uploads':
-        if (id === 'all') {
-          return resolve(null);
-        } else {
-          const provider = this.get('uploadingManager.uploadingProviders')
-            .findBy('id', id);
-          return provider ? resolve(provider) : reject();
-        }
+      case 'uploads': {
+        const oneprovider = this.get('uploadingManager.sidebarOneproviders')
+          .findBy('id', id);
+        return oneprovider ? resolve(oneprovider) : reject();
+      }
       default:
         return reject('No such model type: ' + type);
     }

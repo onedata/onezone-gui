@@ -1,12 +1,25 @@
 .uploading-presenter {
-  position: fixed;
-  right: $padding-small-vertical;
-  bottom: $padding-small-vertical;
-  width: 400px;
   font-family: Open Sans Semibold;
 
+  &.floating {
+    position: fixed;
+    right: $padding-small-vertical;
+    bottom: $padding-small-vertical;
+    width: 400px;
+    z-index: 1002;
+    .upload-summary-header-minimize {
+      display: inline;
+    }
+  }
+
   .up-single-upload {
+    position: relative;
+    bottom: 0;
+    left: 0;
     margin-bottom: $padding-small-vertical;
+    opacity: 1;
+    transform: scaleX(1);
+    transition: bottom .3s linear, left .3s linear, transform .35s ease-in, opacity .35s ease-in; 
     background-color: $color-one-white;
     border: 1px solid $main-border-color;
     &:last-child {
@@ -20,6 +33,12 @@
     align-items: center;
     height: 70px;
     padding: 0 1.25 * $padding-large-horizontal;
+
+    &.cancelled {
+      .cancel-action {
+        color: $color-one-danger;
+      }
+    }
   }
 
   .upload-summary-header-progress-bar {
@@ -43,8 +62,21 @@
     text-transform: uppercase;
   }
   
-  .upload-summary-header-cancel {
+  .upload-summary-header-icons {
     font-size: 1.7em;
+    .one-icon {
+      vertical-align: middle;
+    }
+  }
+
+  .upload-summary-header-minimize {
+    display: none;
+    color: $color-one-light-gray;
+    font-weight: bold;
+
+    &:hover {
+      color: $main-text-color;
+    }
   }
 
   .upload-summary-header-text, .upload-summary-header-icons {
@@ -55,10 +87,16 @@
     position: relative;
     max-height: 33vh;
     border-top: 1px solid $main-border-color;
+    overflow: hidden;
 
     > .ps-container {
       position: relative;
       max-height: inherit;
+      margin-bottom: -1px;
+
+      > .up-upload-object:last-child {
+        margin-bottom: -1px;
+      }
     }
   }
 

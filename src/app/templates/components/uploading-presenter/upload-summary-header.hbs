@@ -1,18 +1,20 @@
 <div class="progress upload-summary-header-progress-bar">
   <div class="progress-bar" role="progressbar" style={{progressBarWidthStyle}}></div>
 </div>
-<div class="upload-summary-header-text">
-  {{#if (eq numberOfFiles 1)}}
-    {{tt this "uploading1File"}}
-  {{else}}
-    {{tt this "uploadingNFiles" numberOfFiles=(or numberOfFiles 0)}}
-  {{/if}}
-</div>
+<div class="upload-summary-header-text">{{headerText}}</div>
 <div class="upload-summary-header-icons">
+  {{#if onMinimize}}
+    {{#one-icon
+      class="upload-summary-header-minimize"
+      icon="move-down"
+      click=(action onMinimize)}}
+      {{one-tooltip title=(tt this "sendToBackground")}}
+    {{/one-icon}}
+  {{/if}}
   {{#one-icon
     class="upload-summary-header-cancel cancel-action"
     icon="ban-left"
     click=(action onCancel)}}
-    {{one-tooltip title=(tt this "cancel")}}
+    {{one-tooltip title=(tt this (if uploadObject.isCancelled "cancelled" "cancel"))}}
   {{/one-icon}}
 </div>
