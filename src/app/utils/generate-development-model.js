@@ -343,12 +343,12 @@ function generateProviderClusterRecord(index) {
   const providerId = getProviderId(index);
   const providerClusterGri = clusterInstanceGri(providerId);
   const providerRecordId = getProviderRecordId(index);
-  return Object.assign({}, providerClusterDefaultData, {
+  return Object.assign({
     id: providerClusterGri,
     gri: providerClusterGri,
     name: PROVIDER_NAMES[index],
     provider: providerRecordId,
-  });
+  }, providerClusterDefaultData);
 }
 
 function createSpacesRecords(store) {
