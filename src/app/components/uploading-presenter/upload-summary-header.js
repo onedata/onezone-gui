@@ -21,6 +21,12 @@ export default Component.extend(I18n, {
   uploadObject: undefined,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isMinimized: false,
+
+  /**
    * Callback called when "Cancel" button is clicked
    * @virtual
    * @type {Function}
@@ -34,7 +40,7 @@ export default Component.extend(I18n, {
    * @type {Function}
    * @returns {undefined}
    */
-  onMinimize: notImplementedIgnore,
+  onToggleMinimize: notImplementedIgnore,
 
   /**
    * Callback called when user clicks on expand/collapse

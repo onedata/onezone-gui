@@ -7,9 +7,6 @@
     bottom: $padding-small-vertical;
     width: 400px;
     z-index: 1002;
-    .upload-summary-header-minimize {
-      display: inline;
-    }
   }
 
   .up-single-upload {
@@ -69,13 +66,19 @@
     }
   }
 
-  .upload-summary-header-minimize {
-    display: none;
+  .upload-summary-header-toggle-minimize {
+    display: inline-block;
+    transform: rotate(45deg);
     color: $color-one-light-gray;
     font-weight: bold;
+    transition: transform .2s ease;
 
     &:hover {
       color: $main-text-color;
+    }
+
+    &.minimized {
+      transform: rotate(225deg);
     }
   }
 

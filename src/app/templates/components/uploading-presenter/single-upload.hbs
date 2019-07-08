@@ -2,7 +2,8 @@
   uploadObject=uploadObject
   onToggleExpand=(action "toggleExpand")
   onCancel=(action "cancel" uploadObject)
-  onMinimize=(action "minimize")}}
+  onToggleMinimize=(action "toggleMinimize")
+  isMinimized=isMinimized}}
 {{#render-later triggerRender=triggerChildrenRender}}
   {{#bs-collapse collapsed=(not isExpanded)}}
     {{uploading-presenter/upload-object-root-list

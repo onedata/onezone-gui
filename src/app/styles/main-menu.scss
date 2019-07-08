@@ -1,0 +1,27 @@
+.main-menu-column {
+  $uploading-progress-bar-horiz-padding: $padding-xs-horizontal;
+
+  .main-menu-uploads-item {
+    position: relative;
+
+    .global-upload-progress-bar {
+      position: absolute;
+      bottom: $padding-small-vertical;
+      left: $uploading-progress-bar-horiz-padding;
+      display: block;
+      height: 5px;
+      width: calc(100% - #{2 * $uploading-progress-bar-horiz-padding});
+      margin: 0;
+      transition: width $collapse-transition-time linear;
+    }
+  }
+  &.collapsed {
+    .main-menu-uploads-item .global-upload-progress-bar {
+      width: $main-menu-collapsed-width - 2 * $uploading-progress-bar-horiz-padding;
+    }
+  }
+}
+
+.main-menu-uploads-item .global-upload-progress-bar {
+  display: none;
+}

@@ -42,6 +42,7 @@ module.exports = function (environment) {
         icon: 'browser-upload',
         sticky: true,
         visibilityCondition: 'uploadingManager.hasUploads',
+        component: 'main-menu/uploads-item',
       },
     ],
     'layoutConfig': {

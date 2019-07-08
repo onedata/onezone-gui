@@ -2,13 +2,10 @@ import Component from '@ember/component';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { inject as service } from '@ember/service';
 import $ from 'jquery';
 
 export default Component.extend({
   classNames: ['up-single-upload'],
-  
-  uploadingManager: service(),
 
   /**
    * @virtual
@@ -29,12 +26,35 @@ export default Component.extend({
   isExpanded: false,
 
   /**
+   * @virtual
+   * @type {boolean}
+   */
+  isMinimized: false,
+
+  /**
    * Callback called when user clicks on expand/collapse
    * @virtual
    * @type {Function}
    * @returns {undefined}
    */
   onToggleExpand: notImplementedIgnore,
+
+  /**
+   * Callback called when user clicks on 'send to background'/'make floating'
+   * @virtual
+   * @type {Function}
+   * @returns {undefined}
+   */
+  onToggleMinimize: notImplementedIgnore,
+
+  /**
+   * Callback called when user clicks cancel on file/directory upload
+   * @virtual
+   * @type {Function}
+   * @param {Utils.UploadingObjectState}
+   * @returns {undefined}
+   */
+  onCancel: notImplementedIgnore,
 
   /**
    * Property used to trigger files rendering when necessary
@@ -59,11 +79,20 @@ export default Component.extend({
       }
     },
     cancel(uploadObject) {
-      this.get('uploadingManager').cancelUpload(uploadObject);
+      this.get('onCancel')(uploadObject);
     },
-    minimize() {
-      const minimizeTargetSelector = this.get('minimizeTargetSelector');
-      if (minimizeTargetSelector) {
+    toggleMinimize() {
+      const {
+        minimizeTargetSelector,
+        isMinimized,
+        onToggleMinimize,
+      } = this.getProperties(
+        'minimizeTargetSelector',
+        'isMinimized',
+        'onToggleMinimize'
+      );
+      const that = this;
+      if (!isMinimized && minimizeTargetSelector) {
         const target = $(minimizeTargetSelector);
         if (target) {
           const {
@@ -85,8 +114,11 @@ export default Component.extend({
             height: 0,
           }, 350, function () {
             $(this).css({ display: 'none' });
+            safeExec(that, 'onToggleMinimize');
           });
         }
+      } else {
+        onToggleMinimize();
       }
     },  
   },

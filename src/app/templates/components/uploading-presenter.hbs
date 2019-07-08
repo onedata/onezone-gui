@@ -1,7 +1,10 @@
 {{#each filteredUploadObjects as |uploadObject|}}
   {{uploading-presenter/single-upload
     uploadObject=uploadObject
+    isMinimized=(not (contains uploadObject uploadingManager.floatingUploads))
     minimizeTargetSelector=minimizeTargetSelector
+    onCancel=(action "cancel")
     isExpanded=(contains uploadObject expandedUploads)
-    onToggleExpand=(action "toggleExpand" uploadObject)}}
+    onToggleExpand=(action "toggleExpand" uploadObject)
+    onToggleMinimize=(action "toggleMinimize" uploadObject)}}
 {{/each}}

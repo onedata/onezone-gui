@@ -7,6 +7,7 @@ export default {
     cancel: 'Cancel',
     cancelled: 'Cancelled',
     sendToBackground: 'Send to background',
+    sendToForeground: 'Make floating',
   },
   uploadObjectInfo: {
     progressOf: 'of',

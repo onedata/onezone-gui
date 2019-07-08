@@ -3,14 +3,12 @@
 </div>
 <div class="upload-summary-header-text">{{headerText}}</div>
 <div class="upload-summary-header-icons">
-  {{#if onMinimize}}
-    {{#one-icon
-      class="upload-summary-header-minimize"
-      icon="move-down"
-      click=(action onMinimize)}}
-      {{one-tooltip title=(tt this "sendToBackground")}}
-    {{/one-icon}}
-  {{/if}}
+  {{#one-icon
+    class=(concat-classes "upload-summary-header-toggle-minimize" (if isMinimized "minimized"))
+    icon="move-down"
+    click=(action onToggleMinimize)}}
+    {{one-tooltip title=(tt this (if isMinimized "sendToForeground" "sendToBackground"))}}
+  {{/one-icon}}
   {{#one-icon
     class="upload-summary-header-cancel cancel-action"
     icon="ban-left"

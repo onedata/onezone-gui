@@ -5,6 +5,7 @@ import { A } from '@ember/array';
 import { array, gt, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import _ from 'lodash';
 
 export default Service.extend(I18n, {
   embeddedIframeManager: service(),
@@ -56,6 +57,30 @@ export default Service.extend(I18n, {
   }),
 
   hasUploads: gt('uploadingOneproviders.length', raw(0)),
+
+  /**
+   * @type {Ember.ComputedProperty<number|undefined>}
+   */
+  globalProgress: computed(
+    'uploadRootObjects.@each.{progress,objectSize}',
+    function globalProgress() {
+      const uploadRootObjects = this.get('uploadRootObjects');
+      const activeUploads = uploadRootObjects.filterBy('isUploading');
+      if (get(activeUploads, 'length') === 0) {
+        return undefined;
+      } else {
+        const totalBytes = _.sum(activeUploads.mapBy('objectSize'));
+        const totalUploadedBytes = _.sum(activeUploads.mapBy('bytesUploaded'));
+        if (totalBytes === 0 && totalUploadedBytes === 0) {
+          return activeUploads.isEvert('state', 'uploaded') ? 100 : 0;
+        } else if (!totalBytes || !totalUploadedBytes ) {
+          return 0;
+        } else {
+          return Math.floor((totalUploadedBytes / totalBytes) * 100);
+        }
+      }
+    }
+  ),
 
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',

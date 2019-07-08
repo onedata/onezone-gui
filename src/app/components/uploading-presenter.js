@@ -82,5 +82,16 @@ export default Component.extend({
         expandedUploads.addObject(uploadObject);
       }
     },
+    toggleMinimize(uploadObject) {
+      const floatingUploads = this.get('uploadingManager.floatingUploads');
+      if (floatingUploads.includes(uploadObject)) {
+        floatingUploads.removeObject(uploadObject);
+      } else {
+        floatingUploads.addObject(uploadObject);
+      }
+    },
+    cancel(uploadObject) {
+      this.get('uploadingManager').cancelUpload(uploadObject);
+    },
   },
 });

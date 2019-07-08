@@ -2,15 +2,12 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import _ from 'lodash';
 
 export default Component.extend({
   classNames: ['up-upload-object'],
   classNameBindings: ['isExpanded:expanded'],
-
-  uploadingManager: service(),
 
   /**
    * @virtual
