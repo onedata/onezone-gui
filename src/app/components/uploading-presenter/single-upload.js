@@ -63,6 +63,12 @@ export default Component.extend({
    */
   triggerChildrenRender: false,
 
+  didInsertElement() {
+    this._super(...arguments);
+
+    this.send('toggleExpand');
+  },
+
   actions: {
     toggleExpand() {
       const {
