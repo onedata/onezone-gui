@@ -18,6 +18,11 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.uploadingManager',
 
+  /**
+   * @type {Window}
+   */
+  _window: window,
+
   areFloatingUploadsVisible: computed(
     'router.currentURL',
     function areFloatingUploadsVisible() {
@@ -59,21 +64,28 @@ export default Service.extend(I18n, {
   hasUploads: gt('uploadingOneproviders.length', raw(0)),
 
   /**
+   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
+   */
+  activeUploads: array.filterBy('uploadRootObjects', raw('isUploading')),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  hasActiveUploads: gt('activeUploads.length', raw(0)),
+
+  /**
    * @type {Ember.ComputedProperty<number|undefined>}
    */
   globalProgress: computed(
-    'uploadRootObjects.@each.{progress,objectSize}',
+    'activeUploads.@each.{progress,objectSize}',
     function globalProgress() {
-      const uploadRootObjects = this.get('uploadRootObjects');
-      const activeUploads = uploadRootObjects.filterBy('isUploading');
+      const activeUploads = this.get('activeUploads');
       if (get(activeUploads, 'length') === 0) {
         return undefined;
       } else {
         const totalBytes = _.sum(activeUploads.mapBy('objectSize'));
         const totalUploadedBytes = _.sum(activeUploads.mapBy('bytesUploaded'));
-        if (totalBytes === 0 && totalUploadedBytes === 0) {
-          return activeUploads.isEvert('state', 'uploaded') ? 100 : 0;
-        } else if (!totalBytes || !totalUploadedBytes ) {
+        if (!totalBytes || !totalUploadedBytes) {
           return 0;
         } else {
           return Math.floor((totalUploadedBytes / totalBytes) * 100);
@@ -81,6 +93,13 @@ export default Service.extend(I18n, {
       }
     }
   ),
+
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   */
+  pageUnloadHandler: computed(function pageUnloadHandler() {
+    return (event) => this.onPageUnload(event);
+  }),
 
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
@@ -130,6 +149,7 @@ export default Service.extend(I18n, {
     this._super(...arguments);
     this.embeddedIframesObserver();
     this.uploadingOneprovidersObserver();
+    this.attachPageUnloadHandler();
     this.get('providerManager').getProviders().then(l => l.get('list')).then(list => list.objectAt(0)).then(oneprovider => {
       // setTimeout(() => {
         const uploadId = 1;
@@ -150,6 +170,24 @@ export default Service.extend(I18n, {
       // }, 2000);
     });
     
+  },
+
+  attachPageUnloadHandler() {
+    const {
+      _window,
+      pageUnloadHandler,
+    } = this.getProperties('pageUnloadHandler', '_window');
+    _window.addEventListener('beforeunload', pageUnloadHandler);
+  },
+
+  onPageUnload(event) {
+    if (this.get('hasActiveUploads')) {
+      // Code based on https://stackoverflow.com/a/19538231
+      const confirmationMessage = this.t('confirmPageClose');
+      event.preventDefault();
+      (event || window.event).returnValue = confirmationMessage;
+      return confirmationMessage;  
+    }
   },
 
   /**
