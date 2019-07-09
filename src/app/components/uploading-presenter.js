@@ -1,8 +1,9 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { conditional, and, not, array, raw } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import { A } from '@ember/array';
+import _ from 'lodash';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
@@ -33,7 +34,12 @@ export default Component.extend({
   minimizeTargetSelector: undefined,
 
   /**
-   * @type {Ember.ComputedProperty<Utils.UploadingObjectState>}
+   * @type {Ember.A<Utils.UploadingObjectState>}
+   */
+  orderedUploadObjects: undefined,
+
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
    */
   expandedUploads: computed(function expandedUploads() {
     return A();
@@ -64,6 +70,57 @@ export default Component.extend({
     array.filterBy('uploadObjects', raw('oneprovider'), 'oneprovider'),
     'uploadObjects'
   ),
+
+  uploadObjectsOrderReset: observer(
+    'floatingMode',
+    'oneprovider',
+    function uploadObjectsOrderReset() {
+      const {
+        floatingMode,
+        filteredUploadObjects,
+      } = this.getProperties('floatingMode', 'filteredUploadObjects');
+      if (floatingMode) {
+        this.set('orderedUploadObjects', filteredUploadObjects);
+      } else {
+        const activeUploads = filteredUploadObjects
+          .filterBy('isUploading')
+          .sortBy('startTime')
+          .reverseObjects();
+        const doneUploads = filteredUploadObjects
+          .rejectBy('isUploading')
+          .sortBy('endTime')
+          .reverseObjects();
+        
+        const orderedUploads = activeUploads.concat(doneUploads);
+        this.set('orderedUploadObjects', orderedUploads);
+      }
+    }
+  ),
+
+  uploadObjectsObserver: observer(
+    'filteredUploadObjects.[]',
+    function uploadObjectObserver() {
+      const {
+        filteredUploadObjects,
+        orderedUploadObjects,
+      } = this.getProperties(
+        'filteredUploadObjects',
+        'orderedUploadObjects'
+      );
+
+      _.difference(orderedUploadObjects, filteredUploadObjects)
+        .forEach(upload => orderedUploadObjects.removeObject(upload));
+      _.difference(filteredUploadObjects, orderedUploadObjects)
+        .reverseObjects()
+        .forEach(upload => orderedUploadObjects.unshiftObject(upload));
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+
+    this.uploadObjectsOrderReset();
+  },
 
   actions: {
     toggleExpand(uploadObject) {

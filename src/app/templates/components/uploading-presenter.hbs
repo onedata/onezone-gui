@@ -1,4 +1,4 @@
-{{#each filteredUploadObjects as |uploadObject|}}
+{{#each orderedUploadObjects as |uploadObject|}}
   {{uploading-presenter/single-upload
     uploadObject=uploadObject
     isMinimized=(not (contains uploadObject uploadingManager.floatingUploads))

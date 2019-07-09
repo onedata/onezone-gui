@@ -1,6 +1,7 @@
-import EmberObject, { computed, get } from '@ember/object';
+import EmberObject, { computed, observer, get } from '@ember/object';
 import { conditional, equal, sum, array, raw, writable } from 'ember-awesome-macros';
 import _ from 'lodash';
+import moment from 'moment';
 
 export default EmberObject.extend({
   /**
@@ -53,6 +54,18 @@ export default EmberObject.extend({
    * @type {number}
    */
   uploadId: undefined,
+
+  /**
+   * Start upload timestamp (in ms)
+   * @type {number}
+   */
+  startTime: undefined,
+
+  /**
+   * End upload timestamp (in ms)
+   * @type {number}
+   */
+  endTime: undefined,
 
   /**
    * Object size (in bytes). Should be overridden with a number if objectType
@@ -213,6 +226,22 @@ export default EmberObject.extend({
       return Math.floor((bytesUploaded / objectSize) * 100);
     }
   }),
+
+  isUploadingObserver: observer('isUploading', function isUploadingObserver() {
+    const {
+      isUploading,
+      endTime,
+    } = this.getProperties('isUploading', 'endTime');
+    if (!isUploading && !endTime) {
+      this.set('endTime', moment().valueOf());
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+
+    this.set('startTime', moment().valueOf());
+  },
 
   /**
    * @returns {undefined}
