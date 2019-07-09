@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -99,17 +99,6 @@ export default Component.extend(I18n, {
             numberOfFiles: notCancelledFiles,
           });
         }
-    }
-  }),
-
-  isCancelledObserver: observer('isCancelled', function isCancelledObserver() {
-    const {
-      isMinimized,
-      isCancelled,
-      onToggleMinimize,
-    } = this.getProperties('isMinimized', 'isCancelled', 'onToggleMinimize');
-    if (isCancelled && !isMinimized) {
-      onToggleMinimize();
     }
   }),
 

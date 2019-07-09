@@ -252,6 +252,10 @@ export default Service.extend(I18n, {
           isUploading: false,
         });
       }
+      // In case of many updates in the same time sometimes root upload object
+      // does not react to all changes in children state. We need to refresh
+      // root state manually.
+      get(uploadObject, 'root').notifyPropertyChange('state');
     }
   },
 
