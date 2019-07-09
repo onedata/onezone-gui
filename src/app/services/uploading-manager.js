@@ -195,15 +195,10 @@ export default Service.extend(I18n, {
    * @returns {undefined}
    */
   cancelUpload(uploadObject) {
-    const floatingUploads = this.get('floatingUploads');
+    uploadObject.cancel();
+
     const uploadObjectRoot = get(uploadObject, 'objectType') === 'root' ?
       uploadObject : get(uploadObject, 'root');
-    
-    uploadObject.cancel();
-    if (get(uploadObjectRoot, 'isCancelled')) {
-      floatingUploads.removeObject(uploadObjectRoot);
-    }
-
     this.updateDataForOneprovider(get(uploadObjectRoot, 'oneprovider'));
   },
 
