@@ -121,7 +121,8 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<string>}
    */
   objectName: computed('objectPath', function objectName() {
-    return get(this.get('objectPath').split('/'), 'lastObject');
+    const objectPath = this.get('objectPath');
+    return objectPath ? get(objectPath.split('/'), 'lastObject') : '';
   }),
 
   /**

@@ -2,6 +2,7 @@ import Service, { inject as service } from '@ember/service';
 import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
 import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
 import { A } from '@ember/array';
+import { reads } from '@ember/object/computed';
 import { array, gt, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -91,6 +92,16 @@ export default Service.extend(I18n, {
           return Math.floor((totalUploadedBytes / totalBytes) * 100);
         }
       }
+    }
+  ),
+
+  floatingSummaryRootDirectory: computed(
+    function floatingSummaryRootDirectory() {
+      return UploadingObjectState.create({
+        uploadingManager: this,
+        objectType: 'root',
+        children: reads('uploadingManager.floatingUploads'),
+      });
     }
   ),
 

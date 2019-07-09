@@ -1,12 +1,26 @@
 .uploading-presenter {
   font-family: Open Sans Semibold;
 
+  &.summary-active ~ .app-layout {
+    &, & .brand-info {
+      @media (max-width: $screen-xs-max) {
+        bottom: 56px;
+      }
+    }
+  }
+
   &.floating {
     position: fixed;
     right: $padding-small-vertical;
     bottom: $padding-small-vertical;
     width: 400px;
     z-index: 1002;
+
+    @media (max-width: $screen-xs-max) {
+      width: 100%;
+      right: 0;
+      bottom: 0;
+    }
   }
 
   .up-single-upload {
@@ -19,8 +33,26 @@
     transition: bottom .3s linear, left .3s linear, transform .35s ease-in, opacity .35s ease-in; 
     background-color: $color-one-white;
     border: 1px solid $main-border-color;
+    
     &:last-child {
       margin-bottom: 0;
+    }
+
+    @media (max-width: $screen-xs-max) {
+      margin-left: $mobile-horizontal-content-padding;
+      margin-right: $mobile-horizontal-content-padding;
+    }
+  }
+
+  .floating-summary-directory {
+    @media (max-width: $screen-xs-max) {
+      margin: 0;
+      border-width: 1px 0 0 0;
+    }
+
+    .up-upload-summary-header {
+      height: 55px;
+      padding: 0 $mobile-horizontal-content-padding;
     }
   }
 

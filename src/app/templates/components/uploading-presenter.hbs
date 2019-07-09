@@ -1,11 +1,25 @@
-{{#each orderedUploadObjects as |uploadObject|}}
+{{#if summaryActive}}
   {{uploading-presenter/single-upload
-    uploadObject=uploadObject
-    floatingMode=floatingMode
-    isMinimized=(not (contains uploadObject uploadingManager.floatingUploads))
-    minimizeTargetSelector=minimizeTargetSelector
-    onCancel=(action "cancel")
-    isExpanded=(contains uploadObject expandedUploads)
-    onToggleExpand=(action "toggleExpand" uploadObject)
-    onToggleMinimize=(action "toggleMinimize" uploadObject)}}
-{{/each}}
+    class="hidden-lg hidden-md hidden-sm floating-summary-directory"
+    uploadObject=uploadingManager.floatingSummaryRootDirectory
+    floatingMode=true
+    isMinimized=(not isSummaryDirectoryVisible)
+    onCancel=(action "cancelSummaryDirectory")
+    isExpanded=false
+    minimizeOnSuccess=false
+    onToggleMinimize=(action "hideSummaryDirectory")
+    click=(action "goToUploads")}}
+{{/if}}
+<div class={{if floatingMode "hidden-xs"}}>
+  {{#each orderedUploadObjects as |uploadObject|}}
+    {{uploading-presenter/single-upload
+      uploadObject=uploadObject
+      floatingMode=floatingMode
+      isMinimized=(not (contains uploadObject uploadingManager.floatingUploads))
+      minimizeTargetSelector=minimizeTargetSelector
+      onCancel=(action "cancel")
+      isExpanded=(contains uploadObject expandedUploads)
+      onToggleExpand=(action "toggleExpand" uploadObject)
+      onToggleMinimize=(action "toggleMinimize" uploadObject)}}
+  {{/each}}
+</div>

@@ -31,6 +31,12 @@ export default Component.extend({
    * @virtual
    * @type {boolean}
    */
+  minimizeOnSuccess: true,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
   isMinimized: false,
   
   /**
@@ -90,7 +96,7 @@ export default Component.extend({
     const {
       isMinimized,
       isCancelled,
-    } = this.getProperties('isMinimized', 'isCancelled');
+    } = this.getProperties('isMinimized', 'isCancelled', 'minimizeOnCancel');
     if (isCancelled && !isMinimized) {
       this.send('toggleMinimize');
     }
@@ -101,8 +107,19 @@ export default Component.extend({
       state,
       scheduledMinimalization,
       floatingMode,
-    } = this.getProperties('state', 'scheduledMinimalization', 'floatingMode');
-    if (state === 'uploaded' && scheduledMinimalization === undefined) {
+      minimizeOnSuccess,
+    } = this.getProperties(
+      'state',
+      'scheduledMinimalization',
+      'floatingMode',
+      'uploadObject',
+      'minimizeOnSuccess'
+    );
+    if (
+      state === 'uploaded' &&
+      scheduledMinimalization === undefined &&
+      minimizeOnSuccess
+    ) {
       this.set(
         'scheduledMinimalization',
         later(this, 'send', 'toggleMinimize', true, floatingMode ? 3000 : 0)

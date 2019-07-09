@@ -1,18 +1,22 @@
 import Component from '@ember/component';
-import { computed, observer } from '@ember/object';
+import { computed, observer, get } from '@ember/object';
 import { conditional, and, not, array, raw } from 'ember-awesome-macros';
+import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import { A } from '@ember/array';
 import _ from 'lodash';
+import $ from 'jquery';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
   classNameBindings: [
     'floatingMode:floating',
     'isHidden:hidden',
+    'summaryActive',
   ],
 
   uploadingManager: service(),
+  router: service(),
 
   /**
    * @virtual
@@ -37,6 +41,25 @@ export default Component.extend({
    * @type {Ember.A<Utils.UploadingObjectState>}
    */
   orderedUploadObjects: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isSummaryDirectoryVisible: false,
+
+  /**
+   * @type {Window}
+   */
+  _window: window,
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  summaryActive: and(
+    'floatingMode',
+    'isSummaryDirectoryVisible',
+    not('isHidden')
+  ),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
@@ -79,8 +102,10 @@ export default Component.extend({
         floatingMode,
         filteredUploadObjects,
       } = this.getProperties('floatingMode', 'filteredUploadObjects');
+      let uploads;
       if (floatingMode) {
-        this.set('orderedUploadObjects', filteredUploadObjects);
+        uploads =
+          this.set('orderedUploadObjects', filteredUploadObjects.toArray());
       } else {
         const activeUploads = filteredUploadObjects
           .filterBy('isUploading')
@@ -92,7 +117,10 @@ export default Component.extend({
           .reverseObjects();
         
         const orderedUploads = activeUploads.concat(doneUploads);
-        this.set('orderedUploadObjects', orderedUploads);
+        uploads = this.set('orderedUploadObjects', orderedUploads);
+      }
+      if (get(uploads, 'length')) {
+        this.set('isSummaryDirectoryVisible', true);
       }
     }
   ),
@@ -103,16 +131,36 @@ export default Component.extend({
       const {
         filteredUploadObjects,
         orderedUploadObjects,
+        floatingMode,
       } = this.getProperties(
         'filteredUploadObjects',
-        'orderedUploadObjects'
+        'orderedUploadObjects',
+        'floatingMode'
       );
-
+      
       _.difference(orderedUploadObjects, filteredUploadObjects)
-        .forEach(upload => orderedUploadObjects.removeObject(upload));
-      _.difference(filteredUploadObjects, orderedUploadObjects)
-        .reverseObjects()
-        .forEach(upload => orderedUploadObjects.unshiftObject(upload));
+          .forEach(upload => orderedUploadObjects.removeObject(upload));
+
+      const newUploads =
+        _.difference(filteredUploadObjects, orderedUploadObjects);
+      if (floatingMode) {
+        orderedUploadObjects.addObjects(newUploads);
+      } else {
+        newUploads
+          .reverseObjects()
+          .forEach(upload => orderedUploadObjects.unshiftObject(upload));
+      }
+
+      if (get(newUploads, 'length')) {
+        this.set('isSummaryDirectoryVisible', true);
+      }
+    }
+  ),
+
+  summaryActiveObserver: observer(
+    'summaryActive',
+    function summaryActiveObserver() {
+      next(() => this.get('_window').dispatchEvent(new Event('resize')));
     }
   ),
 
@@ -150,5 +198,18 @@ export default Component.extend({
     cancel(uploadObject) {
       this.get('uploadingManager').cancelUpload(uploadObject);
     },
+    cancelSummaryDirectory() {
+      this.get('uploadingManager.floatingSummaryRootDirectory.children')
+        .forEach(rootObject => this.send('cancel', rootObject));
+    },
+    hideSummaryDirectory() {
+      this.set('isSummaryDirectoryVisible', false);
+    },
+    goToUploads(event) {
+      if (!$(event.target).closest('.upload-summary-header-icons').length) {
+        this.get('router')
+          .transitionTo('onedata.sidebar.content', 'uploads', 'all');
+      }
+    },  
   },
 });
