@@ -42,8 +42,8 @@ module.exports = function (environment) {
       formLabelColumns: 'col-xs-12 col-sm-5',
       formInputColumns: 'col-xs-12 col-sm-7',
       formSubmitColumns: 'col-xs-12 col-sm-7 col-sm-offset-5 text-xs-center',
-      formToggleLabelColumns: 'col-xs-6 col-sm-5',
-      formToggleInputColumns: 'col-xs-6 col-sm-7',
+      formToggleLabelColumns: 'col-xs-9 col-sm-5',
+      formToggleInputColumns: 'col-xs-3 col-sm-7 text-xs-right',
     },
     'ember-simple-auth': {
       authenticationRoute: 'login',
