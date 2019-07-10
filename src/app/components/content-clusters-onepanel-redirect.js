@@ -55,8 +55,9 @@ export default Component.extend({
   }),
 
   checkOnepanelAvailability() {
-    const origin = this.get('cluster.standaloneOrigin');
-    return checkImg(`${origin}/favicon.ico`);
+    return this.get('cluster.standaloneOriginProxy').then(standaloneOrigin => {
+      return checkImg(`${standaloneOrigin}/favicon.ico`);
+    });
   },
 
   redirectToOnepanelApp() {

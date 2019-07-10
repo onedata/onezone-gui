@@ -37,7 +37,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    */
   resourceId: reads('clusterEntityId'),
 
-  standaloneOnepanelUrl: reads('cluster.standaloneOrigin'),
+  standaloneOnepanelUrl: reads('cluster.standaloneOriginProxy.content'),
 
   clusterEntityId: reads('cluster.entityId'),
 
