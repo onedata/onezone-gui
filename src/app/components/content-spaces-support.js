@@ -13,7 +13,6 @@ import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { hash } from 'rsvp';
-import { computed } from '@ember/object';
 
 export default Component.extend(
   UserProxyMixin,
@@ -30,10 +29,6 @@ export default Component.extend(
      * @type {models/Space}
      */
     space: undefined,
-
-    lazyTokensProxy: computed('tokensProxy', function lazyTokensProxy() {
-      return this.getTokensProxy();
-    }),
 
     init() {
       this._super(...arguments);
