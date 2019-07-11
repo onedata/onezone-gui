@@ -126,7 +126,9 @@ export default Model.extend(
      * @override
      */
     fetchStandaloneOrigin() {
-      return this.fetchRemoteGuiContext().then(({ apiOrigin }) => apiOrigin);
+      return this.fetchRemoteGuiContext().then(({ apiOrigin }) =>
+        'https://' + apiOrigin
+      );
     },
 
     _fetchIsOnline() {
