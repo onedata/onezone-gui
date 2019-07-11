@@ -2,10 +2,8 @@
   font-family: Open Sans Semibold;
 
   &.summary-active ~ .app-layout {
-    &, & .brand-info {
-      @media (max-width: $screen-xs-max) {
-        bottom: 56px;
-      }
+    @media (max-width: $screen-xs-max) {
+      bottom: 56px;
     }
   }
 
@@ -45,6 +43,8 @@
   }
 
   .floating-summary-directory {
+    @include before-top-shadow();
+    
     @media (max-width: $screen-xs-max) {
       margin: 0;
       border-width: 1px 0 0 0;

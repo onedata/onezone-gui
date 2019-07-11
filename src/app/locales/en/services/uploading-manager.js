@@ -1,3 +1,3 @@
 export default {
-  allOneproviders: 'All Oneproviders',
+  allUploads: 'All uploads',
 };

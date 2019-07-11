@@ -3,7 +3,9 @@
 </div>
 <div class="upload-summary-header-text">
   <div class="summary-state">{{headerText}}</div>
-  {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
+  {{#if (and uploadObject.space uploadObject.oneprovider)}}
+    {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
+  {{/if}}
 </div>
 <div class="upload-summary-header-icons">
   {{#one-icon

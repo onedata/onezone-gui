@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
-import { conditional, and, not, array, raw } from 'ember-awesome-macros';
+import { conditional, and, not, array, raw, equal } from 'ember-awesome-macros';
 import { next, later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { inject as service } from '@ember/service';
@@ -20,6 +20,7 @@ export default Component.extend({
   ],
 
   uploadingManager: service(),
+  navigationState: service(),
   router: service(),
 
   /**
@@ -72,9 +73,9 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   summaryActive: and(
-    'floatingMode',
     'isSummaryDirectoryVisible',
-    not('isHidden')
+    // not('isHidden'),
+    not(equal('navigationState.activeContentLevel', raw('sidebar')))
   ),
 
   /**

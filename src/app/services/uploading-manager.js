@@ -54,7 +54,7 @@ export default Service.extend(I18n, {
         }),
         entityId: 'all',
         isAllOneproviders: true,
-        name: this.t('allOneproviders'),
+        name: this.t('allUploads'),
       });
     }
   ),

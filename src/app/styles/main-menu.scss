@@ -5,9 +5,17 @@
     > .main-menu-uploads-item {
       position: relative;
       background-color: $color-one-mint;
+      transition: background-color .4s;
+      
+      &.selected, &.active {
+        transition: none;
+        .global-upload-progress-bar {
+          display: none;
+        }
+      }
       .item-header {
-        transition: background-color .4s, padding-left linear $collapse-transition-time, padding-right linear $collapse-transition-time;
-        
+        transition: padding-left linear $collapse-transition-time, padding-right linear $collapse-transition-time;
+
         .one-icon {
           transform: scale(1);
           transition: transform .4s;
@@ -15,8 +23,8 @@
       }
 
       &.minimize-target-animation {
+        background-color: darken($color-one-mint, 25%);
         .item-header {
-          background-color: darken($color-one-mint, 25%);
           .one-icon {
             transform: scale(1.2);
           }

@@ -20,7 +20,7 @@ export default MainMenuItem.extend({
   progressBarWidthStyle: computed(
     'globalProgress',
     function progressBarWidthStyle() {
-      return htmlSafe(`width: ${this.get('globalProgress') || 0}%`);
+      return htmlSafe(`width: ${this.get('globalProgress') || 50}%`);
     }
   ),
 });
