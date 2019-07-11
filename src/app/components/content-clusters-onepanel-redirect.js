@@ -10,7 +10,6 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import checkImg from 'onedata-gui-common/utils/check-img';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { inject as service } from '@ember/service';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
@@ -55,9 +54,7 @@ export default Component.extend({
   }),
 
   checkOnepanelAvailability() {
-    return this.get('cluster.standaloneOriginProxy').then(standaloneOrigin => {
-      return checkImg(`${standaloneOrigin}/favicon.ico`);
-    });
+    return this.get('cluster').updateIsOnlineProxy();
   },
 
   redirectToOnepanelApp() {

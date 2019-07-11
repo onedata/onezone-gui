@@ -19,7 +19,10 @@ import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-c
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise } from 'rsvp';
-import { onepanelAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+import {
+  onepanelAbbrev,
+  onepanelTestImagePath,
+} from 'onedata-gui-common/utils/onedata-urls';
 
 export default Model.extend(
   GraphSingleModelMixin,
@@ -133,7 +136,7 @@ export default Model.extend(
 
     _fetchIsOnline() {
       return this.get('standaloneOriginProxy').then(standaloneOrigin => {
-        return checkImg(`${standaloneOrigin}/favicon.ico`);
+        return checkImg(`${standaloneOrigin}${onepanelTestImagePath}`);
       });
     },
 
