@@ -14,10 +14,8 @@
     click=(action "onToggleMinimize")}}
     {{one-tooltip title=(tt this (if isMinimized "sendToForeground" "sendToBackground"))}}
   {{/one-icon}}
-  {{#one-icon
-    class="upload-summary-header-cancel cancel-action"
-    icon="ban-left"
-    click=(action onCancel)}}
-    {{one-tooltip title=(tt this (if uploadObject.isCancelled "cancelled" "cancel"))}}
-  {{/one-icon}}
+  {{uploading-presenter/cancel-upload
+    onCancel=onCancel
+    isCancelled=uploadObject.isCancelled
+    iconClass="upload-summary-header-cancel"}}
 </div>

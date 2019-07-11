@@ -4,15 +4,19 @@ export default {
     uploadingNFiles: 'Uploading {{numberOfFiles}} files',
     uploaded1File: 'Uploaded 1 file',
     uploadedNFiles: 'Uploaded {{numberOfFiles}} files',
-    cancel: 'Cancel',
-    cancelled: 'Cancelled',
     sendToBackground: 'Send to background',
     sendToForeground: 'Make floating',
   },
   uploadObjectInfo: {
     progressOf: 'of',
     uploadingFailedTip: 'Uploading failed',
+  },
+  cancelUpload: {
     cancel: 'Cancel',
     cancelled: 'Cancelled',
+    ackHeader: 'Cancel upload',
+    ackMessage: 'Are you sure you want to cancel this upload?',
+    ackYes: 'Yes',
+    ackNo: 'No',
   },
 };

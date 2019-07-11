@@ -18,12 +18,10 @@
         {{bytes-to-string uploadObject.bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string uploadObject.objectSize}}
       </div>
     {{/unless}}
-    {{#one-icon
-      class="upload-object-cancel cancel-action"
-      icon="ban-left"
-      click=(action onCancel)}}
-      {{one-tooltip title=(tt this (if uploadObject.isCancelled "cancelled" "cancel"))}}
-    {{/one-icon}}
+    {{uploading-presenter/cancel-upload
+      onCancel=onCancel
+      isCancelled=uploadObject.isCancelled
+      iconClass="upload-object-cancel"}}
   </div>
   <div class="progress upload-object-progress-bar">
     <div
