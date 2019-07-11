@@ -107,4 +107,10 @@ export default Component.extend(I18n, {
       this.get('onToggleExpand')();
     }
   },
+
+  actions: {
+    onToggleMinimize() {
+      this.get('onToggleMinimize')();
+    },
+  },
 });

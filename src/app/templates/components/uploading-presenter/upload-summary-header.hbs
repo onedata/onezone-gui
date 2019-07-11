@@ -1,12 +1,15 @@
 <div class="progress upload-summary-header-progress-bar">
   <div class="progress-bar" role="progressbar" style={{progressBarWidthStyle}}></div>
 </div>
-<div class="upload-summary-header-text">{{headerText}}</div>
+<div class="upload-summary-header-text">
+  <div class="summary-state">{{headerText}}</div>
+  {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
+</div>
 <div class="upload-summary-header-icons">
   {{#one-icon
     class=(concat-classes "upload-summary-header-toggle-minimize" (if isMinimized "minimized"))
     icon="move-down"
-    click=(action onToggleMinimize)}}
+    click=(action "onToggleMinimize")}}
     {{one-tooltip title=(tt this (if isMinimized "sendToForeground" "sendToBackground"))}}
   {{/one-icon}}
   {{#one-icon

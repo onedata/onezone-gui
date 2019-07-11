@@ -1,11 +1,15 @@
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { conditional, and, not, array, raw } from 'ember-awesome-macros';
-import { next } from '@ember/runloop';
+import { next, later, cancel } from '@ember/runloop';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { inject as service } from '@ember/service';
 import { A } from '@ember/array';
 import _ from 'lodash';
 import $ from 'jquery';
+
+const minimizeIndicationClass = 'minimize-target-animation';
+const minimizeIndicationClassCheck = 'minimize-target-animation';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
@@ -36,6 +40,18 @@ export default Component.extend({
    * Used only if `floatingMode` is true.
    */
   minimizeTargetSelector: undefined,
+
+  /**
+   * @virtual
+   * @type {string}
+   * Used only if `floatingMode` is true.
+   */
+  minimizeIndicationSelector: undefined,
+
+  /**
+   * @type {any}
+   */
+  minimizeIndicationOffTimer: undefined,
 
   /**
    * @type {Ember.A<Utils.UploadingObjectState>}
@@ -170,6 +186,12 @@ export default Component.extend({
     this.uploadObjectsOrderReset();
   },
 
+  turnOffMinimizeIndication() {
+    $(this.get('minimizeIndicationSelector'))
+      .removeClass(minimizeIndicationClass);
+    safeExec(this, () => this.set('minimizeIndicationOffTimer', undefined));
+  },
+
   actions: {
     toggleExpand(uploadObject) {
       const {
@@ -191,6 +213,28 @@ export default Component.extend({
       const floatingUploads = this.get('uploadingManager.floatingUploads');
       if (floatingUploads.includes(uploadObject)) {
         floatingUploads.removeObject(uploadObject);
+
+        // show animation on "uploads" menu
+        if (this.get('floatingMode')) {
+          const {
+            minimizeIndicationSelector,
+            minimizeIndicationOffTimer,
+          } = this.getProperties(
+            'minimizeIndicationSelector',
+            'minimizeIndicationOffTimer'
+          );
+          const $indicator = $(minimizeIndicationSelector);
+          if (!$indicator.hasClass(minimizeIndicationClassCheck)) {
+            $indicator.addClass(minimizeIndicationClass);
+          }
+          if (minimizeIndicationOffTimer !== undefined) {
+            cancel(minimizeIndicationOffTimer);
+          }
+          this.set(
+            'minimizeIndicationOffTimer',
+            later(this, 'turnOffMinimizeIndication', 400)
+          );
+        }
       } else {
         floatingUploads.addObject(uploadObject);
       }
@@ -210,6 +254,6 @@ export default Component.extend({
         this.get('router')
           .transitionTo('onedata.sidebar.content', 'uploads', 'all');
       }
-    },  
+    },
   },
 });

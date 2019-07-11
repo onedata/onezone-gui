@@ -30,7 +30,7 @@
     margin-bottom: $padding-small-vertical;
     opacity: 1;
     transform: scaleX(1);
-    transition: bottom .3s linear, left .3s linear, transform .35s ease-in, opacity .35s ease-in; 
+    transition: bottom .5s linear, left .5s linear, transform .55s ease-in, opacity .55s ease-in; 
     background-color: $color-one-white;
     border: 1px solid $main-border-color;
     
@@ -88,7 +88,13 @@
 
   .upload-summary-header-text {
     flex-grow: 1;
-    text-transform: uppercase;
+    .summary-state {
+      text-transform: uppercase;
+    }
+    .summary-oneprovider {
+      font-size: 80%;
+      color: $main-text-color-inactive;
+    }
   }
   
   .upload-summary-header-icons {

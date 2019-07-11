@@ -92,38 +92,16 @@ export default Component.extend({
    */
   state: reads('uploadObject.state'),
 
-  isCancelledObserver: observer('isCancelled', function isCancelledObserver() {
-    const {
-      isMinimized,
-      isCancelled,
-    } = this.getProperties('isMinimized', 'isCancelled', 'minimizeOnCancel');
-    if (isCancelled && !isMinimized) {
-      this.send('toggleMinimize');
-    }
-  }),
-
   stateObserver: observer('state', function stateObserver() {
     const {
       state,
-      scheduledMinimalization,
-      floatingMode,
       minimizeOnSuccess,
     } = this.getProperties(
       'state',
-      'scheduledMinimalization',
-      'floatingMode',
-      'uploadObject',
       'minimizeOnSuccess'
     );
-    if (
-      state === 'uploaded' &&
-      scheduledMinimalization === undefined &&
-      minimizeOnSuccess
-    ) {
-      this.set(
-        'scheduledMinimalization',
-        later(this, 'send', 'toggleMinimize', true, floatingMode ? 3000 : 0)
-      );
+    if ((state === 'uploaded' && minimizeOnSuccess)) {
+      this.scheduleMinimalization();
     }
   }),
 
@@ -142,6 +120,22 @@ export default Component.extend({
       this.cancelScheduledMinimalization();
     } finally {
       this._super(...arguments);
+    }
+  },
+
+  scheduleMinimalization() {
+    const {
+      scheduledMinimalization,
+      floatingMode,
+    } = this.getProperties(
+      'scheduledMinimalization',
+      'floatingMode',
+    );
+    if (scheduledMinimalization === undefined) {
+      this.set(
+        'scheduledMinimalization',
+        later(this, 'send', 'toggleMinimize', true, floatingMode ? 3000 : 0)
+      );
     }
   },
 
@@ -170,6 +164,9 @@ export default Component.extend({
     },
     cancel(uploadObject) {
       this.get('onCancel')(uploadObject);
+      if (this.get('uploadObject.isCancelled')) {
+        this.scheduleMinimalization();
+      }
     },
     toggleMinimize(minimize) {
       const {
@@ -181,6 +178,9 @@ export default Component.extend({
         'isMinimized',
         'onToggleMinimize'
       );
+      if (minimize === undefined) {
+        minimize = !isMinimized;
+      }
       if (minimize === isMinimized) {
         return;
       } else {
@@ -209,10 +209,10 @@ export default Component.extend({
               opacity: 0.2,
             }).animate({
               height: 0,
-            }, 350, function () {
+            }, 550, function () {
               $(this).css({ display: 'none' });
               // minimalization state could change in the middle of animation
-              if (minimize === that.get('isMinimized')) {
+              if (minimize !== that.get('isMinimized')) {
                 safeExec(that, 'onToggleMinimize');
               }
             });

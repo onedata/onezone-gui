@@ -44,6 +44,13 @@ export default EmberObject.extend({
   /**
    * Only available when `objectType` is `root`
    * @virtual
+   * @type {Models.Space}
+   */
+  space: undefined,
+
+  /**
+   * Only available when `objectType` is `root`
+   * @virtual
    * @type {Models.Provider}
    */
   oneprovider: undefined,

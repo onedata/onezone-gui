@@ -13,6 +13,7 @@ export default Service.extend(I18n, {
   router: service(),
   i18n: service(),
   providerManager: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -309,14 +310,31 @@ export default Service.extend(I18n, {
     const {
       uploadRootObjects,
       floatingUploads,
+      navigationState,
     } = this.getProperties(
       'uploadRootObjects',
       'floatingUploads',
+      'navigationState'
     );
+
+    const {
+      activeResourceType,
+      activeResource,
+    } = getProperties(
+      navigationState,
+      'activeResourceType',
+      'activeResource'
+    );
+
+    let space;
+    if (activeResourceType === 'spaces' && activeResource) {
+      space = activeResource;
+    }
 
     const rootTreeSchema = this.createTreeSchemaFromFileList(files);
     const root = this.createUploadObjectFromTree(rootTreeSchema);
     setProperties(root, {
+      space,
       oneprovider,
       uploadId,
     });
