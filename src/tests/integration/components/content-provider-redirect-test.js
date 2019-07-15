@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
 import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 class FakeWindow {
   constructor() {
@@ -61,6 +62,18 @@ describe('Integration | Component | content provider redirect', function () {
             release: '19.02',
           },
         }),
+        belongsTo() {
+          return {
+            id() {
+              return gri({
+                entityType: 'provider',
+                entityId: '12345',
+                aspect: 'instance',
+                scope: 'protected',
+              });
+            },
+          };
+        },
       };
       const onezoneServer = lookupService(this, 'onezone-server');
       const url = `/${oneproviderAbbrev}/${clusterEntityId}/i#/`;
