@@ -19,6 +19,48 @@
       right: 0;
       bottom: 0;
     }
+
+    .upload-summary-header-text .summary-state {
+      .progress-text {
+        display: none;
+      }
+    }
+  }
+
+  &.full-mode {
+    .up-single-upload {
+      border: 0;
+      margin-bottom: 0;
+
+      + .up-single-upload {
+        border-top: 0;
+      }
+    }
+
+    .up-upload-summary-header {
+      padding: 0 $padding-large-vertical;
+      height: 60px;
+
+      .progress-bar {
+        display: none;
+      }
+    }
+
+    .upload-summary-header-text {
+      .summary-state {
+        text-transform: none;
+      }
+
+      .summary-oneprovider {
+        font-family: 'Open Sans';
+      }
+    }
+
+    .up-upload-object-info {
+      padding-left: $padding-large-vertical;
+      padding-right: $padding-large-vertical;
+      font-family: 'Open Sans';
+    }
   }
 
   .up-single-upload {

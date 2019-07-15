@@ -14,7 +14,7 @@ const minimizeIndicationClassCheck = 'minimize-target-animation';
 export default Component.extend({
   classNames: ['uploading-presenter'],
   classNameBindings: [
-    'floatingMode:floating',
+    'floatingMode:floating:full-mode',
     'isHidden:hidden',
     'summaryActive',
   ],

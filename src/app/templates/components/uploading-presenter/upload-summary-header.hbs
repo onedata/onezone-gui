@@ -2,7 +2,7 @@
   <div class="progress-bar" role="progressbar" style={{progressBarWidthStyle}}></div>
 </div>
 <div class="upload-summary-header-text">
-  <div class="summary-state">{{headerText}}</div>
+  <div class="summary-state">{{headerText}} <span class="progress-text">({{uploadObject.progress}}%)</span></div>
   {{#if (and uploadObject.space uploadObject.oneprovider)}}
     {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
   {{/if}}
