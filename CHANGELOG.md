@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5605 Updated list of space privileges
 * VFS-5607 Updated lodash in onedata-gui-websocket-client
 * VFS-5402 Updated lodash in onedata-gui-common
 * VFS-5502 Fixed not working generate new token button on Oneprovider deploy views

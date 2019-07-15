@@ -20,9 +20,11 @@ export default _.merge({}, privilegesAspectBase, {
     space_read_data: 'Read files',
     space_write_data: 'Write files',
     space_manage_shares: 'Manage shares',
-    space_manage_indexes: 'Manage indexes',
-    space_query_indexes: 'Query indexes',
+    space_view_indices: 'View indices',
+    space_manage_indices: 'Manage indices',
+    space_query_indices: 'Query indices',
     space_view_statistics: 'View statistics',
+    space_view_changes_stream: 'View changes stream',
 
     space_view_transfers: 'View transfers',
     space_schedule_replication: 'Schedule replication',
