@@ -2,7 +2,7 @@
   $uploading-progress-bar-horiz-padding: $padding-xs-horizontal;
 
   .one-list {
-    > .main-menu-uploads-item {
+    > .main-menu-upload-item {
       position: relative;
       background-color: $color-one-mint;
       transition: background-color .4s;
@@ -49,12 +49,12 @@
     }
   }
   &.collapsed {
-    .main-menu-uploads-item .global-upload-progress-bar {
+    .main-menu-upload-item .global-upload-progress-bar {
       width: $main-menu-collapsed-width;
     }
   }
 }
 
-.main-menu-uploads-item .global-upload-progress-bar {
+.main-menu-upload-item .global-upload-progress-bar {
   display: none;
 }

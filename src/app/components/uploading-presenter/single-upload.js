@@ -1,3 +1,12 @@
+/**
+ * Presents a single upload
+ *
+ * @module components/uploading-presenter/single-upload
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -155,6 +164,7 @@ export default Component.extend({
       } = this.getProperties('triggerChildrenRender', 'onToggleExpand');
       this.set('triggerChildrenRender', true);
       if (!triggerChildrenRender) {
+        // wait for children to render
         next(() => safeExec(this, () => {
           onToggleExpand();
         }));

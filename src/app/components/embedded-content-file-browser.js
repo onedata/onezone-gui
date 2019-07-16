@@ -48,12 +48,12 @@ export default OneEmbeddedContainer.extend({
   embeddedComponentName: 'content-file-browser',
 
   /**
-   * @override
+   * @override implements OneEmbeddedContainer
    */
   iframeType: 'oneprovider',
 
   /**
-   * @override
+   * @override implements OneEmbeddedContainer
    */
   relatedData: reads('oneprovider'),
 
@@ -62,10 +62,13 @@ export default OneEmbeddedContainer.extend({
    */
   iframeInjectedProperties: Object.freeze(['fileId', 'spaceId']),
 
+  /**
+   * @override implements OneEmbeddedContainer
+   */
   callParentActionNames: Object.freeze(['sayHello']),
 
   /**
-   * @override
+   * @override implements OneEmbeddedContainer
    */
   iframeId: computed('oneprovider.entityId', function iframeId() {
     const oneproviderId = this.get('oneprovider.entityId');

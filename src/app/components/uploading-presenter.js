@@ -1,3 +1,13 @@
+/**
+ * Presents list of uploads (active and done), that were started by
+ * oneprovider iframes
+ *
+ * @module components/uploading-presenter
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed, observer, get } from '@ember/object';
 import { conditional, and, not, array, raw, equal } from 'ember-awesome-macros';
@@ -9,7 +19,6 @@ import _ from 'lodash';
 import $ from 'jquery';
 
 const minimizeIndicationClass = 'minimize-target-animation';
-const minimizeIndicationClassCheck = 'minimize-target-animation';
 
 export default Component.extend({
   classNames: ['uploading-presenter'],
@@ -32,25 +41,36 @@ export default Component.extend({
   /**
    * @virtual
    * @type {boolean}
+   * If true, list of uploads will float above content
    */
   floatingMode: false,
 
   /**
    * @virtual
+   * @type {boolean}
+   * Should summary entry be visible to user.
+   */
+  isSummaryDirectoryVisible: false,
+
+  /**
+   * @virtual
    * @type {string}
-   * Used only if `floatingMode` is true.
+   * Used only if `floatingMode` is true. Describes an element, that should be
+   * a target for minimize animation.
    */
   minimizeTargetSelector: undefined,
 
   /**
    * @virtual
    * @type {string}
-   * Used only if `floatingMode` is true.
+   * Used only if `floatingMode` is true. Describes an element, that should
+   * animate after minimalization.
    */
   minimizeIndicationSelector: undefined,
 
   /**
    * @type {any}
+   * Used to remember actual minimalization animation state.
    */
   minimizeIndicationOffTimer: undefined,
 
@@ -58,11 +78,6 @@ export default Component.extend({
    * @type {Ember.A<Utils.UploadingObjectState>}
    */
   orderedUploadObjects: undefined,
-
-  /**
-   * @type {boolean}
-   */
-  isSummaryDirectoryVisible: false,
 
   /**
    * @type {Window}
@@ -74,16 +89,15 @@ export default Component.extend({
    */
   summaryActive: and(
     'isSummaryDirectoryVisible',
-    // not('isHidden'),
+    not('isHidden'),
+    // summary is not visible in sidebar mobile mode
     not(equal('navigationState.activeContentLevel', raw('sidebar')))
   ),
 
   /**
    * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
    */
-  expandedUploads: computed(function expandedUploads() {
-    return A();
-  }),
+  expandedUploads: computed(() => A()),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
@@ -161,8 +175,10 @@ export default Component.extend({
       const newUploads =
         _.difference(filteredUploadObjects, orderedUploadObjects);
       if (floatingMode) {
+        // in floating mode add new uploads to the end of list
         orderedUploadObjects.addObjects(newUploads);
       } else {
+        // in standard mode add new uploads to the beginning of list
         newUploads
           .reverseObjects()
           .forEach(upload => orderedUploadObjects.unshiftObject(upload));
@@ -177,6 +193,8 @@ export default Component.extend({
   summaryActiveObserver: observer(
     'summaryActive',
     function summaryActiveObserver() {
+      // showing summary uploads changes size of content view. To reposition all
+      // floating elements, trigger simulated window resize
       next(() => this.get('_window').dispatchEvent(new Event('resize')));
     }
   ),
@@ -187,6 +205,11 @@ export default Component.extend({
     this.uploadObjectsOrderReset();
   },
 
+  /**
+   * Removes minimize indication classes from element described by
+   * `minimizeIndicationSelector`
+   * @returns {undefined}
+   */
   turnOffMinimizeIndication() {
     $(this.get('minimizeIndicationSelector'))
       .removeClass(minimizeIndicationClass);
@@ -204,6 +227,7 @@ export default Component.extend({
       if (isExpanded) {
         expandedUploads.removeObject(uploadObject);
       } else {
+        // in floating mode only one upload can be expanded in the same time
         if (floatingMode) {
           expandedUploads.clear();
         }
@@ -211,6 +235,7 @@ export default Component.extend({
       }
     },
     toggleMinimize(uploadObject) {
+      // This action should be fired AFTER minimalization animation of upload
       const floatingUploads = this.get('uploadingManager.floatingUploads');
       if (floatingUploads.includes(uploadObject)) {
         floatingUploads.removeObject(uploadObject);
@@ -225,7 +250,7 @@ export default Component.extend({
             'minimizeIndicationOffTimer'
           );
           const $indicator = $(minimizeIndicationSelector);
-          if (!$indicator.hasClass(minimizeIndicationClassCheck)) {
+          if (!$indicator.hasClass(minimizeIndicationClass)) {
             $indicator.addClass(minimizeIndicationClass);
           }
           if (minimizeIndicationOffTimer !== undefined) {

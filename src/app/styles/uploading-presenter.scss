@@ -130,6 +130,7 @@
 
   .upload-summary-header-text {
     flex-grow: 1;
+    min-width: 0;
     .summary-state {
       text-transform: uppercase;
     }
@@ -141,6 +142,7 @@
   
   .upload-summary-header-icons {
     font-size: 1.7em;
+    white-space: nowrap;
     .one-icon {
       vertical-align: middle;
     }

@@ -1,9 +1,19 @@
+/**
+ * Manages uploading process by communicating with oneprovider iframes and
+ * dealing with UploadingObjectState objects.
+ *
+ * @module services/uploading-manager
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Service, { inject as service } from '@ember/service';
 import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
 import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
 import { A } from '@ember/array';
 import { reads } from '@ember/object/computed';
-import { array, gt, raw } from 'ember-awesome-macros';
+import { array, gt, raw, conditional, collect } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
@@ -12,7 +22,6 @@ export default Service.extend(I18n, {
   embeddedIframeManager: service(),
   router: service(),
   i18n: service(),
-  providerManager: service(),
   navigationState: service(),
 
   /**
@@ -25,6 +34,9 @@ export default Service.extend(I18n, {
    */
   _window: window,
 
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   areFloatingUploadsVisible: computed(
     'router.currentURL',
     function areFloatingUploadsVisible() {
@@ -32,15 +44,22 @@ export default Service.extend(I18n, {
     }
   ),
 
-  uploadRootObjects: computed(function uploadObjects() {
-    return A();
-  }),
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
+   */
+  uploadRootObjects: computed(() => A()),
 
-  floatingUploads: computed(function floatingUploads() {
-    return A();
-  }),
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
+   */
+  floatingUploads: computed(() => A()),
 
-  uploadingOneproviders: array.uniq(array.mapBy('uploadRootObjects', raw('oneprovider'))),
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<Models.Provider>>}
+   */
+  uploadingOneproviders: array.uniq(
+    array.mapBy('uploadRootObjects', raw('oneprovider'))
+  ),
 
   /**
    * @type {Ember.ComputedProperty<EmberObject>}
@@ -59,10 +78,21 @@ export default Service.extend(I18n, {
     }
   ),
 
-  sidebarOneproviders: computed(function sidebarOneproviders() {
-    return A();
-  }),
+  /**
+   * @type {Ember.ComputedProperty<Ember.A<Models.Provider>>}
+   */
+  sidebarOneproviders: conditional(
+    'uploadingOneproviders.length',
+    array.concat(
+      collect('allProvidersProviderAbstraction'),
+      'uploadingOneproviders'
+    ),
+    raw([]),
+  ),
 
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
   hasUploads: gt('uploadingOneproviders.length', raw(0)),
 
   /**
@@ -96,6 +126,11 @@ export default Service.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<Utils.UploadingObjectState>}
+   * UploadingObjectState that accumulates all floating uploads
+   * stats to single upload visible in mobile mode.
+   */
   floatingSummaryRootDirectory: computed(
     function floatingSummaryRootDirectory() {
       return UploadingObjectState.create({
@@ -116,8 +151,8 @@ export default Service.extend(I18n, {
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
     function embeddedIframesObserver() {
-      const embeddedIframes = this.get('embeddedIframeManager.embeddedIframes');
-      embeddedIframes
+      // attach actions related to uploading to new embedded oneprovider iframes
+      this.get('embeddedIframeManager.embeddedIframes')
         .filterBy('iframeType', 'oneprovider')
         .reject(embIframe =>
           get(embIframe, 'callParentCallbacks.updateUploadProgress')
@@ -137,53 +172,15 @@ export default Service.extend(I18n, {
     }
   ),
 
-  uploadingOneprovidersObserver: observer(
-    'uploadingOneproviders.[]',
-    function uploadingOneprovidersObserver() {
-      const {
-        uploadingOneproviders,
-        allProvidersProviderAbstraction,
-        sidebarOneproviders,
-      } = this.getProperties(
-        'uploadingOneproviders',
-        'allProvidersProviderAbstraction',
-        'sidebarOneproviders'
-      );
-      sidebarOneproviders.clear();
-      if (get(uploadingOneproviders, 'length')) {
-        sidebarOneproviders.pushObject(allProvidersProviderAbstraction);
-        sidebarOneproviders.pushObjects(uploadingOneproviders);
-      }
-    }
-  ),
-
   init() {
     this._super(...arguments);
     this.embeddedIframesObserver();
-    this.uploadingOneprovidersObserver();
-    this.attachPageUnloadHandler();
-    this.get('providerManager').getProviders().then(l => l.get('list')).then(list => list.objectAt(0)).then(oneprovider => {
-      // setTimeout(() => {
-        const uploadId = 1;
-        this.addNewUpload({
-          oneprovider,
-          uploadId,
-          files: [{
-            path: 'test/doc.txt',
-            size: 1024,
-          }],
-        });
-        this.updateUploadProgress({
-          oneprovider,
-          uploadId,
-          path: 'test/doc.txt',
-          bytesUploaded: 700,
-        });
-      // }, 2000);
-    });
-    
+    this.attachPageUnloadHandler();    
   },
 
+  /**
+   * @returns {undefined}
+   */
   attachPageUnloadHandler() {
     const {
       _window,
@@ -192,6 +189,10 @@ export default Service.extend(I18n, {
     _window.addEventListener('beforeunload', pageUnloadHandler);
   },
 
+  /**
+   * @param {Event} event 
+   * @returns {undefined}
+   */
   onPageUnload(event) {
     if (this.get('hasActiveUploads')) {
       // Code based on https://stackoverflow.com/a/19538231
@@ -272,6 +273,8 @@ export default Service.extend(I18n, {
   },
 
   /**
+   * Recalculates uploading state, that will be then injected to oneprovider
+   * iframe
    * @param {Models.Provider} oneprovider
    * @returns {undefined}
    */
@@ -303,7 +306,7 @@ export default Service.extend(I18n, {
    * @param {Object} newUpload
    * @param {Models.Provider} oneprovider
    * @param {number} updateData.uploadId
-   * @param {Array<{ path: string }>} updateData.files
+   * @param {Array<{ path: string, size: number }>} updateData.files
    * @returns {undefined}
    */
   addNewUpload({ oneprovider, uploadId, files }) {
@@ -326,23 +329,64 @@ export default Service.extend(I18n, {
       'activeResource'
     );
 
+    // Determine space (upload target) from navigationState
     let space;
     if (activeResourceType === 'spaces' && activeResource) {
       space = activeResource;
     }
 
+    // Create tree schema
     const rootTreeSchema = this.createTreeSchemaFromFileList(files);
+    // Convert tree schema to real upload state objects
     const root = this.createUploadObjectFromTree(rootTreeSchema);
     setProperties(root, {
       space,
       oneprovider,
       uploadId,
     });
+
     uploadRootObjects.addObject(root);
     floatingUploads.addObject(root);
     this.updateDataForOneprovider(oneprovider);
   },
 
+  /**
+   * Generates tree schema (nested objects structure) with simplified version
+   * of upload state. It can be used then to generate real uploading state
+   * structure.
+   * @param {Array<{ path: string, size: number }>} files flattened files
+   *   structure
+   * @returns {Object} nested object structure, that represents upload
+   *   directories. Objects has keys: objectPath, objectType and children.
+   *   Example:
+   *     For [{ path: 'dir1/file1', size: 12 }, { path: 'file2', size: 800 }]
+   *     it returns:
+   *     ```
+   *       {
+   *         objectType: 'root',
+   *         children: {
+   *           dir1: {
+   *             objectPath: 'dir1',
+   *             objectType: 'directory',
+   *             children: {
+   *               file1: {
+   *                 objectPath: 'dir1/file1',
+   *                 objectType: 'file',
+   *                 children: {},
+   *                 size: 12,
+   *               },
+   *             },
+   *           },
+   *           file2: {
+   *             objectPath: 'file2',
+   *             objectType: 'file',
+   *             children: {},
+   *             size: 800,
+   *           },
+   *         },
+   *       }
+   *     ```
+   */
   createTreeSchemaFromFileList(files) {
     const rootTreeSchema = {
       objectType: 'root',
@@ -354,9 +398,14 @@ export default Service.extend(I18n, {
       const strippedPath = pathElements.join('/');
       if (strippedPath) {
         let nextElementParent = rootTreeSchema;
+        // loop over every level of nesting in file path
         for (let i = 0; i < pathElements.length; i++) {
+          // search for existing node in already generated tree
           let node = nextElementParent.children[pathElements[i]];
+          // if not exist, create new one and attach to children object of
+          // nextElementParent
           if (!node) {
+            // if this path element is a last one, then it must be a file node
             const objectType =
               i === pathElements.length - 1 ? 'file' : 'directory';
             node = {
@@ -376,6 +425,16 @@ export default Service.extend(I18n, {
     return rootTreeSchema;
   },
 
+  /**
+   * Converts treeSchema of uploading state to real uploading state objects.
+   * Is a recurrent function, so calls itself on every children in
+   * `treeSchema`.
+   * @param {Object} treeSchema schema from `createTreeSchemaFromFileList`
+   *   method (may be a nested part of it)
+   * @param {Utils.UploadingObjectState} parent parent node where `treeSchema`
+   *   should be converted
+   * @returns {Utils.UploadingObjectState}
+   */
   createUploadObjectFromTree(treeSchema, parent) {
     const {
       objectPath,
@@ -409,6 +468,10 @@ export default Service.extend(I18n, {
     return uploadObject;
   },
 
+  /**
+   * @param {Models.Provider} oneprovider 
+   * @returns {Utils.EmbeddedIframe}
+   */
   getEmbeddedIframe(oneprovider) {
     return this.get('embeddedIframeManager.embeddedIframes')
       .find(embIframe =>
@@ -417,6 +480,12 @@ export default Service.extend(I18n, {
       );
   },
 
+  /**
+   * Modifies ownership of oneprovider embedded iframe according to whether or
+   * not active uploads are available for this provider
+   * @param {Models.Provider} oneprovider
+   * @returns {undefined}
+   */
   setOwnershipOfEmbeddedIframe(oneprovider) {
     const embeddedIframe = this.getEmbeddedIframe(oneprovider);
     if (embeddedIframe) {
@@ -433,7 +502,7 @@ export default Service.extend(I18n, {
             ownerReference: this,
           }));
         }
-      } else {
+      } else if (existingOwnership) {
         owners.removeObject(existingOwnership);
       }
     }

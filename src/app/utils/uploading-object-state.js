@@ -1,3 +1,19 @@
+/**
+ * Class that represents single upload object state. Upload object may by
+ * a file, a directory or `root` - metadirectory that aggregates multiple
+ * files/dirs in single upload. UploadingObjectState objects creates a tree
+ * structure linked using `children` array and `parent` reference. Also each
+ * object has reference to root object.
+ * 
+ * Properties like objectSize or isUploading are calculated recurrently for
+ * dirs. For files these fields must be set manually.
+ *
+ * @module utils/uploading-object-state
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed, observer, get } from '@ember/object';
 import { conditional, equal, sum, array, raw, writable } from 'ember-awesome-macros';
 import _ from 'lodash';
@@ -13,7 +29,7 @@ export default EmberObject.extend({
 
   /**
    * One of `file`, `directory`, `root`
-   * `root` is a top level collection of all selected files from the 0 level of
+   * `root` is a top level collection of all uploading files from the 0 level of
    * tree nesting - is not related to any real directory
    * @virtual
    * @type {string}
@@ -35,7 +51,7 @@ export default EmberObject.extend({
   parent: undefined,
 
   /**
-   * Nested objects (1 level deep) (if this object is a directory)
+   * Nested objects (1 level deep) (if this object is a directory or root)
    * @virtual
    * @type {Ember.A<Utils.UploadingObjectState>}
    */
@@ -155,7 +171,7 @@ export default EmberObject.extend({
   /**
    * @type {Utils.UploadingObjectState|null}
    */
-  root: computed('objectType', 'parent.root', function () {
+  root: computed('objectType', 'parent.root', function root() {
     if (this.get('objectType') === 'root') {
       return this;
     } else {
@@ -164,7 +180,7 @@ export default EmberObject.extend({
   }),
 
   /**
-   * One of `uploading`, `uploaded`, `partiallyUploading`, `failed`.
+   * One of `uploading`, `uploaded`, `partiallyUploading`, `failed`, `cancelled`.
    * `partiallyUploading` is used for directories, that have both
    * uploading/uploaded and failed files.
    * @virtual
@@ -220,20 +236,25 @@ export default EmberObject.extend({
    * Object upload progress (in percents 0-100).
    * @type {Ember.ComputedProperty<number>}
    */
-  progress: computed('objectSize', 'bytesUploaded', function progress() {
-    const {
-      state,
-      objectSize,
-      bytesUploaded,
-    } = this.getProperties('state', 'objectSize', 'bytesUploaded');
-    if (objectSize === 0 && bytesUploaded === 0) {
-      return state === 'uploaded' ? 100 : 0;
-    } else if (!objectSize || !bytesUploaded ) {
-      return 0;
-    } else {
-      return Math.floor((bytesUploaded / objectSize) * 100);
+  progress: computed(
+    'objectSize',
+    'bytesUploaded',
+    'state',
+    function progress() {
+      const {
+        state,
+        objectSize,
+        bytesUploaded,
+      } = this.getProperties('state', 'objectSize', 'bytesUploaded');
+      if (objectSize === 0 && bytesUploaded === 0) {
+        return state === 'uploaded' ? 100 : 0;
+      } else if (!objectSize || !bytesUploaded ) {
+        return 0;
+      } else {
+        return Math.floor((bytesUploaded / objectSize) * 100);
+      }
     }
-  }),
+  ),
 
   isUploadingObserver: observer('isUploading', function isUploadingObserver() {
     const {

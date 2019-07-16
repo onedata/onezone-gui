@@ -1,3 +1,12 @@
+/**
+ * Top level list of upload objects inside single upload
+ *
+ * @module components/uploading-presenter/upload-object-root-list
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -31,9 +40,7 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<Object>}
    */
-  childrenLevelsExpanded: computed(function expandedChildren() {
-    return {};
-  }),
+  childrenLevelsExpanded: computed(() => ({})),
 
   /**
    * @type {Ember.ComputedProperty<Object>}

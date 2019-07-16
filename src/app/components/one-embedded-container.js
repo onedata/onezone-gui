@@ -5,7 +5,7 @@
  * `appProxy` property.
  * 
  * @module components/one-embedded-container
- * @author Jakub Liput
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -60,6 +60,7 @@ export default Component.extend({
   embeddedComponentName: undefined,
 
   /**
+   * Optional, will be passed to EmbeddedIframe.
    * @virtual
    * @type {string}
    */
@@ -67,11 +68,28 @@ export default Component.extend({
 
   /**
    * Any data, that should be passed along with iframe. Usually will be
-   * correlated to iframeType.
+   * correlated to iframeType. Optional, will be passed to EmbeddedIframe.
    * @virtual
    * @type {any}
    */
   relatedData: undefined,
+
+  /**
+   * If true, the iframe will be absolutely positioned with 100% width and height
+   * @type {boolean}
+   */
+  fitContainer: false,
+
+  /**
+   * Collection of action names (strings), which should be injected to iframe.
+   * @type {Array<string>}
+   */
+  callParentActionNames: Object.freeze([]),
+
+  /**
+   * @type {Utils.EmbeddedIframe}
+   */
+  embeddedIframe: undefined,
 
   /**
    * Set by iframe onload event.
@@ -87,20 +105,15 @@ export default Component.extend({
   iframeError: reads('embeddedIframe.iframeError'),
 
   /**
-   * If true, the iframe will be absolutely positioned with 100% width and height
-   * @type {boolean}
+   * @type {Ember.ComputedProperty<string>}
    */
-  fitContainer: false,
-
-  /**
-   * @type {Array<string>}
-   */
-  callParentActionNames: Object.freeze([]),
-
-  /**
-   * @type {Utils.EmbeddedIframe}
-   */
-  embeddedIframe: undefined,
+  src: computed('baseUrl', 'embeddedComponentName', function src() {
+    const {
+      baseUrl,
+      embeddedComponentName,
+    } = this.getProperties('baseUrl', 'embeddedComponentName');
+    return `${baseUrl}#/onedata/components/${embeddedComponentName}`;
+  }),
 
   iframeIdObserver: observer('iframeId', function iframeIdObserver() {
     const {
@@ -117,23 +130,25 @@ export default Component.extend({
     }
   }),
 
-  src: computed('baseUrl', 'embeddedComponentName', function src() {
-    const {
-      baseUrl,
-      embeddedComponentName,
-    } = this.getProperties('baseUrl', 'embeddedComponentName');
-    return `${baseUrl}#/onedata/components/${embeddedComponentName}`;
-  }),
+  init() {
+    this._super(...arguments);
+
+    // Copy properties below directly to embedded iframe using observers
+    ['src', 'iframeClass'].forEach(propName => {
+      const observerName = `${propName}Observer`;
+      this[observerName] = observer(propName, function () {
+        const embeddedIframe = this.get('embeddedIframe');
+        if (embeddedIframe) {
+          set(embeddedIframe, propName, this.get(propName));
+        }
+      });
+    });
+  },
 
   didInsertElement() {
     this._super(...arguments);
 
-    const {
-      iframeInjectedProperties,
-    } = this.getProperties(
-      'iframeInjectedProperties'
-    );
-    iframeInjectedProperties.forEach(propertyName => {
+    this.get('iframeInjectedProperties').forEach(propertyName => {
       const observerFun = function () {
         this.get('embeddedIframe')
           .setSharedProperty(propertyName, this.get(propertyName));
@@ -151,6 +166,10 @@ export default Component.extend({
     }
   },
 
+  /**
+   * Attaches iframe to this component according to iframeId (by changing ownership)
+   * @returns {undefined}
+   */
   attachIframe() {
     const {
       embeddedIframeManager,
@@ -177,9 +196,11 @@ export default Component.extend({
       hostElement: element,
     };
 
+    // Try to find existing embedded iframe with specified iframeId
     const embeddedIframes = get(embeddedIframeManager, 'embeddedIframes');
     let embeddedIframe = embeddedIframes.findBy('iframeId', iframeId);
     if (!embeddedIframe) {
+      // If not found, create new one...
       embeddedIframe = EmbeddedIframe.create(getOwner(this).ownerInjection(), {
         iframeId,
         owners: A([iframeOwnership]),
@@ -187,16 +208,20 @@ export default Component.extend({
         relatedData,
         iframeType,
       });
+      // ... and add it to global embeddedIframes collection
       embeddedIframes.pushObject(embeddedIframe);
     } else {
+      // If embedded iframe exists, add this component to its owners list
       const owners = get(embeddedIframe, 'owners');
       if (!owners.any(owner => get(owner, 'ownerReference') === this)) {
         owners.unshiftObject(iframeOwnership);
       }
+      // and update its src
       set(embeddedIframe, 'src', src);
     }
     this.set('embeddedIframe', embeddedIframe);
 
+    // Attach all parent actions according to `callParentActionNames` array
     callParentActionNames.forEach(actionName => {
       let actionFun = this.actions[actionName];
       if (actionFun) {
@@ -209,42 +234,30 @@ export default Component.extend({
       }
     });
 
+    // Inject all shared properties into iframe
     iframeInjectedProperties.forEach(propertyName => {
       embeddedIframe.setSharedProperty(propertyName, this.get(propertyName));
     });
   },
-
-  init() {
-    this._super(...arguments);
-    ['src', 'iframeClass'].forEach(propName => {
-      const observerName = `${propName}Observer`;
-      this[observerName] = observer(propName, function () {
-        const embeddedIframe = this.get('embeddedIframe');
-        if (embeddedIframe) {
-          set(embeddedIframe, propName, this.get(propName));
-        }
-      });
-    });
-  },
   
+  /**
+   * Detaches previously attached iframe from this component (by removing
+   * ownership).
+   * @returns {undefined}
+   */
   detachIframe() {
     const {
       callParentActionNames,
       embeddedIframe,
     } = this.getProperties('callParentActionNames', 'embeddedIframe');
 
-    callParentActionNames.forEach(actionName => {
-      set(embeddedIframe, `callParentCallbacks.${actionName}`, undefined);
-    });
+    if (embeddedIframe) {
+      callParentActionNames.forEach(actionName => {
+        set(embeddedIframe, `callParentCallbacks.${actionName}`, undefined);
+      });
 
-    const owners = get(embeddedIframe, 'owners');
-    owners.removeObject(owners.findBy('ownerReference', this));
-  },
-
-  actions: {
-    willDestroyEmbeddedComponent() {
-      // this.get('iframeElement')[sharedObjectName] = undefined;
-    },
- 
+      const owners = get(embeddedIframe, 'owners');
+      owners.removeObject(owners.findBy('ownerReference', this));
+    }
   },
 });
