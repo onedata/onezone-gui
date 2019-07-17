@@ -10,6 +10,9 @@
   }
   .map-selector {
     .collapse:not(.in) {
+      // By default .collapse class changes display to none. Unfortunately it
+      // breaks down jvectormap. To fix that, hack below has been made to
+      // replace `display: none` with, something similar and jvectormap-friendly.
       display: block;
       height: 0;
       overflow: hidden;

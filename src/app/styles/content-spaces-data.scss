@@ -1,6 +1,11 @@
 .content-spaces-data {
   $map-trigger-width: 40px;
   $map-trigger-margin-vert: 4px;
+
+  .content-header-section {
+    z-index: 1;
+  }
+
   .provider-online .one-icon {
     color: $color-one-success;
   }
@@ -12,6 +17,7 @@
 
     .tab-bar-selector {
       z-index: 1;
+      right: $map-trigger-width + $padding-small-horizontal;
     }
 
     .map-trigger {
@@ -54,9 +60,6 @@
       height: calc(100vh - #{($content-header-row-height + $-one-tab-bar-height + $padding-base-vertical + 2 * $content-col-padding)});
     }
 
-    .tab-bar-selector {
-      right: $map-trigger-width + $padding-small-horizontal;
-    }
     .tab-bar-li .inline-icon-container {
       // a hack to make provider icon to be more to the left and everything
       // to be more centered - because the icon has internal padding
