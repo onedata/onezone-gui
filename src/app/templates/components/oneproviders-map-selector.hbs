@@ -11,7 +11,7 @@
           {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
             {{oneprovider-map-circle
               class=(concat "oneprovider-map-circle-" (model-routable-id square.providers.[0]))
-              mapSize=(max map.width map.height)
+              mapSize=(max map.width map.height 1200)
               scale=oneproviderCircleScale
               oneproviders=square.providers
               isSelected=(contains selectedOneprovider square.providers)

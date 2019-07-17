@@ -18,7 +18,7 @@
       position: absolute;
       right: 0;
       top: $map-trigger-margin-vert;
-      bottom: $map-trigger-margin-vert;
+      bottom: $map-trigger-margin-vert + 4px;
       width: $map-trigger-width;
   
       &:hover, &.active {
@@ -31,7 +31,7 @@
         background-color: $color-one-white;
         z-index: 1;
         .one-icon {
-          transform: translateY(-50%) translateX(-50%) translateY(-$map-trigger-margin-vert / 2);
+          transform: translateY(-50%) translateX(-50%) translateY(-$map-trigger-margin-vert - 1px);
         }
       }
   

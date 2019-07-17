@@ -32,24 +32,5 @@
 
 .webui-popover-oneproviders-selector {
   max-width: initial;
-  &.left, &.left-top, &.left-bottom {
-    > .webui-arrow:after {
-      border-left-color: $color-one-semiwhite;
-    }
-  }
-  &.right, &.right-top, &.right-bottom {
-    > .webui-arrow:after {
-      border-right-color: $color-one-semiwhite;
-    }
-  }
-  &.top, &.top-left, &.top-right {
-    > .webui-arrow:after {
-      border-top-color: $color-one-semiwhite;
-    }
-  }
-  &.bottom, &.bottom-left, &.bottom-right {
-    > .webui-arrow:after {
-      border-bottom-color: $color-one-semiwhite;
-    }
-  }
+  @include webui-popover-arrow-color($color-one-semiwhite);
 }
