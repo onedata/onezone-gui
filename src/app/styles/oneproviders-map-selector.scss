@@ -1,0 +1,55 @@
+.oneproviders-map-selector {
+  .map-trigger {
+    position: relative;
+    cursor: pointer;
+
+    .one-icon {
+      @include absolute-align-middle-center();
+      font-size: 1.7em;
+    }
+  }
+  .map-selector {
+    .collapse:not(.in) {
+      display: block;
+      height: 0;
+      overflow: hidden;
+    }
+  }
+  .one-map {
+    border: 1px solid $main-border-color;
+    overflow: hidden;
+  }
+}
+
+.oneproviders-selector-popover {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  white-space: nowrap;
+  background-color: $color-one-semiwhite;
+  font-size: $font-size-small;
+}
+
+.webui-popover-oneproviders-selector {
+  max-width: initial;
+  &.left, &.left-top, &.left-bottom {
+    > .webui-arrow:after {
+      border-left-color: $color-one-semiwhite;
+    }
+  }
+  &.right, &.right-top, &.right-bottom {
+    > .webui-arrow:after {
+      border-right-color: $color-one-semiwhite;
+    }
+  }
+  &.top, &.top-left, &.top-right {
+    > .webui-arrow:after {
+      border-top-color: $color-one-semiwhite;
+    }
+  }
+  &.bottom, &.bottom-left, &.bottom-right {
+    > .webui-arrow:after {
+      border-bottom-color: $color-one-semiwhite;
+    }
+  }
+}

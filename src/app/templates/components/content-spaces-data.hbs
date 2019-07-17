@@ -6,12 +6,18 @@
       </h1>
     </div>
     <div class="row row-content-tab-bar">
-      {{one-tab-bar
+      {{#one-tab-bar
         class="space-providers-tab-bar"
         items=providerItems
         selectedItem=selectedProviderItem
-        selectedItemChanged=(action "selectedProviderChanged")
-      }}
+        selectedItemChanged=(action "selectedProviderChanged")}}
+        {{oneproviders-map-selector
+          isExpanded=isMapExpanded
+          oneproviders=providers
+          selectedOneprovider=selectedProvider
+          onToggleExpand=(action "onToggleExpandMap")
+          onOneproviderSelected=(action "selectedProviderChanged")}}
+      {{/one-tab-bar}}
     </div>
   </div>
   <div class="row absolute-flex-content-child-stretch content-spaces-data-content">

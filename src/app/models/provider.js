@@ -14,8 +14,6 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
-export const providerStatusList = ['online', 'offline'];
-
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   // TODO: add array transform
@@ -28,10 +26,6 @@ export default Model.extend(GraphSingleModelMixin, {
   cluster: belongsTo('cluster'),
 
   spaceList: belongsTo('space-list'),
-
-  isStatusValid: computed('status', function () {
-    return providerStatusList.includes(this.get('status'));
-  }),
 
   onezoneHostedBaseUrl: computed('cluster.id', function onezoneHostedBaseUrl() {
     const clusterId =

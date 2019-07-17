@@ -8,10 +8,11 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get } from '@ember/object';
+import { computed, observer, get, getProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
+import mapPositionForCoordinates from 'onedata-gui-common/utils/map-position-for-coordinates';
 import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -117,7 +118,7 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<number>}
    */
   _providerCircleScale: computed('_mapState.scale', function () {
-    return 1 + this.get('_mapState.scale') / 6;
+    return 2 + this.get('_mapState.scale') / 3;
   }),
 
   /**
@@ -176,21 +177,14 @@ export default Component.extend({
       if (!defaultMapStateGenerated && get(_providersProxy, 'isFulfilled')) {
         const providers = get(_providersProxy, 'content');
         if (get(providers, 'length') > 0) {
-          const latitudes = providers.map(p => get(p, 'latitude'));
-          const longitudes = providers.map(p => get(p, 'longitude'));
-          const minLat = Math.min(...latitudes);
-          const maxLat = Math.max(...latitudes);
-          const minLng = Math.min(...longitudes);
-          const maxLng = Math.max(...longitudes);
-          const areaWidth = (maxLng - minLng) * _mapCalculatedAreaPadding;
-          const areaHeight = (maxLat - minLat) * _mapCalculatedAreaPadding;
-          const xScale = 360 / areaWidth;
-          const yScale = 180 / areaHeight;
-          const scale = Math.max(1, Math.min(xScale, yScale));
+          const points = 
+            providers.map(p => getProperties(p, 'latitude', 'longitude'));
+          const mapPosition =
+            mapPositionForCoordinates(points, _mapCalculatedAreaPadding);
           this.set('_mapDefaultState', {
-            lat: (minLat + maxLat) / 2,
-            lng: (minLng + maxLng) / 2,
-            scale,
+            lat: mapPosition.latitude,
+            lng: mapPosition.longitude,
+            scale: mapPosition.scale,
           });
         }
         this.set('defaultMapStateGenerated', true);

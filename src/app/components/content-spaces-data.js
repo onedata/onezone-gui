@@ -71,6 +71,11 @@ export default Component.extend(
     providerListIsLoaded: false,
 
     /**
+     * @type {boolean}
+     */
+    isMapExpanded: false,
+
+    /**
      * `baseUrl` property for embedded component container.
      * It is URL with path to selected Oneprovider served web application.
      * @type {ComputedProperty<string>}
@@ -126,7 +131,10 @@ export default Component.extend(
 
     actions: {
       selectedProviderChanged(providerItem) {
-        const providerEntityId = get(providerItem, 'id');
+        this.send('onToggleExpandMap', false);
+
+        const providerEntityId =
+          get(providerItem, 'entityId') || get(providerItem, 'id');
         const provider = this.get('providers').findBy('entityId', providerEntityId);
         if (provider) {
           this.set('selectedProvider', provider);
@@ -134,6 +142,9 @@ export default Component.extend(
           // TODO: show error if cannot find the selected provider on list
           return false;
         }
+      },
+      onToggleExpandMap(expand) {
+        this.set('isMapExpanded', expand);
       },
       hello(message) {
         this.get('globalNotify').info(message);
