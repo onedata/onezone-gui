@@ -2,6 +2,8 @@
   $map-trigger-width: 40px;
   $map-trigger-margin-vert: 4px;
 
+  transform: translateZ(0);
+
   .content-header-section {
     z-index: 1;
   }
@@ -47,17 +49,17 @@
     }
 
     .map-selector {
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      top: $content-header-row-height + $-one-tab-bar-height + $padding-base-vertical;
       left: 0;
       right: 0;
-      background-color: $color-one-white;
+      bottom: 0;
     }
 
-    .one-map {
-      position: relative;
-      bottom: initial;
-      height: calc(100vh - #{($content-header-row-height + $-one-tab-bar-height + $padding-base-vertical + 2 * $content-col-padding)});
+    @media (max-width: $screen-xs-max) {
+      .map-selector {
+        top: $-one-tab-bar-height + $padding-base-vertical;
+      }
     }
 
     .tab-bar-li .inline-icon-container {

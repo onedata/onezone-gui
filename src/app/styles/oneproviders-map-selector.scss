@@ -1,4 +1,20 @@
 .oneproviders-map-selector {
+  &.collapsed {
+    .one-map {
+      transform: translateY(-100%);
+    }
+
+    .map-selector {
+      pointer-events: none;
+    }
+  }
+
+  &.expanded {
+    .map-selector {
+      border-top: 1px solid $main-border-color;
+    }
+  }
+
   .map-trigger {
     position: relative;
     cursor: pointer;
@@ -8,19 +24,17 @@
       font-size: 1.7em;
     }
   }
+
   .map-selector {
-    .collapse:not(.in) {
-      // By default .collapse class changes display to none. Unfortunately it
-      // breaks down jvectormap. To fix that, hack below has been made to
-      // replace `display: none` with, something similar and jvectormap-friendly.
-      display: block;
-      height: 0;
-      overflow: hidden;
-    }
+    overflow: hidden;
   }
+  
   .one-map {
     border: 1px solid $main-border-color;
+    border-top: 0;
     overflow: hidden;
+    background-color: white;
+    transition: transform 0.3s ease;
   }
 }
 
