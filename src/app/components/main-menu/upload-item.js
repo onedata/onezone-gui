@@ -16,12 +16,12 @@ import { reads } from '@ember/object/computed';
 export default MainMenuItem.extend({
   classNames: ['main-menu-upload-item'],
 
-  uploadingManager: service(),
+  uploadManager: service(),
 
   /**
    * @type {Ember.ComputedProperty<number|undefined>}
    */
-  globalProgress: reads('uploadingManager.globalProgress'),
+  globalProgress: reads('uploadManager.globalProgress'),
 
   /**
    * @type {Ember.ComputedProperty<HtmlSafe>}

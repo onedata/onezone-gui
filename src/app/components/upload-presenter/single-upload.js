@@ -1,7 +1,9 @@
 /**
- * Presents a single upload
+ * Presents a single upload triggered by user (groups possible many files, that
+ * were marked to upload in the same operation). May be floating over the content
+ * or an element in the standard list (depending on `floatingMode` value).
  *
- * @module components/uploading-presenter/single-upload
+ * @module components/upload-presenter/single-upload
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -20,7 +22,7 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Array<Utils.UploadingObjectState>}
+   * @type {Array<Utils.UploadObject>}
    */
   uploadObject: undefined,
 
@@ -47,7 +49,7 @@ export default Component.extend({
    * @type {boolean}
    */
   isMinimized: false,
-  
+
   /**
    * @virtual
    * @type {boolean}
@@ -74,7 +76,7 @@ export default Component.extend({
    * Callback called when user clicks cancel on file/directory upload
    * @virtual
    * @type {Function}
-   * @param {Utils.UploadingObjectState}
+   * @param {Utils.UploadObject}
    * @returns {undefined}
    */
   onCancel: notImplementedIgnore,
@@ -109,7 +111,7 @@ export default Component.extend({
       'state',
       'minimizeOnSuccess'
     );
-    if ((state === 'uploaded' && minimizeOnSuccess)) {
+    if (state === 'uploaded' && minimizeOnSuccess) {
       this.scheduleMinimalization();
     }
   }),
@@ -120,8 +122,9 @@ export default Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
-
-    this.send('toggleExpand');
+    if (this.get('floatingMode')) {
+      this.send('toggleExpand', true);
+    }
   },
 
   willDestroyElement() {
@@ -157,19 +160,30 @@ export default Component.extend({
   },
 
   actions: {
-    toggleExpand() {
+    toggleExpand(expand) {
       const {
         triggerChildrenRender,
         onToggleExpand,
-      } = this.getProperties('triggerChildrenRender', 'onToggleExpand');
-      this.set('triggerChildrenRender', true);
-      if (!triggerChildrenRender) {
-        // wait for children to render
-        next(() => safeExec(this, () => {
+        isExpanded,
+      } = this.getProperties(
+        'triggerChildrenRender',
+        'onToggleExpand',
+        'isExpanded'
+      );
+      if (expand === undefined) {
+        expand = !isExpanded;
+      }
+
+      if (expand !== isExpanded) {
+        this.set('triggerChildrenRender', true);
+        if (!triggerChildrenRender) {
+          // wait for children to render
+          next(() => safeExec(this, () => {
+            onToggleExpand();
+          }));
+        } else {
           onToggleExpand();
-        }));
-      } else {
-        onToggleExpand();
+        }
       }
     },
     cancel(uploadObject) {
@@ -211,7 +225,7 @@ export default Component.extend({
               uploadTop - this.$().outerHeight();
             const deltaLeft = targetLeft + target.outerWidth() / 2 -
               uploadLeft - this.$().outerWidth() / 2;
-            const that = this;
+            const component = this;
             this.$().css({
               bottom: -deltaTop,
               left: deltaLeft,
@@ -219,11 +233,11 @@ export default Component.extend({
               opacity: 0.2,
             }).animate({
               height: 0,
-            }, 550, function () {
+            }, 550, function afterMinimizeAnimation() {
               $(this).css({ display: 'none' });
               // minimalization state could change in the middle of animation
-              if (minimize !== that.get('isMinimized')) {
-                safeExec(that, 'onToggleMinimize');
+              if (minimize !== component.get('isMinimized')) {
+                safeExec(component, 'onToggleMinimize');
               }
             });
           }
@@ -231,6 +245,6 @@ export default Component.extend({
           onToggleMinimize();
         }
       }
-    },  
+    },
   },
 });

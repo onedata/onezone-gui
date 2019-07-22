@@ -2,7 +2,7 @@
  * Presents list of uploads (active and done), that were started by
  * oneprovider iframes
  *
- * @module components/uploading-presenter
+ * @module components/upload-presenter
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -21,14 +21,14 @@ import $ from 'jquery';
 const minimizeIndicationClass = 'minimize-target-animation';
 
 export default Component.extend({
-  classNames: ['uploading-presenter'],
+  classNames: ['upload-presenter'],
   classNameBindings: [
     'floatingMode:floating:full-mode',
     'isHidden:hidden',
     'summaryActive',
   ],
 
-  uploadingManager: service(),
+  uploadManager: service(),
   navigationState: service(),
   router: service(),
 
@@ -75,7 +75,7 @@ export default Component.extend({
   minimizeIndicationOffTimer: undefined,
 
   /**
-   * @type {Ember.A<Utils.UploadingObjectState>}
+   * @type {Ember.A<Utils.UploadObject>}
    */
   orderedUploadObjects: undefined,
 
@@ -89,13 +89,14 @@ export default Component.extend({
    */
   summaryActive: and(
     'isSummaryDirectoryVisible',
+    'floatingMode',
     not('isHidden'),
     // summary is not visible in sidebar mobile mode
     not(equal('navigationState.activeContentLevel', raw('sidebar')))
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadObject>>}
    */
   expandedUploads: computed(() => A()),
 
@@ -103,21 +104,21 @@ export default Component.extend({
    * @type {Ember.ComputedProperty<boolean>}
    */
   isHidden: and(
-    not('uploadingManager.areFloatingUploadsVisible'),
+    not('uploadManager.areFloatingUploadsVisible'),
     'floatingMode'
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
    */
   uploadObjects: conditional(
     'floatingMode',
-    'uploadingManager.floatingUploads',
-    'uploadingManager.uploadRootObjects'
+    'uploadManager.floatingUploads',
+    'uploadManager.uploadRootObjects'
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
    */
   filteredUploadObjects: conditional(
     'oneprovider',
@@ -146,7 +147,7 @@ export default Component.extend({
           .rejectBy('isUploading')
           .sortBy('endTime')
           .reverseObjects();
-        
+
         const orderedUploads = activeUploads.concat(doneUploads);
         uploads = this.set('orderedUploadObjects', orderedUploads);
       }
@@ -168,9 +169,9 @@ export default Component.extend({
         'orderedUploadObjects',
         'floatingMode'
       );
-      
+
       _.difference(orderedUploadObjects, filteredUploadObjects)
-          .forEach(upload => orderedUploadObjects.removeObject(upload));
+        .forEach(upload => orderedUploadObjects.removeObject(upload));
 
       const newUploads =
         _.difference(filteredUploadObjects, orderedUploadObjects);
@@ -190,6 +191,10 @@ export default Component.extend({
     }
   ),
 
+  oneproviderObserver: observer('oneprovider', function oneproviderObserver() {
+    this.set('expandedUploads', A(this.get('orderedUploadObjects').toArray()));
+  }),
+
   summaryActiveObserver: observer(
     'summaryActive',
     function summaryActiveObserver() {
@@ -203,6 +208,7 @@ export default Component.extend({
     this._super(...arguments);
 
     this.uploadObjectsOrderReset();
+    this.oneproviderObserver();
   },
 
   /**
@@ -236,7 +242,7 @@ export default Component.extend({
     },
     toggleMinimize(uploadObject) {
       // This action should be fired AFTER minimalization animation of upload
-      const floatingUploads = this.get('uploadingManager.floatingUploads');
+      const floatingUploads = this.get('uploadManager.floatingUploads');
       if (floatingUploads.includes(uploadObject)) {
         floatingUploads.removeObject(uploadObject);
 
@@ -266,10 +272,10 @@ export default Component.extend({
       }
     },
     cancel(uploadObject) {
-      this.get('uploadingManager').cancelUpload(uploadObject);
+      this.get('uploadManager').cancelUpload(uploadObject);
     },
     cancelSummaryDirectory() {
-      this.get('uploadingManager.floatingSummaryRootDirectory.children')
+      this.get('uploadManager.floatingSummaryRootDirectory.children')
         .forEach(rootObject => this.send('cancel', rootObject));
     },
     hideSummaryDirectory() {

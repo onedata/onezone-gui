@@ -6,7 +6,7 @@
     <div class="upload-object-icons">
       {{#if (eq uploadObject.status "failed")}}
         {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
-          {{one-tooltip title=(tt this "uploadingFailedTip")}}
+          {{one-tooltip title=(tt this "uploadFailedTip")}}
         {{/one-icon}}
       {{/if}}
       {{#if isExpandable}}
@@ -18,7 +18,7 @@
         {{bytes-to-string uploadObject.bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string uploadObject.objectSize}}
       </div>
     {{/unless}}
-    {{uploading-presenter/cancel-upload
+    {{upload-presenter/cancel-upload
       onCancel=onCancel
       isCancelled=uploadObject.isCancelled
       iconClass="upload-object-cancel"}}
@@ -27,7 +27,8 @@
     <div
       class="progress-bar {{progressBarContextClass}}"
       role="progressbar"
-      style={{unless isCancelledDirectory progressBarWidthStyle}}></div>
+      style={{unless isCancelledDirectory progressBarWidthStyle}}>
+    </div>
     {{one-tooltip title=(if uploadObject.isCancelled (tt this "cancelled") (concat uploadObject.progress "%")) delayShow=200}}
   </div>
 </div>

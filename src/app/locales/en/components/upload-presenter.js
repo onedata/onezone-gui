@@ -4,12 +4,12 @@ export default {
     uploadingNFiles: 'Uploading {{numberOfFiles}} files',
     uploaded1File: 'Uploaded 1 file',
     uploadedNFiles: 'Uploaded {{numberOfFiles}} files',
-    sendToBackground: 'Send to background',
-    sendToForeground: 'Make floating',
+    minimize: 'Minimize',
+    makeFloating: 'Make floating',
   },
   uploadObjectInfo: {
     progressOf: 'of',
-    uploadingFailedTip: 'Uploading failed',
+    uploadFailedTip: 'Upload failed',
   },
   cancelUpload: {
     cancel: 'Cancel',

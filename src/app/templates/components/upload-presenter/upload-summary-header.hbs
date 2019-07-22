@@ -12,9 +12,9 @@
     class=(concat-classes "upload-summary-header-toggle-minimize" (if isMinimized "minimized"))
     icon="move-down"
     click=(action "onToggleMinimize")}}
-    {{one-tooltip title=(tt this (if isMinimized "sendToForeground" "sendToBackground"))}}
+    {{one-tooltip title=(tt this (if isMinimized "makeFloating" "minimize"))}}
   {{/one-icon}}
-  {{uploading-presenter/cancel-upload
+  {{upload-presenter/cancel-upload
     onCancel=onCancel
     isCancelled=uploadObject.isCancelled
     iconClass="upload-summary-header-cancel"}}

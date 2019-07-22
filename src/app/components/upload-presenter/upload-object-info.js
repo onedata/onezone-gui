@@ -1,7 +1,7 @@
 /**
  * Header of upload list item, that shows info about upload.
  *
- * @module components/uploading-presenter/upload-object-info
+ * @module components/upload-presenter/upload-object-info
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import { computed, getProperties } from '@ember/object';
-import { equal, and } from '@ember/object/computed';
+import { equal, and, reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -25,11 +25,11 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.uploadingPresenter.uploadObjectInfo',
+  i18nPrefix: 'components.uploadPresenter.uploadObjectInfo',
 
   /**
    * @virtual
-   * @type {Utils.UploadingObjectState}
+   * @type {Utils.UploadObject}
    */
   uploadObject: undefined,
 
@@ -96,15 +96,20 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  isDirectory: equal('uploadObject.objectType', 'directory'),
+
+  /**
    * If true, object upload is allowed to be expanded and list subobjects
    * @type {Ember.ComputedProperty<boolean>}
    */
-  isExpandable: equal('uploadObject.objectType', 'directory'),
+  isExpandable: reads('isDirectory'),
 
   /**
    * @type {Ember.ComptedProperty<boolean>}
    */
-  isCancelledDirectory: and('isExpandable', 'uploadObject.isCancelled'),
+  isCancelledDirectory: and('isDirectory', 'uploadObject.isCancelled'),
 
   /**
    * Class defining color of progress bar (depending on status)

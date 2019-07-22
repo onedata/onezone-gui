@@ -1,14 +1,14 @@
 /**
  * Class that represents single upload object state. Upload object may by
  * a file, a directory or `root` - metadirectory that aggregates multiple
- * files/dirs in single upload. UploadingObjectState objects creates a tree
+ * files/dirs in single upload. UploadObject objects creates a tree
  * structure linked using `children` array and `parent` reference. Also each
  * object has reference to root object.
  * 
  * Properties like objectSize or isUploading are calculated recurrently for
  * dirs. For files these fields must be set manually.
  *
- * @module utils/uploading-object-state
+ * @module utils/upload-bject
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -21,7 +21,7 @@ import moment from 'moment';
 
 export default EmberObject.extend({
   /**
-   * Full uploading object path. It should be trimmed from `/` character
+   * Full upload object path. It should be trimmed from `/` character
    * @virtual
    * @type {string}
    */
@@ -46,14 +46,14 @@ export default EmberObject.extend({
 
   /**
    * @virtual
-   * @type {Utils.UploadingObjectState|null}
+   * @type {Utils.UploadObject|null}
    */
   parent: undefined,
 
   /**
    * Nested objects (1 level deep) (if this object is a directory or root)
    * @virtual
-   * @type {Ember.A<Utils.UploadingObjectState>}
+   * @type {Ember.A<Utils.UploadObject>}
    */
   children: undefined,
 
@@ -70,9 +70,10 @@ export default EmberObject.extend({
    * @type {Models.Provider}
    */
   oneprovider: undefined,
-  
+
   /**
-   * Only available when `objectType` is `root`
+   * Only available when `objectType` is `root`. Identifies single upload
+   * process (files that are upload in the same batch).
    * @virtual
    * @type {number}
    */
@@ -169,7 +170,7 @@ export default EmberObject.extend({
   ),
 
   /**
-   * @type {Utils.UploadingObjectState|null}
+   * @type {Utils.UploadObject|null}
    */
   root: computed('objectType', 'parent.root', function root() {
     if (this.get('objectType') === 'root') {
@@ -213,8 +214,8 @@ export default EmberObject.extend({
         if (objectType === 'file') {
           return 'uploading';
         } else {
-          const everyChildrenIsOk = children.every(child => 
-            ['uploaded', 'uploading'].includes(get(child, 'state'))
+          const everyChildrenIsOk = children.every(child => ['uploaded', 'uploading']
+            .includes(get(child, 'state'))
           );
           if (everyChildrenIsOk) {
             return 'uploading';
@@ -248,7 +249,7 @@ export default EmberObject.extend({
       } = this.getProperties('state', 'objectSize', 'bytesUploaded');
       if (objectSize === 0 && bytesUploaded === 0) {
         return state === 'uploaded' ? 100 : 0;
-      } else if (!objectSize || !bytesUploaded ) {
+      } else if (!objectSize || !bytesUploaded) {
         return 0;
       } else {
         return Math.floor((bytesUploaded / objectSize) * 100);
@@ -297,7 +298,7 @@ export default EmberObject.extend({
    * Traverses through upload objects structure to find object related to
    * given path
    * @param {string} relativePath
-   * @returns {Utils.UploadingObjectState|null} null if not found
+   * @returns {Utils.UploadObject|null} null if not found
    */
   getFile(relativePath) {
     const children = this.get('children') || [];
@@ -317,7 +318,7 @@ export default EmberObject.extend({
   /**
    * Returns all nested files (at any level od nesting). Is not a computed
    * property to enforce recomputation only on demand.
-   * @returns {Array<Utils.UploadingObjectState>}
+   * @returns {Array<Utils.UploadObject>}
    */
   getAllNestedFiles() {
     const children = this.get('children');

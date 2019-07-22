@@ -31,7 +31,7 @@ module.exports = function (environment) {
      * - [allowIndex]: boolean If true and URL does not specify any resource,
      *     then router will allow showing page not related to any resource -
      *     index page for resource type of that menu item.
-     * - [sticky]: boolean If true, menu item will stick to the bottom
+     * - [stickyBottom]: boolean If true, menu item will stick to the bottom
      *     edge of main-menu column (only in desktop mode) regardless scroll
      * - [visibilityCondition]: string String in format
      *     `serviceName.propertyName`, that will point to boolean value. If it
@@ -56,8 +56,8 @@ module.exports = function (environment) {
       {
         id: 'uploads',
         icon: 'browser-upload',
-        sticky: true,
-        visibilityCondition: 'uploadingManager.hasUploads',
+        stickyBottom: true,
+        visibilityCondition: 'uploadManager.hasUploads',
         component: 'main-menu/upload-item',
       },
     ],

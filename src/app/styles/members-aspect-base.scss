@@ -43,7 +43,7 @@
       padding-right: 250px;
     }
     .one-label {
-      font-weight: bold;
+      @include font-bold();
     }
   }
 

@@ -1,7 +1,7 @@
 /**
  * Top level list of upload objects inside single upload
  *
- * @module components/uploading-presenter/upload-object-root-list
+ * @module components/upload-presenter/upload-object-root-list
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -11,14 +11,14 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import _ from 'lodash';
-import { scheduleOnce} from '@ember/runloop';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend({
   classNames: ['up-upload-object-root-list'],
 
   /**
    * @virtual
-   * @type {Array<Utils.UploadingObjectState>}
+   * @type {Array<Utils.UploadObject>}
    */
   uploadObjects: undefined,
 
@@ -26,7 +26,7 @@ export default Component.extend({
    * Callback called when "Cancel" button is clicked
    * @virtual
    * @type {Function}
-   * @param {Utils.UploadingObjectState} uploadObject
+   * @param {Utils.UploadObject} uploadObject
    * @returns {undefined}
    */
   onCancel: notImplementedIgnore,
@@ -38,6 +38,7 @@ export default Component.extend({
   maxExpandedLevel: 0,
 
   /**
+   * Mapping: path: string -> expandedLevel: number
    * @type {Ember.ComputedProperty<Object>}
    */
   childrenLevelsExpanded: computed(() => ({})),

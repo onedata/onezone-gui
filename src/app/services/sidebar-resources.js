@@ -25,7 +25,7 @@ export default SidebarResources.extend({
   clusterManager: inject(),
   harvesterManager: inject(),
   harvesterActions: inject(),
-  uploadingManager: inject(),
+  uploadManager: inject(),
 
   /**
    * @param {string} type
@@ -47,7 +47,7 @@ export default SidebarResources.extend({
         return this.get('harvesterManager').getHarvesters();
       case 'uploads':
         return resolve({
-          list: this.get('uploadingManager.sidebarOneproviders'),
+          list: this.get('uploadManager.sidebarOneproviders'),
         });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {

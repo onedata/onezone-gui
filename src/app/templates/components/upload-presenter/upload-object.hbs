@@ -1,4 +1,4 @@
-{{uploading-presenter/upload-object-info
+{{upload-presenter/upload-object-info
   uploadObject=uploadObject
   nestingStyle=nestingStyle
   isExpanded=isExpanded
@@ -7,7 +7,7 @@
 {{#render-later triggerRender=triggerChildrenRender}}
   {{#bs-collapse collapsed=(not isExpanded)}}
     {{#each uploadObject.children as |child|}}
-      {{uploading-presenter/upload-object
+      {{upload-presenter/upload-object
         nestingStyle=nestingStyle
         uploadObject=child
         onCancel=onCancel

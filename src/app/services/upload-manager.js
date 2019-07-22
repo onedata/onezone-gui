@@ -1,8 +1,8 @@
 /**
- * Manages uploading process by communicating with oneprovider iframes and
- * dealing with UploadingObjectState objects.
+ * Manages upload process by communicating with oneprovider iframes and
+ * dealing with UploadObject objects.
  *
- * @module services/uploading-manager
+ * @module services/upload-manager
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -10,7 +10,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
-import UploadingObjectState from 'onezone-gui/utils/uploading-object-state';
+import UploadObject from 'onezone-gui/utils/upload-object';
 import { A } from '@ember/array';
 import { reads } from '@ember/object/computed';
 import { array, gt, raw, conditional, collect } from 'ember-awesome-macros';
@@ -27,7 +27,7 @@ export default Service.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'services.uploadingManager',
+  i18nPrefix: 'services.uploadManager',
 
   /**
    * @type {Window}
@@ -35,22 +35,17 @@ export default Service.extend(I18n, {
   _window: window,
 
   /**
-   * @type {Ember.ComputedProperty<boolean>}
+   * @type {boolean}
    */
-  areFloatingUploadsVisible: computed(
-    'router.currentURL',
-    function areFloatingUploadsVisible() {
-      return !this.get('router').isActive('onedata.sidebar', 'uploads');
-    }
-  ),
+  areFloatingUploadsVisible: true,
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadObject>>}
    */
   uploadRootObjects: computed(() => A()),
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Ember.A<Utils.UploadObject>>}
    */
   floatingUploads: computed(() => A()),
 
@@ -64,8 +59,8 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<EmberObject>}
    */
-  allProvidersProviderAbstraction: computed(
-    function allProvidersProviderAbstraction() {
+  allOneprovidersItem: computed(
+    function allOneprovidersItem() {
       return EmberObject.create({
         id: gri({
           entityType: 'provider',
@@ -84,7 +79,7 @@ export default Service.extend(I18n, {
   sidebarOneproviders: conditional(
     'uploadingOneproviders.length',
     array.concat(
-      collect('allProvidersProviderAbstraction'),
+      collect('allOneprovidersItem'),
       'uploadingOneproviders'
     ),
     raw([]),
@@ -96,7 +91,7 @@ export default Service.extend(I18n, {
   hasUploads: gt('uploadingOneproviders.length', raw(0)),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Utils.UploadingObjectState>>}
+   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
    */
   activeUploads: array.filterBy('uploadRootObjects', raw('isUploading')),
 
@@ -127,16 +122,16 @@ export default Service.extend(I18n, {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Utils.UploadingObjectState>}
-   * UploadingObjectState that accumulates all floating uploads
+   * @type {Ember.ComputedProperty<Utils.UploadObject>}
+   * UploadObject that accumulates all floating uploads
    * stats to single upload visible in mobile mode.
    */
   floatingSummaryRootDirectory: computed(
     function floatingSummaryRootDirectory() {
-      return UploadingObjectState.create({
-        uploadingManager: this,
+      return UploadObject.create({
+        uploadManager: this,
         objectType: 'root',
-        children: reads('uploadingManager.floatingUploads'),
+        children: reads('uploadManager.floatingUploads'),
       });
     }
   ),
@@ -175,7 +170,7 @@ export default Service.extend(I18n, {
   init() {
     this._super(...arguments);
     this.embeddedIframesObserver();
-    this.attachPageUnloadHandler();    
+    this.attachPageUnloadHandler();
   },
 
   /**
@@ -190,21 +185,21 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Event} event 
+   * @param {Event} unloadEvent 
    * @returns {undefined}
    */
-  onPageUnload(event) {
+  onPageUnload(unloadEvent) {
     if (this.get('hasActiveUploads')) {
       // Code based on https://stackoverflow.com/a/19538231
       const confirmationMessage = this.t('confirmPageClose');
       event.preventDefault();
-      (event || window.event).returnValue = confirmationMessage;
-      return confirmationMessage;  
+      (unloadEvent || window.unloadEvent).returnValue = confirmationMessage;
+      return confirmationMessage;
     }
   },
 
   /**
-   * @param {Utils.UploadingObjectState} uploadObject
+   * @param {Utils.UploadObject} uploadObject
    * @returns {undefined}
    */
   cancelUpload(uploadObject) {
@@ -219,7 +214,7 @@ export default Service.extend(I18n, {
    * @param {Models.Provider} oneprovider
    * @param {number} uploadId
    * @param {string} path
-   * @returns {Utils.UploadingObjectState|null}
+   * @returns {Utils.UploadObject|null}
    */
   findUploadObject(oneprovider, uploadId, path) {
     const rootObject = this.get('uploadRootObjects')
@@ -236,7 +231,7 @@ export default Service.extend(I18n, {
    * @param {number} updateData.bytesUploaded
    * @param {boolean} updateData.error
    * @param {boolean} updateData.success
-   * @returns {Utils.UploadingObjectState|null}
+   * @returns {Utils.UploadObject|null}
    */
   updateUploadProgress({
     oneprovider,
@@ -296,8 +291,8 @@ export default Service.extend(I18n, {
               .map(uploadObject => ({ path: get(uploadObject, 'objectPath') })),
           };
         });
-        
-      embeddedIframe.setSharedProperty('uploadingFiles', oneproviderData);
+
+      embeddedIframe.setSharedProperty('uploadFiles', oneproviderData);
       this.setOwnershipOfEmbeddedIframe(oneprovider);
     }
   },
@@ -352,7 +347,7 @@ export default Service.extend(I18n, {
 
   /**
    * Generates tree schema (nested objects structure) with simplified version
-   * of upload state. It can be used then to generate real uploading state
+   * of upload objects. It can be used then to generate real upload objects
    * structure.
    * @param {Array<{ path: string, size: number }>} files flattened files
    *   structure
@@ -426,14 +421,14 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Converts treeSchema of uploading state to real uploading state objects.
+   * Converts treeSchema of upload objects to real upload objects.
    * Is a recurrent function, so calls itself on every children in
    * `treeSchema`.
    * @param {Object} treeSchema schema from `createTreeSchemaFromFileList`
    *   method (may be a nested part of it)
-   * @param {Utils.UploadingObjectState} parent parent node where `treeSchema`
+   * @param {Utils.UploadObject} parent parent node where `treeSchema`
    *   should be converted
-   * @returns {Utils.UploadingObjectState}
+   * @returns {Utils.UploadObject}
    */
   createUploadObjectFromTree(treeSchema, parent) {
     const {
@@ -449,7 +444,7 @@ export default Service.extend(I18n, {
       'children'
     );
 
-    const uploadObject = UploadingObjectState.create({
+    const uploadObject = UploadObject.create({
       objectPath,
       objectType,
       parent,
@@ -493,7 +488,7 @@ export default Service.extend(I18n, {
       const oneproviderHasUpload = uploadRootObjects
         .filterBy('oneprovider', oneprovider)
         .isAny('isUploading');
-      
+
       const owners = get(embeddedIframe, 'owners');
       const existingOwnership = owners.findBy('ownerReference', this);
       if (oneproviderHasUpload) {

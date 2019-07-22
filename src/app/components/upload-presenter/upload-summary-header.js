@@ -2,13 +2,13 @@
  * Header of single upload. Shows info about total number of files and total
  * progress.
  *
- * @module components/uploading-presenter/upload-summary-header
+ * @module components/upload-presenter/upload-summary-header
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
- import Component from '@ember/component';
+import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -23,11 +23,11 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.uploadingPresenter.uploadSummaryHeader',
+  i18nPrefix: 'components.uploadPresenter.uploadSummaryHeader',
 
   /**
    * @virtual
-   * @type {Utils.UploadingObjectState}
+   * @type {Utils.UploadObject}
    */
   uploadObject: undefined,
 

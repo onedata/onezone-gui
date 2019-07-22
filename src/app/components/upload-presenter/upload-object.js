@@ -1,7 +1,7 @@
 /**
  * Represents single upload object (info and children)
  *
- * @module components/uploading-presenter/upload-object
+ * @module components/upload-presenter/upload-object
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -20,7 +20,7 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Utils.UploadingObjectState}
+   * @type {Utils.UploadObject}
    */
   uploadObject: undefined,
 
@@ -58,6 +58,7 @@ export default Component.extend({
   isExpanded: false,
 
   /**
+   * Mapping: path: string -> expandedLevel: number
    * @type {Ember.ComputedProperty<Object>}
    */
   childrenLevelsExpanded: computed(() => ({})),

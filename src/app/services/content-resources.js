@@ -19,7 +19,7 @@ export default Service.extend({
   groupManager: service(),
   clusterManager: service(),
   harvesterManager: service(),
-  uploadingManager: service(),
+  uploadManager: service(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -43,11 +43,12 @@ export default Service.extend({
         return this.get('groupManager').getRecord(id);
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
-      case 'uploads': {
-        const oneprovider = this.get('uploadingManager.sidebarOneproviders')
-          .findBy('id', id);
-        return oneprovider ? resolve(oneprovider) : reject();
-      }
+      case 'uploads':
+        {
+          const oneprovider = this.get('uploadManager.sidebarOneproviders')
+            .findBy('id', id);
+          return oneprovider ? resolve(oneprovider) : reject();
+        }
       default:
         return reject('No such model type: ' + type);
     }

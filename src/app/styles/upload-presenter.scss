@@ -1,11 +1,5 @@
-.uploading-presenter {
-  font-family: Open Sans Semibold;
-
-  &.summary-active ~ .app-layout {
-    @media (max-width: $screen-xs-max) {
-      bottom: 56px;
-    }
-  }
+.upload-presenter {
+  @include font-semibold();
 
   &.floating {
     position: fixed;
@@ -52,14 +46,14 @@
       }
 
       .summary-oneprovider {
-        font-family: 'Open Sans';
+        @include font-regular();
       }
     }
 
     .up-upload-object-info {
       padding-left: $padding-large-vertical;
       padding-right: $padding-large-vertical;
-      font-family: 'Open Sans';
+      @include font-regular();
     }
   }
 

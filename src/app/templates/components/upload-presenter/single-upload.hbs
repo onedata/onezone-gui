@@ -1,12 +1,12 @@
-{{uploading-presenter/upload-summary-header
+{{upload-presenter/upload-summary-header
   uploadObject=uploadObject
   onToggleExpand=(action "toggleExpand")
   onCancel=(action "cancel" uploadObject)
   onToggleMinimize=(action "toggleMinimize")
   isMinimized=isMinimized}}
-{{#render-later triggerRender=triggerChildrenRender}}
+{{#render-later triggerRender=(or triggerChildrenRender isExpanded)}}
   {{#bs-collapse collapsed=(not isExpanded)}}
-    {{uploading-presenter/upload-object-root-list
+    {{upload-presenter/upload-object-root-list
       uploadObjects=uploadObject.children
       onCancel=(action "cancel")}}
   {{/bs-collapse}}

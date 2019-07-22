@@ -239,7 +239,7 @@ export default Component.extend({
       embeddedIframe.setSharedProperty(propertyName, this.get(propertyName));
     });
   },
-  
+
   /**
    * Detaches previously attached iframe from this component (by removing
    * ownership).

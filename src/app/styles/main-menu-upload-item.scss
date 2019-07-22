@@ -9,9 +9,6 @@
       
       &.selected, &.active {
         transition: none;
-        .global-upload-progress-bar {
-          display: none;
-        }
       }
       .item-header {
         transition: padding-left linear $collapse-transition-time, padding-right linear $collapse-transition-time;

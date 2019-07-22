@@ -1,7 +1,7 @@
 /**
  * Button used to cancel upload
  *
- * @module components/uploading-presenter/cancel-upload
+ * @module components/upload-presenter/cancel-upload
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -17,7 +17,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.uploadingPresenter.cancelUpload',
+  i18nPrefix: 'components.uploadPresenter.cancelUpload',
 
   /**
    * Callback called when user clicks cancel
@@ -45,9 +45,13 @@ export default Component.extend(I18n, {
   ackPopoverOpened: false,
 
   actions: {
-    toggleAckPopover(isOpened) {
-      if (this.get('ackPopoverOpened') !== isOpened) {
-        this.set('ackPopoverOpened', isOpened);
+    toggleAckPopover(open) {
+      const {
+        ackPopoverOpened,
+        isCancelled,
+      } = this.getProperties('ackPopoverOpened', 'isCancelled');
+      if (ackPopoverOpened !== open && (!isCancelled || !open)) {
+        this.set('ackPopoverOpened', open);
       }
     },
     cancel() {
