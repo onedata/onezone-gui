@@ -142,7 +142,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         formInputColumns: 'col-xs-12 col-sm-9 col-md-10',
         formSubmitColumns: 'col-xs-12 text-center',
         formToggleLabelColumns: 'col-xs-6 col-sm-3 col-md-2',
-        formToggleInputColumns: 'col-xs-6 col-sm-9 col-md-10',
+        formToggleInputColumns: 'col-xs-6 col-sm-9 col-md-10 text-xs-right',
       };
     } else {
       return layoutConfig;

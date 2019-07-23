@@ -17,7 +17,10 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise, resolve } from 'rsvp';
 import config from 'ember-get-config';
-import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+import {
+  oneproviderAbbrev,
+  oneproviderTestImagePath,
+} from 'onedata-gui-common/utils/onedata-urls';
 
 const {
   legacyOneproviderVersion,
@@ -85,7 +88,7 @@ export default Component.extend(I18n, {
    * @returns {Promise<boolean>}
    */
   checkIsProviderAvailable() {
-    return checkImg(`${this.get('oneproviderOrigin')}/favicon.ico`);
+    return checkImg(`${this.get('oneproviderOrigin')}${oneproviderTestImagePath}`);
   },
 
   showEndpointErrorModal() {

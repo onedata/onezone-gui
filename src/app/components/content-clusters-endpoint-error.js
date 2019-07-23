@@ -11,6 +11,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reads } from '@ember/object/computed';
+import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
 
@@ -37,7 +38,11 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    */
   resourceId: reads('clusterEntityId'),
 
-  standaloneOnepanelUrl: reads('cluster.standaloneOrigin'),
+  emergencyOnepanelUrl: computed('cluster.standaloneOriginProxy.content',
+    function emergencyOnepanelUrl() {
+      return this.get('cluster.standaloneOriginProxy.content') + ':9443';
+    }
+  ),
 
   clusterEntityId: reads('cluster.entityId'),
 
@@ -64,18 +69,19 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     this._super(...arguments);
     this.getTryErrorCheckProxy().then(isError => {
       if (isError === undefined || isError === true) {
-        const {
-          i18n,
-          alertService,
-          standaloneOnepanelUrl,
-        } = this.getProperties('i18n', 'alertService', 'standaloneOnepanelUrl');
-        alertService.error(null, {
-          componentName: 'alerts/endpoint-error',
-          header: i18n.t('components.alerts.endpointError.headerPrefix') +
-            ' ' +
-            i18n.t('components.alerts.endpointError.onepanel'),
-          url: standaloneOnepanelUrl,
-          serverType: 'onepanel',
+        this.get('cluster.standaloneOriginProxy').then(standaloneOrigin => {
+          const {
+            i18n,
+            alertService,
+          } = this.getProperties('i18n', 'alertService');
+          alertService.error(null, {
+            componentName: 'alerts/endpoint-error',
+            header: i18n.t('components.alerts.endpointError.headerPrefix') +
+              ' ' +
+              i18n.t('components.alerts.endpointError.onepanel'),
+            url: standaloneOrigin,
+            serverType: 'onepanel',
+          });
         });
       }
     });

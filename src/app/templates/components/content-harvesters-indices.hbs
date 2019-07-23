@@ -9,7 +9,9 @@
 <div class="row content-row row-small {{unless isCreateIndexFormVisible "row-hidden"}}">
   <h1 class="form-title">{{tt this "createNewIndex"}}</h1>
   {{#bs-form class="form-horizontal col-md-10 col-lg-8 col-centered" as |form|}}
-    {{#form.group validation=(if (get createIndexFormChangedFields "name") (if (get createIndexFormErrors "name") "error" "success"))}}
+    {{#form.group
+      validation=(if (not-eq hasNameErrorToShow undefined) (if hasNameErrorToShow "error" "success"))
+      class=(if hasNameErrorToShow "has-message")}}
       <div class="row">
         <label for={{newIndexNameInputId}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.name"}}:</label>
         <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
