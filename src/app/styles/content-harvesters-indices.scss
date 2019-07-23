@@ -165,7 +165,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         text-align: left;
-        font-family: 'Open Sans Semibold';
+        @include font-semibold();
         white-space: nowrap;
       }
       tr.active td {
@@ -212,7 +212,7 @@
       text-align: center;
       line-height: $chart-size;
       color: $color-one-white;
-      font-family: 'Open Sans Semibold';
+      @include font-semibold();
       .donut-ring, .donut-segment {
         fill: transparent;
         stroke-width: 33;
@@ -225,7 +225,7 @@
         stroke-dashoffset: 78.5398;
       }
       .chart-text {
-        font-family: 'Open Sans';
+        @include font-regular();
         font-size: 1.6em;
         text-anchor: middle;
         dominant-baseline: middle;

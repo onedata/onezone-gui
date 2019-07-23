@@ -5,27 +5,31 @@
  * `appProxy` property.
  * 
  * @module components/one-embedded-container
- * @author Jakub Liput
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { computed, observer } from '@ember/object';
+import { computed, observer, set, get } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import {
-  sharedObjectName,
-  setSharedProperty,
-  sharedDataPropertyName,
-} from 'onedata-gui-common/utils/one-embedded-common';
+import EmbeddedIframe from 'onedata-gui-common/utils/embedded-iframe';
+import { A } from '@ember/array';
+import { getOwner } from '@ember/application';
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
   classNameBindings: ['iframeIsLoading:is-loading', 'fitContainer:fit-container'],
 
   guiUtils: service(),
+  embeddedIframeManager: service(),
+
+  /**
+   * @virtual
+   * @type {string}
+   */
+  iframeId: undefined,
 
   /**
    * Root URL where the embedded component's app is served.
@@ -56,23 +60,19 @@ export default Component.extend({
   embeddedComponentName: undefined,
 
   /**
-   * Set by iframe onload event.
-   * @type {boolean}
+   * Optional, will be passed to EmbeddedIframe.
+   * @virtual
+   * @type {string}
    */
-  iframeIsLoading: true,
+  iframeType: undefined,
 
   /**
-   * Error from iframe element when contentWindow cannot be acessed
-   * (typically access error).
+   * Any data, that should be passed along with iframe. Usually will be
+   * correlated to iframeType. Optional, will be passed to EmbeddedIframe.
+   * @virtual
    * @type {any}
    */
-  iframeError: undefined,
-
-  /**
-   * Set on init.
-   * @type {HTMLElement}
-   */
-  iframeElement: undefined,
+  relatedData: undefined,
 
   /**
    * If true, the iframe will be absolutely positioned with 100% width and height
@@ -80,6 +80,33 @@ export default Component.extend({
    */
   fitContainer: false,
 
+  /**
+   * Collection of action names (strings), which should be injected to iframe.
+   * @type {Array<string>}
+   */
+  callParentActionNames: Object.freeze([]),
+
+  /**
+   * @type {Utils.EmbeddedIframe}
+   */
+  embeddedIframe: undefined,
+
+  /**
+   * Set by iframe onload event.
+   * @type {boolean}
+   */
+  iframeIsLoading: reads('embeddedIframe.iframeIsLoading'),
+
+  /**
+   * Error from iframe element when contentWindow cannot be acessed
+   * (typically access error).
+   * @type {any}
+   */
+  iframeError: reads('embeddedIframe.iframeError'),
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
   src: computed('baseUrl', 'embeddedComponentName', function src() {
     const {
       baseUrl,
@@ -88,100 +115,149 @@ export default Component.extend({
     return `${baseUrl}#/onedata/components/${embeddedComponentName}`;
   }),
 
-  srcChanged: observer('src', function srcChanged() {
-    safeExec(this, () => {
-      this.setProperties({
-        iframeIsLoading: true,
-        iframeError: undefined,
+  iframeIdObserver: observer('iframeId', function iframeIdObserver() {
+    const {
+      embeddedIframe,
+      iframeId,
+    } = this.getProperties('embeddedIframe', 'iframeId');
+    const prevIframeId = embeddedIframe && get(embeddedIframe, 'iframeId');
+
+    if (prevIframeId !== iframeId) {
+      if (prevIframeId) {
+        this.detachIframe();
+      }
+      this.attachIframe();
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+
+    // Copy properties below directly to embedded iframe using observers
+    ['src', 'iframeClass'].forEach(propName => {
+      const observerName = `${propName}Observer`;
+      this[observerName] = observer(propName, function () {
+        const embeddedIframe = this.get('embeddedIframe');
+        if (embeddedIframe) {
+          set(embeddedIframe, propName, this.get(propName));
+        }
       });
     });
-  }),
+  },
 
   didInsertElement() {
     this._super(...arguments);
-    // allow to inject iframeElement for test purposes
-    const iframeElement = this.set(
-      'iframeElement',
-      this.$('iframe.one-embedded-component-iframe')[0]
-    );
-    iframeElement[sharedObjectName] = {
-      callParent: this.callParent.bind(this),
-      propertyChanged: notImplementedIgnore,
-      [sharedDataPropertyName]: {
-        parentInfo: {
-          onezoneVersionDetails: this.get('guiUtils.softwareVersionDetails'),
-        },
-      },
-    };
-    const iframeInjectedProperties = this.get('iframeInjectedProperties');
-    iframeInjectedProperties.forEach(propertyName => {
+
+    this.get('iframeInjectedProperties').forEach(propertyName => {
       const observerFun = function () {
-        const sharedObject = iframeElement[sharedObjectName];
-        setSharedProperty(sharedObject, propertyName, this.get(propertyName));
-        sharedObject.propertyChanged(propertyName);
+        this.get('embeddedIframe')
+          .setSharedProperty(propertyName, this.get(propertyName));
       };
-      observerFun.bind(this)();
       this.addObserver(propertyName, this, observerFun);
     });
+    this.iframeIdObserver();
   },
 
   willDestroyElement() {
     try {
-      this.get('iframeElement')[sharedObjectName] = undefined;
+      this.detachIframe();
     } finally {
       this._super(...arguments);
     }
   },
 
-  callParent(method, ...args) {
-    const actionFun = this.actions[method];
-    if (actionFun) {
-      return actionFun.bind(this)(...args);
+  /**
+   * Attaches iframe to this component according to iframeId (by changing ownership)
+   * @returns {undefined}
+   */
+  attachIframe() {
+    const {
+      embeddedIframeManager,
+      iframeId,
+      relatedData,
+      iframeType,
+      src,
+      iframeInjectedProperties,
+      callParentActionNames,
+      element,
+    } = this.getProperties(
+      'embeddedIframeManager',
+      'iframeId',
+      'relatedData',
+      'iframeType',
+      'src',
+      'iframeInjectedProperties',
+      'callParentActionNames',
+      'element'
+    );
+
+    const iframeOwnership = {
+      ownerReference: this,
+      hostElement: element,
+    };
+
+    // Try to find existing embedded iframe with specified iframeId
+    const embeddedIframes = get(embeddedIframeManager, 'embeddedIframes');
+    let embeddedIframe = embeddedIframes.findBy('iframeId', iframeId);
+    if (!embeddedIframe) {
+      // If not found, create new one...
+      embeddedIframe = EmbeddedIframe.create(getOwner(this).ownerInjection(), {
+        iframeId,
+        owners: A([iframeOwnership]),
+        src,
+        relatedData,
+        iframeType,
+      });
+      // ... and add it to global embeddedIframes collection
+      embeddedIframes.pushObject(embeddedIframe);
     } else {
-      throw new Error(
-        `component:one-embedded-container: no such action: ${method}`
-      );
+      // If embedded iframe exists, add this component to its owners list
+      const owners = get(embeddedIframe, 'owners');
+      if (!owners.any(owner => get(owner, 'ownerReference') === this)) {
+        owners.unshiftObject(iframeOwnership);
+      }
+      // and update its src
+      set(embeddedIframe, 'src', src);
     }
+    this.set('embeddedIframe', embeddedIframe);
+
+    // Attach all parent actions according to `callParentActionNames` array
+    callParentActionNames.forEach(actionName => {
+      let actionFun = this.actions[actionName];
+      if (actionFun) {
+        actionFun = actionFun.bind(this);
+        set(embeddedIframe, `callParentCallbacks.${actionName}`, actionFun);
+      } else {
+        throw new Error(
+          `component:one-embedded-container: no such action: ${actionName}`
+        );
+      }
+    });
+
+    // Inject all shared properties into iframe
+    iframeInjectedProperties.forEach(propertyName => {
+      embeddedIframe.setSharedProperty(propertyName, this.get(propertyName));
+    });
   },
 
-  actions: {
-    willDestroyEmbeddedComponent() {
-      this.get('iframeElement')[sharedObjectName] = undefined;
-    },
-    iframeOnLoad() {
-      try {
-        const iframeElement = this.get('iframeElement');
+  /**
+   * Detaches previously attached iframe from this component (by removing
+   * ownership).
+   * @returns {undefined}
+   */
+  detachIframe() {
+    const {
+      callParentActionNames,
+      embeddedIframe,
+    } = this.getProperties('callParentActionNames', 'embeddedIframe');
 
-        // test for properly loaded iframe content - it should throw on security
-        // error
-        iframeElement.contentWindow;
+    if (embeddedIframe) {
+      callParentActionNames.forEach(actionName => {
+        set(embeddedIframe, `callParentCallbacks.${actionName}`, undefined);
+      });
 
-        // attaching handler to intercept click events
-        const pluginBody = iframeElement.contentDocument.body;
-        // NOTE: this could be also resolved by setting rootEventType to 'click'
-        // in ember-basic-dropdown 2.0, but our version of ember-power-select
-        // uses version 1.1.2 and does not pass rootEvenType
-        ['click', 'mousedown'].forEach(eventName => {
-          pluginBody.addEventListener(eventName, (event) => {
-            const newEvent = new event.constructor(event.type, event);
-            iframeElement.dispatchEvent(newEvent);
-          });
-        });
-
-        safeExec(this, () => {
-          this.setProperties({
-            iframeIsLoading: false,
-            iframeError: undefined,
-          });
-        });
-      } catch (error) {
-        safeExec(this, () => {
-          this.setProperties({
-            iframeIsLoading: false,
-            iframeError: error,
-          });
-        });
-      }
-    },
+      const owners = get(embeddedIframe, 'owners');
+      owners.removeObject(owners.findBy('ownerReference', this));
+    }
   },
 });

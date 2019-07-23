@@ -1,0 +1,5 @@
+.upload-presenter.summary-active ~ .app-layout {
+  @media (max-width: $screen-xs-max) {
+    bottom: 56px;
+  }
+}

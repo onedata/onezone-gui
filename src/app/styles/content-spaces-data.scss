@@ -4,6 +4,10 @@
 
   transform: translateZ(0);
 
+  > *:not(.content-spaces-data-content) {
+    pointer-events: auto;
+  }
+
   .content-header-section {
     z-index: 1;
   }

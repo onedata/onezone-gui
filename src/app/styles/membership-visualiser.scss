@@ -184,7 +184,7 @@
       opacity: 0;
       transition: margin-top $animation-time linear, opacity $animation-time linear;
       font-size: 0.8em;
-      font-weight: bold;
+      @include font-bold();
       color: $color-one-azure;
     }
   }
