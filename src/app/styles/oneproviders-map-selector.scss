@@ -1,0 +1,53 @@
+.oneproviders-map-selector {
+  &.collapsed {
+    .one-map {
+      transform: translateY(-100%);
+    }
+
+    .map-selector {
+      pointer-events: none;
+    }
+  }
+
+  &.expanded {
+    .map-selector {
+      border-top: 1px solid $main-border-color;
+    }
+  }
+
+  .map-trigger {
+    position: relative;
+    cursor: pointer;
+
+    .one-icon {
+      @include absolute-align-middle-center();
+      font-size: 1.7em;
+    }
+  }
+
+  .map-selector {
+    overflow: hidden;
+  }
+  
+  .one-map {
+    border: 1px solid $main-border-color;
+    border-top: 0;
+    overflow: hidden;
+    background-color: white;
+    transition: transform 0.3s ease;
+  }
+}
+
+.oneproviders-selector-popover {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  white-space: nowrap;
+  background-color: $color-one-semiwhite;
+  font-size: $font-size-small;
+}
+
+.webui-popover-oneproviders-selector {
+  max-width: initial;
+  @include webui-popover-arrow-color($color-one-semiwhite);
+}
