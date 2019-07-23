@@ -125,7 +125,7 @@
     padding: 0 0.8 * $padding-xs-horizontal;
     border-radius: $border-radius-base;
     background-color: $relation-indicator-color;
-    font-family: 'Open Sans Semibold';
+    @include font-semibold();
     font-size: 0.6em;
     line-height: 16px;
     white-space: nowrap;

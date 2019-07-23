@@ -1,0 +1,17 @@
+{{upload-presenter/upload-object-info
+  uploadObject=uploadObject
+  nestingStyle=nestingStyle
+  isExpanded=isExpanded
+  onToggleExpand=(action "toggleExpand")
+  onCancel=(action onCancel uploadObject)}}
+{{#render-later triggerRender=triggerChildrenRender}}
+  {{#bs-collapse collapsed=(not isExpanded)}}
+    {{#each uploadObject.children as |child|}}
+      {{upload-presenter/upload-object
+        nestingStyle=nestingStyle
+        uploadObject=child
+        onCancel=onCancel
+        onExpand=(action "childrenExpanded" child)}}
+    {{/each}}
+  {{/bs-collapse}}
+{{/render-later}}

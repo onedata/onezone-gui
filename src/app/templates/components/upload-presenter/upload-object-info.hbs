@@ -1,0 +1,34 @@
+<div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
+<div class="upload-object-nesting-container" {{action "toggleExpand" value="target" on="click"}}>
+  <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
+    {{one-icon class=(concat uploadObject.objectType "-icon upload-object-icon") icon=objectIcon}}
+    {{#truncated-string class="upload-object-name"}}{{uploadObject.objectName}}{{/truncated-string}}
+    <div class="upload-object-icons">
+      {{#if (eq uploadObject.status "failed")}}
+        {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
+          {{one-tooltip title=(tt this "uploadFailedTip")}}
+        {{/one-icon}}
+      {{/if}}
+      {{#if isExpandable}}
+        {{one-icon class=(concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")) icon="arrow-down"}}
+      {{/if}}
+    </div>
+    {{#unless isCancelledDirectory}}
+      <div class="upload-object-progress-info">
+        {{bytes-to-string uploadObject.bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string uploadObject.objectSize}}
+      </div>
+    {{/unless}}
+    {{upload-presenter/cancel-upload
+      onCancel=onCancel
+      isCancelled=uploadObject.isCancelled
+      iconClass="upload-object-cancel"}}
+  </div>
+  <div class="progress upload-object-progress-bar">
+    <div
+      class="progress-bar {{progressBarContextClass}}"
+      role="progressbar"
+      style={{unless isCancelledDirectory progressBarWidthStyle}}>
+    </div>
+    {{one-tooltip title=(if uploadObject.isCancelled (tt this "cancelled") (concat uploadObject.progress "%")) delayShow=200}}
+  </div>
+</div>

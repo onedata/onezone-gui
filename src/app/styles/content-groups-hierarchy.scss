@@ -4,7 +4,7 @@
     right: 0;
     display: inline-block;
     width: 200px;
-    font-family: 'Open Sans';
+    @include font-regular();
   }
 
   .ghv-outer-container {

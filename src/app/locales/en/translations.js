@@ -8,6 +8,7 @@ import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
+import uploads from './tabs/uploads';
 import users from './tabs/users';
 
 import cannotInitWebsocket from './errors/cannot-init-websocket';
@@ -75,6 +76,7 @@ import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
+import uploadPresenter from './components/upload-presenter';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -87,6 +89,7 @@ import clientTokenManager from './services/client-token-manager';
 import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
+import uploadManager from './services/upload-manager';
 
 let translations = {
   tabs: {
@@ -97,6 +100,7 @@ let translations = {
     users,
     clusters,
     harvesters,
+    uploads,
   },
   errors: {
     cannotInitWebsocket,
@@ -168,6 +172,7 @@ let translations = {
     harvesterConfiguration,
     websocketReconnectionModal,
     fatalConnectionErrorModal,
+    uploadPresenter,
   },
   services: {
     clientTokenActions,
@@ -179,6 +184,7 @@ let translations = {
     harvesterActions,
     userActions,
     guiUtils,
+    uploadManager,
   },
 };
 

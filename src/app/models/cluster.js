@@ -19,6 +19,10 @@ import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-c
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise } from 'rsvp';
+import {
+  onepanelAbbrev,
+  onepanelTestImagePath,
+} from 'onedata-gui-common/utils/onedata-urls';
 
 export default Model.extend(
   GraphSingleModelMixin,
@@ -26,7 +30,8 @@ export default Model.extend(
   OneproviderClusterInfoMixin,
   createDataProxyMixin('name'),
   createDataProxyMixin('domain'),
-  createDataProxyMixin('isOnline'), {
+  createDataProxyMixin('isOnline'),
+  createDataProxyMixin('standaloneOrigin'), {
     onedataConnection: service(),
     onedataGraph: service(),
 
@@ -52,10 +57,6 @@ export default Model.extend(
     info: attr('object'),
 
     creationTime: reads('info.creationTime'),
-
-    standaloneOrigin: computed('domain', function standaloneOrigin() {
-      return domainToOrigin(this.get('domain'));
-    }),
 
     oneproviderEntityId: computed(function oneproviderEntityId() {
       return parseGri(this.belongsTo('provider').id()).entityId;
@@ -124,9 +125,19 @@ export default Model.extend(
       }
     },
 
+    /**
+     * @override
+     */
+    fetchStandaloneOrigin() {
+      return this.fetchRemoteGuiContext().then(({ apiOrigin }) =>
+        'https://' + apiOrigin
+      );
+    },
+
     _fetchIsOnline() {
-      return this.getDomainProxy()
-        .then(domain => checkImg(`${domainToOrigin(domain)}/favicon.ico`));
+      return this.get('standaloneOriginProxy').then(standaloneOrigin => {
+        return checkImg(`${standaloneOrigin}${onepanelTestImagePath}`);
+      });
     },
 
     loadAsyncProperties() {
@@ -135,9 +146,11 @@ export default Model.extend(
         domain: this.updateDomainProxy(),
       });
     },
+
+    fetchRemoteGuiContext() {
+      const guiContextPath =
+        `${location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
+      return resolve($.get(guiContextPath));
+    },
   }
 );
-
-function domainToOrigin(domain) {
-  return `https://${domain}:9443`;
-}

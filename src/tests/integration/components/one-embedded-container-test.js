@@ -23,6 +23,7 @@ describe('Integration | Component | one embedded container', function () {
     const SomeEmbeddedContainer = OneEmbeddedContainer.extend({
       layout: oneEmbeddedContainerLayout,
       iframeInjectedProperties: Object.freeze(['iprop']),
+      callParentActionNames: Object.freeze(['hello']),
       actions: {
         hello,
       },
@@ -35,10 +36,14 @@ describe('Integration | Component | one embedded container', function () {
       `frameElement.${sharedObjectName}.callParent('hello', frameElement.${sharedObjectName}.${sharedDataPropertyName}.iprop);`;
     s.appendChild(document.createTextNode(code));
 
-    this.render(hbs `{{some-embedded-container
-      src="empty.html"
-      iprop="world"
-    }}`);
+    this.render(hbs `
+      <div class="embedded-iframes-container"></div>
+      {{some-embedded-container
+        iframeId="testId"
+        src="empty.html"
+        iprop="world"
+      }}
+    `);
     const iframe = this.$('iframe')[0];
     iframe.contentDocument.body.appendChild(s);
 
