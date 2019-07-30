@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5591 Updated common libraries
 * VFS-5641 Added model revision check in push communication
 * VFS-5599 Added support for Onepanel Proxy URL
 * VFS-5605 Updated list of space privileges
