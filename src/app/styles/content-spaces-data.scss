@@ -19,7 +19,12 @@
     color: $color-one-danger;
   }
   .one-tab-bar {
-    padding-right: 200px + $map-trigger-width;
+    padding-right: $map-trigger-width;
+    
+    &.tabs-overflowing {
+      padding-right: 210px + $map-trigger-width;
+    }
+    
 
     .tab-bar-selector {
       z-index: 1;
@@ -60,6 +65,15 @@
       bottom: 0;
     }
 
+    @media(max-width: $screen-sm-max) {
+      .map-selector {
+        top: $content-header-row-mobile-height + $-one-tab-bar-height + $padding-base-vertical
+      }
+      .hello-world {
+        
+      }
+    }
+    
     @media (max-width: $screen-xs-max) {
       .map-selector {
         top: $-one-tab-bar-height + $padding-base-vertical;
@@ -71,5 +85,16 @@
       // to be more centered - because the icon has internal padding
       margin-left: -10px;
     }
+  }
+  
+  .tab-bar-selector {
+    @media (max-width: $screen-xs-max) {
+      left: 0;
+      width: auto;
+    }
+  }
+  
+  .tab-bar-ul-container-space {
+    height: 44px;
   }
 }

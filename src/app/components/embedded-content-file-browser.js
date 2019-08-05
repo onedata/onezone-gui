@@ -25,21 +25,11 @@ export default OneEmbeddedContainer.extend({
   oneprovider: undefined,
 
   /**
-   * TODO: to decide if using entity or record id
-   * ID of `file` record of directory to show in files browser.
-   * It can be changed from Onezone GUI to change dir displayed
-   * in Oneprovider's iframe.
-   * @type {string}
-   */
-  fileId: undefined,
-
-  /**
-   * TODO: to decide if using entity or record id
-   * ID of `space` record that is space of directory displayed in files
+   * Entity ID of `space` record that is space of directory displayed in files
    * browser.
    * @type {string}
    */
-  spaceId: undefined,
+  spaceEntityId: undefined,
 
   /**
    * @override implements OneEmbeddedContainer
@@ -60,12 +50,12 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['fileId', 'spaceId']),
+  iframeInjectedProperties: Object.freeze(['spaceEntityId']),
 
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze(['sayHello']),
+  callParentActionNames: Object.freeze([]),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -74,12 +64,4 @@ export default OneEmbeddedContainer.extend({
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
-
-  actions: {
-    // TODO: integration testing code, to remove when content-file-browser
-    // of Oneprovider GUI will be ready
-    sayHello() {
-      this.get('globalNotify').info('hello');
-    },
-  },
 });

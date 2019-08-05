@@ -1,4 +1,4 @@
-import { Promise } from 'rsvp';
+import { resolve } from 'rsvp';
 
 /**
  * Clears out localStorage model
@@ -13,7 +13,12 @@ import { Promise } from 'rsvp';
  * @param {EmberData.Store} store
  * @returns {Promise<undefined, any>}
  */
-export default function clearLocalStorageModel(store) {
-  store.adapterFor('user').clearLocalStorage();
-  return Promise.resolve();
+export default function clearLocalStorageModel() {
+  for (let i = 0; i < localStorage.length; ++i) {
+    const key = localStorage.key(i);
+    if (key.startsWith('onezone-gui:')) {
+      localStorage.removeItem(key);
+    }
+  }
+  return resolve();
 }

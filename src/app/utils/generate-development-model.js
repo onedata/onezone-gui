@@ -9,7 +9,6 @@
  */
 
 import { camelize } from '@ember/string';
-import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve } from 'rsvp';
@@ -20,6 +19,7 @@ import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvest
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
+import { generateSpaceEntityId } from 'onedata-gui-websocket-client/utils/development-model-common';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -252,7 +252,7 @@ function createUserRecord(store, listRecords) {
     .then(space => space && space.get('entityId'))
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
-        id: userGri(USER_ID),
+        id: store.userGri(USER_ID),
         fullName: USERNAME,
         basicAuthEnabled: true,
         hasPassword: false,
@@ -354,6 +354,12 @@ function generateProviderClusterRecord(index) {
 function createSpacesRecords(store) {
   return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
     return store.createRecord('space', {
+      id: gri({
+        entityType: 'space',
+        entityId: generateSpaceEntityId(index),
+        aspect: 'instance',
+        scope: 'auto',
+      }),
       name: `Space ${index}`,
       scope: 'private',
       directMembership: true,

@@ -54,13 +54,6 @@ export default Component.extend(
     space: undefined,
 
     /**
-     * Opened directory's file entity ID.
-     * Currently mocked value.
-     * @virtual
-     */
-    fileId: 'mock_file_id',
-
-    /**
      * One of the Oneproviders that support `space` which will be used
      * to show file browser.
      * @virtual
