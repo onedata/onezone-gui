@@ -194,6 +194,7 @@ export default EmberObject.extend({
     'objectSize',
     'bytesUploaded',
     'children.@each.{state}',
+    'error',
     function state() {
       const {
         objectType,
@@ -202,13 +203,15 @@ export default EmberObject.extend({
         objectSize,
         bytesUploaded,
         children,
+        error,
       } = this.getProperties(
         'objectType',
         'isUploading',
         'isCancelled',
         'objectSize',
         'bytesUploaded',
-        'children'
+        'children',
+        'error'
       );
       if (isUploading) {
         if (objectType === 'file') {
@@ -225,7 +228,7 @@ export default EmberObject.extend({
         }
       } else if (isCancelled) {
         return 'cancelled';
-      } else if (bytesUploaded < objectSize) {
+      } else if (bytesUploaded < objectSize || error) {
         return 'failed';
       } else {
         return 'uploaded';

@@ -101,17 +101,23 @@ export default Service.extend(I18n, {
   hasActiveUploads: gt('activeUploads.length', raw(0)),
 
   /**
+   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
+   */
+  uploadsForGlobalProgress: computed(() => A()),
+
+  /**
    * @type {Ember.ComputedProperty<number|undefined>}
    */
   globalProgress: computed(
-    'activeUploads.@each.{progress,objectSize}',
+    'uploadsForGlobalProgress.@each.{progress,objectSize}',
     function globalProgress() {
-      const activeUploads = this.get('activeUploads');
-      if (get(activeUploads, 'length') === 0) {
+      const uploadsForGlobalProgress = this.get('uploadsForGlobalProgress');
+      if (get(uploadsForGlobalProgress, 'length') === 0) {
         return undefined;
       } else {
-        const totalBytes = _.sum(activeUploads.mapBy('objectSize'));
-        const totalUploadedBytes = _.sum(activeUploads.mapBy('bytesUploaded'));
+        const totalBytes = _.sum(uploadsForGlobalProgress.mapBy('objectSize'));
+        const totalUploadedBytes =
+          _.sum(uploadsForGlobalProgress.mapBy('bytesUploaded'));
         if (!totalBytes || !totalUploadedBytes) {
           return 0;
         } else {
@@ -143,6 +149,15 @@ export default Service.extend(I18n, {
     return (event) => this.onPageUnload(event);
   }),
 
+  hasActiveUploadsObserver: observer(
+    'hasActiveUploads',
+    function hasActiveUploadsObserver() {
+      if (!this.get('hasActiveUploads')) {
+        this.set('uploadsForGlobalProgress', A());
+      }
+    }
+  ),
+
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
     function embeddedIframesObserver() {
@@ -171,6 +186,7 @@ export default Service.extend(I18n, {
     this._super(...arguments);
     this.embeddedIframesObserver();
     this.attachPageUnloadHandler();
+    this.hasActiveUploadsObserver();
   },
 
   /**
@@ -309,10 +325,12 @@ export default Service.extend(I18n, {
       uploadRootObjects,
       floatingUploads,
       navigationState,
+      uploadsForGlobalProgress,
     } = this.getProperties(
       'uploadRootObjects',
       'floatingUploads',
-      'navigationState'
+      'navigationState',
+      'uploadsForGlobalProgress'
     );
 
     const {
@@ -342,6 +360,7 @@ export default Service.extend(I18n, {
 
     uploadRootObjects.addObject(root);
     floatingUploads.addObject(root);
+    uploadsForGlobalProgress.addObject(root);
     this.updateDataForOneprovider(oneprovider);
   },
 

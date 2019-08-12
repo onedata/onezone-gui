@@ -4,9 +4,9 @@
     {{one-icon class=(concat uploadObject.objectType "-icon upload-object-icon") icon=objectIcon}}
     {{#truncated-string class="upload-object-name"}}{{uploadObject.objectName}}{{/truncated-string}}
     <div class="upload-object-icons">
-      {{#if (eq uploadObject.status "failed")}}
+      {{#if (eq uploadObject.state "failed")}}
         {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
-          {{one-tooltip title=(tt this "uploadFailedTip")}}
+          {{one-tooltip title=(concat (tt this "uploadFailedTip") ": " uploadObject.error)}}
         {{/one-icon}}
       {{/if}}
       {{#if isExpandable}}
