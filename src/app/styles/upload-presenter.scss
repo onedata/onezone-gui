@@ -274,6 +274,10 @@
     &:hover {
       color: $color-one-danger;
     }
+
+    &.disabled {
+      pointer-events: none;
+    }
   }
 
   .upload-object-progress-bar {

@@ -15,7 +15,7 @@
  */
 
 import EmberObject, { computed, observer, get } from '@ember/object';
-import { conditional, equal, sum, array, raw, writable } from 'ember-awesome-macros';
+import { conditional, equal, sum, array, raw, writable, or } from 'ember-awesome-macros';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -234,6 +234,14 @@ export default EmberObject.extend({
         return 'uploaded';
       }
     }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  canBeCancelled: or(
+    equal('state', raw('uploading')),
+    equal('state', raw('partiallyUploading'))
   ),
 
   /**

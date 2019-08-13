@@ -280,6 +280,7 @@ export default Service.extend(I18n, {
       // does not react to all changes in children state. We need to refresh
       // root state manually.
       get(uploadObject, 'root').notifyPropertyChange('state');
+      this.setOwnershipOfEmbeddedIframe(oneprovider);
     }
   },
 
@@ -475,6 +476,7 @@ export default Service.extend(I18n, {
 
     if (objectType !== 'file') {
       const childrenObjects = Object.keys(children)
+        .sort((a, b) => a.localeCompare(b))
         .map(key => this.createUploadObjectFromTree(children[key], uploadObject));
       set(uploadObject, 'children', A(childrenObjects));
     }

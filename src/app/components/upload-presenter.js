@@ -151,9 +151,7 @@ export default Component.extend({
         const orderedUploads = activeUploads.concat(doneUploads);
         uploads = this.set('orderedUploadObjects', orderedUploads);
       }
-      if (get(uploads, 'length')) {
-        this.set('isSummaryDirectoryVisible', true);
-      }
+      this.set('isSummaryDirectoryVisible', Boolean(get(uploads, 'length')));
     }
   ),
 
@@ -187,6 +185,8 @@ export default Component.extend({
 
       if (get(newUploads, 'length')) {
         this.set('isSummaryDirectoryVisible', true);
+      } else if (!get(orderedUploadObjects, 'length')) {
+        this.set('isSummaryDirectoryVisible', false);
       }
     }
   ),
