@@ -1,0 +1,11 @@
+.cookies-consent {
+  position: fixed;
+  bottom: $padding-large-vertical;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - #{2 * $padding-large-horizontal});
+  max-width: 1700px;
+  background-color: $color-one-white;
+  border: 1px solid $main-border-color;
+  z-index: $zindex-layer-2-min + 1;
+}

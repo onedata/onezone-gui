@@ -1,0 +1,7 @@
+{{#unless areCookiesAccepted}}
+  <div class="cookies-consent">
+    Cookies!
+    {{#bs-button onClick=(action "acceptCookies")}}Accept!{{/bs-button}}
+  </div>
+{{/unless}}
+{{yield}}
