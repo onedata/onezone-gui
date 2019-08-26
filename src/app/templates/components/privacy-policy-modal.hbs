@@ -1,2 +1,16 @@
-Privacy policy
+{{#bs-modal open=isOpened onHidden=(action "onHidden") as |modal|}}
+  {{#modal.header}}
+    <h1>{{tt this "header"}}</h1>
+  {{/modal.header}}
+  {{#modal.body}}
+    {{#promise-proxy-container proxy=privacyPolicyProxy}}
+      <div class="main-content">
+        {{privacyPolicy}}
+      </div>
+    {{/promise-proxy-container}}
+  {{/modal.body}}
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button type="primary" onClick=modal.close}}{{tt this "close"}}{{/bs-button}}
+  {{/modal.footer}}
+{{/bs-modal}}
 {{yield}}

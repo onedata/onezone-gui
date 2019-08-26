@@ -9,12 +9,15 @@
  */
 
 import Service, { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
+import DOMPurify from 'npm:dompurify';
 
-const cookiesAcceptedCookieName = 'cookiesAccepted';
+const cookiesAcceptedCookieName = 'cookies-accepted';
 
 export default Service.extend({
   cookies: service(),
   onedataRpc: service(),
+  router: service(),
   
   /**
    * @type {boolean}
@@ -25,6 +28,13 @@ export default Service.extend({
    * @type {boolean}
    */
   isPrivacyPolicyInfoVisible: false,
+
+  /**
+   * @override
+   */
+  showPrivacyPolicyAction: computed(function showPrivacyPolicyAction() {
+    return () => this.showPrivacyPolicyInfo();
+  }),
 
   init() {
     this._super(...arguments);
@@ -39,7 +49,8 @@ export default Service.extend({
    * @returns {Promise<string>}
    */
   getPrivacyPolicyContent() {
-    return this.get('onedataRpc').request('getPrivacyPolicy');
+    return this.get('onedataRpc').request('getPrivacyPolicy')
+      .then(({ content }) => DOMPurify.sanitize(content));
   },
 
   /**

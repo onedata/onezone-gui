@@ -22,6 +22,7 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   globalNotify: service(),
   appStorage: service(),
   navigationState: service(),
+  privacyPolicyManager: service(),
 
   beforeModel(transition) {
     const superResult = this._super(...arguments);
@@ -47,6 +48,12 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
       });
       creatingAppModel.catch(reject);
     });
+  },
+
+  afterModel() {
+    if (this.get('navigationState.queryParams.show_privacy_policy')) {
+      this.get('privacyPolicyManager').showPrivacyPolicyInfo();
+    }
   },
 
   setupController(controller) {

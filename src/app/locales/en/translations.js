@@ -76,6 +76,7 @@ import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import cookiesConsent from './components/cookies-consent';
+import privacyPolicyModal from './components/privacy-policy-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -170,6 +171,7 @@ let translations = {
     websocketReconnectionModal,
     fatalConnectionErrorModal,
     cookiesConsent,
+    privacyPolicyModal,
   },
   services: {
     clientTokenActions,
