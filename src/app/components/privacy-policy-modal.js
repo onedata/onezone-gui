@@ -12,7 +12,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { alias } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { htmlSafe } from '@ember/template';
 
 export default Component.extend(I18n, createDataProxyMixin('privacyPolicy'), {
   privacyPolicyManager: service(),
@@ -31,8 +30,7 @@ export default Component.extend(I18n, createDataProxyMixin('privacyPolicy'), {
    * @override
    */
   fetchPrivacyPolicy() {
-    return this.get('privacyPolicyManager').getPrivacyPolicyContent()
-      .then(content => htmlSafe(content));
+    return this.get('privacyPolicyManager').getPrivacyPolicyContent();
   },
 
   actions: {

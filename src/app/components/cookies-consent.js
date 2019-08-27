@@ -19,6 +19,9 @@ export default Component.extend(I18n, {
   areCookiesAccepted: reads('privacyPolicyManager.areCookiesAccepted'),
 
   actions: {
+    showPrivacyPolicy() {
+      this.get('privacyPolicyManager').showPrivacyPolicyInfo();
+    },
     acceptCookies() {
       this.get('privacyPolicyManager').acceptCookies();
     },
