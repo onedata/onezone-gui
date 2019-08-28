@@ -17,6 +17,7 @@ import { array, gt, raw, conditional, collect } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
+import { getOwner } from '@ember/application';
 
 export default Service.extend(I18n, {
   embeddedIframeManager: service(),
@@ -134,7 +135,7 @@ export default Service.extend(I18n, {
    */
   floatingSummaryRootDirectory: computed(
     function floatingSummaryRootDirectory() {
-      return UploadObject.create({
+      return UploadObject.create(getOwner(this).ownerInjection(), {
         uploadManager: this,
         objectType: 'root',
         children: reads('uploadManager.floatingUploads'),
@@ -259,19 +260,21 @@ export default Service.extend(I18n, {
   }) {
     const uploadObject = this.findUploadObject(oneprovider, uploadId, path);
     if (uploadObject) {
+      const uploadRootObject = get(uploadObject, 'root');
+
       if (bytesUploaded !== undefined) {
         set(uploadObject, 'bytesUploaded', bytesUploaded);
       }
       if (error !== undefined) {
         setProperties(uploadObject, {
-          error,
+          errors: [ error ],
           isUploading: false,
         });
       }
       if (success === true) {
         setProperties(uploadObject, {
           success,
-          error: undefined,
+          errors: [],
           isCancelled: false,
           isUploading: false,
         });
@@ -279,8 +282,12 @@ export default Service.extend(I18n, {
       // In case of many updates in the same time sometimes root upload object
       // does not react to all changes in children state. We need to refresh
       // root state manually.
-      get(uploadObject, 'root').notifyPropertyChange('state');
-      this.setOwnershipOfEmbeddedIframe(oneprovider);
+      uploadRootObject.notifyPropertyChange('state');
+
+      // Recaulculate ownership if upload finished
+      if (!get(uploadRootObject, 'isUploading')) {
+        this.setOwnershipOfEmbeddedIframe(oneprovider);
+      }
     }
   },
 
@@ -464,7 +471,7 @@ export default Service.extend(I18n, {
       'children'
     );
 
-    const uploadObject = UploadObject.create({
+    const uploadObject = UploadObject.create(getOwner(this).ownerInjection(), {
       objectPath,
       objectType,
       parent,

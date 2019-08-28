@@ -6,7 +6,9 @@
     <div class="upload-object-icons">
       {{#if (eq uploadObject.state "failed")}}
         {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
-          {{one-tooltip title=(concat (tt this "uploadFailedTip") ": " uploadObject.error)}}
+          {{#if uploadObject.errorMessage}}
+            {{one-tooltip title=uploadObject.errorMessage}}
+          {{/if}}
         {{/one-icon}}
       {{/if}}
       {{#if isExpandable}}

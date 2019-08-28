@@ -134,9 +134,9 @@ export default Component.extend({
         floatingMode,
         filteredUploadObjects,
       } = this.getProperties('floatingMode', 'filteredUploadObjects');
-      let uploads;
+      let orderedUploadObjects;
       if (floatingMode) {
-        uploads =
+        orderedUploadObjects =
           this.set('orderedUploadObjects', filteredUploadObjects.toArray());
       } else {
         const activeUploads = filteredUploadObjects
@@ -149,9 +149,12 @@ export default Component.extend({
           .reverseObjects();
 
         const orderedUploads = activeUploads.concat(doneUploads);
-        uploads = this.set('orderedUploadObjects', orderedUploads);
+        orderedUploadObjects = this.set('orderedUploadObjects', orderedUploads);
       }
-      this.set('isSummaryDirectoryVisible', Boolean(get(uploads, 'length')));
+      this.set(
+        'isSummaryDirectoryVisible',
+        Boolean(get(orderedUploadObjects, 'length'))
+      );
     }
   ),
 
@@ -185,7 +188,7 @@ export default Component.extend({
 
       if (get(newUploads, 'length')) {
         this.set('isSummaryDirectoryVisible', true);
-      } else if (!get(orderedUploadObjects, 'length')) {
+      } else if (!get(filteredUploadObjects, 'length')) {
         this.set('isSummaryDirectoryVisible', false);
       }
     }
