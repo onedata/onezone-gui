@@ -26,6 +26,7 @@ import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesJoin from './components/content-spaces-join';
+import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
 import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
@@ -93,6 +94,9 @@ import uploadManager from './services/upload-manager';
 
 let translations = {
   tabs: {
+    undefined: {
+      menuItem: '',
+    },
     providers,
     tokens,
     spaces,
@@ -122,6 +126,7 @@ let translations = {
     contentSpacesNew,
     contentProviderEmpty,
     contentSpacesJoin,
+    contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
     contentSpacesJoinHarvester,
