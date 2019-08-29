@@ -4,9 +4,11 @@
     {{one-icon class=(concat uploadObject.objectType "-icon upload-object-icon") icon=objectIcon}}
     {{#truncated-string class="upload-object-name"}}{{uploadObject.objectName}}{{/truncated-string}}
     <div class="upload-object-icons">
-      {{#if (eq uploadObject.status "failed")}}
+      {{#if (eq uploadObject.state "failed")}}
         {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
-          {{one-tooltip title=(tt this "uploadFailedTip")}}
+          {{#if uploadObject.errorMessage}}
+            {{one-tooltip title=uploadObject.errorMessage}}
+          {{/if}}
         {{/one-icon}}
       {{/if}}
       {{#if isExpandable}}
@@ -20,6 +22,7 @@
     {{/unless}}
     {{upload-presenter/cancel-upload
       onCancel=onCancel
+      canCancel=uploadObject.canBeCancelled
       isCancelled=uploadObject.isCancelled
       iconClass="upload-object-cancel"}}
   </div>

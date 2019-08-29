@@ -31,6 +31,12 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {boolean}
    */
+  canCancel: true,
+
+  /**
+   * @virtual
+   * @type {boolean}
+   */
   isCancelled: undefined,
 
   /**

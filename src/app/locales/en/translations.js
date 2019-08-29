@@ -92,6 +92,8 @@ import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
+import uploadObject from './utils/upload-object';
+
 let translations = {
   tabs: {
     undefined: {
@@ -190,6 +192,9 @@ let translations = {
     userActions,
     guiUtils,
     uploadManager,
+  },
+  utils: {
+    uploadObject,
   },
 };
 

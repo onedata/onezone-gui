@@ -126,6 +126,7 @@
     flex-grow: 1;
     min-width: 0;
     .summary-state {
+      display: flex;
       text-transform: uppercase;
     }
     .summary-oneprovider {
@@ -273,6 +274,10 @@
 
     &:hover {
       color: $color-one-danger;
+    }
+
+    &.disabled {
+      pointer-events: none;
     }
   }
 
