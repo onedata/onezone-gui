@@ -1,0 +1,57 @@
+.main-menu-column {
+  $uploading-progress-bar-horiz-padding: $padding-xs-horizontal;
+
+  .one-list {
+    > .main-menu-upload-item {
+      position: relative;
+      background-color: $color-one-mint;
+      transition: background-color .4s;
+      
+      &.selected, &.active {
+        transition: none;
+      }
+      .item-header {
+        transition: padding-left linear $collapse-transition-time, padding-right linear $collapse-transition-time;
+
+        .one-icon {
+          transform: scale(1);
+          transition: transform .4s;
+        }
+      }
+
+      &.minimize-target-animation {
+        background-color: darken($color-one-mint, 25%);
+        .item-header {
+          .one-icon {
+            transform: scale(1.2);
+          }
+        }
+      }
+
+      .global-upload-progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        transition: width $collapse-transition-time linear;
+        border-radius: 0;
+        background-color: transparent;
+
+        .progress-bar {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+  &.collapsed {
+    .main-menu-upload-item .global-upload-progress-bar {
+      width: $main-menu-collapsed-width;
+    }
+  }
+}
+
+.main-menu-upload-item .global-upload-progress-bar {
+  display: none;
+}

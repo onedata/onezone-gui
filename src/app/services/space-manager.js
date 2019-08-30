@@ -30,7 +30,10 @@ export default Service.extend({
   getSpaces() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('spaceList'));
+      .then(user => user.get('spaceList'))
+      .then(spaceList => get(spaceList, 'list')
+        .then(() => spaceList)
+      );
   },
 
   /**

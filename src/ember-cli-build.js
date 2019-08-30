@@ -98,5 +98,12 @@ module.exports = function (defaults) {
 
   VENDOR_ASSETS.forEach(path => app.import('vendor/' + path));
 
+  if (app.env === 'test') {
+    app.import('vendor/fixtures/empty.html', {
+      type: 'test',
+      destDir: 'tests',
+    });
+  }
+
   return app.toTree();
 };

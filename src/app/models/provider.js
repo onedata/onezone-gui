@@ -11,9 +11,9 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-
-export const providerStatusList = ['online', 'offline'];
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
@@ -28,8 +28,10 @@ export default Model.extend(GraphSingleModelMixin, {
 
   spaceList: belongsTo('space-list'),
 
-  isStatusValid: computed('status', function () {
-    return providerStatusList.includes(this.get('status'));
+  onezoneHostedBaseUrl: computed('cluster.id', function onezoneHostedBaseUrl() {
+    const clusterId =
+      parseGri(this.belongsTo('cluster').id()).entityId;
+    return `/opw/${clusterId}/i`;
   }),
 
   //#region Aliases and backward-compatibility
@@ -39,4 +41,4 @@ export default Model.extend(GraphSingleModelMixin, {
   }),
   //#endregion
 
-});
+}).reopenClass(StaticGraphModelMixin);

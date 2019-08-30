@@ -9,7 +9,7 @@
 
 import { inject } from '@ember/service';
 import { A } from '@ember/array';
-import { Promise } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 
 export default SidebarResources.extend({
@@ -25,6 +25,7 @@ export default SidebarResources.extend({
   clusterManager: inject(),
   harvesterManager: inject(),
   harvesterActions: inject(),
+  uploadManager: inject(),
 
   /**
    * @param {string} type
@@ -44,12 +45,16 @@ export default SidebarResources.extend({
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
+      case 'uploads':
+        return resolve({
+          list: this.get('uploadManager.sidebarOneproviders'),
+        });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return Promise.resolve({ list: A([user]) });
+          return resolve({ list: A([user]) });
         });
       default:
-        return new Promise((resolve, reject) => reject('No such collection: ' + type));
+        return reject('No such collection: ' + type);
     }
   },
 
@@ -72,6 +77,17 @@ export default SidebarResources.extend({
         return this.get('harvesterActions.buttons');
       default:
         return [];
+    }
+  },
+
+  /**
+   * @override
+   */
+  getItemsSortingFor(resourceType) {
+    if (resourceType === 'uploads') {
+      return ['isAllOneproviders:desc', 'name'];
+    } else {
+      return this._super(...arguments);
     }
   },
 });

@@ -1,0 +1,100 @@
+.content-spaces-data {
+  $map-trigger-width: 40px;
+  $map-trigger-margin-vert: 4px;
+
+  transform: translateZ(0);
+
+  > *:not(.content-spaces-data-content) {
+    pointer-events: auto;
+  }
+
+  .content-header-section {
+    z-index: 1;
+  }
+
+  .provider-online .one-icon {
+    color: $color-one-success;
+  }
+  .provider-offline .one-icon {
+    color: $color-one-danger;
+  }
+  .one-tab-bar {
+    padding-right: $map-trigger-width;
+    
+    &.tabs-overflowing {
+      padding-right: 210px + $map-trigger-width;
+    }
+    
+
+    .tab-bar-selector {
+      z-index: 1;
+      right: $map-trigger-width + $padding-small-horizontal;
+    }
+
+    .map-trigger {
+      position: absolute;
+      right: 0;
+      top: $map-trigger-margin-vert;
+      bottom: $map-trigger-margin-vert + 4px;
+      width: $map-trigger-width;
+  
+      &:hover, &.active {
+        border: 1px solid $main-border-color;
+      }
+  
+      &.active {
+        bottom: -1px;
+        border-bottom: 0;
+        background-color: $color-one-white;
+        z-index: 1;
+        .one-icon {
+          transform: translateY(-50%) translateX(-50%) translateY(-$map-trigger-margin-vert - 1px);
+        }
+      }
+  
+      &:hover {
+        background-color: $main-content-hover-background;
+      }
+    }
+
+    .map-selector {
+      position: fixed;
+      top: $content-header-row-height + $-one-tab-bar-height + $padding-base-vertical;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    @media(max-width: $screen-sm-max) {
+      .map-selector {
+        top: $content-header-row-mobile-height + $-one-tab-bar-height + $padding-base-vertical
+      }
+      .hello-world {
+        
+      }
+    }
+    
+    @media (max-width: $screen-xs-max) {
+      .map-selector {
+        top: $-one-tab-bar-height + $padding-base-vertical;
+      }
+    }
+
+    .tab-bar-li .inline-icon-container {
+      // a hack to make provider icon to be more to the left and everything
+      // to be more centered - because the icon has internal padding
+      margin-left: -10px;
+    }
+  }
+  
+  .tab-bar-selector {
+    @media (max-width: $screen-xs-max) {
+      left: 0;
+      width: auto;
+    }
+  }
+  
+  .tab-bar-ul-container-space {
+    height: 44px;
+  }
+}

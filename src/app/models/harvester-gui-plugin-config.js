@@ -9,6 +9,7 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import { computed } from '@ember/object';
 
@@ -30,4 +31,4 @@ export default Model.extend(GraphSingleModelMixin, {
       return JSON.stringify(guiPluginConfig, null, 2);
     }
   ),
-});
+}).reopenClass(StaticGraphModelMixin);
