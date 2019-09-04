@@ -64,7 +64,7 @@
     margin-bottom: $padding-small-vertical;
     opacity: 1;
     transform: scaleX(1);
-    transition: bottom .5s linear, left .5s linear, transform .55s ease-in, opacity .55s ease-in; 
+    transition: transition-linear(bottom, .5s), transition-linear(left, .5s), transition-ease-in(transform, .55s), transition-ease-in(opacity, .55s) ; 
     background-color: $color-one-white;
     border: 1px solid $main-border-color;
     
@@ -148,7 +148,7 @@
     transform: rotate(45deg);
     color: $color-one-light-gray;
     font-weight: bold;
-    transition: transform .2s ease;
+    transition: transition-ease(transform);
 
     &:hover {
       color: $main-text-color;
@@ -199,7 +199,7 @@
 
   .upload-object-nesting-space {
     flex-shrink: 0;
-    transition: width .3s ease, max-width .3s ease;
+    transition: transition-ease(width, .3s), transition-ease(max-width, .3s);
   }
 
   .upload-object-nesting-container {
@@ -246,7 +246,7 @@
     font-size: 0.7em;
     font-weight: bold;
     transform: rotate(0deg);
-    transition: transform .2s ease;
+    transition: transition-ease(transform);
     &.expanded {
       transform: rotate(180deg);
     }
