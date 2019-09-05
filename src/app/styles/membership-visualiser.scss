@@ -61,14 +61,14 @@
     }
     .type-icon {
       &::before {
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 1;
       }
       &::after {
         content: $oneicon-settings;
         position: absolute;
         left: 0;
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 0;
       }
     }
@@ -104,7 +104,7 @@
     .line, .dot {
       position: absolute;
       left: 0;
-      transition: background-color $animation-time linear;
+      transition: transition-linear(background-color, 'short');
       background-color: $color-one-azure;
     }
     .line {
@@ -135,7 +135,7 @@
       border-width: 0 2px 2px 0;
       transform-origin: right bottom;
       transform: rotate(-45deg);
-      transition: border-color $animation-time linear;
+      transition: transition-linear(border-color, 'short');
     }
     &.hovered {
       .line, .dot {
@@ -159,7 +159,7 @@
       color: $color-one-blue-gray;
       font-size: $trigger-size;
       opacity: 0;
-      transition: opacity $animation-time linear;
+      transition: transition-linear(opacity, 'short');
       cursor: pointer;
       &:hover {
         color: $color-one-azure;
@@ -182,7 +182,7 @@
       transform: translateX(-50%) translateY(-50%) translateY(-1em);
       margin-top: 0;
       opacity: 0;
-      transition: margin-top $animation-time linear, opacity $animation-time linear;
+      transition: transition-linear(margin-top, 'short'), transition-linear(opacity, 'short');
       font-size: 0.8em;
       @include font-bold();
       color: $color-one-azure;

@@ -34,7 +34,7 @@
     border-top: 0;
     overflow: hidden;
     background-color: white;
-    transition: transform 0.3s ease;
+    transition: transition-ease(transform, .3s);
   }
 }
 
