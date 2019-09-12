@@ -3,7 +3,9 @@
 </div>
 <div class="upload-summary-header-text">
   <div class="summary-state">
-    {{headerText}} <span class="progress-text">({{uploadObject.progress}}%)</span>
+    <span class="header-text">{{headerText}}</span>
+    <span class="space"> </span>
+    <span class="progress-text">({{uploadObject.progress}}%)</span>
     {{#if (eq uploadObject.state "failed")}}
       {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
         {{#if uploadObject.errorMessage}}
