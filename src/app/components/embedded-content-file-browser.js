@@ -10,13 +10,14 @@
 import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
 export default OneEmbeddedContainer.extend({
   layout,
 
   globalNotify: service(),
+  router: service(),
 
   /**
    * @virtual
@@ -30,6 +31,18 @@ export default OneEmbeddedContainer.extend({
    * @type {string}
    */
   spaceEntityId: undefined,
+
+  /**
+   * Entity ID of `file` record that is the directory displayed in files
+   * browser.
+   * @type {string}
+   */
+  dirEntityId: computed('router', function dirEntityId() {
+    // FIXME: find a better way
+    const currentUrl = this.get('router').get('currentURL');
+    const m = currentUrl.match(/.*options=dir\.(.*)/);
+    return m && m[1];
+  }),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -50,12 +63,12 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId']),
+  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'dirEntityId']),
 
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze([]),
+  callParentActionNames: Object.freeze(['updateDirEntityId']),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -64,4 +77,23 @@ export default OneEmbeddedContainer.extend({
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
+
+  // TODO: if there will be more params, use some utils for changing options hash
+  dirChangedObserver: observer('dirEntityId', function dirChangedObserver() {
+    const {
+      router,
+      dirEntityId,
+    } = this.getProperties('router', 'dirEntityId');
+    router.transitionTo({
+      queryParams: {
+        options: `dir.${dirEntityId}`,
+      },
+    });
+  }),
+
+  actions: {
+    updateDirEntityId(dirEntityId) {
+      this.set('dirEntityId', dirEntityId);
+    },
+  },
 });
