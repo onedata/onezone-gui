@@ -15,7 +15,7 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, { get, computed } from '@ember/object';
+import EmberObject, { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -44,6 +44,7 @@ export default Component.extend(
     ],
 
     globalNotify: service(),
+    router: service(),
 
     /**
      * Space selected in sidebar to show its data using one of available
@@ -104,6 +105,15 @@ export default Component.extend(
         }
       }
     ),
+
+    // TODO: remember to just edit options if there will be more options than dir
+    spaceChangedObserver: observer('space', function spaceChangedObserver() {
+      this.get('router').transitionTo({
+        queryParams: {
+          options: '',
+        },
+      });
+    }),
 
     init() {
       this._super(...arguments);
