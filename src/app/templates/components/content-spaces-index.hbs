@@ -41,7 +41,7 @@
         footerText=(if isSupported (tt this "addSupport"))
         footerTextIcon=(if isSupported "provider-add")
         footerLinkToParams=(if isSupported (array "onedata.sidebar.content.aspect" "spaces" spaceId "support"))
-      }}  
+      }}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
         }}
