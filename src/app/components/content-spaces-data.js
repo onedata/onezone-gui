@@ -15,6 +15,7 @@ import EmberObject, { observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { promise, computed } from 'ember-awesome-macros';
+import { next } from '@ember/runloop';
 
 const OneproviderTabItem = EmberObject.extend({
   /**
@@ -40,6 +41,7 @@ export default Component.extend({
 
   globalNotify: service(),
   router: service(),
+  pointerEvents: service(),
 
   /**
    * Space selected in sidebar to show its data using one of available
@@ -117,6 +119,15 @@ export default Component.extend({
   init() {
     this._super(...arguments);
     this.providersChanged();
+    next(() => {
+      safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
+    });
+
+  },
+
+  willDestroyElement() {
+    this._super(...arguments);
+    this.set('pointerEvents.pointerNoneToMainContent', false);
   },
 
   actions: {
