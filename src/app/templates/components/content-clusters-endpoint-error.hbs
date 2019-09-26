@@ -1,4 +1,6 @@
-{{#promise-proxy-container proxy=tryErrorCheckProxy}}
+{{#loading-container
+  isLoading=(or tryErrorCheckProxy.isPending (eq errorCheckProxy.content false))
+}}
   {{#content-info
     class="scroll-breakpoint-700"
     header=(tt this "header")
@@ -37,4 +39,4 @@
       </ul>
     </p>
   {{/content-info}}
-{{/promise-proxy-container}}
+{{/loading-container}}
