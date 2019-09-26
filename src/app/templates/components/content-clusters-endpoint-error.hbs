@@ -1,5 +1,6 @@
-{{#loading-container
-  isLoading=(or tryErrorCheckProxy.isPending (eq errorCheckProxy.content false))
+{{#error-check-view
+  tryErrorCheckProxy=tryErrorCheckProxy
+  errorCheckProxy=errorCheckProxy
 }}
   {{#content-info
     class="scroll-breakpoint-700"
@@ -39,4 +40,4 @@
       </ul>
     </p>
   {{/content-info}}
-{{/loading-container}}
+{{/error-check-view}}
