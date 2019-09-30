@@ -60,6 +60,11 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
         icon: 'folder',
       },
       {
+        id: 'transfers',
+        label: this.t('aspects.transfers'),
+        icon: 'transfers',
+      },
+      {
         id: 'providers',
         label: this.t('aspects.providers'),
         icon: 'provider',

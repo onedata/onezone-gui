@@ -1,9 +1,9 @@
 {{#content-spaces-embedded-base
-  contentContainerClass="content-spaces-data-content"
+  contentContainerClass="content-spaces-transfers-content"
   space=space
   as |embeddedBase|
 }}
-  {{embedded-content-file-browser
+  {{embedded-content-space-transfers
     oneprovider=embeddedBase.selectedProvider
     baseUrl=embeddedBase.contentIframeBaseUrl
     spaceEntityId=space.entityId

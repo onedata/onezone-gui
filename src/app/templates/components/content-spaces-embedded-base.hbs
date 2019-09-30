@@ -1,0 +1,38 @@
+{{#promise-proxy-container proxy=initialProvidersListProxy}}
+  {{#if providers.length}}
+    <div class="row content-header-section">
+      <div class="row content-row header-row hidden-xs content-spaces-data-header">
+        <h1 class="normal-case">
+          {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
+        </h1>
+      </div>
+      <div class="row row-content-tab-bar">
+        {{#one-tab-bar
+          class="space-providers-tab-bar"
+          items=providerItems
+          selectedItem=selectedProviderItem
+          selectedItemChanged=(action "selectedProviderChanged")
+        }}
+          {{oneproviders-map-selector
+            isExpanded=isMapExpanded
+            oneproviders=providers
+            selectedOneprovider=selectedProvider
+            onToggleExpand=(action "onToggleExpandMap")
+            onOneproviderSelected=(action "selectedProviderChanged")
+          }}
+        {{/one-tab-bar}}
+      </div>
+    </div>
+    <div
+      class={{concat-classes "row absolute-flex-content-child-stretch" contentContainerClass}}
+    >
+      {{yield (hash
+        contentIframeBaseUrl=contentIframeBaseUrl
+        selectedProvider=selectedProvider
+      )
+      }}
+    </div>
+  {{else}}
+    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+  {{/if}}
+{{/promise-proxy-container}}
