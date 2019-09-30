@@ -9,11 +9,10 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { alias } from '@ember/object/computed';
+import { alias, reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 
-export default Component.extend(I18n, createDataProxyMixin('privacyPolicy'), {
+export default Component.extend(I18n, {
   privacyPolicyManager: service(),
 
   /**
@@ -27,11 +26,9 @@ export default Component.extend(I18n, createDataProxyMixin('privacyPolicy'), {
   isOpened: alias('privacyPolicyManager.isPrivacyPolicyInfoVisible'),
 
   /**
-   * @override
+   * @type {Ember.ComputedProperty<string>}
    */
-  fetchPrivacyPolicy() {
-    return this.get('privacyPolicyManager').getPrivacyPolicyContent();
-  },
+  content: reads('privacyPolicyManager.privacyPolicy'),
 
   actions: {
     onHidden() {

@@ -1,14 +1,14 @@
-{{#bs-modal open=isOpened onHidden=(action "onHidden") as |modal|}}
-  {{#modal.header}}
-    <h1>{{tt this "header"}}</h1>
-  {{/modal.header}}
-  {{#modal.body class="min-height-100"}}
-    {{#promise-proxy-container proxy=privacyPolicyProxy}}
-      {{wysiwig-editor mode="show" content=privacyPolicy}}
-    {{/promise-proxy-container}}
-  {{/modal.body}}
-  {{#modal.footer class="btn-toolbar"}}
-    {{#bs-button type="primary" onClick=modal.close}}{{tt this "close"}}{{/bs-button}}
-  {{/modal.footer}}
-{{/bs-modal}}
+{{#if content}}
+  {{#bs-modal open=isOpened onHidden=(action "onHidden") as |modal|}}
+    {{#modal.header}}
+      <h1>{{tt this "header"}}</h1>
+    {{/modal.header}}
+    {{#modal.body class="min-height-100"}}
+      {{wysiwig-editor mode="show" content=content}}
+    {{/modal.body}}
+    {{#modal.footer class="btn-toolbar"}}
+      {{#bs-button type="primary" onClick=modal.close}}{{tt this "close"}}{{/bs-button}}
+    {{/modal.footer}}
+  {{/bs-modal}}
+{{/if}}
 {{yield}}

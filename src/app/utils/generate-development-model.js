@@ -60,8 +60,9 @@ const perProviderSize = Math.pow(1024, 4);
 export default function generateDevelopmentModel(store) {
   let sharedUsers, groups, spaces, providers, harvesters;
 
-  // create shared users
-  return createSharedUsersRecords(store)
+  return createGuiMessages(store)
+    // create shared users
+    .then(() => createSharedUsersRecords(store))
     .then(su => sharedUsers = su)
     // create main resources lists
     .then(() =>
@@ -219,6 +220,29 @@ export default function generateDevelopmentModel(store) {
       .then(() => listRecords)
     )
     .then(listRecords => createUserRecord(store, listRecords));
+}
+
+function createGuiMessages(store) {
+  return Promise.all([
+    store.createRecord('guiMessage', {
+      id: 'oz_worker.null.gui_message,privacy_policy',
+      gri: 'oz_worker.null.gui_message,privacy_policy',
+      enabled: true,
+      content: '<p>Privacy policy</p>',
+    }).save(),
+    store.createRecord('guiMessage', {
+      id: 'oz_worker.null.gui_message,cookie_consent_notification',
+      gri: 'oz_worker.null.gui_message,cookie_consent_notification',
+      enabled: true,
+      content: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
+    }).save(),
+    // store.createRecord('guiMessage', {
+    //   id: 'oz_worker.null.gui_message,signin_notification',
+    //   gri: 'oz_worker.null.gui_message,signin_notification',
+    //   enabled: true,
+    //   content: 'Onezone will be down for two months. Such a pity.',
+    // }).save(),
+  ]);
 }
 
 function createUserRecord(store, listRecords) {
