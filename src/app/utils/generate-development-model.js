@@ -228,19 +228,19 @@ function createGuiMessages(store) {
       id: 'oz_worker.null.gui_message,privacy_policy',
       gri: 'oz_worker.null.gui_message,privacy_policy',
       enabled: true,
-      content: '<p>Privacy policy</p>',
+      body: '<p>Privacy policy</p>',
     }).save(),
     store.createRecord('guiMessage', {
       id: 'oz_worker.null.gui_message,cookie_consent_notification',
       gri: 'oz_worker.null.gui_message,cookie_consent_notification',
       enabled: true,
-      content: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
+      body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
     }).save(),
     // store.createRecord('guiMessage', {
     //   id: 'oz_worker.null.gui_message,signin_notification',
     //   gri: 'oz_worker.null.gui_message,signin_notification',
     //   enabled: true,
-    //   content: 'Onezone will be down for two months. Such a pity.',
+    //   body: 'Onezone will be down for two months. Such a pity.',
     // }).save(),
   ]);
 }

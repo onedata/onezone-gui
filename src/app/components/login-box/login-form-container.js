@@ -8,7 +8,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { notEmpty, gt, reads, equal } from '@ember/object/computed';
+import { notEmpty, gt, equal } from '@ember/object/computed';
 import { not, or } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
@@ -82,12 +82,6 @@ export default LoginFormContainer.extend(
      * @type {number}
      */
     _animationTimeout: ANIMATION_TIMEOUT,
-
-    /**
-     * Admin message provided by backend
-     * @type {string}
-     */
-    loginNotification: reads('onedataConnection.loginNotification'),
 
     /**
      * Array of all suported authorizers
