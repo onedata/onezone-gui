@@ -11,6 +11,7 @@ import harvesters from './tabs/harvesters';
 import users from './tabs/users';
 
 import cannotInitWebsocket from './errors/cannot-init-websocket';
+import backendErrors from './errors/backend-errors';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
@@ -102,6 +103,7 @@ let translations = {
   },
   errors: {
     cannotInitWebsocket,
+    backendErrors,
   },
   components: {
     alerts: {
