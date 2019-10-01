@@ -37,7 +37,7 @@ export default OneEmbeddedContainer.extend({
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
-  embeddedComponentName: 'content-spaces-transfers',
+  embeddedComponentName: 'content-space-transfers',
 
   /**
    * @override implements OneEmbeddedContainer
@@ -59,6 +59,7 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([]),
 
+  // FIXME: redundancy with file browser iframe, maybe ifameType etc. too
   /**
    * @override implements OneEmbeddedContainer
    */

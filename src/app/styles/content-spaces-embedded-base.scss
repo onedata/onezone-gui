@@ -1,10 +1,10 @@
-.content-spaces-data {
+.content-spaces-embedded-base {
   $map-trigger-width: 40px;
   $map-trigger-margin-vert: 4px;
 
   transform: translateZ(0);
 
-  > *:not(.content-spaces-data-content) {
+  > *:not(.content-spaces-embedded-base-inner) {
     pointer-events: auto;
   }
 
