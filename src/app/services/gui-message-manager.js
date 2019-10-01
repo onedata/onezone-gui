@@ -13,16 +13,23 @@ import { get } from '@ember/object';
 export default Service.extend({
   store: service(),
 
+  /**
+   * @param {string} id message id
+   * @returns {Promise<string>}
+   */
   getMessage(id) {
     return this.get('store')
       .findRecord('gui-message', `oz_worker.null.gui_message,${id}:private`, {
         adapterOptions: {
           _meta: {
+            // GUI messages are not subscribable
             subscribe: false,
           },
         },
       })
       .then(guiMessage => {
+        // GUI messages cannot by modified nor deleted in Onezone GUI. Hence GUI
+        // message model can be simplified to a single string.
         if (get(guiMessage, 'enabled')) {
           return get(guiMessage, 'body') || undefined;
         } else {
