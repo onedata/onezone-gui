@@ -6,10 +6,10 @@ export default Service.extend({
 
   getMessage(id) {
     return this.get('store')
-      .findRecord('gui-message', `oz_worker.null.gui_message,${id}`)
+      .findRecord('gui-message', `oz_worker.undefined.gui_message,${id}:private`)
       .then(guiMessage => {
         if (get(guiMessage, 'enabled')) {
-          return get(guiMessage, 'content') || undefined;
+          return get(guiMessage, 'body') || undefined;
         } else {
           return undefined;
         }

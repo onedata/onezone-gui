@@ -20,5 +20,5 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {Object}
    */
-  content: attr('string'),
+  body: attr('string'),
 });
