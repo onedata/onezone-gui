@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { run } from '@ember/runloop';
@@ -42,9 +42,13 @@ export default Component.extend(I18n, {
   didInsertElement() {
     this._super(...arguments);
 
-    this.$('.privacy-policy-link').click(() => run(() => {
-      this.get('privacyPolicyManager').showPrivacyPolicyInfo();
-    }));
+    const privacyPolicyManager = this.get('privacyPolicyManager');
+    
+    get(privacyPolicyManager, 'cookieConsentNotificationProxy').then(() => {
+      this.$('.privacy-policy-link').click(() => run(() => {
+        this.get('privacyPolicyManager').showPrivacyPolicyInfo();
+      }));
+    });
   },
 
   actions: {

@@ -7,10 +7,12 @@ import Service from '@ember/service';
 import { set, get } from '@ember/object';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
+import { resolve } from 'rsvp';
 
 const PrivacyPolicyManagerStub = Service.extend({
   cookieConsentNotification: 'Cookie consent content <a class="clickable privacy-policy-link">privacy policy</a>.',
   areCookiesAccepted: false,
+  cookieConsentNotificationProxy: resolve(),
 
   acceptCookies() {
     this.set('areCookiesAccepted', true);

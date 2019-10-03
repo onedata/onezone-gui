@@ -12,7 +12,7 @@ import { camelize } from '@ember/string';
 import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise, resolve } from 'rsvp';
+import { Promise, resolve, all as allFulfilled } from 'rsvp';
 import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
@@ -66,7 +66,7 @@ export default function generateDevelopmentModel(store) {
     .then(su => sharedUsers = su)
     // create main resources lists
     .then(() =>
-      Promise.all(
+      allFulfilled(
         types.map(type =>
           createEntityRecords(store, type, names)
           .then(records => {
@@ -93,9 +93,9 @@ export default function generateDevelopmentModel(store) {
     .then(listRecords => {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
-      return Promise.all([providers, spaces])
+      return allFulfilled([providers, spaces])
         .then(([providerList, spacesList]) =>
-          Promise.all(providerList.map(provider =>
+          allFulfilled(providerList.map(provider =>
             createListRecord(store, 'space', spacesList).then(lr => {
               provider.set('spaceList', lr);
               return provider.save();
@@ -109,9 +109,9 @@ export default function generateDevelopmentModel(store) {
       const providers = listRecords[types.indexOf('provider')].get('list');
       const spaces = listRecords[types.indexOf('space')].get('list');
       const clusters = listRecords[types.indexOf('cluster')].get('list');
-      return Promise.all([providers, spaces, clusters])
+      return allFulfilled([providers, spaces, clusters])
         .then(([providerList, spaceList, clusterList]) =>
-          Promise.all(spaceList.map(space => {
+          allFulfilled(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
               _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
@@ -121,7 +121,7 @@ export default function generateDevelopmentModel(store) {
               return space.save();
             });
           }))
-          .then(() => Promise.all(clusterList.map(cluster => {
+          .then(() => allFulfilled(clusterList.map(cluster => {
             if (get(cluster, 'type') === 'oneprovider') {
               const clusterProvider =
                 providerList.findBy('entityId', get(cluster, 'entityId'));
@@ -149,8 +149,8 @@ export default function generateDevelopmentModel(store) {
     // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords[types.indexOf('group')].get('list')
       .then(records =>
-        Promise.all(records.map(record =>
-          Promise.all([
+        allFulfilled(records.map(record =>
+          allFulfilled([
             attachSharedUsersGroupsToModel(
               store, record, 'group', false, sharedUsers, groups
             ),
@@ -165,8 +165,8 @@ export default function generateDevelopmentModel(store) {
       )
       .then(() => listRecords[types.indexOf('space')].get('list')
         .then(records =>
-          Promise.all(records.map(record =>
-            Promise.all([
+          allFulfilled(records.map(record =>
+            allFulfilled([
               attachSharedUsersGroupsToModel(
                 store, record, 'space', false, sharedUsers, groups
               ),
@@ -182,8 +182,8 @@ export default function generateDevelopmentModel(store) {
       )
       .then(() => listRecords[types.indexOf('harvester')].get('list')
         .then(records =>
-          Promise.all(records.map(record =>
-            Promise.all([
+          allFulfilled(records.map(record =>
+            allFulfilled([
               attachSharedUsersGroupsToModel(
                 store, record, 'harvester', false, sharedUsers, groups
               ),
@@ -198,10 +198,10 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => Promise.all(['space', 'group', 'harvester'].map(modelType => {
+      .then(() => allFulfilled(['space', 'group', 'harvester'].map(modelType => {
         return listRecords[types.indexOf(modelType)].get('list')
           .then(records =>
-            Promise.all(records.map(record =>
+            allFulfilled(records.map(record =>
               createPrivilegesForModel(
                 store,
                 record,
@@ -223,26 +223,32 @@ export default function generateDevelopmentModel(store) {
 }
 
 function createGuiMessages(store) {
-  return Promise.all([
-    store.createRecord('guiMessage', {
-      id: 'oz_worker.null.gui_message,privacy_policy',
-      gri: 'oz_worker.null.gui_message,privacy_policy',
+  const messages = [{
+    name: 'privacy_policy',
+    body: '<p>Privacy policy</p>',
+  }, {
+    name: 'cookie_consent_notification',
+    body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
+  }, {
+    name: 'signin_notification',
+    body: 'Onezone will be down for two months. You have 20 seconds to migrate your data. 19... 18...',
+  }];
+
+  return allFulfilled(messages.map(({ name, body }) => {
+    const messageGri = gri({
+      entityType: 'oz_worker',
+      entityId: 'null',
+      aspect: 'gui_message',
+      aspectId: name,
+      scope: 'private',
+    });
+    return store.createRecord('guiMessage', {
+      id: messageGri,
+      gri: messageGri,
       enabled: true,
-      body: '<p>Privacy policy</p>',
-    }).save(),
-    store.createRecord('guiMessage', {
-      id: 'oz_worker.null.gui_message,cookie_consent_notification',
-      gri: 'oz_worker.null.gui_message,cookie_consent_notification',
-      enabled: true,
-      body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
-    }).save(),
-    // store.createRecord('guiMessage', {
-    //   id: 'oz_worker.null.gui_message,signin_notification',
-    //   gri: 'oz_worker.null.gui_message,signin_notification',
-    //   enabled: true,
-    //   body: 'Onezone will be down for two months. Such a pity.',
-    // }).save(),
-  ]);
+      body,
+    }).save();
+  }));
 }
 
 function createUserRecord(store, listRecords) {
@@ -283,7 +289,7 @@ function createEntityRecords(store, type, names, additionalInfo) {
     case 'harvester':
       return createHarvesterRecords(store, additionalInfo);
     default:
-      return Promise.all(names.map(number =>
+      return allFulfilled(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
       ));
   }
@@ -299,7 +305,7 @@ function createListRecord(store, type, records) {
 }
 
 function createProvidersRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_PROVIDERS).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_PROVIDERS).map((index) => {
     let sign = index % 2 ? -1 : 1;
     const providerId = `oneprovider-${index + 1}`;
     const id = `provider.${providerId}.instance:auto`;
@@ -317,7 +323,7 @@ function createProvidersRecords(store) {
 }
 
 function createSpacesRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_SPACES).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_SPACES).map((index) => {
     return store.createRecord('space', {
       name: `Space ${index}`,
       scope: 'private',
@@ -333,13 +339,13 @@ function createSpacesRecords(store) {
 }
 
 function createClientTokensRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
+  return allFulfilled(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
     return store.createRecord('clientToken', {}).save();
   }));
 }
 
 function createGroupsRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_GROUPS).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_GROUPS).map((index) => {
     return store.createRecord('group', {
       name: `group${index}`,
       scope: 'private',
@@ -351,7 +357,7 @@ function createGroupsRecords(store) {
 }
 
 function createLinkedAccount(store) {
-  return Promise.all(LINKED_ACCOUNT_TYPES.map(idp =>
+  return allFulfilled(LINKED_ACCOUNT_TYPES.map(idp =>
     store.createRecord('linkedAccount', {
       idp,
       emails: A([
@@ -366,7 +372,7 @@ function createClusterRecords(store) {
   const onezoneId = clusterInstanceGri('onezone');
   const oneprovider1Id = clusterInstanceGri('oneprovider-1');
   const oneprovider2Id = clusterInstanceGri('oneprovider-2');
-  return Promise.all([{
+  return allFulfilled([{
       id: onezoneId,
       gri: onezoneId,
       type: 'onezone',
@@ -441,7 +447,7 @@ function createClusterRecords(store) {
 }
 
 function createHarvesterRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_HARVESTERS).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_HARVESTERS).map((index) => {
     return store.createRecord('harvester', {
       name: `Harvester ${index}`,
       scope: 'private',
@@ -487,7 +493,7 @@ function createHarvesterRecords(store) {
         },
       }).save().then(() => record)
     ).then(record => {
-      return Promise.all(_.range(3).map((index) => {
+      return allFulfilled(_.range(3).map((index) => {
           return store.createRecord('index', {
             id: gri({
               entityType: 'harvester',
@@ -508,7 +514,7 @@ function createHarvesterRecords(store) {
 }
 
 function createSharedUsersRecords(store) {
-  return Promise.all(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
     return store.createRecord('sharedUser', { name: `sharedUser${index}` }).save();
   }));
 }
@@ -578,7 +584,7 @@ function createPrivilegesForModel(
   groups,
   privilegesFlags
 ) {
-  return Promise.all([
+  return allFulfilled([
     createPrivilegesRecords(
       store, record, modelType, sharedUsers, privilegesFlags, 'user'
     ),
@@ -611,7 +617,7 @@ function createPrivilegesRecords(
   if (modelType === 'group' && privilegesType === 'group') {
     aspect = 'child_privileges';
   }
-  return Promise.all(_.range(sharedGriArray.length).map((index) => {
+  return allFulfilled(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
       entityType: modelType,
@@ -642,14 +648,14 @@ function attachProgressToHarvesterIndices(
   const perHarvesterSeq = 100;
   const maxSeq = perHarvesterSeq * harvestersNumber;
   const lastUpdate = moment().unix();
-  return Promise.all(harvesters.map((harvester, harvesterIndex) => {
+  return allFulfilled(harvesters.map((harvester, harvesterIndex) => {
     const harvesterEntityId = get(harvester, 'entityId');
     return get(harvester, 'indexList')
       .then(indexList => get(indexList, 'list'))
       .then(indices => {
         const indicesNumber = get(indices, 'length');
         const perIndexSeq = Math.ceil(perHarvesterSeq / indicesNumber);
-        return Promise.all(indices.map((index, indexIndex) => {
+        return allFulfilled(indices.map((index, indexIndex) => {
           const indexEntityId = get(index, 'aspectId');
           const currentSeq = harvesterIndex * perHarvesterSeq +
             Math.min((indexIndex + 1) * perIndexSeq, perHarvesterSeq);

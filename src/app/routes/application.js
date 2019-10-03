@@ -9,7 +9,7 @@
 
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
-import { Promise } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
@@ -38,15 +38,17 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
           type: 'cannot-init-websocket',
         };
       })
-      .then(() => Promise.all([
-        get(privacyPolicyManager, 'privacyPolicyProxy'),
-        get(privacyPolicyManager, 'cookieConsentNotificationProxy'),
-      ]).catch(error => {
-        console.error(error);
-        // Error while loading gui messages is not critical, so it should not
-        // stop loading the page.
-        return undefined;
-      }))
+      .then(() =>
+        allFulfilled([
+          get(privacyPolicyManager, 'privacyPolicyProxy'),
+          get(privacyPolicyManager, 'cookieConsentNotificationProxy'),
+        ]).catch(error => {
+          console.error(error);
+          // Error while loading gui messages is not critical, so it should not
+          // stop loading the page.
+          return undefined;
+        })
+      )
       .then(() => superResult);
   },
 });

@@ -67,8 +67,10 @@ export default Service.extend(
       return this.get('guiMessageManager').getMessage('cookie_consent_notification')
         .then(message =>
           DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] })
-            .replace('[privacy-policy]', '<a class="clickable privacy-policy-link">')
-            .replace('[/privacy-policy]', '</a>')
+          .replace(
+            /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
+            '<a class="clickable privacy-policy-link">$1</a>'
+          )
         );
     },
 
