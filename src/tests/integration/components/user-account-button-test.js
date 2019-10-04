@@ -6,6 +6,7 @@ import sinon from 'sinon';
 import Service from '@ember/service';
 import sessionStub from '../../helpers/stubs/services/session';
 import wait from 'ember-test-helpers/wait';
+import { registerService, lookupService } from '../../helpers/stub-service';
 
 const USER_ID = 'some_user_id';
 const USERNAME = 'some_username';
@@ -19,22 +20,22 @@ const storeStub = Service.extend({
   findRecord() {},
 });
 
+const PrivacyPolicyManagerStub = Service.extend({
+  showPrivacyPolicyAction: undefined,
+});
+
 describe('Integration | Component | user account button', function () {
   setupComponentTest('user-account-button', {
     integration: true,
   });
 
   beforeEach(function () {
-    this.register('service:session', sessionStub);
-    this.inject.service('session', { as: 'session' });
+    registerService(this, 'session', sessionStub);
+    registerService(this, 'store', storeStub);
+    registerService(this, 'privacyPolicyManager', PrivacyPolicyManagerStub);
 
-    this.register('service:store', storeStub);
-    this.inject.service('store', { as: 'store' });
-
-    let session = this.container.lookup('service:session');
-    session.get('data.authenticated').identity.user = USER_ID;
-
-    let store = this.container.lookup('service:store');
+    lookupService(this, 'session').get('data.authenticated').identity.user = USER_ID;
+    const store = lookupService(this, 'store');
     this.findRecordStub = sinon.stub(store, 'findRecord')
       .withArgs('user', sinon.match(/.*/))
       .resolves(USER_RECORD);
