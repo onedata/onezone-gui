@@ -13,10 +13,13 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-relation'],
   classNameBindings: ['isHovered:hovered'],
+
+  i18n: service(),
 
   /**
    * @override
