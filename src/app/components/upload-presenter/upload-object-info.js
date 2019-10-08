@@ -112,14 +112,14 @@ export default Component.extend(I18n, {
   isCancelledDirectory: and('isDirectory', 'uploadObject.isCancelled'),
 
   /**
-   * Class defining color of progress bar (depending on status)
+   * Class defining color of progress bar (depending on state)
    * @type {Ember.ComputedProperty<string>}
    */
   progressBarContextClass: computed(
-    'uploadObject.status',
+    'uploadObject.state',
     function progressBarContextClass() {
       let cssClass = 'progress-bar-';
-      switch (this.get('uploadObject.status')) {
+      switch (this.get('uploadObject.state')) {
         case 'failed':
           cssClass += 'danger';
           break;

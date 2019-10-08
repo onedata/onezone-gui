@@ -5,17 +5,17 @@
     > .main-menu-upload-item {
       position: relative;
       background-color: $color-one-mint;
-      transition: background-color .4s;
+      transition: transition-ease(background-color, .4s);
       
       &.selected, &.active {
         transition: none;
       }
       .item-header {
-        transition: padding-left linear $collapse-transition-time, padding-right linear $collapse-transition-time;
+        transition: transition-linear(padding-left), transition-linear(padding-right);
 
         .one-icon {
           transform: scale(1);
-          transition: transform .4s;
+          transition: transition-ease(transform, .4s);
         }
       }
 
@@ -35,7 +35,7 @@
         display: block;
         width: 100%;
         height: 100%;
-        transition: width $collapse-transition-time linear;
+        transition: transition-linear(width);
         border-radius: 0;
         background-color: transparent;
 

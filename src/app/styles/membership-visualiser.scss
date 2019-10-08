@@ -61,14 +61,14 @@
     }
     .type-icon {
       &::before {
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 1;
       }
       &::after {
         content: $oneicon-settings;
         position: absolute;
         left: 0;
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 0;
       }
     }
@@ -100,7 +100,6 @@
   .membership-relation {
     position: relative;
     width: 100px;
-
     &.hovered {
       .line, .dot {
         background-color: $color-one-blue-gray;
@@ -123,7 +122,7 @@
       color: $color-one-blue-gray;
       font-size: $trigger-size;
       opacity: 0;
-      transition: opacity $animation-time linear;
+      transition: transition-linear(opacity, 'short');
       cursor: pointer;
       &:hover {
         color: $color-one-azure;
@@ -143,7 +142,7 @@
     .arrow-text {
       margin-top: 0;
       opacity: 0;
-      transition: margin-top $animation-time linear, opacity $animation-time linear;
+      transition: transition-linear(margin-top, 'short'), transition-linear(opacity, 'short');
     }
   }
   .membership-more {
@@ -164,17 +163,17 @@
       padding-left: 1em;
       font-style: italic;
     }
-    .ps-container {
+    .ps {
       white-space: nowrap;
       position: relative;
-      &.ps-active-x {
+      &.ps--active-x {
         cursor: move;
       }
-      & > .ps-scrollbar-x-rail {
+      & > .ps__rail-x {
         z-index: 1;
       }
     }
-    .ps-container.ps-active-x + .bar-nav {
+    .ps.ps--active-x + .bar-nav {
       display: block;
     }
     .bar-nav {
@@ -192,7 +191,7 @@
     }
     .scroll-left {
       padding-right: 8px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9) 80%, transparent);
+      background: linear-gradient(to right, rgba($main-content-hover-background, 0.9) 80%, transparent);
       left: 0;
       .one-icon {
         margin-left: -4px;
@@ -200,7 +199,7 @@
     }
     .scroll-right {
       padding-left: 8px;
-      background-image: linear-gradient(to left, rgba(255, 255, 255, 0.9) 80%, transparent);
+      background: linear-gradient(to left, rgba($main-content-hover-background, 0.9) 80%, transparent);
       right: 0;
       .one-icon {
         margin-left: 4px;

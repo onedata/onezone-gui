@@ -196,7 +196,8 @@ export default Component.extend(I18n, {
           const isPrevBlock = get(prevBlock, 'type') === 'block';
           const isThisBlock = get(block, 'type') === 'block';
           const child = get(prevBlock, 'record');
-          const isChildCurrentUser = get(child, 'entityType') === 'user' &&
+          const isChildCurrentUser = Boolean(child) &&
+            get(child, 'entityType') === 'user' &&
             get(child, 'entityId') === currentUserId;
           elements.push({
             id: this.getPathRelationId(prevBlock, block),
@@ -319,7 +320,7 @@ export default Component.extend(I18n, {
   },
 
   getScrollContainer() {
-    return this.$().children('.ps-container');
+    return this.$().children('.ps');
   },
 
   recalculateScrollButtonsVisibility() {

@@ -2,7 +2,18 @@
   <div class="progress-bar" role="progressbar" style={{progressBarWidthStyle}}></div>
 </div>
 <div class="upload-summary-header-text">
-  <div class="summary-state">{{headerText}} <span class="progress-text">({{uploadObject.progress}}%)</span></div>
+  <div class="summary-state">
+    <span class="header-text">{{headerText}}</span>
+    <span class="space"> </span>
+    <span class="progress-text">({{uploadObject.progress}}%)</span>
+    {{#if (eq uploadObject.state "failed")}}
+      {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
+        {{#if uploadObject.errorMessage}}
+          {{one-tooltip title=uploadObject.errorMessage}}
+        {{/if}}
+      {{/one-icon}}
+    {{/if}}
+  </div>
   {{#if (and uploadObject.space uploadObject.oneprovider)}}
     {{#truncated-string class="summary-oneprovider"}}{{uploadObject.space.name}} - {{uploadObject.oneprovider.name}}{{/truncated-string}}
   {{/if}}
@@ -16,6 +27,7 @@
   {{/one-icon}}
   {{upload-presenter/cancel-upload
     onCancel=onCancel
+    canCancel=uploadObject.canBeCancelled
     isCancelled=uploadObject.isCancelled
     iconClass="upload-summary-header-cancel"}}
 </div>
