@@ -12,7 +12,7 @@ import ProductionSymbol from 'onedata-gui-websocket-client/services/onedata-conn
 import DevelopmentSymbol from 'onezone-gui/services/mocks/onedata-connection';
 import { reads } from '@ember/object/computed';
 
-const ExtendedProductionSymbol = ProductionSymbol.extend({
+const OnezoneConnection = ProductionSymbol.extend({
   /**
    * Name of zone instance
    * @type {Ember.Computed<string>}
@@ -38,4 +38,4 @@ const ExtendedProductionSymbol = ProductionSymbol.extend({
   loginNotification: reads('attributes.loginNotification'),
 });
 
-export default environmentExport(config, ExtendedProductionSymbol, DevelopmentSymbol);
+export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);
