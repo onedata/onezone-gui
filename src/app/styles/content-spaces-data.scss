@@ -69,14 +69,11 @@
       .map-selector {
         top: $content-header-row-mobile-height + $-one-tab-bar-height + $padding-base-vertical
       }
-      .hello-world {
-        
-      }
     }
     
     @media (max-width: $screen-xs-max) {
       .map-selector {
-        top: $-one-tab-bar-height + $padding-base-vertical;
+        top: $-one-tab-bar-height + $padding-base-vertical - $content-col-padding;
       }
     }
 
