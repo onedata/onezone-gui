@@ -11,7 +11,7 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, { observer, get, set } from '@ember/object';
+import EmberObject, { get, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { promise, computed } from 'ember-awesome-macros';
@@ -110,12 +110,6 @@ export default Component.extend({
     })
   ),
 
-  providersChanged: observer('initialProvidersListProxy', function providersChanged() {
-    this.get('initialProvidersListProxy').then(list => {
-      safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
-    });
-  }),
-
   init() {
     this._super(...arguments);
     this.providersChanged();
@@ -149,9 +143,6 @@ export default Component.extend({
     },
     onToggleExpandMap(expand) {
       this.set('isMapExpanded', expand);
-    },
-    hello(message) {
-      this.get('globalNotify').info(message);
     },
   },
 });
