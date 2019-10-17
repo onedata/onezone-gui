@@ -1,4 +1,7 @@
-{{#promise-proxy-container proxy=tryErrorCheckProxy}}
+{{#error-check-view
+  tryErrorCheckProxy=tryErrorCheckProxy
+  errorCheckProxy=errorCheckProxy
+}}
   {{#content-info
     class="scroll-breakpoint-700"
     header=(tt this "header")
@@ -37,4 +40,4 @@
       </ul>
     </p>
   {{/content-info}}
-{{/promise-proxy-container}}
+{{/error-check-view}}

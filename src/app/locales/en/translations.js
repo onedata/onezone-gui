@@ -12,6 +12,7 @@ import uploads from './tabs/uploads';
 import users from './tabs/users';
 
 import cannotInitWebsocket from './errors/cannot-init-websocket';
+import backendErrors from './errors/backend-errors';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
@@ -78,6 +79,8 @@ import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import uploadPresenter from './components/upload-presenter';
+import cookiesConsent from './components/cookies-consent';
+import privacyPolicyModal from './components/privacy-policy-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -110,6 +113,7 @@ let translations = {
   },
   errors: {
     cannotInitWebsocket,
+    backendErrors,
   },
   components: {
     alerts: {
@@ -180,6 +184,8 @@ let translations = {
     websocketReconnectionModal,
     fatalConnectionErrorModal,
     uploadPresenter,
+    cookiesConsent,
+    privacyPolicyModal,
   },
   services: {
     clientTokenActions,

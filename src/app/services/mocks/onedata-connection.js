@@ -16,5 +16,4 @@ export default OnedataConnection.extend({
   serviceVersion: '19.02.9',
   serviceBuildVersion: 'm-23493894y7238',
   brandSubtitle: 'Isolated zone',
-  loginNotification: '',
 });

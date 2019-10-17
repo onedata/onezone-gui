@@ -61,7 +61,7 @@ describe('Unit | Utility | generate development model', function () {
         'spaceList', 'groupList', 'providerList', 'clientTokenList',
         'linkedAccountList', 'harvesterList', 'indexList',
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',
-        'privilege', 'harvester', 'index',
+        'privilege', 'harvester', 'index', 'guiMessage',
       ].forEach(modelName =>
         expect(createRecord, `createRecord for ${modelName}`)
         .to.be.calledWith(modelName, sinon.match.object)

@@ -6,7 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-5591 Updated common libraries
+* VFS-1891 Added privacy policy and cookie consent notification
+* VFS-5769 Fixed render failure when switching between clusters
 * VFS-5683 Renamed space indices to views
 * VFS-5641 Added model revision check in push communication
 * VFS-5599 Added support for Onepanel Proxy URL
