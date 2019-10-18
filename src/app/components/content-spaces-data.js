@@ -112,7 +112,9 @@ export default Component.extend({
 
   init() {
     this._super(...arguments);
-    this.providersChanged();
+    this.get('initialProvidersListProxy').then(list => {
+      safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
+    });
     next(() => {
       safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
     });
@@ -122,9 +124,6 @@ export default Component.extend({
   willDestroyElement() {
     this._super(...arguments);
     const pointerEvents = this.get('pointerEvents');
-    this.get('initialProvidersListProxy').then(list => {
-      safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
-    });
     next(() => {
       set(pointerEvents, 'pointerNoneToMainContent', false);
     });
