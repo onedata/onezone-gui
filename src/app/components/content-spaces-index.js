@@ -176,6 +176,7 @@ export default Component.extend(
         this.set('leaveSpaceModalTriggers',
           '.btn-leave-space.btn;a.btn-leave-space:modal');
       });
+      this.get('globalNotify').backendError('creating space', null);
     },
 
     /**
