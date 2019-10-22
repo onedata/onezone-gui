@@ -1,0 +1,24 @@
+{{one-icon icon=iconName class="sidebar-item-icon"}}
+{{one-inline-editor
+  isEditing=isRenaming
+  value=item.name
+  showEmptyInfo=false
+  onSave=(action "rename")
+  editOnClick=false
+  onEdit=(action "toggleRename")
+  class="one-label name-editor token-name"
+  click=(action "editorClick")}}
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="auto"
+  actionsArray=actionsArray
+  toolbarToggleClasses="token-menu-trigger"}}
+{{#if isRemoveTokenModalOpened}}
+  {{remove-token-modal
+    opened=isRemoveTokenModalOpened
+    proceed=(action "remove")
+    close=(action "closeRemoveTokenModal")
+    processing=isRemovingToken
+    token=token}}
+{{/if}}
+{{yield}}

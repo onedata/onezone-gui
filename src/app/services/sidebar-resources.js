@@ -74,4 +74,15 @@ export default SidebarResources.extend({
         return [];
     }
   },
+
+  /**
+   * @override
+   */
+  getItemsSortingFor(type) {
+    if (type === 'tokens') {
+      return ['isActive:desc', 'name'];
+    } else {
+      return this._super(...arguments);
+    }
+  },
 });

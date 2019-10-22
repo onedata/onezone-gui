@@ -9,7 +9,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Unit | Model | client token', function() {
   setupModelTest('client-token', {
-      needs: [],
+    needs: [],
   });
 
   beforeEach(function () {

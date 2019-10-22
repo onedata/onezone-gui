@@ -29,18 +29,18 @@ const standardGroupMapping = {
 };
 
 const standardSpaceMapping = {
-  idFieldName: 'groupId',
-  modelName: 'group',
+  idFieldName: 'spaceId',
+  modelName: 'space',
 };
 
 const standardHarvesterMapping = {
-  idFieldName: 'groupId',
-  modelName: 'group',
+  idFieldName: 'harvesterId',
+  modelName: 'harvester',
 };
 
 const standardClusterMapping = {
-  idFieldName: 'groupId',
-  modelName: 'group',
+  idFieldName: 'clusterId',
+  modelName: 'cluster',
 };
 
 export const inviteTokenSubtypeToTargetModelMapping = {

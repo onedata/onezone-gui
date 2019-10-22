@@ -77,6 +77,8 @@ import websocketReconnectionModal from './components/websocket-reconnection-moda
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import cookiesConsent from './components/cookies-consent';
 import privacyPolicyModal from './components/privacy-policy-modal';
+import sidebarTokens from './components/sidebar-tokens';
+import removeTokenModal from './components/remove-token-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -172,6 +174,8 @@ let translations = {
     fatalConnectionErrorModal,
     cookiesConsent,
     privacyPolicyModal,
+    sidebarTokens,
+    removeTokenModal,
   },
   services: {
     clientTokenActions,

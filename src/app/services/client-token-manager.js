@@ -29,24 +29,20 @@ const ClientTokenManager = Service.extend(I18n, {
   getClientTokens() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('clientTokenList'));
+      .then(user => user.get('clientTokenList'))
+      .then(clientTokenList => clientTokenList.get('list')
+        .then(() => clientTokenList)
+      );
   },
 
   /**
    * Returns token with specified id
-   * @param {string} id
+   * @param {string} entityId
+   * @param {boolean} backgroundReload
    * @return {Promise<ClientToken>} token promise
    */
-  getRecord(id) {
-    return this.getClientTokens()
-      .then(listRecord => get(listRecord, 'list'))
-      .then(list => {
-        const token = list.find(t => id === get(t, 'id'));
-        if (!token) {
-          throw new Error(this.t('getTokenError', { id }));
-        }
-        return token;
-      });
+  getRecord(entityId, backgroundReload = true) {
+    return this.get('store').findRecord('clientToken', entityId, { backgroundReload });
   },
 
   /**
@@ -84,7 +80,7 @@ const ClientTokenManager = Service.extend(I18n, {
    * @param {string} id token id
    * @returns {Promise}
    */
-  deleteRecord(id) {
+  deleteToken(id) {
     return this.getRecord(id)
       .then(token => token.destroyRecord()
         .then(destroyResult => {

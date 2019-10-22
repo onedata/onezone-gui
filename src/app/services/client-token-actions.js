@@ -2,22 +2,22 @@
  * A service which provides client-tokens manipulation functions ready to use for gui
  *
  * @module services/client-token-actions
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { default as Service, inject } from '@ember/service';
-import { computed } from '@ember/object';
+import { default as Service, inject as service } from '@ember/service';
+import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 
 export default Service.extend(I18n, {
-  clientTokenManager: inject(),
-  router: inject(),
-  guiUtils: inject(),
-  globalNotify: inject(),
-  i18n: inject(),
+  clientTokenManager: service(),
+  router: service(),
+  guiUtils: service(),
+  globalNotify: service(),
+  i18n: service(),
 
   /**
    * @override
@@ -69,5 +69,26 @@ export default Service.extend(I18n, {
       globalNotify.backendError(this.t('tokenCreation'), error);
       throw error;
     });
+  },
+
+  /**
+   * @param {Models.ClientToken} token
+   * @returns {Promise}
+   */
+  deleteToken(token) {
+    const {
+      globalNotify,
+      clientTokenManager,
+    } = this.getProperties('globalNotify', 'clientTokenManager');
+
+    return clientTokenManager.deleteToken(get(token, 'entityId'))
+      .then(result => {
+        globalNotify.success(this.t('tokenRemoveSuccess'));
+        return result;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('removingToken'), error);
+        throw error;
+      });
   },
 });
