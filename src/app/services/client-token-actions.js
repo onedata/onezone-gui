@@ -34,7 +34,8 @@ export default Service.extend(I18n, {
       title: this.t('createToken'),
       tip: this.t('createToken'),
       class: 'create-token-btn',
-      action: () => this.createToken(),
+      action: () => this.get('router')
+        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
     }];
   }),
 
