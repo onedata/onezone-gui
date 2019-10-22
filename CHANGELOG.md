@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 
+* VFS-5860 Using refactored API for space support
 * VFS-1891 Added privacy policy and cookie consent notification
 * VFS-5769 Fixed render failure when switching between clusters
 * VFS-5683 Renamed space indices to views
