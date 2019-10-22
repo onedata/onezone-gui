@@ -12,10 +12,11 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import EmberObject, { get, set } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, not } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { promise, computed } from 'ember-awesome-macros';
 import { next } from '@ember/runloop';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const OneproviderTabItem = EmberObject.extend({
   /**
@@ -27,12 +28,13 @@ const OneproviderTabItem = EmberObject.extend({
   icon: 'provider',
   id: reads('provider.entityId'),
   name: reads('provider.name'),
+  disabled: not('provider.online'),
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
 });
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: [
     'content-spaces-data',
     'absolute-flex-content',
@@ -42,6 +44,11 @@ export default Component.extend({
   globalNotify: service(),
   router: service(),
   pointerEvents: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentSpacesData',
 
   /**
    * Space selected in sidebar to show its data using one of available
@@ -88,8 +95,10 @@ export default Component.extend({
         providerItems,
         selectedProvider,
       } = this.getProperties('providerItems', 'selectedProvider');
-      const providerEntityId = get(selectedProvider, 'entityId');
-      return providerItems.findBy('id', providerEntityId);
+      if (selectedProvider) {
+        const providerEntityId = get(selectedProvider, 'entityId');
+        return providerItems.findBy('id', providerEntityId);
+      }
     }
   ),
 
@@ -103,6 +112,17 @@ export default Component.extend({
     }
   ),
 
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showAllOfflineInfo: computed(
+    'selectedProvider',
+    'providers.@each.online',
+    function showAllOfflineInfo() {
+      return !this.get('selectedProvider') && !this.get('providers').isAny('online');
+    }
+  ),
+
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
       return this.get('space.providerList')
@@ -113,12 +133,12 @@ export default Component.extend({
   init() {
     this._super(...arguments);
     this.get('initialProvidersListProxy').then(list => {
-      safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
+      const firstOnlineOneprovider = list.findBy('online');
+      safeExec(this, 'set', 'selectedProvider', firstOnlineOneprovider || null);
     });
     next(() => {
       safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
     });
-
   },
 
   willDestroyElement() {

@@ -11,6 +11,7 @@
           class="space-providers-tab-bar"
           items=providerItems
           selectedItem=selectedProviderItem
+          selectDefaultOnInit=false
           selectedItemChanged=(action "selectedProviderChanged")}}
           {{oneproviders-map-selector
             isExpanded=isMapExpanded
@@ -22,11 +23,27 @@
       </div>
     </div>
     <div class="row absolute-flex-content-child-stretch content-spaces-data-content">
-      {{embedded-content-file-browser
-        oneprovider=selectedProvider
-        baseUrl=contentIframeBaseUrl
-        spaceEntityId=space.entityId
-      }}
+      {{#if showAllOfflineInfo}}
+        {{content-info
+          header=(tt this "allOneprovidersOffline")
+          imagePath=(root-url "assets/images/data-error-no-providers.svg")
+          class="preserve-header scroll-breakpoint-600"
+        }}
+      {{else}}
+        {{#if selectedProvider.online}}
+          {{embedded-content-file-browser
+            oneprovider=selectedProvider
+            baseUrl=contentIframeBaseUrl
+            spaceEntityId=space.entityId
+          }}
+        {{else}}
+          {{content-info
+            header=(tt this "oneproviderOffline")
+            imagePath=(root-url "assets/images/no-connection.svg")
+            class="preserve-header scroll-breakpoint-600"
+          }}
+        {{/if}}
+      {{/if}}
     </div>
   {{else}}
     {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
