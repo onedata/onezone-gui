@@ -114,10 +114,12 @@ export default Component.extend(I18n, {
 
         // attaching handler to intercept click events
         const pluginBody = iframe.contentDocument.body;
-        pluginBody.addEventListener('click', (event) => {
-          const newEvent = new event.constructor(event.type, event);
-          iframe.dispatchEvent(newEvent);
-        });
+        if (pluginBody) {
+          pluginBody.addEventListener('click', (event) => {
+            const newEvent = new event.constructor(event.type, event);
+            iframe.dispatchEvent(newEvent);
+          });
+        }
 
         // attaching gui plugin appProxy
         iframe.appProxy = this.get('dataDiscoveryResources').createAppProxyObject();
