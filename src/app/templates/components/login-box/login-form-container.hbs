@@ -56,8 +56,8 @@
     <span>{{tt this "signInTestMode"}}</span><br>
     {{#link-to "login"}}{{tt this "goBackToMainPage"}}{{/link-to}}
   </div>
-{{else if (and loginNotification (not isLoading))}}
+{{else if (and signInNotification (not isLoading))}}
   <div class="login-notification login-notification-admin-message">
-    {{loginNotification}}
+    {{signInNotification}}
   </div>
 {{/if}}

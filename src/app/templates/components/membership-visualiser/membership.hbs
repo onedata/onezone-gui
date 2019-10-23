@@ -1,7 +1,9 @@
 {{#promise-proxy-container proxy=recordsProxy sizeClass="xs"}}
   {{#perfect-scrollbar-element
+    class="membership-scrollbar-element"
     suppressScrollY=true
-    onScroll=(action "scroll")}}
+    onScroll=(action "scroll")
+  }}
     {{membership-visualiser/membership-path
       pathElements=pathElements
       modifyPrivileges=modifyPrivileges

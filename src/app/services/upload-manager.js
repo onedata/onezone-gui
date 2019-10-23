@@ -17,6 +17,7 @@ import { array, gt, raw, conditional, collect } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
+import { getOwner } from '@ember/application';
 
 export default Service.extend(I18n, {
   embeddedIframeManager: service(),
@@ -101,17 +102,23 @@ export default Service.extend(I18n, {
   hasActiveUploads: gt('activeUploads.length', raw(0)),
 
   /**
+   * @type {Ember.ComputedProperty<Array<Utils.UploadObject>>}
+   */
+  uploadsForGlobalProgress: computed(() => A()),
+
+  /**
    * @type {Ember.ComputedProperty<number|undefined>}
    */
   globalProgress: computed(
-    'activeUploads.@each.{progress,objectSize}',
+    'uploadsForGlobalProgress.@each.{progress,objectSize}',
     function globalProgress() {
-      const activeUploads = this.get('activeUploads');
-      if (get(activeUploads, 'length') === 0) {
+      const uploadsForGlobalProgress = this.get('uploadsForGlobalProgress');
+      if (get(uploadsForGlobalProgress, 'length') === 0) {
         return undefined;
       } else {
-        const totalBytes = _.sum(activeUploads.mapBy('objectSize'));
-        const totalUploadedBytes = _.sum(activeUploads.mapBy('bytesUploaded'));
+        const totalBytes = _.sum(uploadsForGlobalProgress.mapBy('objectSize'));
+        const totalUploadedBytes =
+          _.sum(uploadsForGlobalProgress.mapBy('bytesUploaded'));
         if (!totalBytes || !totalUploadedBytes) {
           return 0;
         } else {
@@ -128,7 +135,7 @@ export default Service.extend(I18n, {
    */
   floatingSummaryRootDirectory: computed(
     function floatingSummaryRootDirectory() {
-      return UploadObject.create({
+      return UploadObject.create(getOwner(this).ownerInjection(), {
         uploadManager: this,
         objectType: 'root',
         children: reads('uploadManager.floatingUploads'),
@@ -142,6 +149,15 @@ export default Service.extend(I18n, {
   pageUnloadHandler: computed(function pageUnloadHandler() {
     return (event) => this.onPageUnload(event);
   }),
+
+  hasActiveUploadsObserver: observer(
+    'hasActiveUploads',
+    function hasActiveUploadsObserver() {
+      if (!this.get('hasActiveUploads')) {
+        this.set('uploadsForGlobalProgress', A());
+      }
+    }
+  ),
 
   embeddedIframesObserver: observer(
     'embeddedIframeManager.embeddedIframes.[]',
@@ -171,6 +187,7 @@ export default Service.extend(I18n, {
     this._super(...arguments);
     this.embeddedIframesObserver();
     this.attachPageUnloadHandler();
+    this.hasActiveUploadsObserver();
   },
 
   /**
@@ -243,19 +260,21 @@ export default Service.extend(I18n, {
   }) {
     const uploadObject = this.findUploadObject(oneprovider, uploadId, path);
     if (uploadObject) {
+      const uploadRootObject = get(uploadObject, 'root');
+
       if (bytesUploaded !== undefined) {
         set(uploadObject, 'bytesUploaded', bytesUploaded);
       }
       if (error !== undefined) {
         setProperties(uploadObject, {
-          error,
+          errors: [ error ],
           isUploading: false,
         });
       }
       if (success === true) {
         setProperties(uploadObject, {
           success,
-          error: undefined,
+          errors: [],
           isCancelled: false,
           isUploading: false,
         });
@@ -263,7 +282,12 @@ export default Service.extend(I18n, {
       // In case of many updates in the same time sometimes root upload object
       // does not react to all changes in children state. We need to refresh
       // root state manually.
-      get(uploadObject, 'root').notifyPropertyChange('state');
+      uploadRootObject.notifyPropertyChange('state');
+
+      // Recaulculate ownership if upload finished
+      if (!get(uploadRootObject, 'isUploading')) {
+        this.setOwnershipOfEmbeddedIframe(oneprovider);
+      }
     }
   },
 
@@ -309,10 +333,12 @@ export default Service.extend(I18n, {
       uploadRootObjects,
       floatingUploads,
       navigationState,
+      uploadsForGlobalProgress,
     } = this.getProperties(
       'uploadRootObjects',
       'floatingUploads',
-      'navigationState'
+      'navigationState',
+      'uploadsForGlobalProgress'
     );
 
     const {
@@ -342,6 +368,7 @@ export default Service.extend(I18n, {
 
     uploadRootObjects.addObject(root);
     floatingUploads.addObject(root);
+    uploadsForGlobalProgress.addObject(root);
     this.updateDataForOneprovider(oneprovider);
   },
 
@@ -444,7 +471,7 @@ export default Service.extend(I18n, {
       'children'
     );
 
-    const uploadObject = UploadObject.create({
+    const uploadObject = UploadObject.create(getOwner(this).ownerInjection(), {
       objectPath,
       objectType,
       parent,
@@ -456,6 +483,7 @@ export default Service.extend(I18n, {
 
     if (objectType !== 'file') {
       const childrenObjects = Object.keys(children)
+        .sort((a, b) => a.localeCompare(b))
         .map(key => this.createUploadObjectFromTree(children[key], uploadObject));
       set(uploadObject, 'children', A(childrenObjects));
     }

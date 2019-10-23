@@ -89,6 +89,9 @@ export default Service.extend(I18n, {
         );
         return harvester;
       }).catch(error => {
+        if (error && error.id === 'temporaryFailure') {
+          error.id = 'cannotConnectToElasticsearch';
+        }
         globalNotify.backendError(this.t('harvesterCreating'), error);
         throw error;
       });

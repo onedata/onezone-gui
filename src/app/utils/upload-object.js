@@ -15,11 +15,20 @@
  */
 
 import EmberObject, { computed, observer, get } from '@ember/object';
-import { conditional, equal, sum, array, raw, writable } from 'ember-awesome-macros';
+import { inject as service } from '@ember/service';
+import { conditional, equal, sum, array, raw, writable, or } from 'ember-awesome-macros';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 import moment from 'moment';
 
-export default EmberObject.extend({
+export default EmberObject.extend(I18n, {
+  i18n: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'utils.uploadObject',
+
   /**
    * Full upload object path. It should be trimmed from `/` character
    * @virtual
@@ -35,14 +44,6 @@ export default EmberObject.extend({
    * @type {string}
    */
   objectType: undefined,
-
-  /**
-   * Error related to uploading this file. May be not empty only if `objectType`
-   * is `file`
-   * @virtual
-   * @type {any}
-   */
-  error: undefined,
 
   /**
    * @virtual
@@ -116,6 +117,40 @@ export default EmberObject.extend({
       raw('bytesUploaded')
     ))
   ),
+
+  /**
+   * Errors related to uploading this file or nested files in directory.
+   * @virtual
+   * @type {Ember.ComputedProperty<Array<string>>}
+   */
+  errors: writable(conditional(
+    equal('objectType', raw('file')),
+    raw([]),
+    array.reduce(
+      array.mapBy('children', raw('errors')),
+      (arr, cur) => arr.concat(cur),
+      []
+    )
+  )),
+
+  /**
+   * Error message based on `errors` array
+   * @virtual
+   * @type {Ember.ComputedProperty<Array<string>>}
+   */
+  errorMessage: computed('errors.[]', function errorMessage() {
+    const errors = this.get('errors');
+    if (errors.length) {
+      if (errors.length === 1) {
+        return this.tt('uploadError', { error: errors[0] });
+      } else {
+        return this.tt('uploadMultipleError', {
+          firstError: errors[0],
+          otherErrorsCount: errors.length - 1,
+        });
+      }
+    }
+  }),
 
   /**
    * True if object is cancelled, false otherwise. Should be overridden with
@@ -194,6 +229,7 @@ export default EmberObject.extend({
     'objectSize',
     'bytesUploaded',
     'children.@each.{state}',
+    'errors',
     function state() {
       const {
         objectType,
@@ -202,13 +238,15 @@ export default EmberObject.extend({
         objectSize,
         bytesUploaded,
         children,
+        errors,
       } = this.getProperties(
         'objectType',
         'isUploading',
         'isCancelled',
         'objectSize',
         'bytesUploaded',
-        'children'
+        'children',
+        'errors'
       );
       if (isUploading) {
         if (objectType === 'file') {
@@ -225,12 +263,20 @@ export default EmberObject.extend({
         }
       } else if (isCancelled) {
         return 'cancelled';
-      } else if (bytesUploaded < objectSize) {
+      } else if (bytesUploaded < objectSize || errors.length) {
         return 'failed';
       } else {
         return 'uploaded';
       }
     }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<boolean>}
+   */
+  canBeCancelled: or(
+    equal('state', raw('uploading')),
+    equal('state', raw('partiallyUploading'))
   ),
 
   /**

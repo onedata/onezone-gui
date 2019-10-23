@@ -68,6 +68,9 @@ module.exports = function (environment) {
       formToggleLabelColumns: 'col-xs-9 col-sm-5',
       formToggleInputColumns: 'col-xs-3 col-sm-7 text-xs-right',
     },
+    'onedataWebsocket': {
+      defaultProtocolVersion: 3,
+    },
     'ember-simple-auth': {
       authenticationRoute: 'login',
       routeAfterAuthentication: 'onedata',
@@ -81,6 +84,9 @@ module.exports = function (environment) {
       maxNameLength: 50,
     },
     'legacyOneproviderVersion': '18.02.*',
+    'ember-local-storage': {
+      namespace: true,
+    },
     'APP': {
       // Here you can pass flags/options to your application instance
       // when it is created

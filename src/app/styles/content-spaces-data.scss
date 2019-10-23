@@ -19,7 +19,11 @@
     color: $color-one-danger;
   }
   .one-tab-bar {
-    padding-right: 200px + $map-trigger-width;
+    padding-right: $map-trigger-width;
+    
+    &.tabs-overflowing {
+      padding-right: 210px + $map-trigger-width;
+    }
 
     .tab-bar-selector {
       z-index: 1;
@@ -58,11 +62,23 @@
       left: 0;
       right: 0;
       bottom: 0;
+      @media (max-width: $screen-xs-max) {
+        $map-selector-mobile-padding: $content-col-padding - 4px;
+        left: $map-selector-mobile-padding;
+        right: $map-selector-mobile-padding;
+        bottom: $map-selector-mobile-padding;
+      }
     }
 
+    @media(max-width: $screen-sm-max) {
+      .map-selector {
+        top: $content-header-row-mobile-height + $-one-tab-bar-height + $padding-base-vertical
+      }
+    }
+    
     @media (max-width: $screen-xs-max) {
       .map-selector {
-        top: $-one-tab-bar-height + $padding-base-vertical;
+        top: $-one-tab-bar-height + $padding-base-vertical - $content-col-padding;
       }
     }
 
@@ -70,6 +86,31 @@
       // a hack to make provider icon to be more to the left and everything
       // to be more centered - because the icon has internal padding
       margin-left: -10px;
+    }
+  }
+  
+  .tab-bar-selector {
+    @media (max-width: $screen-xs-max) {
+      left: 0;
+      width: auto;
+    }
+  }
+  
+  .tab-bar-ul-container-space {
+    height: 44px;
+  }
+  
+  .content-info {
+    &.preserve-header {
+      .world-map {
+        top: $content-header-row-mobile-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
+        @media (min-width: $screen-md-min) {
+          top: $content-header-row-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
+        }
+        @media (max-width: $screen-xs-max) {
+          top: 0;
+        }
+      }
     }
   }
 }

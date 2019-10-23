@@ -8,6 +8,7 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import { get, computed, observer } from '@ember/object';
 import { reads, equal } from '@ember/object/computed';
@@ -153,4 +154,4 @@ export default Model.extend(
       return resolve($.get(guiContextPath));
     },
   }
-);
+).reopenClass(StaticGraphModelMixin);

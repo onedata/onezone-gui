@@ -6,6 +6,7 @@ import EmberObject from '@ember/object';
 import { A } from '@ember/array';
 import { Promise, resolve } from 'rsvp';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Unit | Utility | generate development model', function () {
   it('creates and saves records', function (done) {
@@ -42,6 +43,13 @@ describe('Unit | Utility | generate development model', function () {
       createRecord(modelName, props) {
         return createModelStub(modelName, props);
       },
+      userGri() {
+        return gri({
+          entityType: 'user',
+          entityId: 'user_id',
+          aspect: 'instance',
+        });
+      },
     };
 
     const createRecord = sinon.spy(StoreStub, 'createRecord');
@@ -53,7 +61,7 @@ describe('Unit | Utility | generate development model', function () {
         'spaceList', 'groupList', 'providerList', 'clientTokenList',
         'linkedAccountList', 'harvesterList', 'indexList',
         'space', 'group', 'provider', 'clientToken', 'linkedAccount',
-        'privilege', 'harvester', 'index',
+        'privilege', 'harvester', 'index', 'guiMessage',
       ].forEach(modelName =>
         expect(createRecord, `createRecord for ${modelName}`)
         .to.be.calledWith(modelName, sinon.match.object)
