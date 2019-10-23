@@ -1,0 +1,14 @@
+{{#bs-form
+  submitOnEnter=false
+  class=(concat-classes "col-xs-12 col-sm-10 col-md-8" (unless (eq mode "create") "col-lg-6") "col-centered form-horizontal")
+  as |form|}}
+  {{one-form-fields
+    bsForm=form
+    fields=currentFields
+    formValues=formValues
+    inputChanged=(action "inputChanged")
+    onFocusOut=(action "focusOut")
+    disabled=disabled
+    layoutConfig=formLayoutConfig}}
+{{/bs-form}}
+{{yield}}
