@@ -14,13 +14,21 @@ import Ember from 'ember';
 
 const userEntityId = 'userEntityId';
 
+function groupGri(gropuNo) {
+  return `group.group${gropuNo}EntityId.instance:private`;
+}
+
+function membershipGri(groupNo) {
+  return `group.group${groupNo}EntityId.eff_user_membership,${userEntityId}:private`;
+}
+
 const StoreStub = Service.extend({
   groups: Object.freeze({}),
   memberships: Object.freeze({}),
 
   findRecord(modelName, id) {
     // Testing edge case when cannot fetch full membership path
-    if (id == 'group.group2EntityId.eff_user_membership,userEntityId:private') {
+    if (id == membershipGri(2)) {
       return reject({ id: 'forbidden' });
     }
     return resolve(this.peekRecord(modelName, id));
@@ -42,7 +50,7 @@ function generateNGroups(context, n) {
   const membershipsMap = {};
   const groups = _.times(n, index => {
     const group = EmberObject.create({
-      gri: `group.group${index}EntityId.instance:private`,
+      gri: groupGri(index),
       entityType: 'group',
       name: `groups${index}`,
     });
@@ -51,7 +59,7 @@ function generateNGroups(context, n) {
   });
   groups.forEach((group, index) => {
     const membership = EmberObject.create({
-      gri: `group.group${index}EntityId.eff_user_membership,${userEntityId}:private`,
+      gri: membershipGri(index),
       directMembership: true,
       intermediaries: groups.filter(g => g !== group).mapBy('gri'),
     });
@@ -131,7 +139,7 @@ describe('Integration | Component | membership visualiser', function () {
     });
   });
 
-  it('renders all possible paths when visibleBlocks == 2', function () {
+  it('renders all possible paths when visibleBlocks equals 2', function () {
     this.render(hbs `{{membership-visualiser
       contextRecord=user
       visibleBlocks=2
