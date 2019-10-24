@@ -1,14 +1,16 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { get, setProperties } from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import _ from 'lodash';
-import { resolve } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 import Service from '@ember/service';
 import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
+import TestAdapter from '@ember/test/adapter';
+import Ember from 'ember';
 
 const userEntityId = 'userEntityId';
 
@@ -17,6 +19,10 @@ const StoreStub = Service.extend({
   memberships: Object.freeze({}),
 
   findRecord(modelName, id) {
+    // Testing edge case when cannot fetch full membership path
+    if (id == 'group.group2EntityId.eff_user_membership,userEntityId:private') {
+      return reject({ id: 'forbidden' });
+    }
     return resolve(this.peekRecord(modelName, id));
   },
 
@@ -75,6 +81,20 @@ describe('Integration | Component | membership visualiser', function () {
     });
     generateNGroups(this, 3);
     this.set('user', user);
+
+    // Hack: changing default error handling in tests, due to the Ember bug:
+    // rejected, not caught promises with some error inside (not empty) marks
+    // tests as failed. So e.g. `reject({ id: 'forbidden' })` in store.findRecord,
+    // crashes tests even if it's a correct behaviour of findRecord.
+    this.originalLoggerError = Ember.Logger.error;
+    this.originalTestAdapterException = TestAdapter.exception;
+    Ember.Logger.error = function() {};
+    Ember.Test.adapter.exception = function() {};
+  });
+
+  afterEach(function () {
+    Ember.Logger.error = this.originalLoggerError;
+    Ember.Test.adapter.exception = this.originalTestAdapterException;
   });
 
   it('renders all possible paths', function () {
@@ -82,7 +102,7 @@ describe('Integration | Component | membership visualiser', function () {
       contextRecord=user
       targetRecord=groups.[0]}}`);
     return wait().then(() => {
-      expect(this.$('.membership')).to.have.length(5);
+      expect(this.$('.membership')).to.have.length(4);
     });
   });
 
@@ -108,6 +128,16 @@ describe('Integration | Component | membership visualiser', function () {
         expect(blocksNumber).to.be.gte(prevBlocksNumber);
         prevBlocksNumber = blocksNumber;
       });
+    });
+  });
+
+  it('renders all possible paths when visibleBlocks == 2', function () {
+    this.render(hbs `{{membership-visualiser
+      contextRecord=user
+      visibleBlocks=2
+      targetRecord=groups.[0]}}`);
+    return wait().then(() => {
+      expect(this.$('.membership')).to.have.length(4);
     });
   });
 });
