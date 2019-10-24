@@ -41,10 +41,11 @@ export default Service.extend(I18n, {
 
   /**
    * Creates token
+   * @param {Object} tokenPrototype token model prototype
    * @returns {Promise} A promise, which resolves to new token if it has
    * been created successfully.
    */
-  createToken() {
+  createToken(tokenPrototype) {
     const {
       globalNotify,
       router,
@@ -56,7 +57,7 @@ export default Service.extend(I18n, {
       'clientTokenManager',
       'guiUtils'
     );
-    return clientTokenManager.createRecord().then((token) => {
+    return clientTokenManager.createToken(tokenPrototype).then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
       router.transitionTo(
         'onedata.sidebar.content',

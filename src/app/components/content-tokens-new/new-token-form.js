@@ -85,6 +85,16 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   onCreate: notImplementedThrow,
 
   /**
+   * @type {Array<FieldType>}
+   */
+  generalFieldsSource: generalFields,
+
+  /**
+   * @type {Array<FieldType>}
+   */
+  validUntilFieldsSource: validUntilFields,
+
+  /**
    * @type {Object}
    */
   formLayoutConfig: Object.freeze({
@@ -94,6 +104,18 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     formToggleLabelColumns: 'col-xs-6 col-sm-4',
     formToggleInputColumns: 'col-xs-6 col-sm-8 text-xs-right',
   }),
+
+  /**
+   * @override
+   */
+  collapsedPrefixes: computed(
+    'allFieldsValues.general.validUntilEnabled',
+    function collapsedPrefixes() {
+      const validUntilEnabled =
+        this.get('allFieldsValues.general.validUntilEnabled');
+      return validUntilEnabled ? [] : ['validUntil'];
+    }
+  ),
 
   /**
    * @override
@@ -119,24 +141,32 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     'validUntilFields',
   ),
 
-  generalFieldsSource: Object.freeze([
-    nameField,
-    validUntilEnabledField,
-  ]),
-
-  validUntilFieldsSource: Object.freeze([
-    validUntilField,
-  ]),
-
+  /**
+   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   */
   generalFields: computed('generalFieldsSource.[]', function generalFields() {
     return this.get('generalFieldsSource')
       .map(field => this.preprocessField(field, 'general'));
   }),
 
-  validUntilFields: computed('validUntilFieldsSource.[]', function validUntilFields() {
-    return this.get('validUntilFieldsSource')
-      .map(field => this.preprocessField(field, 'validUntil'));
-  }),
+  /**
+   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   */
+  validUntilFields: computed(
+    'validUntilFieldsSource.[]',
+    function validUntilFields() {
+      return this.get('validUntilFieldsSource')
+        .map(field => this.preprocessField(field, 'validUntil'));
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+
+    this.prepareFields();
+    this.injectInitialValues();
+    this.notifyChange();
+  },
 
   preprocessField(field, prefix) {
     const {
@@ -151,17 +181,10 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
 
     return EmberObject.create(field, {
       name: `${prefix}.${name}`,
+      prefix: prefix,
       label: this.t(`fields.${name}.label`),
       tip: tip ? this.t(`fields.${name}.tip`) : undefined,
     });
-  },
-
-  init() {
-    this._super(...arguments);
-
-    this.prepareFields();
-    this.injectInitialValues();
-    this.notifyChange();
   },
 
   injectInitialValues() {

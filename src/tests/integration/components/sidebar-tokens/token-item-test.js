@@ -34,7 +34,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
 
     this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
 
-    expect(this.$('.oneicon-invitation')).to.exist;
+    expect(this.$('.oneicon-invite')).to.exist;
   });
 
   it('shows "access-token" icon for access token', function () {

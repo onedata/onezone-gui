@@ -107,6 +107,32 @@ describe('Integration | Component | content tokens new/new token form', function
         });
       });
   });
+
+  it('hides untilValid prefix by default', function () {
+    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    
+    expect(this.$('.prefix-validUntil')).to.not.have.class('in');
+  });
+
+  it('shows untilValid prefix by when validUntilEnabled is true', function () {
+    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    
+    return click(getField(this, 'validUntilEnabled')[0])
+      .then(() => expect(this.$('.prefix-validUntil')).to.have.class('in'));
+  });
+
+  it('blocks "Create" button when form is invalid', function () {
+    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+
+    expect(this.$('.create-button')).to.have.attr('disabled');
+  });
+
+  it('is valid when only name is not empty', function () {
+    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    
+    return fillIn(getField(this, 'name')[0], 'token')
+      .then(() => expect(this.$('.create-button')).to.not.have.attr('disabled'));
+  });
 });
 
 function getField(self, fieldName) {

@@ -9,14 +9,11 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const ClientTokenManager = Service.extend(I18n, {
   store: service(),
   currentUser: service(),
-  onedataGraph: service(),
   i18n: service(),
 
   i18nPrefix: 'services.clientTokenManager',
@@ -47,32 +44,14 @@ const ClientTokenManager = Service.extend(I18n, {
 
   /**
    * Creates new token
-   * @returns {Promise<ClientToken>}
+   * @param {Object} tokenPrototype token model prototype
+   * @returns {Promise<Models.ClientToken>}
    */
-  createRecord() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => {
-        const userId = get(user, 'entityId');
-        const tokenCreateGri = gri({
-          entityType: 'user',
-          entityId: userId,
-          aspect: 'client_tokens',
-          scope: 'private',
-        });
-        return this.get('onedataGraph')
-          .request({
-            gri: tokenCreateGri,
-            operation: 'create',
-            data: {},
-          })
-          .then(tokenData => {
-            const tokenGri = tokenData.gri;
-            return user.belongsTo('clientTokenList').reload()
-              .then(() =>
-                this.get('store').findRecord('clientToken', tokenGri)
-              );
-          });
-      });
+  createToken(tokenPrototype) {
+    return this.get('store')
+      .createRecord('client-token', tokenPrototype)
+      .save()
+      .then(clientToken => this.reloadList().then(() => clientToken));
   },
 
   /**
@@ -90,6 +69,15 @@ const ClientTokenManager = Service.extend(I18n, {
             .then(() => destroyResult);
         })
       );
+  },
+
+  /**
+   * Reloads token list
+   * @returns {Promise<ClientTokenList>}
+   */
+  reloadList() {
+    return this.get('currentUser').getCurrentUserRecord()
+      .then(user => user.belongsTo('clientTokenList').reload(true));
   },
 });
 
