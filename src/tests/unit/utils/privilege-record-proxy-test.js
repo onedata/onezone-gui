@@ -41,18 +41,20 @@ describe('Unit | Utility | privilege record proxy', function () {
     this.groupedPrivileges = [{
       groupName: 'g1',
       privileges: [
-        'g1.1',
-        'g1.2',
+        { name: 'g1.1' },
+        { name: 'g1.2' },
       ],
     }, {
       groupName: 'g2',
       privileges: [
-        'g2.1',
-        'g2.2',
+        { name: 'g2.1' },
+        { name: 'g2.2' },
       ],
     }, {
       groupName: 'g3',
-      privileges: ['g3.1'],
+      privileges: [
+        { name: 'g3.1' },
+      ],
     }];
   });
 

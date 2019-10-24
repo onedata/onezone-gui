@@ -13,17 +13,20 @@ import { all as allFulfilled } from 'rsvp';
 import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
-import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
   privacyPolicyManager: service(),
 
+  /**
+   * @override
+   */
+  clearLocalStoragePrefix: 'onezone-gui:',
+
   developmentModelConfig: Object.freeze({
     clearOnReload: false,
   }),
   generateDevelopmentModel,
-  clearDevelopmentModel: clearLocalStorageModel,
 
   beforeModel() {
     const superResult = this._super(...arguments);

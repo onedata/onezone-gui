@@ -1,7 +1,51 @@
-{{#promise-proxy-container proxy=providerProxy}}
-  {{content-provider-redirect
-    spaceId=model.resource
-    provider=providerProxy.content
-    transitionToProviderOnMap=(action "transitionAfterFailure")
-  }}
+{{#promise-proxy-container proxy=initialProvidersListProxy}}
+  {{#if providers.length}}
+    <div class="row content-header-section">
+      <div class="row content-row header-row hidden-xs content-spaces-data-header">
+        <h1 class="normal-case">
+          {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
+        </h1>
+      </div>
+      <div class="row row-content-tab-bar">
+        {{#one-tab-bar
+          class="space-providers-tab-bar"
+          items=providerItems
+          selectedItem=selectedProviderItem
+          selectDefaultOnInit=false
+          selectedItemChanged=(action "selectedProviderChanged")}}
+          {{oneproviders-map-selector
+            isExpanded=isMapExpanded
+            oneproviders=providers
+            selectedOneprovider=selectedProvider
+            onToggleExpand=(action "onToggleExpandMap")
+            onOneproviderSelected=(action "selectedProviderChanged")}}
+        {{/one-tab-bar}}
+      </div>
+    </div>
+    <div class="row absolute-flex-content-child-stretch content-spaces-data-content">
+      {{#if showAllOfflineInfo}}
+        {{content-info
+          header=(tt this "allOneprovidersOffline")
+          imagePath=(root-url "assets/images/data-error-no-providers.svg")
+          class="preserve-header scroll-breakpoint-600"
+        }}
+      {{else}}
+        {{#if selectedProvider.online}}
+          {{embedded-content-file-browser
+            oneprovider=selectedProvider
+            baseUrl=contentIframeBaseUrl
+            spaceEntityId=space.entityId
+          }}
+        {{else}}
+          {{content-info
+            header=(tt this "oneproviderOffline")
+            imagePath=(root-url "assets/images/no-connection.svg")
+            class="preserve-header scroll-breakpoint-600"
+          }}
+        {{/if}}
+      {{/if}}
+    </div>
+  {{else}}
+    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+  {{/if}}
 {{/promise-proxy-container}}

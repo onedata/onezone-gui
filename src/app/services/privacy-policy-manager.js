@@ -21,7 +21,7 @@ export default Service.extend(
     cookies: service(),
     guiMessageManager: service(),
     router: service(),
-    
+
     /**
      * @type {boolean}
      */
@@ -57,7 +57,7 @@ export default Service.extend(
      */
     fetchPrivacyPolicy() {
       return this.get('guiMessageManager').getMessage('privacy_policy')
-        .then(message => DOMPurify.sanitize(message));
+        .then(message => DOMPurify.sanitize(message).toString());
     },
 
     /**
@@ -66,7 +66,7 @@ export default Service.extend(
     fetchCookieConsentNotification() {
       return this.get('guiMessageManager').getMessage('cookie_consent_notification')
         .then(message =>
-          DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] })
+          DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
             '<a class="clickable privacy-policy-link">$1</a>'

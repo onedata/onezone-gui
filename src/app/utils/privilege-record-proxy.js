@@ -371,7 +371,7 @@ export default EmberObject.extend({
     });
     return groupedPrivilegesFlags.reduce((tree, group) => {
       tree[group.groupName] = group.privileges.reduce((subtree, priv) => {
-        subtree[priv] = privilegesFlatTree[priv];
+        subtree[priv.name] = privilegesFlatTree[priv.name];
         return subtree;
       }, {});
       return tree;
