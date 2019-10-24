@@ -12,6 +12,12 @@ describe('Integration | Component | content tokens new/new token form', function
     integration: true,
   });
 
+  it('has class "new-token-form"', function () {
+    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+
+    expect(this.$('.new-token-form')).to.exist;
+  });
+
   it('renders form inputs', function () {
     this.render(hbs`{{content-tokens-new/new-token-form}}`);
 
@@ -68,6 +74,30 @@ describe('Integration | Component | content tokens new/new token form', function
       .then(() => validUntilHelper.selectToday())
       .then(() => {
         expect(changeSpy).to.be.calledWith({
+          isValid: true,
+          values: {
+            name: tokenName,
+            validUntilEnabled: true,
+            validUntil: sinon.match.instanceOf(Date),
+          },
+        });
+      });
+  });
+
+  it('calls onCreate when submit button is clicked', function () {
+    const createSpy = sinon.spy();
+    this.on('create', createSpy);
+    const tokenName = 'token name';
+
+    this.render(hbs`{{content-tokens-new/new-token-form onCreate=(action "create")}}`);
+    
+    const validUntilHelper = new OneDatetimePickerHelper(getField(this, 'validUntil'));
+    return fillIn(getField(this, 'name')[0], tokenName)
+      .then(() => click(getField(this, 'validUntilEnabled')[0]))
+      .then(() => validUntilHelper.selectToday())
+      .then(() => click('.create-button'))
+      .then(() => {
+        expect(createSpy).to.be.calledWith({
           isValid: true,
           values: {
             name: tokenName,

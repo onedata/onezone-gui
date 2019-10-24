@@ -13,5 +13,6 @@ export default {
         label: 'Valid until',
       },
     },
+    create: 'Create',
   },
 };

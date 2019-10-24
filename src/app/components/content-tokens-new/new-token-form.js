@@ -4,6 +4,7 @@ import { union } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import createFieldValidator from 'onedata-gui-common/utils/create-field-validator';
 import { buildValidations } from 'ember-cp-validations';
 
@@ -50,6 +51,8 @@ const validationsProto = {};
 });
 
 export default OneForm.extend(I18n, buildValidations(validationsProto), {
+  classNames: ['new-token-form'],
+
   i18n: service(),
 
   /**
@@ -74,6 +77,23 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    *   ```
    */
   onChange: notImplementedIgnore,
+
+  /**
+   * @type {Function}
+   * @param {Object} formState object with the same format as in `onChange`
+   */
+  onCreate: notImplementedThrow,
+
+  /**
+   * @type {Object}
+   */
+  formLayoutConfig: Object.freeze({
+    formLabelColumns: 'col-xs-12 col-sm-4',
+    formInputColumns: 'col-xs-12 col-sm-8',
+    formSubmitColumns: 'col-xs-12 text-center',
+    formToggleLabelColumns: 'col-xs-6 col-sm-4',
+    formToggleInputColumns: 'col-xs-6 col-sm-8 text-xs-right',
+  }),
 
   /**
    * @override
@@ -197,6 +217,33 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     });
   },
 
+  getFormState() {
+    const {
+      allFieldsValues,
+      isValid,
+    } = this.getProperties('allFieldsValues', 'isValid');
+    const {
+      name,
+      validUntilEnabled,
+    } = getProperties(
+      get(allFieldsValues, 'general'),
+      'name',
+      'validUntilEnabled'
+    );
+    const validUntil = get(allFieldsValues, 'validUntil.validUntil');
+
+    const values = {
+      name,
+      validUntilEnabled,
+      validUntil,
+    };
+
+    return {
+      isValid,
+      values,
+    };
+  },
+
   actions: {
     inputChanged(fieldName, value) {
       this.changeFormValue(fieldName, value);
@@ -206,6 +253,10 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     focusOut(field) {
       field.set('changed', true);
       this.recalculateErrors();
+    },
+
+    create() {
+      this.get('onCreate')(this.getFormState());
     },
   },
 });

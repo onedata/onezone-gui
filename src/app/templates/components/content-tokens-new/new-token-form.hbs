@@ -1,6 +1,6 @@
 {{#bs-form
   submitOnEnter=false
-  class=(concat-classes "col-xs-12 col-sm-10 col-md-8" (unless (eq mode "create") "col-lg-6") "col-centered form-horizontal")
+  class=(concat-classes "col-xs-12 col-sm-10 col-md-8 col-centered form-horizontal")
   as |form|}}
   {{one-form-fields
     bsForm=form
@@ -10,5 +10,16 @@
     onFocusOut=(action "focusOut")
     disabled=disabled
     layoutConfig=formLayoutConfig}}
+  <div class="row">
+    <div class={{formLayoutConfig.formSubmitColumns}}>
+      {{#one-spin-button
+        type="submit"
+        class="btn btn-primary create-button"
+        disabled=(not isValid)
+        action=(action "create")}}
+        {{tt this "create"}}  
+      {{/one-spin-button}}
+    </div>
+  </div>
 {{/bs-form}}
 {{yield}}
