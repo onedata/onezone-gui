@@ -16,6 +16,7 @@ const tokenTypeToIconNameMapping = {
 export default Component.extend(I18n, {
   i18n: service(),
   clientTokenActions: service(),
+  navigationState: service(),
 
   classNames: ['token-item'],
   classNameBindings: ['isTokenActive::inactive-token'],
@@ -98,6 +99,25 @@ export default Component.extend(I18n, {
     this.set('isRemoveTokenModalOpened', true);
   },
 
+  /**
+   * If actual token disappeared from the sidebar, redirects to token main page
+   * @returns {Promise}
+   */
+  redirectOnTokenDeletion() {
+    const {
+      navigationState,
+      router,
+    } = this.getProperties('navigationState', 'router');
+    const groupId = get(navigationState, 'activeResource.id');
+    return navigationState
+      .resourceCollectionContainsId(groupId)
+      .then(contains => {
+        if (!contains) {
+          next(() => router.transitionTo('onedata.sidebar', 'groups'));
+        }
+      });
+  },
+
   actions: {
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -139,7 +159,11 @@ export default Component.extend(I18n, {
 
       this.set('isRemovingToken', true);
       return clientTokenActions.deleteToken(token)
-        .finally(() => safeExec(this, () => this.set('isRemovingToken', true)));
+        .then(() => this.redirectOnTokenDeletion())
+        .finally(() => safeExec(this, () => this.setProperties({
+          isRemovingToken: false,
+          isRemoveTokenModalOpened: false,
+        })));
     },
     closeRemoveTokenModal() {
       this.set('isRemoveTokenModalOpened', false);

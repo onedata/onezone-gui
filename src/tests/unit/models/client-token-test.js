@@ -6,6 +6,7 @@ import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/clien
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import moment from 'moment';
 
 describe('Unit | Model | client token', function() {
   setupModelTest('client-token', {
@@ -13,7 +14,7 @@ describe('Unit | Model | client token', function() {
   });
 
   beforeEach(function () {
-    this.clock = sinon.useFakeTimers(Date.now());
+    this.clock = sinon.useFakeTimers(moment().unix() * 1000);
   });
 
   afterEach(function () {
@@ -34,16 +35,16 @@ describe('Unit | Model | client token', function() {
     });
   });
 
-  it('computes undefined tokenSubtype based on access token type', function () {
+  it('computes undefined subtype based on access token type', function () {
     const model = this.subject();
     set(model, 'type', {
       accessToken: {},
     });
 
-    expect(get(model, 'tokenSubtype')).to.be.undefined;
+    expect(get(model, 'subtype')).to.be.undefined;
   });
 
-  it('computes non-empty tokenSubtype based on invite token type', function () {
+  it('computes non-empty subtype based on invite token type', function () {
     const subtype = 'userJoinGroup';
     const model = this.subject();
     set(model, 'type', {
@@ -52,7 +53,7 @@ describe('Unit | Model | client token', function() {
       },
     });
 
-    expect(get(model, 'tokenSubtype')).to.equal(subtype);
+    expect(get(model, 'subtype')).to.equal(subtype);
   });
 
   Object.keys(inviteTokenSubtypeToTargetModelMapping).forEach(subtype => {
@@ -139,21 +140,21 @@ describe('Unit | Model | client token', function() {
 
   it('has isExpired == false when validUntil < now', function () {
     const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(Date.now() - 3600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() - 3600)]);
 
     expect(get(model, 'isExpired')).to.be.true;
   });
 
   it('has isExpired == true when validUntil > now', function () {
     const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(Date.now() + 3600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
 
     expect(get(model, 'isExpired')).to.be.false;
   });
 
   it('schedules change of isExpired if validUntil > now', function () {
     const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(Date.now() + 3600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
 
     this.clock.tick(3601 * 1000);
 
@@ -162,9 +163,9 @@ describe('Unit | Model | client token', function() {
 
   it('resets scheduled change of isExpired if validUntil has been increased', function () {
     const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(Date.now() + 600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() + 600)]);
     this.clock.tick(1 * 1000);
-    set(model, 'caveats', [createTimeCaveat(Date.now() + 3600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
     this.clock.tick(600 * 1000);
 
     expect(get(model, 'isExpired')).to.be.false;
@@ -176,7 +177,7 @@ describe('Unit | Model | client token', function() {
 
   it('removed scheduler change of isExpired if validUntil becomes undefined', function () {
     const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(Date.now() + 3600)]);
+    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
     this.clock.tick(1 * 1000);
     set(model, 'caveats', []);
     this.clock.tick(3601 * 1000);
@@ -189,7 +190,7 @@ describe('Unit | Model | client token', function() {
     function () {
       const model = this.subject();
       setProperties(model, {
-        caveats: [createTimeCaveat(Date.now() + 3600)],
+        caveats: [createTimeCaveat(moment().unix() + 3600)],
         metadata: {
           usageCount: 0,
           usageLimit: 3,
@@ -206,7 +207,7 @@ describe('Unit | Model | client token', function() {
     function () {
       const model = this.subject();
       setProperties(model, {
-        caveats: [createTimeCaveat(Date.now() - 3600)],
+        caveats: [createTimeCaveat(moment().unix() - 3600)],
         metadata: {
           usageCount: 0,
           usageLimit: 3,
@@ -223,7 +224,7 @@ describe('Unit | Model | client token', function() {
     function () {
       const model = this.subject();
       setProperties(model, {
-        caveats: [createTimeCaveat(Date.now() + 3600)],
+        caveats: [createTimeCaveat(moment().unix() + 3600)],
         metadata: {
           usageCount: 0,
           usageLimit: 3,
@@ -240,7 +241,7 @@ describe('Unit | Model | client token', function() {
     function () {
       const model = this.subject();
       setProperties(model, {
-        caveats: [createTimeCaveat(Date.now() + 3600)],
+        caveats: [createTimeCaveat(moment().unix() + 3600)],
         metadata: {
           usageCount: 3,
           usageLimit: 3,

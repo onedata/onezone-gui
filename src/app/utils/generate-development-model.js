@@ -346,6 +346,9 @@ function createClientTokensRecords(store) {
       type: {
         accessToken: {},
       },
+      metadata: {
+        creationTime: moment().unix(),
+      },
     }).save();
     const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
     const inviteTokenPromises = inviteSubtypes
@@ -355,10 +358,16 @@ function createClientTokensRecords(store) {
           type: {
             inviteToken: { subtype },
           },
+          caveats: [{
+            type: 'time',
+            validUntil: moment().add(60 * (-inviteSubtypes.length / 2 + j), 'seconds').unix(),
+          }],
+          metadata: {
+            creationTime: moment().subtract(1, 'hour').unix(),
+          },
         }).save();
       });
     promises.push(accessTokenPromise, ...inviteTokenPromises);
-    // return Promise.all([accessTokenPromise, ...inviteTokenPromises]);
   });
   return allFulfilled(promises);
 }
@@ -543,7 +552,7 @@ function attachModelsToInviteTokens(listRecords) {
     allFulfilled(tokensList
       .filter(token => get(token, 'typeName') === 'invite')
       .map(token => {
-        const subtype = get(token, 'tokenSubtype');
+        const subtype = get(token, 'subtype');
         const modelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
         const targetRecordsList = listRecords[modelMapping.modelName];
         if (targetRecordsList) {

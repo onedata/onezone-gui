@@ -17,11 +17,12 @@ import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import { reads } from '@ember/object/computed';
-import { reject } from 'rsvp';
+import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { cancel, later } from '@ember/runloop';
 import { and, not } from 'ember-awesome-macros';
+import moment from 'moment';
 
 const standardGroupMapping = {
   idFieldName: 'groupId',
@@ -117,7 +118,7 @@ export default Model.extend(
      * - 'groupJoinHarvester',
      * - 'spaceJoinHarvester'
      */
-    tokenSubtype: reads('type.inviteToken.subtype'),
+    subtype: reads('type.inviteToken.subtype'),
 
     /**
      * UNIX timestamp of token expiration time
@@ -162,9 +163,9 @@ export default Model.extend(
         validUntil,
         isExpired,
       } = this.getProperties('validUntil', 'isExpired');
-      const nowTimestamp = Date.now();
+      const nowTimestamp = moment().unix();
       const hasValidUntil = typeof validUntil === 'number';
-
+      
       if (!hasValidUntil || validUntil >= nowTimestamp) {
         if (isExpired) {
           this.set('isExpired', false);
@@ -201,10 +202,11 @@ export default Model.extend(
       } = this.getProperties('store', 'type');
 
       if (!type || !type.inviteToken) {
-        return reject();
+        return resolve(null);
       } else {
         const targetModelMapping =
           inviteTokenSubtypeToTargetModelMapping[type.inviteToken.subtype];
+        // FIXME: modelName to entityType mapping
         const targetModelGri = gri({
           entityType: targetModelMapping.modelName,
           entityId: type.inviteToken[targetModelMapping.idFieldName],
@@ -221,7 +223,7 @@ export default Model.extend(
         expirationTimer,
         validUntil,
       } = this.getProperties('expirationTimer', 'validUntil');
-      const nowTimestamp = Date.now();
+      const nowTimestamp = moment().unix();
 
       cancel(expirationTimer);
       if (typeof validUntil === 'number' && validUntil > nowTimestamp) {

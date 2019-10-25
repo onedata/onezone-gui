@@ -1,26 +1,70 @@
 <div class="row content-row header-row hidden-xs">
   <h1 class="normal-case">
-    <span class="one-label">
-      {{selectedToken.name}}
+    <span class="token-name">
+      {{token.name}}
     </span>
-    {{actions-toolbar actionsArray=globalActions}}
   </h1>
 </div>
-{{#content-info
-  class="scroll-breakpoint-600 preserve-header"
-  header=(tt this "header")
-  text=(tt this "description")}}
-  <div class="token-row">
-    <textarea readonly="true" class="token-textarea form-control">{{selectedToken.token}}</textarea>
-    <div class="text-center">
-      {{#copy-button
-        success=(action "copySuccess")
-        error=(action "copyError")
-        class="btn btn-primary"
-        clipboardTarget=".token-textarea"
-      }}
-        {{one-icon icon="browser-copy"}} {{t "components.contentTokens.copy"}}
-      {{/copy-button}}
+{{#promise-proxy-container proxy=tokenTargetProxy}}
+  <div class="token-content content-row">
+    <div class="property-row token-name-property">
+      <div class="property-name token-name-label">Name:</div>
+      <div class="property-value token-name">{{token.name}}</div>
+    </div>
+    <div class="property-row token-type-property">
+      <div class="property-name token-type-label">Type:</div>
+      <div class="property-value token-type">
+        <span class="type-name">{{tt this (concat "typeNames." token.typeName)}}</span>
+        {{#if token.subtype}}
+          (<span class="subtype">{{tt this (concat "subtypes." token.subtype)}}</span>)
+        {{/if}}
+      </div>
+    </div>
+    {{#if tokenTarget}}
+      <div class="property-row token-target-property">
+        <div class="property-name token-target-label">Target:</div>
+        <div class="property-value token-target">
+          {{#if tokenTarget.error}}
+            {{#if tokenTarget.hasHandledError}}
+              {{tt this (concat "targetErrors." tokenTarget.error.id)}}
+            {{else}}
+              {{resource-load-error reason=tokenTarget.error}}
+            {{/if}}
+          {{else}}
+            {{one-icon class="model-icon" icon=tokenTargetIcon}}
+            <span class="model-name">{{tokenTarget.name}}</span>
+          {{/if}}
+        </div>
+      </div>
+    {{/if}}
+    <div class="property-row token-creation-time-property">
+      <div class="property-name token-creation-time-label">Creation time:</div>
+      <div class="property-value token-creation-time">
+        {{date-format token.metadata.creationTime}}
+      </div>
+    </div>
+    {{#unless (eq token.validUntil undefined)}}
+      <div class="property-row token-expiration-time-property">
+        <div class="property-name token-expiration-time-label">Expiration time:</div>
+        <div class="property-value token-expiration-time">
+          {{date-format token.validUntil}}
+        </div>
+      </div>
+    {{/unless}}
+    <div class="property-row token-revoked-property">
+      <div class="property-name token-revoked-label">Revoked:</div>
+      <div class="property-value token-revoked">
+        {{one-way-toggle checked=token.revoked isReadOnly=true class="token-revoked-toggle"}}
+      </div>
+    </div>
+    <div class="property-row token-token-property">
+      <div class="property-name token-token-label">Token:</div>
+      <div class="property-value token-token">
+        {{one-clipboard-line
+          value=token.token
+          inputClass="token-string"
+          type="textarea"}}
+      </div>
     </div>
   </div>
-{{/content-info}}
+{{/promise-proxy-container}}

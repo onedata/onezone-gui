@@ -21,6 +21,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
       save() {},
     });
     registerService(this, 'client-token-actions', ClientTokenActionsStub);
+    registerService(this, 'navigation-state', NavigationStateStub);
   });
 
   it('shows token name', function () {
@@ -106,6 +107,9 @@ describe('Integration | Component | sidebar tokens/token item', function() {
     const deleteTokenStub = sinon.stub(clientTokenActions, 'deleteToken')
       .withArgs(token)
       .resolves();
+    const navigationState = lookupService(this, 'navigation-state');
+    // to avoid redirecting after delete
+    sinon.stub(navigationState, 'resourceCollectionContainsId').resolves(true);
 
     this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
     return click('.token-menu-trigger')
@@ -145,4 +149,12 @@ describe('Integration | Component | sidebar tokens/token item', function() {
 
 const ClientTokenActionsStub = Service.extend({
   deleteToken() {},
+});
+
+const NavigationStateStub = Service.extend({
+  activeResource: Object.freeze({
+    id: 'someId',
+  }),
+
+  resourceCollectionContainsId() {},
 });
