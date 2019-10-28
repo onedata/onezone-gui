@@ -7,8 +7,8 @@
   {{one-dynamic-tree
     class="border-dashed"
     definition=initialTreeState
-    compareValues=recordProxy.effectivePrivilegesSnapshot
-    overrideValues=recordProxy.effectivePrivilegesSnapshot
+    compareValues=overridePrivileges
+    overrideValues=overridePrivileges
     disabledFieldsPaths=treeDisabledPaths
     valuesChanged=(action "treeValuesChanged")}}
   {{yield}}

@@ -1,5 +1,5 @@
 .support-os-head {
-  font-weight: bold;
+  @include font-bold();
   padding-bottom: 16px;
 }
 .support-os {

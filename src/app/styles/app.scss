@@ -10,8 +10,8 @@
 @import 'content-spaces-providers';
 @import 'content-spaces-index';
 @import 'content-groups-hierarchy';
+@import 'content-spaces-data';
 @import 'members-aspect-base';
-@import 'privileges-tree-editor';
 @import 'privileges-editor-modal';
 @import 'groups-hierarchy-visualiser';
 @import 'group-add-your-group-modal';
@@ -24,5 +24,10 @@
 @import 'harvester-configuration';
 @import 'content-harvesters-indices';
 @import 'content-clusters-deregister';
+@import 'one-embedded-container';
 @import 'content-harvesters-spaces';
+@import 'upload-presenter';
+@import 'main-menu-upload-item';
+@import 'app-layout';
+@import 'oneproviders-map-selector';
 @import 'cookies-consent';
