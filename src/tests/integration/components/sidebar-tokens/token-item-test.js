@@ -43,7 +43,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
 
     this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
 
-    expect(this.$('.oneicon-token-invote')).to.exist;
+    expect(this.$('.oneicon-token-access')).to.exist;
   });
 
   it('shows "tokens" icon for unknown token', function () {

@@ -3,8 +3,6 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { setProperties } from '@ember/object';
-import { registerService } from '../../helpers/stub-service';
-import Service from '@ember/service';
 import moment from 'moment';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import wait from 'ember-test-helpers/wait';
@@ -20,8 +18,6 @@ describe('Integration | Component | content tokens', function () {
   });
 
   beforeEach(function () {
-    registerService(this, 'globalNotify', Service.extend({}));
-
     this.set('token', {
       name: 'token name',
       token: 'sometokenstringsometokenstring',
@@ -40,7 +36,8 @@ describe('Integration | Component | content tokens', function () {
   it('shows token name in header', function () {
     this.render(hbs `{{content-tokens token=token}}`);
 
-    expect(this.$('h1 .token-name').text().trim()).to.equal(this.get('token.name'));
+    expect(this.$('h1 .token-name').text().trim())
+      .to.equal(this.get('token.name'));
   });
 
   it('shows token name', function () {
@@ -48,8 +45,10 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-name-property');
-      expect($tokenPropertyRow.find('.token-name-label').text().trim()).to.equal('Name:');
-      expect($tokenPropertyRow.find('.token-name').text().trim()).to.equal(this.get('token.name'));
+      expect($tokenPropertyRow.find('.token-name-label').text().trim())
+        .to.equal('Name:');
+      expect($tokenPropertyRow.find('.token-name').text().trim())
+        .to.equal(this.get('token.name'));
     });
   });
 
@@ -58,25 +57,30 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-revoked-property');
-      expect($tokenPropertyRow.find('.token-revoked-label').text().trim()).to.equal('Revoked:');
-      expect($tokenPropertyRow.find('.token-revoked-toggle')).to.have.class('checked');
+      expect($tokenPropertyRow.find('.token-revoked-label').text().trim())
+        .to.equal('Revoked:');
+      expect($tokenPropertyRow.find('.token-revoked-toggle'))
+        .to.have.class('checked');
     });
   });
 
-  it('shows type for access token', function () {
+  it('shows type for access token with no subtype', function () {
     this.set('token.typeName', 'access');
 
     this.render(hbs `{{content-tokens token=token}}`);
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-type-property');
-      expect($tokenPropertyRow.find('.token-type-label').text().trim()).to.equal('Type:');
-      expect($tokenPropertyRow.find('.token-type .type-name').text().trim()).to.equal('Access');
-      expect($tokenPropertyRow.find('.token-type .subtype')).to.not.exist;
+      expect($tokenPropertyRow.find('.token-type-label').text().trim())
+        .to.equal('Type:');
+      expect($tokenPropertyRow.find('.token-type .type-name').text().trim())
+        .to.equal('Access');
+      expect($tokenPropertyRow.find('.token-type .subtype'))
+        .to.not.exist;
     });
   });
 
-  it('shows type for invite token', function () {
+  it('shows type for invite token with subtype', function () {
     setProperties(this.get('token'), {
       typeName: 'invite',
       subtype: 'sth',
@@ -86,8 +90,10 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-type-property');
-      expect($tokenPropertyRow.find('.token-type-label').text().trim()).to.equal('Type:');
-      expect($tokenPropertyRow.find('.token-type .type-name').text().trim()).to.equal('Invite');
+      expect($tokenPropertyRow.find('.token-type-label').text().trim())
+        .to.equal('Type:');
+      expect($tokenPropertyRow.find('.token-type .type-name').text().trim())
+        .to.equal('Invite');
       expect($tokenPropertyRow.find('.token-type .subtype')).to.exist;
     });
   });
@@ -100,8 +106,10 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-creation-time-property');
-      expect($tokenPropertyRow.find('.token-creation-time-label').text().trim()).to.equal('Creation time:');
-      expect($tokenPropertyRow.find('.token-creation-time').text().trim()).to.equal(now.format(datetimeFormat));
+      expect($tokenPropertyRow.find('.token-creation-time-label').text().trim())
+        .to.equal('Creation time:');
+      expect($tokenPropertyRow.find('.token-creation-time').text().trim())
+        .to.equal(now.format(datetimeFormat));
     });
   });
 
@@ -113,18 +121,23 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-expiration-time-property');
-      expect($tokenPropertyRow.find('.token-expiration-time-label').text().trim()).to.equal('Expiration time:');
-      expect($tokenPropertyRow.find('.token-expiration-time').text().trim()).to.equal(now.format(datetimeFormat));
+      expect($tokenPropertyRow.find('.token-expiration-time-label').text().trim())
+        .to.equal('Expiration time:');
+      expect($tokenPropertyRow.find('.token-expiration-time').text().trim())
+        .to.equal(now.format(datetimeFormat));
     });
   });
 
-  it('does not shows info about expiration time when it is not specified', function () {
-    this.render(hbs `{{content-tokens token=token}}`);
+  it(
+    'does not shows info about expiration time when it is not specified',
+    function () {
+      this.render(hbs `{{content-tokens token=token}}`);
 
-    expect(this.$('.token-expiration-time-property')).to.not.exist;
-  });
+      expect(this.$('.token-expiration-time-property')).to.not.exist;
+    }
+  );
 
-  it('shows invite token target', function () {
+  it('shows invite token target name', function () {
     setProperties(this.get('token'), {
       typeName: 'invite',
       subtype: 'userJoinGroup',
@@ -139,7 +152,8 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.token-target').text().trim()).to.equal('user1');
+      expect($tokenPropertyRow.find('.token-target').text().trim())
+        .to.equal('user1');
     });
   });
 
@@ -157,51 +171,60 @@ describe('Integration | Component | content tokens', function () {
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-target-property');
       expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-x');
-      expect($tokenPropertyRow.find('.model-error').text().trim()).to.equal('Not found');
+      expect($tokenPropertyRow.find('.model-error').text().trim())
+        .to.equal('Not found');
     });
   });
 
-  it('shows info about token target fetch error due to "forbidden"', function () {
-    setProperties(this.get('token'), {
-      typeName: 'invite',
-      subtype: 'userJoinGroup',
-      tokenTargetProxy: PromiseObject.create({
-        promise: reject({ id: 'forbidden' }),
-      }),
-    });
-
-    this.render(hbs `{{content-tokens token=token}}`);
-
-    return wait().then(() => {
-      const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-no-view');
-      expect($tokenPropertyRow.find('.model-error').text().trim()).to.equal('Forbidden');
-    });
-  });
-
-  it('shows info about token target fetch error due to non-standard error', function () {
-    const errorId = 'badGRI';
-    setProperties(this.get('token'), {
-      typeName: 'invite',
-      subtype: 'userJoinGroup',
-      tokenTargetProxy: PromiseObject.create({
-        promise: reject({ id: errorId }),
-      }),
-    });
-
-    this.render(hbs `{{content-tokens token=token}}`);
-
-    let $tokenPropertyRow;
-    return wait()
-      .then(() => {
-        $tokenPropertyRow = this.$('.token-target-property');
-        expect($tokenPropertyRow.find('.resource-load-error')).to.exist;
-        return click($tokenPropertyRow.find('.promise-error-show-details')[0]);
-      })
-      .then(() => {
-        expect($tokenPropertyRow.find('.error-json')).to.contain(errorId);
+  it(
+    'shows info about token target fetch error due to "forbidden"',
+    function () {
+      setProperties(this.get('token'), {
+        typeName: 'invite',
+        subtype: 'userJoinGroup',
+        tokenTargetProxy: PromiseObject.create({
+          promise: reject({ id: 'forbidden' }),
+        }),
       });
-  });
+
+      this.render(hbs `{{content-tokens token=token}}`);
+
+      return wait().then(() => {
+        const $tokenPropertyRow = this.$('.token-target-property');
+        expect($tokenPropertyRow.find('.model-icon'))
+          .to.have.class('oneicon-no-view');
+        expect($tokenPropertyRow.find('.model-error').text().trim())
+          .to.equal('Forbidden');
+      });
+    }
+  );
+
+  it(
+    'shows info about token target fetch error due to non-standard error',
+    function () {
+      const errorId = 'badGRI';
+      setProperties(this.get('token'), {
+        typeName: 'invite',
+        subtype: 'userJoinGroup',
+        tokenTargetProxy: PromiseObject.create({
+          promise: reject({ id: errorId }),
+        }),
+      });
+
+      this.render(hbs `{{content-tokens token=token}}`);
+
+      let $tokenPropertyRow;
+      return wait()
+        .then(() => {
+          $tokenPropertyRow = this.$('.token-target-property');
+          expect($tokenPropertyRow.find('.resource-load-error')).to.exist;
+          return click($tokenPropertyRow.find('.promise-error-show-details')[0]);
+        })
+        .then(() => {
+          expect($tokenPropertyRow.find('.error-json')).to.contain(errorId);
+        });
+    }
+  );
 
   [{
     subtype: 'userJoinGroup',
@@ -280,7 +303,14 @@ describe('Integration | Component | content tokens', function () {
     model: 'harvester',
     icon: 'light-bulb',
     tooltip: 'The space on behalf of which the token is consumed will become a metadata source for the harvester.',
-  }].forEach(({ subtype, subtypeTranslation, targetLabel, model, icon, tooltip }) => {
+  }].forEach(({
+    subtype,
+    subtypeTranslation,
+    targetLabel,
+    model,
+    icon,
+    tooltip,
+  }) => {
     it(
       `shows "${subtypeTranslation}" as subtype, "${targetLabel}" text as token target label, "${icon}" icon and correct tooltip for "${subtype}" invite token`,
       function () {
@@ -300,17 +330,19 @@ describe('Integration | Component | content tokens', function () {
         this.render(hbs `{{content-tokens token=token}}`);
     
         return wait()
-          .then(() => triggerEvent('.target-tooltip .one-icon', 'mouseenter'))
           .then(() => {
             const $tokenTypePropertyRow = this.$('.token-type-property');
             const $tokenTargetPropertyRow = this.$('.token-target-property');
 
-            expect($tokenTypePropertyRow.find('.token-type .subtype').text().trim()).to.equal(subtypeTranslation);
+            expect($tokenTypePropertyRow.find('.token-type .subtype').text().trim())
+              .to.equal(subtypeTranslation);
             expect($tokenTargetPropertyRow.find('.token-target-label').text().trim())
               .to.equal(targetLabel + ':');
             expect($tokenTargetPropertyRow.find('.model-icon')).to.have.class('oneicon-' + icon);
-            expect($('.tooltip.in').text().trim()).to.equal(tooltip);
-          });
+
+            return triggerEvent('.target-tooltip .one-icon', 'mouseenter');
+          })
+          .then(() => expect($('.tooltip.in').text().trim()).to.equal(tooltip));
       }
     );
   });
@@ -320,8 +352,10 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-token-property');
-      expect($tokenPropertyRow.find('.token-token-label').text().trim()).to.equal('Token:');
-      expect($tokenPropertyRow.find('.token-string').text().trim()).to.equal(this.get('token.token'));
+      expect($tokenPropertyRow.find('.token-token-label').text().trim())
+        .to.equal('Token:');
+      expect($tokenPropertyRow.find('.token-string').text().trim())
+        .to.equal(this.get('token.token'));
     });
   });
 });

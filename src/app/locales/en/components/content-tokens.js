@@ -8,6 +8,14 @@ export default {
   tokenDeletion: 'token deletion',
   description: 'The token can be used for authentication of Oneclient and ' +
     'Onedata REST API calls.',
+  propertyNames: {
+    name: 'Name',
+    type: 'Type',
+    creationTime: 'Creation time',
+    expirationTime: 'Expiration time',
+    revoked: 'Revoked',
+    token: 'Token',
+  },
   typeNames: {
     access: 'Access',
     invite: 'Invite',
@@ -35,16 +43,16 @@ export default {
     default: 'Target',
   },
   targetTooltips: {
-    userJoinGroup: 'The user that consumes the token will become a member of the group.',
-    groupJoinGroup: 'The group on behalf of which the token is consumed will become a member of the group.',
-    userJoinSpace: 'The user that consumes the token will become a member of the space.',
-    groupJoinSpace: 'The group on behalf of which the token is consumed will become a member of the space.',
+    userJoinGroup: generateTargetTooltipForUserJoin('group'),
+    groupJoinGroup: generateTargetTooltipForGroupJoin('group'),
+    userJoinSpace: generateTargetTooltipForUserJoin('space'),
+    groupJoinSpace: generateTargetTooltipForGroupJoin('space'),
     supportSpace: 'A provider can consume this token to grant storage space for the space.',
     registerOneprovider: 'This token can be used to register a new Oneprovider for the appointed admin user.',
-    userJoinCluster: 'The user that consumes the token will become a member of the cluster.',
-    groupJoinCluster: 'The group on behalf of which the token is consumed will become a member of the cluster.',
-    userJoinHarvester: 'The user that consumes the token will become a member of the harvester.',
-    groupJoinHarvester: 'The group on behalf of which the token is consumed will become a member of the harvester.',
+    userJoinCluster: generateTargetTooltipForUserJoin('cluster'),
+    groupJoinCluster: generateTargetTooltipForGroupJoin('cluster'),
+    userJoinHarvester: generateTargetTooltipForUserJoin('harvester'),
+    groupJoinHarvester: generateTargetTooltipForGroupJoin('harvester'),
     spaceJoinHarvester: 'The space on behalf of which the token is consumed will become a metadata source for the harvester.',
   },
   targetErrors: {
@@ -52,3 +60,11 @@ export default {
     forbidden: 'Forbidden',
   },
 };
+
+function generateTargetTooltipForUserJoin(targetModelName) {
+  return `The user that consumes the token will become a member of the ${targetModelName}.`;
+}
+
+function generateTargetTooltipForGroupJoin(targetModelName) {
+  return `The group on behalf of which the token is consumed will become a member of the ${targetModelName}.`;
+}

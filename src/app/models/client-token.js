@@ -16,7 +16,6 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import { reads } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
@@ -61,6 +60,8 @@ export const inviteTokenSubtypeToTargetModelMapping = {
   spaceJoinHarvester: standardHarvesterMapping,
 };
 
+const allowedSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
+
 export default Model.extend(
   GraphSingleModelMixin,
   createDataProxyMixin('tokenTarget'), {
@@ -104,21 +105,11 @@ export default Model.extend(
 
     /**
      * @type {Ember.ComputedProperty<string|undefined>}
-     * One of:
-     * - undefined (for access token)
-     * - 'userJoinGroup',
-     * - 'groupJoinGroup',
-     * - 'userJoinSpace',
-     * - 'groupJoinSpace',
-     * - 'supportSpace',
-     * - 'registerOneprovider',
-     * - 'userJoinCluster',
-     * - 'groupJoinCluster',
-     * - 'userJoinHarvester',
-     * - 'groupJoinHarvester',
-     * - 'spaceJoinHarvester'
      */
-    subtype: reads('type.inviteToken.subtype'),
+    subtype: computed('type.inviteToken.subtype', function subtype() {
+      const tokenSubtype = this.get('type.inviteToken.subtype');
+      return allowedSubtypes.includes(tokenSubtype) ? tokenSubtype : undefined;
+    }),
 
     /**
      * UNIX timestamp of token expiration time
@@ -157,8 +148,7 @@ export default Model.extend(
       not('revoked'),
     ),
 
-    // FIXME: check if it will be fired up on record load
-    validUntilObserver: observer('validUntil', function () {
+    validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {
         validUntil,
         isExpired,
@@ -199,13 +189,14 @@ export default Model.extend(
       const {
         store,
         type,
-      } = this.getProperties('store', 'type');
+        subtype,
+      } = this.getProperties('store', 'type', 'subtype');
 
-      if (!type || !type.inviteToken) {
+      if (!subtype) {
         return resolve(null);
       } else {
         const targetModelMapping =
-          inviteTokenSubtypeToTargetModelMapping[type.inviteToken.subtype];
+          inviteTokenSubtypeToTargetModelMapping[subtype];
         // FIXME: modelName to entityType mapping
         const targetModelGri = gri({
           entityType: targetModelMapping.modelName,
@@ -218,6 +209,9 @@ export default Model.extend(
       }
     },
 
+    /**
+     * @returns {undefined}
+     */
     rescheduleExpirationTimer() {
       const {
         expirationTimer,
@@ -227,6 +221,7 @@ export default Model.extend(
 
       cancel(expirationTimer);
       if (typeof validUntil === 'number' && validUntil > nowTimestamp) {
+        // If validUntil == nowTimestamp, then token is still valid, so we need +1s.
         const timerTime = (validUntil - nowTimestamp + 1) * 1000;
         this.set(
           'expirationTimer',
