@@ -5,7 +5,7 @@
   onToggleExpand=(action "toggleExpand")
   onCancel=(action onCancel uploadObject)}}
 {{#render-later triggerRender=triggerChildrenRender}}
-  {{#bs-collapse collapsed=(not isExpanded)}}
+  {{#one-collapse collapsed=(not isExpanded)}}
     {{#each uploadObject.children as |child|}}
       {{upload-presenter/upload-object
         nestingStyle=nestingStyle
@@ -13,5 +13,5 @@
         onCancel=onCancel
         onExpand=(action "childrenExpanded" child)}}
     {{/each}}
-  {{/bs-collapse}}
+  {{/one-collapse}}
 {{/render-later}}
