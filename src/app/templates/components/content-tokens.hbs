@@ -22,17 +22,24 @@
     </div>
     {{#if tokenTarget}}
       <div class="property-row token-target-property">
-        <div class="property-name token-target-label">Target:</div>
+        <div class="property-name token-target-label">{{targetLabel}}:</div>
         <div class="property-value token-target">
           {{#if tokenTarget.error}}
             {{#if tokenTarget.hasHandledError}}
-              {{tt this (concat "targetErrors." tokenTarget.error.id)}}
+              <span class="text-danger">
+                {{one-icon class="model-icon" icon=tokenTargetIcon}}
+                <span class="model-error">{{tt this (concat "targetErrors." tokenTarget.error.id)}}</span>
+              </span>
             {{else}}
               {{resource-load-error reason=tokenTarget.error}}
             {{/if}}
           {{else}}
             {{one-icon class="model-icon" icon=tokenTargetIcon}}
             <span class="model-name">{{tokenTarget.name}}</span>
+            <span class="space"></span>
+            {{one-label-tip
+              class="target-tooltip"
+              title=(tt this (concat "targetTooltips." token.subtype))}}
           {{/if}}
         </div>
       </div>

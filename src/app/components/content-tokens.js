@@ -12,9 +12,23 @@ import { inject } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-// import { next } from '@ember/runloop';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { resolve } from 'rsvp';
+
+const tokenTypeToTargetLabelI18nKey = {
+  userJoinGroup: 'targetGroup',
+  groupJoinGroup: 'targetGroup',
+  userJoinSpace: 'targetSpace',
+  groupJoinSpace: 'targetSpace',
+  supportSpace: 'spaceToBeSupported',
+  registerOneprovider: 'adminUser',
+  userJoinCluster: 'targetCluster',
+  groupJoinCluster: 'targetCluster',
+  userJoinHarvester: 'targetHarvester',
+  groupJoinHarvester: 'targetHarvester',
+  spaceJoinHarvester: 'targetHarvester',
+  default: 'default',
+};
 
 export default Component.extend(I18n, GlobalActions, createDataProxyMixin('tokenTarget'), {
   classNames: ['content-tokens'],
@@ -52,6 +66,17 @@ export default Component.extend(I18n, GlobalActions, createDataProxyMixin('token
 
   datetimeFormat: 'YYYY/MM/DD H:mm',
 
+    /**
+   * @type {Ember.ComputedProperty<SafeString>}
+   */
+  targetLabel: computed('token.subtype', function targetLabel() {
+    const type = this.get('token.subtype');
+    const i18nKey = tokenTypeToTargetLabelI18nKey[type] ||
+      tokenTypeToTargetLabelI18nKey['default'];
+    
+    return this.t(`targetLabels.${i18nKey}`);
+  }),
+
   tokenTargetIcon: computed('tokenTarget', function () {
     const tokenTarget = this.get('tokenTarget');
 
@@ -61,9 +86,9 @@ export default Component.extend(I18n, GlobalActions, createDataProxyMixin('token
         if (errorId) {
           switch (errorId) {
             case 'notFound':
-              return 'sth';
+              return 'x';
             case 'forbidden':
-              return 'sth';
+              return 'no-view';
             default:
               return null;
           }

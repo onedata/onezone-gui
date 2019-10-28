@@ -9,7 +9,8 @@ import moment from 'moment';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import wait from 'ember-test-helpers/wait';
 import { resolve, reject } from 'rsvp';
-import { click } from 'ember-native-dom-helpers';
+import { click, triggerEvent } from 'ember-native-dom-helpers';
+import $ from 'jquery';
 
 const datetimeFormat = 'YYYY-MM-DD [at] H:mm ([UTC]Z)';
 
@@ -91,34 +92,6 @@ describe('Integration | Component | content tokens', function () {
     });
   });
 
-  [
-    { subtype: 'userJoinGroup', subtypeTranslation: 'join user to group' },
-    { subtype: 'groupJoinGroup', subtypeTranslation: 'join group to group' },
-    { subtype: 'userJoinSpace', subtypeTranslation: 'join user to space' },
-    { subtype: 'groupJoinSpace', subtypeTranslation: 'join group to space' },
-    { subtype: 'supportSpace', subtypeTranslation: 'support space' },
-    { subtype: 'registerOneprovider', subtypeTranslation: 'register Oneprovider' },
-    { subtype: 'userJoinCluster', subtypeTranslation: 'join user to cluster' },
-    { subtype: 'groupJoinCluster', subtypeTranslation: 'join group to cluster' },
-    { subtype: 'userJoinHarvester', subtypeTranslation: 'join user to harvester' },
-    { subtype: 'groupJoinHarvester', subtypeTranslation: 'join group to harvester' },
-    { subtype: 'spaceJoinHarvester', subtypeTranslation: 'join space to harvester' },
-  ].forEach(({ subtype, subtypeTranslation }) => {
-    it(`shows "${subtypeTranslation}" for "${subtype}" invite token`, function () {
-      setProperties(this.get('token'), {
-        typeName: 'invite',
-        subtype,
-      });
-  
-      this.render(hbs `{{content-tokens token=token}}`);
-  
-      return wait().then(() => {
-        const $tokenPropertyRow = this.$('.token-type-property');
-        expect($tokenPropertyRow.find('.token-type .subtype').text().trim()).to.equal(subtypeTranslation);
-      });
-    });
-  });
-
   it('shows creation time', function () {
     const now = moment();
     this.set('token.metadata.creationTime', now.unix());
@@ -166,7 +139,6 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.token-target-label').text().trim()).to.equal('Target:');
       expect($tokenPropertyRow.find('.token-target').text().trim()).to.equal('user1');
     });
   });
@@ -184,7 +156,8 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.token-target').text().trim()).to.equal('Not found');
+      expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-x');
+      expect($tokenPropertyRow.find('.model-error').text().trim()).to.equal('Not found');
     });
   });
 
@@ -201,7 +174,8 @@ describe('Integration | Component | content tokens', function () {
 
     return wait().then(() => {
       const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.token-target').text().trim()).to.equal('Forbidden');
+      expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-no-view');
+      expect($tokenPropertyRow.find('.model-error').text().trim()).to.equal('Forbidden');
     });
   });
 
@@ -229,40 +203,116 @@ describe('Integration | Component | content tokens', function () {
       });
   });
 
-  [
-    { subtype: 'userJoinGroup', model: 'group', icon: 'group' },
-    { subtype: 'groupJoinGroup', model: 'group', icon: 'group' },
-    { subtype: 'userJoinSpace', model: 'space', icon: 'space' },
-    { subtype: 'groupJoinSpace', model: 'space', icon: 'space' },
-    { subtype: 'supportSpace', model: 'space', icon: 'space' },
-    { subtype: 'registerOneprovider', model: 'user', icon: 'user' },
-    { subtype: 'userJoinCluster', model: 'cluster', icon: 'cluster' },
-    { subtype: 'groupJoinCluster', model: 'cluster', icon: 'cluster' },
-    { subtype: 'userJoinHarvester', model: 'harvester', icon: 'light-bulb' },
-    { subtype: 'groupJoinHarvester', model: 'harvester', icon: 'light-bulb' },
-    { subtype: 'spaceJoinHarvester', model: 'harvester', icon: 'light-bulb' },
-  ].forEach(({ subtype, model, icon }) => {
-    it(`shows "${icon}" icon in token target for "${subtype}" invite token`, function () {
-      setProperties(this.get('token'), {
-        typeName: 'invite',
-        subtype: 'userJoinGroup',
-        tokenTargetProxy: PromiseObject.create({
-          promise: resolve({
-            constructor: {
-              modelName: model,
-            },
-            name: 'somemodel name',
+  [{
+    subtype: 'userJoinGroup',
+    subtypeTranslation: 'join user to group',
+    targetLabel: 'Target group',
+    model: 'group',
+    icon: 'group',
+    tooltip: 'The user that consumes the token will become a member of the group.',
+  }, {
+    subtype: 'groupJoinGroup',
+    subtypeTranslation: 'join group to group',
+    targetLabel: 'Target group',
+    model: 'group',
+    icon: 'group',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of the group.',
+  }, {
+    subtype: 'userJoinSpace',
+    subtypeTranslation: 'join user to space',
+    targetLabel: 'Target space',
+    model: 'space',
+    icon: 'space',
+    tooltip: 'The user that consumes the token will become a member of the space.',
+  }, {
+    subtype: 'groupJoinSpace',
+    subtypeTranslation: 'join group to space',
+    targetLabel: 'Target space',
+    model: 'space',
+    icon: 'space',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of the space.',
+  }, {
+    subtype: 'supportSpace',
+    subtypeTranslation: 'support space',
+    targetLabel: 'Space to be supported',
+    model: 'space',
+    icon: 'space',
+    tooltip: 'A provider can consume this token to grant storage space for the space.',
+  }, {
+    subtype: 'registerOneprovider',
+    subtypeTranslation: 'register Oneprovider',
+    targetLabel: 'Admin user',
+    model: 'user',
+    icon: 'user',
+    tooltip: 'This token can be used to register a new Oneprovider for the appointed admin user.',
+  }, {
+    subtype: 'userJoinCluster',
+    subtypeTranslation: 'join user to cluster',
+    targetLabel: 'Target cluster',
+    model: 'cluster',
+    icon: 'cluster',
+    tooltip: 'The user that consumes the token will become a member of the cluster.',
+  }, {
+    subtype: 'groupJoinCluster',
+    subtypeTranslation: 'join group to cluster',
+    targetLabel: 'Target cluster',
+    model: 'cluster',
+    icon: 'cluster',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of the cluster.',
+  }, {
+    subtype: 'userJoinHarvester',
+    subtypeTranslation: 'join user to harvester',
+    targetLabel: 'Target harvester',
+    model: 'harvester',
+    icon: 'light-bulb',
+    tooltip: 'The user that consumes the token will become a member of the harvester.',
+  }, {
+    subtype: 'groupJoinHarvester',
+    subtypeTranslation: 'join group to harvester',
+    targetLabel: 'Target harvester',
+    model: 'harvester',
+    icon: 'light-bulb',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of the harvester.',
+  }, {
+    subtype: 'spaceJoinHarvester',
+    subtypeTranslation: 'join space to harvester',
+    targetLabel: 'Target harvester',
+    model: 'harvester',
+    icon: 'light-bulb',
+    tooltip: 'The space on behalf of which the token is consumed will become a metadata source for the harvester.',
+  }].forEach(({ subtype, subtypeTranslation, targetLabel, model, icon, tooltip }) => {
+    it(
+      `shows "${subtypeTranslation}" as subtype, "${targetLabel}" text as token target label, "${icon}" icon and correct tooltip for "${subtype}" invite token`,
+      function () {
+        setProperties(this.get('token'), {
+          typeName: 'invite',
+          subtype,
+          tokenTargetProxy: PromiseObject.create({
+            promise: resolve({
+              constructor: {
+                modelName: model,
+              },
+              name: 'somemodel name',
+            }),
           }),
-        }),
-      });
-  
-      this.render(hbs `{{content-tokens token=token}}`);
-  
-      return wait().then(() => {
-        const $tokenPropertyRow = this.$('.token-target-property');
-        expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-' + icon);
-      });
-    });
+        });
+    
+        this.render(hbs `{{content-tokens token=token}}`);
+    
+        return wait()
+          .then(() => triggerEvent('.target-tooltip .one-icon', 'mouseenter'))
+          .then(() => {
+            const $tokenTypePropertyRow = this.$('.token-type-property');
+            const $tokenTargetPropertyRow = this.$('.token-target-property');
+
+            expect($tokenTypePropertyRow.find('.token-type .subtype').text().trim()).to.equal(subtypeTranslation);
+            expect($tokenTargetPropertyRow.find('.token-target-label').text().trim())
+              .to.equal(targetLabel + ':');
+            expect($tokenTargetPropertyRow.find('.model-icon')).to.have.class('oneicon-' + icon);
+            expect($('.tooltip.in').text().trim()).to.equal(tooltip);
+          });
+      }
+    );
   });
 
   it('shows token string', function () {

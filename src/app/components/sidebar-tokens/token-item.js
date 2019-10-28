@@ -8,8 +8,8 @@ import { next } from '@ember/runloop';
 import { reject } from 'rsvp';
 
 const tokenTypeToIconNameMapping = {
-  invite: 'invite',
-  access: 'access-token',
+  invite: 'token-invite',
+  access: 'token-access',
   default: 'tokens',
 };
 
