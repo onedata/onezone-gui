@@ -197,9 +197,12 @@ export default Model.extend(
       } else {
         const targetModelMapping =
           inviteTokenSubtypeToTargetModelMapping[subtype];
-        // FIXME: modelName to entityType mapping
+        const modelName = targetModelMapping.modelName;
+        const adapter = store.adapterFor(modelName);
+        const entityType = adapter.getEntityTypeForModelName(modelName);
+
         const targetModelGri = gri({
-          entityType: targetModelMapping.modelName,
+          entityType,
           entityId: type.inviteToken[targetModelMapping.idFieldName],
           aspect: 'instance',
           scope: 'auto',

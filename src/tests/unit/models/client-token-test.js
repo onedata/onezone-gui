@@ -76,6 +76,13 @@ describe('Unit | Model | client token', function() {
         sinon.stub(this.store(), 'findRecord')
           .withArgs(targetModelMapping.modelName, targetModelGri)
           .returns(resolve(targetModelMock));
+        sinon.stub(this.store(), 'adapterFor')
+          .withArgs(targetModelMapping.modelName)
+          .returns({
+            getEntityTypeForModelName(modelName) {
+              return modelName;
+            },
+          });
         const model = this.subject();
         set(model, 'type', {
           inviteToken: {
