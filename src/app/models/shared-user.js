@@ -8,6 +8,7 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { alias } from '@ember/object/computed';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export default Model.extend(GraphSingleModelMixin, {
@@ -17,4 +18,4 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {Ember.ComputedProperty<string>}
    */
   name: alias('fullName'),
-});
+}).reopenClass(StaticGraphModelMixin);

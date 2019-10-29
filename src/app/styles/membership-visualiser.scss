@@ -61,14 +61,14 @@
     }
     .type-icon {
       &::before {
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 1;
       }
       &::after {
         content: $oneicon-settings;
         position: absolute;
         left: 0;
-        transition: opacity $animation-time linear;
+        transition: transition-linear(opacity, 'short');
         opacity: 0;
       }
     }
@@ -100,54 +100,26 @@
   .membership-relation {
     position: relative;
     width: 100px;
-    height: 2 * $line-dot-size;
+
+    .arrowhead {
+      transition: transition-linear(border-color, 'short');
+    }
+
     .line, .dot {
-      position: absolute;
-      left: 0;
-      transition: background-color $animation-time linear;
-      background-color: $color-one-azure;
+      transition: transition-linear(background-color, 'short');
     }
-    .line {
-      @include vertical-align-middle();
-      height: 2px;
-      width: 100%;
-    }
-    .dot {
-      top: 50%;
-      transform: translateX(-50%) translateY(-50%);
-      width: $line-dot-size;
-      height: $line-dot-size;
-      border-radius: 100%;
-    }
-    .dot-right {
-      left: initial;
-      right: 0;
-      transform: translateX(50%) translateY(-50%);
-    }
-    .relation-sign {
-      position: absolute;
-      bottom: 50%;
-      right: -2px;
-      width: 8px;
-      height: 8px;
-      border-color: $color-one-azure;
-      border-style: solid;
-      border-width: 0 2px 2px 0;
-      transform-origin: right bottom;
-      transform: rotate(-45deg);
-      transition: border-color $animation-time linear;
-    }
+
     &.hovered {
       .line, .dot {
         background-color: $color-one-blue-gray;
       }
-      .relation-sign {
+      .arrowhead {
         border-color: $color-one-blue-gray;
       }
       .actions-trigger {
         opacity: 1;
       }
-      .relation-description {
+      .arrow-text {
         margin-top: -5px;
         opacity: 1;
       }
@@ -159,7 +131,7 @@
       color: $color-one-blue-gray;
       font-size: $trigger-size;
       opacity: 0;
-      transition: opacity $animation-time linear;
+      transition: transition-linear(opacity, 'short');
       cursor: pointer;
       &:hover {
         color: $color-one-azure;
@@ -175,17 +147,11 @@
         z-index: -1;
       }
     }
-    .relation-description {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50%) translateY(-1em);
+    
+    .arrow-text {
       margin-top: 0;
       opacity: 0;
-      transition: margin-top $animation-time linear, opacity $animation-time linear;
-      font-size: 0.8em;
-      font-weight: bold;
-      color: $color-one-azure;
+      transition: transition-linear(margin-top, 'short'), transition-linear(opacity, 'short');
     }
   }
   .membership-more {
@@ -206,17 +172,17 @@
       padding-left: 1em;
       font-style: italic;
     }
-    .ps-container {
+    .ps {
       white-space: nowrap;
       position: relative;
-      &.ps-active-x {
+      &.ps--active-x {
         cursor: move;
       }
-      & > .ps-scrollbar-x-rail {
+      & > .ps__rail-x {
         z-index: 1;
       }
     }
-    .ps-container.ps-active-x + .bar-nav {
+    .ps.ps--active-x + .bar-nav {
       display: block;
     }
     .bar-nav {
@@ -234,7 +200,7 @@
     }
     .scroll-left {
       padding-right: 8px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9) 80%, transparent);
+      background: linear-gradient(to right, rgba($main-content-hover-background, 0.9) 80%, transparent);
       left: 0;
       .one-icon {
         margin-left: -4px;
@@ -242,7 +208,7 @@
     }
     .scroll-right {
       padding-left: 8px;
-      background-image: linear-gradient(to left, rgba(255, 255, 255, 0.9) 80%, transparent);
+      background: linear-gradient(to left, rgba($main-content-hover-background, 0.9) 80%, transparent);
       right: 0;
       .one-icon {
         margin-left: 4px;

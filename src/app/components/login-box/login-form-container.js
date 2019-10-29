@@ -18,7 +18,6 @@ import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'npm:dompurify';
-import { htmlSafe } from '@ember/template';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -140,12 +139,12 @@ export default LoginFormContainer.extend(
      */
     fetchSignInNotification() {
       return this.get('guiMessageManager')
-      .getMessage('signin_notification')
-        .then(message => {
-          const sanitizedMessage =
-            DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] });
-          return sanitizedMessage ? htmlSafe(sanitizedMessage) : undefined;
-        });
+        .getMessage('signin_notification')
+          .then(message => {
+            const sanitizedMessage =
+              DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
+            return sanitizedMessage ? sanitizedMessage : undefined;
+          });
     },
 
     /**

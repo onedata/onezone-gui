@@ -9,7 +9,7 @@
 
 import { inject } from '@ember/service';
 import { A } from '@ember/array';
-import { Promise } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 
 export default SidebarResources.extend({
@@ -46,10 +46,10 @@ export default SidebarResources.extend({
         return this.get('harvesterManager').getHarvesters();
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
-          return Promise.resolve({ list: A([user]) });
+          return resolve({ list: A([user]) });
         });
       default:
-        return new Promise((resolve, reject) => reject('No such collection: ' + type));
+        return reject('No such collection: ' + type);
     }
   },
 

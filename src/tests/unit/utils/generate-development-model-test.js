@@ -6,6 +6,7 @@ import EmberObject from '@ember/object';
 import { A } from '@ember/array';
 import { Promise, resolve } from 'rsvp';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Unit | Utility | generate development model', function () {
   it('creates and saves records', function (done) {
@@ -41,6 +42,13 @@ describe('Unit | Utility | generate development model', function () {
     const StoreStub = {
       createRecord(modelName, props) {
         return createModelStub(modelName, props);
+      },
+      userGri() {
+        return gri({
+          entityType: 'user',
+          entityId: 'user_id',
+          aspect: 'instance',
+        });
       },
     };
 
