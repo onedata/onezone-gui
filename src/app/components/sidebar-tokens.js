@@ -29,9 +29,4 @@ export default TwoLevelSidebar.extend({
    * @override
    */
   sidebarType: 'tokens',
-
-  /**
-   * @override
-   */
-  showCreateOnEmpty: false,
 });

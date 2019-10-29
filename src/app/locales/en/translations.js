@@ -14,7 +14,6 @@ import backendErrors from './errors/backend-errors';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
-import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 import contentClustersEndpointError from './components/content-clusters-endpoint-error';
 import contentUsers from './components/content-users';
@@ -112,7 +111,6 @@ let translations = {
     },
     loginBox,
     contentTokens,
-    contentTokensEmpty,
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,

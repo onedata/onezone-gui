@@ -1,6 +1,6 @@
 export default {
   header: 'Create new token',
-  description: 'Fill in the form below to create new token',
+  description: 'Onedata Client Tokens can be used for authentication of Oneclient and Onedata REST API calls. Fill in the form below to create new token.',
   newTokenForm: {
     fields: {
       name: {
