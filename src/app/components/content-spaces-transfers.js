@@ -11,7 +11,7 @@ import Component from '@ember/component';
 
 export default Component.extend({
   classNames: [
-    'content-spaces-embedded-base',
+    'oneprovider-view-container',
     'content-spaces-transfers',
     'absolute-flex-content',
     'no-pointer-events',

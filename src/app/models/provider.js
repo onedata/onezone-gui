@@ -17,9 +17,6 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
-  // TODO: add array transform
-  // urls: attr('array'),
-  // clientName: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),

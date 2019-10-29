@@ -8,29 +8,50 @@
  */
 
 import { inject as service } from '@ember/service';
+import { get } from '@ember/object';
+import { all as allFulfilled } from 'rsvp';
 import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
-import clearLocalStorageModel from 'onezone-gui/utils/clear-local-storage-model';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
+  privacyPolicyManager: service(),
+
+  /**
+   * @override
+   */
+  clearLocalStoragePrefix: 'onezone-gui:',
 
   developmentModelConfig: Object.freeze({
     clearOnReload: false,
   }),
   generateDevelopmentModel,
-  clearDevelopmentModel: clearLocalStorageModel,
 
   beforeModel() {
     const superResult = this._super(...arguments);
-    return this.get('onedataWebsocket.webSocketInitializedProxy')
+    const {
+      privacyPolicyManager,
+      onedataWebsocket,
+    } = this.getProperties('privacyPolicyManager', 'onedataWebsocket');
+    return get(onedataWebsocket, 'webSocketInitializedProxy')
       .catch(() => {
         throw {
           isOnedataCustomError: true,
           type: 'cannot-init-websocket',
         };
       })
+      .then(() =>
+        allFulfilled([
+          get(privacyPolicyManager, 'privacyPolicyProxy'),
+          get(privacyPolicyManager, 'cookieConsentNotificationProxy'),
+        ]).catch(error => {
+          console.error(error);
+          // Error while loading gui messages is not critical, so it should not
+          // stop loading the page.
+          return undefined;
+        })
+      )
       .then(() => superResult);
   },
 });

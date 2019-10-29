@@ -11,7 +11,7 @@ import harvesters from './tabs/harvesters';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
-import cannotInitWebsocket from './errors/cannot-init-websocket';
+import backendErrors from './errors/backend-errors';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
@@ -29,6 +29,7 @@ import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesData from './components/content-spaces-data';
 import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
@@ -78,6 +79,8 @@ import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import uploadPresenter from './components/upload-presenter';
+import cookiesConsent from './components/cookies-consent';
+import privacyPolicyModal from './components/privacy-policy-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -109,7 +112,7 @@ let translations = {
     uploads,
   },
   errors: {
-    cannotInitWebsocket,
+    backendErrors,
   },
   components: {
     alerts: {
@@ -131,6 +134,7 @@ let translations = {
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesData,
     contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
@@ -180,6 +184,8 @@ let translations = {
     websocketReconnectionModal,
     fatalConnectionErrorModal,
     uploadPresenter,
+    cookiesConsent,
+    privacyPolicyModal,
   },
   services: {
     clientTokenActions,

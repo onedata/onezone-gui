@@ -20,6 +20,10 @@ const CurrentUser = Service.extend({
   getCurrentUserRecord() {},
 });
 
+const PrivacyPolicyManagerStub = Service.extend({
+  showPrivacyPolicyAction: undefined,
+});
+
 describe('Integration | Component | user account button', function () {
   setupComponentTest('user-account-button', {
     integration: true,
@@ -28,9 +32,15 @@ describe('Integration | Component | user account button', function () {
   beforeEach(function () {
     registerService(this, 'currentUser', CurrentUser);
     registerService(this, 'session', SessionStub);
+    registerService(this, 'privacyPolicyManager', PrivacyPolicyManagerStub);
 
-    let session = this.container.lookup('service:session');
+    const session = this.container.lookup('service:session');
     session.get('data.authenticated').identity.user = userId;
+
+    const store = lookupService(this, 'store');
+    this.findRecordStub = sinon.stub(store, 'findRecord')
+      .withArgs('user', sinon.match(/.*/))
+      .resolves(userRecord);
   });
 
   it('renders WS account button with username provided by current user record',

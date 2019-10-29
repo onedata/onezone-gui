@@ -1,11 +1,11 @@
-{{#content-spaces-embedded-base
+{{#oneprovider-view-container
   contentContainerClass="content-spaces-data-content"
   space=space
-  as |embeddedBase|
+  as |container|
 }}
   {{embedded-content-file-browser
-    oneprovider=embeddedBase.selectedProvider
-    baseUrl=embeddedBase.contentIframeBaseUrl
+    oneprovider=container.selectedProvider
+    baseUrl=container.contentIframeBaseUrl
     spaceEntityId=space.entityId
   }}
-{{/content-spaces-embedded-base}}
+{{/oneprovider-view-container}}

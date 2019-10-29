@@ -1,4 +1,7 @@
-{{#promise-proxy-container proxy=tryErrorCheckProxy}}
+{{#error-check-view
+  tryErrorCheckProxy=tryErrorCheckProxy
+  errorCheckProxy=errorCheckProxy
+}}
   {{content-info
     class="scroll-breakpoint-600"
     header=(tt this "header")
@@ -7,4 +10,4 @@
     buttonLabel=(tt this "tryAgain")
     buttonAction=(action "tryAgain")
   }}
-{{/promise-proxy-container}}
+{{/error-check-view}}

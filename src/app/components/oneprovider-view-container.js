@@ -1,3 +1,13 @@
+/**
+ * For given space let user select the Oneprovider and give a place where
+ * some component (typically remote component from Oneprovider) will be rendered.
+ * 
+ * @module components/oneprovider-view-container
+ * @author Jakub Liput
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -80,14 +90,21 @@ export default Component.extend({
     }
   ),
 
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showAllOfflineInfo: computed(
+    'selectedProvider',
+    'providers.@each.online',
+    function showAllOfflineInfo() {
+      return !this.get('selectedProvider') && !this.get('providers').isAny('online');
+    }
+  ),
+
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
       return this.get('space.providerList')
-        .then(providerList => get(providerList, 'list'))
-        .then(result => {
-          console.log('initialProvidersListProxy resolved');
-          return result;
-        });
+        .then(providerList => get(providerList, 'list'));
     })
   ),
 
@@ -99,7 +116,10 @@ export default Component.extend({
 
   init() {
     this._super(...arguments);
-    this.providersChanged();
+    this.get('initialProvidersListProxy').then(list => {
+      const firstOnlineOneprovider = list.findBy('online');
+      safeExec(this, 'set', 'selectedProvider', firstOnlineOneprovider || null);
+    });
     next(() => {
       safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
     });

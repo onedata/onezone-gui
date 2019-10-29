@@ -47,11 +47,6 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  relatedData: reads('oneprovider'),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze(['spaceEntityId']),
 
   /**
@@ -59,7 +54,11 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([]),
 
-  // FIXME: redundancy with file browser iframe, maybe ifameType etc. too
+  /**
+   * @override implements OneEmbeddedContainer
+   */
+  relatedData: reads('oneprovider'),
+
   /**
    * @override implements OneEmbeddedContainer
    */

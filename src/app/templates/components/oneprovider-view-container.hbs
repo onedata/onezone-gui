@@ -11,6 +11,7 @@
           class="space-providers-tab-bar"
           items=providerItems
           selectedItem=selectedProviderItem
+          selectDefaultOnInit=false
           selectedItemChanged=(action "selectedProviderChanged")
         }}
           {{oneproviders-map-selector
@@ -24,13 +25,28 @@
       </div>
     </div>
     <div
-      class={{concat-classes "row absolute-flex-content-child-stretch content-spaces-embedded-base-inner" contentContainerClass}}
+      class={{concat-classes "row absolute-flex-content-child-stretch oneprovider-view-container-inner" contentContainerClass}}
     >
-      {{yield (hash
-        contentIframeBaseUrl=contentIframeBaseUrl
-        selectedProvider=selectedProvider
-      )
-      }}
+      {{#if showAllOfflineInfo}}
+        {{content-info
+          header=(tt this "allOneprovidersOffline")
+          imagePath=(root-url "assets/images/data-error-no-providers.svg")
+          class="preserve-header scroll-breakpoint-600"
+        }}
+      {{else}}
+        {{#if selectedProvider.online}}
+          {{yield (hash
+            contentIframeBaseUrl=contentIframeBaseUrl
+            selectedProvider=selectedProvider
+          )}}
+        {{else}}
+          {{content-info
+            header=(tt this "oneproviderOffline")
+            imagePath=(root-url "assets/images/no-connection.svg")
+            class="preserve-header scroll-breakpoint-600"
+          }}
+        {{/if}}
+      {{/if}}
     </div>
   {{else}}
     {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}

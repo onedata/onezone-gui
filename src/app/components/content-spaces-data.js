@@ -1,7 +1,5 @@
 /**
- * TODO: Prototype of go to first online Onprovider that supports this space
- * Need to implement:
- * - disable/show error sign when no Oneprovider is online
+ * Container for remote file browser of single space with Oneprovider selector
  * 
  * @module components/content-spaces-data
  * @author Jakub Liput
@@ -10,28 +8,18 @@
  */
 
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: [
-    'content-spaces-embedded-base',
+    'oneprovider-view-container',
     'content-spaces-data',
     'absolute-flex-content',
     'no-pointer-events',
   ],
 
   /**
-   * Space selected in sidebar to show its embedded content using one
-   * of available Oneproviders.
-   * @virtual
-   * @type {models.Space}
+   * @override
    */
-  space: undefined,
-
-  /**
-   * One of the Oneproviders that support `space` which will be used
-   * to render embedded component
-   * @virtual
-   * @type {models.Provider}
-   */
-  selectedProvider: undefined,
+  i18nPrefix: 'components.contentSpacesData',
 });

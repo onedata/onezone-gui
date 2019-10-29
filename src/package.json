@@ -8,7 +8,7 @@
     "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": "https://git.onedata.org/projects/VFS/repos/onezone-gui",
   "scripts": {
     "build": "ember build",
     "start": "ember server",
@@ -25,6 +25,7 @@
     "chartist-plugin-legend": "0.6.1",
     "color": "2.0.1",
     "contrast": "1.0.1",
+    "dompurify": "1.0.11",
     "ember-ajax": "3.0.0",
     "ember-awesome-macros": "5.0.1",
     "ember-bootstrap": "1.2.0",
@@ -70,6 +71,7 @@
     "ember-moment": "7.5.0",
     "ember-notify": "5.2.1",
     "ember-one-way-controls": "2.0.1",
+    "ember-pell": "1.4.5",
     "ember-power-select": "1.9.5",
     "ember-redirect": "5.1.0",
     "ember-resolver": "4.5.0",
