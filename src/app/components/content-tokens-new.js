@@ -16,7 +16,7 @@ import moment from 'moment';
 export default Component.extend(I18n, {
   classNames: ['content-tokens-new'],
 
-  clientTokenActions: service(),
+  tokenActions: service(),
 
   /**
    * @override
@@ -25,9 +25,7 @@ export default Component.extend(I18n, {
 
   actions: {
     create({ values }) {
-      const {
-        clientTokenActions,
-      } = this.getProperties('clientTokenActions');
+      const tokenActions = this.get('tokenActions');
       const {
         name,
         validUntilEnabled,
@@ -46,7 +44,7 @@ export default Component.extend(I18n, {
         });
       }
 
-      return clientTokenActions.createToken(tokenPrototype);
+      return tokenActions.createToken(tokenPrototype);
     },
   },
 });

@@ -36,7 +36,7 @@ export default Model.extend(GraphSingleModelMixin, {
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
   providerList: belongsTo('providerList'),
-  clientTokenList: belongsTo('clientTokenList'),
+  tokenList: belongsTo('tokenList'),
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
   harvesterList: belongsTo('harvesterList'),

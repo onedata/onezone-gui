@@ -14,8 +14,8 @@ import SidebarResources from 'onedata-gui-common/services/sidebar-resources';
 
 export default SidebarResources.extend({
   providerManager: inject(),
-  clientTokenManager: inject(),
-  clientTokenActions: inject(),
+  tokenManager: inject(),
+  tokenActions: inject(),
   currentUser: inject(),
   spaceManager: inject(),
   clusterActions: inject(),
@@ -37,7 +37,7 @@ export default SidebarResources.extend({
       case 'clusters':
         return this.get('clusterManager').getClusters();
       case 'tokens':
-        return this.get('clientTokenManager').getClientTokens();
+        return this.get('tokenManager').getTokens();
       case 'spaces':
         return this.get('spaceManager').getSpaces();
       case 'groups':
@@ -63,7 +63,7 @@ export default SidebarResources.extend({
       case 'clusters':
         return this.get('clusterActions.buttons');
       case 'tokens':
-        return this.get('clientTokenActions.actionButtons');
+        return this.get('tokenActions.actionButtons');
       case 'spaces':
         return this.get('spaceActions.buttons');
       case 'groups':

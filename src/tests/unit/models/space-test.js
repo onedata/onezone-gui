@@ -14,6 +14,7 @@ describe('Unit | Model | space', function () {
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
     registerService(this, 'onedata-graph-utils', Service);
+    registerService(this, 'token-manager', Service);
   });
 
   it('has getInviteToken method', function () {

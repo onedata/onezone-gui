@@ -176,6 +176,27 @@ describe('Integration | Component | content tokens', function () {
     });
   });
 
+  it('shows info about not found token target when target is in deleted state', function () {
+    setProperties(this.get('token'), {
+      typeName: 'invite',
+      subtype: 'userJoinGroup',
+      tokenTargetProxy: PromiseObject.create({
+        promise: resolve({
+          isDeleted: true,
+        }),
+      }),
+    });
+
+    this.render(hbs `{{content-tokens token=token}}`);
+
+    return wait().then(() => {
+      const $tokenPropertyRow = this.$('.token-target-property');
+      expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-x');
+      expect($tokenPropertyRow.find('.model-error').text().trim())
+        .to.equal('Not found');
+    });
+  });
+
   it(
     'shows info about token target fetch error due to "forbidden"',
     function () {
@@ -357,5 +378,95 @@ describe('Integration | Component | content tokens', function () {
       expect($tokenPropertyRow.find('.token-string').text().trim())
         .to.equal(this.get('token.token'));
     });
+  });
+
+  it('changes visible values after token change', function () {
+    const oldTokenTargetName = 'group1';
+    const oldToken = this.get('token');
+    const now = moment();
+    setProperties(oldToken, {
+      name: 'token1',
+      typeName: 'invite',
+      subtype: 'userJoinGroup',
+      validUntil: now.unix(),
+      token: 'abcdef',
+      revoked: true,
+      metadata: {
+        creationTime: now.unix(),
+      },
+      tokenTargetProxy: PromiseObject.create({
+        promise: resolve({
+          constructor: {
+            modelName: 'group',
+          },
+          name: oldTokenTargetName,
+        }),
+      }),
+    });
+
+    now.add(60, 'seconds');
+    const newTokenTargetName = 'space1';
+    const newToken = {
+      name: 'token2',
+      typeName: 'invite',
+      subtype: 'userJoinSpace',
+      validUntil: now.unix(),
+      token: 'ghijkl',
+      revoked: false,
+      metadata: {
+        creationTime: now.unix(),
+      },
+      tokenTargetProxy: PromiseObject.create({
+        promise: resolve({
+          constructor: {
+            modelName: 'space',
+          },
+          name: newTokenTargetName,
+        }),
+      }),
+    };
+
+    this.render(hbs `{{content-tokens token=token}}`);
+
+    return wait()
+      .then(() => {
+        this.set('token', newToken);
+        return wait();
+      })
+      .then(() => {
+        const $namePropertyRow = this.$('.token-name-property');
+        const $creationPropertyRow = this.$('.token-creation-time-property');
+        const $expirationPropertyRow = this.$('.token-expiration-time-property');
+        const $typePropertyRow = this.$('.token-type-property');
+        const $targetPropertyRow = this.$('.token-target-property');
+        const $tokenPropertyRow = this.$('.token-token-property');
+        const $revokedPropertyRow = this.$('.token-revoked-property');
+
+        expect(this.$('h1 .token-name').text().trim())
+          .to.equal(this.get('token.name'));
+        expect($namePropertyRow.find('.token-name').text().trim())
+          .to.equal(this.get('token.name'));
+        expect($typePropertyRow.find('.token-type .type-name').text().trim())
+          .to.equal('Invite');
+        expect($typePropertyRow.find('.token-type .subtype').text().trim())
+          .to.equal('join user to space');
+        expect($targetPropertyRow.find('.token-target-label').text().trim())
+          .to.equal('Target space:');
+        expect($targetPropertyRow.find('.model-icon'))
+          .to.have.class('oneicon-space');
+        expect($targetPropertyRow.find('.token-target').text().trim())
+          .to.equal(newTokenTargetName);
+        expect($creationPropertyRow.find('.token-creation-time').text().trim())
+          .to.equal(now.format(datetimeFormat));
+        expect($expirationPropertyRow.find('.token-expiration-time').text().trim())
+          .to.equal(now.format(datetimeFormat));
+        expect($tokenPropertyRow.find('.token-string').text().trim())
+          .to.equal(this.get('token.token'));
+        expect($revokedPropertyRow.find('.token-revoked-toggle'))
+          .to.not.have.class('checked');
+
+        return triggerEvent('.target-tooltip .one-icon', 'mouseenter');
+      })
+      .then(() => expect($('.tooltip.in').text().trim()).to.contain('space'));
   });
 });

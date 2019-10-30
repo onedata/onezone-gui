@@ -15,7 +15,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   beforeEach(function () {
-    registerService(this, 'client-token-actions', ClientTokenActionsStub);
+    registerService(this, 'token-actions', TokenActionsStub);
   });
 
   it('has class "content-tokens-new"', function () {
@@ -38,9 +38,9 @@ describe('Integration | Component | content tokens new', function () {
 
   it('allows to create new token with limited lifetime', function () {
     const tokenName = 'token name';
-    const clientTokenActionsStub = lookupService(this, 'client-token-actions');
+    const tokenActionsStub = lookupService(this, 'token-actions');
     const createTokenActionStub =
-      sinon.stub(clientTokenActionsStub, 'createToken').resolves();
+      sinon.stub(tokenActionsStub, 'createToken').resolves();
     this.render(hbs`{{content-tokens-new}}`);
 
     let validUntilHelper;
@@ -67,9 +67,9 @@ describe('Integration | Component | content tokens new', function () {
 
   it('allows to create new token with unlimited lifetime', function () {
     const tokenName = 'token name';
-    const clientTokenActionsStub = lookupService(this, 'client-token-actions');
+    const tokenActionsStub = lookupService(this, 'token-actions');
     const createTokenActionStub =
-      sinon.stub(clientTokenActionsStub, 'createToken').resolves();
+      sinon.stub(tokenActionsStub, 'createToken').resolves();
     this.render(hbs`{{content-tokens-new}}`);
 
     return fillIn('.field-general-name', tokenName)
@@ -83,6 +83,6 @@ describe('Integration | Component | content tokens new', function () {
   });
 });
 
-const ClientTokenActionsStub = Service.extend({
+const TokenActionsStub = Service.extend({
   createToken() {},
 });

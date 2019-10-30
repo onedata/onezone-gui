@@ -15,8 +15,9 @@ const tokenTypeToIconNameMapping = {
 
 export default Component.extend(I18n, {
   i18n: service(),
-  clientTokenActions: service(),
+  tokenActions: service(),
   navigationState: service(),
+  router: service(),
 
   classNames: ['token-item'],
   classNameBindings: ['isTokenActive::inactive-token'],
@@ -27,7 +28,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.sidebarTokens.tokenItem',
 
   /**
-   * @type {Models.ClientToken}
+   * @type {Models.Token}
    */
   item: undefined,
 
@@ -113,7 +114,7 @@ export default Component.extend(I18n, {
       .resourceCollectionContainsId(groupId)
       .then(contains => {
         if (!contains) {
-          next(() => router.transitionTo('onedata.sidebar', 'groups'));
+          next(() => router.transitionTo('onedata.sidebar', 'tokens'));
         }
       });
   },
@@ -153,12 +154,12 @@ export default Component.extend(I18n, {
     },
     remove() {
       const {
-        clientTokenActions,
+        tokenActions,
         token,
-      } = this.getProperties('clientTokenActions', 'token');
+      } = this.getProperties('tokenActions', 'token');
 
       this.set('isRemovingToken', true);
-      return clientTokenActions.deleteToken(token)
+      return tokenActions.deleteToken(token)
         .then(() => this.redirectOnTokenDeletion())
         .finally(() => safeExec(this, () => this.setProperties({
           isRemovingToken: false,

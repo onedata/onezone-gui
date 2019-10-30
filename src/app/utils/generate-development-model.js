@@ -16,7 +16,7 @@ import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/client-token';
+import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -27,7 +27,7 @@ const USER_LOGIN = 'stub_user';
 const NUMBER_OF_SHARED_USERS = 3;
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
-const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
@@ -39,7 +39,7 @@ const types = [
   'linkedAccount',
   'cluster',
   'harvester',
-  'clientToken',
+  'token',
 ];
 const names = ['one', 'two', 'three'];
 
@@ -278,8 +278,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createProvidersRecords(store, additionalInfo);
     case 'space':
       return createSpacesRecords(store, additionalInfo);
-    case 'clientToken':
-      return createClientTokensRecords(store, additionalInfo);
+    case 'token':
+      return createTokensRecords(store, additionalInfo);
     case 'group':
       return createGroupsRecords(store, additionalInfo);
     case 'linkedAccount':
@@ -338,10 +338,10 @@ function createSpacesRecords(store) {
   }));
 }
 
-function createClientTokensRecords(store) {
+function createTokensRecords(store) {
   const promises = [];
-  _.range(NUMBER_OF_CLIENT_TOKENS).forEach((i) => {
-    const accessTokenPromise = store.createRecord('clientToken', {
+  _.range(NUMBER_OF_TOKENS).forEach((i) => {
+    const accessTokenPromise = store.createRecord('token', {
       name: 'Access token ' + i,
       type: {
         accessToken: {},
@@ -353,7 +353,7 @@ function createClientTokensRecords(store) {
     const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
     const inviteTokenPromises = inviteSubtypes
       .map((subtype, j)  => {
-        return store.createRecord('clientToken', {
+        return store.createRecord('token', {
           name: 'Invite token ' + (i * inviteSubtypes.length + j),
           type: {
             inviteToken: { subtype },
@@ -548,7 +548,7 @@ function createSharedUsersRecords(store) {
 }
 
 function attachModelsToInviteTokens(listRecords) {
-  return listRecords.clientToken.get('list').then(tokensList =>
+  return listRecords.token.get('list').then(tokensList =>
     allFulfilled(tokensList
       .filter(token => get(token, 'typeName') === 'invite')
       .map(token => {

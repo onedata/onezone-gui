@@ -10,6 +10,10 @@ const OnedataTokenApiMock = Service.extend({
   getInviteToken() {},
 });
 
+const TokenManagerStub = Service.extend({
+  reloadListIfAlreadyFetched() {},
+});
+
 describe('Unit | Model | group', function () {
   setupModelTest('group', {
     needs: [],
@@ -18,6 +22,7 @@ describe('Unit | Model | group', function () {
   beforeEach(function () {
     registerService(this, 'onedata-token-api', OnedataTokenApiMock);
     registerService(this, 'onedata-graph-utils', Service);
+    registerService(this, 'token-manager', TokenManagerStub);
   });
 
   it('resolves invite token using token api service and graph', function () {
@@ -25,6 +30,8 @@ describe('Unit | Model | group', function () {
     record.set('id', 'group.some_id.instance');
 
     const TOKEN = 'abcd';
+    const tokenManager = lookupService(this, 'token-manager');
+    const reloadTokensStub = sinon.stub(tokenManager, 'reloadListIfAlreadyFetched').resolves();
     let tokenApi = lookupService(this, 'onedata-token-api');
     let tokenApiRequestStub = sinon.stub(tokenApi, 'getInviteToken');
     let tokenData = TOKEN;
@@ -37,6 +44,7 @@ describe('Unit | Model | group', function () {
     expect(tokenApiRequestStub).to.be.calledWith(...validArgs);
     return promise.then(token => {
       expect(token).to.equal(TOKEN);
+      expect(reloadTokensStub).to.be.calledOnce;
     });
   });
 });

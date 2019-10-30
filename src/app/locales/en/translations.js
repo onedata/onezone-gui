@@ -86,8 +86,7 @@ import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
-import clientTokenActions from './services/client-token-actions';
-import clientTokenManager from './services/client-token-manager';
+import tokenActions from './services/token-actions';
 import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
@@ -178,8 +177,7 @@ let translations = {
     contentTokensNew,
   },
   services: {
-    clientTokenActions,
-    clientTokenManager,
+    tokenActions,
     spaceActions,
     groupActions,
     clusterActions,

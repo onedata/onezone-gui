@@ -1,7 +1,7 @@
 /**
- * A service which provides client-tokens manipulation functions ready to use for gui
+ * A service which provides tokens manipulation functions ready to use for gui
  *
- * @module services/client-token-actions
+ * @module services/token-actions
  * @author Michał Borzęcki
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -13,7 +13,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 
 export default Service.extend(I18n, {
-  clientTokenManager: service(),
+  tokenManager: service(),
   router: service(),
   guiUtils: service(),
   globalNotify: service(),
@@ -22,7 +22,7 @@ export default Service.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'services.clientTokenActions',
+  i18nPrefix: 'services.tokenActions',
 
   /**
    * Array of action buttons definitions used by sidebar
@@ -49,15 +49,15 @@ export default Service.extend(I18n, {
     const {
       globalNotify,
       router,
-      clientTokenManager,
+      tokenManager,
       guiUtils,
     } = this.getProperties(
       'globalNotify',
       'router',
-      'clientTokenManager',
+      'tokenManager',
       'guiUtils'
     );
-    return clientTokenManager.createToken(tokenPrototype).then((token) => {
+    return tokenManager.createToken(tokenPrototype).then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
       router.transitionTo(
         'onedata.sidebar.content',
@@ -74,16 +74,16 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Models.ClientToken} token
+   * @param {Models.Token} token
    * @returns {Promise}
    */
   deleteToken(token) {
     const {
       globalNotify,
-      clientTokenManager,
-    } = this.getProperties('globalNotify', 'clientTokenManager');
+      tokenManager,
+    } = this.getProperties('globalNotify', 'tokenManager');
 
-    return clientTokenManager.deleteToken(get(token, 'entityId'))
+    return tokenManager.deleteToken(get(token, 'id'))
       .then(result => {
         globalNotify.success(this.t('tokenRemoveSuccess'));
         return result;

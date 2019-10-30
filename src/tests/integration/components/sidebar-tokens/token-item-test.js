@@ -20,7 +20,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
       isActive: true,
       save() {},
     });
-    registerService(this, 'client-token-actions', ClientTokenActionsStub);
+    registerService(this, 'token-actions', TokenActionsStub);
     registerService(this, 'navigation-state', NavigationStateStub);
   });
 
@@ -103,8 +103,8 @@ describe('Integration | Component | sidebar tokens/token item', function() {
 
   it('allows to remove token through "Remove" action', function () {
     const token = this.get('token');
-    const clientTokenActions = lookupService(this, 'client-token-actions');
-    const deleteTokenStub = sinon.stub(clientTokenActions, 'deleteToken')
+    const tokenActions = lookupService(this, 'token-actions');
+    const deleteTokenStub = sinon.stub(tokenActions, 'deleteToken')
       .withArgs(token)
       .resolves();
     const navigationState = lookupService(this, 'navigation-state');
@@ -127,8 +127,8 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   });
 
   it('allows to cancel removing token through "Remove" action', function () {
-    const clientTokenActions = lookupService(this, 'client-token-actions');
-    const deleteTokenSpy = sinon.spy(clientTokenActions, 'deleteToken');
+    const tokenActions = lookupService(this, 'token-actions');
+    const deleteTokenSpy = sinon.spy(tokenActions, 'deleteToken');
 
     this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
     return click('.token-menu-trigger')
@@ -147,7 +147,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   });
 });
 
-const ClientTokenActionsStub = Service.extend({
+const TokenActionsStub = Service.extend({
   deleteToken() {},
 });
 

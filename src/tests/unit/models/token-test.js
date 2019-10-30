@@ -2,14 +2,14 @@ import { expect } from 'chai';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupModelTest } from 'ember-mocha';
 import { set, get, setProperties } from '@ember/object';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/client-token';
+import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
 
-describe('Unit | Model | client token', function() {
-  setupModelTest('client-token', {
+describe('Unit | Model | token', function() {
+  setupModelTest('token', {
     needs: [],
   });
 

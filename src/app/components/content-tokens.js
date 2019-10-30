@@ -9,10 +9,10 @@
 
 import Component from '@ember/component';
 import { inject } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { computed, get, observer } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { resolve } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 
 const tokenTypeToTargetLabelI18nKey = {
   userJoinGroup: 'targetGroup',
@@ -42,6 +42,12 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    * @override
    */
   i18nPrefix: 'components.contentTokens',
+
+  /**
+   * @virtual
+   * @type {Models.Token}
+   */
+  token: undefined,
 
   /**
    * @type {Ember.ComputedProperty<SafeString>}
@@ -84,12 +90,26 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    */
   fetchTokenTarget() {
     const proxy = this.get('token.tokenTargetProxy') || resolve(null);
-    return proxy.catch(error => {
-      const errorId = error && error.id;
-      return {
-        hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
-        error,
-      };
-    });
+
+    return proxy
+      .then(target => {
+        if (target) {
+          if (get(target, 'isDeleted')) {
+            return reject({ id: 'notFound' });
+          }
+        }
+        return target;
+      })
+      .catch(error => {
+        const errorId = error && error.id;
+        return {
+          hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
+          error,
+        };
+      });
   },
+
+  tokenObserver: observer('token', function tokenObserver() {
+    this.updateTokenTargetProxy();
+  }),
 });

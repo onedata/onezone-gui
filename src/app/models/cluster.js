@@ -17,7 +17,7 @@ import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mix
 import { hash, resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
-import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
+import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 import checkImg from 'onedata-gui-common/utils/check-img';
 import { Promise } from 'rsvp';
 import {
