@@ -8,7 +8,7 @@ export default _.merge({}, privilegesAspectBase, {
     transferManagement: 'Transfer management',
     userManagement: 'User management',
     groupManagement: 'Group management',
-    providerManagement: 'Provider management',
+    supportManagement: 'Support management',
   },
   privileges: {
     space_view: 'View space',
@@ -38,8 +38,8 @@ export default _.merge({}, privilegesAspectBase, {
     space_add_group: 'Add group',
     space_remove_group: 'Remove group',
 
-    space_add_provider: 'Add provider',
-    space_remove_provider: 'Remove provider',
+    space_add_support: 'Add support',
+    space_remove_support: 'Remove support',
   },
   noGroupsStart: 'This space has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',
