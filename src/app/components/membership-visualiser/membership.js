@@ -320,7 +320,7 @@ export default Component.extend(I18n, {
   },
 
   getScrollContainer() {
-    return this.$().children('.ps-container');
+    return this.$().children('.ps');
   },
 
   recalculateScrollButtonsVisibility() {

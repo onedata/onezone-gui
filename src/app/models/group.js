@@ -12,6 +12,7 @@ import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { alias, equal } from '@ember/object/computed';
 
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
 
@@ -90,4 +91,4 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
       this.get('store').findRecord(entityType, gri)
     );
   },
-});
+}).reopenClass(StaticGraphModelMixin);
