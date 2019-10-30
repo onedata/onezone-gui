@@ -15,6 +15,7 @@ import { inject as service } from '@ember/service';
 import DisabledErrorCheckList from 'onedata-gui-common/utils/disabled-error-check-list';
 import { Promise } from 'rsvp';
 import { onepanelAbbrev } from 'onedata-gui-common/utils/onedata-urls';
+import { next } from '@ember/runloop';
 
 export default Component.extend({
   classNames: ['content-clusters-onepanel-redirect'],
@@ -81,12 +82,16 @@ export default Component.extend({
           const clusterRoutableId = guiUtils.getRoutableIdFor(cluster);
           new DisabledErrorCheckList('clusterEndpoint')
             .disableErrorCheckFor(clusterRoutableId);
-          return router.transitionTo(
-            'onedata.sidebar.content.aspect',
-            'clusters',
-            clusterRoutableId,
-            'endpoint-error'
-          );
+          return new Promise((resolve, reject) => {
+            next(() => {
+              router.transitionTo(
+                'onedata.sidebar.content.aspect',
+                'clusters',
+                clusterRoutableId,
+                'endpoint-error'
+              ).then(resolve, reject);
+            });
+          });
         }
       });
   },

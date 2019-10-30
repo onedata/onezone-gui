@@ -9,6 +9,7 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
@@ -37,4 +38,4 @@ export default Model.extend(GraphSingleModelMixin, {
       this.getProperties('entityType', 'entityId', 'aspectId')));
     return this.get('store').findRecord('indexStat', statsGri);
   },
-});
+}).reopenClass(StaticGraphModelMixin);

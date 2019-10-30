@@ -10,6 +10,7 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
@@ -21,4 +22,4 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {Object}
    */
   body: attr('string'),
-});
+}).reopenClass(StaticGraphModelMixin);

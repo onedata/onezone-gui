@@ -9,7 +9,7 @@
 
 import { inject as service } from '@ember/service';
 import Service from '@ember/service';
-import { Promise } from 'rsvp';
+import { reject } from 'rsvp';
 
 export default Service.extend({
   providerManager: service(),
@@ -43,7 +43,7 @@ export default Service.extend({
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
       default:
-        return Promise.reject('No such model type: ' + type);
+        return reject('No such model type: ' + type);
     }
   },
 });
