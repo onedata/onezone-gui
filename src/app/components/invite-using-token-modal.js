@@ -2,8 +2,8 @@
  * Shows modal presenting group/user invitation token for passed record.
  *
  * @module components/invite-using-token-modal
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -63,7 +64,7 @@ export default Component.extend(I18n, {
     'tokenType',
     function tokenLoadingObserver() {
       if (this.get('opened')) {
-        this.loadToken();
+        scheduleOnce('afterRender', this, 'loadToken');
       }
     }
   ),
