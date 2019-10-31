@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import { inject } from '@ember/service';
-import { computed, get, observer } from '@ember/object';
+import { computed, get, observer, getProperties } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { resolve, reject } from 'rsvp';
@@ -89,13 +89,20 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    * @override
    */
   fetchTokenTarget() {
-    const proxy = this.get('token.tokenTargetProxy') || resolve(null);
+    const token = this.get('token');
+    const proxy = token ? token.updateTokenTargetProxy() : resolve(null);
 
     return proxy
       .then(target => {
         if (target) {
-          if (get(target, 'isDeleted')) {
+          const {
+            isDeleted,
+            isForbidden,
+          } = getProperties(target, 'isDeleted', 'isForbidden');
+          if (isDeleted) {
             return reject({ id: 'notFound' });
+          } else if (isForbidden) {
+            return reject({ id: 'forbidden' });
           }
         }
         return target;

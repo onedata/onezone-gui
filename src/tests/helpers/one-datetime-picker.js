@@ -14,7 +14,7 @@ export default class OneDatetimePickerHelper {
     });
 
     return click(this.$trigger[0])
-      .then(() => clock.tick(1000))
+      .then(() => clock.tick(100))
       .then(() => clock.restore());
   }
 

@@ -1,5 +1,5 @@
 /**
- * Allows this record to "invite" some user or group to it
+ * Allows this record to "invite" another record to it
  *
  * @module mixins/models/intiving-model
  * @author Jakub Liput, Michał Borzęcki
@@ -15,7 +15,7 @@ export default Mixin.create({
   tokenManager: service(),
 
   /**
-   * @param {string} receiverType one of: user, group
+   * @param {string} receiverType one of: user, group, space
    * @returns {Promise<string, any>}
    */
   getInviteToken(receiverType) {

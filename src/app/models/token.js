@@ -183,7 +183,7 @@ export default Model.extend(
 
     /**
      * @override
-     * @return {Promise<Models.User|Models.Group|Models.Cluster|Models.Space>}
+     * @return {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester>}
      */
     fetchTokenTarget() {
       const {
@@ -208,7 +208,12 @@ export default Model.extend(
           scope: 'auto',
         });
 
-        return store.findRecord(targetModelMapping.modelName, targetModelGri);
+        return store.findRecord(
+          targetModelMapping.modelName,
+          targetModelGri, {
+            reload: true,
+          }
+        );
       }
     },
 

@@ -1,3 +1,13 @@
+/**
+ * Form for creating new token. It is a very basic version of future complex
+ * token creator.
+ *
+ * @module components/content-tokens-new/new-token-form
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import OneForm from 'onedata-gui-common/components/one-form';
 import EmberObject, { computed, getProperties, set, get } from '@ember/object';
 import { union } from '@ember/object/computed';
@@ -7,6 +17,7 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import createFieldValidator from 'onedata-gui-common/utils/create-field-validator';
 import { buildValidations } from 'ember-cp-validations';
+import { conditional, raw } from 'ember-awesome-macros';
 
 const nameField = {
   name: 'name',
@@ -108,27 +119,22 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   /**
    * @override
    */
-  collapsedPrefixes: computed(
+  collapsedPrefixes: conditional(
     'allFieldsValues.general.validUntilEnabled',
-    function collapsedPrefixes() {
-      const validUntilEnabled =
-        this.get('allFieldsValues.general.validUntilEnabled');
-      return validUntilEnabled ? [] : ['validUntil'];
-    }
+    raw([]),
+    raw(['validUntil'])
   ),
 
   /**
    * @override
    */
-  currentFieldsPrefix: computed(function () {
-    return ['general', 'validUntil'];
-  }),
+  currentFieldsPrefix: allPrefixes,
 
   /**
    * @override
    */
-  allFieldsValues: computed('provider', 'allFields', function () {
-    let values = EmberObject.create();
+  allFieldsValues: computed('provider', 'allFields', function allFieldsValues() {
+    const values = EmberObject.create();
     allPrefixes.forEach((prefix) => values.set(prefix, EmberObject.create()));
     return values;
   }),
@@ -213,31 +219,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   },
 
   notifyChange() {
-    const {
-      allFieldsValues,
-      onChange,
-      isValid,
-    } = this.getProperties('allFieldsValues', 'onChange', 'isValid');
-    const {
-      name,
-      validUntilEnabled,
-    } = getProperties(
-      get(allFieldsValues, 'general'),
-      'name',
-      'validUntilEnabled'
-    );
-    const validUntil = get(allFieldsValues, 'validUntil.validUntil');
-
-    const values = {
-      name,
-      validUntilEnabled,
-      validUntil,
-    };
-
-    onChange({
-      isValid,
-      values,
-    });
+    this.get('onChange')(this.getFormState());
   },
 
   getFormState() {

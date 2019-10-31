@@ -14,7 +14,7 @@ describe('Unit | Model | token', function() {
   });
 
   beforeEach(function () {
-    this.clock = sinon.useFakeTimers(moment().unix() * 1000);
+    this.clock = sinon.useFakeTimers(moment().valueOf());
   });
 
   afterEach(function () {

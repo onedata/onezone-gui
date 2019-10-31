@@ -24,6 +24,9 @@ describe('Integration | Component | content tokens', function () {
       revoked: true,
       metadata: {},
       tokenTargetProxy: PromiseObject.create({ promise: resolve() }),
+      updateTokenTargetProxy() {
+        return this.tokenTargetProxy;
+      },
     });
   });
 
@@ -424,6 +427,9 @@ describe('Integration | Component | content tokens', function () {
           name: newTokenTargetName,
         }),
       }),
+      updateTokenTargetProxy() {
+        return this.tokenTargetProxy;
+      },
     };
 
     this.render(hbs `{{content-tokens token=token}}`);

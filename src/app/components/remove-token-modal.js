@@ -1,5 +1,5 @@
 /**
- * Shows modal asking about space deletion from harvester.
+ * Shows modal asking about token deletion.
  *
  * @module components/remove-token-modal
  * @author Michał Borzęcki

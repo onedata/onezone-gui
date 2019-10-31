@@ -1,3 +1,12 @@
+/**
+ * A first-level item component for tokens sidebar
+ *
+ * @module components/sidebar-tokens/token-item
+ * @author Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { reads, collect } from '@ember/object/computed';
 import { computed, get, set } from '@ember/object';
@@ -84,7 +93,7 @@ export default Component.extend(I18n, {
    */
   removeAction: computed(function () {
     return {
-      action: () => this.showRemoveTokenModal(),
+      action: () => this.set('isRemoveTokenModalOpened', true),
       title: this.t('removeAction'),
       class: 'remove-token-action-trigger',
       icon: 'remove',
@@ -96,10 +105,6 @@ export default Component.extend(I18n, {
    */
   actionsArray: collect('renameAction', 'removeAction'),
 
-  showRemoveTokenModal() {
-    this.set('isRemoveTokenModalOpened', true);
-  },
-
   /**
    * If actual token disappeared from the sidebar, redirects to token main page
    * @returns {Promise}
@@ -109,9 +114,9 @@ export default Component.extend(I18n, {
       navigationState,
       router,
     } = this.getProperties('navigationState', 'router');
-    const groupId = get(navigationState, 'activeResource.id');
+    const tokenId = get(navigationState, 'activeResource.id');
     return navigationState
-      .resourceCollectionContainsId(groupId)
+      .resourceCollectionContainsId(tokenId)
       .then(contains => {
         if (!contains) {
           next(() => router.transitionTo('onedata.sidebar', 'tokens'));
