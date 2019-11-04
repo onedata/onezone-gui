@@ -22,6 +22,7 @@ export default Component.extend(I18n, HasDefaultSpace, {
 
   router: service(),
   guiUtils: service(),
+  i18n: service(),
 
   /**
    * @override
@@ -39,6 +40,12 @@ export default Component.extend(I18n, HasDefaultSpace, {
    * @type {Provider}
    */
   item: undefined,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
 
   /**
    * Just an one-way alias

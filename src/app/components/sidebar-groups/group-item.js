@@ -32,6 +32,12 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.sidebarGroups.groupItem',
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
+
+  /**
    * @type {boolean}
    */
   isRenaming: false,

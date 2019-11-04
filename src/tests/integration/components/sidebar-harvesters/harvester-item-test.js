@@ -2,40 +2,39 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import { click } from 'ember-native-dom-helpers';
 import $ from 'jquery';
+import { click } from 'ember-native-dom-helpers';
 
-describe('Integration | Component | sidebar groups/group item', function () {
-  setupComponentTest('sidebar-groups/group-item', {
+describe('Integration | Component | sidebar harvesters/harvester item', function() {
+  setupComponentTest('sidebar-harvesters/harvester-item', {
     integration: true,
   });
 
   beforeEach(function () {
-    this.set('group', {
-      name: 'group1',
-      type: 'group',
+    this.set('harvester', {
+      name: 'space1',
     });
   });
 
-  it('renders group name, icon and menu trigger', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+  it('renders harvester name, icon and menu trigger', function () {
+    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
 
-    expect(this.$()).to.contain(this.get('group.name'));
-    expect(this.$('.oneicon-group')).to.exist;
+    expect(this.$()).to.contain(this.get('harvester.name'));
+    expect(this.$('.oneicon-light-bulb')).to.exist;
     expect(this.$('.collapsible-toolbar-toggle')).to.exist;
   });
 
   it('does not render actions menu if inSidenav is true', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group inSidenav=true}}`);
+    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
 
     expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
   it('allows to access name editor', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     return click('.collapsible-toolbar-toggle')
-      .then(() => click($('.webui-popover.in .rename-group-action')[0]))
+      .then(() => click($('.webui-popover.in .rename-harvester-action')[0]))
       .then(() => expect(this.$('input[type="text"]')).to.exist);
   });
 
@@ -44,13 +43,13 @@ describe('Integration | Component | sidebar groups/group item', function () {
     modalClass: 'leave-modal',
   }, {
     operation: 'remove',
-    modalClass: 'group-remove-modal',
+    modalClass: 'harvester-remove-modal',
   }].forEach(({ operation, modalClass}) => {
     it(`shows ${operation} acknowledgment modal`, function () {
-      this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+      this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
 
       return click('.collapsible-toolbar-toggle')
-        .then(() => click($(`.webui-popover.in .${operation}-group-action`)[0]))
+        .then(() => click($(`.webui-popover.in .${operation}-harvester-action`)[0]))
         .then(() => expect($(`.${modalClass}.in`)).to.exist);
     });
   });
