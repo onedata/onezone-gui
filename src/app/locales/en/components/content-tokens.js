@@ -47,13 +47,13 @@ export default {
     groupJoinGroup: generateTargetTooltipForGroupJoin('group'),
     userJoinSpace: generateTargetTooltipForUserJoin('space'),
     groupJoinSpace: generateTargetTooltipForGroupJoin('space'),
-    supportSpace: 'A provider can consume this token to grant storage space for the space.',
+    supportSpace: 'A Oneprovider can consume this token to grant storage space for this space.',
     registerOneprovider: 'This token can be used to register a new Oneprovider for the appointed admin user.',
     userJoinCluster: generateTargetTooltipForUserJoin('cluster'),
     groupJoinCluster: generateTargetTooltipForGroupJoin('cluster'),
     userJoinHarvester: generateTargetTooltipForUserJoin('harvester'),
     groupJoinHarvester: generateTargetTooltipForGroupJoin('harvester'),
-    spaceJoinHarvester: 'The space on behalf of which the token is consumed will become a metadata source for the harvester.',
+    spaceJoinHarvester: 'The space on behalf of which the token is consumed will become a metadata source for this harvester.',
   },
   targetErrors: {
     notFound: 'Not found',
@@ -62,9 +62,9 @@ export default {
 };
 
 function generateTargetTooltipForUserJoin(targetModelName) {
-  return `The user that consumes the token will become a member of the ${targetModelName}.`;
+  return `The user that consumes the token will become a member of this ${targetModelName}.`;
 }
 
 function generateTargetTooltipForGroupJoin(targetModelName) {
-  return `The group on behalf of which the token is consumed will become a member of the ${targetModelName}.`;
+  return `The group on behalf of which the token is consumed will become a member of this ${targetModelName}.`;
 }

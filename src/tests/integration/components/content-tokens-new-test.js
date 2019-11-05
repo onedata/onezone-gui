@@ -19,19 +19,19 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('has class "content-tokens-new"', function () {
-    this.render(hbs`{{content-tokens-new}}`);
+    this.render(hbs `{{content-tokens-new}}`);
 
     expect(this.$('.content-tokens-new')).to.exist;
   });
 
   it('renders component content-info', function () {
-    this.render(hbs`{{content-tokens-new}}`);
+    this.render(hbs `{{content-tokens-new}}`);
 
     expect(this.$('.content-info')).to.exist;
   });
 
   it('renders component new-token-form', function () {
-    this.render(hbs`{{content-tokens-new}}`);
+    this.render(hbs `{{content-tokens-new}}`);
 
     expect(this.$('.new-token-form')).to.exist;
   });
@@ -41,13 +41,14 @@ describe('Integration | Component | content tokens new', function () {
     const tokenActionsStub = lookupService(this, 'token-actions');
     const createTokenActionStub =
       sinon.stub(tokenActionsStub, 'createToken').resolves();
-    this.render(hbs`{{content-tokens-new}}`);
+    this.render(hbs `{{content-tokens-new}}`);
 
     let validUntilHelper;
     return fillIn('.field-general-name', tokenName)
       .then(() => click('.toggle-field-general-validUntilEnabled'))
       .then(() => {
-        validUntilHelper = new OneDatetimePickerHelper(this.$('.field-validUntil-validUntil'));
+        validUntilHelper =
+          new OneDatetimePickerHelper(this.$('.field-validUntil-validUntil'));
         return validUntilHelper.selectToday();
       })
       .then(() => click('.create-button'))
@@ -70,7 +71,7 @@ describe('Integration | Component | content tokens new', function () {
     const tokenActionsStub = lookupService(this, 'token-actions');
     const createTokenActionStub =
       sinon.stub(tokenActionsStub, 'createToken').resolves();
-    this.render(hbs`{{content-tokens-new}}`);
+    this.render(hbs `{{content-tokens-new}}`);
 
     return fillIn('.field-general-name', tokenName)
       .then(() => click('.create-button'))

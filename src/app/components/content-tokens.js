@@ -53,9 +53,9 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    * @type {Ember.ComputedProperty<SafeString>}
    */
   targetLabel: computed('token.subtype', function targetLabel() {
-    const type = this.get('token.subtype');
-
-    return type && this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[type]}`);
+    const tokenSubtype = this.get('token.subtype');
+    return tokenSubtype &&
+      this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[tokenSubtype]}`);
   }),
 
   /**
@@ -78,6 +78,8 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
             return modelName;
           case 'harvester':
             return 'light-bulb';
+          default:
+            return null;
         }
       }
     } else {

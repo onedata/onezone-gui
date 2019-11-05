@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { get } from '@ember/object';
 import $ from 'jquery';
 
-describe('Integration | Component | sidebar tokens', function() {
+describe('Integration | Component | sidebar tokens', function () {
   setupComponentTest('sidebar-tokens', {
     integration: true,
   });
@@ -39,14 +39,14 @@ describe('Integration | Component | sidebar tokens', function() {
       },
       tokensOrder: [1, 2, 0, 4, 3],
     });
-    
+
   });
 
   it('renders all tokens', function () {
     const tokens = this.get('model.collection.list');
 
-    this.render(hbs`{{sidebar-tokens model=model}}`);
-    
+    this.render(hbs `{{sidebar-tokens model=model}}`);
+
     const renderedTokens = this.$('.token-item');
     expect(renderedTokens).to.have.length(tokens.length);
   });
@@ -55,11 +55,12 @@ describe('Integration | Component | sidebar tokens', function() {
     const tokens = this.get('model.collection.list');
     const tokensOrder = this.get('tokensOrder');
 
-    this.render(hbs`{{sidebar-tokens model=model}}`);
+    this.render(hbs `{{sidebar-tokens model=model}}`);
 
     this.$('.token-item').each((index, element) => {
       const originIndex = tokensOrder[index];
-      expect($(element).find('.token-name')).to.contain(get(tokens[originIndex], 'name'));
+      expect($(element).find('.token-name'))
+        .to.contain(get(tokens[originIndex], 'name'));
     });
   });
 });

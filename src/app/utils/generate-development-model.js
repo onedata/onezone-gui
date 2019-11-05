@@ -86,8 +86,7 @@ export default function generateDevelopmentModel(store) {
             return createListRecord(store, type, records);
           });
         return promiseHash;
-        }, {}
-      )
+      }, {})
     ))
     .then(listRecords => attachModelsToInviteTokens(listRecords).then(() => listRecords))
     // push space list into providers
@@ -352,7 +351,7 @@ function createTokensRecords(store) {
     }).save();
     const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
     const inviteTokenPromises = inviteSubtypes
-      .map((subtype, j)  => {
+      .map((subtype, j) => {
         return store.createRecord('token', {
           name: 'Invite token ' + (i * inviteSubtypes.length + j),
           type: {
@@ -360,7 +359,9 @@ function createTokensRecords(store) {
           },
           caveats: [{
             type: 'time',
-            validUntil: moment().add(60 * (-inviteSubtypes.length / 2 + j), 'seconds').unix(),
+            validUntil: moment()
+              .add(60 * (-inviteSubtypes.length / 2 + j), 'seconds')
+              .unix(),
           }],
           metadata: {
             creationTime: moment().subtract(1, 'hour').unix(),

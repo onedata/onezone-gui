@@ -9,7 +9,7 @@ import { registerService, lookupService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
 import sinon from 'sinon';
 
-describe('Integration | Component | sidebar tokens/token item', function() {
+describe('Integration | Component | sidebar tokens/token item', function () {
   setupComponentTest('sidebar-tokens/token-item', {
     integration: true,
   });
@@ -25,7 +25,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   });
 
   it('shows token name', function () {
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.token-name')).to.contain(this.get('token.name'));
   });
@@ -33,7 +33,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   it('shows "invitation" icon for invite token', function () {
     set(this.get('token'), 'typeName', 'invite');
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.oneicon-token-invite')).to.exist;
   });
@@ -41,7 +41,7 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   it('shows "access-token" icon for access token', function () {
     set(this.get('token'), 'typeName', 'access');
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.oneicon-token-access')).to.exist;
   });
@@ -49,13 +49,13 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   it('shows "tokens" icon for unknown token', function () {
     set(this.get('token'), 'typeName', undefined);
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.oneicon-tokens')).to.exist;
   });
 
   it('does not add class "inactive-token" when token is active', function () {
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.token-item')).not.to.have.class('inactive-token');
   });
@@ -63,40 +63,49 @@ describe('Integration | Component | sidebar tokens/token item', function() {
   it('adds class "inactive-token" when token is not active', function () {
     set(this.get('token'), 'isActive', false);
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.token-item')).to.have.class('inactive-token');
   });
 
   it('renders actions in dots menu', function () {
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
     return click('.token-menu-trigger')
       .then(() => {
         const popoverContent = $('body .webui-popover.in');
         [
           '.remove-token-action-trigger',
           '.rename-token-action-trigger',
-        ].forEach(actionSelector => expect(popoverContent.find(actionSelector)).to.exist);
+        ].forEach(actionSelector =>
+          expect(popoverContent.find(actionSelector)).to.exist
+        );
       });
+  });
+
+  it('does not render actions menu if inSidenav is true', function () {
+    this.render(hbs `{{sidebar-tokens/token-item item=token inSidenav=true}}`);
+
+    expect(this.$('.token-menu-trigger')).to.not.exist;
   });
 
   it('allows to rename token through "Rename" action', function () {
     const token = this.get('token');
     const saveStub = sinon.stub(token, 'save').resolves();
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
-    
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
+
     return click('.token-menu-trigger')
       .then(() => {
-        const removeTrigger = $('body .webui-popover.in .rename-token-action-trigger')[0];
-        return click(removeTrigger);
+        const renameTrigger =
+          $('body .webui-popover.in .rename-token-action-trigger')[0];
+        return click(renameTrigger);
       })
       .then(() => fillIn('.token-name .form-control', 'newName'))
       .then(() => click('.token-name .save-icon'))
       .then(() => {
-        const tokenNameNode = this.$('.token-name');
-        expect(tokenNameNode).to.contain('newName');
-        expect(tokenNameNode).to.have.class('static');
+        const $tokenNameNode = this.$('.token-name');
+        expect($tokenNameNode).to.contain('newName');
+        expect($tokenNameNode).to.not.have.class('editor');
         expect(saveStub).to.be.calledOnce;
       });
   });
@@ -111,10 +120,11 @@ describe('Integration | Component | sidebar tokens/token item', function() {
     // to avoid redirecting after delete
     sinon.stub(navigationState, 'resourceCollectionContainsId').resolves(true);
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
     return click('.token-menu-trigger')
       .then(() => {
-        const removeTrigger = $('body .webui-popover.in .remove-token-action-trigger')[0];
+        const removeTrigger =
+          $('body .webui-popover.in .remove-token-action-trigger')[0];
         return click(removeTrigger);
       })
       .then(() => {
@@ -126,14 +136,15 @@ describe('Integration | Component | sidebar tokens/token item', function() {
       });
   });
 
-  it('allows to cancel removing token through "Remove" action', function () {
+  it('allows to cancel opened "Remove" proceed modal', function () {
     const tokenActions = lookupService(this, 'token-actions');
     const deleteTokenSpy = sinon.spy(tokenActions, 'deleteToken');
 
-    this.render(hbs`{{sidebar-tokens/token-item item=token}}`);
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
     return click('.token-menu-trigger')
       .then(() => {
-        const removeTrigger = $('body .webui-popover.in .remove-token-action-trigger')[0];
+        const removeTrigger =
+          $('body .webui-popover.in .remove-token-action-trigger')[0];
         return click(removeTrigger);
       })
       .then(() => {

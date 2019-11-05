@@ -30,7 +30,7 @@ export default Component.extend(I18n, {
         name,
         validUntilEnabled,
         validUntil,
-      } = getProperties(values, 'name', 'validUntilEnabled' ,'validUntil');
+      } = getProperties(values, 'name', 'validUntilEnabled', 'validUntil');
 
       const tokenPrototype = {
         name,

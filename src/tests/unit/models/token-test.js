@@ -8,7 +8,7 @@ import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
 
-describe('Unit | Model | token', function() {
+describe('Unit | Model | token', function () {
   setupModelTest('token', {
     needs: [],
   });
@@ -90,7 +90,7 @@ describe('Unit | Model | token', function() {
             [targetModelMapping.idFieldName]: targetModelEntityId,
           },
         });
-    
+
         return get(model, 'tokenTargetProxy').then(result => {
           expect(result).to.deep.equal(targetModelMock);
         });
@@ -145,14 +145,14 @@ describe('Unit | Model | token', function() {
     expect(get(model, 'usageLimitReached')).to.be.false;
   });
 
-  it('has isExpired == false when validUntil < now', function () {
+  it('has isExpired == true when validUntil < now', function () {
     const model = this.subject();
     set(model, 'caveats', [createTimeCaveat(moment().unix() - 3600)]);
 
     expect(get(model, 'isExpired')).to.be.true;
   });
 
-  it('has isExpired == true when validUntil > now', function () {
+  it('has isExpired == false when validUntil > now', function () {
     const model = this.subject();
     set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
 
@@ -210,7 +210,7 @@ describe('Unit | Model | token', function() {
   );
 
   it(
-    'has isActive == true if isExpired == true, revoked == false and usageLimitReached == false',
+    'has isActive == false if isExpired == true, revoked == false and usageLimitReached == false',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -227,7 +227,7 @@ describe('Unit | Model | token', function() {
   );
 
   it(
-    'has isActive == true if isExpired == false, revoked == true and usageLimitReached == false',
+    'has isActive == false if isExpired == false, revoked == true and usageLimitReached == false',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -244,7 +244,7 @@ describe('Unit | Model | token', function() {
   );
 
   it(
-    'has isActive == true if isExpired == false, revoked == false and usageLimitReached == true',
+    'has isActive == false if isExpired == false, revoked == false and usageLimitReached == true',
     function () {
       const model = this.subject();
       setProperties(model, {

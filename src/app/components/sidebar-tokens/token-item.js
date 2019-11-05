@@ -23,13 +23,13 @@ const tokenTypeToIconNameMapping = {
 };
 
 export default Component.extend(I18n, {
+  classNames: ['token-item'],
+  classNameBindings: ['isTokenActive::inactive-token'],
+
   i18n: service(),
   tokenActions: service(),
   navigationState: service(),
   router: service(),
-
-  classNames: ['token-item'],
-  classNameBindings: ['isTokenActive::inactive-token'],
 
   /**
    * @override
@@ -42,6 +42,12 @@ export default Component.extend(I18n, {
   item: undefined,
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
+
+  /**
    * @type {boolean}
    */
   isRenaming: false,
@@ -50,7 +56,7 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isRemovingToken: false,
-  
+
   /**
    * @type {boolean}
    */

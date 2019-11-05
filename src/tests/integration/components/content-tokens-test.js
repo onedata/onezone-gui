@@ -119,7 +119,7 @@ describe('Integration | Component | content tokens', function () {
   it('shows info about expiration time if it is specified', function () {
     const now = moment();
     this.set('token.validUntil', now.unix());
-    
+
     this.render(hbs `{{content-tokens token=token}}`);
 
     return wait().then(() => {
@@ -179,26 +179,27 @@ describe('Integration | Component | content tokens', function () {
     });
   });
 
-  it('shows info about not found token target when target is in deleted state', function () {
-    setProperties(this.get('token'), {
-      typeName: 'invite',
-      subtype: 'userJoinGroup',
-      tokenTargetProxy: PromiseObject.create({
-        promise: resolve({
-          isDeleted: true,
+  it('shows info about not found token target when target is in deleted state',
+    function () {
+      setProperties(this.get('token'), {
+        typeName: 'invite',
+        subtype: 'userJoinGroup',
+        tokenTargetProxy: PromiseObject.create({
+          promise: resolve({
+            isDeleted: true,
+          }),
         }),
-      }),
-    });
+      });
 
-    this.render(hbs `{{content-tokens token=token}}`);
+      this.render(hbs `{{content-tokens token=token}}`);
 
-    return wait().then(() => {
-      const $tokenPropertyRow = this.$('.token-target-property');
-      expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-x');
-      expect($tokenPropertyRow.find('.model-error').text().trim())
-        .to.equal('Not found');
+      return wait().then(() => {
+        const $tokenPropertyRow = this.$('.token-target-property');
+        expect($tokenPropertyRow.find('.model-icon')).to.have.class('oneicon-x');
+        expect($tokenPropertyRow.find('.model-error').text().trim())
+          .to.equal('Not found');
+      });
     });
-  });
 
   it(
     'shows info about token target fetch error due to "forbidden"',
@@ -256,35 +257,35 @@ describe('Integration | Component | content tokens', function () {
     targetLabel: 'Target group',
     model: 'group',
     icon: 'group',
-    tooltip: 'The user that consumes the token will become a member of the group.',
+    tooltip: 'The user that consumes the token will become a member of this group.',
   }, {
     subtype: 'groupJoinGroup',
     subtypeTranslation: 'join group to group',
     targetLabel: 'Target group',
     model: 'group',
     icon: 'group',
-    tooltip: 'The group on behalf of which the token is consumed will become a member of the group.',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of this group.',
   }, {
     subtype: 'userJoinSpace',
     subtypeTranslation: 'join user to space',
     targetLabel: 'Target space',
     model: 'space',
     icon: 'space',
-    tooltip: 'The user that consumes the token will become a member of the space.',
+    tooltip: 'The user that consumes the token will become a member of this space.',
   }, {
     subtype: 'groupJoinSpace',
     subtypeTranslation: 'join group to space',
     targetLabel: 'Target space',
     model: 'space',
     icon: 'space',
-    tooltip: 'The group on behalf of which the token is consumed will become a member of the space.',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of this space.',
   }, {
     subtype: 'supportSpace',
     subtypeTranslation: 'support space',
     targetLabel: 'Space to be supported',
     model: 'space',
     icon: 'space',
-    tooltip: 'A provider can consume this token to grant storage space for the space.',
+    tooltip: 'A Oneprovider can consume this token to grant storage space for this space.',
   }, {
     subtype: 'registerOneprovider',
     subtypeTranslation: 'register Oneprovider',
@@ -298,35 +299,35 @@ describe('Integration | Component | content tokens', function () {
     targetLabel: 'Target cluster',
     model: 'cluster',
     icon: 'cluster',
-    tooltip: 'The user that consumes the token will become a member of the cluster.',
+    tooltip: 'The user that consumes the token will become a member of this cluster.',
   }, {
     subtype: 'groupJoinCluster',
     subtypeTranslation: 'join group to cluster',
     targetLabel: 'Target cluster',
     model: 'cluster',
     icon: 'cluster',
-    tooltip: 'The group on behalf of which the token is consumed will become a member of the cluster.',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of this cluster.',
   }, {
     subtype: 'userJoinHarvester',
     subtypeTranslation: 'join user to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
-    tooltip: 'The user that consumes the token will become a member of the harvester.',
+    tooltip: 'The user that consumes the token will become a member of this harvester.',
   }, {
     subtype: 'groupJoinHarvester',
     subtypeTranslation: 'join group to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
-    tooltip: 'The group on behalf of which the token is consumed will become a member of the harvester.',
+    tooltip: 'The group on behalf of which the token is consumed will become a member of this harvester.',
   }, {
     subtype: 'spaceJoinHarvester',
     subtypeTranslation: 'join space to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
-    tooltip: 'The space on behalf of which the token is consumed will become a metadata source for the harvester.',
+    tooltip: 'The space on behalf of which the token is consumed will become a metadata source for this harvester.',
   }].forEach(({
     subtype,
     subtypeTranslation,
@@ -350,9 +351,9 @@ describe('Integration | Component | content tokens', function () {
             }),
           }),
         });
-    
+
         this.render(hbs `{{content-tokens token=token}}`);
-    
+
         return wait()
           .then(() => {
             const $tokenTypePropertyRow = this.$('.token-type-property');
@@ -362,7 +363,8 @@ describe('Integration | Component | content tokens', function () {
               .to.equal(subtypeTranslation);
             expect($tokenTargetPropertyRow.find('.token-target-label').text().trim())
               .to.equal(targetLabel + ':');
-            expect($tokenTargetPropertyRow.find('.model-icon')).to.have.class('oneicon-' + icon);
+            expect($tokenTargetPropertyRow.find('.model-icon'))
+              .to.have.class('oneicon-' + icon);
 
             return triggerEvent('.target-tooltip .one-icon', 'mouseenter');
           })

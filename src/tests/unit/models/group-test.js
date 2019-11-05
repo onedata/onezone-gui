@@ -31,7 +31,8 @@ describe('Unit | Model | group', function () {
 
     const TOKEN = 'abcd';
     const tokenManager = lookupService(this, 'token-manager');
-    const reloadTokensStub = sinon.stub(tokenManager, 'reloadListIfAlreadyFetched').resolves();
+    const reloadTokensStub = sinon.stub(tokenManager, 'reloadListIfAlreadyFetched')
+      .resolves();
     let tokenApi = lookupService(this, 'onedata-token-api');
     let tokenApiRequestStub = sinon.stub(tokenApi, 'getInviteToken');
     let tokenData = TOKEN;

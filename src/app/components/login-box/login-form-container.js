@@ -140,11 +140,11 @@ export default LoginFormContainer.extend(
     fetchSignInNotification() {
       return this.get('guiMessageManager')
         .getMessage('signin_notification')
-          .then(message => {
-            const sanitizedMessage =
-              DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
-            return sanitizedMessage ? sanitizedMessage : undefined;
-          });
+        .then(message => {
+          const sanitizedMessage =
+            DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
+          return sanitizedMessage ? sanitizedMessage : undefined;
+        });
     },
 
     /**

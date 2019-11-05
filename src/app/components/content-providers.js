@@ -177,7 +177,7 @@ export default Component.extend({
       if (!defaultMapStateGenerated && get(_providersProxy, 'isFulfilled')) {
         const providers = get(_providersProxy, 'content');
         if (get(providers, 'length') > 0) {
-          const points = 
+          const points =
             providers.map(p => getProperties(p, 'latitude', 'longitude'));
           const mapPosition =
             mapPositionForCoordinates(points, _mapCalculatedAreaPadding);

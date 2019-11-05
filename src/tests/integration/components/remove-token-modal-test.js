@@ -17,8 +17,8 @@ describe('Integration | Component | remove token modal', function () {
   });
 
   it('renders token name inside message', function () {
-    this.render(hbs`{{remove-token-modal opened=true token=token}}`);
-    
+    this.render(hbs `{{remove-token-modal opened=true token=token}}`);
+
     return wait().then(() => {
       expect($('body .remove-token-modal.in')).to.contain(this.get('token.name'));
     });

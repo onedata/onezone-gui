@@ -5,7 +5,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
- /**
+/**
  * @typedef {Object} TokenCaveat
  * @property {string} type
  * @property {any} * additional options of caveat
@@ -83,6 +83,7 @@ export default Model.extend(
     isExpired: false,
 
     /**
+     * Ember timer object
      * @type {any}
      */
     expirationTimer: undefined,
@@ -155,7 +156,7 @@ export default Model.extend(
       } = this.getProperties('validUntil', 'isExpired');
       const nowTimestamp = moment().unix();
       const hasValidUntil = typeof validUntil === 'number';
-      
+
       if (!hasValidUntil || validUntil >= nowTimestamp) {
         if (isExpired) {
           this.set('isExpired', false);
@@ -165,7 +166,7 @@ export default Model.extend(
           this.set('isExpired', true);
         }
       }
-      
+
       this.rescheduleExpirationTimer();
     }),
 

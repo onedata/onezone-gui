@@ -1,6 +1,6 @@
 .sidebar-tokens {
-  .token-item {
-    &.inactive-token {
+  .token-item.inactive-token {
+    .sidebar-item-icon, .token-name:not(.editor) {
       opacity: 0.6;
     }
   }

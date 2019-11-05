@@ -7,19 +7,19 @@ import sinon from 'sinon';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import OneDatetimePickerHelper from '../../../helpers/one-datetime-picker';
 
-describe('Integration | Component | content tokens new/new token form', function() {
+describe('Integration | Component | content tokens new/new token form', function () {
   setupComponentTest('content-tokens-new/new-token-form', {
     integration: true,
   });
 
   it('has class "new-token-form"', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
 
     expect(this.$('.new-token-form')).to.exist;
   });
 
   it('renders form inputs', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
 
     [
       'name',
@@ -36,7 +36,7 @@ describe('Integration | Component | content tokens new/new token form', function
     };
     this.set('initialValues', initialValues);
 
-    this.render(hbs`{{content-tokens-new/new-token-form initialValues=initialValues}}`);
+    this.render(hbs `{{content-tokens-new/new-token-form initialValues=initialValues}}`);
 
     expect(getField(this, 'name').val()).to.equal(initialValues.name);
     expect(getField(this, 'validUntilEnabled')).to.have.class('checked');
@@ -49,7 +49,7 @@ describe('Integration | Component | content tokens new/new token form', function
     const changeSpy = sinon.spy();
     this.on('change', changeSpy);
 
-    this.render(hbs`{{content-tokens-new/new-token-form onChange=(action "change")}}`);
+    this.render(hbs `{{content-tokens-new/new-token-form onChange=(action "change")}}`);
 
     expect(changeSpy).to.be.calledWith({
       isValid: false,
@@ -66,9 +66,10 @@ describe('Integration | Component | content tokens new/new token form', function
     this.on('change', changeSpy);
     const tokenName = 'token name';
 
-    this.render(hbs`{{content-tokens-new/new-token-form onChange=(action "change")}}`);
-    
-    const validUntilHelper = new OneDatetimePickerHelper(getField(this, 'validUntil'));
+    this.render(hbs `{{content-tokens-new/new-token-form onChange=(action "change")}}`);
+
+    const validUntilHelper =
+      new OneDatetimePickerHelper(getField(this, 'validUntil'));
     return fillIn(getField(this, 'name')[0], tokenName)
       .then(() => click(getField(this, 'validUntilEnabled')[0]))
       .then(() => validUntilHelper.selectToday())
@@ -89,9 +90,10 @@ describe('Integration | Component | content tokens new/new token form', function
     this.on('create', createSpy);
     const tokenName = 'token name';
 
-    this.render(hbs`{{content-tokens-new/new-token-form onCreate=(action "create")}}`);
-    
-    const validUntilHelper = new OneDatetimePickerHelper(getField(this, 'validUntil'));
+    this.render(hbs `{{content-tokens-new/new-token-form onCreate=(action "create")}}`);
+
+    const validUntilHelper =
+      new OneDatetimePickerHelper(getField(this, 'validUntil'));
     return fillIn(getField(this, 'name')[0], tokenName)
       .then(() => click(getField(this, 'validUntilEnabled')[0]))
       .then(() => validUntilHelper.selectToday())
@@ -109,33 +111,33 @@ describe('Integration | Component | content tokens new/new token form', function
   });
 
   it('hides untilValid prefix by default', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
-    
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
+
     expect(this.$('.prefix-validUntil')).to.not.have.class('in');
   });
 
   it('shows untilValid prefix by when validUntilEnabled is true', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
-    
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
+
     return click(getField(this, 'validUntilEnabled')[0])
       .then(() => expect(this.$('.prefix-validUntil')).to.have.class('in'));
   });
 
   it('blocks "Create" button when form is invalid', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
 
     expect(this.$('.create-button')).to.have.attr('disabled');
   });
 
   it('is valid when only name is not empty', function () {
-    this.render(hbs`{{content-tokens-new/new-token-form}}`);
-    
+    this.render(hbs `{{content-tokens-new/new-token-form}}`);
+
     return fillIn(getField(this, 'name')[0], 'token')
       .then(() => expect(this.$('.create-button')).to.not.have.attr('disabled'));
   });
 });
 
-function getField(self, fieldName) {
+function getField(testCase, fieldName) {
   let selector = '.';
   if (fieldName === 'validUntilEnabled') {
     selector += 'toggle-';
@@ -150,5 +152,5 @@ function getField(self, fieldName) {
     case 'validUntil':
       selector += 'validUntil';
   }
-  return self.$(selector + '-' + fieldName);
+  return testCase.$(selector + '-' + fieldName);
 }

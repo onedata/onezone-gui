@@ -5,7 +5,7 @@ import Service from '@ember/service';
 import sinon from 'sinon';
 import { registerService, lookupService } from '../../helpers/stub-service';
 
-describe('Unit | Service | token actions', function() {
+describe('Unit | Service | token actions', function () {
   setupTest('service:token-actions', {
     // Specify the other units that are required for this test.
     // needs: ['service:foo']
@@ -32,12 +32,12 @@ describe('Unit | Service | token actions', function() {
     const tokenManager = lookupService(this, 'token-manager');
     const deleteTokenStub = sinon.stub(tokenManager, 'deleteToken')
       .withArgs(tokenId).resolves();
-    
+
     const i18n = lookupService(this, 'i18n');
     sinon.stub(i18n, 't')
       .withArgs('services.tokenActions.tokenRemoveSuccess')
       .returns('success');
-    
+
     const service = this.subject();
 
     return service.deleteToken(token).finally(() => {
@@ -60,12 +60,12 @@ describe('Unit | Service | token actions', function() {
     const tokenManager = lookupService(this, 'token-manager');
     const deleteTokenStub = sinon.stub(tokenManager, 'deleteToken')
       .withArgs(tokenId).rejects('err');
-    
+
     const i18n = lookupService(this, 'i18n');
     sinon.stub(i18n, 't')
       .withArgs('services.tokenActions.removingToken')
       .returns('removing token');
-    
+
     const service = this.subject();
 
     return service.deleteToken(token).catch(() => {}).finally(() => {
