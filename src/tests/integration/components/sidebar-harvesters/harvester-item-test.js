@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
 
-describe('Integration | Component | sidebar harvesters/harvester item', function() {
+describe('Integration | Component | sidebar harvesters/harvester item', function () {
   setupComponentTest('sidebar-harvesters/harvester-item', {
     integration: true,
   });
@@ -17,7 +17,7 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
   });
 
   it('renders harvester name, icon and menu trigger', function () {
-    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
+    this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     expect(this.$()).to.contain(this.get('harvester.name'));
     expect(this.$('.oneicon-light-bulb')).to.exist;
@@ -25,13 +25,14 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
   });
 
   it('does not render actions menu if inSidenav is true', function () {
-    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
+    this.render(
+      hbs `{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
 
     expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
   it('allows to access name editor', function () {
-    this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
+    this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     return click('.collapsible-toolbar-toggle')
       .then(() => click($('.webui-popover.in .rename-harvester-action')[0]))
@@ -44,12 +45,14 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
   }, {
     operation: 'remove',
     modalClass: 'harvester-remove-modal',
-  }].forEach(({ operation, modalClass}) => {
+  }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, function () {
-      this.render(hbs`{{sidebar-harvesters/harvester-item item=harvester}}`);
+      this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
       return click('.collapsible-toolbar-toggle')
-        .then(() => click($(`.webui-popover.in .${operation}-harvester-action`)[0]))
+        .then(() =>
+          click($(`.webui-popover.in .${operation}-harvester-action`)[0])
+        )
         .then(() => expect($(`.${modalClass}.in`)).to.exist);
     });
   });

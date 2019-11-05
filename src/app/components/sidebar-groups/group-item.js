@@ -2,8 +2,8 @@
  * A first-level item component for groups sidebar
  *
  * @module components/sidebar-groups/group-item
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -116,7 +116,7 @@ export default Component.extend(I18n, {
           group,
         } = this.getProperties('router', 'guiUtils', 'group');
 
-        router.transitionTo(
+        return router.transitionTo(
           'onedata.sidebar.content.aspect',
           guiUtils.getRoutableIdFor(group),
           'join-harvester'
@@ -139,7 +139,7 @@ export default Component.extend(I18n, {
           guiUtils,
           group,
         } = this.getProperties('router', 'guiUtils', 'group');
-        router.transitionTo(
+        return router.transitionTo(
           'onedata.sidebar.content.aspect',
           guiUtils.getRoutableIdFor(group),
           'join-as-subgroup'
@@ -163,7 +163,7 @@ export default Component.extend(I18n, {
           group,
         } = this.getProperties('router', 'guiUtils', 'group');
 
-        router.transitionTo(
+        return router.transitionTo(
           'onedata.sidebar.content.aspect',
           guiUtils.getRoutableIdFor(group),
           'join-cluster'

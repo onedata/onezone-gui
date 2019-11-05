@@ -18,7 +18,7 @@ describe('Integration | Component | sidebar groups/group item', function () {
   });
 
   it('renders group name, icon and menu trigger', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+    this.render(hbs `{{sidebar-groups/group-item item=group}}`);
 
     expect(this.$()).to.contain(this.get('group.name'));
     expect(this.$('.oneicon-group')).to.exist;
@@ -26,13 +26,13 @@ describe('Integration | Component | sidebar groups/group item', function () {
   });
 
   it('does not render actions menu if inSidenav is true', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group inSidenav=true}}`);
+    this.render(hbs `{{sidebar-groups/group-item item=group inSidenav=true}}`);
 
     expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
   it('allows to access name editor', function () {
-    this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+    this.render(hbs `{{sidebar-groups/group-item item=group}}`);
 
     return click('.collapsible-toolbar-toggle')
       .then(() => click($('.webui-popover.in .rename-group-action')[0]))
@@ -45,9 +45,9 @@ describe('Integration | Component | sidebar groups/group item', function () {
   }, {
     operation: 'remove',
     modalClass: 'group-remove-modal',
-  }].forEach(({ operation, modalClass}) => {
+  }].forEach(({ operation, modalClass }) => {
     it(`shows ${operation} acknowledgment modal`, function () {
-      this.render(hbs`{{sidebar-groups/group-item item=group}}`);
+      this.render(hbs `{{sidebar-groups/group-item item=group}}`);
 
       return click('.collapsible-toolbar-toggle')
         .then(() => click($(`.webui-popover.in .${operation}-group-action`)[0]))
