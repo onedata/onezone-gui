@@ -1,7 +1,7 @@
 <div class="row content-row header-row hidden-xs">
   <h1 class="normal-case with-menu">
     {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
-    {{actions-toolbar actionsArray=globalActions isMinimized=true}}
+    {{actions-toolbar actionsArray=globalActions isMinimized=true renderImmediately=true}}
   </h1>
   {{#one-switchable-popover-modal
     triggersConfiguration=leaveSpaceModalTriggers
