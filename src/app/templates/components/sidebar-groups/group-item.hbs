@@ -1,28 +1,43 @@
 {{one-icon class="sidebar-item-icon" icon=(oneicon-alias item.type)}}
-{{one-inline-editor
-  isEditing=isRenaming
-  value=item.name
-  showEmptyInfo=false
-  onSave=(action "rename")
-  editOnClick=false
-  onEdit=(action "toggleRename")
-  class="one-label name-editor"
-  click=(action "editorClick")}}
-{{actions-toolbar
-  isMinimized=true
-  dropdownPlacement="auto"
-  actionsArray=itemActions}}
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=isRenaming
+    value=item.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor"
+    click=(action "editorClick")}}
+{{else}}
+  {{#truncated-string}}
+    {{name-conflict item=item tagName="span" class="one-label"}}
+  {{/truncated-string}}
+{{/if}}
 
-{{leave-modal
-  opened=leaveGroupModalOpen
-  close=(action "closeLeaveModal")
-  proceed=(action "leave")
-  processing=isLeaving
-  record=group}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=itemActions}}
 
-{{group-remove-modal
-  opened=removeGroupModalOpen
-  close=(action "closeRemoveModal")
-  proceed=(action "remove")
-  processing=isRemoving
-  record=group}}
+  {{#render-later triggerRender=leaveGroupModalOpen as |renderLater|}}
+    {{leave-modal
+      opened=leaveGroupModalOpen
+      close=(action "closeLeaveModal")
+      proceed=(action "leave")
+      processing=isLeaving
+      record=group
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+
+  {{#render-later triggerRender=removeGroupModalOpen as |renderLater|}}
+    {{group-remove-modal
+      opened=removeGroupModalOpen
+      close=(action "closeRemoveModal")
+      proceed=(action "remove")
+      processing=isRemoving
+      record=group
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+{{/unless}}

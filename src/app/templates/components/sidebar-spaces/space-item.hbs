@@ -19,9 +19,11 @@
     hint=(tt this "supportCountHint" count=_providersCount)
   }}
 {{/status-toolbar}}
-{{actions-toolbar
-  isMinimized=true
-  dropdownPlacement="auto"
-  actionsArray=itemActions}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=itemActions}}
+{{/unless}}
 
 
