@@ -86,7 +86,7 @@ export default Component.extend(I18n, {
       );
       this.set('isUploading', true);
       onGuiUploadStart();
-      return getGuiAuthToken().then(token => {
+      return getGuiAuthToken().then(({ token }) => {
         const uploader = Uploader.create({
           url: `/hrv/${get(harvester, 'entityId')}/gui-upload`,
           ajaxSettings: {

@@ -1,16 +1,4 @@
-{{#if relation}}
-  <div class="relation-description">
-    {{#if (eq relation.parentType "provider")}}
-      {{tt this "isSupportedBy"}}
-    {{else}}
-      {{tt this "isMemberOf"}}
-    {{/if}}
-  </div>
-{{/if}}
-
-<div class="line"></div>
-<div class="dot dot-left"></div>
-<div class="relation-sign"></div>
+{{one-arrow direction="right" arrowText=arrowText}}
 
 {{#if relation}}
   {{one-icon

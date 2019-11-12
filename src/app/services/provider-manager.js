@@ -9,6 +9,7 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
+import { get } from '@ember/object';
 
 export default Service.extend({
   store: service(),
@@ -22,7 +23,10 @@ export default Service.extend({
   getProviders() {
     return this.get('currentUser')
       .getCurrentUserRecord()
-      .then(user => user.get('providerList'));
+      .then(user => user.get('providerList'))
+      .then(providerList => get(providerList, 'list')
+        .then(() => providerList)
+      );
   },
 
   /**

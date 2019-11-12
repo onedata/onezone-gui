@@ -1,4 +1,4 @@
-{{#bs-modal
+{{#one-modal
   class="invite-using-token-modal"
   open=opened
   onHide=close
@@ -29,13 +29,13 @@
         error=(action "copyTokenError")
         class="btn btn-primary"
         clipboardTarget=".token-textarea.invitation-token"}}
-        {{one-icon icon="clipboard-copy"}} {{tt this "copy"}}
+        {{one-icon icon="browser-copy"}} {{tt this "copy"}}
       {{/copy-button}}
     {{else}}
       {{!-- copy-button does not support disabled property properly, so replacing it with plain bs-button --}}
       {{#bs-button disabled=true}}
-        {{one-icon icon="clipboard-copy"}} {{tt this "copy"}}
+        {{one-icon icon="browser-copy"}} {{tt this "copy"}}
       {{/bs-button}}
     {{/if}}
   {{/modal.footer}}
-{{/bs-modal}}
+{{/one-modal}}

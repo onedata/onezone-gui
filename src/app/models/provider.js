@@ -11,6 +11,7 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export const providerStatusList = ['online', 'offline'];
@@ -39,4 +40,4 @@ export default Model.extend(GraphSingleModelMixin, {
   }),
   //#endregion
 
-});
+}).reopenClass(StaticGraphModelMixin);

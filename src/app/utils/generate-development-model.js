@@ -9,7 +9,6 @@
  */
 
 import { camelize } from '@ember/string';
-import userGri from 'onedata-gui-websocket-client/utils/user-gri';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled } from 'rsvp';
@@ -258,7 +257,7 @@ function createUserRecord(store, listRecords) {
     .then(space => space && space.get('entityId'))
     .then(defaultSpaceId => {
       const userRecord = store.createRecord('user', {
-        id: userGri(USER_ID),
+        id: store.userGri(USER_ID),
         fullName: USERNAME,
         basicAuthEnabled: true,
         hasPassword: false,

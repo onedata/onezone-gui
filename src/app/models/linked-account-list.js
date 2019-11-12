@@ -7,8 +7,9 @@
 
 import Model from 'ember-data/model';
 import { hasMany } from 'onedata-gui-websocket-client/utils/relationships';
+import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-list-model';
 
 export default Model.extend(GraphListModelMixin, {
   list: hasMany('linkedAccount'),
-});
+}).reopenClass(StaticGraphModelMixin);

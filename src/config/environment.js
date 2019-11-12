@@ -23,7 +23,23 @@ module.exports = function (environment) {
      * Objects in collection:
      * - id: string
      * - icon: string
-     * - [defaultAspect]: string
+     * - [isDefault]: boolean If true, then page under that menu item will be
+     *     a default choice when URL does not specify selected menu item.
+     *     Only one menu item can be default.
+     * - [defaultAspect]: string Aspect name, that should be rendered, when
+     *     URL does not specify any
+     * - [allowIndex]: boolean If true and URL does not specify any resource,
+     *     then router will allow showing page not related to any resource -
+     *     index page for resource type of that menu item.
+     * - [stickyBottom]: boolean If true, menu item will stick to the bottom
+     *     edge of main-menu column (only in desktop mode) regardless scroll
+     * - [visibilityCondition]: string String in format
+     *     `serviceName.propertyName`, that will point to boolean value. If it
+     *     will be true, then menu item will be visible, hidden otherwise.
+     *     `propertyName` can represent a nested property in standard format
+     *     `some.nested.property`.
+     * - [component]: string Custom component name, that should be used to
+     *     render menu item.
      */
     'onedataTabs': [
       { id: 'spaces', icon: 'folder', isDefault: true },
@@ -45,6 +61,9 @@ module.exports = function (environment) {
       formToggleLabelColumns: 'col-xs-9 col-sm-5',
       formToggleInputColumns: 'col-xs-3 col-sm-7 text-xs-right',
     },
+    'onedataWebsocket': {
+      defaultProtocolVersion: 3,
+    },
     'ember-simple-auth': {
       authenticationRoute: 'login',
       routeAfterAuthentication: 'onedata',
@@ -58,6 +77,9 @@ module.exports = function (environment) {
       maxNameLength: 50,
     },
     'legacyOneproviderVersion': '18.02.*',
+    'ember-local-storage': {
+      namespace: true,
+    },
     'APP': {
       // Here you can pass flags/options to your application instance
       // when it is created

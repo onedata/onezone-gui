@@ -3,20 +3,23 @@
  * membership-visualiser component.
  *
  * @module components/membership-visualiser/membership-relation
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-relation'],
   classNameBindings: ['isHovered:hovered'],
+
+  i18n: service(),
 
   /**
    * @override
@@ -63,6 +66,16 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   actionsOpened: false,
+
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  arrowText: computed('relation.parentType', function arrowText() {
+    const relation = this.get('relation');
+    if (relation) {
+      return this.t(get(relation, 'parentType') === 'provider' ? 'isSupportedBy' : 'isMemberOf');
+    }
+  }),
 
   /**
    * @type {Ember.ComputedProperty<boolean>}
