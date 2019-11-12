@@ -2,8 +2,8 @@
  * A first-level item component for groups sidebar
  *
  * @module components/sidebar-groups/group-item
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -22,7 +22,6 @@ export default Component.extend(I18n, {
   i18n: service(),
   globalNotify: service(),
   groupActions: service(),
-  groupManager: service(),
   router: service(),
   guiUtils: service(),
   navigationState: service(),
@@ -31,6 +30,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.sidebarGroups.groupItem',
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
 
   /**
    * @type {boolean}
@@ -65,7 +70,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  renameAction: computed('isRenaming', function () {
+  renameAction: computed('isRenaming', function renameAction() {
     return {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
@@ -78,18 +83,21 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  joinSpaceAction: computed(function () {
-    const {
-      router,
-      guiUtils,
-      group,
-    } = this.getProperties('router', 'guiUtils', 'group');
+  joinSpaceAction: computed(function joinSpaceAction() {
     return {
-      action: () => router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        guiUtils.getRoutableIdFor(group),
-        'join-space'
-      ),
+      action: () => {
+        const {
+          router,
+          guiUtils,
+          group,
+        } = this.getProperties('router', 'guiUtils', 'group');
+
+        return router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          guiUtils.getRoutableIdFor(group),
+          'join-space'
+        );
+      },
       title: this.t('joinSpace'),
       class: 'join-space-action',
       icon: 'space-join',
@@ -100,17 +108,20 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   joinHarvesterAction: computed(function joinHarvesterAction() {
-    const {
-      router,
-      guiUtils,
-      group,
-    } = this.getProperties('router', 'guiUtils', 'group');
     return {
-      action: () => router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        guiUtils.getRoutableIdFor(group),
-        'join-harvester'
-      ),
+      action: () => {
+        const {
+          router,
+          guiUtils,
+          group,
+        } = this.getProperties('router', 'guiUtils', 'group');
+
+        return router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          guiUtils.getRoutableIdFor(group),
+          'join-harvester'
+        );
+      },
       title: this.t('joinHarvester'),
       class: 'join-harvester-action',
       icon: 'light-bulb',
@@ -120,18 +131,20 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  joinAsSubgroupAction: computed(function () {
-    const {
-      router,
-      guiUtils,
-      group,
-    } = this.getProperties('router', 'guiUtils', 'group');
+  joinAsSubgroupAction: computed(function joinAsSubgroupAction() {
     return {
-      action: () => router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        guiUtils.getRoutableIdFor(group),
-        'join-as-subgroup'
-      ),
+      action: () => {
+        const {
+          router,
+          guiUtils,
+          group,
+        } = this.getProperties('router', 'guiUtils', 'group');
+        return router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          guiUtils.getRoutableIdFor(group),
+          'join-as-subgroup'
+        );
+      },
       title: this.t('joinAsSubgroup'),
       class: 'join-as-subgroup-action',
       icon: 'join-plug',
@@ -142,17 +155,20 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<Action>}
    */
   joinClusterAction: computed(function joinClusterAction() {
-    const {
-      router,
-      guiUtils,
-      group,
-    } = this.getProperties('router', 'guiUtils', 'group');
     return {
-      action: () => router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        guiUtils.getRoutableIdFor(group),
-        'join-cluster'
-      ),
+      action: () => {
+        const {
+          router,
+          guiUtils,
+          group,
+        } = this.getProperties('router', 'guiUtils', 'group');
+
+        return router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          guiUtils.getRoutableIdFor(group),
+          'join-cluster'
+        );
+      },
       title: this.t('joinCluster'),
       class: 'join-cluster-action',
       icon: 'cluster',
@@ -162,7 +178,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  leaveAction: computed(function () {
+  leaveAction: computed(function leaveAction() {
     return {
       action: () => this.send('showLeaveModal'),
       title: this.t('leave'),
@@ -174,7 +190,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  removeAction: computed(function () {
+  removeAction: computed(function removeAction() {
     return {
       action: () => this.send('showRemoveModal'),
       title: this.t('remove'),
