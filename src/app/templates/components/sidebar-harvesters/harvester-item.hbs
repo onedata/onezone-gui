@@ -1,28 +1,43 @@
 {{one-icon class="sidebar-item-icon" icon="light-bulb"}}
-{{one-inline-editor
-  isEditing=isRenaming
-  value=item.name
-  showEmptyInfo=false
-  onSave=(action "rename")
-  editOnClick=false
-  onEdit=(action "toggleRename")
-  class="one-label name-editor"
-  click=(action "editorClick")}}
-{{actions-toolbar
-  isMinimized=true
-  dropdownPlacement="auto"
-  actionsArray=itemActions}}
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=isRenaming
+    value=item.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor"
+    click=(action "editorClick")}}
+{{else}}
+  {{#truncated-string}}
+    {{name-conflict item=item tagName="span" class="one-label"}}
+  {{/truncated-string}}
+{{/if}}
 
-{{leave-modal
-  opened=isLeaveModalOpened
-  close=(action "closeLeaveModal")
-  proceed=(action "leave")
-  processing=isLeaving
-  record=harvester}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=itemActions}}
 
-{{harvester-remove-modal
-  opened=isRemoveModalOpened
-  close=(action "closeRemoveModal")
-  proceed=(action "remove")
-  processing=isRemoving
-  record=harvester}}
+  {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
+    {{leave-modal
+      opened=isLeaveModalOpened
+      close=(action "closeLeaveModal")
+      proceed=(action "leave")
+      processing=isLeaving
+      record=harvester
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+
+  {{#render-later triggerRender=isRemoveModalOpened as |renderLater|}}
+    {{harvester-remove-modal
+      opened=isRemoveModalOpened
+      close=(action "closeRemoveModal")
+      proceed=(action "remove")
+      processing=isRemoving
+      record=harvester
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+{{/unless}}
