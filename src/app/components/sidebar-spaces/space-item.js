@@ -22,6 +22,7 @@ export default Component.extend(I18n, HasDefaultSpace, {
 
   router: service(),
   guiUtils: service(),
+  i18n: service(),
 
   /**
    * @override
@@ -39,6 +40,12 @@ export default Component.extend(I18n, HasDefaultSpace, {
    * @type {Provider}
    */
   item: undefined,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
 
   /**
    * Just an one-way alias
@@ -108,17 +115,20 @@ export default Component.extend(I18n, HasDefaultSpace, {
    * @type {Ember.ComputedProperty<Action>}
    */
   joinToHarvesterAction: computed(function joinToHarvesterAction() {
-    const {
-      router,
-      guiUtils,
-      space,
-    } = this.getProperties('router', 'guiUtils', 'space');
     return {
-      action: () => router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        guiUtils.getRoutableIdFor(space),
-        'join-harvester'
-      ),
+      action: () => {
+        const {
+          router,
+          guiUtils,
+          space,
+        } = this.getProperties('router', 'guiUtils', 'space');
+
+        return router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          guiUtils.getRoutableIdFor(space),
+          'join-harvester'
+        );
+      },
       title: this.t('joinToHarvester'),
       class: 'add-to-harvester-action',
       icon: 'light-bulb',

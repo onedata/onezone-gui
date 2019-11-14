@@ -7,8 +7,11 @@ CHANGELOG
 ### Latest changes
 
 
+* VFS-5020 Added Ceph aspect to Oneprovider cluster
 * VFS-5879 Changed provider permissions to support permissions in space
 * VFS-5813 Added translations for new possible backend errors
+* VFS-5875 Fixed navigation to GUI settings of a cluster and optimized rendering of sidebars
+* VFS-5861 Fixed corrupted rendering membership paths with "more" or "forbidden" blocks
 * VFS-1891 Added privacy policy and cookie consent notification
 * VFS-5769 Fixed render failure when switching between clusters
 * VFS-5683 Renamed space indices to views

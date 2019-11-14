@@ -32,6 +32,12 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.sidebarHarvesters.harvesterItem',
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  inSidenav: false,
+
+  /**
    * @type {boolean}
    */
   isRenaming: false,
@@ -68,7 +74,7 @@ export default Component.extend(I18n, {
     return {
       action: () => this.send('toggleRename', true),
       title: this.t('rename'),
-      class: 'rename-group-action',
+      class: 'rename-harvester-action',
       icon: 'rename',
       disabled: this.get('isRenaming'),
     };
