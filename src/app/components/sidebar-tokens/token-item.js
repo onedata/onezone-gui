@@ -14,7 +14,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 
 const tokenTypeToIconNameMapping = {
   invite: 'token-invite',
@@ -30,6 +30,7 @@ export default Component.extend(I18n, {
   tokenActions: service(),
   navigationState: service(),
   router: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -78,7 +79,8 @@ export default Component.extend(I18n, {
   iconName: computed('token.typeName', function () {
     const type = this.get('token.typeName');
 
-    return tokenTypeToIconNameMapping[type] || tokenTypeToIconNameMapping['default'];
+    return tokenTypeToIconNameMapping[type] ||
+      tokenTypeToIconNameMapping['default'];
   }),
 
   /**
@@ -150,16 +152,15 @@ export default Component.extend(I18n, {
         globalNotify,
       } = this.getProperties('token', 'globalNotify');
 
-      const oldName = get(token, 'name');
       set(token, 'name', name);
-      return token.save()
+      return (get(token, 'hasDirtyAttributes') ? token.save() : resolve())
         .then(() => {
           this.send('toggleRename', false);
         })
         .catch((error) => {
           globalNotify.backendError(this.t('savingToken'), error);
           // Restore old name
-          set(token, 'name', oldName);
+          token.rollbackAttributes();
           throw error;
         });
     },

@@ -18,6 +18,7 @@ describe('Integration | Component | sidebar tokens/token item', function () {
     this.set('token', {
       name: 'some token',
       isActive: true,
+      hasDirtyAttributes: true,
       save() {},
     });
     registerService(this, 'token-actions', TokenActionsStub);
