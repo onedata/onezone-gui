@@ -92,7 +92,7 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    */
   fetchTokenTarget() {
     const token = this.get('token');
-    const proxy = token ? token.updateTokenTargetProxy() : resolve(null);
+    const proxy = token ? get(token, 'tokenTargetProxy') : resolve(null);
 
     return proxy
       .then(target => {
@@ -112,7 +112,9 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
       .catch(error => {
         const errorId = error && error.id;
         return {
-          hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
+          hasErrorPossibleToRender: Boolean(
+            targetFetchErrorsPossibleToRender[errorId]
+          ),
           error,
         };
       });

@@ -60,6 +60,21 @@ describe('Unit | Model | token', function () {
     const targetModelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
 
     it(
+      `calculates targetModelName as "${targetModelMapping.modelName}" for subtype ${subtype}`,
+      function () {
+        const model = this.subject();
+        set(model, 'type', {
+          inviteToken: {
+            subtype,
+          },
+        });
+
+        expect(get(model, 'targetModelName'))
+          .to.equal(targetModelMapping.modelName);
+      }
+    );
+
+    it(
       `fetches invite token target (${targetModelMapping.modelName}) with subtype ${subtype}`,
       function () {
         const targetModelEntityId = 'someId';
@@ -168,29 +183,35 @@ describe('Unit | Model | token', function () {
     expect(get(model, 'isExpired')).to.be.true;
   });
 
-  it('resets scheduled change of isExpired if validUntil has been increased', function () {
-    const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(moment().unix() + 600)]);
-    this.clock.tick(1 * 1000);
-    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
-    this.clock.tick(600 * 1000);
+  it(
+    'resets scheduled change of isExpired if validUntil has been increased',
+    function () {
+      const model = this.subject();
+      set(model, 'caveats', [createTimeCaveat(moment().unix() + 600)]);
+      this.clock.tick(1 * 1000);
+      set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
+      this.clock.tick(600 * 1000);
 
-    expect(get(model, 'isExpired')).to.be.false;
+      expect(get(model, 'isExpired')).to.be.false;
 
-    this.clock.tick(3001 * 1000);
+      this.clock.tick(3001 * 1000);
 
-    expect(get(model, 'isExpired')).to.be.true;
-  });
+      expect(get(model, 'isExpired')).to.be.true;
+    }
+  );
 
-  it('removed scheduler change of isExpired if validUntil becomes undefined', function () {
-    const model = this.subject();
-    set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
-    this.clock.tick(1 * 1000);
-    set(model, 'caveats', []);
-    this.clock.tick(3601 * 1000);
+  it(
+    'removes scheduled change of isExpired if validUntil becomes undefined',
+    function () {
+      const model = this.subject();
+      set(model, 'caveats', [createTimeCaveat(moment().unix() + 3600)]);
+      this.clock.tick(1 * 1000);
+      set(model, 'caveats', []);
+      this.clock.tick(3601 * 1000);
 
-    expect(get(model, 'isExpired')).to.be.false;
-  });
+      expect(get(model, 'isExpired')).to.be.false;
+    }
+  );
 
   it(
     'has isActive == true if isExpired == false, revoked == false and usageLimitReached == false',

@@ -4,4 +4,52 @@
       opacity: 0.6;
     }
   }
+
+  .advanced-filters {
+    margin-top: $padding-small-vertical;
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+
+      & + .filter-row, & + * .filter-row {
+        margin-top: $padding-small-vertical;
+      }
+    }
+
+    .filter-label {
+      flex-grow: 0;
+      flex-shrink: 0;
+      width: 80px;
+    }
+
+    .filter-control {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .target-filter-row {
+      display: flex;
+    }
+
+    .target-model-filter {
+      flex-shrink: 0;
+      width: 130px;
+      margin-right: $padding-small-vertical;
+
+      .one-icon {
+        font-size: 1.7em;
+      }
+    }
+
+    .target-record-filter {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .ember-power-select-options[role=listbox] {
+      max-height: 150px;
+      white-space: nowrap;
+    }
+  }
 }

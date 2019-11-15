@@ -113,6 +113,17 @@ export default Model.extend(
     }),
 
     /**
+     * @type {Ember.ComputedProperty<string|undefined>}
+     */
+    targetModelName: computed('subtype', function targetModelName() {
+      const subtype = this.get('subtype');
+      if (subtype) {
+        const targetModelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
+        return targetModelMapping.modelName;
+      }
+    }),
+
+    /**
      * UNIX timestamp of token expiration time
      * @type {Ember.ComputedProperty<number|undefined>}
      */
@@ -191,16 +202,16 @@ export default Model.extend(
         store,
         type,
         subtype,
-      } = this.getProperties('store', 'type', 'subtype');
+        targetModelName,
+      } = this.getProperties('store', 'type', 'subtype', 'targetModelName');
 
-      if (!subtype) {
+      if (!targetModelName) {
         return resolve(null);
       } else {
         const targetModelMapping =
           inviteTokenSubtypeToTargetModelMapping[subtype];
-        const modelName = targetModelMapping.modelName;
-        const adapter = store.adapterFor(modelName);
-        const entityType = adapter.getEntityTypeForModelName(modelName);
+        const adapter = store.adapterFor(targetModelName);
+        const entityType = adapter.getEntityTypeForModelName(targetModelName);
 
         const targetModelGri = gri({
           entityType,
@@ -210,7 +221,7 @@ export default Model.extend(
         });
 
         return store.findRecord(
-          targetModelMapping.modelName,
+          targetModelName,
           targetModelGri, {
             reload: true,
           }
