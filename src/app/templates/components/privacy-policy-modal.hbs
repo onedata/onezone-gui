@@ -1,5 +1,5 @@
 {{#if content}}
-  {{#bs-modal open=isOpened onHidden=(action "onHidden") as |modal|}}
+  {{#one-modal open=isOpened onHidden=(action "onHidden") as |modal|}}
     {{#modal.header}}
       <h1>{{tt this "header"}}</h1>
     {{/modal.header}}
@@ -9,6 +9,6 @@
     {{#modal.footer class="btn-toolbar"}}
       {{#bs-button type="primary" onClick=modal.close class="close-privacy-policy"}}{{tt this "close"}}{{/bs-button}}
     {{/modal.footer}}
-  {{/bs-modal}}
+  {{/one-modal}}
 {{/if}}
 {{yield}}

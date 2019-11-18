@@ -5,9 +5,9 @@
   onToggleMinimize=(action "toggleMinimize")
   isMinimized=isMinimized}}
 {{#render-later triggerRender=(or triggerChildrenRender isExpanded)}}
-  {{#bs-collapse collapsed=(not isExpanded)}}
+  {{#one-collapse collapsed=(not isExpanded)}}
     {{upload-presenter/upload-object-root-list
       uploadObjects=uploadObject.children
       onCancel=(action "cancel")}}
-  {{/bs-collapse}}
+  {{/one-collapse}}
 {{/render-later}}

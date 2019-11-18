@@ -32,7 +32,7 @@ describe('Integration | Component | privacy policy modal', function() {
 
     this.render(hbs`{{privacy-policy-modal}}`);
 
-    expect($('.modal.in')).to.exist;
+    return wait().then(() => expect($('.modal.in')).to.exist);
   });
 
   it('cannot be opened if content is empty', function () {
@@ -43,16 +43,17 @@ describe('Integration | Component | privacy policy modal', function() {
 
     this.render(hbs`{{privacy-policy-modal}}`);
 
-    expect($('.modal.in')).to.not.exist;
+    return wait().then(() => expect($('.modal.in')).to.not.exist);
   });
 
   it('shows privacy policy content', function () {
     set(lookupService(this, 'privacyPolicyManager'), 'isPrivacyPolicyInfoVisible', true);
 
     this.render(hbs`{{privacy-policy-modal}}`);
-
-    expect($('.modal.in h1').text()).to.contain('Privacy policy');
-    expect($('.modal.in p')).to.exist;
+    return wait().then(() => {
+      expect($('.modal.in h1').text()).to.contain('Privacy policy');
+      expect($('.modal.in p')).to.exist;
+    });
   });
 
   it('can be closed', function () {
