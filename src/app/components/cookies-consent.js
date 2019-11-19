@@ -29,7 +29,8 @@ export default Component.extend(I18n, {
   content: computed(
     'privacyPolicyManager.cookieConsentNotification',
     function content() {
-      const consentContent = this.get('privacyPolicyManager.cookieConsentNotification');
+      const consentContent =
+        this.get('privacyPolicyManager.cookieConsentNotification');
       return consentContent ? htmlSafe(consentContent) : undefined;
     }
   ),
@@ -43,7 +44,7 @@ export default Component.extend(I18n, {
     this._super(...arguments);
 
     const privacyPolicyManager = this.get('privacyPolicyManager');
-    
+
     get(privacyPolicyManager, 'cookieConsentNotificationProxy').then(() => {
       this.$('.privacy-policy-link').click(() => run(() => {
         this.get('privacyPolicyManager').showPrivacyPolicyInfo();

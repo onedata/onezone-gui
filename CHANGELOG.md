@@ -6,7 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
-
+* VFS-5782 Added simplified version of new tokens GUI
 * VFS-5020 Added Ceph aspect to Oneprovider cluster
 * VFS-5813 Added translations for new possible backend errors
 * VFS-5875 Fixed navigation to GUI settings of a cluster and optimized rendering of sidebars

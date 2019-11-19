@@ -73,7 +73,8 @@ export default Component.extend(I18n, {
   arrowText: computed('relation.parentType', function arrowText() {
     const relation = this.get('relation');
     if (relation) {
-      return this.t(get(relation, 'parentType') === 'provider' ? 'isSupportedBy' : 'isMemberOf');
+      return this.t(get(relation, 'parentType') === 'provider' ?
+        'isSupportedBy' : 'isMemberOf');
     }
   }),
 

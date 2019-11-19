@@ -1,45 +1,42 @@
 /**
- * A content page for single selected token
+ * A content page for single selected token.
  *
  * @module components/content-tokens
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import { inject } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get, observer, getProperties } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
+import { resolve, reject } from 'rsvp';
 
-export default Component.extend(I18n, GlobalActions, {
+const tokenTypeToTargetLabelI18nKey = {
+  userJoinGroup: 'targetGroup',
+  groupJoinGroup: 'targetGroup',
+  userJoinSpace: 'targetSpace',
+  groupJoinSpace: 'targetSpace',
+  supportSpace: 'spaceToBeSupported',
+  registerOneprovider: 'adminUser',
+  userJoinCluster: 'targetCluster',
+  groupJoinCluster: 'targetCluster',
+  userJoinHarvester: 'targetHarvester',
+  groupJoinHarvester: 'targetHarvester',
+  spaceJoinHarvester: 'targetHarvester',
+};
+
+const targetFetchErrorsPossibleToRender = {
+  forbidden: { icon: 'no-view' },
+  notFound: { icon: 'x' },
+};
+
+export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
   classNames: ['content-tokens'],
 
   i18n: inject(),
-  globalNotify: inject(),
-  clientTokenManager: inject(),
-  router: inject(),
-
-  /**
-   * @type {Ember.ComputedProperty<string>}
-   */
-  globalActionsTitle: computed(function () {
-    return this.t('header');
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<AspectAction>>}
-   */
-  globalActions: computed(function () {
-    return [{
-      action: () => this.send('removeToken'),
-      title: this.t('deleteToken'),
-      class: 'delete-token',
-      buttonStyle: 'danger',
-      icon: 'remove',
-    }];
-  }),
 
   /**
    * @override
@@ -48,35 +45,80 @@ export default Component.extend(I18n, GlobalActions, {
 
   /**
    * @virtual
-   * @type {ClientToken}
+   * @type {Models.Token}
    */
-  selectedToken: undefined,
+  token: undefined,
 
-  actions: {
-    copySuccess() {
-      this.get('globalNotify').info(this.t('tokenCopySuccess'));
-    },
-    copyError() {
-      this.get('globalNotify').info(this.t('tokenCopyError'));
-    },
-    removeToken() {
-      const {
-        globalNotify,
-        clientTokenManager,
-        selectedToken,
-        router,
-      } = this.getProperties(
-        'globalNotify',
-        'clientTokenManager',
-        'selectedToken',
-        'router'
-      );
-      clientTokenManager.deleteRecord(selectedToken.get('id'))
-        .then(() => {
-          globalNotify.success(this.t('tokenDeleteSuccess'));
-          router.transitionTo('onedata.sidebar.index', 'tokens');
-        })
-        .catch(error => globalNotify.backendError(this.t('tokenDeletion'), error));
-    },
+  /**
+   * @type {Ember.ComputedProperty<SafeString>}
+   */
+  targetLabel: computed('token.subtype', function targetLabel() {
+    const tokenSubtype = this.get('token.subtype');
+    return tokenSubtype &&
+      this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[tokenSubtype]}`);
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<string|null>}
+   */
+  targetIcon: computed('tokenTarget', function targetIcon() {
+    const tokenTarget = this.get('tokenTarget');
+
+    if (tokenTarget) {
+      if (get(tokenTarget, 'error')) {
+        const errorId = get(tokenTarget, 'error.id');
+        return (targetFetchErrorsPossibleToRender[errorId] || {}).icon || null;
+      } else {
+        const modelName = tokenTarget.constructor.modelName;
+        switch (modelName) {
+          case 'group':
+          case 'space':
+          case 'user':
+          case 'cluster':
+            return modelName;
+          case 'harvester':
+            return 'light-bulb';
+          default:
+            return null;
+        }
+      }
+    } else {
+      return null;
+    }
+  }),
+
+  /**
+   * @override
+   */
+  fetchTokenTarget() {
+    const token = this.get('token');
+    const proxy = token ? token.updateTokenTargetProxy() : resolve(null);
+
+    return proxy
+      .then(target => {
+        if (target) {
+          const {
+            isDeleted,
+            isForbidden,
+          } = getProperties(target, 'isDeleted', 'isForbidden');
+          if (isDeleted) {
+            return reject({ id: 'notFound' });
+          } else if (isForbidden) {
+            return reject({ id: 'forbidden' });
+          }
+        }
+        return target;
+      })
+      .catch(error => {
+        const errorId = error && error.id;
+        return {
+          hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
+          error,
+        };
+      });
   },
+
+  tokenObserver: observer('token', function tokenObserver() {
+    this.updateTokenTargetProxy();
+  }),
 });

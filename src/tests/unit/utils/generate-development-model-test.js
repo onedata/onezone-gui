@@ -58,9 +58,9 @@ describe('Unit | Utility | generate development model', function () {
     promise.then(() => {
       [
         'user', 'sharedUser',
-        'spaceList', 'groupList', 'providerList', 'clientTokenList',
+        'spaceList', 'groupList', 'providerList', 'tokenList',
         'linkedAccountList', 'harvesterList', 'indexList',
-        'space', 'group', 'provider', 'clientToken', 'linkedAccount',
+        'space', 'group', 'provider', 'token', 'linkedAccount',
         'privilege', 'harvester', 'index', 'guiMessage',
       ].forEach(modelName =>
         expect(createRecord, `createRecord for ${modelName}`)

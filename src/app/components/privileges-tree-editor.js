@@ -54,9 +54,9 @@ export default PrivilegesTreeEditor.extend({
   actions: {
     treeValuesChanged(values) {
       const superResult = this._super(...arguments);
-      
+
       this.get('recordProxy').setNewPrivileges(values);
-      
+
       return superResult;
     },
   },

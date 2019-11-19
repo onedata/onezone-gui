@@ -14,7 +14,6 @@ import backendErrors from './errors/backend-errors';
 
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
-import contentTokensEmpty from './components/content-tokens-empty';
 import contentProviderRedirect from './components/content-provider-redirect';
 import contentClustersEndpointError from './components/content-clusters-endpoint-error';
 import contentUsers from './components/content-users';
@@ -77,6 +76,9 @@ import websocketReconnectionModal from './components/websocket-reconnection-moda
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import cookiesConsent from './components/cookies-consent';
 import privacyPolicyModal from './components/privacy-policy-modal';
+import sidebarTokens from './components/sidebar-tokens';
+import removeTokenModal from './components/remove-token-modal';
+import contentTokensNew from './components/content-tokens-new';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -84,8 +86,7 @@ import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
-import clientTokenActions from './services/client-token-actions';
-import clientTokenManager from './services/client-token-manager';
+import tokenActions from './services/token-actions';
 import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
@@ -109,7 +110,6 @@ let translations = {
     },
     loginBox,
     contentTokens,
-    contentTokensEmpty,
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
@@ -172,10 +172,12 @@ let translations = {
     fatalConnectionErrorModal,
     cookiesConsent,
     privacyPolicyModal,
+    sidebarTokens,
+    removeTokenModal,
+    contentTokensNew,
   },
   services: {
-    clientTokenActions,
-    clientTokenManager,
+    tokenActions,
     spaceActions,
     groupActions,
     clusterActions,

@@ -18,7 +18,7 @@ const PrivacyPolicyManagerStub = Service.extend({
   },
 });
 
-describe('Integration | Component | privacy policy modal', function() {
+describe('Integration | Component | privacy policy modal', function () {
   setupComponentTest('privacy-policy-modal', {
     integration: true,
   });
@@ -28,9 +28,13 @@ describe('Integration | Component | privacy policy modal', function() {
   });
 
   it('can be opened', function () {
-    set(lookupService(this, 'privacyPolicyManager'), 'isPrivacyPolicyInfoVisible', true);
+    set(
+      lookupService(this, 'privacyPolicyManager'),
+      'isPrivacyPolicyInfoVisible',
+      true
+    );
 
-    this.render(hbs`{{privacy-policy-modal}}`);
+    this.render(hbs `{{privacy-policy-modal}}`);
 
     return wait().then(() => expect($('.modal.in')).to.exist);
   });
@@ -41,15 +45,19 @@ describe('Integration | Component | privacy policy modal', function() {
       privacyPolicy: undefined,
     });
 
-    this.render(hbs`{{privacy-policy-modal}}`);
+    this.render(hbs `{{privacy-policy-modal}}`);
 
     return wait().then(() => expect($('.modal.in')).to.not.exist);
   });
 
   it('shows privacy policy content', function () {
-    set(lookupService(this, 'privacyPolicyManager'), 'isPrivacyPolicyInfoVisible', true);
+    set(
+      lookupService(this, 'privacyPolicyManager'),
+      'isPrivacyPolicyInfoVisible',
+      true
+    );
 
-    this.render(hbs`{{privacy-policy-modal}}`);
+    this.render(hbs `{{privacy-policy-modal}}`);
     return wait().then(() => {
       expect($('.modal.in h1').text()).to.contain('Privacy policy');
       expect($('.modal.in p')).to.exist;
@@ -60,7 +68,7 @@ describe('Integration | Component | privacy policy modal', function() {
     const privacyPolicyManager = lookupService(this, 'privacyPolicyManager');
     set(privacyPolicyManager, 'isPrivacyPolicyInfoVisible', true);
 
-    this.render(hbs`{{privacy-policy-modal}}`);
+    this.render(hbs `{{privacy-policy-modal}}`);
 
     return wait()
       .then(() => {
