@@ -1,0 +1,43 @@
+{{#global-modal
+  classNames="remove-disabled-tokens-modal"
+  as |modal|}}
+  
+  {{#modal.header}}
+    <h1>{{tt this "header"}}</h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{#if accessTokensToRemove.length}}
+      {{checkbox-list
+        class="access-tokens-list"
+        headerText=(tt this "accessTokensSection.header")
+        isExpanded=false
+        items=accessTokensToRemove
+        selectedItems=selectedAccessTokensToRemove
+        onChange=(action "selectionChange" "access")}}
+    {{/if}}
+    {{#if inviteTokensToRemove.length}}
+      {{checkbox-list
+        headerText=(tt this "inviteTokensSection.header")
+        class="invite-tokens-list"
+        isExpanded=false
+        items=inviteTokensToRemove
+        selectedItems=selectedInviteTokensToRemove
+        onChange=(action "selectionChange" "invite")}}
+    {{/if}}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button type="default" class="remove-tokens-cancel"}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      class="btn btn-danger remove-tokens-submit"
+      action=(action modal.submit selectedTokensToRemove)
+      disabled=(not selectedTokensToRemove.length)
+    }}
+      {{tt this "submit"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+
+{{/global-modal}}

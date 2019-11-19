@@ -12,6 +12,7 @@ import users from './tabs/users';
 
 import backendErrors from './errors/backend-errors';
 
+import modals from './components/modals';
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
 import contentProviderRedirect from './components/content-provider-redirect';
@@ -108,6 +109,7 @@ let translations = {
     alerts: {
       oneproviderAuthenticationError,
     },
+    modals,
     loginBox,
     contentTokens,
     contentProviderRedirect,
