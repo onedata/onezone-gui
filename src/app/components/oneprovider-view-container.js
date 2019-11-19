@@ -10,11 +10,19 @@
 
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
-import { reads } from '@ember/object/computed';
-import { promise } from 'ember-awesome-macros';
+import { reads, not } from '@ember/object/computed';
+import { promise, notEmpty } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
+import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+
+const nameComparator = createPropertyComparator('name');
+
+function sortedOneprovidersList(list) {
+  return [...list].sort(nameComparator);
+}
 
 const OneproviderTabItem = EmberObject.extend({
   /**
@@ -26,13 +34,19 @@ const OneproviderTabItem = EmberObject.extend({
   icon: 'provider',
   id: reads('provider.entityId'),
   name: reads('provider.name'),
+  disabled: not('provider.online'),
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
 });
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: '',
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.oneproviderViewContainer',
 
   pointerEvents: service(),
 
@@ -64,7 +78,9 @@ export default Component.extend({
    */
   contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
 
-  providers: reads('space.providerList.list'),
+  providers: computed('space.providerList.list.@each.name', function providers() {
+    return sortedOneprovidersList(this.get('space.providerList.list').toArray());
+  }),
 
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
@@ -75,8 +91,10 @@ export default Component.extend({
         providerItems,
         selectedProvider,
       } = this.getProperties('providerItems', 'selectedProvider');
-      const providerEntityId = get(selectedProvider, 'entityId');
-      return providerItems.findBy('id', providerEntityId);
+      if (selectedProvider) {
+        const providerEntityId = get(selectedProvider, 'entityId');
+        return providerItems.findBy('id', providerEntityId);
+      }
     }
   ),
 
@@ -101,17 +119,31 @@ export default Component.extend({
     }
   ),
 
+  hasSupport: notEmpty('providers'),
+
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
       return this.get('space.providerList')
-        .then(providerList => get(providerList, 'list'));
+        .then(providerList =>
+          sortedOneprovidersList(get(providerList, 'list').toArray())
+        );
     })
   ),
 
-  providersChanged: observer('initialProvidersListProxy', function providersChanged() {
-    this.get('initialProvidersListProxy').then(list => {
-      safeExec(this, 'set', 'selectedProvider', list.objectAt(0));
-    });
+  initialProvidersChanged: observer(
+    'initialProvidersListProxy.isFulfilled',
+    function initialProvidersChanged() {
+      if (this.get('initialProvidersListProxy.isFulfilled')) {
+        this.setFirstOnlineProvider();
+      }
+    }
+  ),
+
+  hasSupportChanged: observer('hasSupport', function hasSupportChanged() {
+    const hasSupport = this.get('hasSupport');
+    if (hasSupport) {
+      this.setFirstOnlineProvider();
+    }
   }),
 
   init() {
@@ -131,6 +163,13 @@ export default Component.extend({
     next(() => {
       set(pointerEvents, 'pointerNoneToMainContent', false);
     });
+  },
+
+  setFirstOnlineProvider() {
+    const providers = this.get('providers');
+    if (providers && get(providers, 'length')) {
+      this.set('selectedProvider', providers.objectAt(0));
+    }
   },
 
   actions: {

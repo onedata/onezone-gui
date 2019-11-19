@@ -31,7 +31,7 @@ const NUMBER_OF_CLIENT_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
-const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
+const PROVIDER_NAMES = ['Zeta', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
 );
 

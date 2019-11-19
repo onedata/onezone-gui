@@ -29,7 +29,7 @@ import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
-import contentSpacesData from './components/content-spaces-data';
+import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
@@ -134,7 +134,7 @@ let translations = {
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
-    contentSpacesData,
+    oneproviderViewContainer,
     contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
