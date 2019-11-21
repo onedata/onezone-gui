@@ -178,6 +178,10 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
         }
         return resolve();
       });
+    const successNotifySpy = sinon.spy(
+      lookupService(this, 'global-notify'),
+      'success'
+    );
 
     this.render(hbs `{{global-modal-mounter}}`);
     const actionResultPromise = action.execute();
@@ -192,6 +196,9 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
         );
         expect(reloadTokensSpy).to.be.calledOnce;
         expect(reloadCalledAfterRemove).to.be.true;
+        expect(successNotifySpy).to.be.calledWith(
+          sinon.match.has('string', 'Selected tokens has been removed.')
+        );
         expect(get(actionResult, 'status')).to.equal('done');
       });
   });
@@ -214,6 +221,10 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
           }
           return reject('error');
         });
+      const failureNotifySpy = sinon.spy(
+        lookupService(this, 'global-notify'),
+        'backendError'
+      );
 
       this.render(hbs `{{global-modal-mounter}}`);
       const actionResultPromise = action.execute();
@@ -225,6 +236,10 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
           expect(reloadTokensSpy).to.be.calledOnce;
           expect(reloadCalledAfterRemove).to.be.true;
 
+          expect(failureNotifySpy).to.be.calledWith(
+            sinon.match.has('string', 'removing tokens'),
+            'error'
+          );
           const {
             status,
             error,
@@ -245,6 +260,10 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
       const tokenManager = lookupService(this, 'token-manager');
       sinon.stub(tokenManager, 'reloadList').callsFake(() => reject('error'));
       sinon.stub(tokenManager, 'deleteToken').resolves();
+      const failureNotifySpy = sinon.spy(
+        lookupService(this, 'global-notify'),
+        'backendError'
+      );
 
       this.render(hbs `{{global-modal-mounter}}`);
       const actionResultPromise = action.execute();
@@ -253,6 +272,10 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
         .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
         .then(() => actionResultPromise)
         .then(actionResult => {
+          expect(failureNotifySpy).to.be.calledWith(
+            sinon.match.has('string', 'removing tokens'),
+            'error'
+          );
           const {
             status,
             error,

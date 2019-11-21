@@ -101,12 +101,15 @@ export default Action.extend({
       );
 
       const result = ActionResult.create();
-      return modalManager.show('remove-disabled-tokens', {
-        tokensToRemove,
-        selectedTokensToRemove,
-        onSubmit: (userSelectedTokens) =>
-          result.interceptPromise(this.removeTokens(userSelectedTokens)),
-      }).hiddenPromise.then(() => result);
+      return modalManager
+        .show('remove-disabled-tokens', {
+          tokensToRemove,
+          selectedTokensToRemove,
+          onSubmit: (userSelectedTokens) =>
+            result.interceptPromise(this.removeTokens(userSelectedTokens)),
+        }).hiddenPromise
+        .then(() => this.notifyResult(result))
+        .then(() => result);
     }
   },
 
