@@ -53,6 +53,13 @@ module.exports = function (environment) {
         defaultAspect: 'overview',
         allowIndex: false,
       },
+      {
+        id: 'uploads',
+        icon: 'browser-upload',
+        stickyBottom: true,
+        visibilityCondition: 'uploadManager.hasUploads',
+        component: 'main-menu/upload-item',
+      },
     ],
     'layoutConfig': {
       formLabelColumns: 'col-xs-12 col-sm-5',
