@@ -54,16 +54,14 @@ export default SidebarResources.extend({
   },
 
   /**
-   * Returns sidebar buttons definitions
-   * @param {string} type
-   * @returns {Array<object>}
+   * @override
    */
-  getButtonsFor(type) {
+  getButtonsFor(type, context) {
     switch (type) {
       case 'clusters':
         return this.get('clusterActions.buttons');
       case 'tokens':
-        return this.get('tokenActions.actionButtons');
+        return this.get('tokenActions').createGlobalActionsTriggers(context);
       case 'spaces':
         return this.get('spaceActions.buttons');
       case 'groups':

@@ -28,7 +28,7 @@
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}
-    {{#bs-button type="default" class="remove-tokens-cancel"}}
+    {{#bs-button type="default" class="remove-tokens-cancel" onClick=modal.close}}
       {{tt this "cancel"}}
     {{/bs-button}}
     {{#one-spin-button

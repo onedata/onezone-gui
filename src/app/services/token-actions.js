@@ -11,6 +11,9 @@ import { default as Service, inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
+import { getOwner } from '@ember/application';
+import RemoveDisabledTokensAction from 'onezone-gui/utils/token-actions/remove-disabled-tokens-action';
+import Action from 'onedata-gui-common/utils/action';
 
 export default Service.extend(I18n, {
   tokenManager: service(),
@@ -38,6 +41,20 @@ export default Service.extend(I18n, {
         .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
     }];
   }),
+
+  createGlobalActionsTriggers(context) {
+    const addAction = Action.create({
+      icon: 'add-filled',
+      title: this.t('createToken'),
+      tip: this.t('createToken'),
+      class: 'create-token-btn',
+      execute: () => this.get('router')
+        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
+    });
+    const removeDisabledAction = RemoveDisabledTokensAction
+      .create(getOwner(this).ownerInjection(), { context });
+    return [addAction, removeDisabledAction];
+  },
 
   /**
    * Creates token

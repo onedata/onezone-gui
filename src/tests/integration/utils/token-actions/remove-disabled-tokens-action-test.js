@@ -37,8 +37,8 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
     this.setProperties({
       tokens,
       context: {
-        allTokens: tokens,
-        visibleTokens: tokens,
+        collection: tokens,
+        visibleCollection: tokens,
       },
     });
   });
@@ -48,7 +48,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
     const action = RemoveDisabledTokensAction.create({
       ownerSource: this,
       context: {
-        allTokens: tokens,
+        collection: tokens,
       },
     });
 
@@ -104,8 +104,8 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   it('passes information about visible tokens to modal', function () {
     const tokens = this.get('tokens');
     const context = {
-      allTokens: tokens,
-      visibleTokens: tokens.slice(0, 2),
+      collection: tokens,
+      visibleCollection: tokens.slice(0, 2),
     };
     const action = RemoveDisabledTokensAction.create({
       ownerSource: this,
@@ -134,8 +134,8 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   it('marks all tokens as visible when visibility is not specified', function () {
     const tokens = this.get('tokens');
     const context = {
-      allTokens: tokens,
-      visibleTokens: undefined,
+      collection: tokens,
+      visibleCollection: undefined,
     };
     const action = RemoveDisabledTokensAction.create({
       ownerSource: this,

@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { raw, array, isEmpty } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
@@ -53,12 +53,12 @@ export default Action.extend({
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  allTokens: reads('context.allTokens'),
+  allTokens: reads('context.collection'),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  visibleTokens: reads('context.visibleTokens'),
+  visibleTokens: reads('context.visibleCollection'),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
@@ -119,7 +119,7 @@ export default Action.extend({
    */
   removeTokens(tokens) {
     const tokenManager = this.get('tokenManager');
-    return allSettled(tokens.map(token => tokenManager.deleteToken(token)))
+    return allSettled(tokens.map(token => tokenManager.deleteToken(get(token, 'id'))))
       .then(results => tokenManager.reloadList()
         .then(() => results)
         .catch(reason => [{ state: 'rejected', reason }])
