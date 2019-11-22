@@ -4,9 +4,9 @@ export default {
   tokenCreation: 'token creation',
   tokenRemoveSuccess: 'Token has been removed successfully.',
   removingToken: 'removing token',
-  removeDisabledTokensAction: {
-    title: 'Remove disabled tokens',
-    tip: 'Remove disabled tokens',
+  cleanObsoleteTokensAction: {
+    title: 'Clean up obsolete tokens',
+    tip: 'Clean up obsolete tokens',
     successNotificationText: 'Selected tokens has been removed.',
     failureNotificationActionName: 'removing tokens',
   },

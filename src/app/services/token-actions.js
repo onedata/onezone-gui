@@ -12,7 +12,7 @@ import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 import { getOwner } from '@ember/application';
-import RemoveDisabledTokensAction from 'onezone-gui/utils/token-actions/remove-disabled-tokens-action';
+import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 import Action from 'onedata-gui-common/utils/action';
 
 export default Service.extend(I18n, {
@@ -51,9 +51,9 @@ export default Service.extend(I18n, {
       execute: () => this.get('router')
         .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
     });
-    const removeDisabledAction = RemoveDisabledTokensAction
+    const cleanObsoleteAction = CleanObsoleteTokensAction
       .create(getOwner(this).ownerInjection(), { context });
-    return [addAction, removeDisabledAction];
+    return [addAction, cleanObsoleteAction];
   },
 
   /**

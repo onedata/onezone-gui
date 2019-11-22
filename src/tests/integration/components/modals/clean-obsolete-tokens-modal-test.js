@@ -13,8 +13,8 @@ import { click } from 'ember-native-dom-helpers';
 import { Promise, resolve } from 'rsvp';
 import sinon from 'sinon';
 
-describe('Integration | Component | modals/remove disabled tokens', function () {
-  setupComponentTest('modals/remove-disabled-tokens', {
+describe('Integration | Component | modals/clean obsolete tokens modal', function () {
+  setupComponentTest('modals/clean-obsolete-tokens-modal', {
     integration: true,
   });
 
@@ -41,16 +41,16 @@ describe('Integration | Component | modals/remove disabled tokens', function () 
     });
   });
 
-  it('renders modal with class "remove-disabled-tokens-modal", correct header and footer',
+  it('renders modal with class "clean-obsolete-tokens-modal", correct header and footer',
     function () {
       return showModal(this)
         .then(() => {
           const $modal = getModal();
           const $modalHeader = getModalHeader();
           const $modalFooter = getModalFooter();
-          expect($modal).to.have.class('remove-disabled-tokens-modal');
+          expect($modal).to.have.class('clean-obsolete-tokens-modal');
           expect($modalHeader.find('h1').text().trim())
-            .to.equal('Remove disabled tokens');
+            .to.equal('Clean up obsolete tokens');
           expect($modalFooter.find('.remove-tokens-submit').text().trim())
             .to.equal('Remove');
           expect($modalFooter.find('.remove-tokens-cancel').text().trim())
@@ -242,7 +242,7 @@ function showModal(testCase, expandTokens = false) {
   testCase.render(hbs `{{global-modal-mounter}}`);
 
   return modalManager
-    .show('remove-disabled-tokens', modalOptions).shownPromise
+    .show('clean-obsolete-tokens-modal', modalOptions).shownPromise
     .then(() => expandTokens ? expandSections() : resolve());
 }
 

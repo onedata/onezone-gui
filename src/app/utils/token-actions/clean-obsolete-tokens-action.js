@@ -1,7 +1,7 @@
 /**
  * Allows to remove disabled tokens from passed list of tokens.
  *
- * @module utils/token-actions/remove-disabled-tokens-action
+ * @module utils/token-actions/clean-obsolete-tokens-action
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -23,7 +23,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'services.tokenActions.removeDisabledTokensAction',
+  i18nPrefix: 'services.tokenActions.cleanObsoleteTokensAction',
 
   /**
    * @override
@@ -43,7 +43,7 @@ export default Action.extend({
   /**
    * @override
    */
-  classNames: 'remove-disabled-tokens-trigger',
+  classNames: 'clean-obsolete-tokens-trigger',
 
   /**
    * @override
@@ -102,7 +102,7 @@ export default Action.extend({
 
       const result = ActionResult.create();
       return modalManager
-        .show('remove-disabled-tokens', {
+        .show('clean-obsolete-tokens-modal', {
           tokensToRemove,
           selectedTokensToRemove,
           onSubmit: (userSelectedTokens) =>

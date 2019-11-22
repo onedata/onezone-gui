@@ -12,7 +12,6 @@ import users from './tabs/users';
 
 import backendErrors from './errors/backend-errors';
 
-import modals from './components/modals';
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
 import contentProviderRedirect from './components/content-provider-redirect';
@@ -83,6 +82,8 @@ import contentTokensNew from './components/content-tokens-new';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
+import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
+
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clusterActions from './services/cluster-actions';
@@ -109,7 +110,9 @@ let translations = {
     alerts: {
       oneproviderAuthenticationError,
     },
-    modals,
+    modals: {
+      cleanObsoleteTokensModal,
+    },
     loginBox,
     contentTokens,
     contentProviderRedirect,

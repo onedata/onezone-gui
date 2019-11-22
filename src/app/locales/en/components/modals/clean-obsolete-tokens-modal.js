@@ -1,5 +1,5 @@
 export default {
-  header: 'Remove disabled tokens',
+  header: 'Clean up obsolete tokens',
   accessTokensSection: {
     header: 'Access tokens',
   },

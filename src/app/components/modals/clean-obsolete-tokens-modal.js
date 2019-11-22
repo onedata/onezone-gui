@@ -1,11 +1,11 @@
 /**
- * A modal that is a confirmation of removing disabled tokens. Allows to select
- * which disabled tokens should be removed. Data needed from modalOptions:
+ * A modal that is a confirmation of removing obsolete tokens. Allows to select
+ * which obsolete tokens should be removed. Data needed from modalOptions:
  * * tokensToRemove - list with all tokens possible to remove
  * * selectedTokensToRemove - [optional] a list of preselected tokens (must be a
  *   subset of tokensToRemove). If not provided, then all tokens will be preselected.
  *
- * @module components/modals/remove-disabled-tokens
+ * @module components/modals/clean-obsolete-tokens-modal
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -26,7 +26,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.removeDisabledTokens',
+  i18nPrefix: 'components.modals.cleanObsoleteTokensModal',
 
   /**
    * @virtual

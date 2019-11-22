@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import RemoveDisabledTokensAction from 'onezone-gui/utils/token-actions/remove-disabled-tokens-action';
+import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
@@ -11,7 +11,7 @@ import { click } from 'ember-native-dom-helpers';
 import { reject, resolve } from 'rsvp';
 import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
 
-describe('Integration | Util | token actions/remove disabled tokens action', function () {
+describe('Integration | Util | token actions/clean obsolete tokens action', function () {
   setupComponentTest('global-modal-mounter', {
     integration: true,
   });
@@ -45,7 +45,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
 
   it('is disabled when there are no tokens to remove', function () {
     const tokens = this.get('tokens').setEach('isActive', true);
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: {
         collection: tokens,
@@ -56,7 +56,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   });
 
   it('is enabled when there are tokens to remove', function () {
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: this.get('context'),
     });
@@ -65,7 +65,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   });
 
   it('shows modal on execute', function () {
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: this.get('context'),
     });
@@ -74,12 +74,12 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
     action.execute();
 
     return wait().then(() => {
-      expect(getModal()).to.have.class('remove-disabled-tokens-modal');
+      expect(getModal()).to.have.class('clean-obsolete-tokens-modal');
     });
   });
 
-  it('passes only disabled tokens to modal', function () {
-    const action = RemoveDisabledTokensAction.create({
+  it('passes only obsolete tokens to modal', function () {
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: this.get('context'),
     });
@@ -107,7 +107,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
       collection: tokens,
       visibleCollection: tokens.slice(0, 2),
     };
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context,
     });
@@ -137,7 +137,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
       collection: tokens,
       visibleCollection: undefined,
     };
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context,
     });
@@ -163,7 +163,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
 
   it('executes removing selected tokens on submit (success scenario)', function () {
     const tokens = this.get('tokens');
-    const action = RemoveDisabledTokensAction.create({
+    const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: this.get('context'),
     });
@@ -192,7 +192,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
       .then(actionResult => {
         expect(deleteTokenStub).to.be.calledTwice;
         tokens.rejectBy('isActive').forEach(token =>
-          expect(deleteTokenStub).to.be.calledWith(token)
+          expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
         );
         expect(reloadTokensSpy).to.be.calledOnce;
         expect(reloadCalledAfterRemove).to.be.true;
@@ -206,7 +206,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   it(
     'executes removing selected tokens on submit (remove failure scenario)',
     function () {
-      const action = RemoveDisabledTokensAction.create({
+      const action = CleanObsoleteTokensAction.create({
         ownerSource: this,
         context: this.get('context'),
       });
@@ -253,7 +253,7 @@ describe('Integration | Util | token actions/remove disabled tokens action', fun
   it(
     'executes removing selected tokens on submit (reload failure scenario)',
     function () {
-      const action = RemoveDisabledTokensAction.create({
+      const action = CleanObsoleteTokensAction.create({
         ownerSource: this,
         context: this.get('context'),
       });
