@@ -55,6 +55,8 @@ export default OneEmbeddedContainer.extend({
    */
   iframeType: 'oneprovider',
 
+  _location: location,
+
   /**
    * @override implements OneEmbeddedContainer
    */
@@ -68,7 +70,7 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze(['updateDirEntityId']),
+  callParentActionNames: Object.freeze(['updateDirEntityId', 'getTransfersUrl']),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -94,6 +96,18 @@ export default OneEmbeddedContainer.extend({
   actions: {
     updateDirEntityId(dirEntityId) {
       this.set('dirEntityId', dirEntityId);
+    },
+    getTransfersUrl({ fileId, tabId }) {
+      const {
+        _location,
+        router,
+      } = this.getProperties('_location', 'router');
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'transfers', {
+          queryParams: { options: `fileId.${fileId},tabId.${tabId}` },
+        }
+      );
     },
   },
 });
