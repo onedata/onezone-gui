@@ -7,24 +7,21 @@
   {{/modal.header}}
 
   {{#modal.body}}
-    {{#if accessTokensToRemove.length}}
-      {{checkbox-list
-        class="access-tokens-list"
-        headerText=(tt this "accessTokensSection.header")
-        isExpanded=false
-        items=accessTokensToRemove
-        selectedItems=selectedAccessTokensToRemove
-        onChange=(action "selectionChange" "access")}}
-    {{/if}}
-    {{#if inviteTokensToRemove.length}}
-      {{checkbox-list
-        headerText=(tt this "inviteTokensSection.header")
-        class="invite-tokens-list"
-        isExpanded=false
-        items=inviteTokensToRemove
-        selectedItems=selectedInviteTokensToRemove
-        onChange=(action "selectionChange" "invite")}}
-    {{/if}}
+    <p class="description">{{tt this "description"}}</p>
+    {{checkbox-list
+      class="access-tokens-list"
+      headerText=(tt this "accessTokensSection.header")
+      isInitiallyExpanded=false
+      items=accessTokensToRemove
+      selectedItems=selectedAccessTokensToRemove
+      onChange=(action "selectionChange" "access")}}
+    {{checkbox-list
+      headerText=(tt this "inviteTokensSection.header")
+      class="invite-tokens-list"
+      isInitiallyExpanded=false
+      items=inviteTokensToRemove
+      selectedItems=selectedInviteTokensToRemove
+      onChange=(action "selectionChange" "invite")}}
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}

@@ -9,7 +9,7 @@
 
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { raw, array, isEmpty } from 'ember-awesome-macros';
+import { raw, array, isEmpty, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import Action from 'onedata-gui-common/utils/action';
@@ -38,7 +38,11 @@ export default Action.extend({
   /**
    * @override
    */
-  tip: computedT('tip'),
+  tip: conditional(
+    'tokensToRemove.length',
+    computedT('tipSomethingToClean'),
+    computedT('tipNothingToClean')
+  ),
 
   /**
    * @override

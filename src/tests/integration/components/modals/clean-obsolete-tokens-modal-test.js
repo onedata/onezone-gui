@@ -47,10 +47,14 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
         .then(() => {
           const $modal = getModal();
           const $modalHeader = getModalHeader();
+          const $modalBody = getModalBody();
           const $modalFooter = getModalFooter();
           expect($modal).to.have.class('clean-obsolete-tokens-modal');
           expect($modalHeader.find('h1').text().trim())
             .to.equal('Clean up obsolete tokens');
+          expect($modalBody.find('.description').text().trim()).to.equal(
+            'All tokens that have expired or reached their usage limit are listed below. Select which of them should be removed:',
+          );
           expect($modalFooter.find('.remove-tokens-submit').text().trim())
             .to.equal('Remove');
           expect($modalFooter.find('.remove-tokens-cancel').text().trim())
@@ -70,43 +74,10 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
 
           expect($accessTokensSection).to.exist;
           expect($inviteTokensSection).to.exist;
-          expect($accessTokensSection.find('.header-content').text().trim())
+          expect($accessTokensSection.find('.header-text').text().trim())
             .to.equal('Access tokens');
-          expect($inviteTokensSection.find('.header-content').text().trim())
+          expect($inviteTokensSection.find('.header-text').text().trim())
             .to.equal('Invitation tokens');
-        });
-    }
-  );
-
-  it(
-    'renders section "Access tokens" only when access tokens were passed',
-    function () {
-      this.set(
-        'modalOptions.tokensToRemove',
-        this.get('tokens').filterBy('typeName', 'access')
-      );
-      return showModal(this)
-        .then(() => {
-          const $modalBody = getModalBody();
-          expect($modalBody.find('.access-tokens-list')).to.exist;
-          expect($modalBody.find('.invite-tokens-list')).to.not.exist;
-        });
-    }
-  );
-
-  it(
-    'renders section "Invite tokens" only when invite tokens were passed',
-    function () {
-      this.set(
-        'modalOptions.tokensToRemove',
-        this.get('tokens').filterBy('typeName', 'invite')
-      );
-
-      return showModal(this)
-        .then(() => {
-          const $modalBody = getModalBody();
-          expect($modalBody.find('.access-tokens-list')).to.not.exist;
-          expect($modalBody.find('.invite-tokens-list')).to.exist;
         });
     }
   );

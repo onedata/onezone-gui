@@ -43,6 +43,40 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     });
   });
 
+  it('has correct classNames, icon and title', function () {
+    const action = CleanObsoleteTokensAction.create({
+      ownerSource: this,
+      context: this.get('context'),
+    });
+    const {
+      classNames,
+      icon,
+      title,
+    } = getProperties(action, 'classNames', 'icon', 'title');
+
+    expect(classNames).to.equal('clean-obsolete-tokens-trigger');
+    expect(icon).to.equal('remove');
+    expect(String(title)).to.equal('Clean up obsolete tokens');
+  });
+
+  it('has correct tip when there is something to clean', function () {
+    const action = CleanObsoleteTokensAction.create({
+      ownerSource: this,
+      context: this.get('context'),
+    });
+
+    expect(String(get(action, 'tip'))).to.equal('Clean up obsolete tokens');
+  });
+
+  it('has correct tip when there is nothing to clean', function () {
+    const action = CleanObsoleteTokensAction.create({
+      ownerSource: this,
+    });
+
+    expect(String(get(action, 'tip')))
+      .to.equal('Clean up obsolete tokens (nothing to clean)');
+  });
+
   it('is disabled when there are no tokens to remove', function () {
     const tokens = this.get('tokens').setEach('isActive', true);
     const action = CleanObsoleteTokensAction.create({
