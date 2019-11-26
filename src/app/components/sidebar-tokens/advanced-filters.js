@@ -1,3 +1,13 @@
+/**
+ * An advanced filters component for tokens sidebar. Provides filtering by token
+ * type and target.
+ *
+ * @module components/sidebar-tokens/advanced-filters
+ * @author  Michał Borzęcki
+ * @copyright (C) 2019 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -237,7 +247,7 @@ export default Component.extend(I18n, {
     targetModelChanged(targetModelOption) {
       this.set('selectedTargetModelOption', targetModelOption);
     },
-    recordChanged(targetRecordOption) {
+    targetRecordChanged(targetRecordOption) {
       this.set('selectedTargetRecordOption', targetRecordOption);
     },
   },

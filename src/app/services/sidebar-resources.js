@@ -61,7 +61,7 @@ export default SidebarResources.extend({
       case 'clusters':
         return this.get('clusterActions.buttons');
       case 'tokens':
-        return this.get('tokenActions').createGlobalActionsTriggers(context);
+        return this.get('tokenActions').createGlobalActions(context);
       case 'spaces':
         return this.get('spaceActions.buttons');
       case 'groups':

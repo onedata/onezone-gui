@@ -214,7 +214,7 @@ describe('Unit | Model | token', function () {
   );
 
   it(
-    'has isActive == true if isExpired == false, revoked == false and usageLimitReached == false',
+    'has isActive == true and isObsolete == false if isExpired == false, revoked == false and usageLimitReached == false',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -227,11 +227,12 @@ describe('Unit | Model | token', function () {
       });
 
       expect(get(model, 'isActive')).to.be.true;
+      expect(get(model, 'isObsolete')).to.be.false;
     }
   );
 
   it(
-    'has isActive == false if isExpired == true, revoked == false and usageLimitReached == false',
+    'has isActive == false and isObsolete == true if isExpired == true, revoked == false and usageLimitReached == false',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -244,11 +245,12 @@ describe('Unit | Model | token', function () {
       });
 
       expect(get(model, 'isActive')).to.be.false;
+      expect(get(model, 'isObsolete')).to.be.true;
     }
   );
 
   it(
-    'has isActive == false if isExpired == false, revoked == true and usageLimitReached == false',
+    'has isActive == false and isObsolete == false if isExpired == false, revoked == true and usageLimitReached == false',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -261,11 +263,12 @@ describe('Unit | Model | token', function () {
       });
 
       expect(get(model, 'isActive')).to.be.false;
+      expect(get(model, 'isObsolete')).to.be.false;
     }
   );
 
   it(
-    'has isActive == false if isExpired == false, revoked == false and usageLimitReached == true',
+    'has isActive == false and isObsolete == true if isExpired == false, revoked == false and usageLimitReached == true',
     function () {
       const model = this.subject();
       setProperties(model, {
@@ -278,6 +281,7 @@ describe('Unit | Model | token', function () {
       });
 
       expect(get(model, 'isActive')).to.be.false;
+      expect(get(model, 'isObsolete')).to.be.true;
     }
   );
 });

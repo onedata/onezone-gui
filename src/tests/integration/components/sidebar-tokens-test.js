@@ -58,7 +58,6 @@ describe('Integration | Component | sidebar tokens', function () {
       },
       tokensOrder: [1, 2, 0, 4, 3],
     });
-
   });
 
   it('renders all tokens', function () {
@@ -86,12 +85,8 @@ describe('Integration | Component | sidebar tokens', function () {
   it('shows advanced token filters', function () {
     this.render(hbs `{{sidebar-tokens model=model}}`);
 
-    return click('.toggle-more-filters')
-      .then(() => {
-        expect(
-          this.$('.advanced-filters-collapse.in .advanced-token-filters')
-        ).to.exist;
-      });
+    expect(this.$('.advanced-filters-collapse.in .advanced-token-filters'))
+      .to.exist;
   });
 
   [{
@@ -104,8 +99,7 @@ describe('Integration | Component | sidebar tokens', function () {
     it(`shows only ${type} tokens, when type filter is "${type}"`, function () {
       this.render(hbs `{{sidebar-tokens model=model}}`);
 
-      return click('.toggle-more-filters')
-        .then(() => click(`.btn-${type}`))
+      return click(`.btn-${type}`)
         .then(() => {
           const renderedTokens = this.$('.token-item');
           expect(renderedTokens).to.have.length(count);
@@ -122,8 +116,7 @@ describe('Integration | Component | sidebar tokens', function () {
       this.render(hbs `{{sidebar-tokens model=model}}`);
 
       const targetModelHelper = new TargetModelHelper();
-      return click('.toggle-more-filters')
-        .then(() => click('.btn-invite'))
+      return click('.btn-invite')
         .then(() => targetModelHelper.selectOption(2))
         .then(() => {
           const renderedTokens = this.$('.token-item');
@@ -143,8 +136,7 @@ describe('Integration | Component | sidebar tokens', function () {
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
-      return click('.toggle-more-filters')
-        .then(() => click('.btn-invite'))
+      return click('.btn-invite')
         .then(() => targetModelHelper.selectOption(2))
         .then(() => targetRecordHelper.selectOption(2))
         .then(() => {
@@ -163,8 +155,7 @@ describe('Integration | Component | sidebar tokens', function () {
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
-      return click('.toggle-more-filters')
-        .then(() => click('.btn-invite'))
+      return click('.btn-invite')
         .then(() => targetModelHelper.selectOption(2))
         .then(() => targetRecordHelper.selectOption(2))
         .then(() => click('.btn-access'))

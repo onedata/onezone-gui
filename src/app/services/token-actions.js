@@ -8,12 +8,11 @@
  */
 
 import { default as Service, inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
-import { getOwner } from '@ember/application';
+import CreateTokenLinkAction from 'onezone-gui/utils/token-actions/create-token-link-action';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
-import Action from 'onedata-gui-common/utils/action';
 
 export default Service.extend(I18n, {
   tokenManager: service(),
@@ -27,33 +26,19 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.tokenActions',
 
-  /**
-   * Array of action buttons definitions used by sidebar
-   * @type {Ember.ComputedProperty<Array<object>>}
-   */
-  actionButtons: computed(function () {
-    return [{
-      icon: 'add-filled',
-      title: this.t('createToken'),
-      tip: this.t('createToken'),
-      class: 'create-token-btn',
-      action: () => this.get('router')
-        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
-    }];
-  }),
+  createAddTokenAction(context) {
+    return CreateTokenLinkAction.create({ ownerSource: this, context });
+  },
 
-  createGlobalActionsTriggers(context) {
-    const addAction = Action.create({
-      icon: 'add-filled',
-      title: this.t('createToken'),
-      tip: this.t('createToken'),
-      class: 'create-token-btn',
-      execute: () => this.get('router')
-        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
-    });
-    const cleanObsoleteAction = CleanObsoleteTokensAction
-      .create(getOwner(this).ownerInjection(), { context });
-    return [addAction, cleanObsoleteAction];
+  createCleanObsoleteTokensAction(context) {
+    return CleanObsoleteTokensAction.create({ ownerSource: this, context });
+  },
+
+  createGlobalActions(context) {
+    return [
+      this.createAddTokenAction(context),
+      this.createCleanObsoleteTokensAction(context),
+    ];
   },
 
   /**

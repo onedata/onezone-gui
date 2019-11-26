@@ -67,7 +67,7 @@ export default Action.extend({
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
-  tokensToRemove: array.rejectBy('allTokens', raw('isActive')),
+  tokensToRemove: array.filterBy('allTokens', raw('isObsolete')),
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
@@ -126,7 +126,7 @@ export default Action.extend({
     return allSettled(tokens.map(token => tokenManager.deleteToken(get(token, 'id'))))
       .then(results => tokenManager.reloadList()
         .then(() => results)
-        .catch(reason => [{ state: 'rejected', reason }])
+        .catch(reason => (results || []).concat([{ state: 'rejected', reason }]))
       )
       .then(results => {
         const errorResults = results.filterBy('state', 'rejected');

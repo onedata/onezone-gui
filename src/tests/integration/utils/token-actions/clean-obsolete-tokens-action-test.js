@@ -20,19 +20,19 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     const tokens = [{
       name: 'access token 1',
       typeName: 'access',
-      isActive: false,
+      isObsolete: true,
     }, {
       name: 'access token 2',
       typeName: 'access',
-      isActive: true,
+      isObsolete: false,
     }, {
       name: 'invite token 1',
       typeName: 'invite',
-      isActive: true,
+      isObsolete: false,
     }, {
       name: 'invite token 2',
       typeName: 'invite',
-      isActive: false,
+      isObsolete: true,
     }];
     this.setProperties({
       tokens,
@@ -48,12 +48,12 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       ownerSource: this,
       context: this.get('context'),
     });
+
     const {
       classNames,
       icon,
       title,
     } = getProperties(action, 'classNames', 'icon', 'title');
-
     expect(classNames).to.equal('clean-obsolete-tokens-trigger');
     expect(icon).to.equal('remove');
     expect(String(title)).to.equal('Clean up obsolete tokens');
@@ -78,7 +78,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
   });
 
   it('is disabled when there are no tokens to remove', function () {
-    const tokens = this.get('tokens').setEach('isActive', true);
+    const tokens = this.get('tokens').setEach('isObsolete', false);
     const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: {
@@ -122,11 +122,8 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     action.execute();
 
     return wait().then(() => {
-      const $modalBody = getModalBody();
-      const $accessTokens =
-        $modalBody.find('.access-tokens-list .checkbox-list-item');
-      const $inviteTokens =
-        $modalBody.find('.invite-tokens-list .checkbox-list-item');
+      const $accessTokens = getAccessTokenItems();
+      const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
@@ -137,24 +134,20 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
   it('passes information about visible tokens to modal', function () {
     const tokens = this.get('tokens');
-    const context = {
-      collection: tokens,
-      visibleCollection: tokens.slice(0, 2),
-    };
     const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
-      context,
+      context: {
+        collection: tokens,
+        visibleCollection: tokens.slice(0, 2),
+      },
     });
 
     this.render(hbs `{{global-modal-mounter}}`);
     action.execute();
 
     return wait().then(() => {
-      const $modalBody = getModalBody();
-      const $accessTokens =
-        $modalBody.find('.access-tokens-list .checkbox-list-item');
-      const $inviteTokens =
-        $modalBody.find('.invite-tokens-list .checkbox-list-item');
+      const $accessTokens = getAccessTokenItems();
+      const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
@@ -180,11 +173,8 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     action.execute();
 
     return wait().then(() => {
-      const $modalBody = getModalBody();
-      const $accessTokens =
-        $modalBody.find('.access-tokens-list .checkbox-list-item');
-      const $inviteTokens =
-        $modalBody.find('.invite-tokens-list .checkbox-list-item');
+      const $accessTokens = getAccessTokenItems();
+      const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
@@ -225,7 +215,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       .then(() => actionResultPromise)
       .then(actionResult => {
         expect(deleteTokenStub).to.be.calledTwice;
-        tokens.rejectBy('isActive').forEach(token =>
+        tokens.filterBy('isObsolete').forEach(token =>
           expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
         );
         expect(reloadTokensSpy).to.be.calledOnce;
@@ -320,3 +310,11 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     }
   );
 });
+
+function getAccessTokenItems() {
+  return getModalBody().find('.access-tokens-list .checkbox-list-item');
+}
+
+function getInviteTokenItems() {
+  return getModalBody().find('.invite-tokens-list .checkbox-list-item');
+}

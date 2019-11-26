@@ -20,7 +20,7 @@ import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { cancel, later } from '@ember/runloop';
-import { and, not } from 'ember-awesome-macros';
+import { and, or, not } from 'ember-awesome-macros';
 import moment from 'moment';
 
 const standardGroupMapping = {
@@ -152,13 +152,14 @@ export default Model.extend(
     }),
 
     /**
+     * @type {ComputedProperty<boolean>}
+     */
+    isObsolete: or('isExpired', 'usageLimitReached'),
+
+    /**
      * @type {Ember.ComputedProperty<boolean>}
      */
-    isActive: and(
-      not('isExpired'),
-      not('usageLimitReached'),
-      not('revoked'),
-    ),
+    isActive: and(not('isObsolete'), not('revoked')),
 
     validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {

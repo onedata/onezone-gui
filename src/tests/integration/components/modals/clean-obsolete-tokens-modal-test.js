@@ -22,15 +22,15 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
     const tokens = [{
       name: 'invite token 1',
       typeName: 'invite',
-      isActive: false,
+      isObsolete: true,
     }, {
       name: 'invite token 2',
       typeName: 'invite',
-      isActive: false,
+      isObsolete: true,
     }, {
       name: 'access token 1',
       typeName: 'access',
-      isActive: false,
+      isObsolete: true,
     }];
     this.setProperties({
       modalManager: lookupService(this, 'modal-manager'),
@@ -64,7 +64,7 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
   );
 
   it(
-    'renders sections "Access tokens" and "Invitation tokens" when token of both types were passed',
+    'renders sections "Access tokens" and "Invitation tokens"',
     function () {
       return showModal(this)
         .then(() => {

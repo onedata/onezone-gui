@@ -3,7 +3,7 @@
   <div class="filter-control">
     {{#bs-button-group
       value=selectedType
-      class="type-filter"
+      class="type-filter btn-group-justified"
       type="radio"
       onChange=(action "typeChanged")
       as |bg|
@@ -53,7 +53,7 @@
       triggerClass="small"
       dropdownClass="small"
       options=targetRecordOptions
-      onchange=(action "recordChanged")
+      onchange=(action "targetRecordChanged")
       selected=selectedTargetRecordOption
       renderInPlace=true
       disabled=isTargetRecordDisabled
