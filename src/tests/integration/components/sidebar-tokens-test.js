@@ -82,7 +82,7 @@ describe('Integration | Component | sidebar tokens', function () {
     });
   });
 
-  it('shows advanced token filters', function () {
+  it('shows advanced token filters by default', function () {
     this.render(hbs `{{sidebar-tokens model=model}}`);
 
     expect(this.$('.advanced-filters-collapse.in .advanced-token-filters'))
@@ -111,7 +111,7 @@ describe('Integration | Component | sidebar tokens', function () {
   });
 
   it(
-    'shows only cluster invite tokens, when target filter is "cluster - all"',
+    'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
     function () {
       this.render(hbs `{{sidebar-tokens model=model}}`);
 
@@ -130,7 +130,7 @@ describe('Integration | Component | sidebar tokens', function () {
   );
 
   it(
-    'shows only cluster invite tokens, when target filter is "cluster - cluster1"',
+    'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
     function () {
       this.render(hbs `{{sidebar-tokens model=model}}`);
 

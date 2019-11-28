@@ -118,8 +118,7 @@ export default Model.extend(
     targetModelName: computed('subtype', function targetModelName() {
       const subtype = this.get('subtype');
       if (subtype) {
-        const targetModelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
-        return targetModelMapping.modelName;
+        return inviteTokenSubtypeToTargetModelMapping[subtype].modelName;
       }
     }),
 

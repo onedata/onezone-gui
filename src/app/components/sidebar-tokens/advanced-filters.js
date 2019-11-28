@@ -31,9 +31,13 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Function}
    * @param {Object} filtersState object:
+   *   ```
    *   {
    *     type: 'all'|'access'|'invite',
+   *     targetModelName: 'space'|'group'|...
+   *     targetRecord: null|Models.* // null means all records
    *   }
+   *   ```
    * @returns {undefined}
    */
   onChange: notImplementedIgnore,

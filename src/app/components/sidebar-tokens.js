@@ -9,7 +9,7 @@
 
 import OneSidebar from 'onedata-gui-common/components/one-sidebar';
 import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 
 export default OneSidebar.extend({
   layout,
@@ -38,7 +38,7 @@ export default OneSidebar.extend({
     'filter',
     'advancedFilters',
     function filteredCollection() {
-      let collection = this._super(...arguments);
+      const collection = this._super(...arguments);
 
       const {
         type,
@@ -46,19 +46,24 @@ export default OneSidebar.extend({
         targetRecord,
       } = this.get('advancedFilters');
 
+      const fieldsToFilter = {};
       if (type !== 'all') {
-        collection = collection.filterBy('typeName', type);
+        fieldsToFilter.typeName = type;
 
         if (type === 'invite' && targetModelName !== 'all') {
-          collection = collection.filterBy('targetModelName', targetModelName);
+          fieldsToFilter.targetModelName = targetModelName;
 
           if (targetRecord !== null) {
-            collection = collection.filterBy('tokenTarget', targetRecord);
+            fieldsToFilter.tokenTarget = targetRecord;
           }
         }
       }
 
-      return collection;
+      return !Object.keys(fieldsToFilter).length ?
+        collection : collection.filter(token => {
+          return Object.keys(fieldsToFilter)
+            .every(field => get(token, field) === fieldsToFilter[field]);
+        });
     }
   ),
 });

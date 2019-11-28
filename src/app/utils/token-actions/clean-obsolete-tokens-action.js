@@ -112,8 +112,11 @@ export default Action.extend({
           onSubmit: (userSelectedTokens) =>
             result.interceptPromise(this.removeTokens(userSelectedTokens)),
         }).hiddenPromise
-        .then(() => this.notifyResult(result))
-        .then(() => result);
+        .then(() => {
+          result.cancelIfPending();
+          this.notifyResult(result);
+          return result;
+        });
     }
   },
 

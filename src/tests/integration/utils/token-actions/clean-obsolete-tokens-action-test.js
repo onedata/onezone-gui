@@ -185,6 +185,26 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     });
   });
 
+  it(
+    'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
+    function () {
+      const action = CleanObsoleteTokensAction.create({
+        ownerSource: this,
+        context: this.get('context'),
+      });
+
+      this.render(hbs `{{global-modal-mounter}}`);
+      const resultPromise = action.execute();
+
+      return wait()
+        .then(() => click(getModalFooter().find('.remove-tokens-cancel')[0]))
+        .then(() => resultPromise)
+        .then(actionResult =>
+          expect(get(actionResult, 'status')).to.equal('cancelled')
+        );
+    }
+  );
+
   it('executes removing selected tokens on submit (success scenario)', function () {
     const tokens = this.get('tokens');
     const action = CleanObsoleteTokensAction.create({

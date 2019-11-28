@@ -169,10 +169,8 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
   });
 
   it('submits intially selected tokens', function () {
-    const submitSpy = sinon.spy(function () {
-      return new Promise(() => {});
-    });
-    this.set('modalOptions.onSubmit', submitSpy);
+    const submitStub = sinon.stub().returns(new Promise(() => {}));
+    this.set('modalOptions.onSubmit', submitStub);
 
     let $submitButton;
     return showModal(this)
@@ -180,16 +178,14 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => click($submitButton[0]))
       .then(() => {
         expect($submitButton).to.have.class('in-flight');
-        expect(submitSpy.lastCall.args[0].toArray())
+        expect(submitStub.lastCall.args[0].toArray())
           .to.deep.equal(this.get('tokens').toArray());
       });
   });
 
   it('submits modified selected tokens', function () {
-    const submitSpy = sinon.spy(function () {
-      return new Promise(() => {});
-    });
-    this.set('modalOptions.onSubmit', submitSpy);
+    const submitStub = sinon.stub().returns(new Promise(() => {}));
+    this.set('modalOptions.onSubmit', submitStub);
 
     let $submitButton;
     return showModal(this)
@@ -198,7 +194,7 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => click($submitButton[0]))
       .then(() => {
         expect($submitButton).to.have.class('in-flight');
-        expect(submitSpy.lastCall.args[0].toArray())
+        expect(submitStub.lastCall.args[0].toArray())
           .to.deep.equal(this.get('tokens').slice(0, 2));
       });
   });
