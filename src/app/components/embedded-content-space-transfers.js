@@ -34,6 +34,12 @@ export default OneEmbeddedContainer.extend({
   spaceEntityId: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  fileEntityId: undefined,
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -47,12 +53,12 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId']),
+  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'fileEntityId']),
 
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze([]),
+  callParentActionNames: Object.freeze(['closeFileTab']),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -66,4 +72,10 @@ export default OneEmbeddedContainer.extend({
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
+
+  actions: {
+    closeFileTab() {
+      console.log('FIXME:', 'close file tab called');
+    },
+  },
 });

@@ -16,4 +16,10 @@ export default Component.extend({
     'absolute-flex-content',
     'no-pointer-events',
   ],
+
+  /**
+   * @virtual
+   * @type {string}
+   */
+  fileId: undefined,
 });
