@@ -1,5 +1,5 @@
 /**
- * A sidebar for user (extension of ``two-level-sidebar``)
+ * A sidebar for user (extension of ``one-sidebar``)
  *
  * @module components/sidebar-users
  * @author Michal Borzecki
@@ -7,10 +7,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
-import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
+import OneSidebar from 'onedata-gui-common/components/one-sidebar';
+import layout from 'onedata-gui-common/templates/components/one-sidebar';
 
-export default TwoLevelSidebar.extend({
+export default OneSidebar.extend({
   layout,
 
   classNames: ['sidebar-users'],

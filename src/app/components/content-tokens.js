@@ -12,7 +12,8 @@ import { inject } from '@ember/service';
 import { computed, get, observer, getProperties } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { resolve, reject } from 'rsvp';
+import { Promise } from 'rsvp';
+import { scheduleOnce } from '@ember/runloop';
 
 const tokenTypeToTargetLabelI18nKey = {
   userJoinGroup: 'targetGroup',
@@ -91,31 +92,36 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
    * @override
    */
   fetchTokenTarget() {
-    const token = this.get('token');
-    const proxy = token ? token.updateTokenTargetProxy() : resolve(null);
+    return new Promise(resolve => {
+      scheduleOnce('afterRender', this, () => {
+        const token = this.get('token');
+        const proxy = token ?
+          token.updateTokenTargetProxy() : Promise.resolve(null);
 
-    return proxy
-      .then(target => {
-        if (target) {
-          const {
-            isDeleted,
-            isForbidden,
-          } = getProperties(target, 'isDeleted', 'isForbidden');
-          if (isDeleted) {
-            return reject({ id: 'notFound' });
-          } else if (isForbidden) {
-            return reject({ id: 'forbidden' });
+        proxy.then(target => {
+          if (target) {
+            const {
+              isDeleted,
+              isForbidden,
+            } = getProperties(target, 'isDeleted', 'isForbidden');
+            if (isDeleted) {
+              return Promise.reject({ id: 'notFound' });
+            } else if (isForbidden) {
+              return Promise.reject({ id: 'forbidden' });
+            }
           }
-        }
-        return target;
-      })
-      .catch(error => {
-        const errorId = error && error.id;
-        return {
-          hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
-          error,
-        };
+          resolve(target);
+        }).catch(error => {
+          const errorId = error && error.id;
+          resolve({
+            hasErrorPossibleToRender: Boolean(
+              targetFetchErrorsPossibleToRender[errorId]
+            ),
+            error,
+          });
+        });
       });
+    });
   },
 
   tokenObserver: observer('token', function tokenObserver() {

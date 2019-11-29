@@ -8,9 +8,11 @@
  */
 
 import { default as Service, inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
+import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';
+import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 
 export default Service.extend(I18n, {
   tokenManager: service(),
@@ -24,20 +26,20 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.tokenActions',
 
-  /**
-   * Array of action buttons definitions used by sidebar
-   * @type {Ember.ComputedProperty<Array<object>>}
-   */
-  actionButtons: computed(function () {
-    return [{
-      icon: 'add-filled',
-      title: this.t('createToken'),
-      tip: this.t('createToken'),
-      class: 'create-token-btn',
-      action: () => this.get('router')
-        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
-    }];
-  }),
+  createOpenCreateTokenViewAction(context) {
+    return OpenCreateTokenViewAction.create({ ownerSource: this, context });
+  },
+
+  createCleanObsoleteTokensAction(context) {
+    return CleanObsoleteTokensAction.create({ ownerSource: this, context });
+  },
+
+  createGlobalActions(context) {
+    return [
+      this.createOpenCreateTokenViewAction(context),
+      this.createCleanObsoleteTokensAction(context),
+    ];
+  },
 
   /**
    * Creates token

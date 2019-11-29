@@ -20,7 +20,7 @@ import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { cancel, later } from '@ember/runloop';
-import { and, not } from 'ember-awesome-macros';
+import { and, or, not } from 'ember-awesome-macros';
 import moment from 'moment';
 
 const standardGroupMapping = {
@@ -113,6 +113,16 @@ export default Model.extend(
     }),
 
     /**
+     * @type {Ember.ComputedProperty<string|undefined>}
+     */
+    targetModelName: computed('subtype', function targetModelName() {
+      const subtype = this.get('subtype');
+      if (subtype) {
+        return inviteTokenSubtypeToTargetModelMapping[subtype].modelName;
+      }
+    }),
+
+    /**
      * UNIX timestamp of token expiration time
      * @type {Ember.ComputedProperty<number|undefined>}
      */
@@ -141,13 +151,14 @@ export default Model.extend(
     }),
 
     /**
+     * @type {ComputedProperty<boolean>}
+     */
+    isObsolete: or('isExpired', 'usageLimitReached'),
+
+    /**
      * @type {Ember.ComputedProperty<boolean>}
      */
-    isActive: and(
-      not('isExpired'),
-      not('usageLimitReached'),
-      not('revoked'),
-    ),
+    isActive: and(not('isObsolete'), not('revoked')),
 
     validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {
@@ -191,16 +202,16 @@ export default Model.extend(
         store,
         type,
         subtype,
-      } = this.getProperties('store', 'type', 'subtype');
+        targetModelName,
+      } = this.getProperties('store', 'type', 'subtype', 'targetModelName');
 
-      if (!subtype) {
+      if (!targetModelName) {
         return resolve(null);
       } else {
         const targetModelMapping =
           inviteTokenSubtypeToTargetModelMapping[subtype];
-        const modelName = targetModelMapping.modelName;
-        const adapter = store.adapterFor(modelName);
-        const entityType = adapter.getEntityTypeForModelName(modelName);
+        const adapter = store.adapterFor(targetModelName);
+        const entityType = adapter.getEntityTypeForModelName(targetModelName);
 
         const targetModelGri = gri({
           entityType,
@@ -210,7 +221,7 @@ export default Model.extend(
         });
 
         return store.findRecord(
-          targetModelMapping.modelName,
+          targetModelName,
           targetModelGri, {
             reload: true,
           }

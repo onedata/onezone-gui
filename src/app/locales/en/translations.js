@@ -82,6 +82,8 @@ import contentTokensNew from './components/content-tokens-new';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
+import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
+
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
 import clusterActions from './services/cluster-actions';
@@ -107,6 +109,9 @@ let translations = {
   components: {
     alerts: {
       oneproviderAuthenticationError,
+    },
+    modals: {
+      cleanObsoleteTokensModal,
     },
     loginBox,
     contentTokens,

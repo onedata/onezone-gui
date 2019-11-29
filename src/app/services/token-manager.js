@@ -10,7 +10,8 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import { resolve } from 'rsvp';
+import { resolve, allSettled } from 'rsvp';
+import { get } from '@ember/object';
 
 const TokenManager = Service.extend({
   store: service(),
@@ -27,6 +28,7 @@ const TokenManager = Service.extend({
       .getCurrentUserRecord()
       .then(user => user.get('tokenList'))
       .then(tokenList => tokenList.get('list')
+        .then(list => allSettled(list.map(token => get(token, 'tokenTargetProxy'))))
         .then(() => tokenList)
       );
   },
