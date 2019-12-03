@@ -50,7 +50,8 @@ describe('Integration | Component | content provider redirect', function () {
     registerService(this, 'alert', AlertStub);
   });
 
-  it('redirects to Oneprovider hosted in Onezone URL',
+  it(
+    'redirects to Oneprovider hosted in Onezone URL',
     function () {
       const clusterEntityId = '12345';
       const provider = {
@@ -92,13 +93,15 @@ describe('Integration | Component | content provider redirect', function () {
       expect($contentProviderRedirect).to.exist;
 
       return wait().then(() => {
-        expect(getProviderRedirectUrl).to.be.invokedOnce;
+        expect(getProviderRedirectUrl).to.not.be.called;
         expect(fakeWindow.location.toString()).to.equal(url);
       });
-    });
+    }
+  );
 
-  it('fetches and uses provider redirect URL for legacy Oneproviders',
-    function (done) {
+  it(
+    'fetches and uses provider redirect URL for legacy Oneproviders',
+    function () {
       const provider = {
         entityId: 'test1',
         belongsTo(relName) {
@@ -132,15 +135,16 @@ describe('Integration | Component | content provider redirect', function () {
         _window=fakeWindow
       }}`);
 
-      wait().then(() => {
-        expect(checkIsProviderAvailable).to.be.notCalled;
-        expect(getProviderRedirectUrl).to.be.invokedOnce;
+      return wait().then(() => {
+        expect(checkIsProviderAvailable).to.be.not.called;
+        expect(getProviderRedirectUrl).to.be.calledOnce;
         expect(fakeWindow.location.toString()).to.equal(legacyUrl);
-        done();
       });
-    });
+    }
+  );
 
-  it('redirects to data index and invokes alert then provider is not available',
+  it(
+    'redirects to data index and invokes alert then provider is not available',
     function () {
       const provider = {
         entityId: 'test1',
@@ -172,18 +176,19 @@ describe('Integration | Component | content provider redirect', function () {
       });
 
       this.render(hbs `{{content-provider-redirect
-      checkIsProviderAvailable=checkIsProviderAvailable
-      showEndpointErrorModal=showEndpointErrorModal
-      transitionToProviderOnMap=transitionToProviderOnMap
-      throwEndpointError=throwEndpointError
-      provider=provider
-    }}`);
+        checkIsProviderAvailable=checkIsProviderAvailable
+        showEndpointErrorModal=showEndpointErrorModal
+        transitionToProviderOnMap=transitionToProviderOnMap
+        throwEndpointError=throwEndpointError
+        provider=provider
+      }}`);
 
-      wait().then(() => {
-        expect(checkIsProviderAvailable).to.be.invokedOnce;
-        expect(showEndpointErrorModal).to.be.invokedOnce;
-        expect(transitionToProviderOnMap).to.be.invokedOnce;
-        expect(throwEndpointError).to.be.invokedOnce;
+      return wait().then(() => {
+        expect(checkIsProviderAvailable).to.be.calledOnce;
+        expect(showEndpointErrorModal).to.be.calledOnce;
+        expect(transitionToProviderOnMap).to.be.calledOnce;
+        expect(throwEndpointError).to.be.calledOnce;
       });
-    });
+    }
+  );
 });
