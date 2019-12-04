@@ -1,18 +1,74 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { computed, get, observer } from '@ember/object';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import RadioField from 'onedata-gui-common/utils/form-component/radio-field';
+import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
+import { equal, raw } from 'ember-awesome-macros';
+
+const tokenSubtypeOptions = [{
+  value: 'userJoinGroup',
+  icon: 'group',
+  targetModelName: 'group',
+}, {
+  value: 'groupJoinGroup',
+  icon: 'group',
+  targetModelName: 'group',
+}, {
+  value: 'userJoinSpace',
+  icon: 'space',
+  targetModelName: 'space',
+}, {
+  value: 'groupJoinSpace',
+  icon: 'space',
+  targetModelName: 'space',
+}, {
+  value: 'userJoinCluster',
+  icon: 'cluster',
+  targetModelName: 'cluster',
+}, {
+  value: 'groupJoinCluster',
+  icon: 'cluster',
+  targetModelName: 'cluster',
+}, {
+  value: 'userJoinHarvester',
+  icon: 'light-bulb',
+  targetModelName: 'harvester',
+}, {
+  value: 'groupJoinHarvester',
+  icon: 'light-bulb',
+  targetModelName: 'harvester',
+}, {
+  value: 'spaceJoinHarvester',
+  icon: 'light-bulb',
+  targetModelName: 'harvester',
+}, {
+  value: 'supportSpace',
+  icon: 'space',
+}, {
+  value: 'registerOneprovider',
+  icon: 'provider',
+}];
+
+function getTargetModelNameForSubtype(subtype) {
+  const subtypeOptions = subtype && tokenSubtypeOptions.findBy('value', subtype);
+  return subtypeOptions && subtypeOptions.targetModelName;
+}
 
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
 
   i18n: service(),
+  spaceManager: service(),
+  groupManager: service(),
+  harvesterManager: service(),
+  clusterManager: service(),
+  oneiconAlias: service(),
 
   /**
    * @override
@@ -32,6 +88,69 @@ export default Component.extend(I18n, {
   fields: computed(function fields() {
     const i18nPrefix = this.get('i18nPrefix');
     const component = this;
+
+    const inviteTargetDetailsGroup = FormFieldsGroup.extend({
+      isExpanded: computed(
+        'valuesSource.basic.inviteDetails.subtype',
+        function isExpanded() {
+          const subtype =
+            this.get('valuesSource.basic.inviteDetails.subtype');
+          return getTargetModelNameForSubtype(subtype);
+        },
+      ),
+    }).create({
+      name: 'inviteTargetDetails',
+      fields: [
+        DropdownField.extend({
+          subtype: undefined,
+          targetModelName: undefined,
+          label: computed('subtype', 'path', function label() {
+            const {
+              subtype,
+              path,
+            } = this.getProperties('subtype', 'path');
+            return subtype && this.t(`${path}.label.${subtype}`);
+          }),
+          placeholder: computed('subtype', 'path', function placeholder() {
+            const {
+              subtype,
+              path,
+            } = this.getProperties('subtype', 'path');
+            return subtype && this.t(`${path}.placeholder.${subtype}`);
+          }),
+          subtypeObserver: observer(
+            'valuesSource.basic.inviteDetails.subtype',
+            function subtypeObserver() {
+              const subtype =
+                this.get('valuesSource.basic.inviteDetails.subtype');
+              const targetModelName =
+                getTargetModelNameForSubtype(subtype);
+              if (targetModelName) {
+                this.enable();
+                this.set('subtype', subtype);
+                if (this.get('targetModelName') !== targetModelName) {
+                  this.setProperties({
+                    targetModelName,
+                    options: component
+                      .getTargetOptionsForModel(targetModelName),
+                  });
+                  this.reset();
+                }
+              } else {
+                this.disable();
+              }
+            }
+          ),
+          init() {
+            this._super(...arguments);
+            this.subtypeObserver();
+          },
+        }).create({
+          name: 'target',
+        }),
+      ],
+    });
+
     return FormFieldsRootGroup
       .extend({
         onValueChange() {
@@ -51,14 +170,27 @@ export default Component.extend(I18n, {
               }),
               RadioField.create({
                 name: 'type',
-                options: [{
-                  name: 'access',
-                  value: 'access',
-                }, {
-                  name: 'invite',
-                  value: 'invite',
-                }],
+                options: [
+                  { value: 'access' },
+                  { value: 'invite' },
+                ],
                 defaultValue: 'access',
+              }),
+              FormFieldsGroup.extend({
+                isExpanded: equal(
+                  'valuesSource.basic.type',
+                  raw('invite')
+                ),
+              }).create({
+                name: 'inviteDetails',
+                fields: [
+                  DropdownField.create({
+                    name: 'subtype',
+                    options: tokenSubtypeOptions,
+                    defaultValue: 'userJoinGroup',
+                  }),
+                  inviteTargetDetailsGroup,
+                ],
               }),
             ],
           }),
@@ -77,6 +209,47 @@ export default Component.extend(I18n, {
       isValid: get(fields, 'isValid'),
       invalidFields: get(fields, 'invalidFields').mapBy('path'),
     });
+  },
+
+  getTargetOptionsForModel(modelName) {
+    const {
+      spaceManager,
+      groupManager,
+      harvesterManager,
+      clusterManager,
+      oneiconAlias,
+    } = this.getProperties(
+      'spaceManager',
+      'groupManager',
+      'harvesterManager',
+      'clusterManager',
+      'oneiconAlias'
+    );
+
+    let records;
+    switch (modelName) {
+      case 'group':
+        records = groupManager.getGroups();
+        break;
+      case 'space':
+        records = spaceManager.getSpaces();
+        break;
+      case 'cluster':
+        records = clusterManager.getClusters();
+        break;
+      case 'harvester':
+        records = harvesterManager.getHarvesters();
+        break;
+    }
+
+    return records
+      .then(records => get(records, 'list'))
+      .then(recordsList => recordsList.sortBy('name'))
+      .then(recordsList => recordsList.map(record => ({
+        value: record,
+        label: get(record, 'name'),
+        icon: oneiconAlias.getName(modelName),
+      })));
   },
 
   // willDestroyElement() {
