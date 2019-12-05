@@ -1,12 +1,14 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { computed, get, observer } from '@ember/object';
+import { computed, get, getProperties, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import RadioField from 'onedata-gui-common/utils/form-component/radio-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
+import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
 import { equal, raw } from 'ember-awesome-macros';
@@ -85,71 +87,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  fields: computed(function fields() {
-    const i18nPrefix = this.get('i18nPrefix');
+  fields: computed('basicGroup', function fields() {
+    const {
+      i18nPrefix,
+      basicGroup,
+    } = this.getProperties('i18nPrefix', 'basicGroup');
     const component = this;
-
-    const inviteTargetDetailsGroup = FormFieldsGroup.extend({
-      isExpanded: computed(
-        'valuesSource.basic.inviteDetails.subtype',
-        function isExpanded() {
-          const subtype =
-            this.get('valuesSource.basic.inviteDetails.subtype');
-          return getTargetModelNameForSubtype(subtype);
-        },
-      ),
-    }).create({
-      name: 'inviteTargetDetails',
-      fields: [
-        DropdownField.extend({
-          subtype: undefined,
-          targetModelName: undefined,
-          label: computed('subtype', 'path', function label() {
-            const {
-              subtype,
-              path,
-            } = this.getProperties('subtype', 'path');
-            return subtype && this.t(`${path}.label.${subtype}`);
-          }),
-          placeholder: computed('subtype', 'path', function placeholder() {
-            const {
-              subtype,
-              path,
-            } = this.getProperties('subtype', 'path');
-            return subtype && this.t(`${path}.placeholder.${subtype}`);
-          }),
-          subtypeObserver: observer(
-            'valuesSource.basic.inviteDetails.subtype',
-            function subtypeObserver() {
-              const subtype =
-                this.get('valuesSource.basic.inviteDetails.subtype');
-              const targetModelName =
-                getTargetModelNameForSubtype(subtype);
-              if (targetModelName) {
-                this.enable();
-                this.set('subtype', subtype);
-                if (this.get('targetModelName') !== targetModelName) {
-                  this.setProperties({
-                    targetModelName,
-                    options: component
-                      .getTargetOptionsForModel(targetModelName),
-                  });
-                  this.reset();
-                }
-              } else {
-                this.disable();
-              }
-            }
-          ),
-          init() {
-            this._super(...arguments);
-            this.subtypeObserver();
-          },
-        }).create({
-          name: 'target',
-        }),
-      ],
-    });
 
     return FormFieldsRootGroup
       .extend({
@@ -162,40 +105,106 @@ export default Component.extend(I18n, {
         ownerSource: this,
         i18nPrefix: `${i18nPrefix}.fields`,
         fields: [
-          FormFieldsGroup.create({
-            name: 'basic',
-            fields: [
-              TextField.create({
-                name: 'name',
-              }),
-              RadioField.create({
-                name: 'type',
-                options: [
-                  { value: 'access' },
-                  { value: 'invite' },
-                ],
-                defaultValue: 'access',
-              }),
-              FormFieldsGroup.extend({
-                isExpanded: equal(
-                  'valuesSource.basic.type',
-                  raw('invite')
-                ),
-              }).create({
-                name: 'inviteDetails',
-                fields: [
-                  DropdownField.create({
-                    name: 'subtype',
-                    options: tokenSubtypeOptions,
-                    defaultValue: 'userJoinGroup',
-                  }),
-                  inviteTargetDetailsGroup,
-                ],
-              }),
-            ],
-          }),
+          basicGroup,
         ],
       });
+  }),
+
+  basicGroup: computed('inviteTargetDetailsGroup', function basicGroup() {
+    return FormFieldsGroup.create({
+      name: 'basic',
+      fields: [
+        TextField.create({ name: 'name' }),
+        RadioField.create({
+          name: 'type',
+          options: [
+            { value: 'access' },
+            { value: 'invite' },
+          ],
+          defaultValue: 'access',
+        }),
+        FormFieldsGroup.extend({
+          isExpanded: equal('valuesSource.basic.type', raw('invite')),
+        }).create({
+          name: 'inviteDetails',
+          fields: [
+            DropdownField.create({
+              name: 'subtype',
+              showSearch: false,
+              options: tokenSubtypeOptions,
+              defaultValue: 'userJoinGroup',
+            }),
+            this.get('inviteTargetDetailsGroup'),
+          ],
+        }),
+        JsonField.create({
+          name: 'metadata',
+          isOptional: true,
+        }),
+      ],
+    });
+  }),
+
+  inviteTargetDetailsGroup: computed(
+    'targetField',
+    function inviteTargetDetailsGroup() {
+      return FormFieldsGroup.extend({
+        subtype: reads('valuesSource.basic.inviteDetails.subtype'),
+        isExpanded: computed('subtype', function isExpanded() {
+          return getTargetModelNameForSubtype(this.get('subtype'));
+        }),
+      }).create({
+        name: 'inviteTargetDetails',
+        fields: [this.get('targetField')],
+      });
+    }
+  ),
+
+  targetField: computed(function targetField() {
+    const component = this;
+    return DropdownField.extend({
+      cachedSubtype: undefined,
+      targetModelName: undefined,
+      subtype: reads('valuesSource.basic.inviteDetails.subtype'),
+      label: computed('cachedSubtype', 'path', function label() {
+        const {
+          cachedSubtype,
+          path,
+        } = this.getProperties('cachedSubtype', 'path');
+        return cachedSubtype && this.t(`${path}.label.${cachedSubtype}`);
+      }),
+      placeholder: computed('cachedSubtype', 'path', function placeholder() {
+        const {
+          cachedSubtype,
+          path,
+        } = this.getProperties('cachedSubtype', 'path');
+        return cachedSubtype &&
+          this.t(`${path}.placeholder.${cachedSubtype}`);
+      }),
+      subtypeObserver: observer('subtype', function subtypeObserver() {
+        const {
+          subtype,
+          targetModelName,
+        } = this.getProperties('subtype', 'targetModelName');
+        const newTargetModelName = getTargetModelNameForSubtype(subtype);
+        if (newTargetModelName) {
+          this.enable();
+          this.set('cachedSubtype', subtype);
+          if (targetModelName !== newTargetModelName) {
+            this.setProperties({
+              targetModelName: newTargetModelName,
+              options: component
+                .getTargetOptionsForModel(newTargetModelName),
+            });
+            this.reset();
+          }
+        } else {
+          this.disable();
+        }
+      }),
+    }).create({
+      name: 'target',
+    });
   }),
 
   notifyAboutChange() {
@@ -204,10 +213,15 @@ export default Component.extend(I18n, {
       onChange,
     } = this.getProperties('fields', 'onChange');
 
+    const {
+      isValid,
+      invalidFields,
+    } = getProperties(fields, 'isValid', 'invalidFields');
+
     onChange({
       values: fields.dumpValue(),
-      isValid: get(fields, 'isValid'),
-      invalidFields: get(fields, 'invalidFields').mapBy('path'),
+      isValid,
+      invalidFields: invalidFields.mapBy('path'),
     });
   },
 

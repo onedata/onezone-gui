@@ -430,6 +430,55 @@ describe('Integration | Component | token editor', function () {
         });
     }
   );
+
+  it('renders "metadata" field', function () {
+    this.render(hbs `{{token-editor}}`);
+
+    expect(this.$('.metadata-field label').text().trim()).to.equal('Metadata:');
+    expect(this.$('.metadata-field textarea')).to.exist;
+  });
+
+  it('has valid "metadata" when it is empty', function () {
+    const changeSpy = sinon.spy();
+    this.on('change', changeSpy);
+
+    this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+    const arg = changeSpy.lastCall.args[0];
+    expect(arg).to.not.have.nested.property('values.basic.metadata');
+    expect(arg.invalidFields).to.not.include('basic.metadata');
+  });
+
+  it('notifies about "metadata" field change', function () {
+    const changeSpy = sinon.spy();
+    this.on('change', changeSpy);
+
+    this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+    return wait()
+      .then(() => fillIn('.metadata-field textarea', '{ "a": 1 }'))
+      .then(() => {
+        const arg = changeSpy.lastCall.args[0];
+        expect(arg)
+          .to.have.nested.property('values.basic.metadata', '{ "a": 1 }');
+        expect(arg.invalidFields).to.not.include('basic.metadata');
+      });
+  });
+
+  it('notifies about invalid "metadata" field value', function () {
+    const changeSpy = sinon.spy();
+    this.on('change', changeSpy);
+
+    this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+    return wait()
+      .then(() => fillIn('.metadata-field textarea', '{ a: 1 }'))
+      .then(() => {
+        const arg = changeSpy.lastCall.args[0];
+        expect(arg).to.have.nested.property('values.basic.metadata', '{ a: 1 }');
+        expect(arg.invalidFields).to.include('basic.metadata');
+      });
+  });
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {

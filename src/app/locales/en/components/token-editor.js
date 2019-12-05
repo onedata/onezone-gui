@@ -81,6 +81,9 @@ export default {
           },
         },
       },
+      metadata: {
+        label: 'Metadata',
+      },
     },
   },
 };
