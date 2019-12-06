@@ -86,7 +86,7 @@ export default {
       },
     },
     caveats: {
-      expire: {
+      expireCaveat: {
         expireEnabled: {
           label: 'Expire',
         },
@@ -94,9 +94,27 @@ export default {
           text: 'This token has unlimited lifetime',
         },
       },
-      authorizationNone: {
+      authorizationNoneCaveat: {
         authorizationNoneEnabled: {
           label: 'Authorization none',
+        },
+      },
+      interfaceCaveat: {
+        interfaceEnabled: {
+          label: 'Interface',
+        },
+        interface: {
+          options: {
+            rest: {
+              label: 'REST',
+            },
+            oneclient: {
+              label: 'Oneclient',
+            },
+          },
+        },
+        interfaceDisabledText: {
+          text: 'This token can be used with REST and Oneclient',
         },
       },
     },

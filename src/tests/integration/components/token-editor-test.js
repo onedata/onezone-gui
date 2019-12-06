@@ -504,8 +504,9 @@ describe('Integration | Component | token editor', function () {
 
       const arg = changeSpy.lastCall.args[0];
       expect(arg).to.have.nested
-        .property('values.caveats.expire.expireEnabled', false);
-      expect(arg.invalidFields).to.not.include('caveats.expire.expireEnabled');
+        .property('values.caveats.expireCaveat.expireEnabled', false);
+      expect(arg.invalidFields).to.not.include('caveats.expireCaveat.expireEnabled');
+      expect(arg.invalidFields).to.not.include('caveats.expireCaveat.validUntil');
     }
   );
 
@@ -535,15 +536,17 @@ describe('Integration | Component | token editor', function () {
 
           const arg = changeSpy.lastCall.args[0];
           expect(arg).to.have.nested
-            .property('values.caveats.expire.expireEnabled', true);
+            .property('values.caveats.expireCaveat.expireEnabled', true);
           expect(arg).to.have.nested
-            .property('values.caveats.expire.validUntil');
-          const validUntil = get(arg, 'values.caveats.expire.validUntil');
+            .property('values.caveats.expireCaveat.validUntil');
+          const validUntil = get(arg, 'values.caveats.expireCaveat.validUntil');
           expect(
             tomorrow.isSame(validUntil) || dayAfterTomorrow.isSame(validUntil)
           ).to.be.true;
-          expect(arg.invalidFields).to.not.include('caveats.expire.expireEnabled');
-          expect(arg.invalidFields).to.not.include('caveats.expire.validUntil');
+          expect(arg.invalidFields).to.not.include(
+            'caveats.expireCaveat.expireEnabled');
+          expect(arg.invalidFields).to.not.include(
+            'caveats.expireCaveat.validUntil');
         });
     }
   );
@@ -564,11 +567,11 @@ describe('Integration | Component | token editor', function () {
 
       const arg = changeSpy.lastCall.args[0];
       expect(arg).to.have.nested.property(
-        'values.caveats.authorizationNone.authorizationNoneEnabled',
+        'values.caveats.authorizationNoneCaveat.authorizationNoneEnabled',
         false
       );
       expect(arg.invalidFields).to.not
-        .include('caveats.authorizationNone.authorizationNoneEnabled');
+        .include('caveats.authorizationNoneCaveat.authorizationNoneEnabled');
     }
   );
 
@@ -588,11 +591,101 @@ describe('Integration | Component | token editor', function () {
 
           const arg = changeSpy.lastCall.args[0];
           expect(arg).to.have.nested.property(
-            'values.caveats.authorizationNone.authorizationNoneEnabled',
+            'values.caveats.authorizationNoneCaveat.authorizationNoneEnabled',
             true
           );
           expect(arg.invalidFields).to.not
-            .include('caveats.authorizationNone.authorizationNoneEnabled');
+            .include('caveats.authorizationNoneCaveat.authorizationNoneEnabled');
+        });
+    }
+  );
+
+  it(
+    'renders interface caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.interfaceEnabled-field label');
+      const $toggle = this.$('.interfaceEnabled-field .one-way-toggle');
+      const $interface = this.$('.interface-field');
+      const $disabledDescription = this.$('.interfaceDisabledText-field');
+      expect($label.text().trim()).to.equal('Interface');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($interface).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token can be used with REST and Oneclient');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.interfaceCaveat.interfaceEnabled', false);
+      expect(arg.invalidFields).to.not.include(
+        'caveats.interfaceCaveat.interfaceEnabled');
+      expect(arg.invalidFields).to.not.include('caveats.interfaceCaveat.interface');
+    }
+  );
+
+  it(
+    'renders interface caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $toggle = this.$('.interfaceEnabled-field .one-way-toggle');
+      let $restOption, $oneclientOption;
+      return wait()
+        .then(() => click($toggle[0]))
+        .then(() => {
+          $restOption = this.$('.option-rest');
+          $oneclientOption = this.$('.option-oneclient');
+          expect($toggle).to.have.class('checked');
+          expect($restOption).to.exist;
+          expect($oneclientOption).to.exist;
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.interfaceCaveat.interfaceEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.interfaceCaveat.interface', 'rest');
+          expect(arg.invalidFields).to.not
+            .include('caveats.expireCaveat.interfaceEnabled');
+          expect(arg.invalidFields).to.not
+            .include('caveats.expireCaveat.interface');
+        });
+    }
+  );
+
+  it(
+    'notifies about interface caveat change',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.interfaceEnabled-field .one-way-toggle'))
+        .then(() => click('.option-oneclient'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.interfaceCaveat.interface', 'oneclient');
+          expect(arg.invalidFields).to.not
+            .include('caveats.expireCaveat.interface');
+        })
+        .then(() => click('.option-rest'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.interfaceCaveat.interface', 'rest');
+          expect(arg.invalidFields).to.not
+            .include('caveats.expireCaveat.interface');
         });
     }
   );

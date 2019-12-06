@@ -11,7 +11,9 @@
       align-self: center;
     }
   }
-  .caveat-group-toggle, .static-text-field-renderer {
+  .caveat-group-toggle,
+  .static-text-field-renderer,
+  .radio-field-renderer {
     padding-top: $padding-base-vertical;
   }
   .caveat-group-toggle {

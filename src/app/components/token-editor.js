@@ -226,13 +226,16 @@ export default Component.extend(I18n, {
   caveatsGroup: computed(
     'expireCaveatGroup',
     'authorizationNoneCaveatGroup',
+    'interfaceCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
         authorizationNoneCaveatGroup,
+        interfaceCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
-        'authorizationNoneCaveatGroup'
+        'authorizationNoneCaveatGroup',
+        'interfaceCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -240,6 +243,7 @@ export default Component.extend(I18n, {
         fields: [
           expireCaveatGroup,
           authorizationNoneCaveatGroup,
+          interfaceCaveatGroup,
         ],
       });
     }
@@ -247,19 +251,21 @@ export default Component.extend(I18n, {
 
   expireCaveatGroup: computed(function expireCaveatGroup() {
     return CaveatFormGroup.create({
-      name: 'expire',
+      name: 'expireCaveat',
       fields: [
         CaveatGroupToggle.create({
           name: 'expireEnabled',
         }),
         DatetimeField.extend({
-          isVisible: reads('valuesSource.caveats.expire.expireEnabled'),
+          isVisible: reads(
+            'valuesSource.caveats.expireCaveat.expireEnabled'
+          ),
         }).create({
           name: 'validUntil',
           defaultValue: moment().add(1, 'day').endOf('day').toDate(),
         }),
         StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.expire.expireEnabled'),
+          isVisible: not('valuesSource.caveats.expireCaveat.expireEnabled'),
         }).create({
           name: 'expireDisabledText',
         }),
@@ -269,10 +275,40 @@ export default Component.extend(I18n, {
 
   authorizationNoneCaveatGroup: computed(function authorizationNoneCaveatGroup() {
     return CaveatFormGroup.create({
-      name: 'authorizationNone',
+      name: 'authorizationNoneCaveat',
       fields: [
         CaveatGroupToggle.create({
           name: 'authorizationNoneEnabled',
+        }),
+      ],
+    });
+  }),
+
+  interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'interfaceCaveat',
+      fields: [
+        CaveatGroupToggle.create({
+          name: 'interfaceEnabled',
+        }),
+        RadioField.extend({
+          isVisible: reads(
+            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
+          ),
+        }).create({
+          name: 'interface',
+          options: [
+            { value: 'rest' },
+            { value: 'oneclient' },
+          ],
+          defaultValue: 'rest',
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
+          ),
+        }).create({
+          name: 'interfaceDisabledText',
         }),
       ],
     });
