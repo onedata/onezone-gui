@@ -19,8 +19,7 @@
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
-        route=dataProviderRoute
-        routeQueryParams=dataProviderRouteParams
+        aspect="data"
         moreText=(tt this "browseFiles")}}
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
@@ -42,7 +41,7 @@
         footerText=(if isSupported (tt this "addSupport"))
         footerTextIcon=(if isSupported "provider-add")
         footerLinkToParams=(if isSupported (array "onedata.sidebar.content.aspect" "spaces" spaceId "support"))
-      }}  
+      }}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
         }}

@@ -1,0 +1,36 @@
+<div class="map-trigger {{if isExpanded "active"}}" {{action "toggleExpand"}}>{{one-icon icon="globe"}}</div>
+<div class="map-selector">
+  {{#one-map
+    onViewportChange=(action "mapViewportChanged")
+    initialState=mapInitialState
+    triggerWindowEventName="oneprovidersSelectorRefresh"
+    as |map|}}
+    {{#each clusteredOneproviders key="id" as |square|}}
+      {{#map.position latitude=square.latitude longitude=square.longitude as |x y|}}
+        {{#if (and (gte x 0) (lte x map.width) (gte y 0) (lte y map.height))}}
+          {{oneprovider-map-circle
+            class=(concat "oneprovider-map-circle-" (model-routable-id square.providers.[0]))
+            mapSize=(max map.width map.height 1200)
+            scale=oneproviderCircleScale
+            oneproviders=square.providers
+            isSelected=(contains selectedOneprovider square.providers)
+            click=(if (eq square.providers.length 1) (action onOneproviderSelected square.providers.[0]))}}
+          {{#if (gt square.providers.length 1)}}
+            {{#one-webui-popover
+              class="oneproviders-selector-popover"
+              triggerSelector=(concat ".oneprovider-map-circle-" (model-routable-id square.providers.[0]))
+              padding=false
+              popoverStyle="oneproviders-selector"
+              windowEvent="oneprovidersSelectorRefresh"
+              as |popover|}}
+              {{oneproviders-selector-popover-content
+                oneproviders=square.providers
+                selectedOneprovider=selectedOneprovider
+                onOneproviderSelected=(action "onOneproviderSelectedFromPopover" popover.hide)}}
+            {{/one-webui-popover}}
+          {{/if}}
+        {{/if}}
+      {{/map.position}}
+    {{/each}}
+  {{/one-map}}
+</div>

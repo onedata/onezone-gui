@@ -8,6 +8,7 @@ import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
+import uploads from './tabs/uploads';
 import users from './tabs/users';
 
 import backendErrors from './errors/backend-errors';
@@ -24,8 +25,10 @@ import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesJoin from './components/content-spaces-join';
+import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesData from './components/content-spaces-data';
 import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
@@ -74,6 +77,7 @@ import harvesterRemoveModal from './components/harvester-remove-modal';
 import harvesterConfiguration from './components/harvester-configuration';
 import websocketReconnectionModal from './components/websocket-reconnection-modal';
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
+import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
 import privacyPolicyModal from './components/privacy-policy-modal';
 import sidebarTokens from './components/sidebar-tokens';
@@ -90,9 +94,15 @@ import tokenActions from './services/token-actions';
 import harvesterActions from './services/harvester-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
+import uploadManager from './services/upload-manager';
+
+import uploadObject from './utils/upload-object';
 
 let translations = {
   tabs: {
+    undefined: {
+      menuItem: '',
+    },
     providers,
     tokens,
     spaces,
@@ -100,6 +110,7 @@ let translations = {
     users,
     clusters,
     harvesters,
+    uploads,
   },
   errors: {
     backendErrors,
@@ -120,8 +131,10 @@ let translations = {
     contentSpacesNew,
     contentProviderEmpty,
     contentSpacesJoin,
+    contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesData,
     contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
@@ -170,6 +183,7 @@ let translations = {
     harvesterConfiguration,
     websocketReconnectionModal,
     fatalConnectionErrorModal,
+    uploadPresenter,
     cookiesConsent,
     privacyPolicyModal,
     sidebarTokens,
@@ -185,6 +199,10 @@ let translations = {
     harvesterActions,
     userActions,
     guiUtils,
+    uploadManager,
+  },
+  utils: {
+    uploadObject,
   },
 };
 
