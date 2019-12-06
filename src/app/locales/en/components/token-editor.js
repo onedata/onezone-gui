@@ -85,5 +85,15 @@ export default {
         label: 'Metadata',
       },
     },
+    caveats: {
+      expire: {
+        expireEnabled: {
+          label: 'Expire',
+        },
+        expireDisabledText: {
+          text: 'This token has unlimited lifetime',
+        },
+      },
+    },
   },
 };

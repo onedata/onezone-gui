@@ -9,9 +9,13 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import RadioField from 'onedata-gui-common/utils/form-component/radio-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import JsonField from 'onedata-gui-common/utils/form-component/json-field';
+import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
+import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
+import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw } from 'ember-awesome-macros';
+import { equal, raw, not } from 'ember-awesome-macros';
+import moment from 'moment';
 
 const tokenSubtypeOptions = [{
   value: 'userJoinGroup',
@@ -62,6 +66,14 @@ function getTargetModelNameForSubtype(subtype) {
   return subtypeOptions && subtypeOptions.targetModelName;
 }
 
+const CaveatFormGroup = FormFieldsGroup.extend({
+  classes: 'caveat-group',
+});
+
+const CaveatGroupToggle = ToggleField.extend({
+  classes: 'caveat-group-toggle',
+});
+
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
 
@@ -87,11 +99,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  fields: computed('basicGroup', function fields() {
+  fields: computed('basicGroup', 'caveatsGroup', function fields() {
     const {
       i18nPrefix,
       basicGroup,
-    } = this.getProperties('i18nPrefix', 'basicGroup');
+      caveatsGroup,
+    } = this.getProperties('i18nPrefix', 'basicGroup', 'caveatsGroup');
     const component = this;
 
     return FormFieldsRootGroup
@@ -106,6 +119,7 @@ export default Component.extend(I18n, {
         i18nPrefix: `${i18nPrefix}.fields`,
         fields: [
           basicGroup,
+          caveatsGroup,
         ],
       });
   }),
@@ -124,7 +138,7 @@ export default Component.extend(I18n, {
           defaultValue: 'access',
         }),
         FormFieldsGroup.extend({
-          isExpanded: equal('valuesSource.basic.type', raw('invite')),
+          isVisible: equal('valuesSource.basic.type', raw('invite')),
         }).create({
           name: 'inviteDetails',
           fields: [
@@ -150,7 +164,7 @@ export default Component.extend(I18n, {
     function inviteTargetDetailsGroup() {
       return FormFieldsGroup.extend({
         subtype: reads('valuesSource.basic.inviteDetails.subtype'),
-        isExpanded: computed('subtype', function isExpanded() {
+        isVisible: computed('subtype', function isVisible() {
           return getTargetModelNameForSubtype(this.get('subtype'));
         }),
       }).create({
@@ -204,6 +218,41 @@ export default Component.extend(I18n, {
       }),
     }).create({
       name: 'target',
+    });
+  }),
+
+  caveatsGroup: computed('expireCaveatGroup', function caveatsGroup() {
+    const {
+      expireCaveatGroup,
+    } = this.getProperties('expireCaveatGroup');
+    return FormFieldsGroup.create({
+      name: 'caveats',
+      fields: [
+        expireCaveatGroup,
+      ],
+    });
+  }),
+
+  expireCaveatGroup: computed(function expireCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'expire',
+      fields: [
+        CaveatGroupToggle.create({
+          name: 'expireEnabled',
+          defaultValue: false,
+        }),
+        DatetimeField.extend({
+          isVisible: reads('valuesSource.caveats.expire.expireEnabled'),
+        }).create({
+          name: 'validUntil',
+          defaultValue: moment().add(1, 'day').endOf('day').toDate(),
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.expire.expireEnabled'),
+        }).create({
+          name: 'expireDisabledText',
+        }),
+      ],
     });
   }),
 

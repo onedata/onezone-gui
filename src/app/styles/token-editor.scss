@@ -1,0 +1,24 @@
+.token-editor {
+  .basic-field .control-label,
+  .caveat-group-toggle {
+    width: 200px;
+  }
+  .caveat-group {
+    .fields-group-collapse {
+      display: flex;
+    }
+    .static-text-field-renderer {
+      align-self: center;
+    }
+  }
+  .caveat-group-toggle, .static-text-field-renderer {
+    padding-top: $padding-base-vertical;
+  }
+  .caveat-group-toggle {
+    .field-component {
+      order: -1;
+      flex-grow: 0;
+      margin-right: 25px;
+    }
+  }
+}

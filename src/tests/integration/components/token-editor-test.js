@@ -11,6 +11,8 @@ import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
+import moment from 'moment';
+import { get } from '@ember/object';
 
 const tokenSubtypes = [{
   subtype: 'userJoinGroup',
@@ -479,6 +481,72 @@ describe('Integration | Component | token editor', function () {
         expect(arg.invalidFields).to.include('basic.metadata');
       });
   });
+
+  it(
+    'renders expire caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.expireEnabled-field label');
+      const $toggle = this.$('.expireEnabled-field .one-way-toggle');
+      const $validUntil = this.$('.validUntil-field');
+      const $disabledDescription = this.$('.expireDisabledText-field');
+      expect($label.text().trim()).to.equal('Expire:');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($validUntil).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token has unlimited lifetime');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.expire.expireEnabled', false);
+      expect(arg.invalidFields).to.not.include('caveats.expire.expireEnabled');
+    }
+  );
+
+  it(
+    'renders expire caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+      const tomorrow = moment().add(1, 'day').endOf('day');
+      const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $toggle = this.$('.expireEnabled-field .one-way-toggle');
+      return wait()
+        .then(() => click($toggle[0]))
+        .then(() => {
+          const $validUntil = this.$('.validUntil-field');
+          const $disabledDescription = this.$('.expireDisabledText-field');
+          expect($toggle).to.have.class('checked');
+          expect($validUntil).to.exist;
+          expect($disabledDescription).to.not.exist;
+          expect($validUntil.find('input').val()).to.be.oneOf([
+            tomorrow.format('YYYY/MM/DD H:mm'),
+            dayAfterTomorrow.format('YYYY/MM/DD H:mm'),
+          ]);
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.expire.expireEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.expire.validUntil');
+          const validUntil = get(arg, 'values.caveats.expire.validUntil');
+          expect(
+            tomorrow.isSame(validUntil) || dayAfterTomorrow.isSame(validUntil)
+          ).to.be.true;
+          expect(arg.invalidFields).to.not.include('caveats.expire.expireEnabled');
+          expect(arg.invalidFields).to.not.include('caveats.expire.validUntil');
+        });
+    }
+  );
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {
