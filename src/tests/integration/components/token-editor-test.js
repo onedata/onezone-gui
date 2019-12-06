@@ -494,7 +494,7 @@ describe('Integration | Component | token editor', function () {
       const $toggle = this.$('.expireEnabled-field .one-way-toggle');
       const $validUntil = this.$('.validUntil-field');
       const $disabledDescription = this.$('.expireDisabledText-field');
-      expect($label.text().trim()).to.equal('Expire:');
+      expect($label.text().trim()).to.equal('Expire');
       expect($toggle).to.exist;
       expect($toggle).to.not.have.class('checked');
       expect($validUntil).to.not.exist;
@@ -544,6 +544,55 @@ describe('Integration | Component | token editor', function () {
           ).to.be.true;
           expect(arg.invalidFields).to.not.include('caveats.expire.expireEnabled');
           expect(arg.invalidFields).to.not.include('caveats.expire.validUntil');
+        });
+    }
+  );
+
+  it(
+    'renders authorizationNone caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.authorizationNoneEnabled-field label');
+      const $toggle = this.$('.authorizationNoneEnabled-field .one-way-toggle');
+      expect($label.text().trim()).to.equal('Authorization none');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested.property(
+        'values.caveats.authorizationNone.authorizationNoneEnabled',
+        false
+      );
+      expect(arg.invalidFields).to.not
+        .include('caveats.authorizationNone.authorizationNoneEnabled');
+    }
+  );
+
+  it(
+    'notifies about authorizationNone caveat change',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $toggle = this.$('.authorizationNoneEnabled-field .one-way-toggle');
+      return wait()
+        .then(() => click($toggle[0]))
+        .then(() => {
+          expect($toggle).to.have.class('checked');
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested.property(
+            'values.caveats.authorizationNone.authorizationNoneEnabled',
+            true
+          );
+          expect(arg.invalidFields).to.not
+            .include('caveats.authorizationNone.authorizationNoneEnabled');
         });
     }
   );

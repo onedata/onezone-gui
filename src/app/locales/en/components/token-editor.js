@@ -94,6 +94,11 @@ export default {
           text: 'This token has unlimited lifetime',
         },
       },
+      authorizationNone: {
+        authorizationNoneEnabled: {
+          label: 'Authorization none',
+        },
+      },
     },
   },
 };

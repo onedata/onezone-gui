@@ -72,6 +72,8 @@ const CaveatFormGroup = FormFieldsGroup.extend({
 
 const CaveatGroupToggle = ToggleField.extend({
   classes: 'caveat-group-toggle',
+  addColonToLabel: false,
+  defaultValue: false,
 });
 
 export default Component.extend(I18n, {
@@ -221,17 +223,27 @@ export default Component.extend(I18n, {
     });
   }),
 
-  caveatsGroup: computed('expireCaveatGroup', function caveatsGroup() {
-    const {
-      expireCaveatGroup,
-    } = this.getProperties('expireCaveatGroup');
-    return FormFieldsGroup.create({
-      name: 'caveats',
-      fields: [
+  caveatsGroup: computed(
+    'expireCaveatGroup',
+    'authorizationNoneCaveatGroup',
+    function caveatsGroup() {
+      const {
         expireCaveatGroup,
-      ],
-    });
-  }),
+        authorizationNoneCaveatGroup,
+      } = this.getProperties(
+        'expireCaveatGroup',
+        'authorizationNoneCaveatGroup'
+      );
+
+      return FormFieldsGroup.create({
+        name: 'caveats',
+        fields: [
+          expireCaveatGroup,
+          authorizationNoneCaveatGroup,
+        ],
+      });
+    }
+  ),
 
   expireCaveatGroup: computed(function expireCaveatGroup() {
     return CaveatFormGroup.create({
@@ -239,7 +251,6 @@ export default Component.extend(I18n, {
       fields: [
         CaveatGroupToggle.create({
           name: 'expireEnabled',
-          defaultValue: false,
         }),
         DatetimeField.extend({
           isVisible: reads('valuesSource.caveats.expire.expireEnabled'),
@@ -251,6 +262,17 @@ export default Component.extend(I18n, {
           isVisible: not('valuesSource.caveats.expire.expireEnabled'),
         }).create({
           name: 'expireDisabledText',
+        }),
+      ],
+    });
+  }),
+
+  authorizationNoneCaveatGroup: computed(function authorizationNoneCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'authorizationNone',
+      fields: [
+        CaveatGroupToggle.create({
+          name: 'authorizationNoneEnabled',
         }),
       ],
     });
