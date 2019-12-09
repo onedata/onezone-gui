@@ -22,6 +22,7 @@
             selectedSpace=space
             showSelectedSpaceSupportSize=true
             showSupportedSpacesCount=false
+            providerActions=providerActions
             providerClickAction=(action "providerClicked")
           }}
         </div>
@@ -68,6 +69,14 @@
         </div>
       </div>
     </div>
+    
+    {{cease-oneprovider-support-modal
+      opened=ceaseModalOpened
+      provider=ceaseModalProvider
+      space=space
+      close=(action (mut ceaseModalOpened) false)
+      onHidden=(action (mut ceaseModalProvider) null)
+    }}
     
   {{else}}
     {{content-spaces-no-support}}
