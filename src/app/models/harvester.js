@@ -13,7 +13,7 @@ import { computed } from '@ember/object';
 
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import InvitingModelMixin from 'onedata-gui-websocket-client/mixins/models/inviting-model';
+import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   name: attr('string'),

@@ -1,28 +1,28 @@
 /**
- * A service which provides client-tokens manipulation functions ready to use for gui
+ * A service which provides tokens manipulation functions ready to use for gui
  *
- * @module services/client-token-actions
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @module services/token-actions
+ * @author Michał Borzęcki
+ * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { default as Service, inject } from '@ember/service';
-import { computed } from '@ember/object';
+import { default as Service, inject as service } from '@ember/service';
+import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 
 export default Service.extend(I18n, {
-  clientTokenManager: inject(),
-  router: inject(),
-  guiUtils: inject(),
-  globalNotify: inject(),
-  i18n: inject(),
+  tokenManager: service(),
+  router: service(),
+  guiUtils: service(),
+  globalNotify: service(),
+  i18n: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'services.clientTokenActions',
+  i18nPrefix: 'services.tokenActions',
 
   /**
    * Array of action buttons definitions used by sidebar
@@ -34,28 +34,30 @@ export default Service.extend(I18n, {
       title: this.t('createToken'),
       tip: this.t('createToken'),
       class: 'create-token-btn',
-      action: () => this.createToken(),
+      action: () => this.get('router')
+        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
     }];
   }),
 
   /**
    * Creates token
+   * @param {Object} tokenPrototype token model prototype
    * @returns {Promise} A promise, which resolves to new token if it has
    * been created successfully.
    */
-  createToken() {
+  createToken(tokenPrototype) {
     const {
       globalNotify,
       router,
-      clientTokenManager,
+      tokenManager,
       guiUtils,
     } = this.getProperties(
       'globalNotify',
       'router',
-      'clientTokenManager',
+      'tokenManager',
       'guiUtils'
     );
-    return clientTokenManager.createRecord().then((token) => {
+    return tokenManager.createToken(tokenPrototype).then((token) => {
       globalNotify.success(this.t('tokenCreateSuccess'));
       router.transitionTo(
         'onedata.sidebar.content',
@@ -69,5 +71,26 @@ export default Service.extend(I18n, {
       globalNotify.backendError(this.t('tokenCreation'), error);
       throw error;
     });
+  },
+
+  /**
+   * @param {Models.Token} token
+   * @returns {Promise}
+   */
+  deleteToken(token) {
+    const {
+      globalNotify,
+      tokenManager,
+    } = this.getProperties('globalNotify', 'tokenManager');
+
+    return tokenManager.deleteToken(get(token, 'id'))
+      .then(result => {
+        globalNotify.success(this.t('tokenRemoveSuccess'));
+        return result;
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('removingToken'), error);
+        throw error;
+      });
   },
 });

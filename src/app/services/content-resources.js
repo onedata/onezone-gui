@@ -13,7 +13,7 @@ import { resolve, reject } from 'rsvp';
 
 export default Service.extend({
   providerManager: service(),
-  clientTokenManager: service(),
+  tokenManager: service(),
   currentUser: service(),
   spaceManager: service(),
   groupManager: service(),
@@ -36,7 +36,7 @@ export default Service.extend({
       case 'users':
         return this.get('currentUser').getCurrentUserRecord();
       case 'tokens':
-        return this.get('clientTokenManager').getRecord(id);
+        return this.get('tokenManager').getRecord(id);
       case 'spaces':
         return this.get('spaceManager').getRecord(id);
       case 'groups':

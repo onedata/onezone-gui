@@ -1,0 +1,26 @@
+{{#bs-form
+  submitOnEnter=false
+  class="col-xs-12 col-sm-10 col-md-8 col-centered form-horizontal"
+  as |form|}}
+  {{one-form-fields
+    bsForm=form
+    fields=currentFields
+    formValues=formValues
+    inputChanged=(action "inputChanged")
+    onFocusOut=(action "focusOut")
+    disabled=disabled
+    layoutConfig=formLayoutConfig
+    collapsedPrefixes=collapsedPrefixes}}
+  <div class="row">
+    <div class={{formLayoutConfig.formSubmitColumns}}>
+      {{#one-spin-button
+        type="submit"
+        class="btn btn-primary create-button"
+        disabled=(not isValid)
+        action=(action "create")}}
+        {{tt this "create"}}  
+      {{/one-spin-button}}
+    </div>
+  </div>
+{{/bs-form}}
+{{yield}}

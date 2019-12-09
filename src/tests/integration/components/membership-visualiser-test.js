@@ -96,8 +96,8 @@ describe('Integration | Component | membership visualiser', function () {
     // crashes tests even if it's a correct behaviour of findRecord.
     this.originalLoggerError = Ember.Logger.error;
     this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function() {};
-    Ember.Test.adapter.exception = function() {};
+    Ember.Logger.error = function () {};
+    Ember.Test.adapter.exception = function () {};
   });
 
   afterEach(function () {

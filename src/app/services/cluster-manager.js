@@ -22,6 +22,7 @@ export default Service.extend({
   store: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
+  tokenManager: service(),
 
   getClusters() {
     return this.get('currentUser').getCurrentUserRecord()
@@ -65,8 +66,12 @@ export default Service.extend({
    * @returns {Promise<string>} resolves the token
    */
   getOnezoneRegistrationToken() {
+    const {
+      onedataGraph,
+      tokenManager,
+    } = this.getProperties('onedataGraph', 'tokenManager');
     const userId = this.get('currentUser.userId');
-    return this.get('onedataGraph').request({
+    return onedataGraph.request({
       gri: gri({
         entityType: 'user',
         entityId: 'self',
@@ -75,6 +80,9 @@ export default Service.extend({
       operation: 'create',
       data: { userId },
       subscribe: false,
+    }).then(result => {
+      tokenManager.reloadListIfAlreadyFetched();
+      return result;
     });
   },
 

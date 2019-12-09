@@ -11,11 +11,12 @@
 import { camelize } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise, resolve, all as allFulfilled } from 'rsvp';
+import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
 import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
+import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -27,7 +28,7 @@ const USER_LOGIN = 'stub_user';
 const NUMBER_OF_SHARED_USERS = 3;
 const NUMBER_OF_PROVIDERS = 3;
 const NUMBER_OF_SPACES = 3;
-const NUMBER_OF_CLIENT_TOKENS = 3;
+const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
@@ -39,10 +40,10 @@ const types = [
   'space',
   'group',
   'provider',
-  'clientToken',
   'linkedAccount',
   'cluster',
   'harvester',
+  'token',
 ];
 const names = ['one', 'two', 'three'];
 
@@ -89,10 +90,9 @@ export default function generateDevelopmentModel(store) {
     .then(() => createSharedUsersRecords(store))
     .then(su => sharedUsers = su)
     // create main resources lists
-    .then(() =>
-      allFulfilled(
-        types.map(type =>
-          createEntityRecords(store, type, names)
+    .then(() => hashFulfilled(
+      types.reduce((promiseHash, type) => {
+        promiseHash[type] = createEntityRecords(store, type, names)
           .then(records => {
             switch (type) {
               case 'group':
@@ -109,14 +109,15 @@ export default function generateDevelopmentModel(store) {
                 break;
             }
             return createListRecord(store, type, records);
-          })
-        )
-      )
-    )
+          });
+        return promiseHash;
+      }, {})
+    ))
+    .then(listRecords => attachModelsToInviteTokens(listRecords).then(() => listRecords))
     // push space list into providers
     .then(listRecords => {
-      const providers = listRecords[types.indexOf('provider')].get('list');
-      const spaces = listRecords[types.indexOf('space')].get('list');
+      const providers = listRecords.provider.get('list');
+      const spaces = listRecords.space.get('list');
       return allFulfilled([providers, spaces])
         .then(([providerList, spacesList]) =>
           allFulfilled(providerList.map(provider =>
@@ -130,9 +131,9 @@ export default function generateDevelopmentModel(store) {
     })
     // push provider list and support info into spaces
     .then(listRecords => {
-      const providers = listRecords[types.indexOf('provider')].get('list');
-      const spaces = listRecords[types.indexOf('space')].get('list');
-      const clusters = listRecords[types.indexOf('cluster')].get('list');
+      const providers = listRecords.provider.get('list');
+      const spaces = listRecords.space.get('list');
+      const clusters = listRecords.cluster.get('list');
       return allFulfilled([providers, spaces, clusters])
         .then(([providerList, spaceList, clusterList]) =>
           allFulfilled(spaceList.map(space => {
@@ -171,7 +172,7 @@ export default function generateDevelopmentModel(store) {
         .then(() => listRecords);
     })
     // add groups, memberships, users and privileges to groups
-    .then(listRecords => listRecords[types.indexOf('group')].get('list')
+    .then(listRecords => listRecords.group.get('list')
       .then(records =>
         allFulfilled(records.map(record =>
           allFulfilled([
@@ -187,7 +188,7 @@ export default function generateDevelopmentModel(store) {
           ])
         ))
       )
-      .then(() => listRecords[types.indexOf('space')].get('list')
+      .then(() => listRecords.space.get('list')
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
@@ -204,7 +205,7 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => listRecords[types.indexOf('harvester')].get('list')
+      .then(() => listRecords.harvester.get('list')
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
@@ -223,7 +224,7 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => allFulfilled(['space', 'group', 'harvester'].map(modelType => {
-        return listRecords[types.indexOf(modelType)].get('list')
+        return listRecords[modelType].get('list')
           .then(records =>
             allFulfilled(records.map(record =>
               createPrivilegesForModel(
@@ -276,8 +277,7 @@ function createGuiMessages(store) {
 }
 
 function createUserRecord(store, listRecords) {
-  const spacesIndex = types.indexOf('space');
-  return listRecords[spacesIndex].get('list')
+  return listRecords.space.get('list')
     .then(list => list.get('length') > 0 ? list.get('firstObject ') : null)
     .then(space => space && space.get('entityId'))
     .then(defaultSpaceId => {
@@ -289,7 +289,7 @@ function createUserRecord(store, listRecords) {
         username: USER_LOGIN,
         defaultSpaceId,
       });
-      listRecords.forEach(lr =>
+      Object.values(listRecords).forEach(lr =>
         userRecord.set(camelize(lr.constructor.modelName), lr)
       );
       return userRecord.save();
@@ -302,8 +302,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createProvidersRecords(store, additionalInfo);
     case 'space':
       return createSpacesRecords(store, additionalInfo);
-    case 'clientToken':
-      return createClientTokensRecords(store, additionalInfo);
+    case 'token':
+      return createTokensRecords(store, additionalInfo);
     case 'group':
       return createGroupsRecords(store, additionalInfo);
     case 'linkedAccount':
@@ -403,10 +403,40 @@ function createSpacesRecords(store) {
   }));
 }
 
-function createClientTokensRecords(store) {
-  return allFulfilled(_.range(NUMBER_OF_CLIENT_TOKENS).map(() => {
-    return store.createRecord('clientToken', {}).save();
-  }));
+function createTokensRecords(store) {
+  const promises = [];
+  _.range(NUMBER_OF_TOKENS).forEach((i) => {
+    const accessTokenPromise = store.createRecord('token', {
+      name: 'Access token ' + i,
+      type: {
+        accessToken: {},
+      },
+      metadata: {
+        creationTime: moment().unix(),
+      },
+    }).save();
+    const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
+    const inviteTokenPromises = inviteSubtypes
+      .map((subtype, j) => {
+        return store.createRecord('token', {
+          name: 'Invite token ' + (i * inviteSubtypes.length + j),
+          type: {
+            inviteToken: { subtype },
+          },
+          caveats: [{
+            type: 'time',
+            validUntil: moment()
+              .add(60 * (-inviteSubtypes.length / 2 + j), 'seconds')
+              .unix(),
+          }],
+          metadata: {
+            creationTime: moment().subtract(1, 'hour').unix(),
+          },
+        }).save();
+      });
+    promises.push(accessTokenPromise, ...inviteTokenPromises);
+  });
+  return allFulfilled(promises);
 }
 
 function createGroupsRecords(store) {
@@ -533,6 +563,35 @@ function createSharedUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
     return store.createRecord('sharedUser', { name: `sharedUser${index}` }).save();
   }));
+}
+
+function attachModelsToInviteTokens(listRecords) {
+  return listRecords.token.get('list').then(tokensList =>
+    allFulfilled(tokensList
+      .filter(token => get(token, 'typeName') === 'invite')
+      .map(token => {
+        const subtype = get(token, 'subtype');
+        const modelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
+        const targetRecordsList = listRecords[modelMapping.modelName];
+        if (targetRecordsList) {
+          return targetRecordsList.get('list')
+            .then(modelList => modelList.objectAt(0))
+            .then(model => {
+              const existingTokenType = get(token, 'type');
+              const newTokenType = {
+                inviteToken: Object.assign({}, existingTokenType.inviteToken, {
+                  [modelMapping.idFieldName]: get(model, 'entityId'),
+                }),
+              };
+              set(token, 'type', newTokenType);
+              return token.save();
+            });
+        } else {
+          return resolve();
+        }
+      })
+    )
+  );
 }
 
 function attachSharedUsersGroupsToModel(

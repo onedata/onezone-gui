@@ -1,0 +1,35 @@
+{{one-icon icon=iconName class="sidebar-item-icon"}}
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=isRenaming
+    value=item.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor token-name"
+    click=(action "editorClick")}}
+{{else}}
+  {{#truncated-string}}
+    {{name-conflict item=item tagName="span" class="one-label token-name"}}
+  {{/truncated-string}}
+{{/if}}
+
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=actionsArray
+    toolbarToggleClasses="token-menu-trigger"}}
+
+  {{#render-later triggerRender=isRemoveTokenModalOpened as |renderLater|}}
+    {{remove-token-modal
+      opened=isRemoveTokenModalOpened
+      proceed=(action "remove")
+      close=(action "closeRemoveTokenModal")
+      processing=isRemovingToken
+      token=token
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+{{/unless}}
+{{yield}}

@@ -39,11 +39,6 @@ export default TwoLevelSidebar.extend(I18n, {
   /**
    * @override
    */
-  showCreateOnEmpty: false,
-
-  /**
-   * @override
-   */
   firstLevelItemComponent: 'sidebar-harvesters/harvester-item',
 
   /**

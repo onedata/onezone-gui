@@ -1,5 +1,5 @@
 /**
- * @module models/client-token-list
+ * @module models/token-list
  * @author Michał Borzęcki
  * @copyright (C) 2018-2019 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,5 +12,5 @@ import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/grap
 import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-conflict-model';
 
 export default Model.extend(GraphListModelMixin, listConflictModel, {
-  list: hasMany('clientToken'),
+  list: hasMany('token'),
 }).reopenClass(StaticGraphModelMixin);
