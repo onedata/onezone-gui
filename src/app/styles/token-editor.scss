@@ -1,6 +1,7 @@
 .token-editor {
   .basic-field .control-label,
   .caveat-group-toggle {
+    flex-shrink: 0;
     width: 200px;
   }
   .caveat-group {
@@ -21,6 +22,9 @@
       order: -1;
       flex-grow: 0;
       margin-right: 25px;
+    }
+    + .field-renderer {
+      flex-grow: 1;  
     }
   }
 }

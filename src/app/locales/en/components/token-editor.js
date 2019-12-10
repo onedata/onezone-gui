@@ -117,6 +117,14 @@ export default {
           text: 'This token can be used with REST and Oneclient',
         },
       },
+      asnCaveat: {
+        asnEnabled: {
+          label: 'ASN',
+        },
+        asnDisabledText: {
+          text: 'This token can be used on any ASN',
+        },
+      },
     },
   },
 };

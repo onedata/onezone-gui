@@ -12,6 +12,7 @@ import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
+import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
 import { equal, raw, not } from 'ember-awesome-macros';
@@ -227,15 +228,18 @@ export default Component.extend(I18n, {
     'expireCaveatGroup',
     'authorizationNoneCaveatGroup',
     'interfaceCaveatGroup',
+    'asnCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
         authorizationNoneCaveatGroup,
         interfaceCaveatGroup,
+        asnCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
         'authorizationNoneCaveatGroup',
-        'interfaceCaveatGroup'
+        'interfaceCaveatGroup',
+        'asnCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -244,6 +248,7 @@ export default Component.extend(I18n, {
           expireCaveatGroup,
           authorizationNoneCaveatGroup,
           interfaceCaveatGroup,
+          asnCaveatGroup,
         ],
       });
     }
@@ -310,6 +315,27 @@ export default Component.extend(I18n, {
         }).create({
           name: 'interfaceDisabledText',
         }),
+      ],
+    });
+  }),
+
+  asnCaveatGroup: computed(function asnCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'asnCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'asnEnabled' }),
+        TagsField.extend({
+          isVisible: reads('valuesSource.caveats.asnCaveat.asnEnabled'),
+        }).create({
+          name: 'asn',
+          tagEditorSettings: {
+            regexp: /^\d+$/,
+          },
+          defaultValue: [],
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
+        }).create({ name: 'asnDisabledText' }),
       ],
     });
   }),

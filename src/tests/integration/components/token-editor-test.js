@@ -654,9 +654,9 @@ describe('Integration | Component | token editor', function () {
           expect(arg).to.have.nested
             .property('values.caveats.interfaceCaveat.interface', 'rest');
           expect(arg.invalidFields).to.not
-            .include('caveats.expireCaveat.interfaceEnabled');
+            .include('caveats.interfaceCaveat.interfaceEnabled');
           expect(arg.invalidFields).to.not
-            .include('caveats.expireCaveat.interface');
+            .include('caveats.interfaceCaveat.interface');
         });
     }
   );
@@ -685,7 +685,102 @@ describe('Integration | Component | token editor', function () {
           expect(arg).to.have.nested
             .property('values.caveats.interfaceCaveat.interface', 'rest');
           expect(arg.invalidFields).to.not
-            .include('caveats.expireCaveat.interface');
+            .include('caveats.interfaceCaveat.interface');
+        });
+    }
+  );
+
+  it(
+    'renders asn caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.asnEnabled-field label');
+      const $toggle = this.$('.asnEnabled-field .one-way-toggle');
+      const $asn = this.$('.asn-field');
+      const $disabledDescription = this.$('.asnDisabledText-field');
+      expect($label.text().trim()).to.equal('ASN');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($asn).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token can be used on any ASN');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.asnCaveat.asnEnabled', false);
+      expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asnEnabled');
+      expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asn');
+    }
+  );
+
+  it(
+    'renders asn caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click(this.$('.asnEnabled-field .one-way-toggle')[0]))
+        .then(() => {
+          expect(this.$('.asn-field')).to.exist;
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.asnCaveat.asnEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.asnCaveat.asn.length', 0);
+          expect(arg.invalidFields).to.not
+            .include('caveats.expireCaveat.asnEnabled');
+          expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
+        });
+    }
+  );
+
+  it(
+    'notifies about asn caveat change',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.asnEnabled-field .one-way-toggle'))
+        .then(() => click('.asn-field .tags-input'))
+        .then(() => fillIn('.asn-field .text-editor-input', '123,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.asnCaveat.asn[0]', '123');
+          expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asn');
+        });
+    }
+  );
+
+  it(
+    'not allows to input invalid asn',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.asnEnabled-field .one-way-toggle'))
+        .then(() => click('.asn-field .tags-input'))
+        .then(() => fillIn('.asn-field .text-editor-input', 'abc,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.not.have.nested
+            .property('values.caveats.asnCaveat.asn[0]');
+          expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
         });
     }
   );
