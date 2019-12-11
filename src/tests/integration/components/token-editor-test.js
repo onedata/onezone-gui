@@ -737,7 +737,7 @@ describe('Integration | Component | token editor', function () {
           expect(arg).to.have.nested
             .property('values.caveats.asnCaveat.asn.length', 0);
           expect(arg.invalidFields).to.not
-            .include('caveats.expireCaveat.asnEnabled');
+            .include('caveats.asnCaveat.asnEnabled');
           expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
         });
     }
@@ -781,6 +781,101 @@ describe('Integration | Component | token editor', function () {
           expect(arg).to.not.have.nested
             .property('values.caveats.asnCaveat.asn[0]');
           expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
+        });
+    }
+  );
+
+  it(
+    'renders ip caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.ipEnabled-field label');
+      const $toggle = this.$('.ipEnabled-field .one-way-toggle');
+      const $ip = this.$('.ip-field');
+      const $disabledDescription = this.$('.ipDisabledText-field');
+      expect($label.text().trim()).to.equal('IP');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($ip).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token can be used without any IP address restrictions');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.ipCaveat.ipEnabled', false);
+      expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ipEnabled');
+      expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ip');
+    }
+  );
+
+  it(
+    'renders ip caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click(this.$('.ipEnabled-field .one-way-toggle')[0]))
+        .then(() => {
+          expect(this.$('.ip-field')).to.exist;
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.ipCaveat.ipEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.ipCaveat.ip.length', 0);
+          expect(arg.invalidFields).to.not
+            .include('caveats.ipCaveat.ipEnabled');
+          expect(arg.invalidFields).to.include('caveats.ipCaveat.ip');
+        });
+    }
+  );
+
+  it(
+    'notifies about ip caveat change',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.ipEnabled-field .one-way-toggle'))
+        .then(() => click('.ip-field .tags-input'))
+        .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/24,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.ipCaveat.ip[0]', '123.123.123.123/24');
+          expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ip');
+        });
+    }
+  );
+
+  it(
+    'not allows to input invalid ip',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.ipEnabled-field .one-way-toggle'))
+        .then(() => click('.ip-field .tags-input'))
+        .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/33,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.not.have.nested
+            .property('values.caveats.ipCaveat.ip[0]');
+          expect(arg.invalidFields).to.include('caveats.ipCaveat.ip');
         });
     }
   );

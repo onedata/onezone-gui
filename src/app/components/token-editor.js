@@ -229,17 +229,20 @@ export default Component.extend(I18n, {
     'authorizationNoneCaveatGroup',
     'interfaceCaveatGroup',
     'asnCaveatGroup',
+    'ipCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
         authorizationNoneCaveatGroup,
         interfaceCaveatGroup,
         asnCaveatGroup,
+        ipCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
         'authorizationNoneCaveatGroup',
         'interfaceCaveatGroup',
-        'asnCaveatGroup'
+        'asnCaveatGroup',
+        'ipCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -249,6 +252,7 @@ export default Component.extend(I18n, {
           authorizationNoneCaveatGroup,
           interfaceCaveatGroup,
           asnCaveatGroup,
+          ipCaveatGroup,
         ],
       });
     }
@@ -336,6 +340,28 @@ export default Component.extend(I18n, {
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
         }).create({ name: 'asnDisabledText' }),
+      ],
+    });
+  }),
+
+  ipCaveatGroup: computed(function asnCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'ipCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'ipEnabled' }),
+        TagsField.extend({
+          isVisible: reads('valuesSource.caveats.ipCaveat.ipEnabled'),
+        }).create({
+          name: 'ip',
+          tagEditorSettings: {
+            // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
+            regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
+          },
+          defaultValue: [],
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
+        }).create({ name: 'ipDisabledText' }),
       ],
     });
   }),

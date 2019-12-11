@@ -125,6 +125,14 @@ export default {
           text: 'This token can be used on any ASN',
         },
       },
+      ipCaveat: {
+        ipEnabled: {
+          label: 'IP',
+        },
+        ipDisabledText: {
+          text: 'This token can be used without any IP address restrictions',
+        },
+      },
     },
   },
 };
