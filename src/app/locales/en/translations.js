@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
-import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
 import providers from './tabs/providers';
 import clusters from './tabs/clusters';
@@ -210,6 +209,5 @@ let translations = {
 
 export default _.merge({},
   onedataCommonTranslations,
-  onedataWebsocketClientTranslations,
   translations
 );
