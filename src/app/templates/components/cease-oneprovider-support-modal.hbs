@@ -21,7 +21,7 @@
     {{one-checkbox 
       class="danger one-checkbox-danger one-checkbox-understand"
       checked=confirmChecked
-      update=(action (mut understandChecked))
+      update=(action (mut confirmChecked))
     }}
     <div class="text-understand" {{action (mut confirmChecked) (not confirmChecked)}}>
       {{tt this "confirmCheckbox"}}

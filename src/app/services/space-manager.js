@@ -343,7 +343,7 @@ export default Service.extend({
       .then(() => space.belongsTo('providerList').reload())
       .finally(() => this.get('currentUser').getCurrentUserRecord()
         .then(user => {
-          user.belongsTo('providerList').reload()
+          return user.belongsTo('providerList').reload()
             .then(userProviderList => {
               const providerStillPresent = userProviderList
                 .hasMany('list').ids().includes(get(provider, 'id'));
