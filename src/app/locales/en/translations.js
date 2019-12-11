@@ -82,6 +82,7 @@ import privacyPolicyModal from './components/privacy-policy-modal';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
+import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -188,6 +189,7 @@ let translations = {
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,
+    ceaseOneproviderSupportModal,
   },
   services: {
     tokenActions,

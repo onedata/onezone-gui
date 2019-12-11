@@ -7,20 +7,20 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service, { inject } from '@ember/service';
-import { get } from '@ember/object';
+import Service, { inject as service } from '@ember/service';
+import { get, getProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
-  store: inject(),
-  currentUser: inject(),
-  providerManager: inject(),
-  harvesterManager: inject(),
-  groupManager: inject(),
-  onedataGraph: inject(),
-  onedataGraphUtils: inject(),
+  store: service(),
+  currentUser: service(),
+  providerManager: service(),
+  harvesterManager: service(),
+  groupManager: service(),
+  onedataGraph: service(),
+  onedataGraphUtils: service(),
 
   /**
    * Fetches collection of all spaces
@@ -324,5 +324,37 @@ export default Service.extend({
    */
   reloadEffUserList(entityId) {
     return this.reloadModelList(entityId, 'effUserList');
+  },
+
+  ceaseOneproviderSupport(space, provider) {
+    const {
+      entityType,
+      entityId,
+    } = getProperties(space, 'entityType', 'entityId');
+    const aspectId = get(provider, 'entityId');
+    const ceaseGri = gri({
+      entityType,
+      entityId,
+      aspect: 'provider',
+      aspectId,
+    });
+    return this.get('onedataGraph').request({
+        operation: 'delete',
+        gri: ceaseGri,
+        scope: 'private',
+      })
+      .then(() => space.belongsTo('providerList').reload())
+      .finally(() => this.get('currentUser').getCurrentUserRecord()
+        .then(user => {
+          return user.belongsTo('providerList').reload()
+            .then(userProviderList => {
+              const providerStillPresent = userProviderList
+                .hasMany('list').ids().includes(get(provider, 'id'));
+              if (providerStillPresent) {
+                return provider.belongsTo('spaceList').reload();
+              }
+            });
+        })
+      );
   },
 });
