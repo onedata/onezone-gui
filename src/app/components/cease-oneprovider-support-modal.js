@@ -67,11 +67,6 @@ export default Component.extend(I18n, {
    */
   confirmChecked: false,
 
-  _onHidden() {
-    this.set('confirmChecked', false);
-    return this.get('onHidden')();
-  },
-
   actions: {
     proceed() {
       const {
@@ -94,7 +89,8 @@ export default Component.extend(I18n, {
       return this.get('close')();
     },
     onHidden() {
-      return this._onHidden();
+      this.set('confirmChecked', false);
+      return this.get('onHidden')();
     },
   },
 });
