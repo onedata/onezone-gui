@@ -8,6 +8,8 @@
  */
 
 import Component from '@ember/component';
+import { reads } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 
 export default Component.extend({
   classNames: [
@@ -17,9 +19,28 @@ export default Component.extend({
     'no-pointer-events',
   ],
 
+  navigationState: service(),
+
   /**
-   * @virtual
    * @type {string}
    */
-  fileId: undefined,
+  fileId: reads('navigationState.aspectOptions.fileId'),
+
+  /**
+   * @type {string}
+   */
+  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
+
+  /**
+   * @type {string}
+   */
+  tab: reads('navigationState.aspectOptions.tab'),
+
+  actions: {
+    oneproviderIdChanged(oneproviderId) {
+      this.get('navigationState').setAspectOptions({
+        oneproviderId,
+      });
+    },
+  },
 });

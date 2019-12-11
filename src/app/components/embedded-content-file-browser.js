@@ -12,12 +12,14 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default OneEmbeddedContainer.extend({
   layout,
 
   globalNotify: service(),
   router: service(),
+  navigationState: service(),
 
   /**
    * @virtual
@@ -37,12 +39,7 @@ export default OneEmbeddedContainer.extend({
    * browser.
    * @type {string}
    */
-  dirEntityId: computed('router', function dirEntityId() {
-    // FIXME: find a better way
-    const currentUrl = this.get('router').get('currentURL');
-    const m = currentUrl.match(/.*options=dir\.(.*)/);
-    return m && m[1];
-  }),
+  dirEntityId: reads('navigationState.dir'),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -83,14 +80,10 @@ export default OneEmbeddedContainer.extend({
   // TODO: if there will be more params, use some utils for changing options hash
   dirChangedObserver: observer('dirEntityId', function dirChangedObserver() {
     const {
-      router,
+      navigationState,
       dirEntityId,
-    } = this.getProperties('router', 'dirEntityId');
-    router.transitionTo({
-      queryParams: {
-        options: `dir.${dirEntityId}`,
-      },
-    });
+    } = this.getProperties('navigationState', 'dirEntityId');
+    navigationState.setAspectOptions({ dir: dirEntityId });
   }),
 
   actions: {
@@ -105,7 +98,12 @@ export default OneEmbeddedContainer.extend({
       return _location.origin + _location.pathname + router.urlFor(
         'onedata.sidebar.content.aspect',
         'transfers', {
-          queryParams: { options: `fileId.${fileId},tabId.${tabId}` },
+          queryParams: {
+            options: serializeAspectOptions({
+              fileId,
+              tab: tabId,
+            }),
+          },
         }
       );
     },

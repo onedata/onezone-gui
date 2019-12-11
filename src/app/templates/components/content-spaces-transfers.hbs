@@ -1,6 +1,8 @@
 {{#oneprovider-view-container
   contentContainerClass="content-spaces-transfers-content"
   space=space
+  oneproviderId=oneproviderId
+  oneproviderIdChanged=(action 'oneproviderIdChanged')
   as |container|
 }}
   {{embedded-content-space-transfers
@@ -8,5 +10,6 @@
     baseUrl=container.contentIframeBaseUrl
     spaceEntityId=space.entityId
     fileEntityId=fileId
+    tab=tab
   }}
 {{/oneprovider-view-container}}

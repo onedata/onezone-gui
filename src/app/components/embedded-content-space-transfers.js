@@ -16,6 +16,7 @@ import { reads } from '@ember/object/computed';
 export default OneEmbeddedContainer.extend({
   layout,
 
+  navigationState: service(),
   globalNotify: service(),
   router: service(),
 
@@ -40,6 +41,12 @@ export default OneEmbeddedContainer.extend({
   fileEntityId: undefined,
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  tab: undefined,
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -53,12 +60,20 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'fileEntityId']),
+  iframeInjectedProperties: Object.freeze([
+    'spaceEntityId',
+    'fileEntityId',
+    'tab',
+  ]),
 
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze(['closeFileTab']),
+  callParentActionNames: Object.freeze([
+    'closeFileTab',
+    'resetQueryParams',
+    'changeListTab',
+  ]),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -75,7 +90,20 @@ export default OneEmbeddedContainer.extend({
 
   actions: {
     closeFileTab() {
-      console.log('FIXME:', 'close file tab called');
+      return this.get('navigationState').setAspectOptions({
+        fileId: null,
+      });
+    },
+    resetQueryParams() {
+      return this.get('navigationState').setAspectOptions({
+        tab: null,
+        fileId: null,
+      });
+    },
+    changeListTab(tab) {
+      return this.get('navigationState').setAspectOptions({
+        tab,
+      });
     },
   },
 });

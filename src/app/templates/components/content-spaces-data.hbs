@@ -1,6 +1,8 @@
 {{#oneprovider-view-container
   contentContainerClass="content-spaces-data-content"
   space=space
+  oneproviderId=oneproviderId
+  oneproviderIdChanged=(action 'oneproviderIdChanged')
   as |container|
 }}
   {{embedded-content-file-browser

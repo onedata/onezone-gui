@@ -11,12 +11,13 @@
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
-import { promise, notEmpty } from 'ember-awesome-macros';
+import { promise, notEmpty, array, raw } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 const nameComparator = createPropertyComparator('name');
 
@@ -58,18 +59,25 @@ export default Component.extend(I18n, {
    */
   space: undefined,
 
+  oneproviderIdChanged: notImplementedIgnore,
+
   /**
-   * One of the Oneproviders that support `space` which will be used
+   * EntityId of one of the Oneproviders that support `space` which will be used
    * to render embedded component
    * @virtual
-   * @type {models.Provider}
+   * @type {String}
    */
-  selectedProvider: undefined,
+  oneproviderId: undefined,
 
   /**
    * @type {boolean}
    */
   isMapExpanded: false,
+
+  /**
+   * @type {ComputedProperty<Models.Provider>}
+   */
+  selectedProvider: array.findBy('providers', raw('entityId'), 'oneproviderId'),
 
   /**
    * `baseUrl` property for embedded component container.
@@ -140,8 +148,12 @@ export default Component.extend(I18n, {
   ),
 
   hasSupportChanged: observer('hasSupport', function hasSupportChanged() {
-    const hasSupport = this.get('hasSupport');
-    if (hasSupport) {
+    const {
+      hasSupport,
+      selectedProvider,
+      providers,
+    } = this.getProperties('hasSupport', 'selectedProvider', 'providers');
+    if (hasSupport && !providers.includes(selectedProvider)) {
       this.setFirstOnlineProvider();
     }
   }),
@@ -149,8 +161,13 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     this.get('initialProvidersListProxy').then(list => {
-      const firstOnlineOneprovider = list.findBy('online');
-      safeExec(this, 'set', 'selectedProvider', firstOnlineOneprovider || null);
+      const oneproviderId = this.get('oneproviderId');
+      if (!oneproviderId) {
+        const firstOnlineOneprovider = list.findBy('online');
+        if (firstOnlineOneprovider) {
+          this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
+        }
+      }
     });
     next(() => {
       safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
@@ -166,9 +183,9 @@ export default Component.extend(I18n, {
   },
 
   setFirstOnlineProvider() {
-    const providers = this.get('providers');
-    if (providers && get(providers, 'length')) {
-      this.set('selectedProvider', providers.objectAt(0));
+    const onlineProviders = this.get('providers').filterBy('online');
+    if (onlineProviders && get(onlineProviders, 'length')) {
+      this.get('oneproviderIdChanged')(get(onlineProviders.objectAt(0), 'entityId'));
     }
   },
 
@@ -180,7 +197,7 @@ export default Component.extend(I18n, {
         get(providerItem, 'entityId') || get(providerItem, 'id');
       const provider = this.get('providers').findBy('entityId', providerEntityId);
       if (provider) {
-        this.set('selectedProvider', provider);
+        this.get('oneproviderIdChanged')(providerEntityId);
       } else {
         // TODO: show error if cannot find the selected provider on list
         return false;

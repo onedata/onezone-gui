@@ -9,6 +9,8 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { reads } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: [
@@ -18,8 +20,23 @@ export default Component.extend(I18n, {
     'no-pointer-events',
   ],
 
+  navigationState: service(),
+
+  /**
+   * @type {string}
+   */
+  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
+
   /**
    * @override
    */
   i18nPrefix: 'components.contentSpacesData',
+
+  actions: {
+    oneproviderIdChanged(oneproviderId) {
+      this.get('navigationState').setAspectOptions({
+        oneproviderId,
+      });
+    },
+  },
 });
