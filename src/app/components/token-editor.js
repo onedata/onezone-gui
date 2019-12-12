@@ -232,6 +232,7 @@ export default Component.extend(I18n, {
     'asnCaveatGroup',
     'ipCaveatGroup',
     'regionCaveatGroup',
+    'countryCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
@@ -240,13 +241,15 @@ export default Component.extend(I18n, {
         asnCaveatGroup,
         ipCaveatGroup,
         regionCaveatGroup,
+        countryCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
         'authorizationNoneCaveatGroup',
         'interfaceCaveatGroup',
         'asnCaveatGroup',
         'ipCaveatGroup',
-        'regionCaveatGroup'
+        'regionCaveatGroup',
+        'countryCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -258,6 +261,7 @@ export default Component.extend(I18n, {
           asnCaveatGroup,
           ipCaveatGroup,
           regionCaveatGroup,
+          countryCaveatGroup,
         ],
       });
     }
@@ -444,6 +448,46 @@ export default Component.extend(I18n, {
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.regionCaveat.regionEnabled'),
         }).create({ name: 'regionDisabledText' }),
+      ],
+    });
+  }),
+
+  countryCaveatGroup: computed(function countryCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'countryCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'countryEnabled' }),
+        TagsField.extend({
+          isVisible: reads(
+            'valuesSource.caveats.countryCaveat.countryEnabled'
+          ),
+          sortTags(tags) {
+            return tags.sort((a, b) =>
+              get(a, 'label').toUpperCase().localeCompare(
+                get(b, 'label').toUpperCase()
+              )
+            );
+          },
+          tagsToValue(tags) {
+            return tags
+              .mapBy('label')
+              .map(country => country.toUpperCase())
+              .uniq();
+          },
+        }).create({
+          name: 'country',
+          tagEditorSettings: {
+            // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
+            regexp: /^[a-zA-Z]{2}$/,
+          },
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.countryCaveat.countryEnabled'
+          ),
+        }).create({ name: 'countryDisabledText' }),
       ],
     });
   }),

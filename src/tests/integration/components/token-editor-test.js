@@ -1004,6 +1004,103 @@ describe('Integration | Component | token editor', function () {
         });
     }
   );
+
+  it(
+    'renders country caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.countryEnabled-field label');
+      const $toggle = this.$('.countryEnabled-field .one-way-toggle');
+      const $country = this.$('.country-field');
+      const $disabledDescription = this.$('.countryDisabledText-field');
+      expect($label.text().trim()).to.equal('Country');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($country).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token can be used regardless country');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.countryCaveat.countryEnabled', false);
+      expect(arg.invalidFields)
+        .to.not.include('caveats.countryCaveat.countryEnabled');
+      expect(arg.invalidFields)
+        .to.not.include('caveats.countryCaveat.country');
+    }
+  );
+
+  it(
+    'renders country caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click(this.$('.countryEnabled-field .one-way-toggle')[0]))
+        .then(() => {
+          expect(this.$('.country-field')).to.exist;
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.countryCaveat.countryEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.countryCaveat.country.length', 0);
+          expect(arg.invalidFields).to.not
+            .include('caveats.countryCaveat.countryEnabled');
+          expect(arg.invalidFields).to.include('caveats.countryCaveat.country');
+        });
+    }
+  );
+
+  it(
+    'notifies about country caveat change',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.countryEnabled-field .one-way-toggle'))
+        .then(() => click('.country-field .tags-input'))
+        .then(() => fillIn('.country-field .text-editor-input', 'pl,cz,pl,DK,dk,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          const country = get(arg, 'values.caveats.countryCaveat.country');
+          expect(country).to.deep.equal(['CZ', 'DK', 'PL']);
+          expect(arg.invalidFields).to.not.include('caveats.countryCaveat.country');
+        });
+    }
+  );
+
+  it(
+    'not allows to input invalid country',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.countryEnabled-field .one-way-toggle'))
+        .then(() => click('.country-field .tags-input'))
+        .then(() => fillIn('.country-field .text-editor-input', 'a1,usa,b,a_,'))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.not.have.nested
+            .property('values.caveats.countryCaveat.country[0]');
+          expect(arg.invalidFields).to.include('caveats.countryCaveat.country');
+        });
+    }
+  );
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {

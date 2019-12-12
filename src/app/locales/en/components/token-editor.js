@@ -153,6 +153,14 @@ export default {
           text: 'This token is valid in all regions',
         },
       },
+      countryCaveat: {
+        countryEnabled: {
+          label: 'Country',
+        },
+        countryDisabledText: {
+          text: 'This token can be used regardless country',
+        },
+      },
     },
   },
 };
