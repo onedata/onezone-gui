@@ -15,8 +15,9 @@ import StaticTextField from 'onedata-gui-common/utils/form-component/static-text
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw, not } from 'ember-awesome-macros';
+import { equal, raw, not, hash } from 'ember-awesome-macros';
 import moment from 'moment';
+import _ from 'lodash';
 
 const tokenSubtypeOptions = [{
   value: 'userJoinGroup',
@@ -230,6 +231,7 @@ export default Component.extend(I18n, {
     'interfaceCaveatGroup',
     'asnCaveatGroup',
     'ipCaveatGroup',
+    'regionCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
@@ -237,12 +239,14 @@ export default Component.extend(I18n, {
         interfaceCaveatGroup,
         asnCaveatGroup,
         ipCaveatGroup,
+        regionCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
         'authorizationNoneCaveatGroup',
         'interfaceCaveatGroup',
         'asnCaveatGroup',
-        'ipCaveatGroup'
+        'ipCaveatGroup',
+        'regionCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -253,6 +257,7 @@ export default Component.extend(I18n, {
           interfaceCaveatGroup,
           asnCaveatGroup,
           ipCaveatGroup,
+          regionCaveatGroup,
         ],
       });
     }
@@ -330,12 +335,27 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'asnEnabled' }),
         TagsField.extend({
           isVisible: reads('valuesSource.caveats.asnCaveat.asnEnabled'),
+          sortTags(tags) {
+            return tags.sort((a, b) =>
+              parseInt(get(a, 'label') - parseInt(get(b, 'label')))
+            );
+          },
+          tagsToValue(tags) {
+            return tags
+              .mapBy('label')
+              .map(asnString => parseInt(asnString))
+              .uniq();
+          },
+          valueToTags(value) {
+            return (value || []).map(asn => ({ label: String(asn) }));
+          },
         }).create({
           name: 'asn',
           tagEditorSettings: {
             regexp: /^\d+$/,
           },
           defaultValue: [],
+          sort: true,
         }),
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
@@ -344,13 +364,26 @@ export default Component.extend(I18n, {
     });
   }),
 
-  ipCaveatGroup: computed(function asnCaveatGroup() {
+  ipCaveatGroup: computed(function ipCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'ipCaveat',
       fields: [
         CaveatGroupToggle.create({ name: 'ipEnabled' }),
         TagsField.extend({
           isVisible: reads('valuesSource.caveats.ipCaveat.ipEnabled'),
+          sortTags(tags) {
+            const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
+            const sortKeyDecoratedTags = tags.map(tag => {
+              const parsedIp = get(tag, 'label').match(ipPartsMatcher);
+              const sortKey = parsedIp
+                // Four IP octets (1,2,3,4) and mask (6)
+                .slice(1, 5).concat([parsedIp[6] || '0'])
+                .map(numberStr => _.padStart(numberStr, 3, '0'))
+                .join();
+              return { sortKey, tag };
+            });
+            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+          },
         }).create({
           name: 'ip',
           tagEditorSettings: {
@@ -358,10 +391,59 @@ export default Component.extend(I18n, {
             regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
           },
           defaultValue: [],
+          sort: true,
         }),
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
         }).create({ name: 'ipDisabledText' }),
+      ],
+    });
+  }),
+
+  regionCaveatGroup: computed(function regionCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'regionCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'regionEnabled' }),
+        TagsField.extend({
+          isVisible: reads(
+            'valuesSource.caveats.regionCaveat.regionEnabled'
+          ),
+          allowedTags: computed('i18nPrefix', 'path', function () {
+            const path = this.get('path');
+            return [
+              'Africa',
+              'Antarctica',
+              'Asia',
+              'Europe',
+              'EU',
+              'NorthAmerica',
+              'Oceania',
+              'SouthAmerica',
+            ].map(abbrev => ({
+              label: String(this.t(`${path}.tags.${abbrev}`)),
+              value: abbrev,
+            }));
+          }),
+          tagEditorSettings: hash('allowedTags'),
+          valueToTags(value) {
+            const allowedTags = this.get('allowedTags');
+            return (value || [])
+              .map(val => allowedTags.findBy('value', val))
+              .compact();
+          },
+          tagsToValue(tags) {
+            return tags.mapBy('value');
+          },
+        }).create({
+          name: 'region',
+          tagEditorComponentName: 'tags-input/selector-editor',
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.regionCaveat.regionEnabled'),
+        }).create({ name: 'regionDisabledText' }),
       ],
     });
   }),

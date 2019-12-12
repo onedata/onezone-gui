@@ -87,6 +87,16 @@ const tokenSubtypes = [{
   icon: 'provider',
 }];
 const preselectedSubtype = tokenSubtypes[0];
+const regions = [
+  { label: 'Africa', value: 'Africa' },
+  { label: 'Antarctica', value: 'Antarctica' },
+  { label: 'Asia', value: 'Asia' },
+  { label: 'Europe', value: 'Europe' },
+  { label: 'European Union', value: 'EU' },
+  { label: 'North America', value: 'NorthAmerica' },
+  { label: 'Oceania', value: 'Oceania' },
+  { label: 'South America', value: 'SouthAmerica' },
+];
 
 describe('Integration | Component | token editor', function () {
   setupComponentTest('token-editor', {
@@ -754,11 +764,11 @@ describe('Integration | Component | token editor', function () {
       return wait()
         .then(() => click('.asnEnabled-field .one-way-toggle'))
         .then(() => click('.asn-field .tags-input'))
-        .then(() => fillIn('.asn-field .text-editor-input', '123,'))
+        .then(() => fillIn('.asn-field .text-editor-input', '123,2,123,'))
         .then(() => {
           const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.asnCaveat.asn[0]', '123');
+          const asn = get(arg, 'values.caveats.asnCaveat.asn');
+          expect(asn).to.deep.equal([2, 123]);
           expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asn');
         });
     }
@@ -849,11 +859,18 @@ describe('Integration | Component | token editor', function () {
       return wait()
         .then(() => click('.ipEnabled-field .one-way-toggle'))
         .then(() => click('.ip-field .tags-input'))
-        .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/24,'))
+        .then(() => fillIn(
+          '.ip-field .text-editor-input',
+          '1.1.1.1/24,1.1.1.1/23,1.1.1.1,255.255.255.255,1.1.1.1/24,'))
         .then(() => {
           const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.ipCaveat.ip[0]', '123.123.123.123/24');
+          const ip = get(arg, 'values.caveats.ipCaveat.ip');
+          expect(ip).to.deep.equal([
+            '1.1.1.1',
+            '1.1.1.1/23',
+            '1.1.1.1/24',
+            '255.255.255.255',
+          ]);
           expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ip');
         });
     }
@@ -879,6 +896,114 @@ describe('Integration | Component | token editor', function () {
         });
     }
   );
+
+  it(
+    'renders region caveat form elements which have disabled initial state',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      const $label = this.$('.regionEnabled-field label');
+      const $toggle = this.$('.regionEnabled-field .one-way-toggle');
+      const $region = this.$('.region-field');
+      const $disabledDescription = this.$('.regionDisabledText-field');
+      expect($label.text().trim()).to.equal('Region');
+      expect($toggle).to.exist;
+      expect($toggle).to.not.have.class('checked');
+      expect($region).to.not.exist;
+      expect($disabledDescription).to.exist;
+      expect($disabledDescription.text().trim())
+        .to.equal('This token is valid in all regions');
+
+      const arg = changeSpy.lastCall.args[0];
+      expect(arg).to.have.nested
+        .property('values.caveats.regionCaveat.regionEnabled', false);
+      expect(arg.invalidFields).to.not.include('caveats.regionCaveat.regionEnabled');
+      expect(arg.invalidFields).to.not.include('caveats.regionCaveat.region');
+    }
+  );
+
+  it(
+    'renders region caveat form elements when that caveat is enabled',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click(this.$('.regionEnabled-field .one-way-toggle')[0]))
+        .then(() => {
+          expect(this.$('.region-field')).to.exist;
+
+          const arg = changeSpy.lastCall.args[0];
+          expect(arg).to.have.nested
+            .property('values.caveats.regionCaveat.regionEnabled', true);
+          expect(arg).to.have.nested
+            .property('values.caveats.regionCaveat.region.length', 0);
+          expect(arg.invalidFields).to.not
+            .include('caveats.regionCaveat.regionEnabled');
+          expect(arg.invalidFields).to.include('caveats.regionCaveat.region');
+        });
+    }
+  );
+
+  regions.forEach(({ label, value }) => {
+    it(
+      `notifies about region caveat change to ["${value}"]`,
+      function () {
+        const changeSpy = sinon.spy();
+        this.on('change', changeSpy);
+
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+        return wait()
+          .then(() => click('.regionEnabled-field .one-way-toggle'))
+          .then(() => click('.region-field .tags-input'))
+          .then(() => click(
+            getTagsSelector().find(`.selector-item:contains(${label})`)[0]
+          ))
+          .then(() => {
+            const arg = changeSpy.lastCall.args[0];
+            const region = get(arg, 'values.caveats.regionCaveat.region');
+            expect(region).to.deep.equal([value]);
+            expect(arg.invalidFields)
+              .to.not.include('caveats.regionCaveat.region');
+          });
+      }
+    );
+  });
+
+  it(
+    'sorts tags in region caveat input',
+    function () {
+      const changeSpy = sinon.spy();
+      this.on('change', changeSpy);
+
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.regionEnabled-field .one-way-toggle'))
+        .then(() => click('.region-field .tags-input'))
+        .then(() => click(
+          getTagsSelector().find('.selector-item:contains("Europe")')[0]
+        ))
+        .then(() => click(
+          getTagsSelector().find('.selector-item:contains("Asia")')[0]
+        ))
+        .then(() => {
+          const arg = changeSpy.lastCall.args[0];
+          const region = get(arg, 'values.caveats.regionCaveat.region');
+          expect(region).to.deep.equal([
+            'Asia',
+            'Europe',
+          ]);
+          expect(arg.invalidFields).to.not.include('caveats.regionCaveat.region');
+        });
+    }
+  );
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {
@@ -891,4 +1016,8 @@ class TargetHelper extends EmberPowerSelectHelper {
   constructor() {
     super('.target-field .ember-basic-dropdown');
   }
+}
+
+function getTagsSelector() {
+  return $('.webui-popover.in .tags-selector');
 }

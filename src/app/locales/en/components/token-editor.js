@@ -133,6 +133,26 @@ export default {
           text: 'This token can be used without any IP address restrictions',
         },
       },
+      regionCaveat: {
+        regionEnabled: {
+          label: 'Region',
+        },
+        region: {
+          tags: {
+            Africa: 'Africa',
+            Antarctica: 'Antarctica',
+            Asia: 'Asia',
+            Europe: 'Europe',
+            EU: 'European Union',
+            NorthAmerica: 'North America',
+            Oceania: 'Oceania',
+            SouthAmerica: 'South America',
+          },
+        },
+        regionDisabledText: {
+          text: 'This token is valid in all regions',
+        },
+      },
     },
   },
 };
