@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import onedataCommonTranslations from './onedata-gui-common';
-import onedataWebsocketClientTranslations from './onedata-gui-websocket-client';
 
 import providers from './tabs/providers';
 import clusters from './tabs/clusters';
@@ -83,6 +82,7 @@ import privacyPolicyModal from './components/privacy-policy-modal';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
+import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 
@@ -189,6 +189,7 @@ let translations = {
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,
+    ceaseOneproviderSupportModal,
   },
   services: {
     tokenActions,
@@ -208,6 +209,5 @@ let translations = {
 
 export default _.merge({},
   onedataCommonTranslations,
-  onedataWebsocketClientTranslations,
   translations
 );

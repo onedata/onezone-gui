@@ -15,6 +15,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
+import { collect } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   classNames: ['content-spaces-providers'],
@@ -30,6 +31,17 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
    * @type {Space}
    */
   space: undefined,
+
+  /**
+   * Oneprovider model passed to cease support modal
+   * @type {Models.Provider}
+   */
+  ceaseModalProvider: null,
+
+  /**
+   * @type {boolean}
+   */
+  ceaseModalOpened: false,
 
   /**
    * @override 
@@ -73,6 +85,26 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   globalActions: computed('openAddStorageAction', function getGlobalActions() {
     return [this.get('openAddStorageAction')];
   }),
+
+  ceaseOneproviderSupportAction: computed(
+    function ceaseOneproviderSupportAction() {
+      return {
+        icon: 'leave-space',
+        text: this.t('ceaseSupportItem'),
+        class: 'cease-oneprovider-support-btn',
+        action: (provider) => this.openCeaseModal(provider),
+      };
+    }
+  ),
+
+  providerActions: collect('ceaseOneproviderSupportAction'),
+
+  openCeaseModal(provider) {
+    this.setProperties({
+      ceaseModalOpened: true,
+      ceaseModalProvider: provider,
+    });
+  },
 
   actions: {
     openAddStorage() {
