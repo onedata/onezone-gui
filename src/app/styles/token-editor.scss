@@ -5,7 +5,7 @@
     width: 200px;
   }
   .caveat-group {
-    .fields-group-collapse {
+    > .field-component > .fields-group-collapse {
       display: flex;
     }
     .static-text-field-renderer {
@@ -18,6 +18,7 @@
     padding-top: $padding-base-vertical;
   }
   .caveat-group-toggle {
+    flex-grow: 0;
     .field-component {
       order: -1;
       flex-grow: 0;

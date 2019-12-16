@@ -161,6 +161,14 @@ export default {
           text: 'This token can be used regardless country',
         },
       },
+      objectIdCaveat: {
+        objectIdEnabled: {
+          label: 'Object ID',
+        },
+        objectIdDisabledText: {
+          text: 'This token allows to interact with all objects in Onedata',
+        },
+      },
     },
   },
 };

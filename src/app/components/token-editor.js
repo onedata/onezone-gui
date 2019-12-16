@@ -5,6 +5,7 @@ import { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
+import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import RadioField from 'onedata-gui-common/utils/form-component/radio-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
@@ -142,7 +143,7 @@ export default Component.extend(I18n, {
           defaultValue: 'access',
         }),
         FormFieldsGroup.extend({
-          isVisible: equal('valuesSource.basic.type', raw('invite')),
+          isExpanded: equal('valuesSource.basic.type', raw('invite')),
         }).create({
           name: 'inviteDetails',
           fields: [
@@ -168,7 +169,7 @@ export default Component.extend(I18n, {
     function inviteTargetDetailsGroup() {
       return FormFieldsGroup.extend({
         subtype: reads('valuesSource.basic.inviteDetails.subtype'),
-        isVisible: computed('subtype', function isVisible() {
+        isExpanded: computed('subtype', function isExpanded() {
           return getTargetModelNameForSubtype(this.get('subtype'));
         }),
       }).create({
@@ -233,6 +234,7 @@ export default Component.extend(I18n, {
     'ipCaveatGroup',
     'regionCaveatGroup',
     'countryCaveatGroup',
+    'objectIdCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
@@ -242,6 +244,7 @@ export default Component.extend(I18n, {
         ipCaveatGroup,
         regionCaveatGroup,
         countryCaveatGroup,
+        objectIdCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
         'authorizationNoneCaveatGroup',
@@ -249,7 +252,8 @@ export default Component.extend(I18n, {
         'asnCaveatGroup',
         'ipCaveatGroup',
         'regionCaveatGroup',
-        'countryCaveatGroup'
+        'countryCaveatGroup',
+        'objectIdCaveatGroup'
       );
 
       return FormFieldsGroup.create({
@@ -262,6 +266,7 @@ export default Component.extend(I18n, {
           ipCaveatGroup,
           regionCaveatGroup,
           countryCaveatGroup,
+          objectIdCaveatGroup,
         ],
       });
     }
@@ -488,6 +493,33 @@ export default Component.extend(I18n, {
             'valuesSource.caveats.countryCaveat.countryEnabled'
           ),
         }).create({ name: 'countryDisabledText' }),
+      ],
+    });
+  }),
+
+  objectIdCaveatGroup: computed(function objectIdCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'objectIdCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'objectIdEnabled' }),
+        FormFieldsCollectionGroup.extend({
+          isVisible: reads(
+            'valuesSource.caveats.objectIdCaveat.objectIdEnabled'
+          ),
+          fieldFactoryMethod(createdFieldsCounter) {
+            return TextField.create({
+              value: 'objectIdEntry',
+              valueName: `objectIdEntry${createdFieldsCounter}`,
+            });
+          },
+        }).create({
+          name: 'objectId',
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.objectIdCaveat.objectIdEnabled'
+          ),
+        }).create({ name: 'objectIdDisabledText' }),
       ],
     });
   }),
