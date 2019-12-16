@@ -72,6 +72,11 @@ export default Component.extend(I18n, {
   /**
    * @type {boolean}
    */
+  mapSelectorEnabled: true,
+
+  /**
+   * @type {boolean}
+   */
   isMapExpanded: false,
 
   /**

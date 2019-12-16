@@ -14,13 +14,15 @@
           selectDefaultOnInit=false
           selectedItemChanged=(action "selectedProviderChanged")
         }}
-          {{oneproviders-map-selector
-            isExpanded=isMapExpanded
-            oneproviders=providers
-            selectedOneprovider=selectedProvider
-            onToggleExpand=(action "onToggleExpandMap")
-            onOneproviderSelected=(action "selectedProviderChanged")
-          }}
+          {{#if mapSelectorEnabled}}
+            {{oneproviders-map-selector
+              isExpanded=isMapExpanded
+              oneproviders=providers
+              selectedOneprovider=selectedProvider
+              onToggleExpand=(action "onToggleExpandMap")
+              onOneproviderSelected=(action "selectedProviderChanged")
+            }}
+          {{/if}}
         {{/one-tab-bar}}
       </div>
     </div>
