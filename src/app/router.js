@@ -18,13 +18,14 @@ const Router = EmberRouter.extend({
 
 Router.map(function () {
   this.route('provider-redirect', { path: 'provider-redirect/:provider_id' });
-  this.route('public', function () {
-    this.route('harvesters', { path: 'harvesters/:harvester_id' });
-  });
   this.route('test', function () {
     this.route('login');
   });
-  onedataRouterSetup(Router, this);
+  onedataRouterSetup(Router, this, {
+    public() {
+      this.route('harvesters', { path: 'harvesters/:harvester_id' });
+    },
+  });
 });
 
 export default Router;
