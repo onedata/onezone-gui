@@ -1,4 +1,8 @@
 <form class="form form-horizontal form-component">
-  {{form-component/field-renderer field=fields}}
+  {{form-component/field-renderer field=basicGroup}}
+  <h1 class="toggle-expand {{if caveatsGroup.isExpanded "opened"}}" {{action "toggleCaveatsGroup"}}>
+    {{tt this "fields.caveats.header"}} {{one-icon icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down") class="toggle-icon"}}
+  </h1>
+  {{form-component/field-renderer field=caveatsGroup}}
 </form>
 {{yield}}

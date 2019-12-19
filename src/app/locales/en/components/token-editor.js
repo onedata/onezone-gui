@@ -88,6 +88,7 @@ export default {
       },
     },
     caveats: {
+      header: 'Caveats',
       expireCaveat: {
         expireEnabled: {
           label: 'Expire',

@@ -510,6 +510,13 @@ export default Component.extend(I18n, {
     });
   }),
 
+  init() {
+    this._super(...arguments);
+
+    // Force compute fields root group
+    this.get('fields');
+  },
+
   notifyAboutChange() {
     const {
       fields,
@@ -569,8 +576,9 @@ export default Component.extend(I18n, {
       })));
   },
 
-  // willDestroyElement() {
-  //   this._super(...arguments);
-  //   debugger;
-  // }
+  actions: {
+    toggleCaveatsGroup() {
+      this.toggleProperty('caveatsGroup.isExpanded');
+    },
+  },
 });
