@@ -66,6 +66,7 @@ export default {
               userJoinHarvester: 'Inviting harvester',
               groupJoinHarvester: 'Inviting harvester',
               spaceJoinHarvester: 'Inviting harvester',
+              supportSpace: 'Space to be supported',
             },
             placeholder: {
               userJoinGroup: 'Select group...',
@@ -77,6 +78,7 @@ export default {
               userJoinHarvester: 'Select harvester...',
               groupJoinHarvester: 'Select harvester...',
               spaceJoinHarvester: 'Select harvester...',
+              supportSpace: 'Select space...',
             },
           },
         },
@@ -92,11 +94,6 @@ export default {
         },
         expireDisabledText: {
           text: 'This token has unlimited lifetime',
-        },
-      },
-      authorizationNoneCaveat: {
-        authorizationNoneEnabled: {
-          label: 'Authorization none',
         },
       },
       interfaceCaveat: {

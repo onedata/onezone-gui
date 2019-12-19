@@ -81,6 +81,9 @@ const tokenSubtypes = [{
   subtype: 'supportSpace',
   label: 'Support space',
   icon: 'space',
+  targetModelName: 'space',
+  targetLabel: 'Space to be supported',
+  targetPlaceholder: 'Select space...',
 }, {
   subtype: 'registerOneprovider',
   label: 'Register Oneprovider',
@@ -557,55 +560,6 @@ describe('Integration | Component | token editor', function () {
             'caveats.expireCaveat.expireEnabled');
           expect(arg.invalidFields).to.not.include(
             'caveats.expireCaveat.validUntil');
-        });
-    }
-  );
-
-  it(
-    'renders authorizationNone caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.authorizationNoneEnabled-field label');
-      const $toggle = this.$('.authorizationNoneEnabled-field .one-way-toggle');
-      expect($label.text().trim()).to.equal('Authorization none');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested.property(
-        'values.caveats.authorizationNoneCaveat.authorizationNoneEnabled',
-        false
-      );
-      expect(arg.invalidFields).to.not
-        .include('caveats.authorizationNoneCaveat.authorizationNoneEnabled');
-    }
-  );
-
-  it(
-    'notifies about authorizationNone caveat change',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $toggle = this.$('.authorizationNoneEnabled-field .one-way-toggle');
-      return wait()
-        .then(() => click($toggle[0]))
-        .then(() => {
-          expect($toggle).to.have.class('checked');
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested.property(
-            'values.caveats.authorizationNoneCaveat.authorizationNoneEnabled',
-            true
-          );
-          expect(arg.invalidFields).to.not
-            .include('caveats.authorizationNoneCaveat.authorizationNoneEnabled');
         });
     }
   );

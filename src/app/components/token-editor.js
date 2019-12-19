@@ -59,6 +59,7 @@ const tokenSubtypeOptions = [{
 }, {
   value: 'supportSpace',
   icon: 'space',
+  targetModelName: 'space',
 }, {
   value: 'registerOneprovider',
   icon: 'provider',
@@ -228,7 +229,6 @@ export default Component.extend(I18n, {
 
   caveatsGroup: computed(
     'expireCaveatGroup',
-    'authorizationNoneCaveatGroup',
     'interfaceCaveatGroup',
     'asnCaveatGroup',
     'ipCaveatGroup',
@@ -238,7 +238,6 @@ export default Component.extend(I18n, {
     function caveatsGroup() {
       const {
         expireCaveatGroup,
-        authorizationNoneCaveatGroup,
         interfaceCaveatGroup,
         asnCaveatGroup,
         ipCaveatGroup,
@@ -247,7 +246,6 @@ export default Component.extend(I18n, {
         objectIdCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
-        'authorizationNoneCaveatGroup',
         'interfaceCaveatGroup',
         'asnCaveatGroup',
         'ipCaveatGroup',
@@ -260,7 +258,6 @@ export default Component.extend(I18n, {
         name: 'caveats',
         fields: [
           expireCaveatGroup,
-          authorizationNoneCaveatGroup,
           interfaceCaveatGroup,
           asnCaveatGroup,
           ipCaveatGroup,
@@ -291,17 +288,6 @@ export default Component.extend(I18n, {
           isVisible: not('valuesSource.caveats.expireCaveat.expireEnabled'),
         }).create({
           name: 'expireDisabledText',
-        }),
-      ],
-    });
-  }),
-
-  authorizationNoneCaveatGroup: computed(function authorizationNoneCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'authorizationNoneCaveat',
-      fields: [
-        CaveatGroupToggle.create({
-          name: 'authorizationNoneEnabled',
         }),
       ],
     });
