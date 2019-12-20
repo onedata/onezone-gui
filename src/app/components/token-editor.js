@@ -281,7 +281,7 @@ export default Component.extend(I18n, {
             'valuesSource.caveats.expireCaveat.expireEnabled'
           ),
         }).create({
-          name: 'validUntil',
+          name: 'expire',
           defaultValue: moment().add(1, 'day').endOf('day').toDate(),
         }),
         StaticTextField.extend({

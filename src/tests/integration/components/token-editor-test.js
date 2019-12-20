@@ -12,7 +12,6 @@ import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import moment from 'moment';
-import { get } from '@ember/object';
 
 const tokenSubtypes = [{
   subtype: 'userJoinGroup',
@@ -89,6 +88,31 @@ const tokenSubtypes = [{
   label: 'Register Oneprovider',
   icon: 'provider',
 }];
+const caveats = [{
+  name: 'expire',
+  label: 'Expire',
+  disabledDescription: 'This token has unlimited lifetime',
+}, {
+  name: 'interface',
+  label: 'Interface',
+  disabledDescription: 'This token can be used with REST and Oneclient',
+}, {
+  name: 'asn',
+  label: 'ASN',
+  disabledDescription: 'This token can be used on any ASN',
+}, {
+  name: 'ip',
+  label: 'IP',
+  disabledDescription: 'This token can be used without any IP address restrictions',
+}, {
+  name: 'region',
+  label: 'Region',
+  disabledDescription: 'This token is valid in all regions',
+}, {
+  name: 'country',
+  label: 'Country',
+  disabledDescription: 'This token can be used regardless country',
+}];
 const preselectedSubtype = tokenSubtypes[0];
 const regions = [
   { label: 'Africa', value: 'Africa' },
@@ -107,6 +131,7 @@ describe('Integration | Component | token editor', function () {
   });
 
   beforeEach(function () {
+    const mockedRecords = {};
     [
       'space',
       'group',
@@ -116,16 +141,21 @@ describe('Integration | Component | token editor', function () {
       const serviceName = `${modelName}-manager`;
       const getModelsMethodName = `get${_.upperFirst(modelName)}s`;
       const service = lookupService(this, serviceName);
+      mockedRecords[modelName] = _.reverse(_.range(3)).map(index => ({
+        name: `${modelName}${index}`,
+      }));
       sinon.stub(service, getModelsMethodName)
         .resolves({
           list: PromiseArray.create({
-            promise: resolve(
-              _.reverse(_.range(3)).map(index => ({
-                name: `${modelName}${index}`,
-              }))
-            ),
+            promise: resolve(mockedRecords[modelName]),
           }),
         });
+    });
+    const changeSpy = sinon.spy();
+    this.on('change', changeSpy);
+    this.setProperties({
+      changeSpy,
+      mockedRecords,
     });
   });
 
@@ -138,39 +168,32 @@ describe('Integration | Component | token editor', function () {
   it('renders "name" field', function () {
     this.render(hbs `{{token-editor}}`);
 
-    expect(this.$('.name-field label').text().trim()).to.equal('Name:');
+    expectLabelToEqual(this, 'name', 'Name');
     expect(this.$('.name-field input')).to.exist;
   });
 
   it('has not valid "name" when it is empty', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-    const arg = changeSpy.lastCall.args[0];
-    expect(arg).to.not.have.nested.property('values.basic.name');
-    expect(arg.invalidFields).to.include('basic.name');
+    expectToHaveNoValue(this, 'name');
+    expectToBeInvalid(this, 'name');
   });
 
   it('has valid "name" when it has been changed to not empty value', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
     return wait()
       .then(() => fillIn('.name-field input', 'abc'))
       .then(() => {
-        const arg = changeSpy.lastCall.args[0];
-        expect(arg).to.have.nested.property('values.basic.name', 'abc');
-        expect(arg.invalidFields).to.not.include('basic.name');
+        expectToHaveValue(this, 'name', 'abc');
+        expectToBeValid(this, 'name');
       });
   });
 
   it('renders "type" field', function () {
     this.render(hbs `{{token-editor}}`);
 
+    expectLabelToEqual(this, 'type', 'Type');
     return wait().then(() => {
       expect(this.$('.type-field .control-label').text().trim())
         .to.equal('Type:');
@@ -183,32 +206,24 @@ describe('Integration | Component | token editor', function () {
   });
 
   it('has "type" field with preselected "access" option', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
     return wait().then(() => {
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested.property('values.basic.type', 'access');
-      expect(arg.invalidFields).to.not.include('basic.type');
+      expectToHaveValue(this, 'type', 'access');
+      expectToBeValid(this, 'type');
       expect(this.$('.type-field .option-access input').prop('checked')).to.be
         .true;
     });
   });
 
   it('notifies about "type" field change', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
     return wait()
       .then(() => click('.type-field .option-invite'))
       .then(() => {
-        const arg = changeSpy.lastCall.args[0];
-        expect(arg).to.have.nested.property('values.basic.type', 'invite');
-        expect(arg.invalidFields).to.not.include('basic.type');
+        expectToHaveValue(this, 'type', 'invite');
+        expectToBeValid(this, 'type');
       });
   });
 
@@ -238,8 +253,7 @@ describe('Integration | Component | token editor', function () {
     this.render(hbs `{{token-editor}}`);
 
     const subtypeHelper = new SubtypeHelper();
-    expect(this.$('.subtype-field .control-label').text().trim())
-      .to.equal('Invitation type:');
+    expectLabelToEqual(this, 'subtype', 'Invitation type');
     return wait()
       .then(() => click('.type-field .option-invite'))
       .then(() => subtypeHelper.open())
@@ -255,20 +269,13 @@ describe('Integration | Component | token editor', function () {
   it(
     `has "subtype" field with preselected "${preselectedSubtype.label}" option`,
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested.property(
-            'values.basic.inviteDetails.subtype',
-            preselectedSubtype.subtype
-          );
-          expect(arg.invalidFields).to.not.include('basic.inviteDetails.subtype');
+          expectToHaveValue(this, 'subtype', preselectedSubtype.subtype);
+          expectToBeValid(this, 'subtype');
           const $dropdownTrigger = $(new SubtypeHelper().getTrigger());
           expect($dropdownTrigger.text().trim())
             .to.equal(preselectedSubtype.label);
@@ -279,20 +286,13 @@ describe('Integration | Component | token editor', function () {
   it(
     'has not valid "target" field when it is empty',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
         .then(() => {
-          expect(changeSpy.lastCall.args[0]).to.not.have.nested.property(
-            'values.basic.inviteDetails.inviteTargetDetails.target',
-          );
-          expect(changeSpy.lastCall.args[0].invalidFields).to.include(
-            'basic.inviteDetails.inviteTargetDetails.target'
-          );
+          expectToHaveNoValue(this, 'target');
+          expectToBeInvalid(this, 'target');
         });
     }
   );
@@ -300,17 +300,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not inform about invalid "target" field when it is hidden',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => {
-          expect(changeSpy.lastCall.args[0].invalidFields).to.not.include(
-            'basic.inviteDetails.inviteTargetDetails.target'
-          );
-        });
+        .then(() => expectToBeValid(this, 'target'));
     }
   );
 
@@ -323,9 +316,6 @@ describe('Integration | Component | token editor', function () {
     targetPlaceholder,
   }, index) => {
     it(`notifies about "subtype" field change to "${label}"`, function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       const subtypeHelper = new SubtypeHelper();
@@ -334,12 +324,11 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.type-field .option-invite'))
         .then(() => subtypeHelper.selectOption(index + 1))
         .then(() => {
-          expect(changeSpy.lastCall.args[0]).to.have
-            .nested.property('values.basic.inviteDetails.subtype', subtype);
-          expect(changeSpy.lastCall.args[0].invalidFields)
-            .to.not.include('basic.inviteDetails.subtype');
+          expectToHaveValue(this, 'subtype', subtype);
+          expectToBeValid(this, 'subtype');
         });
     });
+
     if (targetModelName) {
       it(
         `shows correct "target" field when "subtype" field is "${label}"`,
@@ -354,11 +343,10 @@ describe('Integration | Component | token editor', function () {
             .then(() => subtypeHelper.selectOption(index + 1))
             .then(() => {
               const $collapse = this.$('.inviteTargetDetails-collapse');
-              const $label = this.$('.target-field .control-label');
               const $placeholder =
                 this.$('.target-field .ember-power-select-placeholder');
               expect($collapse).to.have.class('in');
-              expect($label.text().trim()).to.equal(targetLabel + ':');
+              expectLabelToEqual(this, 'target', targetLabel);
               expect($placeholder.text().trim()).to.equal(targetPlaceholder);
             })
             .then(() => targetHelper.open())
@@ -377,9 +365,6 @@ describe('Integration | Component | token editor', function () {
       it(
         `notifies about "target" field change when "subtype" field is "${label}"`,
         function () {
-          const changeSpy = sinon.spy();
-          this.on('change', changeSpy);
-
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
           const subtypeHelper = new SubtypeHelper();
@@ -390,13 +375,10 @@ describe('Integration | Component | token editor', function () {
             .then(() => subtypeHelper.selectOption(index + 1))
             .then(() => targetHelper.selectOption(1))
             .then(() => {
-              expect(changeSpy.lastCall.args[0]).to.have.nested.property(
-                'values.basic.inviteDetails.inviteTargetDetails.target.name',
-                `${targetModelName}0`
-              );
-              expect(changeSpy.lastCall.args[0].invalidFields).to.not.include(
-                'basic.inviteDetails.inviteTargetDetails.target'
-              );
+              const selectedTarget =
+                this.get(`mockedRecords.${targetModelName}.lastObject`);
+              expectToHaveValue(this, 'target', selectedTarget);
+              expectToBeValid(this, 'target');
             });
         }
       );
@@ -404,9 +386,6 @@ describe('Integration | Component | token editor', function () {
       it(
         `does not show invite target details when "subtype" field is "${label}"`,
         function () {
-          const changeSpy = sinon.spy();
-          this.on('change', changeSpy);
-
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
           const subtypeHelper = new SubtypeHelper();
@@ -426,9 +405,6 @@ describe('Integration | Component | token editor', function () {
   it(
     'resets "target" field after change to subtype which requires different model',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       const subtypeHelper = new SubtypeHelper();
@@ -438,189 +414,127 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.type-field .option-invite'))
         .then(() => targetHelper.selectOption(1))
         .then(() => subtypeHelper.selectOption(3))
-        .then(() => {
-          expect(changeSpy.lastCall.args[0]).to.not.have.nested.property(
-            'values.basic.inviteDetails.inviteTargetDetails.target'
-          );
-        });
+        .then(() => expectToHaveNoValue(this, 'target'));
     }
   );
 
   it('renders "metadata" field', function () {
     this.render(hbs `{{token-editor}}`);
 
-    expect(this.$('.metadata-field label').text().trim()).to.equal('Metadata:');
+    expectLabelToEqual(this, 'metadata', 'Metadata');
     expect(this.$('.metadata-field textarea')).to.exist;
   });
 
   it('has valid "metadata" when it is empty', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-    const arg = changeSpy.lastCall.args[0];
-    expect(arg).to.not.have.nested.property('values.basic.metadata');
-    expect(arg.invalidFields).to.not.include('basic.metadata');
+    expectToHaveNoValue(this, 'metadata');
+    expectToBeValid(this, 'metadata');
   });
 
   it('notifies about "metadata" field change', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
     return wait()
       .then(() => fillIn('.metadata-field textarea', '{ "a": 1 }'))
       .then(() => {
-        const arg = changeSpy.lastCall.args[0];
-        expect(arg)
-          .to.have.nested.property('values.basic.metadata', '{ "a": 1 }');
-        expect(arg.invalidFields).to.not.include('basic.metadata');
+        expectToHaveValue(this, 'metadata', '{ "a": 1 }');
+        expectToBeValid(this, 'metadata');
       });
   });
 
   it('notifies about invalid "metadata" field value', function () {
-    const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
-
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
     return wait()
       .then(() => fillIn('.metadata-field textarea', '{ a: 1 }'))
       .then(() => {
-        const arg = changeSpy.lastCall.args[0];
-        expect(arg).to.have.nested.property('values.basic.metadata', '{ a: 1 }');
-        expect(arg.invalidFields).to.include('basic.metadata');
+        expectToHaveValue(this, 'metadata', '{ a: 1 }');
+        expectToBeInvalid(this, 'metadata');
       });
   });
 
-  it(
-    'renders expire caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
+  caveats.forEach(({ name, label, disabledDescription }) => {
+    it(
+      `renders unchecked toggle, label and disabled description for ${name} caveat on init`,
+      function () {
+        this.render(hbs `{{token-editor}}`);
 
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        const $disabledDescription = this.$(`.${name}DisabledText-field`);
 
-      const $label = this.$('.expireEnabled-field label');
-      const $toggle = this.$('.expireEnabled-field .one-way-toggle');
-      const $validUntil = this.$('.validUntil-field');
-      const $disabledDescription = this.$('.expireDisabledText-field');
-      expect($label.text().trim()).to.equal('Expire');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($validUntil).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token has unlimited lifetime');
+        expectCaveatToggleState(this, name, false);
+        expectLabelToEqual(this, name, label);
+        expect(getFieldElement(this, name)).to.not.exist;
+        expect($disabledDescription.text().trim()).to.equal(disabledDescription);
+      }
+    );
 
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.expireCaveat.expireEnabled', false);
-      expect(arg.invalidFields).to.not.include('caveats.expireCaveat.expireEnabled');
-      expect(arg.invalidFields).to.not.include('caveats.expireCaveat.validUntil');
-    }
-  );
+    it(
+      `has valid and disabled ${name} caveat on init`,
+      function () {
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+        expectCaveatToHaveValue(this, name, false);
+        expectToBeValid(this, name);
+      }
+    );
+
+    it(
+      `hides disabled description and shows form field on ${name} caveat toggle change`,
+      function () {
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+        return wait()
+          .then(() => toggleCaveat(name))
+          .then(() => {
+            const $disabledDescription = this.$(`.${name}DisabledText-field`);
+
+            expectCaveatToggleState(this, name, true);
+            expect(getFieldElement(this, name)).to.exist;
+            expect($disabledDescription).to.not.exist;
+            expectCaveatToHaveValue(this, name, true);
+          });
+      }
+    );
+  });
 
   it(
     'renders expire caveat form elements when that caveat is enabled',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
       const tomorrow = moment().add(1, 'day').endOf('day');
       const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
 
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      const $toggle = this.$('.expireEnabled-field .one-way-toggle');
       return wait()
-        .then(() => click($toggle[0]))
+        .then(() => toggleCaveat('expire'))
         .then(() => {
-          const $validUntil = this.$('.validUntil-field');
-          const $disabledDescription = this.$('.expireDisabledText-field');
-          expect($toggle).to.have.class('checked');
-          expect($validUntil).to.exist;
-          expect($disabledDescription).to.not.exist;
-          expect($validUntil.find('input').val()).to.be.oneOf([
-            tomorrow.format('YYYY/MM/DD H:mm'),
-            dayAfterTomorrow.format('YYYY/MM/DD H:mm'),
-          ]);
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.expireCaveat.expireEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.expireCaveat.validUntil');
-          const validUntil = get(arg, 'values.caveats.expireCaveat.validUntil');
-          expect(
-            tomorrow.isSame(validUntil) || dayAfterTomorrow.isSame(validUntil)
-          ).to.be.true;
-          expect(arg.invalidFields).to.not.include(
-            'caveats.expireCaveat.expireEnabled');
-          expect(arg.invalidFields).to.not.include(
-            'caveats.expireCaveat.validUntil');
+          expectCaveatToHaveValue(this, 'expire', true, sinon.match(value =>
+            tomorrow.isSame(value) || dayAfterTomorrow.isSame(value)
+          ));
+          expectToBeValid(this, 'expire');
         });
-    }
-  );
-
-  it(
-    'renders interface caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.interfaceEnabled-field label');
-      const $toggle = this.$('.interfaceEnabled-field .one-way-toggle');
-      const $interface = this.$('.interface-field');
-      const $disabledDescription = this.$('.interfaceDisabledText-field');
-      expect($label.text().trim()).to.equal('Interface');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($interface).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token can be used with REST and Oneclient');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.interfaceCaveat.interfaceEnabled', false);
-      expect(arg.invalidFields).to.not.include(
-        'caveats.interfaceCaveat.interfaceEnabled');
-      expect(arg.invalidFields).to.not.include('caveats.interfaceCaveat.interface');
     }
   );
 
   it(
     'renders interface caveat form elements when that caveat is enabled',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      const $toggle = this.$('.interfaceEnabled-field .one-way-toggle');
       let $restOption, $oneclientOption;
       return wait()
-        .then(() => click($toggle[0]))
+        .then(() => toggleCaveat('interface'))
         .then(() => {
           $restOption = this.$('.option-rest');
           $oneclientOption = this.$('.option-oneclient');
-          expect($toggle).to.have.class('checked');
           expect($restOption).to.exist;
+          expect($restOption.text().trim()).to.equal('REST');
           expect($oneclientOption).to.exist;
+          expect($oneclientOption.text().trim()).to.equal('Oneclient');
 
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.interfaceCaveat.interfaceEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.interfaceCaveat.interface', 'rest');
-          expect(arg.invalidFields).to.not
-            .include('caveats.interfaceCaveat.interfaceEnabled');
-          expect(arg.invalidFields).to.not
-            .include('caveats.interfaceCaveat.interface');
+          expectCaveatToHaveValue(this, 'interface', true, 'rest');
+          expectToBeValid(this, 'interface');
         });
     }
   );
@@ -628,102 +542,56 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about interface caveat change',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.interfaceEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('interface'))
         .then(() => click('.option-oneclient'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.interfaceCaveat.interface', 'oneclient');
-          expect(arg.invalidFields).to.not
-            .include('caveats.expireCaveat.interface');
+          expectCaveatToHaveValue(this, 'interface', true, 'oneclient');
+          expectToBeValid(this, 'interface');
         })
         .then(() => click('.option-rest'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.interfaceCaveat.interface', 'rest');
-          expect(arg.invalidFields).to.not
-            .include('caveats.interfaceCaveat.interface');
+          expectCaveatToHaveValue(this, 'interface', true, 'rest');
+          expectToBeValid(this, 'interface');
         });
     }
   );
 
-  it(
-    'renders asn caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
+  [
+    'asn',
+    'ip',
+    'region',
+    'country',
+  ].forEach(caveatName => {
+    it(
+      `renders empty, invalid ${caveatName} caveat when it is enabled`,
+      function () {
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.asnEnabled-field label');
-      const $toggle = this.$('.asnEnabled-field .one-way-toggle');
-      const $asn = this.$('.asn-field');
-      const $disabledDescription = this.$('.asnDisabledText-field');
-      expect($label.text().trim()).to.equal('ASN');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($asn).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token can be used on any ASN');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.asnCaveat.asnEnabled', false);
-      expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asnEnabled');
-      expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asn');
-    }
-  );
-
-  it(
-    'renders asn caveat form elements when that caveat is enabled',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => click(this.$('.asnEnabled-field .one-way-toggle')[0]))
-        .then(() => {
-          expect(this.$('.asn-field')).to.exist;
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.asnCaveat.asnEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.asnCaveat.asn.length', 0);
-          expect(arg.invalidFields).to.not
-            .include('caveats.asnCaveat.asnEnabled');
-          expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
-        });
-    }
-  );
+        return wait()
+          .then(() => toggleCaveat(caveatName))
+          .then(() => {
+            expectCaveatToHaveValue(this, caveatName, true, sinon.match([]));
+            expectToBeInvalid(this, caveatName);
+          });
+      }
+    );
+  });
 
   it(
     'notifies about asn caveat change',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.asnEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('asn'))
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', '123,2,123,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          const asn = get(arg, 'values.caveats.asnCaveat.asn');
-          expect(asn).to.deep.equal([2, 123]);
-          expect(arg.invalidFields).to.not.include('caveats.asnCaveat.asn');
+          expectCaveatToHaveValue(this, 'asn', true, [2, 123]);
+          expectToBeValid(this, 'asn');
         });
     }
   );
@@ -731,73 +599,15 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid asn',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.asnEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('asn'))
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', 'abc,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.not.have.nested
-            .property('values.caveats.asnCaveat.asn[0]');
-          expect(arg.invalidFields).to.include('caveats.asnCaveat.asn');
-        });
-    }
-  );
-
-  it(
-    'renders ip caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.ipEnabled-field label');
-      const $toggle = this.$('.ipEnabled-field .one-way-toggle');
-      const $ip = this.$('.ip-field');
-      const $disabledDescription = this.$('.ipDisabledText-field');
-      expect($label.text().trim()).to.equal('IP');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($ip).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token can be used without any IP address restrictions');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.ipCaveat.ipEnabled', false);
-      expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ipEnabled');
-      expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ip');
-    }
-  );
-
-  it(
-    'renders ip caveat form elements when that caveat is enabled',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => click(this.$('.ipEnabled-field .one-way-toggle')[0]))
-        .then(() => {
-          expect(this.$('.ip-field')).to.exist;
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.ipCaveat.ipEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.ipCaveat.ip.length', 0);
-          expect(arg.invalidFields).to.not
-            .include('caveats.ipCaveat.ipEnabled');
-          expect(arg.invalidFields).to.include('caveats.ipCaveat.ip');
+          expectCaveatToHaveValue(this, 'asn', true, sinon.match([]));
+          expectToBeInvalid(this, 'asn');
         });
     }
   );
@@ -805,27 +615,22 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about ip caveat change',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.ipEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn(
           '.ip-field .text-editor-input',
           '1.1.1.1/24,1.1.1.1/23,1.1.1.1,255.255.255.255,1.1.1.1/24,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          const ip = get(arg, 'values.caveats.ipCaveat.ip');
-          expect(ip).to.deep.equal([
+          expectCaveatToHaveValue(this, 'ip', true, [
             '1.1.1.1',
             '1.1.1.1/23',
             '1.1.1.1/24',
             '255.255.255.255',
           ]);
-          expect(arg.invalidFields).to.not.include('caveats.ipCaveat.ip');
+          expectToBeValid(this, 'ip');
         });
     }
   );
@@ -833,73 +638,15 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid ip',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.ipEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/33,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.not.have.nested
-            .property('values.caveats.ipCaveat.ip[0]');
-          expect(arg.invalidFields).to.include('caveats.ipCaveat.ip');
-        });
-    }
-  );
-
-  it(
-    'renders region caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.regionEnabled-field label');
-      const $toggle = this.$('.regionEnabled-field .one-way-toggle');
-      const $region = this.$('.region-field');
-      const $disabledDescription = this.$('.regionDisabledText-field');
-      expect($label.text().trim()).to.equal('Region');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($region).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token is valid in all regions');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.regionCaveat.regionEnabled', false);
-      expect(arg.invalidFields).to.not.include('caveats.regionCaveat.regionEnabled');
-      expect(arg.invalidFields).to.not.include('caveats.regionCaveat.region');
-    }
-  );
-
-  it(
-    'renders region caveat form elements when that caveat is enabled',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => click(this.$('.regionEnabled-field .one-way-toggle')[0]))
-        .then(() => {
-          expect(this.$('.region-field')).to.exist;
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.regionCaveat.regionEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.regionCaveat.region.length', 0);
-          expect(arg.invalidFields).to.not
-            .include('caveats.regionCaveat.regionEnabled');
-          expect(arg.invalidFields).to.include('caveats.regionCaveat.region');
+          expectCaveatToHaveValue(this, 'ip', true, sinon.match([]));
+          expectToBeInvalid(this, 'ip');
         });
     }
   );
@@ -908,23 +655,17 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about region caveat change to ["${value}"]`,
       function () {
-        const changeSpy = sinon.spy();
-        this.on('change', changeSpy);
-
         this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
         return wait()
-          .then(() => click('.regionEnabled-field .one-way-toggle'))
+          .then(() => toggleCaveat('region'))
           .then(() => click('.region-field .tags-input'))
           .then(() => click(
             getTagsSelector().find(`.selector-item:contains(${label})`)[0]
           ))
           .then(() => {
-            const arg = changeSpy.lastCall.args[0];
-            const region = get(arg, 'values.caveats.regionCaveat.region');
-            expect(region).to.deep.equal([value]);
-            expect(arg.invalidFields)
-              .to.not.include('caveats.regionCaveat.region');
+            expectCaveatToHaveValue(this, 'region', true, sinon.match([value]));
+            expectToBeValid(this, 'region');
           });
       }
     );
@@ -933,13 +674,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'sorts tags in region caveat input',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.regionEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('region'))
         .then(() => click('.region-field .tags-input'))
         .then(() => click(
           getTagsSelector().find('.selector-item:contains("Europe")')[0]
@@ -948,68 +686,11 @@ describe('Integration | Component | token editor', function () {
           getTagsSelector().find('.selector-item:contains("Asia")')[0]
         ))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          const region = get(arg, 'values.caveats.regionCaveat.region');
-          expect(region).to.deep.equal([
+          expectCaveatToHaveValue(this, 'region', true, sinon.match([
             'Asia',
             'Europe',
-          ]);
-          expect(arg.invalidFields).to.not.include('caveats.regionCaveat.region');
-        });
-    }
-  );
-
-  it(
-    'renders country caveat form elements which have disabled initial state',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      const $label = this.$('.countryEnabled-field label');
-      const $toggle = this.$('.countryEnabled-field .one-way-toggle');
-      const $country = this.$('.country-field');
-      const $disabledDescription = this.$('.countryDisabledText-field');
-      expect($label.text().trim()).to.equal('Country');
-      expect($toggle).to.exist;
-      expect($toggle).to.not.have.class('checked');
-      expect($country).to.not.exist;
-      expect($disabledDescription).to.exist;
-      expect($disabledDescription.text().trim())
-        .to.equal('This token can be used regardless country');
-
-      const arg = changeSpy.lastCall.args[0];
-      expect(arg).to.have.nested
-        .property('values.caveats.countryCaveat.countryEnabled', false);
-      expect(arg.invalidFields)
-        .to.not.include('caveats.countryCaveat.countryEnabled');
-      expect(arg.invalidFields)
-        .to.not.include('caveats.countryCaveat.country');
-    }
-  );
-
-  it(
-    'renders country caveat form elements when that caveat is enabled',
-    function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => click(this.$('.countryEnabled-field .one-way-toggle')[0]))
-        .then(() => {
-          expect(this.$('.country-field')).to.exist;
-
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.have.nested
-            .property('values.caveats.countryCaveat.countryEnabled', true);
-          expect(arg).to.have.nested
-            .property('values.caveats.countryCaveat.country.length', 0);
-          expect(arg.invalidFields).to.not
-            .include('caveats.countryCaveat.countryEnabled');
-          expect(arg.invalidFields).to.include('caveats.countryCaveat.country');
+          ]));
+          expectToBeValid(this, 'region');
         });
     }
   );
@@ -1017,20 +698,16 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat change',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.countryEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('country'))
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'pl,cz,pl,DK,dk,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          const country = get(arg, 'values.caveats.countryCaveat.country');
-          expect(country).to.deep.equal(['CZ', 'DK', 'PL']);
-          expect(arg.invalidFields).to.not.include('caveats.countryCaveat.country');
+          expectCaveatToHaveValue(this, 'country', true,
+            sinon.match(['CZ', 'DK', 'PL']));
+          expectToBeValid(this, 'country');
         });
     }
   );
@@ -1038,20 +715,15 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid country',
     function () {
-      const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
-
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
-        .then(() => click('.countryEnabled-field .one-way-toggle'))
+        .then(() => toggleCaveat('country'))
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'a1,usa,b,a_,'))
         .then(() => {
-          const arg = changeSpy.lastCall.args[0];
-          expect(arg).to.not.have.nested
-            .property('values.caveats.countryCaveat.country[0]');
-          expect(arg.invalidFields).to.include('caveats.countryCaveat.country');
+          expectCaveatToHaveValue(this, 'country', true, sinon.match([]));
+          expectToBeInvalid(this, 'country');
         });
     }
   );
@@ -1071,4 +743,93 @@ class TargetHelper extends EmberPowerSelectHelper {
 
 function getTagsSelector() {
   return $('.webui-popover.in .tags-selector');
+}
+
+const basicFieldNameToFieldPath = {
+  name: 'basic.name',
+  type: 'basic.type',
+  subtype: 'basic.inviteDetails.subtype',
+  target: 'basic.inviteDetails.inviteTargetDetails.target',
+  metadata: 'basic.metadata',
+};
+
+function expectToBeValid(testCase, fieldName) {
+  const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
+  const fieldPath = basicFieldNameToFieldPath[fieldName];
+  if (fieldPath) {
+    expect(invalidFields).to.not.include(fieldPath);
+  } else {
+    // Not found, probably a caveat field
+    expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
+    expect(invalidFields).to.not.include(caveatValueFieldPath(fieldName));
+  }
+}
+
+function expectToBeInvalid(testCase, fieldName) {
+  const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
+  const fieldPath = basicFieldNameToFieldPath[fieldName];
+  if (fieldPath) {
+    expect(invalidFields).to.include(fieldPath);
+  } else {
+    // Not found, probably a caveat field
+    expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
+    expect(invalidFields).to.include(caveatValueFieldPath(fieldName));
+  }
+}
+
+function caveatEnabledFieldPath(caveatName) {
+  return `caveats.${caveatName}Caveat.${caveatName}Enabled`;
+}
+
+function caveatValueFieldPath(caveatName) {
+  return `caveats.${caveatName}Caveat.${caveatName}`;
+}
+
+function expectToHaveValue(testCase, fieldName, value) {
+  const changeArg = testCase.get('changeSpy').lastCall.args[0];
+  const fieldValuePath = `values.${basicFieldNameToFieldPath[fieldName]}`;
+  expect(changeArg).to.have.nested.property(fieldValuePath, value);
+}
+
+function expectToHaveNoValue(testCase, fieldName) {
+  const changeArg = testCase.get('changeSpy').lastCall.args[0];
+  const fieldValuePath = `values.${basicFieldNameToFieldPath[fieldName]}`;
+  expect(changeArg).to.not.have.nested.property(fieldValuePath);
+}
+
+function expectCaveatToHaveValue(testCase, caveatName, isEnabled, value = sinon.match.any) {
+  const lastCall = testCase.get('changeSpy').lastCall;
+  const caveatEnabledValuePath = `values.${caveatEnabledFieldPath(caveatName)}`;
+  const caveatValueValuePath = `values.${caveatValueFieldPath(caveatName)}`;
+  expect(lastCall).to.have.been.calledWith(
+    sinon.match.hasNested(caveatEnabledValuePath, isEnabled)
+  );
+  expect(lastCall).to.have.been.calledWith(
+    sinon.match.hasNested(caveatValueValuePath, value)
+  );
+}
+
+function expectLabelToEqual(testCase, fieldName, label) {
+  const isCaveat = !basicFieldNameToFieldPath[fieldName];
+  const domFieldName = isCaveat ? `${fieldName}Enabled` : fieldName;
+  label = isCaveat ? label : `${label}:`;
+  expect(testCase.$(`.${domFieldName}-field label`).text().trim()).to.equal(label);
+}
+
+function expectCaveatToggleState(testCase, caveatName, isChecked) {
+  const $toggle = testCase.$(`.${caveatName}Enabled-field .one-way-toggle`);
+  expect($toggle).to.exist;
+  if (isChecked) {
+    expect($toggle).to.have.class('checked');
+  } else {
+    expect($toggle).to.not.have.class('checked');
+  }
+}
+
+function toggleCaveat(caveatName) {
+  return click(`.${caveatName}Enabled-field .one-way-toggle`);
+}
+
+function getFieldElement(testCase, fieldName) {
+  return testCase.$(`.${fieldName}-field`);
 }
