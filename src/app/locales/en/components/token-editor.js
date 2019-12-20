@@ -164,7 +164,7 @@ export default {
           label: 'Object ID',
         },
         objectIdDisabledText: {
-          text: 'This token allows to interact with all objects in Onedata',
+          text: 'This token allows to interact with all data objects in Onedata',
         },
       },
     },

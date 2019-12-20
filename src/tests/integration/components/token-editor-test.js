@@ -112,6 +112,10 @@ const caveats = [{
   name: 'country',
   label: 'Country',
   disabledDescription: 'This token can be used regardless country',
+}, {
+  name: 'objectId',
+  label: 'Object ID',
+  disabledDescription: 'This token allows to interact with all data objects in Onedata',
 }];
 const preselectedSubtype = tokenSubtypes[0];
 const regions = [
@@ -724,6 +728,40 @@ describe('Integration | Component | token editor', function () {
         .then(() => {
           expectCaveatToHaveValue(this, 'country', true, sinon.match([]));
           expectToBeInvalid(this, 'country');
+        });
+    }
+  );
+
+  it(
+    'renders empty, valid objectId caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('objectId'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'objectId', true,
+            sinon.match.has('__fieldsValueNames', sinon.match([])));
+          expectToBeValid(this, 'objectId');
+        });
+    }
+  );
+
+  it(
+    'notifies about objectId caveat change',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('objectId'))
+        .then(() =>
+          click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
+        )
+        .then(() => fillIn(getFieldElement(this, 'objectId').find('input')[0], 'abc'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'objectId', true,
+            sinon.match.has('objectIdEntry0', 'abc'));
+          expectToBeValid(this, 'objectId');
         });
     }
   );
