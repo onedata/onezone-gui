@@ -88,19 +88,19 @@ const userHandlers = {
     if (operation === 'create') {
       const token = randomToken();
       return this.get('store')
-        .createRecord('clientToken', {
+        .createRecord('token', {
           token,
         })
         .save()
-        .then(clientToken => {
-          const clientTokenId = get(clientToken, 'id');
+        .then(token => {
+          const clientTokenId = get(token, 'id');
           // real operation of adding token to list is server-side
           return this.get('currentUser')
             .getCurrentUserRecord()
             .then(user => get(user, 'clientTokenList'))
             .then(clientTokens => get(clientTokens, 'list'))
             .then(list => {
-              list.pushObject(clientToken);
+              list.pushObject(token);
               return list.save();
             })
             .then(() => ({
