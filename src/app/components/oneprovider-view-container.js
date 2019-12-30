@@ -168,10 +168,7 @@ export default Component.extend(I18n, {
     this.get('initialProvidersListProxy').then(list => {
       const oneproviderId = this.get('oneproviderId');
       if (!oneproviderId) {
-        const firstOnlineOneprovider = list.findBy('online');
-        if (firstOnlineOneprovider) {
-          this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
-        }
+        this.setFirstOnlineProvider(list);
       }
     });
     next(() => {
@@ -187,10 +184,11 @@ export default Component.extend(I18n, {
     });
   },
 
-  setFirstOnlineProvider() {
-    const onlineProviders = this.get('providers').filterBy('online');
-    if (onlineProviders && get(onlineProviders, 'length')) {
-      this.get('oneproviderIdChanged')(get(onlineProviders.objectAt(0), 'entityId'));
+  setFirstOnlineProvider(providers) {
+    const _providers = providers ? providers : this.get('providers').filterBy('online');
+    const firstOnlineOneprovider = _providers.findBy('online');
+    if (firstOnlineOneprovider) {
+      this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
     }
   },
 
