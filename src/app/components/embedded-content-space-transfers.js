@@ -90,9 +90,10 @@ export default OneEmbeddedContainer.extend({
 
   actions: {
     closeFileTab() {
-      return this.get('navigationState').setAspectOptions({
+      return this.get('navigationState').changeRouteAspectOptions({
+        tab: 'waiting',
         fileId: null,
-      });
+      }, true);
     },
     resetQueryParams() {
       return this.get('navigationState').setAspectOptions({

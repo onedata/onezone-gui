@@ -77,7 +77,6 @@ export default OneEmbeddedContainer.extend({
     return `iframe-oneprovider-${oneproviderId}`;
   }),
 
-  // TODO: if there will be more params, use some utils for changing options hash
   dirChangedObserver: observer('dirEntityId', function dirChangedObserver() {
     const {
       navigationState,

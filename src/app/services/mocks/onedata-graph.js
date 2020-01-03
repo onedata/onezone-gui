@@ -124,18 +124,17 @@ const userHandlers = {
 };
 
 export default OnedataGraphMock.extend({
-  _handlers: Object.freeze({
-    space: spaceHandlers,
-    harvester: harvesterHandlers,
-    user: userHandlers,
-    provider: providerHandlers,
-  }),
-
   init() {
     this._super(...arguments);
+    const _handlers = Object.freeze({
+      space: spaceHandlers,
+      harvester: harvesterHandlers,
+      user: userHandlers,
+      provider: providerHandlers,
+    });
     this.set(
       'handlers',
-      _.merge({}, this.get('handlers'), this.get('_handlers'))
+      _.merge({}, this.get('handlers'), _handlers)
     );
   },
 });

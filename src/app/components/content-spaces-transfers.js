@@ -38,9 +38,7 @@ export default Component.extend({
 
   actions: {
     oneproviderIdChanged(oneproviderId) {
-      this.get('navigationState').setAspectOptions({
-        oneproviderId,
-      });
+      this.get('navigationState').setAspectOptions({ oneproviderId });
     },
   },
 });
