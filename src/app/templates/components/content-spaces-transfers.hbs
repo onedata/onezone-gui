@@ -1,13 +1,16 @@
 {{#oneprovider-view-container
-  contentContainerClass="content-spaces-data-content"
+  contentContainerClass="content-spaces-transfers-content"
   space=space
   oneproviderId=oneproviderId
-  oneproviderIdChanged=(action 'oneproviderIdChanged')
+  mapSelectorEnabled=false
+  oneproviderIdChanged=(action "oneproviderIdChanged")
   as |container|
 }}
-  {{embedded-content-file-browser
+  {{embedded-content-space-transfers
     oneprovider=container.selectedProvider
     baseUrl=container.contentIframeBaseUrl
     spaceEntityId=space.entityId
+    fileEntityId=fileId
+    tab=tab
   }}
 {{/oneprovider-view-container}}

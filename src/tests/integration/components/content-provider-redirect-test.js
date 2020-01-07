@@ -76,7 +76,7 @@ describe('Integration | Component | content provider redirect', function () {
         },
       };
       const onezoneServer = lookupService(this, 'onezone-server');
-      const url = `/${oneproviderAbbrev}/${clusterEntityId}/i#/`;
+      const url = `/${oneproviderAbbrev}/${clusterEntityId}/i`;
       const legacyUrl = 'https://test-test-provider-1.com';
       const getProviderRedirectUrl = sinon.stub(
         onezoneServer,

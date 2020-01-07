@@ -1,10 +1,10 @@
-.content-spaces-data {
+.oneprovider-view-container {
   $map-trigger-width: 40px;
   $map-trigger-margin-vert: 4px;
 
   transform: translateZ(0);
 
-  > *:not(.content-spaces-data-content) {
+  > *:not(.oneprovider-view-container-inner) {
     pointer-events: auto;
   }
 

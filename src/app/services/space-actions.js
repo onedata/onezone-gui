@@ -79,8 +79,10 @@ export default Service.extend(I18n, {
       'spaceManager',
       'guiUtils',
     );
-    return spaceManager.createRecord({
-        name,
+    return spaceManager.createRecord({ name })
+      .catch(error => {
+        globalNotify.backendError(this.t('spaceCreation'), error);
+        throw error;
       })
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
@@ -94,10 +96,6 @@ export default Service.extend(I18n, {
           $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
             sidebarContainer[0].clientHeight);
         });
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('spaceCreation'), error);
-        throw error;
       });
   },
 

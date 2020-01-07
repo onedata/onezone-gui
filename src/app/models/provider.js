@@ -14,6 +14,7 @@ import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
@@ -28,7 +29,7 @@ export default Model.extend(GraphSingleModelMixin, {
   onezoneHostedBaseUrl: computed('cluster.id', function onezoneHostedBaseUrl() {
     const clusterId =
       parseGri(this.belongsTo('cluster').id()).entityId;
-    return `/opw/${clusterId}/i`;
+    return getOneproviderPath(clusterId);
   }),
 
   //#region Aliases and backward-compatibility

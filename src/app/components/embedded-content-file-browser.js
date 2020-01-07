@@ -12,12 +12,14 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default OneEmbeddedContainer.extend({
   layout,
 
   globalNotify: service(),
   router: service(),
+  navigationState: service(),
 
   /**
    * @virtual
@@ -37,12 +39,7 @@ export default OneEmbeddedContainer.extend({
    * browser.
    * @type {string}
    */
-  dirEntityId: computed('router', function dirEntityId() {
-    // FIXME: find a better way
-    const currentUrl = this.get('router').get('currentURL');
-    const m = currentUrl.match(/.*options=dir\.(.*)/);
-    return m && m[1];
-  }),
+  dirEntityId: reads('navigationState.dir'),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -54,6 +51,8 @@ export default OneEmbeddedContainer.extend({
    * @override implements OneEmbeddedContainer
    */
   iframeType: 'oneprovider',
+
+  _location: location,
 
   /**
    * @override implements OneEmbeddedContainer
@@ -68,7 +67,7 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze(['updateDirEntityId']),
+  callParentActionNames: Object.freeze(['updateDirEntityId', 'getTransfersUrl']),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -78,22 +77,34 @@ export default OneEmbeddedContainer.extend({
     return `iframe-oneprovider-${oneproviderId}`;
   }),
 
-  // TODO: if there will be more params, use some utils for changing options hash
   dirChangedObserver: observer('dirEntityId', function dirChangedObserver() {
     const {
-      router,
+      navigationState,
       dirEntityId,
-    } = this.getProperties('router', 'dirEntityId');
-    router.transitionTo({
-      queryParams: {
-        options: `dir.${dirEntityId}`,
-      },
-    });
+    } = this.getProperties('navigationState', 'dirEntityId');
+    navigationState.setAspectOptions({ dir: dirEntityId });
   }),
 
   actions: {
     updateDirEntityId(dirEntityId) {
       this.set('dirEntityId', dirEntityId);
+    },
+    getTransfersUrl({ fileId, tabId }) {
+      const {
+        _location,
+        router,
+      } = this.getProperties('_location', 'router');
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'transfers', {
+          queryParams: {
+            options: serializeAspectOptions({
+              fileId,
+              tab: tabId,
+            }),
+          },
+        }
+      );
     },
   },
 });
