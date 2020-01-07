@@ -131,13 +131,13 @@ export default Component.extend(I18n, {
     const _window = this.get('_window');
     const _resourceType = resourceType || spaceId && 'data';
     const path = (spaceId || _resourceType) ?
-      `#/onedata/${_resourceType}/${spaceId}` :
-      '#/';
+      `onedata/${_resourceType}/${spaceId}` :
+      '';
     if (isLegacy) {
       return this.get('onezoneServer')
         // legacy services needs a leading / because redirector does not
         // work when path starts with /
-        .getProviderRedirectUrl(get(provider, 'entityId'), `/${path}`)
+        .getProviderRedirectUrl(get(provider, 'entityId'), `/#/${path}`)
         .then(({ url }) => {
           return new Promise(() => {
             _window.location.replace(url);
