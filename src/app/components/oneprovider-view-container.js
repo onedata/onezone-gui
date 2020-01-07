@@ -82,7 +82,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Models.Provider>}
    */
-  selectedProvider: array.findBy('providers', raw('entityId'), 'oneproviderId'),
+  selectedProvider: array.findBy(
+    'providers',
+    raw('entityId'),
+    'validatedOneproviderId'
+  ),
 
   /**
    * `baseUrl` property for embedded component container.
@@ -90,6 +94,18 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string>}
    */
   contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
+
+  validatedOneproviderId: computed('oneproviderId', function validatedOneproviderId() {
+    const oneproviderId = this.get('oneproviderId');
+    if (oneproviderId) {
+      return oneproviderId;
+    } else {
+      const firstOnlineOneprovider = this.findFirstOnlineProvider();
+      if (firstOnlineOneprovider) {
+        return get(firstOnlineOneprovider, 'entityId');
+      }
+    }
+  }),
 
   providers: computed('space.providerList.list.@each.name', function providers() {
     return sortedOneprovidersList(this.get('space.providerList.list').toArray());
@@ -111,14 +127,9 @@ export default Component.extend(I18n, {
     }
   ),
 
-  providerItems: computed(
-    'providers.[]',
-    function providerItems() {
-      const providers = this.get('providers');
-      if (providers) {
-        return providers.map(provider => OneproviderTabItem.create({ provider }));
-      }
-    }
+  providerItems: array.map(
+    'providers',
+    provider => OneproviderTabItem.create({ provider })
   ),
 
   /**
@@ -143,22 +154,17 @@ export default Component.extend(I18n, {
     })
   ),
 
-  initialProvidersChanged: observer(
-    'initialProvidersListProxy.isFulfilled',
-    function initialProvidersChanged() {
-      if (this.get('initialProvidersListProxy.isFulfilled')) {
-        this.setFirstOnlineProvider();
-      }
-    }
-  ),
-
-  hasSupportChanged: observer('hasSupport', function hasSupportChanged() {
+  /**
+   * When there is no Oneprovider selected (or there is no Oneprovider at all)
+   * we should observe the list to set the first online Oneprovider when it is
+   * async added.
+   */
+  observeOnlineProvider: observer('providers.[]', function observeOnlineProvider() {
     const {
-      hasSupport,
       selectedProvider,
       providers,
-    } = this.getProperties('hasSupport', 'selectedProvider', 'providers');
-    if (hasSupport && !providers.includes(selectedProvider)) {
+    } = this.getProperties('selectedProvider', 'providers');
+    if (!providers.includes(selectedProvider)) {
       this.setFirstOnlineProvider();
     }
   }),
@@ -168,10 +174,7 @@ export default Component.extend(I18n, {
     this.get('initialProvidersListProxy').then(list => {
       const oneproviderId = this.get('oneproviderId');
       if (!oneproviderId) {
-        const firstOnlineOneprovider = list.findBy('online');
-        if (firstOnlineOneprovider) {
-          this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
-        }
+        this.setFirstOnlineProvider(list);
       }
     });
     next(() => {
@@ -187,10 +190,15 @@ export default Component.extend(I18n, {
     });
   },
 
-  setFirstOnlineProvider() {
-    const onlineProviders = this.get('providers').filterBy('online');
-    if (onlineProviders && get(onlineProviders, 'length')) {
-      this.get('oneproviderIdChanged')(get(onlineProviders.objectAt(0), 'entityId'));
+  findFirstOnlineProvider(providers) {
+    const _providers = providers ? providers : this.get('providers').filterBy('online');
+    return _providers.findBy('online');
+  },
+
+  setFirstOnlineProvider(providers) {
+    const firstOnlineOneprovider = this.findFirstOnlineProvider(providers);
+    if (firstOnlineOneprovider) {
+      this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
     }
   },
 
