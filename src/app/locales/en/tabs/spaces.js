@@ -3,6 +3,7 @@ export default {
   aspects: {
     index: 'Space overview',
     data: 'Data',
+    shares: 'Shares',
     transfers: 'Transfers',
     providers: 'Space providers',
     members: 'Space members',

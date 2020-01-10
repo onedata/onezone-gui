@@ -24,6 +24,7 @@ Router.map(function () {
   onedataRouterSetup(Router, this, {
     public() {
       this.route('harvesters', { path: 'harvesters/:harvester_id' });
+      this.route('shares', { path: 'shares/:share_id' });
     },
   });
 });

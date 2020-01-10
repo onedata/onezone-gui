@@ -145,6 +145,16 @@ export default Component.extend(
         return PromiseObject.create({ promise });
       }),
 
+    dataTileQueryParams: computed(
+      'dataProviderProxy.content.entityId',
+      function dataTileQueryParams() {
+        const oneproviderId = this.get('dataProviderProxy.content.entityId');
+        return {
+          options: `oneproviderId.${oneproviderId}`,
+        };
+      }
+    ),
+
     init() {
       this._super(...arguments);
       next(() => {

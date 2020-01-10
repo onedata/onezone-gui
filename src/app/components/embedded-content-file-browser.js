@@ -39,7 +39,7 @@ export default OneEmbeddedContainer.extend({
    * browser.
    * @type {string}
    */
-  dirEntityId: reads('navigationState.dir'),
+  dirEntityId: reads('navigationState.aspectOptions.dir'),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -67,7 +67,11 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze(['updateDirEntityId', 'getTransfersUrl']),
+  callParentActionNames: Object.freeze([
+    'updateDirEntityId',
+    'getTransfersUrl',
+    'getShareUrl',
+  ]),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -101,6 +105,22 @@ export default OneEmbeddedContainer.extend({
             options: serializeAspectOptions({
               fileId,
               tab: tabId,
+            }),
+          },
+        }
+      );
+    },
+    getShareUrl({ shareId }) {
+      const {
+        _location,
+        router,
+      } = this.getProperties('_location', 'router');
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'shares', {
+          queryParams: {
+            options: serializeAspectOptions({
+              shareId,
             }),
           },
         }

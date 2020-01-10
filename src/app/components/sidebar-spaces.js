@@ -57,7 +57,12 @@ export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
       {
         id: 'data',
         label: this.t('aspects.data'),
-        icon: 'folder',
+        icon: 'browser-directory',
+      },
+      {
+        id: 'shares',
+        label: this.t('aspects.shares'),
+        icon: 'share',
       },
       {
         id: 'transfers',

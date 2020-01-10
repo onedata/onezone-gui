@@ -12,7 +12,7 @@ import { camelize } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
-import { get, set } from '@ember/object';
+import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -39,6 +39,7 @@ const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
 const types = [
   'space',
   'group',
+  'share',
   'provider',
   'linkedAccount',
   'cluster',
@@ -134,16 +135,42 @@ export default function generateDevelopmentModel(store) {
       const providers = listRecords.provider.get('list');
       const spaces = listRecords.space.get('list');
       const clusters = listRecords.cluster.get('list');
-      return allFulfilled([providers, spaces, clusters])
-        .then(([providerList, spaceList, clusterList]) =>
+      const shares = listRecords.share.get('list');
+      return allFulfilled([providers, spaces, clusters, shares])
+        .then(([providerList, spaceList, clusterList, shareList]) =>
           allFulfilled(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
               _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
             ));
-            return createListRecord(store, 'provider', providerList).then(lr => {
-              space.set('providerList', lr);
-              return space.save();
+            return allFulfilled([
+              createListRecord(store, 'provider', providerList),
+              createListRecord(store, 'share', shareList),
+            ]).then(([providerLr, shareLr]) => {
+              return store.createRecord('share', {
+                  id: gri({
+                    entityType: 'share',
+                    entityId: `${get(space, 'entityId')}_sh1`,
+                    aspect: 'instance',
+                    scope: 'auto',
+                  }),
+                  name: `Share for ${get(space, 'name')}`,
+                  chosenProviderId: getProviderId(0),
+                  chosenProviderVersion: '20.02.0-beta1',
+                  fileType: 'dir',
+                })
+                .save()
+                .then(share => {
+                  get(shareLr, 'list').pushObject(share);
+                  return shareLr.save();
+                })
+                .then(() => {
+                  setProperties(space, {
+                    providerList: providerLr,
+                    shareList: shareLr,
+                  });
+                  return space.save();
+                });
             });
           }))
           .then(() => allFulfilled(clusterList.map(cluster => {
@@ -302,6 +329,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createProvidersRecords(store, additionalInfo);
     case 'space':
       return createSpacesRecords(store, additionalInfo);
+    case 'share':
+      return createSharesRecords(store, additionalInfo);
     case 'token':
       return createTokensRecords(store, additionalInfo);
     case 'group':
@@ -401,6 +430,11 @@ function createSpacesRecords(store) {
       },
     }).save();
   }));
+}
+
+// FIXME: add some shares data
+function createSharesRecords() {
+  return resolve([]);
 }
 
 function createTokensRecords(store) {

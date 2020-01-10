@@ -32,3 +32,17 @@
 @import 'oneproviders-map-selector';
 @import 'cookies-consent';
 @import 'sidebar-tokens';
+
+
+// FIXME:
+
+
+.content-shares-index:not(.is-loaded) {
+  :not(.one-embedded-container) {
+    pointer-events: auto;
+  }
+}
+
+
+
+

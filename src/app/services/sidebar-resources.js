@@ -18,6 +18,7 @@ export default SidebarResources.extend({
   tokenActions: service(),
   currentUser: service(),
   spaceManager: service(),
+  shareManager: service(),
   clusterActions: service(),
   spaceActions: service(),
   groupManager: service(),
@@ -41,6 +42,8 @@ export default SidebarResources.extend({
         return this.get('tokenManager').getTokens();
       case 'spaces':
         return this.get('spaceManager').getSpaces();
+      case 'shares':
+        return this.get('shareManager').getAllShares();
       case 'groups':
         return this.get('groupManager').getGroups();
       case 'harvesters':

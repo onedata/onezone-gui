@@ -113,4 +113,34 @@
       }
     }
   }
+  
+  .current-oneprovider-bar {
+    position: relative;
+    height: 44px;
+    line-height: 44px;
+    .inline-icon-container-provider {
+      width: 22px;
+      margin-left: -2px;
+    }
+    .current-oneprovider-name {
+      display: inline-block;
+      font-weight: bold;
+      max-width: calc(100% - 380px);
+      vertical-align: middle;
+    }
+    .choose-oneprovider-link {
+      margin-left: 4px;
+    }
+    .collapsed-selector-hint-trigger {
+      margin-left: 6px;
+    }
+    @media (max-width: 900px) {
+      .current-oneprovider-bar-info {
+        display: none;
+      }
+      .current-oneprovider-name {
+        max-width: calc(100% - 270px);
+      }
+    }
+  }
 }

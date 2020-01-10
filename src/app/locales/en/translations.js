@@ -5,6 +5,7 @@ import providers from './tabs/providers';
 import clusters from './tabs/clusters';
 import tokens from './tabs/tokens';
 import spaces from './tabs/spaces';
+import shares from './tabs/shares';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
 import uploads from './tabs/uploads';
@@ -20,6 +21,7 @@ import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
+import contentSharesEmpty from './components/content-shares-empty';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -27,6 +29,9 @@ import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import contentSpacesData from './components/content-spaces-data';
+import contentSpacesShares from './components/content-spaces-shares';
+import contentSpacesTransfers from './components/content-spaces-transfers';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
@@ -46,6 +51,7 @@ import contentClustersAuthenticationError from './components/content-clusters-au
 import contentClustersDeregister from './components/content-clusters-deregister';
 import contentClustersMembers from './components/content-clusters-members';
 import contentClustersJoin from './components/content-clusters-join';
+import contentSharesIndex from './components/content-shares-index';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
 import contentSpacesMembers from './components/content-spaces-members';
@@ -106,6 +112,7 @@ let translations = {
     providers,
     tokens,
     spaces,
+    shares,
     groups,
     users,
     clusters,
@@ -126,6 +133,7 @@ let translations = {
     sidebarSpaces,
     sidebarProviders,
     sidebarGroups,
+    contentSharesEmpty,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,
@@ -134,6 +142,9 @@ let translations = {
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    contentSpacesData,
+    contentSpacesShares,
+    contentSpacesTransfers,
     oneproviderViewContainer,
     contentSpacesJoinHarvester,
     leaveSpaceConfirm,
@@ -153,6 +164,7 @@ let translations = {
     contentClustersDeregister,
     contentClustersMembers,
     contentClustersJoin,
+    contentSharesIndex,
     membersCollection,
     privilegesEditorModal,
     contentSpacesMembers,

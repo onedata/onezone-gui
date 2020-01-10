@@ -9,6 +9,7 @@ export default {
     index: 'Overview',
     data: 'Data',
     transfers: 'Transfers',
+    shares: 'Shares',
     providers: 'Providers',
     members: 'Members',
     membership: 'Membership',

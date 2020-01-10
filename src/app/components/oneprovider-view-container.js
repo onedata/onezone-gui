@@ -59,6 +59,10 @@ export default Component.extend(I18n, {
    */
   space: undefined,
 
+  /**
+   * @virtual
+   * @type {Function}
+   */
   oneproviderIdChanged: notImplementedIgnore,
 
   /**
@@ -68,6 +72,19 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   oneproviderId: undefined,
+
+  /**
+   * @virtual optional
+   * @type {String}
+   */
+  tabBarClass: '',
+
+  /**
+   * In collapsed mode, the currently chosen Oneprovider is displayed and
+   * an option to show full options selector
+   * @type {boolean}
+   */
+  isTabBarCollapsed: true,
 
   /**
    * @type {boolean}
@@ -94,6 +111,22 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string>}
    */
   contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
+
+  hintTriggersConfiguration: computed(function hintTriggersConfiguration() {
+    let parentId;
+    for (let view = this.parentView; view != null; view = view.parentView) {
+      if (view.elementId) {
+        parentId = view.elementId;
+        break;
+      }
+    }
+    if (parentId) {
+      return `#${parentId} .collapsed-selector-hint-trigger`;
+    } else {
+      return '.collapsed-selector-hint-trigger';
+    }
+
+  }),
 
   validatedOneproviderId: computed('oneproviderId', function validatedOneproviderId() {
     const oneproviderId = this.get('oneproviderId');

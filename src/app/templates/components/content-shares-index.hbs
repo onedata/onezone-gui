@@ -1,0 +1,38 @@
+{{#promise-proxy-container proxy=spaceProxy}}
+  {{#oneprovider-view-container
+    contentContainerClass="content-shares-index-content"
+    isTabBarCollapsed=true
+    space=spaceProxy.content
+    oneproviderId=oneproviderId
+    mapSelectorEnabled=false
+    oneproviderIdChanged=(action "oneproviderIdChanged")
+    as |container|
+  }}
+    {{#container.header class="content-shares-index-header"}}
+      <h1 class="normal-case with-menu">
+        <span class="one-label">
+          {{#truncated-string}}
+            <span class="share-name resource-name">
+              {{name-conflict item=share tagName="span" class="one-label"}}
+            </span>
+          {{/truncated-string}}
+        </span>
+      </h1>
+    {{/container.header}}
+    {{#container.body}}
+      {{embedded-content-private-share
+        oneprovider=container.selectedProvider
+        shareId=share.entityId
+        baseUrl=container.selectedProvider.onezoneHostedBaseUrl
+      }}
+    {{/container.body}}
+  {{/oneprovider-view-container}}
+{{/promise-proxy-container}}
+
+{{#copy-button
+  clipboardText=share.publicUrl
+  class="hidden btn-public-url"
+  success=(action "clipboardSuccess")
+  error=(action "clipboardError")
+}}
+{{/copy-button}}

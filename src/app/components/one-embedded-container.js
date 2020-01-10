@@ -107,12 +107,13 @@ export default Component.extend({
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  src: computed('baseUrl', 'embeddedComponentName', function src() {
+  src: computed('baseUrl', 'embeddedComponentName', 'isPublic', function src() {
     const {
       baseUrl,
       embeddedComponentName,
-    } = this.getProperties('baseUrl', 'embeddedComponentName');
-    return `${baseUrl}#/onedata/components/${embeddedComponentName}`;
+      isPublic,
+    } = this.getProperties('baseUrl', 'embeddedComponentName', 'isPublic');
+    return `${baseUrl}#/${isPublic ? 'public' : 'onedata'}/components/${embeddedComponentName}`;
   }),
 
   iframeIdObserver: observer('iframeId', function iframeIdObserver() {
