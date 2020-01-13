@@ -400,41 +400,63 @@ export default Component.extend(I18n, {
       name: 'regionCaveat',
       fields: [
         CaveatGroupToggle.create({ name: 'regionEnabled' }),
-        TagsField.extend({
+        FormFieldsGroup.extend({
           isVisible: reads(
             'valuesSource.caveats.regionCaveat.regionEnabled'
           ),
-          allowedTags: computed('i18nPrefix', 'path', function () {
-            const path = this.get('path');
-            return [
-              'Africa',
-              'Antarctica',
-              'Asia',
-              'Europe',
-              'EU',
-              'NorthAmerica',
-              'Oceania',
-              'SouthAmerica',
-            ].map(abbrev => ({
-              label: String(this.t(`${path}.tags.${abbrev}`)),
-              value: abbrev,
-            }));
-          }),
-          tagEditorSettings: hash('allowedTags'),
-          valueToTags(value) {
-            const allowedTags = this.get('allowedTags');
-            return (value || [])
-              .map(val => allowedTags.findBy('value', val))
-              .compact();
-          },
-          tagsToValue(tags) {
-            return tags.mapBy('value');
-          },
         }).create({
           name: 'region',
-          tagEditorComponentName: 'tags-input/selector-editor',
-          defaultValue: [],
-          sort: true,
+          areValidationClassesEnabled: true,
+          fields: [
+            DropdownField.extend({}).create({
+              name: 'regionType',
+              areValidationClassesEnabled: false,
+              options: [
+                { value: 'whitelist' },
+                { value: 'blacklist' },
+              ],
+              showSearch: false,
+              defaultValue: 'whitelist',
+            }),
+            TagsField.extend({
+              allowedTags: computed(
+                'i18nPrefix',
+                'path',
+                function allowedTags() {
+                  const path = this.get('path');
+                  return [
+                    'Africa',
+                    'Antarctica',
+                    'Asia',
+                    'Europe',
+                    'EU',
+                    'NorthAmerica',
+                    'Oceania',
+                    'SouthAmerica',
+                  ].map(abbrev => ({
+                    label: String(this.t(
+                      `${path}.tags.${abbrev}`)),
+                    value: abbrev,
+                  }));
+                }
+              ),
+              tagEditorSettings: hash('allowedTags'),
+              valueToTags(value) {
+                const allowedTags = this.get('allowedTags');
+                return (value || [])
+                  .map(val => allowedTags.findBy('value', val))
+                  .compact();
+              },
+              tagsToValue(tags) {
+                return tags.mapBy('value');
+              },
+            }).create({
+              name: 'regionList',
+              tagEditorComponentName: 'tags-input/selector-editor',
+              defaultValue: [],
+              sort: true,
+            }),
+          ],
         }),
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.regionCaveat.regionEnabled'),

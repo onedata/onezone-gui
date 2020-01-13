@@ -136,15 +136,27 @@ export default {
           label: 'Region',
         },
         region: {
-          tags: {
-            Africa: 'Africa',
-            Antarctica: 'Antarctica',
-            Asia: 'Asia',
-            Europe: 'Europe',
-            EU: 'European Union',
-            NorthAmerica: 'North America',
-            Oceania: 'Oceania',
-            SouthAmerica: 'South America',
+          regionType: {
+            options: {
+              whitelist: {
+                label: 'Allow',
+              },
+              blacklist: {
+                label: 'Deny',
+              },
+            },
+          },
+          regionList: {
+            tags: {
+              Africa: 'Africa',
+              Antarctica: 'Antarctica',
+              Asia: 'Asia',
+              Europe: 'Europe',
+              EU: 'European Union',
+              NorthAmerica: 'North America',
+              Oceania: 'Oceania',
+              SouthAmerica: 'South America',
+            },
           },
         },
         regionDisabledText: {

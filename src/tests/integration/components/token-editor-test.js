@@ -566,7 +566,6 @@ describe('Integration | Component | token editor', function () {
   [
     'asn',
     'ip',
-    'region',
     'country',
   ].forEach(caveatName => {
     it(
@@ -655,6 +654,21 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
+  it(
+    'renders empty, invalid region caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('region'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'region', true,
+            sinon.match.has('regionList', sinon.match([])));
+          expectToBeInvalid(this, 'region');
+        });
+    }
+  );
+
   regions.forEach(({ label, value }) => {
     it(
       `notifies about region caveat change to ["${value}"]`,
@@ -668,7 +682,8 @@ describe('Integration | Component | token editor', function () {
             getTagsSelector().find(`.selector-item:contains(${label})`)[0]
           ))
           .then(() => {
-            expectCaveatToHaveValue(this, 'region', true, sinon.match([value]));
+            expectCaveatToHaveValue(this, 'region', true,
+              sinon.match.has('regionList', sinon.match([value])));
             expectToBeValid(this, 'region');
           });
       }
@@ -690,10 +705,12 @@ describe('Integration | Component | token editor', function () {
           getTagsSelector().find('.selector-item:contains("Asia")')[0]
         ))
         .then(() => {
-          expectCaveatToHaveValue(this, 'region', true, sinon.match([
-            'Asia',
-            'Europe',
-          ]));
+          expectCaveatToHaveValue(this, 'region', true,
+            sinon.match.has('regionList', sinon.match([
+              'Asia',
+              'Europe',
+            ]))
+          );
           expectToBeValid(this, 'region');
         });
     }
@@ -799,7 +816,7 @@ function expectToBeValid(testCase, fieldName) {
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields).to.not.include(caveatValueFieldPath(fieldName));
+    expect(invalidFields).to.not.include(caveatValueValidationPath(fieldName));
   }
 }
 
@@ -811,7 +828,7 @@ function expectToBeInvalid(testCase, fieldName) {
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields).to.include(caveatValueFieldPath(fieldName));
+    expect(invalidFields).to.include(caveatValueValidationPath(fieldName));
   }
 }
 
@@ -821,6 +838,14 @@ function caveatEnabledFieldPath(caveatName) {
 
 function caveatValueFieldPath(caveatName) {
   return `caveats.${caveatName}Caveat.${caveatName}`;
+}
+
+function caveatValueValidationPath(caveatName) {
+  let caveatPath = caveatName;
+  if (caveatName === 'region') {
+    caveatPath = 'region.regionList';
+  }
+  return `caveats.${caveatName}Caveat.${caveatPath}`;
 }
 
 function expectToHaveValue(testCase, fieldName, value) {

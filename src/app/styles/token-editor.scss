@@ -34,6 +34,29 @@
     height: 130px;
   }
 
+  .region-collapse.in {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .regionType-field {
+    width: 110px;
+    flex-grow: 0;
+
+    .dropdown-field-trigger {
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  .regionList-field {
+    .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
   @media (min-width: $screen-sm-min) {
     .basic-field .control-label,
     .caveat-group-toggle {
