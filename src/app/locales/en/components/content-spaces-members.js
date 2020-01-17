@@ -6,6 +6,7 @@ export default _.merge({}, privilegesAspectBase, {
     spaceManagement: 'Space management',
     dataManagement: 'Data management',
     transferManagement: 'Transfer management',
+    qosManagement: 'QOS management',
     userManagement: 'User management',
     groupManagement: 'Group management',
     supportManagement: 'Support management',
@@ -31,6 +32,9 @@ export default _.merge({}, privilegesAspectBase, {
     space_cancel_replication: 'Cancel replication',
     space_schedule_eviction: 'Schedule eviction',
     space_cancel_eviction: 'Cancel eviction',
+
+    space_view_qos: 'View QOS',
+    space_manage_qos: 'Manage QOS',
 
     space_add_user: 'Add user',
     space_remove_user: 'Remove user',
