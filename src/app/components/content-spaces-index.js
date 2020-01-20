@@ -16,7 +16,6 @@ import { reject } from 'rsvp';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
@@ -24,7 +23,6 @@ export default Component.extend(
   I18n,
   UserProxyMixin,
   GlobalActions,
-  HasDefaultSpace,
   ProvidersColors, {
     classNames: ['content-spaces-index'],
 
@@ -70,30 +68,9 @@ export default Component.extend(
     spaceId: reads('space.entityId'),
 
     /**
-     * True if space loaded into this content is default for current user
-     * @type {Ember.ComputedProperty<boolean>}
-     */
-    isDefaultSpace: reads('hasDefaultSpace'),
-
-    /**
      * @type {Ember.ComputedProperty<boolean>}
      */
     isSupported: gt('space.providerList.list.length', 0),
-
-    /**
-     * @type {Ember.ComputedProperty<AspectAction>}
-     */
-    toggleDefaultSpaceAction: computed('isDefaultSpace', function () {
-      const isDefaultSpace = this.get('isDefaultSpace');
-      const title = this.t('toggleDefault');
-      return {
-        action: () => this.send('toggleDefaultSpace'),
-        title,
-        class: 'btn-toggle-default-space',
-        buttonStyle: 'default',
-        icon: isDefaultSpace ? 'home' : 'home-outline',
-      };
-    }),
 
     /**
      * @type {Ember.ComputedProperty<AspectAction>}
@@ -112,17 +89,14 @@ export default Component.extend(
      * @type {Ember.ComputedProperty<Array<AspectAction>>}
      */
     globalActions: computed(
-      'toggleDefaultSpaceAction',
       'openLeaveModalAction',
       function getGlobalActions() {
         const {
-          toggleDefaultSpaceAction,
           openLeaveModalAction,
         } = this.getProperties(
-          'toggleDefaultSpaceAction',
           'openLeaveModalAction'
         );
-        return [toggleDefaultSpaceAction, openLeaveModalAction];
+        return [openLeaveModalAction];
       }
     ),
 
@@ -200,21 +174,6 @@ export default Component.extend(
       });
     },
 
-    /**
-     * @param {boolean} enable if true, this space will be set as default;
-     *  otherwise this space will be unset as default
-     * @return {Promise} a promise retured by set default space graph operation
-     */
-    _setAsDefaultSpace(enable) {
-      const spaceId = enable ? this.get('space.entityId') : null;
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => user.setDefaultSpaceId(spaceId))
-        .catch(error =>
-          this.get('globalNotify').backendError(this.t('changingDefaultSpace'),
-            error)
-        );
-    },
-
     actions: {
       leave() {
         return this.get('spaceActions').leaveSpace(this.get('space'));
@@ -226,9 +185,6 @@ export default Component.extend(
         }
         set(space, 'name', name);
         return this._saveSpace();
-      },
-      toggleDefaultSpace() {
-        return this._setAsDefaultSpace(!this.get('isDefaultSpace'));
       },
     },
   });

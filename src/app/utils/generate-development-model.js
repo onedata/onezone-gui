@@ -252,24 +252,17 @@ function createGuiMessages(store) {
 }
 
 function createUserRecord(store, listRecords) {
-  const spacesIndex = types.indexOf('space');
-  return listRecords[spacesIndex].get('list')
-    .then(list => list.get('length') > 0 ? list.get('firstObject ') : null)
-    .then(space => space && space.get('entityId'))
-    .then(defaultSpaceId => {
-      const userRecord = store.createRecord('user', {
-        id: userGri(USER_ID),
-        fullName: USERNAME,
-        basicAuthEnabled: true,
-        hasPassword: false,
-        username: USER_LOGIN,
-        defaultSpaceId,
-      });
-      listRecords.forEach(lr =>
-        userRecord.set(camelize(lr.constructor.modelName), lr)
-      );
-      return userRecord.save();
-    });
+  const userRecord = store.createRecord('user', {
+    id: userGri(USER_ID),
+    fullName: USERNAME,
+    basicAuthEnabled: true,
+    hasPassword: false,
+    username: USER_LOGIN,
+  });
+  listRecords.forEach(lr =>
+    userRecord.set(camelize(lr.constructor.modelName), lr)
+  );
+  return userRecord.save();
 }
 
 function createEntityRecords(store, type, names, additionalInfo) {
