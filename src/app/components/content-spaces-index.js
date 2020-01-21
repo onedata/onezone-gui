@@ -18,6 +18,7 @@ import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { collect } from 'ember-awesome-macros';
 
 export default Component.extend(
   I18n,
@@ -88,17 +89,7 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Array<AspectAction>>}
      */
-    globalActions: computed(
-      'openLeaveModalAction',
-      function getGlobalActions() {
-        const {
-          openLeaveModalAction,
-        } = this.getProperties(
-          'openLeaveModalAction'
-        );
-        return [openLeaveModalAction];
-      }
-    ),
+    globalActions: collect('openLeaveModalAction'),
 
     /**
      * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
