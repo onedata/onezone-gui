@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6056 Added resetting navigation state on logout
 * VFS-6024 Removed default space and default Oneprovider features
 * VFS-5907 Added cease Oneprovider support action in supporting Oneproviders space view
 * VFS-5875 Fixed navigation to GUI settings of a cluster and optimized rendering of sidebars
