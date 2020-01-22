@@ -8,7 +8,7 @@ import { Promise, resolve } from 'rsvp';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 describe('Unit | Utility | generate development model', function () {
-  it('creates and saves records', function (done) {
+  it('creates and saves records', function () {
     const stubsToCheck = [];
 
     function createModelStub(modelName, properties) {
@@ -46,20 +46,19 @@ describe('Unit | Utility | generate development model', function () {
 
     const createRecord = sinon.spy(StoreStub, 'createRecord');
 
-    const promise = generateDevelopmentModel(StoreStub);
-    promise.then(() => {
-      [
-        'user', 'sharedUser',
-        'spaceList', 'groupList', 'providerList', 'clientTokenList',
-        'linkedAccountList', 'harvesterList', 'indexList',
-        'space', 'group', 'provider', 'clientToken', 'linkedAccount',
-        'privilege', 'harvester', 'index', 'guiMessage',
-      ].forEach(modelName =>
-        expect(createRecord, `createRecord for ${modelName}`)
-        .to.be.calledWith(modelName, sinon.match.object)
-      );
-      stubsToCheck.forEach(stub => expect(stub).to.be.called);
-      done();
-    });
+    return generateDevelopmentModel(StoreStub)
+      .then(() => {
+        [
+          'user', 'sharedUser',
+          'spaceList', 'groupList', 'providerList', 'clientTokenList',
+          'linkedAccountList', 'harvesterList', 'indexList',
+          'space', 'group', 'provider', 'clientToken', 'linkedAccount',
+          'privilege', 'harvester', 'index', 'guiMessage',
+        ].forEach(modelName =>
+          expect(createRecord, `createRecord for ${modelName}`)
+          .to.be.calledWith(modelName, sinon.match.object)
+        );
+        stubsToCheck.forEach(stub => expect(stub).to.be.called);
+      });
   });
 });
