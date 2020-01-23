@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6047 Added QOS-related privileges to space
 * VFS-5907 Added cease Oneprovider support action in supporting Oneproviders space view
 * VFS-5879 Changed provider permissions to support permissions in space
 * VFS-5782 Added simplified version of new tokens GUI
