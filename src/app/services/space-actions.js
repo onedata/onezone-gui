@@ -79,25 +79,25 @@ export default Service.extend(I18n, {
       'spaceManager',
       'guiUtils',
     );
-    return spaceManager.createRecord({
-        name,
+    return spaceManager.createRecord({ name })
+      .catch(error => {
+        globalNotify.backendError(this.t('spaceCreation'), error);
+        throw error;
       })
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
         return router.transitionTo(
-          'onedata.sidebar.content.aspect',
-          'spaces',
-          guiUtils.getRoutableIdFor(space),
-          'index',
-        ).then(() => {
-          const sidebarContainer = $('.col-sidebar');
-          $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-            sidebarContainer[0].clientHeight);
-        });
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('spaceCreation'), error);
-        throw error;
+            'onedata.sidebar.content.aspect',
+            'spaces',
+            guiUtils.getRoutableIdFor(space),
+            'index',
+          )
+          .then(() => {
+            const sidebarContainer = $('.col-sidebar');
+            sidebarContainer.scrollTop(
+              sidebarContainer[0].scrollHeight - sidebarContainer[0].clientHeight
+            );
+          });
       });
   },
 
@@ -113,6 +113,10 @@ export default Service.extend(I18n, {
       .then(spaceRecord =>
         spaceRecord.reloadList('userList').then(() => spaceRecord)
       )
+      .catch(error => {
+        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
+        throw error;
+      })
       .then(spaceRecord => {
         this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
         return this.get('router').transitionTo(
@@ -120,10 +124,6 @@ export default Service.extend(I18n, {
           guiUtils.getRoutableIdFor(spaceRecord),
           'index',
         );
-      })
-      .catch(error => {
-        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
-        throw error;
       });
   },
 
