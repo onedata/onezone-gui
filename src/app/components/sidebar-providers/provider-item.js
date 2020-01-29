@@ -60,23 +60,6 @@ export default Component.extend(I18n, UserProxyMixin, {
   }),
 
   /**
-   * @type {Ember.ComputedProperty<boolean|undefined>}
-   */
-  isDefaultProvider: computed(
-    'userProxy.content.defaultProviderId',
-    'provider.id',
-    function getIsDefaultProvider() {
-      const {
-        userProxy,
-        provider,
-      } = this.getProperties('userProxy', 'provider');
-      const user = get(userProxy, 'content');
-      return user &&
-        get(user, 'defaultProviderId') === get(provider, 'entityId');
-    },
-  ),
-
-  /**
    * @type {Ember.Computed<models/SpaceList>}
    */
   _spaceList: reads('provider.spaceList'),

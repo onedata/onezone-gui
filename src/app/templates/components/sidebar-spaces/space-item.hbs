@@ -3,12 +3,6 @@
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
 {{#status-toolbar class="with-place-for-dots" as |toolbar|}}
-  {{#if hasDefaultSpace}}
-    {{toolbar.icon
-      icon="home"
-      hint=(tt this "defaultSpaceHint")
-    }}
-  {{/if}}
   {{toolbar.icon
     outerText=_totalSupportSizeHumanReadable
     hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
