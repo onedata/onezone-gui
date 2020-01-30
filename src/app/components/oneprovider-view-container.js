@@ -178,12 +178,14 @@ export default Component.extend(I18n, {
 
   hasSupport: notEmpty('providers'),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<Array<Model.Provider>>>}
+   */
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
       return this.get('space.providerList')
-        .then(providerList =>
-          sortedOneprovidersList(get(providerList, 'list').toArray())
-        );
+        .then(providerList => get(providerList, 'list'))
+        .then(list => sortedOneprovidersList(list.toArray()));
     })
   ),
 
