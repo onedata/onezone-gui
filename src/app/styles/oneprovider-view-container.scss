@@ -62,12 +62,6 @@
       left: 0;
       right: 0;
       bottom: 0;
-      @media (max-width: $screen-xs-max) {
-        $map-selector-mobile-padding: $content-col-padding - 4px;
-        left: $map-selector-mobile-padding;
-        right: $map-selector-mobile-padding;
-        bottom: $map-selector-mobile-padding;
-      }
     }
 
     @media(max-width: $screen-sm-max) {
