@@ -21,22 +21,6 @@ export default GuiUtils.extend(UserProxyMixin, {
   /**
    * @override
    */
-  defaultProviderId: computed('userProxy.content.defaultProviderId', function () {
-    return this.get('userProxy.content.defaultProviderId');
-  }),
-
-  /**
-   * @override 
-   * @param {string} providerEntityId 
-   */
-  setDefaultProviderId(providerEntityId) {
-    return this.get('userProxy')
-      .then(user => user.setDefaultProviderId(providerEntityId));
-  },
-
-  /**
-   * @override
-   */
   guiType: computed(function () {
     return this.t('onezone');
   }),
