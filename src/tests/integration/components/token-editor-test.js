@@ -566,7 +566,6 @@ describe('Integration | Component | token editor', function () {
   [
     'asn',
     'ip',
-    'country',
   ].forEach(caveatName => {
     it(
       `renders empty, invalid ${caveatName} caveat when it is enabled`,
@@ -664,6 +663,8 @@ describe('Integration | Component | token editor', function () {
         .then(() => {
           expectCaveatToHaveValue(this, 'region', true,
             sinon.match.has('regionList', sinon.match([])));
+          expectCaveatToHaveValue(this, 'region', true,
+            sinon.match.has('regionType', 'whitelist'));
           expectToBeInvalid(this, 'region');
         });
     }
@@ -689,6 +690,27 @@ describe('Integration | Component | token editor', function () {
       }
     );
   });
+
+  it(
+    'notifies about region caveat type change to "deny"',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      let regionTypeHelper;
+      return wait()
+        .then(() => toggleCaveat('region'))
+        .then(() => {
+          regionTypeHelper = new RegionTypeHelper();
+          return regionTypeHelper.selectOption(2);
+        })
+        .then(() => {
+          expect(regionTypeHelper.getTrigger().innerText).to.equal('Deny');
+          expectCaveatToHaveValue(this, 'region', true,
+            sinon.match.has('regionType', 'blacklist'));
+          expectToBeInvalid(this, 'region');
+        });
+    }
+  );
 
   it(
     'sorts tags in region caveat input',
@@ -717,6 +739,23 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'renders empty, invalid country caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('country'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'country', true,
+            sinon.match.has('countryList', sinon.match([])));
+          expectCaveatToHaveValue(this, 'country', true,
+            sinon.match.has('countryType', 'whitelist'));
+          expectToBeInvalid(this, 'country');
+        });
+    }
+  );
+
+  it(
     'notifies about country caveat change',
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
@@ -727,7 +766,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => fillIn('.country-field .text-editor-input', 'pl,cz,pl,DK,dk,'))
         .then(() => {
           expectCaveatToHaveValue(this, 'country', true,
-            sinon.match(['CZ', 'DK', 'PL']));
+            sinon.match.has('countryList', ['CZ', 'DK', 'PL']));
           expectToBeValid(this, 'country');
         });
     }
@@ -743,7 +782,29 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'a1,usa,b,a_,'))
         .then(() => {
-          expectCaveatToHaveValue(this, 'country', true, sinon.match([]));
+          expectCaveatToHaveValue(this, 'country', true,
+            sinon.match.has('countryList', []));
+          expectToBeInvalid(this, 'country');
+        });
+    }
+  );
+
+  it(
+    'notifies about country caveat type change to "deny"',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      let countryTypeHelper;
+      return wait()
+        .then(() => toggleCaveat('country'))
+        .then(() => {
+          countryTypeHelper = new CountryTypeHelper();
+          return countryTypeHelper.selectOption(2);
+        })
+        .then(() => {
+          expect(countryTypeHelper.getTrigger().innerText).to.equal('Deny');
+          expectCaveatToHaveValue(this, 'country', true,
+            sinon.match.has('countryType', 'blacklist'));
           expectToBeInvalid(this, 'country');
         });
     }
@@ -796,6 +857,18 @@ class TargetHelper extends EmberPowerSelectHelper {
   }
 }
 
+class RegionTypeHelper extends EmberPowerSelectHelper {
+  constructor() {
+    super('.regionType-field .ember-basic-dropdown');
+  }
+}
+
+class CountryTypeHelper extends EmberPowerSelectHelper {
+  constructor() {
+    super('.countryType-field .ember-basic-dropdown');
+  }
+}
+
 function getTagsSelector() {
   return $('.webui-popover.in .tags-selector');
 }
@@ -807,6 +880,11 @@ const basicFieldNameToFieldPath = {
   target: 'basic.inviteDetails.inviteTargetDetails.target',
   metadata: 'basic.metadata',
 };
+
+const caveatsWithAllowDenyTags = [
+  'region',
+  'country',
+];
 
 function expectToBeValid(testCase, fieldName) {
   const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
@@ -842,8 +920,8 @@ function caveatValueFieldPath(caveatName) {
 
 function caveatValueValidationPath(caveatName) {
   let caveatPath = caveatName;
-  if (caveatName === 'region') {
-    caveatPath = 'region.regionList';
+  if (caveatsWithAllowDenyTags.includes(caveatName)) {
+    caveatPath = `${caveatName}.${caveatName}List`;
   }
   return `caveats.${caveatName}Caveat.${caveatPath}`;
 }

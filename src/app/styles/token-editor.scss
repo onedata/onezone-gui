@@ -34,12 +34,14 @@
     height: 130px;
   }
 
-  .region-collapse.in {
+  .region-collapse.in,
+  .country-collapse.in {
     display: flex;
     align-items: flex-start;
   }
 
-  .regionType-field {
+  .regionType-field,
+  .countryType-field {
     width: 110px;
     flex-grow: 0;
 
@@ -50,7 +52,8 @@
     }
   }
 
-  .regionList-field {
+  .regionList-field,
+  .countryList-field {
     .form-control {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;

@@ -167,6 +167,18 @@ export default {
         countryEnabled: {
           label: 'Country',
         },
+        country: {
+          countryType: {
+            options: {
+              whitelist: {
+                label: 'Allow',
+              },
+              blacklist: {
+                label: 'Deny',
+              },
+            },
+          },
+        },
         countryDisabledText: {
           text: 'This token can be used regardless country',
         },

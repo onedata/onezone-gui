@@ -408,7 +408,7 @@ export default Component.extend(I18n, {
           name: 'region',
           areValidationClassesEnabled: true,
           fields: [
-            DropdownField.extend({}).create({
+            DropdownField.create({
               name: 'regionType',
               areValidationClassesEnabled: false,
               options: [
@@ -470,31 +470,48 @@ export default Component.extend(I18n, {
       name: 'countryCaveat',
       fields: [
         CaveatGroupToggle.create({ name: 'countryEnabled' }),
-        TagsField.extend({
+        FormFieldsGroup.extend({
           isVisible: reads(
             'valuesSource.caveats.countryCaveat.countryEnabled'
           ),
-          sortTags(tags) {
-            return tags.sort((a, b) =>
-              get(a, 'label').toUpperCase().localeCompare(
-                get(b, 'label').toUpperCase()
-              )
-            );
-          },
-          tagsToValue(tags) {
-            return tags
-              .mapBy('label')
-              .map(country => country.toUpperCase())
-              .uniq();
-          },
         }).create({
           name: 'country',
-          tagEditorSettings: {
-            // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
-            regexp: /^[a-zA-Z]{2}$/,
-          },
-          defaultValue: [],
-          sort: true,
+          areValidationClassesEnabled: true,
+          fields: [
+            DropdownField.create({
+              name: 'countryType',
+              areValidationClassesEnabled: false,
+              options: [
+                { value: 'whitelist' },
+                { value: 'blacklist' },
+              ],
+              showSearch: false,
+              defaultValue: 'whitelist',
+            }),
+            TagsField.extend({
+              sortTags(tags) {
+                return tags.sort((a, b) =>
+                  get(a, 'label').toUpperCase().localeCompare(
+                    get(b, 'label').toUpperCase()
+                  )
+                );
+              },
+              tagsToValue(tags) {
+                return tags
+                  .mapBy('label')
+                  .map(country => country.toUpperCase())
+                  .uniq();
+              },
+            }).create({
+              name: 'countryList',
+              tagEditorSettings: {
+                // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
+                regexp: /^[a-zA-Z]{2}$/,
+              },
+              defaultValue: [],
+              sort: true,
+            }),
+          ],
         }),
         StaticTextField.extend({
           isVisible: not(
