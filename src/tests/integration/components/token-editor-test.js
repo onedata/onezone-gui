@@ -882,6 +882,85 @@ describe('Integration | Component | token editor', function () {
         });
     }
   );
+
+  it(
+    'informs about invalid (empty) objectId entry',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('objectId'))
+        .then(() =>
+          click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
+        )
+        .then(() => expectToBeInvalid(this, 'objectId'));
+    }
+  );
+
+  it(
+    'has interface, readonly and objectId caveats under accessOnlyCaveats',
+    function () {
+      const caveatsToCheck = [
+        'interface',
+        'readonly',
+        'objectId',
+      ];
+
+      this.render(hbs `{{token-editor}}`);
+
+      return wait()
+        .then(() => {
+          caveatsToCheck.forEach(caveatName => {
+            const caveatSelector =
+              `.accessOnlyCaveats-field .${caveatName}Caveat-field.caveat-group`;
+            expect(this.$(caveatSelector)).to.exist;
+          });
+          expect(this.$('.accessOnlyCaveats-field .caveat-group'))
+            .to.have.length(caveatsToCheck.length);
+        });
+    }
+  );
+
+  it(
+    'shows access only caveats when token type is changed to access',
+    function () {
+      this.render(hbs `{{token-editor}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-access'))
+        .then(() => {
+          expect(this.$('.accessOnlyCaveats-collapse')).to.have.class('in');
+        });
+    }
+  );
+
+  it(
+    'hides access only caveats when token type is changed to invitation',
+    function () {
+      this.render(hbs `{{token-editor}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-invite'))
+        .then(() => {
+          expect(this.$('.accessOnlyCaveats-collapse')).to.not.have.class('in');
+        });
+    }
+  );
+
+  it(
+    'ignores validation errors in access only caveats when token type is not access',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('objectId'))
+        .then(() =>
+          click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
+        )
+        .then(() => click('.type-field .option-invite'))
+        .then(() => expectToBeValid(this, 'objectId'));
+    }
+  );
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {
@@ -925,6 +1004,12 @@ const caveatsWithAllowDenyTags = [
   'country',
 ];
 
+const accessOnlyCaveats = [
+  'interface',
+  'readonly',
+  'objectId',
+];
+
 function expectToBeValid(testCase, fieldName) {
   const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
   const fieldPath = basicFieldNameToFieldPath[fieldName];
@@ -933,7 +1018,9 @@ function expectToBeValid(testCase, fieldName) {
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields).to.not.include(caveatValueValidationPath(fieldName));
+    expect(invalidFields
+      .filter(path => path.startsWith(caveatValueValidationPath(fieldName)))
+    ).to.be.empty;
   }
 }
 
@@ -945,16 +1032,26 @@ function expectToBeInvalid(testCase, fieldName) {
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields).to.include(caveatValueValidationPath(fieldName));
+    expect(invalidFields
+      .filter(path => path.startsWith(caveatValueValidationPath(fieldName)))
+    ).to.be.not.empty;
   }
 }
 
 function caveatEnabledFieldPath(caveatName) {
-  return `caveats.${caveatName}Caveat.${caveatName}Enabled`;
+  if (accessOnlyCaveats.includes(caveatName)) {
+    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatName}Enabled`;
+  } else {
+    return `caveats.${caveatName}Caveat.${caveatName}Enabled`;
+  }
 }
 
 function caveatValueFieldPath(caveatName) {
-  return `caveats.${caveatName}Caveat.${caveatName}`;
+  if (accessOnlyCaveats.includes(caveatName)) {
+    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatName}`;
+  } else {
+    return `caveats.${caveatName}Caveat.${caveatName}`;
+  }
 }
 
 function caveatValueValidationPath(caveatName) {
@@ -962,7 +1059,11 @@ function caveatValueValidationPath(caveatName) {
   if (caveatsWithAllowDenyTags.includes(caveatName)) {
     caveatPath = `${caveatName}.${caveatName}List`;
   }
-  return `caveats.${caveatName}Caveat.${caveatPath}`;
+  if (accessOnlyCaveats.includes(caveatName)) {
+    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatPath}`;
+  } else {
+    return `caveats.${caveatName}Caveat.${caveatPath}`;
+  }
 }
 
 function expectToHaveValue(testCase, fieldName, value) {

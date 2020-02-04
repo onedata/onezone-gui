@@ -229,30 +229,30 @@ export default Component.extend(I18n, {
 
   caveatsGroup: computed(
     'expireCaveatGroup',
-    'interfaceCaveatGroup',
     'asnCaveatGroup',
     'ipCaveatGroup',
     'regionCaveatGroup',
     'countryCaveatGroup',
+    'interfaceCaveatGroup',
     'readonlyCaveatGroup',
     'objectIdCaveatGroup',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
-        interfaceCaveatGroup,
         asnCaveatGroup,
         ipCaveatGroup,
         regionCaveatGroup,
         countryCaveatGroup,
+        interfaceCaveatGroup,
         readonlyCaveatGroup,
         objectIdCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
-        'interfaceCaveatGroup',
         'asnCaveatGroup',
         'ipCaveatGroup',
         'regionCaveatGroup',
         'countryCaveatGroup',
+        'interfaceCaveatGroup',
         'readonlyCaveatGroup',
         'objectIdCaveatGroup'
       );
@@ -261,13 +261,20 @@ export default Component.extend(I18n, {
         name: 'caveats',
         fields: [
           expireCaveatGroup,
-          interfaceCaveatGroup,
           asnCaveatGroup,
           ipCaveatGroup,
           regionCaveatGroup,
           countryCaveatGroup,
-          readonlyCaveatGroup,
-          objectIdCaveatGroup,
+          FormFieldsGroup.extend({
+            isExpanded: equal('valuesSource.basic.type', raw('access')),
+          }).create({
+            name: 'accessOnlyCaveats',
+            fields: [
+              interfaceCaveatGroup,
+              readonlyCaveatGroup,
+              objectIdCaveatGroup,
+            ],
+          }),
         ],
       });
     }
@@ -292,36 +299,6 @@ export default Component.extend(I18n, {
           isVisible: not('valuesSource.caveats.expireCaveat.expireEnabled'),
         }).create({
           name: 'expireDisabledText',
-        }),
-      ],
-    });
-  }),
-
-  interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'interfaceCaveat',
-      fields: [
-        CaveatGroupToggle.create({
-          name: 'interfaceEnabled',
-        }),
-        RadioField.extend({
-          isVisible: reads(
-            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
-          ),
-        }).create({
-          name: 'interface',
-          options: [
-            { value: 'rest' },
-            { value: 'oneclient' },
-          ],
-          defaultValue: 'rest',
-        }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
-          ),
-        }).create({
-          name: 'interfaceDisabledText',
         }),
       ],
     });
@@ -526,6 +503,36 @@ export default Component.extend(I18n, {
     });
   }),
 
+  interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'interfaceCaveat',
+      fields: [
+        CaveatGroupToggle.create({
+          name: 'interfaceEnabled',
+        }),
+        RadioField.extend({
+          isVisible: reads(
+            'valuesSource.caveats.accessOnlyCaveats.interfaceCaveat.interfaceEnabled'
+          ),
+        }).create({
+          name: 'interface',
+          options: [
+            { value: 'rest' },
+            { value: 'oneclient' },
+          ],
+          defaultValue: 'rest',
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.accessOnlyCaveats.interfaceCaveat.interfaceEnabled'
+          ),
+        }).create({
+          name: 'interfaceDisabledText',
+        }),
+      ],
+    });
+  }),
+
   readonlyCaveatGroup: computed(function readonlyCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'readonlyCaveat',
@@ -533,12 +540,12 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'readonlyEnabled' }),
         StaticTextField.extend({
           isVisible: reads(
-            'valuesSource.caveats.readonlyCaveat.readonlyEnabled'
+            'valuesSource.caveats.accessOnlyCaveats.readonlyCaveat.readonlyEnabled'
           ),
         }).create({ name: 'readonlyEnabledText' }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.readonlyCaveat.readonlyEnabled'
+            'valuesSource.caveats.accessOnlyCaveats.readonlyCaveat.readonlyEnabled'
           ),
         }).create({ name: 'readonlyDisabledText' }),
       ],
@@ -552,11 +559,11 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'objectIdEnabled' }),
         FormFieldsCollectionGroup.extend({
           isVisible: reads(
-            'valuesSource.caveats.objectIdCaveat.objectIdEnabled'
+            'valuesSource.caveats.accessOnlyCaveats.objectIdCaveat.objectIdEnabled'
           ),
           fieldFactoryMethod(createdFieldsCounter) {
             return TextField.create({
-              value: 'objectIdEntry',
+              name: 'objectIdEntry',
               valueName: `objectIdEntry${createdFieldsCounter}`,
             });
           },
@@ -565,7 +572,7 @@ export default Component.extend(I18n, {
         }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.objectIdCaveat.objectIdEnabled'
+            'valuesSource.caveats.accessOnlyCaveats.objectIdCaveat.objectIdEnabled'
           ),
         }).create({ name: 'objectIdDisabledText' }),
       ],
@@ -593,7 +600,7 @@ export default Component.extend(I18n, {
     onChange({
       values: fields.dumpValue(),
       isValid,
-      invalidFields: invalidFields.mapBy('path'),
+      invalidFields: invalidFields.mapBy('valuePath'),
     });
   },
 

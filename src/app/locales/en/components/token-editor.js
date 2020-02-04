@@ -97,24 +97,6 @@ export default {
           text: 'This token has unlimited lifetime',
         },
       },
-      interfaceCaveat: {
-        interfaceEnabled: {
-          label: 'Interface',
-        },
-        interface: {
-          options: {
-            rest: {
-              label: 'REST',
-            },
-            oneclient: {
-              label: 'Oneclient',
-            },
-          },
-        },
-        interfaceDisabledText: {
-          text: 'This token can be used with REST and Oneclient',
-        },
-      },
       asnCaveat: {
         asnEnabled: {
           label: 'ASN',
@@ -183,23 +165,43 @@ export default {
           text: 'This token can be used regardless country',
         },
       },
-      readonlyCaveat: {
-        readonlyEnabled: {
-          label: 'Read only',
+      accessOnlyCaveats: {
+        interfaceCaveat: {
+          interfaceEnabled: {
+            label: 'Interface',
+          },
+          interface: {
+            options: {
+              rest: {
+                label: 'REST',
+              },
+              oneclient: {
+                label: 'Oneclient',
+              },
+            },
+          },
+          interfaceDisabledText: {
+            text: 'This token can be used with REST and Oneclient',
+          },
         },
-        readonlyEnabledText: {
-          text: 'This token allows only read access to user files',
+        readonlyCaveat: {
+          readonlyEnabled: {
+            label: 'Read only',
+          },
+          readonlyEnabledText: {
+            text: 'This token allows only read access to user files',
+          },
+          readonlyDisabledText: {
+            text: 'This token can be used for both reading and writing data',
+          },
         },
-        readonlyDisabledText: {
-          text: 'This token can be used for both reading and writing data',
-        },
-      },
-      objectIdCaveat: {
-        objectIdEnabled: {
-          label: 'Object ID',
-        },
-        objectIdDisabledText: {
-          text: 'This token allows to interact with all data objects in Onedata',
+        objectIdCaveat: {
+          objectIdEnabled: {
+            label: 'Object ID',
+          },
+          objectIdDisabledText: {
+            text: 'This token allows to interact with all data objects in Onedata',
+          },
         },
       },
     },
