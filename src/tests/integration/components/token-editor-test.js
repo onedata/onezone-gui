@@ -113,6 +113,11 @@ const caveats = [{
   label: 'Country',
   disabledDescription: 'This token can be used regardless country',
 }, {
+  name: 'readonly',
+  label: 'Read only',
+  disabledDescription: 'This token can be used for both reading and writing data',
+  dontTestValue: true,
+}, {
   name: 'objectId',
   label: 'Object ID',
   disabledDescription: 'This token allows to interact with all data objects in Onedata',
@@ -458,7 +463,7 @@ describe('Integration | Component | token editor', function () {
       });
   });
 
-  caveats.forEach(({ name, label, disabledDescription }) => {
+  caveats.forEach(({ name, label, disabledDescription, dontTestValue }) => {
     it(
       `renders unchecked toggle, label and disabled description for ${name} caveat on init`,
       function () {
@@ -478,8 +483,12 @@ describe('Integration | Component | token editor', function () {
       function () {
         this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-        expectCaveatToHaveValue(this, name, false);
         expectToBeValid(this, name);
+        if (!dontTestValue) {
+          expectCaveatToHaveValue(this, name, false);
+        } else {
+          expectCaveatToHaveEnabledState(this, name, false);
+        }
       }
     );
 
@@ -494,9 +503,14 @@ describe('Integration | Component | token editor', function () {
             const $disabledDescription = this.$(`.${name}DisabledText-field`);
 
             expectCaveatToggleState(this, name, true);
-            expect(getFieldElement(this, name)).to.exist;
             expect($disabledDescription).to.not.exist;
-            expectCaveatToHaveValue(this, name, true);
+
+            if (!dontTestValue) {
+              expect(getFieldElement(this, name)).to.exist;
+              expectCaveatToHaveValue(this, name, true);
+            } else {
+              expectCaveatToHaveEnabledState(this, name, true);
+            }
           });
       }
     );
@@ -811,6 +825,31 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'hides enabled description when readonly caveat is disabled',
+    function () {
+      this.render(hbs `{{token-editor}}`);
+
+      expect(this.$('.readonlyEnabledText-field')).to.not.exist;
+    }
+  );
+
+  it(
+    'renders readonly caveat form elements when that caveat is enabled',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('readonly'))
+        .then(() => {
+          expect(this.$('.readonlyEnabledText-field').text().trim())
+            .to.equal('This token allows only read access to user files');
+
+          expectToBeValid(this, 'readonly');
+        });
+    }
+  );
+
+  it(
     'renders empty, valid objectId caveat when it is enabled',
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
@@ -940,13 +979,18 @@ function expectToHaveNoValue(testCase, fieldName) {
 
 function expectCaveatToHaveValue(testCase, caveatName, isEnabled, value = sinon.match.any) {
   const lastCall = testCase.get('changeSpy').lastCall;
-  const caveatEnabledValuePath = `values.${caveatEnabledFieldPath(caveatName)}`;
   const caveatValueValuePath = `values.${caveatValueFieldPath(caveatName)}`;
-  expect(lastCall).to.have.been.calledWith(
-    sinon.match.hasNested(caveatEnabledValuePath, isEnabled)
-  );
+  expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled);
   expect(lastCall).to.have.been.calledWith(
     sinon.match.hasNested(caveatValueValuePath, value)
+  );
+}
+
+function expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled) {
+  const lastCall = testCase.get('changeSpy').lastCall;
+  const caveatEnabledValuePath = `values.${caveatEnabledFieldPath(caveatName)}`;
+  expect(lastCall).to.have.been.calledWith(
+    sinon.match.hasNested(caveatEnabledValuePath, isEnabled)
   );
 }
 

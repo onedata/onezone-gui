@@ -183,6 +183,17 @@ export default {
           text: 'This token can be used regardless country',
         },
       },
+      readonlyCaveat: {
+        readonlyEnabled: {
+          label: 'Read only',
+        },
+        readonlyEnabledText: {
+          text: 'This token allows only read access to user files',
+        },
+        readonlyDisabledText: {
+          text: 'This token can be used for both reading and writing data',
+        },
+      },
       objectIdCaveat: {
         objectIdEnabled: {
           label: 'Object ID',
