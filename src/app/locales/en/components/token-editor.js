@@ -55,6 +55,9 @@ export default {
           },
         },
         inviteTargetDetails: {
+          loadingTarget: {
+            loadingText: 'Loading...',
+          },
           target: {
             label: {
               userJoinGroup: 'Inviting group',

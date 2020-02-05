@@ -14,11 +14,14 @@ import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
+import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw, not, hash } from 'ember-awesome-macros';
+import { equal, raw, not, hash, array, getBy } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { Promise } from 'rsvp';
 
 const tokenSubtypeOptions = [{
   value: 'userJoinGroup',
@@ -168,60 +171,102 @@ export default Component.extend(I18n, {
   inviteTargetDetailsGroup: computed(
     'targetField',
     function inviteTargetDetailsGroup() {
+      const component = this;
       return FormFieldsGroup.extend({
-        subtype: reads('valuesSource.basic.inviteDetails.subtype'),
-        isExpanded: computed('subtype', function isExpanded() {
-          return getTargetModelNameForSubtype(this.get('subtype'));
+        isExpanded: equal('latestSubtypeWithTargets', 'subtype'),
+        subtype: reads('parent.value.subtype'),
+        latestSubtypeWithTargets: undefined,
+        cachedTargetsModelName: undefined,
+        cachedTargetsProxy: PromiseObject.create({
+          promise: new Promise(() => {}),
+        }),
+        subtypeObserver: observer('subtype', function subtypeObserver() {
+          const {
+            subtype,
+            cachedTargetsModelName,
+          } = this.getProperties('subtype', 'cachedTargetsModelName');
+          const newTargetsModelName = getTargetModelNameForSubtype(subtype);
+          if (newTargetsModelName) {
+            this.set('latestSubtypeWithTargets', subtype);
+            if (cachedTargetsModelName !== newTargetsModelName) {
+              this.setProperties({
+                cachedTargetsModelName: newTargetsModelName,
+                cachedTargetsProxy: component
+                  .getTargetOptionsForModel(newTargetsModelName),
+              });
+            }
+          }
         }),
       }).create({
         name: 'inviteTargetDetails',
-        fields: [this.get('targetField')],
+        fields: [
+          LoadingField.extend({
+            isVisible: not('isFulfilled'),
+            loadingProxy: reads('parent.cachedTargetsProxy'),
+            label: getBy(
+              array.findBy('parent.fields', raw('name'), raw('target')),
+              raw('label')
+            ),
+            isValid: reads('isFulfilled'),
+          }).create({
+            name: 'loadingTarget',
+          }),
+          this.get('targetField'),
+        ],
       });
     }
   ),
 
   targetField: computed(function targetField() {
-    const component = this;
     return DropdownField.extend({
-      cachedSubtype: undefined,
-      targetModelName: undefined,
-      subtype: reads('valuesSource.basic.inviteDetails.subtype'),
-      label: computed('cachedSubtype', 'path', function label() {
+      isVisible: reads('parent.cachedTargetsProxy.isFulfilled'),
+      subtype: reads('parent.subtype'),
+      latestSubtypeWithTargets: reads('parent.latestSubtypeWithTargets'),
+      label: computed('latestSubtypeWithTargets', 'path', function label() {
         const {
-          cachedSubtype,
+          latestSubtypeWithTargets,
           path,
-        } = this.getProperties('cachedSubtype', 'path');
-        return cachedSubtype && this.t(`${path}.label.${cachedSubtype}`);
+        } = this.getProperties('latestSubtypeWithTargets', 'path');
+        return latestSubtypeWithTargets &&
+          this.t(`${path}.label.${latestSubtypeWithTargets}`);
       }),
-      placeholder: computed('cachedSubtype', 'path', function placeholder() {
-        const {
-          cachedSubtype,
-          path,
-        } = this.getProperties('cachedSubtype', 'path');
-        return cachedSubtype &&
-          this.t(`${path}.placeholder.${cachedSubtype}`);
-      }),
-      subtypeObserver: observer('subtype', function subtypeObserver() {
-        const {
-          subtype,
-          targetModelName,
-        } = this.getProperties('subtype', 'targetModelName');
-        const newTargetModelName = getTargetModelNameForSubtype(subtype);
-        if (newTargetModelName) {
-          this.enable();
-          this.set('cachedSubtype', subtype);
-          if (targetModelName !== newTargetModelName) {
-            this.setProperties({
-              targetModelName: newTargetModelName,
-              options: component
-                .getTargetOptionsForModel(newTargetModelName),
-            });
-            this.reset();
-          }
-        } else {
-          this.disable();
+      placeholder: computed(
+        'latestSubtypeWithTargets',
+        'path',
+        function placeholder() {
+          const {
+            latestSubtypeWithTargets,
+            path,
+          } = this.getProperties('latestSubtypeWithTargets', 'path');
+          return latestSubtypeWithTargets &&
+            this.t(`${path}.placeholder.${latestSubtypeWithTargets}`);
         }
-      }),
+      ),
+      options: reads('parent.cachedTargetsProxy.content'),
+      subtypeObserver: observer(
+        'subtype',
+        'latestSubtypeWithTargets',
+        function subtypeObserver() {
+          const {
+            subtype,
+            latestSubtypeWithTargets,
+          } = this.getProperties(
+            'subtype',
+            'latestSubtypeWithTargets',
+          );
+          if (subtype === latestSubtypeWithTargets) {
+            this.enable();
+          } else {
+            this.disable();
+          }
+        }
+      ),
+      cachedTargetsModelNameObserver: observer(
+        'parent.cachedTargetsModelName',
+        function cachedTargetsModelNameObserver() {
+          this.reset();
+        }
+      ),
     }).create({
       name: 'target',
     });
@@ -635,14 +680,16 @@ export default Component.extend(I18n, {
         break;
     }
 
-    return records
-      .then(records => get(records, 'list'))
-      .then(recordsList => recordsList.sortBy('name'))
-      .then(recordsList => recordsList.map(record => ({
-        value: record,
-        label: get(record, 'name'),
-        icon: oneiconAlias.getName(modelName),
-      })));
+    return PromiseObject.create({
+      promise: records
+        .then(records => get(records, 'list'))
+        .then(recordsList => recordsList.sortBy('name'))
+        .then(recordsList => recordsList.map(record => ({
+          value: record,
+          label: get(record, 'name'),
+          icon: oneiconAlias.getName(modelName),
+        }))),
+    });
   },
 
   actions: {

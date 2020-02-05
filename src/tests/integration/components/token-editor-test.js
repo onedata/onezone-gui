@@ -1078,7 +1078,9 @@ function expectToHaveNoValue(testCase, fieldName) {
   expect(changeArg).to.not.have.nested.property(fieldValuePath);
 }
 
-function expectCaveatToHaveValue(testCase, caveatName, isEnabled, value = sinon.match.any) {
+function expectCaveatToHaveValue(
+  testCase, caveatName, isEnabled, value = sinon.match.any
+) {
   const lastCall = testCase.get('changeSpy').lastCall;
   const caveatValueValuePath = `values.${caveatValueFieldPath(caveatName)}`;
   expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled);
