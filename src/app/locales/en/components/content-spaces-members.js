@@ -10,6 +10,7 @@ export default _.merge({}, privilegesAspectBase, {
     userManagement: 'User management',
     groupManagement: 'Group management',
     supportManagement: 'Support management',
+    harvesterManagement: 'Harvester management',
   },
   privileges: {
     space_view: 'View space',
@@ -44,6 +45,9 @@ export default _.merge({}, privilegesAspectBase, {
 
     space_add_support: 'Add support',
     space_remove_support: 'Remove support',
+
+    space_add_harvester: 'Add harvester',
+    space_remove_harvester: 'Remove harvester',
   },
   noGroupsStart: 'This space has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',
