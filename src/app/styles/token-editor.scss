@@ -35,14 +35,15 @@
   }
 
   .region-collapse.in,
-  .country-collapse.in {
+  .country-collapse.in,
+  .pathEntry-collapse.in {
     display: flex;
     align-items: flex-start;
   }
 
   .regionType-field,
-  .countryType-field {
-    width: 110px;
+  .countryType-field,
+  .pathSpace-field {
     flex-grow: 0;
 
     .dropdown-field-trigger {
@@ -52,8 +53,18 @@
     }
   }
 
+  .regionType-field,
+  .countryType-field {
+    width: 110px;
+  }
+
+  .pathSpace-field {
+    width: 200px;
+  }
+
   .regionList-field,
-  .countryList-field {
+  .countryList-field,
+  .pathString-field {
     .form-control {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;

@@ -118,6 +118,10 @@ const caveats = [{
   disabledDescription: 'This token can be used for both reading and writing data',
   dontTestValue: true,
 }, {
+  name: 'path',
+  label: 'Path',
+  disabledDescription: 'This token does not restrict access to any specific files path',
+}, {
   name: 'objectId',
   label: 'Object ID',
   disabledDescription: 'This token allows to interact with all data objects in Onedata',
@@ -825,6 +829,173 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'renders empty, valid path caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('path'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'path', true,
+            sinon.match.has('__fieldsValueNames', sinon.match([])));
+          expectToBeValid(this, 'path');
+        });
+    }
+  );
+
+  it(
+    'preselects first available space and path "" for new entry in path caveat',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
+        .then(() => {
+          const selectedTarget =
+            this.get('mockedRecords.space.lastObject');
+          expectCaveatToHaveValue(this, 'path', true,
+            sinon.match.hasNested('pathEntry0.pathSpace', selectedTarget));
+          expectCaveatToHaveValue(this, 'path', true,
+            sinon.match.hasNested('pathEntry0.pathString', ''));
+          expectToBeValid(this, 'path');
+
+          const $selectorTrigger = $(new PathSpaceHelper().getTrigger());
+          expect($selectorTrigger.find('.text').text().trim()).to.equal('space0');
+          expect(getFieldElement(this, 'path').find('.pathString-field input'))
+            .to.have.value('');
+          expectToBeValid(this, 'path');
+        });
+    }
+  );
+
+  it(
+    'allows to choose between available spaces in path caveat entry',
+    function () {
+      this.render(hbs `{{token-editor}}`);
+
+      let pathSpaceHelper;
+      return wait()
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
+        .then(() => {
+          pathSpaceHelper = new PathSpaceHelper();
+          return pathSpaceHelper.open();
+        })
+        .then(() => {
+          const $thirdOption = $(pathSpaceHelper.getNthOption(3));
+          expect($thirdOption).to.exist;
+          expect(pathSpaceHelper.getNthOption(4)).to.not.exist;
+          expect($thirdOption.find('.one-icon')).to.have.class('oneicon-space');
+          expect($thirdOption.find('.text').text().trim()).to.equal('space2');
+        });
+    }
+  );
+
+  it(
+    'notifies about path caveat entry space change',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      let pathSpaceHelper;
+      return wait()
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
+        .then(() => {
+          pathSpaceHelper = new PathSpaceHelper();
+          return pathSpaceHelper.selectOption(3);
+        })
+        .then(() => {
+          const $selectorTrigger = $(pathSpaceHelper.getTrigger());
+          expect($selectorTrigger.find('.text').text().trim()).to.equal('space2');
+
+          const selectedTarget =
+            this.get('mockedRecords.space.firstObject');
+          expectCaveatToHaveValue(this, 'path', true,
+            sinon.match.hasNested('pathEntry0.pathSpace', selectedTarget));
+          expectToBeValid(this, 'path');
+        });
+    }
+  );
+
+  it(
+    'notifies about path caveat entry path change',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
+        .then(() => fillIn(
+          getFieldElement(this, 'path').find('.pathString-field input')[0],
+          '/abc'
+        ))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'path', true,
+            sinon.match.hasNested('pathEntry0.pathString', '/abc'));
+          expectToBeValid(this, 'path');
+        });
+    }
+  );
+
+  [
+    '',
+    '/asd',
+    '/asd/xcv.cpp',
+  ].forEach(pathString => {
+    it(
+      `notifies about correct path caveat string ${JSON.stringify(pathString)}`,
+      function () {
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+        return wait()
+          .then(() => toggleCaveat('path'))
+          .then(() =>
+            click(getFieldElement(this, 'path').find('.add-field-button')[0])
+          )
+          .then(() => fillIn(
+            getFieldElement(this, 'path').find('.pathString-field input')[0],
+            pathString
+          ))
+          .then(() => expectToBeValid(this, 'path'));
+      }
+    );
+  });
+
+  [
+    '/',
+    '//',
+    'asd/',
+    ' /asd',
+  ].forEach(pathString => {
+    it(
+      `notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
+      function () {
+        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+        return wait()
+          .then(() => toggleCaveat('path'))
+          .then(() =>
+            click(getFieldElement(this, 'path').find('.add-field-button')[0])
+          )
+          .then(() => fillIn(
+            getFieldElement(this, 'path').find('.pathString-field input')[0],
+            pathString
+          ))
+          .then(() => expectToBeInvalid(this, 'path'));
+      }
+    );
+  });
+
+  it(
     'hides enabled description when readonly caveat is disabled',
     function () {
       this.render(hbs `{{token-editor}}`);
@@ -898,11 +1069,12 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'has interface, readonly and objectId caveats under accessOnlyCaveats',
+    'has interface, readonly, path and objectId caveats under accessOnlyCaveats',
     function () {
       const caveatsToCheck = [
         'interface',
         'readonly',
+        'path',
         'objectId',
       ];
 
@@ -987,6 +1159,12 @@ class CountryTypeHelper extends EmberPowerSelectHelper {
   }
 }
 
+class PathSpaceHelper extends EmberPowerSelectHelper {
+  constructor() {
+    super('.pathSpace-field .ember-basic-dropdown');
+  }
+}
+
 function getTagsSelector() {
   return $('.webui-popover.in .tags-selector');
 }
@@ -1007,6 +1185,7 @@ const caveatsWithAllowDenyTags = [
 const accessOnlyCaveats = [
   'interface',
   'readonly',
+  'path',
   'objectId',
 ];
 

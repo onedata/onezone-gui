@@ -198,6 +198,14 @@ export default {
             text: 'This token can be used for both reading and writing data',
           },
         },
+        pathCaveat: {
+          pathEnabled: {
+            label: 'Path',
+          },
+          pathDisabledText: {
+            text: 'This token does not restrict access to any specific files path',
+          },
+        },
         objectIdCaveat: {
           objectIdEnabled: {
             label: 'Object ID',

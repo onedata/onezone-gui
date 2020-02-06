@@ -17,7 +17,7 @@ import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw, not, hash, array, getBy } from 'ember-awesome-macros';
+import { equal, raw, and, not, hash, array, getBy } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -280,6 +280,7 @@ export default Component.extend(I18n, {
     'countryCaveatGroup',
     'interfaceCaveatGroup',
     'readonlyCaveatGroup',
+    'pathCaveatGroup',
     'objectIdCaveatGroup',
     function caveatsGroup() {
       const {
@@ -290,6 +291,7 @@ export default Component.extend(I18n, {
         countryCaveatGroup,
         interfaceCaveatGroup,
         readonlyCaveatGroup,
+        pathCaveatGroup,
         objectIdCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
@@ -299,6 +301,7 @@ export default Component.extend(I18n, {
         'countryCaveatGroup',
         'interfaceCaveatGroup',
         'readonlyCaveatGroup',
+        'pathCaveatGroup',
         'objectIdCaveatGroup'
       );
 
@@ -317,6 +320,7 @@ export default Component.extend(I18n, {
             fields: [
               interfaceCaveatGroup,
               readonlyCaveatGroup,
+              pathCaveatGroup,
               objectIdCaveatGroup,
             ],
           }),
@@ -593,6 +597,73 @@ export default Component.extend(I18n, {
             'valuesSource.caveats.accessOnlyCaveats.readonlyCaveat.readonlyEnabled'
           ),
         }).create({ name: 'readonlyDisabledText' }),
+      ],
+    });
+  }),
+
+  pathCaveatGroup: computed(function pathCaveatGroup() {
+    const component = this;
+    return CaveatFormGroup.extend({
+      spacesProxy: null,
+      pathEnabledObserver: observer('value.pathEnabled', function () {
+        if (this.get('value.pathEnabled') && !this.get('spacesProxy')) {
+          this.set(
+            'spacesProxy',
+            component.getTargetOptionsForModel('space')
+          );
+        }
+      }),
+    }).create({
+      name: 'pathCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'pathEnabled' }),
+        FormFieldsCollectionGroup.extend({
+          isVisible: and(
+            'parent.value.pathEnabled',
+            'parent.spacesProxy.isFulfilled'
+          ),
+          spaces: reads('parent.spacesProxy.content'),
+          fieldFactoryMethod(createdFieldsCounter) {
+            return FormFieldsGroup.extend({}).create({
+              name: 'pathEntry',
+              valueName: `pathEntry${createdFieldsCounter}`,
+              areValidationClassesEnabled: true,
+              fields: [
+                DropdownField.extend({
+                  options: reads('parent.parent.spaces'),
+                  defaultValue: reads('options.firstObject.value'),
+                }).create({
+                  name: 'pathSpace',
+                  areValidationClassesEnabled: false,
+                }),
+                TextField.extend({}).create({
+                  name: 'pathString',
+                  defaultValue: '',
+                  isOptional: true,
+                  regex: /^(\/[^/]+)*$/,
+                }),
+              ],
+            });
+          },
+        }).create({
+          name: 'path',
+        }),
+        LoadingField.extend({
+          loadingProxy: reads('parent.spacesProxy'),
+          isVisible: and('parent.value.pathEnabled', not('isFulfilled')),
+          label: getBy(
+            array.findBy('parent.fields', raw('name'), raw('path')),
+            raw('label')
+          ),
+          isValid: reads('isFulfilled'),
+        }).create({
+          name: 'loadingPathSpaces',
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.accessOnlyCaveats.pathCaveat.pathEnabled'
+          ),
+        }).create({ name: 'pathDisabledText' }),
       ],
     });
   }),
