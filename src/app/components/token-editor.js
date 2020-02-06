@@ -219,8 +219,6 @@ export default Component.extend(I18n, {
 
   targetField: computed(function targetField() {
     return DropdownField.extend({
-      isVisible: reads('parent.cachedTargetsProxy.isFulfilled'),
-      subtype: reads('parent.subtype'),
       latestSubtypeWithTargets: reads('parent.latestSubtypeWithTargets'),
       label: computed('latestSubtypeWithTargets', 'path', function label() {
         const {
@@ -243,24 +241,6 @@ export default Component.extend(I18n, {
         }
       ),
       options: reads('parent.cachedTargetsProxy.content'),
-      subtypeObserver: observer(
-        'subtype',
-        'latestSubtypeWithTargets',
-        function subtypeObserver() {
-          const {
-            subtype,
-            latestSubtypeWithTargets,
-          } = this.getProperties(
-            'subtype',
-            'latestSubtypeWithTargets',
-          );
-          if (subtype === latestSubtypeWithTargets) {
-            this.enable();
-          } else {
-            this.disable();
-          }
-        }
-      ),
       cachedTargetsModelNameObserver: observer(
         'parent.cachedTargetsModelName',
         function cachedTargetsModelNameObserver() {
