@@ -104,7 +104,30 @@ export default Component.extend(I18n, {
             resolve();
           });
           uploader.on('didError', (jqXHR, textStatus, error) => {
-            globalNotify.backendError(this.t('guiUploading'), error);
+            let responseBody;
+            try {
+              responseBody = jqXHR.responseText &&
+                JSON.parse(jqXHR.responseText);
+            } catch (e) {
+              responseBody = null;
+            }
+
+            if (responseBody &&
+              responseBody.id === 'guiPackageUnverified') {
+              const checksum = responseBody.details &&
+                responseBody.details.checksum;
+              globalNotify.backendError(this.t('guiUploading'), {
+                message: this.t('guiPackageUnverifiedDescription', {
+                  checksum,
+                }),
+              });
+            } else {
+              globalNotify.backendError(
+                this.t('guiUploading'),
+                responseBody || error
+              );
+            }
+
             reject();
           });
           uploader.upload(selectedFile);
