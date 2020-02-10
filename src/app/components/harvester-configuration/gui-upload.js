@@ -115,7 +115,7 @@ export default Component.extend(I18n, {
             if (responseBody &&
               responseBody.id === 'guiPackageUnverified') {
               const checksum = responseBody.details &&
-                responseBody.details.checksum;
+                responseBody.details.shaSum;
               globalNotify.backendError(this.t('guiUploading'), {
                 message: this.t('guiPackageUnverifiedDescription', {
                   checksum,
