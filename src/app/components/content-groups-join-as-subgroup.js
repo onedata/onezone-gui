@@ -9,6 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import trimToken from 'onedata-gui-common/utils/trim-token';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
@@ -31,18 +33,25 @@ export default Component.extend(I18n, {
    */
   token: '',
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  trimmedToken: computedPipe('token', trimToken),
+
   didInsertElement() {
     this._super(...arguments);
     this.$('#join-group-token').focus();
   },
 
   actions: {
-    joinGroup(token) {
+    joinGroup() {
       const {
         group,
         groupActions,
-      } = this.getProperties('group', 'groupActions');
-      return groupActions.joinGroupAsSubgroup(group, token);
+        trimmedToken,
+      } = this.getProperties('group', 'groupActions', 'trimmedToken');
+
+      return groupActions.joinGroupAsSubgroup(group, trimmedToken);
     },
   },
 });
