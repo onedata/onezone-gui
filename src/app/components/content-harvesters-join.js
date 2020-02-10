@@ -9,6 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
+import trimToken from 'onedata-gui-common/utils/trim-token';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
@@ -21,14 +23,24 @@ export default Component.extend(I18n, {
    */
   token: undefined,
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  trimmedToken: computedPipe('token', trimToken),
+
   didInsertElement() {
     this._super(...arguments);
     this.$('#join-harvester-token').focus();
   },
 
   actions: {
-    joinHarvester(token) {
-      return this.get('harvesterActions').joinHarvester(token);
+    joinHarvester() {
+      const {
+        harvesterActions,
+        trimmedToken,
+      } = this.getProperties('harvesterActions', 'trimmedToken');
+
+      return harvesterActions.joinHarvester(trimmedToken);
     },
   },
 });
