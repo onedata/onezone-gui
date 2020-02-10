@@ -112,21 +112,10 @@ export default Component.extend(I18n, {
               responseBody = null;
             }
 
-            if (responseBody &&
-              responseBody.id === 'guiPackageUnverified') {
-              const checksum = responseBody.details &&
-                responseBody.details.shaSum;
-              globalNotify.backendError(this.t('guiUploading'), {
-                message: this.t('guiPackageUnverifiedDescription', {
-                  checksum,
-                }),
-              });
-            } else {
-              globalNotify.backendError(
-                this.t('guiUploading'),
-                responseBody || error
-              );
-            }
+            globalNotify.backendError(
+              this.t('guiUploading'),
+              responseBody || error
+            );
 
             reject();
           });
