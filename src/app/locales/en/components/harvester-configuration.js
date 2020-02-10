@@ -39,7 +39,6 @@ export default {
       upload: 'Upload',
       guiUploadSuccess: 'GUI plugin has been uploaded successfully',
       guiUploading: 'gui plugin uploading',
-      guiPackageUnverifiedDescription: 'GUI plugin package verification failed, because SHA checksum of uploaded package is not whitelisted. To allow uploading this package please contact Onezone administrator and ask to add harvester GUI checksum {{checksum}} to /etc/oz_worker/compatibility.json configuration file.',
       percentDone: '{{percent}}% done...',
     },
     guiInfo: {
