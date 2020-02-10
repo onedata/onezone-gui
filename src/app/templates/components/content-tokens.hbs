@@ -11,7 +11,7 @@
   header=(tt this "header")
   text=(tt this "description")}}
   <div class="token-row">
-    <textarea class="token-textarea form-control">{{selectedToken.token}}</textarea>
+    <textarea class="token-textarea form-control" readonly="readonly">{{selectedToken.token}}</textarea>
     <div class="text-center">
       {{#copy-button
         success=(action "copySuccess")

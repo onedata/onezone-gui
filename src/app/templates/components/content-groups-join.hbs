@@ -4,8 +4,8 @@
   imagePath=(root-url "assets/images/group-join.svg")
   text=(tt this "text")
   buttonLabel=(tt this "joinButton")
-  buttonAction=(action "joinGroup" token)
-  buttonDisabled=(not token)
+  buttonAction=(action "joinGroup")
+  buttonDisabled=(not trimmedToken)
   as |contentInfo|
 }}
   <div class="row">
@@ -14,7 +14,7 @@
         id="join-group-token"
         value={{token}}
         oninput={{action (mut token) value="target.value"}}
-        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        onkeydown={{if trimmedToken (invoke-on-enter contentInfo.buttonAction)}}
         placeholder={{tt this "placeholder"}}
         disabled={{contentInfo.actionInProgress}}
         class="form-control join-group-token"
