@@ -4,8 +4,8 @@
   imagePath="assets/images/space-join-harvester.svg"
   text=(tt this "text" spaceName=space.name)
   buttonLabel=(tt this "joinButton")
-  buttonAction=(action "joinHarvester" token)
-  buttonDisabled=(not token)
+  buttonAction=(action "joinHarvester")
+  buttonDisabled=(not trimmedToken)
   as |contentInfo|
 }}
   <div class="row">
@@ -14,7 +14,7 @@
         id="join-harvester-token"
         value={{token}}
         oninput={{action (mut token) value="target.value"}}
-        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        onkeydown={{if trimmedToken (invoke-on-enter contentInfo.buttonAction)}}
         placeholder={{tt this "placeholder"}}
         disabled={{contentInfo.actionInProgress}}
         class="form-control join-harvester-token"

@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6109 Added more verbose unverified harvester GUI plugin error an trimming to token inputs
 * VFS-6102 Added harvester privileges to space
 * VFS-6056 Added resetting navigation state on logout
 * VFS-6027 Fixed random transition abort message when creating or joining space
