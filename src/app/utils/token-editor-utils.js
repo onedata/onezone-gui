@@ -1,7 +1,7 @@
 import { getProperties, get } from '@ember/object';
 import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
 
-export function editorDataToToken(editorData) {
+export function editorDataToToken(editorData, currentUser) {
   const tokenData = {};
 
   let {
@@ -42,9 +42,14 @@ export function editorDataToToken(editorData) {
       if (availableSubtype) {
         tokenData.type.inviteToken.subtype = subtype;
 
-        if (target && get(target, 'entityType') === availableSubtype.modelName) {
-          tokenData.type.inviteToken[get(availableSubtype, 'idFieldName')] =
-            get(target, 'entityId');
+        let targetEntityId;
+        if (subtype === 'registerOneprovider') {
+          targetEntityId = get(currentUser, 'entityId');
+        } else if (target && get(target, 'entityType') === availableSubtype.modelName) {
+          targetEntityId = get(target, 'entityId');
+        }
+        if (targetEntityId) {
+          tokenData.type.inviteToken[get(availableSubtype, 'idFieldName')] = targetEntityId;
         }
       }
     }

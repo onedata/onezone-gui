@@ -48,39 +48,41 @@ describe('Unit | Utility | token editor utils', function () {
       expect(Object.keys(inviteToken)).to.have.length(1);
     });
 
-    Object.keys(inviteTokenSubtypeToTargetModelMapping).forEach(subtype => {
-      const {
-        idFieldName,
-        modelName,
-      } = getProperties(
-        get(inviteTokenSubtypeToTargetModelMapping, subtype),
-        'idFieldName',
-        'modelName'
-      );
-      it(
-        `returns object with type.inviteToken.{subtype,${idFieldName}} when target is ${modelName} for subtype ${subtype}`,
-        function () {
-          const result = editorDataToToken({
-            basic: {
-              type: 'invite',
-              inviteDetails: {
-                subtype,
-                inviteTargetDetails: {
-                  target: {
-                    entityType: modelName,
-                    entityId: 'abc',
+    Object.keys(inviteTokenSubtypeToTargetModelMapping)
+      .without('registerOneprovider')
+      .forEach(subtype => {
+        const {
+          idFieldName,
+          modelName,
+        } = getProperties(
+          get(inviteTokenSubtypeToTargetModelMapping, subtype),
+          'idFieldName',
+          'modelName'
+        );
+        it(
+          `returns object with type.inviteToken.{subtype,${idFieldName}} when target is ${modelName} for subtype ${subtype}`,
+          function () {
+            const result = editorDataToToken({
+              basic: {
+                type: 'invite',
+                inviteDetails: {
+                  subtype,
+                  inviteTargetDetails: {
+                    target: {
+                      entityType: modelName,
+                      entityId: 'abc',
+                    },
                   },
                 },
               },
-            },
-          });
-          const inviteToken = result.type.inviteToken;
-          expect(inviteToken).to.have.deep.property('subtype', subtype);
-          expect(inviteToken).to.have.deep.property(idFieldName, 'abc');
-          expect(Object.keys(inviteToken)).to.have.length(2);
-        }
-      );
-    });
+            });
+            const inviteToken = result.type.inviteToken;
+            expect(inviteToken).to.have.deep.property('subtype', subtype);
+            expect(inviteToken).to.have.deep.property(idFieldName, 'abc');
+            expect(Object.keys(inviteToken)).to.have.length(2);
+          }
+        );
+      });
 
     it(
       'returns object without specified token invite target if target model is not suitable for invitation subtype',
@@ -103,6 +105,31 @@ describe('Unit | Utility | token editor utils', function () {
         expect(inviteToken).to.not.have.deep.property('clusterId', 'abc');
         expect(inviteToken).to.not.have.deep.property('groupId', 'abc');
         expect(Object.keys(inviteToken)).to.have.length(1);
+      }
+    );
+
+    it(
+      'returns object with current user as a target model when subtype is registerOneprovider',
+      function () {
+        const currentUser = { entityId: 'user1' };
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+            inviteDetails: {
+              subtype: 'registerOneprovider',
+              // Incorrect target to check, that it will be ignored
+              inviteTargetDetails: {
+                target: {
+                  entityType: 'cluster',
+                  entityId: 'abc',
+                },
+              },
+            },
+          },
+        }, currentUser);
+        const inviteToken = result.type.inviteToken;
+        expect(inviteToken).to.have.deep.property('adminUserId', 'user1');
+        expect(Object.keys(inviteToken)).to.have.length(2);
       }
     );
 
