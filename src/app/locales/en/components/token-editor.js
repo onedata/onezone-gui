@@ -86,9 +86,6 @@ export default {
           },
         },
       },
-      metadata: {
-        label: 'Metadata',
-      },
     },
     caveats: {
       header: 'Caveats',
@@ -98,22 +95,6 @@ export default {
         },
         expireDisabledText: {
           text: 'This token has unlimited lifetime',
-        },
-      },
-      asnCaveat: {
-        asnEnabled: {
-          label: 'ASN',
-        },
-        asnDisabledText: {
-          text: 'This token can be used on any ASN',
-        },
-      },
-      ipCaveat: {
-        ipEnabled: {
-          label: 'IP',
-        },
-        ipDisabledText: {
-          text: 'This token can be used without any IP address restrictions',
         },
       },
       regionCaveat: {
@@ -166,6 +147,22 @@ export default {
         },
         countryDisabledText: {
           text: 'This token can be used regardless country',
+        },
+      },
+      asnCaveat: {
+        asnEnabled: {
+          label: 'ASN',
+        },
+        asnDisabledText: {
+          text: 'This token can be used on any ASN',
+        },
+      },
+      ipCaveat: {
+        ipEnabled: {
+          label: 'IP',
+        },
+        ipDisabledText: {
+          text: 'This token can be used without any IP address restrictions',
         },
       },
       accessOnlyCaveats: {

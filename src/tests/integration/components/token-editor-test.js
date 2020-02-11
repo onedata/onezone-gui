@@ -431,42 +431,6 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  it('renders "metadata" field', function () {
-    this.render(hbs `{{token-editor}}`);
-
-    expectLabelToEqual(this, 'metadata', 'Metadata');
-    expect(this.$('.metadata-field textarea')).to.exist;
-  });
-
-  it('has valid "metadata" when it is empty', function () {
-    this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-    expectToHaveNoValue(this, 'metadata');
-    expectToBeValid(this, 'metadata');
-  });
-
-  it('notifies about "metadata" field change', function () {
-    this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-    return wait()
-      .then(() => fillIn('.metadata-field textarea', '{ "a": 1 }'))
-      .then(() => {
-        expectToHaveValue(this, 'metadata', '{ "a": 1 }');
-        expectToBeValid(this, 'metadata');
-      });
-  });
-
-  it('notifies about invalid "metadata" field value', function () {
-    this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-    return wait()
-      .then(() => fillIn('.metadata-field textarea', '{ a: 1 }'))
-      .then(() => {
-        expectToHaveValue(this, 'metadata', '{ a: 1 }');
-        expectToBeInvalid(this, 'metadata');
-      });
-  });
-
   caveats.forEach(({ name, label, disabledDescription, dontTestValue }) => {
     it(
       `renders unchecked toggle, label and disabled description for ${name} caveat on init`,
@@ -1174,7 +1138,6 @@ const basicFieldNameToFieldPath = {
   type: 'basic.type',
   subtype: 'basic.inviteDetails.subtype',
   target: 'basic.inviteDetails.inviteTargetDetails.target',
-  metadata: 'basic.metadata',
 };
 
 const caveatsWithAllowDenyTags = [

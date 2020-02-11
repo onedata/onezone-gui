@@ -9,7 +9,6 @@ import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/f
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import RadioField from 'onedata-gui-common/utils/form-component/radio-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
-import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
@@ -160,10 +159,6 @@ export default Component.extend(I18n, {
             this.get('inviteTargetDetailsGroup'),
           ],
         }),
-        JsonField.create({
-          name: 'metadata',
-          isOptional: true,
-        }),
       ],
     });
   }),
@@ -254,10 +249,10 @@ export default Component.extend(I18n, {
 
   caveatsGroup: computed(
     'expireCaveatGroup',
-    'asnCaveatGroup',
-    'ipCaveatGroup',
     'regionCaveatGroup',
     'countryCaveatGroup',
+    'asnCaveatGroup',
+    'ipCaveatGroup',
     'interfaceCaveatGroup',
     'readonlyCaveatGroup',
     'pathCaveatGroup',
@@ -265,20 +260,20 @@ export default Component.extend(I18n, {
     function caveatsGroup() {
       const {
         expireCaveatGroup,
-        asnCaveatGroup,
-        ipCaveatGroup,
         regionCaveatGroup,
         countryCaveatGroup,
+        asnCaveatGroup,
+        ipCaveatGroup,
         interfaceCaveatGroup,
         readonlyCaveatGroup,
         pathCaveatGroup,
         objectIdCaveatGroup,
       } = this.getProperties(
         'expireCaveatGroup',
-        'asnCaveatGroup',
-        'ipCaveatGroup',
         'regionCaveatGroup',
         'countryCaveatGroup',
+        'asnCaveatGroup',
+        'ipCaveatGroup',
         'interfaceCaveatGroup',
         'readonlyCaveatGroup',
         'pathCaveatGroup',
@@ -289,10 +284,10 @@ export default Component.extend(I18n, {
         name: 'caveats',
         fields: [
           expireCaveatGroup,
-          asnCaveatGroup,
-          ipCaveatGroup,
           regionCaveatGroup,
           countryCaveatGroup,
+          asnCaveatGroup,
+          ipCaveatGroup,
           FormFieldsGroup.extend({
             isExpanded: equal('valuesSource.basic.type', raw('access')),
           }).create({
@@ -329,78 +324,6 @@ export default Component.extend(I18n, {
         }).create({
           name: 'expireDisabledText',
         }),
-      ],
-    });
-  }),
-
-  asnCaveatGroup: computed(function asnCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'asnCaveat',
-      fields: [
-        CaveatGroupToggle.create({ name: 'asnEnabled' }),
-        TagsField.extend({
-          isVisible: reads('valuesSource.caveats.asnCaveat.asnEnabled'),
-          sortTags(tags) {
-            return tags.sort((a, b) =>
-              parseInt(get(a, 'label') - parseInt(get(b, 'label')))
-            );
-          },
-          tagsToValue(tags) {
-            return tags
-              .mapBy('label')
-              .map(asnString => parseInt(asnString))
-              .uniq();
-          },
-          valueToTags(value) {
-            return (value || []).map(asn => ({ label: String(asn) }));
-          },
-        }).create({
-          name: 'asn',
-          tagEditorSettings: {
-            regexp: /^\d+$/,
-          },
-          defaultValue: [],
-          sort: true,
-        }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
-        }).create({ name: 'asnDisabledText' }),
-      ],
-    });
-  }),
-
-  ipCaveatGroup: computed(function ipCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'ipCaveat',
-      fields: [
-        CaveatGroupToggle.create({ name: 'ipEnabled' }),
-        TagsField.extend({
-          isVisible: reads('valuesSource.caveats.ipCaveat.ipEnabled'),
-          sortTags(tags) {
-            const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
-            const sortKeyDecoratedTags = tags.map(tag => {
-              const parsedIp = get(tag, 'label').match(ipPartsMatcher);
-              const sortKey = parsedIp
-                // Four IP octets (1,2,3,4) and mask (6)
-                .slice(1, 5).concat([parsedIp[6] || '0'])
-                .map(numberStr => _.padStart(numberStr, 3, '0'))
-                .join();
-              return { sortKey, tag };
-            });
-            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
-          },
-        }).create({
-          name: 'ip',
-          tagEditorSettings: {
-            // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
-            regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
-          },
-          defaultValue: [],
-          sort: true,
-        }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
-        }).create({ name: 'ipDisabledText' }),
       ],
     });
   }),
@@ -528,6 +451,78 @@ export default Component.extend(I18n, {
             'valuesSource.caveats.countryCaveat.countryEnabled'
           ),
         }).create({ name: 'countryDisabledText' }),
+      ],
+    });
+  }),
+
+  asnCaveatGroup: computed(function asnCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'asnCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'asnEnabled' }),
+        TagsField.extend({
+          isVisible: reads('valuesSource.caveats.asnCaveat.asnEnabled'),
+          sortTags(tags) {
+            return tags.sort((a, b) =>
+              parseInt(get(a, 'label') - parseInt(get(b, 'label')))
+            );
+          },
+          tagsToValue(tags) {
+            return tags
+              .mapBy('label')
+              .map(asnString => parseInt(asnString))
+              .uniq();
+          },
+          valueToTags(value) {
+            return (value || []).map(asn => ({ label: String(asn) }));
+          },
+        }).create({
+          name: 'asn',
+          tagEditorSettings: {
+            regexp: /^\d+$/,
+          },
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
+        }).create({ name: 'asnDisabledText' }),
+      ],
+    });
+  }),
+
+  ipCaveatGroup: computed(function ipCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'ipCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'ipEnabled' }),
+        TagsField.extend({
+          isVisible: reads('valuesSource.caveats.ipCaveat.ipEnabled'),
+          sortTags(tags) {
+            const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
+            const sortKeyDecoratedTags = tags.map(tag => {
+              const parsedIp = get(tag, 'label').match(ipPartsMatcher);
+              const sortKey = parsedIp
+                // Four IP octets (1,2,3,4) and mask (6)
+                .slice(1, 5).concat([parsedIp[6] || '0'])
+                .map(numberStr => _.padStart(numberStr, 3, '0'))
+                .join();
+              return { sortKey, tag };
+            });
+            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+          },
+        }).create({
+          name: 'ip',
+          tagEditorSettings: {
+            // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
+            regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
+          },
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
+        }).create({ name: 'ipDisabledText' }),
       ],
     });
   }),
