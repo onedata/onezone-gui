@@ -9,7 +9,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Unit | Utility | generate development model', function () {
-  it('creates and saves records', function (done) {
+  it('creates and saves records', function () {
     const stubsToCheck = [];
 
     function createModelStub(modelName, properties) {
@@ -54,20 +54,19 @@ describe('Unit | Utility | generate development model', function () {
 
     const createRecord = sinon.spy(StoreStub, 'createRecord');
 
-    const promise = generateDevelopmentModel(StoreStub);
-    promise.then(() => {
-      [
-        'user', 'sharedUser',
-        'spaceList', 'groupList', 'providerList', 'tokenList',
-        'linkedAccountList', 'harvesterList', 'indexList', 'shareList',
-        'space', 'group', 'provider', 'token', 'linkedAccount',
-        'privilege', 'harvester', 'index', 'guiMessage', 'share',
-      ].forEach(modelName =>
-        expect(createRecord, `createRecord for ${modelName}`)
-        .to.be.calledWith(modelName, sinon.match.object)
-      );
-      stubsToCheck.forEach(stub => expect(stub).to.be.called);
-      done();
-    });
+    return generateDevelopmentModel(StoreStub)
+      .then(() => {
+        [
+          'user', 'sharedUser',
+          'spaceList', 'groupList', 'providerList', 'tokenList',
+          'linkedAccountList', 'harvesterList', 'indexList', 'shareList',
+          'space', 'group', 'provider', 'token', 'linkedAccount',
+          'privilege', 'harvester', 'index', 'guiMessage', 'share',
+        ].forEach(modelName =>
+          expect(createRecord, `createRecord for ${modelName}`)
+          .to.be.calledWith(modelName, sinon.match.object)
+        );
+        stubsToCheck.forEach(stub => expect(stub).to.be.called);
+      });
   });
 });

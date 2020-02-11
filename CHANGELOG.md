@@ -7,6 +7,11 @@ CHANGELOG
 ### Latest changes
 
 * VFS-5988 Added shares views and management
+* VFS-6109 Added more verbose unverified harvester GUI plugin error and trimming to token inputs
+* VFS-6102 Added harvester privileges to space
+* VFS-6056 Added resetting navigation state on logout
+* VFS-6027 Fixed random transition abort message when creating or joining space
+* VFS-6024 Removed default space and default Oneprovider features
 * VFS-6047 Added QOS-related privileges to space
 * VFS-5907 Added cease Oneprovider support action in supporting Oneproviders space view
 * VFS-5879 Changed provider permissions to support permissions in space

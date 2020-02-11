@@ -104,7 +104,19 @@ export default Component.extend(I18n, {
             resolve();
           });
           uploader.on('didError', (jqXHR, textStatus, error) => {
-            globalNotify.backendError(this.t('guiUploading'), error);
+            let responseBody;
+            try {
+              responseBody = jqXHR.responseText &&
+                JSON.parse(jqXHR.responseText);
+            } catch (e) {
+              responseBody = null;
+            }
+
+            globalNotify.backendError(
+              this.t('guiUploading'),
+              responseBody || error
+            );
+
             reject();
           });
           uploader.upload(selectedFile);
