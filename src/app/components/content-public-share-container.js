@@ -1,3 +1,12 @@
+/**
+ * A public share container for embedded component served from Oneprovider.
+ * 
+ * @module components/conent-public-share-container
+ * @author Jakub Liput
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { get, set, computed } from '@ember/object';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
@@ -15,7 +24,9 @@ export default Component.extend({
   share: undefined,
 
   /**
-   * @type {PromiseObject<Object>}
+   * Get object simulating provider record with neccessary properties for this
+   * view.
+   * @type {Object}
    */
   oneprovider: computed(
     'share.{chosenProviderId,chosenProviderVersion}',

@@ -1,0 +1,5 @@
+.content-shares-index:not(.is-loaded) {
+  :not(.one-embedded-container) {
+    pointer-events: auto;
+  }
+}

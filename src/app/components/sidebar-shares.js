@@ -31,9 +31,8 @@ export default TwoLevelSidebar.extend({
    */
   sidebarType: 'shares',
 
-  // FIXME: debug
-  init() {
-    this._super(...arguments);
-    window.sidebarShares = this;
-  },
+  /**
+   * @override
+   */
+  firstLevelItemComponent: 'sidebar-shares/share-item',
 });

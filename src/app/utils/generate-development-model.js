@@ -20,7 +20,10 @@ import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
-import { generateSpaceEntityId } from 'onedata-gui-websocket-client/utils/development-model-common';
+import {
+  generateSpaceEntityId,
+  generateShareEntityId,
+} from 'onedata-gui-websocket-client/utils/development-model-common';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -150,7 +153,7 @@ export default function generateDevelopmentModel(store) {
               return store.createRecord('share', {
                   id: gri({
                     entityType: 'share',
-                    entityId: `${get(space, 'entityId')}_sh1`,
+                    entityId: generateShareEntityId(get(space, 'entityId')),
                     aspect: 'instance',
                     scope: 'auto',
                   }),
@@ -432,7 +435,7 @@ function createSpacesRecords(store) {
   }));
 }
 
-// FIXME: add some shares data
+// currently shares records are created separately for each space
 function createSharesRecords() {
   return resolve([]);
 }

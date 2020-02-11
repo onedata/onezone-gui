@@ -10,30 +10,32 @@
 import Route from '@ember/routing/route';
 import { get, setProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { Promise } from 'rsvp';
+import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 
 export default Route.extend({
   shareManager: service(),
   navigationState: service(),
 
   model({ share_id: shareId }) {
-    return this.get('shareManager').getShare(shareId, 'public');
+    return this.get('shareManager').getShareById(shareId, 'public');
   },
 
   afterModel(model) {
-    // FIXME: this code can be used when the version of provider will be updated
-    // if (get(model, 'chosenProviderVersion').startsWith('19.02')) {
-    //   return new Promise(() => {
-    //     window.location = getOneproviderPath(
-    //       get(model, 'chosenProviderId'),
-    //       `onedata/shares/${get(model, 'entityId')}`
-    //     );
-    //   });
-    // } else {
-    const navigationState = this.get('navigationState');
-    setProperties(navigationState, {
-      activeResourceType: 'shares',
-      activeResourceId: get(model, 'entityId'),
-      activeResource: model,
-    });
+    if (get(model, 'chosenProviderVersion').startsWith('19.02')) {
+      return new Promise(() => {
+        window.location = getOneproviderPath(
+          get(model, 'chosenProviderId'),
+          `onedata/shares/${get(model, 'entityId')}`
+        );
+      });
+    } else {
+      const navigationState = this.get('navigationState');
+      setProperties(navigationState, {
+        activeResourceType: 'shares',
+        activeResourceId: get(model, 'entityId'),
+        activeResource: model,
+      });
+    }
   },
 });

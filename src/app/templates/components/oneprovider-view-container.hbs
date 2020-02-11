@@ -6,7 +6,7 @@
       )}}
       <div class="row row-content-tab-bar">
         {{#if (and (not media.isMobile) isTabBarCollapsed)}}
-          <div class="current-oneprovider-bar">
+          <div class={{concat-classes "current-oneprovider-bar" (if multiOneproviders "current-oneprovider-bar-multi")}}>
             <div class="current-oneprovider-bar-left-info">
               <span class="current-oneprovider-bar-info">
                 {{tt this "currentOneproviderInfo"}}
@@ -16,22 +16,24 @@
               </div>
               {{#truncated-string class="current-oneprovider-name"}}
                 {{selectedProviderItem.name}}
-              {{/truncated-string}}.
-              <a {{action (mut isTabBarCollapsed) false}} class="choose-oneprovider-link black clickable">
-                {{tt this "chooseOneprovider"}}
-              </a>
+              {{/truncated-string}}{{#if multiOneproviders}}.{{/if}}
+              {{#if multiOneproviders}}
+                <a {{action (mut isTabBarCollapsed) false}} class="choose-oneprovider-link black clickable">
+                  {{tt this "chooseOneprovider"}}
+                </a>
+              {{/if}}
               {{one-icon
                 icon="sign-question-rounded"
-                class="collapsed-selector-hint-trigger vertical-align-middle clickable"
+                class=(concat-classes collapsedSelectorHintTriggerClass "collapsed-selector-hint-trigger" "vertical-align-middle clickable")
               }}
               {{#one-switchable-popover-modal
                 class="collapsed-selector-hint"
                 triggersConfiguration=hintTriggersConfiguration
                 as |popmodal|
               }}
-                <h1>{{tt this "collapsedSelectorHint.header"}}</h1>
+                <h1>{{tt this (concat "collapsedSelectorHint." collapsedSelectorState ".header")}}</h1>
                 <p>{{tt this "collapsedSelectorHint.basicInfo"}}</p>
-                <p>{{tt this "collapsedSelectorHint.syncInfo"}}</p>
+                <p>{{tt this (concat "collapsedSelectorHint." collapsedSelectorState ".extInfo")}}</p>
                 <div class="btn-toolbar text-right visible-xs-block">
                   {{#bs-button type="default" onClick=popmodal.close}}
                     {{tt this "collapsedSelectorHint.close"}}
@@ -42,7 +44,7 @@
           </div>
         {{else}}
           {{#one-tab-bar
-            class=(concat-classes "space-providers-tab-bar" tabBarClass)
+            class=(concat-classes "space-providers-tab-bar" tabBarClass (if mapSelectorEnabled "with-map-selector"))
             items=providerItems
             selectedItem=selectedProviderItem
             selectDefaultOnInit=false
@@ -72,7 +74,6 @@
         }}
       {{else}}
         {{#if selectedProvider.online}}
-          {{oneprovider-view-container/container-body}}
           {{yield (hash
             body=(component "oneprovider-view-container/container-body")
             contentIframeBaseUrl=contentIframeBaseUrl

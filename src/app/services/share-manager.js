@@ -1,3 +1,12 @@
+/**
+ * Provides data and backend operations associated with shares.
+ *
+ * @module services/shares-manager
+ * @author Jakub Liput
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import EmberObject, { computed, observer, get } from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -7,6 +16,15 @@ import { all as allFulfilled } from 'rsvp';
 import _ from 'lodash';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 
+/**
+ * This object MUST BE initialzed asychronuosly using `asyncInit()`, eg.
+ * ```
+ * VirtualShareList.create({
+ *   userProxy: this.get('userProxy'),
+ * }).asyncInit().then(virtualShareList => doSomethingWith(virtualShareList));
+ * ```
+ * @type {EmberObject}
+ */
 export const VirtualShareList = EmberObject.extend({
   /**
    * @virtual
@@ -46,7 +64,7 @@ export const VirtualShareList = EmberObject.extend({
   list: promise.array(computed('shareListRelations.@each.[]',
     function list() {
       return this.get('shareListRelations')
-        .then(lists => _.flatten(lists.map(list => list.toArray())));
+        .then(lists => _.flatten(lists.invoke('toArray')));
     })),
 
   idsCache: Object.freeze([]),
@@ -56,6 +74,15 @@ export const VirtualShareList = EmberObject.extend({
       this.set('idsCache', list.mapBy('id'));
     });
   }),
+
+  /**
+   * This method MUST BE invoked to properly initialize the object.
+   * The object can be used only after async resolve of this method.
+   * @returns {Promise}
+   */
+  asyncInit() {
+    return this.rebuildIdsCache().then(() => this);
+  },
 
   hasMany(propertyName) {
     if (propertyName === 'list') {
@@ -70,11 +97,11 @@ export default Service.extend(UserProxyMixin, {
   store: service(),
   currentUser: service(),
 
-  getRecord(id) {
-    return this.get('store').findRecord('share', id);
+  getRecord(gri) {
+    return this.get('store').findRecord('share', gri);
   },
 
-  getShare(shareId, scope = 'private') {
+  getShareById(shareId, scope = 'private') {
     return this.getRecord(
       gri({
         entityType: shareEntityType,
@@ -89,7 +116,7 @@ export default Service.extend(UserProxyMixin, {
     const virtualShareList = VirtualShareList.create({
       userProxy: this.get('userProxy'),
     });
-    return virtualShareList.rebuildIdsCache().then(() => virtualShareList);
+    return virtualShareList.asyncInit();
   },
 
   /**
@@ -98,17 +125,18 @@ export default Service.extend(UserProxyMixin, {
    */
   getSpaceForShare(share) {
     return this.get('userProxy')
-      .then(user => get(user, 'spaceList.list'))
-      .then(list =>
-        allFulfilled(
-          _.zip(list.toArray(), list.mapBy('shareList.list'))
-        )
+      .then(user => get(user, 'spaceList'))
+      .then(spaceList => get(spaceList, 'list'))
+      .then(spaces =>
+        allFulfilled(spaces.mapBy('shareList')).then(sl => sl.mapBy('list'))
+        .then(shares => _.zip(
+          spaces.toArray(),
+          shares,
+        ))
       )
-      .then(spacesWithShares =>
-        spacesWithShares
-        .find(([, shares]) => shares.includes(share))
-      )
-      .then((spaceSharesPair) => {
+      .then(spacesWithShares => {
+        const spaceSharesPair = spacesWithShares
+          .find(([, shares]) => shares.includes(share));
         if (spaceSharesPair) {
           return spaceSharesPair[0];
         } else {

@@ -11,13 +11,14 @@
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
-import { promise, notEmpty, array, raw } from 'ember-awesome-macros';
+import { promise, notEmpty, array, raw, tag, conditional } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { guidFor } from '@ember/object/internals';
 
 const nameComparator = createPropertyComparator('name');
 
@@ -112,21 +113,40 @@ export default Component.extend(I18n, {
    */
   contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
 
-  hintTriggersConfiguration: computed(function hintTriggersConfiguration() {
-    let parentId;
-    for (let view = this.parentView; view != null; view = view.parentView) {
-      if (view.elementId) {
-        parentId = view.elementId;
-        break;
-      }
-    }
-    if (parentId) {
-      return `#${parentId} .collapsed-selector-hint-trigger`;
-    } else {
-      return '.collapsed-selector-hint-trigger';
-    }
+  /**
+   * True if there are more than one Oneprovider to select
+   * @type {ComputedProperty<boolean>}
+   */
+  // multiOneproviders: gt('providers.length', raw(1)),
+  multiOneproviders: true,
 
+  /**
+   * State of Oneproviders selector - are there more than one to select?
+   * One of: single, multi.
+   * @type {ComputedProperty<String>}
+   */
+  collapsedSelectorState: conditional(
+    'multiOneproviders',
+    raw('multi'),
+    raw('single'),
+  ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  componentGuid: computed(function componentGuid() {
+    return guidFor(this);
   }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderId: computed('oneproviderId', function validatedOneproviderId() {
     const oneproviderId = this.get('oneproviderId');

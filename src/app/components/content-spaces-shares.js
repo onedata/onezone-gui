@@ -59,7 +59,7 @@ export default Component.extend(I18n, {
       shareManager,
       shareId,
     } = this.getProperties('shareManager', 'shareId');
-    return shareManager.getShare(shareId);
+    return shareManager.getShareById(shareId);
   })),
 
   actions: {

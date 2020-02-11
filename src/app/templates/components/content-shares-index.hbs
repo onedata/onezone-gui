@@ -10,13 +10,9 @@
   }}
     {{#container.header class="content-shares-index-header"}}
       <h1 class="normal-case with-menu">
-        <span class="one-label">
-          {{#truncated-string}}
-            <span class="share-name resource-name">
-              {{name-conflict item=share tagName="span" class="one-label"}}
-            </span>
-          {{/truncated-string}}
-        </span>
+        {{#truncated-string class="one-label share-name resource-name"}}
+          {{name-conflict item=share tagName="span" class="one-label"}}
+        {{/truncated-string}}
       </h1>
     {{/container.header}}
     {{#container.body}}

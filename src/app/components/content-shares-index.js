@@ -1,3 +1,12 @@
+/**
+ * Global share view - show single share accessible from shares > share menu.
+ * 
+ * @module components/content-shares-index
+ * @author Jakub Liput
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -42,10 +51,6 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
-
-  init() {
-    this._super(...arguments);
-  },
 
   actions: {
     oneproviderIdChanged(oneproviderId) {
