@@ -144,6 +144,8 @@ describe('Integration | Component | token editor', function () {
   });
 
   beforeEach(function () {
+    sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
+      .resolves({ entityId: 'user1' });
     const mockedRecords = {};
     [
       'space',
@@ -155,6 +157,8 @@ describe('Integration | Component | token editor', function () {
       const getModelsMethodName = `get${_.upperFirst(modelName)}s`;
       const service = lookupService(this, serviceName);
       mockedRecords[modelName] = _.reverse(_.range(3)).map(index => ({
+        entityId: `${modelName}${index}`,
+        entityType: modelName,
         name: `${modelName}${index}`,
       }));
       sinon.stub(service, getModelsMethodName)
@@ -1119,6 +1123,168 @@ describe('Integration | Component | token editor', function () {
         expect(this.$('.submit-token')).to.not.have.attr('disabled')
       );
   });
+
+  it('calls injected onSubmit on submit click', function () {
+    const submitSpy = sinon.spy();
+    this.on('submit', submitSpy);
+    this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+
+    return wait()
+      .then(() => fillIn('.name-field input', 'abc'))
+      .then(() => click('.submit-token'))
+      .then(() => {
+        expect(submitSpy).to.be.calledOnce;
+      });
+  });
+
+  it(
+    'passess token raw model via injected onSubmit on submit click (access token example with all caveats)',
+    function () {
+      this.timeout(4000);
+      const submitSpy = sinon.spy();
+      this.on('submit', submitSpy);
+      this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+
+      return wait()
+        .then(() => fillIn('.name-field input', 'somename'))
+        .then(() => click('.type-field .option-access'))
+        // 
+        .then(() => toggleCaveat('expire'))
+        // region
+        .then(() => toggleCaveat('region'))
+        .then(() => new RegionTypeHelper().selectOption(2))
+        .then(() => click('.region-field .tags-input'))
+        .then(() => click(
+          getTagsSelector().find('.selector-item:contains("Europe")')[0]
+        ))
+        // country
+        .then(() => toggleCaveat('country'))
+        .then(() => new CountryTypeHelper().selectOption(2))
+        .then(() => click('.country-field .tags-input'))
+        .then(() => fillIn('.country-field .text-editor-input', 'pl,'))
+        // asn
+        .then(() => toggleCaveat('asn'))
+        .then(() => click('.asn-field .tags-input'))
+        .then(() => fillIn('.asn-field .text-editor-input', '123,2,'))
+        // ip
+        .then(() => toggleCaveat('ip'))
+        .then(() => click('.ip-field .tags-input'))
+        .then(() => fillIn('.ip-field .text-editor-input', '255.255.255.255,'))
+        // interface
+        .then(() => toggleCaveat('interface'))
+        .then(() => click('.option-oneclient'))
+        // readonly
+        .then(() => toggleCaveat('readonly'))
+        // path
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
+        .then(() => new PathSpaceHelper().selectOption(1))
+        .then(() => fillIn(
+          getFieldElement(this, 'path').find('.pathString-field input')[0],
+          '/abc'
+        ))
+        // objectid
+        .then(() => toggleCaveat('objectId'))
+        .then(() =>
+          click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
+        )
+        .then(() => fillIn(
+          getFieldElement(this, 'objectId').find('input')[0],
+          'objectid1'
+        ))
+        .then(() => click('.submit-token'))
+        .then(() => {
+          const rawToken = submitSpy.lastCall.args[0];
+          expect(rawToken).to.have.property('name', 'somename');
+          expect(rawToken).to.have.nested.property('type.accessToken');
+
+          const caveats = rawToken.caveats;
+          expect(caveats.length).to.equal(9);
+          expect(caveats.findBy('type', 'time')).to.have.property('validUntil');
+          expect(caveats.findBy('type', 'region')).to.deep.include({
+            filter: 'blacklist',
+            list: ['Europe'],
+          });
+          expect(caveats.findBy('type', 'country')).to.deep.include({
+            filter: 'blacklist',
+            list: ['PL'],
+          });
+          expect(caveats.findBy('type', 'asn')).to.deep.include({
+            whitelist: [2, 123],
+          });
+          expect(caveats.findBy('type', 'ip')).to.deep.include({
+            whitelist: ['255.255.255.255'],
+          });
+          expect(caveats.findBy('type', 'interface'))
+            .to.have.property('interface', 'oneclient');
+          expect(caveats.findBy('type', 'data.readonly')).to.exist;
+          expect(caveats.findBy('type', 'data.path')).to.deep.include({
+            whitelist: ['L3NwYWNlMC9hYmM='],
+          });
+          expect(caveats.findBy('type', 'data.objectid')).to.deep.include({
+            whitelist: ['objectid1'],
+          });
+        });
+    }
+  );
+
+  it(
+    'passess token raw model via injected onSubmit on submit click (invite token example without caveats)',
+    function () {
+      const submitSpy = sinon.spy();
+      this.on('submit', submitSpy);
+      this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+
+      return wait()
+        .then(() => fillIn('.name-field input', 'somename'))
+        .then(() => click('.type-field .option-invite'))
+        .then(() => new SubtypeHelper().selectOption(1))
+        .then(() => new TargetHelper().selectOption(1))
+        .then(() => click('.submit-token'))
+        .then(() => {
+          const rawToken = submitSpy.lastCall.args[0];
+          expect(rawToken).to.have.property('name', 'somename');
+          expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
+            subtype: 'userJoinGroup',
+            groupId: 'group0',
+          });
+          expect(rawToken).to.not.have.property('caveats');
+        });
+    }
+  );
+
+  it(
+    'passess token raw model via injected onSubmit on submit click (register Oneprovider example without caveats)',
+    function () {
+      const submitSpy = sinon.spy();
+      this.on('submit', submitSpy);
+      this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+
+      const registerOneproviderDropdownIndex = tokenSubtypes.indexOf(
+        tokenSubtypes.findBy('subtype', 'registerOneprovider')
+      ) + 1;
+      return wait()
+        .then(() => fillIn('.name-field input', 'somename'))
+        .then(() => click('.type-field .option-invite'))
+        .then(() => new SubtypeHelper().selectOption(1))
+        .then(() => new TargetHelper().selectOption(1))
+        .then(() =>
+          new SubtypeHelper().selectOption(registerOneproviderDropdownIndex)
+        )
+        .then(() => click('.submit-token'))
+        .then(() => {
+          const rawToken = submitSpy.lastCall.args[0];
+          expect(rawToken).to.have.property('name', 'somename');
+          expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
+            subtype: 'registerOneprovider',
+            adminUserId: 'user1',
+          });
+          expect(rawToken).to.not.have.property('caveats');
+        });
+    }
+  );
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {

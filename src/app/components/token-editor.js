@@ -15,6 +15,8 @@ import StaticTextField from 'onedata-gui-common/utils/form-component/static-text
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
+import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
 import { scheduleOnce } from '@ember/runloop';
 import { equal, raw, and, not, hash, array, getBy } from 'ember-awesome-macros';
 import moment from 'moment';
@@ -95,6 +97,7 @@ export default Component.extend(I18n, {
   harvesterManager: service(),
   clusterManager: service(),
   oneiconAlias: service(),
+  currentUser: service(),
 
   /**
    * @override
@@ -107,6 +110,13 @@ export default Component.extend(I18n, {
    * @param {boolean} isValid
    */
   onChange: notImplementedIgnore,
+
+  /**
+   * @type {Function}
+   * @param {Object} tokenRawModel
+   * @param {Promise}
+   */
+  onSubmit: notImplementedReject,
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -745,6 +755,21 @@ export default Component.extend(I18n, {
   actions: {
     toggleCaveatsGroup() {
       this.toggleProperty('caveatsGroup.isExpanded');
+    },
+    submit() {
+      const {
+        fields,
+        onSubmit,
+        currentUser,
+      } = this.getProperties('fields', 'onSubmit', 'currentUser');
+
+      if (get(fields, 'isValid')) {
+        return currentUser.getCurrentUserRecord().then(user => {
+          const formValues = fields.dumpValue();
+          const tokenRawModel = editorDataToToken(formValues, user);
+          return onSubmit(tokenRawModel);
+        });
+      }
     },
   },
 });
