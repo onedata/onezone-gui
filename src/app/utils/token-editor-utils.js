@@ -89,7 +89,7 @@ export function editorDataToToken(editorData, currentUser) {
       const list = get(caveatFormObj, `${caveatName}.${caveatName}List`);
       if (filter && list && list.length) {
         caveatsData.push({
-          type: caveatName,
+          type: `geo.${caveatName}`,
           filter,
           list,
         });

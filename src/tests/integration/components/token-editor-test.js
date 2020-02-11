@@ -1203,11 +1203,11 @@ describe('Integration | Component | token editor', function () {
           const caveats = rawToken.caveats;
           expect(caveats.length).to.equal(9);
           expect(caveats.findBy('type', 'time')).to.have.property('validUntil');
-          expect(caveats.findBy('type', 'region')).to.deep.include({
+          expect(caveats.findBy('type', 'geo.region')).to.deep.include({
             filter: 'blacklist',
             list: ['Europe'],
           });
-          expect(caveats.findBy('type', 'country')).to.deep.include({
+          expect(caveats.findBy('type', 'geo.country')).to.deep.include({
             filter: 'blacklist',
             list: ['PL'],
           });

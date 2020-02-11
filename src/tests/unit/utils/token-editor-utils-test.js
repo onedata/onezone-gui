@@ -271,7 +271,7 @@ describe('Unit | Utility | token editor utils', function () {
           });
 
           expect(result).to.have.deep.nested.property('caveats[0]', {
-            type: caveatName,
+            type: `geo.${caveatName}`,
             filter: type,
             list,
           });
