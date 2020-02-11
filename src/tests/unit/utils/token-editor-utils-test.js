@@ -106,96 +106,84 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
 
-    it('converts metadata', function () {
-      const json = { a: 1 };
-      const result = editorDataToToken({
-        basic: {
-          metadata: JSON.stringify(json),
-        },
-      });
-      expect(result).to.have.deep.property('customMetadata', json);
+    [
+      'invite',
+      'access',
+    ].forEach(type => {
+      it(
+        `has no caveats field in returned object if no caveats were enabled (with values) for token of type ${type}`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: Object.assign(
+              generateCaveatEntry('expire', false, new Date()),
+              generateCaveatEntry('asn', false, [23]),
+              generateCaveatEntry('ip', false, ['1.1.1.1']),
+              generateCaveatEntry('region', false, {
+                regionType: 'whitelist',
+                regionList: ['Europe'],
+              }),
+              generateCaveatEntry('country', false, {
+                countryType: 'whitelist',
+                countryList: ['PL'],
+              }), {
+                accessOnlyCaveats: Object.assign(
+                  generateCaveatEntry('interface', false, 'rest'),
+                  generateCaveatEntry('readonly', false),
+                  generateCaveatEntry('path', false, {
+                    pathEntry0: {
+                      pathSpace: { entityId: 's1' },
+                      pathString: '/abc/def',
+                    },
+                    __fieldsValueNames: ['pathEntry0'],
+                  }),
+                  generateCaveatEntry('objectId', false, {
+                    objectIdEntry0: '1234567890',
+                    __fieldsValueNames: ['objectIdEntry0'],
+                  }),
+                ),
+              }),
+          });
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+
+      it(
+        `has no caveats field in returned object if all caveats with additional values were enabled (additional values are empty) for token of type ${type}`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: Object.assign(
+              generateCaveatEntry('expire', true),
+              generateCaveatEntry('asn', true, []),
+              generateCaveatEntry('ip', true, []),
+              generateCaveatEntry('region', true, {
+                regionType: undefined,
+                regionList: [],
+              }),
+              generateCaveatEntry('country', true, {
+                countryType: undefined,
+                countryList: [],
+              }), {
+                accessOnlyCaveats: Object.assign(
+                  generateCaveatEntry('interface', true),
+                  generateCaveatEntry('path', true, {
+                    __fieldsValueNames: [],
+                  }),
+                  generateCaveatEntry('objectId', true, {
+                    __fieldsValueNames: [],
+                  }),
+                ),
+              }),
+          });
+          expect(result).to.not.have.property('caveats');
+        }
+      );
     });
-
-    it('ignores undefined metadata', function () {
-      const result = editorDataToToken({
-        basic: {
-          metadata: undefined,
-        },
-      });
-      expect(result).to.not.have.property('customMetadata');
-    });
-
-    it('ignores empty string metadata', function () {
-      const result = editorDataToToken({
-        basic: {
-          metadata: '',
-        },
-      });
-      expect(result).to.not.have.property('customMetadata');
-    });
-
-    it(
-      'has no caveats field in returned object if no caveats were enabled (with values)',
-      function () {
-        const result = editorDataToToken({
-          caveats: Object.assign(
-            generateCaveatEntry('expire', false, new Date()),
-            generateCaveatEntry('asn', false, [23]),
-            generateCaveatEntry('ip', false, ['1.1.1.1']),
-            generateCaveatEntry('country', false, {
-              regionType: 'whitelist',
-              regionList: ['Europe'],
-            }),
-            generateCaveatEntry('country', false, {
-              countryType: 'whitelist',
-              countryList: ['PL'],
-            }), {
-              accessOnlyCaveats: Object.assign(
-                generateCaveatEntry('interface', false, 'rest'),
-                generateCaveatEntry('readonly', false),
-                generateCaveatEntry('path', false, {
-                  __fieldsValueNames: [],
-                }),
-                generateCaveatEntry('objectId', false, {
-                  __fieldsValueNames: [],
-                }),
-              ),
-            }),
-        });
-        expect(result).to.not.have.property('caveats');
-      }
-    );
-
-    it(
-      'has no caveats field in returned object if all caveats with additional values were enabled (additional values are empty)',
-      function () {
-        const result = editorDataToToken({
-          caveats: Object.assign(
-            generateCaveatEntry('expire', true),
-            generateCaveatEntry('asn', true, []),
-            generateCaveatEntry('ip', true, []),
-            generateCaveatEntry('country', true, {
-              regionType: undefined,
-              regionList: [],
-            }),
-            generateCaveatEntry('country', true, {
-              countryType: undefined,
-              countryList: [],
-            }), {
-              accessOnlyCaveats: Object.assign(
-                generateCaveatEntry('interface', true),
-                generateCaveatEntry('path', true, {
-                  __fieldsValueNames: [],
-                }),
-                generateCaveatEntry('objectId', true, {
-                  __fieldsValueNames: [],
-                }),
-              ),
-            }),
-        });
-        expect(result).to.not.have.property('caveats');
-      }
-    );
 
     it('converts expire caveat', function () {
       const expireDate = new Date();
@@ -209,6 +197,380 @@ describe('Unit | Utility | token editor utils', function () {
         validUntil: expireTimestamp,
       });
     });
+
+    [
+      'asn',
+      'ip',
+    ].forEach(caveatName => {
+      it(`converts ${caveatName} caveat`, function () {
+        const whitelist = ['A', 'B'];
+        const result = editorDataToToken({
+          caveats: generateCaveatEntry(caveatName, true, whitelist),
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: caveatName,
+          whitelist,
+        });
+      });
+
+      it(
+        `does not convert ${caveatName} caveat when whitelist is empty`,
+        function () {
+          const result = editorDataToToken({
+            caveats: generateCaveatEntry(caveatName, true, []),
+          });
+
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+    });
+
+    [
+      'region',
+      'country',
+    ].forEach(caveatName => {
+      [
+        'whitelist',
+        'blacklist',
+      ].forEach(type => {
+        it(`converts ${caveatName} caveat with ${type}`, function () {
+          const list = ['A', 'B'];
+          const result = editorDataToToken({
+            caveats: generateCaveatEntry(caveatName, true, {
+              [`${caveatName}Type`]: type,
+              [`${caveatName}List`]: list,
+            }),
+          });
+
+          expect(result).to.have.deep.nested.property('caveats[0]', {
+            type: caveatName,
+            filter: type,
+            list,
+          });
+        });
+
+        it(
+          `does not convert ${caveatName} caveat with ${type} when countries list is empty`,
+          function () {
+            const result = editorDataToToken({
+              caveats: generateCaveatEntry(caveatName, true, {
+                [`${caveatName}Type`]: type,
+                [`${caveatName}List`]: [],
+              }),
+            });
+
+            expect(result).to.not.have.property('caveats');
+          }
+        );
+      });
+
+      it(
+        `does not convert ${caveatName} caveat when filter type is not provided`,
+        function () {
+          const result = editorDataToToken({
+            caveats: generateCaveatEntry(caveatName, true, {
+              [`${caveatName}Type`]: undefined,
+              [`${caveatName}List`]: ['A'],
+            }),
+          });
+
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+    });
+
+    it(
+      'does not convert interface caveat, when token is not of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('interface', true, 'rest'),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'converts interface caveat, when token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('interface', true, 'rest'),
+          },
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: 'interface',
+          interface: 'rest',
+        });
+      }
+    );
+
+    it(
+      'does not convert interface caveat, when caveat is empty and token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('interface', true,
+              undefined),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'does not convert readonly caveat, when token is not of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('readonly', true),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'converts readonly caveat, when token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('readonly', true),
+          },
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: 'data.readonly',
+        });
+      }
+    );
+
+    it(
+      'does not convert path caveat, when token is not of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('path', true, {
+              pathEntry0: {
+                pathSpace: { entityId: 's1' },
+                pathString: '/abc/def',
+              },
+              __fieldsValueNames: ['pathEntry0'],
+            }),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'converts path caveat, when token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('path', true, {
+              pathEntry0: {
+                pathSpace: { entityId: 's1' },
+                pathString: '/abc/def',
+              },
+              pathEntry1: {
+                pathSpace: { entityId: 's2' },
+                pathString: '/abc/def/ghi',
+              },
+              __fieldsValueNames: ['pathEntry0', 'pathEntry1'],
+            }),
+          },
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: 'data.path',
+          whitelist: [
+            'L3MxL2FiYy9kZWY=', // /s1/abc/def
+            'L3MyL2FiYy9kZWYvZ2hp', // /s2/abc/def/ghi
+          ],
+        });
+      }
+    );
+
+    it(
+      'converts path caveat, when token is of type "access" and one of paths does not have space specified',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('path', true, {
+              pathEntry0: {
+                pathSpace: undefined,
+                pathString: '/abc/def',
+              },
+              pathEntry1: {
+                pathSpace: { entityId: 's2' },
+                pathString: '/abc/def/ghi',
+              },
+              __fieldsValueNames: ['pathEntry0', 'pathEntry1'],
+            }),
+          },
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: 'data.path',
+          whitelist: [
+            'L3MyL2FiYy9kZWYvZ2hp', // /s2/abc/def/ghi
+          ],
+        });
+      }
+    );
+
+    it(
+      'does not convert path caveat, when caveat is empty and token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('path', true, {
+              __fieldsValueNames: [],
+            }),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'does not convert objectId caveat, when token is not of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
+              objectIdEntry0: '1234567890',
+              __fieldsValueNames: ['objectIdEntry0'],
+            }),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'converts objectId caveat, when token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
+              objectIdEntry0: '1234567890',
+              objectIdEntry1: '0123456789',
+              __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
+            }),
+          },
+        });
+
+        expect(result).to.have.deep.nested.property('caveats[0]', {
+          type: 'data.objectid',
+          whitelist: [
+            '1234567890',
+            '0123456789',
+          ],
+        });
+      }
+    );
+
+    it(
+      'does not convert objectId caveat, when caveat is empty and token is of type "access"',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: {
+            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
+              __fieldsValueNames: [],
+            }),
+          },
+        });
+
+        expect(result).to.not.have.property('caveats');
+      }
+    );
+
+    it(
+      'converts all caveats when all of them are enabled and have a value',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+          },
+          caveats: Object.assign(
+            generateCaveatEntry('expire', true, new Date()),
+            generateCaveatEntry('asn', true, [23]),
+            generateCaveatEntry('ip', true, ['1.1.1.1']),
+            generateCaveatEntry('region', true, {
+              regionType: 'whitelist',
+              regionList: ['Europe'],
+            }),
+            generateCaveatEntry('country', true, {
+              countryType: 'whitelist',
+              countryList: ['PL'],
+            }), {
+              accessOnlyCaveats: Object.assign(
+                generateCaveatEntry('interface', true, 'rest'),
+                generateCaveatEntry('readonly', true),
+                generateCaveatEntry('path', true, {
+                  pathEntry0: {
+                    pathSpace: { entityId: 's1' },
+                    pathString: '/abc/def',
+                  },
+                  __fieldsValueNames: ['pathEntry0'],
+                }),
+                generateCaveatEntry('objectId', true, {
+                  objectIdEntry0: '1234567890',
+                  __fieldsValueNames: ['objectIdEntry0'],
+                }),
+              ),
+            }),
+        });
+        expect(get(result, 'caveats')).to.be.an('array').with.length(9);
+      }
+    );
   });
 });
 

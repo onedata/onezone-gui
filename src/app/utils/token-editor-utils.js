@@ -4,7 +4,7 @@ import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token
 export function editorDataToToken(editorData) {
   const tokenData = {};
 
-  const {
+  let {
     basic,
     caveats,
   } = getProperties(
@@ -12,27 +12,22 @@ export function editorDataToToken(editorData) {
     'basic',
     'caveats',
   );
+  basic = basic || {};
+  caveats = caveats || {};
   const {
     name,
     type,
-    metadata,
   } = getProperties(
-    basic || {},
+    basic,
     'name',
-    'type',
-    'metadata'
+    'type'
   );
-  const {
-    expireCaveat,
-  } = getProperties(
-    caveats || {},
-    'expireCaveat',
-  );
+  const expireCaveat = get(caveats, 'expireCaveat');
 
   if (name) {
     tokenData.name = name;
   }
-  if (['invite', 'access'].contains(type)) {
+  if (['invite', 'access'].includes(type)) {
     const typeKey = `${type}Token`;
     tokenData.type = {
       [typeKey]: {},
@@ -54,9 +49,6 @@ export function editorDataToToken(editorData) {
       }
     }
   }
-  if (metadata) {
-    tokenData.customMetadata = JSON.parse(metadata);
-  }
   const caveatsData = [];
   if (expireCaveat && get(expireCaveat, 'expireEnabled')) {
     const expireDate = get(expireCaveat, 'expire');
@@ -67,6 +59,103 @@ export function editorDataToToken(editorData) {
       });
     }
   }
+  [
+    'asn',
+    'ip',
+  ].forEach(caveatName => {
+    const caveatFormObj = get(caveats, `${caveatName}Caveat`);
+    if (caveatFormObj && get(caveatFormObj, `${caveatName}Enabled`)) {
+      const whitelist = get(caveatFormObj, caveatName);
+      if (whitelist && whitelist.length) {
+        caveatsData.push({
+          type: caveatName,
+          whitelist,
+        });
+      }
+    }
+  });
+  [
+    'region',
+    'country',
+  ].forEach(caveatName => {
+    const caveatFormObj = get(caveats, `${caveatName}Caveat`);
+    if (caveatFormObj && get(caveatFormObj, `${caveatName}Enabled`)) {
+      const filter = get(caveatFormObj, `${caveatName}.${caveatName}Type`);
+      const list = get(caveatFormObj, `${caveatName}.${caveatName}List`);
+      if (filter && list && list.length) {
+        caveatsData.push({
+          type: caveatName,
+          filter,
+          list,
+        });
+      }
+    }
+  });
+  if (type === 'access') {
+    const {
+      interfaceCaveat,
+      readonlyCaveat,
+      pathCaveat,
+      objectIdCaveat,
+    } = getProperties(
+      get(caveats, 'accessOnlyCaveats') || {},
+      'interfaceCaveat',
+      'readonlyCaveat',
+      'pathCaveat',
+      'objectIdCaveat'
+    );
+
+    if (interfaceCaveat && get(interfaceCaveat, 'interfaceEnabled')) {
+      const value = get(interfaceCaveat, 'interface');
+      if (value) {
+        caveatsData.push({
+          type: 'interface',
+          interface: value,
+        });
+      }
+    }
+    if (readonlyCaveat && get(readonlyCaveat, 'readonlyEnabled')) {
+      caveatsData.push({
+        type: 'data.readonly',
+      });
+    }
+
+    if (pathCaveat && get(pathCaveat, 'pathEnabled')) {
+      const pathFieldsNames = get(pathCaveat, 'path.__fieldsValueNames') || [];
+      const whitelist = pathFieldsNames
+        .map(name => get(pathCaveat, `path.${name}`))
+        .compact()
+        .map(pathEntry => {
+          const spaceId = get(pathEntry, 'pathSpace.entityId');
+          const pathString = get(pathEntry, 'pathString');
+          if (spaceId) {
+            const absolutePath = `/${spaceId}${pathString}`;
+            return btoa(absolutePath);
+          }
+        })
+        .compact();
+      if (whitelist.length) {
+        caveatsData.push({
+          type: 'data.path',
+          whitelist,
+        });
+      }
+    }
+
+    if (objectIdCaveat && get(objectIdCaveat, 'objectIdEnabled')) {
+      const objectIdFieldsNames = get(objectIdCaveat, 'objectId.__fieldsValueNames') || [];
+      const whitelist = objectIdFieldsNames
+        .map(name => get(objectIdCaveat, `objectId.${name}`))
+        .compact();
+      if (whitelist.length) {
+        caveatsData.push({
+          type: 'data.objectid',
+          whitelist,
+        });
+      }
+    }
+  }
+
   if (caveatsData.length) {
     tokenData.caveats = caveatsData;
   }
