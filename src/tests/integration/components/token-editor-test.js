@@ -1097,6 +1097,28 @@ describe('Integration | Component | token editor', function () {
         .then(() => expectToBeValid(this, 'objectId'));
     }
   );
+
+  it('renders disabled submit button', function () {
+    this.render(hbs `{{token-editor}}`);
+
+    return wait()
+      .then(() => {
+        const $submit = this.$('.submit-token');
+        expect($submit).to.exist;
+        expect($submit.text().trim()).to.equal('Create token');
+        expect($submit).to.have.attr('disabled');
+      });
+  });
+
+  it('renders enabled submit button when form becomes valid', function () {
+    this.render(hbs `{{token-editor}}`);
+
+    return wait()
+      .then(() => fillIn('.name-field input', 'abc'))
+      .then(() =>
+        expect(this.$('.submit-token')).to.not.have.attr('disabled')
+      );
+  });
 });
 
 class SubtypeHelper extends EmberPowerSelectHelper {
