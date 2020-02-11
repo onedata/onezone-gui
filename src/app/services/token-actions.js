@@ -10,8 +10,8 @@
 import { default as Service, inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import $ from 'jquery';
 import CreateTokenLinkAction from 'onezone-gui/utils/token-actions/create-token-link-action';
+import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 
 export default Service.extend(I18n, {
@@ -26,8 +26,12 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.tokenActions',
 
-  createAddTokenAction(context) {
+  createCreateTokenLinkAction(context) {
     return CreateTokenLinkAction.create({ ownerSource: this, context });
+  },
+
+  createCreateTokenAction(context) {
+    return CreateTokenAction.create({ ownerSource: this, context });
   },
 
   createCleanObsoleteTokensAction(context) {
@@ -36,43 +40,9 @@ export default Service.extend(I18n, {
 
   createGlobalActions(context) {
     return [
-      this.createAddTokenAction(context),
+      this.createCreateTokenLinkAction(context),
       this.createCleanObsoleteTokensAction(context),
     ];
-  },
-
-  /**
-   * Creates token
-   * @param {Object} tokenPrototype token model prototype
-   * @returns {Promise} A promise, which resolves to new token if it has
-   * been created successfully.
-   */
-  createToken(tokenPrototype) {
-    const {
-      globalNotify,
-      router,
-      tokenManager,
-      guiUtils,
-    } = this.getProperties(
-      'globalNotify',
-      'router',
-      'tokenManager',
-      'guiUtils'
-    );
-    return tokenManager.createToken(tokenPrototype).then((token) => {
-      globalNotify.success(this.t('tokenCreateSuccess'));
-      router.transitionTo(
-        'onedata.sidebar.content',
-        'tokens',
-        guiUtils.getRoutableIdFor(token)
-      );
-      // TODO: instead that, always scroll to sidebar position on changing
-      // sidebar chosen item
-      $('.col-sidebar').scrollTop(0);
-    }).catch(error => {
-      globalNotify.backendError(this.t('tokenCreation'), error);
-      throw error;
-    });
   },
 
   /**

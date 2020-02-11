@@ -1,11 +1,13 @@
 export default {
-  tokenCreateSuccess: 'Token created successfully.',
-  tokenCreation: 'token creation',
   tokenRemoveSuccess: 'Token has been removed successfully.',
   removingToken: 'removing token',
   createTokenLinkAction: {
     title: 'Create new token',
     tip: 'Create new token',
+  },
+  createTokenAction: {
+    successNotificationText: 'Token has been created successfully.',
+    failureNotificationActionName: 'creating token',
   },
   cleanObsoleteTokensAction: {
     title: 'Clean up obsolete tokens',
