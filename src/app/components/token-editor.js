@@ -73,13 +73,17 @@ function getTargetModelNameForSubtype(subtype) {
 }
 
 const CaveatFormGroup = FormFieldsGroup.extend({
-  classes: 'caveat-group',
+  classes: computed('isCaveatEnabled', function classes() {
+    return 'caveat-group' + (this.get('isCaveatEnabled') ? ' is-enabled' : '');
+  }),
+  isCaveatEnabled: getBy(array.findBy('fields', raw('isGroupToggle')), raw('value')),
 });
 
 const CaveatGroupToggle = ToggleField.extend({
   classes: 'caveat-group-toggle',
   addColonToLabel: false,
   defaultValue: false,
+  isGroupToggle: true,
 });
 
 export default Component.extend(I18n, {
