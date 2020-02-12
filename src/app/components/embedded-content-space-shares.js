@@ -14,8 +14,9 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
+import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
 
-export default OneEmbeddedContainer.extend({
+export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
   layout,
 
   navigationState: service(),
@@ -102,11 +103,6 @@ export default OneEmbeddedContainer.extend({
   }),
 
   actions: {
-    updateDirId(dirId) {
-      return this.get('navigationState').setAspectOptions({
-        dirId,
-      });
-    },
     updateShareId(shareId) {
       return this.get('navigationState').setAspectOptions({
         shareId,
@@ -124,25 +120,6 @@ export default OneEmbeddedContainer.extend({
           queryParams: {
             options: serializeAspectOptions(
               navigationState.mergedAspectOptions({ shareId })
-            ),
-          },
-        }
-      );
-    },
-    getDataUrl({ spaceId, dirId, providerId }) {
-      const {
-        _location,
-        router,
-        navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        spaceId,
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ dirId, providerId })
             ),
           },
         }

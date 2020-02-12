@@ -12,8 +12,9 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
 
-export default OneEmbeddedContainer.extend({
+export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
   layout,
 
   navigationState: service(),
@@ -86,12 +87,4 @@ export default OneEmbeddedContainer.extend({
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
-
-  actions: {
-    updateDirId(dirId) {
-      return this.get('navigationState').setAspectOptions({
-        dirId,
-      });
-    },
-  },
 });

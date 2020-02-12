@@ -150,18 +150,23 @@ export default function generateDevelopmentModel(store) {
               createListRecord(store, 'provider', providerList),
               createListRecord(store, 'share', shareList),
             ]).then(([providerLr, shareLr]) => {
-              return store.createRecord('share', {
-                  id: gri({
-                    entityType: 'share',
-                    entityId: generateShareEntityId(get(space, 'entityId')),
-                    aspect: 'instance',
-                    scope: 'auto',
-                  }),
-                  name: `Share for ${get(space, 'name')}`,
-                  chosenProviderId: getProviderId(0),
-                  chosenProviderVersion: '20.02.0-beta1',
-                  fileType: 'dir',
-                })
+              const generalGriData = {
+                entityType: 'share',
+                entityId: generateShareEntityId(get(space, 'entityId')),
+                aspect: 'instance',
+              };
+              const privateGri = gri(Object.assign({
+                scope: 'private',
+              }, generalGriData));
+              const generalData = {
+                name: `Share for ${get(space, 'name')}`,
+                chosenProviderId: getProviderId(0),
+                chosenProviderVersion: '20.02.0-beta1',
+                fileType: 'dir',
+              };
+              return store.createRecord('share', Object.assign({
+                  id: privateGri,
+                }, generalData))
                 .save()
                 .then(share => {
                   get(shareLr, 'list').pushObject(share);

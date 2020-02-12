@@ -21,7 +21,6 @@ import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
-import contentSharesEmpty from './components/content-shares-empty';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -133,7 +132,6 @@ let translations = {
     sidebarSpaces,
     sidebarProviders,
     sidebarGroups,
-    contentSharesEmpty,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,

@@ -12,9 +12,9 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
 
-export default OneEmbeddedContainer.extend({
+export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
   layout,
 
   navigationState: service(),
@@ -38,6 +38,12 @@ export default OneEmbeddedContainer.extend({
    * @type {string}
    */
   baseUrl: undefined,
+
+  /**
+   * @virtual
+   * @type {string}
+   */
+  spaceId: undefined,
 
   /**
    * @type {ComputedProperty<string|undefined>}
@@ -65,6 +71,7 @@ export default OneEmbeddedContainer.extend({
    */
   iframeInjectedProperties: Object.freeze([
     'shareId',
+    'spaceId',
     'dirId',
   ]),
 
@@ -73,6 +80,7 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([
     'updateDirId',
+    'getDataUrl',
   ]),
 
   /**
@@ -87,33 +95,4 @@ export default OneEmbeddedContainer.extend({
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
-
-  // TODO: these actions could be common
-
-  actions: {
-    updateDirId(dirId) {
-      return this.get('navigationState').setAspectOptions({
-        dirId,
-      });
-    },
-    getDataUrl({ spaceId, dirId, providerId }) {
-      const {
-        _location,
-        router,
-        navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        spaceId,
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ dirId, providerId })
-            ),
-          },
-        }
-      );
-    },
-  },
 });
