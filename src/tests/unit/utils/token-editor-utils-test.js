@@ -44,7 +44,7 @@ describe('Unit | Utility | token editor utils', function () {
         },
       });
       const inviteToken = result.type.inviteToken;
-      expect(inviteToken).to.have.deep.property('subtype', 'groupJoinGroup');
+      expect(inviteToken).to.have.property('subtype', 'groupJoinGroup');
       expect(Object.keys(inviteToken)).to.have.length(1);
     });
 
@@ -77,8 +77,8 @@ describe('Unit | Utility | token editor utils', function () {
               },
             });
             const inviteToken = result.type.inviteToken;
-            expect(inviteToken).to.have.deep.property('subtype', subtype);
-            expect(inviteToken).to.have.deep.property(idFieldName, 'abc');
+            expect(inviteToken).to.have.property('subtype', subtype);
+            expect(inviteToken).to.have.property(idFieldName, 'abc');
             expect(Object.keys(inviteToken)).to.have.length(2);
           }
         );
@@ -102,8 +102,8 @@ describe('Unit | Utility | token editor utils', function () {
           },
         });
         const inviteToken = result.type.inviteToken;
-        expect(inviteToken).to.not.have.deep.property('clusterId', 'abc');
-        expect(inviteToken).to.not.have.deep.property('groupId', 'abc');
+        expect(inviteToken).to.not.have.property('clusterId', 'abc');
+        expect(inviteToken).to.not.have.property('groupId', 'abc');
         expect(Object.keys(inviteToken)).to.have.length(1);
       }
     );
@@ -130,6 +130,80 @@ describe('Unit | Utility | token editor utils', function () {
         const inviteToken = result.type.inviteToken;
         expect(inviteToken).to.have.deep.property('adminUserId', 'user1');
         expect(Object.keys(inviteToken)).to.have.length(2);
+      }
+    );
+
+    Object.keys(inviteTokenSubtypeToTargetModelMapping).forEach(subtype => {
+      const privilegesModel =
+        get(inviteTokenSubtypeToTargetModelMapping, `${subtype}.privileges`);
+
+      if (privilegesModel) {
+        it(
+          `converts invite privileges for ${subtype} token`,
+          function () {
+            const result = editorDataToToken({
+              basic: {
+                type: 'invite',
+                inviteDetails: {
+                  subtype,
+                  inviteTargetDetails: {
+                    invitePrivilegesDetails: {
+                      privileges: ['space_view'],
+                    },
+                  },
+                },
+              },
+            });
+            expect(result).to.have.deep.property(
+              'privileges',
+              ['space_view']
+            );
+          }
+        );
+      } else {
+        it(
+          `does not convert invite privileges when for ${subtype} token`,
+          function () {
+            const result = editorDataToToken({
+              basic: {
+                type: 'invite',
+                inviteDetails: {
+                  subtype,
+                  inviteTargetDetails: {
+                    invitePrivilegesDetails: {
+                      privileges: ['space_view'],
+                    },
+                  },
+                },
+              },
+            });
+            expect(result).to.not.have.property('privileges');
+          }
+        );
+      }
+    });
+
+    it(
+      'does not convert invite privileges when token is of type access',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+            inviteDetails: {
+              subtype: 'groupJoinGroup',
+              inviteTargetDetails: {
+                target: {
+                  entityType: 'group',
+                  entityId: 'abc',
+                },
+                invitePrivilegesDetails: {
+                  privileges: ['space_view'],
+                },
+              },
+            },
+          },
+        });
+        expect(result).to.not.have.property('privileges');
       }
     );
 

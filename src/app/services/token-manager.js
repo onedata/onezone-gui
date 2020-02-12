@@ -50,11 +50,20 @@ const TokenManager = Service.extend({
    */
   createToken(tokenPrototype) {
     const currestUserEntityId = this.get('currentUser.userId');
+    const additionalData = {};
+    const compatibleTokenPrototype = _.assign({}, tokenPrototype);
+    [
+      'privileges',
+    ].forEach(fieldName => {
+      additionalData[fieldName] = compatibleTokenPrototype[fieldName];
+      delete compatibleTokenPrototype[fieldName];
+    });
     return this.get('store')
-      .createRecord('token', _.merge({}, tokenPrototype, {
+      .createRecord('token', _.merge(compatibleTokenPrototype, {
         _meta: {
           aspect: 'user_named_token',
           aspectId: currestUserEntityId,
+          additionalData,
         },
       }))
       .save()

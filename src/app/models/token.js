@@ -26,29 +26,37 @@ import moment from 'moment';
 const standardGroupMapping = {
   idFieldName: 'groupId',
   modelName: 'group',
+  privileges: 'group',
 };
 
 const standardSpaceMapping = {
   idFieldName: 'spaceId',
   modelName: 'space',
+  privileges: 'space',
 };
 
 const standardHarvesterMapping = {
   idFieldName: 'harvesterId',
   modelName: 'harvester',
+  privileges: 'harvester',
 };
 
 const standardClusterMapping = {
   idFieldName: 'clusterId',
   modelName: 'cluster',
+  privileges: 'cluster',
 };
+
+function mappingWithoutPrivileges(mapping) {
+  return Object.assign({}, mapping, { privileges: undefined });
+}
 
 export const inviteTokenSubtypeToTargetModelMapping = {
   userJoinGroup: standardGroupMapping,
   groupJoinGroup: standardGroupMapping,
   userJoinSpace: standardSpaceMapping,
   groupJoinSpace: standardSpaceMapping,
-  supportSpace: standardSpaceMapping,
+  supportSpace: mappingWithoutPrivileges(standardSpaceMapping),
   registerOneprovider: {
     idFieldName: 'adminUserId',
     modelName: 'user',
@@ -57,7 +65,7 @@ export const inviteTokenSubtypeToTargetModelMapping = {
   groupJoinCluster: standardClusterMapping,
   userJoinHarvester: standardHarvesterMapping,
   groupJoinHarvester: standardHarvesterMapping,
-  spaceJoinHarvester: standardHarvesterMapping,
+  spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
 };
 
 const allowedSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);

@@ -14,11 +14,16 @@ import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-fiel
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
+import PrivilegesField from 'onedata-gui-common/utils/form-component/privileges-field';
+import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
+import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
+import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw, and, not, hash, array, getBy } from 'ember-awesome-macros';
+import { equal, raw, and, or, not, hash, array, getBy } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -60,18 +65,33 @@ const tokenSubtypeOptions = [{
   value: 'spaceJoinHarvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
+  noPrivileges: true,
 }, {
   value: 'supportSpace',
   icon: 'space',
   targetModelName: 'space',
+  noPrivileges: true,
 }, {
   value: 'registerOneprovider',
   icon: 'provider',
+  noPrivileges: true,
 }];
 
+const privilegesForModels = {
+  space: spaceFlags,
+  group: groupFlags,
+  harvester: harvesterFlags,
+  cluster: clusterFlags,
+};
+
 function getTargetModelNameForSubtype(subtype) {
-  const subtypeOptions = subtype && tokenSubtypeOptions.findBy('value', subtype);
-  return subtypeOptions && subtypeOptions.targetModelName;
+  const subtypeOption = subtype && tokenSubtypeOptions.findBy('value', subtype);
+  return subtypeOption && subtypeOption.targetModelName;
+}
+
+function getPrivilegesModelNameForSubtype(subtype) {
+  const subtypeOption = subtype && tokenSubtypeOptions.findBy('value', subtype);
+  return subtypeOption && !subtypeOption.noPrivileges && subtypeOption.targetModelName;
 }
 
 const CaveatFormGroup = FormFieldsGroup.extend({
@@ -96,6 +116,7 @@ export default Component.extend(I18n, {
   groupManager: service(),
   harvesterManager: service(),
   clusterManager: service(),
+  privilegeManager: service(),
   oneiconAlias: service(),
   currentUser: service(),
 
@@ -179,22 +200,40 @@ export default Component.extend(I18n, {
 
   inviteTargetDetailsGroup: computed(
     'targetField',
+    'privilegesField',
     function inviteTargetDetailsGroup() {
       const component = this;
       return FormFieldsGroup.extend({
         isExpanded: equal('latestSubtypeWithTargets', 'subtype'),
         subtype: reads('parent.value.subtype'),
+        subtypeSpecification: computed(
+          'subtype',
+          function subtypeSpecification() {
+            return tokenSubtypeOptions.findBy('value', this.get('subtype'));
+          }
+        ),
         latestSubtypeWithTargets: undefined,
         cachedTargetsModelName: undefined,
         cachedTargetsProxy: PromiseObject.create({
+          promise: new Promise(() => {}),
+        }),
+        cachedPrivilegesModelName: undefined,
+        cachedPrivilegesPresetProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
         subtypeObserver: observer('subtype', function subtypeObserver() {
           const {
             subtype,
             cachedTargetsModelName,
-          } = this.getProperties('subtype', 'cachedTargetsModelName');
+            cachedPrivilegesModelName,
+          } = this.getProperties(
+            'subtype',
+            'cachedTargetsModelName',
+            'cachedPrivilegesModelName'
+          );
           const newTargetsModelName = getTargetModelNameForSubtype(subtype);
+          const newPrivilegesModelName =
+            getPrivilegesModelNameForSubtype(subtype);
           if (newTargetsModelName) {
             this.set('latestSubtypeWithTargets', subtype);
             if (cachedTargetsModelName !== newTargetsModelName) {
@@ -205,7 +244,20 @@ export default Component.extend(I18n, {
               });
             }
           }
+          if (newPrivilegesModelName &&
+            cachedPrivilegesModelName !== newPrivilegesModelName) {
+            this.setProperties({
+              cachedPrivilegesModelName: newPrivilegesModelName,
+              cachedPrivilegesPresetProxy: component
+                .getPrivilegesPresetForModel(newTargetsModelName),
+            });
+          }
         }),
+        init() {
+          this._super(...arguments);
+
+          this.subtypeObserver();
+        },
       }).create({
         name: 'inviteTargetDetails',
         fields: [
@@ -221,6 +273,27 @@ export default Component.extend(I18n, {
             name: 'loadingTarget',
           }),
           this.get('targetField'),
+          FormFieldsGroup.extend({
+            isExpanded: not('parent.subtypeSpecification.noPrivileges'),
+          }).create({
+            name: 'invitePrivilegesDetails',
+            fields: [
+              LoadingField.extend({
+                isVisible: not('isFulfilled'),
+                loadingProxy: reads(
+                  'parent.parent.cachedPrivilegesPresetProxy'),
+                label: getBy(
+                  array.findBy('parent.fields', raw('name'), raw(
+                    'privileges')),
+                  raw('label')
+                ),
+                isValid: reads('isFulfilled'),
+              }).create({
+                name: 'loadingPrivileges',
+              }),
+              this.get('privilegesField'),
+            ],
+          }),
         ],
       });
     }
@@ -228,6 +301,7 @@ export default Component.extend(I18n, {
 
   targetField: computed(function targetField() {
     return DropdownField.extend({
+      cachedTargetsProxy: reads('parent.cachedTargetsProxy'),
       latestSubtypeWithTargets: reads('parent.latestSubtypeWithTargets'),
       label: computed('latestSubtypeWithTargets', 'path', function label() {
         const {
@@ -249,15 +323,65 @@ export default Component.extend(I18n, {
             this.t(`${path}.placeholder.${latestSubtypeWithTargets}`);
         }
       ),
-      options: reads('parent.cachedTargetsProxy.content'),
+      options: reads('cachedTargetsProxy.content'),
       cachedTargetsModelNameObserver: observer(
         'parent.cachedTargetsModelName',
         function cachedTargetsModelNameObserver() {
           this.reset();
         }
       ),
+      isVisible: reads('cachedTargetsProxy.isFulfilled'),
     }).create({
       name: 'target',
+    });
+  }),
+
+  privilegesField: computed(function privilegesField() {
+    return PrivilegesField.extend({
+      cachedPrivilegesModelName: or(
+        'parent.parent.cachedPrivilegesModelName',
+        raw('userJoinGroup')
+      ),
+      cachedPrivilegesPresetProxy: reads(
+        'parent.parent.cachedPrivilegesPresetProxy'),
+      privilegesGroups: computed(
+        'cachedPrivilegesModelName',
+        function privilegesGroups() {
+          return privilegesForModels[this.get('cachedPrivilegesModelName')];
+        }
+      ),
+      privilegeGroupsTranslationsPath: computed(
+        'cachedPrivilegesModelName',
+        function () {
+          const modelName =
+            _.upperFirst(this.get('cachedPrivilegesModelName'));
+          return modelName ?
+            `components.content${modelName}sMembers.privilegeGroups` :
+            undefined;
+        }
+      ),
+      privilegesTranslationsPath: computed(
+        'cachedPrivilegesModelName',
+        function () {
+          const modelName =
+            _.upperFirst(this.get('cachedPrivilegesModelName'));
+          return modelName ?
+            `components.content${modelName}sMembers.privileges` :
+            undefined;
+        }
+      ),
+      isVisible: reads('cachedPrivilegesPresetProxy.isFulfilled'),
+      defaultValue: or('cachedPrivilegesPresetProxy.content', raw([])),
+      cachedPrivilegesPresetProxyObserver: observer(
+        'cachedPrivilegesPresetProxy.isFulfilled',
+        function cachedPrivilegesPresetProxyObserver() {
+          if (this.get('cachedPrivilegesPresetProxy.isFulfilled')) {
+            this.reset();
+          }
+        }
+      ),
+    }).create({
+      name: 'privileges',
     });
   }),
 
@@ -749,6 +873,14 @@ export default Component.extend(I18n, {
           label: get(record, 'name'),
           icon: oneiconAlias.getName(modelName),
         }))),
+    });
+  },
+
+  getPrivilegesPresetForModel(modelName) {
+    return PromiseObject.create({
+      promise: this.get('privilegeManager')
+        .getPrivilegesPresetForModel(modelName)
+        .then(result => result['member']),
     });
   },
 

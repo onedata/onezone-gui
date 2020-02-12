@@ -76,6 +76,7 @@ const tokenSubtypes = [{
   targetModelName: 'harvester',
   targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
+  noPrivileges: true,
 }, {
   subtype: 'supportSpace',
   label: 'Support space',
@@ -83,6 +84,7 @@ const tokenSubtypes = [{
   targetModelName: 'space',
   targetLabel: 'Space to be supported',
   targetPlaceholder: 'Select space...',
+  noPrivileges: true,
 }, {
   subtype: 'registerOneprovider',
   label: 'Register Oneprovider',
@@ -146,6 +148,8 @@ describe('Integration | Component | token editor', function () {
   beforeEach(function () {
     sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
       .resolves({ entityId: 'user1' });
+    const onedataGraphStub =
+      sinon.stub(lookupService(this, 'onedata-graph'), 'request');
     const mockedRecords = {};
     [
       'space',
@@ -153,6 +157,11 @@ describe('Integration | Component | token editor', function () {
       'harvester',
       'cluster',
     ].forEach(modelName => {
+      onedataGraphStub.withArgs({
+        gri: `${modelName}.null.privileges:private`,
+        operation: 'get',
+        subscribe: false,
+      }).resolves({ member: [`${modelName}_view`] });
       const serviceName = `${modelName}-manager`;
       const getModelsMethodName = `get${_.upperFirst(modelName)}s`;
       const service = lookupService(this, serviceName);
@@ -331,6 +340,7 @@ describe('Integration | Component | token editor', function () {
     targetModelName,
     targetLabel,
     targetPlaceholder,
+    noPrivileges,
   }, index) => {
     it(`notifies about "subtype" field change to "${label}"`, function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
@@ -399,7 +409,73 @@ describe('Integration | Component | token editor', function () {
             });
         }
       );
+
+      if (!noPrivileges) {
+        it(
+          `shows correct privileges field when "subtype" field is "${label}"`,
+          function () {
+            this.render(hbs `{{token-editor}}`);
+
+            return wait()
+              .then(() => click('.type-field .option-invite'))
+              .then(() => new SubtypeHelper().selectOption(index + 1))
+              .then(() => {
+                expect(this.$('.invitePrivilegesDetails-collapse'))
+                  .to.have.class('in');
+                expectLabelToEqual(this, 'privileges', 'Privileges');
+                expect(
+                  this.$('.privileges-field .node-text').eq(0).text().trim()
+                ).to.equal(`${_.upperFirst(targetModelName)} management`);
+                expect(this.$(
+                  `.node-text:contains(View ${targetModelName}) + .form-group .one-way-toggle`
+                )).to.have.class('checked');
+                expect(this.$('.one-way-toggle.checked')).to.have.length(1);
+              });
+          }
+        );
+
+        it(
+          `notifies about "privileges" field change when "subtype" field is "${label}"`,
+          function () {
+            this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+            const subtypeHelper = new SubtypeHelper();
+
+            return wait()
+              .then(() => click('.type-field .option-invite'))
+              .then(() => subtypeHelper.selectOption(index + 1))
+              .then(() => click(this.$(
+                `.node-text:contains(Modify ${targetModelName}) + .form-group .one-way-toggle`
+              )[0]))
+              .then(() => {
+                expectToHaveValue(this, 'privileges', [
+                  `${targetModelName}_view`,
+                  `${targetModelName}_update`,
+                ]);
+                expectToBeValid(this, 'privileges');
+              });
+          }
+        );
+      } else {
+        it(
+          `does not show privileges when "subtype" field is "${label}"`,
+          function () {
+            this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+            const subtypeHelper = new SubtypeHelper();
+
+            return wait()
+              .then(() => click('.type-field .option-invite'))
+              .then(() => subtypeHelper.selectOption(index + 1))
+              .then(() => {
+                expect(this.$('.invitePrivilegesDetails-collapse'))
+                  .to.not.have.class('in');
+              });
+          }
+        );
+      }
     } else {
+
       it(
         `does not show invite target details when "subtype" field is "${label}"`,
         function () {
@@ -1250,6 +1326,7 @@ describe('Integration | Component | token editor', function () {
             subtype: 'userJoinGroup',
             groupId: 'group0',
           });
+          expect(rawToken).to.have.deep.property('privileges', ['group_view']);
           expect(rawToken).to.not.have.property('caveats');
         });
     }
@@ -1326,6 +1403,7 @@ const basicFieldNameToFieldPath = {
   type: 'basic.type',
   subtype: 'basic.inviteDetails.subtype',
   target: 'basic.inviteDetails.inviteTargetDetails.target',
+  privileges: 'basic.inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges',
 };
 
 const caveatsWithAllowDenyTags = [
@@ -1399,7 +1477,7 @@ function caveatValueValidationPath(caveatName) {
 function expectToHaveValue(testCase, fieldName, value) {
   const changeArg = testCase.get('changeSpy').lastCall.args[0];
   const fieldValuePath = `values.${basicFieldNameToFieldPath[fieldName]}`;
-  expect(changeArg).to.have.nested.property(fieldValuePath, value);
+  expect(changeArg).to.have.deep.nested.property(fieldValuePath, value);
 }
 
 function expectToHaveNoValue(testCase, fieldName) {
@@ -1431,7 +1509,7 @@ function expectLabelToEqual(testCase, fieldName, label) {
   const isCaveat = !basicFieldNameToFieldPath[fieldName];
   const domFieldName = isCaveat ? `${fieldName}Enabled` : fieldName;
   label = isCaveat ? label : `${label}:`;
-  expect(testCase.$(`.${domFieldName}-field label`).text().trim()).to.equal(label);
+  expect(testCase.$(`.${domFieldName}-field label`).eq(0).text().trim()).to.equal(label);
 }
 
 function expectCaveatToggleState(testCase, caveatName, isChecked) {

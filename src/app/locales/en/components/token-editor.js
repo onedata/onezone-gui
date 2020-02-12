@@ -84,6 +84,11 @@ export default {
               supportSpace: 'Select space...',
             },
           },
+          invitePrivilegesDetails: {
+            privileges: {
+              label: 'Privileges',
+            },
+          },
         },
       },
     },

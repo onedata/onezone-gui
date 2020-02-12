@@ -36,6 +36,8 @@ export function editorDataToToken(editorData, currentUser) {
   if (type === 'invite') {
     const subtype = get(basic, 'inviteDetails.subtype');
     const target = get(basic, 'inviteDetails.inviteTargetDetails.target');
+    const privileges =
+      get(basic, 'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges');
 
     if (subtype) {
       const availableSubtype = get(inviteTokenSubtypeToTargetModelMapping, subtype);
@@ -44,12 +46,16 @@ export function editorDataToToken(editorData, currentUser) {
 
         let targetEntityId;
         if (subtype === 'registerOneprovider') {
-          targetEntityId = get(currentUser, 'entityId');
+          targetEntityId = currentUser && get(currentUser, 'entityId');
         } else if (target && get(target, 'entityType') === availableSubtype.modelName) {
           targetEntityId = get(target, 'entityId');
         }
         if (targetEntityId) {
           tokenData.type.inviteToken[get(availableSubtype, 'idFieldName')] = targetEntityId;
+        }
+
+        if (availableSubtype.privileges && privileges) {
+          tokenData.privileges = privileges;
         }
       }
     }
