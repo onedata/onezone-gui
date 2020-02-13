@@ -601,11 +601,31 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
+  it(
+    'has collapsed caveats section on init by default',
+    function () {
+      this.render(hbs `{{token-editor}}`);
+
+      return wait()
+        .then(() => expect(this.$('.caveats-collapse')).to.not.have.class('in'));
+    }
+  );
+
+  it(
+    'has expanded caveats section on init when expandCaveats is true',
+    function () {
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
+
+      return wait()
+        .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
+    }
+  );
+
   caveats.forEach(({ name, label, disabledDescription, dontTestValue }) => {
     it(
       `renders unchecked toggle, label and disabled description for ${name} caveat on init`,
       function () {
-        this.render(hbs `{{token-editor}}`);
+        this.render(hbs `{{token-editor expandCaveats=true}}`);
 
         const $disabledDescription = this.$(`.${name}DisabledText-field`);
 
@@ -619,7 +639,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `has valid and disabled ${name} caveat on init`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         expectToBeValid(this, name);
         if (!dontTestValue) {
@@ -633,7 +654,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `hides disabled description and shows form field on ${name} caveat toggle change`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         return wait()
           .then(() => toggleCaveat(name))
@@ -660,7 +682,8 @@ describe('Integration | Component | token editor', function () {
       const tomorrow = moment().add(1, 'day').endOf('day');
       const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
 
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('expire'))
@@ -676,7 +699,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders interface caveat form elements when that caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let $restOption, $oneclientOption;
       return wait()
@@ -698,7 +722,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about interface caveat change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('interface'))
@@ -722,7 +747,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `renders empty, invalid ${caveatName} caveat when it is enabled`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         return wait()
           .then(() => toggleCaveat(caveatName))
@@ -737,7 +763,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about asn caveat change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('asn'))
@@ -753,7 +780,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid asn',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('asn'))
@@ -769,7 +797,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about ip caveat change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('ip'))
@@ -792,7 +821,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid ip',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('ip'))
@@ -808,7 +838,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid region caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('region'))
@@ -826,7 +857,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about region caveat change to ["${value}"]`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         return wait()
           .then(() => toggleCaveat('region'))
@@ -846,7 +878,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about region caveat type change to "deny"',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let regionTypeHelper;
       return wait()
@@ -867,7 +900,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'sorts tags in region caveat input',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('region'))
@@ -893,7 +927,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid country caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('country'))
@@ -910,7 +945,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('country'))
@@ -927,7 +963,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid country',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('country'))
@@ -944,7 +981,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat type change to "deny"',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let countryTypeHelper;
       return wait()
@@ -965,7 +1003,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid path caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('path'))
@@ -980,7 +1019,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'preselects first available space and path "" for new entry in path caveat',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('path'))
@@ -1008,7 +1048,7 @@ describe('Integration | Component | token editor', function () {
   it(
     'allows to choose between available spaces in path caveat entry',
     function () {
-      this.render(hbs `{{token-editor}}`);
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       let pathSpaceHelper;
       return wait()
@@ -1033,7 +1073,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about path caveat entry space change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let pathSpaceHelper;
       return wait()
@@ -1061,7 +1102,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about path caveat entry path change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('path'))
@@ -1088,7 +1130,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about correct path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         return wait()
           .then(() => toggleCaveat('path'))
@@ -1113,7 +1156,8 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(hbs `{{token-editor onChange=(action "change")}}`);
+        this.render(
+          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         return wait()
           .then(() => toggleCaveat('path'))
@@ -1132,7 +1176,7 @@ describe('Integration | Component | token editor', function () {
   it(
     'hides enabled description when readonly caveat is disabled',
     function () {
-      this.render(hbs `{{token-editor}}`);
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       expect(this.$('.readonlyEnabledText-field')).to.not.exist;
     }
@@ -1141,7 +1185,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders readonly caveat form elements when that caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('readonly'))
@@ -1157,7 +1202,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid objectId caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('objectId'))
@@ -1172,7 +1218,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about objectId caveat change',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('objectId'))
@@ -1191,7 +1238,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'informs about invalid (empty) objectId entry',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('objectId'))
@@ -1212,7 +1260,7 @@ describe('Integration | Component | token editor', function () {
         'objectId',
       ];
 
-      this.render(hbs `{{token-editor}}`);
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       return wait()
         .then(() => {
@@ -1230,7 +1278,7 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows access only caveats when token type is changed to access',
     function () {
-      this.render(hbs `{{token-editor}}`);
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       return wait()
         .then(() => click('.type-field .option-access'))
@@ -1243,7 +1291,7 @@ describe('Integration | Component | token editor', function () {
   it(
     'hides access only caveats when token type is changed to invitation',
     function () {
-      this.render(hbs `{{token-editor}}`);
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
@@ -1256,7 +1304,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'ignores validation errors in access only caveats when token type is not access',
     function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       return wait()
         .then(() => toggleCaveat('objectId'))
@@ -1309,7 +1358,8 @@ describe('Integration | Component | token editor', function () {
       this.timeout(4000);
       const submitSpy = sinon.spy();
       this.on('submit', submitSpy);
-      this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+      this.render(
+        hbs `{{token-editor expandCaveats=true onSubmit=(action "submit")}}`);
 
       return wait()
         .then(() => fillIn('.name-field input', 'somename'))

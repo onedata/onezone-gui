@@ -128,6 +128,12 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.tokenEditor',
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  expandCaveats: false,
+
+  /**
    * @type {Function}
    * @param {EmberObject} formValues
    * @param {boolean} isValid
@@ -154,7 +160,11 @@ export default Component.extend(I18n, {
       i18nPrefix,
       basicGroup,
       caveatsGroup,
-    } = this.getProperties('i18nPrefix', 'basicGroup', 'caveatsGroup');
+    } = this.getProperties(
+      'i18nPrefix',
+      'basicGroup',
+      'caveatsGroup',
+    );
     const component = this;
 
     return FormFieldsRootGroup
@@ -436,6 +446,7 @@ export default Component.extend(I18n, {
     'readonlyCaveatGroup',
     'pathCaveatGroup',
     'objectIdCaveatGroup',
+    'expandCaveats',
     function caveatsGroup() {
       const {
         expireCaveatGroup,
@@ -447,6 +458,7 @@ export default Component.extend(I18n, {
         readonlyCaveatGroup,
         pathCaveatGroup,
         objectIdCaveatGroup,
+        expandCaveats,
       } = this.getProperties(
         'expireCaveatGroup',
         'regionCaveatGroup',
@@ -456,11 +468,13 @@ export default Component.extend(I18n, {
         'interfaceCaveatGroup',
         'readonlyCaveatGroup',
         'pathCaveatGroup',
-        'objectIdCaveatGroup'
+        'objectIdCaveatGroup',
+        'expandCaveats'
       );
 
       return FormFieldsGroup.create({
         name: 'caveats',
+        isExpanded: expandCaveats,
         fields: [
           expireCaveatGroup,
           regionCaveatGroup,
