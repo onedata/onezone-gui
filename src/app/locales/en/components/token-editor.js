@@ -90,6 +90,22 @@ export default {
             },
           },
         },
+        usageLimit: {
+          label: 'Usage limit',
+          usageLimitSelector: {
+            options: {
+              infinity: {
+                label: 'infinity',
+              },
+              number: {
+                label: '',
+              },
+            },
+          },
+          usageLimitNumber: {
+            placeholder: 'Enter exact number',
+          },
+        },
       },
     },
     caveats: {

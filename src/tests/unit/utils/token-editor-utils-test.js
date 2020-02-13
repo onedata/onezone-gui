@@ -207,6 +207,81 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
 
+    it(
+      'converts infinity usage limit when token is of type invite',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+            inviteDetails: {
+              subtype: 'groupJoinGroup',
+              inviteTargetDetails: {
+                target: {
+                  entityType: 'group',
+                  entityId: 'abc',
+                },
+              },
+              usageLimit: {
+                usageLimitSelector: 'infinity',
+                usageLimitNumber: '2',
+              },
+            },
+          },
+        });
+        expect(result).to.have.property('usageLimit', 'infinity');
+      }
+    );
+
+    it(
+      'converts number usage limit when token is of type invite',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'invite',
+            inviteDetails: {
+              subtype: 'groupJoinGroup',
+              inviteTargetDetails: {
+                target: {
+                  entityType: 'group',
+                  entityId: 'abc',
+                },
+              },
+              usageLimit: {
+                usageLimitSelector: 'number',
+                usageLimitNumber: '2',
+              },
+            },
+          },
+        });
+        expect(result).to.have.property('usageLimit', 2);
+      }
+    );
+
+    it(
+      'does not convert usage limit when token is of type access',
+      function () {
+        const result = editorDataToToken({
+          basic: {
+            type: 'access',
+            inviteDetails: {
+              subtype: 'groupJoinGroup',
+              inviteTargetDetails: {
+                target: {
+                  entityType: 'group',
+                  entityId: 'abc',
+                },
+              },
+              usageLimit: {
+                usageLimitSelector: 'number',
+                usageLimitNumber: '2',
+              },
+            },
+          },
+        });
+        expect(result).to.not.have.property('usageLimit');
+      }
+    );
+
     [
       'invite',
       'access',

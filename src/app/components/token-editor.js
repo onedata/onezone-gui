@@ -15,6 +15,7 @@ import StaticTextField from 'onedata-gui-common/utils/form-component/static-text
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import PrivilegesField from 'onedata-gui-common/utils/form-component/privileges-field';
+import NumberField from 'onedata-gui-common/utils/form-component/number-field';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -167,36 +168,41 @@ export default Component.extend(I18n, {
       });
   }),
 
-  basicGroup: computed('inviteTargetDetailsGroup', function basicGroup() {
-    return FormFieldsGroup.create({
-      name: 'basic',
-      fields: [
-        TextField.create({ name: 'name' }),
-        RadioField.create({
-          name: 'type',
-          options: [
-            { value: 'access' },
-            { value: 'invite' },
-          ],
-          defaultValue: 'access',
-        }),
-        FormFieldsGroup.extend({
-          isExpanded: equal('valuesSource.basic.type', raw('invite')),
-        }).create({
-          name: 'inviteDetails',
-          fields: [
-            DropdownField.create({
-              name: 'subtype',
-              showSearch: false,
-              options: tokenSubtypeOptions,
-              defaultValue: 'userJoinGroup',
-            }),
-            this.get('inviteTargetDetailsGroup'),
-          ],
-        }),
-      ],
-    });
-  }),
+  basicGroup: computed(
+    'inviteTargetDetailsGroup',
+    'usageLimitField',
+    function basicGroup() {
+      return FormFieldsGroup.create({
+        name: 'basic',
+        fields: [
+          TextField.create({ name: 'name' }),
+          RadioField.create({
+            name: 'type',
+            options: [
+              { value: 'access' },
+              { value: 'invite' },
+            ],
+            defaultValue: 'access',
+          }),
+          FormFieldsGroup.extend({
+            isExpanded: equal('valuesSource.basic.type', raw('invite')),
+          }).create({
+            name: 'inviteDetails',
+            fields: [
+              DropdownField.create({
+                name: 'subtype',
+                showSearch: false,
+                options: tokenSubtypeOptions,
+                defaultValue: 'userJoinGroup',
+              }),
+              this.get('inviteTargetDetailsGroup'),
+              this.get('usageLimitField'),
+            ],
+          }),
+        ],
+      });
+    }
+  ),
 
   inviteTargetDetailsGroup: computed(
     'targetField',
@@ -382,6 +388,33 @@ export default Component.extend(I18n, {
       ),
     }).create({
       name: 'privileges',
+    });
+  }),
+
+  usageLimitField: computed(function usageLimitField() {
+    return FormFieldsGroup.create({
+      name: 'usageLimit',
+      fields: [
+        RadioField.create({
+          name: 'usageLimitSelector',
+          options: [{
+            value: 'infinity',
+          }, {
+            value: 'number',
+          }],
+          defaultValue: 'infinity',
+        }),
+        NumberField.extend({
+          isEnabled: equal(
+            'parent.value.usageLimitSelector',
+            raw('number')
+          ),
+        }).create({
+          name: 'usageLimitNumber',
+          gte: 1,
+          integer: true,
+        }),
+      ],
     });
   }),
 

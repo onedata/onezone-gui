@@ -38,6 +38,8 @@ export function editorDataToToken(editorData, currentUser) {
     const target = get(basic, 'inviteDetails.inviteTargetDetails.target');
     const privileges =
       get(basic, 'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges');
+    const usageLimitSelector = get(basic, 'inviteDetails.usageLimit.usageLimitSelector');
+    const usageLimitNumber = get(basic, 'inviteDetails.usageLimit.usageLimitNumber');
 
     if (subtype) {
       const availableSubtype = get(inviteTokenSubtypeToTargetModelMapping, subtype);
@@ -57,6 +59,14 @@ export function editorDataToToken(editorData, currentUser) {
         if (availableSubtype.privileges && privileges) {
           tokenData.privileges = privileges;
         }
+      }
+    }
+    if (usageLimitSelector === 'infinity') {
+      tokenData.usageLimit = 'infinity';
+    } else if (usageLimitSelector === 'number' && usageLimitNumber) {
+      const parsedUsageLimitNumber = parseInt(usageLimitNumber);
+      if (parsedUsageLimitNumber && parsedUsageLimitNumber > 0) {
+        tokenData.usageLimit = parsedUsageLimitNumber;
       }
     }
   }

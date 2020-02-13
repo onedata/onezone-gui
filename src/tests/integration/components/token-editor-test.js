@@ -228,7 +228,6 @@ describe('Integration | Component | token editor', function () {
       expect(this.$('.type-field .option-invite').text().trim())
         .to.equal('invitation');
     });
-
   });
 
   it('has "type" field with preselected "access" option', function () {
@@ -508,6 +507,97 @@ describe('Integration | Component | token editor', function () {
         .then(() => targetHelper.selectOption(1))
         .then(() => subtypeHelper.selectOption(3))
         .then(() => expectToHaveNoValue(this, 'target'));
+    }
+  );
+
+  it('renders "usageLimit" field', function () {
+    this.render(hbs `{{token-editor}}`);
+
+    expectLabelToEqual(this, 'usageLimit', 'Usage limit');
+    return wait()
+      .then(() => click('.type-field .option-invite'))
+      .then(() => {
+        expect(this.$('.usageLimit-field .control-label').text().trim())
+          .to.equal('Usage limit:');
+        expect(this.$('.usageLimit-field .option-infinity').text().trim())
+          .to.equal('infinity');
+        expect(this.$('.usageLimit-field .option-number').text().trim())
+          .to.equal('');
+        expect(this.$('.usageLimitNumber-field input').attr('placeholder'))
+          .to.equal('Enter exact number');
+      });
+  });
+
+  it(
+    'has "usageLimit" field with preselected "infinity" option and disabled number input',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-invite'))
+        .then(() => {
+          expectToHaveValue(this, 'usageLimit', sinon.match({
+            usageLimitSelector: 'infinity',
+          }));
+          expectToBeValid(this, 'usageLimit');
+          expect(this.$('.usageLimit-field .option-infinity input').prop('checked'))
+            .to.be.true;
+        });
+    }
+  );
+
+  it(
+    'notifies about empty limit input error when usageLimit is set to use number',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-invite'))
+        .then(() => click('.usageLimit-field .option-number'))
+        .then(() => {
+          expectToHaveValue(this, 'usageLimit', sinon.match({
+            usageLimitSelector: 'number',
+          }));
+          expectToBeInvalid(this, 'usageLimit');
+        });
+    }
+  );
+
+  it(
+    'notifies about correct limit input value when usageLimit is set to use number',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-invite'))
+        .then(() => click('.usageLimit-field .option-number'))
+        .then(() => fillIn('.usageLimitNumber-field input', '10'))
+        .then(() => {
+          expectToHaveValue(this, 'usageLimit', sinon.match({
+            usageLimitSelector: 'number',
+            usageLimitNumber: '10',
+          }));
+          expectToBeValid(this, 'usageLimit');
+        });
+    }
+  );
+
+  it(
+    'notifies about too low limit input error when usageLimit is set to use number',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-invite'))
+        .then(() => click('.usageLimit-field .option-number'))
+        .then(() => fillIn('.usageLimitNumber-field input', '0'))
+        .then(() => {
+          expectToHaveValue(this, 'usageLimit', sinon.match({
+            usageLimitSelector: 'number',
+            usageLimitNumber: '0',
+          }));
+          expectToBeInvalid(this, 'usageLimit');
+        });
     }
   );
 
@@ -1318,6 +1408,8 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.type-field .option-invite'))
         .then(() => new SubtypeHelper().selectOption(1))
         .then(() => new TargetHelper().selectOption(1))
+        .then(() => click('.usageLimit-field .option-number'))
+        .then(() => fillIn('.usageLimitNumber-field input', '10'))
         .then(() => click('.submit-token'))
         .then(() => {
           const rawToken = submitSpy.lastCall.args[0];
@@ -1327,6 +1419,7 @@ describe('Integration | Component | token editor', function () {
             groupId: 'group0',
           });
           expect(rawToken).to.have.deep.property('privileges', ['group_view']);
+          expect(rawToken).to.have.property('usageLimit', 10);
           expect(rawToken).to.not.have.property('caveats');
         });
     }
@@ -1404,6 +1497,7 @@ const basicFieldNameToFieldPath = {
   subtype: 'basic.inviteDetails.subtype',
   target: 'basic.inviteDetails.inviteTargetDetails.target',
   privileges: 'basic.inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges',
+  usageLimit: 'basic.inviteDetails.usageLimit',
 };
 
 const caveatsWithAllowDenyTags = [
@@ -1421,29 +1515,29 @@ const accessOnlyCaveats = [
 function expectToBeValid(testCase, fieldName) {
   const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
   const fieldPath = basicFieldNameToFieldPath[fieldName];
+  let valuePath;
   if (fieldPath) {
-    expect(invalidFields).to.not.include(fieldPath);
+    valuePath = fieldPath;
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields
-      .filter(path => path.startsWith(caveatValueValidationPath(fieldName)))
-    ).to.be.empty;
+    valuePath = caveatValueValidationPath(fieldName);
   }
+  expect(invalidFields.filter(path => path.startsWith(valuePath))).to.be.empty;
 }
 
 function expectToBeInvalid(testCase, fieldName) {
   const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
   const fieldPath = basicFieldNameToFieldPath[fieldName];
+  let valuePath;
   if (fieldPath) {
-    expect(invalidFields).to.include(fieldPath);
+    valuePath = fieldPath;
   } else {
     // Not found, probably a caveat field
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    expect(invalidFields
-      .filter(path => path.startsWith(caveatValueValidationPath(fieldName)))
-    ).to.be.not.empty;
+    valuePath = caveatValueValidationPath(fieldName);
   }
+  expect(invalidFields.filter(path => path.startsWith(valuePath))).to.not.be.empty;
 }
 
 function caveatEnabledFieldPath(caveatName) {
@@ -1475,9 +1569,10 @@ function caveatValueValidationPath(caveatName) {
 }
 
 function expectToHaveValue(testCase, fieldName, value) {
-  const changeArg = testCase.get('changeSpy').lastCall.args[0];
   const fieldValuePath = `values.${basicFieldNameToFieldPath[fieldName]}`;
-  expect(changeArg).to.have.deep.nested.property(fieldValuePath, value);
+  expect(testCase.get('changeSpy').lastCall).to.have.been.calledWith(
+    sinon.match.hasNested(fieldValuePath, value)
+  );
 }
 
 function expectToHaveNoValue(testCase, fieldName) {

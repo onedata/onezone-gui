@@ -34,11 +34,17 @@
     height: 130px;
   }
 
+  .usageLimit-collapse.in,
   .region-collapse.in,
   .country-collapse.in,
   .pathEntry-collapse.in {
     display: flex;
     align-items: flex-start;
+  }
+
+  .usageLimitSelector-field {
+    flex-grow: 0;
+    white-space: nowrap;
   }
 
   .regionType-field,
@@ -93,6 +99,15 @@
     .caveat-group-toggle {
       flex-shrink: 0;
       width: 200px;
+    }
+
+    .usageLimit-field {
+      flex-wrap: nowrap;
+    }
+
+    .usageLimitNumber-field {
+      flex-grow: 0;
+      flex-basis: 300px;
     }
 
     .regionCaveat-field,

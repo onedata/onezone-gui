@@ -54,6 +54,7 @@ const TokenManager = Service.extend({
     const compatibleTokenPrototype = _.assign({}, tokenPrototype);
     [
       'privileges',
+      'usageLimit',
     ].forEach(fieldName => {
       additionalData[fieldName] = compatibleTokenPrototype[fieldName];
       delete compatibleTokenPrototype[fieldName];
