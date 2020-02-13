@@ -10,7 +10,7 @@ import wait from 'ember-test-helpers/wait';
 import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import { resolve } from 'rsvp';
+import { resolve, Promise } from 'rsvp';
 import moment from 'moment';
 
 const tokenSubtypes = [{
@@ -1452,6 +1452,31 @@ describe('Integration | Component | token editor', function () {
             adminUserId: 'user1',
           });
           expect(rawToken).to.not.have.property('caveats');
+        });
+    }
+  );
+
+  it(
+    'disables all fields and shows spinner in submit when submit promise is pending',
+    function () {
+      let submitResolve;
+      const submitStub = sinon.stub()
+        .returns(new Promise(resolve => submitResolve = resolve));
+      this.on('submit', submitStub);
+      this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
+
+      return wait()
+        .then(() => fillIn('.name-field input', 'abc'))
+        .then(() => click('.submit-token'))
+        .then(() => {
+          expect(this.$('input:not([disabled])')).to.not.exist;
+          expect(this.$('.submit-token [role="progressbar"]')).to.exist;
+          submitResolve();
+          return wait();
+        })
+        .then(() => {
+          expect(this.$('input:not([disabled])')).to.exist;
+          expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
         });
     }
   );

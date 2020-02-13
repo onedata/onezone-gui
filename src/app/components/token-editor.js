@@ -29,6 +29,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 const tokenSubtypeOptions = [{
   value: 'userJoinGroup',
@@ -141,6 +142,11 @@ export default Component.extend(I18n, {
   onSubmit: notImplementedReject,
 
   /**
+   * @type {boolean}
+   */
+  isSubmitting: false,
+
+  /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
   fields: computed('basicGroup', 'caveatsGroup', function fields() {
@@ -153,13 +159,15 @@ export default Component.extend(I18n, {
 
     return FormFieldsRootGroup
       .extend({
+        ownerSource: reads('component'),
+        isEnabled: not('component.isSubmitting'),
         onValueChange() {
           this._super(...arguments);
           scheduleOnce('afterRender', component, 'notifyAboutChange');
         },
       })
       .create({
-        ownerSource: this,
+        component,
         i18nPrefix: `${i18nPrefix}.fields`,
         fields: [
           basicGroup,
@@ -929,11 +937,12 @@ export default Component.extend(I18n, {
       } = this.getProperties('fields', 'onSubmit', 'currentUser');
 
       if (get(fields, 'isValid')) {
+        this.set('isSubmitting', true);
         return currentUser.getCurrentUserRecord().then(user => {
           const formValues = fields.dumpValue();
           const tokenRawModel = editorDataToToken(formValues, user);
           return onSubmit(tokenRawModel);
-        });
+        }).finally(() => safeExec(this, () => this.set('isSubmitting', false)));
       }
     },
   },
