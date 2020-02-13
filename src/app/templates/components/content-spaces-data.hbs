@@ -2,12 +2,19 @@
   contentContainerClass="content-spaces-data-content"
   space=space
   oneproviderId=oneproviderId
-  oneproviderIdChanged=(action 'oneproviderIdChanged')
+  oneproviderIdChanged=(action "oneproviderIdChanged")
   as |container|
 }}
-  {{embedded-content-file-browser
-    oneprovider=container.selectedProvider
-    baseUrl=container.contentIframeBaseUrl
-    spaceEntityId=space.entityId
-  }}
+  {{#container.header class="content-spaces-data-header"}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-file-browser
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceEntityId=space.entityId
+    }}
+  {{/container.body}}
 {{/oneprovider-view-container}}

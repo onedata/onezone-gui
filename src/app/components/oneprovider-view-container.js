@@ -11,13 +11,14 @@
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
-import { promise, notEmpty, array, raw } from 'ember-awesome-macros';
+import { promise, notEmpty, array, raw, tag, conditional } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { guidFor } from '@ember/object/internals';
 
 const nameComparator = createPropertyComparator('name');
 
@@ -59,6 +60,10 @@ export default Component.extend(I18n, {
    */
   space: undefined,
 
+  /**
+   * @virtual
+   * @type {Function}
+   */
   oneproviderIdChanged: notImplementedIgnore,
 
   /**
@@ -68,6 +73,19 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   oneproviderId: undefined,
+
+  /**
+   * @virtual optional
+   * @type {String}
+   */
+  tabBarClass: '',
+
+  /**
+   * In collapsed mode, the currently chosen Oneprovider is displayed and
+   * an option to show full options selector
+   * @type {boolean}
+   */
+  isTabBarCollapsed: true,
 
   /**
    * @type {boolean}
@@ -94,6 +112,41 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string>}
    */
   contentIframeBaseUrl: reads('selectedProvider.onezoneHostedBaseUrl'),
+
+  /**
+   * True if there are more than one Oneprovider to select
+   * @type {ComputedProperty<boolean>}
+   */
+  // multiOneproviders: gt('providers.length', raw(1)),
+  multiOneproviders: true,
+
+  /**
+   * State of Oneproviders selector - are there more than one to select?
+   * One of: single, multi.
+   * @type {ComputedProperty<String>}
+   */
+  collapsedSelectorState: conditional(
+    'multiOneproviders',
+    raw('multi'),
+    raw('single'),
+  ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  componentGuid: computed(function componentGuid() {
+    return guidFor(this);
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderId: computed('oneproviderId', function validatedOneproviderId() {
     const oneproviderId = this.get('oneproviderId');
@@ -145,12 +198,14 @@ export default Component.extend(I18n, {
 
   hasSupport: notEmpty('providers'),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<Array<Model.Provider>>>}
+   */
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
       return this.get('space.providerList')
-        .then(providerList =>
-          sortedOneprovidersList(get(providerList, 'list').toArray())
-        );
+        .then(providerList => get(providerList, 'list'))
+        .then(list => sortedOneprovidersList(list.toArray()));
     })
   ),
 

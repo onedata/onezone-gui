@@ -5,7 +5,7 @@ import sinon from 'sinon';
 import EmberObject from '@ember/object';
 import { A } from '@ember/array';
 import { Promise, resolve } from 'rsvp';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Unit | Utility | generate development model', function () {
@@ -27,7 +27,7 @@ describe('Unit | Utility | generate development model', function () {
             stubsToCheck.push(save);
             const list = A();
             list.save = () => Promise.resolve();
-            this.set('list', PromiseObject.create({
+            this.set('list', PromiseArray.create({
               promise: Promise.resolve(list),
             }));
           },
@@ -59,9 +59,9 @@ describe('Unit | Utility | generate development model', function () {
         [
           'user', 'sharedUser',
           'spaceList', 'groupList', 'providerList', 'tokenList',
-          'linkedAccountList', 'harvesterList', 'indexList',
+          'linkedAccountList', 'harvesterList', 'indexList', 'shareList',
           'space', 'group', 'provider', 'token', 'linkedAccount',
-          'privilege', 'harvester', 'index', 'guiMessage',
+          'privilege', 'harvester', 'index', 'guiMessage', 'share',
         ].forEach(modelName =>
           expect(createRecord, `createRecord for ${modelName}`)
           .to.be.calledWith(modelName, sinon.match.object)

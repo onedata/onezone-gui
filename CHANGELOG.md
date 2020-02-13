@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5988 Added shares views and management
 * VFS-6109 Added more verbose unverified harvester GUI plugin error and trimming to token inputs
 * VFS-6102 Added harvester privileges to space
 * VFS-6056 Added resetting navigation state on logout

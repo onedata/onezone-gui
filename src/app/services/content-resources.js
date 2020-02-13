@@ -16,6 +16,7 @@ export default Service.extend({
   tokenManager: service(),
   currentUser: service(),
   spaceManager: service(),
+  shareManager: service(),
   groupManager: service(),
   clusterManager: service(),
   harvesterManager: service(),
@@ -39,6 +40,8 @@ export default Service.extend({
         return this.get('tokenManager').getRecord(id);
       case 'spaces':
         return this.get('spaceManager').getRecord(id);
+      case 'shares':
+        return this.get('shareManager').getRecord(id);
       case 'groups':
         return this.get('groupManager').getRecord(id);
       case 'harvesters':

@@ -42,7 +42,8 @@ module.exports = function (environment) {
      *     render menu item.
      */
     'onedataTabs': [
-      { id: 'spaces', icon: 'folder', isDefault: true },
+      { id: 'spaces', icon: 'browser-directory', isDefault: true },
+      { id: 'shares', icon: 'browser-share' },
       { id: 'providers', icon: 'provider', allowIndex: true },
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
