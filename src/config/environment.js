@@ -84,7 +84,7 @@ module.exports = function (environment) {
       minNameLength: 2,
       maxNameLength: 50,
     },
-    'legacyOneproviderVersion': '18.02.*',
+    'legacyOneproviderVersion': '19.02',
     'ember-local-storage': {
       namespace: true,
     },

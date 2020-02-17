@@ -17,6 +17,8 @@ import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
+import { resolve } from 'rsvp';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default Component.extend({
   classNames: ['content-providers'],
@@ -313,9 +315,20 @@ export default Component.extend({
         this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
       );
     },
-    goToProvider(provider) {
+    goToProvider(provider, spaceId) {
       if (get(provider, 'online') === true) {
-        return this.transitionToProviderRedirect(provider);
+        let spaceIdPromise;
+        if (spaceId) {
+          spaceIdPromise = resolve(spaceId);
+        } else {
+          spaceIdPromise = get(provider, 'spaceList')
+            .then(spaceList =>
+              parseGri(spaceList.hasMany('list').ids()[0]).entityId
+            );
+        }
+        return spaceIdPromise.then(resolvedSpaceId =>
+          this.transitionToProviderRedirect(provider, resolvedSpaceId)
+        );
       }
     },
   },
