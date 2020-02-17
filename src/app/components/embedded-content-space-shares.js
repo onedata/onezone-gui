@@ -108,7 +108,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
         shareId,
       });
     },
-    getShareUrl({ shareId }) {
+    getShareUrl({ shareId, dirId = null } = {}) {
       const {
         _location,
         router,
@@ -119,7 +119,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
         'shares', {
           queryParams: {
             options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ shareId })
+              navigationState.mergedAspectOptions({ shareId, dirId })
             ),
           },
         }
