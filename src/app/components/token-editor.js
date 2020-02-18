@@ -16,6 +16,10 @@ import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import PrivilegesField from 'onedata-gui-common/utils/form-component/privileges-field';
 import NumberField from 'onedata-gui-common/utils/form-component/number-field';
+import {
+  Tag as RecordTag,
+  removeExcessiveTags,
+} from 'onedata-gui-common/components/tags-input/model-selector-editor';
 import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -24,11 +28,21 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
 import { scheduleOnce } from '@ember/runloop';
-import { equal, raw, and, or, not, hash, array, getBy } from 'ember-awesome-macros';
+import {
+  equal,
+  raw,
+  and,
+  or,
+  not,
+  hash,
+  array,
+  getBy,
+  promise,
+} from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { Promise } from 'rsvp';
+import { Promise, all as allFulfilled, allSettled } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 const tokenSubtypeOptions = [{
@@ -442,6 +456,8 @@ export default Component.extend(I18n, {
     'countryCaveatGroup',
     'asnCaveatGroup',
     'ipCaveatGroup',
+    'consumerCaveatGroup',
+    'serviceCaveatGroup',
     'interfaceCaveatGroup',
     'readonlyCaveatGroup',
     'pathCaveatGroup',
@@ -454,6 +470,8 @@ export default Component.extend(I18n, {
         countryCaveatGroup,
         asnCaveatGroup,
         ipCaveatGroup,
+        consumerCaveatGroup,
+        serviceCaveatGroup,
         interfaceCaveatGroup,
         readonlyCaveatGroup,
         pathCaveatGroup,
@@ -465,6 +483,8 @@ export default Component.extend(I18n, {
         'countryCaveatGroup',
         'asnCaveatGroup',
         'ipCaveatGroup',
+        'consumerCaveatGroup',
+        'serviceCaveatGroup',
         'interfaceCaveatGroup',
         'readonlyCaveatGroup',
         'pathCaveatGroup',
@@ -481,6 +501,8 @@ export default Component.extend(I18n, {
           countryCaveatGroup,
           asnCaveatGroup,
           ipCaveatGroup,
+          consumerCaveatGroup,
+          serviceCaveatGroup,
           FormFieldsGroup.extend({
             isExpanded: equal('valuesSource.basic.type', raw('access')),
           }).create({
@@ -716,6 +738,221 @@ export default Component.extend(I18n, {
         StaticTextField.extend({
           isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
         }).create({ name: 'ipDisabledText' }),
+      ],
+    });
+  }),
+
+  consumerCaveatGroup: computed(function consumerCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'consumerCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'consumerEnabled' }),
+        TagsField.extend({
+          groupManager: service(),
+          spaceManager: service(),
+          currentUser: service(),
+          providerManager: service(),
+          isVisible: reads(
+            'valuesSource.caveats.consumerCaveat.consumerEnabled'
+          ),
+          currentUserProxy: promise.object(computed(
+            function currentUserProxy() {
+              return this.get('currentUser').getCurrentUserRecord();
+            }
+          )),
+          groupsProxy: promise.array(computed(function groupsProxy() {
+            return this.get('groupManager')
+              .getGroups().then(groups => get(groups, 'list'));
+          })),
+          spacesProxy: promise.array(computed(function spacesProxy() {
+            return this.get('spaceManager')
+              .getSpaces().then(spaces => get(spaces, 'list'));
+          })),
+          users: promise.array(computed(
+            'currentUserProxy',
+            'groupsUsersListsProxy.[]',
+            'spacesUsersListsProxy.[]',
+            function users() {
+              const {
+                currentUserProxy,
+                groupsUsersListsProxy,
+                spacesUsersListsProxy,
+              } = this.getProperties(
+                'currentUserProxy',
+                'groupsUsersListsProxy',
+                'spacesUsersListsProxy'
+              );
+              const usersArray = [];
+              return allFulfilled([
+                currentUserProxy,
+                groupsUsersListsProxy,
+                spacesUsersListsProxy,
+              ]).then(([
+                currentUser,
+                groupsUserLists,
+                spacesUsersListsProxy,
+              ]) => {
+                usersArray.push(currentUser);
+                groupsUserLists
+                  .concat(spacesUsersListsProxy)
+                  .forEach(usersList =>
+                    usersArray.push(...usersList.toArray())
+                  );
+                return usersArray.uniqBy('entityId');
+              });
+            }
+          )),
+          groups: promise.array(computed(
+            'groupsProxy',
+            'groupsGroupsListsProxy.[]',
+            'spacesGroupsListsProxy.[]',
+            function users() {
+              const {
+                groupsProxy,
+                groupsGroupsListsProxy,
+                spacesGroupsListsProxy,
+              } = this.getProperties(
+                'groupsProxy',
+                'groupsGroupsListsProxy',
+                'spacesGroupsListsProxy'
+              );
+              const groupsArray = [];
+              return allFulfilled([
+                groupsProxy,
+                groupsGroupsListsProxy,
+                spacesGroupsListsProxy,
+              ]).then(([
+                userGroups,
+                groupsGroupsLists,
+                spacesGroupsLists,
+              ]) => {
+                groupsArray.push(...userGroups.toArray());
+                groupsGroupsLists
+                  .concat(spacesGroupsLists)
+                  .forEach(groupsList =>
+                    groupsArray.push(...groupsList.toArray())
+                  );
+                return groupsArray.uniqBy('entityId');
+              });
+            }
+          )),
+          oneprovidersProxy: promise.array(computed(function oneproviders() {
+            return this.get('providerManager').getProviders()
+              .then(providers => get(providers, 'list'));
+          })),
+          models: computed(function models() {
+            return [{
+              name: 'user',
+              getRecords: () => this.get('users'),
+            }, {
+              name: 'group',
+              getRecords: () => this.get('groups'),
+            }, {
+              name: 'oneprovider',
+              getRecords: () => this.get('oneprovidersProxy'),
+            }];
+          }),
+          tagEditorSettings: hash('models'),
+          init() {
+            this._super(...arguments);
+
+            ['group', 'space'].forEach(parentRecordName => {
+              ['user', 'group'].forEach(childRecordName => {
+                const upperChildRecordName = _.upperFirst(childRecordName);
+                this.set(
+                  `${parentRecordName}s${upperChildRecordName}sListsProxy`,
+                  promise.array(computed(
+                    `${parentRecordName}sProxy.@each.isReloading`,
+                    function () {
+                      return this.get(`${parentRecordName}sProxy`).then(parents =>
+                        onlySettledOk(parents.mapBy(`eff${upperChildRecordName}List`))
+                        .then(effLists => onlySettledOk(effLists.mapBy('list')))
+                      );
+                    }
+                  ))
+                );
+              });
+            });
+          },
+          valueToTags(value) {
+            return (value || []).map(val => RecordTag.create({ value: val }));
+          },
+          tagsToValue(tags) {
+            return removeExcessiveTags(tags).mapBy('value').uniq().compact();
+          },
+          sortTags(tags) {
+            const modelsOrder = this.get('models').mapBy('name');
+            const sortKeyDecoratedTags = tags.map(tag => {
+              const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
+              const label = get(tag, 'label');
+              const sortKey = `${modelIndex}-${label}`;
+              return { sortKey, tag };
+            });
+            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+          },
+        }).create({
+          name: 'consumer',
+          tagEditorComponentName: 'tags-input/model-selector-editor',
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not(
+            'valuesSource.caveats.consumerCaveat.consumerEnabled'),
+        }).create({ name: 'consumerDisabledText' }),
+      ],
+    });
+  }),
+
+  serviceCaveatGroup: computed(function serviceCaveatGroup() {
+    return CaveatFormGroup.create({
+      name: 'serviceCaveat',
+      fields: [
+        CaveatGroupToggle.create({ name: 'serviceEnabled' }),
+        TagsField.extend({
+          clusterManager: service(),
+          isVisible: reads(
+            'valuesSource.caveats.serviceCaveat.serviceEnabled'
+          ),
+          clustersProxy: promise.array(computed(function clustersProxy() {
+            return this.get('clusterManager')
+              .getClusters().then(clusters => get(clusters, 'list'));
+          })),
+          models: computed(function models() {
+            return [{
+              name: 'service',
+              getRecords: () => this.get('clustersProxy'),
+            }, {
+              name: 'serviceOnepanel',
+              getRecords: () => this.get('clustersProxy'),
+            }];
+          }),
+          tagEditorSettings: hash('models'),
+          valueToTags(value) {
+            return (value || []).map(val => RecordTag.create({ value: val }));
+          },
+          tagsToValue(tags) {
+            return removeExcessiveTags(tags).mapBy('value').uniq().compact();
+          },
+          sortTags(tags) {
+            const modelsOrder = this.get('models').mapBy('name');
+            const sortKeyDecoratedTags = tags.map(tag => {
+              const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
+              const label = get(tag, 'label');
+              const sortKey = `${modelIndex}-${label}`;
+              return { sortKey, tag };
+            });
+            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+          },
+        }).create({
+          name: 'service',
+          tagEditorComponentName: 'tags-input/model-selector-editor',
+          defaultValue: [],
+          sort: true,
+        }),
+        StaticTextField.extend({
+          isVisible: not('valuesSource.caveats.serviceCaveat.serviceEnabled'),
+        }).create({ name: 'serviceDisabledText' }),
       ],
     });
   }),
@@ -961,3 +1198,8 @@ export default Component.extend(I18n, {
     },
   },
 });
+
+function onlySettledOk(promiseArr) {
+  return allSettled(promiseArr)
+    .then(arr => arr.filterBy('state', 'fulfilled').mapBy('value'));
+}

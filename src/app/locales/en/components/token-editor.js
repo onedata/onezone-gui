@@ -186,6 +186,22 @@ export default {
           text: 'This token can be used without any IP address restrictions',
         },
       },
+      consumerCaveat: {
+        consumerEnabled: {
+          label: 'Consumer',
+        },
+        consumerDisabledText: {
+          text: 'This token can be used by any consumer',
+        },
+      },
+      serviceCaveat: {
+        serviceEnabled: {
+          label: 'Service',
+        },
+        serviceDisabledText: {
+          text: 'This token can be used to interact with any service',
+        },
+      },
       accessOnlyCaveats: {
         interfaceCaveat: {
           interfaceEnabled: {
