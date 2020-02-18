@@ -502,12 +502,12 @@ export default Component.extend(I18n, {
           asnCaveatGroup,
           ipCaveatGroup,
           consumerCaveatGroup,
-          serviceCaveatGroup,
           FormFieldsGroup.extend({
             isExpanded: equal('valuesSource.basic.type', raw('access')),
           }).create({
             name: 'accessOnlyCaveats',
             fields: [
+              serviceCaveatGroup,
               interfaceCaveatGroup,
               readonlyCaveatGroup,
               pathCaveatGroup,
@@ -911,9 +911,7 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'serviceEnabled' }),
         TagsField.extend({
           clusterManager: service(),
-          isVisible: reads(
-            'valuesSource.caveats.serviceCaveat.serviceEnabled'
-          ),
+          isVisible: reads('parent.value.serviceEnabled'),
           clustersProxy: promise.array(computed(function clustersProxy() {
             return this.get('clusterManager')
               .getClusters().then(clusters => get(clusters, 'list'));
@@ -951,7 +949,7 @@ export default Component.extend(I18n, {
           sort: true,
         }),
         StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.serviceCaveat.serviceEnabled'),
+          isVisible: not('parent.value.serviceEnabled'),
         }).create({ name: 'serviceDisabledText' }),
       ],
     });

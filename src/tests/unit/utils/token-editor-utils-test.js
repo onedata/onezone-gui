@@ -3,6 +3,7 @@ import { describe, it } from 'mocha';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
 import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { get, getProperties } from '@ember/object';
+import _ from 'lodash';
 
 describe('Unit | Utility | token editor utils', function () {
   describe('editor data to token', function () {
@@ -306,6 +307,10 @@ describe('Unit | Utility | token editor utils', function () {
                 countryList: ['PL'],
               }), {
                 accessOnlyCaveats: Object.assign(
+                  generateCaveatEntry('service', false, [{
+                    model: 'service',
+                    id: 'test',
+                  }]),
                   generateCaveatEntry('interface', false, 'rest'),
                   generateCaveatEntry('readonly', false),
                   generateCaveatEntry('path', false, {
@@ -346,6 +351,7 @@ describe('Unit | Utility | token editor utils', function () {
                 countryList: [],
               }), {
                 accessOnlyCaveats: Object.assign(
+                  generateCaveatEntry('service', true, []),
                   generateCaveatEntry('interface', true),
                   generateCaveatEntry('path', true, {
                     __fieldsValueNames: [],
@@ -456,6 +462,69 @@ describe('Unit | Utility | token editor utils', function () {
       );
     });
 
+    it('does not convert service caveat, when token is not of type "access"', function () {
+      const result = editorDataToToken({
+        basic: {
+          type: 'invite',
+        },
+        caveats: {
+          accessOnlyCaveats: generateCaveatEntry('service', true, [{
+            model: 'service',
+            id: 'test',
+          }]),
+        },
+      });
+
+      expect(result).to.not.have.property('caveats');
+    });
+
+    it('converts service caveat, when token is not of type "access"', function () {
+      const selectedValues = _.flatten(['service', 'serviceOnepanel']
+        .map(model => ([{
+          model,
+          record: {
+            type: 'oneprovider',
+            entityId: 'op0',
+          },
+        }, {
+          model,
+          id: 'customid',
+        }, {
+          model,
+          record: {
+            type: 'onezone',
+            entityId: 'oz0',
+          },
+        }, {
+          model,
+          record: {
+            representsAll: 'service',
+          },
+        }])));
+      const result = editorDataToToken({
+        basic: {
+          type: 'access',
+        },
+        caveats: {
+          accessOnlyCaveats: generateCaveatEntry('service', true, selectedValues),
+        },
+      });
+
+      expect(result).to.have.deep.nested.property('caveats[0]', {
+        type: 'service',
+        whitelist: [
+          'opw-op0',
+          'opw-customid',
+          'ozw-onezone',
+          'opw-*',
+          'opp-op0',
+          'opp-customid',
+          'ozp-onezone',
+          'opp-*',
+        ],
+      });
+    });
+
     it(
       'does not convert interface caveat, when token is not of type "access"',
       function () {
@@ -499,8 +568,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('interface', true,
-              undefined),
+            accessOnlyCaveats: generateCaveatEntry('interface', true, undefined),
           },
         });
 
@@ -728,6 +796,10 @@ describe('Unit | Utility | token editor utils', function () {
               countryList: ['PL'],
             }), {
               accessOnlyCaveats: Object.assign(
+                generateCaveatEntry('service', true, [{
+                  model: 'service',
+                  id: 'test',
+                }]),
                 generateCaveatEntry('interface', true, 'rest'),
                 generateCaveatEntry('readonly', true),
                 generateCaveatEntry('path', true, {
@@ -744,7 +816,7 @@ describe('Unit | Utility | token editor utils', function () {
               ),
             }),
         });
-        expect(get(result, 'caveats')).to.be.an('array').with.length(9);
+        expect(get(result, 'caveats')).to.be.an('array').with.length(10);
       }
     );
   });

@@ -115,6 +115,14 @@ const caveats = [{
   label: 'Country',
   disabledDescription: 'This token can be used regardless country',
 }, {
+  name: 'consumer',
+  label: 'Consumer',
+  disabledDescription: 'This token can be used by any consumer',
+}, {
+  name: 'service',
+  label: 'Service',
+  disabledDescription: 'This token can be used to interact with any service',
+}, {
   name: 'readonly',
   label: 'Read only',
   disabledDescription: 'This token can be used for both reading and writing data',
@@ -1001,6 +1009,106 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'renders empty, invalid service caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+      return wait()
+        .then(() => toggleCaveat('service'))
+        .then(() => {
+          expectCaveatToHaveValue(this, 'service', true, []);
+          expectToBeInvalid(this, 'service');
+        });
+    }
+  );
+
+  [
+    'service',
+    'service onepanel',
+  ].forEach((typeName, index) => {
+    it(
+      `shows ${typeName} list in service caveat`,
+      function () {
+        this.render(hbs `{{token-editor expandCaveats=true}}`);
+        let typeSelectorHelper;
+        return wait()
+          .then(() => toggleCaveat('service'))
+          .then(() => click('.service-field .tags-input'))
+          .then(() => {
+            typeSelectorHelper = new TagsSelectorDropdownHelper();
+            return typeSelectorHelper.selectOption(index + 1);
+          }).then(() => {
+            expect(typeSelectorHelper.getTrigger().innerText.trim())
+              .to.equal(_.startCase(typeName));
+            const $selectorItems = getTagsSelector().find('.selector-item');
+            expect($selectorItems).to.have.length(4);
+            _.times(3, i => {
+              expect($selectorItems.filter(`:contains(cluster${i})`)).to.exist;
+            });
+          });
+      }
+    );
+  });
+
+  it('notifies about adding new service in service caveat', function () {
+    this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+    return wait()
+      .then(() => toggleCaveat('service'))
+      .then(() => click('.service-field .tags-input'))
+      .then(() => click(getTagsSelector().find('.record-item')[0]))
+      .then(() => {
+        expectCaveatToHaveValue(this, 'service', true, [{
+          model: 'service',
+          record: this.get('mockedRecords.cluster')[2],
+        }]);
+        expectToBeValid(this, 'service');
+      });
+  });
+
+  [
+    'service',
+    'service onepanel',
+  ].forEach((typeName, index) => {
+    it(
+      `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in service caveat`,
+      function () {
+        this.render(hbs `{{token-editor expandCaveats=true}}`);
+        return wait()
+          .then(() => toggleCaveat('service'))
+          .then(() => click('.service-field .tags-input'))
+          .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
+          .then(() => click(getTagsSelector().find('.record-item')[0]))
+          .then(() => click(getTagsSelector().find('.record-item')[0]))
+          .then(() => {
+            expect(getFieldElement(this, 'service').find('.tag-item')).to.have.length(2);
+            return click(getTagsSelector().find('.all-item')[0]);
+          })
+          .then(() => {
+            const $tagItems = getFieldElement(this, 'service').find('.tag-item');
+            expect($tagItems).to.have.length(1);
+            expect($tagItems.text()).to.contain('Any');
+          });
+      }
+    );
+  });
+
+  it('sorts selected tags in service caveat', function () {
+    this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+    return wait()
+      .then(() => toggleCaveat('service'))
+      .then(() => click('.service-field .tags-input'))
+      .then(() => click(getTagsSelector().find('.record-item')[1]))
+      .then(() => click(getTagsSelector().find('.record-item')[0]))
+      .then(() => {
+        const $tagItems = getFieldElement(this, 'service').find('.tag-item');
+        expect($tagItems.eq(0).text().trim()).to.equal('cluster0');
+        expect($tagItems.eq(1).text().trim()).to.equal('cluster1');
+      });
+  });
+
+  it(
     'renders empty, valid path caveat when it is enabled',
     function () {
       this.render(
@@ -1251,9 +1359,10 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'has interface, readonly, path and objectId caveats under accessOnlyCaveats',
+    'has service, interface, readonly, path and objectId caveats under accessOnlyCaveats',
     function () {
       const caveatsToCheck = [
+        'service',
         'interface',
         'readonly',
         'path',
@@ -1386,6 +1495,10 @@ describe('Integration | Component | token editor', function () {
         .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn('.ip-field .text-editor-input', '255.255.255.255,'))
+        // service
+        .then(() => toggleCaveat('service'))
+        .then(() => click('.service-field .tags-input'))
+        .then(() => click(getTagsSelector().find('.record-item')[0]))
         // interface
         .then(() => toggleCaveat('interface'))
         .then(() => click('.option-oneclient'))
@@ -1417,7 +1530,7 @@ describe('Integration | Component | token editor', function () {
           expect(rawToken).to.have.nested.property('type.accessToken');
 
           const caveats = rawToken.caveats;
-          expect(caveats.length).to.equal(9);
+          expect(caveats.length).to.equal(10);
           expect(caveats.findBy('type', 'time')).to.have.property('validUntil');
           expect(caveats.findBy('type', 'geo.region')).to.deep.include({
             filter: 'blacklist',
@@ -1432,6 +1545,9 @@ describe('Integration | Component | token editor', function () {
           });
           expect(caveats.findBy('type', 'ip')).to.deep.include({
             whitelist: ['255.255.255.255'],
+          });
+          expect(caveats.findBy('type', 'service')).to.deep.include({
+            whitelist: ['opw-cluster0'],
           });
           expect(caveats.findBy('type', 'interface'))
             .to.have.property('interface', 'oneclient');
@@ -1566,6 +1682,12 @@ function getTagsSelector() {
   return $('.webui-popover.in .tags-selector');
 }
 
+class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
+  constructor() {
+    super('.webui-popover.in .tags-selector .ember-basic-dropdown');
+  }
+}
+
 const basicFieldNameToFieldPath = {
   name: 'basic.name',
   type: 'basic.type',
@@ -1581,6 +1703,7 @@ const caveatsWithAllowDenyTags = [
 ];
 
 const accessOnlyCaveats = [
+  'service',
   'interface',
   'readonly',
   'path',

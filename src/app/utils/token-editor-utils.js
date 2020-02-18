@@ -31,12 +31,10 @@ export function editorDataToToken(editorData, currentUser) {
   const {
     expireCaveat,
     consumerCaveat,
-    serviceCaveat,
   } = getProperties(
     caveats,
     'expireCaveat',
     'consumerCaveat',
-    'serviceCaveat',
   );
 
   if (name) {
@@ -149,44 +147,46 @@ export function editorDataToToken(editorData, currentUser) {
       });
     }
   }
-  if (serviceCaveat && get(serviceCaveat, 'serviceEnabled')) {
-    const whitelist = (get(serviceCaveat, 'service') || [])
-      .map(value => {
-        const {
-          record,
-          id: recordId,
-          model,
-        } = getProperties(value, 'record', 'id', 'model');
-        const serviceType = record && get(record, 'type') || 'oneprovider';
-        const prefix = (serviceType === 'onezone' ? 'oz' : 'op') +
-          (model === 'serviceOnepanel' ? 'p' : 'w');
-        let id = serviceType === 'onezone' ? 'onezone' : recordId;
-        if (!id) {
-          id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
-        }
-        return `${prefix}-${id}`;
-      });
-    if (whitelist.length) {
-      caveatsData.push({
-        type: 'service',
-        whitelist,
-      });
-    }
-  }
   if (type === 'access') {
     const {
       interfaceCaveat,
       readonlyCaveat,
       pathCaveat,
       objectIdCaveat,
+      serviceCaveat,
     } = getProperties(
       get(caveats, 'accessOnlyCaveats') || {},
       'interfaceCaveat',
       'readonlyCaveat',
       'pathCaveat',
-      'objectIdCaveat'
+      'objectIdCaveat',
+      'serviceCaveat'
     );
 
+    if (serviceCaveat && get(serviceCaveat, 'serviceEnabled')) {
+      const whitelist = (get(serviceCaveat, 'service') || [])
+        .map(value => {
+          const {
+            record,
+            id: recordId,
+            model,
+          } = getProperties(value, 'record', 'id', 'model');
+          const serviceType = record && get(record, 'type') || 'oneprovider';
+          const prefix = (serviceType === 'onezone' ? 'oz' : 'op') +
+            (model === 'serviceOnepanel' ? 'p' : 'w');
+          let id = serviceType === 'onezone' ? 'onezone' : recordId;
+          if (!id) {
+            id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
+          }
+          return `${prefix}-${id}`;
+        });
+      if (whitelist.length) {
+        caveatsData.push({
+          type: 'service',
+          whitelist,
+        });
+      }
+    }
     if (interfaceCaveat && get(interfaceCaveat, 'interfaceEnabled')) {
       const value = get(interfaceCaveat, 'interface');
       if (value) {

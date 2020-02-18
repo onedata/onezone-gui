@@ -374,7 +374,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         .then(() => {
           expect(changeSpy).to.have.callCount(changesCount);
           expect($(targetRecordHelper.getTrigger()).text()).to.contain('cluster1');
-          expect(targetRecordHelper.getNthOption(3)).to.be.null;
+          expect(targetRecordHelper.getNthOption(3)).to.be.undefined;
         });
     }
   );
@@ -411,7 +411,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         .then(() => {
           expect(changeSpy).to.have.callCount(changesCount + 1);
           expect($(targetRecordHelper.getTrigger()).text()).to.contain('All');
-          expect(targetRecordHelper.getNthOption(3)).to.be.null;
+          expect(targetRecordHelper.getNthOption(3)).to.be.undefined;
           expect(changeSpy.lastCall).to.be.calledWith({
             type: 'invite',
             targetModelName: 'cluster',

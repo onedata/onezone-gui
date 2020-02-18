@@ -194,15 +194,15 @@ export default {
           text: 'This token can be used by any consumer',
         },
       },
-      serviceCaveat: {
-        serviceEnabled: {
-          label: 'Service',
-        },
-        serviceDisabledText: {
-          text: 'This token can be used to interact with any service',
-        },
-      },
       accessOnlyCaveats: {
+        serviceCaveat: {
+          serviceEnabled: {
+            label: 'Service',
+          },
+          serviceDisabledText: {
+            text: 'This token can be used to interact with any service',
+          },
+        },
         interfaceCaveat: {
           interfaceEnabled: {
             label: 'Interface',
