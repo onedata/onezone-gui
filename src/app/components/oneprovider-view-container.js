@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import EmberObject, { get, set, computed, observer } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
-import { promise, notEmpty, array, raw, tag, conditional } from 'ember-awesome-macros';
+import { promise, notEmpty, array, raw, tag, conditional, gt } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
@@ -117,8 +117,7 @@ export default Component.extend(I18n, {
    * True if there are more than one Oneprovider to select
    * @type {ComputedProperty<boolean>}
    */
-  // multiOneproviders: gt('providers.length', raw(1)),
-  multiOneproviders: true,
+  multiOneproviders: gt('providers.length', raw(1)),
 
   /**
    * State of Oneproviders selector - are there more than one to select?

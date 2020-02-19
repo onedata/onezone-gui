@@ -19,6 +19,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
 
   navigationState: service(),
   globalNotify: service(),
+  shareManager: service(),
   router: service(),
 
   /**
@@ -81,6 +82,8 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
   callParentActionNames: Object.freeze([
     'updateDirId',
     'getDataUrl',
+    'showSharesIndex',
+    'reloadShareList',
   ]),
 
   /**
@@ -95,4 +98,15 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
     const oneproviderId = this.get('oneprovider.entityId');
     return `iframe-oneprovider-${oneproviderId}`;
   }),
+
+  actions: {
+    showSharesIndex() {
+      return this.get('router').transitionTo('onedata.sidebar.index', 'shares');
+    },
+    reloadShareList() {
+      return this.get('shareManager')
+        .getAllShares()
+        .then(allShares => allShares.reload());
+    },
+  },
 });
