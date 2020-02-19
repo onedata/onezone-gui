@@ -49,7 +49,7 @@
     border-radius: $border-radius-large;
     background-color: $color-one-white;
     opacity: 1;
-    transition: top $animation-time / 2 linear, left $animation-time linear, opacity $animation-time linear;
+    transition: transition-linear(top, $animation-time / 2), transition-linear(left, $animation-time), transition-linear(opacity, $animation-time);
     font-size: 0.9em;
 
     &:hover, &.hovered {
@@ -125,7 +125,7 @@
     padding: 0 0.8 * $padding-xs-horizontal;
     border-radius: $border-radius-base;
     background-color: $relation-indicator-color;
-    font-family: 'Open Sans Semibold';
+    @include font-semibold();
     font-size: 0.6em;
     line-height: 16px;
     white-space: nowrap;
@@ -224,7 +224,7 @@
     position: absolute;
     top: 0;
     transform: translateY($column-header-height) translateX(-$line-height / 2);
-    transition: left $animation-time linear;
+    transition: transition-linear(left, $animation-time);
     z-index: 1;
   }
 
@@ -238,7 +238,7 @@
     position: absolute;
     width: $line-height;
     background-color: $line-color;
-    transition: left $animation-time linear;
+    transition: transition-linear(left, $animation-time);
 
     &.hovered {
       width: $line-height * 2;
@@ -253,7 +253,7 @@
     position: absolute;
     height: $line-height;
     background-color: $line-color;
-    transition: width $animation-time linear, left $animation-time linear, top $animation-time / 2 linear;
+    transition: transition-linear(top, $animation-time / 2), transition-linear(left, $animation-time), transition-linear(width, $animation-time);
     transform: translateX(-$line-height);
 
     // adds extra height to make hover more available to user
@@ -292,7 +292,7 @@
     top: 0;
     height: 100%;
     padding-top: $column-header-height;
-    transition: left $animation-time linear, width $animation-time linear;
+    transition: transition-linear(left, $animation-time), transition-linear(width, $animation-time);
   }
 
   .column-header {

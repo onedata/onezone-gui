@@ -13,5 +13,5 @@ export default {
   tileProvidersMapTitle: 'Providers map',
   addSupport: 'Add support',
   browseFiles: 'Browse files',
-  sharedDirectories: 'Shared dirs',
+  sharesCount: 'Shares',
 };

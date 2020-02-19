@@ -1,7 +1,20 @@
-{{#promise-proxy-container proxy=providerProxy}}
-  {{content-provider-redirect
-    spaceId=model.resource
-    provider=providerProxy.content
-    transitionToProviderOnMap=(action "transitionAfterFailure")
-  }}
-{{/promise-proxy-container}}
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-data-content"
+  space=space
+  oneproviderId=oneproviderId
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  as |container|
+}}
+  {{#container.header class="content-spaces-data-header"}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-file-browser
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceEntityId=space.entityId
+    }}
+  {{/container.body}}
+{{/oneprovider-view-container}}

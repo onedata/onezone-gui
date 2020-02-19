@@ -15,9 +15,8 @@ import _ from 'lodash';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import HasDefaultSpace from 'onezone-gui/mixins/has-default-space';
 
-export default Component.extend(I18n, HasDefaultSpace, {
+export default Component.extend(I18n, {
   tagName: '',
 
   router: service(),

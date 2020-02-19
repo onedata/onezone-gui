@@ -18,6 +18,7 @@ export default SidebarResources.extend({
   tokenActions: service(),
   currentUser: service(),
   spaceManager: service(),
+  shareManager: service(),
   clusterActions: service(),
   spaceActions: service(),
   groupManager: service(),
@@ -25,6 +26,7 @@ export default SidebarResources.extend({
   clusterManager: service(),
   harvesterManager: service(),
   harvesterActions: service(),
+  uploadManager: service(),
 
   /**
    * @param {string} type
@@ -40,10 +42,16 @@ export default SidebarResources.extend({
         return this.get('tokenManager').getTokens();
       case 'spaces':
         return this.get('spaceManager').getSpaces();
+      case 'shares':
+        return this.get('shareManager').getAllShares();
       case 'groups':
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
+      case 'uploads':
+        return resolve({
+          list: this.get('uploadManager.sidebarOneproviders'),
+        });
       case 'users':
         return this.get('currentUser').getCurrentUserRecord().then(user => {
           return resolve({ list: A([user]) });
@@ -76,9 +84,11 @@ export default SidebarResources.extend({
   /**
    * @override
    */
-  getItemsSortingFor(type) {
-    if (type === 'tokens') {
+  getItemsSortingFor(resourceType) {
+    if (resourceType === 'tokens') {
       return ['isActive:desc', 'name'];
+    } else if (resourceType === 'uploads') {
+      return ['isAllOneproviders:desc', 'name'];
     } else {
       return this._super(...arguments);
     }

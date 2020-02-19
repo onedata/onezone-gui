@@ -19,8 +19,8 @@
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
-        route=dataProviderRoute
-        routeQueryParams=dataProviderRouteParams
+        aspect="data"
+        routeQueryParams=dataTileQueryParams
         moreText=(tt this "browseFiles")}}
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
@@ -30,8 +30,8 @@
     {{/if}}
     {{#resource-info-tile record=space}}
       <tr>
-        <td class="property-name">{{tt this "sharedDirectories"}}</td>
-        <td class="property-value shared-directories">{{space.info.sharedDirectories}}</td>
+        <td class="property-name">{{tt this "sharesCount"}}</td>
+        <td class="property-value shares-count">{{space.info.sharesCount}}</td>
       </tr>
     {{/resource-info-tile}}
     {{#if space.hasViewPrivilege}}
@@ -42,7 +42,7 @@
         footerText=(if isSupported (tt this "addSupport"))
         footerTextIcon=(if isSupported "provider-add")
         footerLinkToParams=(if isSupported (array "onedata.sidebar.content.aspect" "spaces" spaceId "support"))
-      }}  
+      }}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))
         }}

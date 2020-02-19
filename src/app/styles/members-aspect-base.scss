@@ -43,7 +43,7 @@
       padding-right: 250px;
     }
     .one-label {
-      font-weight: bold;
+      @include font-bold();
     }
   }
 
@@ -69,7 +69,7 @@
     background-size: 30px;
     font-size: 1.7em;
     vertical-align: middle;
-    transition: transform 0.2s linear;
+    transition: transition-linear(transform);
     &.active {
       transform: rotate(180deg);
     }
