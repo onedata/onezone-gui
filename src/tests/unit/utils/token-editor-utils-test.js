@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { get, getProperties } from '@ember/object';
 import _ from 'lodash';
 
@@ -35,39 +35,39 @@ describe('Unit | Utility | token editor utils', function () {
       );
     });
 
-    it('returns object with type.inviteToken.subtype', function () {
+    it('returns object with type.inviteToken.inviteType', function () {
       const result = editorDataToToken({
         basic: {
           type: 'invite',
           inviteDetails: {
-            subtype: 'groupJoinGroup',
+            inviteType: 'groupJoinGroup',
           },
         },
       });
       const inviteToken = result.type.inviteToken;
-      expect(inviteToken).to.have.property('subtype', 'groupJoinGroup');
+      expect(inviteToken).to.have.property('inviteType', 'groupJoinGroup');
       expect(Object.keys(inviteToken)).to.have.length(1);
     });
 
-    Object.keys(inviteTokenSubtypeToTargetModelMapping)
+    Object.keys(tokenInviteTypeToTargetModelMapping)
       .without('registerOneprovider')
-      .forEach(subtype => {
+      .forEach(inviteType => {
         const {
           idFieldName,
           modelName,
         } = getProperties(
-          get(inviteTokenSubtypeToTargetModelMapping, subtype),
+          get(tokenInviteTypeToTargetModelMapping, inviteType),
           'idFieldName',
           'modelName'
         );
         it(
-          `returns object with type.inviteToken.{subtype,${idFieldName}} when target is ${modelName} for subtype ${subtype}`,
+          `returns object with type.inviteToken.{inviteType,${idFieldName}} when target is ${modelName} for inviteType ${inviteType}`,
           function () {
             const result = editorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
-                  subtype,
+                  inviteType,
                   inviteTargetDetails: {
                     target: {
                       entityType: modelName,
@@ -78,7 +78,7 @@ describe('Unit | Utility | token editor utils', function () {
               },
             });
             const inviteToken = result.type.inviteToken;
-            expect(inviteToken).to.have.property('subtype', subtype);
+            expect(inviteToken).to.have.property('inviteType', inviteType);
             expect(inviteToken).to.have.property(idFieldName, 'abc');
             expect(Object.keys(inviteToken)).to.have.length(2);
           }
@@ -86,13 +86,13 @@ describe('Unit | Utility | token editor utils', function () {
       });
 
     it(
-      'returns object without specified token invite target if target model is not suitable for invitation subtype',
+      'returns object without specified token invite target if target model is not suitable for invitation inviteType',
       function () {
         const result = editorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
-              subtype: 'groupJoinGroup',
+              inviteType: 'groupJoinGroup',
               inviteTargetDetails: {
                 target: {
                   entityType: 'cluster',
@@ -110,14 +110,14 @@ describe('Unit | Utility | token editor utils', function () {
     );
 
     it(
-      'returns object with current user as a target model when subtype is registerOneprovider',
+      'returns object with current user as a target model when inviteType is registerOneprovider',
       function () {
         const currentUser = { entityId: 'user1' };
         const result = editorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
-              subtype: 'registerOneprovider',
+              inviteType: 'registerOneprovider',
               // Incorrect target to check, that it will be ignored
               inviteTargetDetails: {
                 target: {
@@ -134,19 +134,19 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
 
-    Object.keys(inviteTokenSubtypeToTargetModelMapping).forEach(subtype => {
+    Object.keys(tokenInviteTypeToTargetModelMapping).forEach(inviteType => {
       const privilegesModel =
-        get(inviteTokenSubtypeToTargetModelMapping, `${subtype}.privileges`);
+        get(tokenInviteTypeToTargetModelMapping, `${inviteType}.privileges`);
 
       if (privilegesModel) {
         it(
-          `converts invite privileges for ${subtype} token`,
+          `converts invite privileges for ${inviteType} token`,
           function () {
             const result = editorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
-                  subtype,
+                  inviteType,
                   inviteTargetDetails: {
                     invitePrivilegesDetails: {
                       privileges: ['space_view'],
@@ -163,13 +163,13 @@ describe('Unit | Utility | token editor utils', function () {
         );
       } else {
         it(
-          `does not convert invite privileges when for ${subtype} token`,
+          `does not convert invite privileges when for ${inviteType} token`,
           function () {
             const result = editorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
-                  subtype,
+                  inviteType,
                   inviteTargetDetails: {
                     invitePrivilegesDetails: {
                       privileges: ['space_view'],
@@ -191,7 +191,7 @@ describe('Unit | Utility | token editor utils', function () {
           basic: {
             type: 'access',
             inviteDetails: {
-              subtype: 'groupJoinGroup',
+              inviteType: 'groupJoinGroup',
               inviteTargetDetails: {
                 target: {
                   entityType: 'group',
@@ -215,7 +215,7 @@ describe('Unit | Utility | token editor utils', function () {
           basic: {
             type: 'invite',
             inviteDetails: {
-              subtype: 'groupJoinGroup',
+              inviteType: 'groupJoinGroup',
               inviteTargetDetails: {
                 target: {
                   entityType: 'group',
@@ -240,7 +240,7 @@ describe('Unit | Utility | token editor utils', function () {
           basic: {
             type: 'invite',
             inviteDetails: {
-              subtype: 'groupJoinGroup',
+              inviteType: 'groupJoinGroup',
               inviteTargetDetails: {
                 target: {
                   entityType: 'group',
@@ -265,7 +265,7 @@ describe('Unit | Utility | token editor utils', function () {
           basic: {
             type: 'access',
             inviteDetails: {
-              subtype: 'groupJoinGroup',
+              inviteType: 'groupJoinGroup',
               inviteTargetDetails: {
                 target: {
                   entityType: 'group',

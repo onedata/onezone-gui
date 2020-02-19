@@ -45,7 +45,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, all as allFulfilled, allSettled } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
-const tokenSubtypeOptions = [{
+const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
   icon: 'group',
   targetModelName: 'group',
@@ -100,14 +100,14 @@ const privilegesForModels = {
   cluster: clusterFlags,
 };
 
-function getTargetModelNameForSubtype(subtype) {
-  const subtypeOption = subtype && tokenSubtypeOptions.findBy('value', subtype);
-  return subtypeOption && subtypeOption.targetModelName;
+function getTargetModelNameForInviteType(inviteType) {
+  const inviteTypeOption = inviteType && tokenInviteTypeOptions.findBy('value', inviteType);
+  return inviteTypeOption && inviteTypeOption.targetModelName;
 }
 
-function getPrivilegesModelNameForSubtype(subtype) {
-  const subtypeOption = subtype && tokenSubtypeOptions.findBy('value', subtype);
-  return subtypeOption && !subtypeOption.noPrivileges && subtypeOption.targetModelName;
+function getPrivilegesModelNameForInviteType(inviteType) {
+  const inviteTypeOption = inviteType && tokenInviteTypeOptions.findBy('value', inviteType);
+  return inviteTypeOption && !inviteTypeOption.noPrivileges && inviteTypeOption.targetModelName;
 }
 
 const CaveatFormGroup = FormFieldsGroup.extend({
@@ -222,9 +222,9 @@ export default Component.extend(I18n, {
             name: 'inviteDetails',
             fields: [
               DropdownField.create({
-                name: 'subtype',
+                name: 'inviteType',
                 showSearch: false,
-                options: tokenSubtypeOptions,
+                options: tokenInviteTypeOptions,
                 defaultValue: 'userJoinGroup',
               }),
               this.get('inviteTargetDetailsGroup'),
@@ -242,15 +242,15 @@ export default Component.extend(I18n, {
     function inviteTargetDetailsGroup() {
       const component = this;
       return FormFieldsGroup.extend({
-        isExpanded: equal('latestSubtypeWithTargets', 'subtype'),
-        subtype: reads('parent.value.subtype'),
-        subtypeSpecification: computed(
-          'subtype',
-          function subtypeSpecification() {
-            return tokenSubtypeOptions.findBy('value', this.get('subtype'));
+        isExpanded: equal('latestInviteTypeWithTargets', 'inviteType'),
+        inviteType: reads('parent.value.inviteType'),
+        inviteTypeSpecification: computed(
+          'inviteType',
+          function inviteTypeSpecification() {
+            return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
           }
         ),
-        latestSubtypeWithTargets: undefined,
+        latestInviteTypeWithTargets: undefined,
         cachedTargetsModelName: undefined,
         cachedTargetsProxy: PromiseObject.create({
           promise: new Promise(() => {}),
@@ -259,21 +259,21 @@ export default Component.extend(I18n, {
         cachedPrivilegesPresetProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
-        subtypeObserver: observer('subtype', function subtypeObserver() {
+        inviteTypeObserver: observer('inviteType', function inviteTypeObserver() {
           const {
-            subtype,
+            inviteType,
             cachedTargetsModelName,
             cachedPrivilegesModelName,
           } = this.getProperties(
-            'subtype',
+            'inviteType',
             'cachedTargetsModelName',
             'cachedPrivilegesModelName'
           );
-          const newTargetsModelName = getTargetModelNameForSubtype(subtype);
+          const newTargetsModelName = getTargetModelNameForInviteType(inviteType);
           const newPrivilegesModelName =
-            getPrivilegesModelNameForSubtype(subtype);
+            getPrivilegesModelNameForInviteType(inviteType);
           if (newTargetsModelName) {
-            this.set('latestSubtypeWithTargets', subtype);
+            this.set('latestInviteTypeWithTargets', inviteType);
             if (cachedTargetsModelName !== newTargetsModelName) {
               this.setProperties({
                 cachedTargetsModelName: newTargetsModelName,
@@ -294,7 +294,7 @@ export default Component.extend(I18n, {
         init() {
           this._super(...arguments);
 
-          this.subtypeObserver();
+          this.inviteTypeObserver();
         },
       }).create({
         name: 'inviteTargetDetails',
@@ -312,7 +312,7 @@ export default Component.extend(I18n, {
           }),
           this.get('targetField'),
           FormFieldsGroup.extend({
-            isExpanded: not('parent.subtypeSpecification.noPrivileges'),
+            isExpanded: not('parent.inviteTypeSpecification.noPrivileges'),
           }).create({
             name: 'invitePrivilegesDetails',
             fields: [
@@ -340,25 +340,25 @@ export default Component.extend(I18n, {
   targetField: computed(function targetField() {
     return DropdownField.extend({
       cachedTargetsProxy: reads('parent.cachedTargetsProxy'),
-      latestSubtypeWithTargets: reads('parent.latestSubtypeWithTargets'),
-      label: computed('latestSubtypeWithTargets', 'path', function label() {
+      latestInviteTypeWithTargets: reads('parent.latestInviteTypeWithTargets'),
+      label: computed('latestInviteTypeWithTargets', 'path', function label() {
         const {
-          latestSubtypeWithTargets,
+          latestInviteTypeWithTargets,
           path,
-        } = this.getProperties('latestSubtypeWithTargets', 'path');
-        return latestSubtypeWithTargets &&
-          this.t(`${path}.label.${latestSubtypeWithTargets}`);
+        } = this.getProperties('latestInviteTypeWithTargets', 'path');
+        return latestInviteTypeWithTargets &&
+          this.t(`${path}.label.${latestInviteTypeWithTargets}`);
       }),
       placeholder: computed(
-        'latestSubtypeWithTargets',
+        'latestInviteTypeWithTargets',
         'path',
         function placeholder() {
           const {
-            latestSubtypeWithTargets,
+            latestInviteTypeWithTargets,
             path,
-          } = this.getProperties('latestSubtypeWithTargets', 'path');
-          return latestSubtypeWithTargets &&
-            this.t(`${path}.placeholder.${latestSubtypeWithTargets}`);
+          } = this.getProperties('latestInviteTypeWithTargets', 'path');
+          return latestInviteTypeWithTargets &&
+            this.t(`${path}.placeholder.${latestInviteTypeWithTargets}`);
         }
       ),
       options: reads('cachedTargetsProxy.content'),

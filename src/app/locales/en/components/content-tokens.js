@@ -20,7 +20,7 @@ export default {
     access: 'Access',
     invite: 'Invite',
   },
-  subtypes: {
+  inviteTypes: {
     userJoinGroup: 'join user to group',
     groupJoinGroup: 'join group to group',
     userJoinSpace: 'join user to space',

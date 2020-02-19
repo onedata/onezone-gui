@@ -53,10 +53,10 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
   /**
    * @type {Ember.ComputedProperty<SafeString>}
    */
-  targetLabel: computed('token.subtype', function targetLabel() {
-    const tokenSubtype = this.get('token.subtype');
-    return tokenSubtype &&
-      this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[tokenSubtype]}`);
+  targetLabel: computed('token.inviteType', function targetLabel() {
+    const inviteType = this.get('token.inviteType');
+    return inviteType &&
+      this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[inviteType]}`);
   }),
 
   /**

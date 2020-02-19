@@ -1,5 +1,5 @@
 import { getProperties, get } from '@ember/object';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
 const consumerModelToPrefix = {
   user: 'usr',
@@ -47,29 +47,29 @@ export function editorDataToToken(editorData, currentUser) {
     };
   }
   if (type === 'invite') {
-    const subtype = get(basic, 'inviteDetails.subtype');
+    const inviteType = get(basic, 'inviteDetails.inviteType');
     const target = get(basic, 'inviteDetails.inviteTargetDetails.target');
     const privileges =
       get(basic, 'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges');
     const usageLimitSelector = get(basic, 'inviteDetails.usageLimit.usageLimitSelector');
     const usageLimitNumber = get(basic, 'inviteDetails.usageLimit.usageLimitNumber');
 
-    if (subtype) {
-      const availableSubtype = get(inviteTokenSubtypeToTargetModelMapping, subtype);
-      if (availableSubtype) {
-        tokenData.type.inviteToken.subtype = subtype;
+    if (inviteType) {
+      const availableInviteType = get(tokenInviteTypeToTargetModelMapping, inviteType);
+      if (availableInviteType) {
+        tokenData.type.inviteToken.inviteType = inviteType;
 
         let targetEntityId;
-        if (subtype === 'registerOneprovider') {
+        if (inviteType === 'registerOneprovider') {
           targetEntityId = currentUser && get(currentUser, 'entityId');
-        } else if (target && get(target, 'entityType') === availableSubtype.modelName) {
+        } else if (target && get(target, 'entityType') === availableInviteType.modelName) {
           targetEntityId = get(target, 'entityId');
         }
         if (targetEntityId) {
-          tokenData.type.inviteToken[get(availableSubtype, 'idFieldName')] = targetEntityId;
+          tokenData.type.inviteToken[get(availableInviteType, 'idFieldName')] = targetEntityId;
         }
 
-        if (availableSubtype.privileges && privileges) {
+        if (availableInviteType.privileges && privileges) {
           tokenData.privileges = privileges;
         }
       }

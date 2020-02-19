@@ -13,64 +13,64 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
 import moment from 'moment';
 
-const tokenSubtypes = [{
-  subtype: 'userJoinGroup',
+const tokenInviteTypes = [{
+  inviteType: 'userJoinGroup',
   label: 'Invite user to group',
   icon: 'group',
   targetModelName: 'group',
   targetLabel: 'Inviting group',
   targetPlaceholder: 'Select group...',
 }, {
-  subtype: 'groupJoinGroup',
+  inviteType: 'groupJoinGroup',
   label: 'Invite group to group',
   icon: 'group',
   targetModelName: 'group',
   targetLabel: 'Inviting group',
   targetPlaceholder: 'Select group...',
 }, {
-  subtype: 'userJoinSpace',
+  inviteType: 'userJoinSpace',
   label: 'Invite user to space',
   icon: 'space',
   targetModelName: 'space',
   targetLabel: 'Inviting space',
   targetPlaceholder: 'Select space...',
 }, {
-  subtype: 'groupJoinSpace',
+  inviteType: 'groupJoinSpace',
   label: 'Invite group to space',
   icon: 'space',
   targetModelName: 'space',
   targetLabel: 'Inviting space',
   targetPlaceholder: 'Select space...',
 }, {
-  subtype: 'userJoinCluster',
+  inviteType: 'userJoinCluster',
   label: 'Invite user to cluster',
   icon: 'cluster',
   targetModelName: 'cluster',
   targetLabel: 'Inviting cluster',
   targetPlaceholder: 'Select cluster...',
 }, {
-  subtype: 'groupJoinCluster',
+  inviteType: 'groupJoinCluster',
   label: 'Invite group to cluster',
   icon: 'cluster',
   targetModelName: 'cluster',
   targetLabel: 'Inviting cluster',
   targetPlaceholder: 'Select cluster...',
 }, {
-  subtype: 'userJoinHarvester',
+  inviteType: 'userJoinHarvester',
   label: 'Invite user to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
   targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
 }, {
-  subtype: 'groupJoinHarvester',
+  inviteType: 'groupJoinHarvester',
   label: 'Invite group to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
   targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
 }, {
-  subtype: 'spaceJoinHarvester',
+  inviteType: 'spaceJoinHarvester',
   label: 'Invite space to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
@@ -78,7 +78,7 @@ const tokenSubtypes = [{
   targetPlaceholder: 'Select harvester...',
   noPrivileges: true,
 }, {
-  subtype: 'supportSpace',
+  inviteType: 'supportSpace',
   label: 'Support space',
   icon: 'space',
   targetModelName: 'space',
@@ -86,7 +86,7 @@ const tokenSubtypes = [{
   targetPlaceholder: 'Select space...',
   noPrivileges: true,
 }, {
-  subtype: 'registerOneprovider',
+  inviteType: 'registerOneprovider',
   label: 'Register Oneprovider',
   icon: 'provider',
 }];
@@ -136,7 +136,7 @@ const caveats = [{
   label: 'Object ID',
   disabledDescription: 'This token allows to interact with all data objects in Onedata',
 }];
-const preselectedSubtype = tokenSubtypes[0];
+const preselectedInviteType = tokenInviteTypes[0];
 const regions = [
   { label: 'Africa', value: 'Africa' },
   { label: 'Antarctica', value: 'Antarctica' },
@@ -282,17 +282,17 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  it('renders "subtype" field', function () {
+  it('renders "inviteType" field', function () {
     this.render(hbs `{{token-editor}}`);
 
-    const subtypeHelper = new SubtypeHelper();
-    expectLabelToEqual(this, 'subtype', 'Invitation type');
+    const inviteTypeHelper = new InviteTypeHelper();
+    expectLabelToEqual(this, 'inviteType', 'Invitation type');
     return wait()
       .then(() => click('.type-field .option-invite'))
-      .then(() => subtypeHelper.open())
+      .then(() => inviteTypeHelper.open())
       .then(() => {
-        tokenSubtypes.forEach(({ label, icon }, index) => {
-          const $option = $(subtypeHelper.getNthOption(index + 1));
+        tokenInviteTypes.forEach(({ label, icon }, index) => {
+          const $option = $(inviteTypeHelper.getNthOption(index + 1));
           expect($option.text().trim()).to.equal(label);
           expect($option.find('.one-icon')).to.have.class(`oneicon-${icon}`);
         });
@@ -300,18 +300,18 @@ describe('Integration | Component | token editor', function () {
   });
 
   it(
-    `has "subtype" field with preselected "${preselectedSubtype.label}" option`,
+    `has "inviteType" field with preselected "${preselectedInviteType.label}" option`,
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
         .then(() => {
-          expectToHaveValue(this, 'subtype', preselectedSubtype.subtype);
-          expectToBeValid(this, 'subtype');
-          const $dropdownTrigger = $(new SubtypeHelper().getTrigger());
+          expectToHaveValue(this, 'inviteType', preselectedInviteType.inviteType);
+          expectToBeValid(this, 'inviteType');
+          const $dropdownTrigger = $(new InviteTypeHelper().getTrigger());
           expect($dropdownTrigger.text().trim())
-            .to.equal(preselectedSubtype.label);
+            .to.equal(preselectedInviteType.label);
         });
     }
   );
@@ -340,8 +340,8 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  tokenSubtypes.forEach(({
-    subtype,
+  tokenInviteTypes.forEach(({
+    inviteType,
     label,
     icon,
     targetModelName,
@@ -349,32 +349,32 @@ describe('Integration | Component | token editor', function () {
     targetPlaceholder,
     noPrivileges,
   }, index) => {
-    it(`notifies about "subtype" field change to "${label}"`, function () {
+    it(`notifies about "inviteType" field change to "${label}"`, function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      const subtypeHelper = new SubtypeHelper();
+      const inviteTypeHelper = new InviteTypeHelper();
 
       return wait()
         .then(() => click('.type-field .option-invite'))
-        .then(() => subtypeHelper.selectOption(index + 1))
+        .then(() => inviteTypeHelper.selectOption(index + 1))
         .then(() => {
-          expectToHaveValue(this, 'subtype', subtype);
-          expectToBeValid(this, 'subtype');
+          expectToHaveValue(this, 'inviteType', inviteType);
+          expectToBeValid(this, 'inviteType');
         });
     });
 
     if (targetModelName) {
       it(
-        `shows correct "target" field when "subtype" field is "${label}"`,
+        `shows correct "target" field when "inviteType" field is "${label}"`,
         function () {
           this.render(hbs `{{token-editor}}`);
 
-          const subtypeHelper = new SubtypeHelper();
+          const inviteTypeHelper = new InviteTypeHelper();
           const targetHelper = new TargetHelper();
 
           return wait()
             .then(() => click('.type-field .option-invite'))
-            .then(() => subtypeHelper.selectOption(index + 1))
+            .then(() => inviteTypeHelper.selectOption(index + 1))
             .then(() => {
               const $collapse = this.$('.inviteTargetDetails-collapse');
               const $placeholder =
@@ -397,16 +397,16 @@ describe('Integration | Component | token editor', function () {
       );
 
       it(
-        `notifies about "target" field change when "subtype" field is "${label}"`,
+        `notifies about "target" field change when "inviteType" field is "${label}"`,
         function () {
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-          const subtypeHelper = new SubtypeHelper();
+          const inviteTypeHelper = new InviteTypeHelper();
           const targetHelper = new TargetHelper();
 
           return wait()
             .then(() => click('.type-field .option-invite'))
-            .then(() => subtypeHelper.selectOption(index + 1))
+            .then(() => inviteTypeHelper.selectOption(index + 1))
             .then(() => targetHelper.selectOption(1))
             .then(() => {
               const selectedTarget =
@@ -419,13 +419,13 @@ describe('Integration | Component | token editor', function () {
 
       if (!noPrivileges) {
         it(
-          `shows correct privileges field when "subtype" field is "${label}"`,
+          `shows correct privileges field when "inviteType" field is "${label}"`,
           function () {
             this.render(hbs `{{token-editor}}`);
 
             return wait()
               .then(() => click('.type-field .option-invite'))
-              .then(() => new SubtypeHelper().selectOption(index + 1))
+              .then(() => new InviteTypeHelper().selectOption(index + 1))
               .then(() => {
                 expect(this.$('.invitePrivilegesDetails-collapse'))
                   .to.have.class('in');
@@ -442,15 +442,15 @@ describe('Integration | Component | token editor', function () {
         );
 
         it(
-          `notifies about "privileges" field change when "subtype" field is "${label}"`,
+          `notifies about "privileges" field change when "inviteType" field is "${label}"`,
           function () {
             this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-            const subtypeHelper = new SubtypeHelper();
+            const inviteTypeHelper = new InviteTypeHelper();
 
             return wait()
               .then(() => click('.type-field .option-invite'))
-              .then(() => subtypeHelper.selectOption(index + 1))
+              .then(() => inviteTypeHelper.selectOption(index + 1))
               .then(() => click(this.$(
                 `.node-text:contains(Modify ${targetModelName}) + .form-group .one-way-toggle`
               )[0]))
@@ -465,15 +465,15 @@ describe('Integration | Component | token editor', function () {
         );
       } else {
         it(
-          `does not show privileges when "subtype" field is "${label}"`,
+          `does not show privileges when "inviteType" field is "${label}"`,
           function () {
             this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-            const subtypeHelper = new SubtypeHelper();
+            const inviteTypeHelper = new InviteTypeHelper();
 
             return wait()
               .then(() => click('.type-field .option-invite'))
-              .then(() => subtypeHelper.selectOption(index + 1))
+              .then(() => inviteTypeHelper.selectOption(index + 1))
               .then(() => {
                 expect(this.$('.invitePrivilegesDetails-collapse'))
                   .to.not.have.class('in');
@@ -484,15 +484,15 @@ describe('Integration | Component | token editor', function () {
     } else {
 
       it(
-        `does not show invite target details when "subtype" field is "${label}"`,
+        `does not show invite target details when "inviteType" field is "${label}"`,
         function () {
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-          const subtypeHelper = new SubtypeHelper();
+          const inviteTypeHelper = new InviteTypeHelper();
 
           return wait()
             .then(() => click('.type-field .option-invite'))
-            .then(() => subtypeHelper.selectOption(index + 1))
+            .then(() => inviteTypeHelper.selectOption(index + 1))
             .then(() => {
               expect(this.$('.inviteTargetDetails-collapse'))
                 .to.not.have.class('in');
@@ -503,17 +503,17 @@ describe('Integration | Component | token editor', function () {
   });
 
   it(
-    'resets "target" field after change to subtype which requires different model',
+    'resets "target" field after change to inviteType which requires different model',
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      const subtypeHelper = new SubtypeHelper();
+      const inviteTypeHelper = new InviteTypeHelper();
       const targetHelper = new TargetHelper();
 
       return wait()
         .then(() => click('.type-field .option-invite'))
         .then(() => targetHelper.selectOption(1))
-        .then(() => subtypeHelper.selectOption(3))
+        .then(() => inviteTypeHelper.selectOption(3))
         .then(() => expectToHaveNoValue(this, 'target'));
     }
   );
@@ -1572,7 +1572,7 @@ describe('Integration | Component | token editor', function () {
       return wait()
         .then(() => fillIn('.name-field input', 'somename'))
         .then(() => click('.type-field .option-invite'))
-        .then(() => new SubtypeHelper().selectOption(1))
+        .then(() => new InviteTypeHelper().selectOption(1))
         .then(() => new TargetHelper().selectOption(1))
         .then(() => click('.usageLimit-field .option-number'))
         .then(() => fillIn('.usageLimitNumber-field input', '10'))
@@ -1581,7 +1581,7 @@ describe('Integration | Component | token editor', function () {
           const rawToken = submitSpy.lastCall.args[0];
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
-            subtype: 'userJoinGroup',
+            inviteType: 'userJoinGroup',
             groupId: 'group0',
           });
           expect(rawToken).to.have.deep.property('privileges', ['group_view']);
@@ -1598,23 +1598,23 @@ describe('Integration | Component | token editor', function () {
       this.on('submit', submitSpy);
       this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
 
-      const registerOneproviderDropdownIndex = tokenSubtypes.indexOf(
-        tokenSubtypes.findBy('subtype', 'registerOneprovider')
+      const registerOneproviderDropdownIndex = tokenInviteTypes.indexOf(
+        tokenInviteTypes.findBy('inviteType', 'registerOneprovider')
       ) + 1;
       return wait()
         .then(() => fillIn('.name-field input', 'somename'))
         .then(() => click('.type-field .option-invite'))
-        .then(() => new SubtypeHelper().selectOption(1))
+        .then(() => new InviteTypeHelper().selectOption(1))
         .then(() => new TargetHelper().selectOption(1))
         .then(() =>
-          new SubtypeHelper().selectOption(registerOneproviderDropdownIndex)
+          new InviteTypeHelper().selectOption(registerOneproviderDropdownIndex)
         )
         .then(() => click('.submit-token'))
         .then(() => {
           const rawToken = submitSpy.lastCall.args[0];
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
-            subtype: 'registerOneprovider',
+            inviteType: 'registerOneprovider',
             adminUserId: 'user1',
           });
           expect(rawToken).to.not.have.property('caveats');
@@ -1648,9 +1648,9 @@ describe('Integration | Component | token editor', function () {
   );
 });
 
-class SubtypeHelper extends EmberPowerSelectHelper {
+class InviteTypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.subtype-field .ember-basic-dropdown');
+    super('.inviteType-field .ember-basic-dropdown');
   }
 }
 
@@ -1691,7 +1691,7 @@ class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
 const basicFieldNameToFieldPath = {
   name: 'basic.name',
   type: 'basic.type',
-  subtype: 'basic.inviteDetails.subtype',
+  inviteType: 'basic.inviteDetails.inviteType',
   target: 'basic.inviteDetails.inviteTargetDetails.target',
   privileges: 'basic.inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges',
   usageLimit: 'basic.inviteDetails.usageLimit',

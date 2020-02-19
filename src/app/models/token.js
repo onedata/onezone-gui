@@ -51,7 +51,7 @@ function mappingWithoutPrivileges(mapping) {
   return Object.assign({}, mapping, { privileges: undefined });
 }
 
-export const inviteTokenSubtypeToTargetModelMapping = {
+export const tokenInviteTypeToTargetModelMapping = {
   userJoinGroup: standardGroupMapping,
   groupJoinGroup: standardGroupMapping,
   userJoinSpace: standardSpaceMapping,
@@ -68,7 +68,7 @@ export const inviteTokenSubtypeToTargetModelMapping = {
   spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
 };
 
-const allowedSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
+const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
 
 export default Model.extend(
   GraphSingleModelMixin,
@@ -115,18 +115,19 @@ export default Model.extend(
     /**
      * @type {Ember.ComputedProperty<string|undefined>}
      */
-    subtype: computed('type.inviteToken.subtype', function subtype() {
-      const tokenSubtype = this.get('type.inviteToken.subtype');
-      return allowedSubtypes.includes(tokenSubtype) ? tokenSubtype : undefined;
+    inviteType: computed('type.inviteToken.inviteType', function inviteType() {
+      const tokenInviteType = this.get('type.inviteToken.inviteType');
+      return allowedInviteTypes.includes(tokenInviteType) ?
+        tokenInviteType : undefined;
     }),
 
     /**
      * @type {Ember.ComputedProperty<string|undefined>}
      */
-    targetModelName: computed('subtype', function targetModelName() {
-      const subtype = this.get('subtype');
-      if (subtype) {
-        return inviteTokenSubtypeToTargetModelMapping[subtype].modelName;
+    targetModelName: computed('inviteType', function targetModelName() {
+      const inviteType = this.get('inviteType');
+      if (inviteType) {
+        return tokenInviteTypeToTargetModelMapping[inviteType].modelName;
       }
     }),
 
@@ -209,15 +210,15 @@ export default Model.extend(
       const {
         store,
         type,
-        subtype,
+        inviteType,
         targetModelName,
-      } = this.getProperties('store', 'type', 'subtype', 'targetModelName');
+      } = this.getProperties('store', 'type', 'inviteType', 'targetModelName');
 
       if (!targetModelName) {
         return resolve(null);
       } else {
         const targetModelMapping =
-          inviteTokenSubtypeToTargetModelMapping[subtype];
+          tokenInviteTypeToTargetModelMapping[inviteType];
         const adapter = store.adapterFor(targetModelName);
         const entityType = adapter.getEntityTypeForModelName(targetModelName);
 

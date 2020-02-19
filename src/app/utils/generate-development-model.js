@@ -16,7 +16,7 @@ import { get, set } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -349,18 +349,18 @@ function createTokensRecords(store) {
         creationTime: moment().unix(),
       },
     }).save();
-    const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
-    const inviteTokenPromises = inviteSubtypes
-      .map((subtype, j) => {
+    const inviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
+    const inviteTokenPromises = inviteTypes
+      .map((inviteType, j) => {
         return store.createRecord('token', {
-          name: 'Invite token ' + (i * inviteSubtypes.length + j),
+          name: 'Invite token ' + (i * inviteTypes.length + j),
           type: {
-            inviteToken: { subtype },
+            inviteToken: { inviteType },
           },
           caveats: [{
             type: 'time',
             validUntil: moment()
-              .add(60 * (-inviteSubtypes.length / 2 + j), 'seconds')
+              .add(60 * (-inviteTypes.length / 2 + j), 'seconds')
               .unix(),
           }],
           metadata: {
@@ -553,8 +553,8 @@ function attachModelsToInviteTokens(listRecords) {
     allFulfilled(tokensList
       .filter(token => get(token, 'typeName') === 'invite')
       .map(token => {
-        const subtype = get(token, 'subtype');
-        const modelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
+        const inviteType = get(token, 'inviteType');
+        const modelMapping = tokenInviteTypeToTargetModelMapping[inviteType];
         const targetRecordsList = listRecords[modelMapping.modelName];
         if (targetRecordsList) {
           return targetRecordsList.get('list')

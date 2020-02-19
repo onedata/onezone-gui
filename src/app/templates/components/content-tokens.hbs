@@ -13,8 +13,8 @@
       <div class="property-name token-type-label">{{tt this "propertyNames.type"}}:</div>
       <div class="property-value token-type">
         <span class="type-name">{{tt this (concat "typeNames." token.typeName)}}</span>
-        {{#if token.subtype}}
-          (<span class="subtype">{{tt this (concat "subtypes." token.subtype)}}</span>)
+        {{#if token.inviteType}}
+          (<span class="invite-type">{{tt this (concat "inviteTypes." token.inviteType)}}</span>)
         {{/if}}
       </div>
     </div>
@@ -37,7 +37,7 @@
             <span class="space"></span>
             {{one-label-tip
               class="target-tooltip"
-              title=(tt this (concat "targetTooltips." token.subtype))}}
+              title=(tt this (concat "targetTooltips." token.inviteType))}}
           {{/if}}
         </div>
       </div>

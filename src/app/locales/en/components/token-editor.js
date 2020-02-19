@@ -16,7 +16,7 @@ export default {
         },
       },
       inviteDetails: {
-        subtype: {
+        inviteType: {
           label: 'Invitation type',
           options: {
             userJoinGroup: {

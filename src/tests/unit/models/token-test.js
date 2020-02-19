@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupModelTest } from 'ember-mocha';
 import { set, get, setProperties } from '@ember/object';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -35,37 +35,37 @@ describe('Unit | Model | token', function () {
     });
   });
 
-  it('computes undefined subtype based on access token type', function () {
+  it('computes undefined invite type based on access token type', function () {
     const model = this.subject();
     set(model, 'type', {
       accessToken: {},
     });
 
-    expect(get(model, 'subtype')).to.be.undefined;
+    expect(get(model, 'inviteType')).to.be.undefined;
   });
 
-  it('computes non-empty subtype based on invite token type', function () {
-    const subtype = 'userJoinGroup';
+  it('computes non-empty invite type based on invite token type', function () {
+    const inviteType = 'userJoinGroup';
     const model = this.subject();
     set(model, 'type', {
       inviteToken: {
-        subtype,
+        inviteType,
       },
     });
 
-    expect(get(model, 'subtype')).to.equal(subtype);
+    expect(get(model, 'inviteType')).to.equal(inviteType);
   });
 
-  Object.keys(inviteTokenSubtypeToTargetModelMapping).forEach(subtype => {
-    const targetModelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
+  Object.keys(tokenInviteTypeToTargetModelMapping).forEach(inviteType => {
+    const targetModelMapping = tokenInviteTypeToTargetModelMapping[inviteType];
 
     it(
-      `calculates targetModelName as "${targetModelMapping.modelName}" for subtype ${subtype}`,
+      `calculates targetModelName as "${targetModelMapping.modelName}" for invite type ${inviteType}`,
       function () {
         const model = this.subject();
         set(model, 'type', {
           inviteToken: {
-            subtype,
+            inviteType,
           },
         });
 
@@ -75,7 +75,7 @@ describe('Unit | Model | token', function () {
     );
 
     it(
-      `fetches invite token target (${targetModelMapping.modelName}) with subtype ${subtype}`,
+      `fetches invite token target (${targetModelMapping.modelName}) with invite type ${inviteType}`,
       function () {
         const targetModelEntityId = 'someId';
         const targetModelGri = gri({
@@ -101,7 +101,7 @@ describe('Unit | Model | token', function () {
         const model = this.subject();
         set(model, 'type', {
           inviteToken: {
-            subtype,
+            inviteType,
             [targetModelMapping.idFieldName]: targetModelEntityId,
           },
         });
