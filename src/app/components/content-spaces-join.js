@@ -9,7 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-
+import trimToken from 'onedata-gui-common/utils/trim-token';
+import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default Component.extend(I18n, {
@@ -24,13 +25,23 @@ export default Component.extend(I18n, {
    */
   token: undefined,
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  trimmedToken: computedPipe('token', trimToken),
+
   didInsertElement() {
     document.getElementById('join-space-token').focus();
   },
 
   actions: {
-    joinSpace(token) {
-      return this.get('spaceActions').joinSpace(token);
+    joinSpace() {
+      const {
+        spaceActions,
+        trimmedToken,
+      } = this.getProperties('spaceActions', 'trimmedToken');
+
+      return spaceActions.joinSpace(trimmedToken);
     },
   },
 });

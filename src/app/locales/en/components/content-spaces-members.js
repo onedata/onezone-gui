@@ -6,9 +6,11 @@ export default _.merge({}, privilegesAspectBase, {
     spaceManagement: 'Space management',
     dataManagement: 'Data management',
     transferManagement: 'Transfer management',
+    qosManagement: 'QOS management',
     userManagement: 'User management',
     groupManagement: 'Group management',
-    providerManagement: 'Provider management',
+    supportManagement: 'Support management',
+    harvesterManagement: 'Harvester management',
   },
   privileges: {
     space_view: 'View space',
@@ -32,14 +34,20 @@ export default _.merge({}, privilegesAspectBase, {
     space_schedule_eviction: 'Schedule eviction',
     space_cancel_eviction: 'Cancel eviction',
 
+    space_view_qos: 'View QOS',
+    space_manage_qos: 'Manage QOS',
+
     space_add_user: 'Add user',
     space_remove_user: 'Remove user',
 
     space_add_group: 'Add group',
     space_remove_group: 'Remove group',
 
-    space_add_provider: 'Add provider',
-    space_remove_provider: 'Remove provider',
+    space_add_support: 'Add support',
+    space_remove_support: 'Remove support',
+
+    space_add_harvester: 'Add harvester',
+    space_remove_harvester: 'Remove harvester',
   },
   noGroupsStart: 'This space has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',

@@ -1,0 +1,23 @@
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-transfers-content"
+  space=space
+  oneproviderId=oneproviderId
+  mapSelectorEnabled=false
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  as |container|
+}}
+  {{#container.header class="content-spaces-transfers-header"}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-space-transfers
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceEntityId=space.entityId
+      fileEntityId=fileId
+      tab=tab
+    }}
+  {{/container.body}}
+{{/oneprovider-view-container}}

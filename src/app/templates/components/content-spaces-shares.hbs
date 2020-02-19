@@ -1,0 +1,36 @@
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-shares-content"
+  space=space
+  oneproviderId=oneproviderId
+  mapSelectorEnabled=false
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  as |container|
+}}
+  {{#container.header class="content-spaces-shares-header"}}
+    {{#if shareId}}
+      <h1 class="normal-case with-back with-menu">
+        <span class="one-label">
+          {{#truncated-string}}
+            {{#link-to (query-params options=blankShareIdOptions) class="content-back-link"}}
+              {{one-icon icon="share" class="content-back-resource-icon"}}
+              {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+            {{/link-to}}
+            <span class="share-name resource-name">
+              {{name-conflict item=shareProxy.content tagName="span" class="one-label"}}
+            </span>
+          {{/truncated-string}}
+        </span>
+      </h1>
+    {{else}}
+      <h1>{{tt this "listHeader"}}</h1>
+    {{/if}}
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-space-shares
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceId=space.entityId
+      showShareList=(action "showShareList")
+    }}
+  {{/container.body}}
+{{/oneprovider-view-container}}

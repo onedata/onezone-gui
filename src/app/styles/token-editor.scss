@@ -26,6 +26,9 @@
   }
 
   .toggle-icon {
+    position: initial;
+    display: initial;
+    font-size: 1.2em;
     font-weight: bold;
     vertical-align: middle;
   }
@@ -111,7 +114,8 @@
     }
 
     .regionCaveat-field,
-    .asnCaveat-field {
+    .asnCaveat-field,
+    .serviceCaveat-field {
       &.is-enabled {
         padding-top: $padding-base-vertical;
       }

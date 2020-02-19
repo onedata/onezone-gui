@@ -10,7 +10,7 @@
 import { default as Service, inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import CreateTokenLinkAction from 'onezone-gui/utils/token-actions/create-token-link-action';
+import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';
 import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 
@@ -26,8 +26,8 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.tokenActions',
 
-  createCreateTokenLinkAction(context) {
-    return CreateTokenLinkAction.create({ ownerSource: this, context });
+  createOpenCreateTokenViewAction(context) {
+    return OpenCreateTokenViewAction.create({ ownerSource: this, context });
   },
 
   createCreateTokenAction(context) {
@@ -40,7 +40,7 @@ export default Service.extend(I18n, {
 
   createGlobalActions(context) {
     return [
-      this.createCreateTokenLinkAction(context),
+      this.createOpenCreateTokenViewAction(context),
       this.createCleanObsoleteTokensAction(context),
     ];
   },

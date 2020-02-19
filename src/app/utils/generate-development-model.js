@@ -12,7 +12,7 @@ import { camelize } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
-import { get, set } from '@ember/object';
+import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -20,6 +20,10 @@ import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
+import {
+  generateSpaceEntityId,
+  generateShareEntityId,
+} from 'onedata-gui-websocket-client/utils/development-model-common';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -31,10 +35,14 @@ const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
+const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
+  _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
+);
 
 const types = [
   'space',
   'group',
+  'share',
   'provider',
   'linkedAccount',
   'cluster',
@@ -50,6 +58,27 @@ const privileges = {
 };
 
 const perProviderSize = Math.pow(1024, 4);
+
+const providerClusterDefaultData = {
+  type: 'oneprovider',
+  hasViewPrivilege: true,
+  onepanelProxy: false,
+  info: {
+    creatorType: 'root',
+    creatorId: '',
+    creationTime: 1550156285,
+  },
+  workerVersion: {
+    release: '18.02.*',
+    gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
+    build: '176-g36e2f56',
+  },
+  onepanelVersion: {
+    release: '18.02.0-rc13',
+    gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
+    build: '161-g344737f',
+  },
+};
 
 /**
  * @export
@@ -109,16 +138,47 @@ export default function generateDevelopmentModel(store) {
       const providers = listRecords.provider.get('list');
       const spaces = listRecords.space.get('list');
       const clusters = listRecords.cluster.get('list');
-      return allFulfilled([providers, spaces, clusters])
-        .then(([providerList, spaceList, clusterList]) =>
+      const shares = listRecords.share.get('list');
+      return allFulfilled([providers, spaces, clusters, shares])
+        .then(([providerList, spaceList, clusterList, shareList]) =>
           allFulfilled(spaceList.map(space => {
             space.set('supportSizes', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
               _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
             ));
-            return createListRecord(store, 'provider', providerList).then(lr => {
-              space.set('providerList', lr);
-              return space.save();
+            return allFulfilled([
+              createListRecord(store, 'provider', providerList),
+              createListRecord(store, 'share', shareList),
+            ]).then(([providerLr, shareLr]) => {
+              const generalGriData = {
+                entityType: 'share',
+                entityId: generateShareEntityId(get(space, 'entityId')),
+                aspect: 'instance',
+              };
+              const privateGri = gri(Object.assign({
+                scope: 'private',
+              }, generalGriData));
+              const generalData = {
+                name: `Share for ${get(space, 'name')}`,
+                chosenProviderId: getProviderId(0),
+                chosenProviderVersion: '20.02.0-beta1',
+                fileType: 'dir',
+              };
+              return store.createRecord('share', Object.assign({
+                  id: privateGri,
+                }, generalData))
+                .save()
+                .then(share => {
+                  get(shareLr, 'list').pushObject(share);
+                  return shareLr.save();
+                })
+                .then(() => {
+                  setProperties(space, {
+                    providerList: providerLr,
+                    shareList: shareLr,
+                  });
+                  return space.save();
+                });
             });
           }))
           .then(() => allFulfilled(clusterList.map(cluster => {
@@ -252,23 +312,17 @@ function createGuiMessages(store) {
 }
 
 function createUserRecord(store, listRecords) {
-  return listRecords.space.get('list')
-    .then(list => list.get('length') > 0 ? list.get('firstObject ') : null)
-    .then(space => space && space.get('entityId'))
-    .then(defaultSpaceId => {
-      const userRecord = store.createRecord('user', {
-        id: store.userGri(USER_ID),
-        fullName: USERNAME,
-        basicAuthEnabled: true,
-        hasPassword: false,
-        username: USER_LOGIN,
-        defaultSpaceId,
-      });
-      Object.values(listRecords).forEach(lr =>
-        userRecord.set(camelize(lr.constructor.modelName), lr)
-      );
-      return userRecord.save();
-    });
+  const userRecord = store.createRecord('user', {
+    id: store.userGri(USER_ID),
+    fullName: USERNAME,
+    basicAuthEnabled: true,
+    hasPassword: false,
+    username: USER_LOGIN,
+  });
+  Object.values(listRecords).forEach(lr =>
+    userRecord.set(camelize(lr.constructor.modelName), lr)
+  );
+  return userRecord.save();
 }
 
 function createEntityRecords(store, type, names, additionalInfo) {
@@ -277,6 +331,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createProvidersRecords(store, additionalInfo);
     case 'space':
       return createSpacesRecords(store, additionalInfo);
+    case 'share':
+      return createSharesRecords(store, additionalInfo);
     case 'token':
       return createTokensRecords(store, additionalInfo);
     case 'group':
@@ -303,27 +359,68 @@ function createListRecord(store, type, records) {
   });
 }
 
+function getCoordinates(index) {
+  const sign = index % 2 ? -1 : 1;
+  if (index <= 2) {
+    return [
+      [50.065, 19.945],
+      [48.865, 2.349],
+      [38.737, -9.143],
+    ][index];
+  } else {
+    return [
+      ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) * sign,
+      (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
+    ];
+  }
+}
+
+function getProviderId(index) {
+  return `oneprovider-${index + 1}`;
+}
+
+function getProviderRecordId(index) {
+  return `provider.${getProviderId(index)}.instance:auto`;
+}
+
 function createProvidersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_PROVIDERS).map((index) => {
-    let sign = index % 2 ? -1 : 1;
-    const providerId = `oneprovider-${index + 1}`;
-    const id = `provider.${providerId}.instance:auto`;
+    const providerId = getProviderId(index);
+    const id = getProviderRecordId(index);
+    const [latitude, longitude] = getCoordinates(index);
     return store.createRecord('provider', {
       id,
       gri: id,
-      name: `Provider ${index}`,
-      latitude: ((180 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 90) *
-        sign,
-      longitude: (360 / (NUMBER_OF_PROVIDERS + 1)) * (index + 1) - 180,
-      online: [true, false][index % 2],
+      name: PROVIDER_NAMES[index],
+      latitude,
+      longitude,
+      online: index <= 1,
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));
 }
 
+function generateProviderClusterRecord(index) {
+  const providerId = getProviderId(index);
+  const providerClusterGri = clusterInstanceGri(providerId);
+  const providerRecordId = getProviderRecordId(index);
+  return Object.assign({
+    id: providerClusterGri,
+    gri: providerClusterGri,
+    name: PROVIDER_NAMES[index],
+    provider: providerRecordId,
+  }, providerClusterDefaultData);
+}
+
 function createSpacesRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SPACES).map((index) => {
     return store.createRecord('space', {
+      id: gri({
+        entityType: 'space',
+        entityId: generateSpaceEntityId(index),
+        aspect: 'instance',
+        scope: 'auto',
+      }),
       name: `Space ${index}`,
       scope: 'private',
       directMembership: true,
@@ -335,6 +432,11 @@ function createSpacesRecords(store) {
       },
     }).save();
   }));
+}
+
+// currently shares records are created separately for each space
+function createSharesRecords() {
+  return resolve([]);
 }
 
 function createTokensRecords(store) {
@@ -399,8 +501,6 @@ function createLinkedAccount(store) {
 
 function createClusterRecords(store) {
   const onezoneId = clusterInstanceGri('onezone');
-  const oneprovider1Id = clusterInstanceGri('oneprovider-1');
-  const oneprovider2Id = clusterInstanceGri('oneprovider-2');
   return allFulfilled([{
       id: onezoneId,
       gri: onezoneId,
@@ -424,54 +524,7 @@ function createClusterRecords(store) {
         build: '161-g344737f',
       },
     },
-    {
-      id: oneprovider1Id,
-      gri: oneprovider1Id,
-      type: 'oneprovider',
-      name: 'Cyfronet',
-      onepanelProxy: false,
-      provider: 'provider.oneprovider-1.instance:auto',
-      hasViewPrivilege: true,
-      info: {
-        creatorType: 'root',
-        creatorId: '',
-        creationTime: 1550156285,
-      },
-      workerVersion: {
-        release: '18.02.*',
-        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
-        build: '176-g36e2f56',
-      },
-      onepanelVersion: {
-        release: '18.02.0-rc13',
-        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
-        build: '161-g344737f',
-      },
-    },
-    {
-      id: oneprovider2Id,
-      gri: oneprovider2Id,
-      type: 'oneprovider',
-      name: 'PCSS',
-      onepanelProxy: true,
-      provider: 'provider.oneprovider-2.instance:auto',
-      hasViewPrivilege: false,
-      info: {
-        creatorType: 'root',
-        creatorId: '',
-        creationTime: 1550156285,
-      },
-      workerVersion: {
-        release: '19.02.0',
-        gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
-        build: '176-g36e2f56',
-      },
-      onepanelVersion: {
-        release: '18.02.0-rc13',
-        gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
-        build: '161-g344737f',
-      },
-    },
+    ..._.range(0, NUMBER_OF_PROVIDERS).map(i => generateProviderClusterRecord(i)),
   ].map(c => store.createRecord('cluster', c).save()));
 }
 

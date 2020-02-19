@@ -9,16 +9,18 @@
 
 import { inject as service } from '@ember/service';
 import Service from '@ember/service';
-import { reject } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 
 export default Service.extend({
   providerManager: service(),
   tokenManager: service(),
   currentUser: service(),
   spaceManager: service(),
+  shareManager: service(),
   groupManager: service(),
   clusterManager: service(),
   harvesterManager: service(),
+  uploadManager: service(),
 
   /**
    * @param {string} type plural type of tab, eg. providers
@@ -38,10 +40,17 @@ export default Service.extend({
         return this.get('tokenManager').getRecord(id);
       case 'spaces':
         return this.get('spaceManager').getRecord(id);
+      case 'shares':
+        return this.get('shareManager').getRecord(id);
       case 'groups':
         return this.get('groupManager').getRecord(id);
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
+      case 'uploads': {
+        const oneprovider = this.get('uploadManager.sidebarOneproviders')
+          .findBy('id', id);
+        return oneprovider ? resolve(oneprovider) : reject();
+      }
       default:
         return reject('No such model type: ' + type);
     }

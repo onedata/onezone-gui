@@ -1,0 +1,158 @@
+.oneprovider-view-container {
+  $map-trigger-width: 40px;
+  $map-trigger-margin-vert: 4px;
+
+  transform: translateZ(0);
+
+  > *:not(.oneprovider-view-container-inner) {
+    pointer-events: auto;
+  }
+
+  .content-header-section {
+    z-index: 1;
+  }
+
+  .provider-online .one-icon {
+    color: $color-one-success;
+  }
+  .provider-offline .one-icon {
+    color: $color-one-danger;
+  }
+  .one-tab-bar {
+    padding-right: $map-trigger-width;
+    
+    &.tabs-overflowing {
+      padding-right: 210px + $map-trigger-width;
+    }
+
+    &.with-map-selector {
+      .tab-bar-selector {
+        right: $map-trigger-width + $padding-small-horizontal;
+      }
+    }
+    
+    .tab-bar-selector {
+      z-index: 1;
+    }
+
+    .map-trigger {
+      position: absolute;
+      right: 0;
+      top: $map-trigger-margin-vert;
+      bottom: $map-trigger-margin-vert + 4px;
+      width: $map-trigger-width;
+  
+      &:hover, &.active {
+        border: 1px solid $main-border-color;
+      }
+  
+      &.active {
+        bottom: -1px;
+        border-bottom: 0;
+        background-color: $color-one-white;
+        z-index: 1;
+        .one-icon {
+          transform: translateY(-50%) translateX(-50%) translateY(-$map-trigger-margin-vert - 1px);
+        }
+      }
+  
+      &:hover {
+        background-color: $main-content-hover-background;
+      }
+    }
+
+    .map-selector {
+      position: fixed;
+      top: $content-header-row-height + $-one-tab-bar-height + $padding-base-vertical;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    @media(max-width: $screen-sm-max) {
+      .map-selector {
+        top: $content-header-row-mobile-height + $-one-tab-bar-height + $padding-base-vertical
+      }
+    }
+    
+    @media (max-width: $screen-xs-max) {
+      .map-selector {
+        top: $-one-tab-bar-height + $padding-base-vertical - $content-col-padding;
+      }
+    }
+
+    .tab-bar-li .inline-icon-container {
+      // a hack to make provider icon to be more to the left and everything
+      // to be more centered - because the icon has internal padding
+      margin-left: -10px;
+    }
+  }
+  
+  .tab-bar-selector {
+    @media (max-width: $screen-xs-max) {
+      left: 0;
+      width: auto;
+    }
+  }
+  
+  .tab-bar-ul-container-space {
+    height: 44px;
+  }
+  
+  .content-info {
+    &.preserve-header {
+      .world-map {
+        top: $content-header-row-mobile-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
+        @media (min-width: $screen-md-min) {
+          top: $content-header-row-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
+        }
+        @media (max-width: $screen-xs-max) {
+          top: 0;
+        }
+      }
+    }
+  }
+  
+  .current-oneprovider-bar {
+    position: relative;
+    height: 44px;
+    line-height: 44px;
+    &.current-oneprovider-bar-multi {
+      .current-oneprovider-name {
+        max-width: calc(100% - 380px);
+      }
+      @media (max-width: 900px) {
+        .current-oneprovider-bar-info {
+          display: none;
+        }
+        .current-oneprovider-name {
+          max-width: calc(100% - 270px);
+        }
+      }
+    }
+    .inline-icon-container-provider {
+      width: 22px;
+      margin-left: -2px;
+    }
+    .current-oneprovider-name {
+      display: inline-block;
+      font-weight: bold;
+      max-width: calc(100% - 180px);
+      vertical-align: middle;
+    }
+    .choose-oneprovider-link {
+      margin-left: 4px;
+    }
+    .collapsed-selector-hint-trigger {
+      margin-left: 6px;
+    }
+    @media (max-width: 900px) {
+      .current-oneprovider-bar-info {
+        display: inline;
+      }
+      .current-oneprovider-name {
+        max-width: calc(100% - 200px);
+      }
+    }
+  }
+}

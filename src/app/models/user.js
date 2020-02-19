@@ -8,12 +8,10 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { inject } from '@ember/service';
-import { camelize } from '@ember/string';
 import { alias } from '@ember/object/computed';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Model.extend(GraphSingleModelMixin, {
   onedataGraph: inject(),
@@ -23,15 +21,6 @@ export default Model.extend(GraphSingleModelMixin, {
   username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
-
-  /**
-   * Entity ID of default space ID for user.
-   * To change it, use `setDefaultSpaceId` method - record updates will not work.
-   * @type {DS.attr}
-   */
-  defaultSpaceId: attr('string'),
-
-  defaultProviderId: attr('string'),
 
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
@@ -44,57 +33,6 @@ export default Model.extend(GraphSingleModelMixin, {
   name: alias('fullName'),
 
   //#region Non-store User operations
-
-  getDefaultRelation(type) {
-    const {
-      store,
-      entityId,
-    } = this.getProperties('store', 'entityId');
-    const defaultRelationId = this.get(camelize(`default-${type}-id`));
-    return store.findRecord('space', gri({
-      entityType: 'space',
-      entityId: defaultRelationId,
-      aspect: 'instance',
-      authHint: ['asUser', entityId],
-    }));
-  },
-
-  getDefaultSpace() {
-    return this.getDefaultRelation('space');
-  },
-
-  getDefaultProvider() {
-    return this.getDefaultRelation('provider');
-  },
-
-  setDefaultRelation(type, relationId) {
-    const operation = relationId ? 'create' : 'delete';
-    const entityId = this.get('entityId');
-    return this.get('onedataGraph')
-      .request({
-        gri: gri({
-          entityType: 'user',
-          entityId,
-          aspect: `default_${type}`,
-        }),
-        operation,
-        data: {
-          [camelize(`${type}-id`)]: relationId,
-        },
-        subscribe: false,
-      })
-      .then(() => {
-        return this.reload(true);
-      });
-  },
-
-  setDefaultSpaceId(spaceId) {
-    this.setDefaultRelation('space', spaceId);
-  },
-
-  setDefaultProviderId(providerId) {
-    this.setDefaultRelation('provider', providerId);
-  },
 
   leaveSpace(spaceId) {
     return this._leaveRelation('space', spaceId)
@@ -140,7 +78,6 @@ export default Model.extend(GraphSingleModelMixin, {
   },
 
   /**
-   * 
    * @param {*} entityType 
    * @param {*} token 
    * @returns {Object} joined record

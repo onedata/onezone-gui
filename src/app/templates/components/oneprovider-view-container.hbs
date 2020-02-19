@@ -1,0 +1,94 @@
+{{#promise-proxy-container proxy=initialProvidersListProxy}}
+  {{#if hasSupport}}
+    <div class="row content-header-section">
+      {{yield (hash
+        header=(component "oneprovider-view-container/container-header")
+      )}}
+      <div class="row row-content-tab-bar">
+        {{#if (and (not media.isMobile) isTabBarCollapsed)}}
+          <div class={{concat-classes "current-oneprovider-bar" (if multiOneproviders "current-oneprovider-bar-multi")}}>
+            <div class="current-oneprovider-bar-left-info">
+              <span class="current-oneprovider-bar-info">
+                {{tt this "currentOneproviderInfo"}}
+              </span>
+              <div class="inline-icon-container inline-icon-container-provider">
+                {{one-icon icon="provider"}}
+              </div>
+              {{#truncated-string class="current-oneprovider-name"}}
+                {{selectedProviderItem.name}}
+              {{/truncated-string}}{{#if multiOneproviders}}.{{/if}}
+              {{#if multiOneproviders}}
+                <a {{action (mut isTabBarCollapsed) false}} class="choose-oneprovider-link black clickable">
+                  {{tt this "chooseOneprovider"}}
+                </a>
+              {{/if}}
+              {{one-icon
+                icon="sign-question-rounded"
+                class=(concat-classes collapsedSelectorHintTriggerClass "collapsed-selector-hint-trigger" "vertical-align-middle clickable")
+              }}
+              {{#one-switchable-popover-modal
+                class="collapsed-selector-hint"
+                triggersConfiguration=hintTriggersConfiguration
+                as |popmodal|
+              }}
+                <h1>{{tt this (concat "collapsedSelectorHint." collapsedSelectorState ".header")}}</h1>
+                <p>{{tt this "collapsedSelectorHint.basicInfo"}}</p>
+                <p>{{tt this (concat "collapsedSelectorHint." collapsedSelectorState ".extInfo")}}</p>
+                <div class="btn-toolbar text-right visible-xs-block">
+                  {{#bs-button type="default" onClick=popmodal.close}}
+                    {{tt this "collapsedSelectorHint.close"}}
+                  {{/bs-button}}
+                </div>
+              {{/one-switchable-popover-modal}}
+            </div>
+          </div>
+        {{else}}
+          {{#one-tab-bar
+            class=(concat-classes "space-providers-tab-bar" tabBarClass (if mapSelectorEnabled "with-map-selector"))
+            items=providerItems
+            selectedItem=selectedProviderItem
+            selectDefaultOnInit=false
+            selectedItemChanged=(action "selectedProviderChanged")
+          }}
+            {{#if mapSelectorEnabled}}
+              {{oneproviders-map-selector
+                isExpanded=isMapExpanded
+                oneproviders=providers
+                selectedOneprovider=selectedProvider
+                onToggleExpand=(action "onToggleExpandMap")
+                onOneproviderSelected=(action "selectedProviderChanged")
+              }}
+            {{/if}}
+          {{/one-tab-bar}}
+        {{/if}}
+      </div>
+    </div>
+    <div
+      class={{concat-classes "row absolute-flex-content-child-stretch oneprovider-view-container-inner" contentContainerClass}}
+    >
+      {{#if showAllOfflineInfo}}
+        {{content-info
+          header=(tt this "allOneprovidersOffline")
+          imagePath=(root-url "assets/images/data-error-no-providers.svg")
+          class="preserve-header scroll-breakpoint-600"
+        }}
+      {{else}}
+        {{#if selectedProvider.online}}
+          {{yield (hash
+            body=(component "oneprovider-view-container/container-body")
+            contentIframeBaseUrl=contentIframeBaseUrl
+            selectedProvider=selectedProvider
+          )}}
+        {{else}}
+          {{content-info
+            header=(tt this "oneproviderOffline")
+            imagePath=(root-url "assets/images/no-connection.svg")
+            class="preserve-header scroll-breakpoint-600"
+          }}
+        {{/if}}
+      {{/if}}
+    </div>
+  {{else}}
+    {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
+  {{/if}}
+{{/promise-proxy-container}}

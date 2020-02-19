@@ -22,6 +22,7 @@
             selectedSpace=space
             showSelectedSpaceSupportSize=true
             showSupportedSpacesCount=false
+            providerActions=providerActions
             providerClickAction=(action "providerClicked")
           }}
         </div>
@@ -45,7 +46,6 @@
                             active=(eq provider selectedProvider)
                             renderDrop=(eq provider selectedProvider)
                             circleColor=(get providersColors provider.entityId)
-                            hint=provider.name
                           }}
                         {{/link-to}}
                       {{/position.point}}
@@ -70,15 +70,16 @@
       </div>
     </div>
     
-  {{else}}
-    {{content-info
-      header=(tt this "noSupport.header")
-      text=(tt this "noSupport.text")
-      imagePath=(root-url "assets/images/space-get-support.svg")
-      buttonLabel=(tt this "addStorage")
-      class="no-support scroll-breakpoint-600"
-      buttonAction=(action "openAddStorage")
+    {{cease-oneprovider-support-modal
+      opened=ceaseModalOpened
+      provider=ceaseModalProvider
+      space=space
+      close=(action (mut ceaseModalOpened) false)
+      onHidden=(action (mut ceaseModalProvider) null)
     }}
+
+  {{else}}
+    {{content-spaces-no-support}}
   {{/if}}
 
 {{/promise-proxy-container}}

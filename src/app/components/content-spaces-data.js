@@ -1,11 +1,5 @@
 /**
- * TODO: Prototype of go to first online Onprovider that supports this space
- * Need to implement:
- * - disable item in sidebar when there is no Oneprovider supporting
- * - disable/show error sign when no Oneprovider is online
- * - or for above: make views/graphics that are shown
- * - external link icon?
- * - write tests
+ * Container for remote file browser of single space with Oneprovider selector
  * 
  * @module components/content-spaces-data
  * @author Jakub Liput
@@ -14,47 +8,35 @@
  */
 
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { get } from '@ember/object';
 
-export default Component.extend(
-  createDataProxyMixin('provider'), {
-    router: service(),
+export default Component.extend(I18n, {
+  classNames: [
+    'oneprovider-view-container',
+    'content-spaces-data',
+    'absolute-flex-content',
+    'no-pointer-events',
+  ],
 
-    /**
-     * @virtual
-     * @type {Space}
-     */
-    space: undefined,
+  navigationState: service(),
 
-    init() {
-      this._super(...arguments);
-      this.updateProviderProxy();
+  /**
+   * @type {string}
+   */
+  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentSpacesData',
+
+  actions: {
+    oneproviderIdChanged(oneproviderId) {
+      this.get('navigationState').setAspectOptions({
+        oneproviderId,
+      });
     },
-
-    /**
-     * @override
-     */
-    fetchProvider() {
-      return this.get('space.providerList')
-        .then(providerList =>
-          get(providerList, 'list').then(list =>
-            list.find(provider => get(provider, 'online'))
-          )
-        );
-    },
-
-    actions: {
-      transitionAfterFailure() {
-        const {
-          router,
-          space,
-        } = this.getProperties('router', 'space');
-        router.transitionTo(
-          'onedata.sidebar.content.index',
-          space,
-        );
-      },
-    },
-  });
+  },
+});

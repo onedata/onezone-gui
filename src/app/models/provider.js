@@ -13,14 +13,11 @@ import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-
-export const providerStatusList = ['online', 'offline'];
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
-  // TODO: add array transform
-  // urls: attr('array'),
-  // clientName: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),
   latitude: attr('number', { defaultValue: 0 }),
   online: attr('boolean'),
@@ -29,8 +26,10 @@ export default Model.extend(GraphSingleModelMixin, {
 
   spaceList: belongsTo('space-list'),
 
-  isStatusValid: computed('status', function () {
-    return providerStatusList.includes(this.get('status'));
+  onezoneHostedBaseUrl: computed('cluster.id', function onezoneHostedBaseUrl() {
+    const clusterId =
+      parseGri(this.belongsTo('cluster').id()).entityId;
+    return getOneproviderPath(clusterId);
   }),
 
   //#region Aliases and backward-compatibility
