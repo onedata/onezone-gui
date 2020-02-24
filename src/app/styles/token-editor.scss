@@ -3,6 +3,9 @@
   .caveat-group {
     > .field-component > .fields-group-collapse {
       display: flex;
+      &.collapse:not(.in) {
+        display: none;
+      }
     }
     .static-text-field-renderer {
       align-self: center;
@@ -82,7 +85,8 @@
 
   .regionCaveat-field,
   .asnCaveat-field,
-  .serviceCaveat-field {
+  .consumerCaveat-field,
+  .readonlyCaveat-field {
     &::before {
       content: '';
       display: block;
@@ -115,7 +119,7 @@
 
     .regionCaveat-field,
     .asnCaveat-field,
-    .serviceCaveat-field {
+    .consumerCaveat-field {
       &.is-enabled {
         padding-top: $padding-base-vertical;
       }

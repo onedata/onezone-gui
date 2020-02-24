@@ -10,6 +10,9 @@ export default {
           access: {
             label: 'access',
           },
+          identity: {
+            label: 'identity',
+          },
           invite: {
             label: 'invitation',
           },
@@ -194,33 +197,33 @@ export default {
           text: 'This token can be used by any consumer',
         },
       },
-      accessOnlyCaveats: {
-        serviceCaveat: {
-          serviceEnabled: {
-            label: 'Service',
-          },
-          serviceDisabledText: {
-            text: 'This token can be used to interact with any service',
-          },
+      serviceCaveat: {
+        serviceEnabled: {
+          label: 'Service',
         },
-        interfaceCaveat: {
-          interfaceEnabled: {
-            label: 'Interface',
-          },
-          interface: {
-            options: {
-              rest: {
-                label: 'REST',
-              },
-              oneclient: {
-                label: 'Oneclient',
-              },
+        serviceDisabledText: {
+          text: 'This token can be used to interact with any service',
+        },
+      },
+      interfaceCaveat: {
+        interfaceEnabled: {
+          label: 'Interface',
+        },
+        interface: {
+          options: {
+            rest: {
+              label: 'REST',
+            },
+            oneclient: {
+              label: 'Oneclient',
             },
           },
-          interfaceDisabledText: {
-            text: 'This token can be used with REST and Oneclient',
-          },
         },
+        interfaceDisabledText: {
+          text: 'This token can be used with REST and Oneclient',
+        },
+      },
+      dataAccessCaveats: {
         readonlyCaveat: {
           readonlyEnabled: {
             label: 'Read only',

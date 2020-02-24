@@ -149,6 +149,7 @@ const regions = [
 ];
 
 describe('Integration | Component | token editor', function () {
+  this.timeout(5000);
   setupComponentTest('token-editor', {
     integration: true,
   });
@@ -233,6 +234,8 @@ describe('Integration | Component | token editor', function () {
         .to.equal('Type:');
       expect(this.$('.type-field .option-access').text().trim())
         .to.equal('access');
+      expect(this.$('.type-field .option-identity').text().trim())
+        .to.equal('identity');
       expect(this.$('.type-field .option-invite').text().trim())
         .to.equal('invitation');
     });
@@ -249,25 +252,39 @@ describe('Integration | Component | token editor', function () {
     });
   });
 
-  it('notifies about "type" field change', function () {
-    this.render(hbs `{{token-editor onChange=(action "change")}}`);
+  [
+    'identity',
+    'invite',
+  ].forEach(type => {
+    it(`notifies about "type" field change to ${type}`, function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-    return wait()
-      .then(() => click('.type-field .option-invite'))
-      .then(() => {
-        expectToHaveValue(this, 'type', 'invite');
-        expectToBeValid(this, 'type');
-      });
+      return wait()
+        .then(() => click(`.type-field .option-${type}`))
+        .then(() => {
+          expectToHaveValue(this, 'type', type);
+          expectToBeValid(this, 'type');
+        });
+    });
   });
 
-  it(
-    'does not show invitation related basic fields if "type" is "access"',
-    function () {
-      this.render(hbs `{{token-editor}}`);
+  [
+    'access',
+    'identity',
+  ].forEach(type => {
+    it(
+      'does not show invitation related basic fields if "type" is "access"',
+      function () {
+        this.render(hbs `{{token-editor}}`);
 
-      expect(this.$('.inviteDetails-collapse')).to.not.have.class('in');
-    }
-  );
+        return wait()
+          .then(() => click(`.type-field .option-${type}`))
+          .then(() =>
+            expect(this.$('.inviteDetails-collapse')).to.not.have.class('in')
+          );
+      }
+    );
+  });
 
   it(
     'shows invitation related basic fields only if "type" is "invite"',
@@ -482,7 +499,6 @@ describe('Integration | Component | token editor', function () {
         );
       }
     } else {
-
       it(
         `does not show invite target details when "inviteType" field is "${label}"`,
         function () {
@@ -1359,11 +1375,9 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'has service, interface, readonly, path and objectId caveats under accessOnlyCaveats',
+    'has readonly, path and objectId caveats under dataAccessCaveats',
     function () {
       const caveatsToCheck = [
-        'service',
-        'interface',
         'readonly',
         'path',
         'objectId',
@@ -1375,37 +1389,56 @@ describe('Integration | Component | token editor', function () {
         .then(() => {
           caveatsToCheck.forEach(caveatName => {
             const caveatSelector =
-              `.accessOnlyCaveats-field .${caveatName}Caveat-field.caveat-group`;
+              `.dataAccessCaveats-field .${caveatName}Caveat-field.caveat-group`;
             expect(this.$(caveatSelector)).to.exist;
           });
-          expect(this.$('.accessOnlyCaveats-field .caveat-group'))
+          expect(this.$('.dataAccessCaveats-field .caveat-group'))
             .to.have.length(caveatsToCheck.length);
         });
     }
   );
 
   it(
-    'shows access only caveats when token type is changed to access',
+    'shows access token caveats when token type is changed to access',
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       return wait()
         .then(() => click('.type-field .option-access'))
         .then(() => {
-          expect(this.$('.accessOnlyCaveats-collapse')).to.have.class('in');
+          expect(this.$('.serviceCaveat-collapse')).to.have.class('in');
+          expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
+          expect(this.$('.dataAccessCaveats-collapse')).to.have.class('in');
         });
     }
   );
 
   it(
-    'hides access only caveats when token type is changed to invitation',
+    'shows indentity token caveats when token type is changed to identity',
+    function () {
+      this.render(hbs `{{token-editor expandCaveats=true}}`);
+
+      return wait()
+        .then(() => click('.type-field .option-identity'))
+        .then(() => {
+          expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
+          expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
+          expect(this.$('.dataAccessCaveats-collapse')).to.not.have.class('in');
+        });
+    }
+  );
+
+  it(
+    'shows invite token caveats when token type is changed to invite',
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
         .then(() => {
-          expect(this.$('.accessOnlyCaveats-collapse')).to.not.have.class('in');
+          expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
+          expect(this.$('.interfaceCaveat-collapse')).to.not.have.class('in');
+          expect(this.$('.dataAccessCaveats-collapse')).to.not.have.class('in');
         });
     }
   );
@@ -1421,8 +1454,15 @@ describe('Integration | Component | token editor', function () {
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
         )
+        .then(() => toggleCaveat('path'))
+        .then(() =>
+          click(getFieldElement(this, 'path').find('.add-field-button')[0])
+        )
         .then(() => click('.type-field .option-invite'))
-        .then(() => expectToBeValid(this, 'objectId'));
+        .then(() => {
+          expectToBeValid(this, 'objectId');
+          expectToBeValid(this, 'path');
+        });
     }
   );
 
@@ -1464,7 +1504,6 @@ describe('Integration | Component | token editor', function () {
   it(
     'passess token raw model via injected onSubmit on submit click (access token example with all caveats)',
     function () {
-      this.timeout(4000);
       const submitSpy = sinon.spy();
       this.on('submit', submitSpy);
       this.render(
@@ -1702,9 +1741,7 @@ const caveatsWithAllowDenyTags = [
   'country',
 ];
 
-const accessOnlyCaveats = [
-  'service',
-  'interface',
+const dataAccessCaveats = [
   'readonly',
   'path',
   'objectId',
@@ -1739,16 +1776,16 @@ function expectToBeInvalid(testCase, fieldName) {
 }
 
 function caveatEnabledFieldPath(caveatName) {
-  if (accessOnlyCaveats.includes(caveatName)) {
-    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatName}Enabled`;
+  if (dataAccessCaveats.includes(caveatName)) {
+    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatName}Enabled`;
   } else {
     return `caveats.${caveatName}Caveat.${caveatName}Enabled`;
   }
 }
 
 function caveatValueFieldPath(caveatName) {
-  if (accessOnlyCaveats.includes(caveatName)) {
-    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatName}`;
+  if (dataAccessCaveats.includes(caveatName)) {
+    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatName}`;
   } else {
     return `caveats.${caveatName}Caveat.${caveatName}`;
   }
@@ -1759,8 +1796,8 @@ function caveatValueValidationPath(caveatName) {
   if (caveatsWithAllowDenyTags.includes(caveatName)) {
     caveatPath = `${caveatName}.${caveatName}List`;
   }
-  if (accessOnlyCaveats.includes(caveatName)) {
-    return `caveats.accessOnlyCaveats.${caveatName}Caveat.${caveatPath}`;
+  if (dataAccessCaveats.includes(caveatName)) {
+    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatPath}`;
   } else {
     return `caveats.${caveatName}Caveat.${caveatPath}`;
   }

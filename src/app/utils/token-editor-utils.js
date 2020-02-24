@@ -31,10 +31,14 @@ export function editorDataToToken(editorData, currentUser) {
   const {
     expireCaveat,
     consumerCaveat,
+    interfaceCaveat,
+    serviceCaveat,
   } = getProperties(
     caveats,
     'expireCaveat',
     'consumerCaveat',
+    'interfaceCaveat',
+    'serviceCaveat'
   );
 
   if (name) {
@@ -147,20 +151,27 @@ export function editorDataToToken(editorData, currentUser) {
       });
     }
   }
+  if (['identity', 'access'].includes(type)) {
+    if (interfaceCaveat && get(interfaceCaveat, 'interfaceEnabled')) {
+      const value = get(interfaceCaveat, 'interface');
+      if (value) {
+        caveatsData.push({
+          type: 'interface',
+          interface: value,
+        });
+      }
+    }
+  }
   if (type === 'access') {
     const {
-      interfaceCaveat,
       readonlyCaveat,
       pathCaveat,
       objectIdCaveat,
-      serviceCaveat,
     } = getProperties(
-      get(caveats, 'accessOnlyCaveats') || {},
-      'interfaceCaveat',
+      get(caveats, 'dataAccessCaveats') || {},
       'readonlyCaveat',
       'pathCaveat',
-      'objectIdCaveat',
-      'serviceCaveat'
+      'objectIdCaveat'
     );
 
     if (serviceCaveat && get(serviceCaveat, 'serviceEnabled')) {
@@ -184,15 +195,6 @@ export function editorDataToToken(editorData, currentUser) {
         caveatsData.push({
           type: 'service',
           whitelist,
-        });
-      }
-    }
-    if (interfaceCaveat && get(interfaceCaveat, 'interfaceEnabled')) {
-      const value = get(interfaceCaveat, 'interface');
-      if (value) {
-        caveatsData.push({
-          type: 'interface',
-          interface: value,
         });
       }
     }

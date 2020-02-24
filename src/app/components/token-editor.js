@@ -212,6 +212,7 @@ export default Component.extend(I18n, {
             name: 'type',
             options: [
               { value: 'access' },
+              { value: 'identity' },
               { value: 'invite' },
             ],
             defaultValue: 'access',
@@ -502,13 +503,13 @@ export default Component.extend(I18n, {
           asnCaveatGroup,
           ipCaveatGroup,
           consumerCaveatGroup,
+          serviceCaveatGroup,
+          interfaceCaveatGroup,
           FormFieldsGroup.extend({
             isExpanded: equal('valuesSource.basic.type', raw('access')),
           }).create({
-            name: 'accessOnlyCaveats',
+            name: 'dataAccessCaveats',
             fields: [
-              serviceCaveatGroup,
-              interfaceCaveatGroup,
               readonlyCaveatGroup,
               pathCaveatGroup,
               objectIdCaveatGroup,
@@ -905,7 +906,9 @@ export default Component.extend(I18n, {
   }),
 
   serviceCaveatGroup: computed(function serviceCaveatGroup() {
-    return CaveatFormGroup.create({
+    return CaveatFormGroup.extend({
+      isExpanded: equal('valuesSource.basic.type', raw('access')),
+    }).create({
       name: 'serviceCaveat',
       fields: [
         CaveatGroupToggle.create({ name: 'serviceEnabled' }),
@@ -956,7 +959,9 @@ export default Component.extend(I18n, {
   }),
 
   interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
-    return CaveatFormGroup.create({
+    return CaveatFormGroup.extend({
+      isExpanded: not(equal('valuesSource.basic.type', raw('invite'))),
+    }).create({
       name: 'interfaceCaveat',
       fields: [
         CaveatGroupToggle.create({
@@ -964,7 +969,7 @@ export default Component.extend(I18n, {
         }),
         RadioField.extend({
           isVisible: reads(
-            'valuesSource.caveats.accessOnlyCaveats.interfaceCaveat.interfaceEnabled'
+            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
           ),
         }).create({
           name: 'interface',
@@ -976,7 +981,7 @@ export default Component.extend(I18n, {
         }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.accessOnlyCaveats.interfaceCaveat.interfaceEnabled'
+            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
           ),
         }).create({
           name: 'interfaceDisabledText',
@@ -992,12 +997,12 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'readonlyEnabled' }),
         StaticTextField.extend({
           isVisible: reads(
-            'valuesSource.caveats.accessOnlyCaveats.readonlyCaveat.readonlyEnabled'
+            'valuesSource.caveats.dataAccessCaveats.readonlyCaveat.readonlyEnabled'
           ),
         }).create({ name: 'readonlyEnabledText' }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.accessOnlyCaveats.readonlyCaveat.readonlyEnabled'
+            'valuesSource.caveats.dataAccessCaveats.readonlyCaveat.readonlyEnabled'
           ),
         }).create({ name: 'readonlyDisabledText' }),
       ],
@@ -1064,7 +1069,7 @@ export default Component.extend(I18n, {
         }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.accessOnlyCaveats.pathCaveat.pathEnabled'
+            'valuesSource.caveats.dataAccessCaveats.pathCaveat.pathEnabled'
           ),
         }).create({ name: 'pathDisabledText' }),
       ],
@@ -1078,7 +1083,7 @@ export default Component.extend(I18n, {
         CaveatGroupToggle.create({ name: 'objectIdEnabled' }),
         FormFieldsCollectionGroup.extend({
           isVisible: reads(
-            'valuesSource.caveats.accessOnlyCaveats.objectIdCaveat.objectIdEnabled'
+            'valuesSource.caveats.dataAccessCaveats.objectIdCaveat.objectIdEnabled'
           ),
           fieldFactoryMethod(createdFieldsCounter) {
             return TextField.create({
@@ -1091,7 +1096,7 @@ export default Component.extend(I18n, {
         }),
         StaticTextField.extend({
           isVisible: not(
-            'valuesSource.caveats.accessOnlyCaveats.objectIdCaveat.objectIdEnabled'
+            'valuesSource.caveats.dataAccessCaveats.objectIdCaveat.objectIdEnabled'
           ),
         }).create({ name: 'objectIdDisabledText' }),
       ],

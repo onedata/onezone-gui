@@ -285,6 +285,7 @@ describe('Unit | Utility | token editor utils', function () {
 
     [
       'invite',
+      'identity',
       'access',
     ].forEach(type => {
       it(
@@ -305,13 +306,12 @@ describe('Unit | Utility | token editor utils', function () {
               generateCaveatEntry('country', false, {
                 countryType: 'whitelist',
                 countryList: ['PL'],
-              }), {
-                accessOnlyCaveats: Object.assign(
-                  generateCaveatEntry('service', false, [{
-                    model: 'service',
-                    id: 'test',
-                  }]),
-                  generateCaveatEntry('interface', false, 'rest'),
+              }), generateCaveatEntry('service', false, [{
+                model: 'service',
+                id: 'test',
+              }]),
+              generateCaveatEntry('interface', false, 'rest'), {
+                dataAccessCaveats: Object.assign(
                   generateCaveatEntry('readonly', false),
                   generateCaveatEntry('path', false, {
                     pathEntry0: {
@@ -349,10 +349,10 @@ describe('Unit | Utility | token editor utils', function () {
               generateCaveatEntry('country', true, {
                 countryType: undefined,
                 countryList: [],
-              }), {
-                accessOnlyCaveats: Object.assign(
-                  generateCaveatEntry('service', true, []),
-                  generateCaveatEntry('interface', true),
+              }),
+              generateCaveatEntry('service', true, []),
+              generateCaveatEntry('interface', true), {
+                dataAccessCaveats: Object.assign(
                   generateCaveatEntry('path', true, {
                     __fieldsValueNames: [],
                   }),
@@ -462,23 +462,26 @@ describe('Unit | Utility | token editor utils', function () {
       );
     });
 
-    it('does not convert service caveat, when token is not of type "access"', function () {
-      const result = editorDataToToken({
-        basic: {
-          type: 'invite',
-        },
-        caveats: {
-          accessOnlyCaveats: generateCaveatEntry('service', true, [{
+    [
+      'identity',
+      'invite',
+    ].forEach(type => {
+      it(`does not convert service caveat, when token is of type "${type}"`, function () {
+        const result = editorDataToToken({
+          basic: {
+            type,
+          },
+          caveats: generateCaveatEntry('service', true, [{
             model: 'service',
             id: 'test',
           }]),
-        },
-      });
+        });
 
-      expect(result).to.not.have.property('caveats');
+        expect(result).to.not.have.property('caveats');
+      });
     });
 
-    it('converts service caveat, when token is not of type "access"', function () {
+    it('converts service caveat, when token is of type "access"', function () {
       const selectedValues = _.flatten(['service', 'serviceOnepanel']
         .map(model => ([{
           model,
@@ -505,9 +508,7 @@ describe('Unit | Utility | token editor utils', function () {
         basic: {
           type: 'access',
         },
-        caveats: {
-          accessOnlyCaveats: generateCaveatEntry('service', true, selectedValues),
-        },
+        caveats: generateCaveatEntry('service', true, selectedValues),
       });
 
       expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -526,39 +527,40 @@ describe('Unit | Utility | token editor utils', function () {
     });
 
     it(
-      'does not convert interface caveat, when token is not of type "access"',
+      'does not convert interface caveat, when token is of type "invite"',
       function () {
         const result = editorDataToToken({
           basic: {
             type: 'invite',
           },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('interface', true, 'rest'),
-          },
+          caveats: generateCaveatEntry('interface', true, 'rest'),
         });
 
         expect(result).to.not.have.property('caveats');
       }
     );
 
-    it(
-      'converts interface caveat, when token is of type "access"',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'access',
-          },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('interface', true, 'rest'),
-          },
-        });
+    [
+      'access',
+      'identity',
+    ].forEach(type => {
+      it(
+        `converts interface caveat, when token is of type "${type}"`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: generateCaveatEntry('interface', true, 'rest'),
+          });
 
-        expect(result).to.have.deep.nested.property('caveats[0]', {
-          type: 'interface',
-          interface: 'rest',
-        });
-      }
-    );
+          expect(result).to.have.deep.nested.property('caveats[0]', {
+            type: 'interface',
+            interface: 'rest',
+          });
+        }
+      );
+    });
 
     it(
       'does not convert interface caveat, when caveat is empty and token is of type "access"',
@@ -567,25 +569,7 @@ describe('Unit | Utility | token editor utils', function () {
           basic: {
             type: 'access',
           },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('interface', true, undefined),
-          },
-        });
-
-        expect(result).to.not.have.property('caveats');
-      }
-    );
-
-    it(
-      'does not convert readonly caveat, when token is not of type "access"',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'invite',
-          },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('readonly', true),
-          },
+          caveats: generateCaveatEntry('interface', true, undefined),
         });
 
         expect(result).to.not.have.property('caveats');
@@ -600,7 +584,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('readonly', true),
+            dataAccessCaveats: generateCaveatEntry('readonly', true),
           },
         });
 
@@ -610,27 +594,67 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
 
-    it(
-      'does not convert path caveat, when token is not of type "access"',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'invite',
-          },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('path', true, {
-              pathEntry0: {
-                pathSpace: { entityId: 's1' },
-                pathString: '/abc/def',
-              },
-              __fieldsValueNames: ['pathEntry0'],
-            }),
-          },
-        });
+    [
+      'invite',
+      'identity',
+    ].forEach(type => {
+      it(
+        `does not convert readonly caveat, when token is not of type "${type}"`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: {
+              dataAccessCaveats: generateCaveatEntry('readonly', true),
+            },
+          });
 
-        expect(result).to.not.have.property('caveats');
-      }
-    );
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+
+      it(
+        `does not convert path caveat, when token is not of type "${type}"`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: {
+              dataAccessCaveats: generateCaveatEntry('path', true, {
+                pathEntry0: {
+                  pathSpace: { entityId: 's1' },
+                  pathString: '/abc/def',
+                },
+                __fieldsValueNames: ['pathEntry0'],
+              }),
+            },
+          });
+
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+
+      it(
+        `does not convert objectId caveat, when token is not of type "${type}"`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type,
+            },
+            caveats: {
+              dataAccessCaveats: generateCaveatEntry('objectId', true, {
+                objectIdEntry0: '1234567890',
+                __fieldsValueNames: ['objectIdEntry0'],
+              }),
+            },
+          });
+
+          expect(result).to.not.have.property('caveats');
+        }
+      );
+    });
 
     it(
       'converts path caveat, when token is of type "access"',
@@ -640,7 +664,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('path', true, {
+            dataAccessCaveats: generateCaveatEntry('path', true, {
               pathEntry0: {
                 pathSpace: { entityId: 's1' },
                 pathString: '/abc/def',
@@ -672,7 +696,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('path', true, {
+            dataAccessCaveats: generateCaveatEntry('path', true, {
               pathEntry0: {
                 pathSpace: undefined,
                 pathString: '/abc/def',
@@ -703,27 +727,8 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('path', true, {
+            dataAccessCaveats: generateCaveatEntry('path', true, {
               __fieldsValueNames: [],
-            }),
-          },
-        });
-
-        expect(result).to.not.have.property('caveats');
-      }
-    );
-
-    it(
-      'does not convert objectId caveat, when token is not of type "access"',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'invite',
-          },
-          caveats: {
-            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
-              objectIdEntry0: '1234567890',
-              __fieldsValueNames: ['objectIdEntry0'],
             }),
           },
         });
@@ -740,7 +745,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
+            dataAccessCaveats: generateCaveatEntry('objectId', true, {
               objectIdEntry0: '1234567890',
               objectIdEntry1: '0123456789',
               __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
@@ -766,7 +771,7 @@ describe('Unit | Utility | token editor utils', function () {
             type: 'access',
           },
           caveats: {
-            accessOnlyCaveats: generateCaveatEntry('objectId', true, {
+            dataAccessCaveats: generateCaveatEntry('objectId', true, {
               __fieldsValueNames: [],
             }),
           },
@@ -794,13 +799,13 @@ describe('Unit | Utility | token editor utils', function () {
             generateCaveatEntry('country', true, {
               countryType: 'whitelist',
               countryList: ['PL'],
-            }), {
-              accessOnlyCaveats: Object.assign(
-                generateCaveatEntry('service', true, [{
-                  model: 'service',
-                  id: 'test',
-                }]),
-                generateCaveatEntry('interface', true, 'rest'),
+            }),
+            generateCaveatEntry('service', true, [{
+              model: 'service',
+              id: 'test',
+            }]),
+            generateCaveatEntry('interface', true, 'rest'), {
+              dataAccessCaveats: Object.assign(
                 generateCaveatEntry('readonly', true),
                 generateCaveatEntry('path', true, {
                   pathEntry0: {
