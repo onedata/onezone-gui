@@ -149,7 +149,7 @@ const regions = [
 ];
 
 describe('Integration | Component | token editor', function () {
-  this.timeout(5000);
+  this.timeout(15000);
   setupComponentTest('token-editor', {
     integration: true,
   });

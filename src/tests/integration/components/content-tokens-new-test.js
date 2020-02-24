@@ -10,6 +10,7 @@ import wait from 'ember-test-helpers/wait';
 import { fillIn, click } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | content tokens new', function () {
+  this.timeout(15000);
   setupComponentTest('content-tokens-new', {
     integration: true,
   });
