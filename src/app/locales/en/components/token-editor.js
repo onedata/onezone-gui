@@ -14,7 +14,7 @@ export default {
             label: 'identity',
           },
           invite: {
-            label: 'invitation',
+            label: 'invite',
           },
         },
       },
@@ -178,7 +178,7 @@ export default {
           label: 'ASN',
         },
         asnDisabledText: {
-          text: 'This token can be used on any ASN',
+          text: 'This token can be used in any ASN',
         },
       },
       ipCaveat: {

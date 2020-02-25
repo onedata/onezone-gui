@@ -35,6 +35,19 @@ export default Service.extend({
     });
   },
 
+  /**
+   * Fetches privileges preset for specified model. Preset object looks like:
+   * ```
+   * {
+   *   member: Array<String>,
+   *   manager: Array<String>,
+   *   admin: Array<String>
+   * }
+   * ```
+   * where each array of strings contains a list of default privileges.
+   * @param {String} modelName one of: space, group, harvester, cluster
+   * @returns {Promise<Object>}
+   */
   getPrivilegesPresetForModel(modelName) {
     return this.get('onedataGraph').request({
       gri: gri({

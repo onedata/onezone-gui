@@ -1,30 +1,33 @@
 .token-editor {
   max-width: 1000px;
+
   .caveat-group {
     > .field-component > .fields-group-collapse {
       display: flex;
+
       &.collapse:not(.in) {
         display: none;
       }
     }
+
     .static-text-field-renderer {
       align-self: center;
     }
   }
+
   .caveat-group-toggle,
   .static-text-field-renderer,
   .radio-field-renderer {
     padding-top: $padding-base-vertical;
   }
+
   .caveat-group-toggle {
     flex-grow: 0;
+
     .field-component {
       order: -1;
       flex-grow: 0;
       margin-right: 25px;
-    }
-    + .field-renderer {
-      flex-grow: 1;  
     }
   }
 
@@ -32,12 +35,7 @@
     position: initial;
     display: initial;
     font-size: 1.2em;
-    font-weight: bold;
     vertical-align: middle;
-  }
-
-  .metadata-field textarea {
-    height: 130px;
   }
 
   .usageLimit-collapse.in,
@@ -45,7 +43,6 @@
   .country-collapse.in,
   .pathEntry-collapse.in {
     display: flex;
-    align-items: flex-start;
   }
 
   .usageLimitSelector-field {
@@ -57,6 +54,7 @@
   .countryType-field,
   .pathSpace-field {
     flex-grow: 0;
+    flex-shrink: 0;
 
     .dropdown-field-trigger {
       border-right: 0;
@@ -68,10 +66,6 @@
   .regionType-field,
   .countryType-field {
     width: 110px;
-  }
-
-  .pathSpace-field {
-    width: 200px;
   }
 
   .regionList-field,
@@ -124,6 +118,10 @@
         padding-top: $padding-base-vertical;
       }
     }
+
+    .pathSpace-field {
+      width: 200px;
+    }
   }
 
   @media (max-width: $screen-xs-max) {
@@ -144,6 +142,10 @@
       > .field-component > .fields-group-collapse {
         flex-wrap: wrap;
       }
+    }
+
+    .pathSpace-field {
+      width: 150px;
     }
   }
 }

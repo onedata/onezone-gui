@@ -1,7 +1,7 @@
 /**
  * @module models/token
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -97,14 +97,16 @@ export default Model.extend(
     expirationTimer: undefined,
 
     /**
-     * One of: 'access', 'invite'
-     * @type {Ember.ComputedProperty<string>}
+     * One of: 'access', 'identity', 'invite'
+     * @type {Ember.ComputedProperty<String>}
      */
     typeName: computed('type', function typeName() {
       const type = this.get('type') || {};
 
       if (type.accessToken) {
         return 'access';
+      } else if (type.identityToken) {
+        return 'identity';
       } else if (type.inviteToken) {
         return 'invite';
       } else {

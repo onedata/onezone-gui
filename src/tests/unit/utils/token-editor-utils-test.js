@@ -17,8 +17,9 @@ describe('Unit | Utility | token editor utils', function () {
     });
 
     [
-      'invite',
       'access',
+      'identity',
+      'invite',
     ].forEach(typeName => {
       it(
         `returns object with type.${typeName}Token if type is '${typeName}'`,
@@ -35,7 +36,7 @@ describe('Unit | Utility | token editor utils', function () {
       );
     });
 
-    it('returns object with type.inviteToken.inviteType', function () {
+    it('returns object with type.inviteToken.inviteType when inviteType is specified', function () {
       const result = editorDataToToken({
         basic: {
           type: 'invite',
@@ -103,8 +104,8 @@ describe('Unit | Utility | token editor utils', function () {
           },
         });
         const inviteToken = result.type.inviteToken;
-        expect(inviteToken).to.not.have.property('clusterId', 'abc');
-        expect(inviteToken).to.not.have.property('groupId', 'abc');
+        expect(inviteToken).to.not.have.property('clusterId');
+        expect(inviteToken).to.not.have.property('groupId');
         expect(Object.keys(inviteToken)).to.have.length(1);
       }
     );
@@ -155,10 +156,7 @@ describe('Unit | Utility | token editor utils', function () {
                 },
               },
             });
-            expect(result).to.have.deep.property(
-              'privileges',
-              ['space_view']
-            );
+            expect(result).to.have.deep.property('privileges', ['space_view']);
           }
         );
       } else {
@@ -184,29 +182,34 @@ describe('Unit | Utility | token editor utils', function () {
       }
     });
 
-    it(
-      'does not convert invite privileges when token is of type access',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'access',
-            inviteDetails: {
-              inviteType: 'groupJoinGroup',
-              inviteTargetDetails: {
-                target: {
-                  entityType: 'group',
-                  entityId: 'abc',
-                },
-                invitePrivilegesDetails: {
-                  privileges: ['space_view'],
+    [
+      'access',
+      'identity',
+    ].forEach(tokenType => {
+      it(
+        `does not convert invite privileges when token is of type ${tokenType}`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type: tokenType,
+              inviteDetails: {
+                inviteType: 'groupJoinGroup',
+                inviteTargetDetails: {
+                  target: {
+                    entityType: 'group',
+                    entityId: 'abc',
+                  },
+                  invitePrivilegesDetails: {
+                    privileges: ['space_view'],
+                  },
                 },
               },
             },
-          },
-        });
-        expect(result).to.not.have.property('privileges');
-      }
-    );
+          });
+          expect(result).to.not.have.property('privileges');
+        }
+      );
+    });
 
     it(
       'converts infinity usage limit when token is of type invite',
@@ -258,30 +261,35 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
 
-    it(
-      'does not convert usage limit when token is of type access',
-      function () {
-        const result = editorDataToToken({
-          basic: {
-            type: 'access',
-            inviteDetails: {
-              inviteType: 'groupJoinGroup',
-              inviteTargetDetails: {
-                target: {
-                  entityType: 'group',
-                  entityId: 'abc',
+    [
+      'access',
+      'identity',
+    ].forEach(tokenType => {
+      it(
+        `does not convert usage limit when token is of type ${tokenType}`,
+        function () {
+          const result = editorDataToToken({
+            basic: {
+              type: tokenType,
+              inviteDetails: {
+                inviteType: 'groupJoinGroup',
+                inviteTargetDetails: {
+                  target: {
+                    entityType: 'group',
+                    entityId: 'abc',
+                  },
+                },
+                usageLimit: {
+                  usageLimitSelector: 'number',
+                  usageLimitNumber: '2',
                 },
               },
-              usageLimit: {
-                usageLimitSelector: 'number',
-                usageLimitNumber: '2',
-              },
             },
-          },
-        });
-        expect(result).to.not.have.property('usageLimit');
-      }
-    );
+          });
+          expect(result).to.not.have.property('usageLimit');
+        }
+      );
+    });
 
     [
       'invite',
@@ -289,7 +297,7 @@ describe('Unit | Utility | token editor utils', function () {
       'access',
     ].forEach(type => {
       it(
-        `has no caveats field in returned object if no caveats were enabled (with values) for token of type ${type}`,
+        `has no caveats field in returned object if no caveats were enabled (but are not empty) for token of type ${type}`,
         function () {
           const result = editorDataToToken({
             basic: {
@@ -306,7 +314,12 @@ describe('Unit | Utility | token editor utils', function () {
               generateCaveatEntry('country', false, {
                 countryType: 'whitelist',
                 countryList: ['PL'],
-              }), generateCaveatEntry('service', false, [{
+              }),
+              generateCaveatEntry('consumer', false, [{
+                model: 'user',
+                id: 'test',
+              }]),
+              generateCaveatEntry('service', false, [{
                 model: 'service',
                 id: 'test',
               }]),
@@ -325,14 +338,15 @@ describe('Unit | Utility | token editor utils', function () {
                     __fieldsValueNames: ['objectIdEntry0'],
                   }),
                 ),
-              }),
+              }
+            ),
           });
           expect(result).to.not.have.property('caveats');
         }
       );
 
       it(
-        `has no caveats field in returned object if all caveats with additional values were enabled (additional values are empty) for token of type ${type}`,
+        `has no caveats field in returned object if all caveats that need extra data were enabled (but are empty) for token of type ${type}`,
         function () {
           const result = editorDataToToken({
             basic: {
@@ -351,6 +365,7 @@ describe('Unit | Utility | token editor utils', function () {
                 countryList: [],
               }),
               generateCaveatEntry('service', true, []),
+              generateCaveatEntry('consumer', true, []),
               generateCaveatEntry('interface', true), {
                 dataAccessCaveats: Object.assign(
                   generateCaveatEntry('path', true, {
@@ -360,7 +375,8 @@ describe('Unit | Utility | token editor utils', function () {
                     __fieldsValueNames: [],
                   }),
                 ),
-              }),
+              }
+            ),
           });
           expect(result).to.not.have.property('caveats');
         }
@@ -462,6 +478,43 @@ describe('Unit | Utility | token editor utils', function () {
       );
     });
 
+    it('converts consumer caveat', function () {
+      const selectedValues = _.flatten(['user', 'group', 'oneprovider']
+        .map(model => ([{
+          model,
+          record: {
+            entityId: 'id0',
+          },
+        }, {
+          model,
+          id: 'customid',
+        }, {
+          model,
+          record: {
+            representsAll: model,
+          },
+        }]))
+      );
+      const result = editorDataToToken({
+        caveats: generateCaveatEntry('consumer', true, selectedValues),
+      });
+
+      expect(result).to.have.deep.nested.property('caveats[0]', {
+        type: 'consumer',
+        whitelist: [
+          'usr-id0',
+          'usr-customid',
+          'usr-*',
+          'grp-id0',
+          'grp-customid',
+          'grp-*',
+          'prv-id0',
+          'prv-customid',
+          'prv-*',
+        ],
+      });
+    });
+
     [
       'identity',
       'invite',
@@ -503,7 +556,8 @@ describe('Unit | Utility | token editor utils', function () {
           record: {
             representsAll: 'service',
           },
-        }])));
+        }]))
+      );
       const result = editorDataToToken({
         basic: {
           type: 'access',
@@ -800,6 +854,10 @@ describe('Unit | Utility | token editor utils', function () {
               countryType: 'whitelist',
               countryList: ['PL'],
             }),
+            generateCaveatEntry('consumer', true, [{
+              model: 'user',
+              id: 'test',
+            }]),
             generateCaveatEntry('service', true, [{
               model: 'service',
               id: 'test',
@@ -821,7 +879,7 @@ describe('Unit | Utility | token editor utils', function () {
               ),
             }),
         });
-        expect(get(result, 'caveats')).to.be.an('array').with.length(10);
+        expect(get(result, 'caveats')).to.be.an('array').with.length(11);
       }
     );
   });

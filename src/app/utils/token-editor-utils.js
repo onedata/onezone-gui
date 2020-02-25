@@ -1,3 +1,12 @@
+/**
+ * Util functions related to token-editor component.
+ *
+ * @module utils/token-editor-utils
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import { getProperties, get } from '@ember/object';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
@@ -44,7 +53,7 @@ export function editorDataToToken(editorData, currentUser) {
   if (name) {
     tokenData.name = name;
   }
-  if (['invite', 'access'].includes(type)) {
+  if (['access', 'identity', 'invite'].includes(type)) {
     const typeKey = `${type}Token`;
     tokenData.type = {
       [typeKey]: {},
@@ -59,21 +68,21 @@ export function editorDataToToken(editorData, currentUser) {
     const usageLimitNumber = get(basic, 'inviteDetails.usageLimit.usageLimitNumber');
 
     if (inviteType) {
-      const availableInviteType = get(tokenInviteTypeToTargetModelMapping, inviteType);
-      if (availableInviteType) {
+      const inviteTypeSpec = get(tokenInviteTypeToTargetModelMapping, inviteType);
+      if (inviteTypeSpec) {
         tokenData.type.inviteToken.inviteType = inviteType;
 
         let targetEntityId;
         if (inviteType === 'registerOneprovider') {
           targetEntityId = currentUser && get(currentUser, 'entityId');
-        } else if (target && get(target, 'entityType') === availableInviteType.modelName) {
+        } else if (target && get(target, 'entityType') === inviteTypeSpec.modelName) {
           targetEntityId = get(target, 'entityId');
         }
         if (targetEntityId) {
-          tokenData.type.inviteToken[get(availableInviteType, 'idFieldName')] = targetEntityId;
+          tokenData.type.inviteToken[get(inviteTypeSpec, 'idFieldName')] = targetEntityId;
         }
 
-        if (availableInviteType.privileges && privileges) {
+        if (inviteTypeSpec.privileges && privileges) {
           tokenData.privileges = privileges;
         }
       }
@@ -130,20 +139,19 @@ export function editorDataToToken(editorData, currentUser) {
     }
   });
   if (consumerCaveat && get(consumerCaveat, 'consumerEnabled')) {
-    const whitelist = (get(consumerCaveat, 'consumer') || [])
-      .map(value => {
-        const {
-          record,
-          id: recordId,
-          model,
-        } = getProperties(value, 'record', 'id', 'model');
-        const prefix = consumerModelToPrefix[model];
-        let id = recordId;
-        if (!id) {
-          id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
-        }
-        return `${prefix}-${id}`;
-      });
+    const whitelist = (get(consumerCaveat, 'consumer') || []).map(value => {
+      const {
+        record,
+        id: recordId,
+        model,
+      } = getProperties(value, 'record', 'id', 'model');
+      const prefix = consumerModelToPrefix[model];
+      let id = recordId;
+      if (!id) {
+        id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
+      }
+      return `${prefix}-${id}`;
+    });
     if (whitelist.length) {
       caveatsData.push({
         type: 'consumer',
@@ -175,22 +183,21 @@ export function editorDataToToken(editorData, currentUser) {
     );
 
     if (serviceCaveat && get(serviceCaveat, 'serviceEnabled')) {
-      const whitelist = (get(serviceCaveat, 'service') || [])
-        .map(value => {
-          const {
-            record,
-            id: recordId,
-            model,
-          } = getProperties(value, 'record', 'id', 'model');
-          const serviceType = record && get(record, 'type') || 'oneprovider';
-          const prefix = (serviceType === 'onezone' ? 'oz' : 'op') +
-            (model === 'serviceOnepanel' ? 'p' : 'w');
-          let id = serviceType === 'onezone' ? 'onezone' : recordId;
-          if (!id) {
-            id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
-          }
-          return `${prefix}-${id}`;
-        });
+      const whitelist = (get(serviceCaveat, 'service') || []).map(value => {
+        const {
+          record,
+          id: recordId,
+          model,
+        } = getProperties(value, 'record', 'id', 'model');
+        const serviceType = record && get(record, 'type') || 'oneprovider';
+        const prefix = (serviceType === 'onezone' ? 'oz' : 'op') +
+          (model === 'serviceOnepanel' ? 'p' : 'w');
+        let id = serviceType === 'onezone' ? 'onezone' : recordId;
+        if (!id) {
+          id = get(record, 'representsAll') ? '*' : get(record, 'entityId');
+        }
+        return `${prefix}-${id}`;
+      });
       if (whitelist.length) {
         caveatsData.push({
           type: 'service',
