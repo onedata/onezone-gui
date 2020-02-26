@@ -18,6 +18,7 @@ export default {
   },
   typeNames: {
     access: 'Access',
+    identity: 'Identity',
     invite: 'Invite',
   },
   inviteTypes: {

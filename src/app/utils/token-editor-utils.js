@@ -102,7 +102,7 @@ export function editorDataToToken(editorData, currentUser) {
     if (expireDate) {
       caveatsData.push({
         type: 'time',
-        validUntil: expireDate.valueOf() / 1000,
+        validUntil: Math.floor(expireDate.valueOf() / 1000),
       });
     }
   }
