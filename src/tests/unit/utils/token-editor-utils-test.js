@@ -385,7 +385,7 @@ describe('Unit | Utility | token editor utils', function () {
 
     it('converts expire caveat', function () {
       const expireDate = new Date();
-      const expireTimestamp = expireDate.valueOf() / 1000;
+      const expireTimestamp = Math.floor(expireDate.valueOf() / 1000);
       const result = editorDataToToken({
         caveats: generateCaveatEntry('expire', true, expireDate),
       });
