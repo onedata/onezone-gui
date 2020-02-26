@@ -1,8 +1,19 @@
+/**
+ * Token creation form.
+ *
+ * @module components/token-editor
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { scheduleOnce } from '@ember/runloop';
+import { Promise, all as allFulfilled, allSettled } from 'rsvp';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
@@ -27,7 +38,6 @@ import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
-import { scheduleOnce } from '@ember/runloop';
 import {
   equal,
   raw,
@@ -38,11 +48,13 @@ import {
   array,
   getBy,
   promise,
+  tag,
+  notEmpty,
 } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { Promise, all as allFulfilled, allSettled } from 'rsvp';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 const tokenInviteTypeOptions = [{
@@ -100,29 +112,51 @@ const privilegesForModels = {
   cluster: clusterFlags,
 };
 
-function getTargetModelNameForInviteType(inviteType) {
-  const inviteTypeOption = inviteType && tokenInviteTypeOptions.findBy('value', inviteType);
-  return inviteTypeOption && inviteTypeOption.targetModelName;
-}
-
-function getPrivilegesModelNameForInviteType(inviteType) {
-  const inviteTypeOption = inviteType && tokenInviteTypeOptions.findBy('value', inviteType);
-  return inviteTypeOption && !inviteTypeOption.noPrivileges && inviteTypeOption.targetModelName;
-}
-
 const CaveatFormGroup = FormFieldsGroup.extend({
   classes: computed('isCaveatEnabled', function classes() {
     return 'caveat-group' + (this.get('isCaveatEnabled') ? ' is-enabled' : '');
   }),
-  isCaveatEnabled: getBy(array.findBy('fields', raw('isGroupToggle')), raw('value')),
+  isCaveatEnabled: getBy(
+    array.findBy('fields', raw('isGroupToggle')),
+    raw('value')
+  ),
 });
 
-const CaveatGroupToggle = ToggleField.extend({
-  classes: 'caveat-group-toggle',
-  addColonToLabel: false,
-  defaultValue: false,
-  isGroupToggle: true,
+const ModelTagsFieldPrototype = TagsField.extend({
+  tagEditorComponentName: 'tags-input/model-selector-editor',
+  defaultValue: computed(() => []),
+  sort: true,
+  tagEditorSettings: hash('models'),
+  valueToTags(value) {
+    return (value || []).map(val => RecordTag.create({ value: val }));
+  },
+  tagsToValue(tags) {
+    return removeExcessiveTags(tags).mapBy('value').uniq().compact();
+  },
+  sortTags(tags) {
+    const modelsOrder = this.get('models').mapBy('name');
+    const sortKeyDecoratedTags = tags.map(tag => {
+      const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
+      const label = get(tag, 'label');
+      const sortKey = `${modelIndex}-${label}`;
+      return { sortKey, tag };
+    });
+    return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+  },
 });
+
+function createWhiteBlackListDropdown(fieldName) {
+  return DropdownField.create({
+    name: fieldName,
+    areValidationClassesEnabled: false,
+    options: [
+      { value: 'whitelist' },
+      { value: 'blacklist' },
+    ],
+    showSearch: false,
+    defaultValue: 'whitelist',
+  });
+}
 
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
@@ -142,6 +176,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.tokenEditor',
 
   /**
+   * If true, then form will have expanded caveats at first render
    * @virtual optional
    * @type {boolean}
    */
@@ -151,13 +186,14 @@ export default Component.extend(I18n, {
    * @type {Function}
    * @param {EmberObject} formValues
    * @param {boolean} isValid
+   * @returns {any}
    */
   onChange: notImplementedIgnore,
 
   /**
    * @type {Function}
    * @param {Object} tokenRawModel
-   * @param {Promise}
+   * @returns {Promise}
    */
   onSubmit: notImplementedReject,
 
@@ -171,11 +207,9 @@ export default Component.extend(I18n, {
    */
   fields: computed('basicGroup', 'caveatsGroup', function fields() {
     const {
-      i18nPrefix,
       basicGroup,
       caveatsGroup,
     } = this.getProperties(
-      'i18nPrefix',
       'basicGroup',
       'caveatsGroup',
     );
@@ -183,6 +217,7 @@ export default Component.extend(I18n, {
 
     return FormFieldsRootGroup
       .extend({
+        i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
         ownerSource: reads('component'),
         isEnabled: not('component.isSubmitting'),
         onValueChange() {
@@ -192,7 +227,6 @@ export default Component.extend(I18n, {
       })
       .create({
         component,
-        i18nPrefix: `${i18nPrefix}.fields`,
         fields: [
           basicGroup,
           caveatsGroup,
@@ -200,9 +234,13 @@ export default Component.extend(I18n, {
       });
   }),
 
+  /**
+   * All non-caveats fields
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   basicGroup: computed(
     'inviteTargetDetailsGroup',
-    'usageLimitField',
+    'usageLimitGroup',
     function basicGroup() {
       return FormFieldsGroup.create({
         name: 'basic',
@@ -218,7 +256,7 @@ export default Component.extend(I18n, {
             defaultValue: 'access',
           }),
           FormFieldsGroup.extend({
-            isExpanded: equal('valuesSource.basic.type', raw('invite')),
+            isExpanded: equal('parent.value.type', raw('invite')),
           }).create({
             name: 'inviteDetails',
             fields: [
@@ -229,7 +267,7 @@ export default Component.extend(I18n, {
                 defaultValue: 'userJoinGroup',
               }),
               this.get('inviteTargetDetailsGroup'),
-              this.get('usageLimitField'),
+              this.get('usageLimitGroup'),
             ],
           }),
         ],
@@ -237,49 +275,61 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * Fields group visible only when selected invite type has specified targetModelName
+   * (invitation target). To not break down while collapsing after
+   * invite type change to type without target, it performs caching of previous invite
+   * type value to render it until collapsed. Does the same for invite types
+   * with/without privileges.
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   inviteTargetDetailsGroup: computed(
     'targetField',
     'privilegesField',
     function inviteTargetDetailsGroup() {
       const component = this;
       return FormFieldsGroup.extend({
-        isExpanded: equal('latestInviteTypeWithTargets', 'inviteType'),
+        isExpanded: notEmpty('inviteTypeSpec.targetModelName'),
         inviteType: reads('parent.value.inviteType'),
-        inviteTypeSpecification: computed(
-          'inviteType',
-          function inviteTypeSpecification() {
-            return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
-          }
-        ),
+        inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
+          return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
+        }),
+        // We need to cache values related to latest invite type with target
+        // to preserve previous view while collapsing inviteTargetDetailsGroup
+        // after change to invite type without target. Without caching, labels,
+        // dropdown values etc. will disappear just after invite type change.
         latestInviteTypeWithTargets: undefined,
         cachedTargetsModelName: undefined,
         cachedTargetsProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
+        // Caching for the same reason as for target related values
         cachedPrivilegesModelName: undefined,
         cachedPrivilegesPresetProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
-        inviteTypeObserver: observer('inviteType', function inviteTypeObserver() {
+        inviteTypeSpecObserver: observer('inviteTypeSpec', function inviteTypeSpecObserver() {
           const {
-            inviteType,
+            inviteTypeSpec,
             cachedTargetsModelName,
             cachedPrivilegesModelName,
           } = this.getProperties(
-            'inviteType',
+            'inviteTypeSpec',
             'cachedTargetsModelName',
             'cachedPrivilegesModelName'
           );
-          const newTargetsModelName = getTargetModelNameForInviteType(inviteType);
-          const newPrivilegesModelName =
-            getPrivilegesModelNameForInviteType(inviteType);
+          if (!inviteTypeSpec) {
+            return;
+          }
+          const newTargetsModelName = inviteTypeSpec.targetModelName;
+          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges && newTargetsModelName;
           if (newTargetsModelName) {
-            this.set('latestInviteTypeWithTargets', inviteType);
+            this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
             if (cachedTargetsModelName !== newTargetsModelName) {
               this.setProperties({
                 cachedTargetsModelName: newTargetsModelName,
                 cachedTargetsProxy: component
-                  .getTargetOptionsForModel(newTargetsModelName),
+                  .getRecordOptionsForModel(newTargetsModelName),
               });
             }
           }
@@ -294,8 +344,7 @@ export default Component.extend(I18n, {
         }),
         init() {
           this._super(...arguments);
-
-          this.inviteTypeObserver();
+          this.inviteTypeSpecObserver();
         },
       }).create({
         name: 'inviteTargetDetails',
@@ -313,17 +362,15 @@ export default Component.extend(I18n, {
           }),
           this.get('targetField'),
           FormFieldsGroup.extend({
-            isExpanded: not('parent.inviteTypeSpecification.noPrivileges'),
+            isExpanded: not('parent.inviteTypeSpec.noPrivileges'),
           }).create({
             name: 'invitePrivilegesDetails',
             fields: [
               LoadingField.extend({
                 isVisible: not('isFulfilled'),
-                loadingProxy: reads(
-                  'parent.parent.cachedPrivilegesPresetProxy'),
+                loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
                 label: getBy(
-                  array.findBy('parent.fields', raw('name'), raw(
-                    'privileges')),
+                  array.findBy('parent.fields', raw('name'), raw('privileges')),
                   raw('label')
                 ),
                 isValid: reads('isFulfilled'),
@@ -338,8 +385,13 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * Allows selecting target for invite token
+   * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
+   */
   targetField: computed(function targetField() {
     return DropdownField.extend({
+      cachedTargetsModelName: reads('parent.cachedTargetsModelName'),
       cachedTargetsProxy: reads('parent.cachedTargetsProxy'),
       latestInviteTypeWithTargets: reads('parent.latestInviteTypeWithTargets'),
       label: computed('latestInviteTypeWithTargets', 'path', function label() {
@@ -364,8 +416,9 @@ export default Component.extend(I18n, {
       ),
       options: reads('cachedTargetsProxy.content'),
       cachedTargetsModelNameObserver: observer(
-        'parent.cachedTargetsModelName',
+        'cachedTargetsModelName',
         function cachedTargetsModelNameObserver() {
+          // Reset to default value when target model changes
           this.reset();
         }
       ),
@@ -375,14 +428,17 @@ export default Component.extend(I18n, {
     });
   }),
 
+  /**
+   * Allows selecting privileges for invite token
+   * @type {ComputedProperty<Utils.FormComponent.PrivilegesField>}
+   */
   privilegesField: computed(function privilegesField() {
     return PrivilegesField.extend({
       cachedPrivilegesModelName: or(
         'parent.parent.cachedPrivilegesModelName',
         raw('userJoinGroup')
       ),
-      cachedPrivilegesPresetProxy: reads(
-        'parent.parent.cachedPrivilegesPresetProxy'),
+      cachedPrivilegesPresetProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
       privilegesGroups: computed(
         'cachedPrivilegesModelName',
         function privilegesGroups() {
@@ -391,9 +447,8 @@ export default Component.extend(I18n, {
       ),
       privilegeGroupsTranslationsPath: computed(
         'cachedPrivilegesModelName',
-        function () {
-          const modelName =
-            _.upperFirst(this.get('cachedPrivilegesModelName'));
+        function privilegeGroupsTranslationsPath() {
+          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
           return modelName ?
             `components.content${modelName}sMembers.privilegeGroups` :
             undefined;
@@ -401,9 +456,8 @@ export default Component.extend(I18n, {
       ),
       privilegesTranslationsPath: computed(
         'cachedPrivilegesModelName',
-        function () {
-          const modelName =
-            _.upperFirst(this.get('cachedPrivilegesModelName'));
+        function privilegesTranslationsPath() {
+          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
           return modelName ?
             `components.content${modelName}sMembers.privileges` :
             undefined;
@@ -424,12 +478,16 @@ export default Component.extend(I18n, {
     });
   }),
 
-  usageLimitField: computed(function usageLimitField() {
+  /**
+   * Allows choosing "infinity" and concrete number
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  usageLimitGroup: computed(function usageLimitGroup() {
     return FormFieldsGroup.create({
       name: 'usageLimit',
       fields: [
         RadioField.create({
-          name: 'usageLimitSelector',
+          name: 'usageLimitType',
           options: [{
             value: 'infinity',
           }, {
@@ -438,10 +496,7 @@ export default Component.extend(I18n, {
           defaultValue: 'infinity',
         }),
         NumberField.extend({
-          isEnabled: equal(
-            'parent.value.usageLimitSelector',
-            raw('number')
-          ),
+          isEnabled: equal('parent.value.usageLimitType', raw('number')),
         }).create({
           name: 'usageLimitNumber',
           gte: 1,
@@ -451,6 +506,10 @@ export default Component.extend(I18n, {
     });
   }),
 
+  /**
+   * Aggregates all caveat-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   caveatsGroup: computed(
     'expireCaveatGroup',
     'regionCaveatGroup',
@@ -520,53 +579,42 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * Time caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   expireCaveatGroup: computed(function expireCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'expireCaveat',
       fields: [
-        CaveatGroupToggle.create({
-          name: 'expireEnabled',
-        }),
+        createCaveatToggleField('expire'),
         DatetimeField.extend({
-          isVisible: reads(
-            'valuesSource.caveats.expireCaveat.expireEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
         }).create({
           name: 'expire',
           defaultValue: moment().add(1, 'day').endOf('day').toDate(),
         }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.expireCaveat.expireEnabled'),
-        }).create({
-          name: 'expireDisabledText',
-        }),
+        createDisabledCaveatDescription('expire'),
       ],
     });
   }),
 
+  /**
+   * Region caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   regionCaveatGroup: computed(function regionCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'regionCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'regionEnabled' }),
+        createCaveatToggleField('region'),
         FormFieldsGroup.extend({
-          isVisible: reads(
-            'valuesSource.caveats.regionCaveat.regionEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
         }).create({
           name: 'region',
           areValidationClassesEnabled: true,
           fields: [
-            DropdownField.create({
-              name: 'regionType',
-              areValidationClassesEnabled: false,
-              options: [
-                { value: 'whitelist' },
-                { value: 'blacklist' },
-              ],
-              showSearch: false,
-              defaultValue: 'whitelist',
-            }),
+            createWhiteBlackListDropdown('regionType'),
             TagsField.extend({
               allowedTags: computed(
                 'i18nPrefix',
@@ -583,8 +631,7 @@ export default Component.extend(I18n, {
                     'Oceania',
                     'SouthAmerica',
                   ].map(abbrev => ({
-                    label: String(this.t(
-                      `${path}.tags.${abbrev}`)),
+                    label: String(this.t(`${path}.tags.${abbrev}`)),
                     value: abbrev,
                   }));
                 }
@@ -607,36 +654,27 @@ export default Component.extend(I18n, {
             }),
           ],
         }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.regionCaveat.regionEnabled'),
-        }).create({ name: 'regionDisabledText' }),
+        createDisabledCaveatDescription('region'),
       ],
     });
   }),
 
+  /**
+   * Country caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   countryCaveatGroup: computed(function countryCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'countryCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'countryEnabled' }),
+        createCaveatToggleField('country'),
         FormFieldsGroup.extend({
-          isVisible: reads(
-            'valuesSource.caveats.countryCaveat.countryEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
         }).create({
           name: 'country',
           areValidationClassesEnabled: true,
           fields: [
-            DropdownField.create({
-              name: 'countryType',
-              areValidationClassesEnabled: false,
-              options: [
-                { value: 'whitelist' },
-                { value: 'blacklist' },
-              ],
-              showSearch: false,
-              defaultValue: 'whitelist',
-            }),
+            createWhiteBlackListDropdown('countryType'),
             TagsField.extend({
               sortTags(tags) {
                 return tags.sort((a, b) =>
@@ -662,22 +700,22 @@ export default Component.extend(I18n, {
             }),
           ],
         }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.countryCaveat.countryEnabled'
-          ),
-        }).create({ name: 'countryDisabledText' }),
+        createDisabledCaveatDescription('country'),
       ],
     });
   }),
 
+  /**
+   * ASN caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   asnCaveatGroup: computed(function asnCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'asnCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'asnEnabled' }),
+        createCaveatToggleField('asn'),
         TagsField.extend({
-          isVisible: reads('valuesSource.caveats.asnCaveat.asnEnabled'),
+          isVisible: reads('parent.isCaveatEnabled'),
           sortTags(tags) {
             return tags.sort((a, b) =>
               parseInt(get(a, 'label') - parseInt(get(b, 'label')))
@@ -700,24 +738,27 @@ export default Component.extend(I18n, {
           defaultValue: [],
           sort: true,
         }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.asnCaveat.asnEnabled'),
-        }).create({ name: 'asnDisabledText' }),
+        createDisabledCaveatDescription('asn'),
       ],
     });
   }),
 
+  /**
+   * IP caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   ipCaveatGroup: computed(function ipCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'ipCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'ipEnabled' }),
+        createCaveatToggleField('ip'),
         TagsField.extend({
-          isVisible: reads('valuesSource.caveats.ipCaveat.ipEnabled'),
+          isVisible: reads('parent.isCaveatEnabled'),
           sortTags(tags) {
             const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
             const sortKeyDecoratedTags = tags.map(tag => {
               const parsedIp = get(tag, 'label').match(ipPartsMatcher);
+              // sortKey for "192.168.0.1/24" is 192168000001024
               const sortKey = parsedIp
                 // Four IP octets (1,2,3,4) and mask (6)
                 .slice(1, 5).concat([parsedIp[6] || '0'])
@@ -736,38 +777,36 @@ export default Component.extend(I18n, {
           defaultValue: [],
           sort: true,
         }),
-        StaticTextField.extend({
-          isVisible: not('valuesSource.caveats.ipCaveat.ipEnabled'),
-        }).create({ name: 'ipDisabledText' }),
+        createDisabledCaveatDescription('ip'),
       ],
     });
   }),
 
+  /**
+   * Consumer caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   consumerCaveatGroup: computed(function consumerCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'consumerCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'consumerEnabled' }),
-        TagsField.extend({
+        createCaveatToggleField('consumer'),
+        ModelTagsFieldPrototype.extend({
           groupManager: service(),
           spaceManager: service(),
           currentUser: service(),
           providerManager: service(),
-          isVisible: reads(
-            'valuesSource.caveats.consumerCaveat.consumerEnabled'
-          ),
-          currentUserProxy: promise.object(computed(
-            function currentUserProxy() {
-              return this.get('currentUser').getCurrentUserRecord();
-            }
-          )),
+          isVisible: reads('parent.isCaveatEnabled'),
+          currentUserProxy: promise.object(computed(function currentUserProxy() {
+            return this.get('currentUser').getCurrentUserRecord();
+          })),
           groupsProxy: promise.array(computed(function groupsProxy() {
-            return this.get('groupManager')
-              .getGroups().then(groups => get(groups, 'list'));
+            return this.get('groupManager').getGroups()
+              .then(groups => get(groups, 'list'));
           })),
           spacesProxy: promise.array(computed(function spacesProxy() {
-            return this.get('spaceManager')
-              .getSpaces().then(spaces => get(spaces, 'list'));
+            return this.get('spaceManager').getSpaces()
+              .then(spaces => get(spaces, 'list'));
           })),
           users: promise.array(computed(
             'currentUserProxy',
@@ -837,7 +876,7 @@ export default Component.extend(I18n, {
               });
             }
           )),
-          oneprovidersProxy: promise.array(computed(function oneproviders() {
+          oneprovidersProxy: promise.array(computed(function oneprovidersProxy() {
             return this.get('providerManager').getProviders()
               .then(providers => get(providers, 'list'));
           })),
@@ -853,68 +892,49 @@ export default Component.extend(I18n, {
               getRecords: () => this.get('oneprovidersProxy'),
             }];
           }),
-          tagEditorSettings: hash('models'),
           init() {
             this._super(...arguments);
 
             ['group', 'space'].forEach(parentRecordName => {
               ['user', 'group'].forEach(childRecordName => {
                 const upperChildRecordName = _.upperFirst(childRecordName);
+                const computedLists = computed(
+                  `${parentRecordName}sProxy.@each.isReloading`,
+                  function computedLists() {
+                    return this.get(`${parentRecordName}sProxy`)
+                      .then(parents =>
+                        onlySettledOk(parents.mapBy(`eff${upperChildRecordName}List`))
+                      )
+                      .then(effLists => onlySettledOk(effLists.mapBy('list')));
+                  }
+                );
                 this.set(
                   `${parentRecordName}s${upperChildRecordName}sListsProxy`,
-                  promise.array(computed(
-                    `${parentRecordName}sProxy.@each.isReloading`,
-                    function () {
-                      return this.get(`${parentRecordName}sProxy`).then(parents =>
-                        onlySettledOk(parents.mapBy(`eff${upperChildRecordName}List`))
-                        .then(effLists => onlySettledOk(effLists.mapBy('list')))
-                      );
-                    }
-                  ))
+                  promise.array(computedLists)
                 );
               });
             });
           },
-          valueToTags(value) {
-            return (value || []).map(val => RecordTag.create({ value: val }));
-          },
-          tagsToValue(tags) {
-            return removeExcessiveTags(tags).mapBy('value').uniq().compact();
-          },
-          sortTags(tags) {
-            const modelsOrder = this.get('models').mapBy('name');
-            const sortKeyDecoratedTags = tags.map(tag => {
-              const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
-              const label = get(tag, 'label');
-              const sortKey = `${modelIndex}-${label}`;
-              return { sortKey, tag };
-            });
-            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
-          },
-        }).create({
-          name: 'consumer',
-          tagEditorComponentName: 'tags-input/model-selector-editor',
-          defaultValue: [],
-          sort: true,
-        }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.consumerCaveat.consumerEnabled'),
-        }).create({ name: 'consumerDisabledText' }),
+        }).create({ name: 'consumer' }),
+        createDisabledCaveatDescription('consumer'),
       ],
     });
   }),
 
+  /**
+   * Service caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   serviceCaveatGroup: computed(function serviceCaveatGroup() {
     return CaveatFormGroup.extend({
       isExpanded: equal('valuesSource.basic.type', raw('access')),
     }).create({
       name: 'serviceCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'serviceEnabled' }),
-        TagsField.extend({
+        createCaveatToggleField('service'),
+        ModelTagsFieldPrototype.extend({
           clusterManager: service(),
-          isVisible: reads('parent.value.serviceEnabled'),
+          isVisible: reads('parent.isCaveatEnabled'),
           clustersProxy: promise.array(computed(function clustersProxy() {
             return this.get('clusterManager')
               .getClusters().then(clusters => get(clusters, 'list'));
@@ -928,49 +948,25 @@ export default Component.extend(I18n, {
               getRecords: () => this.get('clustersProxy'),
             }];
           }),
-          tagEditorSettings: hash('models'),
-          valueToTags(value) {
-            return (value || []).map(val => RecordTag.create({ value: val }));
-          },
-          tagsToValue(tags) {
-            return removeExcessiveTags(tags).mapBy('value').uniq().compact();
-          },
-          sortTags(tags) {
-            const modelsOrder = this.get('models').mapBy('name');
-            const sortKeyDecoratedTags = tags.map(tag => {
-              const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
-              const label = get(tag, 'label');
-              const sortKey = `${modelIndex}-${label}`;
-              return { sortKey, tag };
-            });
-            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
-          },
-        }).create({
-          name: 'service',
-          tagEditorComponentName: 'tags-input/model-selector-editor',
-          defaultValue: [],
-          sort: true,
-        }),
-        StaticTextField.extend({
-          isVisible: not('parent.value.serviceEnabled'),
-        }).create({ name: 'serviceDisabledText' }),
+        }).create({ name: 'service' }),
+        createDisabledCaveatDescription('service'),
       ],
     });
   }),
 
+  /**
+   * Interface caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
     return CaveatFormGroup.extend({
       isExpanded: not(equal('valuesSource.basic.type', raw('invite'))),
     }).create({
       name: 'interfaceCaveat',
       fields: [
-        CaveatGroupToggle.create({
-          name: 'interfaceEnabled',
-        }),
+        createCaveatToggleField('interface'),
         RadioField.extend({
-          isVisible: reads(
-            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
         }).create({
           name: 'interface',
           options: [
@@ -979,55 +975,62 @@ export default Component.extend(I18n, {
           ],
           defaultValue: 'rest',
         }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.interfaceCaveat.interfaceEnabled'
-          ),
-        }).create({
-          name: 'interfaceDisabledText',
-        }),
+        createDisabledCaveatDescription('interface'),
       ],
     });
   }),
 
+  /**
+   * Readonly caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   readonlyCaveatGroup: computed(function readonlyCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'readonlyCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'readonlyEnabled' }),
+        createCaveatToggleField('readonly'),
         StaticTextField.extend({
-          isVisible: reads(
-            'valuesSource.caveats.dataAccessCaveats.readonlyCaveat.readonlyEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
         }).create({ name: 'readonlyEnabledText' }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.dataAccessCaveats.readonlyCaveat.readonlyEnabled'
-          ),
-        }).create({ name: 'readonlyDisabledText' }),
+        createDisabledCaveatDescription('readonly'),
       ],
     });
   }),
 
+  /**
+   * Path caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   pathCaveatGroup: computed(function pathCaveatGroup() {
     const component = this;
     return CaveatFormGroup.extend({
       spacesProxy: null,
-      pathEnabledObserver: observer('value.pathEnabled', function () {
+      pathEnabledObserver: observer('value.pathEnabled', function pathEnabledObserver() {
         if (this.get('value.pathEnabled') && !this.get('spacesProxy')) {
           this.set(
             'spacesProxy',
-            component.getTargetOptionsForModel('space')
+            component.getRecordOptionsForModel('space')
           );
         }
       }),
     }).create({
       name: 'pathCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'pathEnabled' }),
+        createCaveatToggleField('path'),
+        LoadingField.extend({
+          loadingProxy: reads('parent.spacesProxy'),
+          isVisible: and('parent.isCaveatEnabled', not('isFulfilled')),
+          label: getBy(
+            array.findBy('parent.fields', raw('name'), raw('path')),
+            raw('label')
+          ),
+          isValid: reads('isFulfilled'),
+        }).create({
+          name: 'loadingPathSpaces',
+        }),
         FormFieldsCollectionGroup.extend({
           isVisible: and(
-            'parent.value.pathEnabled',
+            'parent.isCaveatEnabled',
             'parent.spacesProxy.isFulfilled'
           ),
           spaces: reads('parent.spacesProxy.content'),
@@ -1044,7 +1047,7 @@ export default Component.extend(I18n, {
                   name: 'pathSpace',
                   areValidationClassesEnabled: false,
                 }),
-                TextField.extend({}).create({
+                TextField.create({
                   name: 'pathString',
                   defaultValue: '',
                   isOptional: true,
@@ -1056,35 +1059,22 @@ export default Component.extend(I18n, {
         }).create({
           name: 'path',
         }),
-        LoadingField.extend({
-          loadingProxy: reads('parent.spacesProxy'),
-          isVisible: and('parent.value.pathEnabled', not('isFulfilled')),
-          label: getBy(
-            array.findBy('parent.fields', raw('name'), raw('path')),
-            raw('label')
-          ),
-          isValid: reads('isFulfilled'),
-        }).create({
-          name: 'loadingPathSpaces',
-        }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.dataAccessCaveats.pathCaveat.pathEnabled'
-          ),
-        }).create({ name: 'pathDisabledText' }),
+        createDisabledCaveatDescription('path'),
       ],
     });
   }),
 
+  /**
+   * ObjectId caveat
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
   objectIdCaveatGroup: computed(function objectIdCaveatGroup() {
     return CaveatFormGroup.create({
       name: 'objectIdCaveat',
       fields: [
-        CaveatGroupToggle.create({ name: 'objectIdEnabled' }),
+        createCaveatToggleField('objectId'),
         FormFieldsCollectionGroup.extend({
-          isVisible: reads(
-            'valuesSource.caveats.dataAccessCaveats.objectIdCaveat.objectIdEnabled'
-          ),
+          isVisible: reads('parent.isCaveatEnabled'),
           fieldFactoryMethod(createdFieldsCounter) {
             return TextField.create({
               name: 'objectIdEntry',
@@ -1094,11 +1084,7 @@ export default Component.extend(I18n, {
         }).create({
           name: 'objectId',
         }),
-        StaticTextField.extend({
-          isVisible: not(
-            'valuesSource.caveats.dataAccessCaveats.objectIdCaveat.objectIdEnabled'
-          ),
-        }).create({ name: 'objectIdDisabledText' }),
+        createDisabledCaveatDescription('objectId'),
       ],
     });
   }),
@@ -1128,7 +1114,11 @@ export default Component.extend(I18n, {
     });
   },
 
-  getTargetOptionsForModel(modelName) {
+  /**
+   * @param {String} modelName 
+   * @returns {PromiseArray<FieldOption>}
+   */
+  getRecordOptionsForModel(modelName) {
     const {
       spaceManager,
       groupManager,
@@ -1159,7 +1149,7 @@ export default Component.extend(I18n, {
         break;
     }
 
-    return PromiseObject.create({
+    return PromiseArray.create({
       promise: records
         .then(records => get(records, 'list'))
         .then(recordsList => recordsList.sortBy('name'))
@@ -1171,8 +1161,12 @@ export default Component.extend(I18n, {
     });
   },
 
+  /**
+   * @param {String} modelName 
+   * @returns {PromiseArray<String>}
+   */
   getPrivilegesPresetForModel(modelName) {
-    return PromiseObject.create({
+    return PromiseArray.create({
       promise: this.get('privilegeManager')
         .getPrivilegesPresetForModel(modelName)
         .then(result => result['member']),
@@ -1205,4 +1199,21 @@ export default Component.extend(I18n, {
 function onlySettledOk(promiseArr) {
   return allSettled(promiseArr)
     .then(arr => arr.filterBy('state', 'fulfilled').mapBy('value'));
+}
+
+function createCaveatToggleField(caveatName) {
+  return ToggleField.extend({
+    classes: 'caveat-group-toggle',
+    addColonToLabel: false,
+    defaultValue: false,
+    isGroupToggle: true,
+  }).create({ name: `${caveatName}Enabled` });
+}
+
+function createDisabledCaveatDescription(caveatName) {
+  return StaticTextField.extend({
+    isVisible: not('parent.isCaveatEnabled'),
+  }).create({
+    name: `${caveatName}DisabledText`,
+  });
 }

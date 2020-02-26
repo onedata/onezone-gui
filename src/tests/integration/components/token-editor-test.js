@@ -101,7 +101,7 @@ const caveats = [{
 }, {
   name: 'asn',
   label: 'ASN',
-  disabledDescription: 'This token can be used on any ASN',
+  disabledDescription: 'This token can be used in any ASN',
 }, {
   name: 'ip',
   label: 'IP',
@@ -237,7 +237,7 @@ describe('Integration | Component | token editor', function () {
       expect(this.$('.type-field .option-identity').text().trim())
         .to.equal('identity');
       expect(this.$('.type-field .option-invite').text().trim())
-        .to.equal('invitation');
+        .to.equal('invite');
     });
   });
 
@@ -561,7 +561,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.type-field .option-invite'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
-            usageLimitSelector: 'infinity',
+            usageLimitType: 'infinity',
           }));
           expectToBeValid(this, 'usageLimit');
           expect(this.$('.usageLimit-field .option-infinity input').prop('checked'))
@@ -580,7 +580,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.usageLimit-field .option-number'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
-            usageLimitSelector: 'number',
+            usageLimitType: 'number',
           }));
           expectToBeInvalid(this, 'usageLimit');
         });
@@ -598,7 +598,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => fillIn('.usageLimitNumber-field input', '10'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
-            usageLimitSelector: 'number',
+            usageLimitType: 'number',
             usageLimitNumber: '10',
           }));
           expectToBeValid(this, 'usageLimit');
@@ -617,7 +617,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => fillIn('.usageLimitNumber-field input', '0'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
-            usageLimitSelector: 'number',
+            usageLimitType: 'number',
             usageLimitNumber: '0',
           }));
           expectToBeInvalid(this, 'usageLimit');

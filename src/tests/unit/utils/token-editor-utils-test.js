@@ -226,7 +226,7 @@ describe('Unit | Utility | token editor utils', function () {
                 },
               },
               usageLimit: {
-                usageLimitSelector: 'infinity',
+                usageLimitType: 'infinity',
                 usageLimitNumber: '2',
               },
             },
@@ -251,7 +251,7 @@ describe('Unit | Utility | token editor utils', function () {
                 },
               },
               usageLimit: {
-                usageLimitSelector: 'number',
+                usageLimitType: 'number',
                 usageLimitNumber: '2',
               },
             },
@@ -280,7 +280,7 @@ describe('Unit | Utility | token editor utils', function () {
                   },
                 },
                 usageLimit: {
-                  usageLimitSelector: 'number',
+                  usageLimitType: 'number',
                   usageLimitNumber: '2',
                 },
               },

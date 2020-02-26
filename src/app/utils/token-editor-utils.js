@@ -64,7 +64,7 @@ export function editorDataToToken(editorData, currentUser) {
     const target = get(basic, 'inviteDetails.inviteTargetDetails.target');
     const privileges =
       get(basic, 'inviteDetails.inviteTargetDetails.invitePrivilegesDetails.privileges');
-    const usageLimitSelector = get(basic, 'inviteDetails.usageLimit.usageLimitSelector');
+    const usageLimitType = get(basic, 'inviteDetails.usageLimit.usageLimitType');
     const usageLimitNumber = get(basic, 'inviteDetails.usageLimit.usageLimitNumber');
 
     if (inviteType) {
@@ -87,9 +87,9 @@ export function editorDataToToken(editorData, currentUser) {
         }
       }
     }
-    if (usageLimitSelector === 'infinity') {
+    if (usageLimitType === 'infinity') {
       tokenData.usageLimit = 'infinity';
-    } else if (usageLimitSelector === 'number' && usageLimitNumber) {
+    } else if (usageLimitType === 'number' && usageLimitNumber) {
       const parsedUsageLimitNumber = parseInt(usageLimitNumber);
       if (parsedUsageLimitNumber && parsedUsageLimitNumber > 0) {
         tokenData.usageLimit = parsedUsageLimitNumber;

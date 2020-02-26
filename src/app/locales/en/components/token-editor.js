@@ -95,7 +95,7 @@ export default {
         },
         usageLimit: {
           label: 'Usage limit',
-          usageLimitSelector: {
+          usageLimitType: {
             options: {
               infinity: {
                 label: 'infinity',
