@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { fillIn, click } from 'ember-native-dom-helpers';
 import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
+import OneDatetimePickerHelper from '../../helpers/one-datetime-picker';
 import $ from 'jquery';
 import wait from 'ember-test-helpers/wait';
 import _ from 'lodash';
@@ -229,27 +230,21 @@ describe('Integration | Component | token editor', function () {
     this.render(hbs `{{token-editor}}`);
 
     expectLabelToEqual(this, 'type', 'Type');
-    return wait().then(() => {
-      expect(this.$('.type-field .control-label').text().trim())
-        .to.equal('Type:');
-      expect(this.$('.type-field .option-access').text().trim())
-        .to.equal('access');
-      expect(this.$('.type-field .option-identity').text().trim())
-        .to.equal('identity');
-      expect(this.$('.type-field .option-invite').text().trim())
-        .to.equal('invite');
-    });
+    [
+      'access',
+      'identity',
+      'invite',
+    ].forEach(type =>
+      expect(this.$(`.type-field .option-${type}`).text().trim()).to.equal(type)
+    );
   });
 
   it('has "type" field with preselected "access" option', function () {
     this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-    return wait().then(() => {
-      expectToHaveValue(this, 'type', 'access');
-      expectToBeValid(this, 'type');
-      expect(this.$('.type-field .option-access input').prop('checked')).to.be
-        .true;
-    });
+    expectToHaveValue(this, 'type', 'access');
+    expectToBeValid(this, 'type');
+    expect(this.$('.type-field .option-access input').prop('checked')).to.be.true;
   });
 
   [
@@ -259,8 +254,7 @@ describe('Integration | Component | token editor', function () {
     it(`notifies about "type" field change to ${type}`, function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click(`.type-field .option-${type}`))
+      return click(`.type-field .option-${type}`)
         .then(() => {
           expectToHaveValue(this, 'type', type);
           expectToBeValid(this, 'type');
@@ -273,12 +267,11 @@ describe('Integration | Component | token editor', function () {
     'identity',
   ].forEach(type => {
     it(
-      'does not show invitation related basic fields if "type" is "access"',
+      `does not show invitation related basic fields if "type" is "${type}"`,
       function () {
         this.render(hbs `{{token-editor}}`);
 
-        return wait()
-          .then(() => click(`.type-field .option-${type}`))
+        return click(`.type-field .option-${type}`)
           .then(() =>
             expect(this.$('.inviteDetails-collapse')).to.not.have.class('in')
           );
@@ -291,11 +284,8 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
-        .then(() => {
-          expect(this.$('.inviteDetails-collapse')).to.have.class('in');
-        });
+      return click('.type-field .option-invite')
+        .then(() => expect(this.$('.inviteDetails-collapse')).to.have.class('in'));
     }
   );
 
@@ -303,10 +293,12 @@ describe('Integration | Component | token editor', function () {
     this.render(hbs `{{token-editor}}`);
 
     const inviteTypeHelper = new InviteTypeHelper();
-    expectLabelToEqual(this, 'inviteType', 'Invitation type');
-    return wait()
-      .then(() => click('.type-field .option-invite'))
-      .then(() => inviteTypeHelper.open())
+
+    return click('.type-field .option-invite')
+      .then(() => {
+        expectLabelToEqual(this, 'inviteType', 'Invitation type');
+        return inviteTypeHelper.open();
+      })
       .then(() => {
         tokenInviteTypes.forEach(({ label, icon }, index) => {
           const $option = $(inviteTypeHelper.getNthOption(index + 1));
@@ -321,28 +313,12 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => {
           expectToHaveValue(this, 'inviteType', preselectedInviteType.inviteType);
           expectToBeValid(this, 'inviteType');
           const $dropdownTrigger = $(new InviteTypeHelper().getTrigger());
-          expect($dropdownTrigger.text().trim())
-            .to.equal(preselectedInviteType.label);
-        });
-    }
-  );
-
-  it(
-    'has not valid "target" field when it is empty',
-    function () {
-      this.render(hbs `{{token-editor onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => click('.type-field .option-invite'))
-        .then(() => {
-          expectToHaveNoValue(this, 'target');
-          expectToBeInvalid(this, 'target');
+          expect($dropdownTrigger.text().trim()).to.equal(preselectedInviteType.label);
         });
     }
   );
@@ -352,8 +328,20 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => expectToBeValid(this, 'target'));
+      expectToBeValid(this, 'target');
+    }
+  );
+
+  it(
+    'has not valid "target" field when it is empty',
+    function () {
+      this.render(hbs `{{token-editor onChange=(action "change")}}`);
+
+      return click('.type-field .option-invite')
+        .then(() => {
+          expectToHaveNoValue(this, 'target');
+          expectToBeInvalid(this, 'target');
+        });
     }
   );
 
@@ -371,8 +359,7 @@ describe('Integration | Component | token editor', function () {
 
       const inviteTypeHelper = new InviteTypeHelper();
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => inviteTypeHelper.selectOption(index + 1))
         .then(() => {
           expectToHaveValue(this, 'inviteType', inviteType);
@@ -386,12 +373,9 @@ describe('Integration | Component | token editor', function () {
         function () {
           this.render(hbs `{{token-editor}}`);
 
-          const inviteTypeHelper = new InviteTypeHelper();
           const targetHelper = new TargetHelper();
-
-          return wait()
-            .then(() => click('.type-field .option-invite'))
-            .then(() => inviteTypeHelper.selectOption(index + 1))
+          return click('.type-field .option-invite')
+            .then(() => new InviteTypeHelper().selectOption(index + 1))
             .then(() => {
               const $collapse = this.$('.inviteTargetDetails-collapse');
               const $placeholder =
@@ -399,14 +383,13 @@ describe('Integration | Component | token editor', function () {
               expect($collapse).to.have.class('in');
               expectLabelToEqual(this, 'target', targetLabel);
               expect($placeholder.text().trim()).to.equal(targetPlaceholder);
+              return targetHelper.open();
             })
-            .then(() => targetHelper.open())
             .then(() => {
               const $thirdOption = $(targetHelper.getNthOption(3));
               expect($thirdOption).to.exist;
               expect(targetHelper.getNthOption(4)).to.not.exist;
-              expect($thirdOption.find('.one-icon'))
-                .to.have.class(`oneicon-${icon}`);
+              expect($thirdOption.find('.one-icon')).to.have.class(`oneicon-${icon}`);
               expect($thirdOption.find('.text').text().trim())
                 .to.equal(`${targetModelName}2`);
             });
@@ -418,13 +401,9 @@ describe('Integration | Component | token editor', function () {
         function () {
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-          const inviteTypeHelper = new InviteTypeHelper();
-          const targetHelper = new TargetHelper();
-
-          return wait()
-            .then(() => click('.type-field .option-invite'))
-            .then(() => inviteTypeHelper.selectOption(index + 1))
-            .then(() => targetHelper.selectOption(1))
+          return click('.type-field .option-invite')
+            .then(() => new InviteTypeHelper().selectOption(index + 1))
+            .then(() => new TargetHelper().selectOption(1))
             .then(() => {
               const selectedTarget =
                 this.get(`mockedRecords.${targetModelName}.lastObject`);
@@ -440,8 +419,7 @@ describe('Integration | Component | token editor', function () {
           function () {
             this.render(hbs `{{token-editor}}`);
 
-            return wait()
-              .then(() => click('.type-field .option-invite'))
+            return click('.type-field .option-invite')
               .then(() => new InviteTypeHelper().selectOption(index + 1))
               .then(() => {
                 expect(this.$('.invitePrivilegesDetails-collapse'))
@@ -453,7 +431,7 @@ describe('Integration | Component | token editor', function () {
                 expect(this.$(
                   `.node-text:contains(View ${targetModelName}) + .form-group .one-way-toggle`
                 )).to.have.class('checked');
-                expect(this.$('.one-way-toggle.checked')).to.have.length(1);
+                expect(this.$('.privileges-field .one-way-toggle.checked')).to.have.length(1);
               });
           }
         );
@@ -463,11 +441,8 @@ describe('Integration | Component | token editor', function () {
           function () {
             this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-            const inviteTypeHelper = new InviteTypeHelper();
-
-            return wait()
-              .then(() => click('.type-field .option-invite'))
-              .then(() => inviteTypeHelper.selectOption(index + 1))
+            return click('.type-field .option-invite')
+              .then(() => new InviteTypeHelper().selectOption(index + 1))
               .then(() => click(this.$(
                 `.node-text:contains(Modify ${targetModelName}) + .form-group .one-way-toggle`
               )[0]))
@@ -486,11 +461,8 @@ describe('Integration | Component | token editor', function () {
           function () {
             this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-            const inviteTypeHelper = new InviteTypeHelper();
-
-            return wait()
-              .then(() => click('.type-field .option-invite'))
-              .then(() => inviteTypeHelper.selectOption(index + 1))
+            return click('.type-field .option-invite')
+              .then(() => new InviteTypeHelper().selectOption(index + 1))
               .then(() => {
                 expect(this.$('.invitePrivilegesDetails-collapse'))
                   .to.not.have.class('in');
@@ -504,11 +476,8 @@ describe('Integration | Component | token editor', function () {
         function () {
           this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-          const inviteTypeHelper = new InviteTypeHelper();
-
-          return wait()
-            .then(() => click('.type-field .option-invite'))
-            .then(() => inviteTypeHelper.selectOption(index + 1))
+          return click('.type-field .option-invite')
+            .then(() => new InviteTypeHelper().selectOption(index + 1))
             .then(() => {
               expect(this.$('.inviteTargetDetails-collapse'))
                 .to.not.have.class('in');
@@ -523,13 +492,9 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      const inviteTypeHelper = new InviteTypeHelper();
-      const targetHelper = new TargetHelper();
-
-      return wait()
-        .then(() => click('.type-field .option-invite'))
-        .then(() => targetHelper.selectOption(1))
-        .then(() => inviteTypeHelper.selectOption(3))
+      return click('.type-field .option-invite')
+        .then(() => new TargetHelper().selectOption(1))
+        .then(() => new InviteTypeHelper().selectOption(3))
         .then(() => expectToHaveNoValue(this, 'target'));
     }
   );
@@ -537,18 +502,15 @@ describe('Integration | Component | token editor', function () {
   it('renders "usageLimit" field', function () {
     this.render(hbs `{{token-editor}}`);
 
-    expectLabelToEqual(this, 'usageLimit', 'Usage limit');
-    return wait()
-      .then(() => click('.type-field .option-invite'))
+    return click('.type-field .option-invite')
       .then(() => {
+        expectLabelToEqual(this, 'usageLimit', 'Usage limit');
         expect(this.$('.usageLimit-field .control-label').text().trim())
           .to.equal('Usage limit:');
         expect(this.$('.usageLimit-field .option-infinity').text().trim())
           .to.equal('infinity');
         expect(this.$('.usageLimit-field .option-number').text().trim())
           .to.equal('');
-        expect(this.$('.usageLimitNumber-field input').attr('placeholder'))
-          .to.equal('Enter exact number');
       });
   });
 
@@ -557,15 +519,16 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
             usageLimitType: 'infinity',
           }));
           expectToBeValid(this, 'usageLimit');
-          expect(this.$('.usageLimit-field .option-infinity input').prop('checked'))
-            .to.be.true;
+          expect(this.$('.usageLimit-field .option-infinity input'))
+            .to.have.prop('checked');
+          expect(this.$('.usageLimit-field .usageLimitNumber-field input'))
+            .to.have.attr('disabled');
         });
     }
   );
@@ -575,8 +538,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => click('.usageLimit-field .option-number'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
@@ -592,14 +554,13 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => click('.usageLimit-field .option-number'))
-        .then(() => fillIn('.usageLimitNumber-field input', '10'))
+        .then(() => fillIn('.usageLimitNumber-field input', '1'))
         .then(() => {
           expectToHaveValue(this, 'usageLimit', sinon.match({
             usageLimitType: 'number',
-            usageLimitNumber: '10',
+            usageLimitNumber: '1',
           }));
           expectToBeValid(this, 'usageLimit');
         });
@@ -611,8 +572,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => click('.usageLimit-field .option-number'))
         .then(() => fillIn('.usageLimitNumber-field input', '0'))
         .then(() => {
@@ -630,8 +590,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor}}`);
 
-      return wait()
-        .then(() => expect(this.$('.caveats-collapse')).to.not.have.class('in'));
+      expect(this.$('.caveats-collapse')).to.not.have.class('in');
     }
   );
 
@@ -640,8 +599,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
-      return wait()
-        .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
+      expect(this.$('.caveats-collapse')).to.have.class('in');
     }
   );
 
@@ -663,8 +621,7 @@ describe('Integration | Component | token editor', function () {
     it(
       `has valid and disabled ${name} caveat on init`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
         expectToBeValid(this, name);
         if (!dontTestValue) {
@@ -678,16 +635,12 @@ describe('Integration | Component | token editor', function () {
     it(
       `hides disabled description and shows form field on ${name} caveat toggle change`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-        return wait()
-          .then(() => toggleCaveat(name))
+        return toggleCaveat(name)
           .then(() => {
-            const $disabledDescription = this.$(`.${name}DisabledText-field`);
-
             expectCaveatToggleState(this, name, true);
-            expect($disabledDescription).to.not.exist;
+            expect(this.$(`.${name}DisabledText-field`)).to.not.exist;
 
             if (!dontTestValue) {
               expect(getFieldElement(this, name)).to.exist;
@@ -706,11 +659,9 @@ describe('Integration | Component | token editor', function () {
       const tomorrow = moment().add(1, 'day').endOf('day');
       const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
 
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('expire'))
+      return toggleCaveat('expire')
         .then(() => {
           expectCaveatToHaveValue(this, 'expire', true, sinon.match(value =>
             tomorrow.isSame(value) || dayAfterTomorrow.isSame(value)
@@ -721,17 +672,35 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'notifies about expire caveat change',
+    function () {
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+      let oldExpire;
+      return toggleCaveat('expire')
+        .then(() => {
+          oldExpire =
+            this.get('changeSpy').lastCall.args[0].values.caveats.expireCaveat.expire;
+          return new OneDatetimePickerHelper(this.$('.expire-field input')).selectToday();
+        })
+        .then(() => {
+          expectCaveatToHaveValue(this, 'expire', true, sinon.match(value =>
+            !moment(oldExpire).isSame(value)
+          ));
+          expectToBeValid(this, 'expire');
+        });
+    }
+  );
+
+  it(
     'renders interface caveat form elements when that caveat is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      let $restOption, $oneclientOption;
-      return wait()
-        .then(() => toggleCaveat('interface'))
+      return toggleCaveat('interface')
         .then(() => {
-          $restOption = this.$('.option-rest');
-          $oneclientOption = this.$('.option-oneclient');
+          const $restOption = this.$('.option-rest');
+          const $oneclientOption = this.$('.option-oneclient');
           expect($restOption).to.exist;
           expect($restOption.text().trim()).to.equal('REST');
           expect($oneclientOption).to.exist;
@@ -746,17 +715,15 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about interface caveat change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('interface'))
+      return toggleCaveat('interface')
         .then(() => click('.option-oneclient'))
         .then(() => {
           expectCaveatToHaveValue(this, 'interface', true, 'oneclient');
           expectToBeValid(this, 'interface');
+          return click('.option-rest');
         })
-        .then(() => click('.option-rest'))
         .then(() => {
           expectCaveatToHaveValue(this, 'interface', true, 'rest');
           expectToBeValid(this, 'interface');
@@ -771,11 +738,9 @@ describe('Integration | Component | token editor', function () {
     it(
       `renders empty, invalid ${caveatName} caveat when it is enabled`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-        return wait()
-          .then(() => toggleCaveat(caveatName))
+        return toggleCaveat(caveatName)
           .then(() => {
             expectCaveatToHaveValue(this, caveatName, true, sinon.match([]));
             expectToBeInvalid(this, caveatName);
@@ -787,11 +752,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about asn caveat change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('asn'))
+      return toggleCaveat('asn')
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', '123,2,123,'))
         .then(() => {
@@ -804,11 +767,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid asn',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('asn'))
+      return toggleCaveat('asn')
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', 'abc,'))
         .then(() => {
@@ -821,15 +782,14 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about ip caveat change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('ip'))
+      return toggleCaveat('ip')
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn(
           '.ip-field .text-editor-input',
-          '1.1.1.1/24,1.1.1.1/23,1.1.1.1,255.255.255.255,1.1.1.1/24,'))
+          '1.1.1.1/24,1.1.1.1/23,1.1.1.1,255.255.255.255,1.1.1.1/24,'
+        ))
         .then(() => {
           expectCaveatToHaveValue(this, 'ip', true, [
             '1.1.1.1',
@@ -845,11 +805,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid ip',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('ip'))
+      return toggleCaveat('ip')
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/33,'))
         .then(() => {
@@ -862,11 +820,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid region caveat when it is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('region'))
+      return toggleCaveat('region')
         .then(() => {
           expectCaveatToHaveValue(this, 'region', true,
             sinon.match.has('regionList', sinon.match([])));
@@ -881,11 +837,9 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about region caveat change to ["${value}"]`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-        return wait()
-          .then(() => toggleCaveat('region'))
+        return toggleCaveat('region')
           .then(() => click('.region-field .tags-input'))
           .then(() => click(
             getTagsSelector().find(`.selector-item:contains(${label})`)[0]
@@ -902,12 +856,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about region caveat type change to "deny"',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let regionTypeHelper;
-      return wait()
-        .then(() => toggleCaveat('region'))
+      return toggleCaveat('region')
         .then(() => {
           regionTypeHelper = new RegionTypeHelper();
           return regionTypeHelper.selectOption(2);
@@ -924,11 +876,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'sorts tags in region caveat input',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('region'))
+      return toggleCaveat('region')
         .then(() => click('.region-field .tags-input'))
         .then(() => click(
           getTagsSelector().find('.selector-item:contains("Europe")')[0]
@@ -951,11 +901,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid country caveat when it is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('country'))
+      return toggleCaveat('country')
         .then(() => {
           expectCaveatToHaveValue(this, 'country', true,
             sinon.match.has('countryList', sinon.match([])));
@@ -969,11 +917,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('country'))
+      return toggleCaveat('country')
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'pl,cz,pl,DK,dk,'))
         .then(() => {
@@ -987,11 +933,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid country',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('country'))
+      return toggleCaveat('country')
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'a1,usa,b,a_,'))
         .then(() => {
@@ -1005,12 +949,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat type change to "deny"',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let countryTypeHelper;
-      return wait()
-        .then(() => toggleCaveat('country'))
+      return toggleCaveat('country')
         .then(() => {
           countryTypeHelper = new CountryTypeHelper();
           return countryTypeHelper.selectOption(2);
@@ -1029,8 +971,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('service'))
+      return toggleCaveat('service')
         .then(() => {
           expectCaveatToHaveValue(this, 'service', true, []);
           expectToBeInvalid(this, 'service');
@@ -1046,9 +987,9 @@ describe('Integration | Component | token editor', function () {
       `shows ${typeName} list in service caveat`,
       function () {
         this.render(hbs `{{token-editor expandCaveats=true}}`);
+
         let typeSelectorHelper;
-        return wait()
-          .then(() => toggleCaveat('service'))
+        return toggleCaveat('service')
           .then(() => click('.service-field .tags-input'))
           .then(() => {
             typeSelectorHelper = new TagsSelectorDropdownHelper();
@@ -1058,6 +999,7 @@ describe('Integration | Component | token editor', function () {
               .to.equal(_.startCase(typeName));
             const $selectorItems = getTagsSelector().find('.selector-item');
             expect($selectorItems).to.have.length(4);
+            // 3 because one selector-item is an "all" item
             _.times(3, i => {
               expect($selectorItems.filter(`:contains(cluster${i})`)).to.exist;
             });
@@ -1069,8 +1011,7 @@ describe('Integration | Component | token editor', function () {
   it('notifies about adding new service in service caveat', function () {
     this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-    return wait()
-      .then(() => toggleCaveat('service'))
+    return toggleCaveat('service')
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[0]))
       .then(() => {
@@ -1090,8 +1031,8 @@ describe('Integration | Component | token editor', function () {
       `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in service caveat`,
       function () {
         this.render(hbs `{{token-editor expandCaveats=true}}`);
-        return wait()
-          .then(() => toggleCaveat('service'))
+
+        return toggleCaveat('service')
           .then(() => click('.service-field .tags-input'))
           .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
           .then(() => click(getTagsSelector().find('.record-item')[0]))
@@ -1112,8 +1053,7 @@ describe('Integration | Component | token editor', function () {
   it('sorts selected tags in service caveat', function () {
     this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-    return wait()
-      .then(() => toggleCaveat('service'))
+    return toggleCaveat('service')
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
       .then(() => click(getTagsSelector().find('.record-item')[0]))
@@ -1127,11 +1067,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid path caveat when it is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('path'))
+      return toggleCaveat('path')
         .then(() => {
           expectCaveatToHaveValue(this, 'path', true,
             sinon.match.has('__fieldsValueNames', sinon.match([])));
@@ -1143,19 +1081,14 @@ describe('Integration | Component | token editor', function () {
   it(
     'preselects first available space and path "" for new entry in path caveat',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('path'))
-        .then(() =>
-          click(getFieldElement(this, 'path').find('.add-field-button')[0])
-        )
+      return toggleCaveat('path')
+        .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
-          const selectedTarget =
-            this.get('mockedRecords.space.lastObject');
+          const selectedSpace = this.get('mockedRecords.space.lastObject');
           expectCaveatToHaveValue(this, 'path', true,
-            sinon.match.hasNested('pathEntry0.pathSpace', selectedTarget));
+            sinon.match.hasNested('pathEntry0.pathSpace', selectedSpace));
           expectCaveatToHaveValue(this, 'path', true,
             sinon.match.hasNested('pathEntry0.pathString', ''));
           expectToBeValid(this, 'path');
@@ -1175,11 +1108,8 @@ describe('Integration | Component | token editor', function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
       let pathSpaceHelper;
-      return wait()
-        .then(() => toggleCaveat('path'))
-        .then(() =>
-          click(getFieldElement(this, 'path').find('.add-field-button')[0])
-        )
+      return toggleCaveat('path')
+        .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
           pathSpaceHelper = new PathSpaceHelper();
           return pathSpaceHelper.open();
@@ -1197,15 +1127,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about path caveat entry space change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
       let pathSpaceHelper;
-      return wait()
-        .then(() => toggleCaveat('path'))
-        .then(() =>
-          click(getFieldElement(this, 'path').find('.add-field-button')[0])
-        )
+      return toggleCaveat('path')
+        .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
           pathSpaceHelper = new PathSpaceHelper();
           return pathSpaceHelper.selectOption(3);
@@ -1214,33 +1140,9 @@ describe('Integration | Component | token editor', function () {
           const $selectorTrigger = $(pathSpaceHelper.getTrigger());
           expect($selectorTrigger.find('.text').text().trim()).to.equal('space2');
 
-          const selectedTarget =
-            this.get('mockedRecords.space.firstObject');
+          const selectedSpace = this.get('mockedRecords.space.firstObject');
           expectCaveatToHaveValue(this, 'path', true,
-            sinon.match.hasNested('pathEntry0.pathSpace', selectedTarget));
-          expectToBeValid(this, 'path');
-        });
-    }
-  );
-
-  it(
-    'notifies about path caveat entry path change',
-    function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
-
-      return wait()
-        .then(() => toggleCaveat('path'))
-        .then(() =>
-          click(getFieldElement(this, 'path').find('.add-field-button')[0])
-        )
-        .then(() => fillIn(
-          getFieldElement(this, 'path').find('.pathString-field input')[0],
-          '/abc'
-        ))
-        .then(() => {
-          expectCaveatToHaveValue(this, 'path', true,
-            sinon.match.hasNested('pathEntry0.pathString', '/abc'));
+            sinon.match.hasNested('pathEntry0.pathSpace', selectedSpace));
           expectToBeValid(this, 'path');
         });
     }
@@ -1254,14 +1156,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about correct path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-        return wait()
-          .then(() => toggleCaveat('path'))
-          .then(() =>
-            click(getFieldElement(this, 'path').find('.add-field-button')[0])
-          )
+        return toggleCaveat('path')
+          .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
           .then(() => fillIn(
             getFieldElement(this, 'path').find('.pathString-field input')[0],
             pathString
@@ -1280,14 +1178,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(
-          hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-        return wait()
-          .then(() => toggleCaveat('path'))
-          .then(() =>
-            click(getFieldElement(this, 'path').find('.add-field-button')[0])
-          )
+        return toggleCaveat('path')
+          .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
           .then(() => fillIn(
             getFieldElement(this, 'path').find('.pathString-field input')[0],
             pathString
@@ -1309,11 +1203,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders readonly caveat form elements when that caveat is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('readonly'))
+      return toggleCaveat('readonly')
         .then(() => {
           expect(this.$('.readonlyEnabledText-field').text().trim())
             .to.equal('This token allows only read access to user files');
@@ -1326,11 +1218,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid objectId caveat when it is enabled',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('objectId'))
+      return toggleCaveat('objectId')
         .then(() => {
           expectCaveatToHaveValue(this, 'objectId', true,
             sinon.match.has('__fieldsValueNames', sinon.match([])));
@@ -1342,11 +1232,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about objectId caveat change',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('objectId'))
+      return toggleCaveat('objectId')
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
         )
@@ -1362,11 +1250,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'informs about invalid (empty) objectId entry',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('objectId'))
+      return toggleCaveat('objectId')
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
         )
@@ -1375,7 +1261,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'has readonly, path and objectId caveats under dataAccessCaveats',
+    'has readonly, path and objectId caveats under dataAccessCaveats group',
     function () {
       const caveatsToCheck = [
         'readonly',
@@ -1385,16 +1271,13 @@ describe('Integration | Component | token editor', function () {
 
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
-      return wait()
-        .then(() => {
-          caveatsToCheck.forEach(caveatName => {
-            const caveatSelector =
-              `.dataAccessCaveats-field .${caveatName}Caveat-field.caveat-group`;
-            expect(this.$(caveatSelector)).to.exist;
-          });
-          expect(this.$('.dataAccessCaveats-field .caveat-group'))
-            .to.have.length(caveatsToCheck.length);
-        });
+      caveatsToCheck.forEach(caveatName => {
+        const caveatSelector =
+          `.dataAccessCaveats-field .${caveatName}Caveat-field.caveat-group`;
+        expect(this.$(caveatSelector)).to.exist;
+      });
+      expect(this.$('.dataAccessCaveats-field .caveat-group'))
+        .to.have.length(caveatsToCheck.length);
     }
   );
 
@@ -1403,8 +1286,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-access'))
+      return click('.type-field .option-access')
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
@@ -1418,8 +1300,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-identity'))
+      return click('.type-field .option-identity')
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
@@ -1433,8 +1314,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       this.render(hbs `{{token-editor expandCaveats=true}}`);
 
-      return wait()
-        .then(() => click('.type-field .option-invite'))
+      return click('.type-field .option-invite')
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.not.have.class('in');
@@ -1446,11 +1326,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'ignores validation errors in access only caveats when token type is not access',
     function () {
-      this.render(
-        hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
 
-      return wait()
-        .then(() => toggleCaveat('objectId'))
+      return toggleCaveat('objectId')
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
         )
@@ -1469,20 +1347,16 @@ describe('Integration | Component | token editor', function () {
   it('renders disabled submit button', function () {
     this.render(hbs `{{token-editor}}`);
 
-    return wait()
-      .then(() => {
-        const $submit = this.$('.submit-token');
-        expect($submit).to.exist;
-        expect($submit.text().trim()).to.equal('Create token');
-        expect($submit).to.have.attr('disabled');
-      });
+    const $submit = this.$('.submit-token');
+    expect($submit).to.exist;
+    expect($submit.text().trim()).to.equal('Create token');
+    expect($submit).to.have.attr('disabled');
   });
 
   it('renders enabled submit button when form becomes valid', function () {
     this.render(hbs `{{token-editor}}`);
 
-    return wait()
-      .then(() => fillIn('.name-field input', 'abc'))
+    return fillIn('.name-field input', 'abc')
       .then(() =>
         expect(this.$('.submit-token')).to.not.have.attr('disabled')
       );
@@ -1493,8 +1367,7 @@ describe('Integration | Component | token editor', function () {
     this.on('submit', submitSpy);
     this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
 
-    return wait()
-      .then(() => fillIn('.name-field input', 'abc'))
+    return fillIn('.name-field input', 'abc')
       .then(() => click('.submit-token'))
       .then(() => {
         expect(submitSpy).to.be.calledOnce;
@@ -1506,13 +1379,11 @@ describe('Integration | Component | token editor', function () {
     function () {
       const submitSpy = sinon.spy();
       this.on('submit', submitSpy);
-      this.render(
-        hbs `{{token-editor expandCaveats=true onSubmit=(action "submit")}}`);
+      this.render(hbs `{{token-editor expandCaveats=true onSubmit=(action "submit")}}`);
 
-      return wait()
-        .then(() => fillIn('.name-field input', 'somename'))
+      return fillIn('.name-field input', 'somename')
         .then(() => click('.type-field .option-access'))
-        // 
+        // expire
         .then(() => toggleCaveat('expire'))
         // region
         .then(() => toggleCaveat('region'))
@@ -1608,8 +1479,7 @@ describe('Integration | Component | token editor', function () {
       this.on('submit', submitSpy);
       this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
 
-      return wait()
-        .then(() => fillIn('.name-field input', 'somename'))
+      return fillIn('.name-field input', 'somename')
         .then(() => click('.type-field .option-invite'))
         .then(() => new InviteTypeHelper().selectOption(1))
         .then(() => new TargetHelper().selectOption(1))
@@ -1640,11 +1510,8 @@ describe('Integration | Component | token editor', function () {
       const registerOneproviderDropdownIndex = tokenInviteTypes.indexOf(
         tokenInviteTypes.findBy('inviteType', 'registerOneprovider')
       ) + 1;
-      return wait()
-        .then(() => fillIn('.name-field input', 'somename'))
+      return fillIn('.name-field input', 'somename')
         .then(() => click('.type-field .option-invite'))
-        .then(() => new InviteTypeHelper().selectOption(1))
-        .then(() => new TargetHelper().selectOption(1))
         .then(() =>
           new InviteTypeHelper().selectOption(registerOneproviderDropdownIndex)
         )
@@ -1662,7 +1529,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'disables all fields and shows spinner in submit when submit promise is pending',
+    'disables all fields and shows spinner in submit button when submit promise is pending',
     function () {
       let submitResolve;
       const submitStub = sinon.stub()
@@ -1670,8 +1537,7 @@ describe('Integration | Component | token editor', function () {
       this.on('submit', submitStub);
       this.render(hbs `{{token-editor onSubmit=(action "submit")}}`);
 
-      return wait()
-        .then(() => fillIn('.name-field input', 'abc'))
+      return fillIn('.name-field input', 'abc')
         .then(() => click('.submit-token'))
         .then(() => {
           expect(this.$('input:not([disabled])')).to.not.exist;
@@ -1736,7 +1602,7 @@ const basicFieldNameToFieldPath = {
   usageLimit: 'basic.inviteDetails.usageLimit',
 };
 
-const caveatsWithAllowDenyTags = [
+const caveatsWithAllowDenyMode = [
   'region',
   'country',
 ];
@@ -1748,20 +1614,14 @@ const dataAccessCaveats = [
 ];
 
 function expectToBeValid(testCase, fieldName) {
-  const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
-  const fieldPath = basicFieldNameToFieldPath[fieldName];
-  let valuePath;
-  if (fieldPath) {
-    valuePath = fieldPath;
-  } else {
-    // Not found, probably a caveat field
-    expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
-    valuePath = caveatValueValidationPath(fieldName);
-  }
-  expect(invalidFields.filter(path => path.startsWith(valuePath))).to.be.empty;
+  expectValidationState(testCase, fieldName, true);
 }
 
 function expectToBeInvalid(testCase, fieldName) {
+  expectValidationState(testCase, fieldName, false);
+}
+
+function expectValidationState(testCase, fieldName, shouldBeValid) {
   const invalidFields = testCase.get('changeSpy').lastCall.args[0].invalidFields;
   const fieldPath = basicFieldNameToFieldPath[fieldName];
   let valuePath;
@@ -1772,7 +1632,12 @@ function expectToBeInvalid(testCase, fieldName) {
     expect(invalidFields).to.not.include(caveatEnabledFieldPath(fieldName));
     valuePath = caveatValueValidationPath(fieldName);
   }
-  expect(invalidFields.filter(path => path.startsWith(valuePath))).to.not.be.empty;
+  const invalidField = invalidFields.filter(path => path.startsWith(valuePath));
+  if (shouldBeValid) {
+    expect(invalidField).to.be.empty;
+  } else {
+    expect(invalidField).to.not.be.empty;
+  }
 }
 
 function caveatEnabledFieldPath(caveatName) {
@@ -1792,15 +1657,9 @@ function caveatValueFieldPath(caveatName) {
 }
 
 function caveatValueValidationPath(caveatName) {
-  let caveatPath = caveatName;
-  if (caveatsWithAllowDenyTags.includes(caveatName)) {
-    caveatPath = `${caveatName}.${caveatName}List`;
-  }
-  if (dataAccessCaveats.includes(caveatName)) {
-    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatPath}`;
-  } else {
-    return `caveats.${caveatName}Caveat.${caveatPath}`;
-  }
+  const path = caveatValueFieldPath(caveatName);
+  return caveatsWithAllowDenyMode.includes(caveatName) ?
+    `${path}.${caveatName}List` : path;
 }
 
 function expectToHaveValue(testCase, fieldName, value) {
