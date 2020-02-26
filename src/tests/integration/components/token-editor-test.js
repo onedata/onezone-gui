@@ -11,6 +11,7 @@ import wait from 'ember-test-helpers/wait';
 import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve, Promise } from 'rsvp';
 import moment from 'moment';
 
@@ -156,8 +157,12 @@ describe('Integration | Component | token editor', function () {
   });
 
   beforeEach(function () {
+    const currentUser = {
+      entityId: 'currentuser',
+      name: 'currentuser',
+    };
     sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
-      .resolves({ entityId: 'user1' });
+      .resolves(currentUser);
     const onedataGraphStub =
       sinon.stub(lookupService(this, 'onedata-graph'), 'request');
     const mockedRecords = {};
@@ -165,6 +170,7 @@ describe('Integration | Component | token editor', function () {
       'space',
       'group',
       'harvester',
+      'provider',
       'cluster',
     ].forEach(modelName => {
       onedataGraphStub.withArgs({
@@ -179,6 +185,26 @@ describe('Integration | Component | token editor', function () {
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
+        effUserList: PromiseObject.create({
+          promise: resolve({
+            list: PromiseArray.create({
+              promise: resolve([{
+                entityId: `${modelName}${index}user`,
+                name: `${modelName}${index}user`,
+              }]),
+            }),
+          }),
+        }),
+        effGroupList: PromiseObject.create({
+          promise: resolve({
+            list: PromiseArray.create({
+              promise: resolve([{
+                entityId: `${modelName}${index}group`,
+                name: `${modelName}${index}group`,
+              }]),
+            }),
+          }),
+        }),
       }));
       sinon.stub(service, getModelsMethodName)
         .resolves({
@@ -192,6 +218,7 @@ describe('Integration | Component | token editor', function () {
     this.setProperties({
       changeSpy,
       mockedRecords,
+      currentUser,
     });
   });
 
@@ -967,6 +994,135 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'renders empty, invalid consumer caveat when it is enabled',
+    function () {
+      this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+      return toggleCaveat('consumer')
+        .then(() => {
+          expectCaveatToHaveValue(this, 'consumer', true, []);
+          expectToBeInvalid(this, 'consumer');
+        });
+    }
+  );
+
+  [{
+    model: 'user',
+    name: 'User',
+    list: [
+      'currentuser',
+      'group0user',
+      'group1user',
+      'group2user',
+      'space0user',
+      'space1user',
+      'space2user',
+    ],
+  }, {
+    model: 'group',
+    name: 'Group',
+    list: [
+      'group0',
+      'group1',
+      'group2',
+      'group0group',
+      'group1group',
+      'group2group',
+      'space0group',
+      'space1group',
+      'space2group',
+    ],
+  }, {
+    model: 'provider',
+    name: 'Oneprovider',
+    list: [
+      'provider0',
+      'provider1',
+      'provider2',
+    ],
+  }].forEach(({ model, name, list }, index) => {
+    it(
+      `shows ${model} list in consumer caveat`,
+      function () {
+        this.render(hbs `{{token-editor expandCaveats=true}}`);
+
+        let typeSelectorHelper;
+        return toggleCaveat('consumer')
+          .then(() => click('.consumer-field .tags-input'))
+          .then(() => {
+            typeSelectorHelper = new TagsSelectorDropdownHelper();
+            return typeSelectorHelper.selectOption(index + 1);
+          })
+          .then(() => {
+            expect(typeSelectorHelper.getTrigger().innerText.trim()).to.equal(name);
+            const $selectorItems = getTagsSelector().find('.selector-item');
+            expect($selectorItems).to.have.length(list.length + 1);
+            list.forEach(recordName => {
+              expect($selectorItems.filter(`:contains(${recordName})`)).to.exist;
+            });
+          });
+      }
+    );
+  });
+
+  it('notifies about adding new consumer in consumer caveat', function () {
+    this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+    return toggleCaveat('consumer')
+      .then(() => click('.consumer-field .tags-input'))
+      .then(() => click(getTagsSelector().find('.record-item')[0]))
+      .then(() => {
+        expectCaveatToHaveValue(this, 'consumer', true, [{
+          model: 'user',
+          record: this.get('currentUser'),
+        }]);
+        expectToBeValid(this, 'consumer');
+      });
+  });
+
+  [
+    'user',
+    'group',
+    'provider',
+  ].forEach((typeName, index) => {
+    it(
+      `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in consumer caveat`,
+      function () {
+        this.render(hbs `{{token-editor expandCaveats=true}}`);
+
+        return toggleCaveat('consumer')
+          .then(() => click('.consumer-field .tags-input'))
+          .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
+          .then(() => click(getTagsSelector().find('.record-item')[0]))
+          .then(() => click(getTagsSelector().find('.record-item')[0]))
+          .then(() => {
+            expect(getFieldElement(this, 'consumer').find('.tag-item')).to.have.length(2);
+            return click(getTagsSelector().find('.all-item')[0]);
+          })
+          .then(() => {
+            const $tagItems = getFieldElement(this, 'consumer').find('.tag-item');
+            expect($tagItems).to.have.length(1);
+            expect($tagItems.text()).to.contain('Any');
+          });
+      }
+    );
+  });
+
+  it('sorts selected tags in consumer caveat', function () {
+    this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
+
+    return toggleCaveat('consumer')
+      .then(() => click('.consumer-field .tags-input'))
+      .then(() => click(getTagsSelector().find('.record-item')[1]))
+      .then(() => click(getTagsSelector().find('.record-item')[0]))
+      .then(() => {
+        const $tagItems = getFieldElement(this, 'consumer').find('.tag-item');
+        expect($tagItems.eq(0).text().trim()).to.equal('currentuser');
+        expect($tagItems.eq(1).text().trim()).to.equal('group0user');
+      });
+  });
+
+  it(
     'renders empty, invalid service caveat when it is enabled',
     function () {
       this.render(hbs `{{token-editor expandCaveats=true onChange=(action "change")}}`);
@@ -1405,6 +1561,10 @@ describe('Integration | Component | token editor', function () {
         .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn('.ip-field .text-editor-input', '255.255.255.255,'))
+        // consumer
+        .then(() => toggleCaveat('consumer'))
+        .then(() => click('.consumer-field .tags-input'))
+        .then(() => click(getTagsSelector().find('.record-item')[0]))
         // service
         .then(() => toggleCaveat('service'))
         .then(() => click('.service-field .tags-input'))
@@ -1440,7 +1600,7 @@ describe('Integration | Component | token editor', function () {
           expect(rawToken).to.have.nested.property('type.accessToken');
 
           const caveats = rawToken.caveats;
-          expect(caveats.length).to.equal(10);
+          expect(caveats.length).to.equal(11);
           expect(caveats.findBy('type', 'time')).to.have.property('validUntil');
           expect(caveats.findBy('type', 'geo.region')).to.deep.include({
             filter: 'blacklist',
@@ -1455,6 +1615,9 @@ describe('Integration | Component | token editor', function () {
           });
           expect(caveats.findBy('type', 'ip')).to.deep.include({
             whitelist: ['255.255.255.255'],
+          });
+          expect(caveats.findBy('type', 'consumer')).to.deep.include({
+            whitelist: ['usr-currentuser'],
           });
           expect(caveats.findBy('type', 'service')).to.deep.include({
             whitelist: ['opw-cluster0'],
@@ -1521,7 +1684,7 @@ describe('Integration | Component | token editor', function () {
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
             inviteType: 'registerOneprovider',
-            adminUserId: 'user1',
+            adminUserId: 'currentuser',
           });
           expect(rawToken).to.not.have.property('caveats');
         });
