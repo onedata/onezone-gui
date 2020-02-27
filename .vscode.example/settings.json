@@ -13,9 +13,8 @@
   },
   "editor.tabSize": 2,
   "editor.rulers": [
-    80
+    90
   ],
-  "rewrap.wrappingColumn": 80,
   "[javascript]": {
       "editor.formatOnSave": true,
       "editor.formatOnType": true,

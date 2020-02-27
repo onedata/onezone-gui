@@ -20,17 +20,17 @@ export default Component.extend(I18n, {
     'no-pointer-events',
   ],
 
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentSpacesData',
+
   navigationState: service(),
 
   /**
    * @type {string}
    */
   oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
-
-  /**
-   * @override
-   */
-  i18nPrefix: 'components.contentSpacesData',
 
   actions: {
     oneproviderIdChanged(oneproviderId) {

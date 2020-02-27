@@ -84,6 +84,7 @@ module.exports = function (environment) {
       minNameLength: 2,
       maxNameLength: 50,
     },
+    // Oneproviders with this version have non-embeddable GUI
     'legacyOneproviderVersion': '19.02',
     'ember-local-storage': {
       namespace: true,

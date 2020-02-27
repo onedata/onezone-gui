@@ -19,6 +19,9 @@ import createPropertyComparator from 'onedata-gui-common/utils/create-property-c
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { guidFor } from '@ember/object/internals';
+import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
+import { resolve } from 'rsvp';
 
 const nameComparator = createPropertyComparator('name');
 
@@ -51,6 +54,13 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.oneproviderViewContainer',
 
   pointerEvents: service(),
+
+  /**
+   * @virtual optional
+   * View to show in legacy Oneprovider, eg. spaces, transfers, shares
+   * @type {String}
+   */
+  resourceType: '',
 
   /**
    * Space selected in sidebar to show its embedded content using one
@@ -98,13 +108,29 @@ export default Component.extend(I18n, {
   isMapExpanded: false,
 
   /**
+   * NOTICE: it does not observe providers array, because we do not want to reload view
+   * (proxy goes to pending) when the list changes.
    * @type {ComputedProperty<Models.Provider>}
    */
-  selectedProvider: array.findBy(
-    'providers',
-    raw('entityId'),
-    'validatedOneproviderId'
-  ),
+  selectedProviderProxy: promise.object(computed(
+    'validatedOneproviderIdProxy',
+    function selectedProviderProxy() {
+      const {
+        providers,
+        validatedOneproviderIdProxy,
+      } = this.getProperties('providers', 'validatedOneproviderIdProxy');
+      return validatedOneproviderIdProxy.then(validatedOneproviderId => {
+        return providers.findBy('entityId', validatedOneproviderId);
+      });
+    }
+  )),
+
+  selectedProvider: reads('selectedProviderProxy.content'),
+
+  oneproviderViewProxy: promise.object(promise.all(
+    'isEmbeddableOneproviderProxy',
+    'selectedProviderProxy'
+  )),
 
   /**
    * `baseUrl` property for embedded component container.
@@ -147,17 +173,26 @@ export default Component.extend(I18n, {
    */
   hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
 
-  validatedOneproviderId: computed('oneproviderId', function validatedOneproviderId() {
-    const oneproviderId = this.get('oneproviderId');
-    if (oneproviderId) {
-      return oneproviderId;
-    } else {
-      const firstOnlineOneprovider = this.findFirstOnlineProvider();
-      if (firstOnlineOneprovider) {
-        return get(firstOnlineOneprovider, 'entityId');
+  validatedOneproviderIdProxy: promise.object(computed(
+    'oneproviderId',
+    function validatedOneproviderIdProxy() {
+      const {
+        providers,
+        oneproviderId,
+      } = this.getProperties('providers', 'oneproviderId');
+      if (oneproviderId) {
+        return resolve(oneproviderId);
+      } else {
+        return chooseDefaultOneprovider(providers).then(defaultOneprovider => {
+          if (defaultOneprovider) {
+            return resolve(get(defaultOneprovider, 'entityId'));
+          } else {
+            return resolve(null);
+          }
+        });
       }
     }
-  }),
+  )),
 
   providers: computed('space.providerList.list.@each.name', function providers() {
     return sortedOneprovidersList(this.get('space.providerList.list').toArray());
@@ -208,6 +243,26 @@ export default Component.extend(I18n, {
     })
   ),
 
+  isEmbeddableOneproviderProxy: promise.object(
+    computed(
+      'initialProvidersListProxy',
+      'selectedProvider.versionProxy',
+      function isEmbeddableOneproviderProxy() {
+        return this.get('initialProvidersListProxy').then(() => {
+          const selectedProvider = this.get('selectedProvider');
+          if (selectedProvider) {
+            return get(selectedProvider, 'versionProxy').then(version => {
+              return !isLegacyOneprovider(version);
+            });
+          } else {
+            return null;
+          }
+        });
+      }),
+  ),
+
+  isEmbeddableOneprovider: reads('isEmbeddableOneproviderProxy.content'),
+
   /**
    * When there is no Oneprovider selected (or there is no Oneprovider at all)
    * we should observe the list to set the first online Oneprovider when it is
@@ -219,7 +274,7 @@ export default Component.extend(I18n, {
       providers,
     } = this.getProperties('selectedProvider', 'providers');
     if (!providers.includes(selectedProvider)) {
-      this.setFirstOnlineProvider();
+      return this.selectDefaultProvider();
     }
   }),
 
@@ -228,7 +283,7 @@ export default Component.extend(I18n, {
     this.get('initialProvidersListProxy').then(list => {
       const oneproviderId = this.get('oneproviderId');
       if (!oneproviderId) {
-        this.setFirstOnlineProvider(list);
+        return this.selectDefaultProvider(list);
       }
     });
     next(() => {
@@ -244,16 +299,12 @@ export default Component.extend(I18n, {
     });
   },
 
-  findFirstOnlineProvider(providers) {
-    const _providers = providers ? providers : this.get('providers').filterBy('online');
-    return _providers.findBy('online');
-  },
-
-  setFirstOnlineProvider(providers) {
-    const firstOnlineOneprovider = this.findFirstOnlineProvider(providers);
-    if (firstOnlineOneprovider) {
-      this.get('oneproviderIdChanged')(get(firstOnlineOneprovider, 'entityId'));
-    }
+  selectDefaultProvider(providers = this.get('providers')) {
+    return chooseDefaultOneprovider(providers).then(defaultProvider => {
+      if (defaultProvider) {
+        this.get('oneproviderIdChanged')(get(defaultProvider, 'entityId'));
+      }
+    });
   },
 
   actions: {

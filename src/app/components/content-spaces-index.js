@@ -17,8 +17,10 @@ import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
-import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { collect } from 'ember-awesome-macros';
+import { collect, promise } from 'ember-awesome-macros';
+import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
 
 export default Component.extend(
   I18n,
@@ -97,34 +99,64 @@ export default Component.extend(
     providersProxy: reads('space.providerList.list'),
 
     /**
-     * @type {Ember.ComputedProperty<Provider>}
+     * @type {ComputedProperty<Models.Provider>}
      */
-    dataProviderProxy: computed('space.providerList.list.[]',
+    dataProviderProxy: promise.object(computed('space.providerList.list.[]',
       function dataProviderProxy() {
-        const promise = this.get('space.providerList')
-          .then(providerList =>
-            get(providerList, 'list').then(list =>
-              list.findBy('online')
-            )
-          );
-        return PromiseObject.create({ promise });
-      }),
-
-    dataTileQueryParams: computed(
-      'dataProviderProxy.content.entityId',
-      function dataTileQueryParams() {
-        const oneproviderId = this.get('dataProviderProxy.content.entityId');
-        return {
-          options: `oneproviderId.${oneproviderId}`,
-        };
+        return this.get('space.providerList')
+          .then(providerList => get(providerList, 'list'))
+          .then(providers => {
+            return chooseDefaultOneprovider(providers);
+          });
       }
+    )),
+
+    oneproviderHrefProxy: promise.object(
+      computed(
+        'dataProviderProxy.versionProxy.content',
+        function oneproviderHrefProxy() {
+          const {
+            guiUtils,
+            router,
+            space,
+            dataProviderProxy,
+          } = this.getProperties('guiUtils', 'router', 'space', 'dataProviderProxy');
+          return dataProviderProxy.then(dataProvider => {
+            const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
+            return get(dataProvider, 'versionProxy').then(version => {
+              const spaceId = get(space, 'entityId');
+              if (isLegacyOneprovider(version)) {
+                return router.urlFor(
+                  'provider-redirect',
+                  oneproviderId, {
+                    queryParams: { space_id: spaceId },
+                  }
+                );
+              } else {
+                return router.urlFor(
+                  'onedata.sidebar.content.aspect',
+                  'spaces',
+                  guiUtils.getRoutableIdFor(space),
+                  'data', {
+                    queryParams: {
+                      options: serializeAspectOptions({ oneproviderId }),
+                    },
+                  }
+                );
+              }
+            });
+          });
+        }
+      )
     ),
 
     init() {
       this._super(...arguments);
       next(() => {
-        this.set('leaveSpaceModalTriggers',
-          '.btn-leave-space.btn;a.btn-leave-space:modal');
+        this.set(
+          'leaveSpaceModalTriggers',
+          '.btn-leave-space.btn;a.btn-leave-space:modal'
+        );
       });
     },
 
