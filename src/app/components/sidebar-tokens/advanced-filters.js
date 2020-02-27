@@ -33,7 +33,7 @@ export default Component.extend(I18n, {
    * @param {Object} filtersState object:
    *   ```
    *   {
-   *     type: 'all'|'access'|'invite',
+   *     type: 'all'|'access'|'identity'|'invite',
    *     targetModelName: 'space'|'group'|...
    *     targetRecord: null|Models.* // null means all records
    *   }

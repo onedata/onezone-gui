@@ -5,6 +5,7 @@ export default {
       values: {
         all: 'All',
         access: 'Access',
+        identity: 'Identity',
         invite: 'Invite',
       },
     },
