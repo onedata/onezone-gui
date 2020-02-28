@@ -284,6 +284,44 @@ describe('Unit | Model | token', function () {
       expect(get(model, 'isObsolete')).to.be.true;
     }
   );
+
+  it(
+    'has token privileges available through privileges property',
+    function () {
+      const privileges = ['space_view'];
+
+      const model = this.subject();
+      set(model, 'metadata', {
+        privileges,
+      });
+
+      expect(get(model, 'privileges')).to.equal(privileges);
+    }
+  );
+
+  it(
+    'has token usage limit available through usageLimit property',
+    function () {
+      const model = this.subject();
+      set(model, 'metadata', {
+        usageLimit: 4,
+      });
+
+      expect(get(model, 'usageLimit')).to.equal(4);
+    }
+  );
+
+  it(
+    'has token usage count available through usageCount property',
+    function () {
+      const model = this.subject();
+      set(model, 'metadata', {
+        usageCount: 3,
+      });
+
+      expect(get(model, 'usageCount')).to.equal(3);
+    }
+  );
 });
 
 function createTimeCaveat(validUntil) {

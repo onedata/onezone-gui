@@ -1,9 +1,12 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
+import { editorDataToToken, tokenToEditorDefaultData } from 'onezone-gui/utils/token-editor-utils';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { get, getProperties } from '@ember/object';
 import _ from 'lodash';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
+import { resolve, reject } from 'rsvp';
+import moment from 'moment';
 
 describe('Unit | Utility | token editor utils', function () {
   describe('editor data to token', function () {
@@ -883,6 +886,222 @@ describe('Unit | Utility | token editor utils', function () {
       }
     );
   });
+
+  describe('token to editor default data', function () {
+    it('converts name', function () {
+      const result = tokenToEditorDefaultData({ name: 't1' });
+
+      expect(get(result, 'name')).to.equal('t1');
+    });
+
+    it('converts type', function () {
+      const result = tokenToEditorDefaultData({ typeName: 'identity' });
+
+      expect(get(result, 'type')).to.equal('identity');
+    });
+
+    it('converts invite type', function () {
+      const result = tokenToEditorDefaultData({ inviteType: 'userJoinSpace' });
+
+      expect(get(result, 'inviteType')).to.equal('userJoinSpace');
+    });
+
+    it('converts invite target', function () {
+      const tokenTargetProxy = PromiseObject.create({ promise: resolve() });
+      const result = tokenToEditorDefaultData({ tokenTargetProxy });
+
+      expect(get(result, 'inviteTargetProxy')).to.equal(tokenTargetProxy);
+    });
+
+    it('converts privileges', function () {
+      const privileges = ['space_view'];
+      const result = tokenToEditorDefaultData({ privileges });
+
+      expect(get(result, 'privileges')).to.equal(privileges);
+    });
+
+    it('converts usageLimit', function () {
+      const result = tokenToEditorDefaultData({ usageLimit: 4 });
+
+      expect(get(result, 'usageLimit')).to.equal(4);
+    });
+
+    it('converts usageCount', function () {
+      const result = tokenToEditorDefaultData({ usageCount: 3 });
+
+      expect(get(result, 'usageCount')).to.equal(3);
+    });
+
+    it(
+      'returns result with empty caveats object, when no caveats were passed',
+      function () {
+        const result = tokenToEditorDefaultData({ caveats: [] });
+
+        expect(Object.keys(get(result, 'caveats'))).to.be.empty;
+      }
+    );
+
+    it('converts time caveat', function () {
+      const expireTimestamp = Math.floor(new Date().valueOf() / 1000);
+
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'time',
+          validUntil: expireTimestamp,
+        }],
+      });
+
+      const caveatValue = get(result, 'caveats.expire');
+      expect(caveatValue).to.be.an.instanceof(Date);
+      expect(moment(caveatValue).unix()).to.equal(expireTimestamp);
+    });
+
+    [
+      'region',
+      'country',
+    ].forEach(caveatName => {
+      it(`converts ${caveatName} caveat`, function () {
+        const list = ['abc', 'def'];
+
+        const result = tokenToEditorDefaultData({
+          caveats: [{
+            type: `geo.${caveatName}`,
+            filter: 'blacklist',
+            list,
+          }],
+        });
+
+        const caveatValue = get(result, `caveats.${caveatName}`);
+        expect(get(caveatValue, 'type')).to.equal('blacklist');
+        expect(get(caveatValue, 'list')).to.equal(list);
+      });
+    });
+
+    [
+      'asn',
+      'ip',
+    ].forEach(caveatName => {
+      it(`converts ${caveatName} caveat`, function () {
+        const whitelist = ['abc', 'def'];
+
+        const result = tokenToEditorDefaultData({
+          caveats: [{
+            type: caveatName,
+            whitelist,
+          }],
+        });
+
+        expect(get(result, `caveats.${caveatName}`)).to.equal(whitelist);
+      });
+    });
+
+    it('converts consumer caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'consumer',
+          whitelist: [
+            'usr-1',
+            'usr-unknown',
+            'usr-*',
+            'grp-1',
+            'grp-unknown',
+            'grp-*',
+            'prv-1',
+            'prv-unknown',
+            'prv-*',
+          ],
+        }],
+      }, getRecordMock);
+
+      return get(result, 'caveats.consumer')
+        .then(consumer => {
+          const correctResult = _.flatten(
+            ['user', 'group', 'oneprovider'].map(modelName => [{
+              record: {
+                entityId: '1',
+              },
+              model: modelName,
+            }, {
+              id: 'unknown',
+              model: modelName,
+            }, {
+              record: {
+                representsAll: modelName,
+              },
+              model: modelName,
+            }])
+          );
+          expect(consumer).to.deep.equal(correctResult);
+        });
+    });
+
+    it('converts service caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'service',
+          whitelist: [
+            'opw-1',
+            'opw-unknown',
+            'ozw-onezone',
+            'opw-*',
+            'opp-1',
+            'opp-unknown',
+            'ozp-onezone',
+            'opp-*',
+          ],
+        }],
+      }, getRecordMock);
+
+      return get(result, 'caveats.service')
+        .then(consumer => {
+          const correctResult = _.flatten(
+            ['service', 'serviceOnepanel'].map(modelName => [{
+              record: {
+                entityId: '1',
+                type: 'oneprovider',
+              },
+              model: modelName,
+            }, {
+              id: 'unknown',
+              model: modelName,
+            }, {
+              record: {
+                entityId: 'ozid',
+                type: 'onezone',
+              },
+              model: modelName,
+            }, {
+              record: {
+                representsAll: modelName,
+              },
+              model: modelName,
+            }])
+          );
+          expect(consumer).to.deep.equal(correctResult);
+        });
+    });
+
+    it('converts interface caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'interface',
+          interface: 'oneclient',
+        }],
+      });
+
+      expect(get(result, 'caveats.interface')).to.equal('oneclient');
+    });
+
+    it('converts readonly caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'data.readonly',
+        }],
+      });
+
+      expect(get(result, 'caveats.readonly')).to.equal(true);
+    });
+  });
 });
 
 function generateCaveatEntry(caveatName, isEnabled, value) {
@@ -892,4 +1111,24 @@ function generateCaveatEntry(caveatName, isEnabled, value) {
       [caveatName]: value,
     },
   };
+}
+
+function getRecordMock(modelName, entityId) {
+  if (modelName === 'cluster') {
+    if (entityId === 'unknown') {
+      return reject();
+    } else if (entityId === 'onezone') {
+      return resolve({
+        entityId: 'ozid',
+        type: 'onezone',
+      });
+    } else {
+      return resolve({
+        entityId,
+        type: 'oneprovider',
+      });
+    }
+  } else {
+    return entityId === 'unknown' ? reject() : resolve({ entityId });
+  }
 }

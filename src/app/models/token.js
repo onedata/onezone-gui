@@ -11,7 +11,8 @@
  * @property {any} * additional options of caveat
  */
 
-import { computed, observer, getProperties } from '@ember/object';
+import { computed, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
@@ -144,14 +145,23 @@ export default Model.extend(
     }),
 
     /**
+     * @type {Ember.ComputedProperty<number|String|undefined>}
+     */
+    usageLimit: reads('metadata.usageLimit'),
+
+    /**
+     * @type {Ember.ComputedProperty<number|undefined>}
+     */
+    usageCount: reads('metadata.usageCount'),
+
+    /**
      * @type {Ember.ComputedProperty<boolean>}
      */
-    usageLimitReached: computed('metadata', function usageLimitReached() {
-      const metadata = this.get('metadata') || {};
+    usageLimitReached: computed('usageLimit', 'usageCount', function usageLimitReached() {
       const {
         usageCount,
         usageLimit,
-      } = getProperties(metadata, 'usageCount', 'usageLimit');
+      } = this.getProperties('usageCount', 'usageLimit');
 
       if (typeof usageCount === 'number' && typeof usageLimit === 'number') {
         return usageCount >= usageLimit;
@@ -170,6 +180,11 @@ export default Model.extend(
      * @type {Ember.ComputedProperty<boolean>}
      */
     isActive: and(not('isObsolete'), not('revoked')),
+
+    /**
+     * @type {ComputedProperty<Array<String>|undefined}
+     */
+    privileges: reads('metadata.privileges'),
 
     validUntilObserver: observer('validUntil', function validUntilObserver() {
       const {

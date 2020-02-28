@@ -7,14 +7,19 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { getProperties, get } from '@ember/object';
+import EmberObject, { getProperties, get, set } from '@ember/object';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { Promise, resolve } from 'rsvp';
+import _ from 'lodash';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
 const consumerModelToPrefix = {
   user: 'usr',
   group: 'grp',
   oneprovider: 'prv',
 };
+
+const prefixToConsumerModel = _.invert(consumerModelToPrefix);
 
 export function editorDataToToken(editorData, currentUser) {
   const tokenData = {};
@@ -251,4 +256,146 @@ export function editorDataToToken(editorData, currentUser) {
     tokenData.caveats = caveatsData;
   }
   return tokenData;
+}
+
+/**
+ * @param {Models.Token} token 
+ * @param {Function} getRecord (modelName: String, entityId: String|'onezone'): Promise<Model>
+ * @returns {EmberObject}
+ */
+export function tokenToEditorDefaultData(token, getRecord) {
+  const {
+    name,
+    typeName,
+    inviteType,
+    tokenTargetProxy,
+    privileges,
+    usageLimit,
+    usageCount,
+    caveats,
+  } = getProperties(
+    token,
+    'name',
+    'typeName',
+    'inviteType',
+    'tokenTargetProxy',
+    'privileges',
+    'usageLimit',
+    'usageCount',
+    'caveats'
+  );
+
+  const defaultData = EmberObject.create({
+    name,
+    type: typeName,
+    inviteType,
+    inviteTargetProxy: tokenTargetProxy,
+    privileges,
+    usageLimit,
+    usageCount,
+    caveats: EmberObject.create(),
+  });
+
+  if (caveats && get(caveats, 'length')) {
+    const timeCaveat = caveats.findBy('type', 'time');
+    if (timeCaveat) {
+      const validUntil = new Date((get(timeCaveat, 'validUntil') || 0) * 1000);
+      set(defaultData, 'caveats.expire', validUntil);
+    }
+
+    [
+      'region',
+      'country',
+    ].forEach(caveatName => {
+      const caveat = caveats.findBy('type', `geo.${caveatName}`);
+      if (caveat) {
+        set(defaultData, `caveats.${caveatName}`, EmberObject.create({
+          type: get(caveat, 'filter'),
+          list: get(caveat, 'list'),
+        }));
+      }
+    });
+
+    [
+      'asn',
+      'ip',
+    ].forEach(caveatName => {
+      const caveat = caveats.findBy('type', caveatName);
+      if (caveat) {
+        set(defaultData, `caveats.${caveatName}`, get(caveat, 'whitelist'));
+      }
+    });
+
+    const consumerCaveat = caveats.findBy('type', 'consumer');
+    if (consumerCaveat) {
+      const whitelist = get(consumerCaveat, 'whitelist') || [];
+      const consumerProxy = PromiseArray.create({
+        promise: Promise.all(whitelist.map(recordIdentitier => {
+          const [modelAbbrev, entityId] = recordIdentitier.split('-');
+          const modelName = prefixToConsumerModel[modelAbbrev];
+          if (!modelName) {
+            return undefined;
+          }
+          if (entityId === '*') {
+            return resolve({
+              record: { representsAll: modelName },
+              model: modelName,
+            });
+          } else {
+            return getRecord(modelName, entityId)
+              .then(record => ({
+                record,
+                model: modelName,
+              }))
+              .catch(() => ({
+                id: entityId,
+                model: modelName,
+              }));
+          }
+        })).then(consumers => consumers.compact()),
+      });
+      set(defaultData, 'caveats.consumer', consumerProxy);
+    }
+
+    const serviceCaveat = caveats.findBy('type', 'service');
+    if (serviceCaveat) {
+      const whitelist = get(serviceCaveat, 'whitelist') || [];
+      const serviceProxy = PromiseArray.create({
+        promise: Promise.all(whitelist.map(recordIdentitier => {
+          const [modelAbbrev, entityId] = recordIdentitier.split('-');
+          const modelName = ['opp', 'ozp'].includes(modelAbbrev) ?
+            'serviceOnepanel' : 'service';
+          if (entityId === '*') {
+            return resolve({
+              record: { representsAll: modelName },
+              model: modelName,
+            });
+          } else {
+            return getRecord('cluster', entityId)
+              .then(record => ({
+                record,
+                model: modelName,
+              }))
+              .catch(() => ({
+                id: entityId,
+                model: modelName,
+              }));
+          }
+        })),
+      });
+      set(defaultData, 'caveats.service', serviceProxy);
+    }
+
+    const interfaceCaveat = caveats.findBy('type', 'interface');
+    if (interfaceCaveat) {
+      set(defaultData, 'caveats.interface', get(interfaceCaveat, 'interface'));
+    }
+
+    const readonlyCaveat = caveats.findBy('type', 'data.readonly');
+    if (readonlyCaveat) {
+      set(defaultData, 'caveats.readonly', true);
+    }
+  }
+
+  return defaultData;
 }
