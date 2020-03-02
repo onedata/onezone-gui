@@ -50,6 +50,16 @@ export default Service.extend({
     return this.get('store').findRecord('group', id, { backgroundReload });
   },
 
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: 'group',
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
+  },
+
   /**
    * Creates new group
    * @param {object} group group representation

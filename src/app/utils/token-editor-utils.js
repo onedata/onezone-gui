@@ -16,7 +16,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 const consumerModelToPrefix = {
   user: 'usr',
   group: 'grp',
-  oneprovider: 'prv',
+  provider: 'prv',
 };
 
 const prefixToConsumerModel = _.invert(consumerModelToPrefix);
@@ -264,6 +264,10 @@ export function editorDataToToken(editorData, currentUser) {
  * @returns {EmberObject}
  */
 export function tokenToEditorDefaultData(token, getRecord) {
+  if (!token) {
+    return EmberObject.create();
+  }
+
   const {
     name,
     typeName,
@@ -396,6 +400,8 @@ export function tokenToEditorDefaultData(token, getRecord) {
       set(defaultData, 'caveats.readonly', true);
     }
   }
+
+  set(defaultData, 'hasCaveats', Object.keys(get(defaultData, 'caveats')).length > 1);
 
   return defaultData;
 }

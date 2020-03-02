@@ -10,10 +10,10 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { computed, get, getProperties, observer } from '@ember/object';
+import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
-import { Promise, all as allFulfilled, allSettled } from 'rsvp';
+import { Promise, all as allFulfilled, allSettled, resolve } from 'rsvp';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
@@ -37,8 +37,9 @@ import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/uti
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
-import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
+import { editorDataToToken, tokenToEditorDefaultData } from 'onezone-gui/utils/token-editor-utils';
 import {
+  conditional,
   equal,
   raw,
   and,
@@ -116,19 +117,23 @@ const CaveatFormGroup = FormFieldsGroup.extend({
   classes: computed('isCaveatEnabled', function classes() {
     return 'caveat-group' + (this.get('isCaveatEnabled') ? ' is-enabled' : '');
   }),
-  isCaveatEnabled: getBy(
-    array.findBy('fields', raw('isGroupToggle')),
-    raw('value')
+  isVisible: or('isInEditMode', 'viewTokenValue'),
+  isCaveatEnabled: conditional(
+    'isInEditMode',
+    getBy(array.findBy('fields', raw('isGroupToggle')), raw('value')),
+    notEmpty('viewTokenValue'),
   ),
 });
 
 const ModelTagsFieldPrototype = TagsField.extend({
   tagEditorComponentName: 'tags-input/model-selector-editor',
-  defaultValue: computed(() => []),
   sort: true,
   tagEditorSettings: hash('models'),
   valueToTags(value) {
-    return (value || []).map(val => RecordTag.create({ value: val }));
+    return (value || []).map(val => RecordTag.create({
+      ownerSource: this,
+      value: val,
+    }));
   },
   tagsToValue(tags) {
     return removeExcessiveTags(tags).mapBy('value').uniq().compact();
@@ -146,7 +151,13 @@ const ModelTagsFieldPrototype = TagsField.extend({
 });
 
 function createWhiteBlackListDropdown(fieldName) {
-  return DropdownField.create({
+  return DropdownField.extend({
+    defaultValue: conditional(
+      'isInEditMode',
+      raw('whitelist'),
+      'parent.viewTokenValue.type',
+    ),
+  }).create({
     name: fieldName,
     areValidationClassesEnabled: false,
     options: [
@@ -154,26 +165,42 @@ function createWhiteBlackListDropdown(fieldName) {
       { value: 'blacklist' },
     ],
     showSearch: false,
-    defaultValue: 'whitelist',
   });
 }
 
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
+  classNameBindings: ['modeClass'],
 
   i18n: service(),
+  userManager: service(),
   spaceManager: service(),
   groupManager: service(),
   harvesterManager: service(),
+  providerManager: service(),
   clusterManager: service(),
   privilegeManager: service(),
   oneiconAlias: service(),
   currentUser: service(),
+  guiContext: service(),
 
   /**
    * @override
    */
   i18nPrefix: 'components.tokenEditor',
+
+  /**
+   * One of: create, view, edit
+   * @virtual
+   * @type {String}
+   */
+  mode: 'create',
+
+  /**
+   * @virtual optional
+   * @type {Models.Token}
+   */
+  token: undefined,
 
   /**
    * If true, then form will have expanded caveats at first render
@@ -201,6 +228,21 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isSubmitting: false,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  modeClass: tag `${'mode'}-mode`,
+
+  /**
+   * @type {ComputedProperty<EmberObject>}
+   */
+  tokenDataSource: computed(
+    'token.${name,typeName,metadata,caveats}',
+    function tokenDataSource() {
+      return tokenToEditorDefaultData(this.get('token'), this.getRecord.bind(this));
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -241,33 +283,50 @@ export default Component.extend(I18n, {
   basicGroup: computed(
     'inviteTargetDetailsGroup',
     'usageLimitGroup',
+    'usageCountField',
     function basicGroup() {
+      const component = this;
       return FormFieldsGroup.create({
         name: 'basic',
         fields: [
-          TextField.create({ name: 'name' }),
-          RadioField.create({
+          TextField.extend({
+            component,
+            defaultValue: or('component.tokenDataSource.name', raw(undefined)),
+          }).create({ name: 'name' }),
+          RadioField.extend({
+            component,
+            defaultValue: conditional(
+              'isInEditMode',
+              raw('access'),
+              'component.tokenDataSource.type'
+            ),
+          }).create({
             name: 'type',
             options: [
               { value: 'access' },
               { value: 'identity' },
               { value: 'invite' },
             ],
-            defaultValue: 'access',
           }),
           FormFieldsGroup.extend({
             isExpanded: equal('parent.value.type', raw('invite')),
           }).create({
             name: 'inviteDetails',
             fields: [
-              DropdownField.create({
+              DropdownField.extend({
+                component,
+                defaultValue: or(
+                  'component.tokenDataSource.inviteType',
+                  raw('userJoinGroup')
+                ),
+              }).create({
                 name: 'inviteType',
                 showSearch: false,
                 options: tokenInviteTypeOptions,
-                defaultValue: 'userJoinGroup',
               }),
               this.get('inviteTargetDetailsGroup'),
               this.get('usageLimitGroup'),
+              this.get('usageCountField'),
             ],
           }),
         ],
@@ -289,6 +348,8 @@ export default Component.extend(I18n, {
     function inviteTargetDetailsGroup() {
       const component = this;
       return FormFieldsGroup.extend({
+        component,
+        viewTokenTargetProxy: reads('component.tokenDataSource.inviteTargetProxy'),
         isExpanded: notEmpty('inviteTypeSpec.targetModelName'),
         inviteType: reads('parent.value.inviteType'),
         inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
@@ -308,40 +369,65 @@ export default Component.extend(I18n, {
         cachedPrivilegesPresetProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
-        inviteTypeSpecObserver: observer('inviteTypeSpec', function inviteTypeSpecObserver() {
-          const {
-            inviteTypeSpec,
-            cachedTargetsModelName,
-            cachedPrivilegesModelName,
-          } = this.getProperties(
-            'inviteTypeSpec',
-            'cachedTargetsModelName',
-            'cachedPrivilegesModelName'
-          );
-          if (!inviteTypeSpec) {
-            return;
-          }
-          const newTargetsModelName = inviteTypeSpec.targetModelName;
-          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges && newTargetsModelName;
-          if (newTargetsModelName) {
-            this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
-            if (cachedTargetsModelName !== newTargetsModelName) {
-              this.setProperties({
-                cachedTargetsModelName: newTargetsModelName,
-                cachedTargetsProxy: component
-                  .getRecordOptionsForModel(newTargetsModelName),
-              });
+        inviteTypeSpecObserver: observer(
+          'inviteTypeSpec',
+          'isInEditMode',
+          'viewTokenTargetProxy',
+          function inviteTypeSpecObserver() {
+            const {
+              inviteTypeSpec,
+              viewTokenTargetProxy,
+              isInEditMode,
+              cachedTargetsModelName,
+              cachedPrivilegesModelName,
+            } = this.getProperties(
+              'inviteTypeSpec',
+              'viewTokenTargetProxy',
+              'isInEditMode',
+              'cachedTargetsModelName',
+              'cachedPrivilegesModelName'
+            );
+            if (!inviteTypeSpec) {
+              return;
+            }
+            const newTargetsModelName = inviteTypeSpec.targetModelName;
+            const newPrivilegesModelName = !inviteTypeSpec.noPrivileges && newTargetsModelName;
+            if (isInEditMode) {
+              if (newTargetsModelName) {
+                this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
+                if (cachedTargetsModelName !== newTargetsModelName) {
+                  this.setProperties({
+                    cachedTargetsModelName: newTargetsModelName,
+                    cachedTargetsProxy: component
+                      .getRecordOptionsForModel(newTargetsModelName),
+                  });
+                }
+              }
+              if (newPrivilegesModelName &&
+                cachedPrivilegesModelName !== newPrivilegesModelName) {
+                this.setProperties({
+                  cachedPrivilegesModelName: newPrivilegesModelName,
+                  cachedPrivilegesPresetProxy: component
+                    .getPrivilegesPresetForModel(newTargetsModelName),
+                });
+              }
+            } else {
+              if (newTargetsModelName) {
+                this.setProperties({
+                  latestInviteTypeWithTargets: inviteTypeSpec.value,
+                  cachedTargetsModelName: newTargetsModelName,
+                  cachedTargetsProxy: PromiseArray.create({
+                    promise: viewTokenTargetProxy ? viewTokenTargetProxy.then(record => {
+                      return record ? [component.recordToDropdownOption(record)] : [];
+                    }) : resolve([]),
+                  }),
+                  cachedPrivilegesModelName: newPrivilegesModelName,
+                  cachedPrivilegesPresetProxy: PromiseArray.create({ promise: resolve([]) }),
+                });
+              }
             }
           }
-          if (newPrivilegesModelName &&
-            cachedPrivilegesModelName !== newPrivilegesModelName) {
-            this.setProperties({
-              cachedPrivilegesModelName: newPrivilegesModelName,
-              cachedPrivilegesPresetProxy: component
-                .getPrivilegesPresetForModel(newTargetsModelName),
-            });
-          }
-        }),
+        ),
         init() {
           this._super(...arguments);
           this.inviteTypeSpecObserver();
@@ -390,7 +476,9 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
    */
   targetField: computed(function targetField() {
+    const component = this;
     return DropdownField.extend({
+      component,
       cachedTargetsModelName: reads('parent.cachedTargetsModelName'),
       cachedTargetsProxy: reads('parent.cachedTargetsProxy'),
       latestInviteTypeWithTargets: reads('parent.latestInviteTypeWithTargets'),
@@ -423,6 +511,16 @@ export default Component.extend(I18n, {
         }
       ),
       isVisible: reads('cachedTargetsProxy.isFulfilled'),
+      defaultValue: or('component.tokenDataSource.inviteTargetProxy.content'),
+      defaultValueObserver: observer(
+        'defaultValue',
+        'mode',
+        function defaultValueObserver() {
+          if (this.get('mode') === 'view') {
+            this.reset();
+          }
+        }
+      ),
     }).create({
       name: 'target',
     });
@@ -433,7 +531,9 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.PrivilegesField>}
    */
   privilegesField: computed(function privilegesField() {
+    const component = this;
     return PrivilegesField.extend({
+      component,
       cachedPrivilegesModelName: or(
         'parent.parent.cachedPrivilegesModelName',
         raw('userJoinGroup')
@@ -464,11 +564,15 @@ export default Component.extend(I18n, {
         }
       ),
       isVisible: reads('cachedPrivilegesPresetProxy.isFulfilled'),
-      defaultValue: or('cachedPrivilegesPresetProxy.content', raw([])),
+      defaultValue: conditional(
+        'isInEditMode',
+        or('cachedPrivilegesPresetProxy.content', raw([])),
+        'component.tokenDataSource.privileges',
+      ),
       cachedPrivilegesPresetProxyObserver: observer(
         'cachedPrivilegesPresetProxy.isFulfilled',
         function cachedPrivilegesPresetProxyObserver() {
-          if (this.get('cachedPrivilegesPresetProxy.isFulfilled')) {
+          if (this.get('cachedPrivilegesPresetProxy.isFulfilled') && this.get('mode') === 'edit') {
             this.reset();
           }
         }
@@ -504,6 +608,21 @@ export default Component.extend(I18n, {
         }),
       ],
     });
+  }),
+
+  /**
+   * Shows information [usageCount]/[usageLimit]
+   * @type {ComputedProperty<Utils.FormComponent.StaticTextField>}
+   */
+  usageCountField: computed(function usageCountGroup() {
+    const component = this;
+    return StaticTextField.extend({
+      component,
+      usageCount: reads('component.tokenDataSource.usageCount'),
+      usageLimit: reads('component.tokenDataSource.usageLimit'),
+      text: tag `${'usageCount'}/${'usageLimit'}`,
+      isVisible: reads('isInViewMode'),
+    }).create({ name: 'usageCount' });
   }),
 
   /**
@@ -584,15 +703,23 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   expireCaveatGroup: computed(function expireCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.expire'),
+    }).create({
       name: 'expireCaveat',
       fields: [
         createCaveatToggleField('expire'),
         DatetimeField.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw(moment().add(1, 'day').endOf('day').toDate()),
+            'parent.viewTokenValue',
+          ),
         }).create({
           name: 'expire',
-          defaultValue: moment().add(1, 'day').endOf('day').toDate(),
         }),
         createDisabledCaveatDescription('expire'),
       ],
@@ -604,12 +731,17 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   regionCaveatGroup: computed(function regionCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.region'),
+    }).create({
       name: 'regionCaveat',
       fields: [
         createCaveatToggleField('region'),
         FormFieldsGroup.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          viewTokenValue: reads('parent.viewTokenValue'),
         }).create({
           name: 'region',
           areValidationClassesEnabled: true,
@@ -637,6 +769,11 @@ export default Component.extend(I18n, {
                 }
               ),
               tagEditorSettings: hash('allowedTags'),
+              defaultValue: conditional(
+                'isInEditMode',
+                raw([]),
+                'parent.viewTokenValue.list',
+              ),
               valueToTags(value) {
                 const allowedTags = this.get('allowedTags');
                 return (value || [])
@@ -649,7 +786,6 @@ export default Component.extend(I18n, {
             }).create({
               name: 'regionList',
               tagEditorComponentName: 'tags-input/selector-editor',
-              defaultValue: [],
               sort: true,
             }),
           ],
@@ -664,18 +800,28 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   countryCaveatGroup: computed(function countryCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.country'),
+    }).create({
       name: 'countryCaveat',
       fields: [
         createCaveatToggleField('country'),
         FormFieldsGroup.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          viewTokenValue: reads('parent.viewTokenValue'),
         }).create({
           name: 'country',
           areValidationClassesEnabled: true,
           fields: [
             createWhiteBlackListDropdown('countryType'),
             TagsField.extend({
+              defaultValue: conditional(
+                'isInEditMode',
+                raw([]),
+                'parent.viewTokenValue.list',
+              ),
               sortTags(tags) {
                 return tags.sort((a, b) =>
                   get(a, 'label').toUpperCase().localeCompare(
@@ -695,7 +841,6 @@ export default Component.extend(I18n, {
                 // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
                 regexp: /^[a-zA-Z]{2}$/,
               },
-              defaultValue: [],
               sort: true,
             }),
           ],
@@ -710,12 +855,21 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   asnCaveatGroup: computed(function asnCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.asn'),
+    }).create({
       name: 'asnCaveat',
       fields: [
         createCaveatToggleField('asn'),
         TagsField.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw([]),
+            'parent.viewTokenValue',
+          ),
           sortTags(tags) {
             return tags.sort((a, b) =>
               parseInt(get(a, 'label') - parseInt(get(b, 'label')))
@@ -735,7 +889,6 @@ export default Component.extend(I18n, {
           tagEditorSettings: {
             regexp: /^\d+$/,
           },
-          defaultValue: [],
           sort: true,
         }),
         createDisabledCaveatDescription('asn'),
@@ -748,12 +901,21 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   ipCaveatGroup: computed(function ipCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.ip'),
+    }).create({
       name: 'ipCaveat',
       fields: [
         createCaveatToggleField('ip'),
         TagsField.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw([]),
+            'parent.viewTokenValue',
+          ),
           sortTags(tags) {
             const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
             const sortKeyDecoratedTags = tags.map(tag => {
@@ -774,7 +936,6 @@ export default Component.extend(I18n, {
             // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
             regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
           },
-          defaultValue: [],
           sort: true,
         }),
         createDisabledCaveatDescription('ip'),
@@ -787,7 +948,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   consumerCaveatGroup: computed(function consumerCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.consumer'),
+    }).create({
       name: 'consumerCaveat',
       fields: [
         createCaveatToggleField('consumer'),
@@ -888,10 +1053,15 @@ export default Component.extend(I18n, {
               name: 'group',
               getRecords: () => this.get('groups'),
             }, {
-              name: 'oneprovider',
+              name: 'provider',
               getRecords: () => this.get('oneprovidersProxy'),
             }];
           }),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw([]),
+            'parent.viewTokenValue',
+          ),
           init() {
             this._super(...arguments);
 
@@ -926,8 +1096,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   serviceCaveatGroup: computed(function serviceCaveatGroup() {
+    const component = this;
     return CaveatFormGroup.extend({
+      component,
       isExpanded: equal('valuesSource.basic.type', raw('access')),
+      viewTokenValue: reads('component.tokenDataSource.caveats.service'),
     }).create({
       name: 'serviceCaveat',
       fields: [
@@ -948,6 +1121,11 @@ export default Component.extend(I18n, {
               getRecords: () => this.get('clustersProxy'),
             }];
           }),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw([]),
+            'parent.viewTokenValue',
+          ),
         }).create({ name: 'service' }),
         createDisabledCaveatDescription('service'),
       ],
@@ -959,21 +1137,28 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
+    const component = this;
     return CaveatFormGroup.extend({
+      component,
       isExpanded: not(equal('valuesSource.basic.type', raw('invite'))),
+      viewTokenValue: reads('component.tokenDataSource.caveats.interface'),
     }).create({
       name: 'interfaceCaveat',
       fields: [
         createCaveatToggleField('interface'),
         RadioField.extend({
           isVisible: reads('parent.isCaveatEnabled'),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw('rest'),
+            'parent.viewTokenValue',
+          ),
         }).create({
           name: 'interface',
           options: [
             { value: 'rest' },
             { value: 'oneclient' },
           ],
-          defaultValue: 'rest',
         }),
         createDisabledCaveatDescription('interface'),
       ],
@@ -985,14 +1170,28 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   readonlyCaveatGroup: computed(function readonlyCaveatGroup() {
-    return CaveatFormGroup.create({
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.readonly'),
+    }).create({
       name: 'readonlyCaveat',
       fields: [
         createCaveatToggleField('readonly'),
         StaticTextField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
+          isVisible: and('parent.isCaveatEnabled', 'isInEditionMode'),
         }).create({ name: 'readonlyEnabledText' }),
         createDisabledCaveatDescription('readonly'),
+        ToggleField.extend({
+          isVisible: reads('isInViewMode'),
+          defaultValue: conditional(
+            'isInEditMode',
+            raw(false),
+            or('parent.viewTokenValue', raw(false)),
+          ),
+        }).create({
+          name: 'readonlyView',
+        }),
       ],
     });
   }),
@@ -1089,11 +1288,36 @@ export default Component.extend(I18n, {
     });
   }),
 
+  modeObserver: observer('mode', function modeObserver() {
+    const {
+      fields,
+      mode,
+    } = this.getProperties('fields', 'mode');
+
+    if (mode === 'view') {
+      fields.changeMode('view');
+      fields.reset();
+    }
+  }),
+
+  tokenDataSourceObserver: observer(
+    'tokenDataSource',
+    function tokenDataSourceObserver() {
+      const {
+        fields,
+        mode,
+      } = this.getProperties('fields', 'mode');
+
+      if (mode === 'view') {
+        // update token data
+        fields.reset();
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
-
-    // Force compute fields root group
-    this.get('fields');
+    this.modeObserver();
   },
 
   notifyAboutChange() {
@@ -1162,6 +1386,43 @@ export default Component.extend(I18n, {
   },
 
   /**
+   * @param {String} modelName one of user, group, provider, cluster
+   * @param {String} entityId entityId or 'onezone' (only for cluster model)
+   * @returns {Promise<GraphSingleModel>}
+   */
+  getRecord(modelName, entityId) {
+    const {
+      userManager,
+      groupManager,
+      providerManager,
+      clusterManager,
+      guiContext,
+    } = this.getProperties(
+      'userManager',
+      'groupManager',
+      'providerManager',
+      'clusterManager',
+      'guiContext'
+    );
+
+    switch (modelName) {
+      case 'user':
+        return userManager.getRecordById(entityId);
+      case 'group':
+        return groupManager.getRecordById(entityId);
+      case 'provider':
+        return providerManager.getRecordById(entityId);
+      case 'cluster':
+        if (entityId === 'onezone') {
+          const onezoneClusterEntityId = get(guiContext, 'clusterId');
+          return clusterManager.getRecordById(onezoneClusterEntityId);
+        } else {
+          return clusterManager.getRecordById(entityId);
+        }
+    }
+  },
+
+  /**
    * @param {String} modelName 
    * @returns {PromiseArray<String>}
    */
@@ -1170,6 +1431,15 @@ export default Component.extend(I18n, {
       promise: this.get('privilegeManager')
         .getPrivilegesPresetForModel(modelName)
         .then(result => result['member']),
+    });
+  },
+
+  recordToDropdownOption(record) {
+    return EmberObject.extend({
+      label: reads('value.name'),
+    }).create({
+      value: record,
+      icon: this.get('oneiconAlias').getName(get(record, 'entityType')),
     });
   },
 

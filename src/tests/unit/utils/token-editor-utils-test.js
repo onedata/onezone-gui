@@ -482,7 +482,7 @@ describe('Unit | Utility | token editor utils', function () {
     });
 
     it('converts consumer caveat', function () {
-      const selectedValues = _.flatten(['user', 'group', 'oneprovider']
+      const selectedValues = _.flatten(['user', 'group', 'provider']
         .map(model => ([{
           model,
           record: {
@@ -1016,7 +1016,7 @@ describe('Unit | Utility | token editor utils', function () {
       return get(result, 'caveats.consumer')
         .then(consumer => {
           const correctResult = _.flatten(
-            ['user', 'group', 'oneprovider'].map(modelName => [{
+            ['user', 'group', 'provider'].map(modelName => [{
               record: {
                 entityId: '1',
               },

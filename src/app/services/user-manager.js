@@ -12,6 +12,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   onedataGraph: service(),
+  store: service(),
 
   /**
    * Changes user password
@@ -36,5 +37,29 @@ export default Service.extend({
         newPassword,
       },
     });
+  },
+
+  /**
+   * Returns user with specified GRI
+   * @param {String} gri
+   * @return {Promise<Models.User>} user promise
+   */
+  getRecord(gri) {
+    return this.get('store').findRecord('user', gri);
+  },
+
+  /**
+   * Returns user with specified entityId
+   * @param {String} entityId
+   * @return {Promise<Models.User>} user promise
+   */
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: 'user',
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
   },
 });

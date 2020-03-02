@@ -109,6 +109,9 @@ export default {
             placeholder: 'Enter exact number',
           },
         },
+        usageCount: {
+          label: 'Usage count',
+        },
       },
     },
     caveats: {

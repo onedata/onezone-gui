@@ -38,6 +38,16 @@ export default Service.extend({
       .then(cluster => loadClusterRecord(cluster));
   },
 
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: 'cluster',
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
+  },
+
   /**
    * Reloads clusters list
    * @returns {Promise<Models.ClusterList>}
