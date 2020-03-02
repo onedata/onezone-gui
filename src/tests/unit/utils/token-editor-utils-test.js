@@ -894,6 +894,12 @@ describe('Unit | Utility | token editor utils', function () {
       expect(get(result, 'name')).to.equal('t1');
     });
 
+    it('converts token string', function () {
+      const result = tokenToEditorDefaultData({ token: 'abc' });
+
+      expect(get(result, 'tokenString')).to.equal('abc');
+    });
+
     it('converts type', function () {
       const result = tokenToEditorDefaultData({ typeName: 'identity' });
 

@@ -145,3 +145,8 @@
     }
   }
 }
+
+// Selector with extra nesting to override css rules
+.main-content .token-editor form {
+  margin: 0;
+}

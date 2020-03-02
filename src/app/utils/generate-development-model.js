@@ -467,6 +467,8 @@ function createTokensRecords(store) {
           }],
           metadata: {
             creationTime: moment().subtract(1, 'hour').unix(),
+            usageLimit: 20,
+            usageCount: 10,
           },
         }).save();
       });

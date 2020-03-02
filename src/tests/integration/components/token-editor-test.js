@@ -1761,6 +1761,7 @@ describe('Integration | Component | token editor', function () {
       const now = new Date();
       const token = {
         name: 'token1',
+        token: 'abc',
         typeName: 'access',
         caveats: [{
           type: 'time',
@@ -1817,6 +1818,9 @@ describe('Integration | Component | token editor', function () {
 
       return wait().then(() => {
         expect(getFieldElement(this, 'name').text()).to.contain('token1');
+        expectLabelToEqual(this, 'tokenString', 'Token');
+        expect(getFieldElement(this, 'tokenString').find('textarea').val())
+          .to.contain('abc');
         expect(getFieldElement(this, 'type').text()).to.contain('access');
         expect(getFieldElement(this, 'expire').text())
           .to.contain(moment(now).format('YYYY/MM/DD H:mm'));
@@ -1886,6 +1890,7 @@ describe('Integration | Component | token editor', function () {
         expect(getFieldElement(this, 'target').text()).to.contain('space1');
         expect(getFieldElement(this, 'privileges').find('.one-way-toggle.checked'))
           .to.have.length(3);
+        expect(getFieldElement(this, 'usageLimit')).to.not.exist;
         expectLabelToEqual(this, 'usageCount', 'Usage count');
         expect(getFieldElement(this, 'usageCount').text()).to.contain('5/10');
         expect(this.$('.caveat-group-toggle')).to.not.exist;
@@ -1937,6 +1942,7 @@ class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
 
 const basicFieldNameToFieldPath = {
   name: 'basic.name',
+  tokenString: 'basic.tokenString',
   type: 'basic.type',
   inviteType: 'basic.inviteDetails.inviteType',
   target: 'basic.inviteDetails.inviteTargetDetails.target',

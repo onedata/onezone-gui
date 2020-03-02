@@ -270,6 +270,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
 
   const {
     name,
+    token: tokenString,
     typeName,
     inviteType,
     tokenTargetProxy,
@@ -280,6 +281,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
   } = getProperties(
     token,
     'name',
+    'token',
     'typeName',
     'inviteType',
     'tokenTargetProxy',
@@ -291,6 +293,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
 
   const defaultData = EmberObject.create({
     name,
+    tokenString,
     type: typeName,
     inviteType,
     inviteTargetProxy: tokenTargetProxy,

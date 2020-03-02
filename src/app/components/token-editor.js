@@ -23,6 +23,7 @@ import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-fiel
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
+import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
 import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
 import PrivilegesField from 'onedata-gui-common/utils/form-component/privileges-field';
@@ -293,6 +294,14 @@ export default Component.extend(I18n, {
             component,
             defaultValue: or('component.tokenDataSource.name', raw(undefined)),
           }).create({ name: 'name' }),
+          ClipboardField.extend({
+            component,
+            isVisible: reads('isInViewMode'),
+            defaultValue: reads('component.tokenDataSource.tokenString'),
+          }).create({
+            name: 'tokenString',
+            type: 'textarea',
+          }),
           RadioField.extend({
             component,
             defaultValue: conditional(
@@ -587,7 +596,9 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   usageLimitGroup: computed(function usageLimitGroup() {
-    return FormFieldsGroup.create({
+    return FormFieldsGroup.extend({
+      isVisible: reads('isInEditMode'),
+    }).create({
       name: 'usageLimit',
       fields: [
         RadioField.create({

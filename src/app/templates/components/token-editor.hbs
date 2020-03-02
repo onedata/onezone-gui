@@ -1,6 +1,5 @@
 <form class="form form-horizontal form-component">
   {{form-component/field-renderer field=basicGroup}}
-  {{log tokenDataSource.caveats}}
   {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
     <h1 class="toggle-expand caveats-expand {{if caveatsGroup.isExpanded "opened"}}" {{action "toggleCaveatsGroup"}}>
       {{tt this "fields.caveats.header"}} {{one-icon icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down") class="toggle-icon"}}

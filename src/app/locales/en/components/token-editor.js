@@ -4,6 +4,9 @@ export default {
       name: {
         label: 'Name',
       },
+      tokenString: {
+        label: 'Token',
+      },
       type: {
         label: 'Type',
         options: {
