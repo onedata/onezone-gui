@@ -23,7 +23,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'services.tokenActions.createTokenAction',
+  i18nPrefix: 'utils.tokenActions.createTokenAction',
 
   /**
    * @type {ComputedProperty<Object>}

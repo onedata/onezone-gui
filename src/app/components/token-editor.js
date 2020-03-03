@@ -13,7 +13,8 @@ import { inject as service } from '@ember/service';
 import { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
-import { Promise, all as allFulfilled, allSettled } from 'rsvp';
+import { Promise, all as allFulfilled } from 'rsvp';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
@@ -24,7 +25,7 @@ import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import DatetimeField from 'onedata-gui-common/utils/form-component/datetime-field';
 import StaticTextField from 'onedata-gui-common/utils/form-component/static-text-field';
 import TagsField from 'onedata-gui-common/utils/form-component/tags-field';
-import LoadingField from 'onedata-gui-common/utils/form-component/loading-field';
+import SiblingLoadingField from 'onedata-gui-common/utils/form-component/sibling-loading-field';
 import PrivilegesField from 'onedata-gui-common/utils/form-component/privileges-field';
 import NumberField from 'onedata-gui-common/utils/form-component/number-field';
 import {
@@ -39,6 +40,7 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { editorDataToToken } from 'onezone-gui/utils/token-editor-utils';
 import {
+  conditional,
   equal,
   raw,
   and,
@@ -56,6 +58,8 @@ import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import ArrayProxy from '@ember/array/proxy';
+import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -143,6 +147,23 @@ const ModelTagsFieldPrototype = TagsField.extend({
     });
     return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
   },
+});
+
+const RecordsOptionsArrayProxy = ArrayProxy.extend(OwnerInjector, {
+  oneiconAlias: service(),
+  records: undefined,
+  sortedRecords: array.sort('records', ['name']),
+  content: computed('sortedRecords.@each.name', function content() {
+    const {
+      sortedRecords,
+      oneiconAlias,
+    } = this.getProperties('sortedRecords', 'oneiconAlias');
+    return sortedRecords.map(record => ({
+      value: record,
+      label: get(record, 'name'),
+      icon: oneiconAlias.getName(get(record, 'entityType')),
+    }));
+  }),
 });
 
 function createWhiteBlackListDropdown(fieldName) {
@@ -308,7 +329,7 @@ export default Component.extend(I18n, {
         cachedPrivilegesPresetProxy: PromiseObject.create({
           promise: new Promise(() => {}),
         }),
-        inviteTypeSpecObserver: observer('inviteTypeSpec', function inviteTypeSpecObserver() {
+        inviteTypeSpecObserver: observer('inviteTypeSpec', function itsObserver() {
           const {
             inviteTypeSpec,
             cachedTargetsModelName,
@@ -322,7 +343,8 @@ export default Component.extend(I18n, {
             return;
           }
           const newTargetsModelName = inviteTypeSpec.targetModelName;
-          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges && newTargetsModelName;
+          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
+            newTargetsModelName;
           if (newTargetsModelName) {
             this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
             if (cachedTargetsModelName !== newTargetsModelName) {
@@ -349,15 +371,10 @@ export default Component.extend(I18n, {
       }).create({
         name: 'inviteTargetDetails',
         fields: [
-          LoadingField.extend({
-            isVisible: not('isFulfilled'),
+          SiblingLoadingField.extend({
             loadingProxy: reads('parent.cachedTargetsProxy'),
-            label: getBy(
-              array.findBy('parent.fields', raw('name'), raw('target')),
-              raw('label')
-            ),
-            isValid: reads('isFulfilled'),
           }).create({
+            siblingName: 'target',
             name: 'loadingTarget',
           }),
           this.get('targetField'),
@@ -366,16 +383,11 @@ export default Component.extend(I18n, {
           }).create({
             name: 'invitePrivilegesDetails',
             fields: [
-              LoadingField.extend({
-                isVisible: not('isFulfilled'),
+              SiblingLoadingField.extend({
                 loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
-                label: getBy(
-                  array.findBy('parent.fields', raw('name'), raw('privileges')),
-                  raw('label')
-                ),
-                isValid: reads('isFulfilled'),
               }).create({
                 name: 'loadingPrivileges',
+                siblingName: 'privileges',
               }),
               this.get('privilegesField'),
             ],
@@ -584,19 +596,14 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   expireCaveatGroup: computed(function expireCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'expireCaveat',
-      fields: [
-        createCaveatToggleField('expire'),
-        DatetimeField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-        }).create({
-          name: 'expire',
-          defaultValue: moment().add(1, 'day').endOf('day').toDate(),
-        }),
-        createDisabledCaveatDescription('expire'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('expire', [
+      DatetimeField.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+      }).create({
+        name: 'expire',
+        defaultValue: moment().add(1, 'day').endOf('day').toDate(),
+      }),
+    ]));
   }),
 
   /**
@@ -604,59 +611,59 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   regionCaveatGroup: computed(function regionCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'regionCaveat',
-      fields: [
-        createCaveatToggleField('region'),
-        FormFieldsGroup.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-        }).create({
-          name: 'region',
-          areValidationClassesEnabled: true,
-          fields: [
-            createWhiteBlackListDropdown('regionType'),
-            TagsField.extend({
-              allowedTags: computed(
-                'i18nPrefix',
-                'path',
-                function allowedTags() {
-                  const path = this.get('path');
-                  return [
-                    'Africa',
-                    'Antarctica',
-                    'Asia',
-                    'Europe',
-                    'EU',
-                    'NorthAmerica',
-                    'Oceania',
-                    'SouthAmerica',
-                  ].map(abbrev => ({
-                    label: String(this.t(`${path}.tags.${abbrev}`)),
-                    value: abbrev,
-                  }));
-                }
-              ),
-              tagEditorSettings: hash('allowedTags'),
-              valueToTags(value) {
-                const allowedTags = this.get('allowedTags');
-                return (value || [])
-                  .map(val => allowedTags.findBy('value', val))
-                  .compact();
-              },
-              tagsToValue(tags) {
-                return tags.mapBy('value');
-              },
-            }).create({
-              name: 'regionList',
-              tagEditorComponentName: 'tags-input/selector-editor',
-              defaultValue: [],
-              sort: true,
-            }),
-          ],
-        }),
-        createDisabledCaveatDescription('region'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('region', [
+      FormFieldsGroup.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+      }).create({
+        name: 'region',
+        areValidationClassesEnabled: true,
+        fields: [
+          createWhiteBlackListDropdown('regionType'),
+          TagsField.extend({
+            classes: conditional(
+              equal('parent.value.regionType', raw('whitelist')),
+              raw('tags-success'),
+              raw('tags-danger'),
+            ),
+            allowedTags: computed(
+              'i18nPrefix',
+              'path',
+              function allowedTags() {
+                const path = this.get('path');
+                return [
+                  'Africa',
+                  'Antarctica',
+                  'Asia',
+                  'Europe',
+                  'EU',
+                  'NorthAmerica',
+                  'Oceania',
+                  'SouthAmerica',
+                ].map(abbrev => ({
+                  label: String(this.t(`${path}.tags.${abbrev}`)),
+                  value: abbrev,
+                }));
+              }
+            ),
+            tagEditorSettings: hash('allowedTags'),
+            valueToTags(value) {
+              const allowedTags = this.get('allowedTags');
+              return (value || [])
+                .map(val => allowedTags.findBy('value', val))
+                .compact();
+            },
+            tagsToValue(tags) {
+              return tags.mapBy('value');
+            },
+          }).create({
+            name: 'regionList',
+            tagEditorComponentName: 'tags-input/selector-editor',
+            defaultValue: [],
+            sort: true,
+          }),
+        ],
+      }),
+    ]));
   }),
 
   /**
@@ -664,45 +671,44 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   countryCaveatGroup: computed(function countryCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'countryCaveat',
-      fields: [
-        createCaveatToggleField('country'),
-        FormFieldsGroup.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-        }).create({
-          name: 'country',
-          areValidationClassesEnabled: true,
-          fields: [
-            createWhiteBlackListDropdown('countryType'),
-            TagsField.extend({
-              sortTags(tags) {
-                return tags.sort((a, b) =>
-                  get(a, 'label').toUpperCase().localeCompare(
-                    get(b, 'label').toUpperCase()
-                  )
-                );
-              },
-              tagsToValue(tags) {
-                return tags
-                  .mapBy('label')
-                  .map(country => country.toUpperCase())
-                  .uniq();
-              },
-            }).create({
-              name: 'countryList',
-              tagEditorSettings: {
-                // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
-                regexp: /^[a-zA-Z]{2}$/,
-              },
-              defaultValue: [],
-              sort: true,
-            }),
-          ],
-        }),
-        createDisabledCaveatDescription('country'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('country', [
+      FormFieldsGroup.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+      }).create({
+        name: 'country',
+        areValidationClassesEnabled: true,
+        fields: [
+          createWhiteBlackListDropdown('countryType'),
+          TagsField.extend({
+            classes: conditional(
+              equal('parent.value.countryType', raw('whitelist')),
+              raw('tags-success'),
+              raw('tags-danger'),
+            ),
+            sortTags(tags) {
+              return tags.sort((a, b) =>
+                get(a, 'label').localeCompare(get(b, 'label').toUpperCase())
+              );
+            },
+            valueToTags(value) {
+              if (value && get(value, 'length')) {
+                value = value.map(v => v.toUpperCase());
+              }
+              return this._super(value);
+            },
+          }).create({
+            name: 'countryList',
+            tagEditorSettings: {
+              // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
+              regexp: /^[a-zA-Z]{2}$/,
+              transform: label => label.toUpperCase(),
+            },
+            defaultValue: [],
+            sort: true,
+          }),
+        ],
+      }),
+    ]));
   }),
 
   /**
@@ -710,37 +716,32 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   asnCaveatGroup: computed(function asnCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'asnCaveat',
-      fields: [
-        createCaveatToggleField('asn'),
-        TagsField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-          sortTags(tags) {
-            return tags.sort((a, b) =>
-              parseInt(get(a, 'label') - parseInt(get(b, 'label')))
-            );
-          },
-          tagsToValue(tags) {
-            return tags
-              .mapBy('label')
-              .map(asnString => parseInt(asnString))
-              .uniq();
-          },
-          valueToTags(value) {
-            return (value || []).map(asn => ({ label: String(asn) }));
-          },
-        }).create({
-          name: 'asn',
-          tagEditorSettings: {
-            regexp: /^\d+$/,
-          },
-          defaultValue: [],
-          sort: true,
-        }),
-        createDisabledCaveatDescription('asn'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('asn', [
+      TagsField.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+        sortTags(tags) {
+          return tags.sort((a, b) =>
+            parseInt(get(a, 'label') - parseInt(get(b, 'label')))
+          );
+        },
+        tagsToValue(tags) {
+          return tags
+            .mapBy('label')
+            .map(asnString => parseInt(asnString))
+            .uniq();
+        },
+        valueToTags(value) {
+          return (value || []).map(asn => ({ label: String(asn) }));
+        },
+      }).create({
+        name: 'asn',
+        tagEditorSettings: {
+          regexp: /^\d+$/,
+        },
+        defaultValue: [],
+        sort: true,
+      }),
+    ]));
   }),
 
   /**
@@ -748,38 +749,33 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   ipCaveatGroup: computed(function ipCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'ipCaveat',
-      fields: [
-        createCaveatToggleField('ip'),
-        TagsField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-          sortTags(tags) {
-            const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
-            const sortKeyDecoratedTags = tags.map(tag => {
-              const parsedIp = get(tag, 'label').match(ipPartsMatcher);
-              // sortKey for "192.168.0.1/24" is 192168000001024
-              const sortKey = parsedIp
-                // Four IP octets (1,2,3,4) and mask (6)
-                .slice(1, 5).concat([parsedIp[6] || '0'])
-                .map(numberStr => _.padStart(numberStr, 3, '0'))
-                .join();
-              return { sortKey, tag };
-            });
-            return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
-          },
-        }).create({
-          name: 'ip',
-          tagEditorSettings: {
-            // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
-            regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
-          },
-          defaultValue: [],
-          sort: true,
-        }),
-        createDisabledCaveatDescription('ip'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('ip', [
+      TagsField.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+        sortTags(tags) {
+          const ipPartsMatcher = /^(\d+)\.(\d+)\.(\d+)\.(\d+)(\/(\d+))?$/;
+          const sortKeyDecoratedTags = tags.map(tag => {
+            const parsedIp = get(tag, 'label').match(ipPartsMatcher);
+            // sortKey for "192.168.0.1/24" is 192168000001024
+            const sortKey = parsedIp
+              // Four IP octets (1,2,3,4) and mask (6)
+              .slice(1, 5).concat([parsedIp[6] || '0'])
+              .map(numberStr => _.padStart(numberStr, 3, '0'))
+              .join();
+            return { sortKey, tag };
+          });
+          return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
+        },
+      }).create({
+        name: 'ip',
+        tagEditorSettings: {
+          // IP address with an optional mask (format: 1.1.1.1 or 1.1.1.1/2)
+          regexp: /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))?$/,
+        },
+        defaultValue: [],
+        sort: true,
+      }),
+    ]));
   }),
 
   /**
@@ -787,138 +783,133 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   consumerCaveatGroup: computed(function consumerCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'consumerCaveat',
-      fields: [
-        createCaveatToggleField('consumer'),
-        ModelTagsFieldPrototype.extend({
-          groupManager: service(),
-          spaceManager: service(),
-          currentUser: service(),
-          providerManager: service(),
-          isVisible: reads('parent.isCaveatEnabled'),
-          currentUserProxy: promise.object(computed(function currentUserProxy() {
-            return this.get('currentUser').getCurrentUserRecord();
-          })),
-          groupsProxy: promise.array(computed(function groupsProxy() {
-            return this.get('groupManager').getGroups()
-              .then(groups => get(groups, 'list'));
-          })),
-          spacesProxy: promise.array(computed(function spacesProxy() {
-            return this.get('spaceManager').getSpaces()
-              .then(spaces => get(spaces, 'list'));
-          })),
-          users: promise.array(computed(
-            'currentUserProxy',
-            'groupsUsersListsProxy.[]',
-            'spacesUsersListsProxy.[]',
-            function users() {
-              const {
-                currentUserProxy,
-                groupsUsersListsProxy,
-                spacesUsersListsProxy,
-              } = this.getProperties(
-                'currentUserProxy',
-                'groupsUsersListsProxy',
-                'spacesUsersListsProxy'
-              );
-              const usersArray = [];
-              return allFulfilled([
-                currentUserProxy,
-                groupsUsersListsProxy,
-                spacesUsersListsProxy,
-              ]).then(([
-                currentUser,
-                groupsUserLists,
-                spacesUsersListsProxy,
-              ]) => {
-                usersArray.push(currentUser);
-                groupsUserLists
-                  .concat(spacesUsersListsProxy)
-                  .forEach(usersList =>
-                    usersArray.push(...usersList.toArray())
-                  );
-                return usersArray.uniqBy('entityId');
-              });
-            }
-          )),
-          groups: promise.array(computed(
-            'groupsProxy',
-            'groupsGroupsListsProxy.[]',
-            'spacesGroupsListsProxy.[]',
-            function users() {
-              const {
-                groupsProxy,
-                groupsGroupsListsProxy,
-                spacesGroupsListsProxy,
-              } = this.getProperties(
-                'groupsProxy',
-                'groupsGroupsListsProxy',
-                'spacesGroupsListsProxy'
-              );
-              const groupsArray = [];
-              return allFulfilled([
-                groupsProxy,
-                groupsGroupsListsProxy,
-                spacesGroupsListsProxy,
-              ]).then(([
-                userGroups,
-                groupsGroupsLists,
-                spacesGroupsLists,
-              ]) => {
-                groupsArray.push(...userGroups.toArray());
-                groupsGroupsLists
-                  .concat(spacesGroupsLists)
-                  .forEach(groupsList =>
-                    groupsArray.push(...groupsList.toArray())
-                  );
-                return groupsArray.uniqBy('entityId');
-              });
-            }
-          )),
-          oneprovidersProxy: promise.array(computed(function oneprovidersProxy() {
-            return this.get('providerManager').getProviders()
-              .then(providers => get(providers, 'list'));
-          })),
-          models: computed(function models() {
-            return [{
-              name: 'user',
-              getRecords: () => this.get('users'),
-            }, {
-              name: 'group',
-              getRecords: () => this.get('groups'),
-            }, {
-              name: 'oneprovider',
-              getRecords: () => this.get('oneprovidersProxy'),
-            }];
-          }),
-          init() {
-            this._super(...arguments);
-
-            ['group', 'space'].forEach(parentRecordName => {
-              ['user', 'group'].forEach(childRecordName => {
-                const upperChildRecordName = _.upperFirst(childRecordName);
-                const computedLists = computed(
-                  `${parentRecordName}sProxy.@each.isReloading`,
-                  function computedLists() {
-                    return this.get(`${parentRecordName}sProxy`)
-                      .then(parents =>
-                        onlySettledOk(parents.mapBy(`eff${upperChildRecordName}List`))
-                      )
-                      .then(effLists => onlySettledOk(effLists.mapBy('list')));
-                  }
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('consumer', [
+      ModelTagsFieldPrototype.extend({
+        groupManager: service(),
+        spaceManager: service(),
+        currentUser: service(),
+        providerManager: service(),
+        isVisible: reads('parent.isCaveatEnabled'),
+        currentUserProxy: promise.object(computed(function currentUserProxy() {
+          return this.get('currentUser').getCurrentUserRecord();
+        })),
+        groupsProxy: promise.array(computed(function groupsProxy() {
+          return this.get('groupManager').getGroups()
+            .then(groups => get(groups, 'list'));
+        })),
+        spacesProxy: promise.array(computed(function spacesProxy() {
+          return this.get('spaceManager').getSpaces()
+            .then(spaces => get(spaces, 'list'));
+        })),
+        users: promise.array(computed(
+          'currentUserProxy',
+          'groupsUsersListsProxy.[]',
+          'spacesUsersListsProxy.[]',
+          function users() {
+            const {
+              currentUserProxy,
+              groupsUsersListsProxy,
+              spacesUsersListsProxy,
+            } = this.getProperties(
+              'currentUserProxy',
+              'groupsUsersListsProxy',
+              'spacesUsersListsProxy'
+            );
+            const usersArray = [];
+            return allFulfilled([
+              currentUserProxy,
+              groupsUsersListsProxy,
+              spacesUsersListsProxy,
+            ]).then(([
+              currentUser,
+              groupsUserLists,
+              spacesUsersListsProxy,
+            ]) => {
+              usersArray.push(currentUser);
+              groupsUserLists
+                .concat(spacesUsersListsProxy)
+                .forEach(usersList =>
+                  usersArray.push(...usersList.toArray())
                 );
-                this.set(
-                  `${parentRecordName}s${upperChildRecordName}sListsProxy`,
-                  promise.array(computedLists)
-                );
-              });
+              return usersArray.uniqBy('entityId');
             });
-          },
-        }).create({ name: 'consumer' }),
-        createDisabledCaveatDescription('consumer'),
-      ],
-    });
+          }
+        )),
+        groups: promise.array(computed(
+          'groupsProxy',
+          'groupsGroupsListsProxy.[]',
+          'spacesGroupsListsProxy.[]',
+          function users() {
+            const {
+              groupsProxy,
+              groupsGroupsListsProxy,
+              spacesGroupsListsProxy,
+            } = this.getProperties(
+              'groupsProxy',
+              'groupsGroupsListsProxy',
+              'spacesGroupsListsProxy'
+            );
+            const groupsArray = [];
+            return allFulfilled([
+              groupsProxy,
+              groupsGroupsListsProxy,
+              spacesGroupsListsProxy,
+            ]).then(([
+              userGroups,
+              groupsGroupsLists,
+              spacesGroupsLists,
+            ]) => {
+              groupsArray.push(...userGroups.toArray());
+              groupsGroupsLists
+                .concat(spacesGroupsLists)
+                .forEach(groupsList =>
+                  groupsArray.push(...groupsList.toArray())
+                );
+              return groupsArray.uniqBy('entityId');
+            });
+          }
+        )),
+        oneprovidersProxy: promise.array(computed(function oneprovidersProxy() {
+          return this.get('providerManager').getProviders()
+            .then(providers => get(providers, 'list'));
+        })),
+        models: computed(function models() {
+          return [{
+            name: 'user',
+            getRecords: () => this.get('users'),
+          }, {
+            name: 'group',
+            getRecords: () => this.get('groups'),
+          }, {
+            name: 'oneprovider',
+            getRecords: () => this.get('oneprovidersProxy'),
+          }];
+        }),
+        init() {
+          this._super(...arguments);
+
+          ['group', 'space'].forEach(parentRecordName => {
+            ['user', 'group'].forEach(childRecordName => {
+              const upperChildRecordName = _.upperFirst(childRecordName);
+              const computedLists = computed(
+                `${parentRecordName}sProxy.@each.isReloading`,
+                function computedLists() {
+                  return this.get(`${parentRecordName}sProxy`)
+                    .then(parents =>
+                      onlyFulfilledValues(parents.mapBy(`eff${upperChildRecordName}List`))
+                    )
+                    .then(effLists => onlyFulfilledValues(effLists.mapBy('list')));
+                }
+              );
+              this.set(
+                `${parentRecordName}s${upperChildRecordName}sListsProxy`,
+                promise.array(computedLists)
+              );
+            });
+          });
+        },
+      }).create({ name: 'consumer' }),
+    ]));
   }),
 
   /**
@@ -928,30 +919,25 @@ export default Component.extend(I18n, {
   serviceCaveatGroup: computed(function serviceCaveatGroup() {
     return CaveatFormGroup.extend({
       isExpanded: equal('valuesSource.basic.type', raw('access')),
-    }).create({
-      name: 'serviceCaveat',
-      fields: [
-        createCaveatToggleField('service'),
-        ModelTagsFieldPrototype.extend({
-          clusterManager: service(),
-          isVisible: reads('parent.isCaveatEnabled'),
-          clustersProxy: promise.array(computed(function clustersProxy() {
-            return this.get('clusterManager')
-              .getClusters().then(clusters => get(clusters, 'list'));
-          })),
-          models: computed(function models() {
-            return [{
-              name: 'service',
-              getRecords: () => this.get('clustersProxy'),
-            }, {
-              name: 'serviceOnepanel',
-              getRecords: () => this.get('clustersProxy'),
-            }];
-          }),
-        }).create({ name: 'service' }),
-        createDisabledCaveatDescription('service'),
-      ],
-    });
+    }).create(generateCaveatFormGroupBody('service', [
+      ModelTagsFieldPrototype.extend({
+        clusterManager: service(),
+        isVisible: reads('parent.isCaveatEnabled'),
+        clustersProxy: promise.array(computed(function clustersProxy() {
+          return this.get('clusterManager')
+            .getClusters().then(clusters => get(clusters, 'list'));
+        })),
+        models: computed(function models() {
+          return [{
+            name: 'service',
+            getRecords: () => this.get('clustersProxy'),
+          }, {
+            name: 'serviceOnepanel',
+            getRecords: () => this.get('clustersProxy'),
+          }];
+        }),
+      }).create({ name: 'service' }),
+    ]));
   }),
 
   /**
@@ -961,23 +947,18 @@ export default Component.extend(I18n, {
   interfaceCaveatGroup: computed(function interfaceCaveatGroup() {
     return CaveatFormGroup.extend({
       isExpanded: not(equal('valuesSource.basic.type', raw('invite'))),
-    }).create({
-      name: 'interfaceCaveat',
-      fields: [
-        createCaveatToggleField('interface'),
-        RadioField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-        }).create({
-          name: 'interface',
-          options: [
-            { value: 'rest' },
-            { value: 'oneclient' },
-          ],
-          defaultValue: 'rest',
-        }),
-        createDisabledCaveatDescription('interface'),
-      ],
-    });
+    }).create(generateCaveatFormGroupBody('interface', [
+      RadioField.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+      }).create({
+        name: 'interface',
+        options: [
+          { value: 'rest' },
+          { value: 'oneclient' },
+        ],
+        defaultValue: 'rest',
+      }),
+    ]));
   }),
 
   /**
@@ -985,16 +966,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   readonlyCaveatGroup: computed(function readonlyCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'readonlyCaveat',
-      fields: [
-        createCaveatToggleField('readonly'),
-        StaticTextField.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-        }).create({ name: 'readonlyEnabledText' }),
-        createDisabledCaveatDescription('readonly'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('readonly', [
+      StaticTextField.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+      }).create({ name: 'readonlyEnabledText' }),
+    ]));
   }),
 
   /**
@@ -1013,55 +989,46 @@ export default Component.extend(I18n, {
           );
         }
       }),
-    }).create({
-      name: 'pathCaveat',
-      fields: [
-        createCaveatToggleField('path'),
-        LoadingField.extend({
-          loadingProxy: reads('parent.spacesProxy'),
-          isVisible: and('parent.isCaveatEnabled', not('isFulfilled')),
-          label: getBy(
-            array.findBy('parent.fields', raw('name'), raw('path')),
-            raw('label')
-          ),
-          isValid: reads('isFulfilled'),
-        }).create({
-          name: 'loadingPathSpaces',
-        }),
-        FormFieldsCollectionGroup.extend({
-          isVisible: and(
-            'parent.isCaveatEnabled',
-            'parent.spacesProxy.isFulfilled'
-          ),
-          spaces: reads('parent.spacesProxy.content'),
-          fieldFactoryMethod(createdFieldsCounter) {
-            return FormFieldsGroup.extend({}).create({
-              name: 'pathEntry',
-              valueName: `pathEntry${createdFieldsCounter}`,
-              areValidationClassesEnabled: true,
-              fields: [
-                DropdownField.extend({
-                  options: reads('parent.parent.spaces'),
-                  defaultValue: reads('options.firstObject.value'),
-                }).create({
-                  name: 'pathSpace',
-                  areValidationClassesEnabled: false,
-                }),
-                TextField.create({
-                  name: 'pathString',
-                  defaultValue: '',
-                  isOptional: true,
-                  regex: /^(\/[^/]+)*$/,
-                }),
-              ],
-            });
-          },
-        }).create({
-          name: 'path',
-        }),
-        createDisabledCaveatDescription('path'),
-      ],
-    });
+    }).create(generateCaveatFormGroupBody('path', [
+      SiblingLoadingField.extend({
+        loadingProxy: reads('parent.spacesProxy'),
+        isVisible: and('parent.isCaveatEnabled', not('isFulfilled')),
+      }).create({
+        name: 'loadingPathSpaces',
+        siblingName: 'path',
+      }),
+      FormFieldsCollectionGroup.extend({
+        isVisible: and(
+          'parent.isCaveatEnabled',
+          'parent.spacesProxy.isFulfilled'
+        ),
+        spaces: reads('parent.spacesProxy.content'),
+        fieldFactoryMethod(createdFieldsCounter) {
+          return FormFieldsGroup.extend({}).create({
+            name: 'pathEntry',
+            valueName: `pathEntry${createdFieldsCounter}`,
+            areValidationClassesEnabled: true,
+            fields: [
+              DropdownField.extend({
+                options: reads('parent.parent.spaces'),
+                defaultValue: reads('options.firstObject.value'),
+              }).create({
+                name: 'pathSpace',
+                areValidationClassesEnabled: false,
+              }),
+              TextField.create({
+                name: 'pathString',
+                defaultValue: '',
+                isOptional: true,
+                regex: /^(\/[^/]+)*$/,
+              }),
+            ],
+          });
+        },
+      }).create({
+        name: 'path',
+      }),
+    ]));
   }),
 
   /**
@@ -1069,24 +1036,19 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   objectIdCaveatGroup: computed(function objectIdCaveatGroup() {
-    return CaveatFormGroup.create({
-      name: 'objectIdCaveat',
-      fields: [
-        createCaveatToggleField('objectId'),
-        FormFieldsCollectionGroup.extend({
-          isVisible: reads('parent.isCaveatEnabled'),
-          fieldFactoryMethod(createdFieldsCounter) {
-            return TextField.create({
-              name: 'objectIdEntry',
-              valueName: `objectIdEntry${createdFieldsCounter}`,
-            });
-          },
-        }).create({
-          name: 'objectId',
-        }),
-        createDisabledCaveatDescription('objectId'),
-      ],
-    });
+    return CaveatFormGroup.create(generateCaveatFormGroupBody('objectId', [
+      FormFieldsCollectionGroup.extend({
+        isVisible: reads('parent.isCaveatEnabled'),
+        fieldFactoryMethod(createdFieldsCounter) {
+          return TextField.create({
+            name: 'objectIdEntry',
+            valueName: `objectIdEntry${createdFieldsCounter}`,
+          });
+        },
+      }).create({
+        name: 'objectId',
+      }),
+    ]));
   }),
 
   init() {
@@ -1124,13 +1086,11 @@ export default Component.extend(I18n, {
       groupManager,
       harvesterManager,
       clusterManager,
-      oneiconAlias,
     } = this.getProperties(
       'spaceManager',
       'groupManager',
       'harvesterManager',
       'clusterManager',
-      'oneiconAlias'
     );
 
     let records;
@@ -1152,12 +1112,10 @@ export default Component.extend(I18n, {
     return PromiseArray.create({
       promise: records
         .then(records => get(records, 'list'))
-        .then(recordsList => recordsList.sortBy('name'))
-        .then(recordsList => recordsList.map(record => ({
-          value: record,
-          label: get(record, 'name'),
-          icon: oneiconAlias.getName(modelName),
-        }))),
+        .then(recordsList => RecordsOptionsArrayProxy.create({
+          ownerSource: this,
+          records: recordsList,
+        })),
     });
   },
 
@@ -1196,11 +1154,6 @@ export default Component.extend(I18n, {
   },
 });
 
-function onlySettledOk(promiseArr) {
-  return allSettled(promiseArr)
-    .then(arr => arr.filterBy('state', 'fulfilled').mapBy('value'));
-}
-
 function createCaveatToggleField(caveatName) {
   return ToggleField.extend({
     classes: 'caveat-group-toggle',
@@ -1216,4 +1169,15 @@ function createDisabledCaveatDescription(caveatName) {
   }).create({
     name: `${caveatName}DisabledText`,
   });
+}
+
+function generateCaveatFormGroupBody(caveatName, caveatFields) {
+  return {
+    name: `${caveatName}Caveat`,
+    fields: [
+      createCaveatToggleField(caveatName),
+      ...caveatFields,
+      createDisabledCaveatDescription(caveatName),
+    ],
+  };
 }

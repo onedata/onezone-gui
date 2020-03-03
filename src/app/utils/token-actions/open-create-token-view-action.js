@@ -18,7 +18,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'services.tokenActions.openCreateTokenViewAction',
+  i18nPrefix: 'utils.tokenActions.openCreateTokenViewAction',
 
   /**
    * @override

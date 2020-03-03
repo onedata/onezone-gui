@@ -91,7 +91,7 @@ import tokenEditor from './components/token-editor';
 import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
-
+// http://localhost:7357/3481/tests/index.html?hidepassed&grep=Integration%20%5C%7C%20Component%20%5C%7C%20token%20editor
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 
 import spaceActions from './services/space-actions';
@@ -105,6 +105,9 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import uploadObject from './utils/upload-object';
+import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
+import createTokenAction from './utils/token-actions/create-token-action';
+import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
 
 let translations = {
   tabs: {
@@ -221,6 +224,11 @@ let translations = {
   },
   utils: {
     uploadObject,
+    tokenActions: {
+      cleanObsoleteTokensAction,
+      createTokenAction,
+      openCreateTokenViewAction,
+    },
   },
 };
 
