@@ -25,6 +25,11 @@
       flex-grow: 0;
       margin-right: 25px;
     }
+    &.field-view-mode {
+      .field-component {
+        display: none;
+      }
+    }
   }
 
   .toggle-icon {
@@ -52,6 +57,10 @@
     flex-grow: 0;
     flex-shrink: 0;
 
+    &.field-view-mode {
+      width: initial;
+    }
+
     .dropdown-field-trigger {
       border-right: 0;
       border-top-right-radius: 0;
@@ -62,6 +71,13 @@
   .regionType-field,
   .countryType-field {
     width: 110px;
+
+    &.field-view-mode {
+      margin-right: $padding-small-horizontal;
+      .text::after {
+        content: ':';
+      }
+    }
   }
 
   .regionList-field,

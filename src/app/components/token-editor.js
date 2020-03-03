@@ -324,9 +324,10 @@ export default Component.extend(I18n, {
             fields: [
               DropdownField.extend({
                 component,
-                defaultValue: or(
-                  'component.tokenDataSource.inviteType',
-                  raw('userJoinGroup')
+                defaultValue: conditional(
+                  'isInEditMode',
+                  raw('userJoinGroup'),
+                  'component.tokenDataSource.inviteType'
                 ),
               }).create({
                 name: 'inviteType',
@@ -439,7 +440,7 @@ export default Component.extend(I18n, {
         ),
         init() {
           this._super(...arguments);
-          this.inviteTypeSpecObserver();
+          scheduleOnce('afterRender', this, 'inviteTypeSpecObserver');
         },
       }).create({
         name: 'inviteTargetDetails',
@@ -1485,7 +1486,7 @@ function onlySettledOk(promiseArr) {
 function createCaveatToggleField(caveatName) {
   return ToggleField.extend({
     classes: 'caveat-group-toggle',
-    addColonToLabel: false,
+    addColonToLabel: reads('isInViewMode'),
     defaultValue: false,
     isGroupToggle: true,
   }).create({ name: `${caveatName}Enabled` });
