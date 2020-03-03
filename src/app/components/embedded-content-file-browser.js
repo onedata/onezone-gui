@@ -10,9 +10,10 @@
 import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { computed, observer } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import { string, raw, writable } from 'ember-awesome-macros';
 
 export default OneEmbeddedContainer.extend({
   layout,
@@ -42,6 +43,12 @@ export default OneEmbeddedContainer.extend({
   dirEntityId: reads('navigationState.aspectOptions.dir'),
 
   /**
+   * List of file entity ids that are selected
+   * @type {Array<String>}
+   */
+  selected: writable(string.split('navigationState.aspectOptions.selected', raw(','))),
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -62,7 +69,7 @@ export default OneEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'dirEntityId']),
+  iframeInjectedProperties: Object.freeze(['spaceEntityId', 'dirEntityId', 'selected']),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -81,17 +88,9 @@ export default OneEmbeddedContainer.extend({
     return `iframe-oneprovider-${oneproviderId}`;
   }),
 
-  dirChangedObserver: observer('dirEntityId', function dirChangedObserver() {
-    const {
-      navigationState,
-      dirEntityId,
-    } = this.getProperties('navigationState', 'dirEntityId');
-    navigationState.setAspectOptions({ dir: dirEntityId });
-  }),
-
   actions: {
     updateDirEntityId(dirEntityId) {
-      this.set('dirEntityId', dirEntityId);
+      this.get('navigationState').setAspectOptions({ dir: dirEntityId });
     },
     getTransfersUrl({ fileId, tabId }) {
       const {

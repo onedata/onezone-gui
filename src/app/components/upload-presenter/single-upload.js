@@ -17,6 +17,8 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
 
+const minimizeAfterFinishDelay = 10000;
+
 export default Component.extend({
   classNames: ['up-single-upload'],
 
@@ -135,6 +137,18 @@ export default Component.extend({
     }
   },
 
+  mouseEnter() {
+    if (this.get('state') === 'uploaded') {
+      const {
+        isMinimized,
+        minimizeTargetSelector,
+      } = this.getProperties('isMinimized', 'minimizeTargetSelector');
+      if (!isMinimized && minimizeTargetSelector) {
+        this.cancelScheduledMinimalization();
+      }
+    }
+  },
+
   scheduleMinimalization() {
     const {
       scheduledMinimalization,
@@ -146,7 +160,13 @@ export default Component.extend({
     if (scheduledMinimalization === undefined) {
       this.set(
         'scheduledMinimalization',
-        later(this, 'send', 'toggleMinimize', true, floatingMode ? 3000 : 0)
+        later(
+          this,
+          'send',
+          'toggleMinimize',
+          true,
+          floatingMode ? minimizeAfterFinishDelay : 0
+        )
       );
     }
   },

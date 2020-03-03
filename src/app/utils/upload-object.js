@@ -81,6 +81,20 @@ export default EmberObject.extend(I18n, {
   uploadId: undefined,
 
   /**
+   * @virtual
+   * Oneprovider's file model entityId
+   * @type {string}
+   */
+  fileId: undefined,
+
+  /**
+   * @virtual
+   * Oneprovider's file model spaceId
+   * @type {string}
+   */
+  spaceId: undefined,
+
+  /**
    * Start upload timestamp (in ms)
    * @type {number}
    */
