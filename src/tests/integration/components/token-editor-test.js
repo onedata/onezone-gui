@@ -94,49 +94,60 @@ const tokenInviteTypes = [{
 }];
 const caveats = [{
   name: 'expire',
-  label: 'Expire',
-  disabledDescription: 'This token has unlimited lifetime',
+  label: 'Expiration',
+  disabledDescription: 'This token has no time validity limit.',
+  tip: 'Limits the token\'s validity in time.',
 }, {
   name: 'interface',
   label: 'Interface',
-  disabledDescription: 'This token can be used with REST and Oneclient',
+  disabledDescription: 'This token can be used on all system interfaces.',
+  tip: 'Limits the available interfaces on which the token can be used to a certain one.',
 }, {
   name: 'asn',
   label: 'ASN',
-  disabledDescription: 'This token can be used in any ASN',
+  disabledDescription: 'This token can be utilized from any ASN.',
+  tip: 'Limits the ASNs (Autonomous System Number) from which the token can be utilized. The client\'s ASN is resolved based on client\'s IP and MaxMind\'s GeoLite database.',
 }, {
   name: 'ip',
   label: 'IP',
-  disabledDescription: 'This token can be used without any IP address restrictions',
+  disabledDescription: 'This token does not limit allowed client IPs.',
+  tip: 'Limits the allowed client IPs to a certain whitelist (masks are supported).',
 }, {
   name: 'region',
   label: 'Region',
-  disabledDescription: 'This token is valid in all regions',
+  disabledDescription: 'This token can be utilized from any geographical region.',
+  tip: 'Limits the geographical regions from which the token can be utilized. The available values are the 7 continents (Oceania covers Australia and the pacific islands) or the EU meta region, which matches member countries of the European Union. The client\'s region is resolved based on client\'s IP and MaxMind\'s GeoLite database.',
 }, {
   name: 'country',
   label: 'Country',
-  disabledDescription: 'This token can be used regardless country',
+  disabledDescription: 'This token can be utilized from any country.',
+  tip: 'Limits the countries from which the token can be utilized. The client\'s country is resolved based on client\'s IP and MaxMind\'s GeoLite database. Countries list should be provided using the ISO 3166-1 alpha-2 codes (two-letter codes).',
 }, {
   name: 'consumer',
   label: 'Consumer',
-  disabledDescription: 'This token can be used by any consumer',
+  disabledDescription: 'This token can be consumed by anyone.',
+  tip: 'Limits the consumers that can use the token. Consumer is the token bearer that utilizes the token - performs a request with an access token or attempts to consume an invite token. If the caveat is present, the consumer must prove their identity using an identity token.',
 }, {
   name: 'service',
   label: 'Service',
-  disabledDescription: 'This token can be used to interact with any service',
+  disabledDescription: 'This token can be used to interact with any service.',
+  tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request - e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
 }, {
   name: 'readonly',
   label: 'Read only',
-  disabledDescription: 'This token can be used for both reading and writing data',
+  disabledDescription: 'This token can be used for both reading and writing user files.',
+  tip: 'Allows only read access to user files.',
   dontTestValue: true,
 }, {
   name: 'path',
   label: 'Path',
-  disabledDescription: 'This token does not restrict access to any specific files path',
+  disabledDescription: 'This token does not limit paths in which data can be accessed.',
+  tip: 'Limits the paths in which data can be accessed with the token. If a directory path is given, the token allows to access all nested files and directories starting from the specified directory.',
 }, {
   name: 'objectId',
   label: 'Object ID',
-  disabledDescription: 'This token allows to interact with all data objects in Onedata',
+  disabledDescription: 'This token does not limit object ids in which data can be accessed.',
+  tip: 'Limits the object ids in which data can be accessed with the token. The object ids comply with the CDMI format and can be used in the Oneprovider\'s REST and CDMI APIs. If a directory object id is given, the token allows to access all nested files and directories starting from the specified directory.',
 }];
 const preselectedInviteType = tokenInviteTypes[0];
 const regions = [
@@ -262,7 +273,7 @@ describe('Integration | Component | token editor', function () {
       'identity',
       'invite',
     ].forEach(type =>
-      expect(this.$(`.type-field .option-${type}`).text().trim()).to.equal(type)
+      expect(this.$(`.type-field .option-${type}`).text().trim()).to.equal(_.upperFirst(type))
     );
   });
 
@@ -1364,7 +1375,7 @@ describe('Integration | Component | token editor', function () {
       return toggleCaveat('readonly')
         .then(() => {
           expect(this.$('.readonlyEnabledText-field').text().trim())
-            .to.equal('This token allows only read access to user files');
+            .to.equal('This token allows only read access to user files.');
 
           expectToBeValid(this, 'readonly');
         });

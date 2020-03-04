@@ -24,6 +24,10 @@
   .caveat-group-toggle {
     flex-grow: 0;
 
+    .control-label {
+      min-width: 120px;
+    }
+
     .field-component {
       order: -1;
       flex-grow: 0;
