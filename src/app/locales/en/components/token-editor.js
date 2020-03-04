@@ -20,7 +20,7 @@ export default {
       },
       inviteDetails: {
         inviteType: {
-          label: 'Invitation type',
+          label: 'Invite type',
           options: {
             userJoinGroup: {
               label: 'Invite user to group',

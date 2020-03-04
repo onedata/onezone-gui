@@ -325,7 +325,7 @@ describe('Integration | Component | token editor', function () {
 
     return click('.type-field .option-invite')
       .then(() => {
-        expectLabelToEqual(this, 'inviteType', 'Invitation type');
+        expectLabelToEqual(this, 'inviteType', 'Invite type');
         return inviteTypeHelper.open();
       })
       .then(() => {
