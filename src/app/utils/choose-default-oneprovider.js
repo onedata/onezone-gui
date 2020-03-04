@@ -9,7 +9,7 @@
  */
 
 import { resolve, all as allFulfilled } from 'rsvp';
-import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 
 export default function chooseDefaultOneprovider(providers) {
   if (!providers) {
@@ -18,7 +18,7 @@ export default function chooseDefaultOneprovider(providers) {
   const onlineProviders = providers.filterBy('online');
   return allFulfilled(onlineProviders.mapBy('versionProxy'))
     .then(onlineVersions =>
-      onlineProviders.objectAt(onlineVersions.findIndex(ver => !isLegacyOneprovider(ver)))
+      onlineProviders.objectAt(onlineVersions.findIndex(ver => !isStandaloneGuiOneprovider(ver)))
     )
     .then(provider => {
       if (provider) {

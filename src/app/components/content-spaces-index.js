@@ -18,7 +18,7 @@ import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import { collect, promise } from 'ember-awesome-macros';
-import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
 
@@ -125,7 +125,7 @@ export default Component.extend(
             const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
             return get(dataProvider, 'versionProxy').then(version => {
               const spaceId = get(space, 'entityId');
-              if (isLegacyOneprovider(version)) {
+              if (isStandaloneGuiOneprovider(version)) {
                 return router.urlFor(
                   'provider-redirect',
                   oneproviderId, {

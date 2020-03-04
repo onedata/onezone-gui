@@ -12,7 +12,7 @@ import { get, setProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
-import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 
 export default Route.extend({
   shareManager: service(),
@@ -23,7 +23,7 @@ export default Route.extend({
   },
 
   afterModel(model) {
-    if (isLegacyOneprovider(get(model, 'chosenProviderVersion'))) {
+    if (isStandaloneGuiOneprovider(get(model, 'chosenProviderVersion'))) {
       return new Promise(() => {
         window.location = getOneproviderPath(
           get(model, 'chosenProviderId'),

@@ -20,7 +20,6 @@ export default TwoLevelSidebar.extend({
    */
   model: null,
 
-  // FIXME: change to custom firstLevelItemComponent that shows file or dir icon
   /**
    * @override
    */

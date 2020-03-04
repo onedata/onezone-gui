@@ -4,7 +4,7 @@
  *
  * @module services/upload-manager
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -454,10 +454,11 @@ export default Service.extend(I18n, {
               children: {},
             };
             if (objectType === 'file') {
-              set(node, 'objectSize', size);
-              // FIXME: refactor
-              set(node, 'fileId', fileId);
-              set(node, 'spaceId', spaceId);
+              setProperties(node, {
+                objectSize: size,
+                fileId,
+                spaceId,
+              });
             }
             nextElementParent.children[pathElements[i]] = node;
           }

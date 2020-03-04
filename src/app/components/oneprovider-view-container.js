@@ -19,7 +19,7 @@ import createPropertyComparator from 'onedata-gui-common/utils/create-property-c
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { guidFor } from '@ember/object/internals';
-import isLegacyOneprovider from 'onedata-gui-common/utils/is-legacy-oneprovider';
+import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
 import { resolve } from 'rsvp';
 
@@ -252,7 +252,7 @@ export default Component.extend(I18n, {
           const selectedProvider = this.get('selectedProvider');
           if (selectedProvider) {
             return get(selectedProvider, 'versionProxy').then(version => {
-              return !isLegacyOneprovider(version);
+              return !isStandaloneGuiOneprovider(version);
             });
           } else {
             return null;
