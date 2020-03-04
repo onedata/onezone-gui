@@ -226,7 +226,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  fields: computed('basicGroup', 'caveatsGroup', function fields() {
+  fields: computed(function fields() {
     const {
       basicGroup,
       caveatsGroup,
@@ -259,42 +259,38 @@ export default Component.extend(I18n, {
    * All non-caveats fields
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  basicGroup: computed(
-    'inviteTargetDetailsGroup',
-    'usageLimitGroup',
-    function basicGroup() {
-      return FormFieldsGroup.create({
-        name: 'basic',
-        fields: [
-          TextField.create({ name: 'name' }),
-          RadioField.create({
-            name: 'type',
-            options: [
-              { value: 'access' },
-              { value: 'identity' },
-              { value: 'invite' },
-            ],
-            defaultValue: 'access',
-          }),
-          FormFieldsGroup.extend({
-            isExpanded: equal('parent.value.type', raw('invite')),
-          }).create({
-            name: 'inviteDetails',
-            fields: [
-              DropdownField.create({
-                name: 'inviteType',
-                showSearch: false,
-                options: tokenInviteTypeOptions,
-                defaultValue: 'userJoinGroup',
-              }),
-              this.get('inviteTargetDetailsGroup'),
-              this.get('usageLimitGroup'),
-            ],
-          }),
-        ],
-      });
-    }
-  ),
+  basicGroup: computed(function basicGroup() {
+    return FormFieldsGroup.create({
+      name: 'basic',
+      fields: [
+        TextField.create({ name: 'name' }),
+        RadioField.create({
+          name: 'type',
+          options: [
+            { value: 'access' },
+            { value: 'identity' },
+            { value: 'invite' },
+          ],
+          defaultValue: 'access',
+        }),
+        FormFieldsGroup.extend({
+          isExpanded: equal('parent.value.type', raw('invite')),
+        }).create({
+          name: 'inviteDetails',
+          fields: [
+            DropdownField.create({
+              name: 'inviteType',
+              showSearch: false,
+              options: tokenInviteTypeOptions,
+              defaultValue: 'userJoinGroup',
+            }),
+            this.get('inviteTargetDetailsGroup'),
+            this.get('usageLimitGroup'),
+          ],
+        }),
+      ],
+    });
+  }),
 
   /**
    * Fields group visible only when selected invite type has specified targetModelName
@@ -304,98 +300,94 @@ export default Component.extend(I18n, {
    * with/without privileges.
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  inviteTargetDetailsGroup: computed(
-    'targetField',
-    'privilegesField',
-    function inviteTargetDetailsGroup() {
-      const component = this;
-      return FormFieldsGroup.extend({
-        isExpanded: notEmpty('inviteTypeSpec.targetModelName'),
-        inviteType: reads('parent.value.inviteType'),
-        inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
-          return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
-        }),
-        // We need to cache values related to latest invite type with target
-        // to preserve previous view while collapsing inviteTargetDetailsGroup
-        // after change to invite type without target. Without caching, labels,
-        // dropdown values etc. will disappear just after invite type change.
-        latestInviteTypeWithTargets: undefined,
-        cachedTargetsModelName: undefined,
-        cachedTargetsProxy: PromiseObject.create({
-          promise: new Promise(() => {}),
-        }),
-        // Caching for the same reason as for target related values
-        cachedPrivilegesModelName: undefined,
-        cachedPrivilegesPresetProxy: PromiseObject.create({
-          promise: new Promise(() => {}),
-        }),
-        inviteTypeSpecObserver: observer('inviteTypeSpec', function itsObserver() {
-          const {
-            inviteTypeSpec,
-            cachedTargetsModelName,
-            cachedPrivilegesModelName,
-          } = this.getProperties(
-            'inviteTypeSpec',
-            'cachedTargetsModelName',
-            'cachedPrivilegesModelName'
-          );
-          if (!inviteTypeSpec) {
-            return;
-          }
-          const newTargetsModelName = inviteTypeSpec.targetModelName;
-          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
-            newTargetsModelName;
-          if (newTargetsModelName) {
-            this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
-            if (cachedTargetsModelName !== newTargetsModelName) {
-              this.setProperties({
-                cachedTargetsModelName: newTargetsModelName,
-                cachedTargetsProxy: component
-                  .getRecordOptionsForModel(newTargetsModelName),
-              });
-            }
-          }
-          if (newPrivilegesModelName &&
-            cachedPrivilegesModelName !== newPrivilegesModelName) {
+  inviteTargetDetailsGroup: computed(function inviteTargetDetailsGroup() {
+    const component = this;
+    return FormFieldsGroup.extend({
+      isExpanded: notEmpty('inviteTypeSpec.targetModelName'),
+      inviteType: reads('parent.value.inviteType'),
+      inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
+        return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
+      }),
+      // We need to cache values related to latest invite type with target
+      // to preserve previous view while collapsing inviteTargetDetailsGroup
+      // after change to invite type without target. Without caching, labels,
+      // dropdown values etc. will disappear just after invite type change.
+      latestInviteTypeWithTargets: undefined,
+      cachedTargetsModelName: undefined,
+      cachedTargetsProxy: PromiseObject.create({
+        promise: new Promise(() => {}),
+      }),
+      // Caching for the same reason as for target related values
+      cachedPrivilegesModelName: undefined,
+      cachedPrivilegesPresetProxy: PromiseObject.create({
+        promise: new Promise(() => {}),
+      }),
+      inviteTypeSpecObserver: observer('inviteTypeSpec', function itsObserver() {
+        const {
+          inviteTypeSpec,
+          cachedTargetsModelName,
+          cachedPrivilegesModelName,
+        } = this.getProperties(
+          'inviteTypeSpec',
+          'cachedTargetsModelName',
+          'cachedPrivilegesModelName'
+        );
+        if (!inviteTypeSpec) {
+          return;
+        }
+        const newTargetsModelName = inviteTypeSpec.targetModelName;
+        const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
+          newTargetsModelName;
+        if (newTargetsModelName) {
+          this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
+          if (cachedTargetsModelName !== newTargetsModelName) {
             this.setProperties({
-              cachedPrivilegesModelName: newPrivilegesModelName,
-              cachedPrivilegesPresetProxy: component
-                .getPrivilegesPresetForModel(newTargetsModelName),
+              cachedTargetsModelName: newTargetsModelName,
+              cachedTargetsProxy: component
+                .getRecordOptionsForModel(newTargetsModelName),
             });
           }
+        }
+        if (newPrivilegesModelName &&
+          cachedPrivilegesModelName !== newPrivilegesModelName) {
+          this.setProperties({
+            cachedPrivilegesModelName: newPrivilegesModelName,
+            cachedPrivilegesPresetProxy: component
+              .getPrivilegesPresetForModel(newTargetsModelName),
+          });
+        }
+      }),
+      init() {
+        this._super(...arguments);
+        this.inviteTypeSpecObserver();
+      },
+    }).create({
+      name: 'inviteTargetDetails',
+      fields: [
+        SiblingLoadingField.extend({
+          loadingProxy: reads('parent.cachedTargetsProxy'),
+        }).create({
+          siblingName: 'target',
+          name: 'loadingTarget',
         }),
-        init() {
-          this._super(...arguments);
-          this.inviteTypeSpecObserver();
-        },
-      }).create({
-        name: 'inviteTargetDetails',
-        fields: [
-          SiblingLoadingField.extend({
-            loadingProxy: reads('parent.cachedTargetsProxy'),
-          }).create({
-            siblingName: 'target',
-            name: 'loadingTarget',
-          }),
-          this.get('targetField'),
-          FormFieldsGroup.extend({
-            isExpanded: not('parent.inviteTypeSpec.noPrivileges'),
-          }).create({
-            name: 'invitePrivilegesDetails',
-            fields: [
-              SiblingLoadingField.extend({
-                loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
-              }).create({
-                name: 'loadingPrivileges',
-                siblingName: 'privileges',
-              }),
-              this.get('privilegesField'),
-            ],
-          }),
-        ],
-      });
-    }
-  ),
+        this.get('targetField'),
+        FormFieldsGroup.extend({
+          isExpanded: not('parent.inviteTypeSpec.noPrivileges'),
+        }).create({
+          name: 'invitePrivilegesDetails',
+          fields: [
+            SiblingLoadingField.extend({
+              loadingProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
+            }).create({
+              name: 'loadingPrivileges',
+              siblingName: 'privileges',
+            }),
+            this.get('privilegesField'),
+          ],
+        }),
+      ],
+    });
+  }),
 
   /**
    * Allows selecting target for invite token
@@ -406,14 +398,7 @@ export default Component.extend(I18n, {
       cachedTargetsModelName: reads('parent.cachedTargetsModelName'),
       cachedTargetsProxy: reads('parent.cachedTargetsProxy'),
       latestInviteTypeWithTargets: reads('parent.latestInviteTypeWithTargets'),
-      label: computed('latestInviteTypeWithTargets', 'path', function label() {
-        const {
-          latestInviteTypeWithTargets,
-          path,
-        } = this.getProperties('latestInviteTypeWithTargets', 'path');
-        return latestInviteTypeWithTargets &&
-          this.t(`${path}.label.${latestInviteTypeWithTargets}`);
-      }),
+      addColonToLabel: false,
       placeholder: computed(
         'latestInviteTypeWithTargets',
         'path',
@@ -522,21 +507,39 @@ export default Component.extend(I18n, {
    * Aggregates all caveat-related form elements
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  caveatsGroup: computed(
-    'expireCaveatGroup',
-    'regionCaveatGroup',
-    'countryCaveatGroup',
-    'asnCaveatGroup',
-    'ipCaveatGroup',
-    'consumerCaveatGroup',
-    'serviceCaveatGroup',
-    'interfaceCaveatGroup',
-    'readonlyCaveatGroup',
-    'pathCaveatGroup',
-    'objectIdCaveatGroup',
-    'expandCaveats',
-    function caveatsGroup() {
-      const {
+  caveatsGroup: computed(function caveatsGroup() {
+    const {
+      expireCaveatGroup,
+      regionCaveatGroup,
+      countryCaveatGroup,
+      asnCaveatGroup,
+      ipCaveatGroup,
+      consumerCaveatGroup,
+      serviceCaveatGroup,
+      interfaceCaveatGroup,
+      readonlyCaveatGroup,
+      pathCaveatGroup,
+      objectIdCaveatGroup,
+      expandCaveats,
+    } = this.getProperties(
+      'expireCaveatGroup',
+      'regionCaveatGroup',
+      'countryCaveatGroup',
+      'asnCaveatGroup',
+      'ipCaveatGroup',
+      'consumerCaveatGroup',
+      'serviceCaveatGroup',
+      'interfaceCaveatGroup',
+      'readonlyCaveatGroup',
+      'pathCaveatGroup',
+      'objectIdCaveatGroup',
+      'expandCaveats'
+    );
+
+    return FormFieldsGroup.create({
+      name: 'caveats',
+      isExpanded: expandCaveats,
+      fields: [
         expireCaveatGroup,
         regionCaveatGroup,
         countryCaveatGroup,
@@ -545,51 +548,19 @@ export default Component.extend(I18n, {
         consumerCaveatGroup,
         serviceCaveatGroup,
         interfaceCaveatGroup,
-        readonlyCaveatGroup,
-        pathCaveatGroup,
-        objectIdCaveatGroup,
-        expandCaveats,
-      } = this.getProperties(
-        'expireCaveatGroup',
-        'regionCaveatGroup',
-        'countryCaveatGroup',
-        'asnCaveatGroup',
-        'ipCaveatGroup',
-        'consumerCaveatGroup',
-        'serviceCaveatGroup',
-        'interfaceCaveatGroup',
-        'readonlyCaveatGroup',
-        'pathCaveatGroup',
-        'objectIdCaveatGroup',
-        'expandCaveats'
-      );
-
-      return FormFieldsGroup.create({
-        name: 'caveats',
-        isExpanded: expandCaveats,
-        fields: [
-          expireCaveatGroup,
-          regionCaveatGroup,
-          countryCaveatGroup,
-          asnCaveatGroup,
-          ipCaveatGroup,
-          consumerCaveatGroup,
-          serviceCaveatGroup,
-          interfaceCaveatGroup,
-          FormFieldsGroup.extend({
-            isExpanded: equal('valuesSource.basic.type', raw('access')),
-          }).create({
-            name: 'dataAccessCaveats',
-            fields: [
-              readonlyCaveatGroup,
-              pathCaveatGroup,
-              objectIdCaveatGroup,
-            ],
-          }),
-        ],
-      });
-    }
-  ),
+        FormFieldsGroup.extend({
+          isExpanded: equal('valuesSource.basic.type', raw('access')),
+        }).create({
+          name: 'dataAccessCaveats',
+          fields: [
+            readonlyCaveatGroup,
+            pathCaveatGroup,
+            objectIdCaveatGroup,
+          ],
+        }),
+      ],
+    });
+  }),
 
   /**
    * Time caveat
@@ -685,6 +656,14 @@ export default Component.extend(I18n, {
               raw('tags-success'),
               raw('tags-danger'),
             ),
+            tagEditorSettings: computed('path', function tagEditorSettings() {
+              return {
+                // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
+                regexp: /^[a-zA-Z]{2}$/,
+                transform: label => label.toUpperCase(),
+                placeholder: this.t(`${this.get('path')}.editorPlaceholder`),
+              };
+            }),
             sortTags(tags) {
               return tags.sort((a, b) =>
                 get(a, 'label').localeCompare(get(b, 'label').toUpperCase())
@@ -698,11 +677,6 @@ export default Component.extend(I18n, {
             },
           }).create({
             name: 'countryList',
-            tagEditorSettings: {
-              // Only ASCII letters are allowed. See ISO 3166-1 Alpha-2 codes documentation
-              regexp: /^[a-zA-Z]{2}$/,
-              transform: label => label.toUpperCase(),
-            },
             defaultValue: [],
             sort: true,
           }),

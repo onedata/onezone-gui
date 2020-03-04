@@ -26,7 +26,7 @@ export default {
               label: 'Invite user to group',
             },
             groupJoinGroup: {
-              label: 'Invite group to group',
+              label: 'Invite group to parent group',
             },
             userJoinSpace: {
               label: 'Invite user to space',
@@ -62,21 +62,10 @@ export default {
             loadingText: 'Loading...',
           },
           target: {
-            label: {
-              userJoinGroup: 'Inviting group',
-              groupJoinGroup: 'Inviting group',
-              userJoinSpace: 'Inviting space',
-              groupJoinSpace: 'Inviting space',
-              userJoinCluster: 'Inviting cluster',
-              groupJoinCluster: 'Inviting cluster',
-              userJoinHarvester: 'Inviting harvester',
-              groupJoinHarvester: 'Inviting harvester',
-              spaceJoinHarvester: 'Inviting harvester',
-              supportSpace: 'Space to be supported',
-            },
+            label: '',
             placeholder: {
               userJoinGroup: 'Select group...',
-              groupJoinGroup: 'Select group...',
+              groupJoinGroup: 'Select parent group...',
               userJoinSpace: 'Select space...',
               groupJoinSpace: 'Select space...',
               userJoinCluster: 'Select cluster...',
@@ -90,6 +79,7 @@ export default {
           invitePrivilegesDetails: {
             privileges: {
               label: 'Privileges',
+              tip: 'These privileges will be granted to a new member after joining with this invite token.',
             },
           },
         },
@@ -158,7 +148,7 @@ export default {
       countryCaveat: {
         countryEnabled: {
           label: 'Country',
-          tip: 'Limits the countries from which the token can be utilized. The client\'s country is resolved based on client\'s IP and MaxMind\'s GeoLite database. Countries list should be provided using the ISO 3166-1 alpha-2 codes (two-letter codes).',
+          tip: 'Limits the countries from which the token can be utilized. Countries list should be provided using two-letter codes (ISO 3166-1 alpha-2). The client\'s country is resolved based on client\'s IP and MaxMind\'s GeoLite database.',
         },
         country: {
           countryType: {
@@ -170,6 +160,9 @@ export default {
                 label: 'Deny',
               },
             },
+          },
+          countryList: {
+            editorPlaceholder: 'Example: PL',
           },
         },
         countryDisabledText: {

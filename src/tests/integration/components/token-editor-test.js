@@ -14,69 +14,61 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve, Promise } from 'rsvp';
 import moment from 'moment';
+import OneTooltipHelper from '../../helpers/one-tooltip';
 
 const tokenInviteTypes = [{
   inviteType: 'userJoinGroup',
   label: 'Invite user to group',
   icon: 'group',
   targetModelName: 'group',
-  targetLabel: 'Inviting group',
   targetPlaceholder: 'Select group...',
 }, {
   inviteType: 'groupJoinGroup',
-  label: 'Invite group to group',
+  label: 'Invite group to parent group',
   icon: 'group',
   targetModelName: 'group',
-  targetLabel: 'Inviting group',
-  targetPlaceholder: 'Select group...',
+  targetPlaceholder: 'Select parent group...',
 }, {
   inviteType: 'userJoinSpace',
   label: 'Invite user to space',
   icon: 'space',
   targetModelName: 'space',
-  targetLabel: 'Inviting space',
   targetPlaceholder: 'Select space...',
 }, {
   inviteType: 'groupJoinSpace',
   label: 'Invite group to space',
   icon: 'space',
   targetModelName: 'space',
-  targetLabel: 'Inviting space',
   targetPlaceholder: 'Select space...',
 }, {
   inviteType: 'userJoinCluster',
   label: 'Invite user to cluster',
   icon: 'cluster',
   targetModelName: 'cluster',
-  targetLabel: 'Inviting cluster',
   targetPlaceholder: 'Select cluster...',
 }, {
   inviteType: 'groupJoinCluster',
   label: 'Invite group to cluster',
   icon: 'cluster',
   targetModelName: 'cluster',
-  targetLabel: 'Inviting cluster',
   targetPlaceholder: 'Select cluster...',
 }, {
   inviteType: 'userJoinHarvester',
   label: 'Invite user to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
-  targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
 }, {
   inviteType: 'groupJoinHarvester',
   label: 'Invite group to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
-  targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
 }, {
   inviteType: 'spaceJoinHarvester',
   label: 'Invite space to harvester',
   icon: 'light-bulb',
   targetModelName: 'harvester',
-  targetLabel: 'Inviting harvester',
   targetPlaceholder: 'Select harvester...',
   noPrivileges: true,
 }, {
@@ -84,7 +76,6 @@ const tokenInviteTypes = [{
   label: 'Support space',
   icon: 'space',
   targetModelName: 'space',
-  targetLabel: 'Space to be supported',
   targetPlaceholder: 'Select space...',
   noPrivileges: true,
 }, {
@@ -121,7 +112,7 @@ const caveats = [{
   name: 'country',
   label: 'Country',
   disabledDescription: 'This token can be utilized from any country.',
-  tip: 'Limits the countries from which the token can be utilized. The client\'s country is resolved based on client\'s IP and MaxMind\'s GeoLite database. Countries list should be provided using the ISO 3166-1 alpha-2 codes (two-letter codes).',
+  tip: 'Limits the countries from which the token can be utilized. Countries list should be provided using two-letter codes (ISO 3166-1 alpha-2). The client\'s country is resolved based on client\'s IP and MaxMind\'s GeoLite database.',
 }, {
   name: 'consumer',
   label: 'Consumer',
@@ -388,7 +379,6 @@ describe('Integration | Component | token editor', function () {
     label,
     icon,
     targetModelName,
-    targetLabel,
     targetPlaceholder,
     noPrivileges,
   }, index) => {
@@ -419,7 +409,7 @@ describe('Integration | Component | token editor', function () {
               const $placeholder =
                 this.$('.target-field .ember-power-select-placeholder');
               expect($collapse).to.have.class('in');
-              expectLabelToEqual(this, 'target', targetLabel);
+              expectLabelToEqual(this, 'target', '', true);
               expect($placeholder.text().trim()).to.equal(targetPlaceholder);
               return targetHelper.open();
             })
@@ -470,7 +460,12 @@ describe('Integration | Component | token editor', function () {
                   `.node-text:contains(View ${targetModelName}) + .form-group .one-way-toggle`
                 )).to.have.class('checked');
                 expect(this.$('.privileges-field .one-way-toggle.checked')).to.have.length(1);
-              });
+                return new OneTooltipHelper('.privileges-field .one-label-tip .oneicon')
+                  .getText();
+              })
+              .then(tooltipText => expect(tooltipText).to.equal(
+                'These privileges will be granted to a new member after joining with this invite token.'
+              ));
           }
         );
 
@@ -641,9 +636,9 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  caveats.forEach(({ name, label, disabledDescription, dontTestValue }) => {
+  caveats.forEach(({ name, label, disabledDescription, tip, dontTestValue }) => {
     it(
-      `renders unchecked toggle, label and disabled description for ${name} caveat on init`,
+      `renders unchecked toggle, label, tip and disabled description for ${name} caveat on init`,
       function () {
         this.render(hbs `{{token-editor expandCaveats=true}}`);
 
@@ -653,6 +648,8 @@ describe('Integration | Component | token editor', function () {
         expectLabelToEqual(this, name, label);
         expect(getFieldElement(this, name)).to.not.exist;
         expect($disabledDescription.text().trim()).to.equal(disabledDescription);
+        return new OneTooltipHelper(`.${name}Caveat-field .one-label-tip .oneicon`)
+          .getText().then(text => expect(text).to.equal(tip));
       }
     );
 
@@ -948,7 +945,12 @@ describe('Integration | Component | token editor', function () {
           expectCaveatToHaveValue(this, 'country', true,
             sinon.match.has('countryType', 'whitelist'));
           expectToBeInvalid(this, 'country');
-        });
+          return click('.country-field .tags-input');
+        })
+        .then(() =>
+          expect(this.$('.country-field .text-editor-input').attr('placeholder'))
+          .to.equal('Example: PL')
+        );
     }
   );
 
@@ -1868,10 +1870,10 @@ function expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled) {
   );
 }
 
-function expectLabelToEqual(testCase, fieldName, label) {
+function expectLabelToEqual(testCase, fieldName, label, omitColon = false) {
   const isCaveat = !basicFieldNameToFieldPath[fieldName];
   const domFieldName = isCaveat ? `${fieldName}Enabled` : fieldName;
-  label = isCaveat ? label : `${label}:`;
+  label = (isCaveat || omitColon) ? label : `${label}:`;
   expect(testCase.$(`.${domFieldName}-field label`).eq(0).text().trim()).to.equal(label);
 }
 
