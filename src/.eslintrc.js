@@ -8,6 +8,7 @@ module.exports = {
   },
   plugins: [
     'ember',
+    'promise',
   ],
   extends: [
     'eslint:recommended',
@@ -18,9 +19,6 @@ module.exports = {
     es6: true,
     jquery: true,
   },
-  plugins: [
-    'promise',
-  ],
   rules: {
     'no-console': 0,
     'dot-location': [
