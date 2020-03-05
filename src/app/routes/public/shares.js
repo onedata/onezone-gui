@@ -3,7 +3,7 @@
  * 
  * @module routes/public/harvesters
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,11 +12,7 @@ import { get, setProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
-import config from 'ember-get-config';
-
-const {
-  legacyOneproviderVersion,
-} = config;
+import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 
 export default Route.extend({
   shareManager: service(),
@@ -27,7 +23,7 @@ export default Route.extend({
   },
 
   afterModel(model) {
-    if (get(model, 'chosenProviderVersion').startsWith(legacyOneproviderVersion)) {
+    if (isStandaloneGuiOneprovider(get(model, 'chosenProviderVersion'))) {
       return new Promise(() => {
         window.location = getOneproviderPath(
           get(model, 'chosenProviderId'),

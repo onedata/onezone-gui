@@ -4,12 +4,19 @@
  *
  * @module services/upload-manager
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service, { inject as service } from '@ember/service';
-import EmberObject, { computed, observer, get, getProperties, set, setProperties } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+  getProperties,
+  set,
+  setProperties,
+} from '@ember/object';
 import UploadObject from 'onezone-gui/utils/upload-object';
 import { A } from '@ember/array';
 import { reads } from '@ember/object/computed';
@@ -178,6 +185,8 @@ export default Service.extend(I18n, {
               this.updateUploadProgress(Object.assign({ oneprovider }, data)),
             addNewUpload: (data) =>
               this.addNewUpload(Object.assign({ oneprovider }, data)),
+            uploadInitialized: (data) =>
+              this.uploadInitialized(Object.assign({ oneprovider }, data)),
           });
         });
     }
@@ -267,7 +276,7 @@ export default Service.extend(I18n, {
       }
       if (error !== undefined) {
         setProperties(uploadObject, {
-          errors: [ error ],
+          errors: [error],
           isUploading: false,
         });
       }
@@ -321,11 +330,20 @@ export default Service.extend(I18n, {
     }
   },
 
+  uploadInitialized({ oneprovider, uploadId, path, fileId, spaceId }) {
+    const uploadObject = this.findUploadObject(oneprovider, uploadId, path);
+    setProperties(uploadObject, {
+      fileId,
+      spaceId,
+    });
+    this.updateDataForOneprovider(oneprovider);
+  },
+
   /**
    * @param {Object} newUpload
    * @param {Models.Provider} oneprovider
    * @param {number} updateData.uploadId
-   * @param {Array<{ path: string, size: number }>} updateData.files
+   * @param {Array<{ path: string, size: number, fileId: string, spaceId: string }>} updateData.files
    * @returns {undefined}
    */
   addNewUpload({ oneprovider, uploadId, files }) {
@@ -414,7 +432,7 @@ export default Service.extend(I18n, {
       objectType: 'root',
       children: {},
     };
-    files.forEach(({ path, size }) => {
+    files.forEach(({ path, size, fileId, spaceId }) => {
       const pathElements = path.split('/').filter(element => element);
       // path without possible surrounding `/` characters
       const strippedPath = pathElements.join('/');
@@ -436,7 +454,11 @@ export default Service.extend(I18n, {
               children: {},
             };
             if (objectType === 'file') {
-              set(node, 'objectSize', size);
+              setProperties(node, {
+                objectSize: size,
+                fileId,
+                spaceId,
+              });
             }
             nextElementParent.children[pathElements[i]] = node;
           }
@@ -462,18 +484,24 @@ export default Service.extend(I18n, {
       objectPath,
       objectType,
       objectSize,
+      fileId,
+      spaceId,
       children,
     } = getProperties(
       treeSchema,
       'objectPath',
       'objectType',
       'objectSize',
+      'fileId',
+      'spaceId',
       'children'
     );
 
     const uploadObject = UploadObject.create(getOwner(this).ownerInjection(), {
       objectPath,
       objectType,
+      fileId,
+      spaceId,
       parent,
     });
 

@@ -8,6 +8,7 @@ module.exports = {
   },
   plugins: [
     'ember',
+    'promise',
   ],
   extends: [
     'eslint:recommended',
@@ -18,9 +19,6 @@ module.exports = {
     es6: true,
     jquery: true,
   },
-  plugins: [
-    'promise',
-  ],
   rules: {
     'no-console': 0,
     'dot-location': [
@@ -52,9 +50,35 @@ module.exports = {
       {
         requireParamDescription: false,
         requireReturnDescription: false,
+        requireReturn: false,
       },
     ],
-
+    'prefer-const': [
+      1,
+      {
+        'destructuring': 'all',
+        'ignoreReadBeforeAssign': true
+      }
+    ],
+    'no-var': 1,
+    'one-var': [
+      1,
+      'never',
+    ],
+    'max-len': [
+      1,
+      {
+        'code': 90,
+        'tabWidth': 2,
+        'ignoreStrings': false,
+        'ignoreComments': true,
+        'ignoreTrailingComments': false,
+        'ignoreUrls': true,
+        'ignoreTemplateLiterals': false,
+        'ignoreRegExpLiterals': true,
+        'ignorePattern': '^import|.*[\'"`]\\)?,?;?$',
+      }
+    ],
     'promise/always-return': 'off', // default: error
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',

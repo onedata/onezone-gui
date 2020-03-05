@@ -1,4 +1,3 @@
-// Place your settings in this file to overwrite default and user settings.
 {
   "files.exclude": {
     "**/.git": true,
@@ -13,12 +12,18 @@
   },
   "editor.tabSize": 2,
   "editor.rulers": [
-    80
+    90
   ],
-  "rewrap.wrappingColumn": 80,
+  "files.insertFinalNewline": true,
   "[javascript]": {
-      "editor.formatOnSave": true,
-      "editor.formatOnType": true,
-      "editor.formatOnPaste": true
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true
+  },
+  "seito-openfile.wordbound": "[\\s\\\"\\'\\>\\<#;?{}.(]",
+  "seito-openfile.leadingPathMapping": {
+    "oneprovider-gui": "",
+    "onezone-gui": "",
+    "onepanel-gui": ""
   }
 }
