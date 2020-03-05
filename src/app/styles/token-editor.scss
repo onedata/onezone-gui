@@ -1,0 +1,155 @@
+.token-editor {
+  max-width: 1000px;
+
+  .caveat-group {
+    > .field-component > .fields-group-collapse {
+      display: flex;
+
+      &.collapse:not(.in) {
+        display: none;
+      }
+    }
+
+    .static-text-field-renderer {
+      align-self: center;
+    }
+  }
+
+  .caveat-group-toggle,
+  .static-text-field-renderer,
+  .radio-field-renderer {
+    padding-top: $padding-base-vertical;
+  }
+
+  .caveat-group-toggle {
+    flex-grow: 0;
+
+    .control-label {
+      min-width: 120px;
+    }
+
+    .field-component {
+      order: -1;
+      flex-grow: 0;
+      margin-right: 25px;
+    }
+  }
+
+  .toggle-icon {
+    position: initial;
+    display: initial;
+    font-size: 1.2em;
+    vertical-align: middle;
+  }
+
+  .usageLimit-collapse.in,
+  .region-collapse.in,
+  .country-collapse.in,
+  .pathEntry-collapse.in {
+    display: flex;
+  }
+
+  .usageLimitType-field {
+    flex-grow: 0;
+    white-space: nowrap;
+  }
+
+  .regionType-field,
+  .countryType-field,
+  .pathSpace-field {
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    .dropdown-field-trigger {
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  .regionType-field,
+  .countryType-field {
+    width: 110px;
+  }
+
+  .regionList-field,
+  .countryList-field,
+  .pathString-field {
+    .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  .regionCaveat-field,
+  .asnCaveat-field,
+  .consumerCaveat-field,
+  .readonlyCaveat-field {
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -5px;
+      width: 100%;
+      border-top: 1px solid $main-border-color;
+    }
+  }
+
+  .submit-token {
+    margin-top: $padding-base-vertical;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .basic-field .control-label,
+    .caveat-group-toggle {
+      flex-shrink: 0;
+      width: 200px;
+    }
+
+    .usageLimit-field {
+      flex-wrap: nowrap;
+    }
+
+    .usageLimitNumber-field {
+      flex-grow: 0;
+      flex-basis: 300px;
+    }
+
+    .regionCaveat-field,
+    .asnCaveat-field,
+    .consumerCaveat-field {
+      &.is-enabled {
+        padding-top: $padding-base-vertical;
+      }
+    }
+
+    .pathSpace-field {
+      width: 200px;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .caveat-group-toggle {
+      flex-basis: 100%;
+
+      .control-label {
+        width: initial;
+      }
+    }
+
+    .caveat-group {
+      .static-text-field-renderer,
+      .radio-field-renderer {
+        padding-top: 0;
+      }
+
+      > .field-component > .fields-group-collapse {
+        flex-wrap: wrap;
+      }
+    }
+
+    .pathSpace-field {
+      width: 150px;
+    }
+  }
+}

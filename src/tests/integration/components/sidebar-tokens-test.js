@@ -37,6 +37,10 @@ describe('Integration | Component | sidebar tokens', function () {
             typeName: 'access',
             isActive: true,
           }, {
+            name: 'identity token',
+            typeName: 'identity',
+            isActive: true,
+          }, {
             name: 'invite token 1 cluster cluster1',
             typeName: 'invite',
             isActive: true,
@@ -56,7 +60,7 @@ describe('Integration | Component | sidebar tokens', function () {
           }],
         },
       },
-      tokensOrder: [1, 2, 0, 4, 3],
+      tokensOrder: [1, 2, 3, 0, 5, 4],
     });
   });
 
@@ -92,6 +96,9 @@ describe('Integration | Component | sidebar tokens', function () {
   [{
     type: 'access',
     count: 2,
+  }, {
+    type: 'identity',
+    count: 1,
   }, {
     type: 'invite',
     count: 3,

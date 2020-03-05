@@ -42,6 +42,27 @@ const spaceHandlers = {
       return messageNotSupported;
     }
   },
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['space_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
+};
+
+const groupHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['group_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
 };
 
 const harvesterHandlers = {
@@ -56,6 +77,15 @@ const harvesterHandlers = {
       };
     } else {
       return messageNotSupported;
+    }
+  },
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['harvester_view'],
+      };
+    } else {
+      throw messageNotSupported;
     }
   },
 };
@@ -79,6 +109,18 @@ const providerHandlers = {
       };
     } else {
       return messageNotSupported;
+    }
+  },
+};
+
+const clusterHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['cluster_view'],
+      };
+    } else {
+      throw messageNotSupported;
     }
   },
 };
@@ -128,9 +170,11 @@ export default OnedataGraphMock.extend({
     this._super(...arguments);
     const _handlers = Object.freeze({
       space: spaceHandlers,
+      group: groupHandlers,
       harvester: harvesterHandlers,
       user: userHandlers,
       provider: providerHandlers,
+      cluser: clusterHandlers,
     });
     this.set(
       'handlers',

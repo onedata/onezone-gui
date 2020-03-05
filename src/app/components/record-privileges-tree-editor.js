@@ -1,7 +1,8 @@
 /**
- * Privileges tree editor component.
+ * PrivilegesTreeEditor extension which allows to work on recordProxy - an abstraction
+ * of model records, which allows batch edition and saving.
  *
- * @module components/privileges-tree-editor
+ * @module components/record-privileges-tree-editor
  * @author Michał Borzęcki
  * @copyright (C) 2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

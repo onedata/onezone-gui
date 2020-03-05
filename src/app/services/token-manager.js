@@ -50,11 +50,25 @@ const TokenManager = Service.extend({
    */
   createToken(tokenPrototype) {
     const currestUserEntityId = this.get('currentUser.userId');
+    const additionalData = {};
+    // New token prototype object is not compatible with Ember Data token model
+    // specification, because create request body differs from the get request body.
+    // To send a non-compatible token body, some of the fields must be sent using
+    // `additionalData` GraphSync adapter option.
+    const compatibleTokenPrototype = _.assign({}, tokenPrototype);
+    [
+      'privileges',
+      'usageLimit',
+    ].forEach(fieldName => {
+      additionalData[fieldName] = compatibleTokenPrototype[fieldName];
+      delete compatibleTokenPrototype[fieldName];
+    });
     return this.get('store')
-      .createRecord('token', _.merge({}, tokenPrototype, {
+      .createRecord('token', _.merge(compatibleTokenPrototype, {
         _meta: {
           aspect: 'user_named_token',
           aspectId: currestUserEntityId,
+          additionalData,
         },
       }))
       .save()

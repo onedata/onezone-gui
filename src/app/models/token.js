@@ -1,7 +1,7 @@
 /**
  * @module models/token
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -26,29 +26,37 @@ import moment from 'moment';
 const standardGroupMapping = {
   idFieldName: 'groupId',
   modelName: 'group',
+  privileges: 'group',
 };
 
 const standardSpaceMapping = {
   idFieldName: 'spaceId',
   modelName: 'space',
+  privileges: 'space',
 };
 
 const standardHarvesterMapping = {
   idFieldName: 'harvesterId',
   modelName: 'harvester',
+  privileges: 'harvester',
 };
 
 const standardClusterMapping = {
   idFieldName: 'clusterId',
   modelName: 'cluster',
+  privileges: 'cluster',
 };
 
-export const inviteTokenSubtypeToTargetModelMapping = {
+function mappingWithoutPrivileges(mapping) {
+  return Object.assign({}, mapping, { privileges: undefined });
+}
+
+export const tokenInviteTypeToTargetModelMapping = {
   userJoinGroup: standardGroupMapping,
   groupJoinGroup: standardGroupMapping,
   userJoinSpace: standardSpaceMapping,
   groupJoinSpace: standardSpaceMapping,
-  supportSpace: standardSpaceMapping,
+  supportSpace: mappingWithoutPrivileges(standardSpaceMapping),
   registerOneprovider: {
     idFieldName: 'adminUserId',
     modelName: 'user',
@@ -57,10 +65,10 @@ export const inviteTokenSubtypeToTargetModelMapping = {
   groupJoinCluster: standardClusterMapping,
   userJoinHarvester: standardHarvesterMapping,
   groupJoinHarvester: standardHarvesterMapping,
-  spaceJoinHarvester: standardHarvesterMapping,
+  spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
 };
 
-const allowedSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
+const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
 
 export default Model.extend(
   GraphSingleModelMixin,
@@ -89,14 +97,16 @@ export default Model.extend(
     expirationTimer: undefined,
 
     /**
-     * One of: 'access', 'invite'
-     * @type {Ember.ComputedProperty<string>}
+     * One of: 'access', 'identity', 'invite'
+     * @type {Ember.ComputedProperty<String>}
      */
     typeName: computed('type', function typeName() {
       const type = this.get('type') || {};
 
       if (type.accessToken) {
         return 'access';
+      } else if (type.identityToken) {
+        return 'identity';
       } else if (type.inviteToken) {
         return 'invite';
       } else {
@@ -107,18 +117,19 @@ export default Model.extend(
     /**
      * @type {Ember.ComputedProperty<string|undefined>}
      */
-    subtype: computed('type.inviteToken.subtype', function subtype() {
-      const tokenSubtype = this.get('type.inviteToken.subtype');
-      return allowedSubtypes.includes(tokenSubtype) ? tokenSubtype : undefined;
+    inviteType: computed('type.inviteToken.inviteType', function inviteType() {
+      const tokenInviteType = this.get('type.inviteToken.inviteType');
+      return allowedInviteTypes.includes(tokenInviteType) ?
+        tokenInviteType : undefined;
     }),
 
     /**
      * @type {Ember.ComputedProperty<string|undefined>}
      */
-    targetModelName: computed('subtype', function targetModelName() {
-      const subtype = this.get('subtype');
-      if (subtype) {
-        return inviteTokenSubtypeToTargetModelMapping[subtype].modelName;
+    targetModelName: computed('inviteType', function targetModelName() {
+      const inviteType = this.get('inviteType');
+      if (inviteType) {
+        return tokenInviteTypeToTargetModelMapping[inviteType].modelName;
       }
     }),
 
@@ -201,15 +212,15 @@ export default Model.extend(
       const {
         store,
         type,
-        subtype,
+        inviteType,
         targetModelName,
-      } = this.getProperties('store', 'type', 'subtype', 'targetModelName');
+      } = this.getProperties('store', 'type', 'inviteType', 'targetModelName');
 
       if (!targetModelName) {
         return resolve(null);
       } else {
         const targetModelMapping =
-          inviteTokenSubtypeToTargetModelMapping[subtype];
+          tokenInviteTypeToTargetModelMapping[inviteType];
         const adapter = store.adapterFor(targetModelName);
         const entityType = adapter.getEntityTypeForModelName(targetModelName);
 

@@ -18,9 +18,10 @@ export default {
   },
   typeNames: {
     access: 'Access',
+    identity: 'Identity',
     invite: 'Invite',
   },
-  subtypes: {
+  inviteTypes: {
     userJoinGroup: 'join user to group',
     groupJoinGroup: 'join group to group',
     userJoinSpace: 'join user to space',

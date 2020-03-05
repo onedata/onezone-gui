@@ -20,12 +20,21 @@
     .filter-label {
       flex-grow: 0;
       flex-shrink: 0;
-      width: 80px;
+      width: 60px;
     }
 
     .filter-control {
       flex-grow: 1;
       min-width: 0;
+      display: flex;
+    }
+
+    .type-filter {
+      flex-wrap: wrap;
+
+      .btn {
+        flex-grow: 1;
+      }
     }
 
     .target-filter-row {
@@ -34,12 +43,9 @@
 
     .target-model-filter {
       flex-shrink: 0;
-      width: 130px;
+      flex-basis: 130px;
+      min-width: 0;
       margin-right: $padding-small-vertical;
-
-      .one-icon {
-        font-size: 1.7em;
-      }
     }
 
     .target-record-filter {
@@ -50,6 +56,57 @@
     .ember-power-select-options[role=listbox] {
       max-height: 150px;
       white-space: nowrap;
+    }
+  }
+
+  @media (max-width: $screen-md-max) {
+    .advanced-filters {
+      .type-filter {
+        .btn {
+          flex-basis: 50%;
+          margin-left: -1px;
+          padding-left: $padding-small-horizontal;
+          padding-right: $padding-small-horizontal;
+
+          &:first-child {
+            border-bottom-left-radius: 0;
+            margin-left: 0;
+          }
+
+          &:nth-child(2) {
+            border-top-right-radius: $border-radius-small;
+            & ~ .btn {
+              margin-top: -1px;
+            }
+          }
+
+          &:nth-child(3) {
+            border-bottom-left-radius: $border-radius-small;
+            margin-left: 0;
+          }
+
+          &:last-child {
+            border-top-right-radius: 0;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $screen-sm-max) {
+    .advanced-filters {
+      .target-filter {
+        flex-wrap: wrap;
+      }
+
+      .target-model-filter {
+        margin: $padding-small-vertical 0;
+      }
+
+      .target-model-filter,
+      .target-record-filter {
+        flex-basis: 100%;
+      }
     }
   }
 }

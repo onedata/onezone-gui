@@ -10,7 +10,7 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { Promise, resolve } from 'rsvp';
+import { Promise, resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 function loadClusterRecord(cluster) {
@@ -26,7 +26,11 @@ export default Service.extend({
 
   getClusters() {
     return this.get('currentUser').getCurrentUserRecord()
-      .then(user => get(user, 'clusterList'));
+      .then(user => get(user, 'clusterList'))
+      .then(clusterList => get(clusterList, 'list')
+        .then(list => allFulfilled(list.map(cluster => cluster.getNameProxy())))
+        .then(() => clusterList)
+      );
   },
 
   getRecord(id) {

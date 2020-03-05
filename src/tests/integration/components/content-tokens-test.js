@@ -67,7 +67,7 @@ describe('Integration | Component | content tokens', function () {
     });
   });
 
-  it('shows type for access token with no subtype', function () {
+  it('shows type for access token with no invite type', function () {
     this.set('token.typeName', 'access');
 
     this.render(hbs `{{content-tokens token=token}}`);
@@ -78,15 +78,15 @@ describe('Integration | Component | content tokens', function () {
         .to.equal('Type:');
       expect($tokenPropertyRow.find('.token-type .type-name').text().trim())
         .to.equal('Access');
-      expect($tokenPropertyRow.find('.token-type .subtype'))
+      expect($tokenPropertyRow.find('.token-type .invite-type'))
         .to.not.exist;
     });
   });
 
-  it('shows type for invite token with subtype', function () {
+  it('shows type for invite token with invite type', function () {
     setProperties(this.get('token'), {
       typeName: 'invite',
-      subtype: 'sth',
+      inviteType: 'sth',
     });
 
     this.render(hbs `{{content-tokens token=token}}`);
@@ -97,7 +97,7 @@ describe('Integration | Component | content tokens', function () {
         .to.equal('Type:');
       expect($tokenPropertyRow.find('.token-type .type-name').text().trim())
         .to.equal('Invite');
-      expect($tokenPropertyRow.find('.token-type .subtype')).to.exist;
+      expect($tokenPropertyRow.find('.token-type .invite-type')).to.exist;
     });
   });
 
@@ -143,7 +143,7 @@ describe('Integration | Component | content tokens', function () {
   it('shows invite token target name', function () {
     setProperties(this.get('token'), {
       typeName: 'invite',
-      subtype: 'userJoinGroup',
+      inviteType: 'userJoinGroup',
       tokenTargetProxy: PromiseObject.create({
         promise: resolve({
           name: 'user1',
@@ -163,7 +163,7 @@ describe('Integration | Component | content tokens', function () {
   it('shows info about not found token target', function () {
     setProperties(this.get('token'), {
       typeName: 'invite',
-      subtype: 'userJoinGroup',
+      inviteType: 'userJoinGroup',
       tokenTargetProxy: PromiseObject.create({
         promise: reject({ id: 'notFound' }),
       }),
@@ -183,7 +183,7 @@ describe('Integration | Component | content tokens', function () {
     function () {
       setProperties(this.get('token'), {
         typeName: 'invite',
-        subtype: 'userJoinGroup',
+        inviteType: 'userJoinGroup',
         tokenTargetProxy: PromiseObject.create({
           promise: resolve({
             isDeleted: true,
@@ -206,7 +206,7 @@ describe('Integration | Component | content tokens', function () {
     function () {
       setProperties(this.get('token'), {
         typeName: 'invite',
-        subtype: 'userJoinGroup',
+        inviteType: 'userJoinGroup',
         tokenTargetProxy: PromiseObject.create({
           promise: reject({ id: 'forbidden' }),
         }),
@@ -230,7 +230,7 @@ describe('Integration | Component | content tokens', function () {
       const errorId = 'badGRI';
       setProperties(this.get('token'), {
         typeName: 'invite',
-        subtype: 'userJoinGroup',
+        inviteType: 'userJoinGroup',
         tokenTargetProxy: PromiseObject.create({
           promise: reject({ id: errorId }),
         }),
@@ -252,96 +252,96 @@ describe('Integration | Component | content tokens', function () {
   );
 
   [{
-    subtype: 'userJoinGroup',
-    subtypeTranslation: 'join user to group',
+    inviteType: 'userJoinGroup',
+    inviteTypeTranslation: 'join user to group',
     targetLabel: 'Target group',
     model: 'group',
     icon: 'group',
     tooltip: 'The user that consumes the token will become a member of this group.',
   }, {
-    subtype: 'groupJoinGroup',
-    subtypeTranslation: 'join group to group',
+    inviteType: 'groupJoinGroup',
+    inviteTypeTranslation: 'join group to group',
     targetLabel: 'Target group',
     model: 'group',
     icon: 'group',
     tooltip: 'The group on behalf of which the token is consumed will become a member of this group.',
   }, {
-    subtype: 'userJoinSpace',
-    subtypeTranslation: 'join user to space',
+    inviteType: 'userJoinSpace',
+    inviteTypeTranslation: 'join user to space',
     targetLabel: 'Target space',
     model: 'space',
     icon: 'space',
     tooltip: 'The user that consumes the token will become a member of this space.',
   }, {
-    subtype: 'groupJoinSpace',
-    subtypeTranslation: 'join group to space',
+    inviteType: 'groupJoinSpace',
+    inviteTypeTranslation: 'join group to space',
     targetLabel: 'Target space',
     model: 'space',
     icon: 'space',
     tooltip: 'The group on behalf of which the token is consumed will become a member of this space.',
   }, {
-    subtype: 'supportSpace',
-    subtypeTranslation: 'support space',
+    inviteType: 'supportSpace',
+    inviteTypeTranslation: 'support space',
     targetLabel: 'Space to be supported',
     model: 'space',
     icon: 'space',
     tooltip: 'A Oneprovider can consume this token to grant storage space for this space.',
   }, {
-    subtype: 'registerOneprovider',
-    subtypeTranslation: 'register Oneprovider',
+    inviteType: 'registerOneprovider',
+    inviteTypeTranslation: 'register Oneprovider',
     targetLabel: 'Admin user',
     model: 'user',
     icon: 'user',
     tooltip: 'This token can be used to register a new Oneprovider for the appointed admin user.',
   }, {
-    subtype: 'userJoinCluster',
-    subtypeTranslation: 'join user to cluster',
+    inviteType: 'userJoinCluster',
+    inviteTypeTranslation: 'join user to cluster',
     targetLabel: 'Target cluster',
     model: 'cluster',
     icon: 'cluster',
     tooltip: 'The user that consumes the token will become a member of this cluster.',
   }, {
-    subtype: 'groupJoinCluster',
-    subtypeTranslation: 'join group to cluster',
+    inviteType: 'groupJoinCluster',
+    inviteTypeTranslation: 'join group to cluster',
     targetLabel: 'Target cluster',
     model: 'cluster',
     icon: 'cluster',
     tooltip: 'The group on behalf of which the token is consumed will become a member of this cluster.',
   }, {
-    subtype: 'userJoinHarvester',
-    subtypeTranslation: 'join user to harvester',
+    inviteType: 'userJoinHarvester',
+    inviteTypeTranslation: 'join user to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
     tooltip: 'The user that consumes the token will become a member of this harvester.',
   }, {
-    subtype: 'groupJoinHarvester',
-    subtypeTranslation: 'join group to harvester',
+    inviteType: 'groupJoinHarvester',
+    inviteTypeTranslation: 'join group to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
     tooltip: 'The group on behalf of which the token is consumed will become a member of this harvester.',
   }, {
-    subtype: 'spaceJoinHarvester',
-    subtypeTranslation: 'join space to harvester',
+    inviteType: 'spaceJoinHarvester',
+    inviteTypeTranslation: 'join space to harvester',
     targetLabel: 'Target harvester',
     model: 'harvester',
     icon: 'light-bulb',
     tooltip: 'The space on behalf of which the token is consumed will become a metadata source for this harvester.',
   }].forEach(({
-    subtype,
-    subtypeTranslation,
+    inviteType,
+    inviteTypeTranslation,
     targetLabel,
     model,
     icon,
     tooltip,
   }) => {
     it(
-      `shows "${subtypeTranslation}" as subtype, "${targetLabel}" text as token target label, "${icon}" icon and correct tooltip for "${subtype}" invite token`,
+      `shows "${inviteTypeTranslation}" as invite type, "${targetLabel}" text as token target label, "${icon}" icon and correct tooltip for "${inviteType}" invite token`,
       function () {
         setProperties(this.get('token'), {
           typeName: 'invite',
-          subtype,
+          inviteType,
           tokenTargetProxy: PromiseObject.create({
             promise: resolve({
               constructor: {
@@ -359,8 +359,8 @@ describe('Integration | Component | content tokens', function () {
             const $tokenTypePropertyRow = this.$('.token-type-property');
             const $tokenTargetPropertyRow = this.$('.token-target-property');
 
-            expect($tokenTypePropertyRow.find('.token-type .subtype').text().trim())
-              .to.equal(subtypeTranslation);
+            expect($tokenTypePropertyRow.find('.token-type .invite-type').text().trim())
+              .to.equal(inviteTypeTranslation);
             expect($tokenTargetPropertyRow.find('.token-target-label').text().trim())
               .to.equal(targetLabel + ':');
             expect($tokenTargetPropertyRow.find('.model-icon'))
@@ -392,7 +392,7 @@ describe('Integration | Component | content tokens', function () {
     setProperties(oldToken, {
       name: 'token1',
       typeName: 'invite',
-      subtype: 'userJoinGroup',
+      inviteType: 'userJoinGroup',
       validUntil: now.unix(),
       token: 'abcdef',
       revoked: true,
@@ -414,7 +414,7 @@ describe('Integration | Component | content tokens', function () {
     const newToken = {
       name: 'token2',
       typeName: 'invite',
-      subtype: 'userJoinSpace',
+      inviteType: 'userJoinSpace',
       validUntil: now.unix(),
       token: 'ghijkl',
       revoked: false,
@@ -456,7 +456,7 @@ describe('Integration | Component | content tokens', function () {
           .to.equal(this.get('token.name'));
         expect($typePropertyRow.find('.token-type .type-name').text().trim())
           .to.equal('Invite');
-        expect($typePropertyRow.find('.token-type .subtype').text().trim())
+        expect($typePropertyRow.find('.token-type .invite-type').text().trim())
           .to.equal('join user to space');
         expect($targetPropertyRow.find('.token-target-label').text().trim())
           .to.equal('Target space:');

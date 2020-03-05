@@ -66,6 +66,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     expect($typeFilterRow.find('.filter-label').text().trim()).to.equal('Type:');
     expect($typeFilterRow.find('.btn-all').text().trim()).to.equal('All');
     expect($typeFilterRow.find('.btn-access').text().trim()).to.equal('Access');
+    expect($typeFilterRow.find('.btn-identity').text().trim()).to.equal('Identity');
     expect($typeFilterRow.find('.btn-invite').text().trim()).to.equal('Invite');
   });
 
@@ -75,6 +76,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     const $typeFilterRow = this.$('.type-filter-row');
     expect($typeFilterRow.find('.btn-all')).to.have.class('active');
     expect($typeFilterRow.find('.btn-access')).to.not.have.class('active');
+    expect($typeFilterRow.find('.btn-identity')).to.not.have.class('active');
     expect($typeFilterRow.find('.btn-invite')).to.not.have.class('active');
   });
 
@@ -103,7 +105,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     `);
 
     let checkPromise = resolve();
-    ['access', 'invite', 'all'].forEach(type => {
+    ['access', 'identity', 'invite', 'all'].forEach(type => {
       checkPromise = checkPromise
         .then(() => selectType(type))
         .then(() => expect(changeSpy.lastCall).to.be.calledWith({
@@ -133,6 +135,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
   [
     'all',
     'access',
+    'identity',
   ].forEach(type => {
     it(
       `does not show target filter when type filter equals "${type}"`,

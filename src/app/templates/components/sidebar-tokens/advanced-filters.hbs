@@ -1,66 +1,63 @@
 <div class="type-filter-row filter-row">
   <label class="filter-label">{{tt this "typeFilter.label"}}:</label>
-  <div class="filter-control">
-    {{#bs-button-group
-      value=selectedType
-      class="type-filter btn-group-justified"
-      type="radio"
-      onChange=(action "typeChanged")
-      as |bg|
-    }}
-      <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-all" value="all"}}
-          {{tt this "typeFilter.values.all"}}
-        {{/bg.button}}
-      </div>
-      <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-access" value="access"}}
-          {{tt this "typeFilter.values.access"}}
-        {{/bg.button}}
-      </div>
-      <div class="btn-group" role="group">
-        {{#bg.button type="default" class="btn-sm btn-invite" value="invite"}}
-          {{tt this "typeFilter.values.invite"}}
-        {{/bg.button}}
-      </div>
-    {{/bs-button-group}}
-  </div>
+  {{#bs-button-group
+    value=selectedType
+    class="type-filter filter-control"
+    type="radio"
+    onChange=(action "typeChanged")
+    as |bg|
+  }}
+    {{#bg.button type="default" class="btn-sm btn-all" value="all"}}
+      {{tt this "typeFilter.values.all"}}
+    {{/bg.button}}
+    {{#bg.button type="default" class="btn-sm btn-access" value="access"}}
+      {{tt this "typeFilter.values.access"}}
+    {{/bg.button}}
+    {{#bg.button type="default" class="btn-sm btn-identity" value="identity"}}
+      {{tt this "typeFilter.values.identity"}}
+    {{/bg.button}}
+    {{#bg.button type="default" class="btn-sm btn-invite" value="invite"}}
+      {{tt this "typeFilter.values.invite"}}
+    {{/bg.button}}
+  {{/bs-button-group}}
 </div>
 {{#one-collapse collapsed=(not isTargetFilterVisible) class="target-filter-row-collapse"}}
   <div class="target-filter-row filter-row">
     <label class="filter-label">{{tt this "targetFilter.label"}}:</label>
-    {{#power-select
-      tagName="div"
-      class="target-model-filter"
-      triggerClass="small"
-      dropdownClass="small"
-      options=targetModelOptions
-      onchange=(action "targetModelChanged")
-      selected=selectedTargetModelOption
-      renderInPlace=true
-      as |option|
-    }}
-      <div class="option-container">
-        {{#if option.icon}}
-          {{one-icon class="model-icon" icon=option.icon}}
-        {{/if}}
-        <span class="text model-name">{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
-      </div>
-    {{/power-select}}
-    {{#power-select
-      tagName="div"
-      class="target-record-filter"
-      triggerClass="small"
-      dropdownClass="small"
-      options=targetRecordOptions
-      onchange=(action "targetRecordChanged")
-      selected=selectedTargetRecordOption
-      renderInPlace=true
-      disabled=isTargetRecordDisabled
-      as |option|}}
-      {{#truncated-string}}
-        {{option.name}}
-      {{/truncated-string}}
-    {{/power-select}}
+    <div class="filter-control target-filter">
+      {{#power-select
+        tagName="div"
+        class="target-model-filter"
+        triggerClass="small"
+        dropdownClass="small"
+        options=targetModelOptions
+        onchange=(action "targetModelChanged")
+        selected=selectedTargetModelOption
+        renderInPlace=true
+        as |option|
+      }}
+        <div class="option-container">
+          {{#if option.icon}}
+            {{one-icon class="model-icon" icon=option.icon}}
+          {{/if}}
+          <span class="text model-name">{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
+        </div>
+      {{/power-select}}
+      {{#power-select
+        tagName="div"
+        class="target-record-filter"
+        triggerClass="small"
+        dropdownClass="small"
+        options=targetRecordOptions
+        onchange=(action "targetRecordChanged")
+        selected=selectedTargetRecordOption
+        renderInPlace=true
+        disabled=isTargetRecordDisabled
+        as |option|}}
+        {{#truncated-string}}
+          {{option.name}}
+        {{/truncated-string}}
+      {{/power-select}}
+    </div>
   </div>
 {{/one-collapse}}
