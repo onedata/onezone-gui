@@ -1,9 +1,14 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
-import { resolve } from 'rsvp';
+import { resolve, reject } from 'rsvp';
 
 describe('Unit | Utility | choose default oneprovider', function () {
+  beforeEach(function beforeEach() {
+    this.versionReject = reject(new Error('cannot fetch version'));
+    this.versionReject.catch(() => {});
+  });
+
   it('resolves first online new Oneprovider', function () {
     const oneproviders = [{
         name: 'one',
@@ -53,5 +58,24 @@ describe('Unit | Utility | choose default oneprovider', function () {
     return chooseDefaultOneprovider(oneproviders).then(oneprovider => {
       expect(oneprovider.name).to.equal('two');
     });
+  });
+
+  it('skips oneprovider if versionProxy rejects', function () {
+    const oneproviders = [{
+        name: 'one',
+        online: true,
+        versionProxy: this.versionReject,
+      },
+      {
+        name: 'two',
+        online: true,
+        versionProxy: resolve('20.02.0-beta1'),
+      },
+    ];
+
+    return chooseDefaultOneprovider(oneproviders)
+      .then(oneprovider => {
+        expect(oneprovider.name).to.equal('two');
+      });
   });
 });

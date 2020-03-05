@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = function (environment) {
-  let ENV = {
+  const ENV = {
     'modulePrefix': 'onezone-gui',
     environment,
     'rootURL': null,
@@ -84,8 +84,6 @@ module.exports = function (environment) {
       minNameLength: 2,
       maxNameLength: 50,
     },
-    // Oneproviders with this version have non-embeddable GUI
-    'legacyOneproviderVersion': '19.02',
     'ember-local-storage': {
       namespace: true,
     },
