@@ -14,14 +14,22 @@
               "providers"
               (model-routable-id square.providers.[0])
               "index"
-              (query-params map_lat=_mapState.lat map_lng=_mapState.lng map_scale=_mapState.scale)}}
+              (query-params
+                map_lat=_mapState.lat
+                map_lng=_mapState.lng
+                map_scale=_mapState.scale
+              )
+            }}
               {{provider-place
                 class=(concat "provider-place-" square.providers.[0].id)
                 provider=square.providers
                 atlasWidth=1500
                 circleSizeScale=_providerCircleScale
                 active=(contains selectedProvider square.providers)
-                renderDrop=(and (contains selectedProvider square.providers) (not isWhileDraggingMap))
+                renderDrop=(and
+                  (contains selectedProvider square.providers)
+                  (not isWhileDraggingMap)
+                )
                 selectedProvider=selectedProvider
                 popoverPlacement="horizontal"
                 providerSelectedAction=(action "providerSelected")
