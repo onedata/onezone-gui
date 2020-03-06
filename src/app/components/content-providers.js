@@ -288,17 +288,6 @@ export default Component.extend({
     }
   },
 
-  transitionToProviderRedirect(provider) {
-    const {
-      router,
-      guiUtils,
-    } = this.getProperties('router', 'guiUtils');
-    return router.transitionTo(
-      'provider-redirect',
-      guiUtils.getRoutableIdFor(provider)
-    );
-  },
-
   actions: {
     mapViewportChanged(event) {
       this.set('_mapState', {
@@ -326,7 +315,6 @@ export default Component.extend({
           'guiUtils',
           '_window'
         );
-        const openUrl = (url) => _window.open(url, '_self');
         return get(provider, 'spaceList')
           .then(spaceList => get(spaceList, 'list'))
           .then(list => get(list, 'firstObject'))
@@ -339,13 +327,7 @@ export default Component.extend({
                 providerVersion,
                 space,
               });
-              return new Promise((resolve, reject) => {
-                try {
-                  openUrl(oneproviderUrl);
-                } catch (error) {
-                  reject(error);
-                }
-              });
+              return new Promise(() => _window.open(oneproviderUrl, '_self'));
             });
           });
       }
