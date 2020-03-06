@@ -17,8 +17,8 @@ import { scheduleOnce } from '@ember/runloop';
 import $ from 'jquery';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
-import { resolve } from 'rsvp';
-import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
+import { Promise } from 'rsvp';
+import getVisitOneproviderUrl from 'onedata-gui-common/utils/get-visit-oneprovider-url';
 
 export default Component.extend({
   classNames: ['content-providers'],
@@ -246,7 +246,7 @@ export default Component.extend({
 
   willDestroyElement() {
     try {
-      let {
+      const {
         _window,
         _windowResizeHandler,
       } = this.getProperties('_window', '_windowResizeHandler');
@@ -288,17 +288,6 @@ export default Component.extend({
     }
   },
 
-  transitionToProviderRedirect(provider) {
-    const {
-      router,
-      guiUtils,
-    } = this.getProperties('router', 'guiUtils');
-    return router.transitionTo(
-      'provider-redirect',
-      guiUtils.getRoutableIdFor(provider)
-    );
-  },
-
   actions: {
     mapViewportChanged(event) {
       this.set('_mapState', {
@@ -315,20 +304,32 @@ export default Component.extend({
         this.get('guiUtils').getRoutableIdFor(provider), { queryParams }
       );
     },
-    goToProvider(provider, spaceId) {
+    goToProvider(provider) {
       if (get(provider, 'online') === true) {
-        let spaceIdPromise;
-        if (spaceId) {
-          spaceIdPromise = resolve(spaceId);
-        } else {
-          spaceIdPromise = get(provider, 'spaceList')
-            .then(spaceList =>
-              parseGri(spaceList.hasMany('list').ids()[0]).entityId
-            );
-        }
-        return spaceIdPromise.then(resolvedSpaceId =>
-          this.transitionToProviderRedirect(provider, resolvedSpaceId)
+        const {
+          router,
+          guiUtils,
+          _window,
+        } = this.getProperties(
+          'router',
+          'guiUtils',
+          '_window'
         );
+        return get(provider, 'spaceList')
+          .then(spaceList => get(spaceList, 'list'))
+          .then(list => get(list, 'firstObject'))
+          .then(space => {
+            return get(provider, 'versionProxy').then(providerVersion => {
+              const oneproviderUrl = getVisitOneproviderUrl({
+                router,
+                guiUtils,
+                provider,
+                providerVersion,
+                space,
+              });
+              return new Promise(() => _window.open(oneproviderUrl, '_self'));
+            });
+          });
       }
     },
   },
