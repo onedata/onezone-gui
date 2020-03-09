@@ -101,6 +101,10 @@
   }
 
   .field-view-mode {
+    &.inviteType-field.needs-target-model .text::after {
+      content: ':';
+    }
+
     &.regionCaveat-field,
     &.countryCaveat-field,
     &.asnCaveat-field,

@@ -276,6 +276,8 @@ export function tokenToEditorDefaultData(token, getRecord) {
     token: tokenString,
     typeName,
     inviteType,
+    targetModelName,
+    targetRecordId,
     tokenTargetProxy,
     privileges,
     usageLimit,
@@ -287,6 +289,8 @@ export function tokenToEditorDefaultData(token, getRecord) {
     'token',
     'typeName',
     'inviteType',
+    'targetModelName',
+    'targetRecordId',
     'tokenTargetProxy',
     'privileges',
     'usageLimit',
@@ -294,12 +298,28 @@ export function tokenToEditorDefaultData(token, getRecord) {
     'caveats'
   );
 
+  const inviteTargetProxy = PromiseObject.create({
+    promise: (tokenTargetProxy || resolve(null))
+      .catch(() => null)
+      .then(record => {
+        if (record) {
+          return record;
+        } else {
+          return {
+            entityId: targetRecordId,
+            entityType: targetModelName,
+            name: `ID: ${targetRecordId ? targetRecordId : 'unknown'}`,
+          };
+        }
+      }),
+  });
+
   const defaultData = EmberObject.create({
     name,
     tokenString,
     type: typeName,
     inviteType,
-    inviteTargetProxy: tokenTargetProxy,
+    inviteTargetProxy,
     privileges,
     usageLimit,
     usageCount,

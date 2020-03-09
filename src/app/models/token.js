@@ -135,6 +135,23 @@ export default Model.extend(
     }),
 
     /**
+     * @type {ComputedProperty<String|undefined>}
+     */
+    targetRecordId: computed('inviteType', function targetModelId() {
+      const {
+        type,
+        inviteType,
+      } = this.getProperties('type', 'inviteType');
+      if (inviteType) {
+        const targetModelMapping =
+          tokenInviteTypeToTargetModelMapping[inviteType];
+        return targetModelMapping && type.inviteToken[targetModelMapping.idFieldName];
+      } else {
+        return undefined;
+      }
+    }),
+
+    /**
      * UNIX timestamp of token expiration time
      * @type {Ember.ComputedProperty<number|undefined>}
      */
@@ -226,22 +243,23 @@ export default Model.extend(
     fetchTokenTarget() {
       const {
         store,
-        type,
-        inviteType,
         targetModelName,
-      } = this.getProperties('store', 'type', 'inviteType', 'targetModelName');
+        targetRecordId,
+      } = this.getProperties(
+        'store',
+        'targetModelName',
+        'targetRecordId'
+      );
 
-      if (!targetModelName) {
+      if (!targetModelName || !targetRecordId) {
         return resolve(null);
       } else {
-        const targetModelMapping =
-          tokenInviteTypeToTargetModelMapping[inviteType];
         const adapter = store.adapterFor(targetModelName);
         const entityType = adapter.getEntityTypeForModelName(targetModelName);
 
         const targetModelGri = gri({
           entityType,
-          entityId: type.inviteToken[targetModelMapping.idFieldName],
+          entityId: targetRecordId,
           aspect: 'instance',
           scope: 'auto',
         });

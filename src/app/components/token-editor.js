@@ -341,20 +341,36 @@ export default Component.extend(I18n, {
         }),
         FormFieldsGroup.extend({
           isExpanded: equal('parent.value.type', raw('invite')),
+          inviteType: reads('value.inviteType'),
+          inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
+            return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
+          }),
+          targetModelName: reads('inviteTypeSpec.targetModelName'),
         }).create({
           name: 'inviteDetails',
           fields: [
             DropdownField.extend({
               component,
+              classes: conditional(
+                'parent.targetModelName',
+                raw('needs-target-model'),
+                raw('')
+              ),
               defaultValue: conditional(
                 'isInEditMode',
                 raw('userJoinGroup'),
                 'component.tokenDataSource.inviteType'
               ),
+              options: conditional(
+                'isInEditMode',
+                raw(tokenInviteTypeOptions),
+                raw(tokenInviteTypeOptions
+                  .map(option => Object.assign({}, option, { icon: undefined }))
+                )
+              ),
             }).create({
               name: 'inviteType',
               showSearch: false,
-              options: tokenInviteTypeOptions,
             }),
             this.get('inviteTargetDetailsGroup'),
             this.get('usageLimitGroup'),
@@ -379,10 +395,8 @@ export default Component.extend(I18n, {
       component,
       viewTokenTargetProxy: reads('component.tokenDataSource.inviteTargetProxy'),
       isExpanded: notEmpty('inviteTypeSpec.targetModelName'),
-      inviteType: reads('parent.value.inviteType'),
-      inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
-        return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
-      }),
+      inviteType: reads('parent.inviteType'),
+      inviteTypeSpec: reads('parent.inviteTypeSpec'),
       // We need to cache values related to latest invite type with target
       // to preserve previous view while collapsing inviteTargetDetailsGroup
       // after change to invite type without target. Without caching, labels,

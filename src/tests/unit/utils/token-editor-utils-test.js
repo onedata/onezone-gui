@@ -933,11 +933,63 @@ describe('Unit | Utility | token editor utils', function () {
       expect(get(result, 'inviteType')).to.equal('userJoinSpace');
     });
 
-    it('converts invite target', function () {
-      const tokenTargetProxy = PromiseObject.create({ promise: resolve() });
+    it('converts invite target (fetch success)', function () {
+      const tokenTargetProxy = PromiseObject.create({ promise: resolve('sth') });
       const result = tokenToEditorDefaultData({ tokenTargetProxy });
 
-      expect(get(result, 'inviteTargetProxy')).to.equal(tokenTargetProxy);
+      get(result, 'inviteTargetProxy').then(record =>
+        expect(record).to.equal('sth')
+      );
+    });
+
+    it('converts invite target (id not specified, fetched null)', function () {
+      const tokenTargetProxy = PromiseObject.create({ promise: resolve(null) });
+      const result = tokenToEditorDefaultData({
+        tokenTargetProxy,
+        targetModelName: 'space',
+      });
+
+      get(result, 'inviteTargetProxy').then(record =>
+        expect(record).to.deep.equal({
+          entityId: undefined,
+          entityType: 'space',
+          name: 'ID: unknown',
+        })
+      );
+    });
+
+    it('converts invite target (id specified, fetched null)', function () {
+      const tokenTargetProxy = PromiseObject.create({ promise: resolve(null) });
+      const result = tokenToEditorDefaultData({
+        tokenTargetProxy,
+        targetModelName: 'space',
+        targetRecordId: 'space1',
+      });
+
+      get(result, 'inviteTargetProxy').then(record =>
+        expect(record).to.deep.equal({
+          entityId: 'space1',
+          entityType: 'space',
+          name: 'ID: space1',
+        })
+      );
+    });
+
+    it('converts invite target (fetch error)', function () {
+      const tokenTargetProxy = PromiseObject.create({ promise: reject('error') });
+      const result = tokenToEditorDefaultData({
+        tokenTargetProxy,
+        targetModelName: 'space',
+        targetRecordId: 'space1',
+      });
+
+      get(result, 'inviteTargetProxy').then(record =>
+        expect(record).to.deep.equal({
+          entityId: 'space1',
+          entityType: 'space',
+          name: 'ID: space1',
+        })
+      );
     });
 
     it('converts privileges', function () {

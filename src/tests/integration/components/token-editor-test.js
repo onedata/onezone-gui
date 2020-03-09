@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { resolve, Promise } from 'rsvp';
+import { resolve, reject, Promise } from 'rsvp';
 import moment from 'moment';
 import { set } from '@ember/object';
 import OneTooltipHelper from '../../helpers/one-tooltip';
@@ -1934,6 +1934,42 @@ describe('Integration | Component | token editor', function () {
         expect(getFieldElement(this, 'type').text()).to.contain('Invite');
         expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
         expect(getFieldElement(this, 'target').text()).to.contain('space1');
+        expect(getFieldElement(this, 'privileges').find('.one-way-toggle.checked'))
+          .to.have.length(3);
+        expect(getFieldElement(this, 'usageLimit')).to.not.exist;
+        expectLabelToEqual(this, 'usageCount', 'Usage count');
+        expect(getFieldElement(this, 'usageCount').text()).to.contain('5/10');
+        expect(this.$('.caveat-group-toggle')).to.not.exist;
+        expect(this.$('.caveats-expand')).to.not.exist;
+      });
+    }
+  );
+
+  it(
+    'shows passed token data in view mode (invite token with unknown target, no caveats)',
+    function () {
+      const token = {
+        name: 'token1',
+        typeName: 'invite',
+        inviteType: 'userJoinSpace',
+        targetModelName: 'space',
+        targetRecordId: 'space1',
+        tokenTargetProxy: PromiseObject.create({
+          promise: reject('error'),
+        }),
+        privileges: ['space_view', 'space_update', 'space_delete'],
+        usageLimit: 10,
+        usageCount: 5,
+      };
+      this.set('token', token);
+
+      this.render(hbs `{{token-editor mode="view" token=token}}`);
+
+      return wait().then(() => {
+        expect(getFieldElement(this, 'name').text()).to.contain('token1');
+        expect(getFieldElement(this, 'type').text()).to.contain('Invite');
+        expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
+        expect(getFieldElement(this, 'target').text()).to.contain('ID: space1');
         expect(getFieldElement(this, 'privileges').find('.one-way-toggle.checked'))
           .to.have.length(3);
         expect(getFieldElement(this, 'usageLimit')).to.not.exist;
