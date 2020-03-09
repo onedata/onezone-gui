@@ -915,6 +915,12 @@ describe('Unit | Utility | token editor utils', function () {
       expect(get(result, 'name')).to.equal('t1');
     });
 
+    it('converts revoked', function () {
+      const result = tokenToEditorDefaultData({ revoked: true });
+
+      expect(get(result, 'revoked')).to.be.true;
+    });
+
     it('converts token string', function () {
       const result = tokenToEditorDefaultData({ token: 'abc' });
 

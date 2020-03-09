@@ -4,6 +4,9 @@ export default {
       name: {
         label: 'Name',
       },
+      revoked: {
+        label: 'Revoked',
+      },
       tokenString: {
         label: 'Token',
       },

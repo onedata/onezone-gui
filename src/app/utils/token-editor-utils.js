@@ -273,6 +273,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
 
   const {
     name,
+    revoked,
     token: tokenString,
     typeName,
     inviteType,
@@ -286,6 +287,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
   } = getProperties(
     token,
     'name',
+    'revoked',
     'token',
     'typeName',
     'inviteType',
@@ -316,6 +318,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
 
   const defaultData = EmberObject.create({
     name,
+    revoked,
     tokenString,
     type: typeName,
     inviteType,

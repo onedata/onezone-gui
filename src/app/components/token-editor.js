@@ -316,6 +316,13 @@ export default Component.extend(I18n, {
           component,
           defaultValue: or('component.tokenDataSource.name', raw(undefined)),
         }).create({ name: 'name' }),
+        ToggleField.extend({
+          component,
+          isVisible: reads('isInViewMode'),
+          defaultValue: reads('component.tokenDataSource.revoked'),
+        }).create({
+          name: 'revoked',
+        }),
         ClipboardField.extend({
           component,
           isVisible: reads('isInViewMode'),

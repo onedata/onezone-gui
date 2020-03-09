@@ -1774,11 +1774,36 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
+    'renders fields from view mode when component is in view mode',
+    function () {
+      this.render(hbs `{{token-editor mode="view"}}`);
+
+      return wait().then(() => {
+        expectLabelToEqual(this, 'revoked', 'Revoked');
+        expect(getFieldElement(this, 'revoked').find('.one-way-toggle')).to.exist;
+        expectLabelToEqual(this, 'tokenString', 'Token');
+        expect(getFieldElement(this, 'tokenString').find('textarea')).to.exist;
+      });
+    }
+  );
+
+  it(
+    'does not show fields from view mode, when is in create mode',
+    function () {
+      this.render(hbs `{{token-editor mode="create"}}`);
+
+      expect(getFieldElement(this, 'tokenString')).to.not.exist;
+      expect(getFieldElement(this, 'revoked')).to.not.exist;
+    }
+  );
+
+  it(
     'shows passed token data in view mode (access token, all caveats)',
     function () {
       const now = new Date();
       const token = {
         name: 'token1',
+        revoked: true,
         token: 'abc',
         typeName: 'access',
         caveats: [{
@@ -1849,7 +1874,8 @@ describe('Integration | Component | token editor', function () {
 
       return wait().then(() => {
         expect(getFieldElement(this, 'name').text()).to.contain('token1');
-        expectLabelToEqual(this, 'tokenString', 'Token');
+        expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+          .to.have.class('checked');
         expect(getFieldElement(this, 'tokenString').find('textarea').val())
           .to.contain('abc');
         expect(getFieldElement(this, 'type').text()).to.contain('Access');
@@ -1913,6 +1939,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       const token = {
         name: 'token1',
+        revoked: false,
         typeName: 'invite',
         inviteType: 'userJoinSpace',
         tokenTargetProxy: PromiseObject.create({
@@ -1931,6 +1958,8 @@ describe('Integration | Component | token editor', function () {
 
       return wait().then(() => {
         expect(getFieldElement(this, 'name').text()).to.contain('token1');
+        expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+          .to.not.have.class('checked');
         expect(getFieldElement(this, 'type').text()).to.contain('Invite');
         expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
         expect(getFieldElement(this, 'target').text()).to.contain('space1');
@@ -2024,6 +2053,7 @@ class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
 
 const basicFieldNameToFieldPath = {
   name: 'basic.name',
+  revoked: 'basic.revoked',
   tokenString: 'basic.tokenString',
   type: 'basic.type',
   inviteType: 'basic.inviteDetails.inviteType',
