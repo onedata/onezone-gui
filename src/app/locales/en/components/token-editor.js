@@ -248,6 +248,13 @@ export default {
             label: 'Path',
             tip: 'Limits the paths in which data can be accessed with the token. If a directory path is given, the token allows to access all nested files and directories starting from the specified directory.',
           },
+          path: {
+            pathEntry: {
+              pathString: {
+                placeholder: 'Example: /my/directory/path',
+              },
+            },
+          },
           pathDisabledText: {
             text: 'This token does not limit paths in which data can be accessed.',
           },

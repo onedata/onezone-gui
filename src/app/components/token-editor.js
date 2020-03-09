@@ -1270,7 +1270,7 @@ export default Component.extend(I18n, {
                 name: 'pathString',
                 defaultValue: '',
                 isOptional: true,
-                regex: /^(\/[^/]+)*$/,
+                regex: /^(\/[^/]+)*\/?$/,
                 mode: nestedFieldMode,
               }),
             ],

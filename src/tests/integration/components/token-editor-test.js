@@ -1259,7 +1259,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'preselects first available space and path "" for new entry in path caveat',
+    'preselects first available space and path "" with placeholder for new entry in path caveat',
     function () {
       this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
 
@@ -1275,8 +1275,9 @@ describe('Integration | Component | token editor', function () {
 
           const $selectorTrigger = $(new PathSpaceHelper().getTrigger());
           expect($selectorTrigger.find('.text').text().trim()).to.equal('space0');
-          expect(getFieldElement(this, 'path').find('.pathString-field input'))
-            .to.have.value('');
+          const $entryInput = getFieldElement(this, 'path').find('.pathString-field input');
+          expect($entryInput).to.have.value('');
+          expect($entryInput.attr('placeholder')).to.equal('Example: /my/directory/path');
           expectToBeValid(this, 'path');
         });
     }
@@ -1330,7 +1331,9 @@ describe('Integration | Component | token editor', function () {
 
   [
     '',
+    '/',
     '/asd',
+    '/asd/',
     '/asd/xcv.cpp',
   ].forEach(pathString => {
     it(
@@ -1350,9 +1353,9 @@ describe('Integration | Component | token editor', function () {
   });
 
   [
-    '/',
     '//',
     'asd/',
+    '/asd//',
     ' /asd',
   ].forEach(pathString => {
     it(
@@ -1829,6 +1832,7 @@ describe('Integration | Component | token editor', function () {
           type: 'data.path',
           whitelist: [
             'L3NwYWNlMS9hYmMvZGVm', // /space1/abc/def
+            'L3NwYWNlMQ==', // /space1
             'L3Vua25vd24vYWJjL2RlZi9naGk=', // /unknown/abc/def/ghi (non-existing space)
           ],
         }, {
@@ -1885,13 +1889,16 @@ describe('Integration | Component | token editor', function () {
           .to.have.class('checked');
         expect(getFieldElement(this, 'readonlyEnabledText')).to.not.exist;
         const pathsFields = getFieldElement(this, 'path').find('.pathEntry-field');
-        expect(pathsFields).to.have.length(2);
+        expect(pathsFields).to.have.length(3);
         expect(pathsFields.eq(0).find('.pathSpace-field .oneicon-space')).to.exist;
         expect(pathsFields.eq(0).find('.pathSpace-field').text()).to.contain('space1');
         expect(pathsFields.eq(0).find('.pathString-field').text()).to.contain('/abc/def');
-        expect(pathsFields.eq(0).find('.pathSpace-field .oneicon-space')).to.exist;
-        expect(pathsFields.eq(1).find('.pathSpace-field').text()).to.contain('ID: unknown');
-        expect(pathsFields.eq(1).find('.pathString-field').text()).to.contain('/abc/def/ghi');
+        expect(pathsFields.eq(1).find('.pathSpace-field .oneicon-space')).to.exist;
+        expect(pathsFields.eq(1).find('.pathSpace-field').text()).to.contain('space1');
+        expect(pathsFields.eq(1).find('.pathString-field').text()).to.contain('/');
+        expect(pathsFields.eq(2).find('.pathSpace-field .oneicon-space')).to.exist;
+        expect(pathsFields.eq(2).find('.pathSpace-field').text()).to.contain('ID: unknown');
+        expect(pathsFields.eq(2).find('.pathString-field').text()).to.contain('/abc/def/ghi');
         const objectIdsFields = getFieldElement(this, 'objectId').find('.objectIdEntry-field');
         expect(objectIdsFields).to.have.length(2);
         expect(objectIdsFields.eq(0).text()).to.contain('abc');

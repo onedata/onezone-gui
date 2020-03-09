@@ -22,7 +22,7 @@ const consumerModelToPrefix = {
 
 const prefixToConsumerModel = _.invert(consumerModelToPrefix);
 
-const decodedPathRegexp = /\/([^/]+)(.*)/;
+const decodedPathRegexp = /^\/([^/]+)(.*)$/;
 
 export function editorDataToToken(editorData, currentUser) {
   const tokenData = {};
@@ -226,7 +226,7 @@ export function editorDataToToken(editorData, currentUser) {
         .compact()
         .map(pathEntry => {
           const spaceId = get(pathEntry, 'pathSpace.entityId');
-          const pathString = get(pathEntry, 'pathString');
+          const pathString = (get(pathEntry, 'pathString') || '').replace(/\/+$/, '');
           if (spaceId) {
             const absolutePath = `/${spaceId}${pathString}`;
             return btoa(absolutePath);
@@ -416,7 +416,8 @@ export function tokenToEditorDefaultData(token, getRecord) {
       whitelist.forEach((encodedPath, index) => {
         const valueName = `pathEntry${index}`;
         const decodedPath = atob(encodedPath);
-        const [, spaceEntityId, pathString] = decodedPath.match(decodedPathRegexp);
+        let [, spaceEntityId, pathString] = decodedPath.match(decodedPathRegexp);
+        pathString = pathString || '/';
         const spaceFetchPromise = getRecord('space', spaceEntityId)
           .then(pathSpace => {
             caveatDefaultData[valueName] = {

@@ -1,6 +1,13 @@
 .token-editor {
   max-width: 1000px;
 
+  &:not(.create-mode) {
+    .caveats-expand {
+      margin-top: $padding-base-vertical;
+      margin-bottom: $padding-small-vertical;
+    }
+  }
+
   .privileges-field-renderer.field-view-mode {
     .node-text.disabled {
       opacity: 1;

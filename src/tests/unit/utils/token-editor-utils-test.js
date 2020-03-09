@@ -727,10 +727,28 @@ describe('Unit | Utility | token editor utils', function () {
                 pathString: '/abc/def',
               },
               pathEntry1: {
+                pathSpace: { entityId: 's1' },
+                pathString: '/abc/def/',
+              },
+              pathEntry2: {
+                pathSpace: { entityId: 's1' },
+                pathString: '/',
+              },
+              pathEntry3: {
+                pathSpace: { entityId: 's1' },
+                pathString: undefined,
+              },
+              pathEntry4: {
                 pathSpace: { entityId: 's2' },
                 pathString: '/abc/def/ghi',
               },
-              __fieldsValueNames: ['pathEntry0', 'pathEntry1'],
+              __fieldsValueNames: [
+                'pathEntry0',
+                'pathEntry1',
+                'pathEntry2',
+                'pathEntry3',
+                'pathEntry4',
+              ],
             }),
           },
         });
@@ -739,6 +757,9 @@ describe('Unit | Utility | token editor utils', function () {
           type: 'data.path',
           whitelist: [
             'L3MxL2FiYy9kZWY=', // /s1/abc/def
+            'L3MxL2FiYy9kZWY=', // /s1/abc/def/
+            'L3Mx', // /s1/
+            'L3Mx', // /s1
             'L3MyL2FiYy9kZWYvZ2hp', // /s2/abc/def/ghi
           ],
         });
@@ -1114,6 +1135,7 @@ describe('Unit | Utility | token editor utils', function () {
           type: 'data.path',
           whitelist: [
             'L3MxL2FiYy9kZWY=', // /s1/abc/def
+            'L3Mx', // /s1
             'L3Vua25vd24vYWJjL2RlZi9naGk=', // /unknown/abc/def/ghi (non-existing space)
           ],
         }],
@@ -1129,11 +1151,17 @@ describe('Unit | Utility | token editor utils', function () {
           },
           pathEntry1: {
             pathSpace: {
+              entityId: 's1',
+            },
+            pathString: '/',
+          },
+          pathEntry2: {
+            pathSpace: {
               entityId: 'unknown',
             },
             pathString: '/abc/def/ghi',
           },
-          __fieldsValueNames: ['pathEntry0', 'pathEntry1'],
+          __fieldsValueNames: ['pathEntry0', 'pathEntry1', 'pathEntry2'],
         });
       });
     });
