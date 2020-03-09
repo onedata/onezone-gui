@@ -45,6 +45,16 @@ export default Service.extend({
     return this.get('store').findRecord('space', id);
   },
 
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: 'space',
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
+  },
+
   /**
    * Creates new space
    * @returns {Promise<Space>}

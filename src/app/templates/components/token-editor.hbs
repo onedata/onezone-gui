@@ -2,14 +2,20 @@
   {{form-component/field-renderer field=basicGroup}}
   {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
     <h1
-      class="toggle-expand caveats-expand {{if caveatsGroup.isExpanded "opened"}}"
-      {{action "toggleCaveatsGroup"}}
+      class={{concat-classes
+        "toggle-expand caveats-expand"
+        (if caveatsGroup.isExpanded "opened")
+        (if (not disableCaveatsCollapse) "clickable")
+      }}
+      onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
     >
       {{tt this "fields.caveats.header"}}
-      {{one-icon
-        icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
-        class="toggle-icon"
-      }}
+      {{#if (not disableCaveatsCollapse)}}
+        {{one-icon
+          icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
+          class="toggle-icon"
+        }}
+      {{/if}}
     </h1>
     {{form-component/field-renderer field=caveatsGroup}}
   {{/if}}

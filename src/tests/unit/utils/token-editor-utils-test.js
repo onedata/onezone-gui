@@ -1107,6 +1107,54 @@ describe('Unit | Utility | token editor utils', function () {
 
       expect(get(result, 'caveats.readonly')).to.equal(true);
     });
+
+    it('converts path caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'data.path',
+          whitelist: [
+            'L3MxL2FiYy9kZWY=', // /s1/abc/def
+            'L3Vua25vd24vYWJjL2RlZi9naGk=', // /unknown/abc/def/ghi (non-existing space)
+          ],
+        }],
+      }, getRecordMock);
+
+      return get(result, 'caveats.path').then(pathCaveat => {
+        expect(pathCaveat).to.deep.equal({
+          pathEntry0: {
+            pathSpace: {
+              entityId: 's1',
+            },
+            pathString: '/abc/def',
+          },
+          pathEntry1: {
+            pathSpace: {
+              entityId: 'unknown',
+            },
+            pathString: '/abc/def/ghi',
+          },
+          __fieldsValueNames: ['pathEntry0', 'pathEntry1'],
+        });
+      });
+    });
+
+    it('converts objectId caveat', function () {
+      const result = tokenToEditorDefaultData({
+        caveats: [{
+          type: 'data.objectid',
+          whitelist: [
+            'abc',
+            'def',
+          ],
+        }],
+      });
+
+      expect(get(result, 'caveats.objectId')).to.deep.equal({
+        objectIdEntry0: 'abc',
+        objectIdEntry1: 'def',
+        __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
+      });
+    });
   });
 });
 

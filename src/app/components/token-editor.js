@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
+import EmberObject, { computed, get, set, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
@@ -53,6 +53,7 @@ import {
   promise,
   tag,
   notEmpty,
+  notEqual,
 } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
@@ -264,6 +265,11 @@ export default Component.extend(I18n, {
       return tokenToEditorDefaultData(this.get('token'), this.getRecord.bind(this));
     }
   ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  disableCaveatsCollapse: notEqual('mode', raw('create')),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -1166,15 +1172,51 @@ export default Component.extend(I18n, {
   pathCaveatGroup: computed(function pathCaveatGroup() {
     const component = this;
     return CaveatFormGroup.extend({
+      oneiconAlias: service(),
+      component,
       spacesProxy: null,
-      pathEnabledObserver: observer('value.pathEnabled', function pathEnabledObserver() {
-        if (this.get('value.pathEnabled') && !this.get('spacesProxy')) {
-          this.set(
+      viewTokenValue: reads('component.tokenDataSource.caveats.path'),
+      pathEnabledObserver: observer(
+        'isCaveatEnabled',
+        'isInViewMode',
+        function pathEnabledObserver() {
+          const {
+            isCaveatEnabled,
+            spacesProxy,
+            isInViewMode,
+            viewTokenValue,
+          } = this.getProperties(
+            'isCaveatEnabled',
             'spacesProxy',
-            component.getRecordOptionsForModel('space')
+            'isInViewMode',
+            'viewTokenValue'
           );
+          if (isCaveatEnabled && !spacesProxy) {
+            // Services are available after the form structure got stable. Having value ==
+            // form is ready
+            const oneiconAlias = this.get('oneiconAlias');
+            let newProxy;
+            if (isInViewMode) {
+              newProxy = PromiseArray.create({
+                promise: viewTokenValue.then(defaultValue =>
+                  Object.keys(defaultValue).without('__fieldsValueNames')
+                  .map(key => {
+                    const record = get(defaultValue, `${key}.pathSpace`);
+                    return {
+                      value: record,
+                      label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
+                      icon: oneiconAlias.getName('space'),
+                    };
+                  })
+                ),
+              });
+            } else {
+              newProxy = component.getRecordOptionsForModel('space');
+            }
+            this.set('spacesProxy', newProxy);
+          }
         }
-      }),
+      ),
     }).create(generateCaveatFormGroupBody('path', [
       SiblingLoadingField.extend({
         loadingProxy: reads('parent.spacesProxy'),
@@ -1188,8 +1230,29 @@ export default Component.extend(I18n, {
           'parent.isCaveatEnabled',
           'parent.spacesProxy.isFulfilled'
         ),
+        defaultValue: conditional(
+          'isInEditMode',
+          raw(undefined),
+          'parent.viewTokenValue.content'
+        ),
         spaces: reads('parent.spacesProxy.content'),
+        defaultValueObserver: observer(
+          'parent.viewTokenValue.isFulfilled',
+          'isInViewMode',
+          function defaultValueObserver() {
+            const {
+              isInViewMode,
+              defaultValue,
+            } = this.getProperties('isInViewMode', 'defaultValue');
+            if (isInViewMode && defaultValue) {
+              this.reset();
+              // Ember is not smart enough to know, that value has changed
+              this.notifyPropertyChange('value');
+            }
+          }
+        ),
         fieldFactoryMethod(uniqueFieldValueName) {
+          const nestedFieldMode = this.get('mode') !== 'view' ? 'edit' : 'view';
           return FormFieldsGroup.extend({}).create({
             name: 'pathEntry',
             valueName: uniqueFieldValueName,
@@ -1201,15 +1264,24 @@ export default Component.extend(I18n, {
               }).create({
                 name: 'pathSpace',
                 areValidationClassesEnabled: false,
+                mode: nestedFieldMode,
               }),
               TextField.create({
                 name: 'pathString',
                 defaultValue: '',
                 isOptional: true,
                 regex: /^(\/[^/]+)*$/,
+                mode: nestedFieldMode,
               }),
             ],
           });
+        },
+        dumpDefaultValue() {
+          if (this.get('isInEditMode')) {
+            return this._super(...arguments);
+          } else {
+            return this.get('defaultValue');
+          }
         },
       }).create({
         name: 'path',
@@ -1222,14 +1294,31 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   objectIdCaveatGroup: computed(function objectIdCaveatGroup() {
-    return CaveatFormGroup.create(generateCaveatFormGroupBody('objectId', [
+    const component = this;
+    return CaveatFormGroup.extend({
+      component,
+      viewTokenValue: reads('component.tokenDataSource.caveats.objectId'),
+    }).create(generateCaveatFormGroupBody('objectId', [
       FormFieldsCollectionGroup.extend({
         isVisible: reads('parent.isCaveatEnabled'),
+        defaultValue: conditional(
+          'isInEditMode',
+          raw(undefined),
+          'parent.viewTokenValue'
+        ),
         fieldFactoryMethod(uniqueFieldValueName) {
           return TextField.create({
             name: 'objectIdEntry',
             valueName: uniqueFieldValueName,
+            mode: this.get('mode') !== 'view' ? 'edit' : 'view',
           });
+        },
+        dumpDefaultValue() {
+          if (this.get('isInEditMode')) {
+            return this._super(...arguments);
+          } else {
+            return this.get('defaultValue');
+          }
         },
       }).create({
         name: 'objectId',
@@ -1246,6 +1335,7 @@ export default Component.extend(I18n, {
     if (mode === 'view') {
       fields.changeMode('view');
       fields.reset();
+      this.expandCaveatsDependingOnCaveatsExistence();
     }
   }),
 
@@ -1260,6 +1350,7 @@ export default Component.extend(I18n, {
       if (mode === 'view') {
         // update token data
         fields.reset();
+        this.expandCaveatsDependingOnCaveatsExistence();
       }
     }
   ),
@@ -1272,6 +1363,15 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     this._super(...arguments);
     this.get('fields').destroy();
+  },
+
+  expandCaveatsDependingOnCaveatsExistence() {
+    const {
+      caveatsGroup,
+      tokenDataSource,
+    } = this.getProperties('caveatsGroup', 'tokenDataSource');
+
+    set(caveatsGroup, 'isExpanded', get(tokenDataSource, 'hasCaveats'));
   },
 
   notifyAboutChange() {
@@ -1343,12 +1443,14 @@ export default Component.extend(I18n, {
   getRecord(modelName, entityId) {
     const {
       userManager,
+      spaceManager,
       groupManager,
       providerManager,
       clusterManager,
       guiContext,
     } = this.getProperties(
       'userManager',
+      'spaceManager',
       'groupManager',
       'providerManager',
       'clusterManager',
@@ -1358,6 +1460,8 @@ export default Component.extend(I18n, {
     switch (modelName) {
       case 'user':
         return userManager.getRecordById(entityId);
+      case 'space':
+        return spaceManager.getRecordById(entityId);
       case 'group':
         return groupManager.getRecordById(entityId);
       case 'provider':

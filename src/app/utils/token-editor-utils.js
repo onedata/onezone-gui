@@ -9,9 +9,10 @@
 
 import EmberObject, { getProperties, get, set } from '@ember/object';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
-import { Promise, resolve } from 'rsvp';
+import { Promise, resolve, all as allFulfilled } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 
 const consumerModelToPrefix = {
   user: 'usr',
@@ -20,6 +21,8 @@ const consumerModelToPrefix = {
 };
 
 const prefixToConsumerModel = _.invert(consumerModelToPrefix);
+
+const decodedPathRegexp = /\/([^/]+)(.*)/;
 
 export function editorDataToToken(editorData, currentUser) {
   const tokenData = {};
@@ -401,6 +404,53 @@ export function tokenToEditorDefaultData(token, getRecord) {
     const readonlyCaveat = caveats.findBy('type', 'data.readonly');
     if (readonlyCaveat) {
       set(defaultData, 'caveats.readonly', true);
+    }
+
+    const pathCaveat = caveats.findBy('type', 'data.path');
+    if (pathCaveat && get(pathCaveat, 'whitelist.length')) {
+      const whitelist = get(pathCaveat, 'whitelist');
+      const caveatDefaultData = {
+        __fieldsValueNames: [],
+      };
+      const spacesFetchPromises = [];
+      whitelist.forEach((encodedPath, index) => {
+        const valueName = `pathEntry${index}`;
+        const decodedPath = atob(encodedPath);
+        const [, spaceEntityId, pathString] = decodedPath.match(decodedPathRegexp);
+        const spaceFetchPromise = getRecord('space', spaceEntityId)
+          .then(pathSpace => {
+            caveatDefaultData[valueName] = {
+              pathSpace,
+              pathString,
+            };
+          })
+          .catch(() => {
+            caveatDefaultData[valueName] = {
+              pathSpace: { entityId: spaceEntityId },
+              pathString,
+            };
+          });
+        spacesFetchPromises.push(spaceFetchPromise);
+        caveatDefaultData.__fieldsValueNames.push(valueName);
+      });
+      const pathProxy = PromiseObject.create({
+        promise: allFulfilled(spacesFetchPromises).then(() => caveatDefaultData),
+      });
+      set(defaultData, 'caveats.path', pathProxy);
+    }
+
+    const objectIdCaveat = caveats.findBy('type', 'data.objectid');
+    if (objectIdCaveat && get(objectIdCaveat, 'whitelist.length')) {
+      const whitelist = get(objectIdCaveat, 'whitelist');
+      const caveatDefaultData = {
+        __fieldsValueNames: [],
+      };
+      whitelist.forEach((objectId, index) => {
+        const valueName = `objectIdEntry${index}`;
+        caveatDefaultData[valueName] = objectId;
+        caveatDefaultData.__fieldsValueNames.push(valueName);
+      });
+      set(defaultData, 'caveats.objectId', caveatDefaultData);
     }
   }
 

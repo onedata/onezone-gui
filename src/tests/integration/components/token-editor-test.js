@@ -1825,6 +1825,18 @@ describe('Integration | Component | token editor', function () {
           interface: 'oneclient',
         }, {
           type: 'data.readonly',
+        }, {
+          type: 'data.path',
+          whitelist: [
+            'L3NwYWNlMS9hYmMvZGVm', // /space1/abc/def
+            'L3Vua25vd24vYWJjL2RlZi9naGk=', // /unknown/abc/def/ghi (non-existing space)
+          ],
+        }, {
+          type: 'data.objectid',
+          whitelist: [
+            'abc',
+            'def',
+          ],
         }],
       };
       this.set('token', token);
@@ -1872,6 +1884,18 @@ describe('Integration | Component | token editor', function () {
         expect(getFieldElement(this, 'readonlyView').find('.one-way-toggle'))
           .to.have.class('checked');
         expect(getFieldElement(this, 'readonlyEnabledText')).to.not.exist;
+        const pathsFields = getFieldElement(this, 'path').find('.pathEntry-field');
+        expect(pathsFields).to.have.length(2);
+        expect(pathsFields.eq(0).find('.pathSpace-field .oneicon-space')).to.exist;
+        expect(pathsFields.eq(0).find('.pathSpace-field').text()).to.contain('space1');
+        expect(pathsFields.eq(0).find('.pathString-field').text()).to.contain('/abc/def');
+        expect(pathsFields.eq(0).find('.pathSpace-field .oneicon-space')).to.exist;
+        expect(pathsFields.eq(1).find('.pathSpace-field').text()).to.contain('ID: unknown');
+        expect(pathsFields.eq(1).find('.pathString-field').text()).to.contain('/abc/def/ghi');
+        const objectIdsFields = getFieldElement(this, 'objectId').find('.objectIdEntry-field');
+        expect(objectIdsFields).to.have.length(2);
+        expect(objectIdsFields.eq(0).text()).to.contain('abc');
+        expect(objectIdsFields.eq(1).text()).to.contain('def');
         expect(this.$('.submit-token')).to.not.exist;
       });
     }
