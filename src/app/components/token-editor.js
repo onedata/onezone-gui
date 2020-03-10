@@ -427,64 +427,67 @@ export default Component.extend(I18n, {
         'isInEditMode',
         'viewTokenTargetProxy',
         function inviteTypeSpecObserver() {
-          const {
-            inviteTypeSpec,
-            viewTokenTargetProxy,
-            isInEditMode,
-            cachedTargetsModelName,
-            cachedPrivilegesModelName,
-          } = this.getProperties(
-            'inviteTypeSpec',
-            'viewTokenTargetProxy',
-            'isInEditMode',
-            'cachedTargetsModelName',
-            'cachedPrivilegesModelName'
-          );
-          if (!inviteTypeSpec) {
-            return;
-          }
-          const newTargetsModelName = inviteTypeSpec.targetModelName;
-          const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
-            newTargetsModelName;
-          if (isInEditMode) {
-            if (newTargetsModelName) {
-              this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
-              if (cachedTargetsModelName !== newTargetsModelName) {
-                this.setProperties({
-                  cachedTargetsModelName: newTargetsModelName,
-                  cachedTargetsProxy: component
-                    .getRecordOptionsForModel(newTargetsModelName),
-                });
-              }
-            }
-            if (newPrivilegesModelName &&
-              cachedPrivilegesModelName !== newPrivilegesModelName) {
-              this.setProperties({
-                cachedPrivilegesModelName: newPrivilegesModelName,
-                cachedPrivilegesPresetProxy: component
-                  .getPrivilegesPresetForModel(newTargetsModelName),
-              });
-            }
-          } else {
-            if (newTargetsModelName) {
-              this.setProperties({
-                latestInviteTypeWithTargets: inviteTypeSpec.value,
-                cachedTargetsModelName: newTargetsModelName,
-                cachedTargetsProxy: PromiseArray.create({
-                  promise: viewTokenTargetProxy ? viewTokenTargetProxy.then(record => {
-                    return record ? [component.recordToDropdownOption(record)] : [];
-                  }) : resolve([]),
-                }),
-                cachedPrivilegesModelName: newPrivilegesModelName,
-                cachedPrivilegesPresetProxy: PromiseArray.create({ promise: resolve([]) }),
-              });
-            }
-          }
+          scheduleOnce('afterRender', this, 'inviteTypeSpecObserverFunc');
         }
       ),
       init() {
         this._super(...arguments);
-        scheduleOnce('afterRender', this, 'inviteTypeSpecObserver');
+        this.inviteTypeSpecObserver();
+      },
+      inviteTypeSpecObserverFunc() {
+        const {
+          inviteTypeSpec,
+          viewTokenTargetProxy,
+          isInEditMode,
+          cachedTargetsModelName,
+          cachedPrivilegesModelName,
+        } = this.getProperties(
+          'inviteTypeSpec',
+          'viewTokenTargetProxy',
+          'isInEditMode',
+          'cachedTargetsModelName',
+          'cachedPrivilegesModelName'
+        );
+        if (!inviteTypeSpec) {
+          return;
+        }
+        const newTargetsModelName = inviteTypeSpec.targetModelName;
+        const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
+          newTargetsModelName;
+        if (isInEditMode) {
+          if (newTargetsModelName) {
+            this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
+            if (cachedTargetsModelName !== newTargetsModelName) {
+              this.setProperties({
+                cachedTargetsModelName: newTargetsModelName,
+                cachedTargetsProxy: component
+                  .getRecordOptionsForModel(newTargetsModelName),
+              });
+            }
+          }
+          if (newPrivilegesModelName &&
+            cachedPrivilegesModelName !== newPrivilegesModelName) {
+            this.setProperties({
+              cachedPrivilegesModelName: newPrivilegesModelName,
+              cachedPrivilegesPresetProxy: component
+                .getPrivilegesPresetForModel(newTargetsModelName),
+            });
+          }
+        } else {
+          if (newTargetsModelName) {
+            this.setProperties({
+              latestInviteTypeWithTargets: inviteTypeSpec.value,
+              cachedTargetsModelName: newTargetsModelName,
+              cachedTargetsProxy: PromiseArray.create({
+                promise: viewTokenTargetProxy ? viewTokenTargetProxy.then(record => {
+                  return record ? [component.recordToDropdownOption(record)] : [];
+                }) : resolve([]),
+              }),
+              cachedPrivilegesModelName: newPrivilegesModelName,
+              cachedPrivilegesPresetProxy: PromiseArray.create({ promise: resolve([]) }),
+            });
+          }
+        }
       },
     }).create({
       name: 'inviteTargetDetails',
