@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';
 import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
+import ModifyTokenAction from 'onezone-gui/utils/token-actions/modify-token-action';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 
 export default Service.extend(I18n, {
@@ -32,6 +33,10 @@ export default Service.extend(I18n, {
 
   createCreateTokenAction(context) {
     return CreateTokenAction.create({ ownerSource: this, context });
+  },
+
+  createModifyTokenAction(context) {
+    return ModifyTokenAction.create({ ownerSource: this, context });
   },
 
   createCleanObsoleteTokensAction(context) {
