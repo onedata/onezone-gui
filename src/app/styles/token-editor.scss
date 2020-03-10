@@ -103,8 +103,14 @@
   .field-view-mode {
     &.name-field,
     &.target-field {
-      flex-wrap: nowrap;
       word-break: break-all;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      &.name-field,
+      &.target-field {
+        flex-wrap: nowrap;
+      }
     }
 
     &.inviteType-field.needs-target-model .text::after {

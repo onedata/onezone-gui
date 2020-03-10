@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { editorDataToToken, tokenToEditorDefaultData } from 'onezone-gui/utils/token-editor-utils';
+import {
+  creatorDataToToken,
+  editorDataToDiffObject,
+  tokenToEditorDefaultData,
+} from 'onezone-gui/utils/token-editor-utils';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { get, getProperties } from '@ember/object';
 import _ from 'lodash';
@@ -9,9 +13,9 @@ import { resolve, reject } from 'rsvp';
 import moment from 'moment';
 
 describe('Unit | Utility | token editor utils', function () {
-  describe('editor data to token', function () {
+  describe('creator data to token', function () {
     it('converts name', function () {
-      const result = editorDataToToken({
+      const result = creatorDataToToken({
         basic: {
           name: 'asd',
         },
@@ -27,7 +31,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `returns object with type.${typeName}Token if type is '${typeName}'`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type: typeName,
             },
@@ -40,7 +44,7 @@ describe('Unit | Utility | token editor utils', function () {
     });
 
     it('returns object with type.inviteToken.inviteType when inviteType is specified', function () {
-      const result = editorDataToToken({
+      const result = creatorDataToToken({
         basic: {
           type: 'invite',
           inviteDetails: {
@@ -67,7 +71,7 @@ describe('Unit | Utility | token editor utils', function () {
         it(
           `returns object with type.inviteToken.{inviteType,${idFieldName}} when target is ${modelName} for inviteType ${inviteType}`,
           function () {
-            const result = editorDataToToken({
+            const result = creatorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
@@ -92,7 +96,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'returns object without specified token invite target if target model is not suitable for invitation inviteType',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
@@ -117,7 +121,7 @@ describe('Unit | Utility | token editor utils', function () {
       'returns object with current user as a target model when inviteType is registerOneprovider',
       function () {
         const currentUser = { entityId: 'user1' };
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
@@ -146,7 +150,7 @@ describe('Unit | Utility | token editor utils', function () {
         it(
           `converts invite privileges for ${inviteType} token`,
           function () {
-            const result = editorDataToToken({
+            const result = creatorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
@@ -166,7 +170,7 @@ describe('Unit | Utility | token editor utils', function () {
         it(
           `does not convert invite privileges when for ${inviteType} token`,
           function () {
-            const result = editorDataToToken({
+            const result = creatorDataToToken({
               basic: {
                 type: 'invite',
                 inviteDetails: {
@@ -192,7 +196,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert invite privileges when token is of type ${tokenType}`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type: tokenType,
               inviteDetails: {
@@ -217,7 +221,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts infinity usage limit when token is of type invite',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
@@ -242,7 +246,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts number usage limit when token is of type invite',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'invite',
             inviteDetails: {
@@ -271,7 +275,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert usage limit when token is of type ${tokenType}`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type: tokenType,
               inviteDetails: {
@@ -302,7 +306,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `has no caveats field in returned object if no caveats were enabled (but are not empty) for token of type ${type}`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -351,7 +355,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `has no caveats field in returned object if all caveats that need extra data were enabled (but are empty) for token of type ${type}`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -389,7 +393,7 @@ describe('Unit | Utility | token editor utils', function () {
     it('converts expire caveat', function () {
       const expireDate = new Date();
       const expireTimestamp = Math.floor(expireDate.valueOf() / 1000);
-      const result = editorDataToToken({
+      const result = creatorDataToToken({
         caveats: generateCaveatEntry('expire', true, expireDate),
       });
 
@@ -405,7 +409,7 @@ describe('Unit | Utility | token editor utils', function () {
     ].forEach(caveatName => {
       it(`converts ${caveatName} caveat`, function () {
         const whitelist = ['A', 'B'];
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           caveats: generateCaveatEntry(caveatName, true, whitelist),
         });
 
@@ -418,7 +422,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert ${caveatName} caveat when whitelist is empty`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             caveats: generateCaveatEntry(caveatName, true, []),
           });
 
@@ -437,7 +441,7 @@ describe('Unit | Utility | token editor utils', function () {
       ].forEach(type => {
         it(`converts ${caveatName} caveat with ${type}`, function () {
           const list = ['A', 'B'];
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             caveats: generateCaveatEntry(caveatName, true, {
               [`${caveatName}Type`]: type,
               [`${caveatName}List`]: list,
@@ -454,7 +458,7 @@ describe('Unit | Utility | token editor utils', function () {
         it(
           `does not convert ${caveatName} caveat with ${type} when countries list is empty`,
           function () {
-            const result = editorDataToToken({
+            const result = creatorDataToToken({
               caveats: generateCaveatEntry(caveatName, true, {
                 [`${caveatName}Type`]: type,
                 [`${caveatName}List`]: [],
@@ -469,7 +473,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert ${caveatName} caveat when filter type is not provided`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             caveats: generateCaveatEntry(caveatName, true, {
               [`${caveatName}Type`]: undefined,
               [`${caveatName}List`]: ['A'],
@@ -498,7 +502,7 @@ describe('Unit | Utility | token editor utils', function () {
           },
         }]))
       );
-      const result = editorDataToToken({
+      const result = creatorDataToToken({
         caveats: generateCaveatEntry('consumer', true, selectedValues),
       });
 
@@ -523,7 +527,7 @@ describe('Unit | Utility | token editor utils', function () {
       'invite',
     ].forEach(type => {
       it(`does not convert service caveat, when token is of type "${type}"`, function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type,
           },
@@ -561,7 +565,7 @@ describe('Unit | Utility | token editor utils', function () {
           },
         }]))
       );
-      const result = editorDataToToken({
+      const result = creatorDataToToken({
         basic: {
           type: 'access',
         },
@@ -586,7 +590,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'does not convert interface caveat, when token is of type "invite"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'invite',
           },
@@ -604,7 +608,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `converts interface caveat, when token is of type "${type}"`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -622,7 +626,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'does not convert interface caveat, when caveat is empty and token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -636,7 +640,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts readonly caveat, when token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -658,7 +662,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert readonly caveat, when token is not of type "${type}"`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -674,7 +678,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert path caveat, when token is not of type "${type}"`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -696,7 +700,7 @@ describe('Unit | Utility | token editor utils', function () {
       it(
         `does not convert objectId caveat, when token is not of type "${type}"`,
         function () {
-          const result = editorDataToToken({
+          const result = creatorDataToToken({
             basic: {
               type,
             },
@@ -716,7 +720,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts path caveat, when token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -769,7 +773,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts path caveat, when token is of type "access" and one of paths does not have space specified',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -800,7 +804,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'does not convert path caveat, when caveat is empty and token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -818,7 +822,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts objectId caveat, when token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -844,7 +848,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'does not convert objectId caveat, when caveat is empty and token is of type "access"',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -862,7 +866,7 @@ describe('Unit | Utility | token editor utils', function () {
     it(
       'converts all caveats when all of them are enabled and have a value',
       function () {
-        const result = editorDataToToken({
+        const result = creatorDataToToken({
           basic: {
             type: 'access',
           },
@@ -906,6 +910,56 @@ describe('Unit | Utility | token editor utils', function () {
         expect(get(result, 'caveats')).to.be.an('array').with.length(11);
       }
     );
+  });
+
+  describe('editor data to diff object', function () {
+    it('converts name if it has been changed', function () {
+      const result = editorDataToDiffObject({
+        basic: {
+          name: 'token2',
+        },
+      }, {
+        name: 'token1',
+      });
+
+      expect(result).to.have.property('name', 'token2');
+    });
+
+    it('does not convert name if it has not been changed', function () {
+      const result = editorDataToDiffObject({
+        basic: {
+          name: 'token1',
+        },
+      }, {
+        name: 'token1',
+      });
+
+      expect(result).to.not.have.property('name');
+    });
+
+    it('converts revoked if it has been changed', function () {
+      const result = editorDataToDiffObject({
+        basic: {
+          revoked: true,
+        },
+      }, {
+        revoked: false,
+      });
+
+      expect(result).to.have.property('revoked', true);
+    });
+
+    it('does not convert revoked if it has not been changed', function () {
+      const result = editorDataToDiffObject({
+        basic: {
+          revoked: false,
+        },
+      }, {
+        revoked: false,
+      });
+
+      expect(result).to.not.have.property('revoked');
+    });
   });
 
   describe('token to editor default data', function () {

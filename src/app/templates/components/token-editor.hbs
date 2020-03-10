@@ -19,6 +19,15 @@
     </h1>
     {{form-component/field-renderer field=caveatsGroup}}
   {{/if}}
+  {{#if (eq mode "edit")}}
+    {{#bs-button
+      type="primary"
+      class="cancel-edition"
+      disabled=isSubmitting
+    }}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+  {{/if}}
   {{#if (not-eq mode "view")}}
     {{#one-spin-button
       class="btn btn-primary submit-token"
@@ -26,7 +35,7 @@
       type="button"
       action=(action "submit")
     }}
-      {{tt this "createToken"}}
+      {{submitBtnText}}
     {{/one-spin-button}}
   {{/if}}
 </form>

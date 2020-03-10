@@ -12,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import EmberObject, { computed, get, set, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { scheduleOnce } from '@ember/runloop';
+import { scheduleOnce, next } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
@@ -39,7 +39,11 @@ import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/uti
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
-import { editorDataToToken, tokenToEditorDefaultData } from 'onezone-gui/utils/token-editor-utils';
+import {
+  creatorDataToToken,
+  editorDataToDiffObject,
+  tokenToEditorDefaultData,
+} from 'onezone-gui/utils/token-editor-utils';
 import {
   conditional,
   equal,
@@ -318,7 +322,7 @@ export default Component.extend(I18n, {
         }).create({ name: 'name' }),
         ToggleField.extend({
           component,
-          isVisible: reads('isInViewMode'),
+          isVisible: notEqual('component.mode', raw('create')),
           defaultValue: reads('component.tokenDataSource.revoked'),
         }).create({
           name: 'revoked',
@@ -1347,16 +1351,29 @@ export default Component.extend(I18n, {
     ]));
   }),
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  submitBtnText: computed('mode', function submitBtnText() {
+    return this.t(this.get('mode') === 'create' ? 'createToken' : 'saveToken');
+  }),
+
   modeObserver: observer('mode', function modeObserver() {
     const {
       fields,
       mode,
     } = this.getProperties('fields', 'mode');
 
-    if (mode === 'view') {
+    if (['view', 'edit'].includes(mode)) {
       fields.changeMode('view');
       fields.reset();
       this.expandCaveatsDependingOnCaveatsExistence();
+    }
+    if (mode === 'edit') {
+      [
+        fields.getFieldByPath('basic.name'),
+        fields.getFieldByPath('basic.revoked'),
+      ].forEach(field => field.changeMode('edit'));
     }
   }),
 
@@ -1383,7 +1400,7 @@ export default Component.extend(I18n, {
 
   willDestroyElement() {
     this._super(...arguments);
-    this.get('fields').destroy();
+    next(() => this.get('fields').destroy());
   },
 
   expandCaveatsDependingOnCaveatsExistence() {
@@ -1527,15 +1544,25 @@ export default Component.extend(I18n, {
         fields,
         onSubmit,
         currentUser,
-      } = this.getProperties('fields', 'onSubmit', 'currentUser');
+        mode,
+        token,
+      } = this.getProperties('fields', 'onSubmit', 'currentUser', 'mode', 'token');
 
       if (get(fields, 'isValid')) {
         this.set('isSubmitting', true);
-        return currentUser.getCurrentUserRecord().then(user => {
-          const formValues = fields.dumpValue();
-          const tokenRawModel = editorDataToToken(formValues, user);
-          return onSubmit(tokenRawModel);
-        }).finally(() => safeExec(this, () => this.set('isSubmitting', false)));
+        let submitPromise;
+        const formValues = fields.dumpValue();
+        if (mode === 'create') {
+          submitPromise = currentUser.getCurrentUserRecord().then(user => {
+            const tokenRawModel = creatorDataToToken(formValues, user);
+            return onSubmit(tokenRawModel);
+          });
+        } else {
+          const diffObject = editorDataToDiffObject(formValues, token);
+          submitPromise = onSubmit(diffObject);
+        }
+        return submitPromise
+          .finally(() => safeExec(this, () => this.set('isSubmitting', false)));
       }
     },
   },

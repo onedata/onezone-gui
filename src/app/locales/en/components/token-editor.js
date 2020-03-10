@@ -275,4 +275,6 @@ export default {
     },
   },
   createToken: 'Create token',
+  saveToken: 'Save',
+  cancel: 'Cancel',
 };

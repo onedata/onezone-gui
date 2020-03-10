@@ -24,7 +24,7 @@ const prefixToConsumerModel = _.invert(consumerModelToPrefix);
 
 const decodedPathRegexp = /^\/([^/]+)(.*)$/;
 
-export function editorDataToToken(editorData, currentUser) {
+export function creatorDataToToken(editorData, currentUser) {
   const tokenData = {};
 
   let {
@@ -259,6 +259,37 @@ export function editorDataToToken(editorData, currentUser) {
     tokenData.caveats = caveatsData;
   }
   return tokenData;
+}
+
+/**
+ * @param {Object} editorData 
+ * @param {Object} token used to calculate changes diff
+ * @returns {EmberObject}
+ */
+export function editorDataToDiffObject(editorData, token) {
+  const {
+    name: newName,
+    revoked: newRevoked,
+  } = getProperties(get(editorData || {}, 'basic') || {}, 'name', 'revoked');
+  const {
+    name: oldName,
+    revoked: oldRevoked,
+  } = getProperties(token || {}, 'name', 'revoked');
+
+  const diffObject = {};
+
+  if ((!oldName || (oldName !== newName)) && newName) {
+    diffObject.name = newName;
+  }
+
+  if (
+    (oldRevoked === undefined || oldRevoked !== newRevoked) &&
+    newRevoked !== undefined
+  ) {
+    diffObject.revoked = newRevoked;
+  }
+
+  return diffObject;
 }
 
 /**

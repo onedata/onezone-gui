@@ -2009,6 +2009,164 @@ describe('Integration | Component | token editor', function () {
       });
     }
   );
+
+  it(
+    'has only name and revoked fields in edition mode, when mode is "edit"',
+    function () {
+      this.render(hbs `{{token-editor mode="edit"}}`);
+
+      expect(this.$('.token-editor')).to.have.class('edit-mode');
+      const $editFields = this.$('.field-edit-mode');
+      expect($editFields).to.have.length(2);
+      expect($editFields.filter('.name-field')).to.exist;
+      expect($editFields.filter('.revoked-field')).to.exist;
+    }
+  );
+
+  it(
+    'represents token values in edit fields in component "edit" mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
+
+      this.render(hbs `{{token-editor mode="edit" token=token}}`);
+
+      expect(getFieldElement(this, 'name').find('input').val()).to.equal('token1');
+      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+        .to.have.class('checked');
+    }
+  );
+
+  it(
+    'does not change values in edit fields, when token data changes in edit mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
+
+      this.render(hbs `{{token-editor mode="edit" token=token}}`);
+
+      this.set('token', {
+        name: 'anothertoken',
+        revoked: false,
+      });
+
+      expect(getFieldElement(this, 'name').find('input').val()).to.equal('token1');
+      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+        .to.have.class('checked');
+    }
+  );
+
+  it('renders submit and cancel buttons in edit mode', function () {
+    const token = {
+      name: 'token1',
+      revoked: true,
+    };
+    this.set('token', token);
+
+    this.render(hbs `{{token-editor mode="edit" token=token}}`);
+
+    const $submit = this.$('.submit-token');
+    const $cancel = this.$('.cancel-edition');
+    expect($submit).to.exist;
+    expect($submit.text().trim()).to.equal('Save');
+    expect($submit).to.not.have.attr('disabled');
+    expect($cancel).to.exist;
+    expect($cancel.text().trim()).to.equal('Cancel');
+    expect($cancel).to.not.have.attr('disabled');
+  });
+
+  it('renders disabled submit button when form becomes invalid in edit mode', function () {
+    const token = {
+      name: 'token1',
+      revoked: true,
+    };
+    this.set('token', token);
+
+    this.render(hbs `{{token-editor mode="edit" token=token}}`);
+
+    return fillIn('.name-field input', '')
+      .then(() => expect(this.$('.submit-token')).to.have.attr('disabled'));
+  });
+
+  it(
+    'calls injected onSubmit on submit click with empty diff object in edit mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
+      const submitStub = sinon.stub().resolves();
+      this.on('submit', submitStub);
+
+      this.render(hbs `{{token-editor mode="edit" token=token onSubmit=(action "submit")}}`);
+
+      return click('.submit-token')
+        .then(() => {
+          expect(submitStub).to.be.calledOnce;
+          expect(submitStub).to.be.calledWithMatch(v => Object.keys(v).length === 0);
+        });
+    }
+  );
+
+  it(
+    'calls injected onSubmit on submit click with diff object containing changed fields in edit mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
+      const submitStub = sinon.stub().resolves();
+      this.on('submit', submitStub);
+
+      this.render(hbs `{{token-editor mode="edit" token=token onSubmit=(action "submit")}}`);
+
+      return fillIn('.name-field input', 'token2')
+        .then(() => click('.revoked-field .one-way-toggle'))
+        .then(() => click('.submit-token'))
+        .then(() => {
+          expect(submitStub).to.be.calledOnce;
+          expect(submitStub).to.be.calledWithMatch({ name: 'token2', revoked: false });
+        });
+    }
+  );
+
+  it(
+    'disables all fields and shows spinner in submit button when submit promise is pending in edit mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
+      let submitResolve;
+      const submitStub = sinon.stub()
+        .returns(new Promise(resolve => submitResolve = resolve));
+      this.on('submit', submitStub);
+      this.render(hbs `{{token-editor mode="edit" token=token onSubmit=(action "submit")}}`);
+
+      return click('.submit-token')
+        .then(() => {
+          expect(this.$('input:not([disabled])')).to.not.exist;
+          expect(this.$('.submit-token [role="progressbar"]')).to.exist;
+          expect(this.$('.cancel-edition')).to.have.attr('disabled');
+          submitResolve();
+          return wait();
+        })
+        .then(() => {
+          expect(this.$('input:not([disabled])')).to.exist;
+          expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
+          expect(this.$('.cancel-edition')).to.not.have.attr('disabled');
+        });
+    }
+  );
 });
 
 class InviteTypeHelper extends EmberPowerSelectHelper {
