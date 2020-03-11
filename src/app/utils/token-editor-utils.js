@@ -509,7 +509,7 @@ export function tokenToEditorDefaultData(token, getRecord) {
     }
   }
 
-  set(defaultData, 'hasCaveats', Object.keys(get(defaultData, 'caveats')).length > 1);
+  set(defaultData, 'hasCaveats', Object.keys(get(defaultData, 'caveats')).length > 0);
 
   return defaultData;
 }

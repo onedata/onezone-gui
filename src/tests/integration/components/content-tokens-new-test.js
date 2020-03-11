@@ -29,8 +29,7 @@ describe('Integration | Component | content tokens new', function () {
   it('has class "content-tokens-new', function () {
     this.render(hbs `{{content-tokens-new}}`);
 
-    return wait()
-      .then(() => expect(this.$('.content-tokens-new')).to.exist);
+    expect(this.$('.content-tokens-new')).to.exist;
   });
 
   it(

@@ -444,6 +444,7 @@ function createTokensRecords(store) {
   _.range(NUMBER_OF_TOKENS).forEach((i) => {
     const accessTokenPromise = store.createRecord('token', {
       name: 'Access token ' + i,
+      revoked: false,
       type: {
         accessToken: {},
       },
@@ -456,6 +457,7 @@ function createTokensRecords(store) {
       .map((inviteType, j) => {
         return store.createRecord('token', {
           name: 'Invite token ' + (i * inviteTypes.length + j),
+          revoked: false,
           type: {
             inviteToken: { inviteType },
           },

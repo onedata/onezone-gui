@@ -76,7 +76,7 @@ export default Model.extend(
   createDataProxyMixin('tokenTarget'), {
     name: attr('string'),
     type: attr('object'),
-    rekoved: attr('boolean'),
+    revoked: attr('boolean'),
     metadata: attr('object'),
     token: attr('string'),
 

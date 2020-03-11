@@ -1967,7 +1967,7 @@ describe('Integration | Component | token editor', function () {
           .to.have.length(3);
         expect(getFieldElement(this, 'usageLimit')).to.not.exist;
         expectLabelToEqual(this, 'usageCount', 'Usage count');
-        expect(getFieldElement(this, 'usageCount').text()).to.contain('5/10');
+        expect(getFieldElement(this, 'usageCount').text()).to.contain('5 / 10');
         expect(this.$('.caveat-group-toggle')).to.not.exist;
         expect(this.$('.caveats-expand')).to.not.exist;
       });
@@ -2003,7 +2003,7 @@ describe('Integration | Component | token editor', function () {
           .to.have.length(3);
         expect(getFieldElement(this, 'usageLimit')).to.not.exist;
         expectLabelToEqual(this, 'usageCount', 'Usage count');
-        expect(getFieldElement(this, 'usageCount').text()).to.contain('5/10');
+        expect(getFieldElement(this, 'usageCount').text()).to.contain('5 / 10');
         expect(this.$('.caveat-group-toggle')).to.not.exist;
         expect(this.$('.caveats-expand')).to.not.exist;
       });
@@ -2165,6 +2165,19 @@ describe('Integration | Component | token editor', function () {
           expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
           expect(this.$('.cancel-edition')).to.not.have.attr('disabled');
         });
+    }
+  );
+
+  it(
+    'calls injected onCancel on cancel click in edit mode',
+    function () {
+      const cancelSpy = sinon.spy();
+      this.on('cancel', cancelSpy);
+
+      this.render(hbs `{{token-editor mode="edit" onCancel=(action "cancel")}}`);
+
+      return click('.cancel-edition')
+        .then(() => expect(cancelSpy).to.be.calledOnce);
     }
   );
 });

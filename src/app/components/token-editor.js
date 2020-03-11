@@ -12,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import EmberObject, { computed, get, set, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { scheduleOnce, next } from '@ember/runloop';
+import { scheduleOnce } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
@@ -251,6 +251,12 @@ export default Component.extend(I18n, {
   onSubmit: notImplementedReject,
 
   /**
+   * @type {Function}
+   * @returns {any}
+   */
+  onCancel: notImplementedIgnore,
+
+  /**
    * @type {boolean}
    */
   isSubmitting: false,
@@ -264,7 +270,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<EmberObject>}
    */
   tokenDataSource: computed(
-    'token.${name,typeName,metadata,caveats}',
+    'token.{name,revoked,typeName,metadata,caveats}',
     function tokenDataSource() {
       return tokenToEditorDefaultData(this.get('token'), this.getRecord.bind(this));
     }
@@ -615,7 +621,7 @@ export default Component.extend(I18n, {
             this.get('cachedPrivilegesPresetProxy.isFulfilled') &&
             this.get('isInEditMode')
           ) {
-            this.reset();
+            safeExec(this.get('component'), () => this.reset());
           }
         }
       ),
@@ -664,7 +670,7 @@ export default Component.extend(I18n, {
       component,
       usageCount: reads('component.tokenDataSource.usageCount'),
       usageLimit: reads('component.tokenDataSource.usageLimit'),
-      text: tag `${'usageCount'}/${'usageLimit'}`,
+      text: tag `${'usageCount'} / ${'usageLimit'}`,
       isVisible: reads('isInViewMode'),
     }).create({ name: 'usageCount' });
   }),
@@ -1281,7 +1287,7 @@ export default Component.extend(I18n, {
         ),
         fieldFactoryMethod(uniqueFieldValueName) {
           const nestedFieldMode = this.get('mode') !== 'view' ? 'edit' : 'view';
-          return FormFieldsGroup.extend({}).create({
+          return FormFieldsGroup.create({
             name: 'pathEntry',
             valueName: uniqueFieldValueName,
             areValidationClassesEnabled: true,
@@ -1403,7 +1409,7 @@ export default Component.extend(I18n, {
 
   willDestroyElement() {
     this._super(...arguments);
-    next(() => this.get('fields').destroy());
+    this.get('fields').destroy();
   },
 
   expandCaveatsDependingOnCaveatsExistence() {

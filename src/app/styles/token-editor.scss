@@ -1,11 +1,9 @@
 .token-editor {
   max-width: 1000px;
 
-  &:not(.create-mode) {
-    .caveats-expand {
-      margin-top: $padding-base-vertical;
-      margin-bottom: $padding-small-vertical;
-    }
+  .form-horizontal .caveats-expand {
+    margin-top: $padding-base-vertical;
+    margin-bottom: $padding-base-vertical;
   }
 
   .privileges-field-renderer.field-view-mode {
@@ -28,7 +26,8 @@
     flex-grow: 0;
 
     .control-label {
-      min-width: 120px;
+      flex-grow: 1;
+      min-width: 0;
     }
 
     .field-component {
@@ -58,6 +57,7 @@
   }
 
   .usageLimitType-field {
+    padding-top: $padding-base-vertical;
     flex-grow: 0;
     white-space: nowrap;
   }
@@ -148,6 +148,10 @@
     &.countryType-field {
       padding-top: 0.2em;
     }
+    
+    &.objectId-field .collection-item:not(:last-child) {
+      margin-bottom: $form-component-view-margin;
+    }
   }
 
   .regionCaveat-field,
@@ -201,8 +205,15 @@
     word-break: break-all;
   }
 
-  .submit-token {
-    margin-top: $padding-base-vertical;
+  .form-component {
+    .footer-buttons {
+      margin-top: $padding-base-vertical;
+      float: none;
+      text-align: left;
+      .btn {
+        margin-left: $padding-small-horizontal;
+      }
+    }
   }
 
   @media (min-width: $screen-sm-min) {
@@ -228,6 +239,32 @@
         padding-top: $padding-base-vertical;
       }
     }
+
+    .regionCaveat-field,
+    .asnCaveat-field,
+    .consumerCaveat-field,
+    .readonlyCaveat-field {
+      &.field-edit-mode {
+        .caveat-group-toggle,
+        .static-text-field {
+          padding-top: $padding-base-vertical;
+        }
+      }
+    }
+
+    .expireCaveat-field,
+    .countryCaveat-field,
+    .ipCaveat-field,
+    .serviceCaveat-field,
+    .pathCaveat-field,
+    .objectIdCaveat-field {
+      &.is-enabled.field-edit-mode {
+        .caveat-group-toggle {
+          padding-top: $padding-base-vertical;
+        }
+      }
+    }
+
 
     .pathSpace-field {
       width: 200px;

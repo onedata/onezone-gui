@@ -1,8 +1,14 @@
 <div class="row content-row header-row hidden-xs">
-  <h1 class="normal-case">
-    <span class="token-name">{{token.name}}</span>
+  <h1 class="normal-case with-menu">
+    {{#truncated-string class="token-name"}}{{token.name}}{{/truncated-string}}
+    {{actions-toolbar actionsArray=globalActions isMinimized=true renderImmediately=true}}
   </h1>
 </div>
 <div class="row content-row">
-  {{token-editor mode="view" token=token}}
+  {{token-editor
+    mode=mode
+    token=token
+    onSubmit=(action "saveToken")
+    onCancel=(action (mut mode) "view")
+  }}
 </div>

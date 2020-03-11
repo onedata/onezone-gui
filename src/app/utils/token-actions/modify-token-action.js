@@ -12,6 +12,7 @@ import { reads } from '@ember/object/computed';
 import { setProperties } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
+import { resolve } from 'rsvp';
 
 export default Action.extend({
   /**
@@ -43,15 +44,21 @@ export default Action.extend({
       );
 
       const result = ActionResult.create();
-      setProperties(token, tokenDiff);
-      return result.interceptPromise(token.save().then(() => token))
-        .catch(() => {
-          token.rollbackAttributes();
-        })
-        .then(() => {
-          this.notifyResult(result);
-          return result;
-        });
+      let promise;
+      if (Object.keys(tokenDiff).length > 0) {
+        setProperties(token, tokenDiff);
+        promise = result.interceptPromise(token.save().then(() => token))
+          .catch(() => {
+            token.rollbackAttributes();
+          });
+      } else {
+        promise = result.interceptPromise(resolve(token));
+      }
+
+      return promise.then(() => {
+        this.notifyResult(result);
+        return result;
+      });
     }
   },
 });
