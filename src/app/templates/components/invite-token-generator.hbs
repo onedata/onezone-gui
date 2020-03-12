@@ -1,0 +1,19 @@
+{{#if description}}
+  <p class="description">{{description}}</p>
+{{/if}}
+{{#promise-proxy-container proxy=generatedTokenProxy}}
+  {{one-clipboard-line
+    value=generatedTokenProxy.content
+    type="textarea"
+    inputClass="token-textarea"
+  }}
+  <div class="additional-token-actions">
+    <a class="generate-another-action" {{action "generateAnother"}}>
+      {{tt this "generateAnotherAction"}}
+    </a>
+    <a href={{goToAdvancedUrl}} class="go-to-advanced-action">
+      {{tt this "goToAdvanced"}}
+    </a>
+  </div>
+{{/promise-proxy-container}}
+{{yield}}

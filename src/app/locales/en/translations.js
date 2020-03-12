@@ -89,9 +89,9 @@ import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
 import tokenEditor from './components/token-editor';
 import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
+import inviteTokenGenerator from './components/invite-token-generator';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
-// http://localhost:7357/3481/tests/index.html?hidepassed&grep=Integration%20%5C%7C%20Component%20%5C%7C%20token%20editor
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 
 import spaceActions from './services/space-actions';
@@ -211,6 +211,7 @@ let translations = {
     contentTokensNew,
     tokenEditor,
     ceaseOneproviderSupportModal,
+    inviteTokenGenerator,
   },
   services: {
     tokenActions,
