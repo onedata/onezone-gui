@@ -1,16 +1,28 @@
 /**
- * A set of known RPC methods used in Onezone with Onedata Sync API
+ * A set of server methods for acquiring data which is not directly related to any model.
  *
- * @module services/onezone-serer
- * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @module services/onezone-server
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { default as Service, inject } from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 
 export default Service.extend({
-  onedataRpc: inject(),
+  onedataRpc: service(),
+  onedataGraph: service(),
+
+  /**
+   * @returns {Promise<number>} Backend clock timestamp
+   */
+  getServerTime() {
+    return this.get('onedataGraph').request({
+      gri: 'provider.null.current_time:private',
+      operation: 'get',
+      subscribe: false,
+    }).then(({ timeMillis }) => Math.floor(timeMillis / 1000));
+  },
 
   /**
    * Fetch a URL to login endpoint.

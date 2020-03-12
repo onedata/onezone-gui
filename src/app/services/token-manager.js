@@ -21,6 +21,7 @@ const TokenManager = Service.extend({
   i18n: service(),
   onedataConnection: service(),
   onedataGraph: service(),
+  onezoneServer: service(),
 
   /**
    * Fetches collection of all tokens
@@ -89,7 +90,13 @@ const TokenManager = Service.extend({
       currentUser,
       onedataGraph,
       onedataConnection,
-    } = this.getProperties('currentUser', 'onedataGraph', 'onedataConnection');
+      onezoneServer,
+    } = this.getProperties(
+      'currentUser',
+      'onedataGraph',
+      'onedataConnection',
+      'onezoneServer'
+    );
 
     const currestUserEntityId = get(currentUser, 'userId');
     const targetRecordId = inviteType === 'registerOneprovider' ?
@@ -97,29 +104,30 @@ const TokenManager = Service.extend({
     const maxTtl = get(onedataConnection, 'maxTemporaryTokenTtl');
     const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
 
-    return onedataGraph.request({
-      gri: gri({
-        entityId: null,
-        entityType: 'token',
-        aspect: 'user_temporary_token',
-        aspectId: currestUserEntityId,
-      }),
-      operation: 'create',
-      data: {
-        type: {
-          inviteToken: {
-            inviteType,
-            [inviteTypeSpec.idFieldName]: targetRecordId,
+    return onezoneServer.getServerTime().then(serverTimestamp =>
+      onedataGraph.request({
+        gri: gri({
+          entityId: null,
+          entityType: 'token',
+          aspect: 'user_temporary_token',
+          aspectId: currestUserEntityId,
+        }),
+        operation: 'create',
+        data: {
+          type: {
+            inviteToken: {
+              inviteType,
+              [inviteTypeSpec.idFieldName]: targetRecordId,
+            },
           },
+          caveats: [{
+            type: 'time',
+            validUntil: serverTimestamp + Math.min(maxTtl, 7 * 24 * 60 * 60),
+          }],
         },
-        caveats: [{
-          type: 'time',
-          validUntil: Math.floor(new Date().valueOf() / 1000) +
-            Math.min(maxTtl, 7 * 24 * 60 * 60),
-        }],
-      },
-      subscribe: false,
-    });
+        subscribe: false,
+      })
+    );
   },
 
   /**
