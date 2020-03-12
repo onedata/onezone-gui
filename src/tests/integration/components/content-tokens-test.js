@@ -179,7 +179,7 @@ describe('Integration | Component | content tokens', function () {
   );
 
   it(
-    'comes back to view mode when is in edit mode, but token instance has been changed',
+    'comes back to view mode when is in edit mode and token instance has changed',
     function () {
       this.render(hbs `{{content-tokens token=token}}`);
 

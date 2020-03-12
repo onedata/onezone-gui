@@ -1908,7 +1908,7 @@ describe('Integration | Component | token editor', function () {
           'ID: prvpunknown',
           'Any Oneprovider Onepanel',
         ].forEach(service => expect(serviceCaveatText).to.contain(service));
-        // onezone cluster should occurr twice
+        // onezone cluster should occur twice
         expect(serviceCaveatText.split('cluster2')).to.have.length(3);
         expect(getFieldElement(this, 'interface').text()).to.contain('Oneclient');
         expect(getFieldElement(this, 'readonlyView').find('.one-way-toggle'))

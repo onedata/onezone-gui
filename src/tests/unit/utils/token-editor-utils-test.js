@@ -997,7 +997,7 @@ describe('Unit | Utility | token editor utils', function () {
       const tokenTargetProxy = PromiseObject.create({ promise: resolve('sth') });
       const result = tokenToEditorDefaultData({ tokenTargetProxy });
 
-      get(result, 'inviteTargetProxy').then(record =>
+      return get(result, 'inviteTargetProxy').then(record =>
         expect(record).to.equal('sth')
       );
     });
@@ -1009,7 +1009,7 @@ describe('Unit | Utility | token editor utils', function () {
         targetModelName: 'space',
       });
 
-      get(result, 'inviteTargetProxy').then(record =>
+      return get(result, 'inviteTargetProxy').then(record =>
         expect(record).to.deep.equal({
           entityId: undefined,
           entityType: 'space',
@@ -1026,7 +1026,7 @@ describe('Unit | Utility | token editor utils', function () {
         targetRecordId: 'space1',
       });
 
-      get(result, 'inviteTargetProxy').then(record =>
+      return get(result, 'inviteTargetProxy').then(record =>
         expect(record).to.deep.equal({
           entityId: 'space1',
           entityType: 'space',
@@ -1043,7 +1043,7 @@ describe('Unit | Utility | token editor utils', function () {
         targetRecordId: 'space1',
       });
 
-      get(result, 'inviteTargetProxy').then(record =>
+      return get(result, 'inviteTargetProxy').then(record =>
         expect(record).to.deep.equal({
           entityId: 'space1',
           entityType: 'space',

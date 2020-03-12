@@ -1483,7 +1483,7 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {String} modelName one of user, group, provider, cluster
+   * @param {String} modelName one of user, space, group, provider, cluster
    * @param {String} entityId entityId or 'onezone' (only for cluster model)
    * @returns {Promise<GraphSingleModel>}
    */
