@@ -24,14 +24,13 @@ describe('Integration | Component | modals/generate invite token modal', functio
     sinon.stub(lookupService(this, 'token-manager'), 'createTemporaryInviteToken')
       .resolves('token');
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
-    const targetRecord = {
-      entityId: 'group1',
-    };
     this.setProperties({
       modalManager: lookupService(this, 'modal-manager'),
       modalOptions: {
         inviteType: 'userJoinGroup',
-        targetRecord,
+        targetRecord: {
+          entityId: 'group1',
+        },
       },
     });
   });

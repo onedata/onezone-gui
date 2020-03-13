@@ -14,6 +14,7 @@ import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-crea
 import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
 import ModifyTokenAction from 'onezone-gui/utils/token-actions/modify-token-action';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
+import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
 
 export default Service.extend(I18n, {
   tokenManager: service(),
@@ -41,6 +42,10 @@ export default Service.extend(I18n, {
 
   createCleanObsoleteTokensAction(context) {
     return CleanObsoleteTokensAction.create({ ownerSource: this, context });
+  },
+
+  createGenerateInviteTokenAction(context) {
+    return GenerateInviteTokenAction.create({ ownerSource: this, context });
   },
 
   createGlobalActions(context) {

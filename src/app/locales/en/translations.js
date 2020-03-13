@@ -110,6 +110,7 @@ import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-toke
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
 import modifyTokenAction from './utils/token-actions/modify-token-action';
+import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
 
 let translations = {
   tabs: {
@@ -233,6 +234,7 @@ let translations = {
       createTokenAction,
       openCreateTokenViewAction,
       modifyTokenAction,
+      generateInviteTokenAction,
     },
   },
 };

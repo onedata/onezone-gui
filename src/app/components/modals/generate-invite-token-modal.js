@@ -36,7 +36,7 @@ export default Component.extend(I18n, {
   inviteType: reads('modalOptions.inviteType'),
 
   /**
-   * @type {ComputedProperty<GraphSingleModel|undefined>}
+   * @type {ComputedProperty<GraphSingleModel>}
    */
   targetRecord: reads('modalOptions.targetRecord'),
 });
