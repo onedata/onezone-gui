@@ -93,6 +93,7 @@ import inviteTokenGenerator from './components/invite-token-generator';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
+import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -134,6 +135,7 @@ let translations = {
     },
     modals: {
       cleanObsoleteTokensModal,
+      generateInviteTokenModal,
     },
     loginBox,
     contentTokens,

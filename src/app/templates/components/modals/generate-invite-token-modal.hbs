@@ -1,0 +1,22 @@
+{{#global-modal
+  classNames="generate-invite-token-modal"
+  as |modal|}}
+
+  {{#modal.header}}
+    <h1>{{tt this (concat "header." inviteType)}}</h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{invite-token-generator
+      inviteType=inviteType
+      targetRecord=targetRecord
+    }}
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button type="default" class="modal-cancel" onClick=modal.close}}
+      {{tt this "cancel"}}
+    {{/bs-button}}
+  {{/modal.footer}}
+
+{{/global-modal}}
