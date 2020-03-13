@@ -1422,20 +1422,22 @@ export default Component.extend(I18n, {
   },
 
   notifyAboutChange() {
-    const {
-      fields,
-      onChange,
-    } = this.getProperties('fields', 'onChange');
+    safeExec(this, () => {
+      const {
+        fields,
+        onChange,
+      } = this.getProperties('fields', 'onChange');
 
-    const {
-      isValid,
-      invalidFields,
-    } = getProperties(fields, 'isValid', 'invalidFields');
+      const {
+        isValid,
+        invalidFields,
+      } = getProperties(fields, 'isValid', 'invalidFields');
 
-    onChange({
-      values: fields.dumpValue(),
-      isValid,
-      invalidFields: invalidFields.mapBy('valuePath'),
+      onChange({
+        values: fields.dumpValue(),
+        isValid,
+        invalidFields: invalidFields.mapBy('valuePath'),
+      });
     });
   },
 

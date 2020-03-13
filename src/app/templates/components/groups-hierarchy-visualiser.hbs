@@ -15,7 +15,6 @@ right column will always be before left in html --}}
     createRelativeGroup=(action "showCreateRelativeModal")
     addYourGroup=(action "showAddYourGroupModal")
     joinUsingToken=(action (mut groupConsumingToken))
-    inviteUsingToken=(action (mut invitingGroupUsingToken))
     viewGroup=(action "viewGroup")}}
   {{groups-hierarchy-visualiser/column-separator separator=column.separator}}
 {{/each}}
@@ -64,10 +63,6 @@ right column will always be before left in html --}}
   close=(action (mut groupConsumingToken) null)
   proceed=(action "joinUsingToken")
   processing=isGroupConsumingToken}}
-{{invite-using-token-modal
-  opened=(and invitingGroupUsingToken (not invitingGroupUsingToken.isDeleted))
-  close=(action (mut invitingGroupUsingToken) null)
-  record=invitingGroupUsingToken}}
 {{#if privilegesEditorModel}}
   {{privileges-editor-modal
     privilegesGroups=groupedPrivilegesFlags

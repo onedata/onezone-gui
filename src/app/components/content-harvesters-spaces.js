@@ -26,6 +26,7 @@ export default Component.extend(
     classNames: ['content-harvesters-spaces'],
 
     harvesterActions: service(),
+    tokenActions: service(),
     i18n: service(),
 
     /**
@@ -48,11 +49,6 @@ export default Component.extend(
      * @type {boolean}
      */
     isRemovingSpace: false,
-
-    /**
-     * @type {boolean}
-     */
-    isInviteUsingTokenModalOpened: false,
 
     /**
      * @type {boolean}
@@ -96,14 +92,20 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<Action>}
      */
-    inviteSpaceUsingTokenAction: computed(function inviteSpaceUsingTokenAction() {
-      return {
-        action: () => this.set('isInviteUsingTokenModalOpened', true),
-        title: this.t('inviteSpaceUsingToken'),
-        class: 'invite-space-using-token-action',
-        icon: 'join-plug',
-      };
-    }),
+    inviteSpaceUsingTokenAction: computed(
+      'harvester',
+      function inviteSpaceUsingTokenAction() {
+        const {
+          harvester,
+          tokenActions,
+        } = this.getProperties('harvester', 'tokenActions');
+
+        return tokenActions.createGenerateInviteTokenAction({
+          inviteType: 'spaceJoinHarvester',
+          targetRecord: harvester,
+        });
+      }
+    ),
 
     /**
      * @override 
@@ -158,6 +160,9 @@ export default Component.extend(
             isAddYourSpaceModalOpened: false,
           })
         );
+      },
+      inviteSpaceUsingToken() {
+        return this.get('inviteSpaceUsingTokenAction').execute();
       },
     },
   }

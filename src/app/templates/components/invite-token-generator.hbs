@@ -1,7 +1,7 @@
 {{#if description}}
   <p class="description">{{description}}</p>
 {{/if}}
-{{#promise-proxy-container proxy=generatedTokenProxy}}
+{{#promise-proxy-container proxy=generatedTokenProxy sizeClass="sm"}}
   {{one-clipboard-line
     value=generatedTokenProxy.content
     type="textarea"
