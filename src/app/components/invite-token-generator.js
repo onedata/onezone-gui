@@ -14,6 +14,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
   classNames: ['invite-token-generator'],
@@ -39,6 +40,13 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   inviteType: undefined,
+
+  /**
+   * @virtual optional
+   * @type {Function}
+   * @returns {any}
+   */
+  onGoToAdvancedClick: notImplementedIgnore,
 
   /**
    * @type {PromiseObject<String>}
@@ -105,6 +113,9 @@ export default Component.extend(I18n, {
   actions: {
     generateAnother() {
       this.generateToken();
+    },
+    goToAdvancedClick() {
+      this.get('onGoToAdvancedClick')();
     },
   },
 });

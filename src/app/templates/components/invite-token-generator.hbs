@@ -11,7 +11,11 @@
     <a class="generate-another-action" {{action "generateAnother"}}>
       {{tt this "generateAnotherAction"}}
     </a>
-    <a href={{goToAdvancedUrl}} class="go-to-advanced-action">
+    <a
+      href={{goToAdvancedUrl}}
+      class="go-to-advanced-action"
+      {{action "goToAdvancedClick" preventDefault=false}}
+    >
       {{tt this "goToAdvanced"}}
     </a>
   </div>

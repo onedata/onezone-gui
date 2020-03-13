@@ -21,7 +21,7 @@ describe('Integration | Component | invite token generator', function () {
     Ember.Logger.error = function () {};
     Ember.Test.adapter.exception = function () {};
 
-    const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
+    const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
     this.setProperties({
       targetRecord: {
         entityType: 'group',
@@ -218,6 +218,27 @@ describe('Integration | Component | invite token generator', function () {
         expect(this.$('.go-to-advanced-action')).to.have.attr('href', 'correctUrl')
       );
   });
+
+  it(
+    'calls passed onGoToAdvancedClick when "advanced generator" has been clicked',
+    function () {
+      stubCreateToken(this, ['userJoinGroup', this.get('targetRecord')], resolve());
+      const clickSpy = sinon.spy();
+      this.on('clickHandler', clickSpy);
+
+      this.render(hbs `
+        {{invite-token-generator
+          inviteType="userJoinGroup"
+          targetRecord=targetRecord
+          onGoToAdvancedClick=(action "clickHandler")
+        }}
+      `);
+
+      return wait()
+        .then(() => click('.go-to-advanced-action'))
+        .then(() => expect(clickSpy).to.be.calledOnce);
+    }
+  );
 
   [{
     inviteType: 'userJoinGroup',

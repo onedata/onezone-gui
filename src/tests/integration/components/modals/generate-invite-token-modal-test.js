@@ -23,7 +23,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
   beforeEach(function () {
     sinon.stub(lookupService(this, 'token-manager'), 'createTemporaryInviteToken')
       .resolves('token');
-    sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
+    sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
     this.setProperties({
       modalManager: lookupService(this, 'modal-manager'),
       modalOptions: {
@@ -117,6 +117,15 @@ describe('Integration | Component | modals/generate invite token modal', functio
           expect(get(testComponent, 'inviteType')).to.equal('userJoinSpace');
           expect(get(testComponent, 'targetRecord.entityId')).to.equal('sth');
         });
+    }
+  );
+
+  it(
+    'closes modal on "advanced generator" click',
+    function () {
+      return showModal(this)
+        .then(() => click(getModalBody().find('.go-to-advanced-action')[0]))
+        .then(() => expect(isModalOpened()).to.be.false);
     }
   );
 });
