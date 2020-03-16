@@ -1436,10 +1436,14 @@ export default Component.extend(I18n, {
         inviteType,
         inviteTargetId,
       } = getProperties(predefinedValues, 'type', 'inviteType', 'inviteTargetId');
-      if (type) {
+      if (type && ['access', 'identity', 'invite'].includes(type)) {
         typeField.valueChanged(type);
       }
-      if (get(typeField, 'value') === 'invite' && inviteType) {
+      if (
+        get(typeField, 'value') === 'invite' &&
+        inviteType &&
+        tokenInviteTypeOptions.findBy('value', inviteType)
+      ) {
         inviteTypeField.valueChanged(inviteType);
       }
       // observers must have time to launch after changing inviteType

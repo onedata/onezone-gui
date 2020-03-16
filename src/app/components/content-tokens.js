@@ -78,6 +78,10 @@ export default Component.extend(I18n, GlobalActions, {
     }
   }),
 
+  init() {
+    this._super(...arguments);
+  },
+
   actions: {
     saveToken(tokenDiff) {
       const {
