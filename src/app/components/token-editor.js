@@ -12,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import EmberObject, { computed, get, set, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { scheduleOnce } from '@ember/runloop';
+import { scheduleOnce, next } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
@@ -221,6 +221,12 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   mode: 'create',
+
+  /**
+   * @virtual optional
+   * @type {Object|undefined}
+   */
+  predefinedValues: undefined,
 
   /**
    * @virtual optional
@@ -1405,11 +1411,63 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     this.modeObserver();
+    this.setPredefinedValues();
   },
 
   willDestroyElement() {
     this._super(...arguments);
     this.get('fields').destroy();
+  },
+
+  setPredefinedValues() {
+    const {
+      predefinedValues,
+      mode,
+      fields,
+    } = this.getProperties('predefinedValues', 'mode', 'fields');
+
+    if (mode === 'create' && predefinedValues) {
+      const typeField = fields.getFieldByPath('basic.type');
+      const inviteTypeField = fields.getFieldByPath('basic.inviteDetails.inviteType');
+      const inviteTargetField =
+        fields.getFieldByPath('basic.inviteDetails.inviteTargetDetails.target');
+      const {
+        type,
+        inviteType,
+        inviteTargetId,
+      } = getProperties(predefinedValues, 'type', 'inviteType', 'inviteTargetId');
+      if (type) {
+        typeField.valueChanged(type);
+      }
+      if (get(typeField, 'value') === 'invite' && inviteType) {
+        inviteTypeField.valueChanged(inviteType);
+      }
+      // observers must have time to launch after changing inviteType
+      next(() => {
+        const {
+          cachedTargetsModelName,
+          cachedTargetsProxy,
+        } = getProperties(
+          inviteTargetField,
+          'cachedTargetsModelName',
+          'cachedTargetsProxy'
+        );
+
+        if (cachedTargetsModelName && inviteTargetId) {
+          cachedTargetsProxy.then(() => safeExec(this, () => {
+            if (
+              get(inviteTargetField, 'cachedTargetsModelName') === cachedTargetsModelName
+            ) {
+              const optionToSelect =
+                cachedTargetsProxy.findBy('value.entityId', inviteTargetId);
+              if (optionToSelect) {
+                inviteTargetField.valueChanged(get(optionToSelect, 'value'));
+              }
+            }
+          }));
+        }
+      });
+    }
   },
 
   expandCaveatsDependingOnCaveatsExistence() {
