@@ -15,6 +15,16 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import generateShellCommand from 'onezone-gui/utils/generate-shell-command';
+import { all as allFulfilled } from 'rsvp';
+import { not, array, raw } from 'ember-awesome-macros';
+
+const inviteTypesWithoutDescription = [
+  'supportSpace',
+  'registerOneprovider',
+  'onedatify',
+  'onedatifyWithImport',
+];
 
 export default Component.extend(I18n, {
   classNames: ['invite-token-generator'],
@@ -35,7 +45,9 @@ export default Component.extend(I18n, {
   targetRecord: undefined,
 
   /**
-   * For possible values see Token model source code
+   * For possible values see Token model source code. Additional values are:
+   * - onedatify
+   * - onedatifyWithImport
    * @virtual
    * @type {String}
    */
@@ -58,12 +70,20 @@ export default Component.extend(I18n, {
    */
   description: computed('inviteType', function description() {
     const inviteType = this.get('inviteType');
-    if (['supportSpace', 'registerOneprovider'].includes(inviteType)) {
+    if (inviteTypesWithoutDescription.includes(inviteType)) {
       return undefined;
     } else {
       return this.t(`description.${inviteType}`);
     }
   }),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showGoToAdvanced: not(array.includes(
+    raw(['onedatify', 'onedatifyWithImport']),
+    'inviteType'
+  )),
 
   /**
    * @type {ComputedProperty<String>}
@@ -103,10 +123,28 @@ export default Component.extend(I18n, {
       tokenManager,
       targetRecord,
       inviteType,
-    } = this.getProperties('tokenManager', 'targetRecord', 'inviteType');
+    } = this.getProperties(
+      'tokenManager',
+      'targetRecord',
+      'inviteType'
+    );
 
+    let tokenPromise;
+    if (['onedatify', 'onedatifyWithImport'].includes(inviteType)) {
+      tokenPromise = allFulfilled([
+        tokenManager.createTemporaryInviteToken('registerOneprovider'),
+        tokenManager.createTemporaryInviteToken('supportSpace', targetRecord),
+      ]).then(([onezoneRegistrationToken, supportToken]) =>
+        generateShellCommand(inviteType === 'onedatify' ? 'oneprovider' : 'onedatify', {
+          onezoneRegistrationToken,
+          supportToken,
+        })
+      );
+    } else {
+      tokenPromise = tokenManager.createTemporaryInviteToken(inviteType, targetRecord);
+    }
     this.set('generatedTokenProxy', PromiseObject.create({
-      promise: tokenManager.createTemporaryInviteToken(inviteType, targetRecord),
+      promise: tokenPromise,
     }));
   },
 

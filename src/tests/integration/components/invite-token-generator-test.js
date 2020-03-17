@@ -271,7 +271,13 @@ describe('Integration | Component | invite token generator', function () {
   }, {
     inviteType: 'spaceJoinHarvester',
     description: 'Copy below token and pass it to the owner of space you would like to invite:',
-  }].forEach(({ inviteType, description }) => {
+  }, {
+    inviteType: 'onedatify',
+    dontShowAdvanced: true,
+  }, {
+    inviteType: 'onedatifyWithImport',
+    dontShowAdvanced: true,
+  }].forEach(({ inviteType, description, dontShowAdvanced }) => {
     it(`shows correct description for ${inviteType} invite token`, function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
@@ -284,6 +290,72 @@ describe('Integration | Component | invite token generator', function () {
         expect(this.$('.description')).to.not.exist;
       }
     });
+
+    if (dontShowAdvanced) {
+      it(`does not show "go to advanced" link for ${inviteType} invite token`, function () {
+        this.set('inviteType', inviteType);
+        stubCreateToken(this, [inviteType, undefined], resolve());
+
+        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+
+        return wait()
+          .then(() => expect(this.$('.go-to-advanced-action')).to.not.exist);
+      });
+    } else {
+      it(`shows "go to advanced" link for ${inviteType} invite token`, function () {
+        this.set('inviteType', inviteType);
+        stubCreateToken(this, [inviteType, undefined], resolve());
+
+        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+
+        return wait()
+          .then(() => expect(this.$('.go-to-advanced-action')).to.exist);
+      });
+    }
+  });
+
+  it('allows to generate onedatify command', function () {
+    const space = { entityId: 'space0' };
+    this.set('targetRecord', space);
+    stubCreateToken(this,
+      ['supportSpace', space],
+      resolve('supporttoken')
+    );
+    stubCreateToken(this,
+      ['registerOneprovider'],
+      resolve('registertoken')
+    );
+
+    this.render(hbs `
+      {{invite-token-generator
+        inviteType="onedatify"
+        targetRecord=targetRecord
+      }}
+    `);
+
+    return wait()
+      .then(() => expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
+      ));
+  });
+
+  it('allows to generate onedatify with import command', function () {
+    const space = { entityId: 'space0' };
+    this.set('targetRecord', space);
+    stubCreateToken(this, ['supportSpace', space], resolve('supporttoken'));
+    stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
+
+    this.render(hbs `
+      {{invite-token-generator
+        inviteType="onedatifyWithImport"
+        targetRecord=targetRecord
+      }}
+    `);
+
+    return wait()
+      .then(() => expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
+      ));
   });
 });
 

@@ -9,29 +9,13 @@
 <div class="row content-row">
   {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
     {{#tab.pane title=(tt this "requestSupport.tabName")}}
-      {{!-- TODO: always fetching registration token once - make lazy loading of command tabs--}}
-      {{content-spaces-support/request-support
-        copySuccess=(action "copySuccess")
-        copyError=(action "copyError")
-        getNewSupportToken=(action "getNewSupportToken")
-        supportTokenProxy=supportTokenProxy
-      }}
+      {{content-spaces-support/request-support space=space}}
     {{/tab.pane}}
     {{#tab.pane title=(tt this "deployProvider.tabName")}}
-      {{content-spaces-support/deploy-provider
-        copySuccess=(action "copySuccess")
-        copyError=(action "copyError")
-        getTokens=(action "getNewTokens")
-        tokensProxy=tokensProxy
-      }}
+      {{content-spaces-support/deploy-provider space=space}}
     {{/tab.pane}}
     {{#tab.pane title=(tt this "exposeData.tabName")}}
-      {{content-spaces-support/expose-data
-        copySuccess=(action "copySuccess")
-        copyError=(action "copyError")
-        getTokens=(action "getNewTokens")
-        tokensProxy=tokensProxy
-      }}
+      {{content-spaces-support/expose-data space=space}}
     {{/tab.pane}}
   {{/bs-tab}}
 </div>

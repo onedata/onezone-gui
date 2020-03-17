@@ -2,82 +2,19 @@
  * A support page for space
  *
  * @module components/content-spaces-support
- * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { inject as service } from '@ember/service';
-import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { hash } from 'rsvp';
 
-export default Component.extend(
-  UserProxyMixin,
-  I18n,
-  createDataProxyMixin('supportToken'),
-  createDataProxyMixin('tokens'), {
-    currentUser: service(),
-    globalNotify: service(),
-    clusterManager: service(),
+export default Component.extend(I18n, {
+  i18nPrefix: 'components.contentSpacesSupport',
 
-    i18nPrefix: 'components.contentSpacesSupport',
-
-    /**
-     * @type {models/Space}
-     */
-    space: undefined,
-
-    init() {
-      this._super(...arguments);
-      if (!this.get('tokensProxy')) {
-        this.updateTokensProxy();
-      }
-    },
-
-    /**
-     * @override
-     */
-    fetchSupportToken() {
-      return this.get('space').getInviteToken('provider');
-    },
-
-    /**
-     * @override
-     */
-    fetchTokens() {
-      return hash({
-        supportToken: this.updateSupportTokenProxy(),
-        onezoneRegistrationToken: this.get('clusterManager')
-          .getOnezoneRegistrationToken(),
-      });
-    },
-
-    actions: {
-      getNewSupportToken() {
-        return this.updateSupportTokenProxy();
-      },
-
-      getNewTokens() {
-        return this.updateTokensProxy();
-      },
-
-      /**
-       * @param {string} type one of: token, command
-       * @returns {undefined}
-       */
-      copySuccess(type) {
-        this.get('globalNotify').info(this.t(`copy.${type}.success`));
-      },
-
-      /**
-       * @param {string} type one of: token, command
-       * @returns {undefined}
-       */
-      copyError(type) {
-        this.get('globalNotify').info(this.t(`copy.${type}.error`));
-      },
-    },
-  });
+  /**
+   * @type {models/Space}
+   */
+  space: undefined,
+});

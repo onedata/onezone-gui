@@ -175,7 +175,8 @@ const userHandlers = {
 const tokenHandlers = {
   user_temporary_token(operation, entityId, data) {
     if (operation === 'create') {
-      return JSON.stringify(data);
+      const valuesToEmbed = _.values(get(data, 'type.inviteToken' || {})).join('X');
+      return `${randomToken()}X${valuesToEmbed}`;
     } else {
       return messageNotSupported;
     }

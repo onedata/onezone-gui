@@ -17,23 +17,10 @@
     <div class="row content-row no-border">
       <div class="inner-row-content">
         <h5>{{t "components.contentSpacesSupport.tabsCommon.command"}}</h5>
-        <div class="row loadable-row lg">
-          {{#promise-proxy-container proxy=commandProxy}}
-            <textarea class="token-textarea deploy-provider-command no-resize form-control" rows="9" readonly>{{commandProxy.content}}</textarea>
-            {{#copy-button
-              success=(action "copySuccess" "command")
-              error=(action "copyError" "command")
-              class="btn btn-primary pull-left"
-              clipboardTarget=".token-textarea.deploy-provider-command"
-            }}
-              {{one-icon icon="browser-copy"}}
-              {{t "components.contentSpacesSupport.tabsCommon.copy"}}
-            {{/copy-button}}
-            <a class="clickable btn-get-token pull-right" {{action "getTokens"}}>
-              {{t "components.contentSpacesSupport.tabsCommon.generateToken"}}
-            </a>
-          {{/promise-proxy-container}}
-        </div>
+        {{invite-token-generator
+          inviteType="onedatify"
+          targetRecord=space
+        }}
       </div>
     </div>
   </div>

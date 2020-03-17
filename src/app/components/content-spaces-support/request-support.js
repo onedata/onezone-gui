@@ -2,28 +2,25 @@
  * Content for support space tab: get token for manual support request 
  *
  * @module components/content-spaces-support/request-support
- * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import TabBase from 'onezone-gui/components/content-spaces-support/-tab-base';
+import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
-export default TabBase.extend(I18n, {
+export default Component.extend(I18n, {
   classNames: ['request-support-tab'],
+
+  /**
+   * @override
+   */
   i18nPrefix: 'components.contentSpacesSupport.requestSupport',
 
   /**
    * @virtual
-   * @type {Function}
+   * @type {Models.Space}
    */
-  getNewSupportToken: notImplementedReject,
-
-  actions: {
-    getNewSupportToken() {
-      return this.get('getNewSupportToken')();
-    },
-  },
+  space: undefined,
 });
