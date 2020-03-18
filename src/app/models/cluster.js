@@ -25,6 +25,8 @@ import {
   onepanelTestImagePath,
 } from 'onedata-gui-common/utils/onedata-urls';
 
+export const entityType = 'cluster';
+
 export default Model.extend(
   GraphSingleModelMixin,
   InvitingModelMixin,

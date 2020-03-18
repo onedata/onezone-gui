@@ -13,6 +13,10 @@ describe('Integration | Util | token actions/modify token action', function () {
   });
 
   it('executes modifying token (success scenario)', function () {
+    const tokenDiff = {
+      name: 'token2',
+      revoked: false,
+    };
     const token = {
       name: 'token1',
       revoked: true,
@@ -21,10 +25,6 @@ describe('Integration | Util | token actions/modify token action', function () {
           return resolve();
         }
       }),
-    };
-    const tokenDiff = {
-      name: 'token2',
-      revoked: false,
     };
     const action = ModifyTokenAction.create({
       ownerSource: this,
@@ -52,6 +52,10 @@ describe('Integration | Util | token actions/modify token action', function () {
   });
 
   it('executes modifying token (failure scenario)', function () {
+    const tokenDiff = {
+      name: 'token2',
+      revoked: false,
+    };
     const token = {
       name: 'token1',
       revoked: true,
@@ -64,10 +68,6 @@ describe('Integration | Util | token actions/modify token action', function () {
         token.name = 'token1';
         token.revoked = true;
       },
-    };
-    const tokenDiff = {
-      name: 'token2',
-      revoked: false,
     };
     const action = ModifyTokenAction.create({
       ownerSource: this,

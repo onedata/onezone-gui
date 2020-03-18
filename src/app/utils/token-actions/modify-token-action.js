@@ -34,31 +34,33 @@ export default Action.extend({
    * @override
    */
   execute() {
-    if (!this.get('disabled')) {
-      const {
-        token,
-        tokenDiff,
-      } = this.getProperties(
-        'token',
-        'tokenDiff',
-      );
-
-      const result = ActionResult.create();
-      let promise;
-      if (Object.keys(tokenDiff).length > 0) {
-        setProperties(token, tokenDiff);
-        promise = result.interceptPromise(token.save().then(() => token))
-          .catch(() => {
-            token.rollbackAttributes();
-          });
-      } else {
-        promise = result.interceptPromise(resolve(token));
-      }
-
-      return promise.then(() => {
-        this.notifyResult(result);
-        return result;
-      });
+    if (this.get('disabled')) {
+      return;
     }
+
+    const {
+      token,
+      tokenDiff,
+    } = this.getProperties(
+      'token',
+      'tokenDiff',
+    );
+
+    const result = ActionResult.create();
+    let promise;
+    if (Object.keys(tokenDiff).length > 0) {
+      setProperties(token, tokenDiff);
+      promise = result.interceptPromise(token.save().then(() => token))
+        .catch(() => {
+          token.rollbackAttributes();
+        });
+    } else {
+      promise = result.interceptPromise(resolve(token));
+    }
+
+    return promise.then(() => {
+      this.notifyResult(result);
+      return result;
+    });
   },
 });

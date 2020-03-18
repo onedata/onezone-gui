@@ -16,6 +16,8 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 
+export const entityType = 'provider';
+
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),

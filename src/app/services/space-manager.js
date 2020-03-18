@@ -12,6 +12,7 @@ import { get, getProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as spaceEntityType } from 'onezone-gui/models/space';
 
 export default Service.extend({
   store: service(),
@@ -47,7 +48,7 @@ export default Service.extend({
 
   getRecordById(entityId) {
     const recordGri = gri({
-      entityType: 'space',
+      entityType: spaceEntityType,
       entityId: entityId,
       aspect: 'instance',
       scope: 'auto',
@@ -119,7 +120,7 @@ export default Service.extend({
       .then(user =>
         onedataGraph.request({
           gri: gri({
-            entityType: 'space',
+            entityType: spaceEntityType,
             entityId,
             aspect: 'user',
             aspectId: get(user, 'entityId'),
@@ -147,7 +148,7 @@ export default Service.extend({
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'space',
+          entityType: spaceEntityType,
           entityId: spaceEntityId,
           aspect: 'group',
           scope: 'auto',
@@ -173,7 +174,7 @@ export default Service.extend({
   addMemberGroup(spaceEntityId, groupEntityId) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'space',
+        entityType: spaceEntityType,
         entityId: spaceEntityId,
         aspect: 'group',
         aspectId: groupEntityId,
@@ -199,7 +200,7 @@ export default Service.extend({
     const currentUser = this.get('currentUser');
     const space = this.getLoadedSpaceByEntityId(spaceEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
-      'space',
+      spaceEntityType,
       spaceEntityId,
       'user',
       userEntityId
@@ -225,7 +226,7 @@ export default Service.extend({
     return this.get('onedataGraphUtils').leaveRelation(
       'group',
       groupEntityId,
-      'space',
+      spaceEntityType,
       spaceEntityId
     ).then(() =>
       Promise.all([
@@ -245,7 +246,7 @@ export default Service.extend({
    */
   removeGroupFromSpace(spaceEntityId, groupEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'space',
+      spaceEntityType,
       spaceEntityId,
       'group',
       groupEntityId

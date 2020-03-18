@@ -47,7 +47,7 @@ export default Action.extend({
   /**
    * @override
    */
-  classNames: 'clean-obsolete-tokens-trigger',
+  className: 'clean-obsolete-tokens-trigger',
 
   /**
    * @override
