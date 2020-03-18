@@ -4,6 +4,12 @@ export default {
       name: {
         label: 'Name',
       },
+      revoked: {
+        label: 'Revoked',
+      },
+      tokenString: {
+        label: 'Token',
+      },
       type: {
         label: 'Type',
         options: {
@@ -98,6 +104,9 @@ export default {
           usageLimitNumber: {
             placeholder: 'Enter exact number',
           },
+        },
+        usageCount: {
+          label: 'Usage count',
         },
       },
     },
@@ -242,6 +251,13 @@ export default {
             label: 'Path',
             tip: 'Limits the paths in which data can be accessed with the token. If a directory path is given, the token allows to access all nested files and directories starting from the specified directory.',
           },
+          path: {
+            pathEntry: {
+              pathString: {
+                placeholder: 'Example: /my/directory/path',
+              },
+            },
+          },
           pathDisabledText: {
             text: 'This token does not limit paths in which data can be accessed.',
           },
@@ -259,4 +275,6 @@ export default {
     },
   },
   createToken: 'Create token',
+  saveToken: 'Save',
+  cancel: 'Cancel',
 };

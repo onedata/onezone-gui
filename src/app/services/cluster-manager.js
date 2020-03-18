@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { Promise, resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 
 function loadClusterRecord(cluster) {
   return cluster.loadAsyncProperties().then(() => cluster);
@@ -36,6 +37,16 @@ export default Service.extend({
   getRecord(id) {
     return this.get('store').findRecord('cluster', id)
       .then(cluster => loadClusterRecord(cluster));
+  },
+
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: clusterEntityType,
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
   },
 
   /**
@@ -100,7 +111,7 @@ export default Service.extend({
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'cluster',
+          entityType: clusterEntityType,
           entityId: clusterEntityId,
           aspect: 'group',
           scope: 'auto',
@@ -123,7 +134,7 @@ export default Service.extend({
   addMemberGroupToCluster(clusterEntityId, groupEntityId) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'cluster',
+        entityType: clusterEntityType,
         entityId: clusterEntityId,
         aspect: 'group',
         aspectId: groupEntityId,
@@ -152,7 +163,7 @@ export default Service.extend({
       .then(user =>
         onedataGraph.request({
           gri: gri({
-            entityType: 'cluster',
+            entityType: clusterEntityType,
             entityId: clusterEntityId,
             aspect: 'user',
             aspectId: get(user, 'entityId'),
@@ -192,7 +203,7 @@ export default Service.extend({
     const currentUser = this.get('currentUser');
     const cluster = this.getLoadedClusterByEntityId(clusterEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
-      'cluster',
+      clusterEntityType,
       clusterEntityId,
       'user',
       userEntityId
@@ -217,7 +228,7 @@ export default Service.extend({
     return this.get('onedataGraphUtils').leaveRelation(
       'group',
       groupEntityId,
-      'cluster',
+      clusterEntityType,
       clusterEntityId
     ).then(() =>
       Promise.all([
@@ -237,7 +248,7 @@ export default Service.extend({
    */
   removeMemberGroupFromCluster(clusterEntityId, groupEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'cluster',
+      clusterEntityType,
       clusterEntityId,
       'group',
       groupEntityId

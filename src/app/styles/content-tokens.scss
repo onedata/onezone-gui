@@ -28,8 +28,6 @@
   }
 
   @media (max-width: $screen-xs-max) {
-    padding: 0 $mobile-horizontal-content-padding;
-
     .property-row {
       flex-wrap: wrap;
     }

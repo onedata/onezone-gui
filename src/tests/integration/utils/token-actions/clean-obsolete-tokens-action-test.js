@@ -43,19 +43,19 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
     });
   });
 
-  it('has correct classNames, icon and title', function () {
+  it('has correct className, icon and title', function () {
     const action = CleanObsoleteTokensAction.create({
       ownerSource: this,
       context: this.get('context'),
     });
 
     const {
-      classNames,
+      className,
       icon,
       title,
-    } = getProperties(action, 'classNames', 'icon', 'title');
-    expect(classNames).to.equal('clean-obsolete-tokens-trigger');
-    expect(icon).to.equal('remove');
+    } = getProperties(action, 'className', 'icon', 'title');
+    expect(className).to.equal('clean-obsolete-tokens-trigger');
+    expect(icon).to.equal('clean');
     expect(String(title)).to.equal('Clean up obsolete tokens');
   });
 

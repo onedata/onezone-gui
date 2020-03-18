@@ -9,9 +9,11 @@
 
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as userEntityType } from 'onezone-gui/models/user';
 
 export default Service.extend({
   onedataGraph: service(),
+  store: service(),
 
   /**
    * Changes user password
@@ -24,7 +26,7 @@ export default Service.extend({
     const onedataGraph = this.get('onedataGraph');
     return onedataGraph.request({
       gri: gri({
-        entityType: 'user',
+        entityType: userEntityType,
         entityId: userEntityId,
         aspect: 'password',
         scope: 'private',
@@ -36,5 +38,29 @@ export default Service.extend({
         newPassword,
       },
     });
+  },
+
+  /**
+   * Returns user with specified GRI
+   * @param {String} gri
+   * @return {Promise<Models.User>} user promise
+   */
+  getRecord(gri) {
+    return this.get('store').findRecord('user', gri);
+  },
+
+  /**
+   * Returns user with specified entityId
+   * @param {String} entityId
+   * @return {Promise<Models.User>} user promise
+   */
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: userEntityType,
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
   },
 });

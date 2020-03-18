@@ -1,23 +1,45 @@
 <form class="form form-horizontal form-component">
   {{form-component/field-renderer field=basicGroup}}
-  <h1
-    class="toggle-expand {{if caveatsGroup.isExpanded "opened"}}"
-    {{action "toggleCaveatsGroup"}}
-  >
-    {{tt this "fields.caveats.header"}}
-    {{one-icon
-      icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
-      class="toggle-icon"
-    }}
-  </h1>
-  {{form-component/field-renderer field=caveatsGroup}}
-  {{#one-spin-button
-    class="btn btn-primary submit-token"
-    disabled=(not fields.isValid)
-    type="button"
-    action=(action "submit")
-  }}
-    {{tt this "createToken"}}
-  {{/one-spin-button}}
+  {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
+    <h1
+      class={{concat-classes
+        "toggle-expand caveats-expand"
+        (if caveatsGroup.isExpanded "opened")
+        (if (not disableCaveatsCollapse) "clickable")
+      }}
+      onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
+    >
+      {{tt this "fields.caveats.header"}}
+      {{#if (not disableCaveatsCollapse)}}
+        {{one-icon
+          icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
+          class="toggle-icon"
+        }}
+      {{/if}}
+    </h1>
+    {{form-component/field-renderer field=caveatsGroup}}
+  {{/if}}
+  <div class="btn-toolbar footer-buttons">
+    {{#if (not-eq mode "view")}}
+      {{#one-spin-button
+        class="btn btn-primary submit-token"
+        disabled=(not fields.isValid)
+        type="button"
+        action=(action "submit")
+      }}
+        {{submitBtnText}}
+      {{/one-spin-button}}
+    {{/if}}
+    {{#if (eq mode "edit")}}
+      {{#bs-button
+        type="warning"
+        class="cancel-edition"
+        disabled=isSubmitting
+        onClick=onCancel
+      }}
+        {{tt this "cancel"}}
+      {{/bs-button}}
+    {{/if}}
+  </div>
 </form>
 {{yield}}

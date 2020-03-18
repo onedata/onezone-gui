@@ -15,6 +15,7 @@ import { Promise, resolve, reject } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import { entityType as groupEntityType } from 'onezone-gui/models/group';
 
 export default Service.extend({
   store: service(),
@@ -48,6 +49,16 @@ export default Service.extend({
    */
   getRecord(id, backgroundReload = true) {
     return this.get('store').findRecord('group', id, { backgroundReload });
+  },
+
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: groupEntityType,
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
   },
 
   /**
@@ -101,7 +112,7 @@ export default Service.extend({
       .then(user =>
         onedataGraph.request({
           gri: gri({
-            entityType: 'group',
+            entityType: groupEntityType,
             entityId,
             aspect: 'user',
             aspectId: get(user, 'entityId'),
@@ -259,7 +270,7 @@ export default Service.extend({
    */
   removeGroupFromGroup(parentEntityId, childEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       parentEntityId,
       'child',
       childEntityId
@@ -285,7 +296,7 @@ export default Service.extend({
     const currentUser = this.get('currentUser');
     const group = this.getLoadedGroupByEntityId(groupEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       groupEntityId,
       'user',
       userEntityId
@@ -310,7 +321,7 @@ export default Service.extend({
    */
   leaveGroupAsGroup(parentEntityId, childEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       childEntityId,
       'parent',
       parentEntityId
@@ -336,7 +347,7 @@ export default Service.extend({
   createParent(childEntityId, parentGroupRepresentation) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'group',
+        entityType: groupEntityType,
         aspect: 'instance',
       }),
       operation: 'create',
@@ -360,7 +371,7 @@ export default Service.extend({
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'group',
+          entityType: groupEntityType,
           entityId: parentEntityId,
           aspect: 'child',
           scope: 'auto',
@@ -386,7 +397,7 @@ export default Service.extend({
   addChild(groupEntityId, futureChildEntityId) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'group',
+        entityType: groupEntityType,
         entityId: groupEntityId,
         aspect: 'child',
         aspectId: futureChildEntityId,

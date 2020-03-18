@@ -1,75 +1,14 @@
 <div class="row content-row header-row hidden-xs">
-  <h1 class="normal-case">
-    <span class="token-name">{{token.name}}</span>
+  <h1 class="normal-case with-menu">
+    {{#truncated-string class="token-name"}}{{token.name}}{{/truncated-string}}
+    {{actions-toolbar actionsArray=globalActions isMinimized=true renderImmediately=true}}
   </h1>
 </div>
-{{#promise-proxy-container proxy=tokenTargetProxy}}
-  <div class="token-content content-row">
-    <div class="property-row token-name-property">
-      <div class="property-name token-name-label">{{tt this "propertyNames.name"}}:</div>
-      <div class="property-value token-name break-all">{{token.name}}</div>
-    </div>
-    <div class="property-row token-type-property">
-      <div class="property-name token-type-label">{{tt this "propertyNames.type"}}:</div>
-      <div class="property-value token-type">
-        <span class="type-name">{{tt this (concat "typeNames." token.typeName)}}</span>
-        {{#if token.inviteType}}
-          (<span class="invite-type">{{tt this (concat "inviteTypes." token.inviteType)}}</span>)
-        {{/if}}
-      </div>
-    </div>
-    {{#if tokenTarget}}
-      <div class="property-row token-target-property">
-        <div class="property-name token-target-label">{{targetLabel}}:</div>
-        <div class="property-value token-target">
-          {{#if tokenTarget.error}}
-            {{#if tokenTarget.hasErrorPossibleToRender}}
-              <span class="text-danger">
-                {{one-icon class="model-icon" icon=targetIcon}}
-                <span class="model-error">{{tt this (concat "targetErrors." tokenTarget.error.id)}}</span>
-              </span>
-            {{else}}
-              {{resource-load-error reason=tokenTarget.error}}
-            {{/if}}
-          {{else}}
-            {{one-icon class="model-icon" icon=targetIcon}}
-            <span class="model-name break-all">{{tokenTarget.name}}</span>
-            <span class="space"></span>
-            {{one-label-tip
-              class="target-tooltip"
-              title=(tt this (concat "targetTooltips." token.inviteType))}}
-          {{/if}}
-        </div>
-      </div>
-    {{/if}}
-    <div class="property-row token-creation-time-property">
-      <div class="property-name token-creation-time-label">{{tt this "propertyNames.creationTime"}}:</div>
-      <div class="property-value token-creation-time">
-        {{date-format token.metadata.creationTime}}
-      </div>
-    </div>
-    {{#unless (eq token.validUntil undefined)}}
-      <div class="property-row token-expiration-time-property">
-        <div class="property-name token-expiration-time-label">{{tt this "propertyNames.expirationTime"}}:</div>
-        <div class="property-value token-expiration-time">
-          {{date-format token.validUntil}}
-        </div>
-      </div>
-    {{/unless}}
-    <div class="property-row token-revoked-property">
-      <div class="property-name token-revoked-label">{{tt this "propertyNames.revoked"}}:</div>
-      <div class="property-value token-revoked">
-        {{one-way-toggle checked=token.revoked isReadOnly=true class="token-revoked-toggle"}}
-      </div>
-    </div>
-    <div class="property-row token-token-property">
-      <div class="property-name token-token-label">{{tt this "propertyNames.token"}}:</div>
-      <div class="property-value token-token">
-        {{one-clipboard-line
-          value=token.token
-          inputClass="token-string"
-          type="textarea"}}
-      </div>
-    </div>
-  </div>
-{{/promise-proxy-container}}
+<div class="row content-row">
+  {{token-editor
+    mode=mode
+    token=token
+    onSubmit=(action "saveToken")
+    onCancel=(action (mut mode) "view")
+  }}
+</div>

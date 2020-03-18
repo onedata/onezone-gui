@@ -108,6 +108,7 @@ import uploadObject from './utils/upload-object';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
+import modifyTokenAction from './utils/token-actions/modify-token-action';
 
 let translations = {
   tabs: {
@@ -228,6 +229,7 @@ let translations = {
       cleanObsoleteTokensAction,
       createTokenAction,
       openCreateTokenViewAction,
+      modifyTokenAction,
     },
   },
 };
