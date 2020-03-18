@@ -1424,7 +1424,8 @@ export default Component.extend(I18n, {
       predefinedValues,
       mode,
       fields,
-    } = this.getProperties('predefinedValues', 'mode', 'fields');
+      caveatsGroup,
+    } = this.getProperties('predefinedValues', 'mode', 'fields', 'caveatsGroup');
 
     if (mode === 'create' && predefinedValues) {
       const typeField = fields.getFieldByPath('basic.type');
@@ -1435,7 +1436,14 @@ export default Component.extend(I18n, {
         type,
         inviteType,
         inviteTargetId,
-      } = getProperties(predefinedValues, 'type', 'inviteType', 'inviteTargetId');
+        expire,
+      } = getProperties(
+        predefinedValues,
+        'type',
+        'inviteType',
+        'inviteTargetId',
+        'expire'
+      );
       if (type && ['access', 'identity', 'invite'].includes(type)) {
         typeField.valueChanged(type);
       }
@@ -1471,6 +1479,20 @@ export default Component.extend(I18n, {
           }));
         }
       });
+      if (expire) {
+        let expireDate;
+        try {
+          const expireNumber = typeof expire === 'number' ? expire : parseInt(expire);
+          expireDate = expireNumber ? new Date(Math.floor(expireNumber) * 1000) : null;
+        } catch (err) {
+          expireDate = null;
+        }
+        if (expireDate) {
+          set(caveatsGroup, 'isExpanded', true);
+          caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
+          caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
+        }
+      }
     }
   },
 

@@ -2259,6 +2259,23 @@ describe('Integration | Component | token editor', function () {
       });
     }
   );
+
+  it(
+    'sets token expire caveat if predefinedValues property has "expire" field with timestamp',
+    function () {
+      this.set('predefinedValues', {
+        expire: '1584525600',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      return wait().then(() => {
+        expect(this.$('.caveats-collapse')).to.have.class('in');
+        expectCaveatToggleState(this, 'expire', true);
+        expect(getFieldElement(this, 'expire').find('input').val())
+          .to.contain('2020/03/18');
+      });
+    }
+  );
 });
 
 class InviteTypeHelper extends EmberPowerSelectHelper {

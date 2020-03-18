@@ -113,6 +113,7 @@ export default Component.extend(I18n, {
     const options = {
       type: 'invite',
       inviteType,
+      expire: Math.floor(new Date().valueOf() / 1000) + 24 * 60 * 60,
     };
     if (targetRecord) {
       options.inviteTargetId = get(targetRecord, 'entityId');

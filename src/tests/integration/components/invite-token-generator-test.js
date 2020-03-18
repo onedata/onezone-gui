@@ -32,6 +32,10 @@ describe('Integration | Component | invite token generator', function () {
   });
 
   afterEach(function () {
+    const fakeClock = this.get('fakeClock');
+    if (fakeClock) {
+      fakeClock.restore();
+    }
     Ember.Logger.error = this.originalLoggerError;
     Ember.Test.adapter.exception = this.originalTestAdapterException;
   });
@@ -121,10 +125,15 @@ describe('Integration | Component | invite token generator', function () {
       routerStub,
     } = this.getProperties('targetRecord', 'routerStub');
     stubCreateToken(this, ['userJoinGroup', targetRecord], resolve());
+    const timestamp = 1584525600;
+    this.set('fakeClock', sinon.useFakeTimers({
+      now: timestamp * 1000,
+      shouldAdvanceTime: true,
+    }));
     routerStub
       .withArgs('onedata.sidebar.content', 'tokens', 'new', {
         queryParams: {
-          options: 'type.invite..inviteType.userJoinGroup..inviteTargetId.group1',
+          options: `type.invite..inviteType.userJoinGroup..expire.${timestamp + 24 * 60 * 60}..inviteTargetId.group1`,
         },
       })
       .returns('correctUrl');

@@ -113,6 +113,7 @@ describe('Integration | Component | content tokens new', function () {
         type: 'invite',
         inviteType: 'userJoinHarvester',
         inviteTargetId: 'harvester1',
+        expire: '1584525600',
       });
 
       this.render(hbs `{{content-tokens-new}}`);
@@ -122,6 +123,7 @@ describe('Integration | Component | content tokens new', function () {
           expect(this.$('.type-field .option-invite input').prop('checked')).to.be.true;
           expect(this.$('.inviteType-field').text()).to.contain('Invite user to harvester');
           expect(this.$('.target-field').text()).to.contain('harvester1');
+          expect(this.$('.expire-field').find('input').val()).to.contain('2020/03/18');
         });
     }
   );
