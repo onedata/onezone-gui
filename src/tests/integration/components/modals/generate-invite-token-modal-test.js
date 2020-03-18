@@ -121,10 +121,10 @@ describe('Integration | Component | modals/generate invite token modal', functio
   );
 
   it(
-    'closes modal on "advanced generator" click',
+    'closes modal on "custom token" click',
     function () {
       return showModal(this)
-        .then(() => click(getModalBody().find('.go-to-advanced-action')[0]))
+        .then(() => click(getModalBody().find('.custom-token-action')[0]))
         .then(() => expect(isModalOpened()).to.be.false);
     }
   );

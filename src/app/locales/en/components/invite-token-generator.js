@@ -1,19 +1,21 @@
-function createDescription(subjectName) {
-  return `Copy below token and pass it to the ${subjectName} you would like to invite:`;
+function createSubjectDescription(subjectName) {
+  return `Copy below token and pass it to the ${subjectName} you would like to invite. `;
 }
 
 export default {
-  generateAnotherAction: 'Generate another token',
-  goToAdvanced: 'Advanced generator',
-  description: {
-    userJoinGroup: createDescription('user'),
-    groupJoinGroup: createDescription('owner of group'),
-    userJoinSpace: createDescription('user'),
-    groupJoinSpace: createDescription('owner of group'),
-    userJoinCluster: createDescription('user'),
-    groupJoinCluster: createDescription('owner of group'),
-    userJoinHarvester: createDescription('user'),
-    groupJoinHarvester: createDescription('owner of group'),
-    spaceJoinHarvester: createDescription('owner of space'),
+  subjectDescription: {
+    userJoinGroup: createSubjectDescription('user'),
+    groupJoinGroup: createSubjectDescription('owner of group'),
+    userJoinSpace: createSubjectDescription('user'),
+    groupJoinSpace: createSubjectDescription('owner of group'),
+    userJoinCluster: createSubjectDescription('user'),
+    groupJoinCluster: createSubjectDescription('owner of group'),
+    userJoinHarvester: createSubjectDescription('user'),
+    groupJoinHarvester: createSubjectDescription('owner of group'),
+    spaceJoinHarvester: createSubjectDescription('owner of space'),
   },
+  limitationsDescription: '<strong>This token will expire in 24 hours and has no usage count limit.</strong> ',
+  onedatifyLimitationsDescription: '<strong>Tokens used below will expire in 24 hours and have no usage count limit.</strong>',
+  customTokenLabel: 'Create&nbsp;a&nbsp;custom&nbsp;token',
+  postCustomTokenLabel: ' if you require different parameters.',
 };

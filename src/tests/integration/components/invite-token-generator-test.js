@@ -115,84 +115,7 @@ describe('Integration | Component | invite token generator', function () {
       });
   });
 
-  it('shows additional actions', function () {
-    stubCreateToken(this, ['userJoinGroup', this.get('targetRecord')], resolve('token'));
-
-    this.render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
-    `);
-
-    return wait()
-      .then(() => {
-        const $additionalActions = this.$('.additional-token-actions');
-        expect($additionalActions).to.exist;
-        expect($additionalActions.find('.generate-another-action').text().trim())
-          .to.equal('Generate another token');
-        expect($additionalActions.find('.go-to-advanced-action').text().trim())
-          .to.equal('Advanced generator');
-      });
-  });
-
-  it('does not show additional actions when is loading token', function () {
-    stubCreateToken(this,
-      ['userJoinGroup', this.get('targetRecord')],
-      new Promise(() => {})
-    );
-
-    this.render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
-    `);
-
-    return wait()
-      .then(() => expect(this.$('.additional-token-actions')).to.not.exist);
-  });
-
-  it('does not show additional actions when generation error occurred', function () {
-    stubCreateToken(this, ['userJoinGroup', this.get('targetRecord')], reject());
-
-    this.render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
-    `);
-
-    return wait()
-      .then(() => expect(this.$('.additional-token-actions')).to.not.exist);
-  });
-
-  it('allows to generate another token', function () {
-    const secondToken = 'secondToken';
-    const targetRecord = this.get('targetRecord');
-    stubCreateToken(this, ['userJoinGroup', targetRecord], resolve('firstToken'));
-
-    this.render(hbs `
-      {{invite-token-generator
-        inviteType="userJoinGroup"
-        targetRecord=targetRecord
-      }}
-    `);
-
-    return wait()
-      .then(() => {
-        stubCreateToken(this, ['userJoinGroup', targetRecord], resolve(secondToken));
-        return click('.generate-another-action');
-      })
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledTwice;
-        expect(this.$('.token-textarea').val()).to.equal(secondToken);
-        expect(this.$('.spinner')).to.not.exist;
-        expect(this.$('.resource-load-error')).to.not.exist;
-      });
-  });
-
-  it('sets correct url for "advanced generator" action', function () {
+  it('sets correct url for "custom token" action', function () {
     const {
       targetRecord,
       routerStub,
@@ -215,12 +138,12 @@ describe('Integration | Component | invite token generator', function () {
 
     return wait()
       .then(() =>
-        expect(this.$('.go-to-advanced-action')).to.have.attr('href', 'correctUrl')
+        expect(this.$('.custom-token-action')).to.have.attr('href', 'correctUrl')
       );
   });
 
   it(
-    'calls passed onGoToAdvancedClick when "advanced generator" has been clicked',
+    'calls passed onCustomTokenClick when "custom token" action has been clicked',
     function () {
       stubCreateToken(this, ['userJoinGroup', this.get('targetRecord')], resolve());
       const clickSpy = sinon.spy();
@@ -230,86 +153,112 @@ describe('Integration | Component | invite token generator', function () {
         {{invite-token-generator
           inviteType="userJoinGroup"
           targetRecord=targetRecord
-          onGoToAdvancedClick=(action "clickHandler")
+          onCustomTokenClick=(action "clickHandler")
         }}
       `);
 
       return wait()
-        .then(() => click('.go-to-advanced-action'))
+        .then(() => click('.custom-token-action'))
         .then(() => expect(clickSpy).to.be.calledOnce);
     }
   );
 
+  const standardLimitations = 'This token will expire in 24 hours and has no usage count limit.';
+  const onedatifyLimitations = 'Tokens used below will expire in 24 hours and have no usage count limit.';
+
   [{
     inviteType: 'userJoinGroup',
-    description: 'Copy below token and pass it to the user you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinGroup',
-    description: 'Copy below token and pass it to the owner of group you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinSpace',
-    description: 'Copy below token and pass it to the user you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinSpace',
-    description: 'Copy below token and pass it to the owner of group you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'supportSpace',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'registerOneprovider',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinCluster',
-    description: 'Copy below token and pass it to the user you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinCluster',
-    description: 'Copy below token and pass it to the owner of group you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinHarvester',
-    description: 'Copy below token and pass it to the user you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinHarvester',
-    description: 'Copy below token and pass it to the owner of group you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'spaceJoinHarvester',
-    description: 'Copy below token and pass it to the owner of space you would like to invite:',
+    subjectDescription: 'Copy below token and pass it to the owner of space you would like to invite.',
+    limitationsDescription: standardLimitations,
   }, {
     inviteType: 'onedatify',
-    dontShowAdvanced: true,
+    limitationsDescription: onedatifyLimitations,
+    dontShowCustomToken: true,
   }, {
     inviteType: 'onedatifyWithImport',
-    dontShowAdvanced: true,
-  }].forEach(({ inviteType, description, dontShowAdvanced }) => {
-    it(`shows correct description for ${inviteType} invite token`, function () {
+    limitationsDescription: onedatifyLimitations,
+    dontShowCustomToken: true,
+
+  }].forEach(({ inviteType, subjectDescription, limitationsDescription, dontShowCustomToken }) => {
+    it(`shows correct subject description for ${inviteType} invite token`, function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
 
       this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-      if (description) {
-        expect(this.$('.description').text().trim()).to.equal(description);
+      if (subjectDescription) {
+        expect(this.$('.subject-description').text().trim()).to.equal(subjectDescription);
       } else {
-        expect(this.$('.description')).to.not.exist;
+        expect(this.$('.subject-description')).to.not.exist;
       }
     });
 
-    if (dontShowAdvanced) {
-      it(`does not show "go to advanced" link for ${inviteType} invite token`, function () {
+    it(`shows correct limitations description for ${inviteType} invite token`, function () {
+      this.set('inviteType', inviteType);
+      stubCreateToken(this, [inviteType, undefined], resolve());
+
+      this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+
+      expect(this.$('.limitations-text').text().trim()).to.equal(limitationsDescription);
+    });
+
+    if (dontShowCustomToken) {
+      it(`does not show "custom token" link for ${inviteType} invite token`, function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
         this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
         return wait()
-          .then(() => expect(this.$('.go-to-advanced-action')).to.not.exist);
+          .then(() => expect(this.$('.custom-token-action')).to.not.exist);
       });
     } else {
-      it(`shows "go to advanced" link for ${inviteType} invite token`, function () {
+      it(`shows "custom token" link for ${inviteType} invite token`, function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
         this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
         return wait()
-          .then(() => expect(this.$('.go-to-advanced-action')).to.exist);
+          .then(() => expect(this.$('.custom-token-action')).to.exist);
       });
     }
   });

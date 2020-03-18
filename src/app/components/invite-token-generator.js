@@ -19,7 +19,7 @@ import generateShellCommand from 'onezone-gui/utils/generate-shell-command';
 import { all as allFulfilled } from 'rsvp';
 import { not, array, raw } from 'ember-awesome-macros';
 
-const inviteTypesWithoutDescription = [
+const inviteTypesWithoutSubjectDescription = [
   'supportSpace',
   'registerOneprovider',
   'onedatify',
@@ -58,7 +58,7 @@ export default Component.extend(I18n, {
    * @type {Function}
    * @returns {any}
    */
-  onGoToAdvancedClick: notImplementedIgnore,
+  onCustomTokenClick: notImplementedIgnore,
 
   /**
    * @type {PromiseObject<String>}
@@ -66,21 +66,31 @@ export default Component.extend(I18n, {
   generatedTokenProxy: undefined,
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String>}
    */
-  description: computed('inviteType', function description() {
+  subjectDescription: computed('inviteType', function subjectDescription() {
     const inviteType = this.get('inviteType');
-    if (inviteTypesWithoutDescription.includes(inviteType)) {
-      return undefined;
+    if (!inviteTypesWithoutSubjectDescription.includes(inviteType)) {
+      return this.t(`subjectDescription.${inviteType}`);
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  limitationsDescription: computed('inviteType', function subjectDescription() {
+    const inviteType = this.get('inviteType');
+    if (['onedatify', 'onedatifyWithImport'].includes(inviteType)) {
+      return this.t('onedatifyLimitationsDescription');
     } else {
-      return this.t(`description.${inviteType}`);
+      return this.t('limitationsDescription');
     }
   }),
 
   /**
    * @type {ComputedProperty<boolean>}
    */
-  showGoToAdvanced: not(array.includes(
+  showCustomTokenLink: not(array.includes(
     raw(['onedatify', 'onedatifyWithImport']),
     'inviteType'
   )),
@@ -88,12 +98,17 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  goToAdvancedUrl: computed('inviteType', 'targetRecord', function goToAdvancedUrl() {
+  customTokenUrl: computed('inviteType', 'targetRecord', function goToAdvancedUrl() {
     const {
       router,
       inviteType,
       targetRecord,
-    } = this.getProperties('router', 'inviteType', 'targetRecord');
+      showCustomTokenLink,
+    } = this.getProperties('router', 'inviteType', 'targetRecord', 'showCustomTokenLink');
+
+    if (!showCustomTokenLink) {
+      return;
+    }
 
     const options = {
       type: 'invite',
@@ -146,14 +161,5 @@ export default Component.extend(I18n, {
     this.set('generatedTokenProxy', PromiseObject.create({
       promise: tokenPromise,
     }));
-  },
-
-  actions: {
-    generateAnother() {
-      this.generateToken();
-    },
-    goToAdvancedClick() {
-      this.get('onGoToAdvancedClick')();
-    },
   },
 });

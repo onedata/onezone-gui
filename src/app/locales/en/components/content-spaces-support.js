@@ -14,7 +14,6 @@ export default {
     tabName: 'Request support',
     desc1: 'Request storage support for this space from an existing Oneprovider.',
     desc2: 'Pass the token below to the administrator of the Oneprovider of your choice (e.g. via email).',
-    desc3: 'Each token can only be used once.',
   },
   exposeData: {
     tabName: 'Expose existing data set',

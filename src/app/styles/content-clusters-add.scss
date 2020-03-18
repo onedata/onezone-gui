@@ -1,10 +1,11 @@
 .content-clusters-add {
-  .spinner-container {
-    // min-height to hold spinner
-    height: 96px;
+  .limitations-description {
+    text-align: center;
   }
-  .generate-token {
-    margin-top: -5px;
-    margin-bottom: $padding-large-vertical;
+
+  @media (min-width: $screen-sm-min) {
+    .limitations-text {
+      display: block;
+    }
   }
 }
