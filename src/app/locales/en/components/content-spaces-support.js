@@ -1,15 +1,5 @@
 export default {
   header: 'Add support',
-  copy: {
-    token: {
-      success: 'The support token has been copied to clipboard',
-      error: 'Cannot copy the token to clipboard, please copy it manually',
-    },
-    command: {
-      success: 'The command has been copied to clipboard',
-      error: 'Cannot copy the command to clipboard, please copy it manually',
-    },
-  },
   requestSupport: {
     tabName: 'Request support',
     desc1: 'Request storage support for this space from an existing Oneprovider.',
@@ -32,8 +22,6 @@ export default {
       'a dockerized Oneprovider instance.',
     token: 'Token',
     command: 'Command',
-    generateToken: 'Generate another token',
-    copy: 'Copy',
     distributionsSupported: 'The following Linux distributions are officially supported. ' +
       'Hovewer, since the deployment is Docker-based, it is likely to work on other systems.',
 

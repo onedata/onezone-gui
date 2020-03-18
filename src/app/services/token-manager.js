@@ -14,6 +14,7 @@ import { resolve, allSettled } from 'rsvp';
 import { get } from '@ember/object';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as tokenEntityType } from 'onezone-gui/models/token';
 
 const TokenManager = Service.extend({
   store: service(),
@@ -108,7 +109,7 @@ const TokenManager = Service.extend({
       onedataGraph.request({
         gri: gri({
           entityId: null,
-          entityType: 'token',
+          entityType: tokenEntityType,
           aspect: 'user_temporary_token',
           aspectId: currestUserEntityId,
         }),

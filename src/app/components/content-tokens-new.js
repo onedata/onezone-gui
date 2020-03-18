@@ -22,16 +22,6 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.contentTokensNew',
 
-  willDestroyElement() {
-    this._super(...arguments);
-
-    // this.get('navigationState').setAspectOptions({
-    //   type: null,
-    //   inviteType: null,
-    //   inviteTargetId: null,
-    // });
-  },
-
   actions: {
     submit(rawToken) {
       const createTokenAction = this.get('tokenActions')
