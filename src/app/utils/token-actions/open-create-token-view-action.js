@@ -38,7 +38,7 @@ export default Action.extend({
   /**
    * @override
    */
-  classNames: 'create-token-link-trigger',
+  className: 'create-token-link-trigger',
 
   /**
    * @override

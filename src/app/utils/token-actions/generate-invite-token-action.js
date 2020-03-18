@@ -36,7 +36,7 @@ export default Action.extend({
   /**
    * @override
    */
-  classNames: 'generate-invite-token-action',
+  className: 'generate-invite-token-action',
 
   /**
    * @override

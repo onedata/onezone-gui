@@ -66,6 +66,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import ArrayProxy from '@ember/array/proxy';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -123,6 +124,10 @@ const privilegesForModels = {
 };
 
 const CaveatFormGroup = FormFieldsGroup.extend({
+  /**
+   * @type {any}
+   */
+  viewTokenValue: undefined,
   classes: computed('isCaveatEnabled', function classes() {
     return 'caveat-group' + (this.get('isCaveatEnabled') ? ' is-enabled' : '');
   }),
@@ -1231,10 +1236,8 @@ export default Component.extend(I18n, {
             'isInViewMode',
             'viewTokenValue'
           );
+          const oneiconAlias = this.get('component.oneiconAlias');
           if (isCaveatEnabled && !spacesProxy) {
-            // Services are available after the form structure got stable. Having value ==
-            // form is ready
-            const oneiconAlias = this.get('oneiconAlias');
             let newProxy;
             if (isInViewMode) {
               newProxy = PromiseArray.create({
@@ -1369,9 +1372,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  submitBtnText: computed('mode', function submitBtnText() {
-    return this.t(this.get('mode') === 'create' ? 'createToken' : 'saveToken');
-  }),
+  submitBtnText: conditional(
+    equal('mode', raw('create')),
+    computedT('createToken'),
+    computedT('saveToken')
+  ),
 
   modeObserver: observer('mode', function modeObserver() {
     const {

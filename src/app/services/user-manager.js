@@ -9,6 +9,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as userEntityType } from 'onezone-gui/models/user';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -25,7 +26,7 @@ export default Service.extend({
     const onedataGraph = this.get('onedataGraph');
     return onedataGraph.request({
       gri: gri({
-        entityType: 'user',
+        entityType: userEntityType,
         entityId: userEntityId,
         aspect: 'password',
         scope: 'private',
@@ -55,7 +56,7 @@ export default Service.extend({
    */
   getRecordById(entityId) {
     const recordGri = gri({
-      entityType: 'user',
+      entityType: userEntityType,
       entityId: entityId,
       aspect: 'instance',
       scope: 'auto',

@@ -83,7 +83,7 @@ describe('Integration | Util | token actions/generate invite token action', func
         context: this.get('context'),
       });
 
-      expect(get(action, 'classNames')).to.equal('generate-invite-token-action');
+      expect(get(action, 'className')).to.equal('generate-invite-token-action');
       expect(get(action, 'icon')).to.equal('join-plug');
       expect(get(action, 'disabled')).to.be.false;
     }

@@ -11,6 +11,7 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 
 export default Service.extend({
   store: service(),
@@ -41,7 +42,7 @@ export default Service.extend({
 
   getRecordById(entityId) {
     const recordGri = gri({
-      entityType: 'provider',
+      entityType: providerEntityType,
       entityId: entityId,
       aspect: 'instance',
       scope: 'auto',

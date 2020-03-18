@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import { computed, set, get, observer } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -22,8 +22,8 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-tokens'],
 
-  i18n: inject(),
-  tokenActions: inject(),
+  i18n: service(),
+  tokenActions: service(),
 
   /**
    * @override
@@ -48,6 +48,11 @@ export default Component.extend(I18n, GlobalActions, {
   globalActionsTitle: computedT('globalActionsGroupName'),
 
   /**
+   * @override
+   */
+  globalActions: collect('editTriggerAction'),
+
+  /**
    * @type {ComputedProperty<Utils.Action>}
    */
   editTriggerAction: computed(function editTriggerAction() {
@@ -56,7 +61,7 @@ export default Component.extend(I18n, GlobalActions, {
       ownerSource: component,
       component,
       i18nPrefix: tag `${'component.i18nPrefix'}.editTriggerAction`,
-      classNames: 'edit-token-action-btn',
+      className: 'edit-token-action-btn',
       icon: 'rename',
       title: computedT('title'),
       disabled: equal('component.mode', raw('edit')),
@@ -66,11 +71,6 @@ export default Component.extend(I18n, GlobalActions, {
       },
     }).create();
   }),
-
-  /**
-   * @override
-   */
-  globalActions: collect('editTriggerAction'),
 
   tokenObserver: observer('token', function tokenObserver() {
     if (this.get('mode') === 'edit') {
