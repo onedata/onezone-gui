@@ -110,6 +110,7 @@ import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
 import modifyTokenAction from './utils/token-actions/modify-token-action';
 import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
+import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 
 let translations = {
   tabs: {
@@ -233,6 +234,7 @@ let translations = {
       openCreateTokenViewAction,
       modifyTokenAction,
       generateInviteTokenAction,
+      openConsumeTokenViewAction,
     },
   },
 };
