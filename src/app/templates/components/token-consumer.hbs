@@ -1,0 +1,35 @@
+<input
+  type="text"
+  class="token-string"
+  placeholder={{tt this "tokenInputPlaceholder"}}
+  oninput={{action "tokenChanged" value="target.value"}}
+>
+{{#if invalidTokenErrorOccured}}
+  <div class="invalid-token-message alert alert-warning" role="alert">
+    {{tt this "invalidTokenMessage"}}
+  </div>
+{{else}}
+  {{#if typeText}}
+    <span class="token-type">{{typeText}}</span>
+  {{/if}}
+  {{#if joiningRecordSelectorModelName}}
+    {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy}}
+      <div class="joining-record-selector">
+        {{#one-dropdown
+          options=joiningRecordSelectorOptionsProxy
+          onchange=(action (mut selectedJoiningRecordOption))
+          selected=selectedJoiningRecordOption
+          renderInPlace=true
+          as |recordOption|}}
+          <div class="option-container">
+            {{one-icon icon=recordOption.icon}}
+            {{#truncated-string class="text"}}
+              {{recordOption.label}}
+            {{/truncated-string}}
+          </div>
+        {{/one-dropdown}}
+      </div>
+    {{/promise-proxy-container}}
+    {{/if}}
+{{/if}}
+{{yield}}

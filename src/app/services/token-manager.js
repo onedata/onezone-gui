@@ -149,6 +149,25 @@ const TokenManager = Service.extend({
   },
 
   /**
+   * Gets information about given token
+   * @param {String} token 
+   * @returns {Promise}
+   */
+  examineToken(token) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: tokenEntityType,
+        entityId: 'null',
+        aspect: 'examine',
+        scope: 'public',
+      }),
+      operation: 'create',
+      data: { token },
+      subscribe: false,
+    });
+  },
+
+  /**
    * Reloads token list
    * @returns {Promise<TokenList>}
    */

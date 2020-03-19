@@ -64,9 +64,8 @@ import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import ArrayProxy from '@ember/array/proxy';
-import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -162,23 +161,6 @@ const ModelTagsFieldPrototype = TagsField.extend({
     });
     return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
   },
-});
-
-const RecordsOptionsArrayProxy = ArrayProxy.extend(OwnerInjector, {
-  oneiconAlias: service(),
-  records: undefined,
-  sortedRecords: array.sort('records', ['name']),
-  content: computed('sortedRecords.@each.name', function content() {
-    const {
-      sortedRecords,
-      oneiconAlias,
-    } = this.getProperties('sortedRecords', 'oneiconAlias');
-    return sortedRecords.map(record => ({
-      value: record,
-      label: get(record, 'name'),
-      icon: oneiconAlias.getName(get(record, 'entityType')),
-    }));
-  }),
 });
 
 function createWhiteBlackListDropdown(fieldName) {
