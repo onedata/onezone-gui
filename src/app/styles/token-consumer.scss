@@ -1,0 +1,22 @@
+.token-consumer {
+  &.is-examining {
+    .token-string {
+      padding-right: 2 * $padding-base-horizontal + 24px;
+    }
+  }
+
+  .token-container {
+    position: relative;
+
+    .spin-spinner-block {
+      position: absolute;
+      top: 0;
+      right: $padding-base-horizontal;
+      height: $input-height-base;
+    }
+  }
+
+  .warning-icon {
+    height: 18px;
+  }
+}

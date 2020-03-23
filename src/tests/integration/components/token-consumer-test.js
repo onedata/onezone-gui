@@ -6,12 +6,13 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { fillIn } from 'ember-native-dom-helpers';
-import { resolve, reject } from 'rsvp';
+import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
 import TestAdapter from '@ember/test/adapter';
 import Ember from 'ember';
+import OneTooltipHelper from '../../helpers/one-tooltip';
 
 describe('Integration | Component | token consumer', function () {
   setupComponentTest('token-consumer', {
@@ -129,70 +130,70 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite user to group "someRecord"',
+    typeText: 'Invite user to group someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite group to parent group "someRecord"',
+    typeText: 'Invite group to parent group someRecord',
     modelToSelect: 'group',
   }, {
     inviteSpec: {
       inviteType: 'userJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite user to space "someRecord"',
+    typeText: 'Invite user to space someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite group to space "someRecord"',
+    typeText: 'Invite group to space someRecord',
     modelToSelect: 'group',
   }, {
     inviteSpec: {
       inviteType: 'userJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite user to cluster "someRecord"',
+    typeText: 'Invite user to cluster someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite group to cluster "someRecord"',
+    typeText: 'Invite group to cluster someRecord',
     modelToSelect: 'group',
   }, {
     inviteSpec: {
       inviteType: 'userJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite user to harvester "someRecord"',
+    typeText: 'Invite user to harvester someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite group to harvester "someRecord"',
+    typeText: 'Invite group to harvester someRecord',
     modelToSelect: 'group',
   }, {
     inviteSpec: {
       inviteType: 'spaceJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite space to harvester "someRecord"',
+    typeText: 'Invite space to harvester someRecord',
     modelToSelect: 'space',
   }, {
     inviteSpec: {
       inviteType: 'supportSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Support space "someRecord"',
+    typeText: 'Support space someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
@@ -212,7 +213,10 @@ describe('Integration | Component | token consumer', function () {
       this.render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
-        .then(() => expect(this.$('.token-type').text().trim()).to.equal(typeText));
+        .then(() => {
+          expect(this.$('.token-type').text().trim()).to.equal(typeText);
+          expect(this.$('.type-info .warning-icon')).to.not.exist;
+        });
     });
 
     if (modelToSelect) {
@@ -263,6 +267,34 @@ describe('Integration | Component | token consumer', function () {
     }
   });
 
+  it(
+    'shows "unknown" target name and warning for invite token when target name is null',
+    function () {
+      stubExamine(this, 'token', resolve({
+        type: {
+          inviteToken: {
+            inviteType: 'userJoinSpace',
+            spaceName: null,
+          },
+        },
+      }));
+
+      this.render(hbs `{{token-consumer}}`);
+
+      return fillIn('.token-string', 'token')
+        .then(() => {
+          expect(this.$('.token-type').text().trim())
+            .to.equal('Invite user to space unknown');
+          const $warningIcon = this.$('.type-info .warning-icon');
+          expect($warningIcon).to.exist;
+          return new OneTooltipHelper($warningIcon[0]).getText();
+        })
+        .then(tooltipText => expect(tooltipText).to.equal(
+          'Cannot resolve invite target name, this token might be outdated or invalid.'
+        ));
+    }
+  );
+
   it('informs about incorrect token', function () {
     stubExamine(this, 'token', reject({ id: 'badValueToken' }));
 
@@ -272,6 +304,17 @@ describe('Integration | Component | token consumer', function () {
       .then(() =>
         expect(this.$('.invalid-token-message').text().trim())
         .to.equal('Provided token is invalid.')
+      );
+  });
+
+  it('informs about other examine errors', function () {
+    stubExamine(this, 'token', reject({ id: 'someOtherError' }));
+
+    this.render(hbs `{{token-consumer}}`);
+
+    return fillIn('.token-string', 'token')
+      .then(() =>
+        expect(this.$('.resource-load-error').text()).to.contain('someOtherError')
       );
   });
 
@@ -295,6 +338,22 @@ describe('Integration | Component | token consumer', function () {
         expect(this.$('.token-type')).to.not.exist;
         expect(this.get('examineStub')).to.not.be.called;
       });
+  });
+
+  it('shows spinner while examining token', function () {
+    let resolveRequest;
+    stubExamine(this, 'token', new Promise(resolve => resolveRequest = resolve));
+
+    this.render(hbs `{{token-consumer}}`);
+
+    expect(this.$('.spinner')).to.not.exist;
+    return fillIn('.token-string', 'token')
+      .then(() => {
+        expect(this.$('.spinner')).to.exist;
+        resolveRequest();
+        return wait();
+      })
+      .then(() => expect(this.$('.spinner')).to.not.exist);
   });
 });
 

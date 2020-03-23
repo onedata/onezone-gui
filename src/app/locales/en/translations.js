@@ -90,6 +90,7 @@ import tokenEditor from './components/token-editor';
 import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
+import contentTokensConsumer from './components/content-tokens-consumer';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -216,6 +217,7 @@ let translations = {
     ceaseOneproviderSupportModal,
     inviteTokenGenerator,
     tokenConsumer,
+    contentTokensConsumer,
   },
   services: {
     tokenActions,

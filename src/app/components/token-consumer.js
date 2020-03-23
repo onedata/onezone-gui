@@ -3,7 +3,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
-import { conditional, array, raw, equal } from 'ember-awesome-macros';
+import { conditional, array, raw, equal, and, notEqual, isEmpty } from 'ember-awesome-macros';
 import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
@@ -14,6 +14,7 @@ import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 
 export default Component.extend(I18n, {
   classNames: ['token-consumer'],
+  classNameBindings: ['pendingCheckTime:is-examining'],
 
   tokenManager: service(),
   spaceManager: service(),
@@ -34,6 +35,11 @@ export default Component.extend(I18n, {
    * @type {number}
    */
   lastInputTime: 0,
+
+  /**
+   * @type {number}
+   */
+  pendingCheckTime: 0,
 
   /**
    * @type {Object}
@@ -85,31 +91,60 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  typeText: computed('type', 'typeName', 'targetName', function typeText() {
-    const {
-      type,
-      typeName,
-    } = this.getProperties('type', 'typeName');
-
-    if (!type) {
-      return null;
-    }
-
-    if (typeName === 'invite') {
-      const inviteType = get(type, 'inviteToken.inviteType');
+  inviteTargetName: computed('type', function inviteTargetName() {
+    const inviteType = this.get('type.inviteToken.inviteType');
+    if (inviteType) {
       const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
       if (inviteTypeSpec) {
-        const targetName = get(type, `inviteToken.${inviteTypeSpec.modelName}Name`);
-        return this.t(
-          `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
-        );
-      } else {
-        return null;
+        return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Name`);
       }
-    } else {
-      return this.t(`type.${typeName}`);
     }
   }),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  hasUnresolvedTargetName: and(
+    equal('typeName', raw('invite')),
+    notEqual('type.inviteToken.inviteType', raw('registerOneprovider')),
+    isEmpty('inviteTargetName')
+  ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  typeText: computed(
+    'type.inviteToken.inviteType',
+    'inviteTargetName',
+    'typeName',
+    'targetName',
+    function typeText() {
+      const {
+        type,
+        typeName,
+        inviteTargetName,
+      } = this.getProperties('type', 'typeName', 'inviteTargetName');
+
+      if (!type) {
+        return null;
+      }
+
+      if (typeName === 'invite') {
+        const inviteType = get(type, 'inviteToken.inviteType');
+        const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+        if (inviteTypeSpec) {
+          const targetName = inviteTargetName || this.t('unknownTargetName');
+          return this.t(
+            `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
+          );
+        } else {
+          return null;
+        }
+      } else {
+        return this.t(`type.${typeName}`);
+      }
+    }
+  ),
 
   joiningModelName: computed('type', function joiningModelName() {
     const inviteType = this.get('type.inviteToken.inviteType');
@@ -166,24 +201,25 @@ export default Component.extend(I18n, {
     } = this.getProperties('token', 'trimmedToken', 'tokenManager', 'lastInputTime');
 
     if (token.trim().length === 0) {
-      this.setProperties({
-        type: null,
-        error: null,
-      });
+      this.resetState();
     } else if (!trimmedToken) {
       // has only incorrect characters
-      this.setProperties({
-        type: null,
-        error: { id: 'badValueToken' },
-      });
+      this.resetState();
+      this.set('error', { id: 'badValueToken' });
     } else {
+      this.set('pendingCheckTime', lastInputTime);
       return tokenManager.examineToken(trimmedToken)
         .then(result =>
           safeExec(this, 'processExaminationResult', result, lastInputTime)
         )
         .catch(error =>
           safeExec(this, 'processExaminationError', error, lastInputTime)
-        );
+        )
+        .finally(() => safeExec(this, () => {
+          if (this.get('pendingCheckTime') === lastInputTime) {
+            this.set('pendingCheckTime', 0);
+          }
+        }));
     }
   },
 
@@ -193,6 +229,7 @@ export default Component.extend(I18n, {
       return;
     }
 
+    this.resetState();
     this.set('type', get(result || {}, 'type'));
   },
 
@@ -202,6 +239,7 @@ export default Component.extend(I18n, {
       return;
     }
 
+    this.resetState();
     this.set('error', error);
   },
 
@@ -235,6 +273,14 @@ export default Component.extend(I18n, {
           ownerSource: this,
           records: recordsList,
         })),
+    });
+  },
+
+  resetState() {
+    this.setProperties({
+      type: null,
+      error: null,
+      pendingCheckTime: 0,
     });
   },
 

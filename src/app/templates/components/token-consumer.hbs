@@ -1,16 +1,33 @@
-<input
-  type="text"
-  class="token-string"
-  placeholder={{tt this "tokenInputPlaceholder"}}
-  oninput={{action "tokenChanged" value="target.value"}}
->
+<div class="token-container">
+  <input
+    type="text"
+    class="token-string form-control"
+    placeholder={{tt this "tokenInputPlaceholder"}}
+    oninput={{action "tokenChanged" value="target.value"}}
+  >
+  {{#if pendingCheckTime}}
+    {{spin-spinner-block sizeClass="xs"}}
+  {{/if}}
+</div>
 {{#if invalidTokenErrorOccured}}
   <div class="invalid-token-message alert alert-warning" role="alert">
     {{tt this "invalidTokenMessage"}}
   </div>
+{{else if error}}
+  {{resource-load-error reason=error}}
 {{else}}
   {{#if typeText}}
-    <span class="token-type">{{typeText}}</span>
+    <div class="type-info">
+      <span class="type-label">{{tt this "typeLabel"}}:</span> <span class="token-type">{{typeText}}</span>
+      {{#if hasUnresolvedTargetName}}
+        <img class="warning-icon {{elementId}}-warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}>
+        {{one-tooltip
+          title=(tt this "unresolvedTargetWarning")
+          triggerElement=(concat "." elementId "-warning-icon")
+          triggerEvent="hover"
+        }}
+      {{/if}}
+    </div>
   {{/if}}
   {{#if joiningRecordSelectorModelName}}
     {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy}}
