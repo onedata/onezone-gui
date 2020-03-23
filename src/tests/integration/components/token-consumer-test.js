@@ -123,7 +123,20 @@ describe('Integration | Component | token consumer', function () {
       return fillIn('.token-string', 'token')
         .then(() => expect(this.$('.token-type').text().trim()).to.equal(typeText));
     });
+
+    it(`does not show "Join" button for ${name} token`, function () {
+      stubExamine(this, 'token', resolve({ type }));
+
+      this.render(hbs `{{token-consumer}}`);
+
+      return fillIn('.token-string', 'token')
+        .then(() => expect(this.$('.join-btn')).to.not.exist);
+    });
   });
+
+  function selectorDescription(targetModelName, joiningModelName) {
+    return `To use this token you have to select which ${joiningModelName} should join ${targetModelName} someRecord:`;
+  }
 
   [{
     inviteSpec: {
@@ -139,6 +152,8 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to parent group someRecord',
     modelToSelect: 'group',
+    selectorDescription: selectorDescription('parent group', 'group'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinSpace',
@@ -153,6 +168,8 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to space someRecord',
     modelToSelect: 'group',
+    selectorDescription: selectorDescription('space', 'group'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinCluster',
@@ -167,6 +184,8 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to cluster someRecord',
     modelToSelect: 'group',
+    selectorDescription: selectorDescription('cluster', 'group'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinHarvester',
@@ -181,6 +200,8 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to harvester someRecord',
     modelToSelect: 'group',
+    selectorDescription: selectorDescription('harvester', 'group'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'spaceJoinHarvester',
@@ -188,6 +209,8 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite space to harvester someRecord',
     modelToSelect: 'space',
+    selectorDescription: selectorDescription('harvester', 'space'),
+    selectorPlaceholder: 'Select space...',
   }, {
     inviteSpec: {
       inviteType: 'supportSpace',
@@ -195,14 +218,55 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Support space someRecord',
     modelToSelect: null,
+    noJoinBtn: true,
   }, {
     inviteSpec: {
       inviteType: 'registerOneprovider',
     },
     modelToSelect: null,
     typeText: 'Register Oneprovider',
-  }].forEach(({ inviteSpec, typeText, modelToSelect }) => {
+    noJoinBtn: true,
+  }].forEach(({
+    inviteSpec,
+    typeText,
+    modelToSelect,
+    selectorPlaceholder,
+    noJoinBtn,
+    selectorDescription,
+  }) => {
     const inviteType = inviteSpec.inviteType;
+
+    if (noJoinBtn) {
+      it(`does not show "Join" button for invite ${inviteType} token`, function () {
+        stubExamine(this, 'token', resolve({
+          type: {
+            inviteToken: inviteSpec,
+          },
+        }));
+
+        this.render(hbs `{{token-consumer}}`);
+
+        return fillIn('.token-string', 'token')
+          .then(() => expect(this.$('.join-btn')).to.not.exist);
+      });
+    } else {
+      it(`shows "Join" button for invite ${inviteType} token`, function () {
+        stubExamine(this, 'token', resolve({
+          type: {
+            inviteToken: inviteSpec,
+          },
+        }));
+
+        this.render(hbs `{{token-consumer}}`);
+
+        return fillIn('.token-string', 'token')
+          .then(() => {
+            const $joinBtn = this.$('.join-btn');
+            expect($joinBtn).to.exist;
+          });
+      });
+    }
+
     it(`shows type information for invite ${inviteType} token`, function () {
       stubExamine(this, 'token', resolve({
         type: {
@@ -235,7 +299,12 @@ describe('Integration | Component | token consumer', function () {
           let joiningRecordHelper = new JoiningRecordHelper();
           return fillIn('.token-string', 'token')
             .then(() => {
-              expect(this.$('.joining-record-selector')).to.exist;
+              const $recordSelector = this.$('.joining-record-selector');
+              expect($recordSelector).to.exist;
+              expect(this.$('.selector-description').text().trim())
+                .to.equal(selectorDescription);
+              expect($recordSelector.find('.ember-power-select-placeholder').text().trim())
+                .to.equal(selectorPlaceholder);
               return joiningRecordHelper.open();
             })
             .then(() => {
@@ -245,6 +314,39 @@ describe('Integration | Component | token consumer', function () {
                 expect(option.querySelector(`.oneicon-${modelToSelect}`)).to.exist;
               });
             });
+        }
+      );
+
+      it(
+        `has disabled "Join" button for invite ${inviteType} token when no target record is selected`,
+        function () {
+          stubExamine(this, 'token', resolve({
+            type: {
+              inviteToken: inviteSpec,
+            },
+          }));
+
+          this.render(hbs `{{token-consumer}}`);
+
+          return fillIn('.token-string', 'token')
+            .then(() => expect(this.$('.join-btn')).to.have.attr('disabled'));
+        }
+      );
+
+      it(
+        `has enabled "Join" button for invite ${inviteType} token when target record is selected`,
+        function () {
+          stubExamine(this, 'token', resolve({
+            type: {
+              inviteToken: inviteSpec,
+            },
+          }));
+
+          this.render(hbs `{{token-consumer}}`);
+
+          return fillIn('.token-string', 'token')
+            .then(() => new JoiningRecordHelper().selectOption(1))
+            .then(() => expect(this.$('.join-btn')).to.not.have.attr('disabled'));
         }
       );
     } else {
@@ -262,6 +364,22 @@ describe('Integration | Component | token consumer', function () {
 
           return fillIn('.token-string', 'token')
             .then(() => expect(this.$('.joining-record-selector')).to.not.exist);
+        }
+      );
+
+      it(
+        `has enabled "Join" button for invite ${inviteType} token`,
+        function () {
+          stubExamine(this, 'token', resolve({
+            type: {
+              inviteToken: inviteSpec,
+            },
+          }));
+
+          this.render(hbs `{{token-consumer}}`);
+
+          return fillIn('.token-string', 'token')
+            .then(() => expect(this.$('.join-btn')).to.not.have.attr('disabled'));
         }
       );
     }

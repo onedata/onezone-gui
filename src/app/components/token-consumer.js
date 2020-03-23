@@ -3,7 +3,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
-import { conditional, array, raw, equal, and, notEqual, isEmpty } from 'ember-awesome-macros';
+import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
 import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
@@ -164,10 +164,57 @@ export default Component.extend(I18n, {
     raw(null)
   ),
 
+  joiningRecordSelectorDescription: computed(
+    'latestJoiningRecordSelectorModelName',
+    'type',
+    'inviteTargetName',
+    function joiningRecordSelectorDescription() {
+      const {
+        latestJoiningRecordSelectorModelName,
+        inviteTargetName,
+      } = this.getProperties(
+        'latestJoiningRecordSelectorModelName',
+        'inviteTargetName'
+      );
+      const inviteType = this.get('type.inviteToken.inviteType');
+
+      if (latestJoiningRecordSelectorModelName && inviteType) {
+        const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+        if (inviteTypeSpec)
+          return this.t('joiningRecordSelectorDescription', {
+            joiningModelName: this.t(
+              `joiningModelName.${latestJoiningRecordSelectorModelName}`
+            ),
+            targetModelName: this.t(`targetModelName.${inviteTypeSpec.modelName}`),
+            targetRecordName: inviteTargetName || this.t('unknownTargetName'),
+          });
+      }
+    }
+  ),
+
   /**
    * @type {ComputedProperty<boolean>}
    */
   invalidTokenErrorOccured: equal('error.id', raw('badValueToken')),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showJoinBtn: and(
+    equal('typeName', raw('invite')),
+    not(array.includes(
+      raw(['supportSpace', 'registerOneprovider']),
+      'type.inviteToken.inviteType'
+    )),
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isJoinBtnDisabled: and(
+    'joiningRecordSelectorModelName',
+    not('selectedJoiningRecordOption')
+  ),
 
   joiningRecordSelectorModelNameObserver: observer(
     'joiningRecordSelectorModelName',

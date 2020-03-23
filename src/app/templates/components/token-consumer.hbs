@@ -31,12 +31,14 @@
   {{/if}}
   {{#if joiningRecordSelectorModelName}}
     {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy}}
+      <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
       <div class="joining-record-selector">
         {{#one-dropdown
           options=joiningRecordSelectorOptionsProxy
           onchange=(action (mut selectedJoiningRecordOption))
           selected=selectedJoiningRecordOption
           renderInPlace=true
+          placeholder=(tt this (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName))
           as |recordOption|}}
           <div class="option-container">
             {{one-icon icon=recordOption.icon}}
@@ -48,5 +50,10 @@
       </div>
     {{/promise-proxy-container}}
     {{/if}}
+{{/if}}
+{{#if showJoinBtn}}
+  {{#bs-button class="join-btn" size="lg" type="primary" disabled=isJoinBtnDisabled}}
+    {{tt this "joinBtn"}}
+  {{/bs-button}}
 {{/if}}
 {{yield}}

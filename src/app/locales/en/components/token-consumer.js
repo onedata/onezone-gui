@@ -18,7 +18,23 @@ export default {
       registerOneprovider: 'Register Oneprovider',
     },
   },
+  joiningRecordSelectorDescription: 'To use this token you have to select which {{joiningModelName}} should join {{targetModelName}} <em>{{targetRecordName}}</em>:',
+  joiningModelName: {
+    group: 'group',
+    space: 'space',
+  },
+  targetModelName: {
+    group: 'parent group',
+    space: 'space',
+    cluster: 'cluster',
+    harvester: 'harvester',
+  },
+  recordSelectorPlaceholder: {
+    group: 'Select group...',
+    space: 'Select space...',
+  },
   unknownTargetName: 'unknown',
   unresolvedTargetWarning: 'Cannot resolve invite target name, this token might be outdated or invalid.',
   invalidTokenMessage: 'Provided token is invalid.',
+  joinBtn: 'Join',
 };
