@@ -27,21 +27,20 @@ describe('Integration | Component | token consumer', function () {
 
     const tokenManager = lookupService(this, 'token-manager');
     const examineStub = sinon.stub(tokenManager, 'examineToken').returns(resolve());
+    const recordManager = lookupService(this, 'record-manager');
+    const getUserRecordListStub = sinon.stub(recordManager, 'getUserRecordList');
 
     const mockedRecords = {};
     [
       'space',
       'group',
     ].forEach(modelName => {
-      const serviceName = `${modelName}-manager`;
-      const getModelsMethodName = `get${_.upperFirst(modelName)}s`;
-      const service = lookupService(this, serviceName);
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
       }));
-      sinon.stub(service, getModelsMethodName).resolves({
+      getUserRecordListStub.withArgs(modelName).resolves({
         list: PromiseArray.create({
           promise: resolve(mockedRecords[modelName]),
         }),

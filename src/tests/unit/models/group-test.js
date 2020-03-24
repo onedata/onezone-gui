@@ -11,7 +11,7 @@ const OnedataTokenApiMock = Service.extend({
 });
 
 const TokenManagerStub = Service.extend({
-  reloadListIfAlreadyFetched() {},
+  reloadList() {},
 });
 
 describe('Unit | Model | group', function () {
@@ -31,7 +31,7 @@ describe('Unit | Model | group', function () {
 
     const TOKEN = 'abcd';
     const tokenManager = lookupService(this, 'token-manager');
-    const reloadTokensStub = sinon.stub(tokenManager, 'reloadListIfAlreadyFetched')
+    const reloadTokensStub = sinon.stub(tokenManager, 'reloadList')
       .resolves();
     let tokenApi = lookupService(this, 'onedata-token-api');
     let tokenApiRequestStub = sinon.stub(tokenApi, 'getInviteToken');

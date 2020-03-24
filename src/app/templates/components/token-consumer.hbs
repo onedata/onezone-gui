@@ -52,7 +52,7 @@
     {{/if}}
 {{/if}}
 {{#if showJoinBtn}}
-  {{#bs-button class="join-btn" size="lg" type="primary" disabled=isJoinBtnDisabled}}
+  {{#bs-button class="join-btn" size="lg" type="primary" disabled=isJoinBtnDisabled onClick=(action "join")}}
     {{tt this "joinBtn"}}
   {{/bs-button}}
 {{/if}}

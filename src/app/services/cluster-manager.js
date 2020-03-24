@@ -96,7 +96,7 @@ export default Service.extend({
       data: { userId },
       subscribe: false,
     }).then(result => {
-      tokenManager.reloadListIfAlreadyFetched();
+      tokenManager.reloadList();
       return result;
     });
   },

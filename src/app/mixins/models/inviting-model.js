@@ -33,7 +33,7 @@ export default Mixin.create({
 
     return onedataTokenApi.getInviteToken(entityType, entityId, receiverType)
       .then(result => {
-        tokenManager.reloadListIfAlreadyFetched();
+        tokenManager.reloadList();
         return result;
       });
   },

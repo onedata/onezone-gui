@@ -17,18 +17,17 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   beforeEach(function () {
-    sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
-      .resolves({
-        entityId: 'user1',
-      });
-    sinon.stub(lookupService(this, 'group-manager'), 'getGroups')
-      .resolves({
+    const recordManager = lookupService(this, 'record-manager');
+    sinon.stub(recordManager, 'getCurrentUserRecord').resolves({
+      entityId: 'user1',
+    });
+    sinon.stub(recordManager, 'getUserRecordList')
+      .withArgs('group').resolves({
         list: PromiseArray.create({
           promise: resolve([]),
         }),
-      });
-    sinon.stub(lookupService(this, 'harvester-manager'), 'getHarvesters')
-      .resolves({
+      })
+      .withArgs('harvester').resolves({
         list: PromiseArray.create({
           promise: resolve([{
             entityId: 'harvester0',

@@ -295,5 +295,16 @@ export default Model.extend(
         );
       }
     },
+
+    /**
+     * @override
+     */
+    loadRequiredRelations() {
+      return this._super(...arguments)
+        // Errors while loading token target are a normal situation e.g. target can not
+        // exist or we have insufficient access rights. We can ignore them. Any errors are
+        // still accessible via the proxy object.
+        .then(() => this.get('tokenTargetProxy').catch(() => {}));
+    },
   }
 ).reopenClass(StaticGraphModelMixin);

@@ -17,8 +17,7 @@ export default Component.extend(I18n, {
   classNameBindings: ['pendingCheckTime:is-examining'],
 
   tokenManager: service(),
-  spaceManager: service(),
-  groupManager: service(),
+  recordManager: service(),
   i18n: service(),
 
   /**
@@ -97,6 +96,19 @@ export default Component.extend(I18n, {
       const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
       if (inviteTypeSpec) {
         return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Name`);
+      }
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteTargetModelName: computed('type', function inviteTargetModelName() {
+    const inviteType = this.get('type.inviteToken.inviteType');
+    if (inviteType) {
+      const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+      if (inviteTypeSpec) {
+        return inviteTypeSpec.modelName;
       }
     }
   }),
@@ -295,26 +307,8 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<FieldOption>}
    */
   getRecordOptionsForModel(modelName) {
-    const {
-      spaceManager,
-      groupManager,
-    } = this.getProperties(
-      'spaceManager',
-      'groupManager',
-    );
-
-    let records;
-    switch (modelName) {
-      case 'group':
-        records = groupManager.getGroups();
-        break;
-      case 'space':
-        records = spaceManager.getSpaces();
-        break;
-    }
-
     return PromiseArray.create({
-      promise: records
+      promise: this.get('recordManager').getUserRecordList(modelName)
         .then(records => get(records, 'list'))
         .then(recordsList => RecordsOptionsArrayProxy.create({
           ownerSource: this,
@@ -338,6 +332,40 @@ export default Component.extend(I18n, {
         lastInputTime: new Date().valueOf(),
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
+    },
+    join() {
+      const {
+        recordManager,
+        tokenManager,
+        trimmedToken,
+        inviteTargetModelName,
+        selectedJoiningRecordOption,
+        joiningRecordSelectorModelName,
+      } = this.getProperties(
+        'recordManager',
+        'tokenManager',
+        'trimmedToken',
+        'inviteTargetModelName',
+        'selectedJoiningRecordOption',
+        'joiningRecordSelectorModelName'
+      );
+
+      let joiningModelName, joiningRecordId;
+      if (joiningRecordSelectorModelName) {
+        const joiningRecord = get(selectedJoiningRecordOption, 'value');
+        joiningModelName = joiningRecord.constructor.modelName;
+        joiningRecordId = get(joiningRecord, 'entityId');
+      } else {
+        joiningModelName = 'user';
+        joiningRecordId = get(recordManager.getCurrentUserRecord(), 'entityId');
+      }
+
+      return tokenManager.consumeInviteToken(
+        trimmedToken,
+        inviteTargetModelName,
+        joiningModelName,
+        joiningRecordId
+      );
     },
   },
 });
