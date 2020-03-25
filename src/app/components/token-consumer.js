@@ -17,6 +17,7 @@ export default Component.extend(I18n, {
   classNameBindings: ['pendingCheckTime:is-examining'],
 
   tokenManager: service(),
+  tokenActions: service(),
   recordManager: service(),
   i18n: service(),
 
@@ -336,36 +337,32 @@ export default Component.extend(I18n, {
     join() {
       const {
         recordManager,
-        tokenManager,
-        trimmedToken,
+        tokenActions,
+        token,
         inviteTargetModelName,
         selectedJoiningRecordOption,
         joiningRecordSelectorModelName,
       } = this.getProperties(
         'recordManager',
-        'tokenManager',
-        'trimmedToken',
+        'tokenActions',
+        'token',
         'inviteTargetModelName',
         'selectedJoiningRecordOption',
         'joiningRecordSelectorModelName'
       );
 
-      let joiningModelName, joiningRecordId;
+      let joiningRecord;
       if (joiningRecordSelectorModelName) {
-        const joiningRecord = get(selectedJoiningRecordOption, 'value');
-        joiningModelName = joiningRecord.constructor.modelName;
-        joiningRecordId = get(joiningRecord, 'entityId');
+        joiningRecord = get(selectedJoiningRecordOption, 'value');
       } else {
-        joiningModelName = 'user';
-        joiningRecordId = get(recordManager.getCurrentUserRecord(), 'entityId');
+        joiningRecord = recordManager.getCurrentUserRecord();
       }
 
-      return tokenManager.consumeInviteToken(
-        trimmedToken,
-        inviteTargetModelName,
-        joiningModelName,
-        joiningRecordId
-      );
+      return tokenActions.createConsumeInviteTokenAction({
+        joiningRecord,
+        targetModelName: inviteTargetModelName,
+        token,
+      }).execute();
     },
   },
 });

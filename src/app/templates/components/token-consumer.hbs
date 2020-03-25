@@ -1,3 +1,4 @@
+<p>{{tt this "tokenInputDescription"}}</p>
 <div class="token-container">
   <input
     type="text"
@@ -29,6 +30,11 @@
       {{/if}}
     </div>
   {{/if}}
+  {{#if (and typeName (not-eq typeName "invite"))}}
+    <div class="not-invite-token-message alert alert-info" role="alert">
+      {{tt this "notAnInviteTokenInfo"}}
+    </div>
+  {{/if}}
   {{#if joiningRecordSelectorModelName}}
     {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy}}
       <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
@@ -49,11 +55,15 @@
         {{/one-dropdown}}
       </div>
     {{/promise-proxy-container}}
-    {{/if}}
-{{/if}}
-{{#if showJoinBtn}}
-  {{#bs-button class="join-btn" size="lg" type="primary" disabled=isJoinBtnDisabled onClick=(action "join")}}
-    {{tt this "joinBtn"}}
-  {{/bs-button}}
+  {{/if}}
+  {{#if showJoinBtn}}
+    {{#one-spin-button
+      class="join-btn btn btn-lg btn-primary"
+      disabled=isJoinBtnDisabled
+      action=(action "join")
+    }}
+      {{tt this "joinBtn"}}
+    {{/one-spin-button}}
+  {{/if}}
 {{/if}}
 {{yield}}

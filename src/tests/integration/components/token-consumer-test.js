@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
-import { fillIn } from 'ember-native-dom-helpers';
+import { fillIn, click } from 'ember-native-dom-helpers';
 import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -129,7 +129,12 @@ describe('Integration | Component | token consumer', function () {
       this.render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
-        .then(() => expect(this.$('.join-btn')).to.not.exist);
+        .then(() => {
+          expect(this.$('.not-invite-token-message').text().trim()).to.equal(
+            'This is not an invite token and cannot be used to join to any resource.'
+          );
+          expect(this.$('.join-btn')).to.not.exist;
+        });
     });
   });
 
@@ -260,8 +265,8 @@ describe('Integration | Component | token consumer', function () {
 
         return fillIn('.token-string', 'token')
           .then(() => {
-            const $joinBtn = this.$('.join-btn');
-            expect($joinBtn).to.exist;
+            expect(this.$('.not-invite-token-message')).to.not.exist;
+            expect(this.$('.join-btn')).to.exist;
           });
       });
     }
@@ -472,6 +477,76 @@ describe('Integration | Component | token consumer', function () {
       })
       .then(() => expect(this.$('.spinner')).to.not.exist);
   });
+
+  it(
+    'passess data to ConsumeInviteTokenAction instance and executes it',
+    function () {
+      stubExamine(this, 'token', resolve({
+        type: {
+          inviteToken: {
+            inviteType: 'groupJoinSpace',
+          },
+        },
+      }));
+      const tokenActions = lookupService(this, 'token-actions');
+      const consumeInviteTokenAction = {
+        execute: sinon.stub().resolves(),
+      };
+      const createConsumeInviteTokenActionStub =
+        sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
+        .returns(consumeInviteTokenAction);
+
+      this.render(hbs `{{token-consumer}}`);
+
+      let joiningRecordHelper = new JoiningRecordHelper();
+      return fillIn('.token-string', 'token')
+        .then(() => joiningRecordHelper.selectOption(1))
+        .then(() => click('.join-btn'))
+        .then(() => {
+          expect(createConsumeInviteTokenActionStub).to.be.calledOnce;
+          expect(createConsumeInviteTokenActionStub).to.be.calledWith(sinon.match({
+            joiningRecord: this.get('mockedRecords.group')[0],
+            targetModelName: 'space',
+            token: 'token',
+          }));
+          expect(consumeInviteTokenAction.execute).to.be.calledOnce;
+        });
+    }
+  );
+
+  it(
+    'has join button blocked until ConsumeInviteTokenAction execution is done',
+    function () {
+      stubExamine(this, 'token', resolve({
+        type: {
+          inviteToken: {
+            inviteType: 'userJoinSpace',
+          },
+        },
+      }));
+      let resolveSubmit;
+      const tokenActions = lookupService(this, 'token-actions');
+      const consumeInviteTokenAction = {
+        execute: sinon.stub()
+          .returns(new Promise(resolve => resolveSubmit = resolve)),
+      };
+      sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
+        .returns(consumeInviteTokenAction);
+
+      this.render(hbs `{{token-consumer}}`);
+
+      return fillIn('.token-string', 'token')
+        .then(() => click('.join-btn'))
+        .then(() => {
+          expect(this.$('.join-btn [role="progressbar"]')).to.exist;
+          resolveSubmit();
+          return wait();
+        })
+        .then(() =>
+          expect(this.$('.join-btn [role="progressbar"]')).to.not.exist
+        );
+    }
+  );
 });
 
 function stubExamine(testSuite, token, response) {

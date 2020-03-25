@@ -1,4 +1,5 @@
 export default {
+  tokenInputDescription: 'Enter an invite token below to see invitation details. It should be provided to you by another Onedata user.',
   tokenInputPlaceholder: 'Enter token...',
   typeLabel: 'Type',
   type: {
@@ -18,6 +19,7 @@ export default {
       registerOneprovider: 'Register Oneprovider',
     },
   },
+  notAnInviteTokenInfo: 'This is not an invite token and cannot be used to join to any resource.',
   joiningRecordSelectorDescription: 'To use this token you have to select which {{joiningModelName}} should join {{targetModelName}} <em>{{targetRecordName}}</em>:',
   joiningModelName: {
     group: 'group',
