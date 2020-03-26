@@ -42,7 +42,6 @@ import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
 import contentClustersDeregister from './components/content-clusters-deregister';
 import contentClustersMembers from './components/content-clusters-members';
-import contentClustersJoin from './components/content-clusters-join';
 import contentSharesIndex from './components/content-shares-index';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
@@ -162,7 +161,6 @@ let translations = {
     contentClustersEndpointError,
     contentClustersDeregister,
     contentClustersMembers,
-    contentClustersJoin,
     contentSharesIndex,
     membersCollection,
     privilegesEditorModal,
