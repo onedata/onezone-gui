@@ -95,35 +95,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Joins group as a subgroup
-   * @param {Group} group 
-   * @param {string} token
-   * @param {boolean} redirect 
-   * @returns {Promise<Group>} parent group
-   */
-  joinGroupAsSubgroup(group, token, redirect = true) {
-    const {
-      globalNotify,
-      groupManager,
-    } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinGroupAsGroup(group, token)
-      .then(parentGroup => {
-        globalNotify.success(this.t('joinGroupAsSubgroupSuccess', {
-          groupName: get(group, 'name'),
-          parentGroupName: get(parentGroup, 'name'),
-        }));
-        if (redirect) {
-          next(() => this.redirectToGroup(group, 'parents'));
-        }
-        return parentGroup;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningGroupAsSubgroup'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Deletes group
    * @param {Group} group
    * @returns {Promise}

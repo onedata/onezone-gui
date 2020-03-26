@@ -38,6 +38,11 @@ export default Action.extend({
   targetModelName: reads('context.targetModelName'),
 
   /**
+   * @type {ComputedProperty<boolean>}
+   */
+  dontRedirect: reads('context.dontRedirect'),
+
+  /**
    * @type {ComputedProperty<String>}
    */
   token: computedPipe('context.token', trimToken),
@@ -51,6 +56,7 @@ export default Action.extend({
         joiningRecord,
         targetModelName,
         token,
+        dontRedirect,
         tokenManager,
         router,
         guiUtils,
@@ -58,6 +64,7 @@ export default Action.extend({
         'joiningRecord',
         'targetModelName',
         'token',
+        'dontRedirect',
         'tokenManager',
         'router',
         'guiUtils'
@@ -75,7 +82,7 @@ export default Action.extend({
         .catch(() => {})
         .then(() => {
           this.notifyResult(result);
-          if (get(result, 'status') === 'done') {
+          if (get(result, 'status') === 'done' && !dontRedirect) {
             next(() => {
               router.transitionTo(
                 'onedata.sidebar.content',

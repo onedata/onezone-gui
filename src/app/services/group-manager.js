@@ -158,30 +158,6 @@ export default Service.extend({
   },
 
   /**
-   * Joins group as a subgroup
-   * @param {Group} childGroup 
-   * @param {string} token
-   * @returns {Promise<Group>} parent group
-   */
-  joinGroupAsGroup(childGroup, token) {
-    const childEntityId = get(childGroup, 'entityId');
-    return childGroup.joinGroup(token)
-      .then(parentGroup =>
-        Promise.all([
-          this.reloadList(),
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          this.reloadChildList(get(parentGroup, 'entityId'))
-          .catch(ignoreForbiddenError),
-          this.reloadEffChildList(get(parentGroup, 'entityId'))
-          .catch(ignoreForbiddenError),
-          this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
-          this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
-        ]).then(() => parentGroup)
-      );
-  },
-
-  /**
    * @param {string} parentEntityId 
    * @param {string} childEntityId
    * @returns {Promise}

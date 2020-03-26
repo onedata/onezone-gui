@@ -199,6 +199,7 @@ export default Component.extend(I18n, {
   i18n: service(),
   groupManager: service(),
   groupActions: service(),
+  tokenActions: service(),
   privilegeManager: service(),
   privilegeActions: service(),
   globalNotify: service(),
@@ -845,13 +846,18 @@ export default Component.extend(I18n, {
     joinUsingToken(token) {
       const {
         groupConsumingToken,
-        groupActions,
+        tokenActions,
       } = this.getProperties(
         'groupConsumingToken',
-        'groupActions'
+        'tokenActions'
       );
       this.set('isGroupConsumingToken', true);
-      return groupActions.joinGroupAsSubgroup(groupConsumingToken, token, false)
+      return tokenActions.createConsumeInviteTokenAction({
+          joiningRecord: groupConsumingToken,
+          targetModelName: 'group',
+          token,
+          dontRedirect: true,
+        }).execute()
         .then(() => safeExec(this, 'reloadModel'))
         .finally(() =>
           safeExec(this, 'setProperties', {

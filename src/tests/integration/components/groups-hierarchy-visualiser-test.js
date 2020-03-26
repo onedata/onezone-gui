@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import EmberObject, { computed, get, set } from '@ember/object';
+import EmberObject, { computed, get, getProperties, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
@@ -613,18 +613,34 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     let childGroup = {};
     let passedToken = '';
     let newParent = {};
-    registerService(this, 'group-actions', Service.extend({
-      joinGroupAsSubgroup(group, token) {
-        childGroup = group;
-        passedToken = token;
-        newParent = GroupStub.create(Object.assign({
-          name: 'testParent',
-          _childList: A([group]),
-        }));
-        get(group, '_parentList').pushObject(newParent);
-        return resolve(newParent);
-      },
-    }));
+    lookupService(this, 'token-actions').createConsumeInviteTokenAction = context => {
+      const {
+        joiningRecord,
+        targetModelName,
+        token,
+        dontRedirect,
+      } = getProperties(
+        context,
+        'joiningRecord',
+        'targetModelName',
+        'token',
+        'dontRedirect'
+      );
+      if (dontRedirect && targetModelName === 'group') {
+        return {
+          execute() {
+            childGroup = joiningRecord;
+            passedToken = token;
+            newParent = GroupStub.create(Object.assign({
+              name: 'testParent',
+              _childList: A([joiningRecord]),
+            }));
+            get(joiningRecord, '_parentList').pushObject(newParent);
+            return resolve({ result: newParent });
+          },
+        };
+      }
+    };
 
     this.render(hbs `
       <div style={{containerStyle}}>

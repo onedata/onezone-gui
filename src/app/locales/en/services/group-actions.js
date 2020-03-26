@@ -5,9 +5,6 @@ export default {
   },
   groupCreateSuccess: 'New group created successfully',
   groupCreation: 'creating group',
-  joinGroupAsSubgroupSuccess: 'Successfully joined group "{{parentGroupName}}" ' +
-    'as group "{{groupName}}"',
-  joiningGroupAsSubgroup: 'joining group as subgroup',
   deleteGroupSuccess: 'Group "{{groupName}}" has been removed',
   groupDeletion: 'group deletion',
   leaveGroupSuccess: 'Group "{{groupName}}" left successfully',

@@ -133,6 +133,30 @@ describe('Integration | Util | token actions/consume invite token action', funct
     });
   });
 
+  it(
+    'does not redirect to target record if dontRedirect is true',
+    function () {
+      this.set('context.targetModelName', 'group');
+      this.set('context.joiningRecord.constructor.modelName', 'group');
+      const action = ConsumeInviteTokenAction.create({
+        ownerSource: this,
+        context: Object.assign(this.get('context'), { dontRedirect: true }),
+      });
+      const tokenManager = lookupService(this, 'token-manager');
+      const router = lookupService(this, 'router');
+      sinon.stub(tokenManager, 'consumeInviteToken')
+        .resolves({
+          id: 'group.recordid.instance:private',
+          name: 'target',
+        });
+      const transitionToStub = sinon.stub(router, 'transitionTo')
+        .resolves();
+
+      return action.execute()
+        .then(() => new Promise(resolve => next(resolve)))
+        .then(() => expect(transitionToStub).to.not.be.called);
+    });
+
   it('executes consuming token (failure scenario)', function () {
     this.set('context.targetModelName', 'group');
     this.set('context.joiningRecord.constructor.modelName', 'group');
