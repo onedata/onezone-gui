@@ -61,7 +61,6 @@ import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 import sidebarHarvesters from './components/sidebar-harvesters';
 import contentHarvestersNew from './components/content-harvesters-new';
-import contentHarvestersJoin from './components/content-harvesters-join';
 import contentHarvestersConfig from './components/content-harvesters-config';
 import contentHarvestersSpaces from './components/content-harvesters-spaces';
 import contentHarvestersIndices from './components/content-harvesters-indices';
@@ -182,7 +181,6 @@ let translations = {
     resourceMembershipTile,
     sidebarHarvesters,
     contentHarvestersNew,
-    contentHarvestersJoin,
     contentHarvestersConfig,
     contentHarvestersSpaces,
     contentHarvestersIndices,

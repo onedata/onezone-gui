@@ -3,7 +3,7 @@
  * 
  * @module services/harvester-manager
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 20190-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -66,25 +66,6 @@ export default Service.extend(
             })
           ).save().then(harvester => this.reloadList().then(() => harvester));
         });
-    },
-
-    /**
-     * Joins user to a harvester using given token
-     * @param {string} token
-     * @returns {Promise<Model.Harvester>}
-     */
-    joinHarvester(token) {
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => user.joinHarvester(token)
-          .then(harvester => {
-            const harvesterEntityId = get(harvester, 'entityId');
-            return Promise.all([
-              this.reloadList(),
-              this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
-              this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
-            ]).then(() => harvester);
-          })
-        );
     },
 
     /**

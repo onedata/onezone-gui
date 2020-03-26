@@ -30,7 +30,7 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<SidebarButtonDefinition>>}
    */
-  buttons: collect('btnCreate', 'btnJoin'),
+  buttons: collect('btnCreate'),
 
   /**
    * @type {Ember.ComputedProperty<SidebarButtonDefinition>}
@@ -44,21 +44,6 @@ export default Service.extend(I18n, {
       class: 'create-harvester-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'harvesters',
         'new'),
-    };
-  }),
-
-  /**
-   * @type {Ember.Computed<SidebarButtonDefinition>}
-   */
-  btnJoin: computed(function btnJoin() {
-    const router = this.get('router');
-    return {
-      icon: 'join-plug',
-      title: this.t('btnJoin.title'),
-      tip: this.t('btnJoin.hint'),
-      class: 'join-harvester-btn',
-      action: () => router.transitionTo('onedata.sidebar.content', 'harvesters',
-        'join'),
     };
   }),
 
@@ -110,25 +95,6 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         globalNotify.backendError(this.t('updatingHarvester'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins to existing harvester using token
-   * @param {string} token
-   * @returns {Promise<Model.Harvester>} A promise, which resolves to harvester
-   * if it has been joined successfully.
-   */
-  joinHarvester(token) {
-    return this.get('harvesterManager').joinHarvester(token)
-      .then(harvester => {
-        this.get('globalNotify').info(this.t('joinedHarvesterSuccess'));
-        this.redirectToHarvester(harvester);
-        return harvester;
-      })
-      .catch(error => {
-        this.get('globalNotify').backendError(this.t('joiningHarvester'), error);
         throw error;
       });
   },
