@@ -24,7 +24,6 @@ import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
-import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
@@ -32,7 +31,6 @@ import contentSpacesData from './components/content-spaces-data';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import oneproviderViewContainer from './components/oneprovider-view-container';
-import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsJoin from './components/content-groups-join';
@@ -152,7 +150,6 @@ let translations = {
     contentSpacesIndex,
     contentSpacesNew,
     contentProviderEmpty,
-    contentSpacesJoin,
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
@@ -160,7 +157,6 @@ let translations = {
     contentSpacesShares,
     contentSpacesTransfers,
     oneproviderViewContainer,
-    contentSpacesJoinHarvester,
     leaveSpaceConfirm,
     contentGroupsJoin,
     contentGroupsNew,
