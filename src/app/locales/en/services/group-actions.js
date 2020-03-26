@@ -3,22 +3,11 @@ export default {
     title: 'Create new group',
     hint: 'Create new group',
   },
-  btnJoin: {
-    title: 'Join a group',
-    hint: 'Join some group using a group invitation token',
-  },
   groupCreateSuccess: 'New group created successfully',
   groupCreation: 'creating group',
-  joiningGroup: 'joining the group',
-  joinedGroupSuccess: 'Group joined successfully',
-  joinSpaceAsGroupSuccess: 'Successfully joined space "{{spaceName}}" as group ' +
-    '"{{groupName}}"',
-  joiningSpaceAsGroup: 'joining space',
   joinGroupAsSubgroupSuccess: 'Successfully joined group "{{parentGroupName}}" ' +
     'as group "{{groupName}}"',
   joiningGroupAsSubgroup: 'joining group as subgroup',
-  joinClusterAsGroupSuccess: 'Successfully joined cluster "{{clusterName}}" as group "{{groupName}}"',
-  joiningClusterAsGroup: 'joining cluster',
   deleteGroupSuccess: 'Group "{{groupName}}" has been removed',
   groupDeletion: 'group deletion',
   leaveGroupSuccess: 'Group "{{groupName}}" left successfully',
@@ -37,6 +26,4 @@ export default {
   childGroupAddition: 'child group addition',
   addChildGroupSuccess: 'Child group "{{childGroupName}}" has been added successfully',
   removeRelationSuccess: 'Relation between "{{parentGroupName}}" and "{{childGroupName}}" has been removed',
-  joinHarvesterAsGroupSuccess: 'Successfully joined harvester "{{harvesterName}}" as group "{{groupName}}"',
-  joiningHarvesterAsGroup: 'joining harvester',
 };

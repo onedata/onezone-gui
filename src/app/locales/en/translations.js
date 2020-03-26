@@ -33,15 +33,10 @@ import contentSpacesTransfers from './components/content-spaces-transfers';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
-import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
-import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
-import contentGroupsJoinSpace from './components/content-groups-join-space';
-import contentGroupsJoinHarvester from './components/content-groups-join-harvester';
-import contentGroupsJoinCluster from './components/content-groups-join-cluster';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
@@ -158,15 +153,10 @@ let translations = {
     contentSpacesTransfers,
     oneproviderViewContainer,
     leaveSpaceConfirm,
-    contentGroupsJoin,
     contentGroupsNew,
     contentGroupsEmpty,
     contentGroupsMembers,
     contentGroupsHierarchy,
-    contentGroupsJoinAsSubgroup,
-    contentGroupsJoinSpace,
-    contentGroupsJoinHarvester,
-    contentGroupsJoinCluster,
     contentClustersAdd,
     contentClustersEmpty,
     contentClustersAuthenticationError,

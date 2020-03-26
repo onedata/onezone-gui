@@ -80,24 +80,6 @@ export default Service.extend({
   },
 
   /**
-   * Joins user to a group using given token
-   * @param {string} token
-   * @returns {Promise<Group>}
-   */
-  joinGroup(token) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.joinGroup(token)
-        .then(group => Promise.all([
-          this.reloadList(),
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
-          this.reloadEffUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
-        ]).then(() => group))
-      );
-  },
-
-  /**
    * Joins user to a group without token
    * @param {string} entityId
    * @returns {Promise}
@@ -176,49 +158,6 @@ export default Service.extend({
   },
 
   /**
-   * Joins group to a space using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Space>}
-   */
-  joinSpaceAsGroup(group, token) {
-    const {
-      providerManager,
-      spaceManager,
-    } = this.getProperties('providerManager', 'spaceManager');
-    return group.joinSpace(token)
-      .then(space =>
-        Promise.all([
-          this.reloadSpaceList(get(group, 'entityId')).catch(ignoreForbiddenError),
-          providerManager.reloadList(),
-          spaceManager.reloadList(),
-          spaceManager.reloadGroupList(get(space, 'entityId'))
-          .catch(ignoreForbiddenError),
-        ]).then(() => space)
-      );
-  },
-
-  /**
-   * Joins group to a harvester using token
-   * @param {Model.Group} group 
-   * @param {string} token
-   * @returns {Promise<Harvester>}
-   */
-  joinHarvesterAsGroup(group, token) {
-    const harvesterManager = this.get('harvesterManager');
-    return group.joinHarvester(token)
-      .then(harvester => {
-        const harvesterEntityId = get(harvester, 'entityId');
-        return Promise.all([
-          harvesterManager.reloadGroupList(harvesterEntityId)
-          .catch(ignoreForbiddenError),
-          harvesterManager.reloadEffGroupList(harvesterEntityId)
-          .catch(ignoreForbiddenError),
-        ]).then(() => harvester);
-      });
-  },
-
-  /**
    * Joins group as a subgroup
    * @param {Group} childGroup 
    * @param {string} token
@@ -240,27 +179,6 @@ export default Service.extend({
           this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
         ]).then(() => parentGroup)
       );
-  },
-
-  /**
-   * Joins group to a cluster using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Cluster>}
-   */
-  joinClusterAsGroup(group, token) {
-    const clusterManager = this.get('clusterManager');
-    return group.joinCluster(token)
-      .then(cluster => {
-        const clusterEntityId = get(cluster, 'entityId');
-        return Promise.all([
-          clusterManager.reloadList(),
-          clusterManager.reloadGroupList(clusterEntityId)
-          .catch(ignoreForbiddenError),
-          clusterManager.reloadEffGroupList(clusterEntityId)
-          .catch(ignoreForbiddenError),
-        ]).then(() => cluster);
-      });
   },
 
   /**
