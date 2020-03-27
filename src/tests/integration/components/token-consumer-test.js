@@ -107,11 +107,11 @@ describe('Integration | Component | token consumer', function () {
 
   [{
     type: { accessToken: {} },
-    typeText: 'Access',
+    typeText: 'Access token',
     name: 'access',
   }, {
     type: { identityToken: {} },
-    typeText: 'Identity',
+    typeText: 'Identity token',
     name: 'identity',
   }].forEach(({ type, typeText, name }) => {
     it(`shows type information for ${name} token`, function () {
@@ -130,7 +130,7 @@ describe('Integration | Component | token consumer', function () {
 
       return fillIn('.token-string', 'token')
         .then(() => {
-          expect(this.$('.not-invite-token-message').text().trim()).to.equal(
+          expect(this.$('.no-join-message').text().trim()).to.equal(
             'This is not an invite token and cannot be used to join to any resource.'
           );
           expect(this.$('.join-btn')).to.not.exist;
@@ -222,25 +222,25 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Support space someRecord',
     modelToSelect: null,
-    noJoinBtn: true,
+    noJoinMessage: 'This token can be consumed only while giving a support to a space in Oneprovider Panel.',
   }, {
     inviteSpec: {
       inviteType: 'registerOneprovider',
     },
     modelToSelect: null,
     typeText: 'Register Oneprovider',
-    noJoinBtn: true,
+    noJoinMessage: 'This token can be consumed only during the setup of a new Oneprovider cluster.',
   }].forEach(({
     inviteSpec,
     typeText,
     modelToSelect,
     selectorPlaceholder,
-    noJoinBtn,
+    noJoinMessage,
     selectorDescription,
   }) => {
     const inviteType = inviteSpec.inviteType;
 
-    if (noJoinBtn) {
+    if (noJoinMessage) {
       it(`does not show "Join" button for invite ${inviteType} token`, function () {
         stubExamine(this, 'token', resolve({
           type: {
@@ -251,7 +251,10 @@ describe('Integration | Component | token consumer', function () {
         this.render(hbs `{{token-consumer}}`);
 
         return fillIn('.token-string', 'token')
-          .then(() => expect(this.$('.join-btn')).to.not.exist);
+          .then(() => {
+            expect(this.$('.no-join-message').text().trim()).to.equal(noJoinMessage);
+            expect(this.$('.join-btn')).to.not.exist;
+          });
       });
     } else {
       it(`shows "Join" button for invite ${inviteType} token`, function () {
@@ -265,7 +268,7 @@ describe('Integration | Component | token consumer', function () {
 
         return fillIn('.token-string', 'token')
           .then(() => {
-            expect(this.$('.not-invite-token-message')).to.not.exist;
+            expect(this.$('.no-join-message')).to.not.exist;
             expect(this.$('.join-btn')).to.exist;
           });
       });

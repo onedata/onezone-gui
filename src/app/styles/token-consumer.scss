@@ -9,7 +9,7 @@
 
   .token-container {
     position: relative;
-    margin-bottom: $padding-base-vertical;
+    margin-bottom: 2 * $padding-base-vertical;
 
     .spin-spinner-block {
       position: absolute;
@@ -20,19 +20,31 @@
   }
 
   .type-info {
-    margin-bottom: 2 * $padding-large-vertical;
+    margin-bottom: 2 * $padding-base-vertical;
+    font-size: 13pt;
+
+    strong {
+      @include font-bold();
+    }
 
     .type-label {
       @include font-semibold();
     }
   }
 
+  .joining-record-container {
+    position: relative;
+    min-height: 60px;
+    margin-bottom: 2 * $padding-base-vertical;
+  }
+
   .joining-record-selector {
     text-align: left;
-    margin-bottom: $padding-base-vertical;
+    margin-bottom: 2 * $padding-base-vertical;
   }
 
   .warning-icon {
-    height: 18px;
+    height: 21px;
+    vertical-align: text-bottom;
   }
 }

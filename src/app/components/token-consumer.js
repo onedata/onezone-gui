@@ -159,6 +159,9 @@ export default Component.extend(I18n, {
     }
   ),
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
   joiningModelName: computed('type', function joiningModelName() {
     const inviteType = this.get('type.inviteToken.inviteType');
     if (inviteType) {
@@ -171,12 +174,18 @@ export default Component.extend(I18n, {
     return null;
   }),
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
   joiningRecordSelectorModelName: conditional(
     array.includes(raw(['group', 'space']), 'joiningModelName'),
     'joiningModelName',
     raw(null)
   ),
 
+  /**
+   * @type {ComputedProperty<String>}
+   */
   joiningRecordSelectorDescription: computed(
     'latestJoiningRecordSelectorModelName',
     'type',
@@ -220,6 +229,27 @@ export default Component.extend(I18n, {
       'type.inviteToken.inviteType'
     )),
   ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  noJoinMessage: computed('type.inviteToken.inviteType', function noJoinMessage() {
+    const typeName = this.get('typeName');
+    const inviteType = this.get('type.inviteToken.inviteType');
+
+    let translationName;
+    if (typeName !== 'invite') {
+      translationName = 'notAnInviteTokenInfo';
+    } else if (inviteType === 'registerOneprovider') {
+      translationName = 'registerOneproviderTokenInfo';
+    } else if (inviteType === 'supportSpace') {
+      translationName = 'supportSpaceTokenInfo';
+    }
+
+    if (translationName && typeName) {
+      return this.t(translationName);
+    }
+  }),
 
   /**
    * @type {ComputedProperty<boolean>}

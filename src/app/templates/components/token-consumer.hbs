@@ -1,4 +1,3 @@
-<p>{{tt this "tokenInputDescription"}}</p>
 <div class="token-container">
   <input
     type="text"
@@ -19,42 +18,46 @@
 {{else}}
   {{#if typeText}}
     <div class="type-info">
-      <span class="type-label">{{tt this "typeLabel"}}:</span> <span class="token-type">{{typeText}}</span>
-      {{#if hasUnresolvedTargetName}}
-        <img class="warning-icon {{elementId}}-warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}>
-        {{one-tooltip
-          title=(tt this "unresolvedTargetWarning")
-          triggerElement=(concat "." elementId "-warning-icon")
-          triggerEvent="hover"
-        }}
-      {{/if}}
+      <p class="token-type">
+        {{typeText}}
+        {{#if hasUnresolvedTargetName}}
+          <img class="warning-icon {{elementId}}-warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}>
+          {{one-tooltip
+            title=(tt this "unresolvedTargetWarning")
+            triggerElement=(concat "." elementId "-warning-icon")
+            triggerEvent="hover"
+          }}
+        {{/if}}
+      </p>
     </div>
   {{/if}}
-  {{#if (and typeName (not-eq typeName "invite"))}}
-    <div class="not-invite-token-message alert alert-info" role="alert">
-      {{tt this "notAnInviteTokenInfo"}}
+  {{#if noJoinMessage}}
+    <div class="no-join-message alert alert-info" role="alert">
+      {{noJoinMessage}}
     </div>
   {{/if}}
   {{#if joiningRecordSelectorModelName}}
-    {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy}}
-      <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
-      <div class="joining-record-selector">
-        {{#one-dropdown
-          options=joiningRecordSelectorOptionsProxy
-          onchange=(action (mut selectedJoiningRecordOption))
-          selected=selectedJoiningRecordOption
-          renderInPlace=true
-          placeholder=(tt this (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName))
-          as |recordOption|}}
-          <div class="option-container">
-            {{one-icon icon=recordOption.icon}}
-            {{#truncated-string class="text"}}
-              {{recordOption.label}}
-            {{/truncated-string}}
-          </div>
-        {{/one-dropdown}}
-      </div>
-    {{/promise-proxy-container}}
+    <div class="joining-record-container">
+      {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy sizeClass="sm"}}
+        <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
+        <div class="joining-record-selector">
+          {{#one-dropdown
+            options=joiningRecordSelectorOptionsProxy
+            onchange=(action (mut selectedJoiningRecordOption))
+            selected=selectedJoiningRecordOption
+            renderInPlace=true
+            placeholder=(tt this (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName))
+            as |recordOption|}}
+            <div class="option-container">
+              {{one-icon icon=recordOption.icon}}
+              {{#truncated-string class="text"}}
+                {{recordOption.label}}
+              {{/truncated-string}}
+            </div>
+          {{/one-dropdown}}
+        </div>
+      {{/promise-proxy-container}}
+    </div>
   {{/if}}
   {{#if showJoinBtn}}
     {{#one-spin-button
