@@ -78,7 +78,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  limitationsDescription: computed('inviteType', function subjectDescription() {
+  limitationsDescription: computed('inviteType', function limitationsDescription() {
     const inviteType = this.get('inviteType');
     if (['onedatify', 'onedatifyWithImport'].includes(inviteType)) {
       return this.t('onedatifyLimitationsDescription');

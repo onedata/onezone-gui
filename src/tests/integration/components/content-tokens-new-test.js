@@ -18,9 +18,7 @@ describe('Integration | Component | content tokens new', function () {
 
   beforeEach(function () {
     sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
-      .resolves({
-        entityId: 'user1',
-      });
+      .resolves({ entityId: 'user1' });
     sinon.stub(lookupService(this, 'group-manager'), 'getGroups')
       .resolves({
         list: PromiseArray.create({

@@ -1,8 +1,8 @@
 /**
  * A modal that generates temporary invite tokens of specified type. Data needed from
  * modalOptions:
- * * inviteType - type of invite token, e.g. userJoinSpace,
- * * targetRecord - target of invitation, e.g. space record for userJoinSpace type,
+ * - inviteType - type of invite token, e.g. userJoinSpace,
+ * - targetRecord - target of invitation, e.g. space record for userJoinSpace type.
  *
  * @module components/modals/generate-invite-token-modal
  * @author Michał Borzęcki

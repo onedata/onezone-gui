@@ -2211,6 +2211,7 @@ describe('Integration | Component | token editor', function () {
     'does not set token invite type if predefinedValues has property "inviteType" specified but form has "type" different than "invite"',
     function () {
       this.set('predefinedValues', {
+        type: 'access',
         inviteType: 'userJoinHarvester',
       });
       this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
@@ -2249,7 +2250,7 @@ describe('Integration | Component | token editor', function () {
       this.set('predefinedValues', {
         type: 'invite',
         inviteType: 'userJoinHarvester',
-        inviteTargetId: 'harvester3',
+        inviteTargetId: 'notExistingHarvester',
       });
       this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
 
