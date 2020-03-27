@@ -91,6 +91,10 @@ export const VirtualShareList = EmberObject.extend({
       };
     }
   },
+
+  reload() {
+    return allFulfilled(this.get('shareLists').invoke('reload'));
+  },
 });
 
 export default Service.extend(UserProxyMixin, {

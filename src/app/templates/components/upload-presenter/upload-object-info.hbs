@@ -1,8 +1,21 @@
 <div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
-<div class="upload-object-nesting-container" {{action "toggleExpand" value="target" on="click"}}>
+<div
+  class="upload-object-nesting-container"
+  onclick={{action "toggleExpand" value="target"}}
+>
   <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
     {{one-icon class=(concat uploadObject.objectType "-icon upload-object-icon") icon=objectIcon}}
-    {{#truncated-string class="upload-object-name"}}{{uploadObject.objectName}}{{/truncated-string}}
+    {{#if fileUrl}}
+      {{#truncated-string class="upload-object-name"}}
+        <a href={{fileUrl}} class="black upload-object-link">
+          {{uploadObject.objectName}}
+        </a>
+      {{/truncated-string}}
+    {{else}}
+      {{#truncated-string class="upload-object-name"}}
+        {{uploadObject.objectName}}
+      {{/truncated-string}}
+    {{/if}}
     <div class="upload-object-icons">
       {{#if (eq uploadObject.state "failed")}}
         {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
@@ -17,7 +30,9 @@
     </div>
     {{#unless isCancelledDirectory}}
       <div class="upload-object-progress-info">
-        {{bytes-to-string uploadObject.bytesUploaded}} {{tt this "progressOf"}} {{bytes-to-string uploadObject.objectSize}}
+        {{bytes-to-string uploadObject.bytesUploaded}}
+        {{tt this "progressOf"}}
+        {{bytes-to-string uploadObject.objectSize}}
       </div>
     {{/unless}}
     {{upload-presenter/cancel-upload
@@ -30,7 +45,8 @@
     <div
       class="progress-bar {{progressBarContextClass}}"
       role="progressbar"
-      style={{unless isCancelledDirectory progressBarWidthStyle}}>
+      style={{unless isCancelledDirectory progressBarWidthStyle}}
+    >
     </div>
     {{one-tooltip title=(if uploadObject.isCancelled (tt this "cancelled") (concat uploadObject.progress "%")) delayShow=200}}
   </div>

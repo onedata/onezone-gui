@@ -3,7 +3,7 @@
  *
  * @module components/upload-presenter/upload-object-info
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -14,6 +14,8 @@ import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: ['up-upload-object-info'],
@@ -21,6 +23,8 @@ export default Component.extend(I18n, {
     'isExpanded:expanded',
     'uploadObject.isCancelled:cancelled',
   ],
+
+  router: service(),
 
   /**
    * @override
@@ -146,6 +150,26 @@ export default Component.extend(I18n, {
     }
   ),
 
+  fileUrl: computed('uploadObject.{objectType,fileId,spaceId}', function fileUrl() {
+    const {
+      uploadObject,
+      router,
+    } = this.getProperties('uploadObject', 'router');
+    const { objectType, fileId, spaceId } = uploadObject;
+    if (objectType === 'file' && fileId && spaceId) {
+      return router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'data', {
+          queryParams: {
+            options: serializeAspectOptions({ dir: fileId, selected: fileId }),
+          },
+        }
+      );
+    }
+  }),
+
   actions: {
     toggleExpand() {
       const {
@@ -154,6 +178,8 @@ export default Component.extend(I18n, {
       } = this.getProperties('onToggleExpand', 'isExpandable');
       if (!$(event.target).closest('.cancel-action').length && isExpandable) {
         onToggleExpand();
+      } else {
+        return true;
       }
     },
   },

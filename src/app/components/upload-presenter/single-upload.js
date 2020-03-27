@@ -5,7 +5,7 @@
  *
  * @module components/upload-presenter/single-upload
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -16,6 +16,8 @@ import { next, later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
+
+const minimizeAfterFinishDelay = 10000;
 
 export default Component.extend({
   classNames: ['up-single-upload'],
@@ -135,6 +137,18 @@ export default Component.extend({
     }
   },
 
+  mouseEnter() {
+    if (this.get('state') === 'uploaded') {
+      const {
+        isMinimized,
+        minimizeTargetSelector,
+      } = this.getProperties('isMinimized', 'minimizeTargetSelector');
+      if (!isMinimized && minimizeTargetSelector) {
+        this.cancelScheduledMinimalization();
+      }
+    }
+  },
+
   scheduleMinimalization() {
     const {
       scheduledMinimalization,
@@ -146,7 +160,13 @@ export default Component.extend({
     if (scheduledMinimalization === undefined) {
       this.set(
         'scheduledMinimalization',
-        later(this, 'send', 'toggleMinimize', true, floatingMode ? 3000 : 0)
+        later(
+          this,
+          'send',
+          'toggleMinimize',
+          true,
+          floatingMode ? minimizeAfterFinishDelay : 0
+        )
       );
     }
   },

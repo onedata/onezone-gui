@@ -19,12 +19,13 @@
       {{#one-tile
         class="text-center resource-browse-tile"
         title=(tt this "tileDataTitle")
-        aspect="data"
-        routeQueryParams=dataTileQueryParams
+        customLink=oneproviderHrefProxy.content
         moreText=(tt this "browseFiles")}}
         <figure class="main-figure">
           <img class="main-image" src="assets/images/space-data.svg">
-          {{#truncated-string tagName="span" class="one-label"}}{{dataProviderProxy.name}}{{/truncated-string}}
+          {{#truncated-string tagName="span" class="one-label"}}
+            {{dataProviderProxy.name}}
+          {{/truncated-string}}
         </figure>
       {{/one-tile}}
     {{/if}}
@@ -41,7 +42,9 @@
         aspect=(if isSupported "providers" "support")
         footerText=(if isSupported (tt this "addSupport"))
         footerTextIcon=(if isSupported "provider-add")
-        footerLinkToParams=(if isSupported (array "onedata.sidebar.content.aspect" "spaces" spaceId "support"))
+        footerLinkToParams=(if isSupported
+          (array "onedata.sidebar.content.aspect" "spaces" spaceId "support")
+        )
       }}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))

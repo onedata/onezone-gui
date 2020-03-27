@@ -6,6 +6,10 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5929 Updated common libs
+* VFS-6176 Fixed broken Oneprovider dropdown on global map
+* VFS-6115 Fixed bugs and added improvements related to embedded Oneprovider GUI SP1
+* VFS-5767 Fixed major bugs in file browser and shares integration
 * VFS-5988 Added shares views and management
 * VFS-6109 Added more verbose unverified harvester GUI plugin error and trimming to token inputs
 * VFS-6102 Added harvester privileges to space

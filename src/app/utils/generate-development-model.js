@@ -3,7 +3,7 @@
  *
  * @module utils/generate-development-model
  * @author Jakub Liput
- * @copyright (C) 2017-2018 ACK CYFRONET AGH
+ * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  *
  */
@@ -38,6 +38,9 @@ const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
 );
+const providerVersions = _.times(NUMBER_OF_PROVIDERS, _.constant('20.02.0-beta1'));
+// uncomment below to test 19.02.1 integration
+// providerVersions[0] = '19.02.1';
 
 const types = [
   'space',
@@ -67,16 +70,6 @@ const providerClusterDefaultData = {
     creatorType: 'root',
     creatorId: '',
     creationTime: 1550156285,
-  },
-  workerVersion: {
-    release: '18.02.*',
-    gui: '87bbe581a731f1bce18bdf0a2def80671226f3721bc6685ecad0d468f3d754e5',
-    build: '176-g36e2f56',
-  },
-  onepanelVersion: {
-    release: '18.02.0-rc13',
-    gui: '47d07d54d0a33c4715f1532c3d50b468db7b66d3e753b0bb13dfdeeefdc450a2',
-    build: '161-g344737f',
   },
 };
 
@@ -404,11 +397,22 @@ function generateProviderClusterRecord(index) {
   const providerId = getProviderId(index);
   const providerClusterGri = clusterInstanceGri(providerId);
   const providerRecordId = getProviderRecordId(index);
+  const release = providerVersions[index];
   return Object.assign({
     id: providerClusterGri,
     gri: providerClusterGri,
     name: PROVIDER_NAMES[index],
     provider: providerRecordId,
+    workerVersion: {
+      release,
+      gui: '019e66e9fda19abfabcef7e4261f99d681a1973373ea287bc0c6f84ef6a1da79',
+      build: '0-gcb4d07f5f',
+    },
+    onepanelVersion: {
+      release,
+      gui: '2c4bec5dcd19bb900ea5f63fcdd39e359ef6e18cd064b20016d52fcde337cab0',
+      build: '0-g6313464e',
+    },
   }, providerClusterDefaultData);
 }
 
