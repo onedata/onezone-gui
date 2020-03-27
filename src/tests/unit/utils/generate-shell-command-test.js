@@ -8,7 +8,7 @@ describe('Unit | Utility | generate shell command', function () {
     const supportToken = 'jdisdfg7fgr36t67f';
     const onezoneRegistrationToken = 'some_reg_token';
 
-    let result = generateShellCommand('onedatify', {
+    const result = generateShellCommand('onedatify', {
       supportToken,
       onezoneRegistrationToken,
     });
@@ -21,7 +21,7 @@ describe('Unit | Utility | generate shell command', function () {
   it('escapes string delimiter in onedatify command', function () {
     const supportToken = '\'hey\'destroy\'; rm -rf;';
 
-    let result = generateShellCommand('onedatify', { supportToken });
+    const result = generateShellCommand('onedatify', { supportToken });
     expect(result).to.match(/curl/);
     expect(result).to.match(/'\\'hey\\'destroy\\'; rm -rf;'/);
   });

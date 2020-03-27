@@ -24,7 +24,7 @@ export default function handleLoginEndpoint(data, onError) {
       onError();
     }
   } else {
-    let { method, url, formData } = data;
+    const { method, url, formData } = data;
     if (method === 'get') {
       window.location = url;
     } else if (method === 'post') {

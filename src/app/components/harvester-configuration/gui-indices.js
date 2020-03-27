@@ -133,7 +133,7 @@ export default Component.extend(I18n, {
       return PromiseArray.create({
         promise: get(harvester, 'hasViewPrivilege') !== false ?
           get(harvester, 'indexList').then(list => list ? get(list, 'list') : A()) :
-          reject({ id: 'forbidden' }),
+        reject({ id: 'forbidden' }),
       });
     }
   ),
@@ -297,16 +297,14 @@ export default Component.extend(I18n, {
     guiPluginIndices.forEach(guiIndex => {
       const guiIndexName = get(guiIndex, 'name');
       switch (get(selectedAssignMethods, guiIndexName)) {
-        case 'create':
-          {
-            createNames.push(get(createIndicesNames, guiIndexName).trim());
-            break;
-          }
-        case 'reuse':
-          {
-            alreadySelected.push(get(selectedIndices, guiIndexName));
-            break;
-          }
+        case 'create': {
+          createNames.push(get(createIndicesNames, guiIndexName).trim());
+          break;
+        }
+        case 'reuse': {
+          alreadySelected.push(get(selectedIndices, guiIndexName));
+          break;
+        }
       }
     });
 
@@ -315,40 +313,38 @@ export default Component.extend(I18n, {
       const assignMethod = get(selectedAssignMethods, guiIndexName);
       let value;
       switch (assignMethod) {
-        case 'create':
-          {
-            value = get(createIndicesNames, guiIndexName).trim();
-            if (existingNames.includes(value)) {
-              set(
-                errors,
-                guiIndexName,
-                this.getErrorMessage('nameUsedByExistingIndex', true)
-              );
-              return;
-            } else if (createNames.indexOf(value) !== createNames.lastIndexOf(value)) {
-              set(
-                errors,
-                guiIndexName,
-                this.getErrorMessage('nameUsedToCreateAnotherIndex', true)
-              );
-              return;
-            }
-            break;
+        case 'create': {
+          value = get(createIndicesNames, guiIndexName).trim();
+          if (existingNames.includes(value)) {
+            set(
+              errors,
+              guiIndexName,
+              this.getErrorMessage('nameUsedByExistingIndex', true)
+            );
+            return;
+          } else if (createNames.indexOf(value) !== createNames.lastIndexOf(value)) {
+            set(
+              errors,
+              guiIndexName,
+              this.getErrorMessage('nameUsedToCreateAnotherIndex', true)
+            );
+            return;
           }
-        case 'reuse':
-          {
-            value = get(selectedIndices, guiIndexName);
-            if (alreadySelected.indexOf(value) !==
-              alreadySelected.lastIndexOf(value)) {
-              set(
-                errors,
-                guiIndexName,
-                this.getErrorMessage('isAlreadyAssigned', true)
-              );
-              return;
-            }
-            break;
+          break;
+        }
+        case 'reuse': {
+          value = get(selectedIndices, guiIndexName);
+          if (alreadySelected.indexOf(value) !==
+            alreadySelected.lastIndexOf(value)) {
+            set(
+              errors,
+              guiIndexName,
+              this.getErrorMessage('isAlreadyAssigned', true)
+            );
+            return;
           }
+          break;
+        }
         case 'unassigned':
           // whatever value that will pass "emptiness" test
           value = true;
@@ -394,23 +390,22 @@ export default Component.extend(I18n, {
       const guiIndexName = get(guiIndex, 'name');
       const assignMethod = get(selectedAssignMethods, guiIndexName);
       switch (assignMethod) {
-        case 'create':
-          {
-            let schema = get(guiIndex, 'schema');
-            if (isNone(schema) || schema === '') {
-              schema = '';
-            } else if (typeof schema !== 'string') {
-              schema = JSON.stringify(schema, null, 2);
-            }
-            indicesToCreate.pushObject({
-              name: get(createIndicesNames, guiIndexName),
-              schema,
-              guiPluginName: guiIndexName,
-            });
+        case 'create': {
+          let schema = get(guiIndex, 'schema');
+          if (isNone(schema) || schema === '') {
+            schema = '';
+          } else if (typeof schema !== 'string') {
+            schema = JSON.stringify(schema, null, 2);
           }
-          // fallthrough to remove old assign to harvester index, which could be
-          // used for gui index we have just created 
-          /* fallthrough */
+          indicesToCreate.pushObject({
+            name: get(createIndicesNames, guiIndexName),
+            schema,
+            guiPluginName: guiIndexName,
+          });
+        }
+        // fallthrough to remove old assign to harvester index, which could be
+        // used for gui index we have just created 
+        /* fallthrough */
         case 'unassigned':
           harvesterIndicesProxy.forEach(index => {
             if (get(index, 'guiPluginName') === guiIndexName) {
@@ -419,21 +414,20 @@ export default Component.extend(I18n, {
             }
           });
           break;
-        case 'reuse':
-          {
-            const selectedIndex = get(selectedIndices, guiIndexName);
-            harvesterIndicesProxy.without(selectedIndex).forEach(index => {
-              if (get(index, 'guiPluginName') === guiIndexName) {
-                set(index, 'guiPluginName', null);
-                indicesToUpdate.addObject(index);
-              }
-            });
-            if (get(selectedIndex, 'guiPluginName') !== guiIndexName) {
-              set(selectedIndex, 'guiPluginName', guiIndexName);
-              indicesToUpdate.addObject(selectedIndex);
+        case 'reuse': {
+          const selectedIndex = get(selectedIndices, guiIndexName);
+          harvesterIndicesProxy.without(selectedIndex).forEach(index => {
+            if (get(index, 'guiPluginName') === guiIndexName) {
+              set(index, 'guiPluginName', null);
+              indicesToUpdate.addObject(index);
             }
-            break;
+          });
+          if (get(selectedIndex, 'guiPluginName') !== guiIndexName) {
+            set(selectedIndex, 'guiPluginName', guiIndexName);
+            indicesToUpdate.addObject(selectedIndex);
           }
+          break;
+        }
       }
     });
     return {
@@ -489,7 +483,7 @@ export default Component.extend(I18n, {
           .then(() => {
             const createErrors = createPromises.filterBy('success', false);
             const updateErrors = updatePromises.filterBy('success', false);
-            let errorsToShow = [];
+            const errorsToShow = [];
             if (listReloadError) {
               errorsToShow.push({
                 error: this.t('listReloadError'),

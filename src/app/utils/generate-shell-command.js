@@ -42,7 +42,7 @@ const GENERATORS = {
  * @returns {string|undefined}
  */
 export default function generateShellCommand(type, options = {}) {
-  let fun = GENERATORS[type];
+  const fun = GENERATORS[type];
   if (fun) {
     return fun(options);
   } else {

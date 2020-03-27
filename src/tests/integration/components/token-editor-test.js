@@ -275,7 +275,8 @@ describe('Integration | Component | token editor', function () {
       'identity',
       'invite',
     ].forEach(type =>
-      expect(this.$(`.type-field .option-${type}`).text().trim()).to.equal(_.upperFirst(type))
+      expect(this.$(`.type-field .option-${type}`).text().trim())
+      .to.equal(_.upperFirst(type))
     );
   });
 
@@ -470,7 +471,8 @@ describe('Integration | Component | token editor', function () {
                 expect(this.$(
                   `.node-text:contains(View ${targetModelName}) + .form-group .one-way-toggle`
                 )).to.have.class('checked');
-                expect(this.$('.privileges-field .one-way-toggle.checked')).to.have.length(1);
+                expect(this.$('.privileges-field .one-way-toggle.checked'))
+                  .to.have.length(1);
                 return new OneTooltipHelper('.privileges-field .one-label-tip .oneicon')
                   .getText();
               })
@@ -2081,18 +2083,21 @@ describe('Integration | Component | token editor', function () {
     expect($cancel).to.not.have.attr('disabled');
   });
 
-  it('renders disabled submit button when form becomes invalid in edit mode', function () {
-    const token = {
-      name: 'token1',
-      revoked: true,
-    };
-    this.set('token', token);
+  it(
+    'renders disabled submit button when form becomes invalid in edit mode',
+    function () {
+      const token = {
+        name: 'token1',
+        revoked: true,
+      };
+      this.set('token', token);
 
-    this.render(hbs `{{token-editor mode="edit" token=token}}`);
+      this.render(hbs `{{token-editor mode="edit" token=token}}`);
 
-    return fillIn('.name-field input', '')
-      .then(() => expect(this.$('.submit-token')).to.have.attr('disabled'));
-  });
+      return fillIn('.name-field input', '')
+        .then(() => expect(this.$('.submit-token')).to.have.attr('disabled'));
+    }
+  );
 
   it(
     'calls injected onSubmit on submit click with empty diff object in edit mode',

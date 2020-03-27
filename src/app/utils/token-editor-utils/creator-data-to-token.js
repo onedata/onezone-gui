@@ -234,7 +234,8 @@ export default function creatorDataToToken(editorData, currentUser) {
     }
 
     if (objectIdCaveat && get(objectIdCaveat, 'objectIdEnabled')) {
-      const objectIdFieldsNames = get(objectIdCaveat, 'objectId.__fieldsValueNames') || [];
+      const objectIdFieldsNames =
+        get(objectIdCaveat, 'objectId.__fieldsValueNames') || [];
       const whitelist = objectIdFieldsNames
         .map(name => get(objectIdCaveat, `objectId.${name}`))
         .compact();

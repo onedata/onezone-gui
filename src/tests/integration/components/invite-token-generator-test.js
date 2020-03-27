@@ -237,8 +237,12 @@ describe('Integration | Component | invite token generator', function () {
     inviteType: 'onedatifyWithImport',
     limitationsDescription: onedatifyLimitations,
     dontShowCustomToken: true,
-
-  }].forEach(({ inviteType, subjectDescription, limitationsDescription, dontShowCustomToken }) => {
+  }].forEach(({
+    inviteType,
+    subjectDescription,
+    limitationsDescription,
+    dontShowCustomToken,
+  }) => {
     it(`shows correct subject description for ${inviteType} invite token`, function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
@@ -252,14 +256,18 @@ describe('Integration | Component | invite token generator', function () {
       }
     });
 
-    it(`shows correct limitations description for ${inviteType} invite token`, function () {
-      this.set('inviteType', inviteType);
-      stubCreateToken(this, [inviteType, undefined], resolve());
+    it(
+      `shows correct limitations description for ${inviteType} invite token`,
+      function () {
+        this.set('inviteType', inviteType);
+        stubCreateToken(this, [inviteType, undefined], resolve());
 
-      this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-      expect(this.$('.limitations-text').text().trim()).to.equal(limitationsDescription);
-    });
+        expect(this.$('.limitations-text').text().trim())
+          .to.equal(limitationsDescription);
+      }
+    );
 
     if (dontShowCustomToken) {
       it(`does not show "custom token" link for ${inviteType} invite token`, function () {

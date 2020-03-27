@@ -80,7 +80,11 @@ const providerClusterDefaultData = {
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers, groups, spaces, providers, harvesters;
+  let sharedUsers;
+  let groups;
+  let spaces;
+  let providers;
+  let harvesters;
 
   return createGuiMessages(store)
     // create shared users
@@ -723,7 +727,8 @@ function createPrivilegesRecords(
 ) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
   const recordGri = get(record, 'gri');
-  let recordId, subjectId;
+  let recordId;
+  let subjectId;
   try {
     recordId = parseGri(recordGri).entityId;
   } catch (e) {

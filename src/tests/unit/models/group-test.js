@@ -26,22 +26,22 @@ describe('Unit | Model | group', function () {
   });
 
   it('resolves invite token using token api service and graph', function () {
-    let record = this.subject();
+    const record = this.subject();
     record.set('id', 'group.some_id.instance');
 
     const TOKEN = 'abcd';
     const tokenManager = lookupService(this, 'token-manager');
     const reloadTokensStub = sinon.stub(tokenManager, 'reloadListIfAlreadyFetched')
       .resolves();
-    let tokenApi = lookupService(this, 'onedata-token-api');
-    let tokenApiRequestStub = sinon.stub(tokenApi, 'getInviteToken');
-    let tokenData = TOKEN;
+    const tokenApi = lookupService(this, 'onedata-token-api');
+    const tokenApiRequestStub = sinon.stub(tokenApi, 'getInviteToken');
+    const tokenData = TOKEN;
     const validArgs = ['group', 'some_id', 'user'];
     tokenApiRequestStub
       .withArgs(...validArgs)
       .resolves(tokenData);
 
-    let promise = record.getInviteToken('user');
+    const promise = record.getInviteToken('user');
     expect(tokenApiRequestStub).to.be.calledWith(...validArgs);
     return promise.then(token => {
       expect(token).to.equal(TOKEN);

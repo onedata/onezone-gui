@@ -111,7 +111,7 @@ import openCreateTokenViewAction from './utils/token-actions/open-create-token-v
 import modifyTokenAction from './utils/token-actions/modify-token-action';
 import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
 
-let translations = {
+const translations = {
   tabs: {
     undefined: {
       menuItem: '',

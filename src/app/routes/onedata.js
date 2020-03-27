@@ -34,11 +34,11 @@ export default OnedataRoute.extend(AuthenticationErrorHandlerMixin, {
   },
 
   model() {
-    let currentUser = this.get('currentUser');
+    const currentUser = this.get('currentUser');
     return new Promise((resolve, reject) => {
-      let creatingAppModel = this._super(...arguments);
+      const creatingAppModel = this._super(...arguments);
       creatingAppModel.then(appModel => {
-        let gettingUser = currentUser.getCurrentUserRecord();
+        const gettingUser = currentUser.getCurrentUserRecord();
         gettingUser.then(userRecord => {
           appModel.user = userRecord;
           resolve(appModel);
