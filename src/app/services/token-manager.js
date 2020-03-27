@@ -3,7 +3,7 @@
  *
  * @module services/token-manager
  * @author Michał Borzęcki, Jakub Liput
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,11 +12,17 @@ import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import { resolve, allSettled } from 'rsvp';
 import { get } from '@ember/object';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import gri from 'onedata-gui-websocket-client/utils/gri';
+import { entityType as tokenEntityType } from 'onezone-gui/models/token';
 
 const TokenManager = Service.extend({
   store: service(),
   currentUser: service(),
   i18n: service(),
+  onedataConnection: service(),
+  onedataGraph: service(),
+  onezoneServer: service(),
 
   /**
    * Fetches collection of all tokens
@@ -73,6 +79,56 @@ const TokenManager = Service.extend({
       }))
       .save()
       .then(token => this.reloadList().then(() => token));
+  },
+
+  /**
+   * @param {String} inviteType 
+   * @param {GraphSingleModel} targetRecord
+   * @returns {Promise<String>}
+   */
+  createTemporaryInviteToken(inviteType, targetRecord) {
+    const {
+      currentUser,
+      onedataGraph,
+      onedataConnection,
+      onezoneServer,
+    } = this.getProperties(
+      'currentUser',
+      'onedataGraph',
+      'onedataConnection',
+      'onezoneServer'
+    );
+
+    const currestUserEntityId = get(currentUser, 'userId');
+    const targetRecordId = inviteType === 'registerOneprovider' ?
+      currestUserEntityId : get(targetRecord, 'entityId');
+    const maxTtl = get(onedataConnection, 'maxTemporaryTokenTtl');
+    const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+
+    return onezoneServer.getServerTime().then(serverTimestamp =>
+      onedataGraph.request({
+        gri: gri({
+          entityId: null,
+          entityType: tokenEntityType,
+          aspect: 'user_temporary_token',
+          aspectId: currestUserEntityId,
+        }),
+        operation: 'create',
+        data: {
+          type: {
+            inviteToken: {
+              inviteType,
+              [inviteTypeSpec.idFieldName]: targetRecordId,
+            },
+          },
+          caveats: [{
+            type: 'time',
+            validUntil: serverTimestamp + Math.min(maxTtl, 24 * 60 * 60),
+          }],
+        },
+        subscribe: false,
+      })
+    );
   },
 
   /**

@@ -32,7 +32,7 @@ export default Service.extend(
     getHarvesters() {
       return this.get('currentUser')
         .getCurrentUserRecord()
-        .then(user => user.get('harvesterList'))
+        .then(user => get(user, 'harvesterList'))
         .then(harvesterList =>
           get(harvesterList, 'list').then(() => harvesterList)
         );

@@ -111,6 +111,13 @@ const providerHandlers = {
       return messageNotSupported;
     }
   },
+  current_time(operation) {
+    if (operation === 'get') {
+      return {
+        timeMillis: new Date().valueOf(),
+      };
+    }
+  },
 };
 
 const clusterHandlers = {
@@ -165,6 +172,17 @@ const userHandlers = {
   },
 };
 
+const tokenHandlers = {
+  user_temporary_token(operation, entityId, data) {
+    if (operation === 'create') {
+      const valuesToEmbed = _.values(get(data, 'type.inviteToken' || {})).join('X');
+      return `${randomToken()}X${valuesToEmbed}`;
+    } else {
+      return messageNotSupported;
+    }
+  },
+};
+
 export default OnedataGraphMock.extend({
   init() {
     this._super(...arguments);
@@ -174,7 +192,8 @@ export default OnedataGraphMock.extend({
       harvester: harvesterHandlers,
       user: userHandlers,
       provider: providerHandlers,
-      cluser: clusterHandlers,
+      cluster: clusterHandlers,
+      token: tokenHandlers,
     });
     this.set(
       'handlers',

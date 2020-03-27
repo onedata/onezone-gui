@@ -2180,6 +2180,103 @@ describe('Integration | Component | token editor', function () {
         .then(() => expect(cancelSpy).to.be.calledOnce);
     }
   );
+
+  it('sets token type if predefinedValues property has "type" specified', function () {
+    this.set('predefinedValues', { type: 'invite' });
+    this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+    expect(getFieldElement(this, 'type').find('.option-invite input').prop('checked'))
+      .to.be.true;
+  });
+
+  it(
+    'sets token invite type if predefinedValues property has "type" and "inviteType" specified',
+    function () {
+      this.set('predefinedValues', {
+        type: 'invite',
+        inviteType: 'userJoinHarvester',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      return wait().then(() => {
+        const inviteType = tokenInviteTypes.findBy('inviteType', 'userJoinHarvester');
+        const $dropdownTrigger = $(new InviteTypeHelper().getTrigger());
+        expect($dropdownTrigger.text().trim()).to.equal(inviteType.label);
+      });
+
+    }
+  );
+
+  it(
+    'does not set token invite type if predefinedValues has property "inviteType" specified but form has "type" different than "invite"',
+    function () {
+      this.set('predefinedValues', {
+        type: 'access',
+        inviteType: 'userJoinHarvester',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      expect(getFieldElement(this, 'type').find('.option-invite input').prop('checked'))
+        .to.be.false;
+      return click(getFieldElement(this, 'type').find('.option-invite')[0])
+        .then(() => {
+          const inviteType = tokenInviteTypes.findBy('inviteType', 'userJoinHarvester');
+          const $dropdownTrigger = $(new InviteTypeHelper().getTrigger());
+          expect($dropdownTrigger.text().trim()).to.not.equal(inviteType.label);
+        });
+    }
+  );
+
+  it(
+    'sets token invite target if predefinedValues property has "inviteTargetId"',
+    function () {
+      this.set('predefinedValues', {
+        type: 'invite',
+        inviteType: 'userJoinHarvester',
+        inviteTargetId: 'harvester1',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      return wait().then(() => {
+        const $dropdownTrigger = $(new TargetHelper().getTrigger());
+        expect($dropdownTrigger.text().trim()).to.equal('harvester1');
+      });
+    }
+  );
+
+  it(
+    'does not set token invite target if predefinedValues property has "inviteTargetId" relating to non-existing record',
+    function () {
+      this.set('predefinedValues', {
+        type: 'invite',
+        inviteType: 'userJoinHarvester',
+        inviteTargetId: 'notExistingHarvester',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      return wait().then(() => {
+        const $dropdownTrigger = $(new TargetHelper().getTrigger());
+        expect($dropdownTrigger.text().trim()).to.equal('Select harvester...');
+      });
+    }
+  );
+
+  it(
+    'sets token expire caveat if predefinedValues property has "expire" field with timestamp',
+    function () {
+      this.set('predefinedValues', {
+        expire: '1584525600',
+      });
+      this.render(hbs `{{token-editor mode="create" predefinedValues=predefinedValues}}`);
+
+      return wait().then(() => {
+        expect(this.$('.caveats-collapse')).to.have.class('in');
+        expectCaveatToggleState(this, 'expire', true);
+        expect(getFieldElement(this, 'expire').find('input').val())
+          .to.contain('2020/03/18');
+      });
+    }
+  );
 });
 
 class InviteTypeHelper extends EmberPowerSelectHelper {

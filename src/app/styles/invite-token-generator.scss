@@ -1,0 +1,13 @@
+.invite-token-generator {
+  position: relative;
+  min-height: 180px;
+
+  .clipboard-line {
+    margin-bottom: $padding-small-vertical;
+  }
+  
+  .token-textarea {
+    margin: 0;
+    height: 140px;
+  }
+}

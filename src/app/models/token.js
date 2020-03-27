@@ -71,6 +71,8 @@ export const tokenInviteTypeToTargetModelMapping = {
 
 const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
 
+export const entityType = 'token';
+
 export default Model.extend(
   GraphSingleModelMixin,
   createDataProxyMixin('tokenTarget'), {

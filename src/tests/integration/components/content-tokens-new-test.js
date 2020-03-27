@@ -8,6 +8,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import { fillIn, click } from 'ember-native-dom-helpers';
+import { set } from '@ember/object';
 
 describe('Integration | Component | content tokens new', function () {
   this.timeout(15000);
@@ -22,6 +23,18 @@ describe('Integration | Component | content tokens new', function () {
       .resolves({
         list: PromiseArray.create({
           promise: resolve([]),
+        }),
+      });
+    sinon.stub(lookupService(this, 'harvester-manager'), 'getHarvesters')
+      .resolves({
+        list: PromiseArray.create({
+          promise: resolve([{
+            entityId: 'harvester0',
+            name: 'harvester0',
+          }, {
+            entityId: 'harvester1',
+            name: 'harvester1',
+          }]),
         }),
       });
   });
@@ -88,6 +101,28 @@ describe('Integration | Component | content tokens new', function () {
         .then(() =>
           expect(this.$('.submit-token [role="progressbar"]')).to.not.exist
         );
+    }
+  );
+
+  it(
+    'injects values passed via aspectOptions to form',
+    function () {
+      set(lookupService(this, 'navigation-state'), 'aspectOptions', {
+        type: 'invite',
+        inviteType: 'userJoinHarvester',
+        inviteTargetId: 'harvester1',
+        expire: '1584525600',
+      });
+
+      this.render(hbs `{{content-tokens-new}}`);
+
+      return wait()
+        .then(() => {
+          expect(this.$('.type-field .option-invite input').prop('checked')).to.be.true;
+          expect(this.$('.inviteType-field').text()).to.contain('Invite user to harvester');
+          expect(this.$('.target-field').text()).to.contain('harvester1');
+          expect(this.$('.expire-field').find('input').val()).to.contain('2020/03/18');
+        });
     }
   );
 });

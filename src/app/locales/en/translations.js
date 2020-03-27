@@ -61,7 +61,6 @@ import removeRelationModal from './components/remove-relation-modal';
 import groupCreateRelativeModal from './components/group-create-relative-modal';
 import groupAddYourGroupModal from './components/group-add-your-group-modal';
 import groupJoinUsingTokenModal from './components/group-join-using-token-modal';
-import inviteUsingTokenModal from './components/invite-using-token-modal';
 import joinAsUserModal from './components/join-as-user-modal';
 import membershipVisualiser from './components/membership-visualiser';
 import resourceInfoTile from './components/resource-info-tile';
@@ -89,10 +88,11 @@ import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
 import tokenEditor from './components/token-editor';
 import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
+import inviteTokenGenerator from './components/invite-token-generator';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
-// http://localhost:7357/3481/tests/index.html?hidepassed&grep=Integration%20%5C%7C%20Component%20%5C%7C%20token%20editor
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
+import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -109,6 +109,7 @@ import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-toke
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
 import modifyTokenAction from './utils/token-actions/modify-token-action';
+import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
 
 let translations = {
   tabs: {
@@ -134,6 +135,7 @@ let translations = {
     },
     modals: {
       cleanObsoleteTokensModal,
+      generateInviteTokenModal,
     },
     loginBox,
     contentTokens,
@@ -183,7 +185,6 @@ let translations = {
     groupCreateRelativeModal,
     groupAddYourGroupModal,
     groupJoinUsingTokenModal,
-    inviteUsingTokenModal,
     joinAsUserModal,
     membershipVisualiser,
     resourceInfoTile,
@@ -211,6 +212,7 @@ let translations = {
     contentTokensNew,
     tokenEditor,
     ceaseOneproviderSupportModal,
+    inviteTokenGenerator,
   },
   services: {
     tokenActions,
@@ -230,6 +232,7 @@ let translations = {
       createTokenAction,
       openCreateTokenViewAction,
       modifyTokenAction,
+      generateInviteTokenAction,
     },
   },
 };

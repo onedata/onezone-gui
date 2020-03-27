@@ -27,6 +27,7 @@ export default Component.extend(I18n, {
   ],
   attributeBindings: ['style'],
 
+  tokenActions: service(),
   i18n: service(),
 
   /**
@@ -115,14 +116,6 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   addYourGroup: notImplementedThrow,
-
-  /**
-   * Triggers generating group invitation token
-   * @type {Function}
-   * @virtual
-   * @returns {undefined}
-   */
-  inviteUsingToken: notImplementedThrow,
 
   /**
    * Triggers joining to group using token
@@ -239,24 +232,24 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  addChildGroupAction: computed(function addChildGroupAction() {
+  addChildGroupAction: computed('groupBox.group', function addChildGroupAction() {
     return {
       nestedActions: [{
-        action: () => this.get('createRelativeGroup')('child'),
-        title: this.t('createNewGroup'),
-        class: 'create-new-action',
-        icon: 'add-filled',
-      }, {
-        action: () => this.get('addYourGroup')('child'),
-        title: this.t('addYourGroup'),
-        class: 'add-your-group-action',
-        icon: 'group-invite',
-      }, {
-        action: () => this.get('inviteUsingToken')(),
-        title: this.t('inviteUsingToken'),
-        class: 'invite-using-token-action',
-        icon: 'join-plug',
-      }],
+          action: () => this.get('createRelativeGroup')('child'),
+          title: this.t('createNewGroup'),
+          class: 'create-new-action',
+          icon: 'add-filled',
+        }, {
+          action: () => this.get('addYourGroup')('child'),
+          title: this.t('addYourGroup'),
+          class: 'add-your-group-action',
+          icon: 'group-invite',
+        },
+        this.get('tokenActions').createGenerateInviteTokenAction({
+          inviteType: 'groupJoinGroup',
+          targetRecord: this.get('groupBox.group'),
+        }),
+      ],
       title: this.t('addChildGroup'),
       class: 'add-child-group-action',
       icon: 'add-filled',

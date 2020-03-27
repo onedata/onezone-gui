@@ -15,6 +15,7 @@ export default Component.extend(I18n, {
   classNames: ['content-tokens-new'],
 
   tokenActions: service(),
+  navigationState: service(),
 
   /**
    * @override

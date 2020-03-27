@@ -24,8 +24,8 @@
         &#32;
         {{#bs-button
           class="btn btn-primary btn-content-info btn-invite-space"
-          onClick=(action (mut isInviteUsingTokenModalOpened) true)}}
-          {{tt this "inviteSpaceUsingToken"}}
+          onClick=(action "inviteSpaceUsingToken")}}
+          {{inviteSpaceUsingTokenAction.title}}
         {{/bs-button}}
       </div>
     {{/content-info}}
@@ -74,8 +74,3 @@
   processing=isAddingYourSpace
   relatedRecord=harvester
   relation="sourceFor"}}
-{{invite-using-token-modal
-  opened=isInviteUsingTokenModalOpened
-  close=(action (mut isInviteUsingTokenModalOpened) false)
-  tokenType="space"
-  record=harvester}}

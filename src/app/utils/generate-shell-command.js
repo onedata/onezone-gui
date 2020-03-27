@@ -14,7 +14,7 @@ function _onezoneUrl(windowLocation = window.location) {
 function _curlCommand(url, supportToken, onezoneRegistrationToken, suffix = '') {
   const escapedSupportToken = supportToken.replace(/'/g, '\\\'');
   const onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
-  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${onezoneRegistrationToken}' --token '${escapedSupportToken}' ${suffix}`;
+  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${onezoneRegistrationToken}' --token '${escapedSupportToken}'${suffix ? ' ' + suffix : ''}`;
 }
 
 const GENERATORS = {

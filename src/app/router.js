@@ -1,8 +1,8 @@
 /**
  * Using standard routes and configuration from onedata-gui-common addon
  * @module router
- * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -14,6 +14,9 @@ import config from './config/environment';
 const Router = EmberRouter.extend({
   location: config.locationType,
   rootURL: config.rootURL,
+  // Clear all query params on each transition
+  // WARNING: This method belongs to a private Ember API. May change in next Ember versions
+  _hydrateUnsuppliedQueryParams() {},
 });
 
 Router.map(function () {

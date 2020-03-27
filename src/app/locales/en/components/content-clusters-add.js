@@ -4,6 +4,4 @@ export default {
   descriptionSee: 'See the',
   descriptionDocumentation: 'documentation',
   descriptionForMore: 'for more.',
-  generateToken: 'Generate another token',
-  copy: 'Copy',
 };

@@ -2,5 +2,9 @@
   <h1>{{tt this "header"}}</h1>
 </div>
 <div class="row content-row">
-  {{token-editor mode="create" onSubmit=(action "submit")}}
+  {{token-editor
+    mode="create"
+    predefinedValues=navigationState.aspectOptions
+    onSubmit=(action "submit")
+  }}
 </div>

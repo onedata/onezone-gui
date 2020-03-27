@@ -23,6 +23,7 @@ import { next, scheduleOnce } from '@ember/runloop';
 export default Mixin.create({
   privilegeManager: service(),
   privilegeActions: service(),
+  tokenActions: service(),
   media: service(),
   navigationState: service(),
 
@@ -119,13 +120,6 @@ export default Mixin.create({
    * @type {boolean}
    */
   isJoiningAsUser: false,
-
-  /**
-   * Positive value will show invite-using-token-modal. Possible values:
-   * 'user', 'group', null
-   * @type {string|null}
-   */
-  inviteTokenModalType: null,
 
   /**
    * @type {boolean}
@@ -286,25 +280,37 @@ export default Mixin.create({
   }),
 
   /**
+   * @type {ComputedProperty<Action>}
+   */
+  inviteGroupUsingTokenAction: computed('record', function inviteGroupUsingTokenAction() {
+    const {
+      record,
+      tokenActions,
+    } = this.getProperties('record', 'tokenActions');
+
+    return tokenActions.createGenerateInviteTokenAction({
+      inviteType: `groupJoin${_.upperFirst(get(record, 'entityType'))}`,
+      targetRecord: record,
+    });
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  groupListActions: computed(function groupListActions() {
+  groupListActions: computed('inviteGroupUsingTokenAction', function groupListActions() {
     return [{
-      action: () => this.set('createChildGroupModalVisible', true),
-      title: this.t('createChildGroup'),
-      class: 'create-child-group-action',
-      icon: 'add-filled',
-    }, {
-      action: () => this.set('addYourGroupModalVisible', true),
-      title: this.t('addYourGroup'),
-      class: 'add-your-group-action',
-      icon: 'group-invite',
-    }, {
-      action: () => this.set('inviteTokenModalType', 'group'),
-      title: this.t('inviteGroupUsingToken'),
-      class: 'invite-group-using-token-action',
-      icon: 'join-plug',
-    }];
+        action: () => this.set('createChildGroupModalVisible', true),
+        title: this.t('createChildGroup'),
+        class: 'create-child-group-action',
+        icon: 'add-filled',
+      }, {
+        action: () => this.set('addYourGroupModalVisible', true),
+        title: this.t('addYourGroup'),
+        class: 'add-your-group-action',
+        icon: 'group-invite',
+      },
+      this.get('inviteGroupUsingTokenAction'),
+    ];
   }),
 
   /**
@@ -320,19 +326,37 @@ export default Mixin.create({
   }),
 
   /**
+   * @type {ComputedProperty<Action>}
+   */
+  inviteUserUsingTokenAction: computed('record', function inviteUserUsingTokenAction() {
+    const {
+      record,
+      tokenActions,
+    } = this.getProperties('record', 'tokenActions');
+
+    return tokenActions.createGenerateInviteTokenAction({
+      inviteType: `userJoin${_.upperFirst(get(record, 'entityType'))}`,
+      targetRecord: record,
+    });
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  userListActions: computed('record.directMembership', function userListActions() {
-    const directMembership = this.get('record.directMembership');
-    const actions = directMembership ? [] : [this.get('joinAsUserAction')];
-    actions.push({
-      action: () => this.set('inviteTokenModalType', 'user'),
-      title: this.t('inviteUserUsingToken'),
-      class: 'invite-user-using-token-action',
-      icon: 'join-plug',
-    });
-    return actions;
-  }),
+  userListActions: computed(
+    'record.directMembership',
+    'inviteUserUsingTokenAction',
+    function userListActions() {
+      const {
+        joinAsUserAction,
+        record,
+        inviteUserUsingTokenAction,
+      } = this.getProperties('joinAsUserAction', 'record', 'inviteUserUsingTokenAction');
+      const actions = get(record, 'directMembership') ? [] : [joinAsUserAction];
+      actions.push(inviteUserUsingTokenAction);
+      return actions;
+    }
+  ),
 
   /**
    * @override 
@@ -505,7 +529,6 @@ export default Mixin.create({
       createChildGroupModalVisible: false,
       addYourGroupModalVisible: false,
       joinAsUserModalVisible: false,
-      inviteTokenModalType: null,
       selectedUsersProxies: A(),
       selectedGroupsProxies: A(),
       memberIdToExpand: null,
@@ -629,6 +652,12 @@ export default Mixin.create({
           joinAsUserModalVisible: false,
         })
       );
+    },
+    inviteGroupUsingToken() {
+      this.get('inviteGroupUsingTokenAction').execute();
+    },
+    inviteUserUsingToken() {
+      this.get('inviteUserUsingTokenAction').execute();
     },
   },
 });

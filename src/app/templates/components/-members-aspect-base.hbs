@@ -89,7 +89,7 @@
         truncate=false}}
         <span class="one-label">
           {{tt this "noGroupsStart"}}
-          <a {{action (mut inviteTokenModalType) "group"}}>{{tt this "noGroupsInvite"}}</a>
+          <a {{action "inviteGroupUsingToken"}}>{{tt this "noGroupsInvite"}}</a>
           {{tt this "noGroupsEnd"}}
         </span>
       {{/listItem.header}}
@@ -122,7 +122,7 @@
         truncate=false}}
         <span class="one-label">
           {{tt this "noUsersStart"}}
-          <a {{action (mut inviteTokenModalType) "user"}}>{{tt this "noUsersInvite"}}</a>
+          <a {{action "inviteUserUsingToken"}}>{{tt this "noUsersInvite"}}</a>
           {{tt this "noUsersEnd"}}
         </span>
       {{/listItem.header}}
@@ -160,11 +160,6 @@
   processing=isAddingYourGroup
   relatedRecord=record
   relation=(if (eq record.entityType "group") "child" "member")}}
-{{invite-using-token-modal
-  opened=inviteTokenModalType
-  close=(action (mut inviteTokenModalType) null)
-  tokenType=inviteTokenModalType
-  record=record}}
 {{remove-relation-modal
   opened=(and memberToRemove (not memberToRemove.isDeleted))
   close=(action (mut memberToRemove) null)

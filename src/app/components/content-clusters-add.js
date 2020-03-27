@@ -9,34 +9,12 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { inject as service } from '@ember/service';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 
-export default Component.extend(I18n, createDataProxyMixin('token'), {
+export default Component.extend(I18n, {
   classNames: ['content-clusters-add'],
-
-  clusterManager: service(),
 
   /**
    * @override
    */
   i18nPrefix: 'components.contentClustersAdd',
-
-  init() {
-    this._super(...arguments);
-    this.updateTokenProxy();
-  },
-
-  /**
-   * @override
-   */
-  fetchToken() {
-    return this.get('clusterManager').getOnezoneRegistrationToken();
-  },
-
-  actions: {
-    generateToken() {
-      this.updateTokenProxy();
-    },
-  },
 });

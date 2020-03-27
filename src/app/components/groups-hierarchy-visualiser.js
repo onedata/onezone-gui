@@ -68,7 +68,7 @@
  *      show/hide relation in previous/next column.
  *    - modals: GroupLeaveModal, GroupRemoveModal, GroupRemoveRelationModal,
  *      GroupCreateRelativeModal, GroupAddYourGroupModal, GroupJoinUsingTokenModal,
- *      GroupInviteUsingTokenModal, PrivilegesEditorModal.
+ *      PrivilegesEditorModal.
  * 
  *                        GroupsHierarchyVisualiser
  *                                    |
@@ -319,12 +319,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isGroupConsumingToken: false,
-
-  /**
-   * Group for invite-using-token-modal
-   * @type {Group|null}
-   */
-  invitingGroupUsingToken: null,
 
   /**
    * Relation for privileges-editor-modal

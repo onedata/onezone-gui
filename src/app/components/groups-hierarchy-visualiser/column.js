@@ -93,15 +93,6 @@ export default Component.extend(I18n, {
   addYourGroup: notImplementedThrow,
 
   /**
-   * Triggers generating group invitation token
-   * @type {Function}
-   * @virtual
-   * @param {Group} group
-   * @returns {undefined}
-   */
-  inviteUsingToken: notImplementedThrow,
-
-  /**
    * Triggers joining to group using token
    * @type {Function}
    * @virtual
