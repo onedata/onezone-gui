@@ -55,7 +55,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       title,
     } = getProperties(action, 'className', 'icon', 'title');
     expect(className).to.equal('clean-obsolete-tokens-trigger');
-    expect(icon).to.equal('clean');
+    expect(icon).to.equal('clean-filled');
     expect(String(title)).to.equal('Clean up obsolete tokens');
   });
 

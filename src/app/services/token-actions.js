@@ -60,9 +60,9 @@ export default Service.extend(I18n, {
 
   createGlobalActions(context) {
     return [
-      this.createOpenConsumeTokenViewAction(context),
       this.createOpenCreateTokenViewAction(context),
       this.createCleanObsoleteTokensAction(context),
+      this.createOpenConsumeTokenViewAction(context),
     ];
   },
 

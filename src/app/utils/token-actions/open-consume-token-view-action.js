@@ -28,7 +28,7 @@ export default Action.extend({
   /**
    * @override
    */
-  icon: 'add-filled',
+  icon: 'consume-token',
 
   /**
    * @override
