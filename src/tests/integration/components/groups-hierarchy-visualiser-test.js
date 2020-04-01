@@ -376,8 +376,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       })
       .then(() => {
         const helper = new GroupsHierarchyVisualiserHelper(this.$());
-        let $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
-        let $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
+        const $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
+        const $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
         expect(
           Number.parseFloat($groupBox2.get(0).style.top) -
           Number.parseFloat($groupBox1.get(0).style.top)
@@ -782,7 +782,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    let helper, $nonEmptyColumnsBefore, $nonEmptyColumnsAfter;
+    let helper;
+    let $nonEmptyColumnsBefore;
+    let $nonEmptyColumnsAfter;
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());

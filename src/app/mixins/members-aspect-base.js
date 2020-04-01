@@ -537,7 +537,6 @@ export default Mixin.create({
 
   /**
    * Loads all data necessary for creating batch edit model
-   * @returns {PrivilegeRecordProxy}
    */
   loadBatchPrivilegesEditModel() {
     const selectedMembersProxies = this.get('selectedMembersProxies');
@@ -579,7 +578,7 @@ export default Mixin.create({
       }));
     },
     recordsSelected(type, records) {
-      let targetListName = type === 'user' ?
+      const targetListName = type === 'user' ?
         'selectedUsersProxies' : 'selectedGroupsProxies';
       this.set(targetListName, A(records));
       // there are issues in refreshing state in recalculating

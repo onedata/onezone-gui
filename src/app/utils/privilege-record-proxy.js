@@ -139,7 +139,7 @@ export default EmberObject.extend({
     'records.{reason,content.@each.isForbidden}',
     function fetchError() {
       const records = this.get('records') || {};
-      let reason = get(records, 'reason');
+      const reason = get(records, 'reason');
       if (reason) {
         return reason;
       } else {

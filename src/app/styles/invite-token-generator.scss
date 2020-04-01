@@ -10,16 +10,4 @@
     margin: 0;
     height: 140px;
   }
-
-  .additional-token-actions {
-    text-align: right;
-
-    a {
-      display: inline-block;
-
-      &:first-child ~ a {
-        margin-left: $padding-small-horizontal;
-      }
-    }
-  }
 }

@@ -46,9 +46,9 @@ export default EmberObject.extend({
         set(column, 'workspace', workspace);
       }
     });
-    let prevColumn,
-      column = null,
-      nextColumn = columns.objectAt(0);
+    let prevColumn;
+    let column = null;
+    let nextColumn = columns.objectAt(0);
     for (let i = 0, l = get(columns, 'length'); i < l; i++) {
       prevColumn = column;
       column = nextColumn;

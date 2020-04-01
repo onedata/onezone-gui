@@ -32,7 +32,7 @@ export default Mixin.create({
         'data', {
           queryParams: {
             options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ dirId, providerId })
+              navigationState.mergedAspectOptions({ dir: dirId, providerId })
             ),
           },
         }

@@ -240,7 +240,8 @@ export default Component.extend(I18n, {
         for (let i = 0; i < elementsNumber; i++) {
           const element = recordsProxy.objectAt(i);
           if (!element) {
-            let nonEmptyElement, j;
+            let nonEmptyElement;
+            let j;
             for (j = i + 1; j < elementsNumber; j++) {
               const thisElement = recordsProxy.objectAt(j);
               if (thisElement) {

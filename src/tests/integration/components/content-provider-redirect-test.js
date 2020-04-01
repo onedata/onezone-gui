@@ -104,52 +104,7 @@ describe('Integration | Component | content provider redirect', function () {
     }
   );
 
-  it(
-    'fetches and uses provider redirect URL for legacy Oneproviders',
-    function () {
-      const provider = {
-        entityId: 'test1',
-        belongsTo(relName) {
-          if (relName === 'cluster') {
-            return {
-              id: () => 'clusters.123.instance:protected',
-            };
-          }
-        },
-        cluster: resolve({
-          workerVersion: {
-            release: '18.02.*',
-          },
-        }),
-      };
-      const onezoneServer = lookupService(this, 'onezone-server');
-      const legacyUrl = 'https://test-test-provider-1.com';
-      const getProviderRedirectUrl = sinon.stub(
-        onezoneServer,
-        'getProviderRedirectUrl'
-      ).resolves({ url: legacyUrl });
-
-      const fakeWindow = new FakeWindow();
-      const checkIsProviderAvailable = sinon.stub().resolves(false);
-
-      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
-
-      this.render(hbs `{{content-provider-redirect
-        checkIsProviderAvailable=checkIsProviderAvailable
-        provider=provider
-        _window=fakeWindow
-      }}`);
-
-      return wait().then(() => {
-        expect(checkIsProviderAvailable).to.be.not.called;
-        expect(getProviderRedirectUrl).to.be.calledOnce;
-        expect(fakeWindow.location.toString()).to.equal(legacyUrl);
-      });
-    }
-  );
-
-  it(
-    'redirects to data index and invokes alert then provider is not available',
+  it('redirects to data index and invokes alert then provider is not available',
     function () {
       const provider = {
         entityId: 'test1',

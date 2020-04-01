@@ -18,7 +18,7 @@ describe('Unit | Model | space', function () {
   });
 
   it('has getInviteToken method', function () {
-    let record = this.subject();
+    const record = this.subject();
     expect(record.getInviteToken).to.be.instanceOf(Function);
   });
 });

@@ -118,14 +118,13 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       const isPublic = this.get('allFieldsValues.edit.public');
       switch (mode) {
         case 'view':
-        case 'edit':
-          {
-            const prefixes = [mode];
-            if (isPublic) {
-              prefixes.push('publicUrl');
-            }
-            return prefixes;
+        case 'edit': {
+          const prefixes = [mode];
+          if (isPublic) {
+            prefixes.push('publicUrl');
           }
+          return prefixes;
+        }
         case 'create':
           return ['create'];
       }
@@ -195,7 +194,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * @override
    */
   allFieldsValues: computed('provider', 'allFields', function () {
-    let values = EmberObject.create();
+    const values = EmberObject.create();
     allPrefixes.forEach((prefix) => values.set(prefix, EmberObject.create()));
     return values;
   }),
@@ -393,17 +392,16 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
       this.set('disabled', true);
       let promise;
       switch (mode) {
-        case 'edit':
-          {
-            const oldValues = getProperties(harvester, ...valueNames);
-            setProperties(harvester, values);
-            promise = harvesterActions.updateHarvester(harvester)
+        case 'edit': {
+          const oldValues = getProperties(harvester, ...valueNames);
+          setProperties(harvester, values);
+          promise = harvesterActions.updateHarvester(harvester)
             .then(() => safeExec(this, () => {
               this.set('mode', 'view');
             }))
             .catch(() => setProperties(harvester, oldValues));
-            break;
-          }
+          break;
+        }
         case 'create':
           promise = harvesterActions.createHarvester(values);
       }

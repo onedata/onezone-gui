@@ -9,6 +9,8 @@ import { resolve, reject, Promise } from 'rsvp';
 import TestAdapter from '@ember/test/adapter';
 import Ember from 'ember';
 import { click } from 'ember-native-dom-helpers';
+import { parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import _ from 'lodash';
 
 describe('Integration | Component | invite token generator', function () {
   setupComponentTest('invite-token-generator', {
@@ -130,13 +132,21 @@ describe('Integration | Component | invite token generator', function () {
       now: timestamp * 1000,
       shouldAdvanceTime: true,
     }));
-    routerStub
-      .withArgs('onedata.sidebar.content', 'tokens', 'new', {
-        queryParams: {
-          options: `type.invite..inviteType.userJoinGroup..expire.${timestamp + 24 * 60 * 60}..inviteTargetId.group1`,
-        },
-      })
-      .returns('correctUrl');
+    const correctRouteOptions = {
+      type: 'invite',
+      inviteType: 'userJoinGroup',
+      expire: String(timestamp + 24 * 60 * 60),
+      inviteTargetId: 'group1',
+    };
+    routerStub.callsFake((route, resource, content, options) => {
+      if (route === 'onedata.sidebar.content' &&
+        resource === 'tokens' &&
+        content === 'new' &&
+        _.isEqual(parseAspectOptions(options.queryParams.options), correctRouteOptions)
+      ) {
+        return 'correctUrl';
+      }
+    });
 
     this.render(hbs `
       {{invite-token-generator
@@ -174,22 +184,24 @@ describe('Integration | Component | invite token generator', function () {
 
   const standardLimitations = 'This token will expire in 24 hours and has no usage count limit.';
   const onedatifyLimitations = 'Tokens used below will expire in 24 hours and have no usage count limit.';
+  const passToUserDescription = 'Copy below token and pass it to the user you would like to invite.';
+  const passToGroupDescription = 'Copy below token and pass it to the owner of group you would like to invite.';
 
   [{
     inviteType: 'userJoinGroup',
-    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    subjectDescription: passToUserDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinGroup',
-    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    subjectDescription: passToGroupDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinSpace',
-    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    subjectDescription: passToUserDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinSpace',
-    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    subjectDescription: passToGroupDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'supportSpace',
@@ -199,19 +211,19 @@ describe('Integration | Component | invite token generator', function () {
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinCluster',
-    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    subjectDescription: passToUserDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinCluster',
-    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    subjectDescription: passToGroupDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'userJoinHarvester',
-    subjectDescription: 'Copy below token and pass it to the user you would like to invite.',
+    subjectDescription: passToUserDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'groupJoinHarvester',
-    subjectDescription: 'Copy below token and pass it to the owner of group you would like to invite.',
+    subjectDescription: passToGroupDescription,
     limitationsDescription: standardLimitations,
   }, {
     inviteType: 'spaceJoinHarvester',
@@ -225,8 +237,12 @@ describe('Integration | Component | invite token generator', function () {
     inviteType: 'onedatifyWithImport',
     limitationsDescription: onedatifyLimitations,
     dontShowCustomToken: true,
-
-  }].forEach(({ inviteType, subjectDescription, limitationsDescription, dontShowCustomToken }) => {
+  }].forEach(({
+    inviteType,
+    subjectDescription,
+    limitationsDescription,
+    dontShowCustomToken,
+  }) => {
     it(`shows correct subject description for ${inviteType} invite token`, function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
@@ -240,14 +256,18 @@ describe('Integration | Component | invite token generator', function () {
       }
     });
 
-    it(`shows correct limitations description for ${inviteType} invite token`, function () {
-      this.set('inviteType', inviteType);
-      stubCreateToken(this, [inviteType, undefined], resolve());
+    it(
+      `shows correct limitations description for ${inviteType} invite token`,
+      function () {
+        this.set('inviteType', inviteType);
+        stubCreateToken(this, [inviteType, undefined], resolve());
 
-      this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-      expect(this.$('.limitations-text').text().trim()).to.equal(limitationsDescription);
-    });
+        expect(this.$('.limitations-text').text().trim())
+          .to.equal(limitationsDescription);
+      }
+    );
 
     if (dontShowCustomToken) {
       it(`does not show "custom token" link for ${inviteType} invite token`, function () {

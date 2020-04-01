@@ -35,19 +35,22 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
     );
   });
 
-  it('returns object with type.inviteToken.inviteType when inviteType is specified', function () {
-    const result = creatorDataToToken({
-      basic: {
-        type: 'invite',
-        inviteDetails: {
-          inviteType: 'groupJoinGroup',
+  it(
+    'returns object with type.inviteToken.inviteType when inviteType is specified',
+    function () {
+      const result = creatorDataToToken({
+        basic: {
+          type: 'invite',
+          inviteDetails: {
+            inviteType: 'groupJoinGroup',
+          },
         },
-      },
-    });
-    const inviteToken = result.type.inviteToken;
-    expect(inviteToken).to.have.property('inviteType', 'groupJoinGroup');
-    expect(Object.keys(inviteToken)).to.have.length(1);
-  });
+      });
+      const inviteToken = result.type.inviteToken;
+      expect(inviteToken).to.have.property('inviteType', 'groupJoinGroup');
+      expect(Object.keys(inviteToken)).to.have.length(1);
+    }
+  );
 
   Object.keys(tokenInviteTypeToTargetModelMapping)
     .without('registerOneprovider')

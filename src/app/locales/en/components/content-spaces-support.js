@@ -22,8 +22,6 @@ export default {
       'a dockerized Oneprovider instance.',
     token: 'Token',
     command: 'Command',
-    distributionsSupported: 'The following Linux distributions are officially supported. ' +
-      'Hovewer, since the deployment is Docker-based, it is likely to work on other systems.',
-
+    distributionsSupported: 'The following Linux distributions are officially supported. Hovewer, since the deployment is Docker-based, it is likely to work on other systems.',
   },
 };

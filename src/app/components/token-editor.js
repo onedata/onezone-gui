@@ -1399,72 +1399,76 @@ export default Component.extend(I18n, {
       caveatsGroup,
     } = this.getProperties('predefinedValues', 'mode', 'fields', 'caveatsGroup');
 
-    if (mode === 'create' && predefinedValues) {
-      const typeField = fields.getFieldByPath('basic.type');
-      const inviteTypeField = fields.getFieldByPath('basic.inviteDetails.inviteType');
-      const inviteTargetField =
-        fields.getFieldByPath('basic.inviteDetails.inviteTargetDetails.target');
-      const {
-        type,
-        inviteType,
-        inviteTargetId,
-        expire,
-      } = getProperties(
-        predefinedValues,
-        'type',
-        'inviteType',
-        'inviteTargetId',
-        'expire'
-      );
-      if (type && ['access', 'identity', 'invite'].includes(type)) {
-        typeField.valueChanged(type);
+    if (!(mode === 'create' && predefinedValues)) {
+      return;
+    }
+    const typeField = fields.getFieldByPath('basic.type');
+    const inviteTypeField = fields.getFieldByPath('basic.inviteDetails.inviteType');
+    const {
+      type,
+      inviteType,
+      inviteTargetId,
+      expire,
+    } = getProperties(
+      predefinedValues,
+      'type',
+      'inviteType',
+      'inviteTargetId',
+      'expire'
+    );
+    if (type && ['access', 'identity', 'invite'].includes(type)) {
+      typeField.valueChanged(type);
+    }
+    if (
+      get(typeField, 'value') === 'invite' &&
+      inviteType &&
+      tokenInviteTypeOptions.findBy('value', inviteType)
+    ) {
+      inviteTypeField.valueChanged(inviteType);
+    }
+    if (expire) {
+      let expireDate;
+      try {
+        const expireNumber = typeof expire === 'number' ? expire : parseInt(expire);
+        expireDate = expireNumber ? new Date(Math.floor(expireNumber) * 1000) : null;
+      } catch (err) {
+        expireDate = null;
       }
-      if (
-        get(typeField, 'value') === 'invite' &&
-        inviteType &&
-        tokenInviteTypeOptions.findBy('value', inviteType)
-      ) {
-        inviteTypeField.valueChanged(inviteType);
+      if (expireDate) {
+        set(caveatsGroup, 'isExpanded', true);
+        caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
+        caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
       }
-      // observers must have time to launch after changing inviteType
-      next(() => {
-        const {
-          cachedTargetsModelName,
-          cachedTargetsProxy,
-        } = getProperties(
-          inviteTargetField,
-          'cachedTargetsModelName',
-          'cachedTargetsProxy'
-        );
+    }
 
-        if (cachedTargetsModelName && inviteTargetId) {
-          cachedTargetsProxy.then(() => safeExec(this, () => {
-            if (
-              get(inviteTargetField, 'cachedTargetsModelName') === cachedTargetsModelName
-            ) {
-              const optionToSelect =
-                cachedTargetsProxy.findBy('value.entityId', inviteTargetId);
-              if (optionToSelect) {
-                inviteTargetField.valueChanged(get(optionToSelect, 'value'));
-              }
-            }
-          }));
+    // observers must have time to launch after changing inviteType
+    next(() => this.selectInviteTargetById(inviteTargetId));
+  },
+
+  selectInviteTargetById(inviteTargetId) {
+    const inviteTargetField = this.get('fields')
+      .getFieldByPath('basic.inviteDetails.inviteTargetDetails.target');
+    const {
+      cachedTargetsModelName,
+      cachedTargetsProxy,
+    } = getProperties(
+      inviteTargetField,
+      'cachedTargetsModelName',
+      'cachedTargetsProxy'
+    );
+
+    if (cachedTargetsModelName && inviteTargetId) {
+      cachedTargetsProxy.then(() => safeExec(this, () => {
+        if (
+          get(inviteTargetField, 'cachedTargetsModelName') === cachedTargetsModelName
+        ) {
+          const optionToSelect =
+            cachedTargetsProxy.findBy('value.entityId', inviteTargetId);
+          if (optionToSelect) {
+            inviteTargetField.valueChanged(get(optionToSelect, 'value'));
+          }
         }
-      });
-      if (expire) {
-        let expireDate;
-        try {
-          const expireNumber = typeof expire === 'number' ? expire : parseInt(expire);
-          expireDate = expireNumber ? new Date(Math.floor(expireNumber) * 1000) : null;
-        } catch (err) {
-          expireDate = null;
-        }
-        if (expireDate) {
-          set(caveatsGroup, 'isExpanded', true);
-          caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
-          caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
-        }
-      }
+      }));
     }
   },
 

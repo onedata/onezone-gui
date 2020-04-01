@@ -36,7 +36,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
   });
 
   it(
-    'renders modal with class "clean-obsolete-tokens-modal", generator in body and cancel button in footer',
+    'renders modal with class "generate-invite-token-modal", generator in body and cancel button in footer',
     function () {
       return showModal(this)
         .then(() => {

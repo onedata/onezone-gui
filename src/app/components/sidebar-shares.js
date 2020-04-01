@@ -1,16 +1,16 @@
 /**
- * A sidebar for shares (extension of `two-level-sidebar`)
+ * A sidebar for shares (extension of `one-sidebar`)
  *
  * @module components/sidebar-shares
  * @author Jakub Liput
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
-import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
+import OneSidebar from 'onedata-gui-common/components/one-sidebar';
+import layout from 'onedata-gui-common/templates/components/one-sidebar';
 
-export default TwoLevelSidebar.extend({
+export default OneSidebar.extend({
   layout,
 
   classNames: ['sidebar-shares'],
@@ -20,7 +20,6 @@ export default TwoLevelSidebar.extend({
    */
   model: null,
 
-  // FIXME: change to custom firstLevelItemComponent that shows file or dir icon
   /**
    * @override
    */

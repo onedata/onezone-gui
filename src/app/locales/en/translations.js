@@ -106,7 +106,7 @@ import generateInviteTokenAction from './utils/token-actions/generate-invite-tok
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 
-let translations = {
+const translations = {
   tabs: {
     undefined: {
       menuItem: '',

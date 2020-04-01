@@ -1,11 +1,7 @@
 export default {
   formSubtitle: 'using your username & password',
-  formSubtitleTip: 'This sign-in method is available for administrators and special users ' +
-    'created via Onepanel administrative interface. Regular users must sign in via social or ' +
-    'institutional accounts, which can be found in previous menu.',
-  noProvidersFormSubtitleTip: 'This sign-in method is available for administrators and special ' +
-    'users created via Onepanel administrative interface. Regular users must sign in via social or ' +
-    'institutional accounts, which are currently disabled by the administrators of this zone.',
+  formSubtitleTip: 'This sign-in method is available for administrators and special users created via Onepanel administrative interface. Regular users must sign in via social or institutional accounts, which can be found in previous menu.',
+  noProvidersFormSubtitleTip: 'This sign-in method is available for administrators and special users created via Onepanel administrative interface. Regular users must sign in via social or institutional accounts, which are currently disabled by the administrators of this zone.',
   dropdownSubtitle: 'with your identity provider',
   signInWith: 'Sign in with',
   findProviderPlaceholder: 'Find your identity provider...',

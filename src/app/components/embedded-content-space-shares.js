@@ -3,7 +3,7 @@
  * 
  * @module components/embedded-content-space-shares
  * @author Jakub Liput
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -108,7 +108,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
         shareId,
       });
     },
-    getShareUrl({ shareId }) {
+    getShareUrl({ shareId, dirId = null } = {}) {
       const {
         _location,
         router,
@@ -119,7 +119,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
         'shares', {
           queryParams: {
             options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ shareId })
+              navigationState.mergedAspectOptions({ shareId, dirId })
             ),
           },
         }

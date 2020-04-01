@@ -96,8 +96,7 @@ export default Component.extend({
   aStyle: computed(
     'iconBackgroundColor',
     function aStyle() {
-      let iconBackgroundColor;
-      iconBackgroundColor = this.get('iconBackgroundColor') ||
+      const iconBackgroundColor = this.get('iconBackgroundColor') ||
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
@@ -107,7 +106,7 @@ export default Component.extend({
   ),
 
   hasLink: computed('link', function hasLink() {
-    let link = this.get('link');
+    const link = this.get('link');
     return link && link.length !== 0;
   }),
 
