@@ -303,15 +303,16 @@ describe('Integration | Component | token consumer', function () {
 
           this.render(hbs `{{token-consumer}}`);
 
-          let joiningRecordHelper = new JoiningRecordHelper();
+          const joiningRecordHelper = new JoiningRecordHelper();
           return fillIn('.token-string', 'token')
             .then(() => {
               const $recordSelector = this.$('.joining-record-selector');
               expect($recordSelector).to.exist;
               expect(this.$('.selector-description').text().trim())
                 .to.equal(selectorDescription);
-              expect($recordSelector.find('.ember-power-select-placeholder').text().trim())
-                .to.equal(selectorPlaceholder);
+              expect(
+                $recordSelector.find('.ember-power-select-placeholder').text().trim()
+              ).to.equal(selectorPlaceholder);
               return joiningRecordHelper.open();
             })
             .then(() => {
@@ -454,16 +455,19 @@ describe('Integration | Component | token consumer', function () {
       });
   });
 
-  it('interprets forbidden-only characters in token input as an incorrect token', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it(
+    'interprets forbidden-only characters in token input as an incorrect token',
+    function () {
+      this.render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', '!@#$%^&*()')
-      .then(() => {
-        expect(this.$('.invalid-token-message')).to.exist;
-        expect(this.$('.token-type')).to.not.exist;
-        expect(this.get('examineStub')).to.not.be.called;
-      });
-  });
+      return fillIn('.token-string', '!@#$%^&*()')
+        .then(() => {
+          expect(this.$('.invalid-token-message')).to.exist;
+          expect(this.$('.token-type')).to.not.exist;
+          expect(this.get('examineStub')).to.not.be.called;
+        });
+    }
+  );
 
   it('shows spinner while examining token', function () {
     let resolveRequest;
@@ -501,7 +505,7 @@ describe('Integration | Component | token consumer', function () {
 
       this.render(hbs `{{token-consumer}}`);
 
-      let joiningRecordHelper = new JoiningRecordHelper();
+      const joiningRecordHelper = new JoiningRecordHelper();
       return fillIn('.token-string', 'token')
         .then(() => joiningRecordHelper.selectOption(1))
         .then(() => click('.join-btn'))

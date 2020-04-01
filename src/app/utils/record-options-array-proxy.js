@@ -1,3 +1,13 @@
+/**
+ * It is a proxy array that transforms source array to an array of options ready to use
+ * by dropdown or other enumeration mechanism. Extracts label and correct icon. Needs
+ * owner injected.
+ *
+ * @module utils/record-options-array-proxy
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ */
+
 import ArrayProxy from '@ember/array/proxy';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { computed, get } from '@ember/object';

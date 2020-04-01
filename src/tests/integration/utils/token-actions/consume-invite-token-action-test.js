@@ -113,8 +113,8 @@ describe('Integration | Util | token actions/consume invite token action', funct
           return action.execute()
             .then(actionResult => {
               expect(consumeTokenStub).to.be.calledOnce;
-              expect(consumeTokenStub)
-                .to.be.calledWith(token, targetModelName, joiningModelName, joiningRecordId);
+              expect(consumeTokenStub).to.be
+                .calledWith(token, targetModelName, joiningModelName, joiningRecordId);
               expect(successNotifySpy).to.be.calledWith(
                 sinon.match.has('string', notifyText)
               );

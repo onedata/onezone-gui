@@ -184,9 +184,6 @@ describe('Integration | Component | token editor', function () {
         operation: 'get',
         subscribe: false,
       }).resolves({ member: [`${modelName}_view`] });
-      // const serviceName = 'record-manager';
-      // const getModelsMethodName = 'getUserRecordList';
-      // const service = lookupService(this, serviceName);
       mockedRecords[modelName] = _.reverse(_.range(3)).map(index => ({
         entityId: `${modelName}${index}`,
         entityType: modelName,

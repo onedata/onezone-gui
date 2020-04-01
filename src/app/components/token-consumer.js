@@ -1,3 +1,12 @@
+/**
+ * Asks for token, display info about it and allows to consume an invite token.
+ *
+ * @module components/token-consumer
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -165,7 +174,7 @@ export default Component.extend(I18n, {
   joiningModelName: computed('type', function joiningModelName() {
     const inviteType = this.get('type.inviteToken.inviteType');
     if (inviteType) {
-      for (let modelName of ['user', 'group', 'space']) {
+      for (const modelName of ['user', 'group', 'space']) {
         if (inviteType.startsWith(`${modelName}Join`)) {
           return modelName;
         }

@@ -1,5 +1,5 @@
 /**
- * Allows to consume invite token and the redirects to target record.
+ * Allows to consume invite token and then redirects to target record.
  * Needs joiningRecord, targetModelName and token passed via context.
  *
  * @module utils/token-actions/consume-invite-token-action
