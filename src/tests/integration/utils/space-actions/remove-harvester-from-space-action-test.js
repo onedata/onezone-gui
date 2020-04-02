@@ -100,9 +100,9 @@ describe(
           ownerSource: this,
           context: this.get('context'),
         });
-        const spaceManager = lookupService(this, 'space-manager');
+        const harvesterManager = lookupService(this, 'harvester-manager');
         const removeHarvesterStub = sinon
-          .stub(spaceManager, 'removeHarvesterFromSpace')
+          .stub(harvesterManager, 'removeSpaceFromHarvester')
           .resolves();
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -117,7 +117,7 @@ describe(
           .then(() => actionResultPromise)
           .then(actionResult => {
             expect(removeHarvesterStub).to.be.calledOnce;
-            expect(removeHarvesterStub).to.be.calledWith('spaceId', 'harvesterId');
+            expect(removeHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
             expect(successNotifySpy).to.be.calledWith(sinon.match.has(
               'string',
               'The harvester has been sucessfully removed from the space.'
@@ -134,8 +134,8 @@ describe(
           ownerSource: this,
           context: this.get('context'),
         });
-        const spaceManager = lookupService(this, 'space-manager');
-        sinon.stub(spaceManager, 'removeHarvesterFromSpace')
+        const harvesterManager = lookupService(this, 'harvester-manager');
+        sinon.stub(harvesterManager, 'removeSpaceFromHarvester')
           .returns(reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),

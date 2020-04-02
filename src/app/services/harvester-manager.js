@@ -10,12 +10,13 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { Promise, resolve, reject } from 'rsvp';
+import { resolve, reject, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import GuiPluginManifest from 'onezone-gui/utils/harvester-configuration/gui-plugin-manifest';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester';
+import { entityType as spaceEntityType } from 'onezone-gui/models/space';
 
 export default Service.extend(
   createDataProxyMixin('pluginsList', { type: 'array' }), {
@@ -25,6 +26,7 @@ export default Service.extend(
     groupManager: service(),
     spaceManager: service(),
     store: service(),
+    recordManager: service(),
 
     /**
      * Fetches collection of all harvesters
@@ -78,9 +80,9 @@ export default Service.extend(
       return this.get('currentUser').getCurrentUserRecord()
         .then(user => user.leaveHarvester(harvesterEntityId))
         .then(destroyResult => {
-          return Promise.all([
+          return allFulfilled([
             this.reloadList(),
-            harvester ? Promise.all([
+            harvester ? allFulfilled([
               harvester.reload().catch(ignoreForbiddenError),
               this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
               this.reloadEffUserList(harvesterEntityId).catch(
@@ -128,18 +130,35 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterEntityId 
-     * @param {string} spaceEntityId
+     * @param {string} harvesterId 
+     * @param {string} spaceId
      * @returns {Promise}
      */
-    removeSpaceFromHarvester(harvesterEntityId, spaceEntityId) {
-      return this.get('onedataGraphUtils').leaveRelation(
+    removeSpaceFromHarvester(harvesterId, spaceId) {
+      const {
+        onedataGraphUtils,
+        recordManager,
+      } = this.getProperties('onedataGraphUtils', 'recordManager');
+
+      return onedataGraphUtils.leaveRelation(
         harvesterEntityType,
-        harvesterEntityId,
-        'space',
-        spaceEntityId
+        harvesterId,
+        spaceEntityType,
+        spaceId
+      ).catch(error =>
+        onedataGraphUtils.leaveRelation(
+          spaceEntityType,
+          spaceId,
+          harvesterEntityType,
+          harvesterId
+        ).catch(() => { throw error; })
       ).then(() =>
-        this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError),
+        allFulfilled([
+          recordManager.reloadRecordListById('space', spaceId, 'harvester')
+          .catch(ignoreForbiddenError),
+          recordManager.reloadRecordListById('harvester', harvesterId, 'space')
+          .catch(ignoreForbiddenError),
+        ])
       );
     },
 
@@ -206,7 +225,7 @@ export default Service.extend(
             }
             throw meaningfulErrors[0] || { id: 'forbidden' };
           });
-        }).then(() => Promise.all([
+        }).then(() => allFulfilled([
           this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
           this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
           this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
@@ -229,10 +248,10 @@ export default Service.extend(
         'user',
         userEntityId
       ).then(() =>
-        Promise.all([
+        allFulfilled([
           this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
           this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
-          currentUser.runIfThisUser(userEntityId, () => Promise.all([
+          currentUser.runIfThisUser(userEntityId, () => allFulfilled([
             this.reloadList(),
             harvester ? harvester.reload().catch(ignoreForbiddenError) : resolve(),
           ])),
@@ -264,7 +283,7 @@ export default Service.extend(
           data: childGroupRepresentation,
           authHint: ['asUser', get(user, 'entityId')],
         }).then(() => {
-          return Promise.all([
+          return allFulfilled([
             this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
             this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
             groupManager.reloadList(),
@@ -288,7 +307,7 @@ export default Service.extend(
           scope: 'auto',
         }),
         operation: 'create',
-      }).then(() => Promise.all([
+      }).then(() => allFulfilled([
         this.reloadGroupList(harvesterEntityId).catch(ignoreForbiddenError),
         this.reloadEffGroupList(harvesterEntityId).catch(ignoreForbiddenError),
       ]));
@@ -319,7 +338,7 @@ export default Service.extend(
             subscribe: false,
           })
         )
-        .then(() => Promise.all([
+        .then(() => allFulfilled([
           harvester ? harvester.reload() : resolve(),
           this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
           this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),

@@ -15,7 +15,7 @@ import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 
 export default Action.extend({
-  spaceManager: service(),
+  harvesterManager: service(),
   modalManager: service(),
 
   /**
@@ -92,14 +92,14 @@ export default Action.extend({
    */
   removeHarvesterFromSpace() {
     const {
-      spaceManager,
+      harvesterManager,
       space,
       harvester,
-    } = this.getProperties('spaceManager', 'space', 'harvester');
+    } = this.getProperties('harvesterManager', 'space', 'harvester');
 
-    return spaceManager.removeHarvesterFromSpace(
-      get(space, 'entityId'),
-      get(harvester, 'entityId')
+    return harvesterManager.removeSpaceFromHarvester(
+      get(harvester, 'entityId'),
+      get(space, 'entityId')
     );
   },
 });

@@ -13,7 +13,6 @@ import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as spaceEntityType } from 'onezone-gui/models/space';
-import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester';
 
 export default Service.extend({
   store: service(),
@@ -277,31 +276,6 @@ export default Service.extend({
         .catch(ignoreForbiddenError)
         .then(() => space)
       );
-  },
-
-  /**
-   * @param {String} spaceId 
-   * @param {String} harvesterId
-   * @returns {Promise}
-   */
-  removeHarvesterFromSpace(spaceId, harvesterId) {
-    const {
-      onedataGraphUtils,
-      recordManager,
-    } = this.getProperties('onedataGraphUtils', 'recordManager');
-    return onedataGraphUtils.leaveRelation(
-      spaceEntityType,
-      spaceId,
-      harvesterEntityType,
-      harvesterId
-    ).then(() =>
-      allFulfilled([
-        recordManager.reloadRecordListById('space', spaceId, 'harvester')
-        .catch(ignoreForbiddenError),
-        recordManager.reloadRecordListById('harvester', harvesterId, 'space')
-        .catch(ignoreForbiddenError),
-      ])
-    );
   },
 
   /**

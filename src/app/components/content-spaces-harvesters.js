@@ -10,11 +10,17 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   oneiconAlias: service(),
+  spaceActions: service(),
 
   /**
    * @virtual
    */
   harvester: undefined,
+
+  /**
+   * @virtual
+   */
+  parentSpace: undefined,
 
   /**
    * @override
@@ -31,6 +37,21 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
    */
   icon: computed(function icon() {
     return this.get('oneiconAlias').getName('harvester');
+  }),
+
+  /**
+   * @override
+   */
+  actions: computed('parentSpace', 'harvester', function actions() {
+    const {
+      spaceActions,
+      parentSpace,
+      harvester,
+    } = this.getProperties('spaceActions', 'parentSpace', 'harvester');
+    return [spaceActions.createRemoveHarvesterFromSpaceAction({
+      space: parentSpace,
+      harvester,
+    })];
   }),
 });
 
@@ -65,8 +86,10 @@ export default Component.extend(I18n, {
    */
   harvesterItems: computed('spaceHarvestersProxy.[]', function harvesterItems() {
     const harvesters = this.get('spaceHarvestersProxy.content') || [];
+    const space = this.get('space');
     return harvesters.map(harvester => HarvesterListItem.create({
       ownerSource: this,
+      parentSpace: space,
       harvester,
     }));
   }),
