@@ -88,6 +88,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import recordSelectorModal from './components/modals/record-selector-modal';
+import questionModal from './components/modals/question-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -134,6 +135,7 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
       recordSelectorModal,
+      questionModal,
     },
     loginBox,
     contentTokens,

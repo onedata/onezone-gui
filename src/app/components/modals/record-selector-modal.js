@@ -7,7 +7,7 @@
  * - selectorPlaceholderText - (optional) selector placeholder
  * - submitText - submit button text
  * 
- * @module components/modals/generate-invite-token-modal
+ * @module components/modals/record-selector-modal
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
