@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import { lookupService } from '../../../helpers/stub-service';
 import hbs from 'htmlbars-inline-precompile';
@@ -12,23 +12,19 @@ import {
 import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
 import { Promise, resolve, reject } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
-import TestAdapter from '@ember/test/adapter';
-import Ember from 'ember';
 import { A } from '@ember/array';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import suppressRejections from '../../../helpers/suppress-rejections';
 
 describe('Integration | Component | modals/record selector modal', function () {
   setupComponentTest('modals/record-selector-modal', {
     integration: true,
   });
 
-  beforeEach(function () {
-    this.originalLoggerError = Ember.Logger.error;
-    this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function () {};
-    Ember.Test.adapter.exception = function () {};
+  suppressRejections();
 
+  beforeEach(function () {
     // space is before group to test sorting records by name
     const records = A([{
       name: 'space1',
@@ -49,11 +45,6 @@ describe('Integration | Component | modals/record selector modal', function () {
         selectorPlaceholderText: 'Select...',
       },
     });
-  });
-
-  afterEach(function () {
-    Ember.Logger.error = this.originalLoggerError;
-    Ember.Test.adapter.exception = this.originalTestAdapterException;
   });
 
   it(

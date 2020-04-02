@@ -77,6 +77,10 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
         id: 'members',
         label: this.t('aspects.members'),
         icon: 'group',
+      }, {
+        id: 'harvesters',
+        label: this.t('aspects.harvesters'),
+        icon: 'light-bulb',
       },
     ];
   }),
