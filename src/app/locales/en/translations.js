@@ -101,6 +101,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import uploadObject from './utils/upload-object';
+import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
@@ -221,6 +222,9 @@ const translations = {
   },
   utils: {
     uploadObject,
+    spaceActions: {
+      removeHarvesterFromSpaceAction,
+    },
     tokenActions: {
       cleanObsoleteTokensAction,
       createTokenAction,
