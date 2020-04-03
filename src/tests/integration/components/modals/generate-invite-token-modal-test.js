@@ -53,6 +53,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
   const userHeader = 'Invite user using token';
   const groupHeader = 'Invite group using token';
   const spaceHeader = 'Invite space using token';
+  const harvesterHeader = 'Invite harvester using token';
   [{
     inviteType: 'userJoinGroup',
     header: userHeader,
@@ -65,6 +66,9 @@ describe('Integration | Component | modals/generate invite token modal', functio
   }, {
     inviteType: 'groupJoinSpace',
     header: groupHeader,
+  }, {
+    inviteType: 'harvesterJoinSpace',
+    header: harvesterHeader,
   }, {
     inviteType: 'userJoinCluster',
     header: userHeader,

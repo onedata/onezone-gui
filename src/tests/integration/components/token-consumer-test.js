@@ -34,6 +34,7 @@ describe('Integration | Component | token consumer', function () {
     [
       'space',
       'group',
+      'harvester',
     ].forEach(modelName => {
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
@@ -156,6 +157,7 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to parent group someRecord',
     modelToSelect: 'group',
+    selectorIcon: 'group',
     selectorDescription: selectorDescription('parent group', 'group'),
     selectorPlaceholder: 'Select group...',
   }, {
@@ -172,8 +174,19 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to space someRecord',
     modelToSelect: 'group',
+    selectorIcon: 'group',
     selectorDescription: selectorDescription('space', 'group'),
     selectorPlaceholder: 'Select group...',
+  }, {
+    inviteSpec: {
+      inviteType: 'harvesterJoinSpace',
+      spaceName: 'someRecord',
+    },
+    typeText: 'Invite harvester to space someRecord',
+    modelToSelect: 'harvester',
+    selectorIcon: 'light-bulb',
+    selectorDescription: selectorDescription('space', 'harvester'),
+    selectorPlaceholder: 'Select harvester...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinCluster',
@@ -188,6 +201,7 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to cluster someRecord',
     modelToSelect: 'group',
+    selectorIcon: 'group',
     selectorDescription: selectorDescription('cluster', 'group'),
     selectorPlaceholder: 'Select group...',
   }, {
@@ -204,6 +218,7 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite group to harvester someRecord',
     modelToSelect: 'group',
+    selectorIcon: 'group',
     selectorDescription: selectorDescription('harvester', 'group'),
     selectorPlaceholder: 'Select group...',
   }, {
@@ -213,6 +228,7 @@ describe('Integration | Component | token consumer', function () {
     },
     typeText: 'Invite space to harvester someRecord',
     modelToSelect: 'space',
+    selectorIcon: 'space',
     selectorDescription: selectorDescription('harvester', 'space'),
     selectorPlaceholder: 'Select space...',
   }, {
@@ -234,6 +250,7 @@ describe('Integration | Component | token consumer', function () {
     inviteSpec,
     typeText,
     modelToSelect,
+    selectorIcon,
     selectorPlaceholder,
     noJoinMessage,
     selectorDescription,
@@ -319,7 +336,7 @@ describe('Integration | Component | token consumer', function () {
               _.range(3).forEach(i => {
                 const option = joiningRecordHelper.getNthOption(i + 1);
                 expect(option.innerText).to.contain(`${modelToSelect}${i}`);
-                expect(option.querySelector(`.oneicon-${modelToSelect}`)).to.exist;
+                expect(option.querySelector(`.oneicon-${selectorIcon}`)).to.exist;
               });
             });
         }

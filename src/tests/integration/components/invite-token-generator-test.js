@@ -204,6 +204,10 @@ describe('Integration | Component | invite token generator', function () {
     subjectDescription: passToGroupDescription,
     limitationsDescription: standardLimitations,
   }, {
+    inviteType: 'harvesterJoinSpace',
+    subjectDescription: 'Copy below token and pass it to the owner of harvester you would like to invite.',
+    limitationsDescription: standardLimitations,
+  }, {
     inviteType: 'supportSpace',
     limitationsDescription: standardLimitations,
   }, {

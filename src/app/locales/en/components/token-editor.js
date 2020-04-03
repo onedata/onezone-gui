@@ -40,6 +40,9 @@ export default {
             groupJoinSpace: {
               label: 'Invite group to space',
             },
+            harvesterJoinSpace: {
+              label: 'Invite harvester to space',
+            },
             userJoinCluster: {
               label: 'Invite user to cluster',
             },
@@ -74,6 +77,7 @@ export default {
               groupJoinGroup: 'Select parent group...',
               userJoinSpace: 'Select space...',
               groupJoinSpace: 'Select space...',
+              harvesterJoinSpace: 'Select space...',
               userJoinCluster: 'Select cluster...',
               groupJoinCluster: 'Select cluster...',
               userJoinHarvester: 'Select harvester...',

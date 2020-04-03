@@ -84,6 +84,11 @@ const tokenInviteTypeOptions = [{
   icon: 'space',
   targetModelName: 'space',
 }, {
+  value: 'harvesterJoinSpace',
+  icon: 'space',
+  targetModelName: 'space',
+  noPrivileges: true,
+}, {
   value: 'userJoinCluster',
   icon: 'cluster',
   targetModelName: 'cluster',

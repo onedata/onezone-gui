@@ -174,7 +174,7 @@ export default Component.extend(I18n, {
   joiningModelName: computed('type', function joiningModelName() {
     const inviteType = this.get('type.inviteToken.inviteType');
     if (inviteType) {
-      for (const modelName of ['user', 'group', 'space']) {
+      for (const modelName of ['user', 'group', 'space', 'harvester']) {
         if (inviteType.startsWith(`${modelName}Join`)) {
           return modelName;
         }
@@ -187,7 +187,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   joiningRecordSelectorModelName: conditional(
-    array.includes(raw(['group', 'space']), 'joiningModelName'),
+    array.includes(raw(['group', 'space', 'harvester']), 'joiningModelName'),
     'joiningModelName',
     raw(null)
   ),
