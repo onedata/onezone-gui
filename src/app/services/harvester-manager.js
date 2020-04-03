@@ -24,7 +24,6 @@ export default Service.extend(
     onedataGraphUtils: service(),
     currentUser: service(),
     groupManager: service(),
-    spaceManager: service(),
     store: service(),
     recordManager: service(),
 
@@ -163,23 +162,44 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterEntityId 
-     * @param {string} spaceEntityId
+     * @param {string} harvesterId 
+     * @param {string} spaceId
      * @returns {Promise}
      */
-    addSpaceToHarvester(harvesterEntityId, spaceEntityId) {
-      return this.get('onedataGraph').request({
-        gri: gri({
-          entityType: harvesterEntityType,
-          entityId: harvesterEntityId,
-          aspect: 'space',
-          aspectId: spaceEntityId,
-          scope: 'auto',
-        }),
-        operation: 'create',
-      }).then(() =>
-        this.reloadSpaceList(harvesterEntityId).catch(ignoreForbiddenError)
-      );
+    addSpaceToHarvester(harvesterId, spaceId) {
+      const {
+        onedataGraph,
+        recordManager,
+      } = this.getProperties('onedataGraph', 'recordManager');
+      return onedataGraph
+        .request({
+          gri: gri({
+            entityType: harvesterEntityType,
+            entityId: harvesterId,
+            aspect: spaceEntityType,
+            aspectId: spaceId,
+            scope: 'auto',
+          }),
+          operation: 'create',
+        })
+        .catch(error => onedataGraph.request({
+          gri: gri({
+            entityType: spaceEntityType,
+            entityId: spaceId,
+            aspect: harvesterEntityType,
+            aspectId: harvesterId,
+            scope: 'auto',
+          }),
+          operation: 'create',
+        }).catch(() => { throw error; }))
+        .then(() =>
+          allFulfilled([
+            recordManager.reloadRecordListById('space', spaceId, 'harvester')
+            .catch(ignoreForbiddenError),
+            recordManager.reloadRecordListById('harvester', harvesterId, 'space')
+            .catch(ignoreForbiddenError),
+          ])
+        );
     },
 
     /**
