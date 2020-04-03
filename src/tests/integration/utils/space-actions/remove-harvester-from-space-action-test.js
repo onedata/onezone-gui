@@ -94,7 +94,7 @@ describe(
     );
 
     it(
-      'executes removing harvester from space tokens on submit (success scenario)',
+      'executes removing harvester from space on submit (success scenario)',
       function () {
         const action = RemoveHarvesterFromSpaceAction.create({
           ownerSource: this,
@@ -128,7 +128,7 @@ describe(
     );
 
     it(
-      'executes removing harvester from space tokens on submit (failure scenario)',
+      'executes removing harvester from space on submit (failure scenario)',
       function () {
         const action = RemoveHarvesterFromSpaceAction.create({
           ownerSource: this,
