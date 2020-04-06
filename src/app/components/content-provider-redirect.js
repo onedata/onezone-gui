@@ -122,9 +122,7 @@ export default Component.extend(I18n, {
       '';
     const clusterId =
       parseGri(provider.belongsTo('cluster').id()).entityId;
-    console.log('before promise');
     return new Promise(() => {
-      console.log('promise');
       _location.replace(getOneproviderPath(clusterId, path));
     });
   },
