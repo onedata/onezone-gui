@@ -3,26 +3,12 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import Service from '@ember/service';
-import { registerService, lookupService } from '../../helpers/stub-service';
+import { registerService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
 import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-
-class FakeWindow {
-  constructor() {
-    this.location = {
-      _str: '',
-      replace(val) {
-        this._str = val;
-      },
-      toString() {
-        return this._str;
-      },
-    };
-  }
-}
 
 const OnezoneServerStub = Service.extend({
   getProviderRedirectUrl() {
@@ -76,30 +62,27 @@ describe('Integration | Component | content provider redirect', function () {
           };
         },
       };
-      const onezoneServer = lookupService(this, 'onezone-server');
       const url = `/${oneproviderAbbrev}/${clusterEntityId}/i`;
-      const legacyUrl = 'https://test-test-provider-1.com';
-      const getProviderRedirectUrl = sinon.stub(
-        onezoneServer,
-        'getProviderRedirectUrl'
-      ).resolves({ url: legacyUrl });
-      const fakeWindow = new FakeWindow();
+      const fakeLocation = {
+        replace() {},
+      };
+      const locationReplace = sinon.spy(fakeLocation, 'replace');
       const checkIsProviderAvailable = sinon.stub().resolves(true);
 
-      this.setProperties({ provider, fakeWindow, checkIsProviderAvailable });
+      this.setProperties({ provider, fakeLocation, checkIsProviderAvailable });
 
       this.render(hbs `{{content-provider-redirect
         checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
-        _window=fakeWindow
+        _location=fakeLocation
       }}`);
 
       const $contentProviderRedirect = this.$('.content-provider-redirect');
       expect($contentProviderRedirect).to.exist;
 
       return wait().then(() => {
-        expect(getProviderRedirectUrl).to.not.be.called;
-        expect(fakeWindow.location.toString()).to.equal(url);
+        expect(locationReplace).to.be.calledOnce;
+        expect(locationReplace).to.be.calledWith(url);
       });
     }
   );

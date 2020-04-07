@@ -25,7 +25,6 @@ import {
 export default Component.extend(I18n, {
   classNames: ['content-provider-redirect'],
 
-  onezoneServer: service(),
   globalNotify: service(),
   i18n: service(),
   alert: service(),
@@ -62,9 +61,9 @@ export default Component.extend(I18n, {
 
   /**
    * For test purposes. Do not change it except when testing!
-   * @type {Window}
+   * @type {Location}
    */
-  _window: window,
+  _location: location,
 
   goToProviderProxy: computed('spaceId', 'resourceType', function goToProviderProxy() {
     const {
@@ -116,7 +115,7 @@ export default Component.extend(I18n, {
   },
 
   redirectToProvider({ provider, spaceId, resourceType }) {
-    const _window = this.get('_window');
+    const _location = this.get('_location');
     const _resourceType = resourceType || spaceId && 'data';
     const path = (spaceId || _resourceType) ?
       `onedata/${_resourceType}/${spaceId}` :
@@ -124,7 +123,7 @@ export default Component.extend(I18n, {
     const clusterId =
       parseGri(provider.belongsTo('cluster').id()).entityId;
     return new Promise(() => {
-      _window.location.replace(getOneproviderPath(clusterId, path));
+      _location.replace(getOneproviderPath(clusterId, path));
     });
   },
 
