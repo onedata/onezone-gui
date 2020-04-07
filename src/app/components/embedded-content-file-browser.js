@@ -76,6 +76,7 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([
     'updateDirEntityId',
+    'getDataUrl',
     'getTransfersUrl',
     'getShareUrl',
   ]),
@@ -91,6 +92,22 @@ export default OneEmbeddedContainer.extend({
   actions: {
     updateDirEntityId(dirEntityId) {
       this.get('navigationState').setAspectOptions({ dir: dirEntityId });
+    },
+    getDataUrl({ fileId }) {
+      const {
+        _location,
+        router,
+        navigationState,
+      } = this.getProperties('_location', 'router', 'navigationState');
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'data', {
+          queryParams: {
+            options: serializeAspectOptions(
+              navigationState.mergedAspectOptions({ dir: fileId })
+            ),
+          },
+        });
     },
     getTransfersUrl({ fileId, tabId }) {
       const {

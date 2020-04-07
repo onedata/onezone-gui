@@ -41,7 +41,7 @@ describe('Integration | Component | content clusters deregister', function () {
           .to.have.attr('disabled');
         return click('.content-clusters-deregister .btn-deregister')
           .then(() => {
-            expect(deregister).to.be.notCalled;
+            expect(deregister).to.be.not.called;
           });
       });
     }
