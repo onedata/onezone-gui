@@ -39,6 +39,9 @@ describe('Integration | Component | token consumer', function () {
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
+        constructor: {
+          modelName,
+        },
       }));
       getUserRecordListStub.withArgs(modelName).resolves({
         list: PromiseArray.create({

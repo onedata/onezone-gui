@@ -26,7 +26,7 @@ export default ArrayProxy.extend(OwnerInjector, {
     return sortedRecords.map(record => ({
       value: record,
       label: get(record, 'name'),
-      icon: oneiconAlias.getName(get(record, 'entityType')),
+      icon: oneiconAlias.getName(record.constructor.modelName),
     }));
   }),
 });

@@ -188,6 +188,9 @@ describe('Integration | Component | token editor', function () {
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
+        constructor: {
+          modelName,
+        },
         effUserList: PromiseObject.create({
           promise: resolve({
             list: PromiseArray.create({
