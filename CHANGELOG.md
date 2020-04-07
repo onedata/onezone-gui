@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6145 Added support for file QoS management in Oneprovider GUI
 * VFS-5929 Updated common libs
 * VFS-6176 Fixed broken Oneprovider dropdown on global map
 * VFS-6115 Fixed bugs and added improvements related to embedded Oneprovider GUI SP1
