@@ -33,7 +33,7 @@ export default Action.extend({
   /**
    * @override
    */
-  icon: 'clean',
+  icon: 'clean-filled',
 
   /**
    * @override

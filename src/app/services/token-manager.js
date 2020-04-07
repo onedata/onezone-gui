@@ -10,18 +10,21 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import { resolve, allSettled } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as tokenEntityType } from 'onezone-gui/models/token';
+import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 const TokenManager = Service.extend({
   store: service(),
   currentUser: service(),
-  i18n: service(),
+  recordManager: service(),
   onedataConnection: service(),
   onedataGraph: service(),
+  onedataGraphUtils: service(),
   onezoneServer: service(),
 
   /**
@@ -30,23 +33,16 @@ const TokenManager = Service.extend({
    * @return {Promise<DS.RecordArray<Models.Token>>} resolves to an array of tokens
    */
   getTokens() {
-    return this.get('currentUser')
-      .getCurrentUserRecord()
-      .then(user => user.get('tokenList'))
-      .then(tokenList => tokenList.get('list')
-        .then(list => allSettled(list.map(token => get(token, 'tokenTargetProxy'))))
-        .then(() => tokenList)
-      );
+    return this.get('recordManager').getUserRecordList('token');
   },
 
   /**
-   * Returns token with specified id
-   * @param {string} id
-   * @param {boolean} backgroundReload
+   * Returns token with specified gri
+   * @param {String} gri
    * @return {Promise<Models.Token>} token promise
    */
-  getRecord(id, backgroundReload = true) {
-    return this.get('store').findRecord('token', id, { backgroundReload });
+  getRecord(gri) {
+    return this.get('recordManager').getRecord('token', gri);
   },
 
   /**
@@ -138,39 +134,73 @@ const TokenManager = Service.extend({
    */
   deleteToken(id) {
     return this.getRecord(id)
-      .then(token => token.destroyRecord()
-        .then(destroyResult => {
-          this.get('currentUser')
-            .getCurrentUserRecord()
-            .then(user => user.belongsTo('tokenList').reload())
-            .then(() => destroyResult);
-        })
+      .then(token => token.destroyRecord())
+      .then(destroyResult =>
+        this.get('recordManager').reloadUserRecordList('token').then(() => destroyResult)
       );
   },
 
   /**
-   * Reloads token list
-   * @returns {Promise<TokenList>}
+   * Gets information about given token
+   * @param {String} token 
+   * @returns {Promise}
    */
-  reloadList() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.belongsTo('tokenList').reload(true));
+  examineToken(token) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: tokenEntityType,
+        entityId: 'null',
+        aspect: 'examine',
+        scope: 'public',
+      }),
+      operation: 'create',
+      data: { token },
+      subscribe: false,
+    });
   },
 
   /**
-   * Reloads token list only if it has been already fetched
-   * @returns {Promise<Models.TokenList|null>}
+   * @param {String} token
+   * @param {String} targetModelName
+   * @param {String} joiningModelName
+   * @param {String} joiningRecordId
+   * @returns {Promise<GraphSingleModel>} target record
    */
-  reloadListIfAlreadyFetched() {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => {
-        const tokenListRelation = user.belongsTo('tokenList');
-        if (tokenListRelation.value() !== null) {
-          return tokenListRelation.reload(true);
-        } else {
-          return resolve(null);
-        }
-      });
+  consumeInviteToken(token, targetModelName, joiningModelName, joiningRecordId) {
+    const {
+      store,
+      onedataGraphUtils,
+      recordManager,
+    } = this.getProperties('store', 'onedataGraphUtils', 'recordManager');
+    const adapter = store.adapterFor('user');
+    const targetEntityType = adapter.getEntityTypeForModelName(targetModelName);
+    const joiningEntityType = adapter.getEntityTypeForModelName(joiningModelName);
+    return onedataGraphUtils.joinRelation(
+      targetEntityType,
+      token, [`as${_.upperFirst(joiningEntityType)}`, joiningRecordId]
+    ).then(({ gri }) => {
+      const targetId = parseGri(gri).entityId;
+      return allFulfilled([
+        recordManager.reloadRecordListById(
+          joiningModelName,
+          joiningRecordId,
+          targetModelName
+        ).catch(ignoreForbiddenError),
+        recordManager.reloadRecordListById(
+          targetModelName,
+          targetId,
+          joiningModelName
+        ).catch(ignoreForbiddenError),
+      ]).then(() => recordManager.getRecord(targetModelName, gri));
+    });
+  },
+
+  /**
+   * Reloads token list (if already loaded)
+   * @returns {Promise<TokenList>}
+   */
+  reloadList() {
+    return this.get('recordManager').reloadUserRecordList('token');
   },
 });
 

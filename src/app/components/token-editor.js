@@ -64,9 +64,8 @@ import _ from 'lodash';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import ArrayProxy from '@ember/array/proxy';
-import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -164,23 +163,6 @@ const ModelTagsFieldPrototype = TagsField.extend({
   },
 });
 
-const RecordsOptionsArrayProxy = ArrayProxy.extend(OwnerInjector, {
-  oneiconAlias: service(),
-  records: undefined,
-  sortedRecords: array.sort('records', ['name']),
-  content: computed('sortedRecords.@each.name', function content() {
-    const {
-      sortedRecords,
-      oneiconAlias,
-    } = this.getProperties('sortedRecords', 'oneiconAlias');
-    return sortedRecords.map(record => ({
-      value: record,
-      label: get(record, 'name'),
-      icon: oneiconAlias.getName(get(record, 'entityType')),
-    }));
-  }),
-});
-
 function createWhiteBlackListDropdown(fieldName) {
   return DropdownField.extend({
     defaultValue: conditional(
@@ -204,16 +186,10 @@ export default Component.extend(I18n, {
   classNameBindings: ['modeClass'],
 
   i18n: service(),
-  userManager: service(),
-  spaceManager: service(),
-  groupManager: service(),
-  harvesterManager: service(),
-  providerManager: service(),
-  clusterManager: service(),
   privilegeManager: service(),
   oneiconAlias: service(),
-  currentUser: service(),
   guiContext: service(),
+  recordManager: service(),
 
   /**
    * @override
@@ -988,47 +964,38 @@ export default Component.extend(I18n, {
       viewTokenValue: reads('component.tokenDataSource.caveats.consumer'),
     }).create(generateCaveatFormGroupBody('consumer', [
       ModelTagsFieldPrototype.extend({
-        groupManager: service(),
-        spaceManager: service(),
-        currentUser: service(),
-        providerManager: service(),
+        recordManager: service(),
         isVisible: reads('parent.isCaveatEnabled'),
-        currentUserProxy: promise.object(computed(function currentUserProxy() {
-          return this.get('currentUser').getCurrentUserRecord();
-        })),
         groupsProxy: promise.array(computed(function groupsProxy() {
-          return this.get('groupManager').getGroups()
+          return this.get('recordManager').getUserRecordList('group')
             .then(groups => get(groups, 'list'));
         })),
         spacesProxy: promise.array(computed(function spacesProxy() {
-          return this.get('spaceManager').getSpaces()
-            .then(spaces => get(spaces, 'list'));
+          return this.get('recordManager').getUserRecordList('space')
+            .then(groups => get(groups, 'list'));
         })),
         users: promise.array(computed(
-          'currentUserProxy',
           'groupsUsersListsProxy.[]',
           'spacesUsersListsProxy.[]',
           function users() {
             const {
-              currentUserProxy,
+              recordManager,
               groupsUsersListsProxy,
               spacesUsersListsProxy,
             } = this.getProperties(
-              'currentUserProxy',
+              'recordManager',
               'groupsUsersListsProxy',
               'spacesUsersListsProxy'
             );
             const usersArray = [];
             return allFulfilled([
-              currentUserProxy,
               groupsUsersListsProxy,
               spacesUsersListsProxy,
             ]).then(([
-              currentUser,
               groupsUserLists,
               spacesUsersListsProxy,
             ]) => {
-              usersArray.push(currentUser);
+              usersArray.push(recordManager.getCurrentUserRecord());
               groupsUserLists
                 .concat(spacesUsersListsProxy)
                 .forEach(usersList =>
@@ -1073,7 +1040,7 @@ export default Component.extend(I18n, {
           }
         )),
         oneprovidersProxy: promise.array(computed(function oneprovidersProxy() {
-          return this.get('providerManager').getProviders()
+          return this.get('recordManager').getUserRecordList('provider')
             .then(providers => get(providers, 'list'));
         })),
         models: computed(function models() {
@@ -1132,11 +1099,11 @@ export default Component.extend(I18n, {
       viewTokenValue: reads('component.tokenDataSource.caveats.service'),
     }).create(generateCaveatFormGroupBody('service', [
       ModelTagsFieldPrototype.extend({
-        clusterManager: service(),
+        recordManager: service(),
         isVisible: reads('parent.isCaveatEnabled'),
         clustersProxy: promise.array(computed(function clustersProxy() {
-          return this.get('clusterManager')
-            .getClusters().then(clusters => get(clusters, 'list'));
+          return this.get('recordManager').getUserRecordList('cluster')
+            .then(clusters => get(clusters, 'list'));
         })),
         models: computed(function models() {
           return [{
@@ -1539,36 +1506,8 @@ export default Component.extend(I18n, {
    * @returns {PromiseArray<FieldOption>}
    */
   getRecordOptionsForModel(modelName) {
-    const {
-      spaceManager,
-      groupManager,
-      harvesterManager,
-      clusterManager,
-    } = this.getProperties(
-      'spaceManager',
-      'groupManager',
-      'harvesterManager',
-      'clusterManager',
-    );
-
-    let records;
-    switch (modelName) {
-      case 'group':
-        records = groupManager.getGroups();
-        break;
-      case 'space':
-        records = spaceManager.getSpaces();
-        break;
-      case 'cluster':
-        records = clusterManager.getClusters();
-        break;
-      case 'harvester':
-        records = harvesterManager.getHarvesters();
-        break;
-    }
-
     return PromiseArray.create({
-      promise: records
+      promise: this.get('recordManager').getUserRecordList(modelName)
         .then(records => get(records, 'list'))
         .then(recordsList => RecordsOptionsArrayProxy.create({
           ownerSource: this,
@@ -1583,39 +1522,11 @@ export default Component.extend(I18n, {
    * @returns {Promise<GraphSingleModel>}
    */
   getRecord(modelName, entityId) {
-    const {
-      userManager,
-      spaceManager,
-      groupManager,
-      providerManager,
-      clusterManager,
-      guiContext,
-    } = this.getProperties(
-      'userManager',
-      'spaceManager',
-      'groupManager',
-      'providerManager',
-      'clusterManager',
-      'guiContext'
-    );
-
-    switch (modelName) {
-      case 'user':
-        return userManager.getRecordById(entityId);
-      case 'space':
-        return spaceManager.getRecordById(entityId);
-      case 'group':
-        return groupManager.getRecordById(entityId);
-      case 'provider':
-        return providerManager.getRecordById(entityId);
-      case 'cluster':
-        if (entityId === 'onezone') {
-          const onezoneClusterEntityId = get(guiContext, 'clusterId');
-          return clusterManager.getRecordById(onezoneClusterEntityId);
-        } else {
-          return clusterManager.getRecordById(entityId);
-        }
+    if (modelName === 'cluster' && entityId === 'onezone') {
+      entityId = this.get('guiContext.clusterId');
     }
+
+    return this.get('recordManager').getRecordById(modelName, entityId);
   },
 
   /**
@@ -1647,23 +1558,22 @@ export default Component.extend(I18n, {
       const {
         fields,
         onSubmit,
-        currentUser,
+        recordManager,
         mode,
         token,
-      } = this.getProperties('fields', 'onSubmit', 'currentUser', 'mode', 'token');
+      } = this.getProperties('fields', 'onSubmit', 'recordManager', 'mode', 'token');
 
       if (get(fields, 'isValid')) {
         this.set('isSubmitting', true);
         let submitPromise;
         const formValues = fields.dumpValue();
         if (mode === 'create') {
-          submitPromise = currentUser.getCurrentUserRecord().then(user => {
-            const tokenRawModel = creatorDataToToken(formValues, user);
-            return onSubmit(tokenRawModel);
-          });
+          submitPromise = onSubmit(creatorDataToToken(
+            formValues,
+            recordManager.getCurrentUserRecord()
+          ));
         } else {
-          const diffObject = editorDataToDiffObject(formValues, token);
-          submitPromise = onSubmit(diffObject);
+          submitPromise = onSubmit(editorDataToDiffObject(formValues, token));
         }
         return submitPromise
           .finally(() => safeExec(this, () => this.set('isSubmitting', false)));

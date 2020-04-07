@@ -59,23 +59,6 @@ export default Service.extend({
   },
 
   /**
-   * Joins user to a cluster using given token
-   * @param {string} token
-   * @returns {Promise<Cluster>}
-   */
-  joinCluster(token) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.joinCluster(token)
-        .then(cluster => Promise.all([
-          this.reloadList(),
-          this.reloadUserList(get(cluster, 'entityId')).catch(ignoreForbiddenError),
-          this.reloadEffUserList(get(cluster, 'entityId'))
-          .catch(ignoreForbiddenError),
-        ]).then(() => cluster))
-      );
-  },
-
-  /**
    * Get token that allows to register Oneprovider in Onezone.
    * We get resource called `provider_registration_token`.
    * @returns {Promise<string>} resolves the token
@@ -96,7 +79,7 @@ export default Service.extend({
       data: { userId },
       subscribe: false,
     }).then(result => {
-      tokenManager.reloadListIfAlreadyFetched();
+      tokenManager.reloadList();
       return result;
     });
   },

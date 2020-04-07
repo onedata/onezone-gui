@@ -1,0 +1,78 @@
+<div class="token-container">
+  <input
+    type="text"
+    class="token-string form-control"
+    placeholder={{tt this "tokenInputPlaceholder"}}
+    oninput={{action "tokenChanged" value="target.value"}}
+  >
+  {{#if pendingCheckTime}}
+    {{spin-spinner-block sizeClass="xs"}}
+  {{/if}}
+</div>
+{{#if invalidTokenErrorOccured}}
+  <div class="invalid-token-message alert alert-warning" role="alert">
+    {{tt this "invalidTokenMessage"}}
+  </div>
+{{else if error}}
+  {{resource-load-error reason=error}}
+{{else}}
+  {{#if typeText}}
+    <div class="type-info">
+      <p class="token-type">
+        {{typeText}}
+        {{#if hasUnresolvedTargetName}}
+          <img
+            class="warning-icon {{elementId}}-warning-icon"
+            src={{root-url "assets/images/sign-warning-large.svg"}}
+          >
+          {{one-tooltip
+            title=(tt this "unresolvedTargetWarning")
+            triggerElement=(concat "." elementId "-warning-icon")
+            triggerEvent="hover"
+          }}
+        {{/if}}
+      </p>
+    </div>
+  {{/if}}
+  {{#if noJoinMessage}}
+    <div class="no-join-message alert alert-info" role="alert">
+      {{noJoinMessage}}
+    </div>
+  {{/if}}
+  {{#if joiningRecordSelectorModelName}}
+    <div class="joining-record-container">
+      {{#promise-proxy-container proxy=joiningRecordSelectorOptionsProxy sizeClass="sm"}}
+        <p class="selector-description">{{joiningRecordSelectorDescription}}</p>
+        <div class="joining-record-selector">
+          {{#one-dropdown
+            options=joiningRecordSelectorOptionsProxy
+            onchange=(action (mut selectedJoiningRecordOption))
+            selected=selectedJoiningRecordOption
+            renderInPlace=true
+            placeholder=(tt this
+              (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
+            )
+            as |recordOption|
+          }}
+            <div class="option-container">
+              {{one-icon icon=recordOption.icon}}
+              {{#truncated-string class="text"}}
+                {{recordOption.label}}
+              {{/truncated-string}}
+            </div>
+          {{/one-dropdown}}
+        </div>
+      {{/promise-proxy-container}}
+    </div>
+  {{/if}}
+  {{#if showJoinBtn}}
+    {{#one-spin-button
+      class="join-btn btn btn-lg btn-primary"
+      disabled=isJoinBtnDisabled
+      action=(action "join")
+    }}
+      {{tt this "joinBtn"}}
+    {{/one-spin-button}}
+  {{/if}}
+{{/if}}
+{{yield}}

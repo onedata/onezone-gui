@@ -24,7 +24,6 @@ import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
-import contentSpacesJoin from './components/content-spaces-join';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
@@ -32,24 +31,17 @@ import contentSpacesData from './components/content-spaces-data';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import oneproviderViewContainer from './components/oneprovider-view-container';
-import contentSpacesJoinHarvester from './components/content-spaces-join-harvester';
 import contentProviderEmpty from './components/content-provider-empty';
 import leaveSpaceConfirm from './components/leave-space-confirm';
-import contentGroupsJoin from './components/content-groups-join';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
 import contentGroupsHierarchy from './components/content-groups-hierarchy';
-import contentGroupsJoinAsSubgroup from './components/content-groups-join-as-subgroup';
-import contentGroupsJoinSpace from './components/content-groups-join-space';
-import contentGroupsJoinHarvester from './components/content-groups-join-harvester';
-import contentGroupsJoinCluster from './components/content-groups-join-cluster';
 import contentClustersAdd from './components/content-clusters-add';
 import contentClustersEmpty from './components/content-clusters-empty';
 import contentClustersAuthenticationError from './components/content-clusters-authentication-error';
 import contentClustersDeregister from './components/content-clusters-deregister';
 import contentClustersMembers from './components/content-clusters-members';
-import contentClustersJoin from './components/content-clusters-join';
 import contentSharesIndex from './components/content-shares-index';
 import membersCollection from './components/members-collection';
 import privilegesEditorModal from './components/privileges-editor-modal';
@@ -68,7 +60,6 @@ import resourceMembersTile from './components/resource-members-tile';
 import resourceMembershipTile from './components/resource-membership-tile';
 import sidebarHarvesters from './components/sidebar-harvesters';
 import contentHarvestersNew from './components/content-harvesters-new';
-import contentHarvestersJoin from './components/content-harvesters-join';
 import contentHarvestersConfig from './components/content-harvesters-config';
 import contentHarvestersSpaces from './components/content-harvesters-spaces';
 import contentHarvestersIndices from './components/content-harvesters-indices';
@@ -89,6 +80,8 @@ import contentTokensNew from './components/content-tokens-new';
 import tokenEditor from './components/token-editor';
 import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 import inviteTokenGenerator from './components/invite-token-generator';
+import tokenConsumer from './components/token-consumer';
+import contentTokensConsumer from './components/content-tokens-consumer';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -110,6 +103,8 @@ import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
 import modifyTokenAction from './utils/token-actions/modify-token-action';
 import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
+import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
+import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 
 const translations = {
   tabs: {
@@ -148,7 +143,6 @@ const translations = {
     contentSpacesIndex,
     contentSpacesNew,
     contentProviderEmpty,
-    contentSpacesJoin,
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
@@ -156,24 +150,17 @@ const translations = {
     contentSpacesShares,
     contentSpacesTransfers,
     oneproviderViewContainer,
-    contentSpacesJoinHarvester,
     leaveSpaceConfirm,
-    contentGroupsJoin,
     contentGroupsNew,
     contentGroupsEmpty,
     contentGroupsMembers,
     contentGroupsHierarchy,
-    contentGroupsJoinAsSubgroup,
-    contentGroupsJoinSpace,
-    contentGroupsJoinHarvester,
-    contentGroupsJoinCluster,
     contentClustersAdd,
     contentClustersEmpty,
     contentClustersAuthenticationError,
     contentClustersEndpointError,
     contentClustersDeregister,
     contentClustersMembers,
-    contentClustersJoin,
     contentSharesIndex,
     membersCollection,
     privilegesEditorModal,
@@ -192,7 +179,6 @@ const translations = {
     resourceMembershipTile,
     sidebarHarvesters,
     contentHarvestersNew,
-    contentHarvestersJoin,
     contentHarvestersConfig,
     contentHarvestersSpaces,
     contentHarvestersIndices,
@@ -213,6 +199,8 @@ const translations = {
     tokenEditor,
     ceaseOneproviderSupportModal,
     inviteTokenGenerator,
+    tokenConsumer,
+    contentTokensConsumer,
   },
   services: {
     tokenActions,
@@ -233,6 +221,8 @@ const translations = {
       openCreateTokenViewAction,
       modifyTokenAction,
       generateInviteTokenAction,
+      openConsumeTokenViewAction,
+      consumeInviteTokenAction,
     },
   },
 };

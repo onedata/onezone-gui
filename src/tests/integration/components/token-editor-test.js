@@ -164,10 +164,12 @@ describe('Integration | Component | token editor', function () {
       entityId: 'currentuser',
       name: 'currentuser',
     };
-    sinon.stub(lookupService(this, 'current-user'), 'getCurrentUserRecord')
-      .resolves(currentUser);
     const onedataGraphStub =
       sinon.stub(lookupService(this, 'onedata-graph'), 'request');
+    const recordManagerService = lookupService(this, 'record-manager');
+    sinon.stub(recordManagerService, 'getCurrentUserRecord').returns(currentUser);
+    const getUserRecordListStub = sinon.stub(recordManagerService, 'getUserRecordList');
+    const getRecordByIdStub = sinon.stub(recordManagerService, 'getRecordById').rejects();
     const mockedRecords = {};
     [
       'user',
@@ -182,13 +184,13 @@ describe('Integration | Component | token editor', function () {
         operation: 'get',
         subscribe: false,
       }).resolves({ member: [`${modelName}_view`] });
-      const serviceName = `${modelName}-manager`;
-      const getModelsMethodName = `get${_.upperFirst(modelName)}s`;
-      const service = lookupService(this, serviceName);
       mockedRecords[modelName] = _.reverse(_.range(3)).map(index => ({
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
+        constructor: {
+          modelName,
+        },
         effUserList: PromiseObject.create({
           promise: resolve({
             list: PromiseArray.create({
@@ -210,16 +212,13 @@ describe('Integration | Component | token editor', function () {
           }),
         }),
       }));
-      sinon.stub(service, getModelsMethodName)
-        .resolves({
-          list: PromiseArray.create({
-            promise: resolve(mockedRecords[modelName]),
-          }),
-        });
-      const getRecordByIdStub = sinon.stub(service, 'getRecordById');
-      getRecordByIdStub.rejects();
+      getUserRecordListStub.withArgs(modelName).resolves({
+        list: PromiseArray.create({
+          promise: resolve(mockedRecords[modelName]),
+        }),
+      });
       mockedRecords[modelName].forEach(record =>
-        getRecordByIdStub.withArgs(record.entityId).resolves(record)
+        getRecordByIdStub.withArgs(modelName, record.entityId).resolves(record)
       );
     });
     mockedRecords['cluster'].forEach(cluster => cluster.type = 'oneprovider');
@@ -1548,22 +1547,22 @@ describe('Integration | Component | token editor', function () {
   });
 
   it('calls injected onSubmit on submit click', function () {
-    const submitSpy = sinon.spy();
-    this.on('submit', submitSpy);
+    const submitStub = sinon.stub().resolves();
+    this.on('submit', submitStub);
     this.render(hbs `{{token-editor mode="create" onSubmit=(action "submit")}}`);
 
     return fillIn('.name-field input', 'abc')
       .then(() => click('.submit-token'))
       .then(() => {
-        expect(submitSpy).to.be.calledOnce;
+        expect(submitStub).to.be.calledOnce;
       });
   });
 
   it(
     'passess token raw model via injected onSubmit on submit click (access token example with all caveats)',
     function () {
-      const submitSpy = sinon.spy();
-      this.on('submit', submitSpy);
+      const submitStub = sinon.stub().resolves();
+      this.on('submit', submitStub);
       this.render(hbs `{{token-editor mode="create" expandCaveats=true onSubmit=(action "submit")}}`);
 
       return fillIn('.name-field input', 'somename')
@@ -1626,7 +1625,7 @@ describe('Integration | Component | token editor', function () {
         ))
         .then(() => click('.submit-token'))
         .then(() => {
-          const rawToken = submitSpy.lastCall.args[0];
+          const rawToken = submitStub.lastCall.args[0];
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.nested.property('type.accessToken');
 
@@ -1669,8 +1668,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'passess token raw model via injected onSubmit on submit click (invite token example without caveats)',
     function () {
-      const submitSpy = sinon.spy();
-      this.on('submit', submitSpy);
+      const submitStub = sinon.stub().resolves();
+      this.on('submit', submitStub);
       this.render(hbs `{{token-editor mode="create" onSubmit=(action "submit")}}`);
 
       return fillIn('.name-field input', 'somename')
@@ -1681,7 +1680,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => fillIn('.usageLimitNumber-field input', '10'))
         .then(() => click('.submit-token'))
         .then(() => {
-          const rawToken = submitSpy.lastCall.args[0];
+          const rawToken = submitStub.lastCall.args[0];
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
             inviteType: 'userJoinGroup',
@@ -1697,8 +1696,8 @@ describe('Integration | Component | token editor', function () {
   it(
     'passess token raw model via injected onSubmit on submit click (register Oneprovider example without caveats)',
     function () {
-      const submitSpy = sinon.spy();
-      this.on('submit', submitSpy);
+      const submitStub = sinon.stub().resolves();
+      this.on('submit', submitStub);
       this.render(hbs `{{token-editor mode="create" onSubmit=(action "submit")}}`);
 
       const registerOneproviderDropdownIndex = tokenInviteTypes.indexOf(
@@ -1711,7 +1710,7 @@ describe('Integration | Component | token editor', function () {
         )
         .then(() => click('.submit-token'))
         .then(() => {
-          const rawToken = submitSpy.lastCall.args[0];
+          const rawToken = submitStub.lastCall.args[0];
           expect(rawToken).to.have.property('name', 'somename');
           expect(rawToken).to.have.deep.nested.property('type.inviteToken', {
             inviteType: 'registerOneprovider',

@@ -1,0 +1,50 @@
+.token-consumer {
+  text-align: center;
+
+  &.is-examining {
+    .token-string {
+      padding-right: 2 * $padding-base-horizontal + 24px;
+    }
+  }
+
+  .token-container {
+    position: relative;
+    margin-bottom: 2 * $padding-base-vertical;
+
+    .spin-spinner-block {
+      position: absolute;
+      top: 0;
+      right: $padding-base-horizontal;
+      height: $input-height-base;
+    }
+  }
+
+  .type-info {
+    margin-bottom: 2 * $padding-base-vertical;
+    font-size: 13pt;
+
+    strong {
+      @include font-bold();
+    }
+
+    .type-label {
+      @include font-semibold();
+    }
+  }
+
+  .joining-record-container {
+    position: relative;
+    min-height: 60px;
+    margin-bottom: 2 * $padding-base-vertical;
+  }
+
+  .joining-record-selector {
+    text-align: left;
+    margin-bottom: 2 * $padding-base-vertical;
+  }
+
+  .warning-icon {
+    height: 21px;
+    vertical-align: text-bottom;
+  }
+}

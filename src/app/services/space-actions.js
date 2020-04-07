@@ -2,7 +2,7 @@
  * A service which provides spaces manipulation functions ready to use for GUI 
  *
  * @module services/space-actions
- * @author Jakub Liput
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -11,7 +11,7 @@ import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
-import { next } from '@ember/runloop';
+import { collect } from '@ember/object/computed';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -26,13 +26,7 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
    */
-  buttons: computed('btnCreate', 'btnJoin', function getButtons() {
-    const {
-      btnCreate,
-      btnJoin,
-    } = this.getProperties('btnCreate', 'btnJoin');
-    return [btnCreate, btnJoin];
-  }),
+  buttons: collect('btnCreate'),
 
   // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route
@@ -44,21 +38,6 @@ export default Service.extend(I18n, {
       tip: this.t('btnCreate.hint'),
       class: 'create-space-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
-    };
-  }),
-
-  btnJoin: computed('router', function getBtnCreate() {
-    const router = this.get('router');
-    return {
-      icon: 'join-plug',
-      title: this.t('btnJoin.title'),
-      tip: this.t('btnJoin.hint'),
-      class: 'join-space-btn',
-      action: () => router.transitionTo(
-        'onedata.sidebar.content',
-        'spaces',
-        'join'
-      ),
     };
   }),
 
@@ -102,32 +81,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Joins a space
-   * @param {string} token an invitation token
-   * @returns {Promise} A promise of transition into view of newly joined space
-   */
-  joinSpace(token) {
-    const guiUtils = this.get('guiUtils');
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.joinSpace(token))
-      .then(spaceRecord =>
-        spaceRecord.reloadList('userList').then(() => spaceRecord)
-      )
-      .catch(error => {
-        this.get('globalNotify').backendError(this.t('joiningSpace'), error);
-        throw error;
-      })
-      .then(spaceRecord => {
-        this.get('globalNotify').info(this.t('joinedSpaceSuccess'));
-        return this.get('router').transitionTo(
-          'onedata.sidebar.content.aspect',
-          guiUtils.getRoutableIdFor(spaceRecord),
-          'index',
-        );
-      });
-  },
-
-  /**
    * Leave space
    * @param {models.Space} space
    * @returns {Promise}
@@ -161,32 +114,6 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningSpace'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins space to a harvester using token
-   * @param {Model.Space} space 
-   * @param {string} token
-   * @returns {Promise<Harvester>}
-   */
-  joinSpaceToHarvester(space, token) {
-    const {
-      globalNotify,
-      spaceManager,
-    } = this.getProperties('globalNotify', 'spaceManager');
-    return spaceManager.joinSpaceToHarvester(space, token)
-      .then(harvester => {
-        globalNotify.success(this.t('joinSpaceToHarvesterSuccess', {
-          spaceName: get(space, 'name'),
-          harvesterName: get(harvester, 'name'),
-        }));
-        next(() => this.redirectToSpace(space));
-        return harvester;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningSpaceToHarvester'), error);
         throw error;
       });
   },
@@ -312,24 +239,5 @@ export default Service.extend(I18n, {
       globalNotify.backendError(this.t('userDeletion'), error);
       throw error;
     });
-  },
-
-  /**
-   * Redirects to space page
-   * @param {Model.Space} space
-   * @param {string} aspect
-   * @returns {Promise}
-   */
-  redirectToSpace(space, aspect = 'index') {
-    const {
-      router,
-      guiUtils,
-    } = this.getProperties('router', 'guiUtils');
-    return router.transitionTo(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      guiUtils.getRoutableIdFor(space),
-      aspect,
-    );
   },
 });

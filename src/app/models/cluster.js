@@ -155,5 +155,13 @@ export default Model.extend(
         `${location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
       return resolve($.get(guiContextPath));
     },
+
+    /**
+     * @override
+     */
+    loadRequiredRelations() {
+      return this._super(...arguments)
+        .then(() => this.loadAsyncProperties());
+    },
   }
 ).reopenClass(StaticGraphModelMixin);

@@ -15,6 +15,8 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 
+export const entityType = 'harvester';
+
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   name: attr('string'),
   scope: attr('string'),
