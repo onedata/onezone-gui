@@ -65,6 +65,10 @@ export default SelectModelModal.extend({
         relation,
         relatedRecord,
       } = this.getProperties('relation', 'relatedRecord');
+      if (!relatedRecord) {
+        return;
+      }
+
       const {
         name,
         entityType,
