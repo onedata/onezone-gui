@@ -331,7 +331,8 @@ export default Component.extend(I18n, {
       griAspect,
       onlyDirect,
     } = this.getProperties('record', 'recordType', 'griAspect', 'onlyDirect');
-    let recordId, subjectId;
+    let recordId;
+    let subjectId;
     try {
       recordId = parseGri(get(record, 'id')).entityId;
       subjectId = parseGri(get(member, 'id')).entityId;

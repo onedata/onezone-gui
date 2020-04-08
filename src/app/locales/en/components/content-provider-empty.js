@@ -1,7 +1,6 @@
 export default {
   addSupportHeader: 'Add support',
-  leadText: 'To store data, you need to belong to a space that is supported by ' +
-    'at least one provider. There are three ways to achieve this:',
+  leadText: 'To store data, you need to belong to a space that is supported by at least one provider. There are three ways to achieve this:',
   space: 'space',
   group: 'group',
   invitationToken: 'invitation token',
@@ -11,10 +10,8 @@ export default {
     'or deploy your own provider.',
   create: 'create one',
   pIfYouHave: 'If you have a',
-  pVisit: 'visit',
-  p2_2: 'tab and',
   joinSpace: 'join an existing space',
-  p3_2: 'tab and join a group to gain access to spaces of that group',
+  joinGroup: 'join a group',
+  p3_1: ' to gain access to spaces of that group',
   manageSpacesHead: 'spaces',
-  manageGroupsHead: 'groups',
 };

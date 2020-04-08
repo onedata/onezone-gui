@@ -10,7 +10,6 @@ export default {
     addParentGroup: 'Add parent group',
     createNewGroup: 'Create new group',
     addYourGroup: 'Add one of your groups',
-    inviteUsingToken: 'Invite group using token',
     joinUsingToken: 'Join to group using token',
   },
   groupBoxRelation: {

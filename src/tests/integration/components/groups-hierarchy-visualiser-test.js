@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import EmberObject, { computed, get, set } from '@ember/object';
+import EmberObject, { computed, get, getProperties, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import Service from '@ember/service';
-import { registerService } from '../../helpers/stub-service';
+import { registerService, lookupService } from '../../helpers/stub-service';
 import I18nStub from '../../helpers/i18n-stub';
 import { htmlSafe } from '@ember/string';
 import { resolve } from 'rsvp';
@@ -17,6 +17,7 @@ import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visu
 import { A } from '@ember/array';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
+import sinon from 'sinon';
 
 function getContainerStyle(style) {
   return htmlSafe(`width: ${style.width}px; height: ${style.height}px;`);
@@ -49,7 +50,6 @@ const GroupStub = EmberObject.extend({
   hasViewPrivilege: true,
   isEffectiveMember: true,
   directMembership: true,
-  _token: 'token1',
 
   id: computed('name', function id() {
     return `group.${this.get('name')}.instance:auto`;
@@ -98,10 +98,6 @@ const GroupStub = EmberObject.extend({
   reload() {
     return resolve(this);
   },
-
-  getInviteToken() {
-    return resolve(this.get('_token'));
-  },
 });
 
 GroupStub.relationshipNames = {
@@ -138,6 +134,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         return resolve(true);
       },
     }));
+    sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
 
     const group = GroupStub.create({
       name: 'a1',
@@ -377,8 +374,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       })
       .then(() => {
         const helper = new GroupsHierarchyVisualiserHelper(this.$());
-        let $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
-        let $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
+        const $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
+        const $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
         expect(
           Number.parseFloat($groupBox2.get(0).style.top) -
           Number.parseFloat($groupBox1.get(0).style.top)
@@ -588,6 +585,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
 
   it('generates invitation token for group', function () {
     this.render(hbs `
+      {{global-modal-mounter}}
       <div style={{containerStyle}}>
         {{groups-hierarchy-visualiser group=group workspace=workspace}}
       </div>
@@ -599,31 +597,48 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         const $groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
         return helper.clickGroupBoxActions($groupBox, [
           '.add-child-group-action',
-          '.add-child-group-action + .nested-actions .invite-using-token-action',
+          '.add-child-group-action + .nested-actions .generate-invite-token-action ',
         ]);
       })
-      .then(() =>
-        expect($('.invite-using-token-modal .invitation-token').text().trim())
-        .to.equal('token1')
-      );
+      .then(() => {
+        const token = $('.generate-invite-token-modal .token-textarea').val();
+        expect(token).to.contain('groupJoinGroup');
+        expect(token).to.contain('a1');
+      });
   });
 
   it('joins group to some parent group using token', function () {
     let childGroup = {};
     let passedToken = '';
     let newParent = {};
-    registerService(this, 'group-actions', Service.extend({
-      joinGroupAsSubgroup(group, token) {
-        childGroup = group;
-        passedToken = token;
-        newParent = GroupStub.create(Object.assign({
-          name: 'testParent',
-          _childList: A([group]),
-        }));
-        get(group, '_parentList').pushObject(newParent);
-        return resolve(newParent);
-      },
-    }));
+    lookupService(this, 'token-actions').createConsumeInviteTokenAction = context => {
+      const {
+        joiningRecord,
+        targetModelName,
+        token,
+        dontRedirect,
+      } = getProperties(
+        context,
+        'joiningRecord',
+        'targetModelName',
+        'token',
+        'dontRedirect'
+      );
+      if (dontRedirect && targetModelName === 'group') {
+        return {
+          execute() {
+            childGroup = joiningRecord;
+            passedToken = token;
+            newParent = GroupStub.create(Object.assign({
+              name: 'testParent',
+              _childList: A([joiningRecord]),
+            }));
+            get(joiningRecord, '_parentList').pushObject(newParent);
+            return resolve({ result: newParent });
+          },
+        };
+      }
+    };
 
     this.render(hbs `
       <div style={{containerStyle}}>
@@ -765,7 +780,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    let helper, $nonEmptyColumnsBefore, $nonEmptyColumnsAfter;
+    let helper;
+    let $nonEmptyColumnsBefore;
+    let $nonEmptyColumnsAfter;
     return wait()
       .then(() => {
         helper = new GroupsHierarchyVisualiserHelper(this.$());

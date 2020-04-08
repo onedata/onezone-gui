@@ -19,6 +19,7 @@ import { reject, resolve } from 'rsvp';
 const tokenTypeToIconNameMapping = {
   invite: 'token-invite',
   access: 'token-access',
+  identity: 'token-identity',
   default: 'tokens',
 };
 

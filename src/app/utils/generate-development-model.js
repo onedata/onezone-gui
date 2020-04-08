@@ -16,7 +16,7 @@ import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
-import { inviteTokenSubtypeToTargetModelMapping } from 'onezone-gui/models/token';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -80,7 +80,11 @@ const providerClusterDefaultData = {
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers, groups, spaces, providers, harvesters;
+  let sharedUsers;
+  let groups;
+  let spaces;
+  let providers;
+  let harvesters;
 
   return createGuiMessages(store)
     // create shared users
@@ -448,6 +452,7 @@ function createTokensRecords(store) {
   _.range(NUMBER_OF_TOKENS).forEach((i) => {
     const accessTokenPromise = store.createRecord('token', {
       name: 'Access token ' + i,
+      revoked: false,
       type: {
         accessToken: {},
       },
@@ -455,22 +460,25 @@ function createTokensRecords(store) {
         creationTime: moment().unix(),
       },
     }).save();
-    const inviteSubtypes = Object.keys(inviteTokenSubtypeToTargetModelMapping);
-    const inviteTokenPromises = inviteSubtypes
-      .map((subtype, j) => {
+    const inviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
+    const inviteTokenPromises = inviteTypes
+      .map((inviteType, j) => {
         return store.createRecord('token', {
-          name: 'Invite token ' + (i * inviteSubtypes.length + j),
+          name: 'Invite token ' + (i * inviteTypes.length + j),
+          revoked: false,
           type: {
-            inviteToken: { subtype },
+            inviteToken: { inviteType },
           },
           caveats: [{
             type: 'time',
             validUntil: moment()
-              .add(60 * (-inviteSubtypes.length / 2 + j), 'seconds')
+              .add(60 * (-inviteTypes.length / 2 + j), 'seconds')
               .unix(),
           }],
           metadata: {
             creationTime: moment().subtract(1, 'hour').unix(),
+            usageLimit: 20,
+            usageCount: 10,
           },
         }).save();
       });
@@ -610,8 +618,8 @@ function attachModelsToInviteTokens(listRecords) {
     allFulfilled(tokensList
       .filter(token => get(token, 'typeName') === 'invite')
       .map(token => {
-        const subtype = get(token, 'subtype');
-        const modelMapping = inviteTokenSubtypeToTargetModelMapping[subtype];
+        const inviteType = get(token, 'inviteType');
+        const modelMapping = tokenInviteTypeToTargetModelMapping[inviteType];
         const targetRecordsList = listRecords[modelMapping.modelName];
         if (targetRecordsList) {
           return targetRecordsList.get('list')
@@ -719,7 +727,8 @@ function createPrivilegesRecords(
 ) {
   const sharedGriArray = sharedArray.map(subject => subject.get('id'));
   const recordGri = get(record, 'gri');
-  let recordId, subjectId;
+  let recordId;
+  let subjectId;
   try {
     recordId = parseGri(recordGri).entityId;
   } catch (e) {

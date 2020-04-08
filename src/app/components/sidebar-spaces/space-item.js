@@ -8,7 +8,7 @@
  */
 
 import { computed, get } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import _ from 'lodash';
@@ -19,8 +19,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 export default Component.extend(I18n, {
   tagName: '',
 
-  router: service(),
-  guiUtils: service(),
   i18n: service(),
 
   /**
@@ -109,33 +107,4 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
-
-  /**
-   * @type {Ember.ComputedProperty<Action>}
-   */
-  joinToHarvesterAction: computed(function joinToHarvesterAction() {
-    return {
-      action: () => {
-        const {
-          router,
-          guiUtils,
-          space,
-        } = this.getProperties('router', 'guiUtils', 'space');
-
-        return router.transitionTo(
-          'onedata.sidebar.content.aspect',
-          guiUtils.getRoutableIdFor(space),
-          'join-harvester'
-        );
-      },
-      title: this.t('joinToHarvester'),
-      class: 'add-to-harvester-action',
-      icon: 'light-bulb',
-    };
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  itemActions: collect('joinToHarvesterAction'),
 });

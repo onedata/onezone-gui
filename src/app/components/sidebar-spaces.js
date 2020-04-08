@@ -1,5 +1,5 @@
 /**
- * A sidebar for providers (extension of ``two-level-sidebar``)
+ * A sidebar for providers (extension of ``one-sidebar``)
  *
  * @module components/sidebar-spaces
  * @author Jakub Liput, Michal Borzecki
@@ -7,14 +7,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import TwoLevelSidebar from 'onedata-gui-common/components/two-level-sidebar';
-import layout from 'onedata-gui-common/templates/components/two-level-sidebar';
+import OneSidebar from 'onedata-gui-common/components/one-sidebar';
+import layout from 'onedata-gui-common/templates/components/one-sidebar';
 import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
 
-export default TwoLevelSidebar.extend(I18n, UserProxyMixin, {
+export default OneSidebar.extend(I18n, UserProxyMixin, {
   layout,
 
   /**

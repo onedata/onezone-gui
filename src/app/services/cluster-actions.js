@@ -37,25 +37,6 @@ export default ClusterActions.extend({
   },
 
   /**
-   * Joins to existing cluster using token
-   * @param {string} token
-   * @returns {Promise} A promise, which resolves to cluster if it has
-   * been joined successfully.
-   */
-  joinCluster(token) {
-    return this.get('clusterManager').joinCluster(token)
-      .then(cluster => {
-        this.get('globalNotify').info(this.t('joinedClusterSuccess'));
-        this.redirectToCluster(cluster);
-        return cluster;
-      })
-      .catch(error => {
-        this.get('globalNotify').backendError(this.t('joiningCluster'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Creates member group for specified cluster
    * @param {Models.Cluster} cluster 
    * @param {Object} groupRepresentation

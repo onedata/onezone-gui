@@ -257,7 +257,6 @@ export default Service.extend(I18n, {
    * @param {number} updateData.bytesUploaded
    * @param {boolean} updateData.error
    * @param {boolean} updateData.success
-   * @returns {Utils.UploadObject|null}
    */
   updateUploadProgress({
     oneprovider,

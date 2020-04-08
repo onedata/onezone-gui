@@ -18,6 +18,8 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import { getOneproviderPath } from 'onedata-gui-common/utils/onedata-urls';
 import { promise } from 'ember-awesome-macros';
 
+export const entityType = 'provider';
+
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   longitude: attr('number', { defaultValue: 0 }),

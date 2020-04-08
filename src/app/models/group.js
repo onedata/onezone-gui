@@ -16,6 +16,8 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 
+export const entityType = 'group';
+
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   onedataGraphUtils: service(),
 

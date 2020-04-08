@@ -7,11 +7,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import _ from 'lodash';
 
 export default Service.extend({
+  onedataGraph: service(),
+
   /**
    * Generates privilege record GRI
    * @param {string} parentType `group` or `space`
@@ -35,14 +36,28 @@ export default Service.extend({
   },
 
   /**
-   * Flattens privileges tree (object) to the array representation compatible
-   * with privilege model
-   * @param {Object} privilegesTree 
-   * @returns {Array<string>}
+   * Fetches privileges preset for specified model. Preset object looks like:
+   * ```
+   * {
+   *   member: Array<String>,
+   *   manager: Array<String>,
+   *   admin: Array<String>
+   * }
+   * ```
+   * where each array of strings contains a list of default privileges.
+   * @param {String} modelName one of: space, group, harvester, cluster
+   * @returns {Promise<Object>}
    */
-  treeToArray(privilegesTree) {
-    const flattenedPrivilegesTree = _.assign({}, ..._.values(privilegesTree));
-    return Object.keys(flattenedPrivilegesTree)
-      .filter(key => flattenedPrivilegesTree[key]);
+  getPrivilegesPresetForModel(modelName) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: modelName,
+        entityId: 'null',
+        aspect: 'privileges',
+        scope: 'private',
+      }),
+      operation: 'get',
+      subscribe: false,
+    });
   },
 });

@@ -1,10 +1,10 @@
-{{#content-info
-  class="scroll-breakpoint-800"
-  header=(tt this "header")
-  imagePath=(root-url "assets/images/token-new.svg")
-  text=(tt this "description")
-  as |contentInfo|
-}}
-  {{content-tokens-new/new-token-form
-    onCreate=(action "create")}}
-{{/content-info}}
+<div class="row content-row header-row hidden-xs">
+  <h1>{{tt this "header"}}</h1>
+</div>
+<div class="row content-row">
+  {{token-editor
+    mode="create"
+    predefinedValues=navigationState.aspectOptions
+    onSubmit=(action "submit")
+  }}
+</div>

@@ -3,40 +3,27 @@
  *
  * @module components/content-tokens
  * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
-import { inject } from '@ember/service';
-import { computed, get, observer, getProperties } from '@ember/object';
+import { inject as service } from '@ember/service';
+import { computed, set, get, observer } from '@ember/object';
+import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { resolve, reject } from 'rsvp';
+import { resolve } from 'rsvp';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import computedT from 'onedata-gui-common/utils/computed-t';
+import Action from 'onedata-gui-common/utils/action';
+import { tag, equal, raw } from 'ember-awesome-macros';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
-const tokenTypeToTargetLabelI18nKey = {
-  userJoinGroup: 'targetGroup',
-  groupJoinGroup: 'targetGroup',
-  userJoinSpace: 'targetSpace',
-  groupJoinSpace: 'targetSpace',
-  supportSpace: 'spaceToBeSupported',
-  registerOneprovider: 'adminUser',
-  userJoinCluster: 'targetCluster',
-  groupJoinCluster: 'targetCluster',
-  userJoinHarvester: 'targetHarvester',
-  groupJoinHarvester: 'targetHarvester',
-  spaceJoinHarvester: 'targetHarvester',
-};
-
-const targetFetchErrorsPossibleToRender = {
-  forbidden: { icon: 'no-view' },
-  notFound: { icon: 'x' },
-};
-
-export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
+export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-tokens'],
 
-  i18n: inject(),
+  i18n: service(),
+  tokenActions: service(),
 
   /**
    * @override
@@ -50,75 +37,63 @@ export default Component.extend(I18n, createDataProxyMixin('tokenTarget'), {
   token: undefined,
 
   /**
-   * @type {Ember.ComputedProperty<SafeString>}
+   * One of: view, edit
+   * @type {String}
    */
-  targetLabel: computed('token.subtype', function targetLabel() {
-    const tokenSubtype = this.get('token.subtype');
-    return tokenSubtype &&
-      this.t(`targetLabels.${tokenTypeToTargetLabelI18nKey[tokenSubtype]}`);
-  }),
-
-  /**
-   * @type {Ember.ComputedProperty<string|null>}
-   */
-  targetIcon: computed('tokenTarget', function targetIcon() {
-    const tokenTarget = this.get('tokenTarget');
-
-    if (tokenTarget) {
-      if (get(tokenTarget, 'error')) {
-        const errorId = get(tokenTarget, 'error.id');
-        return (targetFetchErrorsPossibleToRender[errorId] || {}).icon || null;
-      } else {
-        const modelName = tokenTarget.constructor.modelName;
-        switch (modelName) {
-          case 'group':
-          case 'space':
-          case 'user':
-          case 'cluster':
-            return modelName;
-          case 'harvester':
-            return 'light-bulb';
-          default:
-            return null;
-        }
-      }
-    } else {
-      return null;
-    }
-  }),
+  mode: 'view',
 
   /**
    * @override
    */
-  fetchTokenTarget() {
-    const token = this.get('token');
-    const proxy = token ? token.updateTokenTargetProxy() : resolve(null);
+  globalActionsTitle: computedT('globalActionsGroupName'),
 
-    return proxy
-      .then(target => {
-        if (target) {
-          const {
-            isDeleted,
-            isForbidden,
-          } = getProperties(target, 'isDeleted', 'isForbidden');
-          if (isDeleted) {
-            return reject({ id: 'notFound' });
-          } else if (isForbidden) {
-            return reject({ id: 'forbidden' });
-          }
-        }
-        return target;
-      })
-      .catch(error => {
-        const errorId = error && error.id;
-        return {
-          hasErrorPossibleToRender: Boolean(targetFetchErrorsPossibleToRender[errorId]),
-          error,
-        };
-      });
-  },
+  /**
+   * @override
+   */
+  globalActions: collect('editTriggerAction'),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  editTriggerAction: computed(function editTriggerAction() {
+    const component = this;
+    return Action.extend({
+      ownerSource: component,
+      component,
+      i18nPrefix: tag `${'component.i18nPrefix'}.editTriggerAction`,
+      className: 'edit-token-action-btn',
+      icon: 'rename',
+      title: computedT('title'),
+      disabled: equal('component.mode', raw('edit')),
+      execute() {
+        set(component, 'mode', 'edit');
+        return resolve();
+      },
+    }).create();
+  }),
 
   tokenObserver: observer('token', function tokenObserver() {
-    this.updateTokenTargetProxy();
+    if (this.get('mode') === 'edit') {
+      this.set('mode', 'view');
+    }
   }),
+
+  actions: {
+    saveToken(tokenDiff) {
+      const {
+        tokenActions,
+        token,
+      } = this.getProperties('tokenActions', 'token');
+
+      const modifyTokenAction = tokenActions
+        .createModifyTokenAction({ token, tokenDiff });
+
+      return modifyTokenAction.execute()
+        .then(result => {
+          if (get(result, 'status') === 'done') {
+            safeExec(this, () => this.set('mode', 'view'));
+          }
+        });
+    },
+  },
 });

@@ -15,6 +15,7 @@ import { Promise, resolve, reject } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import { entityType as groupEntityType } from 'onezone-gui/models/group';
 
 export default Service.extend({
   store: service(),
@@ -50,6 +51,16 @@ export default Service.extend({
     return this.get('store').findRecord('group', id, { backgroundReload });
   },
 
+  getRecordById(entityId) {
+    const recordGri = gri({
+      entityType: groupEntityType,
+      entityId: entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    return this.getRecord(recordGri);
+  },
+
   /**
    * Creates new group
    * @param {object} group group representation
@@ -69,24 +80,6 @@ export default Service.extend({
   },
 
   /**
-   * Joins user to a group using given token
-   * @param {string} token
-   * @returns {Promise<Group>}
-   */
-  joinGroup(token) {
-    return this.get('currentUser').getCurrentUserRecord()
-      .then(user => user.joinGroup(token)
-        .then(group => Promise.all([
-          this.reloadList(),
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          this.reloadUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
-          this.reloadEffUserList(get(group, 'entityId')).catch(ignoreForbiddenError),
-        ]).then(() => group))
-      );
-  },
-
-  /**
    * Joins user to a group without token
    * @param {string} entityId
    * @returns {Promise}
@@ -101,7 +94,7 @@ export default Service.extend({
       .then(user =>
         onedataGraph.request({
           gri: gri({
-            entityType: 'group',
+            entityType: groupEntityType,
             entityId,
             aspect: 'user',
             aspectId: get(user, 'entityId'),
@@ -165,101 +158,13 @@ export default Service.extend({
   },
 
   /**
-   * Joins group to a space using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Space>}
-   */
-  joinSpaceAsGroup(group, token) {
-    const {
-      providerManager,
-      spaceManager,
-    } = this.getProperties('providerManager', 'spaceManager');
-    return group.joinSpace(token)
-      .then(space =>
-        Promise.all([
-          this.reloadSpaceList(get(group, 'entityId')).catch(ignoreForbiddenError),
-          providerManager.reloadList(),
-          spaceManager.reloadList(),
-          spaceManager.reloadGroupList(get(space, 'entityId'))
-          .catch(ignoreForbiddenError),
-        ]).then(() => space)
-      );
-  },
-
-  /**
-   * Joins group to a harvester using token
-   * @param {Model.Group} group 
-   * @param {string} token
-   * @returns {Promise<Harvester>}
-   */
-  joinHarvesterAsGroup(group, token) {
-    const harvesterManager = this.get('harvesterManager');
-    return group.joinHarvester(token)
-      .then(harvester => {
-        const harvesterEntityId = get(harvester, 'entityId');
-        return Promise.all([
-          harvesterManager.reloadGroupList(harvesterEntityId)
-          .catch(ignoreForbiddenError),
-          harvesterManager.reloadEffGroupList(harvesterEntityId)
-          .catch(ignoreForbiddenError),
-        ]).then(() => harvester);
-      });
-  },
-
-  /**
-   * Joins group as a subgroup
-   * @param {Group} childGroup 
-   * @param {string} token
-   * @returns {Promise<Group>} parent group
-   */
-  joinGroupAsGroup(childGroup, token) {
-    const childEntityId = get(childGroup, 'entityId');
-    return childGroup.joinGroup(token)
-      .then(parentGroup =>
-        Promise.all([
-          this.reloadList(),
-          this.get('providerManager').reloadList(),
-          this.get('spaceManager').reloadList(),
-          this.reloadChildList(get(parentGroup, 'entityId'))
-          .catch(ignoreForbiddenError),
-          this.reloadEffChildList(get(parentGroup, 'entityId'))
-          .catch(ignoreForbiddenError),
-          this.reloadParentList(childEntityId).catch(ignoreForbiddenError),
-          this.reloadSpaceList(childEntityId).catch(ignoreForbiddenError),
-        ]).then(() => parentGroup)
-      );
-  },
-
-  /**
-   * Joins group to a cluster using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Cluster>}
-   */
-  joinClusterAsGroup(group, token) {
-    const clusterManager = this.get('clusterManager');
-    return group.joinCluster(token)
-      .then(cluster => {
-        const clusterEntityId = get(cluster, 'entityId');
-        return Promise.all([
-          clusterManager.reloadList(),
-          clusterManager.reloadGroupList(clusterEntityId)
-          .catch(ignoreForbiddenError),
-          clusterManager.reloadEffGroupList(clusterEntityId)
-          .catch(ignoreForbiddenError),
-        ]).then(() => cluster);
-      });
-  },
-
-  /**
    * @param {string} parentEntityId 
    * @param {string} childEntityId
    * @returns {Promise}
    */
   removeGroupFromGroup(parentEntityId, childEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       parentEntityId,
       'child',
       childEntityId
@@ -285,7 +190,7 @@ export default Service.extend({
     const currentUser = this.get('currentUser');
     const group = this.getLoadedGroupByEntityId(groupEntityId);
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       groupEntityId,
       'user',
       userEntityId
@@ -310,7 +215,7 @@ export default Service.extend({
    */
   leaveGroupAsGroup(parentEntityId, childEntityId) {
     return this.get('onedataGraphUtils').leaveRelation(
-      'group',
+      groupEntityType,
       childEntityId,
       'parent',
       parentEntityId
@@ -336,7 +241,7 @@ export default Service.extend({
   createParent(childEntityId, parentGroupRepresentation) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'group',
+        entityType: groupEntityType,
         aspect: 'instance',
       }),
       operation: 'create',
@@ -360,7 +265,7 @@ export default Service.extend({
     return this.get('currentUser').getCurrentUserRecord()
       .then(user => this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'group',
+          entityType: groupEntityType,
           entityId: parentEntityId,
           aspect: 'child',
           scope: 'auto',
@@ -386,7 +291,7 @@ export default Service.extend({
   addChild(groupEntityId, futureChildEntityId) {
     return this.get('onedataGraph').request({
       gri: gri({
-        entityType: 'group',
+        entityType: groupEntityType,
         entityId: groupEntityId,
         aspect: 'child',
         aspectId: futureChildEntityId,

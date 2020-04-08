@@ -45,7 +45,7 @@ import { reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { Promise, resolve, reject } from 'rsvp';
-import privilegesArrayToObject from 'onedata-gui-websocket-client/utils/privileges-array-to-object';
+import privilegesArrayToObject from 'onedata-gui-common/utils/privileges-array-to-object';
 import _ from 'lodash';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { inject as service } from '@ember/service';
@@ -139,7 +139,7 @@ export default EmberObject.extend({
     'records.{reason,content.@each.isForbidden}',
     function fetchError() {
       const records = this.get('records') || {};
-      let reason = get(records, 'reason');
+      const reason = get(records, 'reason');
       if (reason) {
         return reason;
       } else {

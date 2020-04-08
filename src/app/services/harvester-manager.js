@@ -3,7 +3,7 @@
  * 
  * @module services/harvester-manager
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 20190-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -15,6 +15,7 @@ import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-erro
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import GuiPluginManifest from 'onezone-gui/utils/harvester-configuration/gui-plugin-manifest';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
+import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester';
 
 export default Service.extend(
   createDataProxyMixin('pluginsList', { type: 'array' }), {
@@ -32,7 +33,7 @@ export default Service.extend(
     getHarvesters() {
       return this.get('currentUser')
         .getCurrentUserRecord()
-        .then(user => user.get('harvesterList'))
+        .then(user => get(user, 'harvesterList'))
         .then(harvesterList =>
           get(harvesterList, 'list').then(() => harvesterList)
         );
@@ -65,25 +66,6 @@ export default Service.extend(
             })
           ).save().then(harvester => this.reloadList().then(() => harvester));
         });
-    },
-
-    /**
-     * Joins user to a harvester using given token
-     * @param {string} token
-     * @returns {Promise<Model.Harvester>}
-     */
-    joinHarvester(token) {
-      return this.get('currentUser').getCurrentUserRecord()
-        .then(user => user.joinHarvester(token)
-          .then(harvester => {
-            const harvesterEntityId = get(harvester, 'entityId');
-            return Promise.all([
-              this.reloadList(),
-              this.reloadUserList(harvesterEntityId).catch(ignoreForbiddenError),
-              this.reloadEffUserList(harvesterEntityId).catch(ignoreForbiddenError),
-            ]).then(() => harvester);
-          })
-        );
     },
 
     /**
@@ -152,7 +134,7 @@ export default Service.extend(
      */
     removeSpaceFromHarvester(harvesterEntityId, spaceEntityId) {
       return this.get('onedataGraphUtils').leaveRelation(
-        'harvester',
+        harvesterEntityType,
         harvesterEntityId,
         'space',
         spaceEntityId
@@ -169,7 +151,7 @@ export default Service.extend(
     addSpaceToHarvester(harvesterEntityId, spaceEntityId) {
       return this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'harvester',
+          entityType: harvesterEntityType,
           entityId: harvesterEntityId,
           aspect: 'space',
           aspectId: spaceEntityId,
@@ -202,13 +184,13 @@ export default Service.extend(
           onedataGraphUtils.leaveRelation(
             'group',
             groupEntityId,
-            'harvester',
+            harvesterEntityType,
             harvesterEntityId,
           ) : reject(null);
         return leavePromise.catch(leaveError => {
           const removePromise = isEffMemberOfHarvester ?
             onedataGraphUtils.leaveRelation(
-              'harvester',
+              harvesterEntityType,
               harvesterEntityId,
               'group',
               groupEntityId,
@@ -242,7 +224,7 @@ export default Service.extend(
       const currentUser = this.get('currentUser');
       const harvester = this.getLoadedHarvesterByEntityId(harvesterEntityId);
       return this.get('onedataGraphUtils').leaveRelation(
-        'harvester',
+        harvesterEntityType,
         harvesterEntityId,
         'user',
         userEntityId
@@ -273,7 +255,7 @@ export default Service.extend(
       return currentUser.getCurrentUserRecord()
         .then(user => onedataGraph.request({
           gri: gri({
-            entityType: 'harvester',
+            entityType: harvesterEntityType,
             entityId: harvesterEntityId,
             aspect: 'group',
             scope: 'auto',
@@ -299,7 +281,7 @@ export default Service.extend(
     addMemberGroupToHarvester(harvesterEntityId, groupEntityId) {
       return this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'harvester',
+          entityType: harvesterEntityType,
           entityId: harvesterEntityId,
           aspect: 'group',
           aspectId: groupEntityId,
@@ -327,7 +309,7 @@ export default Service.extend(
         .then(user =>
           onedataGraph.request({
             gri: gri({
-              entityType: 'harvester',
+              entityType: harvesterEntityType,
               entityId: harvesterEntityId,
               aspect: 'user',
               aspectId: get(user, 'entityId'),
@@ -363,7 +345,7 @@ export default Service.extend(
       };
       return onedataGraph.request({
         gri: gri({
-          entityType: 'harvester',
+          entityType: harvesterEntityType,
           entityId: harvesterId,
           aspect: 'query',
           aspectId: indexId,
@@ -397,7 +379,7 @@ export default Service.extend(
     getGuiPluginConfig(harvesterEntityId) {
       const store = this.get('store');
       return store.findRecord('harvesterGuiPluginConfig', gri({
-        entityType: 'harvester',
+        entityType: harvesterEntityType,
         entityId: harvesterEntityId,
         aspect: 'gui_plugin_config',
         scope: 'private',
@@ -410,7 +392,7 @@ export default Service.extend(
     fetchPluginsList() {
       return this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'harvester',
+          entityType: harvesterEntityType,
           aspect: 'all_plugins',
           scope: 'private',
         }),
@@ -440,7 +422,7 @@ export default Service.extend(
     createIndex(harvesterEntityId, indexRepresentation, reloadList = true) {
       return this.get('onedataGraph').request({
         gri: gri({
-          entityType: 'harvester',
+          entityType: harvesterEntityType,
           entityId: harvesterEntityId,
           aspect: 'index',
         }),

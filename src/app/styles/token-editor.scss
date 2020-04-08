@@ -1,0 +1,293 @@
+.token-editor {
+  max-width: 1000px;
+
+  .form-horizontal .caveats-expand {
+    margin-top: $padding-base-vertical;
+    margin-bottom: $padding-base-vertical;
+  }
+
+  .caveat-group {
+    > .field-component > .fields-group-collapse {
+      display: flex;
+
+      &.collapse:not(.in) {
+        display: none;
+      }
+    }
+  }
+
+  .caveat-group-toggle {
+    flex-grow: 0;
+
+    .control-label {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .field-component {
+      order: -1;
+      flex-grow: 0;
+      margin-right: 25px;
+    }
+  }
+
+  .toggle-icon {
+    position: initial;
+    display: initial;
+    font-size: 1.2em;
+    vertical-align: middle;
+  }
+
+  .usageLimit-collapse.in,
+  .region-collapse.in,
+  .country-collapse.in,
+  .pathEntry-collapse.in {
+    display: flex;
+  }
+
+  .usageLimitType-field {
+    padding-top: $padding-base-vertical;
+    flex-grow: 0;
+    white-space: nowrap;
+  }
+
+  .regionType-field,
+  .countryType-field,
+  .pathSpace-field {
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    .dropdown-field-trigger {
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  .regionType-field,
+  .countryType-field {
+    width: 110px;
+  }
+
+  .regionList-field,
+  .countryList-field,
+  .pathString-field {
+    .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  .field-view-mode {
+    &.caveat-group-toggle {
+      margin-bottom: 0;
+
+      .field-component {
+        display: none;
+      }
+    }
+
+    &.name-field,
+    &.target-field {
+      word-break: break-all;
+    }
+
+    &.privileges-field-renderer {
+      .node-text.disabled {
+        opacity: 1;
+      }
+    }
+
+    &.inviteType-field.needs-target-model .text::after {
+      content: ':';
+    }
+
+    &.regionCaveat-field,
+    &.countryCaveat-field,
+    &.asnCaveat-field,
+    &.ipCaveat-field,
+    &.consumerCaveat-field,
+    &.serviceCaveat-field {
+      .caveat-group-toggle .control-label {
+        padding-top: 0.2em;
+      }
+    }
+
+    &.regionCaveat-field,
+    &.asnCaveat-field,
+    &.consumerCaveat-field,
+    &.readonlyCaveat-field {
+      padding-top: $form-component-view-margin;
+
+      &::before {
+        top: 0px;
+      }
+    }
+
+    &.regionType-field,
+    &.countryType-field {
+      padding-top: 0.2em;
+      margin-right: $padding-small-horizontal;
+      .text::after {
+        content: ':';
+      }
+    }
+
+    &.regionType-field,
+    &.countryType-field,
+    &.pathSpace-field {
+      width: initial;
+    }
+    
+    &.pathEntry-field .pathEntry-collapse.in {
+      align-items: flex-start;
+    }
+
+    &.pathSpace-field {
+      max-width: 50%;
+      word-break: break-all;
+      .dropdown-field {
+        padding: $padding-base-vertical * 0.5;
+        border-radius: $border-radius-base;
+        background-color: $color-one-light-blue;
+        font-size: 90%;
+      }
+      .one-icon {
+        font-size: 1.5em;
+      }
+    }
+
+    &.pathString-field .text-like-field {
+      padding-top: $padding-base-vertical * 0.5 - 1px;
+      padding-left: $padding-xs-horizontal;
+      word-break: break-all;
+    }
+    
+    &.objectId-field .collection-item:not(:last-child) {
+      margin-bottom: $form-component-view-margin;
+    }
+
+    &.objectIdEntry-field {
+      margin: 0;
+      word-break: break-all;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      &.name-field,
+      &.target-field {
+        flex-wrap: nowrap;
+      }
+    }
+  }
+
+  .regionCaveat-field,
+  .asnCaveat-field,
+  .consumerCaveat-field,
+  .readonlyCaveat-field {
+    &::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -5px;
+      width: 100%;
+      border-top: 1px solid $main-border-color;
+    }
+  }
+
+  .path-field .collection-item:last-child .field-view-mode {
+    margin: 0;
+  }
+
+  .form-component {
+    .footer-buttons {
+      margin-top: $padding-base-vertical;
+      float: none;
+      text-align: left;
+      .btn {
+        margin-left: $padding-small-horizontal;
+      }
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .basic-field .control-label,
+    .caveat-group-toggle {
+      flex-shrink: 0;
+      width: 200px;
+    }
+
+    .usageLimit-field {
+      flex-wrap: nowrap;
+    }
+
+    .usageLimitNumber-field {
+      flex-grow: 0;
+      flex-basis: 300px;
+    }
+
+    .field-edit-mode {
+      &.regionCaveat-field,
+      &.asnCaveat-field,
+      &.consumerCaveat-field,
+      &.readonlyCaveat-field {
+        .caveat-group-toggle,
+        .static-text-field {
+          padding-top: $padding-base-vertical;
+        }
+      }
+
+      &.is-enabled {
+        &.regionCaveat-field,
+        &.asnCaveat-field,
+        &.consumerCaveat-field {
+          padding-top: $padding-base-vertical;
+        }
+
+        &.expireCaveat-field,
+        &.countryCaveat-field,
+        &.ipCaveat-field,
+        &.serviceCaveat-field,
+        &.pathCaveat-field,
+        &.objectIdCaveat-field {
+          .caveat-group-toggle {
+            padding-top: $padding-base-vertical;
+          }
+        }
+      }
+    }
+
+    .pathSpace-field {
+      width: 200px;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .caveat-group-toggle {
+      flex-basis: 100%;
+
+      .control-label {
+        width: initial;
+      }
+    }
+
+    .caveat-group {
+      .static-text-field-renderer,
+      .radio-field-renderer {
+        padding-top: 0;
+      }
+
+      > .field-component > .fields-group-collapse {
+        flex-wrap: wrap;
+      }
+    }
+
+    .pathSpace-field {
+      width: 150px;
+    }
+  }
+}
+
+// Selector with extra nesting to override css rules
+.main-content .token-editor form {
+  margin: 0;
+}

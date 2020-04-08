@@ -1,8 +1,8 @@
 /**
  * Exports a real onedata-connection service or its mock.
- * @module services/onedata-websocket
+ * @module services/onedata-connection
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -32,10 +32,10 @@ const OnezoneConnection = ProductionSymbol.extend({
   brandSubtitle: reads('attributes.brandSubtitle'),
 
   /**
-   * Informational text shown on the sign-in page
+   * Max temporary token TTL in seconds
    * @type {Ember.Computed<string>}
    */
-  loginNotification: reads('attributes.loginNotification'),
+  maxTemporaryTokenTtl: reads('attributes.maxTemporaryTokenTtl'),
 });
 
 export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);

@@ -14,17 +14,10 @@ describe('Integration | Component | sidebar spaces/space item', function () {
     });
   });
 
-  it('renders space name, icon and menu trigger', function () {
+  it('renders space name and icon', function () {
     this.render(hbs `{{sidebar-spaces/space-item item=space}}`);
 
     expect(this.$()).to.contain(this.get('space.name'));
     expect(this.$('.oneicon-space')).to.exist;
-    expect(this.$('.collapsible-toolbar-toggle')).to.exist;
-  });
-
-  it('does not render actions menu if inSidenav is true', function () {
-    this.render(hbs `{{sidebar-spaces/space-item item=space inSidenav=true}}`);
-
-    expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 });

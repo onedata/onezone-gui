@@ -25,6 +25,8 @@ import {
   onepanelTestImagePath,
 } from 'onedata-gui-common/utils/onedata-urls';
 
+export const entityType = 'cluster';
+
 export default Model.extend(
   GraphSingleModelMixin,
   InvitingModelMixin,
@@ -152,6 +154,14 @@ export default Model.extend(
       const guiContextPath =
         `${location.origin}/${onepanelAbbrev}/${this.get('entityId')}/gui-context`;
       return resolve($.get(guiContextPath));
+    },
+
+    /**
+     * @override
+     */
+    loadRequiredRelations() {
+      return this._super(...arguments)
+        .then(() => this.loadAsyncProperties());
     },
   }
 ).reopenClass(StaticGraphModelMixin);

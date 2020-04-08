@@ -1,6 +1,10 @@
 {
   "html": {
-    "allowed_file_extensions": ["htm", "html", "hbs"],
+    "allowed_file_extensions": [
+      "htm",
+      "html",
+      "hbs"
+    ],
     "indent_handlebars": true,
     "indent_size": 2
   },

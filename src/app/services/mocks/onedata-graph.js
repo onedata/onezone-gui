@@ -42,6 +42,27 @@ const spaceHandlers = {
       return messageNotSupported;
     }
   },
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['space_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
+};
+
+const groupHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['group_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
 };
 
 const harvesterHandlers = {
@@ -56,6 +77,15 @@ const harvesterHandlers = {
       };
     } else {
       return messageNotSupported;
+    }
+  },
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['harvester_view'],
+      };
+    } else {
+      throw messageNotSupported;
     }
   },
 };
@@ -79,6 +109,25 @@ const providerHandlers = {
       };
     } else {
       return messageNotSupported;
+    }
+  },
+  current_time(operation) {
+    if (operation === 'get') {
+      return {
+        timeMillis: new Date().valueOf(),
+      };
+    }
+  },
+};
+
+const clusterHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['cluster_view'],
+      };
+    } else {
+      throw messageNotSupported;
     }
   },
 };
@@ -123,14 +172,57 @@ const userHandlers = {
   },
 };
 
+const tokenHandlers = {
+  user_temporary_token(operation, entityId, data) {
+    if (operation === 'create') {
+      const valuesToEmbed = _.values(get(data, 'type.inviteToken' || {})).join('X');
+      return `${randomToken()}X${valuesToEmbed}`;
+    } else {
+      return messageNotSupported;
+    }
+  },
+  examine(operation, entityId, data) {
+    if (operation === 'create') {
+      const token = get(data, 'token');
+      const tokenRecord = this.get('store').peekAll('token').findBy('token', token);
+      if (tokenRecord) {
+        const type = get(tokenRecord, 'type');
+        const response = {
+          type,
+        };
+        return tokenRecord.get('tokenTargetProxy')
+          .then(target => {
+            if (target) {
+              const modelName = target.constructor.modelName;
+              response.type.inviteToken[`${modelName}Name`] = get(target, 'name');
+
+            }
+            return response;
+          });
+      } else {
+        return {
+          success: false,
+          error: { id: 'badToken' },
+          data: {},
+        };
+      }
+    } else {
+      return messageNotSupported;
+    }
+  },
+};
+
 export default OnedataGraphMock.extend({
   init() {
     this._super(...arguments);
     const _handlers = Object.freeze({
       space: spaceHandlers,
+      group: groupHandlers,
       harvester: harvesterHandlers,
       user: userHandlers,
       provider: providerHandlers,
+      cluster: clusterHandlers,
+      token: tokenHandlers,
     });
     this.set(
       'handlers',

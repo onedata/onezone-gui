@@ -19,23 +19,17 @@
       <li>
         {{tt this "pIfYouHave"}}
         <strong>{{tt this "space"}} {{tt this "invitationToken"}}</strong>,
-        {{tt this "pVisit"}}
-        {{#link-to "onedata.sidebar" "spaces"}}
-          {{tt this "manageSpacesHead"}}
-        {{/link-to}}
-        {{tt this "p2_2"}}
-        {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
           {{tt this "joinSpace"}}
         {{/link-to}}
       </li>
       <li>
         {{tt this "pIfYouHave"}}
         <strong>{{tt this "group"}} {{tt this "invitationToken"}}</strong>,
-        {{tt this "pVisit"}}
-        {{#link-to "onedata.sidebar" "groups"}}
-          {{tt this "manageGroupsHead"}}
+        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+          {{tt this "joinGroup"}}
         {{/link-to}}
-        {{tt this "p3_2"}}
+        {{tt this "p3_1"}}
       </li>
     </ul>  
   </p>

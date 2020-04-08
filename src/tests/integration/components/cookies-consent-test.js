@@ -35,12 +35,15 @@ describe('Integration | Component | cookies consent', function () {
     expect(this.$('.cookies-consent').text()).to.contain('consent content');
   });
 
-  it('does not render cookie consent notification when cookies are accepted', function () {
-    set(lookupService(this, 'privacyPolicyManager'), 'areCookiesAccepted', true);
-    this.render(hbs `{{cookies-consent}}`);
+  it(
+    'does not render cookie consent notification when cookies are accepted',
+    function () {
+      set(lookupService(this, 'privacyPolicyManager'), 'areCookiesAccepted', true);
+      this.render(hbs `{{cookies-consent}}`);
 
-    expect(this.$('.cookies-consent')).to.not.exist;
-  });
+      expect(this.$('.cookies-consent')).to.not.exist;
+    }
+  );
 
   it('allows to accepts cookies', function () {
     this.render(hbs `{{cookies-consent}}`);

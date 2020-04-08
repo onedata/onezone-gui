@@ -37,7 +37,8 @@ describe('Integration | Component | content provider redirect', function () {
     registerService(this, 'alert', AlertStub);
   });
 
-  it('redirects to Oneprovider hosted in Onezone URL',
+  it(
+    'redirects to Oneprovider hosted in Onezone URL',
     function () {
       const clusterEntityId = '12345';
       const provider = {
@@ -83,7 +84,8 @@ describe('Integration | Component | content provider redirect', function () {
         expect(locationReplace).to.be.calledOnce;
         expect(locationReplace).to.be.calledWith(url);
       });
-    });
+    }
+  );
 
   it('redirects to data index and invokes alert then provider is not available',
     function () {
@@ -117,18 +119,19 @@ describe('Integration | Component | content provider redirect', function () {
       });
 
       this.render(hbs `{{content-provider-redirect
-      checkIsProviderAvailable=checkIsProviderAvailable
-      showEndpointErrorModal=showEndpointErrorModal
-      transitionToProviderOnMap=transitionToProviderOnMap
-      throwEndpointError=throwEndpointError
-      provider=provider
-    }}`);
+        checkIsProviderAvailable=checkIsProviderAvailable
+        showEndpointErrorModal=showEndpointErrorModal
+        transitionToProviderOnMap=transitionToProviderOnMap
+        throwEndpointError=throwEndpointError
+        provider=provider
+      }}`);
 
-      wait().then(() => {
+      return wait().then(() => {
         expect(checkIsProviderAvailable).to.be.calledOnce;
         expect(showEndpointErrorModal).to.be.calledOnce;
         expect(transitionToProviderOnMap).to.be.calledOnce;
         expect(throwEndpointError).to.be.calledOnce;
       });
-    });
+    }
+  );
 });

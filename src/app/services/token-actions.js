@@ -8,9 +8,15 @@
  */
 
 import { default as Service, inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import $ from 'jquery';
+import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';
+import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
+import ModifyTokenAction from 'onezone-gui/utils/token-actions/modify-token-action';
+import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
+import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
+import OpenConsumeTokenViewAction from 'onezone-gui/utils/token-actions/open-consume-token-view-action';
+import ConsumeInviteTokenAction from 'onezone-gui/utils/token-actions/consume-invite-token-action';
 
 export default Service.extend(I18n, {
   tokenManager: service(),
@@ -24,53 +30,40 @@ export default Service.extend(I18n, {
    */
   i18nPrefix: 'services.tokenActions',
 
-  /**
-   * Array of action buttons definitions used by sidebar
-   * @type {Ember.ComputedProperty<Array<object>>}
-   */
-  actionButtons: computed(function () {
-    return [{
-      icon: 'add-filled',
-      title: this.t('createToken'),
-      tip: this.t('createToken'),
-      class: 'create-token-btn',
-      action: () => this.get('router')
-        .transitionTo('onedata.sidebar.content', 'tokens', 'new'),
-    }];
-  }),
+  createOpenCreateTokenViewAction(context) {
+    return OpenCreateTokenViewAction.create({ ownerSource: this, context });
+  },
 
-  /**
-   * Creates token
-   * @param {Object} tokenPrototype token model prototype
-   * @returns {Promise} A promise, which resolves to new token if it has
-   * been created successfully.
-   */
-  createToken(tokenPrototype) {
-    const {
-      globalNotify,
-      router,
-      tokenManager,
-      guiUtils,
-    } = this.getProperties(
-      'globalNotify',
-      'router',
-      'tokenManager',
-      'guiUtils'
-    );
-    return tokenManager.createToken(tokenPrototype).then((token) => {
-      globalNotify.success(this.t('tokenCreateSuccess'));
-      router.transitionTo(
-        'onedata.sidebar.content',
-        'tokens',
-        guiUtils.getRoutableIdFor(token)
-      );
-      // TODO: instead that, always scroll to sidebar position on changing
-      // sidebar chosen item
-      $('.col-sidebar').scrollTop(0);
-    }).catch(error => {
-      globalNotify.backendError(this.t('tokenCreation'), error);
-      throw error;
-    });
+  createCreateTokenAction(context) {
+    return CreateTokenAction.create({ ownerSource: this, context });
+  },
+
+  createModifyTokenAction(context) {
+    return ModifyTokenAction.create({ ownerSource: this, context });
+  },
+
+  createCleanObsoleteTokensAction(context) {
+    return CleanObsoleteTokensAction.create({ ownerSource: this, context });
+  },
+
+  createGenerateInviteTokenAction(context) {
+    return GenerateInviteTokenAction.create({ ownerSource: this, context });
+  },
+
+  createOpenConsumeTokenViewAction(context) {
+    return OpenConsumeTokenViewAction.create({ ownerSource: this, context });
+  },
+
+  createConsumeInviteTokenAction(context) {
+    return ConsumeInviteTokenAction.create({ ownerSource: this, context });
+  },
+
+  createGlobalActions(context) {
+    return [
+      this.createOpenCreateTokenViewAction(context),
+      this.createCleanObsoleteTokensAction(context),
+      this.createOpenConsumeTokenViewAction(context),
+    ];
   },
 
   /**

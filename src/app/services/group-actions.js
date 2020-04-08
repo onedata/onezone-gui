@@ -8,6 +8,7 @@
  */
 
 import Service, { inject } from '@ember/service';
+import { collect } from '@ember/object/computed';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
@@ -26,13 +27,7 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
    */
-  buttons: computed('btnCreate', 'btnJoin', function getButtons() {
-    const {
-      btnCreate,
-      btnJoin,
-    } = this.getProperties('btnCreate', 'btnJoin');
-    return [btnCreate, btnJoin];
-  }),
+  buttons: collect('btnCreate'),
 
   /**
    * @type {Ember.Computed<SidebarButtonDefinition>}
@@ -45,24 +40,6 @@ export default Service.extend(I18n, {
       tip: this.t('btnCreate.hint'),
       class: 'create-group-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'groups', 'new'),
-    };
-  }),
-
-  /**
-   * @type {Ember.Computed<SidebarButtonDefinition>}
-   */
-  btnJoin: computed('router', function getBtnCreate() {
-    const router = this.get('router');
-    return {
-      icon: 'join-plug',
-      title: this.t('btnJoin.title'),
-      tip: this.t('btnJoin.hint'),
-      class: 'join-group-btn',
-      action: () => router.transitionTo(
-        'onedata.sidebar.content',
-        'groups',
-        'join'
-      ),
     };
   }),
 
@@ -100,25 +77,6 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Joins to existing group using token
-   * @param {string} token
-   * @returns {Promise} A promise, which resolves to group if it has
-   * been joined successfully.
-   */
-  joinGroup(token) {
-    return this.get('groupManager').joinGroup(token)
-      .then(groupRecord => {
-        this.get('globalNotify').info(this.t('joinedGroupSuccess'));
-        this.redirectToGroup(groupRecord);
-        return groupRecord;
-      })
-      .catch(error => {
-        this.get('globalNotify').backendError(this.t('joiningGroup'), error);
-        throw error;
-      });
-  },
-
-  /**
    * Joins user to an existing group (without token)
    * @param {Group} group
    * @returns {Promise} A promise, which resolves to group if it has
@@ -132,113 +90,6 @@ export default Service.extend(I18n, {
       })
       .catch(error => {
         this.get('globalNotify').backendError(this.t('joiningGroup'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins group to a space using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Space>}
-   */
-  joinSpaceAsGroup(group, token) {
-    const {
-      globalNotify,
-      groupManager,
-    } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinSpaceAsGroup(group, token)
-      .then(space => {
-        globalNotify.success(this.t('joinSpaceAsGroupSuccess', {
-          groupName: get(group, 'name'),
-          spaceName: get(space, 'name'),
-        }));
-        next(() => this.redirectToGroup(group));
-        return space;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningSpaceAsGroup'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins group to a harvester using token
-   * @param {Model.Group} group 
-   * @param {string} token
-   * @returns {Promise<Harvester>}
-   */
-  joinHarvesterAsGroup(group, token) {
-    const {
-      globalNotify,
-      groupManager,
-    } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinHarvesterAsGroup(group, token)
-      .then(harvester => {
-        globalNotify.success(this.t('joinHarvesterAsGroupSuccess', {
-          groupName: get(group, 'name'),
-          harvesterName: get(harvester, 'name'),
-        }));
-        next(() => this.redirectToGroup(group));
-        return harvester;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningHarvesterAsGroup'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins group as a subgroup
-   * @param {Group} group 
-   * @param {string} token
-   * @param {boolean} redirect 
-   * @returns {Promise<Group>} parent group
-   */
-  joinGroupAsSubgroup(group, token, redirect = true) {
-    const {
-      globalNotify,
-      groupManager,
-    } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinGroupAsGroup(group, token)
-      .then(parentGroup => {
-        globalNotify.success(this.t('joinGroupAsSubgroupSuccess', {
-          groupName: get(group, 'name'),
-          parentGroupName: get(parentGroup, 'name'),
-        }));
-        if (redirect) {
-          next(() => this.redirectToGroup(group, 'parents'));
-        }
-        return parentGroup;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningGroupAsSubgroup'), error);
-        throw error;
-      });
-  },
-
-  /**
-   * Joins group to a cluster using token
-   * @param {Group} group 
-   * @param {string} token
-   * @returns {Promise<Models.Cluster>}
-   */
-  joinClusterAsGroup(group, token) {
-    const {
-      globalNotify,
-      groupManager,
-    } = this.getProperties('globalNotify', 'groupManager');
-    return groupManager.joinClusterAsGroup(group, token)
-      .then(cluster => {
-        globalNotify.success(this.t('joinClusterAsGroupSuccess', {
-          groupName: get(group, 'name'),
-          clusterName: get(cluster, 'name'),
-        }));
-        next(() => this.redirectToGroup(group));
-        return cluster;
-      })
-      .catch(error => {
-        globalNotify.backendError(this.t('joiningClusterAsGroup'), error);
         throw error;
       });
   },
