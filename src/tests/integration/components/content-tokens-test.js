@@ -9,7 +9,6 @@ import wait from 'ember-test-helpers/wait';
 import { Promise } from 'rsvp';
 
 describe('Integration | Component | content tokens', function () {
-  this.timeout(15000);
   setupComponentTest('content-tokens', {
     integration: true,
   });
