@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import EmberObject, { get, set, computed, observer } from '@ember/object';
+import EmberObject, { get, computed, observer } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
 import { promise, notEmpty, array, raw, tag, conditional, gt } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
@@ -293,9 +293,8 @@ export default Component.extend(I18n, {
 
   willDestroyElement() {
     this._super(...arguments);
-    const pointerEvents = this.get('pointerEvents');
     next(() => {
-      set(pointerEvents, 'pointerNoneToMainContent', false);
+      safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', false);
     });
   },
 
