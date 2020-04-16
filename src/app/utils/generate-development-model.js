@@ -391,7 +391,9 @@ function createProvidersRecords(store) {
       name: PROVIDER_NAMES[index],
       latitude,
       longitude,
-      online: index <= 1,
+      // FIXME: develop
+      online: false,
+      // online: index <= 1,
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));
