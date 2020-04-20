@@ -1,9 +1,10 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
+import chooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import { resolve, reject } from 'rsvp';
+import EmberObject from '@ember/object';
 
-describe('Unit | Utility | choose default oneprovider', function () {
+describe('Unit | Mixin | choose default oneprovider', function () {
   beforeEach(function beforeEach() {
     this.versionReject = reject(new Error('cannot fetch version'));
     this.versionReject.catch(() => {});
@@ -32,7 +33,11 @@ describe('Unit | Utility | choose default oneprovider', function () {
       },
     ];
 
-    return chooseDefaultOneprovider(oneproviders).then(oneprovider => {
+    const obj = EmberObject.extend(chooseDefaultOneprovider).create({
+      providers: oneproviders,
+    });
+
+    return obj.chooseDefaultOneprovider().then(oneprovider => {
       expect(oneprovider.name).to.equal('three');
     });
   });
@@ -55,7 +60,11 @@ describe('Unit | Utility | choose default oneprovider', function () {
       },
     ];
 
-    return chooseDefaultOneprovider(oneproviders).then(oneprovider => {
+    const obj = EmberObject.extend(chooseDefaultOneprovider).create({
+      providers: oneproviders,
+    });
+
+    return obj.chooseDefaultOneprovider().then(oneprovider => {
       expect(oneprovider.name).to.equal('two');
     });
   });
@@ -73,9 +82,35 @@ describe('Unit | Utility | choose default oneprovider', function () {
       },
     ];
 
-    return chooseDefaultOneprovider(oneproviders)
+    const obj = EmberObject.extend(chooseDefaultOneprovider).create({
+      providers: oneproviders,
+    });
+
+    return obj.chooseDefaultOneprovider()
       .then(oneprovider => {
         expect(oneprovider.name).to.equal('two');
       });
+  });
+
+  it('uses Oneproviders list provided by optional argument', function () {
+    const oneprovidersOne = [{
+      name: 'one',
+      online: true,
+      versionProxy: resolve('20.02.0-beta1'),
+    }];
+
+    const oneprovidersTwo = [{
+      name: 'two',
+      online: true,
+      versionProxy: resolve('20.02.0-beta1'),
+    }];
+
+    const obj = EmberObject.extend(chooseDefaultOneprovider).create({
+      providers: oneprovidersOne,
+    });
+
+    return obj.chooseDefaultOneprovider(oneprovidersTwo).then(oneprovider => {
+      expect(oneprovider.name).to.equal('two');
+    });
   });
 });

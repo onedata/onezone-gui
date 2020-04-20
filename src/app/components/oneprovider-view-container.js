@@ -20,7 +20,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { guidFor } from '@ember/object/internals';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
-import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
+import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import { resolve } from 'rsvp';
 
 const nameComparator = createPropertyComparator('name');
@@ -45,7 +45,7 @@ const OneproviderTabItem = EmberObject.extend({
   }),
 });
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tagName: '',
 
   /**
@@ -176,14 +176,11 @@ export default Component.extend(I18n, {
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
     function validatedOneproviderIdProxy() {
-      const {
-        providers,
-        oneproviderId,
-      } = this.getProperties('providers', 'oneproviderId');
+      const oneproviderId = this.get('oneproviderId');
       if (oneproviderId) {
         return resolve(oneproviderId);
       } else {
-        return chooseDefaultOneprovider(providers).then(defaultOneprovider => {
+        return this.chooseDefaultOneprovider().then(defaultOneprovider => {
           if (defaultOneprovider) {
             return resolve(get(defaultOneprovider, 'entityId'));
           } else {
@@ -299,7 +296,7 @@ export default Component.extend(I18n, {
   },
 
   selectDefaultProvider(providers = this.get('providers')) {
-    return chooseDefaultOneprovider(providers).then(defaultProvider => {
+    return this.chooseDefaultOneprovider(providers).then(defaultProvider => {
       if (defaultProvider) {
         this.get('oneproviderIdChanged')(get(defaultProvider, 'entityId'));
       }
@@ -309,11 +306,11 @@ export default Component.extend(I18n, {
   actions: {
     selectedProviderChanged(providerItem) {
       this.send('onToggleExpandMap', false);
-
       const providerEntityId =
         get(providerItem, 'entityId') || get(providerItem, 'id');
       const provider = this.get('providers').findBy('entityId', providerEntityId);
       if (provider) {
+        this.setBrowserDefaultOneproviderId(providerEntityId);
         this.get('oneproviderIdChanged')(providerEntityId);
       } else {
         // TODO: show error if cannot find the selected provider on list
