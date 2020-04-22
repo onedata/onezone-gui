@@ -10,7 +10,7 @@ describe('Unit | Mixin | choose default oneprovider', function () {
     this.versionReject.catch(() => {});
   });
 
-  it('resolves first online new Oneprovider', function () {
+  it('resolves first online new Oneprovider sorted by name', function () {
     const oneproviders = [{
         name: 'one',
         online: false,
@@ -38,7 +38,7 @@ describe('Unit | Mixin | choose default oneprovider', function () {
     });
 
     return obj.chooseDefaultOneprovider().then(oneprovider => {
-      expect(oneprovider.name).to.equal('three');
+      expect(oneprovider.name).to.equal('four');
     });
   });
 
