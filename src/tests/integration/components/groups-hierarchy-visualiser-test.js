@@ -123,8 +123,6 @@ class FakeWindow {
 }
 
 describe('Integration | Component | groups hierarchy visualiser', function () {
-  this.timeout(5000);
-
   setupComponentTest('groups-hierarchy-visualiser', {
     integration: true,
   });

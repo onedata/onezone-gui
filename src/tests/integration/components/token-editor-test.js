@@ -161,7 +161,6 @@ const regions = [
 ];
 
 describe('Integration | Component | token editor', function () {
-  this.timeout(15000);
   setupComponentTest('token-editor', {
     integration: true,
   });
@@ -195,6 +194,9 @@ describe('Integration | Component | token editor', function () {
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
+        constructor: {
+          modelName,
+        },
         effUserList: PromiseObject.create({
           promise: resolve({
             list: PromiseArray.create({

@@ -11,7 +11,6 @@ import { fillIn, click } from 'ember-native-dom-helpers';
 import { set } from '@ember/object';
 
 describe('Integration | Component | content tokens new', function () {
-  this.timeout(15000);
   setupComponentTest('content-tokens-new', {
     integration: true,
   });

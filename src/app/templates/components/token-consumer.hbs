@@ -21,7 +21,10 @@
       <p class="token-type">
         {{typeText}}
         {{#if hasUnresolvedTargetName}}
-          <img class="warning-icon {{elementId}}-warning-icon" src={{root-url "assets/images/sign-warning-large.svg"}}>
+          <img
+            class="warning-icon {{elementId}}-warning-icon"
+            src={{root-url "assets/images/sign-warning-large.svg"}}
+          >
           {{one-tooltip
             title=(tt this "unresolvedTargetWarning")
             triggerElement=(concat "." elementId "-warning-icon")
@@ -46,8 +49,11 @@
             onchange=(action (mut selectedJoiningRecordOption))
             selected=selectedJoiningRecordOption
             renderInPlace=true
-            placeholder=(tt this (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName))
-            as |recordOption|}}
+            placeholder=(tt this
+              (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
+            )
+            as |recordOption|
+          }}
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
               {{#truncated-string class="text"}}

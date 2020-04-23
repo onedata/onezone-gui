@@ -12,6 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
 import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -51,6 +52,7 @@ export default Component.extend(I18n, {
   pendingCheckTime: 0,
 
   /**
+   * Has the same structure as `type` field in token model
    * @type {Object}
    */
   type: undefined,
@@ -61,12 +63,14 @@ export default Component.extend(I18n, {
   error: undefined,
 
   /**
+   * Set by joiningRecordSelectorModelNameObserver
    * @type {String}
    */
   latestJoiningRecordSelectorModelName: undefined,
 
   /**
-   * @type {String}
+   * Set by joiningRecordSelectorModelNameObserver
+   * @type {PromiseArray<FieldOption>}
    */
   joiningRecordSelectorOptionsProxy: undefined,
 
@@ -98,30 +102,30 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<String>}
+   * For this object details see models/token
+   * @type {ComputedProperty<Object>}
    */
-  inviteTargetName: computed('type', function inviteTargetName() {
+  inviteTypeSpec: computed('type.inviteToken.inviteType', function () {
     const inviteType = this.get('type.inviteToken.inviteType');
     if (inviteType) {
-      const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
-      if (inviteTypeSpec) {
-        return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Name`);
-      }
+      return tokenInviteTypeToTargetModelMapping[inviteType];
     }
   }),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  inviteTargetModelName: computed('type', function inviteTargetModelName() {
-    const inviteType = this.get('type.inviteToken.inviteType');
-    if (inviteType) {
-      const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
-      if (inviteTypeSpec) {
-        return inviteTypeSpec.modelName;
-      }
+  inviteTargetName: computed('type', function inviteTargetName() {
+    const inviteTypeSpec = this.get('inviteTypeSpec');
+    if (inviteTypeSpec) {
+      return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Name`);
     }
   }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteTargetModelName: reads('inviteTypeSpec.modelName'),
 
   /**
    * @type {ComputedProperty<boolean>}
@@ -145,7 +149,8 @@ export default Component.extend(I18n, {
         type,
         typeName,
         inviteTargetName,
-      } = this.getProperties('type', 'typeName', 'inviteTargetName');
+        inviteTypeSpec,
+      } = this.getProperties('type', 'typeName', 'inviteTargetName', 'inviteTypeSpec');
 
       if (!type) {
         return null;
@@ -153,7 +158,6 @@ export default Component.extend(I18n, {
 
       if (typeName === 'invite') {
         const inviteType = get(type, 'inviteToken.inviteType');
-        const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
         if (inviteTypeSpec) {
           const targetName = inviteTargetName || this.t('unknownTargetName');
           return this.t(
@@ -207,18 +211,16 @@ export default Component.extend(I18n, {
         'latestJoiningRecordSelectorModelName',
         'inviteTargetName'
       );
-      const inviteType = this.get('type.inviteToken.inviteType');
 
-      if (latestJoiningRecordSelectorModelName && inviteType) {
-        const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
-        if (inviteTypeSpec)
-          return this.t('joiningRecordSelectorDescription', {
-            joiningModelName: this.t(
-              `joiningModelName.${latestJoiningRecordSelectorModelName}`
-            ),
-            targetModelName: this.t(`targetModelName.${inviteTypeSpec.modelName}`),
-            targetRecordName: inviteTargetName || this.t('unknownTargetName'),
-          });
+      const inviteTypeSpec = this.get('inviteTypeSpec');
+      if (latestJoiningRecordSelectorModelName && inviteTypeSpec) {
+        return this.t('joiningRecordSelectorDescription', {
+          joiningModelName: this.t(
+            `joiningModelName.${latestJoiningRecordSelectorModelName}`
+          ),
+          targetModelName: this.t(`targetModelName.${inviteTypeSpec.modelName}`),
+          targetRecordName: inviteTargetName || this.t('unknownTargetName'),
+        });
       }
     }
   ),
@@ -390,12 +392,8 @@ export default Component.extend(I18n, {
         'joiningRecordSelectorModelName'
       );
 
-      let joiningRecord;
-      if (joiningRecordSelectorModelName) {
-        joiningRecord = get(selectedJoiningRecordOption, 'value');
-      } else {
-        joiningRecord = recordManager.getCurrentUserRecord();
-      }
+      const joiningRecord = joiningRecordSelectorModelName ?
+        get(selectedJoiningRecordOption, 'value') : recordManager.getCurrentUserRecord();
 
       return tokenActions.createConsumeInviteTokenAction({
         joiningRecord,

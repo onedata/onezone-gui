@@ -181,6 +181,35 @@ const tokenHandlers = {
       return messageNotSupported;
     }
   },
+  examine(operation, entityId, data) {
+    if (operation === 'create') {
+      const token = get(data, 'token');
+      const tokenRecord = this.get('store').peekAll('token').findBy('token', token);
+      if (tokenRecord) {
+        const type = get(tokenRecord, 'type');
+        const response = {
+          type,
+        };
+        return tokenRecord.get('tokenTargetProxy')
+          .then(target => {
+            if (target) {
+              const modelName = target.constructor.modelName;
+              response.type.inviteToken[`${modelName}Name`] = get(target, 'name');
+
+            }
+            return response;
+          });
+      } else {
+        return {
+          success: false,
+          error: { id: 'badToken' },
+          data: {},
+        };
+      }
+    } else {
+      return messageNotSupported;
+    }
+  },
 };
 
 export default OnedataGraphMock.extend({
