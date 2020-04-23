@@ -14,7 +14,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
-import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
+import RecordsOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { debounce } from '@ember/runloop';

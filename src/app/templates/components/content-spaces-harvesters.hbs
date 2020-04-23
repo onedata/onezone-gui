@@ -1,4 +1,4 @@
-{{#unless (eq spaceHarvestersProxy.length 0)}}
+{{#if spaceHarvestersProxy.length}}
   <div class="row content-row header-row hidden-xs">
     <h1 class="with-menu">
       <span class="one-label">
@@ -7,7 +7,7 @@
       {{actions-toolbar isMinimized=true actionsArray=globalActions}}
     </h1>
   </div>
-{{/unless}}
+{{/if}}
 {{#promise-proxy-container proxy=spaceHarvestersProxy}}
   {{#if (eq spaceHarvestersProxy.length 0)}}
     {{#content-info
@@ -22,7 +22,6 @@
           onClick=addHarvesterAction.executeCallback}}
           {{addHarvesterAction.title}}
         {{/bs-button}}
-        &#32;
         {{#bs-button
           type="primary"
           class=(concat-classes "btn-content-info" inviteHarvesterUsingTokenAction.className)

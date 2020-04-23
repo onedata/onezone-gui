@@ -22,7 +22,6 @@ export default Service.extend({
   groupManager: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
-  recordManager: service(),
 
   /**
    * Fetches collection of all spaces
@@ -261,21 +260,6 @@ export default Service.extend({
         .catch(ignoreForbiddenError),
       ])
     );
-  },
-
-  /**
-   * Joins space to a harvester using token
-   * @param {Model.Space} space 
-   * @param {string} token
-   * @returns {Promise<Model.Harvester>}
-   */
-  joinSpaceToHarvester(space, token) {
-    const harvesterManager = this.get('harvesterManager');
-    return space.joinHarvester(token)
-      .then(harvester => harvesterManager.reloadSpaceList(get(harvester, 'entityId'))
-        .catch(ignoreForbiddenError)
-        .then(() => space)
-      );
   },
 
   /**

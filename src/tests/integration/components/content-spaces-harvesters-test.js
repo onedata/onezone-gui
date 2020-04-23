@@ -8,7 +8,6 @@ import { resolve, reject, Promise } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import suppressRejections from '../../helpers/suppress-rejections';
 import { click } from 'ember-native-dom-helpers';
-import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
@@ -39,11 +38,12 @@ describe('Integration | Component | content spaces harvesters', function () {
   afterEach(function () {
     // Reset stubbed actions
     [
-      AddHarvesterToSpaceAction.prototype.execute,
-      GenerateInviteTokenAction.prototype.execute,
-    ].forEach(callback => {
-      if (callback.restore) {
-        callback.restore();
+      AddHarvesterToSpaceAction,
+      GenerateInviteTokenAction,
+      RemoveHarvesterFromSpaceAction,
+    ].forEach(action => {
+      if (action.prototype.execute.restore) {
+        action.prototype.execute.restore();
       }
     });
   });
@@ -142,29 +142,16 @@ describe('Integration | Component | content spaces harvesters', function () {
   it('performs removing harvester from space', function () {
     this.render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    const executeSpy = sinon.spy();
-    sinon.stub(
-      lookupService(this, 'space-actions'),
-      'createRemoveHarvesterFromSpaceAction'
-    ).callsFake(context =>
-      RemoveHarvesterFromSpaceAction.create({
-        ownerSource: this,
-        execute() {
-          executeSpy(context.space, context.harvester);
-        },
-      })
-    );
+    const executeStub = sinon.stub(RemoveHarvesterFromSpaceAction.prototype, 'execute')
+      .callsFake(function () {
+        expect(this.get('space.name')).to.equal('space1');
+        expect(this.get('harvester.name')).to.equal('harvester1');
+      });
 
     return wait()
       .then(() => click(this.$('.resource-item:first-child .btn-menu-toggle')[0]))
       .then(() => click(document.querySelector('.remove-harvester-from-space-trigger')))
-      .then(() => {
-        expect(executeSpy).to.be.calledOnce;
-        expect(executeSpy).to.be.calledWith(
-          sinon.match({ name: 'space1' }),
-          sinon.match({ name: 'harvester1' })
-        );
-      });
+      .then(() => expect(executeStub).to.be.calledOnce);
   });
 
   it(
@@ -207,14 +194,14 @@ describe('Integration | Component | content spaces harvesters', function () {
     }
   );
 
-  it('executes adding harvester', function () {
+  it('executes adding harvester from list view', function () {
     return testAddingHarvester(this, () =>
       click('h1 .collapsible-toolbar-toggle')
       .then(() => click($('.dropdown-menu .add-harvester-to-space-trigger')[0]))
     );
   });
 
-  it('executes inviting harvester using token', function () {
+  it('executes inviting harvester using token from list view', function () {
     return testInvitingHarvesterUsingToken(this, () =>
       click('h1 .collapsible-toolbar-toggle')
       .then(() => click($('.dropdown-menu .generate-invite-token-action')[0]))

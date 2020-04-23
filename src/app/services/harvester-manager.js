@@ -511,16 +511,6 @@ export default Service.extend(
     },
 
     /**
-     * Reloads spaceList of harvester identified by entityId. If list has not been
-     * fetched, nothing is reloaded
-     * @param {string} entityId harvester entityId
-     * @returns {Promise}
-     */
-    reloadSpaceList(entityId) {
-      return this.reloadModelList(entityId, 'spaceList');
-    },
-
-    /**
      * Reloads groupList of harvester identified by entityId. If list has not been
      * fetched, nothing is reloaded
      * @param {string} entityId harvester entityId
