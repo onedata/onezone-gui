@@ -198,6 +198,47 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
           .to.deep.equal(this.get('tokens').slice(0, 2));
       });
   });
+
+  it('closes modal on cancel click', function () {
+    const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
+
+    return showModal(this)
+      .then(() => {
+        expect(onHideSpy).to.not.been.called;
+        return click(getModalFooter().find('.remove-tokens-cancel')[0]);
+      })
+      .then(() => expect(onHideSpy).to.be.calledOnce);
+  });
+
+  it('closes modal on backdrop click', function () {
+    const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
+
+    return showModal(this)
+      .then(() => click(getModal()[0]))
+      .then(() => expect(onHideSpy).to.be.calledOnce);
+  });
+
+  it('disables cancel button when submitting', function () {
+    const submitStub = sinon.stub().returns(new Promise(() => {}));
+    this.set('modalOptions.onSubmit', submitStub);
+
+    return showModal(this)
+      .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
+      .then(() =>
+        expect(getModalFooter().find('.remove-tokens-cancel')).to.have.attr('disabled')
+      );
+  });
+
+  it('does not close modal on backdrop click when submitting', function () {
+    const submitStub = sinon.stub().returns(new Promise(() => {}));
+    this.set('modalOptions.onSubmit', submitStub);
+    const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
+
+    return showModal(this)
+      .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
+      .then(() => click(getModal()[0]))
+      .then(() => expect(onHideSpy).to.not.be.called);
+  });
 });
 
 function showModal(testCase, expandTokens = false) {
