@@ -65,7 +65,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import RecordsOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
+import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -1514,7 +1514,7 @@ export default Component.extend(I18n, {
     return PromiseArray.create({
       promise: this.get('recordManager').getUserRecordList(modelName)
         .then(records => get(records, 'list'))
-        .then(recordsList => RecordsOptionsArrayProxy.create({
+        .then(recordsList => RecordOptionsArrayProxy.create({
           ownerSource: this,
           records: recordsList,
         })),
