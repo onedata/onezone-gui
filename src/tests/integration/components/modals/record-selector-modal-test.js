@@ -28,10 +28,14 @@ describe('Integration | Component | modals/record selector modal', function () {
     // space is before group to test sorting records by name
     const records = A([{
       name: 'space1',
-      entityType: 'space',
+      constructor: {
+        modelName: 'space',
+      },
     }, {
       name: 'group1',
-      entityType: 'group',
+      constructor: {
+        modelName: 'group',
+      },
     }]);
 
     this.setProperties({

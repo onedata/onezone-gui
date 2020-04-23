@@ -1,12 +1,38 @@
-<div class="row content-row header-row hidden-xs">
+{{#unless (eq spaceHarvestersProxy.length 0)}}
+  <div class="row content-row header-row hidden-xs">
     <h1 class="with-menu">
       <span class="one-label">
         {{tt this "header"}}
       </span>
-      {{!-- {{actions-toolbar actionsArray=globalActions}} --}}
+      {{actions-toolbar isMinimized=true actionsArray=globalActions}}
     </h1>
   </div>
+{{/unless}}
 {{#promise-proxy-container proxy=spaceHarvestersProxy}}
-  {{resources-list items=harvesterItems}}
+  {{#if (eq spaceHarvestersProxy.length 0)}}
+    {{#content-info
+      imagePath=(root-url "assets/images/harvester-space-new.svg")
+      class="scroll-breakpoint-700"
+      header=(tt this "empty.header")
+      text=(tt this "empty.description")}}
+      <div class="action-buttons">
+        {{#bs-button
+          type="primary"
+          class=(concat-classes "btn-content-info" addHarvesterAction.className)
+          onClick=addHarvesterAction.executeCallback}}
+          {{addHarvesterAction.title}}
+        {{/bs-button}}
+        &#32;
+        {{#bs-button
+          type="primary"
+          class=(concat-classes "btn-content-info" inviteHarvesterUsingTokenAction.className)
+          onClick=inviteHarvesterUsingTokenAction.executeCallback}}
+          {{inviteHarvesterUsingTokenAction.title}}
+        {{/bs-button}}
+      </div>
+    {{/content-info}}
+  {{else}}
+    {{resources-list items=harvesterItems}}
+  {{/if}}
 {{/promise-proxy-container}}
 {{yield}}

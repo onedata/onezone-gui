@@ -1,12 +1,22 @@
+/**
+ * Manages harvesters of specified space
+ *
+ * @module components/content-spaces-harvesters
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, collect } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import { promise } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
 const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   oneiconAlias: service(),
@@ -55,8 +65,11 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   }),
 });
 
-export default Component.extend(I18n, {
+export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-spaces-harvesters'],
+
+  spaceActions: service(),
+  tokenActions: service(),
 
   /**
    * @override
@@ -93,4 +106,39 @@ export default Component.extend(I18n, {
       harvester,
     }));
   }),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  addHarvesterAction: computed('space', function addHarvesterAction() {
+    const {
+      space,
+      spaceActions,
+    } = this.getProperties('space', 'spaceActions');
+
+    return spaceActions.createAddHarvesterToSpaceAction({ space });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  inviteHarvesterUsingTokenAction: computed(
+    'space',
+    function inviteHarvesterUsingTokenAction() {
+      const {
+        space,
+        tokenActions,
+      } = this.getProperties('space', 'tokenActions');
+
+      return tokenActions.createGenerateInviteTokenAction({
+        inviteType: 'harvesterJoinSpace',
+        targetRecord: space,
+      });
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.Action>>}
+   */
+  globalActions: collect('addHarvesterAction', 'inviteHarvesterUsingTokenAction'),
 });

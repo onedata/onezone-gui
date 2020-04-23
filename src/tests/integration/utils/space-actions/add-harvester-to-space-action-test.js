@@ -27,9 +27,11 @@ describe(
     beforeEach(function () {
       const recordManager = lookupService(this, 'record-manager');
       const harvesters = [{
-        entityType: 'harvester',
         entityId: 'harvesterId',
         name: 'harvester1',
+        constructor: {
+          modelName: 'harvester',
+        },
       }];
       sinon.stub(recordManager, 'getUserRecordList')
         .withArgs('harvester')

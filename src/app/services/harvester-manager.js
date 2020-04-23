@@ -182,16 +182,6 @@ export default Service.extend(
           }),
           operation: 'create',
         })
-        .catch(error => onedataGraph.request({
-          gri: gri({
-            entityType: spaceEntityType,
-            entityId: spaceId,
-            aspect: harvesterEntityType,
-            aspectId: harvesterId,
-            scope: 'auto',
-          }),
-          operation: 'create',
-        }).catch(() => { throw error; }))
         .then(() =>
           allFulfilled([
             recordManager.reloadRecordListById('space', spaceId, 'harvester')
