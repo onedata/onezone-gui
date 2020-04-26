@@ -17,13 +17,17 @@ import { inject as service } from '@ember/service';
 import EmbeddedIframe from 'onedata-gui-common/utils/embedded-iframe';
 import { A } from '@ember/array';
 import { getOwner } from '@ember/application';
+import { array } from 'ember-awesome-macros';
 
 export default Component.extend({
   classNames: ['one-embedded-container'],
   classNameBindings: ['iframeIsLoading:is-loading', 'fitContainer:fit-container'],
 
   guiUtils: service(),
+  router: service(),
+  recordManager: service(),
   embeddedIframeManager: service(),
+  alertService: service('alert'),
 
   /**
    * @virtual
@@ -67,6 +71,11 @@ export default Component.extend({
   iframeType: undefined,
 
   /**
+   * @type {Location}
+   */
+  _location: location,
+
+  /**
    * Any data, that should be passed along with iframe. Usually will be
    * correlated to iframeType. Optional, will be passed to EmbeddedIframe.
    * @virtual
@@ -81,10 +90,25 @@ export default Component.extend({
   fitContainer: false,
 
   /**
+   * Collection of action names (strings), which will be injected to iframe from this
+   * component.
+   * @type {Array<string>}
+   */
+  commonCallParentActionNames: Object.freeze([
+    'showOneproviderConnectionError',
+    'getManageClusterUrl',
+  ]),
+
+  /**
    * Collection of action names (strings), which should be injected to iframe.
    * @type {Array<string>}
    */
   callParentActionNames: Object.freeze([]),
+
+  allCallParentActionNames: array.concat(
+    'commonCallParentActionNames',
+    'callParentActionNames'
+  ),
 
   /**
    * @type {Utils.EmbeddedIframe}
@@ -179,7 +203,7 @@ export default Component.extend({
       iframeType,
       src,
       iframeInjectedProperties,
-      callParentActionNames,
+      allCallParentActionNames,
       element,
     } = this.getProperties(
       'embeddedIframeManager',
@@ -188,7 +212,7 @@ export default Component.extend({
       'iframeType',
       'src',
       'iframeInjectedProperties',
-      'callParentActionNames',
+      'allCallParentActionNames',
       'element'
     );
 
@@ -222,8 +246,8 @@ export default Component.extend({
     }
     this.set('embeddedIframe', embeddedIframe);
 
-    // Attach all parent actions according to `callParentActionNames` array
-    callParentActionNames.forEach(actionName => {
+    // Attach all parent actions according to `allCallParentActionNames` array
+    allCallParentActionNames.forEach(actionName => {
       let actionFun = this.actions[actionName];
       if (actionFun) {
         actionFun = actionFun.bind(this);
@@ -248,17 +272,56 @@ export default Component.extend({
    */
   detachIframe() {
     const {
-      callParentActionNames,
+      allCallParentActionNames,
       embeddedIframe,
-    } = this.getProperties('callParentActionNames', 'embeddedIframe');
+    } = this.getProperties('allCallParentActionNames', 'embeddedIframe');
 
     if (embeddedIframe) {
-      callParentActionNames.forEach(actionName => {
+      allCallParentActionNames.forEach(actionName => {
         set(embeddedIframe, `callParentCallbacks.${actionName}`, undefined);
       });
 
       const owners = get(embeddedIframe, 'owners');
       owners.removeObject(owners.findBy('ownerReference', this));
     }
+  },
+
+  actions: {
+    showOneproviderConnectionError({ oneproviderUrl }) {
+      const {
+        alertService,
+        i18n,
+      } = this.getProperties('alertService', 'i18n');
+      alertService.error(null, {
+        componentName: 'alerts/endpoint-error',
+        header: i18n.t('components.alerts.endpointError.headerPrefix') +
+          ' ' +
+          i18n.t('components.alerts.endpointError.oneprovider'),
+        url: oneproviderUrl,
+        serverType: 'oneprovider',
+      });
+    },
+    getManageClusterUrl({ clusterId }) {
+      const {
+        recordManager,
+        router,
+        guiUtils,
+        _location,
+      } = this.getProperties('recordManager', 'router', 'guiUtils', '_location');
+      return recordManager.getUserRecordList('cluster')
+        .then(clusterList => get(clusterList, 'list'))
+        .then(list => {
+          const cluster = list.findBy('entityId', clusterId);
+          if (cluster) {
+            return _location.origin + _location.pathname + router.urlFor(
+              'onedata.sidebar.content',
+              'clusters',
+              guiUtils.getRoutableIdFor(cluster),
+            );
+          } else {
+            return null;
+          }
+        });
+    },
   },
 });
