@@ -254,6 +254,11 @@ export default Component.extend(I18n, {
   isSubmitting: false,
 
   /**
+   * @type {booleal}
+   */
+  areServiceCaveatWarningDetailsVisible: false,
+
+  /**
    * @type {ComputedProperty<String>}
    */
   modeClass: tag `${'mode'}-mode`,
@@ -1121,11 +1126,14 @@ export default Component.extend(I18n, {
         }),
         defaultValue: conditional(
           'isInEditMode',
-          raw([]),
+          raw([{
+            record: { representsAll: 'service' },
+            model: 'service',
+          }]),
           'parent.viewTokenValue',
         ),
       }).create({ name: 'service' }),
-    ]));
+    ], true));
   }),
 
   /**
@@ -1348,6 +1356,34 @@ export default Component.extend(I18n, {
     equal('mode', raw('create')),
     computedT('createToken'),
     computedT('saveToken')
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isServiceCaveatWarningVisible: and(
+    equal('basicGroup.value.type', raw('access')),
+    not(and(
+      'serviceCaveatGroup.value.serviceEnabled',
+      notEmpty('serviceCaveatGroup.value.service'),
+      not(array.find(
+        'serviceCaveatGroup.value.service',
+        option => get(option, 'record.type') === 'onezone'
+      ))
+    )),
+    not(and(
+      'interfaceCaveatGroup.value.interfaceEnabled',
+      equal('interfaceCaveatGroup.value.interface', raw('oneclient'))
+    )),
+    not('readonlyCaveatGroup.value.readonlyEnabled'),
+    not(and(
+      'pathCaveatGroup.value.pathEnabled',
+      notEmpty('pathCaveatGroup.value.path.__fieldsValueNames')
+    )),
+    not(and(
+      'objectIdCaveatGroup.value.objectIdEnabled',
+      notEmpty('objectIdCaveatGroup.value.objectId.__fieldsValueNames')
+    ))
   ),
 
   modeObserver: observer('mode', function modeObserver() {
@@ -1587,11 +1623,11 @@ export default Component.extend(I18n, {
   },
 });
 
-function createCaveatToggleField(caveatName) {
+function createCaveatToggleField(caveatName, isEnabledByDefault = false) {
   return ToggleField.extend({
     classes: 'caveat-group-toggle',
     addColonToLabel: reads('isInViewMode'),
-    defaultValue: false,
+    defaultValue: Boolean(isEnabledByDefault),
     isGroupToggle: true,
   }).create({ name: `${caveatName}Enabled` });
 }
@@ -1604,11 +1640,15 @@ function createDisabledCaveatDescription(caveatName) {
   });
 }
 
-function generateCaveatFormGroupBody(caveatName, caveatFields) {
+function generateCaveatFormGroupBody(
+  caveatName,
+  caveatFields,
+  isEnabledByDefault = false
+) {
   return {
     name: `${caveatName}Caveat`,
     fields: [
-      createCaveatToggleField(caveatName),
+      createCaveatToggleField(caveatName, isEnabledByDefault),
       ...caveatFields,
       createDisabledCaveatDescription(caveatName),
     ],
