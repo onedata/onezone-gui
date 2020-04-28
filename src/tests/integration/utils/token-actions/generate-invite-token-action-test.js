@@ -155,7 +155,7 @@ describe('Integration | Util | token actions/generate invite token action', func
     return wait()
       .then(() => {
         expect(promiseIsResolved).to.be.false;
-        return click(getModalFooter().find('.modal-cancel')[0]);
+        return click(getModalFooter().find('.modal-close')[0]);
       })
       .then(() => expect(promiseIsResolved).to.be.true);
   });

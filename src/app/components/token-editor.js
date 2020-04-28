@@ -43,6 +43,7 @@ import {
   creatorDataToToken,
   editorDataToDiffObject,
   tokenToEditorDefaultData,
+  generateTokenName,
 } from 'onezone-gui/utils/token-editor-utils';
 import {
   conditional,
@@ -497,6 +498,7 @@ export default Component.extend(I18n, {
       fields: [
         SiblingLoadingField.extend({
           loadingProxy: reads('parent.cachedTargetsProxy'),
+          addColonToLabel: false,
         }).create({
           siblingName: 'target',
           name: 'loadingTarget',
@@ -1244,6 +1246,7 @@ export default Component.extend(I18n, {
       SiblingLoadingField.extend({
         loadingProxy: reads('parent.spacesProxy'),
         isVisible: and('parent.isCaveatEnabled', not('isFulfilled')),
+        addColonToLabel: false,
       }).create({
         name: 'loadingPathSpaces',
         siblingName: 'path',
@@ -1421,10 +1424,33 @@ export default Component.extend(I18n, {
     }
   ),
 
+  autoNameGenerator: observer(
+    'mode',
+    'basicGroup.value.{type,inviteDetails.inviteType,inviteDetails.inviteTargetDetails.target}',
+    'inviteType',
+    function autoNameGenerator() {
+      const mode = this.get('mode');
+      const nameField = this.get('fields').getFieldByPath('basic.name');
+      if (mode !== 'create' || get(nameField, 'isModified')) {
+        return;
+      }
+
+      const type = this.get('basicGroup.value.type');
+      const inviteType = this.get('basicGroup.value.inviteDetails.inviteType');
+      const inviteTargetName =
+        this.get('basicGroup.value.inviteDetails.inviteTargetDetails.target.name');
+      this.set(
+        'basicGroup.value.name',
+        generateTokenName(type, inviteType, inviteTargetName)
+      );
+    }
+  ),
+
   init() {
     this._super(...arguments);
     this.modeObserver();
     this.setPredefinedValues();
+    this.autoNameGenerator();
   },
 
   willDestroyElement() {

@@ -16,5 +16,5 @@ export default {
     groupJoinHarvester: groupHeader,
     spaceJoinHarvester: spaceHeader,
   },
-  cancel: 'Cancel',
+  close: 'Close',
 };

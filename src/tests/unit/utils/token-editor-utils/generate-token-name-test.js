@@ -68,7 +68,7 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     nameWithoutTarget: 'support-space',
   }, {
     inviteType: 'registerOneprovider',
-    nameWithTarget: 'register-oneprovider-recordName',
+    nameWithTarget: 'register-oneprovider',
     nameWithoutTarget: 'register-oneprovider',
   }, {
     inviteType: 'userJoinCluster',

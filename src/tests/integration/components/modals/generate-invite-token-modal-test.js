@@ -45,7 +45,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
           const $modalFooter = getModalFooter();
           expect($modal).to.have.class('generate-invite-token-modal');
           expect($modalBody.find('.invite-token-generator')).to.exist;
-          expect($modalFooter.find('.modal-cancel').text().trim()).to.equal('Cancel');
+          expect($modalFooter.find('.modal-close').text().trim()).to.equal('Close');
         });
     }
   );
@@ -100,7 +100,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
     'closes modal on cancel click',
     function () {
       return showModal(this)
-        .then(() => click(getModalFooter().find('.modal-cancel')[0]))
+        .then(() => click(getModalFooter().find('.modal-close')[0]))
         .then(() => expect(isModalOpened()).to.be.false);
     }
   );

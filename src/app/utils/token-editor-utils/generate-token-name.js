@@ -23,6 +23,10 @@ const inviteTypeNames = {
   groupJoinHarvester: 'inv-grp-hrv',
   spaceJoinHarvester: 'inv-spc-hrv',
 };
+const possibleInviteTypes = Object.keys(inviteTypeNames);
+const inviteTypesWithoutTarget = [
+  'registerOneprovider',
+];
 
 /**
  * @param {String} type One of: access, indentity, invite
@@ -33,9 +37,8 @@ const inviteTypeNames = {
  * @returns {String}
  */
 export default function generateTokenName(type, inviteType, inviteTargetName) {
-  const possibleInviteTypes = Object.keys(inviteTypeNames);
-
   const timeString = moment().format('YYYY.MM.DD-HH.mm');
+
   switch (type) {
     case 'access':
     case 'identity':
@@ -45,7 +48,7 @@ export default function generateTokenName(type, inviteType, inviteTargetName) {
         return `${type}-${timeString}`;
       }
       let name = inviteTypeNames[inviteType];
-      if (inviteTargetName) {
+      if (inviteTargetName && !inviteTypesWithoutTarget.includes(inviteType)) {
         name += `-${inviteTargetName}`;
       }
       name += `-${timeString}`;
