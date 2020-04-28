@@ -1513,10 +1513,10 @@ export default Component.extend(I18n, {
   getRecordOptionsForModel(modelName) {
     return PromiseArray.create({
       promise: this.get('recordManager').getUserRecordList(modelName)
-        .then(records => get(records, 'list'))
-        .then(recordsList => RecordOptionsArrayProxy.create({
+        .then(recordsList => get(recordsList, 'list'))
+        .then(records => RecordOptionsArrayProxy.create({
           ownerSource: this,
-          records: recordsList,
+          records,
         })),
     });
   },

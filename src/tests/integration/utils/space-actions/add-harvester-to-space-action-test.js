@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, context, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
@@ -21,8 +21,6 @@ describe(
     setupComponentTest('global-modal-mounter', {
       integration: true,
     });
-
-    suppressRejections();
 
     beforeEach(function () {
       const recordManager = lookupService(this, 'record-manager');
@@ -128,44 +126,49 @@ describe(
       }
     );
 
-    it(
-      'executes adding harvester to space tokens on submit (failure scenario)',
-      function () {
-        const action = AddHarvesterToSpaceAction.create({
-          ownerSource: this,
-          context: this.get('context'),
-        });
-        const harvesterManager = lookupService(this, 'harvester-manager');
-        sinon.stub(harvesterManager, 'addSpaceToHarvester')
-          .returns(reject('someError'));
-        const failureNotifySpy = sinon.spy(
-          lookupService(this, 'global-notify'),
-          'backendError'
-        );
+    context('handles errors', function () {
+      suppressRejections();
 
-        this.render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
-
-        const dropdownHelper = new RecordHelper();
-        return wait()
-          .then(() => dropdownHelper.selectOption(1))
-          .then(() => click(getModalFooter().find('.record-selector-submit')[0]))
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(failureNotifySpy).to.be.calledWith(
-              sinon.match.has('string', 'adding the harvester to the space'),
-              'someError'
-            );
-            const {
-              status,
-              error,
-            } = getProperties(actionResult, 'status', 'error');
-            expect(status).to.equal('failed');
-            expect(error).to.equal('someError');
+      it(
+        'executes adding harvester to space tokens on submit (failure scenario)',
+        function () {
+          const action = AddHarvesterToSpaceAction.create({
+            ownerSource: this,
+            context: this.get('context'),
           });
-      }
-    );
-  });
+          const harvesterManager = lookupService(this, 'harvester-manager');
+          sinon.stub(harvesterManager, 'addSpaceToHarvester')
+            .returns(reject('someError'));
+          const failureNotifySpy = sinon.spy(
+            lookupService(this, 'global-notify'),
+            'backendError'
+          );
+
+          this.render(hbs `{{global-modal-mounter}}`);
+          const actionResultPromise = action.execute();
+
+          const dropdownHelper = new RecordHelper();
+          return wait()
+            .then(() => dropdownHelper.selectOption(1))
+            .then(() => click(getModalFooter().find('.record-selector-submit')[0]))
+            .then(() => actionResultPromise)
+            .then(actionResult => {
+              expect(failureNotifySpy).to.be.calledWith(
+                sinon.match.has('string', 'adding the harvester to the space'),
+                'someError'
+              );
+              const {
+                status,
+                error,
+              } = getProperties(actionResult, 'status', 'error');
+              expect(status).to.equal('failed');
+              expect(error).to.equal('someError');
+            });
+        }
+      );
+    });
+  }
+);
 
 class RecordHelper extends EmberPowerSelectHelper {
   constructor() {

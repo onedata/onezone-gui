@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { describe, context, it, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -19,8 +19,6 @@ describe('Integration | Component | content spaces harvesters', function () {
   setupComponentTest('content-spaces-harvesters', {
     integration: true,
   });
-
-  suppressRejections();
 
   beforeEach(function () {
     this.set('space', EmberObject.create({
@@ -65,22 +63,6 @@ describe('Integration | Component | content spaces harvesters', function () {
         expect(this.$('.resources-list')).to.not.exist;
         expect(this.$('.resource-load-error')).to.not.exist;
         expect(this.$('.content-info')).to.not.exist;
-      });
-  });
-
-  it('shows error when harvesters cannot be loaded', function () {
-    this.set('space.harvesterList', promiseObject(reject('someError')));
-
-    this.render(hbs `{{content-spaces-harvesters space=space}}`);
-
-    return wait()
-      .then(() => {
-        expect(this.$('.spinner')).to.not.exist;
-        expect(this.$('.resources-list')).to.not.exist;
-        expect(this.$('.content-info')).to.not.exist;
-        const $loadError = this.$('.resource-load-error');
-        expect($loadError).to.exist;
-        expect($loadError.text()).to.contain('someError');
       });
   });
 
@@ -206,6 +188,26 @@ describe('Integration | Component | content spaces harvesters', function () {
       click('h1 .collapsible-toolbar-toggle')
       .then(() => click($('.dropdown-menu .generate-invite-token-action')[0]))
     );
+  });
+
+  context('handles errors', function () {
+    suppressRejections();
+
+    it('shows error when harvesters cannot be loaded', function () {
+      this.set('space.harvesterList', promiseObject(reject('someError')));
+
+      this.render(hbs `{{content-spaces-harvesters space=space}}`);
+
+      return wait()
+        .then(() => {
+          expect(this.$('.spinner')).to.not.exist;
+          expect(this.$('.resources-list')).to.not.exist;
+          expect(this.$('.content-info')).to.not.exist;
+          const $loadError = this.$('.resource-load-error');
+          expect($loadError).to.exist;
+          expect($loadError.text()).to.contain('someError');
+        });
+    });
   });
 });
 

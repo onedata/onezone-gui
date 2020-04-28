@@ -14,18 +14,24 @@
       imagePath=(root-url "assets/images/harvester-space-new.svg")
       class="scroll-breakpoint-700"
       header=(tt this "empty.header")
-      text=(tt this "empty.description")}}
+      text=(tt this "empty.description")
+    }}
       <div class="action-buttons">
         {{#bs-button
           type="primary"
           class=(concat-classes "btn-content-info" addHarvesterAction.className)
-          onClick=addHarvesterAction.executeCallback}}
+          onClick=addHarvesterAction.executeCallback
+        }}
           {{addHarvesterAction.title}}
         {{/bs-button}}
         {{#bs-button
           type="primary"
-          class=(concat-classes "btn-content-info" inviteHarvesterUsingTokenAction.className)
-          onClick=inviteHarvesterUsingTokenAction.executeCallback}}
+          class=(concat-classes
+            "btn-content-info"
+            inviteHarvesterUsingTokenAction.className
+          )
+          onClick=inviteHarvesterUsingTokenAction.executeCallback
+        }}
           {{inviteHarvesterUsingTokenAction.title}}
         {{/bs-button}}
       </div>
