@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6302 Added "token is powerful, may be dangerous" warning and token name autogenerating
 * VFS-5899 Added new tokens GUI
 * VFS-6145 Added support for file QoS management in Oneprovider GUI
 * VFS-5929 Updated common libs

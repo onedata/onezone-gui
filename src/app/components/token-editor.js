@@ -57,6 +57,7 @@ import {
   getBy,
   promise,
   tag,
+  isEmpty,
   notEmpty,
   notEqual,
 } from 'ember-awesome-macros';
@@ -1365,28 +1366,35 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<boolean>}
    */
   isServiceCaveatWarningVisible: and(
+    // type: access token
     equal('basicGroup.value.type', raw('access')),
-    not(and(
-      'serviceCaveatGroup.value.serviceEnabled',
-      notEmpty('serviceCaveatGroup.value.service'),
-      not(array.find(
+    // service caveat is disabled or is enabled and empty, or is enabled with
+    // Onezone service selected
+    or(
+      not('serviceCaveatGroup.value.serviceEnabled'),
+      isEmpty('serviceCaveatGroup.value.service'),
+      array.find(
         'serviceCaveatGroup.value.service',
         option => get(option, 'record.type') === 'onezone'
-      ))
-    )),
-    not(and(
-      'interfaceCaveatGroup.value.interfaceEnabled',
-      equal('interfaceCaveatGroup.value.interface', raw('oneclient'))
-    )),
+      )
+    ),
+    // interface caveat is disabled or enabled with selection != oneclient
+    or(
+      not('interfaceCaveatGroup.value.interfaceEnabled'),
+      notEqual('interfaceCaveatGroup.value.interface', raw('oneclient'))
+    ),
+    // readonly caveat is disabled
     not('readonlyCaveatGroup.value.readonlyEnabled'),
-    not(and(
-      'pathCaveatGroup.value.pathEnabled',
-      notEmpty('pathCaveatGroup.value.path.__fieldsValueNames')
-    )),
-    not(and(
-      'objectIdCaveatGroup.value.objectIdEnabled',
-      notEmpty('objectIdCaveatGroup.value.objectId.__fieldsValueNames')
-    ))
+    // path caveat is disabled or enabled with no entries
+    or(
+      not('pathCaveatGroup.value.pathEnabled'),
+      isEmpty('pathCaveatGroup.value.path.__fieldsValueNames')
+    ),
+    // objectid caveat is disabled or enabled with no entries
+    or(
+      not('objectIdCaveatGroup.value.objectIdEnabled'),
+      isEmpty('objectIdCaveatGroup.value.objectId.__fieldsValueNames')
+    )
   ),
 
   modeObserver: observer('mode', function modeObserver() {
@@ -1426,7 +1434,7 @@ export default Component.extend(I18n, {
 
   autoNameGenerator: observer(
     'mode',
-    'basicGroup.value.{type,inviteDetails.inviteType,inviteDetails.inviteTargetDetails.target}',
+    'basicGroup.value.{type,inviteDetails.inviteType,inviteDetails.inviteTargetDetails.target.name}',
     'inviteType',
     function autoNameGenerator() {
       const mode = this.get('mode');

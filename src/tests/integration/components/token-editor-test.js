@@ -1219,9 +1219,11 @@ describe('Integration | Component | token editor', function () {
   });
 
   it(
-    'renders empty, invalid service caveat when it is enabled',
+    'renders valid service caveat with "Any Oneprovider" preselected on init',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `
+        {{token-editor mode="create" expandCaveats=true onChange=(action "change")}}
+      `);
 
       expectCaveatToHaveValue(this, 'service', true, sinon.match([
         sinon.match({
@@ -1243,7 +1245,7 @@ describe('Integration | Component | token editor', function () {
         this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
         let typeSelectorHelper;
-        // Tag remove to clean default
+        // Remove tag to clean default
         return click('.service-field .tags-input .tag-remove')
           .then(() => click('.service-field .tags-input'))
           .then(() => {
@@ -1266,7 +1268,7 @@ describe('Integration | Component | token editor', function () {
   it('notifies about adding new service in service caveat', function () {
     this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
 
-    // Tag remove to clean default
+    // Remove tag to clean default
     return click('.service-field .tags-input .tag-remove')
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[0]))
@@ -1288,7 +1290,7 @@ describe('Integration | Component | token editor', function () {
       function () {
         this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
-        // Tag remove to clean default
+        // Remove tag to clean default
         return click('.service-field .tags-input .tag-remove')
           .then(() => click('.service-field .tags-input'))
           .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
@@ -1310,7 +1312,7 @@ describe('Integration | Component | token editor', function () {
   it('sorts selected tags in service caveat', function () {
     this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
 
-    // Tag remove to clean default
+    // Remove tag to clean default
     return click('.service-field .tags-input .tag-remove')
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
@@ -1606,7 +1608,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it('does not show service caveat warning in initial values configuration', function () {
-    this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+    this.render(hbs `{{token-editor mode="create"}}`);
 
     expect(this.$('.service-caveat-warning')).to.not.exist;
   });
@@ -1622,7 +1624,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'shows service caveat warning when service caveat is disabled and not available',
+    'does not show service caveat warning when service caveat is disabled and not available',
     function () {
       this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
@@ -1712,7 +1714,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'shows service caveat warning when service caveat is disabled and objectId caveat is enabled without any id',
+    'shows service caveat warning when service caveat is disabled and objectId caveat is enabled without any object id',
     function () {
       this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
@@ -1723,7 +1725,7 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'does not show service caveat warning when service caveat is disabled and objectId caveat is enabled with one id included',
+    'does not show service caveat warning when service caveat is disabled and objectId caveat is enabled with one object id included',
     function () {
       this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 

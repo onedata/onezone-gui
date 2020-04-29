@@ -68,6 +68,8 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     nameWithoutTarget: 'support-space',
   }, {
     inviteType: 'registerOneprovider',
+    // register-oneprovider token target is the user-creator. Mentioning it in a token
+    // name is worthless
     nameWithTarget: 'register-oneprovider',
     nameWithoutTarget: 'register-oneprovider',
   }, {

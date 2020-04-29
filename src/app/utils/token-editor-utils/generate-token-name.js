@@ -1,5 +1,5 @@
 /**
- * Generates a default name for token using type, inviteType and invite target name.
+ * Generates a default name for a token using it's type, invite type and invite target name.
  *
  * @module utils/token-editor-utils/generate-token-name
  * @author Michał Borzęcki
