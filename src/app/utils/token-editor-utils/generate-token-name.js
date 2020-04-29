@@ -8,6 +8,7 @@
  */
 
 import moment from 'moment';
+import { maxLength } from 'onedata-gui-common/utils/backendify-name';
 
 const inviteTypeNames = {
   userJoinGroup: 'inv-usr-grp',
@@ -49,7 +50,9 @@ export default function generateTokenName(type, inviteType, inviteTargetName) {
       }
       let name = inviteTypeNames[inviteType];
       if (inviteTargetName && !inviteTypesWithoutTarget.includes(inviteType)) {
-        name += `-${inviteTargetName}`;
+        // 2 for dashes before name and time string
+        const maxNameLength = maxLength - name.length - timeString.length - 2;
+        name += `-${inviteTargetName.slice(0, maxNameLength)}`;
       }
       name += `-${timeString}`;
       return name;

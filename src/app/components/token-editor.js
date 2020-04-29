@@ -1437,8 +1437,11 @@ export default Component.extend(I18n, {
     'basicGroup.value.{type,inviteDetails.inviteType,inviteDetails.inviteTargetDetails.target.name}',
     'inviteType',
     function autoNameGenerator() {
-      const mode = this.get('mode');
-      const nameField = this.get('fields').getFieldByPath('basic.name');
+      const {
+        mode,
+        fields,
+      } = this.getProperties('mode', 'fields');
+      const nameField = fields.getFieldByPath('basic.name');
       if (mode !== 'create' || get(nameField, 'isModified')) {
         return;
       }

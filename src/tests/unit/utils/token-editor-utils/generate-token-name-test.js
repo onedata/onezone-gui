@@ -3,6 +3,8 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import generateTokenName from 'onezone-gui/utils/token-editor-utils/generate-token-name';
 import sinon from 'sinon';
 import moment from 'moment';
+import backendifyName from 'onedata-gui-common/utils/backendify-name';
+import _ from 'lodash';
 
 describe('Unit | Utility | token editor utils/generate token name', function () {
   beforeEach(function () {
@@ -108,5 +110,15 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
         expect(name).to.equal(`${nameWithTarget}-${this.nowString}`);
       }
     );
+  });
+
+  it('generates name compatible with backend naming convention', function () {
+    const name = generateTokenName(
+      'invite',
+      'userJoinSpace',
+      _.times(30, () => 'very').join(' ') + ' long'
+    );
+
+    expect(backendifyName(name)).to.equal(name);
   });
 });

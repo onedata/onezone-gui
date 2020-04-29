@@ -279,7 +279,7 @@ export default {
     },
   },
   serviceCaveatWarning: {
-    basicText: 'This is a powerful token granting full access to your account - <strong>can be safely used only in Onezone REST API</strong>.',
+    basicText: 'This is a powerful token granting full access to your account ‐ <strong>can be safely used only in Onezone REST API</strong>.',
     showDetailsLink: 'Show details...',
     hideDetailsLink: 'Hide details',
     detailsIntro: 'To obtain a token that can be securely used for accessing other services (e.g. Oneprovider REST/CDMI API or mounting Oneclient), you should add <strong>at least one</strong> of the following caveats:',
