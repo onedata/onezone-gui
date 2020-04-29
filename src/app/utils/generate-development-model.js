@@ -233,6 +233,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
+              attachRecordsListToModel(store, record, 'harvester', harvesters),
             ])
           ))
         )
@@ -250,7 +251,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'harvester', groups
               ),
-              attachSpacesToModel(store, record, spaces),
+              attachRecordsListToModel(store, record, 'space', spaces),
             ])
           ))
         )
@@ -691,11 +692,11 @@ function attachMembershipsToModel(
   }).save();
 }
 
-function attachSpacesToModel(store, record, spaces) {
-  return createListRecord(store, 'space', spaces)
+function attachRecordsListToModel(store, targetRecord, recordName, records) {
+  return createListRecord(store, recordName, records)
     .then(list => {
-      record.set('spaceList', list);
-      return record.save();
+      targetRecord.set(`${recordName}List`, list);
+      return targetRecord.save();
     });
 }
 

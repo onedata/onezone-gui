@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, context, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
@@ -18,8 +18,6 @@ describe(
     setupComponentTest('global-modal-mounter', {
       integration: true,
     });
-
-    suppressRejections();
 
     beforeEach(function () {
       this.set('context', {
@@ -127,39 +125,44 @@ describe(
       }
     );
 
-    it(
-      'executes removing harvester from space on submit (failure scenario)',
-      function () {
-        const action = RemoveHarvesterFromSpaceAction.create({
-          ownerSource: this,
-          context: this.get('context'),
-        });
-        const harvesterManager = lookupService(this, 'harvester-manager');
-        sinon.stub(harvesterManager, 'removeSpaceFromHarvester')
-          .returns(reject('someError'));
-        const failureNotifySpy = sinon.spy(
-          lookupService(this, 'global-notify'),
-          'backendError'
-        );
+    context('handles errors', function () {
+      suppressRejections();
 
-        this.render(hbs `{{global-modal-mounter}}`);
-        const actionResultPromise = action.execute();
-
-        return wait()
-          .then(() => click(getModalFooter().find('.question-yes')[0]))
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(failureNotifySpy).to.be.calledWith(
-              sinon.match.has('string', 'removing the harvester from the space'),
-              'someError'
-            );
-            const {
-              status,
-              error,
-            } = getProperties(actionResult, 'status', 'error');
-            expect(status).to.equal('failed');
-            expect(error).to.equal('someError');
+      it(
+        'executes removing harvester from space on submit (failure scenario)',
+        function () {
+          const action = RemoveHarvesterFromSpaceAction.create({
+            ownerSource: this,
+            context: this.get('context'),
           });
-      }
-    );
-  });
+          const harvesterManager = lookupService(this, 'harvester-manager');
+          sinon.stub(harvesterManager, 'removeSpaceFromHarvester')
+            .returns(reject('someError'));
+          const failureNotifySpy = sinon.spy(
+            lookupService(this, 'global-notify'),
+            'backendError'
+          );
+
+          this.render(hbs `{{global-modal-mounter}}`);
+          const actionResultPromise = action.execute();
+
+          return wait()
+            .then(() => click(getModalFooter().find('.question-yes')[0]))
+            .then(() => actionResultPromise)
+            .then(actionResult => {
+              expect(failureNotifySpy).to.be.calledWith(
+                sinon.match.has('string', 'removing the harvester from the space'),
+                'someError'
+              );
+              const {
+                status,
+                error,
+              } = getProperties(actionResult, 'status', 'error');
+              expect(status).to.equal('failed');
+              expect(error).to.equal('someError');
+            });
+        }
+      );
+    });
+  }
+);
