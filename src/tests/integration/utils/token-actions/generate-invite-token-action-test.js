@@ -33,6 +33,7 @@ describe('Integration | Util | token actions/generate invite token action', func
   const userTitle = 'Invite user using token';
   const groupTitle = 'Invite group using token';
   const spaceTitle = 'Invite space using token';
+  const harvesterTitle = 'Invite harvester using token';
   [{
     inviteType: 'userJoinGroup',
     title: userTitle,
@@ -45,6 +46,9 @@ describe('Integration | Util | token actions/generate invite token action', func
   }, {
     inviteType: 'groupJoinSpace',
     title: groupTitle,
+  }, {
+    inviteType: 'harvesterJoinSpace',
+    title: harvesterTitle,
   }, {
     inviteType: 'userJoinCluster',
     title: userTitle,

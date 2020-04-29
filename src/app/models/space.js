@@ -49,6 +49,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   userList: belongsTo('sharedUserList'),
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('sharedUserList'),
+  harvesterList: belongsTo('harvesterList'),
 
   /**
    * True, if user has a "View space" privilege

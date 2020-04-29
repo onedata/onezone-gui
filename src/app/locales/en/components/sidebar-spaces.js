@@ -11,5 +11,6 @@ export default {
     providers: 'Providers',
     members: 'Members',
     membership: 'Membership',
+    harvesters: 'Harvesters',
   },
 };

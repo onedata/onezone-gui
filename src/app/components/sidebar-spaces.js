@@ -23,6 +23,7 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
    * @type {Ember.Service}
    */
   currentUser: service(),
+  oneiconAlias: service(),
 
   i18nPrefix: 'components.sidebarSpaces',
 
@@ -49,6 +50,8 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
   sidebarType: 'spaces',
 
   secondLevelItems: computed(function getSecondLevelItems() {
+    const oneiconAlias = this.get('oneiconAlias');
+
     return [{
         id: 'index',
         label: this.t('aspects.index'),
@@ -77,6 +80,10 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
         id: 'members',
         label: this.t('aspects.members'),
         icon: 'group',
+      }, {
+        id: 'harvesters',
+        label: this.t('aspects.harvesters'),
+        icon: oneiconAlias.getName('harvester'),
       },
     ];
   }),

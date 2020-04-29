@@ -57,6 +57,7 @@ export const tokenInviteTypeToTargetModelMapping = {
   groupJoinGroup: standardGroupMapping,
   userJoinSpace: standardSpaceMapping,
   groupJoinSpace: standardSpaceMapping,
+  harvesterJoinSpace: mappingWithoutPrivileges(standardSpaceMapping),
   supportSpace: mappingWithoutPrivileges(standardSpaceMapping),
   registerOneprovider: {
     idFieldName: 'adminUserId',

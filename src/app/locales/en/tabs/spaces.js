@@ -9,7 +9,7 @@ export default {
     members: 'Space members',
     membership: 'Membership',
     support: 'Add support',
-    joinHarvester: 'Join harvester',
+    harvesters: 'Space harvesters',
     notFound: 'Space not found',
   },
 };

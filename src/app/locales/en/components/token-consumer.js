@@ -9,6 +9,7 @@ export default {
       groupJoinGroup: '<strong>Invite group</strong> to parent group <strong>{{targetName}}</strong>',
       userJoinSpace: '<strong>Invite user</strong> to space <strong>{{targetName}}</strong>',
       groupJoinSpace: '<strong>Invite group</strong> to space <strong>{{targetName}}</strong>',
+      harvesterJoinSpace: '<strong>Invite harvester</strong> to space <strong>{{targetName}}</strong>',
       userJoinCluster: '<strong>Invite user</strong> to cluster <strong>{{targetName}}</strong>',
       groupJoinCluster: '<strong>Invite group</strong> to cluster <strong>{{targetName}}</strong>',
       userJoinHarvester: '<strong>Invite user</strong> to harvester <strong>{{targetName}}</strong>',
@@ -25,6 +26,7 @@ export default {
   joiningModelName: {
     group: 'group',
     space: 'space',
+    harvester: 'harvester',
   },
   targetModelName: {
     group: 'parent group',
@@ -35,6 +37,7 @@ export default {
   recordSelectorPlaceholder: {
     group: 'Select group...',
     space: 'Select space...',
+    harvester: 'Select harvester...',
   },
   unknownTargetName: 'unknown',
   unresolvedTargetWarning: 'Cannot resolve invite target name, this token might be outdated or invalid.',

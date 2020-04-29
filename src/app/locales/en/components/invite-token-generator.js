@@ -8,6 +8,7 @@ export default {
     groupJoinGroup: createSubjectDescription('owner of group'),
     userJoinSpace: createSubjectDescription('user'),
     groupJoinSpace: createSubjectDescription('owner of group'),
+    harvesterJoinSpace: createSubjectDescription('owner of harvester'),
     userJoinCluster: createSubjectDescription('user'),
     groupJoinCluster: createSubjectDescription('owner of group'),
     userJoinHarvester: createSubjectDescription('user'),

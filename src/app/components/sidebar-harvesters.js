@@ -29,11 +29,6 @@ export default OneSidebar.extend(I18n, {
   /**
    * @override
    */
-  firstLevelItemIcon: 'light-bulb',
-
-  /**
-   * @override
-   */
   sidebarType: 'harvesters',
 
   /**

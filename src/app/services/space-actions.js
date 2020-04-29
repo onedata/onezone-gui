@@ -12,6 +12,8 @@ import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import $ from 'jquery';
 import { collect } from '@ember/object/computed';
+import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
+import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -40,6 +42,14 @@ export default Service.extend(I18n, {
       action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
     };
   }),
+
+  createAddHarvesterToSpaceAction(context) {
+    return AddHarvesterToSpaceAction.create({ ownerSource: this, context });
+  },
+
+  createRemoveHarvesterFromSpaceAction(context) {
+    return RemoveHarvesterFromSpaceAction.create({ ownerSource: this, context });
+  },
 
   /**
    * Creates new space

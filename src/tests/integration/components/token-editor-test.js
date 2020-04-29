@@ -42,6 +42,13 @@ const tokenInviteTypes = [{
   targetModelName: 'space',
   targetPlaceholder: 'Select space...',
 }, {
+  inviteType: 'harvesterJoinSpace',
+  label: 'Invite harvester to space',
+  icon: 'space',
+  targetModelName: 'space',
+  targetPlaceholder: 'Select space...',
+  noPrivileges: true,
+}, {
   inviteType: 'userJoinCluster',
   label: 'Invite user to cluster',
   icon: 'cluster',
