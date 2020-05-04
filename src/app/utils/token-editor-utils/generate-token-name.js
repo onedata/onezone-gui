@@ -9,20 +9,21 @@
 
 import moment from 'moment';
 import { maxLength } from 'onedata-gui-common/utils/backendify-name';
+import _ from 'lodash';
 
 const inviteTypeNames = {
-  userJoinGroup: 'inv-usr-grp',
-  groupJoinGroup: 'inv-grp-grp',
-  userJoinSpace: 'inv-usr-spc',
-  groupJoinSpace: 'inv-grp-spc',
-  harvesterJoinSpace: 'inv-hrv-spc',
-  supportSpace: 'support-space',
-  registerOneprovider: 'register-oneprovider',
-  userJoinCluster: 'inv-usr-cls',
-  groupJoinCluster: 'inv-grp-cls',
-  userJoinHarvester: 'inv-usr-hrv',
-  groupJoinHarvester: 'inv-grp-hrv',
-  spaceJoinHarvester: 'inv-spc-hrv',
+  userJoinGroup: 'Inv. usr. grp.',
+  groupJoinGroup: 'Inv. grp. grp.',
+  userJoinSpace: 'Inv. usr. spc.',
+  groupJoinSpace: 'Inv. grp. spc.',
+  harvesterJoinSpace: 'Inv. hrv. spc.',
+  supportSpace: 'Support space',
+  registerOneprovider: 'Register Oneprovider',
+  userJoinCluster: 'Inv. usr. cls.',
+  groupJoinCluster: 'Inv. grp. cls.',
+  userJoinHarvester: 'Inv. usr. hrv.',
+  groupJoinHarvester: 'Inv. grp. hrv.',
+  spaceJoinHarvester: 'Inv. spc. hrv.',
 };
 const possibleInviteTypes = Object.keys(inviteTypeNames);
 const inviteTypesWithoutTarget = [
@@ -43,21 +44,21 @@ export default function generateTokenName(type, inviteType, inviteTargetName) {
   switch (type) {
     case 'access':
     case 'identity':
-      return `${type}-${timeString}`;
+      return `${_.upperFirst(type)} ${timeString}`;
     case 'invite': {
       if (!possibleInviteTypes.includes(inviteType)) {
-        return `${type}-${timeString}`;
+        return `${_.upperFirst(type)} ${timeString}`;
       }
       let name = inviteTypeNames[inviteType];
       if (inviteTargetName && !inviteTypesWithoutTarget.includes(inviteType)) {
-        // 2 for dashes before name and time string
+        // 2 for spaces before name and time string
         const maxNameLength = maxLength - name.length - timeString.length - 2;
-        name += `-${inviteTargetName.slice(0, maxNameLength)}`;
+        name += ` ${inviteTargetName.slice(0, maxNameLength)}`;
       }
-      name += `-${timeString}`;
+      name += ` ${timeString}`;
       return name;
     }
     default:
-      return `token-${timeString}`;
+      return `Token ${timeString}`;
   }
 }

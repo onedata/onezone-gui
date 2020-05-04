@@ -20,9 +20,9 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     this.fakeClock.restore();
   });
 
-  it('returns "token-DATE" when no arguments have been passed', function () {
+  it('returns "Token DATE" when no arguments have been passed', function () {
     const name = generateTokenName();
-    expect(name).to.equal(`token-${this.nowString}`);
+    expect(name).to.equal(`Token ${this.nowString}`);
   });
 
   [
@@ -30,84 +30,84 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     'identity',
     'invite',
   ].forEach(type => {
-    it(`returns "${type}-DATE" when type is "${type}"`, function () {
+    it(`returns "${_.upperFirst(type)} DATE" when type is "${type}"`, function () {
       const name = generateTokenName(type);
-      expect(name).to.equal(`${type}-${this.nowString}`);
+      expect(name).to.equal(`${_.upperFirst(type)} ${this.nowString}`);
     });
   });
 
   it(
-    'returns "invite-DATE" when type is "invite" and inviteType has unknown value',
+    'returns "Invite DATE" when type is "invite" and inviteType has unknown value',
     function () {
       const name = generateTokenName('invite', 'sth');
-      expect(name).to.equal(`invite-${this.nowString}`);
+      expect(name).to.equal(`Invite ${this.nowString}`);
     }
   );
 
   [{
     inviteType: 'userJoinGroup',
-    nameWithTarget: 'inv-usr-grp-recordName',
-    nameWithoutTarget: 'inv-usr-grp',
+    nameWithTarget: 'Inv. usr. grp. recordName',
+    nameWithoutTarget: 'Inv. usr. grp.',
   }, {
     inviteType: 'groupJoinGroup',
-    nameWithTarget: 'inv-grp-grp-recordName',
-    nameWithoutTarget: 'inv-grp-grp',
+    nameWithTarget: 'Inv. grp. grp. recordName',
+    nameWithoutTarget: 'Inv. grp. grp.',
   }, {
     inviteType: 'userJoinSpace',
-    nameWithTarget: 'inv-usr-spc-recordName',
-    nameWithoutTarget: 'inv-usr-spc',
+    nameWithTarget: 'Inv. usr. spc. recordName',
+    nameWithoutTarget: 'Inv. usr. spc.',
   }, {
     inviteType: 'groupJoinSpace',
-    nameWithTarget: 'inv-grp-spc-recordName',
-    nameWithoutTarget: 'inv-grp-spc',
+    nameWithTarget: 'Inv. grp. spc. recordName',
+    nameWithoutTarget: 'Inv. grp. spc.',
   }, {
     inviteType: 'harvesterJoinSpace',
-    nameWithTarget: 'inv-hrv-spc-recordName',
-    nameWithoutTarget: 'inv-hrv-spc',
+    nameWithTarget: 'Inv. hrv. spc. recordName',
+    nameWithoutTarget: 'Inv. hrv. spc.',
   }, {
     inviteType: 'supportSpace',
-    nameWithTarget: 'support-space-recordName',
-    nameWithoutTarget: 'support-space',
+    nameWithTarget: 'Support space recordName',
+    nameWithoutTarget: 'Support space',
   }, {
     inviteType: 'registerOneprovider',
     // register-oneprovider token target is the user-creator. Mentioning it in a token
     // name is worthless
-    nameWithTarget: 'register-oneprovider',
-    nameWithoutTarget: 'register-oneprovider',
+    nameWithTarget: 'Register Oneprovider',
+    nameWithoutTarget: 'Register Oneprovider',
   }, {
     inviteType: 'userJoinCluster',
-    nameWithTarget: 'inv-usr-cls-recordName',
-    nameWithoutTarget: 'inv-usr-cls',
+    nameWithTarget: 'Inv. usr. cls. recordName',
+    nameWithoutTarget: 'Inv. usr. cls.',
   }, {
     inviteType: 'groupJoinCluster',
-    nameWithTarget: 'inv-grp-cls-recordName',
-    nameWithoutTarget: 'inv-grp-cls',
+    nameWithTarget: 'Inv. grp. cls. recordName',
+    nameWithoutTarget: 'Inv. grp. cls.',
   }, {
     inviteType: 'userJoinHarvester',
-    nameWithTarget: 'inv-usr-hrv-recordName',
-    nameWithoutTarget: 'inv-usr-hrv',
+    nameWithTarget: 'Inv. usr. hrv. recordName',
+    nameWithoutTarget: 'Inv. usr. hrv.',
   }, {
     inviteType: 'groupJoinHarvester',
-    nameWithTarget: 'inv-grp-hrv-recordName',
-    nameWithoutTarget: 'inv-grp-hrv',
+    nameWithTarget: 'Inv. grp. hrv. recordName',
+    nameWithoutTarget: 'Inv. grp. hrv.',
   }, {
     inviteType: 'spaceJoinHarvester',
-    nameWithTarget: 'inv-spc-hrv-recordName',
-    nameWithoutTarget: 'inv-spc-hrv',
+    nameWithTarget: 'Inv. spc. hrv. recordName',
+    nameWithoutTarget: 'Inv. spc. hrv.',
   }].forEach(({ inviteType, nameWithTarget, nameWithoutTarget }) => {
     it(
-      `returns "${nameWithoutTarget}-DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is not provided`,
+      `returns "${nameWithoutTarget} DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is not provided`,
       function () {
         const name = generateTokenName('invite', inviteType);
-        expect(name).to.equal(`${nameWithoutTarget}-${this.nowString}`);
+        expect(name).to.equal(`${nameWithoutTarget} ${this.nowString}`);
       }
     );
 
     it(
-      `returns "${nameWithTarget}-DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is "recordName"`,
+      `returns "${nameWithTarget} DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is "recordName"`,
       function () {
         const name = generateTokenName('invite', inviteType, 'recordName');
-        expect(name).to.equal(`${nameWithTarget}-${this.nowString}`);
+        expect(name).to.equal(`${nameWithTarget} ${this.nowString}`);
       }
     );
   });
