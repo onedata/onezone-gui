@@ -102,7 +102,7 @@ export default Component.extend(I18n, {
       case 'group':
         return oneiconAlias.getName(this.get('record.type'));
       case 'harvester':
-        return 'light-bulb';
+        return oneiconAlias.getName('harvester');
       default:
         return recordType;
     }

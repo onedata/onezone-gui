@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-5980 Unified Oneprovider GUI Service Pack 2
+* VFS-6112 Added support for inviting harvester to space
 * VFS-5899 Added new tokens GUI
 * VFS-6145 Added support for file QoS management in Oneprovider GUI
 * VFS-5929 Updated common libs

@@ -17,6 +17,8 @@ import { inject as service } from '@ember/service';
 import { array, raw } from 'ember-awesome-macros';
 import { reads } from '@ember/object/computed';
 import _ from 'lodash';
+import { resolve } from 'rsvp';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -32,6 +34,11 @@ export default Component.extend(I18n, {
    * @virtual
    */
   modalOptions: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  isSubmitting: false,
 
   /**
    * @type {Array<Models.Token>}
@@ -109,6 +116,13 @@ export default Component.extend(I18n, {
         .filter(token => !removedSelection.includes(token))
         .concat(addedSelection);
       this.set('selectedTokensToRemove', newSelectedTokensToRemove);
+    },
+    submit(submitCallback) {
+      const selectedTokensToRemove = this.get('selectedTokensToRemove');
+
+      this.set('isSubmitting', true);
+      return resolve(submitCallback(selectedTokensToRemove))
+        .finally(() => safeExec(this, () => this.set('isSubmitting', false)));
     },
   },
 });

@@ -14,7 +14,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
-import RecordsOptionsArrayProxy from 'onezone-gui/utils/record-options-array-proxy';
+import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import { debounce } from '@ember/runloop';
@@ -178,7 +178,7 @@ export default Component.extend(I18n, {
   joiningModelName: computed('type', function joiningModelName() {
     const inviteType = this.get('type.inviteToken.inviteType');
     if (inviteType) {
-      for (const modelName of ['user', 'group', 'space']) {
+      for (const modelName of ['user', 'group', 'space', 'harvester']) {
         if (inviteType.startsWith(`${modelName}Join`)) {
           return modelName;
         }
@@ -191,7 +191,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   joiningRecordSelectorModelName: conditional(
-    array.includes(raw(['group', 'space']), 'joiningModelName'),
+    array.includes(raw(['group', 'space', 'harvester']), 'joiningModelName'),
     'joiningModelName',
     raw(null)
   ),
@@ -351,10 +351,10 @@ export default Component.extend(I18n, {
   getRecordOptionsForModel(modelName) {
     return PromiseArray.create({
       promise: this.get('recordManager').getUserRecordList(modelName)
-        .then(records => get(records, 'list'))
-        .then(recordsList => RecordsOptionsArrayProxy.create({
+        .then(recordsList => get(recordsList, 'list'))
+        .then(records => RecordOptionsArrayProxy.create({
           ownerSource: this,
-          records: recordsList,
+          records,
         })),
     });
   },
