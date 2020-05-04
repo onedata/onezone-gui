@@ -209,6 +209,16 @@
     }
   }
 
+  .service-caveat-warning {
+    p {
+      margin-bottom: $padding-base-vertical;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
   @media (min-width: $screen-sm-min) {
     .basic-field .control-label,
     .caveat-group-toggle {
@@ -283,6 +293,13 @@
 
     .pathSpace-field {
       width: 150px;
+    }
+
+    .regionCaveat-field,
+    .asnCaveat-field,
+    .consumerCaveat-field,
+    .readonlyCaveat-field {
+      padding-top: $padding-base-vertical;
     }
   }
 }

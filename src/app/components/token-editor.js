@@ -43,6 +43,7 @@ import {
   creatorDataToToken,
   editorDataToDiffObject,
   tokenToEditorDefaultData,
+  generateTokenName,
 } from 'onezone-gui/utils/token-editor-utils';
 import {
   conditional,
@@ -56,6 +57,7 @@ import {
   getBy,
   promise,
   tag,
+  isEmpty,
   notEmpty,
   notEqual,
 } from 'ember-awesome-macros';
@@ -252,6 +254,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isSubmitting: false,
+
+  /**
+   * @type {booleal}
+   */
+  areServiceCaveatWarningDetailsVisible: false,
 
   /**
    * @type {ComputedProperty<String>}
@@ -492,6 +499,7 @@ export default Component.extend(I18n, {
       fields: [
         SiblingLoadingField.extend({
           loadingProxy: reads('parent.cachedTargetsProxy'),
+          addColonToLabel: false,
         }).create({
           siblingName: 'target',
           name: 'loadingTarget',
@@ -1121,11 +1129,14 @@ export default Component.extend(I18n, {
         }),
         defaultValue: conditional(
           'isInEditMode',
-          raw([]),
+          raw([{
+            record: { representsAll: 'service' },
+            model: 'service',
+          }]),
           'parent.viewTokenValue',
         ),
       }).create({ name: 'service' }),
-    ]));
+    ], true));
   }),
 
   /**
@@ -1236,6 +1247,7 @@ export default Component.extend(I18n, {
       SiblingLoadingField.extend({
         loadingProxy: reads('parent.spacesProxy'),
         isVisible: and('parent.isCaveatEnabled', not('isFulfilled')),
+        addColonToLabel: false,
       }).create({
         name: 'loadingPathSpaces',
         siblingName: 'path',
@@ -1350,6 +1362,41 @@ export default Component.extend(I18n, {
     computedT('saveToken')
   ),
 
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isServiceCaveatWarningVisible: and(
+    // type: access token
+    equal('basicGroup.value.type', raw('access')),
+    // service caveat is disabled or is enabled and empty, or is enabled with
+    // Onezone service selected
+    or(
+      not('serviceCaveatGroup.value.serviceEnabled'),
+      isEmpty('serviceCaveatGroup.value.service'),
+      array.find(
+        'serviceCaveatGroup.value.service',
+        option => get(option, 'record.type') === 'onezone'
+      )
+    ),
+    // interface caveat is disabled or enabled with selection != oneclient
+    or(
+      not('interfaceCaveatGroup.value.interfaceEnabled'),
+      notEqual('interfaceCaveatGroup.value.interface', raw('oneclient'))
+    ),
+    // readonly caveat is disabled
+    not('readonlyCaveatGroup.value.readonlyEnabled'),
+    // path caveat is disabled or enabled with no entries
+    or(
+      not('pathCaveatGroup.value.pathEnabled'),
+      isEmpty('pathCaveatGroup.value.path.__fieldsValueNames')
+    ),
+    // objectid caveat is disabled or enabled with no entries
+    or(
+      not('objectIdCaveatGroup.value.objectIdEnabled'),
+      isEmpty('objectIdCaveatGroup.value.objectId.__fieldsValueNames')
+    )
+  ),
+
   modeObserver: observer('mode', function modeObserver() {
     const {
       fields,
@@ -1385,10 +1432,36 @@ export default Component.extend(I18n, {
     }
   ),
 
+  autoNameGenerator: observer(
+    'mode',
+    'basicGroup.value.{type,inviteDetails.inviteType,inviteDetails.inviteTargetDetails.target.name}',
+    'inviteType',
+    function autoNameGenerator() {
+      const {
+        mode,
+        fields,
+      } = this.getProperties('mode', 'fields');
+      const nameField = fields.getFieldByPath('basic.name');
+      if (mode !== 'create' || get(nameField, 'isModified')) {
+        return;
+      }
+
+      const type = this.get('basicGroup.value.type');
+      const inviteType = this.get('basicGroup.value.inviteDetails.inviteType');
+      const inviteTargetName =
+        this.get('basicGroup.value.inviteDetails.inviteTargetDetails.target.name');
+      this.set(
+        'basicGroup.value.name',
+        generateTokenName(type, inviteType, inviteTargetName)
+      );
+    }
+  ),
+
   init() {
     this._super(...arguments);
     this.modeObserver();
     this.setPredefinedValues();
+    this.autoNameGenerator();
   },
 
   willDestroyElement() {
@@ -1587,11 +1660,11 @@ export default Component.extend(I18n, {
   },
 });
 
-function createCaveatToggleField(caveatName) {
+function createCaveatToggleField(caveatName, isEnabledByDefault = false) {
   return ToggleField.extend({
     classes: 'caveat-group-toggle',
     addColonToLabel: reads('isInViewMode'),
-    defaultValue: false,
+    defaultValue: Boolean(isEnabledByDefault),
     isGroupToggle: true,
   }).create({ name: `${caveatName}Enabled` });
 }
@@ -1604,11 +1677,15 @@ function createDisabledCaveatDescription(caveatName) {
   });
 }
 
-function generateCaveatFormGroupBody(caveatName, caveatFields) {
+function generateCaveatFormGroupBody(
+  caveatName,
+  caveatFields,
+  isEnabledByDefault = false
+) {
   return {
     name: `${caveatName}Caveat`,
     fields: [
-      createCaveatToggleField(caveatName),
+      createCaveatToggleField(caveatName, isEnabledByDefault),
       ...caveatFields,
       createDisabledCaveatDescription(caveatName),
     ],

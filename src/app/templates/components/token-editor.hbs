@@ -19,6 +19,49 @@
     </h1>
     {{form-component/field-renderer field=caveatsGroup}}
   {{/if}}
+  {{#if isServiceCaveatWarningVisible}}
+    <div class="service-caveat-warning alert alert-warning">
+      <p>
+        {{tt this "serviceCaveatWarning.basicText"}}
+        <a
+          class="clickable"
+          {{action
+            (mut areServiceCaveatWarningDetailsVisible)
+            (not areServiceCaveatWarningDetailsVisible)
+          }}
+        >
+          {{tt this (concat
+            "serviceCaveatWarning."
+            (if areServiceCaveatWarningDetailsVisible "hideDetailsLink" "showDetailsLink")
+          )}}
+        </a>
+      </p>
+      {{#if areServiceCaveatWarningDetailsVisible}}
+        <div class="service-caveat-warning-details">
+          <p>
+            {{tt this "serviceCaveatWarning.detailsIntro"}}
+            <ul>
+              {{#each
+                (array "Service" "Interface" "Readonly" "Path" "ObjectId")
+                as |tPart|
+              }}
+                <li>{{tt this (concat "serviceCaveatWarning.details" tPart "Item")}}</li>
+              {{/each}}
+            </ul>
+          </p>
+          <p>
+            {{tt this "serviceCaveatWarning.detailsNeverEnclose"}}
+            <a
+              href={{one-doc-url "using_onedata/tokens[security-and-privacy-considerations].html"}}
+              target="_blank"
+            >
+              {{tt this "serviceCaveatWarning.detailsLearnMore"}}
+            </a>
+          </p>
+        </div>
+      {{/if}}
+    </div>
+  {{/if}}
   <div class="btn-toolbar footer-buttons">
     {{#if (not-eq mode "view")}}
       {{#one-spin-button
