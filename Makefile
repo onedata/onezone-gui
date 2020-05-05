@@ -1,7 +1,8 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
+XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
-.PHONY: deps build_mock build_dev build_prod doc clean test tesxt_xunit_output pull_onedata_gui_common push_onedata_gui_common
+.PHONY: deps build_mock build_dev build_prod doc clean test test_xunit_output
 
 all: build_dev
 
@@ -26,17 +27,11 @@ doc:
 clean:
 	cd $(SRC_DIR) && rm -rf node_modules bower_components dist tmp ../$(REL_DIR)/*
 
-test: deps
-	cd $(SRC_DIR) && xvfb-run ember test
+test:
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
 
 test_xunit_output: deps
-	cd $(SRC_DIR) && xvfb-run ember test -r xunit
-
-pull_onedata_gui_common:
-	git subtree pull --prefix=src/lib/onedata-gui-common onedata-gui-common `git rev-parse --abbrev-ref HEAD`
-
-push_onedata_gui_common: pull_onedata_gui_common
-	git subtree push --prefix=src/lib/onedata-gui-common onedata-gui-common `git rev-parse --abbrev-ref HEAD`
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
 
 ##
 ## Submodules

@@ -13,23 +13,21 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { get, computed, set } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
-import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { next } from '@ember/runloop';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import { collect, promise } from 'ember-awesome-macros';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
-import chooseDefaultOneprovider from 'onezone-gui/utils/choose-default-oneprovider';
+import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 
 export default Component.extend(
   I18n,
-  UserProxyMixin,
   GlobalActions,
-  ProvidersColors, {
+  ProvidersColors,
+  ChooseDefaultOneprovider, {
     classNames: ['content-spaces-index'],
 
-    currentUser: service(),
     globalNotify: service(),
     spaceActions: service(),
     router: service(),
@@ -106,7 +104,7 @@ export default Component.extend(
         return this.get('space.providerList')
           .then(providerList => get(providerList, 'list'))
           .then(providers => {
-            return chooseDefaultOneprovider(providers);
+            return this.chooseDefaultOneprovider(providers);
           });
       }
     )),

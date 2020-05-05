@@ -2,14 +2,14 @@
   {{#if hasSupport}}
     <div class="row content-header-section">
       {{#promise-proxy-container proxy=isEmbeddableOneproviderProxy}}
-        {{#if isEmbeddableOneprovider}}
+        {{#if (or isEmbeddableOneprovider (not selectedProvider))}}
           {{yield (hash
             header=(component "oneprovider-view-container/container-header")
           )}}
         {{/if}}
       {{/promise-proxy-container}}
       <div class="row row-content-tab-bar">
-        {{#if (and (not media.isMobile) isTabBarCollapsed)}}
+        {{#if (and (not media.isMobile) isTabBarCollapsed (not showAllOfflineInfo))}}
           <div class={{concat-classes
             "current-oneprovider-bar"
             (if multiOneproviders "current-oneprovider-bar-multi")

@@ -10,10 +10,6 @@
     <p class="lead">
       <ul class="info">
         <li>
-          {{tt this "liMakeSure1"}}
-          <a href={{emergencyOnepanelUrl}}>{{tt this "liMakeSureLink"}}</a>.
-        </li>
-        <li>
           {{tt this "liTryAgain1"}}
           {{#link-to
             "onedata.sidebar.content.aspect"
@@ -24,6 +20,10 @@
             {{tt this "liTryAgainLink"}}
           {{/link-to}}
           {{tt this "liTryAgain2"}}.
+        </li>
+        <li>
+          {{tt this "liMakeSure1"}}
+          <a href={{emergencyOnepanelUrl}}>{{tt this "liMakeSureLink"}}</a>.
         </li>
         {{#if (eq cluster.type "oneprovider")}}
           <li>

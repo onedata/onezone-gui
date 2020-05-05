@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5980 Unified Oneprovider GUI Service Pack 2
 * VFS-6302 Added "token is powerful, may be dangerous" warning and token name autogenerating
 * VFS-6112 Added support for inviting harvester to space
 * VFS-5899 Added new tokens GUI
