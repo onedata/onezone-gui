@@ -5,7 +5,6 @@ import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
-import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
@@ -18,18 +17,6 @@ const TestCurrentUser = CurrentUser.extend({
   })),
 });
 
-const Store = Service.extend({
-  findRecord(modelName, id) {
-    throw new Error(`findRecord not stubbed: ${modelName}, ${id}`);
-  },
-});
-
-const Router = Service.extend({
-  urlFor() {
-    return '#/xd';
-  },
-});
-
 describe('Integration | Component | content spaces index', function () {
   setupComponentTest('content-spaces-index', {
     integration: true,
@@ -37,8 +24,10 @@ describe('Integration | Component | content spaces index', function () {
 
   beforeEach(function () {
     registerService(this, 'currentUser', TestCurrentUser);
-    registerService(this, 'store', Store);
-    registerService(this, 'router', Router);
+    sinon.stub(lookupService(this, 'router'), 'urlFor').returns('#/xd');
+    lookupService(this, 'store').findRecord = function findRecord(modelName, id) {
+      throw new Error(`findRecord not stubbed: ${modelName}, ${id}`);
+    };
   });
 
   it('renders a tile with resolved default Oneprovider', function () {
@@ -106,7 +95,6 @@ describe('Integration | Component | content spaces index', function () {
     }}`);
 
     return wait().then(() => {
-      console.log(this.$('.resource-browse-tile').html());
       expect(
         this.$('.resource-browse-tile .main-figure .one-label').text(),
         'browse files tile text'
