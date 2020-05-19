@@ -354,7 +354,7 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    reset(memberProxy) {
+    discardChanges(memberProxy) {
       get(memberProxy, 'privilegesProxy').resetModifications();
     },
     savePrivileges(memberProxy) {

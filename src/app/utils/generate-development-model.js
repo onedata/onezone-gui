@@ -152,19 +152,25 @@ export default function generateDevelopmentModel(store) {
                 entityId: generateShareEntityId(get(space, 'entityId')),
                 aspect: 'instance',
               };
-              const privateGri = gri(Object.assign({
-                scope: 'private',
-              }, generalGriData));
+              const privateGri = gri(Object.assign({ scope: 'private' }, generalGriData));
+              const publicGri = gri(Object.assign({ scope: 'public' }, generalGriData));
               const generalData = {
                 name: `Share for ${get(space, 'name')}`,
                 chosenProviderId: getProviderId(0),
                 chosenProviderVersion: '20.02.0-beta1',
                 fileType: 'dir',
               };
-              return store.createRecord('share', Object.assign({
-                  id: privateGri,
-                }, generalData))
-                .save()
+              return store.createRecord(
+                  'share',
+                  Object.assign({ id: publicGri }, generalData)
+                )
+                .save().then(() =>
+                  store.createRecord(
+                    'share',
+                    Object.assign({ id: privateGri }, generalData)
+                  )
+                  .save()
+                )
                 .then(share => {
                   get(shareLr, 'list').pushObject(share);
                   return shareLr.save();

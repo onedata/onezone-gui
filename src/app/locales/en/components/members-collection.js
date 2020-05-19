@@ -1,6 +1,6 @@
 export default {
   save: 'Save',
-  reset: 'Reset',
+  discard: 'Discard changes',
   you: 'you',
   direct: 'direct',
 };
