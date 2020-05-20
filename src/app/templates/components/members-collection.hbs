@@ -52,13 +52,18 @@
             <div class="btn-toolbar hidden-xs">
               {{#one-spin-button
                 action=(action "savePrivileges" memberProxy)
-                class="btn btn-sm btn-primary"}}
+                class="btn btn-sm btn-primary save-btn"
+              }}
                 {{tt this "save"}}
               {{/one-spin-button}}
-              {{#bs-button size="sm" type="danger"
+              {{#bs-button
+                size="sm"
+                type="warning"
+                class="discard-btn"
                 disabled=memberProxy.privilegesProxy.isSaving
-                onClick=(action "reset" memberProxy)}}
-                {{tt this "reset"}}
+                onClick=(action "discardChanges" memberProxy)
+              }}
+                {{tt this "discard"}}
               {{/bs-button}}
             </div>
           {{/if}}
@@ -81,10 +86,14 @@
                   onClick=(action "savePrivileges" memberProxy)}}
                   {{tt this "save"}}
                 {{/bs-button}}
-                {{#bs-button size="sm" type="danger"
+                {{#bs-button
+                  size="sm"
+                  type="warning"
+                  class="discard-btn"
                   disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
-                  onClick=(action "reset" memberProxy)}}
-                  {{tt this "reset"}}
+                  onClick=(action "discardChanges" memberProxy)}}
+                  {{tt this "discard"
+                }}
                 {{/bs-button}}
               </div>
             {{/if}}

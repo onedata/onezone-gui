@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6323 Unified Oneprovider GUI Service Pack 3
 * VFS-6324 Updated common libs
 * VFS-5980 Unified Oneprovider GUI Service Pack 2
 * VFS-6302 Added "token is powerful, may be dangerous" warning and token name autogenerating
