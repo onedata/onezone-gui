@@ -79,7 +79,6 @@ import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
 import tokenEditor from './components/token-editor';
-import ceaseOneproviderSupportModal from './components/cease-oneprovider-support-modal';
 import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
@@ -201,7 +200,6 @@ const translations = {
     removeTokenModal,
     contentTokensNew,
     tokenEditor,
-    ceaseOneproviderSupportModal,
     inviteTokenGenerator,
     tokenConsumer,
     contentTokensConsumer,
