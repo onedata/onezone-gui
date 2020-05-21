@@ -63,4 +63,12 @@ export default Service.extend({
     });
     return this.getRecord(recordGri);
   },
+
+  /**
+   * @param {Models.User} user 
+   * @returns {Promise}
+   */
+  remove(user) {
+    return user.destroyRecord();
+  },
 });

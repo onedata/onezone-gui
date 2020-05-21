@@ -1,4 +1,21 @@
 export default {
+  globalActionsGroupName: 'User',
+  deleteAccountAction: {
+    title: 'Delete account',
+  },
+  deleteAccountModal: {
+    header: 'Delete account',
+    remove: 'Delete account',
+    cancel: 'Cancel',
+    deletingAccount: 'deleting account',
+    textRemoveWarning: 'This operation will delete your user account and corresponding login information. All your memberships (in groups, spaces etc.) will be removed. Your spaces and the data you produced will remain in the system and your collaborators will still have access to them. ',
+    textRecreate: 'If at any later point you decide to recreate your account, it might be possible to regain access to some of your data by rejoining the groups and spaces that you had belonged to in the past.',
+    textUnderstand: 'I understand the consequences of deleting my user account.',
+    accountDetails: 'Account details',
+    fullName: 'Full name',
+    username: 'Username',
+    id: 'User ID',
+  },
   profile: 'Profile',
   fullName: 'Full name',
   username: 'Username',

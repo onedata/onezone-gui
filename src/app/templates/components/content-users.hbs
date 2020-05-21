@@ -1,6 +1,11 @@
 <div class="row content-row header-row hidden-xs">
-  <h1>
+  <h1 class="with-menu">
     <span class="one-label">{{tt this "profile"}}</span>
+    {{actions-toolbar
+      actionsArray=globalActions
+      isMinimized=true
+      renderImmediately=true
+    }}
   </h1>
 </div>
 <div class="content-row">
@@ -96,3 +101,57 @@
     {{/promise-proxy-container}}
   </ul>
 </div>
+
+{{#render-later triggerRender=deleteAccountOpened}}
+  {{#proceed-process-modal
+    opened=deleteAccountOpened
+    modalIcon="sign-warning-rounded"
+    modalClass="delete-account-modal"
+    headerText=(tt this "deleteAccountModal.header")
+    cancelButtonText=(tt this "deleteAccountModal.cancel")
+    proceedButtonText=(tt this "deleteAccountModal.remove")
+    proceedDisabled=(not deleteConfirmChecked)
+    close=(action (mut deleteAccountOpened) false)
+    proceed=(action "removeUser")
+    onHidden=(action "removeModalHidden")
+  }}
+    <p>{{tt this "deleteAccountModal.textRemoveWarning"}}</p>
+    <p>{{tt this "deleteAccountModal.textRecreate"}}</p>
+    <div class="row account-details">
+      <p class="account-details-header">
+        {{tt this "deleteAccountModal.accountDetails"}}:
+      </p>
+      <div class="row account-details-row">
+        <div class="col-key">{{tt this "deleteAccountModal.fullName"}}</div>
+        <div class="col-value col-value-full-name">
+          {{clipboard-line size="sm" value=user.fullName}}
+        </div>
+      </div>
+      <div class="row account-details-row">
+        <div class="col-key">{{tt this "deleteAccountModal.username"}}</div>
+        <div class="col-value col-value-username">
+          {{clipboard-line size="sm" value=user.username}}
+        </div>
+      </div>
+      <div class="row account-details-row">
+        <div class="col-key">{{tt this "deleteAccountModal.id"}}</div>
+        <div class="col-value col-value-user-id">
+          {{clipboard-line size="sm" value=user.entityId}}
+        </div>
+      </div>
+    </div>
+    <div class="row content-row no-border row-understand-notice">
+      {{one-checkbox
+        class="danger one-checkbox-danger one-checkbox-understand"
+        checked=deleteConfirmChecked
+        update=(action (mut deleteConfirmChecked))
+      }}
+      <div
+        class="text-understand"
+        {{action (mut deleteConfirmChecked) (not deleteConfirmChecked)}}
+      >
+        {{tt this "deleteAccountModal.textUnderstand"}}
+      </div>
+    </div>
+  {{/proceed-process-modal}}
+{{/render-later}}
