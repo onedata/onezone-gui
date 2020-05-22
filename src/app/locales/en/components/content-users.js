@@ -15,6 +15,7 @@ export default {
     fullName: 'Full name',
     username: 'Username',
     id: 'User ID',
+    createdAt: 'Created at',
   },
   profile: 'Profile',
   fullName: 'Full name',

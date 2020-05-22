@@ -21,6 +21,7 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import { collect } from '@ember/object/computed';
 import Action from 'onedata-gui-common/utils/action';
 import { tag } from 'ember-awesome-macros';
+import moment from 'moment';
 
 const animationTimeout = 333;
 
@@ -32,6 +33,7 @@ const mixins = [
 export default Component.extend(...mixins, {
   classNames: 'content-users',
 
+  i18n: service(),
   globalNotify: service(),
   linkedAccountManager: service(),
   authorizerManager: service(),
@@ -102,6 +104,17 @@ export default Component.extend(...mixins, {
    * @type {ComputedProperty<boolean>}
    */
   showPasswordSection: reads('user.basicAuthEnabled'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  createdAtString: computed('user.info.creationTime', function createdAtString() {
+    const creationTime = this.get('user.info.creationTime');
+    const creationMoment = moment.unix(creationTime);
+    const absolute = creationMoment.format('D MMM YYYY H:mm');
+    const relative = creationMoment.fromNow();
+    return `${absolute} (${relative})`;
+  }),
 
   /**
    * @type {ComputedProperty<Utils.Action>}

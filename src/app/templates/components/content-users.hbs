@@ -124,19 +124,25 @@
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.fullName"}}</div>
         <div class="col-value col-value-full-name">
-          {{clipboard-line size="sm" value=user.fullName}}
+          {{#truncated-string}}{{user.fullName}}{{/truncated-string}}
         </div>
       </div>
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.username"}}</div>
         <div class="col-value col-value-username">
-          {{clipboard-line size="sm" value=user.username}}
+          {{#truncated-string}}{{user.username}}{{/truncated-string}}
         </div>
       </div>
       <div class="row account-details-row">
         <div class="col-key">{{tt this "deleteAccountModal.id"}}</div>
         <div class="col-value col-value-user-id">
-          {{clipboard-line size="sm" value=user.entityId}}
+          {{#truncated-string}}{{user.entityId}}{{/truncated-string}}
+        </div>
+      </div>
+      <div class="row account-details-row">
+        <div class="col-key">{{tt this "deleteAccountModal.createdAt"}}</div>
+        <div class="col-value col-value-user-created-at">
+          {{#truncated-string}}{{createdAtString}}{{/truncated-string}}
         </div>
       </div>
     </div>

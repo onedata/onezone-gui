@@ -7,7 +7,7 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import { alias } from '@ember/object/computed';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
@@ -16,13 +16,19 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 export const entityType = 'user';
 
 export default Model.extend(GraphSingleModelMixin, {
-  onedataGraph: inject(),
-  onedataGraphUtils: inject(),
+  onedataGraph: service(),
+  onedataGraphUtils: service(),
 
   fullName: attr('string'),
   username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
+
+  /**
+   * Properties:
+   * - creationTime: Number, UNIX timestamp
+   */
+  info: attr('object'),
 
   spaceList: belongsTo('spaceList'),
   groupList: belongsTo('groupList'),
