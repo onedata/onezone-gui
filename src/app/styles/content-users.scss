@@ -102,3 +102,26 @@
     }
   }
 }
+
+.delete-account-modal {
+  .account-details {
+    margin-top: $padding-large-vertical;
+    margin-bottom: $padding-base-vertical;
+  }
+  .account-details-header {
+    @include font-semibold;
+  }
+  .account-details-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    .col-key {
+      flex: 0 0 86px;
+      @include font-semibold;
+    }
+    .col-value {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+  }
+}

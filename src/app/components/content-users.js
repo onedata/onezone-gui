@@ -2,31 +2,45 @@
  * A content page with user account details
  *
  * @module components/content-users
- * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Jakub Liput
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 import { computed, set, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { htmlSafe } from '@ember/template';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import computedT from 'onedata-gui-common/utils/computed-t';
+import { collect } from '@ember/object/computed';
+import Action from 'onedata-gui-common/utils/action';
+import { tag } from 'ember-awesome-macros';
+import moment from 'moment';
 
 const animationTimeout = 333;
 
-export default Component.extend(I18n, {
+const mixins = [
+  I18n,
+  GlobalActions,
+];
+
+export default Component.extend(...mixins, {
   classNames: 'content-users',
 
-  globalNotify: inject(),
-  linkedAccountManager: inject(),
-  authorizerManager: inject(),
-  onezoneServer: inject(),
-  userActions: inject(),
+  i18n: service(),
+  globalNotify: service(),
+  linkedAccountManager: service(),
+  authorizerManager: service(),
+  onezoneServer: service(),
+  userActions: service(),
+  userManager: service(),
+  guiUtils: service(),
 
   /**
    * @override
@@ -34,9 +48,29 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentUsers',
 
   /**
+   * @override
+   */
+  globalActionsTitle: computedT('globalActionsGroupName'),
+
+  /**
+   * @override
+   */
+  globalActions: collect('deleteAccountAction'),
+
+  /**
    * @type {models/user}
    */
   user: undefined,
+
+  /**
+   * @type {Boolean}
+   */
+  deleteAccountOpened: false,
+
+  /**
+   * @type {Boolean}
+   */
+  deleteConfirmChecked: false,
 
   /**
    * @type {undefined|AuthorizerInfo}
@@ -70,6 +104,36 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<boolean>}
    */
   showPasswordSection: reads('user.basicAuthEnabled'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  createdAtString: computed('user.info.creationTime', function createdAtString() {
+    const creationTime = this.get('user.info.creationTime');
+    const creationMoment = moment.unix(creationTime);
+    const absolute = creationMoment.format('D MMM YYYY H:mm');
+    const relative = creationMoment.fromNow();
+    return `${absolute} (${relative})`;
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  deleteAccountAction: computed(function deleteAccountAction() {
+    const component = this;
+    return Action.extend({
+      ownerSource: component,
+      component,
+      i18nPrefix: tag `${'component.i18nPrefix'}.deleteAccountAction`,
+      className: 'delete-account-action-btn',
+      icon: 'x',
+      title: computedT('title'),
+      disabled: false,
+      execute() {
+        set(component, 'deleteAccountOpened', true);
+      },
+    }).create();
+  }),
 
   /**
    * @type {ComputedProperty<string>}
@@ -276,6 +340,25 @@ export default Component.extend(I18n, {
           )
         ).catch(error => this._authEndpointError(error))
         .finally(() => safeExec(this, 'set', '_selectedAuthorizer', undefined));
+    },
+    removeModalHidden() {
+      this.set('deleteConfirmChecked', false);
+    },
+    removeUser() {
+      const {
+        userManager,
+        globalNotify,
+        guiUtils,
+        user,
+      } = this.getProperties('userManager', 'globalNotify', 'guiUtils', 'user');
+      return userManager.remove(user)
+        .catch(error => {
+          globalNotify.backendError(this.t('deleteAccountModal.deletingAccount'));
+          throw error;
+        })
+        .then(() => {
+          return guiUtils.logout();
+        });
     },
   },
 });
