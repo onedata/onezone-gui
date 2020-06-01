@@ -17,6 +17,7 @@
     "clean": "rm -rf tmp dist rel node_modules bower_components .sass-cache tests/test-results.xml"
   },
   "devDependencies": {
+    "babel-plugin-ember-modules-api-polyfill": "2.13.0",
     "basictable": "git+https://github.com/kliput/basictable.git#b00a7e52512e43a526e8f5b0ae8b3063efbe0bf5",
     "bootstrap-sass": "3.3.7",
     "broccoli-asset-rev": "2.6.0",

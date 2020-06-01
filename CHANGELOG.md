@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6381 Fixed build process
 * VFS-6343 Added delete account feature
 * VFS-6323 Unified Oneprovider GUI Service Pack 3
 * VFS-6324 Updated common libs
