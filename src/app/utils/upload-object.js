@@ -277,9 +277,11 @@ export default EmberObject.extend(I18n, {
         if (objectType === 'file') {
           return 'uploading';
         } else {
-          const everyChildrenIsOk = children.every(child => ['uploaded', 'uploading']
-            .includes(get(child, 'state'))
-          );
+          const childrenStates = new Set(children.mapBy('state'));
+          childrenStates.delete('uploaded');
+          childrenStates.delete('uploading');
+          const everyChildrenIsOk = childrenStates.size === 0;
+
           if (everyChildrenIsOk) {
             return 'uploading';
           } else {
@@ -361,6 +363,7 @@ export default EmberObject.extend(I18n, {
         });
       }
     } else {
+      this.set('isUploading', false);
       children.invoke('cancel');
     }
   },
