@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import EmberObject, { computed, get, set, getProperties, observer } from '@ember/object';
+import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce, next } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
@@ -223,11 +223,12 @@ export default Component.extend(I18n, {
   token: undefined,
 
   /**
-   * If true, then form will have expanded caveats at first render
+   * If true, then form will have expanded caveats at first render. When not specified,
+   * then caveats section will be expanded according to the initial form values.
    * @virtual optional
    * @type {boolean}
    */
-  expandCaveats: false,
+  expandCaveats: undefined,
 
   /**
    * @type {Function}
@@ -689,9 +690,7 @@ export default Component.extend(I18n, {
       consumerCaveatGroup,
       serviceCaveatGroup,
       interfaceCaveatGroup,
-      readonlyCaveatGroup,
-      pathCaveatGroup,
-      objectIdCaveatGroup,
+      dataAccessCaveatsGroup,
       expandCaveats,
     } = this.getProperties(
       'expireCaveatGroup',
@@ -702,9 +701,7 @@ export default Component.extend(I18n, {
       'consumerCaveatGroup',
       'serviceCaveatGroup',
       'interfaceCaveatGroup',
-      'readonlyCaveatGroup',
-      'pathCaveatGroup',
-      'objectIdCaveatGroup',
+      'dataAccessCaveatsGroup',
       'expandCaveats'
     );
 
@@ -720,16 +717,34 @@ export default Component.extend(I18n, {
         consumerCaveatGroup,
         serviceCaveatGroup,
         interfaceCaveatGroup,
-        FormFieldsGroup.extend({
-          isExpanded: equal('valuesSource.basic.type', raw('access')),
-        }).create({
-          name: 'dataAccessCaveats',
-          fields: [
-            readonlyCaveatGroup,
-            pathCaveatGroup,
-            objectIdCaveatGroup,
-          ],
-        }),
+        dataAccessCaveatsGroup,
+      ],
+    });
+  }),
+
+  /**
+   * Aggregates all "data access caveat"-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  dataAccessCaveatsGroup: computed(function dataAccessCaveatsGroup() {
+    const {
+      readonlyCaveatGroup,
+      pathCaveatGroup,
+      objectIdCaveatGroup,
+    } = this.getProperties(
+      'readonlyCaveatGroup',
+      'pathCaveatGroup',
+      'objectIdCaveatGroup',
+    );
+
+    return FormFieldsGroup.extend({
+      isExpanded: equal('valuesSource.basic.type', raw('access')),
+    }).create({
+      name: 'dataAccessCaveats',
+      fields: [
+        readonlyCaveatGroup,
+        pathCaveatGroup,
+        objectIdCaveatGroup,
       ],
     });
   }),
@@ -1354,6 +1369,20 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isAnyCaveatEnabled: or(
+    array.isAny(
+      array.filterBy('caveatsGroup.fields', raw('isExpanded')),
+      raw('isCaveatEnabled')
+    ),
+    and(
+      'dataAccessCaveatsGroup.isExpanded',
+      array.isAny('dataAccessCaveatsGroup.fields', raw('isCaveatEnabled'))
+    )
+  ),
+
+  /**
    * @type {ComputedProperty<String>}
    */
   submitBtnText: conditional(
@@ -1462,6 +1491,9 @@ export default Component.extend(I18n, {
     this.modeObserver();
     this.setPredefinedValues();
     this.autoNameGenerator();
+    if (this.get('expandCaveats') === undefined) {
+      this.expandCaveatsDependingOnCaveatsExistence();
+    }
   },
 
   willDestroyElement() {
@@ -1513,7 +1545,6 @@ export default Component.extend(I18n, {
         expireDate = null;
       }
       if (expireDate) {
-        set(caveatsGroup, 'isExpanded', true);
         caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
         caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
       }
@@ -1551,12 +1582,7 @@ export default Component.extend(I18n, {
   },
 
   expandCaveatsDependingOnCaveatsExistence() {
-    const {
-      caveatsGroup,
-      tokenDataSource,
-    } = this.getProperties('caveatsGroup', 'tokenDataSource');
-
-    set(caveatsGroup, 'isExpanded', get(tokenDataSource, 'hasCaveats'));
+    this.set('caveatsGroup.isExpanded', this.get('isAnyCaveatEnabled'));
   },
 
   notifyAboutChange() {
