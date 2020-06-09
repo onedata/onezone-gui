@@ -28,6 +28,7 @@ export default Component.extend({
   recordManager: service(),
   embeddedIframeManager: service(),
   alertService: service('alert'),
+  globalNotify: service(),
 
   /**
    * @virtual
@@ -71,6 +72,11 @@ export default Component.extend({
   iframeType: undefined,
 
   /**
+   * @type {Ember.ApplicationInstance}
+   */
+  applicationInstance: window.OnezoneGui,
+
+  /**
    * @type {Location}
    */
   _location: location,
@@ -97,6 +103,8 @@ export default Component.extend({
   commonCallParentActionNames: Object.freeze([
     'showOneproviderConnectionError',
     'getManageClusterUrl',
+    'callGlobalNotify',
+    'getApplicationInstance',
   ]),
 
   /**
@@ -322,6 +330,12 @@ export default Component.extend({
             return null;
           }
         });
+    },
+    callGlobalNotify(methodName, ...args) {
+      return this.get('globalNotify')[methodName](...args);
+    },
+    getApplicationInstance() {
+      return this.get('applicationInstance');
     },
   },
 });
