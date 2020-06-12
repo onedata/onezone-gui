@@ -1370,7 +1370,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isAnyCaveatEnabled: or(
+  isAnyVisibleCaveatEnabled: or(
     array.isAny(
       array.filterBy('caveatsGroup.fields', raw('isExpanded')),
       raw('isCaveatEnabled')
@@ -1581,7 +1581,7 @@ export default Component.extend(I18n, {
   },
 
   expandCaveatsDependingOnCaveatsExistence() {
-    this.set('caveatsGroup.isExpanded', this.get('isAnyCaveatEnabled'));
+    this.set('caveatsGroup.isExpanded', this.get('isAnyVisibleCaveatEnabled'));
   },
 
   notifyAboutChange() {
