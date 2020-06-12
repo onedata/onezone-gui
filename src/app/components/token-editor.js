@@ -270,7 +270,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<EmberObject>}
    */
   tokenDataSource: computed(
-    'token.{name,revoked,typeName,metadata,caveats}',
+    'token.{name,revoked}',
     function tokenDataSource() {
       return tokenToEditorDefaultData(this.get('token'), this.getRecord.bind(this));
     }
@@ -1222,20 +1222,19 @@ export default Component.extend(I18n, {
       pathEnabledObserver: observer(
         'isCaveatEnabled',
         'isInViewMode',
+        'viewTokenValue',
         function pathEnabledObserver() {
           const {
             isCaveatEnabled,
-            spacesProxy,
             isInViewMode,
             viewTokenValue,
           } = this.getProperties(
             'isCaveatEnabled',
-            'spacesProxy',
             'isInViewMode',
             'viewTokenValue'
           );
           const oneiconAlias = this.get('component.oneiconAlias');
-          if (isCaveatEnabled && !spacesProxy) {
+          if (isCaveatEnabled) {
             let newProxy;
             if (isInViewMode) {
               newProxy = PromiseArray.create({
