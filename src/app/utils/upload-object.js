@@ -219,6 +219,17 @@ export default EmberObject.extend(I18n, {
   ),
 
   /**
+   * Number of uploaded files (calculated recurrently). If this object represents
+   * a file, then numberOfFiles is 1 if it is uploaded, or 0 otherwise.
+   * @type {Ember.ComputedProperty<number>}
+   */
+  numberOfUploadedFiles: conditional(
+    equal('objectType', raw('file')),
+    conditional(equal('state', raw('uploaded')), raw(1), raw(0)),
+    sum(array.mapBy('children', raw('numberOfUploadedFiles')))
+  ),
+
+  /**
    * @type {Utils.UploadObject|null}
    */
   root: computed('objectType', 'parent.root', function root() {
