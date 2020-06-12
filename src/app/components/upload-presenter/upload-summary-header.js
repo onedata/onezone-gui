@@ -82,13 +82,12 @@ export default Component.extend(I18n, {
   headerText: computed('uploadObject.state', function () {
     const uploadObject = this.get('uploadObject');
 
-    const files = uploadObject.getAllNestedFiles();
-    const notCancelledFiles = files.rejectBy('isCancelled').length;
-    const uploadedFiles = files.filterBy('state', 'uploaded').length;
+    const notCancelledFiles = get(uploadObject, 'numberOfFiles');
+    const uploadedFiles = get(uploadObject, 'numberOfUploadedFiles');
     switch (get(uploadObject, 'state')) {
       case 'uploaded':
       case 'cancelled':
-      case 'failed':
+      case 'failed': {
         if (notCancelledFiles === 1 && uploadedFiles === 1) {
           return this.t('uploaded1File');
         } else {
@@ -100,13 +99,14 @@ export default Component.extend(I18n, {
             });
           }
         }
+      }
       case 'uploading':
       case 'partiallyUploading':
         if (notCancelledFiles === 1) {
           return this.t('uploading1File');
         } else {
           return this.t('uploadingNFiles', {
-            numberOfFiles: notCancelledFiles,
+            numberOfFiles: `${uploadedFiles}/${notCancelledFiles}`,
           });
         }
     }

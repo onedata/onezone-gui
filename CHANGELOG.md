@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-6344 Improved QoS text
+* VFS-6357 Added uploaded files counter to the uploader
 * VFS-6381 Fixed build process
 * VFS-6343 Added delete account feature
 * VFS-6323 Unified Oneprovider GUI Service Pack 3

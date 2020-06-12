@@ -33,6 +33,9 @@
         {{bytes-to-string uploadObject.bytesUploaded}}
         {{tt this "progressOf"}}
         {{bytes-to-string uploadObject.objectSize}}
+        {{#if (eq uploadObject.objectType "directory")}}
+          ({{uploadObject.numberOfUploadedFiles}}/{{uploadObject.numberOfFiles}})
+        {{/if}}
       </div>
     {{/unless}}
     {{upload-presenter/cancel-upload
