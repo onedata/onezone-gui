@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6344 Improved QoS text
 * VFS-6358 Uploader optimization
 * VFS-6357 Added uploaded files counter to the uploader
 * VFS-6381 Fixed build process
@@ -27,7 +28,7 @@ CHANGELOG
 * VFS-6056 Added resetting navigation state on logout
 * VFS-6027 Fixed random transition abort message when creating or joining space
 * VFS-6024 Removed default space and default Oneprovider features
-* VFS-6047 Added QOS-related privileges to space
+* VFS-6047 Added QoS-related privileges to space
 * VFS-5907 Added cease Oneprovider support action in supporting Oneproviders space view
 * VFS-5879 Changed provider permissions to support permissions in space
 * VFS-5782 Added simplified version of new tokens GUI
