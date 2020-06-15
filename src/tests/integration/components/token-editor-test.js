@@ -690,9 +690,18 @@ describe('Integration | Component | token editor', function () {
   );
 
   it(
-    'has collapsed caveats section on init by default',
+    'has expanded caveats section on init by default',
     function () {
       this.render(hbs `{{token-editor mode="create"}}`);
+
+      expect(this.$('.caveats-collapse')).to.have.class('in');
+    }
+  );
+
+  it(
+    'has collapsed caveats section on init when expandCaveats is false',
+    function () {
+      this.render(hbs `{{token-editor mode="create" expandCaveats=false}}`);
 
       expect(this.$('.caveats-collapse')).to.not.have.class('in');
     }
