@@ -17,6 +17,7 @@ export default {
     space: {
       group: createSuccessNotificationText('space', 'group'),
       user: createSuccessNotificationText('space'),
+      harvester: createSuccessNotificationText('space', 'harvester'),
     },
     cluster: {
       group: createSuccessNotificationText('cluster', 'group'),
