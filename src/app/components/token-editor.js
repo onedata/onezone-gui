@@ -1371,6 +1371,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<boolean>}
    */
   isAnyVisibleCaveatEnabled: or(
+    and(notEqual('mode', raw('create')), 'tokenDataSource.hasCaveats'),
     array.isAny(
       array.filterBy('caveatsGroup.fields', raw('isExpanded')),
       raw('isCaveatEnabled')

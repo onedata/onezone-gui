@@ -48,6 +48,9 @@ describe('Integration | Util | token actions/consume invite token action', funct
     }, {
       modelName: 'user',
       notifyText: 'You have joined to space "target" successfully.',
+    }, {
+      modelName: 'harvester',
+      notifyText: 'Harvester "abc" has joined to space "target" successfully.',
     }],
   }, {
     targetModelName: 'cluster',
