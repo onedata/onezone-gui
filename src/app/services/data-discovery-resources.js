@@ -14,12 +14,20 @@ import { inject as service } from '@ember/service';
 import { reject, resolve } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import cdmiObjectIdToGuid from 'onedata-gui-common/utils/cdmi-object-id-to-guid';
+import { getSpaceIdFromFileId } from 'onedata-gui-common/utils/file-id-parsers';
 
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
   currentUser: service(),
   router: service(),
+
+  /**
+   * @type {Location}
+   */
+  _location: window.location,
 
   /**
    * Actual harvester, that should be used as a context for all data discovery
@@ -77,6 +85,7 @@ export default Service.extend({
       viewModeRequest: () => this.viewModeRequest(),
       userRequest: () => this.getCurrentUser(),
       onezoneUrlRequest: () => this.getOnezoneUrl(),
+      fileBrowserUrlRequest: (...args) => this.getFileBrowserUrl(...args),
     };
   },
 
@@ -169,7 +178,7 @@ export default Service.extend({
 
   /**
    * Returns url to Onezone
-   * @returns {Promise<string>}
+   * @returns {Promise<String>}
    */
   getOnezoneUrl() {
     const _location = this.get('_location');
@@ -180,5 +189,35 @@ export default Service.extend({
 
     const url = origin + pathname;
     return resolve(url);
+  },
+
+  /**
+   * Returns url, which opens file browser at specified file
+   * @param {String} cdmiObjectId
+   * @returns {Promise<String>}
+   */
+  getFileBrowserUrl(cdmiObjectId) {
+    let fileId;
+    let spaceId;
+    try {
+      fileId = cdmiObjectIdToGuid(cdmiObjectId);
+      spaceId = getSpaceIdFromFileId(fileId);
+    } catch (error) {
+      console.error(error);
+      return resolve('');
+    }
+
+    return this.getOnezoneUrl().then(onezoneUrl => {
+      const onezoneRouteUrl = this.get('router').urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'data', {
+          queryParams: {
+            options: serializeAspectOptions({ dir: fileId, selected: fileId }),
+          },
+        });
+      return onezoneRouteUrl ? `${onezoneUrl}${onezoneRouteUrl}` : '';
+    });
   },
 });
