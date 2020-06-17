@@ -1,7 +1,7 @@
 /* eslint-env node */
 'use strict';
 
-var EmberApp = require('ember-cli/lib/broccoli/ember-app');
+const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const defineSassColors = require(
   './lib/onedata-gui-common/addon/utils/define-sass-colors'
 );
@@ -13,7 +13,7 @@ const breakpointValues =
   require('./lib/onedata-gui-common/addon/breakpoint-values').default;
 
 module.exports = function (defaults) {
-  var app = new EmberApp(defaults, {
+  const app = new EmberApp(defaults, {
     'fingerprint': {
       extensions: ['js', 'css', 'map'],
     },
@@ -79,14 +79,13 @@ module.exports = function (defaults) {
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
 
-  const BOWER_ASSETS = [
-    'webui-popover/dist/jquery.webui-popover.css',
-    'webui-popover/dist/jquery.webui-popover.js',
-  ];
+  const BOWER_ASSETS = [];
 
   const NODE_ASSETS = [
     'input-tokenizer/tokenizer.min.js',
     'perfect-scrollbar/css/perfect-scrollbar.css',
+    'webui-popover/dist/jquery.webui-popover.css',
+    'webui-popover/dist/jquery.webui-popover.js',
   ];
 
   const VENDOR_ASSETS = [
