@@ -1,6 +1,6 @@
 {{tt parentView "descriptionStart"}}
-{{tt parentView "descriptionSee"}}
-<a href={{one-doc-url "administering_onedata/onedatify_deploy.html"}}>
-  {{tt parentView "descriptionDocumentation"}}
-</a>
-{{tt parentView "descriptionForMore"}}
+{{one-doc-see-more
+  internal=true
+  docPath="administering_onedata/onedatify_deploy.html"
+  linkName=(tt parentView "onedatify")
+}}.

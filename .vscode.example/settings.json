@@ -14,7 +14,7 @@
   "editor.rulers": [
     90
   ],
-  "files.insertFinalNewline": true,
+  "files.insertFinalNewline": false,
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
