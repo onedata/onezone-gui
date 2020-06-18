@@ -117,10 +117,12 @@
     &.asnCaveat-field,
     &.consumerCaveat-field,
     &.readonlyCaveat-field {
-      padding-top: $form-component-view-margin;
+      &:not(:first-child) {
+        padding-top: $form-component-view-margin;
 
-      &::before {
-        top: 0px;
+        &::before {
+          top: 0px;
+        }
       }
     }
 
@@ -184,7 +186,7 @@
   .asnCaveat-field,
   .consumerCaveat-field,
   .readonlyCaveat-field {
-    &::before {
+    &:not(:first-child)::before {
       content: '';
       display: block;
       position: absolute;

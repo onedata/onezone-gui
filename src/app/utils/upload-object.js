@@ -219,6 +219,17 @@ export default EmberObject.extend(I18n, {
   ),
 
   /**
+   * Number of uploaded files (calculated recurrently). If this object represents
+   * a file, then numberOfFiles is 1 if it is uploaded, or 0 otherwise.
+   * @type {Ember.ComputedProperty<number>}
+   */
+  numberOfUploadedFiles: conditional(
+    equal('objectType', raw('file')),
+    conditional(equal('state', raw('uploaded')), raw(1), raw(0)),
+    sum(array.mapBy('children', raw('numberOfUploadedFiles')))
+  ),
+
+  /**
    * @type {Utils.UploadObject|null}
    */
   root: computed('objectType', 'parent.root', function root() {
@@ -266,9 +277,11 @@ export default EmberObject.extend(I18n, {
         if (objectType === 'file') {
           return 'uploading';
         } else {
-          const everyChildrenIsOk = children.every(child => ['uploaded', 'uploading']
-            .includes(get(child, 'state'))
-          );
+          const childrenStates = new Set(children.mapBy('state'));
+          childrenStates.delete('uploaded');
+          childrenStates.delete('uploading');
+          const everyChildrenIsOk = childrenStates.size === 0;
+
           if (everyChildrenIsOk) {
             return 'uploading';
           } else {
@@ -350,6 +363,7 @@ export default EmberObject.extend(I18n, {
         });
       }
     } else {
+      this.set('isUploading', false);
       children.invoke('cancel');
     }
   },
