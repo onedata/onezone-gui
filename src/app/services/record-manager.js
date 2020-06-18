@@ -24,7 +24,7 @@ export default Service.extend({
   getUserRecordList(modelNameInList) {
     const user = this.getCurrentUserRecord();
     const listRelationName = `${modelNameInList}List`;
-    return get(user, listRelationName)
+    return user.getRelation(listRelationName)
       .then(recordList => get(recordList, 'list').then(list =>
         allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
         .then(() => recordList)

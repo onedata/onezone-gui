@@ -229,11 +229,13 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   hasSupport: notEmpty('providers'),
 
+  // FIXME: problem with relation get - make something generic to handle errors here and in qos
   /**
    * @type {ComputedProperty<PromiseObject<Array<Model.Provider>>>}
    */
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
+      // const providerListGri = 
       return this.get('space.providerList')
         .then(providerList => get(providerList, 'list'))
         .then(list => sortedOneprovidersList(list.toArray()));
