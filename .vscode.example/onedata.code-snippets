@@ -1,5 +1,6 @@
 {
   "Onedata: license header": {
+		"scope": "javascript",
 		"prefix": "one-head",
 		"body": [
       "/**",
@@ -13,6 +14,7 @@
 		]
 	},
   "Ember: set multiple": {
+		"scope": "javascript",
 		"prefix": "ember-sm",
 		"body": [
 			"this.setPropeties({",
@@ -22,24 +24,28 @@
 		]
 	},
   "Ember: set": {
+		"scope": "javascript",
 		"prefix": "ember-set",
 		"body": [
 			"this.get('$1')"
 		]
 	},
   "Ember: get": {
+		"scope": "javascript",
 		"prefix": "ember-get",
 		"body": [
 			"this.get('$1')"
 		]
 	},
 	"Ember: get single property to variable": {
+		"scope": "javascript",
 		"prefix": "ember-lgs",
 		"body": [
 			"let $1 = this.get('$1');"
 		]
 	},
 	"Ember: get multiple properties to variables": {
+		"scope": "javascript",
 		"prefix": "ember-lgm",
 		"body": [
 			"let {",
@@ -47,14 +53,6 @@
 			"} = this.getProperties(",
 			"	 '$1'",
 			");"
-		]
-	},
-	"Ember: destructure Ember": {
-		"prefix": "ember-de",
-		"body": [
-			"const {",
-			"  $1",
-			"} = Ember;"
 		]
 	}
 }

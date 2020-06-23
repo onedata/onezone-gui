@@ -51,10 +51,11 @@ export default OneEmbeddedContainer.extend({
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
-      return this.set(
+      this.set(
         'navigationState.aspectOptions.selected',
         value && value.join(',') || null
       );
+      return value;
     },
   }),
 
@@ -102,6 +103,9 @@ export default OneEmbeddedContainer.extend({
   actions: {
     updateDirEntityId(dirEntityId) {
       this.get('navigationState').setAspectOptions({ dir: dirEntityId, selected: null });
+    },
+    updateSelected(selected) {
+      this.set('selected', selected);
     },
     getDataUrl({ fileId, selected }) {
       const {

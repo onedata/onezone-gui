@@ -14,11 +14,14 @@
   "editor.rulers": [
     90
   ],
-  "files.insertFinalNewline": false,
+  "files.insertFinalNewline": true,
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "editor.formatOnPaste": true
+  },
+  "[handlebars]": {
+    "files.insertFinalNewline": false
   },
   "seito-openfile.wordbound": "[\\s\\\"\\'\\>\\<#;?{}.(]",
   "seito-openfile.leadingPathMapping": {

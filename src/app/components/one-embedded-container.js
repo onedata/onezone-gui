@@ -72,11 +72,6 @@ export default Component.extend({
   iframeType: undefined,
 
   /**
-   * @type {Ember.ApplicationInstance}
-   */
-  applicationInstance: window.OnezoneGui,
-
-  /**
    * @type {Location}
    */
   _location: location,
@@ -104,7 +99,6 @@ export default Component.extend({
     'showOneproviderConnectionError',
     'getManageClusterUrl',
     'callGlobalNotify',
-    'getApplicationInstance',
   ]),
 
   /**
@@ -333,9 +327,6 @@ export default Component.extend({
     },
     callGlobalNotify(methodName, ...args) {
       return this.get('globalNotify')[methodName](...args);
-    },
-    getApplicationInstance() {
-      return this.get('applicationInstance');
     },
   },
 });
