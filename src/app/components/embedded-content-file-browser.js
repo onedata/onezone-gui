@@ -51,10 +51,9 @@ export default OneEmbeddedContainer.extend({
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
-      this.set(
-        'navigationState.aspectOptions.selected',
-        value && value.join(',') || null
-      );
+      this.get('navigationState').setAspectOptions({
+        selected: value && value.join(',') || null,
+      });
       return value;
     },
   }),
@@ -87,6 +86,7 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([
     'updateDirEntityId',
+    'updateSelected',
     'getDataUrl',
     'getTransfersUrl',
     'getShareUrl',
