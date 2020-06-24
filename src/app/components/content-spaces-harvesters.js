@@ -87,7 +87,7 @@ export default Component.extend(I18n, GlobalActions, {
   spaceHarvestersProxy: promise.array(computed('space', function spaceHarvestersProxy() {
     const space = this.get('space');
     if (space) {
-      return get(space, 'harvesterList')
+      return space.getRelation('harvesterList')
         .then(harvesterList => get(harvesterList, 'list'));
     } else {
       return resolve([]);

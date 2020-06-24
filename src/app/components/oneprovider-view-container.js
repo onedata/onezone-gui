@@ -234,7 +234,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    */
   initialProvidersListProxy: promise.object(
     computed('space.providerList', function initialProvidersListProxy() {
-      return this.get('space.providerList')
+      return this.get('space').getRelation('providerList')
         .then(providerList => get(providerList, 'list'))
         .then(list => sortedOneprovidersList(list.toArray()));
     })

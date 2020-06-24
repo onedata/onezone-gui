@@ -25,10 +25,16 @@ describe('Integration | Component | oneprovider view container', function () {
         versionProxy: promiseObject(resolve('20.02.1')),
         online: true,
       };
+      const providerListPromise = promiseObject(resolve({
+        list: promiseArray(resolve([provider])),
+      }));
       const space = {
-        providerList: promiseObject(resolve({
-          list: promiseArray(resolve([provider])),
-        })),
+        providerList: providerListPromise,
+        getRelation(name) {
+          if (name === 'providerList') {
+            return providerListPromise;
+          }
+        },
       };
       this.setProperties({
         provider,
@@ -155,11 +161,18 @@ describe('Integration | Component | oneprovider view container', function () {
         online: true,
         onezoneHostedBaseUrl: 'https://op2.onedata.org',
       };
+
+      const providerListPromise = promiseObject(resolve({
+        list: promiseArray(resolve([provider1, provider2])),
+      }));
       const space = {
         entityId: 's1',
-        providerList: promiseObject(resolve({
-          list: promiseArray(resolve([provider1, provider2])),
-        })),
+        providerList: providerListPromise,
+        getRelation(name) {
+          if (name === 'providerList') {
+            return providerListPromise;
+          }
+        },
       };
       const changeOneproviderId = sinon.stub().callsFake((id) => {
         return this.set('oneproviderId', id);

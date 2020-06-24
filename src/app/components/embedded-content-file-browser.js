@@ -13,7 +13,6 @@ import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
-import { string, raw, writable } from 'ember-awesome-macros';
 
 export default OneEmbeddedContainer.extend({
   layout,
@@ -46,7 +45,18 @@ export default OneEmbeddedContainer.extend({
    * List of file entity ids that are selected
    * @type {Array<String>}
    */
-  selected: writable(string.split('navigationState.aspectOptions.selected', raw(','))),
+  selected: computed('navigationState.aspectOptions.selected.[]', {
+    get() {
+      const rawSelected = this.get('navigationState.aspectOptions.selected');
+      return rawSelected && rawSelected.split(',') || [];
+    },
+    set(key, value) {
+      this.get('navigationState').setAspectOptions({
+        selected: value && value.join(',') || null,
+      });
+      return value;
+    },
+  }),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -76,6 +86,7 @@ export default OneEmbeddedContainer.extend({
    */
   callParentActionNames: Object.freeze([
     'updateDirEntityId',
+    'updateSelected',
     'getDataUrl',
     'getTransfersUrl',
     'getShareUrl',
@@ -91,9 +102,12 @@ export default OneEmbeddedContainer.extend({
 
   actions: {
     updateDirEntityId(dirEntityId) {
-      this.get('navigationState').setAspectOptions({ dir: dirEntityId });
+      this.get('navigationState').setAspectOptions({ dir: dirEntityId, selected: null });
     },
-    getDataUrl({ fileId }) {
+    updateSelected(selected) {
+      this.set('selected', selected);
+    },
+    getDataUrl({ fileId, selected }) {
       const {
         _location,
         router,
@@ -104,7 +118,11 @@ export default OneEmbeddedContainer.extend({
         'data', {
           queryParams: {
             options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({ dir: fileId })
+              navigationState.mergedAspectOptions({
+                dir: fileId,
+                selected: (selected instanceof Array) ?
+                  selected.join(',') : selected || '',
+              })
             ),
           },
         });

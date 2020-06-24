@@ -21,15 +21,21 @@ describe('Integration | Component | content spaces harvesters', function () {
   });
 
   beforeEach(function () {
+    const harvesterListPromise = promiseObject(resolve(EmberObject.create({
+      list: promiseArray(resolve([{
+        name: 'harvester1',
+      }, {
+        name: 'harvester2',
+      }])),
+    })));
     this.set('space', EmberObject.create({
       name: 'space1',
-      harvesterList: promiseObject(resolve(EmberObject.create({
-        list: promiseArray(resolve([{
-          name: 'harvester1',
-        }, {
-          name: 'harvester2',
-        }])),
-      }))),
+      harvesterList: harvesterListPromise,
+      getRelation(name) {
+        if (name === 'harvesterList') {
+          return harvesterListPromise;
+        }
+      },
     }));
   });
 
@@ -53,7 +59,9 @@ describe('Integration | Component | content spaces harvesters', function () {
   });
 
   it('shows spinner when harvesters are being loaded', function () {
-    this.set('space.harvesterList', promiseObject(new Promise(() => {})));
+    sinon.stub(this.get('space'), 'getRelation').withArgs('harvesterList').returns(
+      promiseObject(new Promise(() => {}))
+    );
 
     this.render(hbs `{{content-spaces-harvesters space=space}}`);
 
@@ -212,12 +220,12 @@ describe('Integration | Component | content spaces harvesters', function () {
 });
 
 function mockEmptyHarvestersList(testSuite) {
-  testSuite.set(
-    'space.harvesterList',
-    promiseObject(resolve(EmberObject.create({
-      list: promiseArray(resolve([])),
-    })))
-  );
+  const empty = promiseObject(resolve(EmberObject.create({
+    list: promiseArray(resolve([])),
+  })));
+  testSuite.set('space.harvesterList', empty);
+  sinon.stub(testSuite.get('space'), 'getRelation').withArgs('harvesterList')
+    .returns(empty);
 }
 
 function testAddingHarvester(testSuite, triggerActionCallback) {
