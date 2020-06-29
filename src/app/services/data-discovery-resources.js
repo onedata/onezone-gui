@@ -81,6 +81,7 @@ export default Service.extend({
   createAppProxyObject() {
     return {
       dataRequest: (...args) => this.dataRequest(...args),
+      dataCurlCommandRequest: (...args) => this.dataCurlCommandRequest(...args),
       configRequest: (...args) => this.configRequest(...args),
       viewModeRequest: () => this.viewModeRequest(),
       userRequest: () => this.getCurrentUser(),
@@ -89,19 +90,12 @@ export default Service.extend({
     };
   },
 
-  /**
-   * @param {Object} requestOptions
-   * @param {string} requestOptions.indexName
-   * @returns {Promise<any>} resolves to request result
-   */
-  dataRequest(requestOptions) {
+  getIndexRelatedRequestOptions(requestOptions) {
     const {
       harvesterId,
-      harvesterManager,
       harvesterIndices,
     } = this.getProperties(
       'harvesterId',
-      'harvesterManager',
       'harvesterIndices'
     );
 
@@ -115,11 +109,32 @@ export default Service.extend({
           throw new Error(`Cannot find index "${indexName}".`);
         } else {
           const indexId = get(index, 'aspectId');
-          requestOptions = _.assign({ harvesterId, indexId }, requestOptions);
-          return harvesterManager.dataRequest(requestOptions);
+          return resolve({ harvesterId, indexId });
         }
       });
     }
+  },
+
+  /**
+   * @param {Object} requestOptions
+   * @param {String} requestOptions.indexName
+   * @returns {Promise<any>} resolves to request result
+   */
+  dataRequest(requestOptions) {
+    return this.getIndexRelatedRequestOptions().then(baseOptions =>
+      this.get('harvesterManager').dataRequest(_.assign(baseOptions, requestOptions))
+    );
+  },
+
+  /**
+   * @param {Object} requestOptions
+   * @param {String} requestOptions.indexName
+   * @returns {Promise<any>} resolves to curl request command
+   */
+  dataCurlCommandRequest(requestOptions) {
+    return this.getIndexRelatedRequestOptions().then(baseOptions =>
+      this.get('harvesterManager').dataCurlRequest(_.assign(baseOptions, requestOptions))
+    );
   },
 
   /**

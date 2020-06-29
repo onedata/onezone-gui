@@ -37,6 +37,7 @@ describe('Unit | Service | data discovery resources', function () {
 
     [
       'dataRequest',
+      'dataCurlCommandRequest',
       'configRequest',
       'viewModeRequest',
       'userRequest',

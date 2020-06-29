@@ -401,6 +401,38 @@ export default Service.extend(
     },
 
     /**
+     * Prepares CURL request command equivalent to the dataRequest call with the
+     * same arguments.
+     * @param {String} harvesterId
+     * @param {String} indexId
+     * @param {String} method
+     * @param {String} path
+     * @param {any} body
+     * @returns {Promise<String>} curl command
+     */
+    dataCurlRequest({ harvesterId, indexId, method, path, body }) {
+      const onedataGraph = this.get('onedataGraph');
+
+      const requestData = {
+        method,
+        path,
+        body,
+      };
+      return onedataGraph.request({
+        gri: gri({
+          entityType: harvesterEntityType,
+          entityId: harvesterId,
+          aspect: 'query_curl_request',
+          aspectId: indexId,
+          scope: 'auto',
+        }),
+        operation: 'create',
+        data: requestData,
+        subscribe: false,
+      });
+    },
+
+    /**
      * Gets harvester GUI plugin configuration
      * @param {string} harvesterEntityId
      * @returns {Promise<HarvesterConfigurationGuiPLuginConfig>}
