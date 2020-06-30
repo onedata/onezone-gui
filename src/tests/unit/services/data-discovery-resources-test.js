@@ -1,11 +1,14 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, context, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
 import { set, setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 import sinon from 'sinon';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import suppressRejections from '../../helpers/suppress-rejections';
 
 const HarvesterManager = Service.extend({
   getGuiPluginConfig() {},
@@ -43,6 +46,7 @@ describe('Unit | Service | data discovery resources', function () {
       'userRequest',
       'onezoneUrlRequest',
       'fileBrowserUrlRequest',
+      'spacesRequest',
     ].forEach(fieldName => expect(appProxy[fieldName]).to.be.a('function'));
   });
 
@@ -199,4 +203,66 @@ describe('Unit | Service | data discovery resources', function () {
         .then(url => expect(url).to.equal(''));
     }
   );
+
+  it('injects info about harvester spaces', function () {
+    const service = this.subject();
+    const navigationState = lookupService(this, 'navigation-state');
+    setProperties(navigationState, {
+      activeResourceType: 'harvesters',
+      activeResource: {
+        entityId: 'someId',
+        hasViewPrivilege: true,
+        spaceList: promiseObject(resolve({
+          list: promiseArray(resolve([{
+            entityId: 'space1Id',
+            name: 'space1',
+          }, {
+            entityId: 'space2Id',
+            name: 'space2',
+          }])),
+        })),
+      },
+    });
+
+    const appProxy = service.createAppProxyObject();
+
+    return appProxy.spacesRequest().then(spaces =>
+      expect(spaces).to.deep.equal([{
+        id: 'space1Id',
+        name: 'space1',
+      }, {
+        id: 'space2Id',
+        name: 'space2',
+      }])
+    );
+  });
+
+  it('injects no info about harvester spaces (no harvester specified)', function () {
+    const service = this.subject();
+
+    const appProxy = service.createAppProxyObject();
+
+    return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+  });
+
+  context('handles errors', function () {
+    suppressRejections();
+
+    it('injects no info about harvester spaces (no view privilege)', function () {
+      const service = this.subject();
+      const navigationState = lookupService(this, 'navigation-state');
+      setProperties(navigationState, {
+        activeResourceType: 'harvesters',
+        activeResource: {
+          entityId: 'someId',
+          hasViewPrivilege: false,
+          spaceList: promiseObject(reject({ id: 'forbidden' })),
+        },
+      });
+
+      const appProxy = service.createAppProxyObject();
+
+      return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+    });
+  });
 });

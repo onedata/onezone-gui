@@ -87,6 +87,7 @@ export default Service.extend({
       userRequest: () => this.getCurrentUser(),
       onezoneUrlRequest: () => this.getOnezoneUrl(),
       fileBrowserUrlRequest: (...args) => this.getFileBrowserUrl(...args),
+      spacesRequest: () => this.getSpaces(),
     };
   },
 
@@ -121,7 +122,7 @@ export default Service.extend({
    * @returns {Promise<any>} resolves to request result
    */
   dataRequest(requestOptions) {
-    return this.getIndexRelatedRequestOptions().then(baseOptions =>
+    return this.getIndexRelatedRequestOptions(requestOptions).then(baseOptions =>
       this.get('harvesterManager').dataRequest(_.assign(baseOptions, requestOptions))
     );
   },
@@ -132,7 +133,7 @@ export default Service.extend({
    * @returns {Promise<any>} resolves to curl request command
    */
   dataCurlCommandRequest(requestOptions) {
-    return this.getIndexRelatedRequestOptions().then(baseOptions =>
+    return this.getIndexRelatedRequestOptions(requestOptions).then(baseOptions =>
       this.get('harvesterManager').dataCurlRequest(_.assign(baseOptions, requestOptions))
     );
   },
@@ -234,5 +235,25 @@ export default Service.extend({
         });
       return onezoneRouteUrl ? `${onezoneUrl}${onezoneRouteUrl}` : '';
     });
+  },
+
+  /**
+   * @returns {Promise<Array<{ id: String, name: String }>>}
+   */
+  getSpaces() {
+    const harvester = this.get('harvester');
+
+    if (!harvester || !get(harvester, 'hasViewPrivilege')) {
+      return resolve([]);
+    }
+
+    return get(harvester, 'spaceList')
+      .then(spaceList => get(spaceList, 'list'))
+      .then(list => list.map(space => ({
+        id: get(space, 'entityId'),
+        name: get(space, 'name'),
+      })))
+      // errors are a normal situation, espacially forbidden errors in public view
+      .catch(() => []);
   },
 });
