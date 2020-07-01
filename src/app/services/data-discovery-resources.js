@@ -110,7 +110,7 @@ export default Service.extend({
           throw new Error(`Cannot find index "${indexName}".`);
         } else {
           const indexId = get(index, 'aspectId');
-          return resolve(Object.assign({ harvesterId, indexId }, requestOptions));
+          return Object.assign({ harvesterId, indexId }, requestOptions);
         }
       });
     }

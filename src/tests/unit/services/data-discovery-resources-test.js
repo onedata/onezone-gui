@@ -50,7 +50,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it(
-    'injects rejected gui configuration response when haravester is not defined',
+    'injects rejected gui configuration response when harvester is not defined',
     function () {
       const service = this.subject();
 
@@ -63,7 +63,7 @@ describe('Unit | Service | data discovery resources', function () {
     }
   );
 
-  it('injects gui configuration when haravester is defined', function () {
+  it('injects gui configuration when harvester is defined', function () {
     const service = this.subject();
     const navigationState = lookupService(this, 'navigation-state');
     const harvesterManager = lookupService(this, 'harvester-manager');
@@ -191,7 +191,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it(
-    'injects info about how file browser url looks like for specific file (incorrect cdmiObjectId)',
+    'injects no info about how file browser url looks like for specific file when passed cdmiObjectId is incorrect',
     function () {
       const cdmiObjectId = null;
 
