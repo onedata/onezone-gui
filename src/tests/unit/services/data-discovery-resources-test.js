@@ -6,7 +6,6 @@ import Service from '@ember/service';
 import { set, setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 import sinon from 'sinon';
-import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import suppressRejections from '../../helpers/suppress-rejections';
 
@@ -212,15 +211,17 @@ describe('Unit | Service | data discovery resources', function () {
       activeResource: {
         entityId: 'someId',
         hasViewPrivilege: true,
-        spaceList: promiseObject(resolve({
-          list: promiseArray(resolve([{
-            entityId: 'space1Id',
-            name: 'space1',
-          }, {
-            entityId: 'space2Id',
-            name: 'space2',
-          }])),
-        })),
+        getRelation(name) {
+          return name === 'spaceList' ? resolve({
+            list: promiseArray(resolve([{
+              entityId: 'space1Id',
+              name: 'space1',
+            }, {
+              entityId: 'space2Id',
+              name: 'space2',
+            }])),
+          }) : reject();
+        },
       },
     });
 
@@ -256,7 +257,9 @@ describe('Unit | Service | data discovery resources', function () {
         activeResource: {
           entityId: 'someId',
           hasViewPrivilege: false,
-          spaceList: promiseObject(reject({ id: 'forbidden' })),
+          getRelation() {
+            return reject({ id: 'forbidden ' });
+          },
         },
       });
 

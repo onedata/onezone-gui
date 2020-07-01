@@ -91,7 +91,7 @@ export default Service.extend({
     };
   },
 
-  getIndexRelatedRequestOptions(requestOptions) {
+  getIndexRelatedRequestOptions(requestOptions = {}) {
     const {
       harvesterId,
       harvesterIndices,
@@ -110,7 +110,7 @@ export default Service.extend({
           throw new Error(`Cannot find index "${indexName}".`);
         } else {
           const indexId = get(index, 'aspectId');
-          return resolve({ harvesterId, indexId });
+          return resolve(Object.assign({ harvesterId, indexId }, requestOptions));
         }
       });
     }
@@ -122,8 +122,8 @@ export default Service.extend({
    * @returns {Promise<any>} resolves to request result
    */
   dataRequest(requestOptions) {
-    return this.getIndexRelatedRequestOptions(requestOptions).then(baseOptions =>
-      this.get('harvesterManager').dataRequest(_.assign(baseOptions, requestOptions))
+    return this.getIndexRelatedRequestOptions(requestOptions).then(options =>
+      this.get('harvesterManager').dataRequest(options)
     );
   },
 
@@ -133,8 +133,8 @@ export default Service.extend({
    * @returns {Promise<any>} resolves to curl request command
    */
   dataCurlCommandRequest(requestOptions) {
-    return this.getIndexRelatedRequestOptions(requestOptions).then(baseOptions =>
-      this.get('harvesterManager').dataCurlRequest(_.assign(baseOptions, requestOptions))
+    return this.getIndexRelatedRequestOptions(requestOptions).then(options =>
+      this.get('harvesterManager').dataCurlRequest(options)
     );
   },
 
@@ -224,7 +224,7 @@ export default Service.extend({
     }
 
     return this.getOnezoneUrl().then(onezoneUrl => {
-      const onezoneRouteUrl = this.get('router').urlFor(
+      const onezoneRoute = this.get('router').urlFor(
         'onedata.sidebar.content.aspect',
         'spaces',
         spaceId,
@@ -233,7 +233,7 @@ export default Service.extend({
             options: serializeAspectOptions({ dir: fileId, selected: fileId }),
           },
         });
-      return onezoneRouteUrl ? `${onezoneUrl}${onezoneRouteUrl}` : '';
+      return onezoneRoute ? `${onezoneUrl}${onezoneRoute}` : '';
     });
   },
 
@@ -247,7 +247,7 @@ export default Service.extend({
       return resolve([]);
     }
 
-    return get(harvester, 'spaceList')
+    return harvester.getRelation('spaceList')
       .then(spaceList => get(spaceList, 'list'))
       .then(list => list.map(space => ({
         id: get(space, 'entityId'),
