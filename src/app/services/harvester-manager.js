@@ -34,7 +34,7 @@ export default Service.extend(
     getHarvesters() {
       return this.get('currentUser')
         .getCurrentUserRecord()
-        .then(user => get(user, 'harvesterList'))
+        .then(user => user.getRelation('harvesterList'))
         .then(harvesterList =>
           get(harvesterList, 'list').then(() => harvesterList)
         );

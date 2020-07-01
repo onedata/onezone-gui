@@ -28,6 +28,7 @@ export default Component.extend({
   recordManager: service(),
   embeddedIframeManager: service(),
   alertService: service('alert'),
+  globalNotify: service(),
 
   /**
    * @virtual
@@ -97,6 +98,7 @@ export default Component.extend({
   commonCallParentActionNames: Object.freeze([
     'showOneproviderConnectionError',
     'getManageClusterUrl',
+    'callGlobalNotify',
   ]),
 
   /**
@@ -322,6 +324,9 @@ export default Component.extend({
             return null;
           }
         });
+    },
+    callGlobalNotify(methodName, ...args) {
+      return this.get('globalNotify')[methodName](...args);
     },
   },
 });

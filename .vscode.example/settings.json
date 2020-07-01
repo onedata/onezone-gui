@@ -20,6 +20,9 @@
     "editor.formatOnType": true,
     "editor.formatOnPaste": true
   },
+  "[handlebars]": {
+    "files.insertFinalNewline": false
+  },
   "seito-openfile.wordbound": "[\\s\\\"\\'\\>\\<#;?{}.(]",
   "seito-openfile.leadingPathMapping": {
     "oneprovider-gui": "",

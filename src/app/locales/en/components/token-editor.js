@@ -289,6 +289,7 @@ export default {
     detailsPathItem: 'Path',
     detailsObjectIdItem: 'Object ID',
     detailsNeverEnclose: 'Never enclose your tokens (even those secured with proper caveats) to services that are not trusted.',
+    documentationLink: 'tokens',
     detailsLearnMore: 'Learn more...',
   },
   createToken: 'Create token',

@@ -51,12 +51,12 @@
           </p>
           <p>
             {{tt this "serviceCaveatWarning.detailsNeverEnclose"}}
-            <a
-              href={{one-doc-url "using_onedata/tokens[security-and-privacy-considerations].html"}}
-              target="_blank"
-            >
-              {{tt this "serviceCaveatWarning.detailsLearnMore"}}
-            </a>
+          </p>
+          <p>
+            {{one-doc-see-more
+              linkName=(tt this "serviceCaveatWarning.documentationLink")
+              docPath="using_onedata/tokens[security-and-privacy-considerations].html"
+            }}
           </p>
         </div>
       {{/if}}
