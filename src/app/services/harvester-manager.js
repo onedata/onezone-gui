@@ -422,7 +422,7 @@ export default Service.extend(
         gri: gri({
           entityType: harvesterEntityType,
           entityId: harvesterId,
-          aspect: 'query_curl_request',
+          aspect: 'gen_curl_query',
           aspectId: indexId,
           scope: 'auto',
         }),
