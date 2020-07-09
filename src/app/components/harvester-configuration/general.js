@@ -38,13 +38,25 @@ const viewCreateFieldDefinitions = [{
   type: 'dropdown',
   options: [],
   tip: true,
-}, {
+}];
+
+const createOnlyFieldDefinitions = [{
   name: 'endpoint',
   type: 'text',
+  tip: true,
+  optional: true,
+}, {
+  name: 'preconfigureGui',
+  type: 'checkbox',
+  defaultValue: true,
   tip: true,
 }];
 
 const viewEditFieldDefinitions = [{
+  name: 'endpoint',
+  type: 'text',
+  tip: true,
+}, {
   name: 'public',
   type: 'checkbox',
   defaultValue: false,
@@ -132,22 +144,9 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Object>}
+   * @type {Object}
    */
-  formLayoutConfig: computed('mode', function formLayoutConfig() {
-    if (this.get('mode') === 'create') {
-      return {
-        formLabelColumns: 'col-xs-12 col-sm-3 col-md-2',
-        formInputColumns: 'col-xs-12 col-sm-9 col-md-10',
-        formSubmitColumns: 'col-xs-12 text-center',
-        formToggleLabelColumns: 'col-xs-6 col-sm-3 col-md-2',
-        formToggleInputColumns: 'col-xs-6 col-sm-9 col-md-10 text-xs-right',
-      };
-    } else {
-      return layoutConfig;
-    }
-  }),
-
+  formLayoutConfig: layoutConfig,
   /**
    * @type {Ember.ComputedProperty<Array<FieldType>>}
    */
@@ -160,7 +159,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
    * @type {Ember.ComputedProperty<Array<FieldType>>}
    */
   createFields: computed(function createFields() {
-    return viewCreateFieldDefinitions
+    return [...viewCreateFieldDefinitions, ...createOnlyFieldDefinitions]
       .map(field => this.preprocessField(field, 'create'));
   }),
 
@@ -388,6 +387,8 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
         valueNames.push('public');
       }
       const values = getProperties(get(formValues, mode), ...valueNames);
+      const preconfigureGui =
+        mode === 'create' && get(formValues, 'create.preconfigureGui');
 
       this.set('disabled', true);
       let promise;
@@ -403,7 +404,7 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
           break;
         }
         case 'create':
-          promise = harvesterActions.createHarvester(values);
+          promise = harvesterActions.createHarvester(values, preconfigureGui);
       }
       return promise.finally(() =>
         safeExec(this, () => this.set('disabled', false))
