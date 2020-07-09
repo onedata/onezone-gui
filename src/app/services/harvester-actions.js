@@ -50,10 +50,11 @@ export default Service.extend(I18n, {
   /**
    * Creates new harvester
    * @param {Object} harvester harvester base object
+   * @param {boolean} [preconfigureGui=false]
    * @returns {Promise} A promise, which resolves to new harvester if it has
    * been created successfully.
    */
-  createHarvester(harvester) {
+  createHarvester(harvester, preconfigureGui = false) {
     const {
       globalNotify,
       harvesterManager,
@@ -62,6 +63,11 @@ export default Service.extend(I18n, {
       'harvesterManager'
     );
     return harvesterManager.createRecord(harvester)
+      .then(harvester => {
+        return preconfigureGui ?
+          harvesterManager.preconfigureGui(get(harvester, 'id')).then(() => harvester) :
+          harvester;
+      })
       .then(harvester => {
         globalNotify.success(this.t('harvesterCreateSuccess'));
         next(() =>

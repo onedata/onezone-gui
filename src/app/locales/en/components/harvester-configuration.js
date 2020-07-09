@@ -12,7 +12,11 @@ export default {
       },
       endpoint: {
         label: 'Endpoint',
-        tip: 'Location of the harvesting service (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.',
+        tip: 'Location of the harvesting service (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries. If not provided while creation, the default value (taken from the Onezone configuration) will be used.',
+      },
+      preconfigureGui: {
+        label: 'Preconfigure GUI',
+        tip: 'If enabled, initial configuration will be applied to the default harvester GUI plugin to let it work out-of-the-box. <strong>Notice:</strong> it may create indices in an external harvesting service (e.g. Elasticsearch).',
       },
       public: {
         label: 'Public',
