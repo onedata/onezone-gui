@@ -31,6 +31,12 @@ export default [{
     displayName: 'your username & password',
   },
   {
+    iconPath: iconPrefix + 'keycloak.svg',
+    id: 'keycloak',
+    iconBackgroundColor: '#ffffff',
+    displayName: 'Keycloak',
+  },
+  {
     iconPath: iconPrefix + 'indigo.svg',
     id: 'indigo',
     iconBackgroundColor: '#341246',

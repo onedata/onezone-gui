@@ -1,6 +1,8 @@
-<div class="public-onedata-header"></div>
-{{embedded-content-public-share
-  shareId=share.entityId
-  oneprovider=oneprovider
-  baseUrl=oneprovider.onezoneHostedBaseUrl
-}}
+<div class="public-route light {{if pointerEvents.pointerNoneToMainContent "no-pointer-events"}}">
+  <div class="public-onedata-header"></div>
+  {{embedded-content-public-share
+    shareId=share.entityId
+    oneprovider=oneprovider
+    baseUrl=oneprovider.onezoneHostedBaseUrl
+  }}
+</div>
