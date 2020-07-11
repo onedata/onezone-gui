@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { get, getProperties, set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { resolve, reject, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
@@ -17,6 +17,7 @@ import GuiPluginManifest from 'onezone-gui/utils/harvester-configuration/gui-plu
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester';
 import { entityType as spaceEntityType } from 'onezone-gui/models/space';
+import backendifyName from 'onedata-gui-common/utils/backendify-name';
 
 export default Service.extend(
   createDataProxyMixin('pluginsList', { type: 'array' }), {
@@ -401,6 +402,38 @@ export default Service.extend(
     },
 
     /**
+     * Prepares CURL request command equivalent to the dataRequest call with the
+     * same arguments.
+     * @param {String} harvesterId
+     * @param {String} indexId
+     * @param {String} method
+     * @param {String} path
+     * @param {any} body
+     * @returns {Promise<String>} curl command
+     */
+    dataCurlRequest({ harvesterId, indexId, method, path, body }) {
+      const onedataGraph = this.get('onedataGraph');
+
+      const requestData = {
+        method,
+        path,
+        body,
+      };
+      return onedataGraph.request({
+        gri: gri({
+          entityType: harvesterEntityType,
+          entityId: harvesterId,
+          aspect: 'gen_curl_query',
+          aspectId: indexId,
+          scope: 'auto',
+        }),
+        operation: 'create',
+        data: requestData,
+        subscribe: false,
+      });
+    },
+
+    /**
      * Gets harvester GUI plugin configuration
      * @param {string} harvesterEntityId
      * @returns {Promise<HarvesterConfigurationGuiPLuginConfig>}
@@ -438,6 +471,42 @@ export default Service.extend(
     getGuiPluginManifest(harvesterId) {
       return GuiPluginManifest.create({
         harvesterProxy: this.getRecord(harvesterId, false),
+      });
+    },
+
+    /**
+     * Sets default GUI plugin configuration and creates indices needed by GUI plugin
+     * NOTICE: call only once after creating harvester
+     * @param {string} harvesterId
+     * @returns {Promise}
+     */
+    preconfigureGui(harvesterId) {
+      const guiPluginManifest = this.getGuiPluginManifest(harvesterId);
+      const harvesterEntityId = parseGri(harvesterId).entityId;
+
+      return allFulfilled([
+        guiPluginManifest,
+        this.getGuiPluginConfig(harvesterEntityId),
+      ]).then(([, guiPluginConfig]) => {
+        const {
+          defaultGuiConfiguration,
+          indices,
+        } = getProperties(guiPluginManifest, 'defaultGuiConfiguration', 'indices');
+
+        set(guiPluginConfig, 'guiPluginConfig', defaultGuiConfiguration || {});
+        const createIndicesPromises = indices.length ? indices.map(({ name, schema }) =>
+          this.createIndex(harvesterEntityId, {
+            name: backendifyName(name),
+            guiPluginName: name,
+            schema: JSON.stringify(schema || '', null, 2),
+          }, false)
+        ) : [resolve()];
+
+        return allFulfilled([
+          allFulfilled(createIndicesPromises)
+          .then(() => this.reloadIndexList(harvesterEntityId)),
+          guiPluginConfig.save(),
+        ]);
       });
     },
 

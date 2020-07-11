@@ -14,12 +14,20 @@ import { inject as service } from '@ember/service';
 import { reject, resolve } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import cdmiObjectIdToGuid from 'onedata-gui-common/utils/cdmi-object-id-to-guid';
+import { getSpaceIdFromFileId } from 'onedata-gui-common/utils/file-id-parsers';
 
 export default Service.extend({
   navigationState: service(),
   harvesterManager: service(),
   currentUser: service(),
   router: service(),
+
+  /**
+   * @type {Location}
+   */
+  _location: window.location,
 
   /**
    * Actual harvester, that should be used as a context for all data discovery
@@ -73,26 +81,22 @@ export default Service.extend({
   createAppProxyObject() {
     return {
       dataRequest: (...args) => this.dataRequest(...args),
+      dataCurlCommandRequest: (...args) => this.dataCurlCommandRequest(...args),
       configRequest: (...args) => this.configRequest(...args),
       viewModeRequest: () => this.viewModeRequest(),
       userRequest: () => this.getCurrentUser(),
       onezoneUrlRequest: () => this.getOnezoneUrl(),
+      fileBrowserUrlRequest: (...args) => this.getFileBrowserUrl(...args),
+      spacesRequest: () => this.getSpaces(),
     };
   },
 
-  /**
-   * @param {Object} requestOptions
-   * @param {string} requestOptions.indexName
-   * @returns {Promise<any>} resolves to request result
-   */
-  dataRequest(requestOptions) {
+  getIndexRelatedRequestOptions(requestOptions = {}) {
     const {
       harvesterId,
-      harvesterManager,
       harvesterIndices,
     } = this.getProperties(
       'harvesterId',
-      'harvesterManager',
       'harvesterIndices'
     );
 
@@ -106,11 +110,32 @@ export default Service.extend({
           throw new Error(`Cannot find index "${indexName}".`);
         } else {
           const indexId = get(index, 'aspectId');
-          requestOptions = _.assign({ harvesterId, indexId }, requestOptions);
-          return harvesterManager.dataRequest(requestOptions);
+          return Object.assign({ harvesterId, indexId }, requestOptions);
         }
       });
     }
+  },
+
+  /**
+   * @param {Object} requestOptions
+   * @param {String} requestOptions.indexName
+   * @returns {Promise<any>} resolves to request result
+   */
+  dataRequest(requestOptions) {
+    return this.getIndexRelatedRequestOptions(requestOptions).then(options =>
+      this.get('harvesterManager').dataRequest(options)
+    );
+  },
+
+  /**
+   * @param {Object} requestOptions
+   * @param {String} requestOptions.indexName
+   * @returns {Promise<any>} resolves to curl request command
+   */
+  dataCurlCommandRequest(requestOptions) {
+    return this.getIndexRelatedRequestOptions(requestOptions).then(options =>
+      this.get('harvesterManager').dataCurlRequest(options)
+    );
   },
 
   /**
@@ -169,7 +194,7 @@ export default Service.extend({
 
   /**
    * Returns url to Onezone
-   * @returns {Promise<string>}
+   * @returns {Promise<String>}
    */
   getOnezoneUrl() {
     const _location = this.get('_location');
@@ -180,5 +205,55 @@ export default Service.extend({
 
     const url = origin + pathname;
     return resolve(url);
+  },
+
+  /**
+   * Returns url, which opens file browser at specified file
+   * @param {String} cdmiObjectId
+   * @returns {Promise<String>}
+   */
+  getFileBrowserUrl(cdmiObjectId) {
+    let fileId;
+    let spaceId;
+    try {
+      fileId = cdmiObjectIdToGuid(cdmiObjectId);
+      spaceId = getSpaceIdFromFileId(fileId);
+    } catch (error) {
+      console.error(error);
+      return resolve('');
+    }
+
+    return this.getOnezoneUrl().then(onezoneUrl => {
+      const onezoneRoute = this.get('router').urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'data', {
+          queryParams: {
+            options: serializeAspectOptions({ dir: fileId, selected: fileId }),
+          },
+        });
+      return onezoneRoute ? `${onezoneUrl}${onezoneRoute}` : '';
+    });
+  },
+
+  /**
+   * @returns {Promise<Array<{ id: String, name: String }>>}
+   */
+  getSpaces() {
+    const harvester = this.get('harvester');
+
+    if (!harvester || !get(harvester, 'hasViewPrivilege')) {
+      return resolve([]);
+    }
+
+    return harvester.getRelation('spaceList')
+      .then(spaceList => get(spaceList, 'list'))
+      .then(list => list.map(space => ({
+        id: get(space, 'entityId'),
+        name: get(space, 'name'),
+      })))
+      // errors are a normal situation, espacially forbidden errors in public view
+      .catch(() => []);
   },
 });
