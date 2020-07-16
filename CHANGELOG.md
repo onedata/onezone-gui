@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6541 Improvements in showing harvester-space relation
 * VFS-6430 Fixed hidden service and consumer caveats in token view
 * VFS-6344 Improved QoS text
 * VFS-6358 Uploader optimization
