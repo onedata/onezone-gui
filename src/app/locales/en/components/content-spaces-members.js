@@ -21,6 +21,7 @@ export default _.merge({}, privilegesAspectBase, {
 
     space_read_data: 'Read files',
     space_write_data: 'Write files',
+    space_register_files: 'Register files',
     space_manage_shares: 'Manage shares',
     space_view_views: 'View database views',
     space_manage_views: 'Manage database views',
