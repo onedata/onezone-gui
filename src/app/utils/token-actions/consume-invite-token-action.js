@@ -56,18 +56,12 @@ export default Action.extend({
         joiningRecord,
         targetModelName,
         token,
-        dontRedirect,
         tokenManager,
-        router,
-        guiUtils,
       } = this.getProperties(
         'joiningRecord',
         'targetModelName',
         'token',
-        'dontRedirect',
         'tokenManager',
-        'router',
-        'guiUtils'
       );
 
       const consumePromise = tokenManager.consumeInviteToken(
@@ -82,15 +76,7 @@ export default Action.extend({
         .catch(() => {})
         .then(() => {
           this.notifyResult(result);
-          if (get(result, 'status') === 'done' && !dontRedirect) {
-            next(() => {
-              router.transitionTo(
-                'onedata.sidebar.content',
-                targetModelName + 's',
-                guiUtils.getRoutableIdFor(get(result, 'result'))
-              );
-            });
-          }
+          this.transitionIfSuccess(result);
           return result;
         });
     }
@@ -115,5 +101,50 @@ export default Action.extend({
       joiningRecordName,
       targetRecordName,
     });
+  },
+
+  transitionIfSuccess(result) {
+    const {
+      joiningRecord,
+      targetModelName,
+      dontRedirect,
+      router,
+      guiUtils,
+    } = this.getProperties(
+      'joiningRecord',
+      'targetModelName',
+      'dontRedirect',
+      'router',
+      'guiUtils'
+    );
+    const joiningModelName = get(joiningRecord, 'constructor.modelName');
+
+    if (get(result, 'status') !== 'done' || dontRedirect) {
+      return;
+    }
+    const promiseResult = get(result, 'result');
+
+    let transitionModelName = targetModelName + 's';
+    let transitionRecordId = promiseResult && guiUtils.getRoutableIdFor(promiseResult);
+    let transitionAspect = 'index';
+    if (
+      (targetModelName === 'harvester' && joiningModelName === 'space') ||
+      (targetModelName === 'space' && joiningModelName === 'harvester')
+    ) {
+      transitionAspect = transitionModelName;
+      transitionModelName = joiningModelName + 's';
+      transitionRecordId = guiUtils.getRoutableIdFor(joiningRecord);
+    }
+
+    if (transitionRecordId) {
+      next(() => {
+        router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          transitionModelName,
+          transitionRecordId,
+          transitionAspect
+        );
+      });
+    }
   },
 });

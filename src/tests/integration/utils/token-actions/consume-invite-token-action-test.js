@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
 import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Util | token actions/consume invite token action', function () {
   setupComponentTest('global-modal-mounter', {
@@ -51,6 +52,7 @@ describe('Integration | Util | token actions/consume invite token action', funct
     }, {
       modelName: 'harvester',
       notifyText: 'Harvester "abc" has joined to space "target" successfully.',
+      transitionToAspect: true,
     }],
   }, {
     targetModelName: 'cluster',
@@ -72,12 +74,17 @@ describe('Integration | Util | token actions/consume invite token action', funct
     }, {
       modelName: 'space',
       notifyText: 'Space "abc" has joined to harvester "target" successfully.',
+      transitionToAspect: true,
     }],
   }].forEach(({
     targetModelName,
     joiningModels,
   }) => {
-    joiningModels.forEach(({ modelName: joiningModelName, notifyText }) => {
+    joiningModels.forEach(({
+      modelName: joiningModelName,
+      notifyText,
+      transitionToAspect,
+    }) => {
       it(
         `executes consuming invite token ${joiningModelName} -> ${targetModelName} (success scenario)`,
         function () {
@@ -96,6 +103,12 @@ describe('Integration | Util | token actions/consume invite token action', funct
           };
           this.set('context.targetModelName', targetModelName);
           this.set('context.joiningRecord.constructor.modelName', joiningModelName);
+          this.set('context.joiningRecord.id', gri({
+            entityType: joiningModelName,
+            entityId: joiningRecordId,
+            aspect: 'instance',
+            scope: 'auto',
+          }));
           const action = ConsumeInviteTokenAction.create({
             ownerSource: this,
             context,
@@ -127,9 +140,10 @@ describe('Integration | Util | token actions/consume invite token action', funct
             })
             .then(() => {
               expect(transitionToStub).to.be.calledWith(
-                'onedata.sidebar.content',
-                `${targetModelName}s`,
-                'recordid'
+                'onedata.sidebar.content.aspect',
+                (transitionToAspect ? `${joiningModelName}s` : `${targetModelName}s`),
+                (transitionToAspect ? joiningRecordId : 'recordid'),
+                (transitionToAspect ? `${targetModelName}s` : 'index'),
               );
             });
         });

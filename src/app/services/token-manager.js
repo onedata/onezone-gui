@@ -25,6 +25,7 @@ const TokenManager = Service.extend({
   onedataConnection: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
+  onedataGraphContext: service(),
   onezoneServer: service(),
 
   /**
@@ -170,16 +171,34 @@ const TokenManager = Service.extend({
     const {
       store,
       onedataGraphUtils,
+      onedataGraphContext,
       recordManager,
-    } = this.getProperties('store', 'onedataGraphUtils', 'recordManager');
+    } = this.getProperties(
+      'store',
+      'onedataGraphUtils',
+      'onedataGraphContext',
+      'recordManager'
+    );
     const adapter = store.adapterFor('user');
     const targetEntityType = adapter.getEntityTypeForModelName(targetModelName);
     const joiningEntityType = adapter.getEntityTypeForModelName(joiningModelName);
     return onedataGraphUtils.joinRelation(
       targetEntityType,
       token, [`as${_.upperFirst(joiningEntityType)}`, joiningRecordId]
-    ).then(({ gri }) => {
-      const targetId = parseGri(gri).entityId;
+    ).then(({ gri: targetGri }) => {
+      const targetId = parseGri(targetGri).entityId;
+      const targetGriWithAutoScope = gri({
+        entityType: targetEntityType,
+        entityId: targetId,
+        aspect: 'instance',
+        scope: 'auto',
+      });
+      onedataGraphContext.register(targetGriWithAutoScope, gri({
+        entityType: joiningEntityType,
+        entityId: joiningRecordId,
+        aspect: 'instance',
+        scope: 'auto',
+      }));
       return allFulfilled([
         recordManager.reloadRecordListById(
           joiningModelName,
@@ -191,7 +210,18 @@ const TokenManager = Service.extend({
           targetId,
           joiningModelName
         ).catch(ignoreForbiddenError),
-      ]).then(() => recordManager.getRecord(targetModelName, gri));
+      ]).then(() =>
+        recordManager.getRecord(targetModelName, targetGriWithAutoScope)
+        .catch(error => {
+          // It is possible in some invite scenarios (like space -> harvester), that
+          // user cannot fetch target record after joining, because he did not become
+          // a member of a target record. In such situations "forbidden" errors are normal.
+          if (error && error.id === 'forbidden') {
+            return null;
+          }
+          throw error;
+        })
+      );
     });
   },
 
