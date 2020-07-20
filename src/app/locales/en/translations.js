@@ -107,6 +107,7 @@ import modifyTokenAction from './utils/token-actions/modify-token-action';
 import generateInviteTokenAction from './utils/token-actions/generate-invite-token-action';
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
+import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
 
 const translations = {
   tabs: {
@@ -229,6 +230,9 @@ const translations = {
       generateInviteTokenAction,
       openConsumeTokenViewAction,
       consumeInviteTokenAction,
+    },
+    userActions: {
+      toggleBeingOwnerAction,
     },
   },
 };

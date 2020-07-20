@@ -145,63 +145,63 @@ export default Service.extend({
 
   /**
    * Adds new owner the the record
-   * @param {GraphSingleModel} ownershipRecord 
+   * @param {GraphSingleModel} ownedRecord 
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
-  addOwnerToRecord(ownershipRecord, ownerRecord) {
+  addOwnerToRecord(ownedRecord, ownerRecord) {
     return this.addOwnerToRecordById(
-      get(ownershipRecord, 'entityId'),
+      get(ownedRecord, 'entityId'),
       get(ownerRecord, 'entityId')
     );
   },
 
   /**
    * Adds new owner the the record
-   * @param {String} ownershipModelName
-   * @param {String} ownershipRecordId 
+   * @param {String} ownedModelName
+   * @param {String} ownedRecordId 
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
-  addOwnerToRecordById(ownershipModelName, ownershipRecordId, ownerRecordId) {
+  addOwnerToRecordById(ownedModelName, ownedRecordId, ownerRecordId) {
     return this.get('onedataGraphUtils').addOwner(
-      this.getEntityTypeForModelName(ownershipModelName),
-      ownershipRecordId,
+      this.getEntityTypeForModelName(ownedModelName),
+      ownedRecordId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'user'),
-      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'sharedUser'),
+      this.reloadRecordListById(ownedModelName, ownerRecordId, 'user'),
+      this.reloadRecordListById(ownedModelName, ownerRecordId, 'sharedUser'),
     ]).catch(ignoreForbiddenError));
   },
 
   /**
    * Removes an owner from the the record
-   * @param {GraphSingleModel} ownershipRecord 
+   * @param {GraphSingleModel} ownedRecord 
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
-  removeOwnerFromRecord(ownershipRecord, ownerRecord) {
+  removeOwnerFromRecord(ownedRecord, ownerRecord) {
     return this.removeOwnerFromRecordById(
-      get(ownershipRecord, 'entityId'),
+      get(ownedRecord, 'entityId'),
       get(ownerRecord, 'entityId')
     );
   },
 
   /**
    * Removes an owner from the the record
-   * @param {String} ownershipModelName
-   * @param {String} ownershipRecordId 
+   * @param {String} ownedModelName
+   * @param {String} ownedRecordId 
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
-  removeOwnerFromRecordById(ownershipModelName, ownershipRecordId, ownerRecordId) {
+  removeOwnerFromRecordById(ownedModelName, ownedRecordId, ownerRecordId) {
     return this.get('onedataGraphUtils').removeOwner(
-      this.getEntityTypeForModelName(ownershipModelName),
-      ownershipRecordId,
+      this.getEntityTypeForModelName(ownedModelName),
+      ownedRecordId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'user'),
-      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'sharedUser'),
+      this.reloadRecordListById(ownedModelName, ownerRecordId, 'user'),
+      this.reloadRecordListById(ownedModelName, ownerRecordId, 'sharedUser'),
     ]).catch(ignoreForbiddenError));
   },
 

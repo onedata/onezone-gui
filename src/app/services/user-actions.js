@@ -10,6 +10,7 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import ToggleBeingOwnerAction from 'onezone-gui/utils/user-actions/toggle-being-owner-action';
 
 export default Service.extend(I18n, {
   i18n: service(),
@@ -20,6 +21,10 @@ export default Service.extend(I18n, {
    * @override
    */
   i18nPrefix: 'services.userActions',
+
+  createToggleBeingOwnerAction(context) {
+    return ToggleBeingOwnerAction.create({ ownerSource: this, context });
+  },
 
   /**
    * Changes user password
