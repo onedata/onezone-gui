@@ -11,10 +11,12 @@ import Service, { inject as service } from '@ember/service';
 import { resolve, all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
+import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
   currentUser: service(),
   store: service(),
+  onedataGraphUtils: service(),
 
   /**
    * Returns loaded *List relation of current user
@@ -110,12 +112,8 @@ export default Service.extend({
    * @returns {Promise<GraphModel>}
    */
   getRecordById(modelName, id, backgroundReload = true) {
-    const store = this.get('store');
-    // Get application adapter. It's not important for which model it is
-    const entityType = store.adapterFor('user').getEntityTypeForModelName(modelName);
-
     const recordGri = gri({
-      entityType,
+      entityType: this.getEntityTypeForModelName(modelName),
       entityId: id,
       aspect: 'instance',
       scope: 'auto',
@@ -143,5 +141,77 @@ export default Service.extend({
    */
   loadRequiredRelationsOfRecord(record) {
     return record.loadRequiredRelations ? record.loadRequiredRelations() : resolve();
+  },
+
+  /**
+   * Adds new owner the the record
+   * @param {GraphSingleModel} ownershipRecord 
+   * @param {Models.User} ownerRecord
+   * @returns {Promise}
+   */
+  addOwnerToRecord(ownershipRecord, ownerRecord) {
+    return this.addOwnerToRecordById(
+      get(ownershipRecord, 'entityId'),
+      get(ownerRecord, 'entityId')
+    );
+  },
+
+  /**
+   * Adds new owner the the record
+   * @param {String} ownershipModelName
+   * @param {String} ownershipRecordId 
+   * @param {String} ownerRecordId
+   * @returns {Promise}
+   */
+  addOwnerToRecordById(ownershipModelName, ownershipRecordId, ownerRecordId) {
+    return this.get('onedataGraphUtils').addOwner(
+      this.getEntityTypeForModelName(ownershipModelName),
+      ownershipRecordId,
+      ownerRecordId
+    ).then(() => allFulfilled([
+      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'user'),
+      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'sharedUser'),
+    ]).catch(ignoreForbiddenError));
+  },
+
+  /**
+   * Removes an owner from the the record
+   * @param {GraphSingleModel} ownershipRecord 
+   * @param {Models.User} ownerRecord
+   * @returns {Promise}
+   */
+  removeOwnerFromRecord(ownershipRecord, ownerRecord) {
+    return this.removeOwnerFromRecordById(
+      get(ownershipRecord, 'entityId'),
+      get(ownerRecord, 'entityId')
+    );
+  },
+
+  /**
+   * Removes an owner from the the record
+   * @param {String} ownershipModelName
+   * @param {String} ownershipRecordId 
+   * @param {String} ownerRecordId
+   * @returns {Promise}
+   */
+  removeOwnerFromRecordById(ownershipModelName, ownershipRecordId, ownerRecordId) {
+    return this.get('onedataGraphUtils').removeOwner(
+      this.getEntityTypeForModelName(ownershipModelName),
+      ownershipRecordId,
+      ownerRecordId
+    ).then(() => allFulfilled([
+      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'user'),
+      this.reloadRecordListById(ownershipModelName, ownerRecordId, 'sharedUser'),
+    ]).catch(ignoreForbiddenError));
+  },
+
+  /**
+   * Returns entity type for given model name
+   * @param {String} modelName
+   * @returns {String}
+   */
+  getEntityTypeForModelName(modelName) {
+    // Get application adapter. It's not important for which model it is
+    return this.get('store').adapterFor('user').getEntityTypeForModelName(modelName);
   },
 });
