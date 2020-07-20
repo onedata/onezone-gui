@@ -142,12 +142,12 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<Action>}
    */
-  itemActions: Object.freeze([]),
+  itemActionsGenerator: Object.freeze([]),
 
   /**
    * @type {Array<Action>}
    */
-  effectiveItemActions: Object.freeze([]),
+  effectiveItemActionsGenerator: Object.freeze([]),
 
   /**
    * @type {boolean}
@@ -217,6 +217,7 @@ export default Component.extend(I18n, {
     'onlyDirect',
     function membersListObserver() {
       const {
+        directMembersList,
         membersList,
         membersProxyList,
         groupedPrivilegesFlags,
@@ -225,7 +226,10 @@ export default Component.extend(I18n, {
         currentUser,
         isListCollapsed,
         collapseForNumber,
+        itemActionsGenerator,
+        effectiveItemActionsGenerator,
       } = this.getProperties(
+        'directMembersList',
         'membersList',
         'membersProxyList',
         'groupedPrivilegesFlags',
@@ -233,7 +237,9 @@ export default Component.extend(I18n, {
         'subjectType',
         'currentUser',
         'isListCollapsed',
-        'collapseForNumber'
+        'collapseForNumber',
+        'itemActionsGenerator',
+        'effectiveItemActionsGenerator'
       );
 
       if (isListCollapsed === undefined && collapseForNumber &&
@@ -263,8 +269,11 @@ export default Component.extend(I18n, {
           proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
+            directMembersList,
             privilegesProxy: {},
             isYou: member === currentUserMember,
+            directMemberActions: itemActionsGenerator(member),
+            effectiveMemberActions: effectiveItemActionsGenerator(member),
           });
         }
         // If privileges mode is different, generate new privileges object.

@@ -13,14 +13,16 @@ import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
+import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
+import { resolve } from 'rsvp';
 
-export default Mixin.create({
+export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' }), {
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
@@ -38,6 +40,11 @@ export default Mixin.create({
    * @virtual
    */
   modelType: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  modelSupportsOwners: false,
 
   /**
    * @type {Array<Object>}
@@ -130,16 +137,6 @@ export default Mixin.create({
    * @type {boolean}
    */
   showMembershipDescription: false,
-
-  /**
-   * @type {Array<Action>}
-   */
-  effectiveGroupActions: Object.freeze([]),
-
-  /**
-   * @type {Array<Action>}
-   */
-  effectiveUserActions: Object.freeze([]),
 
   /**
    * @type {Ember.ComputedProperty<string>}
@@ -255,28 +252,36 @@ export default Mixin.create({
     }
   ),
 
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  groupActions: computed(function groupActions() {
-    return [{
-      action: member => this.set('memberToRemove', member),
+  groupActionsGenerator: computed(function groupActionsGenerator() {
+    return group => [{
+      action: () => this.set('memberToRemove', group),
       title: this.t('removeThisMember'),
       class: 'remove-group',
       icon: 'close',
     }];
   }),
 
-  /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
-   */
-  userActions: computed(function userActions() {
-    return [{
-      action: member => this.set('memberToRemove', member),
+  userActionsGenerator: computed(function userActionsGenerator() {
+    return user => [{
+      action: () => this.set('memberToRemove', user),
       title: this.t('removeThisMember'),
       class: 'remove-user',
       icon: 'close',
     }];
+  }),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.Action>>}
+   */
+  effectiveGroupActionsGenerator: computed(function effectiveGroupActionsGenerator() {
+    return () => [];
+  }),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.Action>>}
+   */
+  effectiveUserActionsGenerator: computed(function effectiveUserActionsGenerator() {
+    return () => [];
   }),
 
   /**
@@ -467,6 +472,15 @@ export default Mixin.create({
       }
       this.set('viewToolsVisible', viewToolsVisible === 'true');
     }
+  },
+
+  /**
+   * Fetches list of record owners
+   * @virtual
+   * @return {Promise<Array<User>>}
+   */
+  fetchOwnerList() {
+    return resolve([]);
   },
 
   /**

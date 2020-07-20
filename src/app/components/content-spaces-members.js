@@ -36,6 +36,11 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
+  modelSupportsOwners: true,
+
+  /**
+   * @override
+   */
   groupedPrivilegesFlags: groupedFlags,
 
   /**
@@ -47,6 +52,14 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    * @override
    */
   record: reads('space'),
+
+  /**
+   * @override
+   */
+  fetchOwnerList() {
+    return this.get('record').getRelation('ownerList')
+      .then(ownerList => get(ownerList, 'list'));
+  },
 
   /**
    * @override

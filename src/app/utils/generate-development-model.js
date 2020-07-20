@@ -215,7 +215,7 @@ export default function generateDevelopmentModel(store) {
         allFulfilled(records.map(record =>
           allFulfilled([
             attachSharedUsersGroupsToModel(
-              store, record, 'group', false, sharedUsers, groups
+              store, record, 'group', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
             ),
             attachSharedUsersGroupsToModel(
               store, record, 'group', true, sharedUsers, groups
@@ -231,11 +231,12 @@ export default function generateDevelopmentModel(store) {
           allFulfilled(records.map(record =>
             allFulfilled([
               attachSharedUsersGroupsToModel(
-                store, record, 'space', false, sharedUsers, groups
+                store, record, 'space', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
               ),
               attachSharedUsersGroupsToModel(
                 store, record, 'space', true, sharedUsers, groups
               ),
+              attachOwnersToModel(store, record, sharedUsers.slice(0, 1)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
@@ -249,7 +250,8 @@ export default function generateDevelopmentModel(store) {
           allFulfilled(records.map(record =>
             allFulfilled([
               attachSharedUsersGroupsToModel(
-                store, record, 'harvester', false, sharedUsers, groups
+                store, record, 'harvester', false,
+                sharedUsers.slice(0, 2), groups.slice(0, 2)
               ),
               attachSharedUsersGroupsToModel(
                 store, record, 'harvester', true, sharedUsers, groups
@@ -675,6 +677,18 @@ function attachSharedUsersGroupsToModel(
     .then(list => {
       const listName = isEffective ? 'effUserList' : 'userList';
       record.set(listName, list);
+      return record.save();
+    });
+}
+
+function attachOwnersToModel(
+  store,
+  record,
+  owners
+) {
+  return createListRecord(store, 'sharedUser', owners)
+    .then(list => {
+      record.set('ownerList', list);
       return record.save();
     });
 }
