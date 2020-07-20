@@ -59,6 +59,11 @@ export default Component.extend(I18n, {
   subjectType: undefined,
 
   /**
+   * @type {Array<Model.User>}
+   */
+  ownerList: undefined,
+
+  /**
    * If greater than 0, autocollapses list on init if number of records is over
    * `collapseForNumber`. If equal to 0, list is never autocollapsed.
    * @type {number}
@@ -217,6 +222,7 @@ export default Component.extend(I18n, {
     'onlyDirect',
     function membersListObserver() {
       const {
+        ownerList,
         directMembersList,
         membersList,
         membersProxyList,
@@ -229,6 +235,7 @@ export default Component.extend(I18n, {
         itemActionsGenerator,
         effectiveItemActionsGenerator,
       } = this.getProperties(
+        'ownerList',
         'directMembersList',
         'membersList',
         'membersProxyList',
@@ -269,6 +276,7 @@ export default Component.extend(I18n, {
           proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
+            ownerList,
             directMembersList,
             privilegesProxy: {},
             isYou: member === currentUserMember,

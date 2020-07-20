@@ -20,6 +20,11 @@ export default EmberObject.extend({
   member: undefined,
 
   /**
+   * @type {Array<Models.User>}
+   */
+  ownerList: undefined,
+
+  /**
    * @virtual
    * @type {Array<Models.User|Models.Group>}
    */
@@ -54,6 +59,11 @@ export default EmberObject.extend({
    * @type {Ember.ComputedProperty<String>}
    */
   id: reads('member.id'),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isOwner: array.includes('ownerList', 'member'),
 
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}

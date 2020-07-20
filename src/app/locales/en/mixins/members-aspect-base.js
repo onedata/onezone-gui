@@ -3,6 +3,7 @@ export default {
   groups: 'Groups',
   users: 'Users',
   removeThisMember: 'Remove this member',
+  onlyOwnerCanRemoveOtherOwner: 'Only owners can remove other owners.',
   multiedit: 'Bulk edit',
   batchPrivilegesEditModalSelectedItems: 'Selected items',
   createChildGroup: 'Create new group',

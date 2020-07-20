@@ -21,11 +21,15 @@ import notImplementedReject from 'onedata-gui-common/utils/not-implemented-rejec
 import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
 import { resolve } from 'rsvp';
+import Action from 'onedata-gui-common/utils/action';
+import { and, not, array } from 'ember-awesome-macros';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' }), {
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
+  userActions: service(),
   media: service(),
   navigationState: service(),
 
@@ -261,14 +265,44 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
     }];
   }),
 
-  userActionsGenerator: computed(function userActionsGenerator() {
-    return user => [{
-      action: () => this.set('memberToRemove', user),
-      title: this.t('removeThisMember'),
-      class: 'remove-user',
-      icon: 'close',
-    }];
-  }),
+  userActionsGenerator: computed(
+    'ownerList',
+    'record',
+    'modelSupportsOwners',
+    function userActionsGenerator() {
+      const {
+        userActions,
+        modelSupportsOwners,
+        ownerList,
+        record,
+        i18nPrefix,
+      } = this.getProperties(
+        'userActions',
+        'modelSupportsOwners',
+        'ownerList',
+        'record',
+        'i18nPrefix'
+      );
+      return user => {
+        const actions = [];
+        if (modelSupportsOwners) {
+          actions.push(userActions.createToggleBeingOwnerAction({
+            ownedRecord: record,
+            ownerRecord: user,
+            ownerList,
+          }));
+        }
+        actions.push(RemoveUserAction.create({
+          ownerSource: this,
+          i18nPrefix,
+          user,
+          ownerList,
+          execute: () => this.set('memberToRemove', user),
+        }));
+        return actions;
+      };
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
@@ -673,4 +707,65 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
       this.get('inviteUserUsingTokenAction').execute();
     },
   },
+});
+
+const RemoveUserAction = Action.extend({
+  recordManager: service(),
+
+  /**
+   * @virtual
+   * @type {Models.User}
+   */
+  user: undefined,
+
+  /**
+   * @override
+   */
+  className: 'remove-user',
+
+  /**
+   * @override
+   */
+  icon: 'close',
+
+  /**
+   * @override
+   */
+  title: computedT('removeThisMember'),
+
+  /**
+   * @type {Array<Models.User>}
+   */
+  ownerList: undefined,
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isOwner: array.includes('ownerList', 'user'),
+
+  /**
+   * @type {ComputedProperty<Models.User>}
+   */
+  currentUser: computed(function currentUser() {
+    return this.get('recordManager').getCurrentUserRecord();
+  }),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isCurrentUserOwner: array.includes('ownerList', 'currentUser'),
+
+  /**
+   * @override
+   */
+  disabled: and('isOwner', not('isCurrentUserOwner')),
+
+  /**
+   * @override
+   */
+  tip: computed('disabled', function tip() {
+    if (this.get('disabled')) {
+      return this.t('onlyOwnerCanRemoveOtherOwner');
+    }
+  }),
 });

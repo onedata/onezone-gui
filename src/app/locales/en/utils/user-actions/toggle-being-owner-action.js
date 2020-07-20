@@ -13,6 +13,7 @@ export default {
   },
   tip: {
     unmakeButIsSingleOwner: 'Cannot remove this ownership - there must be at least one owner.',
+    forbidden: 'Only owners can modify ownership.',
   },
   successNotificationText: {
     owned: {

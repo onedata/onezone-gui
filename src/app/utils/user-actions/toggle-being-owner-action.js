@@ -81,8 +81,19 @@ export default Action.extend({
   /**
    * @override
    */
-  tip: computed('isSingleOwner', function tip() {
-    return this.get('isSingleOwner') ? this.t('tip.unmakeButIsSingleOwner') : undefined;
+  tip: computed('isCurrentUserOwner', 'isSingleOwner', function tip() {
+    const {
+      isCurrentUserOwner,
+      isSingleOwner,
+    } = this.getProperties('isCurrentUserOwner', 'isSingleOwner');
+
+    if (!isCurrentUserOwner) {
+      return this.t('tip.forbidden');
+    } else if (isSingleOwner) {
+      return this.t('tip.unmakeButIsSingleOwner');
+    } else {
+      return undefined;
+    }
   }),
 
   /**

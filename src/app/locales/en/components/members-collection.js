@@ -3,4 +3,5 @@ export default {
   discard: 'Discard changes',
   you: 'you',
   direct: 'direct',
+  owner: 'owner',
 };

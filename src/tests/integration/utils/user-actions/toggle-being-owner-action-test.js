@@ -114,6 +114,8 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
     expect(get(action, 'disabled')).to.be.true;
+    expect(String(get(action, 'tip')))
+      .to.equal('Only owners can modify ownership.');
   });
 
   it('has icon "role-holders"', function () {
