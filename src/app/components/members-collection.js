@@ -228,7 +228,6 @@ export default Component.extend(I18n, {
         membersProxyList,
         groupedPrivilegesFlags,
         onlyDirect,
-        subjectType,
         currentUser,
         isListCollapsed,
         collapseForNumber,
@@ -241,7 +240,6 @@ export default Component.extend(I18n, {
         'membersProxyList',
         'groupedPrivilegesFlags',
         'onlyDirect',
-        'subjectType',
         'currentUser',
         'isListCollapsed',
         'collapseForNumber',
@@ -255,17 +253,18 @@ export default Component.extend(I18n, {
       }
 
       // Create ordered list of members. Records should be sorted by name except
-      // current user record - it should be always at the top.
-      const currentUserId = get(currentUser, 'userId');
-      let orderedMembersList = membersList.sortBy('name');
-      let currentUserMember;
-      if (subjectType === 'user') {
-        currentUserMember = orderedMembersList.findBy('entityId', currentUserId);
-        if (currentUserMember) {
-          orderedMembersList = [currentUserMember]
-            .concat(orderedMembersList.without(currentUserMember));
-        }
-      }
+      // current user record and owners - they should be always at the top.
+      const currentUserMember =
+        membersList.findBy('entityId', get(currentUser, 'userId'));
+      const membersListSortKeys = new Map();
+      membersList.forEach(member => {
+        let key = member === currentUserMember ? '0#' : '1#';
+        key += (ownerList || []).includes(member) ? '0#' : '1#';
+        key += get(member, 'name');
+        membersListSortKeys.set(key, member);
+      });
+      const orderedMembersList = [...membersListSortKeys.keys()].sort()
+        .map(key => membersListSortKeys.get(key));
 
       // Create list of member proxies reusing already generated ones as much
       // as possible.

@@ -314,9 +314,31 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  effectiveUserActionsGenerator: computed(function effectiveUserActionsGenerator() {
-    return () => [];
-  }),
+  effectiveUserActionsGenerator: computed(
+    'ownerList',
+    'record',
+    'modelSupportsOwners',
+    function effectiveUserActionsGenerator() {
+      const {
+        userActions,
+        modelSupportsOwners,
+        ownerList,
+        record,
+      } = this.getProperties(
+        'userActions',
+        'modelSupportsOwners',
+        'ownerList',
+        'record',
+      );
+      return user => {
+        return modelSupportsOwners ? [userActions.createToggleBeingOwnerAction({
+          ownedRecord: record,
+          ownerRecord: user,
+          ownerList,
+        })] : [];
+      };
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Action>}

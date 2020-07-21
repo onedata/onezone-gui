@@ -45,7 +45,7 @@
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
             {{/if}}
             {{#if memberProxy.isOwner}}
-              <span class="space"></span><span class="label label-default">{{tt this "owner"}}</span>
+              <span class="space"></span><span class="label label-warning">{{tt this "owner"}}</span>
             {{/if}}
             {{#if (and (not onlyDirect) (contains memberProxy.member directMembersList))}}
               <span class="space"></span><span class="label label-info">{{tt this "direct"}}</span>

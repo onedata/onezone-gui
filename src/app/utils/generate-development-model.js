@@ -236,7 +236,7 @@ export default function generateDevelopmentModel(store) {
               attachSharedUsersGroupsToModel(
                 store, record, 'space', true, sharedUsers, groups
               ),
-              attachOwnersToModel(store, record, sharedUsers.slice(0, 1)),
+              attachOwnersToModel(store, record, sharedUsers.slice(1, 2)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
