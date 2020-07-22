@@ -22,7 +22,7 @@ import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
 import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
-import { and, not, array } from 'ember-awesome-macros';
+import { and, or, not, array, raw, equal } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' }), {
@@ -766,6 +766,11 @@ const RemoveUserAction = Action.extend({
   isOwner: array.includes('ownerList', 'user'),
 
   /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isSingleOwner: and('isOwner', equal('ownerList.length', raw(1))),
+
+  /**
    * @type {ComputedProperty<Models.User>}
    */
   currentUser: computed(function currentUser() {
@@ -775,19 +780,27 @@ const RemoveUserAction = Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isCurrentUserOwner: array.includes('ownerList', 'currentUser'),
+  isCurrentUserOwner: array.includes(
+    array.mapBy('ownerList', raw('entityId')),
+    'currentUser.entityId'
+  ),
 
   /**
    * @override
    */
-  disabled: and('isOwner', not('isCurrentUserOwner')),
+  disabled: or(
+    and('isOwner', not('isCurrentUserOwner')),
+    'isSingleOwner'
+  ),
 
   /**
    * @override
    */
   tip: computed('disabled', function tip() {
     if (this.get('disabled')) {
-      return this.t('onlyOwnerCanRemoveOtherOwner');
+      return this.t(this.get('isSingleOwner') ?
+        'cannotRemoveSingleOwner' : 'onlyOwnerCanRemoveOtherOwner'
+      );
     }
   }),
 });

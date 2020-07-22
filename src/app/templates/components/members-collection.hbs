@@ -45,10 +45,10 @@
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
             {{/if}}
             {{#if memberProxy.isOwner}}
-              <span class="space"></span><span class="label label-warning">{{tt this "owner"}}</span>
+              <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
             {{/if}}
             {{#if (and (not onlyDirect) (contains memberProxy.member directMembersList))}}
-              <span class="space"></span><span class="label label-info">{{tt this "direct"}}</span>
+              <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
             {{/if}}
           </span>
           {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
@@ -101,6 +101,15 @@
               </div>
             {{/if}}
             {{#if (eq aspect "privileges")}}
+              {{#if memberProxy.isOwner}}
+                <div class="alert alert-warning privileges-of-owner-warning">
+                  {{tt this "ownerPrivilegesWarning"
+                    model=(tt this
+                      (concat "ownerPrivilegesWarningModels." record.constructor.modelName)
+                    )
+                  }}
+                </div>
+              {{/if}}
               {{record-privileges-tree-editor
                 privilegesGroups=groupedPrivilegesFlags
                 privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath

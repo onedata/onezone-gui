@@ -15,9 +15,10 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
 
   beforeEach(function () {
     const currentUser = {
-
+      entityId: 'currentUserId',
     };
     const ownerRecord = {
+      entityId: 'ownerRecordId',
       name: 'user1',
     };
     this.setProperties({

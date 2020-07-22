@@ -97,7 +97,14 @@
       {{/list.item}}
     {{/members-collection}}
   </div>
-  <div class="row">
+  <div class="row user-list-row">
+    {{#if (and modelSupportsOwners (not ownerList.length))}}
+      <div class="alert alert-warning">
+        {{tt this "noOwnerWarning"
+          model=(tt this (concat "noOwnerWarningModel." record.constructor.modelName))
+        }}
+      </div>
+    {{/if}}
     {{#members-collection
       record=record
       griAspect=griAspects.user

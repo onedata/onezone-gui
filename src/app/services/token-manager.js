@@ -210,6 +210,7 @@ const TokenManager = Service.extend({
           targetId,
           joiningModelName
         ).catch(ignoreForbiddenError),
+        recordManager.reloadUserRecordList(targetModelName),
       ]).then(() =>
         recordManager.getRecord(targetModelName, targetGriWithAutoScope)
         .catch(error => {

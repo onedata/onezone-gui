@@ -151,6 +151,7 @@ export default Service.extend({
    */
   addOwnerToRecord(ownedRecord, ownerRecord) {
     return this.addOwnerToRecordById(
+      get(ownedRecord, 'constructor.modelName'),
       get(ownedRecord, 'entityId'),
       get(ownerRecord, 'entityId')
     );
@@ -169,8 +170,8 @@ export default Service.extend({
       ownedRecordId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownedModelName, ownerRecordId, 'user'),
-      this.reloadRecordListById(ownedModelName, ownerRecordId, 'sharedUser'),
+      this.reloadRecordListById(ownedModelName, ownedRecordId, 'user'),
+      this.reloadRecordListById(ownedModelName, ownedRecordId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
   },
 
@@ -182,6 +183,7 @@ export default Service.extend({
    */
   removeOwnerFromRecord(ownedRecord, ownerRecord) {
     return this.removeOwnerFromRecordById(
+      get(ownedRecord, 'constructor.modelName'),
       get(ownedRecord, 'entityId'),
       get(ownerRecord, 'entityId')
     );
@@ -200,8 +202,8 @@ export default Service.extend({
       ownedRecordId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownedModelName, ownerRecordId, 'user'),
-      this.reloadRecordListById(ownedModelName, ownerRecordId, 'sharedUser'),
+      this.reloadRecordListById(ownedModelName, ownedRecordId, 'user'),
+      this.reloadRecordListById(ownedModelName, ownedRecordId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
   },
 

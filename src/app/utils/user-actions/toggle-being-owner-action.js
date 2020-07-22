@@ -69,7 +69,10 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isCurrentUserOwner: array.includes('ownerList', 'currentUser'),
+  isCurrentUserOwner: array.includes(
+    array.mapBy('ownerList', raw('entityId')),
+    'currentUser.entityId'
+  ),
 
   /**
    * @override
