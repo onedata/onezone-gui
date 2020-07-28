@@ -14,11 +14,11 @@ import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
+import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
 import { Promise } from 'rsvp';
 
-export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
+export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,
   classNames: ['members-aspect-base', 'content-spaces-members'],
 
@@ -56,7 +56,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  fetchOwnerList() {
+  fetchOwners() {
     return this.get('record').getRelation('ownerList')
       .then(ownerList => get(ownerList, 'list'));
   },

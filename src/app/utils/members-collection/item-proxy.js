@@ -22,13 +22,13 @@ export default EmberObject.extend({
   /**
    * @type {Array<Models.User>}
    */
-  ownerList: undefined,
+  owners: undefined,
 
   /**
    * @virtual
    * @type {Array<Models.User|Models.Group>}
    */
-  directMembersList: undefined,
+  directMembers: undefined,
 
   /**
    * @virtual
@@ -63,13 +63,13 @@ export default EmberObject.extend({
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isOwner: array.includes('ownerList', 'member'),
+  isOwner: array.includes('owners', 'member'),
 
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
   actions: conditional(
-    array.includes('directMembersList', 'member'),
+    array.includes('directMembers', 'member'),
     'directMemberActions',
     'effectiveMemberActions'
   ),

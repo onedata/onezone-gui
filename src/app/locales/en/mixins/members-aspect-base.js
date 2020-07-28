@@ -8,7 +8,7 @@ export default {
   },
   removeThisMember: 'Remove this member',
   onlyOwnerCanRemoveOtherOwner: 'Only owners can remove other owners.',
-  cannotRemoveSingleOwner: 'Cannot remove this member - there must be at least one owner.',
+  cannotRemoveSingleOwner: 'Cannot remove this member ‐ there must be at least one owner.',
   multiedit: 'Bulk edit',
   batchPrivilegesEditModalSelectedItems: 'Selected items',
   createChildGroup: 'Create new group',

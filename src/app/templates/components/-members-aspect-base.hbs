@@ -62,7 +62,7 @@
     {{/if}}
   </div>
 {{/sticky-element}}
-{{#promise-proxy-container proxy=ownerListProxy}}
+{{#promise-proxy-container proxy=ownersProxy}}
   <div class="row">
     {{#members-collection
       record=record
@@ -98,7 +98,7 @@
     {{/members-collection}}
   </div>
   <div class="row user-list-row">
-    {{#if (and modelSupportsOwners (not ownerList.length))}}
+    {{#if (and modelSupportsOwners (not owners.length))}}
       <div class="alert alert-warning">
         {{tt this "noOwnerWarning"
           model=(tt this (concat "noOwnerWarningModel." record.constructor.modelName))
@@ -112,7 +112,7 @@
       onlyDirect=onlyDirect
       showMembershipDescription=showMembershipDescription
       subjectType="user"
-      ownerList=ownerList
+      owners=owners
       recordsSelected=(action "recordsSelected" "user")
       membersLoaded=(action "recordsLoaded")
       listHeader=(tt this "users")

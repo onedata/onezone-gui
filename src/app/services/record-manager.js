@@ -145,65 +145,65 @@ export default Service.extend({
 
   /**
    * Adds new owner the the record
-   * @param {GraphSingleModel} ownedRecord 
+   * @param {GraphSingleModel} recordBeingOwned 
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
-  addOwnerToRecord(ownedRecord, ownerRecord) {
+  addOwnerToRecord(recordBeingOwned, ownerRecord) {
     return this.addOwnerToRecordById(
-      get(ownedRecord, 'constructor.modelName'),
-      get(ownedRecord, 'entityId'),
+      get(recordBeingOwned, 'constructor.modelName'),
+      get(recordBeingOwned, 'entityId'),
       get(ownerRecord, 'entityId')
     );
   },
 
   /**
    * Adds new owner the the record
-   * @param {String} ownedModelName
-   * @param {String} ownedRecordId 
+   * @param {String} modelBeingOwnedName
+   * @param {String} recordBeingOwnedId 
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
-  addOwnerToRecordById(ownedModelName, ownedRecordId, ownerRecordId) {
+  addOwnerToRecordById(modelBeingOwnedName, recordBeingOwnedId, ownerRecordId) {
     return this.get('onedataGraphUtils').addOwner(
-      this.getEntityTypeForModelName(ownedModelName),
-      ownedRecordId,
+      this.getEntityTypeForModelName(modelBeingOwnedName),
+      recordBeingOwnedId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownedModelName, ownedRecordId, 'user'),
-      this.reloadRecordListById(ownedModelName, ownedRecordId, 'shared-user'),
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
   },
 
   /**
    * Removes an owner from the the record
-   * @param {GraphSingleModel} ownedRecord 
+   * @param {GraphSingleModel} recordBeingOwned 
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
-  removeOwnerFromRecord(ownedRecord, ownerRecord) {
+  removeOwnerFromRecord(recordBeingOwned, ownerRecord) {
     return this.removeOwnerFromRecordById(
-      get(ownedRecord, 'constructor.modelName'),
-      get(ownedRecord, 'entityId'),
+      get(recordBeingOwned, 'constructor.modelName'),
+      get(recordBeingOwned, 'entityId'),
       get(ownerRecord, 'entityId')
     );
   },
 
   /**
    * Removes an owner from the the record
-   * @param {String} ownedModelName
-   * @param {String} ownedRecordId 
+   * @param {String} modelBeingOwnedName
+   * @param {String} recordBeingOwnedId 
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
-  removeOwnerFromRecordById(ownedModelName, ownedRecordId, ownerRecordId) {
+  removeOwnerFromRecordById(modelBeingOwnedName, recordBeingOwnedId, ownerRecordId) {
     return this.get('onedataGraphUtils').removeOwner(
-      this.getEntityTypeForModelName(ownedModelName),
-      ownedRecordId,
+      this.getEntityTypeForModelName(modelBeingOwnedName),
+      recordBeingOwnedId,
       ownerRecordId
     ).then(() => allFulfilled([
-      this.reloadRecordListById(ownedModelName, ownedRecordId, 'user'),
-      this.reloadRecordListById(ownedModelName, ownedRecordId, 'shared-user'),
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
   },
 

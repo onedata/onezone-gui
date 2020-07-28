@@ -1,6 +1,6 @@
 /**
  * Allows to (un)make a specific user an owner of a given record.
- * Needs ownedRecord, ownerRecord and (optionally) ownerList passed via context.
+ * Needs recordBeingOwned, ownerRecord and (optionally) owners passed via context.
  *
  * @module utils/user-actions/toggle-being-owner-action
  * @author Michał Borzęcki
@@ -13,7 +13,8 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { array, and, or, not, equal, raw } from 'ember-awesome-macros';
+import { array, and, or, not, equal, raw, conditional } from 'ember-awesome-macros';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Action.extend({
   recordManager: service(),
@@ -37,7 +38,7 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<GraphSingleModel>}
    */
-  ownedRecord: reads('context.ownedRecord'),
+  recordBeingOwned: reads('context.recordBeingOwned'),
 
   /**
    * @type {ComputedProperty<Models.User>}
@@ -47,17 +48,17 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<Array<Models.User>>}
    */
-  ownerList: reads('context.ownerList'),
+  owners: reads('context.owners'),
 
   /**
    * @type {ComputedProperty<boolean>}
    */
-  hasOwnership: array.includes('ownerList', 'ownerRecord'),
+  hasOwnership: array.includes('owners', 'ownerRecord'),
 
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isSingleOwner: and('hasOwnership', equal('ownerList.length', raw(1))),
+  isSingleOwner: and('hasOwnership', equal('owners.length', raw(1))),
 
   /**
    * @type {ComputedProperty<Models.User>}
@@ -70,7 +71,7 @@ export default Action.extend({
    * @type {ComputedProperty<boolean>}
    */
   isCurrentUserOwner: array.includes(
-    array.mapBy('ownerList', raw('entityId')),
+    array.mapBy('owners', raw('entityId')),
     'currentUser.entityId'
   ),
 
@@ -84,26 +85,21 @@ export default Action.extend({
   /**
    * @override
    */
-  tip: computed('isCurrentUserOwner', 'isSingleOwner', function tip() {
-    const {
-      isCurrentUserOwner,
-      isSingleOwner,
-    } = this.getProperties('isCurrentUserOwner', 'isSingleOwner');
-
-    if (!isCurrentUserOwner) {
-      return this.t('tip.forbidden');
-    } else if (isSingleOwner) {
-      return this.t('tip.unmakeButIsSingleOwner');
-    } else {
-      return undefined;
-    }
-  }),
+  tip: conditional(
+    not('isCurrentUserOwner'),
+    computedT('tip.forbidden'),
+    conditional(
+      'isSingleOwner',
+      computedT('tip.unmakeButIsSingleOwner'),
+      raw(undefined)
+    )
+  ),
 
   /**
    * @override
    */
   disabled: or(
-    and('ownerList', not('isCurrentUserOwner')),
+    and('owners', not('isCurrentUserOwner')),
     'isSingleOwner'
   ),
 
@@ -113,12 +109,12 @@ export default Action.extend({
   execute() {
     if (!this.get('disabled')) {
       const {
-        ownedRecord,
+        recordBeingOwned,
         ownerRecord,
         hasOwnership,
         recordManager,
       } = this.getProperties(
-        'ownedRecord',
+        'recordBeingOwned',
         'ownerRecord',
         'hasOwnership',
         'recordManager',
@@ -126,7 +122,7 @@ export default Action.extend({
 
       const methodName = hasOwnership ? 'removeOwnerFromRecord' : 'addOwnerToRecord';
       const actionPromise = recordManager[methodName](
-        ownedRecord,
+        recordBeingOwned,
         ownerRecord,
       );
 
@@ -145,20 +141,20 @@ export default Action.extend({
    */
   getSuccessNotificationText(result) {
     const {
-      ownedRecord,
+      recordBeingOwned,
       ownerRecord,
     } = this.getProperties(
-      'ownedRecord',
+      'recordBeingOwned',
       'ownerRecord',
     );
-    const ownedRecordName = get(ownedRecord, 'name');
-    const ownedModelName = get(ownedRecord, 'constructor.modelName');
+    const recordBeingOwnedName = get(recordBeingOwned, 'name');
+    const modelBeingOwnedName = get(recordBeingOwned, 'constructor.modelName');
     const ownerRecordName = get(ownerRecord, 'name');
     const owned = !get(result, 'hadOwnership');
 
     return this.t(
-      `successNotificationText.${owned ? 'owned' : 'notOwned'}.${ownedModelName}`, {
-        ownedRecordName,
+      `successNotificationText.${owned ? 'owned' : 'notOwned'}.${modelBeingOwnedName}`, {
+        recordBeingOwnedName,
         ownerRecordName,
       }
     );

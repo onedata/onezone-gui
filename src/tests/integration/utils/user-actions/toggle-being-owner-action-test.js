@@ -23,15 +23,16 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     };
     this.setProperties({
       currentUser,
+      ownerRecord,
       context: {
-        ownedRecord: {
+        recordBeingOwned: {
           constructor: {
             modelName: 'space',
           },
           name: 'space1',
         },
         ownerRecord,
-        ownerList: A([ownerRecord, currentUser, {}]),
+        owners: A([ownerRecord, currentUser, {}]),
       },
     });
     sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserRecord')
@@ -46,7 +47,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
 
   it('has title "Make an owner" when ownerRecord is not an owner', function () {
     const context = this.get('context');
-    context.ownerList = context.ownerList.without(context.ownerRecord);
+    context.owners = context.owners.without(context.ownerRecord);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
@@ -54,16 +55,20 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   });
 
   it('has title "Remove ownership" when ownerRecord is an owner', function () {
-    const context = this.get('context');
+    const {
+      context,
+      ownerRecord,
+    } = this.getProperties('context', 'ownerRecord');
+    context.owners = [ownerRecord];
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
     expect(String(get(action, 'title'))).to.equal('Remove ownership');
   });
 
-  it('is not disabled when ownerList is not provided', function () {
+  it('is not disabled when `owners` is not provided', function () {
     const context = this.get('context');
-    context.ownerList = null;
+    context.owners = null;
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
@@ -71,9 +76,14 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   });
 
   it(
-    'is not disabled when ownerList has at least two users (including ownerRecord)',
+    'is not disabled when `owners` has at least two users (including ownerRecord)',
     function () {
-      const context = this.get('context');
+      const {
+        context,
+        ownerRecord,
+        currentUser,
+      } = this.getProperties('context', 'ownerRecord', 'currentUser');
+      context.owners = [ownerRecord, currentUser, {}];
 
       const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
@@ -81,27 +91,27 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     }
   );
 
-  it('is disabled when ownerList has one user equal to ownerRecord', function () {
+  it('is disabled when `owners` has one user equal to ownerRecord', function () {
     const {
       context,
       currentUser,
     } = this.getProperties('context', 'currentUser');
     context.ownerRecord = currentUser;
-    context.ownerList = A([currentUser]);
+    context.owners = A([currentUser]);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
     expect(get(action, 'disabled')).to.be.true;
     expect(String(get(action, 'tip')))
-      .to.equal('Cannot remove this ownership - there must be at least one owner.');
+      .to.equal('Cannot remove this ownership ‐ there must be at least one owner.');
   });
 
-  it('is not disabled when ownerList has one user not equal to ownerRecord', function () {
+  it('is not disabled when `owners` has one user not equal to ownerRecord', function () {
     const {
       context,
       currentUser,
     } = this.getProperties('context', 'currentUser');
-    context.ownerList = A([currentUser]);
+    context.owners = A([currentUser]);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
@@ -110,7 +120,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
 
   it('is disabled when current user is not an owner', function () {
     const context = this.get('context');
-    context.ownerList = A([context.ownerRecord, {}]);
+    context.owners = A([context.ownerRecord, {}]);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
@@ -125,16 +135,16 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     expect(get(action, 'icon')).to.equal('role-holders');
   });
 
-  it('executes adding owner (success scenario)', function () {
+  it('notifies success on adding owner action success', function () {
     const context = this.get('context');
-    context.ownerList = context.ownerList.without(context.ownerRecord);
+    context.owners = context.owners.without(context.ownerRecord);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
       'addOwnerToRecord'
-    ).withArgs(context.ownedRecord, context.ownerRecord).resolves();
+    ).withArgs(context.recordBeingOwned, context.ownerRecord).resolves();
     const successNotifySpy = sinon.spy(
       lookupService(this, 'global-notify'),
       'success'
@@ -150,7 +160,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       });
   });
 
-  it('executes removing owner (success scenario)', function () {
+  it('notifies success on removing owner action success', function () {
     const context = this.get('context');
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
@@ -158,7 +168,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
       'removeOwnerFromRecord'
-    ).withArgs(context.ownedRecord, context.ownerRecord).resolves();
+    ).withArgs(context.recordBeingOwned, context.ownerRecord).resolves();
     const successNotifySpy = sinon.spy(
       lookupService(this, 'global-notify'),
       'success'
@@ -174,17 +184,18 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       });
   });
 
-  it('executes adding owner (failure scenario)', function () {
+  it('notifies failure on adding owner action failure', function () {
     const context = this.get('context');
-    context.ownerList = context.ownerList.without(context.ownerRecord);
+    context.owners = context.owners.without(context.ownerRecord);
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
       'addOwnerToRecord'
-    ).callsFake((ownedRecord, ownerRecord) => {
-      if (ownedRecord === context.ownedRecord && ownerRecord === context.ownerRecord) {
+    ).callsFake((recordBeingOwned, ownerRecord) => {
+      if (recordBeingOwned === context.recordBeingOwned &&
+        ownerRecord === context.ownerRecord) {
         return reject('err');
       }
     });
@@ -204,7 +215,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       });
   });
 
-  it('executes removing owner (failure scenario)', function () {
+  it('notifies failure on removing owner action failure', function () {
     const context = this.get('context');
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
@@ -212,8 +223,9 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
       'removeOwnerFromRecord'
-    ).callsFake((ownedRecord, ownerRecord) => {
-      if (ownedRecord === context.ownedRecord && ownerRecord === context.ownerRecord) {
+    ).callsFake((recordBeingOwned, ownerRecord) => {
+      if (recordBeingOwned === context.recordBeingOwned &&
+        ownerRecord === context.ownerRecord) {
         return reject('err');
       }
     });

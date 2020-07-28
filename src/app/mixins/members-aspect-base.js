@@ -22,10 +22,10 @@ import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
 import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
-import { and, or, not, array, raw, equal } from 'ember-awesome-macros';
+import { and, or, not, array, raw, equal, conditional } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
-export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' }), {
+export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
@@ -46,6 +46,8 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
   modelType: undefined,
 
   /**
+   * By default most of the models does not support ownerships. If set to true, then it means
+   * that `record` supports ownerships and owner-related functionalities will be enabled.
    * @type {boolean}
    */
   modelSupportsOwners: false,
@@ -77,13 +79,13 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
 
   /**
    * Contains users selected on list
-   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
   selectedUsersProxies: Object.freeze(A()),
 
   /**
    * Contains groups selected on list
-   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
   selectedGroupsProxies: Object.freeze(A()),
 
@@ -163,7 +165,7 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Utils/MembersList/ItemProxy>>}
+   * @type {Ember.ComputedProperty<Array<Utils/MembersCollection/ItemProxy>>}
    */
   selectedMembersProxies: union(
     'selectedUsersProxies',
@@ -250,36 +252,46 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
         ),
         title: this.t('removeSelected'),
         class: 'remove-selected-action',
-        icon: 'close',
+        icon: 'x',
         disabled: !this.get('batchPrivilegesEditEnabled'),
       };
     }
   ),
 
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.Group}
+   * @returns {Array<Utils.Action>}
+   */
   groupActionsGenerator: computed(function groupActionsGenerator() {
     return group => [{
       action: () => this.set('memberToRemove', group),
       title: this.t('removeThisMember'),
       class: 'remove-group',
-      icon: 'close',
+      icon: 'x',
     }];
   }),
 
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.User}
+   * @returns {Array<Utils.Action>}
+   */
   userActionsGenerator: computed(
-    'ownerList',
+    'owners',
     'record',
     'modelSupportsOwners',
     function userActionsGenerator() {
       const {
         userActions,
         modelSupportsOwners,
-        ownerList,
+        owners,
         record,
         i18nPrefix,
       } = this.getProperties(
         'userActions',
         'modelSupportsOwners',
-        'ownerList',
+        'owners',
         'record',
         'i18nPrefix'
       );
@@ -287,16 +299,16 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
         const actions = [];
         if (modelSupportsOwners) {
           actions.push(userActions.createToggleBeingOwnerAction({
-            ownedRecord: record,
+            recordBeingOwned: record,
             ownerRecord: user,
-            ownerList,
+            owners,
           }));
         }
         actions.push(RemoveUserAction.create({
           ownerSource: this,
           i18nPrefix,
           user,
-          ownerList,
+          owners,
           execute: () => this.set('memberToRemove', user),
         }));
         return actions;
@@ -315,26 +327,26 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
   effectiveUserActionsGenerator: computed(
-    'ownerList',
+    'owners',
     'record',
     'modelSupportsOwners',
     function effectiveUserActionsGenerator() {
       const {
         userActions,
         modelSupportsOwners,
-        ownerList,
+        owners,
         record,
       } = this.getProperties(
         'userActions',
         'modelSupportsOwners',
-        'ownerList',
+        'owners',
         'record',
       );
       return user => {
         return modelSupportsOwners ? [userActions.createToggleBeingOwnerAction({
-          ownedRecord: record,
+          recordBeingOwned: record,
           ownerRecord: user,
-          ownerList,
+          owners,
         })] : [];
       };
     }
@@ -535,7 +547,7 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
    * @virtual
    * @return {Promise<Array<User>>}
    */
-  fetchOwnerList() {
+  fetchOwners() {
     return resolve([]);
   },
 
@@ -731,6 +743,10 @@ export default Mixin.create(createDataProxyMixin('ownerList', { type: 'array' })
   },
 });
 
+/**
+ * Remove user action specific for members aspect. Takes into account ownerships.
+ * Needs: `ownerSource`, `i18nPrefix`, `user` and (optionally) `owners`
+ */
 const RemoveUserAction = Action.extend({
   recordManager: service(),
 
@@ -741,6 +757,12 @@ const RemoveUserAction = Action.extend({
   user: undefined,
 
   /**
+   * @virtual
+   * @type {Array<Models.User>}
+   */
+  owners: undefined,
+
+  /**
    * @override
    */
   className: 'remove-user',
@@ -748,7 +770,7 @@ const RemoveUserAction = Action.extend({
   /**
    * @override
    */
-  icon: 'close',
+  icon: 'x',
 
   /**
    * @override
@@ -756,19 +778,14 @@ const RemoveUserAction = Action.extend({
   title: computedT('removeThisMember'),
 
   /**
-   * @type {Array<Models.User>}
+   * @type {ComputedProperty<boolean>}
    */
-  ownerList: undefined,
+  isOwner: array.includes('owners', 'user'),
 
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isOwner: array.includes('ownerList', 'user'),
-
-  /**
-   * @type {ComputedProperty<boolean>}
-   */
-  isSingleOwner: and('isOwner', equal('ownerList.length', raw(1))),
+  isSingleOwner: and('isOwner', equal('owners.length', raw(1))),
 
   /**
    * @type {ComputedProperty<Models.User>}
@@ -781,7 +798,7 @@ const RemoveUserAction = Action.extend({
    * @type {ComputedProperty<boolean>}
    */
   isCurrentUserOwner: array.includes(
-    array.mapBy('ownerList', raw('entityId')),
+    array.mapBy('owners', raw('entityId')),
     'currentUser.entityId'
   ),
 
@@ -796,11 +813,13 @@ const RemoveUserAction = Action.extend({
   /**
    * @override
    */
-  tip: computed('disabled', function tip() {
-    if (this.get('disabled')) {
-      return this.t(this.get('isSingleOwner') ?
-        'cannotRemoveSingleOwner' : 'onlyOwnerCanRemoveOtherOwner'
-      );
-    }
-  }),
+  tip: conditional(
+    'disabled',
+    conditional(
+      'isSingleOwner',
+      computedT('cannotRemoveSingleOwner'),
+      computedT('onlyOwnerCanRemoveOtherOwner'),
+    ),
+    raw(undefined)
+  ),
 });
