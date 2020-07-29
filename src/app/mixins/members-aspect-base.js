@@ -260,7 +260,9 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
 
   /**
    * @type {Ember.ComputedProperty<Function>}
-   * @param {Models.Group}
+   * @param {Models.Group} member
+   * @param {ArrayProxy<Models.Group>} directMembers
+   * @param {ArrayProxy<Models.Group>} effectiveMembers
    * @returns {Array<Utils.Action>}
    */
   groupActionsGenerator: computed(function groupActionsGenerator() {
@@ -274,7 +276,9 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
 
   /**
    * @type {Ember.ComputedProperty<Function>}
-   * @param {Models.User}
+   * @param {Models.User} member
+   * @param {ArrayProxy<Models.User>} directMembers
+   * @param {ArrayProxy<Models.User>} effectiveMembers
    * @returns {Array<Utils.Action>}
    */
   userActionsGenerator: computed(
@@ -295,7 +299,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
         'record',
         'i18nPrefix'
       );
-      return user => {
+      return (user, directUsers, effectiveUsers) => {
         const actions = [];
         if (modelSupportsOwners) {
           actions.push(userActions.createToggleBeingOwnerAction({
@@ -309,6 +313,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
           i18nPrefix,
           user,
           owners,
+          effectiveUsers,
           execute: () => this.set('memberToRemove', user),
         }));
         return actions;
@@ -317,14 +322,22 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   ),
 
   /**
-   * @type {ComputedProperty<Array<Utils.Action>>}
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.Group} member
+   * @param {ArrayProxy<Models.Group>} directMembers
+   * @param {ArrayProxy<Models.Group>} effectiveMembers
+   * @returns {Array<Utils.Action>}
    */
   effectiveGroupActionsGenerator: computed(function effectiveGroupActionsGenerator() {
     return () => [];
   }),
 
   /**
-   * @type {ComputedProperty<Array<Utils.Action>>}
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.User} member
+   * @param {ArrayProxy<Models.User>} directMembers
+   * @param {ArrayProxy<Models.User>} effectiveMembers
+   * @returns {Array<Utils.Action>}
    */
   effectiveUserActionsGenerator: computed(
     'owners',
@@ -763,6 +776,12 @@ const RemoveUserAction = Action.extend({
   owners: undefined,
 
   /**
+   * @virtual
+   * @type {ArrayProxy<Models.User>}
+   */
+  effectiveUsers: undefined,
+
+  /**
    * @override
    */
   className: 'remove-user',
@@ -788,6 +807,11 @@ const RemoveUserAction = Action.extend({
   isSingleOwner: and('isOwner', equal('owners.length', raw(1))),
 
   /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isSingleUser: equal('effectiveUsers.length', raw(1)),
+
+  /**
    * @type {ComputedProperty<Models.User>}
    */
   currentUser: computed(function currentUser() {
@@ -807,7 +831,7 @@ const RemoveUserAction = Action.extend({
    */
   disabled: or(
     and('isOwner', not('isCurrentUserOwner')),
-    'isSingleOwner'
+    and('isSingleOwner', not('isSingleUser'))
   ),
 
   /**
@@ -816,7 +840,7 @@ const RemoveUserAction = Action.extend({
   tip: conditional(
     'disabled',
     conditional(
-      'isSingleOwner',
+      and('isSingleOwner', not('isSingleUser')),
       computedT('cannotRemoveSingleOwner'),
       computedT('onlyOwnerCanRemoveOtherOwner'),
     ),

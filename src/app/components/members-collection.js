@@ -24,6 +24,7 @@ import { A } from '@ember/array';
 import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 import { scheduleOnce } from '@ember/runloop';
+import { promise } from 'ember-awesome-macros';
 
 const fallbackActionsGenerator = () => [];
 
@@ -149,7 +150,9 @@ export default Component.extend(I18n, {
   /**
    * @virtual
    * @type {Function}
-   * @param {Models.User|Models.Group}
+   * @param {Models.User|Models.Group} member
+   * @param {ArrayProxy<Models.User|Models.Group>} directMembers
+   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembers
    * @returns {Array<Action>}
    */
   itemActionsGenerator: fallbackActionsGenerator,
@@ -157,7 +160,9 @@ export default Component.extend(I18n, {
   /**
    * @virtual
    * @type {Function}
-   * @param {Models.User|Models.Group}
+   * @param {Models.User|Models.Group} member
+   * @param {ArrayProxy<Models.User|Models.Group>} directMembers
+   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembers
    * @returns {Array<Action>}
    */
   effectiveItemActionsGenerator: fallbackActionsGenerator,
@@ -199,6 +204,12 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * Promise proxy used to load all members
+   * @type {Ember.ComputedProperty<PromiseArray>}
+   */
+  allMembersLoadingProxy: promise.array(promise.all('directMembers', 'effectiveMembers')),
+
+  /**
    * One of `directMembers`, `effectiveMembers` depending on
    * `onlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
@@ -232,6 +243,7 @@ export default Component.extend(I18n, {
       const {
         owners,
         directMembers,
+        effectiveMembers,
         members,
         membersProxyList,
         groupedPrivilegesFlags,
@@ -244,6 +256,7 @@ export default Component.extend(I18n, {
       } = this.getProperties(
         'owners',
         'directMembers',
+        'effectiveMembers',
         'members',
         'membersProxyList',
         'groupedPrivilegesFlags',
@@ -287,8 +300,16 @@ export default Component.extend(I18n, {
             directMembers,
             privilegesProxy: {},
             isYou: member === currentUserMember,
-            directMemberActions: itemActionsGenerator(member),
-            effectiveMemberActions: effectiveItemActionsGenerator(member),
+            directMemberActions: itemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
+            effectiveMemberActions: effectiveItemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
           });
         }
         // If privileges mode is different, generate new privileges object.

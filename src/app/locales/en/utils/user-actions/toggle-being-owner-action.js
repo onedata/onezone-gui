@@ -2,7 +2,7 @@ function successNotificationText(owned, modelBeingOwnedName) {
   if (owned) {
     return `User "{{ownerRecordName}}" has become an owner of ${modelBeingOwnedName} "{{recordBeingOwnedName}}".`;
   } else {
-    return `User "{{ownerRecordName}}" has stopped being an owner of ${modelBeingOwnedName} "{{recordBeingOwnedName}}".`;
+    return `User "{{ownerRecordName}}" is no longer an owner of ${modelBeingOwnedName} "{{recordBeingOwnedName}}".`;
   }
 }
 
@@ -12,8 +12,8 @@ export default {
     unmake: 'Remove ownership',
   },
   tip: {
-    unmakeButIsSingleOwner: 'Cannot remove this ownership ‐ there must be at least one owner.',
-    forbidden: 'Only owners can modify ownership.',
+    unmakeButIsSingleOwner: 'Cannot revoke this ownership ‐ there must be at least one owner.',
+    forbidden: 'Ownership can only be managed by owners.',
   },
   successNotificationText: {
     owned: {
@@ -24,7 +24,7 @@ export default {
     },
   },
   failureNotificationActionName: {
-    owned: 'assigning an owner',
-    notOwned: 'unassigning an owner',
+    owned: 'granting ownership',
+    notOwned: 'revoking ownership',
   },
 };

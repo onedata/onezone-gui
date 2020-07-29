@@ -103,7 +103,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
 
     expect(get(action, 'disabled')).to.be.true;
     expect(String(get(action, 'tip')))
-      .to.equal('Cannot remove this ownership ‐ there must be at least one owner.');
+      .to.equal('Cannot revoke this ownership ‐ there must be at least one owner.');
   });
 
   it('is not disabled when `owners` has one user not equal to ownerRecord', function () {
@@ -126,7 +126,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
 
     expect(get(action, 'disabled')).to.be.true;
     expect(String(get(action, 'tip')))
-      .to.equal('Only owners can modify ownership.');
+      .to.equal('Ownership can only be managed by owners.');
   });
 
   it('has icon "role-holders"', function () {
@@ -178,7 +178,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
-          'string', 'User "user1" has stopped being an owner of space "space1".'
+          'string', 'User "user1" is no longer an owner of space "space1".'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
       });
@@ -208,7 +208,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'assigning an owner'),
+          sinon.match.has('string', 'granting ownership'),
           'err'
         );
         expect(get(actionResult, 'status')).to.equal('failed');
@@ -238,7 +238,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       .then(actionResult => {
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'unassigning an owner'),
+          sinon.match.has('string', 'revoking ownership'),
           'err'
         );
         expect(get(actionResult, 'status')).to.equal('failed');
