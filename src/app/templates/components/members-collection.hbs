@@ -1,35 +1,41 @@
-{{#promise-proxy-container proxy=membersList}}
+{{#promise-proxy-container proxy=allMembersLoadingProxy}}
   {{#one-collapsible-list
     hasCheckboxes=true
     class=(concat subjectType "-list")
     selectionChanged=recordsSelected
     isListCollapsed=isListCollapsed
     listCollapsed=(action "listCollapsed")
-    resetSelectionTrigger=membersList
-    as |list|}}
+    resetSelectionTrigger=members
+    as |list|
+  }}
     {{#list.header
-      title=(concat listHeader " (" membersList.length ")")
-      searchVisible=membersList.length
-      withPlaceForDots=true}}
+      title=(concat listHeader " (" members.length ")")
+      searchVisible=members.length
+      withPlaceForDots=true
+    }}
       {{actions-toolbar
         isMinimized=true
         toolbarClasses=""
         toolbarToggleClasses="btn-menu-toggle"
         dropdownPlacement="auto"
-        actionsArray=collectionActions}}
+        actionsArray=collectionActions
+      }}
     {{/list.header}}
     {{#each membersProxyList key="id" as |memberProxy|}}
       {{#list.item
         class=(concat-classes "member-item" (concat "member-" memberProxy.member.entityId))
-        selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembersList))) null memberProxy)
-        as |listItem|}}
+        selectionValue=(if (and (not onlyDirect) (not (contains memberProxy.member directMembers))) null memberProxy)
+        as |listItem|
+      }}
         {{#listItem.header
-          disableToggleIcon=itemActions.length
-          class=(if memberProxy.privilegesProxy.isModified "item-modified-header")}}
+          disableToggleIcon=true
+          class=(if memberProxy.privilegesProxy.isModified "item-modified-header")
+        }}
           <span class="item-icon-container">
             {{one-icon
               class="item-icon"
-              icon=(if (eq subjectType "group") (oneicon-alias memberProxy.member.type) "user")}}
+              icon=(if (eq subjectType "group") (oneicon-alias memberProxy.member.type) "user")
+            }}
             {{one-tooltip
               title=memberProxy.member.name
               placement="top"
@@ -44,8 +50,11 @@
             {{#if memberProxy.isYou}}
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
             {{/if}}
-            {{#if (and (not onlyDirect) (contains memberProxy.member directMembersList))}}
-              <span class="space"></span><span class="label label-info">{{tt this "direct"}}</span>
+            {{#if memberProxy.isOwner}}
+              <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
+            {{/if}}
+            {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
+              <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
             {{/if}}
           </span>
           {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
@@ -67,14 +76,15 @@
               {{/bs-button}}
             </div>
           {{/if}}
-          {{#if (get (if (contains memberProxy.member directMembersList) itemActions effectiveItemAction) "length")}}
+          {{#if memberProxy.actions.length}}
             {{actions-toolbar
               isMinimized=true
               toolbarClasses=""
               toolbarToggleClasses="btn-menu-toggle"
               dropdownPlacement="auto"
-              actionsArray=(if (contains memberProxy.member directMembersList) itemActions effectiveItemAction)
-              actionsArg=memberProxy.member}}
+              actionsArray=memberProxy.actions
+              actionsArg=memberProxy.member
+            }}
           {{/if}}
         {{/listItem.header}}
         {{#listItem.content}}
@@ -83,7 +93,8 @@
               <div class="hidden-sm hidden-md hidden-lg text-center row content-row">
                 {{#bs-button size="sm" type="primary"
                   disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
-                  onClick=(action "savePrivileges" memberProxy)}}
+                  onClick=(action "savePrivileges" memberProxy)
+                }}
                   {{tt this "save"}}
                 {{/bs-button}}
                 {{#bs-button
@@ -91,23 +102,35 @@
                   type="warning"
                   class="discard-btn"
                   disabled=(or memberProxy.privilegesProxy.saving (not memberProxy.privilegesProxy.isModified))
-                  onClick=(action "discardChanges" memberProxy)}}
+                  onClick=(action "discardChanges" memberProxy)
+                }}
                   {{tt this "discard"
                 }}
                 {{/bs-button}}
               </div>
             {{/if}}
             {{#if (eq aspect "privileges")}}
+              {{#if memberProxy.isOwner}}
+                <div class="alert alert-warning privileges-of-owner-warning">
+                  {{tt this "ownerPrivilegesWarning"
+                    model=(tt this
+                      (concat "ownerPrivilegesWarningModels." record.constructor.modelName)
+                    )
+                  }}
+                </div>
+              {{/if}}
               {{record-privileges-tree-editor
                 privilegesGroups=groupedPrivilegesFlags
                 privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
                 privilegesTranslationsPath=privilegesTranslationsPath
-                recordProxy=memberProxy.privilegesProxy}}
+                recordProxy=memberProxy.privilegesProxy
+              }}
             {{else if (eq aspect "memberships")}}
               {{membership-visualiser
                 contextRecord=memberProxy.member
                 targetRecord=record
-                showDescription=showMembershipDescription}}
+                showDescription=showMembershipDescription
+              }}
             {{/if}}
           {{/render-later}}
         {{/listItem.content}}

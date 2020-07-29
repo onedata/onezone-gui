@@ -1,5 +1,5 @@
 .members-aspect-base {
-  .user-list {
+  .user-list-row {
     margin-top: 2 * $padding-large-vertical;
   }
 
@@ -15,15 +15,19 @@
   }
 
   .member-item .one-collapsible-list-item-header {
-    padding-right: 150px;
+    padding-right: 190px;
     .btn-toolbar {
-      margin-right: 100px;
+      margin-right: 140px;
     }
   }
 
   .labels-container {
     @include vertical-align-middle();
     right: 50px;
+  }
+
+  .privileges-of-owner-warning {
+    margin: $padding-large-horizontal;
   }
 
   .privileges-tree-editor {

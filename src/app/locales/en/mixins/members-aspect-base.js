@@ -2,7 +2,13 @@ export default {
   members: 'Members',
   groups: 'Groups',
   users: 'Users',
+  noOwnerWarning: 'This {{model}} has no owner assigned. It is strongly recommended to assign at least one owner. In order to do so, you can invite chosen user (or yourself) to join the {{model}} as a direct member. <strong>The first user that joins this {{model}} will be assigned as an owner.</strong>',
+  noOwnerWarningModel: {
+    space: 'space',
+  },
   removeThisMember: 'Remove this member',
+  onlyOwnerCanRemoveOtherOwner: 'Only owners can remove other owners.',
+  cannotRemoveSingleOwner: 'Cannot remove this member ‐ there must be at least one owner. Assign ownership to another user first.',
   multiedit: 'Bulk edit',
   batchPrivilegesEditModalSelectedItems: 'Selected items',
   createChildGroup: 'Create new group',

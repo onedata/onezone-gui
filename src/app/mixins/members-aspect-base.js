@@ -13,17 +13,23 @@ import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
+import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
+import { resolve } from 'rsvp';
+import Action from 'onedata-gui-common/utils/action';
+import { and, or, not, array, raw, equal, conditional } from 'ember-awesome-macros';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
-export default Mixin.create({
+export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
   privilegeActions: service(),
   tokenActions: service(),
+  userActions: service(),
   media: service(),
   navigationState: service(),
 
@@ -38,6 +44,13 @@ export default Mixin.create({
    * @virtual
    */
   modelType: undefined,
+
+  /**
+   * By default most of the models does not support ownerships. If set to true, then it means
+   * that `record` supports ownerships and owner-related functionalities will be enabled.
+   * @type {boolean}
+   */
+  modelSupportsOwners: false,
 
   /**
    * @type {Array<Object>}
@@ -66,13 +79,13 @@ export default Mixin.create({
 
   /**
    * Contains users selected on list
-   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
   selectedUsersProxies: Object.freeze(A()),
 
   /**
    * Contains groups selected on list
-   * @type {Ember.Array<Utils/MembersList/ItemProxy>}
+   * @type {Ember.Array<Utils/MembersCollection/ItemProxy>}
    */
   selectedGroupsProxies: Object.freeze(A()),
 
@@ -132,16 +145,6 @@ export default Mixin.create({
   showMembershipDescription: false,
 
   /**
-   * @type {Array<Action>}
-   */
-  effectiveGroupActions: Object.freeze([]),
-
-  /**
-   * @type {Array<Action>}
-   */
-  effectiveUserActions: Object.freeze([]),
-
-  /**
    * @type {Ember.ComputedProperty<string>}
    */
   privilegesTranslationsPath: computed(
@@ -162,7 +165,7 @@ export default Mixin.create({
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Utils/MembersList/ItemProxy>>}
+   * @type {Ember.ComputedProperty<Array<Utils/MembersCollection/ItemProxy>>}
    */
   selectedMembersProxies: union(
     'selectedUsersProxies',
@@ -249,35 +252,118 @@ export default Mixin.create({
         ),
         title: this.t('removeSelected'),
         class: 'remove-selected-action',
-        icon: 'close',
+        icon: 'x',
         disabled: !this.get('batchPrivilegesEditEnabled'),
       };
     }
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.Group} member
+   * @param {ArrayProxy<Models.Group>} directMembers
+   * @param {ArrayProxy<Models.Group>} effectiveMembers
+   * @returns {Array<Utils.Action>}
    */
-  groupActions: computed(function groupActions() {
-    return [{
-      action: member => this.set('memberToRemove', member),
+  groupActionsGenerator: computed(function groupActionsGenerator() {
+    return group => [{
+      action: () => this.set('memberToRemove', group),
       title: this.t('removeThisMember'),
       class: 'remove-group',
-      icon: 'close',
+      icon: 'x',
     }];
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Action>>}
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.User} member
+   * @param {ArrayProxy<Models.User>} directMembers
+   * @param {ArrayProxy<Models.User>} effectiveMembers
+   * @returns {Array<Utils.Action>}
    */
-  userActions: computed(function userActions() {
-    return [{
-      action: member => this.set('memberToRemove', member),
-      title: this.t('removeThisMember'),
-      class: 'remove-user',
-      icon: 'close',
-    }];
+  userActionsGenerator: computed(
+    'owners',
+    'record',
+    'modelSupportsOwners',
+    function userActionsGenerator() {
+      const {
+        userActions,
+        modelSupportsOwners,
+        owners,
+        record,
+        i18nPrefix,
+      } = this.getProperties(
+        'userActions',
+        'modelSupportsOwners',
+        'owners',
+        'record',
+        'i18nPrefix'
+      );
+      return (user, directUsers, effectiveUsers) => {
+        const actions = [];
+        if (modelSupportsOwners) {
+          actions.push(userActions.createToggleBeingOwnerAction({
+            recordBeingOwned: record,
+            ownerRecord: user,
+            owners,
+          }));
+        }
+        actions.push(RemoveUserAction.create({
+          ownerSource: this,
+          i18nPrefix,
+          user,
+          owners,
+          effectiveUsers,
+          execute: () => this.set('memberToRemove', user),
+        }));
+        return actions;
+      };
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.Group} member
+   * @param {ArrayProxy<Models.Group>} directMembers
+   * @param {ArrayProxy<Models.Group>} effectiveMembers
+   * @returns {Array<Utils.Action>}
+   */
+  effectiveGroupActionsGenerator: computed(function effectiveGroupActionsGenerator() {
+    return () => [];
   }),
+
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   * @param {Models.User} member
+   * @param {ArrayProxy<Models.User>} directMembers
+   * @param {ArrayProxy<Models.User>} effectiveMembers
+   * @returns {Array<Utils.Action>}
+   */
+  effectiveUserActionsGenerator: computed(
+    'owners',
+    'record',
+    'modelSupportsOwners',
+    function effectiveUserActionsGenerator() {
+      const {
+        userActions,
+        modelSupportsOwners,
+        owners,
+        record,
+      } = this.getProperties(
+        'userActions',
+        'modelSupportsOwners',
+        'owners',
+        'record',
+      );
+      return user => {
+        return modelSupportsOwners ? [userActions.createToggleBeingOwnerAction({
+          recordBeingOwned: record,
+          ownerRecord: user,
+          owners,
+        })] : [];
+      };
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Action>}
@@ -470,6 +556,15 @@ export default Mixin.create({
   },
 
   /**
+   * Fetches list of record owners
+   * @virtual
+   * @return {Promise<Array<User>>}
+   */
+  fetchOwners() {
+    return resolve([]);
+  },
+
+  /**
    * Removes member. Should be implemented in component.
    * @virtual
    * @param {string} type type of member model
@@ -659,4 +754,96 @@ export default Mixin.create({
       this.get('inviteUserUsingTokenAction').execute();
     },
   },
+});
+
+/**
+ * Remove user action specific for members aspect. Takes into account ownerships.
+ * Needs: `ownerSource`, `i18nPrefix`, `user` and (optionally) `owners`
+ */
+const RemoveUserAction = Action.extend({
+  recordManager: service(),
+
+  /**
+   * @virtual
+   * @type {Models.User}
+   */
+  user: undefined,
+
+  /**
+   * @virtual
+   * @type {Array<Models.User>}
+   */
+  owners: undefined,
+
+  /**
+   * @virtual
+   * @type {ArrayProxy<Models.User>}
+   */
+  effectiveUsers: undefined,
+
+  /**
+   * @override
+   */
+  className: 'remove-user',
+
+  /**
+   * @override
+   */
+  icon: 'x',
+
+  /**
+   * @override
+   */
+  title: computedT('removeThisMember'),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isOwner: array.includes('owners', 'user'),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isSingleOwner: and('isOwner', equal('owners.length', raw(1))),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isSingleUser: equal('effectiveUsers.length', raw(1)),
+
+  /**
+   * @type {ComputedProperty<Models.User>}
+   */
+  currentUser: computed(function currentUser() {
+    return this.get('recordManager').getCurrentUserRecord();
+  }),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isCurrentUserOwner: array.includes(
+    array.mapBy('owners', raw('entityId')),
+    'currentUser.entityId'
+  ),
+
+  /**
+   * @override
+   */
+  disabled: or(
+    and('isOwner', not('isCurrentUserOwner')),
+    and('isSingleOwner', not('isSingleUser'))
+  ),
+
+  /**
+   * @override
+   */
+  tip: conditional(
+    'disabled',
+    conditional(
+      and('isSingleOwner', not('isSingleUser')),
+      computedT('cannotRemoveSingleOwner'),
+      computedT('onlyOwnerCanRemoveOtherOwner'),
+    ),
+    raw(undefined)
+  ),
 });

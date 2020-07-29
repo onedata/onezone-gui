@@ -62,109 +62,119 @@
     {{/if}}
   </div>
 {{/sticky-element}}
-<div class="row">
-  {{#members-collection
-    record=record
-    griAspect=griAspects.group
-    aspect=aspect
-    onlyDirect=onlyDirect
-    showMembershipDescription=showMembershipDescription
-    collapseForNumber=10
-    subjectType="group"
-    recordsSelected=(action "recordsSelected" "group")
-    membersLoaded=(action "recordsLoaded")
-    listHeader=(tt this "groups")
-    groupedPrivilegesFlags=groupedPrivilegesFlags
+{{#promise-proxy-container proxy=ownersProxy}}
+  <div class="row">
+    {{#members-collection
+      record=record
+      griAspect=griAspects.group
+      aspect=aspect
+      onlyDirect=onlyDirect
+      showMembershipDescription=showMembershipDescription
+      collapseForNumber=10
+      subjectType="group"
+      recordsSelected=(action "recordsSelected" "group")
+      membersLoaded=(action "recordsLoaded")
+      listHeader=(tt this "groups")
+      groupedPrivilegesFlags=groupedPrivilegesFlags
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
+      collectionActions=groupListActions
+      itemActionsGenerator=groupActionsGenerator
+      effectiveItemActionsGenerator=effectiveGroupActionsGenerator as |list|}}
+      {{#list.item as |listItem|}}
+        {{#listItem.header
+          class="text-center"
+          disableToggleIcon=true
+          isCollapsible=false
+          hasCheckbox=false
+          truncate=false}}
+          <span class="one-label">
+            {{tt this "noGroupsStart"}}
+            <a {{action "inviteGroupUsingToken"}}>{{tt this "noGroupsInvite"}}</a>
+            {{tt this "noGroupsEnd"}}
+          </span>
+        {{/listItem.header}}
+      {{/list.item}}
+    {{/members-collection}}
+  </div>
+  <div class="row user-list-row">
+    {{#if (and modelSupportsOwners (not owners.length))}}
+      <div class="alert alert-warning">
+        {{tt this "noOwnerWarning"
+          model=(tt this (concat "noOwnerWarningModel." record.constructor.modelName))
+        }}
+      </div>
+    {{/if}}
+    {{#members-collection
+      record=record
+      griAspect=griAspects.user
+      aspect=aspect
+      onlyDirect=onlyDirect
+      showMembershipDescription=showMembershipDescription
+      subjectType="user"
+      owners=owners
+      recordsSelected=(action "recordsSelected" "user")
+      membersLoaded=(action "recordsLoaded")
+      listHeader=(tt this "users")
+      groupedPrivilegesFlags=groupedPrivilegesFlags
+      privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
+      privilegesTranslationsPath=privilegesTranslationsPath
+      collectionActions=userListActions
+      itemActionsGenerator=userActionsGenerator
+      effectiveItemActionsGenerator=effectiveUserActionsGenerator as |list|}}
+      {{#list.item as |listItem|}}
+        {{#listItem.header
+          class="text-center"
+          disableToggleIcon=true
+          isCollapsible=false
+          hasCheckbox=false
+          truncate=false}}
+          <span class="one-label">
+            {{tt this "noUsersStart"}}
+            <a {{action "inviteUserUsingToken"}}>{{tt this "noUsersInvite"}}</a>
+            {{tt this "noUsersEnd"}}
+          </span>
+        {{/listItem.header}}
+      {{/list.item}}
+    {{/members-collection}}
+  </div>
+  {{privileges-editor-modal
+    privilegesGroups=groupedPrivilegesFlags
     privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
     privilegesTranslationsPath=privilegesTranslationsPath
-    collectionActions=groupListActions
-    itemActions=groupActions
-    effectiveItemActions=effectiveGroupActions as |list|}}
-    {{#list.item as |listItem|}}
-      {{#listItem.header
-        class="text-center"
-        disableToggleIcon=true
-        isCollapsible=false
-        hasCheckbox=false
-        truncate=false}}
-        <span class="one-label">
-          {{tt this "noGroupsStart"}}
-          <a {{action "inviteGroupUsingToken"}}>{{tt this "noGroupsInvite"}}</a>
-          {{tt this "noGroupsEnd"}}
-        </span>
-      {{/listItem.header}}
-    {{/list.item}}
-  {{/members-collection}}
-</div>
-<div class="row">
-  {{#members-collection
-    record=record
-    griAspect=griAspects.user
-    aspect=aspect
-    onlyDirect=onlyDirect
-    showMembershipDescription=showMembershipDescription
-    subjectType="user"
-    recordsSelected=(action "recordsSelected" "user")
-    membersLoaded=(action "recordsLoaded")
-    listHeader=(tt this "users")
-    groupedPrivilegesFlags=groupedPrivilegesFlags
-    privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-    privilegesTranslationsPath=privilegesTranslationsPath
-    collectionActions=userListActions
-    itemActions=userActions
-    effectiveItemActions=effectiveUserActions as |list|}}
-    {{#list.item as |listItem|}}
-      {{#listItem.header
-        class="text-center"
-        disableToggleIcon=true
-        isCollapsible=false
-        hasCheckbox=false
-        truncate=false}}
-        <span class="one-label">
-          {{tt this "noUsersStart"}}
-          <a {{action "inviteUserUsingToken"}}>{{tt this "noUsersInvite"}}</a>
-          {{tt this "noUsersEnd"}}
-        </span>
-      {{/listItem.header}}
-    {{/list.item}}
-  {{/members-collection}}
-</div>
-{{privileges-editor-modal
-  privilegesGroups=groupedPrivilegesFlags
-  privilegeGroupsTranslationsPath=privilegeGroupsTranslationsPath
-  privilegesTranslationsPath=privilegesTranslationsPath
-  recordProxy=batchPrivilegesEditModalModel
-  save=(action "batchPrivilegesSave")
-  close=(action "batchPrivilegesEditClose")
-  opened=batchPrivilegesEditActive
-  processing=batchPrivilegesEditModalModel.isSaving
-  treeRootText=(tt this "batchPrivilegesEditModalSelectedItems")}}
-{{join-as-user-modal
-  opened=joinAsUserModalVisible
-  close=(action (mut joinAsUserModalVisible) false)
-  proceed=(action "join")
-  processing=isJoiningAsUser
-  modelType=record.entityType
-  model=record}}
-{{group-create-relative-modal
-  opened=createChildGroupModalVisible
-  close=(action (mut createChildGroupModalVisible) false)
-  proceed=(action "createChildGroup")
-  processing=isCreatingChildGroup
-  relatedRecord=record
-  relation=(if (eq record.entityType "group") "child" "member")}}
-{{group-add-your-group-modal
-  opened=addYourGroupModalVisible
-  close=(action (mut addYourGroupModalVisible) false)
-  proceed=(action "addYourGroup")
-  processing=isAddingYourGroup
-  relatedRecord=record
-  relation=(if (eq record.entityType "group") "child" "member")}}
-{{remove-relation-modal
-  opened=(and memberToRemove (not memberToRemove.isDeleted))
-  close=(action (mut memberToRemove) null)
-  proceed=(action "removeMember")
-  processing=isRemovingMember
-  parent=record
-  child=memberToRemove}}
+    recordProxy=batchPrivilegesEditModalModel
+    save=(action "batchPrivilegesSave")
+    close=(action "batchPrivilegesEditClose")
+    opened=batchPrivilegesEditActive
+    processing=batchPrivilegesEditModalModel.isSaving
+    treeRootText=(tt this "batchPrivilegesEditModalSelectedItems")}}
+  {{join-as-user-modal
+    opened=joinAsUserModalVisible
+    close=(action (mut joinAsUserModalVisible) false)
+    proceed=(action "join")
+    processing=isJoiningAsUser
+    modelType=record.entityType
+    model=record}}
+  {{group-create-relative-modal
+    opened=createChildGroupModalVisible
+    close=(action (mut createChildGroupModalVisible) false)
+    proceed=(action "createChildGroup")
+    processing=isCreatingChildGroup
+    relatedRecord=record
+    relation=(if (eq record.entityType "group") "child" "member")}}
+  {{group-add-your-group-modal
+    opened=addYourGroupModalVisible
+    close=(action (mut addYourGroupModalVisible) false)
+    proceed=(action "addYourGroup")
+    processing=isAddingYourGroup
+    relatedRecord=record
+    relation=(if (eq record.entityType "group") "child" "member")}}
+  {{remove-relation-modal
+    opened=(and memberToRemove (not memberToRemove.isDeleted))
+    close=(action (mut memberToRemove) null)
+    proceed=(action "removeMember")
+    processing=isRemovingMember
+    parent=record
+    child=memberToRemove}}
+{{/promise-proxy-container}}
 {{yield}}

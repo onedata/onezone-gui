@@ -24,6 +24,9 @@ import { A } from '@ember/array';
 import _ from 'lodash';
 import ItemProxy from 'onezone-gui/utils/members-collection/item-proxy';
 import { scheduleOnce } from '@ember/runloop';
+import { promise } from 'ember-awesome-macros';
+
+const fallbackActionsGenerator = () => [];
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -57,6 +60,11 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   subjectType: undefined,
+
+  /**
+   * @type {Array<Model.User>}
+   */
+  owners: undefined,
 
   /**
    * If greater than 0, autocollapses list on init if number of records is over
@@ -111,8 +119,8 @@ export default Component.extend(I18n, {
   privilegesTranslationsPath: undefined,
 
   /**
-   * Is calculated by `membersListObserver`
-   * @type {Array<Utils/MembersList/ItemProxy>}
+   * Is calculated by `membersObserver`
+   * @type {Array<Utils/MembersCollection/ItemProxy>}
    */
   membersProxyList: Object.freeze([]),
 
@@ -140,14 +148,24 @@ export default Component.extend(I18n, {
   collectionActions: undefined,
 
   /**
-   * @type {Array<Action>}
+   * @virtual
+   * @type {Function}
+   * @param {Models.User|Models.Group} member
+   * @param {ArrayProxy<Models.User|Models.Group>} directMembers
+   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembers
+   * @returns {Array<Action>}
    */
-  itemActions: Object.freeze([]),
+  itemActionsGenerator: fallbackActionsGenerator,
 
   /**
-   * @type {Array<Action>}
+   * @virtual
+   * @type {Function}
+   * @param {Models.User|Models.Group} member
+   * @param {ArrayProxy<Models.User|Models.Group>} directMembers
+   * @param {ArrayProxy<Models.User|Models.Group>} effectiveMembers
+   * @returns {Array<Action>}
    */
-  effectiveItemActions: Object.freeze([]),
+  effectiveItemActionsGenerator: fallbackActionsGenerator,
 
   /**
    * @type {boolean}
@@ -163,11 +181,11 @@ export default Component.extend(I18n, {
    * Direct members
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  directMembersList: computed(
+  directMembers: computed(
     'record',
     'subjectType',
-    function directMembersList() {
-      return this.getMembersList(this.get('subjectType') + 'List');
+    function directMembers() {
+      return this.getMembers(this.get('subjectType') + 'List');
     }
   ),
 
@@ -175,28 +193,34 @@ export default Component.extend(I18n, {
    * Effective members
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  effectiveMembersList: computed(
+  effectiveMembers: computed(
     'record',
     'subjectType',
-    function effectiveMembersList() {
-      return this.getMembersList(
+    function effectiveMembers() {
+      return this.getMembers(
         'eff' + _.upperFirst(this.get('subjectType')) + 'List'
       );
     }
   ),
 
   /**
-   * One of `directMembersList`, `effectiveMembersList` depending on
+   * Promise proxy used to load all members
+   * @type {Ember.ComputedProperty<PromiseArray>}
+   */
+  allMembersLoadingProxy: promise.array(promise.all('directMembers', 'effectiveMembers')),
+
+  /**
+   * One of `directMembers`, `effectiveMembers` depending on
    * `onlyDirect` flag
    * @type {Ember.ComputedProperty<PromiseArray<DS.ManyArray<GraphSingleModel>>>}
    */
-  membersList: computed(
+  members: computed(
     'onlyDirect',
     'record',
     'subjectType',
-    function membersList() {
+    function members() {
       return this.get('onlyDirect') ?
-        this.get('directMembersList') : this.get('effectiveMembersList');
+        this.get('directMembers') : this.get('effectiveMembers');
     }
   ),
 
@@ -212,59 +236,80 @@ export default Component.extend(I18n, {
     return aspect === 'privileges' && onlyDirect;
   }),
 
-  membersListObserver: observer(
-    'membersList.@each.name',
+  membersObserver: observer(
+    'members.@each.name',
     'onlyDirect',
-    function membersListObserver() {
+    function membersObserver() {
       const {
-        membersList,
+        owners,
+        directMembers,
+        effectiveMembers,
+        members,
         membersProxyList,
         groupedPrivilegesFlags,
         onlyDirect,
-        subjectType,
         currentUser,
         isListCollapsed,
         collapseForNumber,
+        itemActionsGenerator,
+        effectiveItemActionsGenerator,
       } = this.getProperties(
-        'membersList',
+        'owners',
+        'directMembers',
+        'effectiveMembers',
+        'members',
         'membersProxyList',
         'groupedPrivilegesFlags',
         'onlyDirect',
-        'subjectType',
         'currentUser',
         'isListCollapsed',
-        'collapseForNumber'
+        'collapseForNumber',
+        'itemActionsGenerator',
+        'effectiveItemActionsGenerator'
       );
 
       if (isListCollapsed === undefined && collapseForNumber &&
-        get(membersList, 'length') > collapseForNumber) {
+        get(members, 'length') > collapseForNumber) {
         this.set('isListCollapsed', true);
       }
 
       // Create ordered list of members. Records should be sorted by name except
-      // current user record - it should be always at the top.
-      const currentUserId = get(currentUser, 'userId');
-      let orderedMembersList = membersList.sortBy('name');
-      let currentUserMember;
-      if (subjectType === 'user') {
-        currentUserMember = orderedMembersList.findBy('entityId', currentUserId);
-        if (currentUserMember) {
-          orderedMembersList = [currentUserMember]
-            .concat(orderedMembersList.without(currentUserMember));
-        }
-      }
+      // current user record and owners - they should be always at the top.
+      const currentUserMember =
+        members.findBy('entityId', get(currentUser, 'userId'));
+      const membersSortKeys = new Map();
+      members.forEach(member => {
+        let key = member === currentUserMember ? '0\n' : '1\n';
+        key += (owners || []).includes(member) ? '0\n' : '1\n';
+        key += get(member, 'name');
+        membersSortKeys.set(key, member);
+      });
+      const orderedMembers = [...membersSortKeys.keys()].sort()
+        .map(key => membersSortKeys.get(key));
 
       // Create list of member proxies reusing already generated ones as much
       // as possible.
-      const newMembersProxyList = orderedMembersList.map(member => {
+      const newMembersProxyList = orderedMembers.map(member => {
         let proxy = membersProxyList.findBy('member', member);
         // If proxy has not been generated for that member, create new empty proxy.
         if (!proxy) {
           proxy = ItemProxy.create({
             id: get(member, 'id'),
             member,
+            owners,
+            directMembers,
             privilegesProxy: {},
             isYou: member === currentUserMember,
+            directMemberActions: itemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
+            effectiveMemberActions: effectiveItemActionsGenerator(
+              member,
+              directMembers,
+              effectiveMembers
+            ),
           });
         }
         // If privileges mode is different, generate new privileges object.
@@ -283,7 +328,7 @@ export default Component.extend(I18n, {
         return proxy;
       });
       this.set('membersProxyList', newMembersProxyList);
-      if (get(membersList, 'isFulfilled')) {
+      if (get(members, 'isFulfilled')) {
         scheduleOnce('afterRender', this, 'membersLoaded');
       }
     }
@@ -300,7 +345,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.membersListObserver();
+    this.membersObserver();
   },
 
   /**
@@ -308,7 +353,7 @@ export default Component.extend(I18n, {
    * @param {string} listName for example 'userList', 'effGroupList'
    * @returns {PromiseArray<DS.ManyArray<GraphSingleModel>>}
    */
-  getMembersList(listName) {
+  getMembers(listName) {
     const record = this.get('record');
     return PromiseArray.create({
       promise: get(record, 'hasViewPrivilege') !== false ?
