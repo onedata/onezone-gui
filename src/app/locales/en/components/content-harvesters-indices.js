@@ -7,6 +7,46 @@ export default {
   create: 'Create new index',
   createNewIndex: 'Create new index',
   noIndices: 'No indices',
+  indexForm: {
+    fields: {
+      name: {
+        label: 'Name',
+      },
+      schema: {
+        label: 'Schema',
+      },
+      includeMetadata: {
+        label: 'Include metadata',
+        metadataBasic: {
+          label: 'Basic',
+        },
+        metadataJson: {
+          label: 'JSON',
+        },
+        metadataRdf: {
+          label: 'RDF',
+        },
+      },
+      includeFileDetails: {
+        label: 'Include file details',
+        fileName: {
+          label: 'File name',
+        },
+        originSpace: {
+          label: 'Origin space',
+        },
+        metadataExistenceFlags: {
+          label: 'Metadata existence flags',
+        },
+      },
+      includeRejectionReason: {
+        label: 'Include rejection reason',
+      },
+      retryOnRejection: {
+        label: 'Retry on rejection',
+      },
+    },
+  },
   createIndexForm: {
     name: 'Name',
     schema: 'Schema',

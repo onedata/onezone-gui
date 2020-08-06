@@ -1,4 +1,28 @@
 .content-harvesters-indices {
+  .form-component {
+    .includeFileDetails-field .toggle-field-renderer,
+    .includeMetadata-field .toggle-field-renderer {
+      display: inline-flex;
+
+      .control-label {
+        order: 1;
+        flex-grow: 1;
+        min-width: initial;
+        width: initial;
+        margin-left: $padding-base-vertical;
+        padding-right: 3 * $padding-base-vertical;
+      }
+  
+      .field-component {
+        flex-grow: initial;
+      }
+
+      &:not(:last-child) {
+        margin-bottom: $padding-base-vertical;
+      }
+    }
+  }
+
   .schema-textarea {
     font-family: monospace;
     resize: none;
