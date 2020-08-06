@@ -57,8 +57,8 @@
         {{content-harvesters-indices/progress-table index=index harvester=harvester}}
       {{/render-later}}
     {{/tab.pane}}
-    {{#tab.pane elementId=(concat parentView.elementId "-schema-tab") title=(tt this "schema")}}
-      <textarea class="schema-textarea form-control" rows="10" readonly="readonly">{{index.schema}}</textarea>
+    {{#tab.pane elementId=(concat parentView.elementId "-settings-tab") title=(tt this "settings")}}
+      {{content-harvesters-indices/index-form mode="view" index=index}}
     {{/tab.pane}}
   {{/bs-tab}}
 {{/listItem.content}}

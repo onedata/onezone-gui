@@ -68,7 +68,7 @@ export default {
     remove: 'Remove',
     rename: 'Rename',
     harvestingProgress: 'Harvesting progress',
-    schema: 'Schema',
+    settings: 'Settings',
   },
   progressTable: {
     nothingToHarvest: 'There is no data to harvest. Set up files metadata in connected spaces or attach another space to start harvesting process.',
