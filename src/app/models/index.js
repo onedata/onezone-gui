@@ -16,7 +16,7 @@ import _ from 'lodash';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
-   * @type {string}
+   * @type {String}
    */
   name: attr('string'),
 
@@ -26,12 +26,34 @@ export default Model.extend(GraphSingleModelMixin, {
   schema: attr('string'),
 
   /**
-   * @type {string}
+   * @type {String}
    */
   guiPluginName: attr('string'),
 
   /**
-   * @returns {Promise<models.IndexStat>}
+   * Example: `['basic', 'json', 'rdf']`
+   * @type {Array<String>}
+   */
+  includeMetadata: attr('array'),
+
+  /**
+   * Example: `['fileName', 'originSpace', 'metadataExistenceFlags']`
+   * @type {Array<String>}
+   */
+  includeFileDetails: attr('array'),
+
+  /**
+   * @type {boolean}
+   */
+  includeRejectionReason: attr('boolean'),
+
+  /**
+   * @type {boolean}
+   */
+  retryOnRejection: attr('boolean'),
+
+  /**
+   * @returns {Promise<Models.IndexStat>}
    */
   getStats() {
     const statsGri = gri(_.assign({ aspect: 'index_stats', scope: 'private' },

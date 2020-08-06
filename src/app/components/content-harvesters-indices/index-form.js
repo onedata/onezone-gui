@@ -6,9 +6,10 @@ import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { and, not, tag } from 'ember-awesome-macros';
+import { conditional, and, not, tag, equal, raw, array } from 'ember-awesome-macros';
 import { reads } from '@ember/object/computed';
 import { validator } from 'ember-cp-validations';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   classNames: ['content-harvesters-indices-index-form'],
@@ -20,9 +21,22 @@ export default Component.extend(I18n, {
 
   /**
    * One of: 'view', 'create'
+   * @virtual optional
    * @type {String}
    */
   mode: 'view',
+
+  /**
+   * Needed only when mode == 'view'
+   * @virtual optional
+   * @type {Models.Index}
+   */
+  index: undefined,
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  inViewMode: equal('mode', raw('view')),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -43,19 +57,42 @@ export default Component.extend(I18n, {
         component,
         fields: [
           TextField.extend({
-            // component,
-            // defaultValue: or('component.tokenDataSource.name', raw(undefined)),
-          }).create({ name: 'name' }),
-          TextareaField.create({ name: 'schema' }),
+            isVisible: not('component.inViewMode'),
+          }).create({
+            component,
+            name: 'name',
+          }),
+          TextareaField.extend({
+            defaultValue: conditional(
+              'component.inViewMode',
+              'component.index.schema',
+              raw('')
+            ),
+          }).create({
+            component,
+            name: 'schema',
+          }),
           includeMetadataFormGroup,
           includeFileDetails,
-          ToggleField.create({
+          ToggleField.extend({
+            defaultValue: conditional(
+              'component.inViewMode',
+              'component.index.includeRejectionReason',
+              raw(true)
+            ),
+          }).create({
+            component,
             name: 'includeRejectionReason',
-            defaultValue: true,
           }),
-          ToggleField.create({
+          ToggleField.extend({
+            defaultValue: conditional(
+              'component.inViewMode',
+              'component.index.retryOnRejection',
+              raw(true)
+            ),
+          }).create({
+            component,
             name: 'retryOnRejection',
-            defaultValue: true,
           }),
         ],
       });
@@ -65,6 +102,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   includeMetadataFormGroup: computed(function includeMetadataFormGroup() {
+    const component = this;
     return FormFieldsGroup.extend({
       allTogglesUnchecked: and(
         not('value.metadataBasic'),
@@ -74,12 +112,18 @@ export default Component.extend(I18n, {
     }).create({
       name: 'includeMetadata',
       classes: 'no-label-top-padding nowrap-on-desktop',
-      fields: ['Basic', 'Json', 'Rdf'].map(metadataType =>
-        ToggleField.create({
-          name: `metadata${metadataType}`,
+      fields: ['basic', 'json', 'rdf'].map(metadataType =>
+        ToggleField.extend({
+          defaultValue: conditional(
+            'component.inViewMode',
+            array.includes('component.index.includeMetadata', raw(metadataType)),
+            raw(true)
+          ),
+        }).create({
+          component,
+          name: `metadata${_.upperFirst(metadataType)}`,
           addColonToLabel: false,
           classes: 'label-after',
-          defaultValue: true,
           customValidators: [
             validator(function (value, options, model) {
               return !get(model, 'field.parent.allTogglesUnchecked');
@@ -96,15 +140,22 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   includeFileDetails: computed(function includeFileDetails() {
+    const component = this;
     return FormFieldsGroup.create({
       name: 'includeFileDetails',
       classes: 'no-label-top-padding nowrap-on-desktop',
       fields: ['fileName', 'originSpace', 'metadataExistenceFlags'].map(fieldName =>
-        ToggleField.create({
+        ToggleField.extend({
+          defaultValue: conditional(
+            'component.inViewMode',
+            array.includes('component.index.includeFileDetails', raw(fieldName)),
+            raw(true)
+          ),
+        }).create({
+          component,
           name: fieldName,
           addColonToLabel: false,
           classes: 'label-after',
-          defaultValue: true,
         }),
       ),
     });

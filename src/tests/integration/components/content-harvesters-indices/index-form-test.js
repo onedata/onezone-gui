@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { blur, fillIn, click } from 'ember-native-dom-helpers';
 import { all as allFulfilled, resolve } from 'rsvp';
+import _ from 'lodash';
 
 describe('Integration | Component | content harvesters indices/index form', function () {
   setupComponentTest('content-harvesters-indices/index-form', {
@@ -188,6 +189,93 @@ describe('Integration | Component | content harvesters indices/index form', func
       this.render(hbs `{{content-harvesters-indices/index-form mode="view"}}`);
 
       expect(this.$('.field-edit-mode')).to.not.exist;
+    });
+
+    it('does not show "name" field', function () {
+      this.render(hbs `{{content-harvesters-indices/index-form mode="view"}}`);
+
+      expect(this.$('.name-field')).to.not.exist;
+    });
+
+    const metadataTypes = ['basic', 'json', 'rdf'];
+    const fileDetailsFields = [
+      'fileName',
+      'originSpace',
+      'metadataExistenceFlags',
+    ];
+    [
+      ...metadataTypes.map(metadataType => ({
+        descriptionSuffix: ` with disabled ${metadataType} metadata`,
+        alteredRecordProps: {
+          includeMetadata: metadataTypes.without(metadataType),
+        },
+        alteredChecks: {
+          [`metadata${_.upperFirst(metadataType)}`]: testCase => expect(
+            testCase.$(`.metadata${_.upperFirst(metadataType)}-field .one-way-toggle`)
+          ).to.not.have.class('checked'),
+        },
+      })),
+      ...fileDetailsFields.map(fieldName => ({
+        descriptionSuffix: ` with disabled ${_.snakeCase(fieldName).replace(new RegExp('_', 'g'), ' ')} detail`,
+        alteredRecordProps: {
+          includeFileDetails: fileDetailsFields.without(fieldName),
+        },
+        alteredChecks: {
+          [fieldName]: testCase => expect(
+            testCase.$(`.${fieldName}-field .one-way-toggle`)
+          ).to.not.have.class('checked'),
+        },
+      })),
+      ...['includeRejectionReason', 'retryOnRejection'].map(fieldName => ({
+        descriptionSuffix: ` with disabled ${_.snakeCase(fieldName).replace(new RegExp('_', 'g'), ' ')}`,
+        alteredRecordProps: {
+          [fieldName]: false,
+        },
+        alteredChecks: {
+          [fieldName]: testCase => expect(
+            testCase.$(`.${fieldName}-field .one-way-toggle`)
+          ).to.not.have.class('checked'),
+        },
+      })),
+    ].forEach(({ descriptionSuffix, alteredRecordProps, alteredChecks }) => {
+      it(`shows index full configuration${descriptionSuffix || ''}`, function () {
+        const index = {
+          schema: 'indexSchema',
+          includeMetadata: ['basic', 'json', 'rdf'],
+          includeFileDetails: ['fileName', 'originSpace', 'metadataExistenceFlags'],
+          includeRejectionReason: true,
+          retryOnRejection: true,
+        };
+        Object.assign(index, alteredRecordProps);
+        this.set('index', index);
+
+        const checks = {
+          schema: testCase =>
+            expect(testCase.$('.schema-field textarea')).to.have.value('indexSchema'),
+        };
+        [
+          'metadataBasic',
+          'metadataJson',
+          'metadataRdf',
+          'fileName',
+          'originSpace',
+          'metadataExistenceFlags',
+          'includeRejectionReason',
+          'retryOnRejection',
+        ].forEach(fieldName =>
+          checks[fieldName] = testCase =>
+          expect(testCase.$(`.${fieldName}-field .one-way-toggle`))
+          .to.have.class('checked')
+        );
+        Object.assign(checks, alteredChecks);
+
+        this.render(hbs `{{content-harvesters-indices/index-form
+          mode="view"
+          index=index
+        }}`);
+
+        Object.values(checks).forEach(check => check(this));
+      });
     });
   });
 });
