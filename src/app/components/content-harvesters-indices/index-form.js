@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed, get, trySet } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
@@ -10,6 +10,8 @@ import { conditional, and, not, tag, equal, raw, array } from 'ember-awesome-mac
 import { reads } from '@ember/object/computed';
 import { validator } from 'ember-cp-validations';
 import _ from 'lodash';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default Component.extend(I18n, {
   classNames: ['content-harvesters-indices-index-form'],
@@ -32,6 +34,24 @@ export default Component.extend(I18n, {
    * @type {Models.Index}
    */
   index: undefined,
+
+  /**
+   * @virtual
+   * @type {Function}
+   */
+  onCancel: notImplementedIgnore,
+
+  /**
+   * @virtual
+   * @type {Function}
+   * @param {Object} indexPrototype
+   */
+  onCreate: notImplementedReject,
+
+  /**
+   * @type {boolean}
+   */
+  isCreating: false,
 
   /**
    * @type {ComputedProperty<boolean>}
@@ -71,6 +91,7 @@ export default Component.extend(I18n, {
           }).create({
             component,
             name: 'schema',
+            isOptional: true,
           }),
           includeMetadataFormGroup,
           includeFileDetails,
@@ -176,5 +197,33 @@ export default Component.extend(I18n, {
     if (mode !== 'create') {
       fields.changeMode('view');
     }
+  },
+
+  actions: {
+    create() {
+      this.set('isCreating', true);
+
+      const {
+        onCreate,
+        fields,
+      } = this.getProperties('onCreate', 'fields');
+      const formValues = fields.dumpValue();
+
+      const indexPrototype = {};
+      [
+        'name',
+        'schema',
+        'includeRejectionReason',
+        'retryOnRejection',
+      ].forEach(fieldName => indexPrototype[fieldName] = formValues[fieldName]);
+      indexPrototype.includeMetadata = Object.keys(formValues.includeMetadata)
+        .filter(key => formValues.includeMetadata[key])
+        .map(key => key.slice('metadata'.length).toLowerCase());
+      indexPrototype.includeFileDetails = Object.keys(formValues.includeFileDetails)
+        .filter(key => formValues.includeFileDetails[key]);
+
+      return onCreate(indexPrototype)
+        .finally(() => trySet(this, 'isCreating', false));
+    },
   },
 });

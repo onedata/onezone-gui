@@ -46,6 +46,8 @@ export default {
         label: 'Retry on rejection',
       },
     },
+    createBtnText: 'Create index',
+    cancelBtnText: 'Cancel',
   },
   createIndexForm: {
     name: 'Name',
