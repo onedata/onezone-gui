@@ -10,11 +10,16 @@ export default {
         label: 'Plugin',
         tip: 'Onezone plugin used to integrate with an external harvesting service (e.g. Elasticsearch). Can provide persistence and analytics for harvested metadata.',
       },
-      endpoint: {
-        label: 'Endpoint',
-        tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries. If not provided, the default backend configured for this Onezone will be used.',
+      useDefaultHarvestingBackend: {
+        label: 'Use default harvesting backend',
       },
-      preconfigureGui: {
+      endpointGroup: {
+        endpoint: {
+          label: 'Endpoint',
+          tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries. If not provided, the default backend configured for this Onezone will be used.',
+        },
+      },
+      autoSetup: {
         label: 'Auto setup',
         tip: '<p>If enabled, default configuration will be applied and default indices will be created in the harvester backend (e.g. Elasticsearch). The harvester will work out-of-the-box with the default GUI.</p><p>If disabled, you will have to manually setup the harvester GUI, its configuration and required indices.</p>',
       },
@@ -22,8 +27,10 @@ export default {
         label: 'Public',
         tip: 'If enabled, anyone with the public link can browse the harvested metadata or use the REST API for queries.',
       },
-      publicUrl: {
-        label: 'Public URL',
+      publicFields: {
+        publicUrl: {
+          label: 'Public URL',
+        },
       },
     },
     edit: 'Edit',

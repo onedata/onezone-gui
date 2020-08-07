@@ -17,4 +17,5 @@ export default OnedataConnection.extend({
   serviceBuildVersion: 'm-23493894y7238',
   brandSubtitle: 'Isolated zone',
   maxTemporaryTokenTtl: 7 * 24 * 60 * 60,
+  defaultHarvesterEndpoint: '172.17.0.8:9200',
 });

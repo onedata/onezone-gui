@@ -15,27 +15,33 @@ import { reads } from '@ember/object/computed';
 const OnezoneConnection = ProductionSymbol.extend({
   /**
    * Name of zone instance
-   * @type {Ember.Computed<string>}
+   * @type {Ember.ComputedProperty<String>}
    */
   zoneName: reads('attributes.zoneName'),
 
   /**
    * Domain name of Onezone
-   * @type {Ember.ComputedProperty<string>}
+   * @type {Ember.ComputedProperty<String>}
    */
   zoneDomain: reads('attributes.zoneDomain'),
 
   /**
    * Text shown on the sign-in page in logo
-   * @type {Ember.Computed<string>}
+   * @type {Ember.ComputedProperty<String>}
    */
   brandSubtitle: reads('attributes.brandSubtitle'),
 
   /**
    * Max temporary token TTL in seconds
-   * @type {Ember.Computed<string>}
+   * @type {Ember.ComputedProperty<String>}
    */
   maxTemporaryTokenTtl: reads('attributes.maxTemporaryTokenTtl'),
+
+  /**
+   * Default location of harvesting backend (e.g. Elasticsearch)
+   * @type {Ember.ComputedProperty<String>}
+   */
+  defaultHarvesterEndpoint: reads('attributes.defaultHarvesterEndpoint'),
 });
 
 export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);
