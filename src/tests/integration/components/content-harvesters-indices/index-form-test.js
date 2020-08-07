@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import { blur, fillIn, click } from 'ember-native-dom-helpers';
+import { focus, blur, fillIn, click } from 'ember-native-dom-helpers';
 import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import _ from 'lodash';
 import sinon from 'sinon';
@@ -129,7 +129,8 @@ describe('Integration | Component | content harvesters indices/index form', func
         function () {
           this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-          return blur(fieldInputSelector)
+          return focus(fieldInputSelector)
+            .then(() => blur(fieldInputSelector))
             .then(() => isOptional ?
               expect(this.$(fieldGroupSelector)).to.not.have.class('has-error') :
               expect(this.$(fieldGroupSelector)).to.have.class('has-error')

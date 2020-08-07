@@ -216,6 +216,10 @@ export default Component.extend(I18n, {
         'includeRejectionReason',
         'retryOnRejection',
       ].forEach(fieldName => indexPrototype[fieldName] = formValues[fieldName]);
+      if (!indexPrototype.schema) {
+        delete indexPrototype.schema;
+      }
+
       indexPrototype.includeMetadata = Object.keys(formValues.includeMetadata)
         .filter(key => formValues.includeMetadata[key])
         .map(key => key.slice('metadata'.length).toLowerCase());

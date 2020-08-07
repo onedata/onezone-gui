@@ -49,8 +49,10 @@
     actionsArg=index}}
 {{/listItem.header}}
 {{#listItem.content}}
+  {{!-- fade=false to prevent scroll issues during tabs animation --}}
   {{#bs-tab
     class="bs-tab-onedata bs-tab-modern"
+    fade=false
     as |tab|}}
     {{#tab.pane elementId=(concat parentView.elementId "-progress-tab") title=(tt this "harvestingProgress")}}
       {{#render-later triggerRender=listItem.isActive}}
