@@ -1,32 +1,16 @@
 .content-harvesters-indices {
   .form-component {
-    .includeFileDetails-field .toggle-field-renderer,
-    .includeMetadata-field .toggle-field-renderer {
-      display: inline-flex;
-
-      .control-label {
-        order: 1;
-        flex-grow: 1;
-        min-width: initial;
-        width: initial;
-        margin-left: 1.5 * $padding-xs-horizontal;
-        padding-right: 3 * $padding-base-vertical;
-        @include font-regular;
-      }
-  
-      .field-component {
-        flex-grow: initial;
-      }
-
-      &:not(:last-child) {
-        margin-bottom: $padding-base-vertical;
-      }
-    }
-
     .schema-field textarea {
       font-family: monospace;
       height: 200px;
     }
+
+    .includeFileDetails-field .toggle-field-renderer,
+      .includeMetadata-field .toggle-field-renderer {
+        .control-label {
+          @include font-regular;
+        }
+      }
 
     .btn-toolbar {
       float: none;
@@ -43,6 +27,52 @@
   
     .form-component {
       width: 90%;
+
+      .includeFileDetails-field,
+      .includeMetadata-field {
+        > .control-label {
+          margin-bottom: $form-group-margin-bottom;
+        }
+
+        .toggle-field-renderer {
+          display: inline-flex;
+  
+          .control-label {
+            order: 1;
+            flex-grow: 1;
+            min-width: initial;
+            width: initial;
+            margin-left: 1.5 * $padding-xs-horizontal;
+            padding-right: 3 * $padding-base-vertical;
+            text-align: left;
+            @include font-regular;
+          }
+      
+          .field-component {
+            flex-grow: initial;
+          }
+  
+          &:not(:last-child) {
+            margin-bottom: $padding-base-vertical;
+            min-width: 190px;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .form-component {
+      .includeFileDetails-field,
+      .includeMetadata-field {
+        > .control-label {
+          margin-bottom: $form-group-margin-bottom;
+        }
+
+        &.field-view-mode > .control-label {
+          margin-bottom: $form-component-view-margin;
+        }
+      }
     }
   }
 

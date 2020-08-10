@@ -98,12 +98,24 @@
     }
   }
   .harvester-configuration-general {
-    min-height: 100px;
     @media (max-width: $screen-xs-max) {
       .form {
         margin: 0;
         padding: 0;
       }
+    }
+  }
+}
+
+.harvester-configuration-general {
+  @extend .center-block;
+  min-height: 100px;
+
+  @media (min-width: $screen-sm-min) {
+    max-width: 600px;
+
+    .control-label {
+      min-width: 200px;
     }
   }
 }

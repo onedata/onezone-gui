@@ -8,10 +8,12 @@
  */
 
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { get, computed } from '@ember/object';
+import { get, getProperties, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import $ from 'jquery';
 import { Promise } from 'rsvp';
+import { isNone } from '@ember/utils';
+import { isArray } from '@ember/array';
 
 export default PromiseObject.extend({
   /**
@@ -36,9 +38,9 @@ export default PromiseObject.extend({
   indices: computed('manifest.onedata.indices', function indices() {
     const manifestIndices = this.get('manifest.onedata.indices');
     if (Array.isArray(manifestIndices)) {
-      return manifestIndices.filter(index =>
-        index && typeof get(index, 'name') === 'string'
-      ).uniqBy('name');
+      return manifestIndices
+        .map(index => this.normalizeIndex(index))
+        .uniqBy('name');
     } else {
       return [];
     }
@@ -93,5 +95,65 @@ export default PromiseObject.extend({
     });
     this.set('promise', promise);
     return promise;
+  },
+
+  normalizeIndex(index) {
+    const normalizedIndex = index && typeof index === 'object' ? index : {};
+    const {
+      name,
+      schema,
+      includeMetadata,
+      includeFileDetails,
+      includeRejectionReason,
+      retryOnRejection,
+    } = getProperties(normalizedIndex,
+      'name',
+      'schema',
+      'includeMetadata',
+      'includeFileDetails',
+      'includeRejectionReason',
+      'retryOnRejection'
+    );
+
+    if (typeof name !== 'string' || !name) {
+      return null;
+    }
+
+    let normalizedSchema;
+    if (isNone(schema) || schema === '') {
+      normalizedSchema = '';
+    } else if (typeof schema !== 'string') {
+      normalizedSchema = JSON.stringify(schema, null, 2);
+    }
+
+    let normalizedIncludeMetadata;
+    if (isNone(includeMetadata) || !isArray(includeMetadata)) {
+      normalizedIncludeMetadata = ['basic', 'json', 'rdf'];
+    } else {
+      normalizedIncludeMetadata =
+        includeMetadata.filter(metadata => typeof metadata === 'string');
+    }
+
+    let normalizedIncludeFileDetails;
+    if (isNone(includeFileDetails) || !isArray(includeFileDetails)) {
+      normalizedIncludeFileDetails = [
+        'fileName',
+        'originSpace',
+        'metadataExistenceFlags',
+      ];
+    } else {
+      normalizedIncludeFileDetails =
+        includeFileDetails.filter(detail => typeof detail === 'string');
+    }
+
+    return {
+      name,
+      schema: normalizedSchema,
+      includeMetadata: normalizedIncludeMetadata,
+      includeFileDetails: normalizedIncludeFileDetails,
+      includeRejectionReason: typeof includeRejectionReason === 'boolean' ?
+        includeRejectionReason : true,
+      retryOnRejection: typeof retryOnRejection === 'boolean' ? retryOnRejection : true,
+    };
   },
 });

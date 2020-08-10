@@ -1,19 +1,17 @@
 {{#promise-proxy-container proxy=pluginsListProxy}}
   <div class="form form-horizontal form-component">
     {{form-component/field-renderer field=fields}}
-    <div class="row">
-      <div class={{formLayoutConfig.formSubmitColumns}}>
-        {{#if (eq mode "view")}}
-          {{#bs-button type="default" onClick=(action "edit") class="edit-btn"}}{{tt this "edit"}}{{/bs-button}}
-        {{else}}
-          {{#one-spin-button type="submit" class="btn btn-primary submit-btn" disabled=(not fields.isValid) action=(action "submit")}}
-            {{tt this (if (eq mode "create") "create" "save")}}  
-          {{/one-spin-button}}
-          {{#if (eq mode "edit")}}
-            {{#bs-button type="default" onClick=(action "cancel") disabled=disabled class="cancel-btn"}}{{tt this "cancel"}}{{/bs-button}}
-          {{/if}}
+    <div class="text-center">
+      {{#if (eq mode "view")}}
+        {{#bs-button type="default" onClick=(action "edit") class="edit-btn"}}{{tt this "edit"}}{{/bs-button}}
+      {{else}}
+        {{#one-spin-button type="submit" class="btn btn-primary submit-btn" disabled=(not fields.isValid) action=(action "submit")}}
+          {{tt this (if (eq mode "create") "create" "save")}}  
+        {{/one-spin-button}}
+        {{#if (eq mode "edit")}}
+          {{#bs-button type="default" onClick=(action "cancel") disabled=disabled class="cancel-btn"}}{{tt this "cancel"}}{{/bs-button}}
         {{/if}}
-      </div>
+      {{/if}}
     </div>
   </div>
 {{/promise-proxy-container}}

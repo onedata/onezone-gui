@@ -12,11 +12,12 @@ export default {
       },
       useDefaultHarvestingBackend: {
         label: 'Use default harvesting backend',
+        tip: 'If enabled, default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a location (endpoint) of your harvesting service.',
       },
       endpointGroup: {
         endpoint: {
           label: 'Endpoint',
-          tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries. If not provided, the default backend configured for this Onezone will be used.',
+          tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.',
         },
       },
       autoSetup: {

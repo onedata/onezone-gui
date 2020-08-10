@@ -17,7 +17,6 @@ import { inject as service } from '@ember/service';
 import Messages from 'ember-cp-validations/validators/messages';
 import { hash, Promise, reject } from 'rsvp';
 import { A } from '@ember/array';
-import { isNone } from '@ember/utils';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 function catchPromiseError(promise, model) {
@@ -391,17 +390,10 @@ export default Component.extend(I18n, {
       const assignMethod = get(selectedAssignMethods, guiIndexName);
       switch (assignMethod) {
         case 'create': {
-          let schema = get(guiIndex, 'schema');
-          if (isNone(schema) || schema === '') {
-            schema = '';
-          } else if (typeof schema !== 'string') {
-            schema = JSON.stringify(schema, null, 2);
-          }
-          indicesToCreate.pushObject({
+          indicesToCreate.pushObject(Object.assign({}, guiIndex, {
             name: get(createIndicesNames, guiIndexName),
-            schema,
             guiPluginName: guiIndexName,
-          });
+          }));
         }
         // fallthrough to remove old assign to harvester index, which could be
         // used for gui index we have just created 

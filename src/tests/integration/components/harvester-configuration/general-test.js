@@ -92,20 +92,19 @@ describe('Integration | Component | harvester configuration/general', function (
       function () {
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
-        // const pluginTooltip = new OneTooltipHelper(
-        //   '.useDefaultHarvestingBackend-field .one-label-tip .oneicon'
-        // );
+        const tooltip = new OneTooltipHelper(
+          '.useDefaultHarvestingBackend-field .one-label-tip .oneicon'
+        );
         const $formGroup = this.$('.useDefaultHarvestingBackend-field');
         expect($formGroup).to.exist;
         expect($formGroup.find('.control-label').text().trim())
           .to.equal('Use default harvesting backend:');
         expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
 
-        // FIXME: add tip
-        // return pluginTooltip.getText()
-        //   .then(tipText => expect(tipText).to.equal(
-        //     'someTip'
-        //   ));
+        return tooltip.getText()
+          .then(tipText => expect(tipText).to.equal(
+            'If enabled, default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a location (endpoint) of your harvesting service.'
+          ));
       }
     );
 
@@ -157,7 +156,7 @@ describe('Integration | Component | harvester configuration/general', function (
             return tooltip.getText();
           })
           .then(tipText => expect(tipText).to.equal(
-            'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries. If not provided, the default backend configured for this Onezone will be used.'
+            'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.'
           ));
       }
     );

@@ -494,12 +494,11 @@ export default Service.extend(
         } = getProperties(guiPluginManifest, 'defaultGuiConfiguration', 'indices');
 
         set(guiPluginConfig, 'guiPluginConfig', defaultGuiConfiguration || {});
-        const createIndicesPromises = indices.length ? indices.map(({ name, schema }) =>
-          this.createIndex(harvesterEntityId, {
-            name: backendifyName(name),
-            guiPluginName: name,
-            schema: JSON.stringify(schema || '', null, 2),
-          }, false)
+        const createIndicesPromises = indices.length ? indices.map(index =>
+          this.createIndex(harvesterEntityId, Object.assign({}, index, {
+            name: backendifyName(index.name),
+            guiPluginName: index.name,
+          }), false)
         ) : [resolve()];
 
         return allFulfilled([
