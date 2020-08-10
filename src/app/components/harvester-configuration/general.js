@@ -364,7 +364,8 @@ export default Component.extend(I18n, {
         plugin: fieldsValues.plugin,
       };
       if (mode === 'create') {
-        const endpoint = fieldsValues.useDefaultHarvestingBackend ?
+        const endpoint =
+          fieldsValues.useDefaultHarvestingBackend && defaultHarvesterEndpoint ?
           defaultHarvesterEndpoint : fieldsValues.endpointGroup.endpoint;
         normalizedFieldsValues.endpoint = endpoint;
       } else {
