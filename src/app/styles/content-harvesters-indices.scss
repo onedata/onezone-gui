@@ -6,11 +6,11 @@
     }
 
     .includeFileDetails-field .toggle-field-renderer,
-      .includeMetadata-field .toggle-field-renderer {
-        .control-label {
-          @include font-regular;
-        }
+    .includeMetadata-field .toggle-field-renderer {
+      .control-label {
+        @include font-regular;
       }
+    }
 
     .btn-toolbar {
       float: none;

@@ -6,6 +6,7 @@ import { focus, blur, fillIn, click } from 'ember-native-dom-helpers';
 import { all as allFulfilled, resolve, Promise } from 'rsvp';
 import _ from 'lodash';
 import sinon from 'sinon';
+import OneTooltipHelper from '../../../helpers/one-tooltip';
 
 const metadataTypes = ['basic', 'json', 'rdf'];
 const fileDetailsFields = [
@@ -51,7 +52,7 @@ describe('Integration | Component | content harvesters indices/index form', func
     });
 
     it(
-      'shows three preselected toggles: basic, JSON and RDF with "Include metadata" label',
+      'shows three preselected toggles: basic (with tooltip), JSON and RDF with "Include metadata" label and tooltip',
       function () {
         this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
@@ -67,11 +68,28 @@ describe('Integration | Component | content harvesters indices/index form', func
             .to.equal(metadataType);
           expect($toggleGroup.find('.one-way-toggle')).to.have.class('checked');
         });
+
+        const tooltip = new OneTooltipHelper(
+          '.includeMetadata-field > .control-label .one-label-tip .oneicon'
+        );
+        const basicTooltip = new OneTooltipHelper(
+          '.metadataBasic-field .one-label-tip .oneicon'
+        );
+        return tooltip.getText()
+          .then(tipText => {
+            expect(tipText).to.equal(
+              'Specifies which types of file metadata should be sent to the index. At least one type must be enabled.'
+            );
+            return basicTooltip.getText();
+          })
+          .then(tipText => expect(tipText).to.equal(
+            'Key-value pairs representing extended file attributes (xattrs).'
+          ));
       }
     );
 
     it(
-      'shows three preselected toggles: "file name", "origin space" and "metadata existence flags" with "Include file details" label',
+      'shows three preselected toggles: "file name", "origin space" and "metadata existence flags" with "Include file details" label and tooltip',
       function () {
         this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
@@ -91,28 +109,55 @@ describe('Integration | Component | content harvesters indices/index form', func
             .to.equal(fieldLabel);
           expect($toggleGroup.find('.one-way-toggle')).to.have.class('checked');
         });
+
+        const tooltip = new OneTooltipHelper(
+          '.includeFileDetails-field > .control-label .one-label-tip .oneicon'
+        );
+        return tooltip.getText().then(tipText => expect(tipText).to.equal(
+          'If enabled, the index will include boolean flags containing information whether basic, JSON and RDF metadata exist.'
+        ));
       }
     );
 
-    it('shows preselected toggle with "Include rejection reason" label', function () {
-      this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+    it(
+      'shows preselected toggle with "Include rejection reason" label and tooltip',
+      function () {
+        this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-      const $formGroup = this.$('.includeRejectionReason-field');
-      expect($formGroup).to.exist;
-      expect($formGroup.find('.control-label').text().trim())
-        .to.equal('Include rejection reason:');
-      expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
-    });
+        const $formGroup = this.$('.includeRejectionReason-field');
+        expect($formGroup).to.exist;
+        expect($formGroup.find('.control-label').text().trim())
+          .to.equal('Include rejection reason:');
+        expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
 
-    it('shows preselected toggle with "Retry on rejection" label', function () {
-      this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+        const tooltip = new OneTooltipHelper(
+          '.includeRejectionReason-field .one-label-tip .oneicon'
+        );
+        return tooltip.getText().then(tipText => expect(tipText).to.equal(
+          'If enabled, the index will include an error description in case of a file indexing failure. It allows to preserve file rejection reasons for a later analysis.'
+        ));
+      }
+    );
 
-      const $formGroup = this.$('.retryOnRejection-field');
-      expect($formGroup).to.exist;
-      expect($formGroup.find('.control-label').text().trim())
-        .to.equal('Retry on rejection:');
-      expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
-    });
+    it(
+      'shows preselected toggle with "Retry on rejection" label and tooltip',
+      function () {
+        this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
+
+        const $formGroup = this.$('.retryOnRejection-field');
+        expect($formGroup).to.exist;
+        expect($formGroup.find('.control-label').text().trim())
+          .to.equal('Retry on rejection:');
+        expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
+
+        const tooltip = new OneTooltipHelper(
+          '.retryOnRejection-field .one-label-tip .oneicon'
+        );
+        return tooltip.getText().then(tipText => expect(tipText).to.equal(
+          'If enabled, after a file indexing rejection the data will be sent to the index again, possibly without the problematic data causing the rejection.'
+        ));
+      }
+    );
 
     [{
       fieldName: 'name',

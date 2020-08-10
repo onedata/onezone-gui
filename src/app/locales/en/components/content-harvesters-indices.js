@@ -17,8 +17,10 @@ export default {
       },
       includeMetadata: {
         label: 'Include metadata',
+        tip: 'Specifies which types of file metadata should be sent to the index. At least one type must be enabled.',
         metadataBasic: {
           label: 'Basic',
+          tip: 'Key-value pairs representing extended file attributes (xattrs).',
         },
         metadataJson: {
           label: 'JSON',
@@ -29,6 +31,7 @@ export default {
       },
       includeFileDetails: {
         label: 'Include file details',
+        tip: 'If enabled, the index will include boolean flags containing information whether basic, JSON and RDF metadata exist.',
         fileName: {
           label: 'File name',
         },
@@ -41,9 +44,11 @@ export default {
       },
       includeRejectionReason: {
         label: 'Include rejection reason',
+        tip: 'If enabled, the index will include an error description in case of a file indexing failure. It allows to preserve file rejection reasons for a later analysis.',
       },
       retryOnRejection: {
         label: 'Retry on rejection',
+        tip: 'If enabled, after a file indexing rejection the data will be sent to the index again, possibly without the problematic data causing the rejection.',
       },
     },
     createBtnText: 'Create index',
