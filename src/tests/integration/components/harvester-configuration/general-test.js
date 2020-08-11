@@ -129,14 +129,14 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('has hidden endpoint field by default', function () {
+    it('has hidden "Harvesting backend endpoint" field by default', function () {
       this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       expect(this.$('.endpointGroup-collapse')).to.not.have.class('in');
     });
 
     it(
-      'shows empty text field with "Endpoint" label, tip and no placeholder when "Use default harvesting backend" toggle is unchecked',
+      'shows empty text field with "Harvesting backend endpoint" label, tip and no placeholder when "Use default harvesting backend" toggle is unchecked',
       function () {
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
@@ -150,7 +150,7 @@ describe('Integration | Component | harvester configuration/general', function (
             const $input = $formGroup.find('input');
             expect($formGroup).to.exist;
             expect($formGroup.find('.control-label').text().trim())
-              .to.equal('Endpoint:');
+              .to.equal('Harvesting backend endpoint:');
             expect($input).to.have.value('');
             expect($input).to.not.have.attr('placeholder');
             return tooltip.getText();
@@ -176,7 +176,7 @@ describe('Integration | Component | harvester configuration/general', function (
     });
 
     it(
-      'does not show "Use default harvesting backend" toggle and shows "Endpoint" input when there is no default endpoint',
+      'does not show "Use default harvesting backend" toggle and shows "Harvesting backend endpoint" input when there is no default endpoint',
       function () {
         set(
           lookupService(this, 'onedata-connection'),

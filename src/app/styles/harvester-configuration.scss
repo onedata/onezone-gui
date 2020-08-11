@@ -103,6 +103,14 @@
         margin: 0;
         padding: 0;
       }
+
+      .edit-btn-form-group {
+        display: block;
+        
+        .control-label {
+          display: none;
+        }
+      }
     }
   }
 }

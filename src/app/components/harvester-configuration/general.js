@@ -303,20 +303,8 @@ export default Component.extend(I18n, {
     this._super(...arguments);
 
     this.get('pluginsListProxy').then(() => safeExec(this, () => {
-      this.resetFormIfCreateMode();
       this.modeObserver();
     }));
-  },
-
-  resetFormIfCreateMode() {
-    const {
-      mode,
-      fields,
-    } = this.getProperties('mode', 'fields');
-
-    if (mode === 'create') {
-      fields.reset();
-    }
   },
 
   didInsertElement() {
@@ -364,10 +352,9 @@ export default Component.extend(I18n, {
         plugin: fieldsValues.plugin,
       };
       if (mode === 'create') {
-        const endpoint =
+        normalizedFieldsValues.endpoint =
           fieldsValues.useDefaultHarvestingBackend && defaultHarvesterEndpoint ?
           defaultHarvesterEndpoint : fieldsValues.endpointGroup.endpoint;
-        normalizedFieldsValues.endpoint = endpoint;
       } else {
         normalizedFieldsValues.public = fieldsValues.public;
         normalizedFieldsValues.endpoint = fieldsValues.endpointGroup.endpoint;

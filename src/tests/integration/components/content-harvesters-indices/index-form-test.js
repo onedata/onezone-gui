@@ -8,10 +8,10 @@ import _ from 'lodash';
 import sinon from 'sinon';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
 
-const metadataTypes = ['basic', 'json', 'rdf'];
+const metadataTypes = ['xattrs', 'json', 'rdf'];
 const fileDetailsFields = [
   'fileName',
-  'originSpace',
+  'spaceId',
   'metadataExistenceFlags',
 ];
 
@@ -73,7 +73,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           '.includeMetadata-field > .control-label .one-label-tip .oneicon'
         );
         const basicTooltip = new OneTooltipHelper(
-          '.metadataBasic-field .one-label-tip .oneicon'
+          '.metadataXattrs-field .one-label-tip .oneicon'
         );
         return tooltip.getText()
           .then(tipText => {
@@ -216,7 +216,7 @@ describe('Integration | Component | content harvesters indices/index form', func
             // due to modification.
             return allFulfilled($metadataToggles.toArray().map(toggle => click(toggle)))
               .then(() => basicMetadataSelected ?
-                click('.metadataBasic-field .one-way-toggle') : resolve()
+                click('.metadataXattrs-field .one-way-toggle') : resolve()
               )
               .then(() => jsonMetadataSelected ?
                 click('.metadataJson-field .one-way-toggle') : resolve()
@@ -338,8 +338,8 @@ describe('Integration | Component | content harvesters indices/index form', func
               sinon.match(Object.assign({
                 name: 'abc',
                 schema: 'someschema',
-                includeMetadata: ['basic', 'json', 'rdf'],
-                includeFileDetails: ['fileName', 'originSpace', 'metadataExistenceFlags'],
+                includeMetadata: ['xattrs', 'json', 'rdf'],
+                includeFileDetails: ['fileName', 'spaceId', 'metadataExistenceFlags'],
                 includeRejectionReason: true,
                 retryOnRejection: true,
               }, alteredRecordProps))
@@ -373,8 +373,8 @@ describe('Integration | Component | content harvesters indices/index form', func
     beforeEach(function () {
       this.set('index', {
         schema: 'indexSchema',
-        includeMetadata: ['basic', 'json', 'rdf'],
-        includeFileDetails: ['fileName', 'originSpace', 'metadataExistenceFlags'],
+        includeMetadata: ['xattrs', 'json', 'rdf'],
+        includeFileDetails: ['fileName', 'spaceId', 'metadataExistenceFlags'],
         includeRejectionReason: true,
         retryOnRejection: true,
       });
@@ -441,11 +441,11 @@ describe('Integration | Component | content harvesters indices/index form', func
             expect(testCase.$('.schema-field textarea')).to.have.value('indexSchema'),
         };
         [
-          'metadataBasic',
+          'metadataXattrs',
           'metadataJson',
           'metadataRdf',
           'fileName',
-          'originSpace',
+          'spaceId',
           'metadataExistenceFlags',
           'includeRejectionReason',
           'retryOnRejection',

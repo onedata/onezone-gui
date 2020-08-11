@@ -40,6 +40,7 @@ export default PromiseObject.extend({
     if (Array.isArray(manifestIndices)) {
       return manifestIndices
         .map(index => this.normalizeIndex(index))
+        .compact()
         .uniqBy('name');
     } else {
       return [];
@@ -97,6 +98,11 @@ export default PromiseObject.extend({
     return promise;
   },
 
+  /**
+   * Converts manifest index to the form compatible with index model.
+   * @param {Object} index index representation taken from manifest file
+   * @returns {Object} null if index is invalid
+   */
   normalizeIndex(index) {
     const normalizedIndex = index && typeof index === 'object' ? index : {};
     const {
@@ -128,7 +134,7 @@ export default PromiseObject.extend({
 
     let normalizedIncludeMetadata;
     if (isNone(includeMetadata) || !isArray(includeMetadata)) {
-      normalizedIncludeMetadata = ['basic', 'json', 'rdf'];
+      normalizedIncludeMetadata = ['xattrs', 'json', 'rdf'];
     } else {
       normalizedIncludeMetadata =
         includeMetadata.filter(metadata => typeof metadata === 'string');
@@ -138,7 +144,7 @@ export default PromiseObject.extend({
     if (isNone(includeFileDetails) || !isArray(includeFileDetails)) {
       normalizedIncludeFileDetails = [
         'fileName',
-        'originSpace',
+        'spaceId',
         'metadataExistenceFlags',
       ];
     } else {

@@ -5,10 +5,16 @@
       height: 200px;
     }
 
-    .includeFileDetails-field .toggle-field-renderer,
-    .includeMetadata-field .toggle-field-renderer {
-      .control-label {
-        @include font-regular;
+    .includeFileDetails-field,
+    .includeMetadata-field {
+      > .control-label {
+        margin-bottom: $form-group-margin-bottom;
+      }
+
+      .toggle-field-renderer {
+        .control-label {
+          @include font-regular;
+        }
       }
     }
 
@@ -28,12 +34,12 @@
     .form-component {
       width: 90%;
 
+      .control-label {
+        min-width: 120px;
+      }
+
       .includeFileDetails-field,
       .includeMetadata-field {
-        > .control-label {
-          margin-bottom: $form-group-margin-bottom;
-        }
-
         .toggle-field-renderer {
           display: inline-flex;
   
@@ -45,7 +51,6 @@
             margin-left: 1.5 * $padding-xs-horizontal;
             padding-right: 3 * $padding-base-vertical;
             text-align: left;
-            @include font-regular;
           }
       
           .field-component {
@@ -65,10 +70,6 @@
     .form-component {
       .includeFileDetails-field,
       .includeMetadata-field {
-        > .control-label {
-          margin-bottom: $form-group-margin-bottom;
-        }
-
         &.field-view-mode > .control-label {
           margin-bottom: $form-component-view-margin;
         }

@@ -73,9 +73,20 @@ export default Component.extend(I18n, {
   fields: computed(function fields() {
     const component = this;
     const {
-      includeMetadataFormGroup,
-      includeFileDetails,
-    } = this.getProperties('includeMetadataFormGroup', 'includeFileDetails');
+      nameField,
+      schemaField,
+      includeMetadataGroup,
+      includeFileDetailsGroup,
+      includeRejectionReasonField,
+      retryOnRejectionField,
+    } = this.getProperties(
+      'nameField',
+      'schemaField',
+      'includeMetadataGroup',
+      'includeFileDetailsGroup',
+      'includeRejectionReasonField',
+      'retryOnRejectionField'
+    );
 
     return FormFieldsRootGroup
       .extend({
@@ -85,64 +96,62 @@ export default Component.extend(I18n, {
       .create({
         component,
         fields: [
-          TextField.extend({
-            isVisible: not('component.inViewMode'),
-          }).create({
-            component,
-            name: 'name',
-          }),
-          TextareaField.extend({
-            defaultValue: conditional(
-              'component.inViewMode',
-              'component.index.schema',
-              raw('')
-            ),
-          }).create({
-            component,
-            name: 'schema',
-            isOptional: true,
-          }),
-          includeMetadataFormGroup,
-          includeFileDetails,
-          ToggleField.extend({
-            defaultValue: conditional(
-              'component.inViewMode',
-              'component.index.includeRejectionReason',
-              raw(true)
-            ),
-          }).create({
-            component,
-            name: 'includeRejectionReason',
-          }),
-          ToggleField.extend({
-            defaultValue: conditional(
-              'component.inViewMode',
-              'component.index.retryOnRejection',
-              raw(true)
-            ),
-          }).create({
-            component,
-            name: 'retryOnRejection',
-          }),
+          nameField,
+          schemaField,
+          includeMetadataGroup,
+          includeFileDetailsGroup,
+          includeRejectionReasonField,
+          retryOnRejectionField,
         ],
       });
   }),
 
   /**
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
+   */
+  nameField: computed(function nameField() {
+    const component = this;
+    return TextField.extend({
+      isVisible: not('component.inViewMode'),
+    }).create({
+      component,
+      name: 'name',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.TextareaField>}
+   */
+  schemaField: computed(function schemaField() {
+    const component = this;
+    return TextareaField.extend({
+      defaultValue: conditional(
+        'component.inViewMode',
+        'component.index.schema',
+        raw('')
+      ),
+    }).create({
+      component,
+      name: 'schema',
+      isOptional: true,
+    });
+  }),
+
+  /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  includeMetadataFormGroup: computed(function includeMetadataFormGroup() {
+  includeMetadataGroup: computed(function includeMetadataGroup() {
     const component = this;
     return FormFieldsGroup.extend({
       allTogglesUnchecked: and(
-        not('value.metadataBasic'),
+        not('value.metadataXattrs'),
         not('value.metadataJson'),
         not('value.metadataRdf')
       ),
     }).create({
       name: 'includeMetadata',
       classes: 'no-label-top-padding nowrap-on-desktop',
-      fields: ['basic', 'json', 'rdf'].map(metadataType =>
+      fields: ['xattrs', 'json', 'rdf'].map(metadataType =>
         ToggleField.extend({
           defaultValue: conditional(
             'component.inViewMode',
@@ -169,12 +178,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
-  includeFileDetails: computed(function includeFileDetails() {
+  includeFileDetailsGroup: computed(function includeFileDetailsGroup() {
     const component = this;
     return FormFieldsGroup.create({
       name: 'includeFileDetails',
       classes: 'no-label-top-padding nowrap-on-desktop',
-      fields: ['fileName', 'originSpace', 'metadataExistenceFlags'].map(fieldName =>
+      fields: ['fileName', 'spaceId', 'metadataExistenceFlags'].map(fieldName =>
         ToggleField.extend({
           defaultValue: conditional(
             'component.inViewMode',
@@ -188,6 +197,40 @@ export default Component.extend(I18n, {
           classes: 'label-after',
         }),
       ),
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
+   */
+  includeRejectionReasonField: computed(function includeRejectionReasonField() {
+    const component = this;
+    return ToggleField.extend({
+      defaultValue: conditional(
+        'component.inViewMode',
+        'component.index.includeRejectionReason',
+        raw(true)
+      ),
+    }).create({
+      component,
+      name: 'includeRejectionReason',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
+   */
+  retryOnRejectionField: computed(function retryOnRejectionField() {
+    const component = this;
+    return ToggleField.extend({
+      defaultValue: conditional(
+        'component.inViewMode',
+        'component.index.retryOnRejection',
+        raw(true)
+      ),
+    }).create({
+      component,
+      name: 'retryOnRejection',
     });
   }),
 

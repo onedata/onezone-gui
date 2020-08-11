@@ -18,7 +18,7 @@ export default {
       includeMetadata: {
         label: 'Include metadata',
         tip: 'Specifies which types of file metadata should be sent to the index. At least one type must be enabled.',
-        metadataBasic: {
+        metadataXattrs: {
           label: 'Basic',
           tip: 'Key-value pairs representing extended file attributes (xattrs).',
         },
@@ -35,8 +35,8 @@ export default {
         fileName: {
           label: 'File name',
         },
-        originSpace: {
-          label: 'Origin space',
+        spaceId: {
+          label: 'Space ID',
         },
         metadataExistenceFlags: {
           label: 'Metadata existence flags',

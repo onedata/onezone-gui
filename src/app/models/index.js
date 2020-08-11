@@ -31,13 +31,13 @@ export default Model.extend(GraphSingleModelMixin, {
   guiPluginName: attr('string'),
 
   /**
-   * Example: `['basic', 'json', 'rdf']`
+   * Example: `['xattrs', 'json', 'rdf']`
    * @type {Array<String>}
    */
   includeMetadata: attr('array'),
 
   /**
-   * Example: `['fileName', 'originSpace', 'metadataExistenceFlags']`
+   * Example: `['fileName', 'spaceId', 'metadataExistenceFlags']`
    * @type {Array<String>}
    */
   includeFileDetails: attr('array'),

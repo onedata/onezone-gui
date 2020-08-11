@@ -16,7 +16,7 @@ export default {
       },
       endpointGroup: {
         endpoint: {
-          label: 'Endpoint',
+          label: 'Harvesting backend endpoint',
           tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.',
         },
       },
