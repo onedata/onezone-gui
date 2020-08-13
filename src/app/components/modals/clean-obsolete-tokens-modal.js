@@ -15,8 +15,8 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { array, raw } from 'ember-awesome-macros';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import _ from 'lodash';
 import { resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
@@ -62,6 +62,15 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
    */
+  identityTokensToRemove: array.filterBy(
+    'tokensToRemove',
+    raw('typeName'),
+    raw('identity')
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Models.Token>>}
+   */
   inviteTokensToRemove: array.filterBy(
     'tokensToRemove',
     raw('typeName'),
@@ -75,6 +84,15 @@ export default Component.extend(I18n, {
     'selectedTokensToRemove',
     raw('typeName'),
     raw('access')
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Array<Models.Token>>}
+   */
+  selectedIdentityTokensToRemove: array.filterBy(
+    'selectedTokensToRemove',
+    raw('typeName'),
+    raw('identity')
   ),
 
   /**
@@ -96,25 +114,9 @@ export default Component.extend(I18n, {
 
   actions: {
     selectionChange(tokenType, newSelection) {
-      const {
-        selectedTokensToRemove,
-        selectedAccessTokensToRemove,
-        selectedInviteTokensToRemove,
-      } = this.getProperties(
-        'selectedTokensToRemove',
-        'selectedAccessTokensToRemove',
-        'selectedInviteTokensToRemove'
-      );
-
-      const oldSelection = tokenType === 'access' ?
-        selectedAccessTokensToRemove : selectedInviteTokensToRemove;
-
-      const removedSelection = _.difference(oldSelection, newSelection);
-      const addedSelection = _.difference(newSelection, oldSelection);
-
-      const newSelectedTokensToRemove = selectedTokensToRemove
-        .filter(token => !removedSelection.includes(token))
-        .concat(addedSelection);
+      const newSelectedTokensToRemove = this.get('selectedTokensToRemove')
+        .filter(token => get(token, 'typeName') !== tokenType)
+        .concat(newSelection);
       this.set('selectedTokensToRemove', newSelectedTokensToRemove);
     },
     submit(submitCallback) {

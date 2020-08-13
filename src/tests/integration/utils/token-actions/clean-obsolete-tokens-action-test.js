@@ -26,6 +26,14 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       typeName: 'access',
       isObsolete: false,
     }, {
+      name: 'identity token 1',
+      typeName: 'identity',
+      isObsolete: true,
+    }, {
+      name: 'identity token 2',
+      typeName: 'identity',
+      isObsolete: false,
+    }, {
       name: 'invite token 1',
       typeName: 'invite',
       isObsolete: false,
@@ -123,10 +131,13 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
     return wait().then(() => {
       const $accessTokens = getAccessTokenItems();
+      const $identityTokens = getIdentityTokenItems();
       const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
+      expect($identityTokens).to.have.length(1);
+      expect($identityTokens.text().trim()).to.equal('identity token 1');
       expect($inviteTokens).to.have.length(1);
       expect($inviteTokens.text().trim()).to.equal('invite token 2');
     });
@@ -147,11 +158,15 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
     return wait().then(() => {
       const $accessTokens = getAccessTokenItems();
+      const $identityTokens = getIdentityTokenItems();
       const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
       expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
+      expect($identityTokens).to.have.length(1);
+      expect($identityTokens.text().trim()).to.equal('identity token 1');
+      expect($identityTokens.find('.one-checkbox')).to.not.have.class('checked');
       expect($inviteTokens).to.have.length(1);
       expect($inviteTokens.text().trim()).to.equal('invite token 2');
       expect($inviteTokens.find('.one-checkbox')).to.not.have.class('checked');
@@ -174,11 +189,15 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
     return wait().then(() => {
       const $accessTokens = getAccessTokenItems();
+      const $identityTokens = getIdentityTokenItems();
       const $inviteTokens = getInviteTokenItems();
 
       expect($accessTokens).to.have.length(1);
       expect($accessTokens.text().trim()).to.equal('access token 1');
       expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
+      expect($identityTokens).to.have.length(1);
+      expect($identityTokens.text().trim()).to.equal('identity token 1');
+      expect($identityTokens.find('.one-checkbox')).to.have.class('checked');
       expect($inviteTokens).to.have.length(1);
       expect($inviteTokens.text().trim()).to.equal('invite token 2');
       expect($inviteTokens.find('.one-checkbox')).to.have.class('checked');
@@ -234,14 +253,14 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
       .then(() => actionResultPromise)
       .then(actionResult => {
-        expect(deleteTokenStub).to.be.calledTwice;
+        expect(deleteTokenStub).to.be.calledThrice;
         tokens.filterBy('isObsolete').forEach(token =>
           expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
         );
         expect(reloadTokensSpy).to.be.calledOnce;
         expect(reloadCalledAfterRemove).to.be.true;
         expect(successNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'Selected tokens has been removed.')
+          sinon.match.has('string', 'Selected tokens have been removed.')
         );
         expect(get(actionResult, 'status')).to.equal('done');
       });
@@ -333,6 +352,10 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
 function getAccessTokenItems() {
   return getModalBody().find('.access-tokens-list .checkbox-list-item');
+}
+
+function getIdentityTokenItems() {
+  return getModalBody().find('.identity-tokens-list .checkbox-list-item');
 }
 
 function getInviteTokenItems() {

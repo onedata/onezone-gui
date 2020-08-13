@@ -18,6 +18,13 @@
       selectedItems=selectedAccessTokensToRemove
       onChange=(action "selectionChange" "access")}}
     {{checkbox-list
+      class="identity-tokens-list"
+      headerText=(tt this "identityTokensSection.header")
+      isInitiallyExpanded=false
+      items=identityTokensToRemove
+      selectedItems=selectedIdentityTokensToRemove
+      onChange=(action "selectionChange" "identity")}}
+    {{checkbox-list
       headerText=(tt this "inviteTokensSection.header")
       class="invite-tokens-list"
       isInitiallyExpanded=false
