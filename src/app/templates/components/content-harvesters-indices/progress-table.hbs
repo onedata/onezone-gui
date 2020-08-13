@@ -18,52 +18,84 @@
     </div>
   </div>
   {{#if (if showOnlyActive activeProgressData.length progressData.length)}}
-    <div class="progress-table-container {{if useTableLayout "table-layout" "list-layout"}}">
+    <div
+      class="progress-table-container {{if useTableLayout "table-layout" "list-layout"}}"
+    >
       {{#if useTableLayout}}
-        {{#basic-table breakpoint=breakpoint setupTrigger=basicTableSetupTrigger class="table dropdown-table-rows"}}
-          <thead>
-            <tr class="hidden">
-              <th class="space-name"></th>
-              {{#each (if showOnlyActive activeProgressProviders providers) as |provider|}}
-                <th class="provider-name">{{provider.name}}</th>
-              {{/each}}
-            </tr>
-          </thead>
-          <tbody>
-            {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
-              <tr class={{if (contains spaceProgress.space expandedRows) "active"}}>
-                <td class="space-name row-header" {{action "rowHeaderClick" spaceProgress.space}}>
-                  <span>
-                    {{#unless isTableCollapsed}}
-                      {{one-tooltip title=spaceProgress.space.name}}
-                    {{/unless}}
-                    {{spaceProgress.space.name}}
-                  </span>
-                </td>
-                {{#each spaceProgress.progress as |providerProgress|}}
-                  {{content-harvesters-indices/progress-table-cell
-                    progress=providerProgress
-                    isTableCollapsed=isTableCollapsed}}
+        <div class="progress-table-inner-container">
+        {{#perfect-scrollbar-element onScroll=(action "scroll")}}
+            <table>
+              <tr class="table-row constant-column-labels">
+                <td class="table-cell"></td>
+                <td class="table-cell floating-row-label"></td>
+                {{#each
+                  (if showOnlyActive activeProgressProviders providers)
+                  as |oneprovider|
+                }}
+                  <td class="table-cell column-label constant-column-label">
+                    {{name-conflict tagName="div" class="one-label" item=oneprovider}}
+                  </td>
                 {{/each}}
               </tr>
-            {{/each}}
-            <tr class="provider-names">
-              <td class="space-name"></td>
-              {{#each (if showOnlyActive activeProgressProviders providers) as |provider|}}
-                <td class="provider-name">{{provider.name}}</td>
+              <tr class="table-row floating-column-labels">
+                <td class="table-cell"></td>
+                <td class="table-cell floating-row-label"></td>
+                {{#each
+                  (if showOnlyActive activeProgressProviders providers)
+                  as |oneprovider|
+                }}
+                  <td class="table-cell column-label floating-column-label">
+                    {{name-conflict tagName="div" class="one-label" item=oneprovider}}
+                    {{#one-tooltip placement="bottom"}}
+                      {{name-conflict item=oneprovider}}
+                    {{/one-tooltip}}
+                  </td>
+                {{/each}}
+              </tr>
+              {{#each
+                (if showOnlyActive activeProgressData progressData)
+                as |spaceProgress|
+              }}
+                <tr class="table-row">
+                  <td class="table-cell row-label constant-row-label">
+                    {{name-conflict
+                      item=spaceProgress.space
+                      tagName="div"
+                      class="one-label"
+                    }}
+                  </td>
+                  <td class="table-cell row-label floating-row-label">
+                    {{name-conflict
+                      item=spaceProgress.space
+                      tagName="div"
+                      class="one-label"
+                    }}
+                  </td>
+                  {{#each spaceProgress.progress as |providerProgress|}}
+                    {{content-harvesters-indices/progress-table-cell
+                      progress=providerProgress
+                    }}
+                  {{/each}}
+                </tr>
               {{/each}}
-            </tr>
-          </tbody>
-        {{/basic-table}}
+            </table>
+          {{/perfect-scrollbar-element}}
+        </div>      
       {{else}}
         {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
           {{#each spaceProgress.progress as |progress|}}
-            {{#unless (or (and showOnlyActive progress.archival) (not progress.isSupported))}}
+            {{#unless (or
+              (and showOnlyActive progress.archival)
+              (not progress.isSupported)
+            )}}
               <div class="row content-row progress-row">
-                {{#truncated-string}}{{progress.space.name}} - {{progress.provider.name}}{{/truncated-string}}
+                {{#truncated-string}}
+                  {{progress.space.name}} - {{progress.provider.name}}
+                {{/truncated-string}}
                 {{content-harvesters-indices/progress-table-cell
                   tagName="div"
-                  progress=progress}}
+                  progress=progress
+                }}
               </div>
             {{/unless}}
           {{/each}}

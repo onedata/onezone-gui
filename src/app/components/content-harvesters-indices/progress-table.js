@@ -19,6 +19,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
 import moment from 'moment';
 import { scheduleOnce, next } from '@ember/runloop';
+import $ from 'jquery';
 
 export default Component.extend(I18n, WindowResizeHandler, {
   classNames: ['content-harvesters-indices-progress-table'],
@@ -47,16 +48,6 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @type {boolean}
    */
-  isTableCollapsed: false,
-
-  /**
-   * @type {number}
-   */
-  breakpoint: 1200,
-
-  /**
-   * @type {boolean}
-   */
   showOnlyActive: true,
 
   /**
@@ -68,13 +59,6 @@ export default Component.extend(I18n, WindowResizeHandler, {
    * @type {number}
    */
   previousSeqSum: null,
-
-  /**
-   * @type {Ember.ComputedProperty<Ember.A>}
-   */
-  expandedRows: computed(function expandedRows() {
-    return A();
-  }),
 
   /**
    * @type {Ember.ComputedProperty<number>}
@@ -335,7 +319,14 @@ export default Component.extend(I18n, WindowResizeHandler, {
       if (showOnlyActive) {
         meaningfulData = meaningfulData.rejectBy('archival');
       }
-      return get(meaningfulData, 'length') > 4;
+
+      const meaningfulCellsCount = get(meaningfulData, 'length');
+      // At least 5 non-empty cells and minimum 2 spaces and 2 providers. Having a
+      // table with only one row or one column does not have any sense.
+      // > 15 to deal with a finite height of a collapsible-list item
+      return (meaningfulCellsCount > 4 &&
+        meaningfulData.mapBy('space').uniq().length > 1 &&
+        meaningfulData.mapBy('provider').uniq().length > 1) || meaningfulCellsCount > 15;
     }
   ),
 
@@ -358,16 +349,17 @@ export default Component.extend(I18n, WindowResizeHandler, {
     }
   },
 
+  didRender() {
+    this._super(...arguments);
+
+    this.recalculateTableLayout();
+  },
+
   /**
    * @override
    */
-  onWindowResize(event) {
-    const window = event.target;
-    const breakpoint = this.get('breakpoint');
-
-    safeExec(this, () => {
-      this.set('isTableCollapsed', get(window, 'innerWidth') <= breakpoint);
-    });
+  onWindowResize() {
+    this.recalculateTableLayout();
   },
 
   /**
@@ -431,14 +423,46 @@ export default Component.extend(I18n, WindowResizeHandler, {
     }
   },
 
+  recalculateTableLayout() {
+    if (this.get('element')) {
+      const scrollLeftOffset = this.$('.ps').scrollLeft();
+      const scrollTopOffset = this.$('.ps').scrollTop();
+      const $constantRowLabels =
+        this.$('.row-label.constant-row-label');
+      const $floatingRowLabels = this.$('.row-label.floating-row-label');
+      const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
+      const $floatingColumnLabelsRow = this.$('.floating-column-labels');
+      const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
+
+      $constantRowLabels.each(function each(index) {
+        $floatingRowLabels.eq(index).css({
+          height: `${parseFloat($(this).css('height'))}px`,
+        });
+      });
+      $floatingRowLabels.css({
+        left: `${scrollLeftOffset}px`,
+        width: $constantRowLabels.css('width'),
+        visibility: 'visible',
+      });
+
+      $constantColumnLabels.each(function each(index) {
+        $floatingColumnLabels.eq(index).css({
+          width: `${parseFloat($(this).css('width'))}px`,
+        });
+      });
+      $floatingColumnLabels.css({
+        height: $constantColumnLabels.css('height'),
+        visibility: 'visible',
+      });
+      $floatingColumnLabelsRow.css({
+        top: `${scrollTopOffset}px`,
+      });
+    }
+  },
+
   actions: {
-    rowHeaderClick(space) {
-      const expandedRows = this.get('expandedRows');
-      if (expandedRows.includes(space)) {
-        expandedRows.removeObject(space);
-      } else {
-        expandedRows.addObject(space);
-      }
+    scroll() {
+      this.recalculateTableLayout();
     },
     showArchivalChanged(showArchival) {
       this.set('showOnlyActive', !showArchival);

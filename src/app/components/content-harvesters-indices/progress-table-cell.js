@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { computed, observer, getProperties } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
 import moment from 'moment';
 
@@ -48,17 +48,17 @@ export default Component.extend(I18n, {
   progress: undefined,
 
   /**
-   * @virtual
-   * @type {boolean}
-   */
-  isTableCollapsed: false,
-
-  /**
    * @type {boolean}
    * 
    * If true, popover with additional info will be visible
    */
   isMoreInfoVisible: false,
+
+  /**
+   * Must have method "hide"
+   * @type {Object}
+   */
+  popoverApi: undefined,
 
   /**
    * @type {Ember.ComputedProperty<models.Space>}
@@ -166,24 +166,40 @@ export default Component.extend(I18n, {
     return `${circleCoord} ${maxCircleCoord - circleCoord}`;
   }),
 
-  isTableCollapsedObserver: observer(
-    'isTableCollapsed',
-    function isTableCollapsedObserver() {
-      const isMoreInfoVisible = this.get('isMoreInfoVisible');
-
-      // Close popovers on table transform to prevent showing popovers for
-      // collapsed items
-      if (isMoreInfoVisible) {
-        this.set('isMoreInfoVisible', false);
+  /**
+   * @type {Ember.ComputedProperty<Function>}
+   */
+  parentScrollEventListener: computed(function () {
+    return () => {
+      const popoverApi = this.get('popoverApi');
+      if (popoverApi) {
+        popoverApi.hide();
       }
-    }
-  ),
+    };
+  }),
+
+  didInsertElement() {
+    this._super(...arguments);
+
+    this.$().closest('.perfect-scrollbar-element')[0]
+      .addEventListener('scroll', this.get('parentScrollEventListener'));
+  },
+
+  willDestroyElement() {
+    this._super(...arguments);
+
+    this.$().closest('.perfect-scrollbar-element')[0]
+      .removeEventListener('scroll', this.get('parentScrollEventListener'));
+  },
 
   actions: {
     toggleMoreInfo(isVisible) {
       if (isVisible !== this.get('isMoreInfoVisible')) {
         this.set('isMoreInfoVisible', isVisible);
       }
+    },
+    registerPopoverApi(api) {
+      this.set('popoverApi', api);
     },
   },
 });
