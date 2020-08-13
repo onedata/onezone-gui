@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6609 Added missing identity tokens section in "Clean obsolete tokens" modal
 * VFS-6554 Added space owners concept
 * VFS-6541 Improvements in showing harvester-space relation
 * VFS-6430 Fixed hidden service and consumer caveats in token view
