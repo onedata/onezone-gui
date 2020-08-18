@@ -119,11 +119,22 @@
   @extend .center-block;
   min-height: 100px;
 
+  .form-component > .field-renderer {
+    margin-bottom: $padding-base-vertical;
+  }
+
   @media (min-width: $screen-sm-min) {
-    max-width: 600px;
+    max-width: 800px;
 
     .control-label {
       min-width: 200px;
+      width: 40%;
     }
+  }
+}
+
+.content-info .harvester-configuration-general {
+  @media (min-width: $screen-sm-min) {
+    max-width: 600px;
   }
 }

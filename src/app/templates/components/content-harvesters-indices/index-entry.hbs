@@ -23,7 +23,7 @@
       <span class="label label-info">{{tt this "usedByGui"}}</span>
     </span>
   {{/if}}
-  {{one-icon icon="sign-info-rounded" class="id-presenter-trigger"}}
+  {{one-icon icon="circle-id" class="id-presenter-trigger"}}
   {{#one-webui-popover
     class="index-id-info"
     triggerSelector=(concat "#" parentView.elementId " .id-presenter-trigger")
@@ -54,12 +54,18 @@
     class="bs-tab-onedata bs-tab-modern"
     fade=false
     as |tab|}}
-    {{#tab.pane elementId=(concat parentView.elementId "-progress-tab") title=(tt this "harvestingProgress")}}
+    {{#tab.pane
+      elementId=(concat parentView.elementId "-progress-tab")
+      title=(tt this "harvestingProgress")
+    }}
       {{#render-later triggerRender=listItem.isActive}}
         {{content-harvesters-indices/progress-table index=index harvester=harvester}}
       {{/render-later}}
     {{/tab.pane}}
-    {{#tab.pane elementId=(concat parentView.elementId "-settings-tab") title=(tt this "settings")}}
+    {{#tab.pane
+      elementId=(concat parentView.elementId "-settings-tab")
+      title=(tt this "settings")
+    }}
       {{content-harvesters-indices/index-form mode="view" index=index}}
     {{/tab.pane}}
   {{/bs-tab}}

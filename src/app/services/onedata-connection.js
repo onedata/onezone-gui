@@ -38,10 +38,16 @@ const OnezoneConnection = ProductionSymbol.extend({
   maxTemporaryTokenTtl: reads('attributes.maxTemporaryTokenTtl'),
 
   /**
+   * Default harvesting backend type (e.g. Elasticsearch)
+   * @type {ComputedProperty<String>}
+   */
+  defaultHarvestingBackendType: reads('attributes.defaultHarvestingBackendType'),
+
+  /**
    * Default location of harvesting backend (e.g. Elasticsearch)
    * @type {ComputedProperty<String>}
    */
-  defaultHarvesterEndpoint: reads('attributes.defaultHarvesterEndpoint'),
+  defaultHarvestingBackendEndpoint: reads('attributes.defaultHarvestingBackendEndpoint'),
 });
 
 export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);

@@ -14,6 +14,18 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
 
+export const includeMetadataCorrectValues = [
+  'xattrs',
+  'json',
+  'rdf',
+];
+
+export const includeFileDetailsCorrectValues = [
+  'fileName',
+  'spaceId',
+  'metadataExistenceFlags',
+];
+
 export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {String}

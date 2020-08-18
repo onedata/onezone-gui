@@ -20,7 +20,7 @@ import { entityType as spaceEntityType } from 'onezone-gui/models/space';
 import backendifyName from 'onedata-gui-common/utils/backendify-name';
 
 export default Service.extend(
-  createDataProxyMixin('pluginsList', { type: 'array' }), {
+  createDataProxyMixin('backendTypesList', { type: 'array' }), {
     onedataGraph: service(),
     onedataGraphUtils: service(),
     currentUser: service(),
@@ -451,16 +451,16 @@ export default Service.extend(
     /**
      * @returns {Promise<Array<Object>>}
      */
-    fetchPluginsList() {
+    fetchBackendTypesList() {
       return this.get('onedataGraph').request({
         gri: gri({
           entityType: harvesterEntityType,
-          aspect: 'all_plugins',
+          aspect: 'all_backend_types',
           scope: 'private',
         }),
         operation: 'get',
         subscribe: false,
-      }).then(({ allPlugins }) => allPlugins);
+      }).then(({ allBackendTypes }) => allBackendTypes);
     },
 
     /**

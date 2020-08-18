@@ -7,13 +7,18 @@
 
     .includeFileDetails-field,
     .includeMetadata-field {
-      > .control-label {
-        margin-bottom: $form-group-margin-bottom;
-      }
+      margin-bottom: $form-group-margin-bottom;
 
       .toggle-field-renderer {
+        margin-bottom: $padding-small-vertical;
+        transition: transition-linear(color);
+
         .control-label {
           @include font-regular;
+        }
+
+        &.has-error {
+          color: $color-one-danger;
         }
       }
     }
@@ -32,20 +37,39 @@
     }
   
     .form-component {
-      width: 90%;
+      width: calc(100% - #{$padding-large-horizontal});
 
       .control-label {
-        min-width: 120px;
+        min-width: 180px;
       }
 
       .includeFileDetails-field,
       .includeMetadata-field {
+        justify-content: flex-end;
+
+        > .control-label {
+          flex-basis: 20%;
+          margin-bottom: 0;
+        }
+
+        > .field-component {
+          flex-basis: calc(80% - 180px);
+        }
+
+        > .field-message {
+          flex-basis: 80%;
+          max-width: calc(100% - 180px);
+          text-align: left;
+        }
+
         .toggle-field-renderer {
           display: inline-flex;
+          min-width: 190px;
   
           .control-label {
             order: 1;
             flex-grow: 1;
+            flex-shrink: 1;
             min-width: initial;
             width: initial;
             margin-left: 1.5 * $padding-xs-horizontal;
@@ -55,11 +79,6 @@
       
           .field-component {
             flex-grow: initial;
-          }
-  
-          &:not(:last-child) {
-            margin-bottom: $padding-base-vertical;
-            min-width: 190px;
           }
         }
       }
@@ -100,7 +119,7 @@
   .id-presenter-trigger {
     @include vertical-align-middle();
     right: 60px;
-    font-size: 1.3em;
+    font-size: 2.1em;
     display: none;
     @media (max-width: $screen-xs-max) {
       display: block;
@@ -347,7 +366,6 @@
     .visible-stats-label {
       .one-icon {
         margin-left: 3px;
-        vertical-align: middle;
       }
     }
     .pulse-green {

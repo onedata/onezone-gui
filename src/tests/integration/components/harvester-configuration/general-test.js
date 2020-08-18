@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
-import { set } from '@ember/object';
+import { set, setProperties } from '@ember/object';
 import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
 import { focus, blur, fillIn, click } from 'ember-native-dom-helpers';
@@ -14,8 +14,8 @@ import sinon from 'sinon';
 const exampleHarvester = {
   entityId: 'abc',
   name: 'harvester1',
-  plugin: 'elasticsearch_plugin',
-  endpoint: 'someendpoint',
+  harvestingBackendType: 'elasticsearch_harvesting_backend',
+  harvestingBackendEndpoint: 'someendpoint',
   public: true,
 };
 
@@ -26,19 +26,21 @@ describe('Integration | Component | harvester configuration/general', function (
 
   beforeEach(function () {
     const plugins = [{
-      id: 'elasticsearch_plugin',
-      name: 'Elasticsearch plugin',
+      id: 'some_backend',
+      name: 'Some backend',
+    }, {
+      id: 'elasticsearch_harvesting_backend',
+      name: 'Elasticsearch backend',
     }];
     set(
       lookupService(this, 'harvester-manager'),
-      'pluginsListProxy',
+      'backendTypesListProxy',
       promiseArray(resolve(plugins))
     );
-    set(
-      lookupService(this, 'onedata-connection'),
-      'defaultHarvesterEndpoint',
-      'default.endpoint'
-    );
+    setProperties(lookupService(this, 'onedata-connection'), {
+      defaultHarvestingBackendType: 'elasticsearch_harvesting_backend',
+      defaultHarvestingBackendEndpoint: 'default.endpoint',
+    });
   });
 
   it('has class "harvester-configuration-general"', function () {
@@ -61,34 +63,7 @@ describe('Integration | Component | harvester configuration/general', function (
     });
 
     it(
-      'shows dropdown field with "Plugin" label, tip, preselected option and plugins list',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
-
-        const pluginDropdown = new PluginHelper();
-        const tooltip =
-          new OneTooltipHelper('.plugin-field .one-label-tip .oneicon');
-        return pluginDropdown.open()
-          .then(() => {
-            const $formGroup = this.$('.plugin-field');
-            const $trigger = pluginDropdown.getTrigger();
-            expect($formGroup).to.exist;
-            expect($formGroup.find('.control-label').text().trim()).to.equal('Plugin:');
-            expect($trigger.textContent.trim()).to.equal('Elasticsearch plugin');
-            expect(pluginDropdown.getNthOption(1).textContent.trim())
-              .to.equal('Elasticsearch plugin');
-            expect(pluginDropdown.getNthOption(2)).to.not.exist;
-
-            return tooltip.getText();
-          })
-          .then(tipText => expect(tipText).to.equal(
-            'Onezone plugin used to integrate with an external harvesting service (e.g. Elasticsearch). Can provide persistence and analytics for harvested metadata.'
-          ));
-      }
-    );
-
-    it(
-      'shows preselected toggle field with "Use default harvesting backend" label and tip',
+      'shows preselected toggle field with "Use default backend" label and tip',
       function () {
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
@@ -98,12 +73,12 @@ describe('Integration | Component | harvester configuration/general', function (
         const $formGroup = this.$('.useDefaultHarvestingBackend-field');
         expect($formGroup).to.exist;
         expect($formGroup.find('.control-label').text().trim())
-          .to.equal('Use default harvesting backend:');
+          .to.equal('Use default backend:');
         expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
 
         return tooltip.getText()
           .then(tipText => expect(tipText).to.equal(
-            'If enabled, default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a location (endpoint) of your harvesting service.'
+            'If enabled, the default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a type and location (endpoint) of your harvesting service.'
           ));
       }
     );
@@ -124,40 +99,73 @@ describe('Integration | Component | harvester configuration/general', function (
 
         return tooltip.getText()
           .then(tipText => expect(tipText).to.equal(
-            'If enabled, default configuration will be applied and default indices will be created in the harvester backend (e.g. Elasticsearch). The harvester will work out-of-the-box with the default GUI.\n\nIf disabled, you will have to manually setup the harvester GUI, its configuration and required indices.'
+            'If enabled, default configuration will be applied and default indices will be created in the harvester backend (e.g. Elasticsearch). The harvester will work out-of-the-box with the default GUI.If disabled, you will have to manually setup the harvester GUI, its configuration and required indices.'
           ));
       }
     );
 
-    it('has hidden "Harvesting backend endpoint" field by default', function () {
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+    it(
+      'shows dropdown field with "Backend type" label, tip, preselected option and types list',
+      function () {
+        // reset default backend type to unlock the field and not set default value
+        set(
+          lookupService(this, 'onedata-connection'),
+          'defaultHarvestingBackendType',
+          ''
+        );
 
-      expect(this.$('.endpointGroup-collapse')).to.not.have.class('in');
-    });
+        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+
+        const typeDropdown = new TypeHelper();
+        const tooltip =
+          new OneTooltipHelper('.type-field .one-label-tip .oneicon');
+        return typeDropdown.open()
+          .then(() => {
+            const $formGroup = this.$('.type-field');
+            const $trigger = typeDropdown.getTrigger();
+            expect($formGroup).to.exist;
+            expect($formGroup.find('.control-label').text().trim())
+              .to.equal('Backend type:');
+            expect($trigger.textContent.trim()).to.equal('Some backend');
+            expect(typeDropdown.getNthOption(1).textContent.trim())
+              .to.equal('Some backend');
+            expect(typeDropdown.getNthOption(2).textContent.trim())
+              .to.equal('Elasticsearch backend');
+            expect(typeDropdown.getNthOption(3)).to.not.exist;
+
+            return tooltip.getText();
+          })
+          .then(tipText => expect(tipText).to.equal(
+            'Type of external harvesting backend that will provide persistence and analytics for harvested metadata. Can be chosen from predefined backends and optionally custom ones configured by Onezone admins.'
+          ));
+      }
+    );
 
     it(
-      'shows empty text field with "Harvesting backend endpoint" label, tip and no placeholder when "Use default harvesting backend" toggle is unchecked',
+      'shows empty text field with "Backend endpoint" label, tip and no placeholder',
       function () {
+        // reset default backend endpoint to unlock the field and not set default value
+        set(
+          lookupService(this, 'onedata-connection'),
+          'defaultHarvestingBackendEndpoint',
+          ''
+        );
+
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const tooltip = new OneTooltipHelper(
           '.endpoint-field .one-label-tip .oneicon'
         );
-        return click('.useDefaultHarvestingBackend-field .one-way-toggle')
-          .then(() => {
-            expect(this.$('.endpointGroup-collapse')).to.have.class('in');
-            const $formGroup = this.$('.endpointGroup-collapse .endpoint-field');
-            const $input = $formGroup.find('input');
-            expect($formGroup).to.exist;
-            expect($formGroup.find('.control-label').text().trim())
-              .to.equal('Harvesting backend endpoint:');
-            expect($input).to.have.value('');
-            expect($input).to.not.have.attr('placeholder');
-            return tooltip.getText();
-          })
-          .then(tipText => expect(tipText).to.equal(
-            'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.'
-          ));
+        const $formGroup = this.$('.endpoint-field');
+        const $input = $formGroup.find('input');
+        expect($formGroup).to.exist;
+        expect($formGroup.find('.control-label').text().trim())
+          .to.equal('Backend endpoint:');
+        expect($input).to.have.value('');
+        expect($input).to.not.have.attr('placeholder');
+        return tooltip.getText().then(tipText => expect(tipText).to.equal(
+          'Endpoint where the specified harvesting backend can be reached by Onezone to feed incoming metadata and perform queries.'
+        ));
       }
     );
 
@@ -176,22 +184,85 @@ describe('Integration | Component | harvester configuration/general', function (
     });
 
     it(
-      'does not show "Use default harvesting backend" toggle and shows "Harvesting backend endpoint" input when there is no default endpoint',
+      'shows enabled "Use default backend" toggle and disabled backend-related fields with default values',
+      function () {
+        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+
+        const $defaultBackendToggle =
+          this.$('.useDefaultHarvestingBackend-field .one-way-toggle');
+        expect($defaultBackendToggle).to.exist.and.to.have.class('checked');
+        expectBackendTypeState(this, false, 'Elasticsearch backend');
+        expectBackendEndpointState(this, false, 'default.endpoint');
+      }
+    );
+
+    it(
+      'enables backend-related fields with default values when toggle "Use default backend" becomes unchecked',
+      function () {
+        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+
+        return click('.useDefaultHarvestingBackend-field .one-way-toggle')
+          .then(() => {
+            expectBackendTypeState(this, true, 'Elasticsearch backend');
+            expectBackendEndpointState(this, true, 'default.endpoint');
+          });
+      }
+    );
+
+    it(
+      'resets backend-related fields to default values when toggle "Use default backend" becomes unchecked, fields are modified and then toggle again becomes checked',
+      function () {
+        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+
+        return click('.useDefaultHarvestingBackend-field .one-way-toggle')
+          .then(() => {
+            const typeDropdown = new TypeHelper();
+            return typeDropdown.selectOption(1);
+          })
+          .then(() => fillIn('.endpoint-field input', 'someendpoint'))
+          .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
+          .then(() => {
+            expectBackendTypeState(this, false, 'Elasticsearch backend');
+            expectBackendEndpointState(this, false, 'default.endpoint');
+          });
+      }
+    );
+
+    it(
+      'does not show "Use default backend" toggle and has enabled and empty backend-related fields when there is no default backend type',
       function () {
         set(
           lookupService(this, 'onedata-connection'),
-          'defaultHarvesterEndpoint',
+          'defaultHarvestingBackendType',
           ''
         );
 
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
-        expect(this.$('.endpointGroup-collapse')).to.have.class('in');
+        expectBackendTypeState(this, true, 'Some backend');
+        expectBackendEndpointState(this, true, '');
       }
     );
 
-    it('shows validation when name field is empty', function () {
+    it(
+      'does not show "Use default backend" toggle and has enabled and empty backend-related fields when there is no default backend endpoint',
+      function () {
+        set(
+          lookupService(this, 'onedata-connection'),
+          'defaultHarvestingBackendEndpoint',
+          ''
+        );
+
+        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+
+        expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
+        expectBackendTypeState(this, true, 'Some backend');
+        expectBackendEndpointState(this, true, '');
+      }
+    );
+
+    it('shows validation error when name field is empty', function () {
       this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       return focus('.name-field input')
@@ -199,12 +270,11 @@ describe('Integration | Component | harvester configuration/general', function (
         .then(() => expect(this.$('.name-field')).to.have.class('has-error'));
     });
 
-    it('shows validation when endpoint field is empty', function () {
+    it('shows validation error when endpoint field is empty', function () {
       this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       return click('.useDefaultHarvestingBackend-field .one-way-toggle')
-        .then(() => focus('.endpoint-field input'))
-        .then(() => blur('.endpoint-field input'))
+        .then(() => fillIn('.endpoint-field input', ''))
         .then(() => expect(this.$('.endpoint-field')).to.have.class('has-error'));
     });
 
@@ -233,12 +303,13 @@ describe('Integration | Component | harvester configuration/general', function (
     );
 
     it(
-      'has disabled "Create" button when for is filled in but endpoint is empty',
+      'has disabled "Create" button when form is filled in but endpoint is empty',
       function () {
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
+          .then(() => fillIn('.endpoint-field input', ''))
           .then(() => expect(this.$('.submit-btn')).to.have.attr('disabled'));
       }
     );
@@ -266,14 +337,14 @@ describe('Integration | Component | harvester configuration/general', function (
         .then(() => {
           expect(createStub).to.be.calledOnce.and.to.be.calledWith(sinon.match({
             name: 'abc',
-            plugin: 'elasticsearch_plugin',
-            endpoint: 'default.endpoint',
+            harvestingBackendType: 'elasticsearch_harvesting_backend',
+            harvestingBackendEndpoint: 'default.endpoint',
           }), true);
         });
     });
 
     it(
-      'tries to create harvester on "Create" click using custom endpoint and no auto setup',
+      'tries to create harvester on "Create" click using custom backend type, endpoint and no auto setup',
       function () {
         const harvesterActions = lookupService(this, 'harvester-actions');
         const createStub = sinon.stub(harvesterActions, 'createHarvester').resolves();
@@ -282,14 +353,18 @@ describe('Integration | Component | harvester configuration/general', function (
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
+          .then(() => {
+            const typeDropdown = new TypeHelper();
+            return typeDropdown.selectOption(1);
+          })
           .then(() => fillIn('.endpoint-field input', 'def'))
           .then(() => click('.autoSetup-field .one-way-toggle'))
           .then(() => click('.submit-btn'))
           .then(() => {
             expect(createStub).to.be.calledOnce.and.to.be.calledWith(sinon.match({
               name: 'abc',
-              plugin: 'elasticsearch_plugin',
-              endpoint: 'def',
+              harvestingBackendType: 'some_backend',
+              harvestingBackendEndpoint: 'def',
             }), false);
           });
       }
@@ -345,8 +420,8 @@ describe('Integration | Component | harvester configuration/general', function (
       }}`);
 
       expect(this.$('.name-field .field-component').text().trim()).to.equal('harvester1');
-      expect(this.$('.plugin-field .field-component').text().trim())
-        .to.equal('Elasticsearch plugin');
+      expect(this.$('.type-field .field-component').text().trim())
+        .to.equal('Elasticsearch backend');
       expect(this.$('.endpoint-field .field-component').text().trim())
         .to.equal('someendpoint');
       expect(this.$('.public-field .one-way-toggle')).to.have.class('checked');
@@ -435,8 +510,8 @@ describe('Integration | Component | harvester configuration/general', function (
       return click('.edit-btn')
         .then(() => {
           expect(this.$('.name-field input')).to.have.value('harvester1');
-          expect(this.$('.plugin-field .field-component').text().trim())
-            .to.equal('Elasticsearch plugin');
+          expect(this.$('.type-field .field-component').text().trim())
+            .to.equal('Elasticsearch backend');
           expect(this.$('.endpoint-field input')).to.have.value('someendpoint');
           expect(this.$('.public-field .one-way-toggle')).to.have.class('checked');
 
@@ -561,13 +636,18 @@ describe('Integration | Component | harvester configuration/general', function (
 
       return click('.edit-btn')
         .then(() => fillIn('.name-field input', 'newname'))
+        .then(() => {
+          const typeDropdown = new TypeHelper();
+          return typeDropdown.selectOption(1);
+        })
         .then(() => fillIn('.endpoint-field input', 'newendpoint'))
         .then(() => click('.public-field .one-way-toggle'))
         .then(() => click('.submit-btn'))
         .then(() => {
           expect(updateStub).to.be.called.and.to.be.calledWith(sinon.match({
             name: 'newname',
-            endpoint: 'newendpoint',
+            harvestingBackendType: 'some_backend',
+            harvestingBackendEndpoint: 'newendpoint',
             public: false,
           }));
           expect(this.$('.field-edit-mode')).to.not.exist;
@@ -602,8 +682,30 @@ describe('Integration | Component | harvester configuration/general', function (
   });
 });
 
-class PluginHelper extends EmberPowerSelectHelper {
+class TypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.plugin-field .ember-basic-dropdown');
+    super('.type-field .ember-basic-dropdown');
   }
+}
+
+function expectBackendTypeState(testCase, isEnabled, value) {
+  const $typeTrigger = testCase.$('.type-field .dropdown-field-trigger');
+
+  if (isEnabled) {
+    expect($typeTrigger).to.not.have.attr('aria-disabled');
+  } else {
+    expect($typeTrigger).to.have.attr('aria-disabled');
+  }
+  expect($typeTrigger.text().trim()).to.equal(value);
+}
+
+function expectBackendEndpointState(testCase, isEnabled, value) {
+  const $endpointInput = testCase.$('.endpoint-field input');
+
+  if (isEnabled) {
+    expect($endpointInput).to.not.have.attr('disabled');
+  } else {
+    expect($endpointInput).to.have.attr('disabled');
+  }
+  expect($endpointInput).to.have.value(value);
 }

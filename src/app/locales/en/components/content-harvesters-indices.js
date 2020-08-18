@@ -17,7 +17,8 @@ export default {
       },
       includeMetadata: {
         label: 'Include metadata',
-        tip: 'Specifies which types of file metadata should be sent to the index. At least one type must be enabled.',
+        tip: 'Specifies what types of file metadata should be harvested in this index. At least one type must be given.',
+        nothingEnabledError: 'At least one type must be enabled.',
         metadataXattrs: {
           label: 'Basic',
           tip: 'Key-value pairs representing extended file attributes (xattrs).',
@@ -31,7 +32,7 @@ export default {
       },
       includeFileDetails: {
         label: 'Include file details',
-        tip: 'If enabled, the index will include boolean flags containing information whether basic, JSON and RDF metadata exist.',
+        tip: 'Specifies what file details should be harvested alongside the metadata. Enabling "Metadata existence flags" will add boolean flags saying whether the file has any metadata of certain type. The "File name" field may be utilized by the GUI plugin to improve the browsing experience.',
         fileName: {
           label: 'File name',
         },
@@ -44,11 +45,11 @@ export default {
       },
       includeRejectionReason: {
         label: 'Include rejection reason',
-        tip: 'If enabled, the index will include an error description in case of a file indexing failure. It allows to preserve file rejection reasons for a later analysis.',
+        tip: 'If enabled, all harvesting errors (e.g. when the index rejects a payload due to non-matching schema) are stored as text in the index, which may be useful for later analysis.',
       },
       retryOnRejection: {
         label: 'Retry on rejection',
-        tip: 'If enabled, after a file indexing rejection the data will be sent to the index again, possibly without the problematic data causing the rejection.',
+        tip: 'If enabled, all payloads rejected by the harvesting backend will be automatically analysed for offending data (e.g. fields that do not match the schema), pruned and submitted again. This might slow down the harvesting process and cause nonconformant metadata to be lost.',
       },
     },
     createBtnText: 'Create index',

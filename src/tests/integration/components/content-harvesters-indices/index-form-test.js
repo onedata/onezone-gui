@@ -78,7 +78,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         return tooltip.getText()
           .then(tipText => {
             expect(tipText).to.equal(
-              'Specifies which types of file metadata should be sent to the index. At least one type must be enabled.'
+              'Specifies what types of file metadata should be harvested in this index. At least one type must be given.'
             );
             return basicTooltip.getText();
           })
@@ -89,7 +89,7 @@ describe('Integration | Component | content harvesters indices/index form', func
     );
 
     it(
-      'shows three preselected toggles: "file name", "origin space" and "metadata existence flags" with "Include file details" label and tooltip',
+      'shows three preselected toggles: "file name", "space id" and "metadata existence flags" with "Include file details" label and tooltip',
       function () {
         this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
@@ -101,7 +101,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         expect($toggleGroups).to.have.length(3);
         [
           'File name',
-          'Origin space',
+          'Space ID',
           'Metadata existence flags',
         ].forEach((fieldLabel, index) => {
           const $toggleGroup = $toggleGroups.eq(index);
@@ -114,7 +114,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           '.includeFileDetails-field > .control-label .one-label-tip .oneicon'
         );
         return tooltip.getText().then(tipText => expect(tipText).to.equal(
-          'If enabled, the index will include boolean flags containing information whether basic, JSON and RDF metadata exist.'
+          'Specifies what file details should be harvested alongside the metadata. Enabling "Metadata existence flags" will add boolean flags saying whether the file has any metadata of certain type. The "File name" field may be utilized by the GUI plugin to improve the browsing experience.'
         ));
       }
     );
@@ -134,7 +134,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           '.includeRejectionReason-field .one-label-tip .oneicon'
         );
         return tooltip.getText().then(tipText => expect(tipText).to.equal(
-          'If enabled, the index will include an error description in case of a file indexing failure. It allows to preserve file rejection reasons for a later analysis.'
+          'If enabled, all harvesting errors (e.g. when the index rejects a payload due to non-matching schema) are stored as text in the index, which may be useful for later analysis.'
         ));
       }
     );
@@ -154,7 +154,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           '.retryOnRejection-field .one-label-tip .oneicon'
         );
         return tooltip.getText().then(tipText => expect(tipText).to.equal(
-          'If enabled, after a file indexing rejection the data will be sent to the index again, possibly without the problematic data causing the rejection.'
+          'If enabled, all payloads rejected by the harvesting backend will be automatically analysed for offending data (e.g. fields that do not match the schema), pruned and submitted again. This might slow down the harvesting process and cause nonconformant metadata to be lost.'
         ));
       }
     );
@@ -227,10 +227,14 @@ describe('Integration | Component | content harvesters indices/index form', func
               .then(() => {
                 const $invalidToggleGroups =
                   this.$('.includeMetadata-field .toggle-field-renderer.has-error');
+                const $errorMessage = this.$('.includeMetadata-field .field-message');
                 if (shouldBeInvalid) {
                   expect($invalidToggleGroups).to.have.length(3);
+                  expect($errorMessage.text().trim())
+                    .to.equal('At least one type must be enabled.');
                 } else {
                   expect($invalidToggleGroups).to.not.exist;
+                  expect($errorMessage).to.not.exist;
                 }
               });
           });

@@ -1,4 +1,4 @@
-{{#promise-proxy-container proxy=pluginsListProxy}}
+{{#promise-proxy-container proxy=backendTypesListProxy}}
   <div class="form form-horizontal form-component">
     {{form-component/field-renderer field=fields}}
     <div class="text-center">
@@ -22,8 +22,8 @@
       }}
         {{tt this (if (eq mode "create") "create" "save")}}  
       {{/one-spin-button}}
+
       {{#if (eq mode "edit")}}
-        &nbsp;
         {{#bs-button
           type="default"
           onClick=(action "cancel")

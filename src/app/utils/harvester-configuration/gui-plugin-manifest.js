@@ -14,6 +14,7 @@ import $ from 'jquery';
 import { Promise } from 'rsvp';
 import { isNone } from '@ember/utils';
 import { isArray } from '@ember/array';
+import { includeMetadataCorrectValues, includeFileDetailsCorrectValues } from 'onezone-gui/models/index';
 
 export default PromiseObject.extend({
   /**
@@ -134,22 +135,18 @@ export default PromiseObject.extend({
 
     let normalizedIncludeMetadata;
     if (isNone(includeMetadata) || !isArray(includeMetadata)) {
-      normalizedIncludeMetadata = ['xattrs', 'json', 'rdf'];
+      normalizedIncludeMetadata = includeMetadataCorrectValues.slice();
     } else {
-      normalizedIncludeMetadata =
-        includeMetadata.filter(metadata => typeof metadata === 'string');
+      normalizedIncludeMetadata = includeMetadata
+        .filter(metadata => includeMetadataCorrectValues.includes(metadata));
     }
 
     let normalizedIncludeFileDetails;
     if (isNone(includeFileDetails) || !isArray(includeFileDetails)) {
-      normalizedIncludeFileDetails = [
-        'fileName',
-        'spaceId',
-        'metadataExistenceFlags',
-      ];
+      normalizedIncludeFileDetails = includeFileDetailsCorrectValues.slice();
     } else {
-      normalizedIncludeFileDetails =
-        includeFileDetails.filter(detail => typeof detail === 'string');
+      normalizedIncludeFileDetails = includeFileDetails
+        .filter(detail => includeFileDetailsCorrectValues.includes(detail));
     }
 
     return {

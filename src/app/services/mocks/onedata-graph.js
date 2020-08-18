@@ -66,11 +66,11 @@ const groupHandlers = {
 };
 
 const harvesterHandlers = {
-  all_plugins(operation) {
+  all_backend_types(operation) {
     if (operation === 'get') {
       return {
         success: true,
-        allPlugins: [{
+        allBackendTypes: [{
           id: 'elasticsearch_plugin',
           name: 'Elasticsearch plugin',
         }],

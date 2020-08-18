@@ -554,8 +554,8 @@ function createHarvesterRecords(store) {
     return store.createRecord('harvester', {
       name: `Harvester ${index}`,
       scope: 'private',
-      plugin: 'elasticsearch_plugin',
-      endpoint: '127.0.0.1:9200',
+      harvestingBackendType: 'elasticsearch_plugin',
+      harvestingBackendEndpoint: '127.0.0.1:9200',
       directMembership: true,
       canViewPrivileges: true,
       public: false,

@@ -6,18 +6,18 @@ export default {
       name: {
         label: 'Name',
       },
-      plugin: {
-        label: 'Plugin',
-        tip: 'Onezone plugin used to integrate with an external harvesting service (e.g. Elasticsearch). Can provide persistence and analytics for harvested metadata.',
-      },
       useDefaultHarvestingBackend: {
-        label: 'Use default harvesting backend',
-        tip: 'If enabled, default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a location (endpoint) of your harvesting service.',
+        label: 'Use default backend',
+        tip: 'If enabled, the default harvesting backend configured for this Onezone (e.g Elasticsearch) will be used. If disabled, you will have to provide a type and location (endpoint) of your harvesting service.',
       },
-      endpointGroup: {
+      harvestingBackendFields: {
+        type: {
+          label: 'Backend type',
+          tip: 'Type of external harvesting backend that will provide persistence and analytics for harvested metadata. Can be chosen from predefined backends and optionally custom ones configured by Onezone admins.',
+        },
         endpoint: {
-          label: 'Harvesting backend endpoint',
-          tip: 'Location of the harvesting backend (e.g. Elasticsearch) where the plugin will feed incoming metadata and perform queries.',
+          label: 'Backend endpoint',
+          tip: 'Endpoint where the specified harvesting backend can be reached by Onezone to feed incoming metadata and perform queries.',
         },
       },
       autoSetup: {

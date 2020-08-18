@@ -148,9 +148,17 @@ export default Component.extend(I18n, {
         not('value.metadataJson'),
         not('value.metadataRdf')
       ),
+      errors: computed('allTogglesUnchecked', function errors() {
+        if (this.get('allTogglesUnchecked')) {
+          return [{
+            message: this.t(`${this.get('path')}.nothingEnabledError`),
+          }];
+        }
+      }),
     }).create({
       name: 'includeMetadata',
-      classes: 'no-label-top-padding nowrap-on-desktop',
+      classes: 'no-label-top-padding',
+      areValidationClassesEnabled: true,
       fields: ['xattrs', 'json', 'rdf'].map(metadataType =>
         ToggleField.extend({
           defaultValue: conditional(
@@ -182,7 +190,7 @@ export default Component.extend(I18n, {
     const component = this;
     return FormFieldsGroup.create({
       name: 'includeFileDetails',
-      classes: 'no-label-top-padding nowrap-on-desktop',
+      classes: 'no-label-top-padding',
       fields: ['fileName', 'spaceId', 'metadataExistenceFlags'].map(fieldName =>
         ToggleField.extend({
           defaultValue: conditional(

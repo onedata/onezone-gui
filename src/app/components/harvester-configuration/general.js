@@ -68,7 +68,20 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  defaultHarvesterEndpoint: reads('onedataConnection.defaultHarvesterEndpoint'),
+  defaultHarvestingBackendType: reads('onedataConnection.defaultHarvestingBackendType'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  defaultHarvestingBackendEndpoint: reads('onedataConnection.defaultHarvestingBackendEndpoint'),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  hasDefaultHarvestingBackendSetup: and(
+    'defaultHarvestingBackendType',
+    'defaultHarvestingBackendEndpoint'
+  ),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -77,7 +90,7 @@ export default Component.extend(I18n, {
     const component = this;
     const {
       nameField,
-      pluginField,
+      typeField,
       useDefaultHarvestingBackendField,
       endpointField,
       autoSetupField,
@@ -85,7 +98,7 @@ export default Component.extend(I18n, {
       publicUrlField,
     } = this.getProperties(
       'nameField',
-      'pluginField',
+      'typeField',
       'useDefaultHarvestingBackendField',
       'endpointField',
       'autoSetupField',
@@ -97,22 +110,35 @@ export default Component.extend(I18n, {
       i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
       ownerSource: reads('component'),
       isEnabled: not('component.disabled'),
+      onValueChange(value, field) {
+        this._super(...arguments);
+
+        if (this.get('component.mode') === 'create' &&
+          get(field, 'name') === 'useDefaultHarvestingBackend' && value
+        ) {
+          scheduleOnce(
+            'afterRender',
+            this,
+            () => this.getFieldByPath('harvestingBackendFields').reset()
+          );
+        }
+      },
     }).create({
       component,
       fields: [
         nameField,
-        pluginField,
         useDefaultHarvestingBackendField,
         FormFieldsGroup.extend({
-          isExpanded: or(
+          isEnabled: or(
             notEqual('component.mode', raw('create')),
-            not('component.defaultHarvesterEndpoint'),
+            not('component.hasDefaultHarvestingBackendSetup'),
             not('parent.value.useDefaultHarvestingBackend')
           ),
         }).create({
           component,
-          name: 'endpointGroup',
+          name: 'harvestingBackendFields',
           fields: [
+            typeField,
             endpointField,
           ],
         }),
@@ -150,32 +176,6 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
-   */
-  pluginField: computed(function pluginField() {
-    const component = this;
-    return DropdownField.extend({
-      options: computed('component.pluginsListProxy.isFulfilled', function options() {
-        const pluginsListProxy = this.get('component.pluginsListProxy');
-        if (get(pluginsListProxy, 'isFulfilled')) {
-          return pluginsListProxy.map(({ id, name }) => ({ value: id, label: name }));
-        } else {
-          return [];
-        }
-      }),
-      defaultValue: conditional(
-        equal('component.mode', raw('create')),
-        'options.firstObject.value',
-        'component.harvester.plugin'
-      ),
-    }).create({
-      component,
-      name: 'plugin',
-      showSearch: false,
-    });
-  }),
-
-  /**
    * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
    */
   useDefaultHarvestingBackendField: computed(function useDefaultHarvestingBackendField() {
@@ -183,12 +183,46 @@ export default Component.extend(I18n, {
     return ToggleField.extend({
       isVisible: and(
         equal('component.mode', raw('create')),
-        'component.defaultHarvesterEndpoint'
+        'component.hasDefaultHarvestingBackendSetup'
       ),
     }).create({
       component,
       name: 'useDefaultHarvestingBackend',
       defaultValue: true,
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
+   */
+  typeField: computed(function typeField() {
+    const component = this;
+    return DropdownField.extend({
+      options: computed(
+        'component.backendTypesListProxy.isFulfilled',
+        function options() {
+          const backendTypesListProxy = this.get('component.backendTypesListProxy');
+          if (get(backendTypesListProxy, 'isFulfilled')) {
+            return backendTypesListProxy
+              .map(({ id, name }) => ({ value: id, label: name }));
+          } else {
+            return [];
+          }
+        }
+      ),
+      defaultValue: conditional(
+        equal('component.mode', raw('create')),
+        conditional(
+          'component.hasDefaultHarvestingBackendSetup',
+          'component.defaultHarvestingBackendType',
+          'options.firstObject.value'
+        ),
+        'component.harvester.harvestingBackendType'
+      ),
+    }).create({
+      component,
+      name: 'type',
+      showSearch: false,
     });
   }),
 
@@ -200,8 +234,12 @@ export default Component.extend(I18n, {
     return TextField.extend({
       defaultValue: conditional(
         equal('component.mode', raw('create')),
-        raw(''),
-        'component.harvester.endpoint',
+        conditional(
+          'component.hasDefaultHarvestingBackendSetup',
+          'component.defaultHarvestingBackendEndpoint',
+          raw('')
+        ),
+        'component.harvester.harvestingBackendEndpoint',
       ),
     }).create({
       component,
@@ -255,10 +293,10 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * Available harvester plugins list
+   * Available harvesting backend types list
    * @returns {Ember.ComputedProperty<PromiseArray<string>>}
    */
-  pluginsListProxy: reads('harvesterManager.pluginsListProxy'),
+  backendTypesListProxy: reads('harvesterManager.backendTypesListProxy'),
 
   /**
    * @type {Ember.ComputedProperty<string|null>}
@@ -302,7 +340,7 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
 
-    this.get('pluginsListProxy').then(() => safeExec(this, () => {
+    this.get('backendTypesListProxy').then(() => safeExec(this, () => {
       this.modeObserver();
     }));
   },
@@ -312,10 +350,10 @@ export default Component.extend(I18n, {
 
     const {
       mode,
-      pluginsListProxy,
-    } = this.getProperties('mode', 'pluginsListProxy');
+      backendTypesListProxy,
+    } = this.getProperties('mode', 'backendTypesListProxy');
     if (mode === 'create') {
-      pluginsListProxy.then(() => {
+      backendTypesListProxy.then(() => {
         scheduleOnce(
           'afterRender',
           this,
@@ -338,26 +376,20 @@ export default Component.extend(I18n, {
         mode,
         harvester,
         harvesterActions,
-        defaultHarvesterEndpoint,
       } = this.getProperties(
         'fields',
         'mode',
         'harvester',
-        'harvesterActions',
-        'defaultHarvesterEndpoint'
+        'harvesterActions'
       );
       const fieldsValues = fields.dumpValue();
       const normalizedFieldsValues = {
         name: fieldsValues.name,
-        plugin: fieldsValues.plugin,
+        harvestingBackendType: fieldsValues.harvestingBackendFields.type,
+        harvestingBackendEndpoint: fieldsValues.harvestingBackendFields.endpoint,
       };
-      if (mode === 'create') {
-        normalizedFieldsValues.endpoint =
-          fieldsValues.useDefaultHarvestingBackend && defaultHarvesterEndpoint ?
-          defaultHarvesterEndpoint : fieldsValues.endpointGroup.endpoint;
-      } else {
+      if (mode === 'edit') {
         normalizedFieldsValues.public = fieldsValues.public;
-        normalizedFieldsValues.endpoint = fieldsValues.endpointGroup.endpoint;
       }
       const preconfigureGui = mode === 'create' && fieldsValues.autoSetup;
 
