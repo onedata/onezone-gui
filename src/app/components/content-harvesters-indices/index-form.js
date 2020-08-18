@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get, trySet } from '@ember/object';
+import { computed, observer, get, trySet } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
@@ -21,6 +21,7 @@ import { validator } from 'ember-cp-validations';
 import _ from 'lodash';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   classNames: ['content-harvesters-indices-index-form'],
@@ -242,10 +243,20 @@ export default Component.extend(I18n, {
     });
   }),
 
+  indexObserver: observer('index.isLoaded', function indexObserver() {
+    const isIndexLoaded = this.get('index.isLoaded') || false;
+    if (this.get('mode') !== 'create' && isIndexLoaded) {
+      // scheduleOnce because (maybe due to some Ember bug) sometimes record does not have
+      // data populated yet even if isLoaded == true
+      scheduleOnce('afterRender', this, () => this.get('fields').reset());
+    }
+  }),
+
   init() {
     this._super(...arguments);
 
     this.setupFieldsMode();
+    this.indexObserver();
   },
 
   setupFieldsMode() {

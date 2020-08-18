@@ -26,11 +26,11 @@ describe('Integration | Component | harvester configuration/general', function (
 
   beforeEach(function () {
     const plugins = [{
-      id: 'some_backend',
-      name: 'Some backend',
+      id: 'postgre',
+      name: 'Postgre',
     }, {
       id: 'elasticsearch_harvesting_backend',
-      name: 'Elasticsearch backend',
+      name: 'Elasticsearch',
     }];
     set(
       lookupService(this, 'harvester-manager'),
@@ -126,11 +126,11 @@ describe('Integration | Component | harvester configuration/general', function (
             expect($formGroup).to.exist;
             expect($formGroup.find('.control-label').text().trim())
               .to.equal('Backend type:');
-            expect($trigger.textContent.trim()).to.equal('Some backend');
+            expect($trigger.textContent.trim()).to.equal('Postgre');
             expect(typeDropdown.getNthOption(1).textContent.trim())
-              .to.equal('Some backend');
+              .to.equal('Postgre');
             expect(typeDropdown.getNthOption(2).textContent.trim())
-              .to.equal('Elasticsearch backend');
+              .to.equal('Elasticsearch');
             expect(typeDropdown.getNthOption(3)).to.not.exist;
 
             return tooltip.getText();
@@ -191,7 +191,7 @@ describe('Integration | Component | harvester configuration/general', function (
         const $defaultBackendToggle =
           this.$('.useDefaultHarvestingBackend-field .one-way-toggle');
         expect($defaultBackendToggle).to.exist.and.to.have.class('checked');
-        expectBackendTypeState(this, false, 'Elasticsearch backend');
+        expectBackendTypeState(this, false, 'Elasticsearch');
         expectBackendEndpointState(this, false, 'default.endpoint');
       }
     );
@@ -203,7 +203,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
         return click('.useDefaultHarvestingBackend-field .one-way-toggle')
           .then(() => {
-            expectBackendTypeState(this, true, 'Elasticsearch backend');
+            expectBackendTypeState(this, true, 'Elasticsearch');
             expectBackendEndpointState(this, true, 'default.endpoint');
           });
       }
@@ -222,7 +222,7 @@ describe('Integration | Component | harvester configuration/general', function (
           .then(() => fillIn('.endpoint-field input', 'someendpoint'))
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
           .then(() => {
-            expectBackendTypeState(this, false, 'Elasticsearch backend');
+            expectBackendTypeState(this, false, 'Elasticsearch');
             expectBackendEndpointState(this, false, 'default.endpoint');
           });
       }
@@ -240,7 +240,7 @@ describe('Integration | Component | harvester configuration/general', function (
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
-        expectBackendTypeState(this, true, 'Some backend');
+        expectBackendTypeState(this, true, 'Postgre');
         expectBackendEndpointState(this, true, '');
       }
     );
@@ -257,7 +257,7 @@ describe('Integration | Component | harvester configuration/general', function (
         this.render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
-        expectBackendTypeState(this, true, 'Some backend');
+        expectBackendTypeState(this, true, 'Postgre');
         expectBackendEndpointState(this, true, '');
       }
     );
@@ -363,7 +363,7 @@ describe('Integration | Component | harvester configuration/general', function (
           .then(() => {
             expect(createStub).to.be.calledOnce.and.to.be.calledWith(sinon.match({
               name: 'abc',
-              harvestingBackendType: 'some_backend',
+              harvestingBackendType: 'postgre',
               harvestingBackendEndpoint: 'def',
             }), false);
           });
@@ -421,7 +421,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
       expect(this.$('.name-field .field-component').text().trim()).to.equal('harvester1');
       expect(this.$('.type-field .field-component').text().trim())
-        .to.equal('Elasticsearch backend');
+        .to.equal('Elasticsearch');
       expect(this.$('.endpoint-field .field-component').text().trim())
         .to.equal('someendpoint');
       expect(this.$('.public-field .one-way-toggle')).to.have.class('checked');
@@ -511,7 +511,7 @@ describe('Integration | Component | harvester configuration/general', function (
         .then(() => {
           expect(this.$('.name-field input')).to.have.value('harvester1');
           expect(this.$('.type-field .field-component').text().trim())
-            .to.equal('Elasticsearch backend');
+            .to.equal('Elasticsearch');
           expect(this.$('.endpoint-field input')).to.have.value('someendpoint');
           expect(this.$('.public-field .one-way-toggle')).to.have.class('checked');
 
@@ -646,7 +646,7 @@ describe('Integration | Component | harvester configuration/general', function (
         .then(() => {
           expect(updateStub).to.be.called.and.to.be.calledWith(sinon.match({
             name: 'newname',
-            harvestingBackendType: 'some_backend',
+            harvestingBackendType: 'postgre',
             harvestingBackendEndpoint: 'newendpoint',
             public: false,
           }));

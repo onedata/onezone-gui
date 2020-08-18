@@ -72,7 +72,7 @@ const harvesterHandlers = {
         success: true,
         allBackendTypes: [{
           id: 'elasticsearch_harvesting_backend',
-          name: 'Elasticsearch backend',
+          name: 'Elasticsearch',
         }],
       };
     } else {
