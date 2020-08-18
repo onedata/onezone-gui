@@ -18,7 +18,7 @@ export default {
       includeMetadata: {
         label: 'Include metadata',
         tip: 'Specifies what types of file metadata should be harvested in this index. At least one type must be given.',
-        nothingEnabledError: 'At least one type must be enabled.',
+        nothingEnabledError: 'At least one type must be enabled',
         metadataXattrs: {
           label: 'Basic',
           tip: 'Key-value pairs representing extended file attributes (xattrs).',

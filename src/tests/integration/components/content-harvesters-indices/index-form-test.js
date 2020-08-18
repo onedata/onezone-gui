@@ -231,7 +231,7 @@ describe('Integration | Component | content harvesters indices/index form', func
                 if (shouldBeInvalid) {
                   expect($invalidToggleGroups).to.have.length(3);
                   expect($errorMessage.text().trim())
-                    .to.equal('At least one type must be enabled.');
+                    .to.equal('At least one type must be enabled');
                 } else {
                   expect($invalidToggleGroups).to.not.exist;
                   expect($errorMessage).to.not.exist;

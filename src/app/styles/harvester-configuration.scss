@@ -119,6 +119,7 @@
   @extend .center-block;
   min-height: 100px;
 
+  // root form group
   .form-component > .field-renderer {
     margin-bottom: $padding-base-vertical;
   }

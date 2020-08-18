@@ -29,7 +29,6 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   harvestingBackendType: attr('string'),
 
   /**
-   * Elasticsearch endpoint
    * @type {string}
    */
   harvestingBackendEndpoint: attr('string'),
