@@ -7,6 +7,54 @@ export default {
   create: 'Create new index',
   createNewIndex: 'Create new index',
   noIndices: 'No indices',
+  indexForm: {
+    fields: {
+      name: {
+        label: 'Name',
+      },
+      schema: {
+        label: 'Schema',
+      },
+      includeMetadata: {
+        label: 'Include metadata',
+        tip: 'Specifies what types of file metadata should be harvested in this index. At least one type must be given.',
+        nothingEnabledError: 'At least one type must be enabled',
+        metadataXattrs: {
+          label: 'Basic',
+          tip: 'Key-value pairs representing extended file attributes (xattrs).',
+        },
+        metadataJson: {
+          label: 'JSON',
+        },
+        metadataRdf: {
+          label: 'RDF',
+        },
+      },
+      includeFileDetails: {
+        label: 'Include file details',
+        tip: 'Specifies what file details should be harvested alongside the metadata. Enabling "Metadata existence flags" will add boolean flags saying whether the file has any metadata of certain type. The "File name" field may be utilized by the GUI plugin to improve the browsing experience.',
+        fileName: {
+          label: 'File name',
+        },
+        spaceId: {
+          label: 'Space ID',
+        },
+        metadataExistenceFlags: {
+          label: 'Metadata existence flags',
+        },
+      },
+      includeRejectionReason: {
+        label: 'Include rejection reason',
+        tip: 'If enabled, all harvesting errors (e.g. when the index rejects a payload due to non-matching schema) are stored as text in the index, which may be useful for later analysis.',
+      },
+      retryOnRejection: {
+        label: 'Retry on rejection',
+        tip: 'If enabled, all payloads rejected by the harvesting backend will be automatically analysed for offending data (e.g. fields that do not match the schema), pruned and submitted again. This might slow down the harvesting process and cause nonconformant metadata to be lost.',
+      },
+    },
+    createBtnText: 'Create index',
+    cancelBtnText: 'Cancel',
+  },
   createIndexForm: {
     name: 'Name',
     schema: 'Schema',
@@ -28,7 +76,7 @@ export default {
     remove: 'Remove',
     rename: 'Rename',
     harvestingProgress: 'Harvesting progress',
-    schema: 'Schema',
+    settings: 'Settings',
   },
   progressTable: {
     nothingToHarvest: 'There is no data to harvest. Set up files metadata in connected spaces or attach another space to start harvesting process.',

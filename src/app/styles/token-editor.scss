@@ -222,6 +222,10 @@
   }
 
   @media (min-width: $screen-sm-min) {
+    .control-label {
+      text-align: left;
+    }
+
     .basic-field .control-label,
     .caveat-group-toggle {
       flex-shrink: 0;

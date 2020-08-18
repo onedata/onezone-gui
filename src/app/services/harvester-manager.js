@@ -20,7 +20,7 @@ import { entityType as spaceEntityType } from 'onezone-gui/models/space';
 import backendifyName from 'onedata-gui-common/utils/backendify-name';
 
 export default Service.extend(
-  createDataProxyMixin('pluginsList', { type: 'array' }), {
+  createDataProxyMixin('backendTypesList', { type: 'array' }), {
     onedataGraph: service(),
     onedataGraphUtils: service(),
     currentUser: service(),
@@ -451,16 +451,16 @@ export default Service.extend(
     /**
      * @returns {Promise<Array<Object>>}
      */
-    fetchPluginsList() {
+    fetchBackendTypesList() {
       return this.get('onedataGraph').request({
         gri: gri({
           entityType: harvesterEntityType,
-          aspect: 'all_plugins',
+          aspect: 'all_backend_types',
           scope: 'private',
         }),
         operation: 'get',
         subscribe: false,
-      }).then(({ allPlugins }) => allPlugins);
+      }).then(({ allBackendTypes }) => allBackendTypes);
     },
 
     /**
@@ -494,12 +494,11 @@ export default Service.extend(
         } = getProperties(guiPluginManifest, 'defaultGuiConfiguration', 'indices');
 
         set(guiPluginConfig, 'guiPluginConfig', defaultGuiConfiguration || {});
-        const createIndicesPromises = indices.length ? indices.map(({ name, schema }) =>
-          this.createIndex(harvesterEntityId, {
-            name: backendifyName(name),
-            guiPluginName: name,
-            schema: JSON.stringify(schema || '', null, 2),
-          }, false)
+        const createIndicesPromises = indices.length ? indices.map(index =>
+          this.createIndex(harvesterEntityId, Object.assign({}, index, {
+            name: backendifyName(index.name),
+            guiPluginName: index.name,
+          }), false)
         ) : [resolve()];
 
         return allFulfilled([

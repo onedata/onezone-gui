@@ -24,15 +24,14 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   directMembership: attr('boolean', { defaultValue: false }),
 
   /**
-   * Elasticsearch endpoint
    * @type {string}
    */
-  endpoint: attr('string'),
+  harvestingBackendType: attr('string'),
 
   /**
    * @type {string}
    */
-  plugin: attr('string'),
+  harvestingBackendEndpoint: attr('string'),
 
   /**
    * @type {boolean}
