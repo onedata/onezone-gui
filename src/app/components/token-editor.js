@@ -627,6 +627,7 @@ export default Component.extend(I18n, {
         }
       ),
     }).create({
+      classes: 'wrap-on-desktop',
       name: 'privileges',
     });
   }),

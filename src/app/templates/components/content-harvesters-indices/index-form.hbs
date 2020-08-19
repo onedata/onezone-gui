@@ -1,0 +1,23 @@
+<form class="form form-horizontal form-component clearfix">
+  {{form-component/field-renderer field=fields}}
+  {{#if (eq mode "create")}}
+    <div class="btn-toolbar">
+      {{#bs-button
+        class="cancel-btn"
+        disabled=isCreating
+        onClick=onCancel
+      }}
+        {{tt this "cancelBtnText"}}
+      {{/bs-button}}
+      {{#one-spin-button
+        class="btn btn-primary create-btn"
+        disabled=(not fields.isValid)
+        type="button"
+        action=(action "create")
+      }}
+        {{tt this "createBtnText"}}
+      {{/one-spin-button}}
+    </div>
+  {{/if}}
+</form>
+{{yield}}

@@ -98,12 +98,44 @@
     }
   }
   .harvester-configuration-general {
-    min-height: 100px;
     @media (max-width: $screen-xs-max) {
       .form {
         margin: 0;
         padding: 0;
       }
+
+      .edit-btn-form-group {
+        display: block;
+        
+        .control-label {
+          display: none;
+        }
+      }
     }
+  }
+}
+
+.harvester-configuration-general {
+  @extend .center-block;
+  min-height: 100px;
+
+  // root form group
+  .form-component > .field-renderer {
+    margin-bottom: $padding-base-vertical;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    max-width: 800px;
+
+    .control-label {
+      min-width: 200px;
+      width: 40%;
+    }
+  }
+}
+
+.content-info .harvester-configuration-general {
+  @media (min-width: $screen-sm-min) {
+    max-width: 600px;
   }
 }
