@@ -7,18 +7,18 @@
  *
  * @module components/modals/clean-obsolete-tokens-modal
  * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { array, raw } from 'ember-awesome-macros';
-import { get } from '@ember/object';
+import { array, raw, notEmpty, or } from 'ember-awesome-macros';
 import { reads } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -43,7 +43,17 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<Models.Token>}
    */
-  selectedTokensToRemove: undefined,
+  selectedAccessTokensToRemove: undefined,
+
+  /**
+   * @type {Array<Models.Token>}
+   */
+  selectedIdentityTokensToRemove: undefined,
+
+  /**
+   * @type {Array<Models.Token>}
+   */
+  selectedInviteTokensToRemove: undefined,
 
   /**
    * @type {Ember.ComputedProperty<Array<Models.Token>>}
@@ -78,53 +88,53 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Array<Models.Token>>}
+   * @type {Ember.ComputedProperty<boolean>}
    */
-  selectedAccessTokensToRemove: array.filterBy(
-    'selectedTokensToRemove',
-    raw('typeName'),
-    raw('access')
-  ),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Models.Token>>}
-   */
-  selectedIdentityTokensToRemove: array.filterBy(
-    'selectedTokensToRemove',
-    raw('typeName'),
-    raw('identity')
-  ),
-
-  /**
-   * @type {Ember.ComputedProperty<Array<Models.Token>>}
-   */
-  selectedInviteTokensToRemove: array.filterBy(
-    'selectedTokensToRemove',
-    raw('typeName'),
-    raw('invite')
+  hasSelectedTokensToRemove: or(
+    notEmpty('selectedAccessTokensToRemove'),
+    notEmpty('selectedIdentityTokensToRemove'),
+    notEmpty('selectedInviteTokensToRemove')
   ),
 
   init() {
     this._super(...arguments);
 
+    this.initializeSelectedTokensArrays();
+  },
+
+  initializeSelectedTokensArrays() {
     const selectedTokensToRemove = this.get('modalOptions.selectedTokensToRemove') ||
       this.get('tokensToRemove');
-    this.set('selectedTokensToRemove', selectedTokensToRemove);
+
+    this.setProperties({
+      selectedAccessTokensToRemove: selectedTokensToRemove.filterBy('typeName', 'access'),
+      selectedIdentityTokensToRemove: selectedTokensToRemove.filterBy('typeName', 'identity'),
+      selectedInviteTokensToRemove: selectedTokensToRemove.filterBy('typeName', 'invite'),
+    });
   },
 
   actions: {
     selectionChange(tokenType, newSelection) {
-      const newSelectedTokensToRemove = this.get('selectedTokensToRemove')
-        .filter(token => get(token, 'typeName') !== tokenType)
-        .concat(newSelection);
-      this.set('selectedTokensToRemove', newSelectedTokensToRemove);
+      const selectedTokensFieldName = `selected${_.upperFirst(tokenType)}TokensToRemove`;
+      this.set(selectedTokensFieldName, newSelection);
     },
     submit(submitCallback) {
-      const selectedTokensToRemove = this.get('selectedTokensToRemove');
+      const {
+        selectedAccessTokensToRemove,
+        selectedIdentityTokensToRemove,
+        selectedInviteTokensToRemove,
+      } = this.getProperties(
+        'selectedAccessTokensToRemove',
+        'selectedIdentityTokensToRemove',
+        'selectedInviteTokensToRemove',
+      );
 
       this.set('isSubmitting', true);
-      return resolve(submitCallback(selectedTokensToRemove))
-        .finally(() => safeExec(this, () => this.set('isSubmitting', false)));
+      return resolve(submitCallback([
+        ...selectedAccessTokensToRemove,
+        ...selectedIdentityTokensToRemove,
+        ...selectedInviteTokensToRemove,
+      ])).finally(() => safeExec(this, () => this.set('isSubmitting', false)));
     },
   },
 });

@@ -45,7 +45,7 @@
     {{#one-spin-button
       class="btn btn-danger remove-tokens-submit"
       action=(action "submit" modal.submit)
-      disabled=(not selectedTokensToRemove.length)
+      disabled=(not hasSelectedTokensToRemove)
     }}
       {{tt this "submit"}}
     {{/one-spin-button}}
