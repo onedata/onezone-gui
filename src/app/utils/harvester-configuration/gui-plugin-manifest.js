@@ -8,10 +8,13 @@
  */
 
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
-import { get, computed } from '@ember/object';
+import { get, getProperties, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import $ from 'jquery';
 import { Promise } from 'rsvp';
+import { isNone } from '@ember/utils';
+import { isArray } from '@ember/array';
+import { includeMetadataCorrectValues, includeFileDetailsCorrectValues } from 'onezone-gui/models/index';
 
 export default PromiseObject.extend({
   /**
@@ -36,9 +39,10 @@ export default PromiseObject.extend({
   indices: computed('manifest.onedata.indices', function indices() {
     const manifestIndices = this.get('manifest.onedata.indices');
     if (Array.isArray(manifestIndices)) {
-      return manifestIndices.filter(index =>
-        index && typeof get(index, 'name') === 'string'
-      ).uniqBy('name');
+      return manifestIndices
+        .map(index => this.normalizeIndex(index))
+        .compact()
+        .uniqBy('name');
     } else {
       return [];
     }
@@ -93,5 +97,66 @@ export default PromiseObject.extend({
     });
     this.set('promise', promise);
     return promise;
+  },
+
+  /**
+   * Converts manifest index to the form compatible with index model.
+   * @param {Object} index index representation taken from manifest file
+   * @returns {Object} null if index is invalid
+   */
+  normalizeIndex(index) {
+    const normalizedIndex = index && typeof index === 'object' ? index : {};
+    const {
+      name,
+      schema,
+      includeMetadata,
+      includeFileDetails,
+      includeRejectionReason,
+      retryOnRejection,
+    } = getProperties(normalizedIndex,
+      'name',
+      'schema',
+      'includeMetadata',
+      'includeFileDetails',
+      'includeRejectionReason',
+      'retryOnRejection'
+    );
+
+    if (typeof name !== 'string' || !name) {
+      return null;
+    }
+
+    let normalizedSchema;
+    if (isNone(schema) || schema === '') {
+      normalizedSchema = '';
+    } else if (typeof schema !== 'string') {
+      normalizedSchema = JSON.stringify(schema, null, 2);
+    }
+
+    let normalizedIncludeMetadata;
+    if (isNone(includeMetadata) || !isArray(includeMetadata)) {
+      normalizedIncludeMetadata = includeMetadataCorrectValues.slice();
+    } else {
+      normalizedIncludeMetadata = includeMetadata
+        .filter(metadata => includeMetadataCorrectValues.includes(metadata));
+    }
+
+    let normalizedIncludeFileDetails;
+    if (isNone(includeFileDetails) || !isArray(includeFileDetails)) {
+      normalizedIncludeFileDetails = includeFileDetailsCorrectValues.slice();
+    } else {
+      normalizedIncludeFileDetails = includeFileDetails
+        .filter(detail => includeFileDetailsCorrectValues.includes(detail));
+    }
+
+    return {
+      name,
+      schema: normalizedSchema,
+      includeMetadata: normalizedIncludeMetadata,
+      includeFileDetails: normalizedIncludeFileDetails,
+      includeRejectionReason: typeof includeRejectionReason === 'boolean' ?
+        includeRejectionReason : true,
+      retryOnRejection: typeof retryOnRejection === 'boolean' ? retryOnRejection : true,
+    };
   },
 });

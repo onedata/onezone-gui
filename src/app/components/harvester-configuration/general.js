@@ -7,90 +7,36 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneForm from 'onedata-gui-common/components/one-form';
+import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import EmberObject, {
+import {
   get,
-  set,
   observer,
   computed,
   getProperties,
   setProperties,
 } from '@ember/object';
-import { union, reads } from '@ember/object/computed';
-import { buildValidations } from 'ember-cp-validations';
-import createFieldValidator from 'onedata-gui-common/utils/create-field-validator';
+import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { next } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import config from 'ember-get-config';
+import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
+import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
+import TextField from 'onedata-gui-common/utils/form-component/text-field';
+import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
+import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
+import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
+import { tag, equal, notEqual, raw, or, not, and, conditional } from 'ember-awesome-macros';
+import { resolve } from 'rsvp';
+import _ from 'lodash';
 import { scheduleOnce } from '@ember/runloop';
 
-const {
-  layoutConfig,
-} = config;
-
-const viewCreateFieldDefinitions = [{
-  name: 'name',
-  type: 'text',
-}, {
-  name: 'plugin',
-  type: 'dropdown',
-  options: [],
-  tip: true,
-}];
-
-const createOnlyFieldDefinitions = [{
-  name: 'endpoint',
-  type: 'text',
-  tip: true,
-  optional: true,
-}, {
-  name: 'preconfigureGui',
-  type: 'checkbox',
-  defaultValue: true,
-  tip: true,
-}];
-
-const viewEditFieldDefinitions = [{
-  name: 'endpoint',
-  type: 'text',
-  tip: true,
-}, {
-  name: 'public',
-  type: 'checkbox',
-  defaultValue: false,
-  tip: true,
-}];
-
-const publicUrlFieldDefinitions = [{
-  name: 'publicUrl',
-  type: 'clipboard-line',
-}];
-
-const allPrefixes = [
-  'view',
-  'create',
-  'edit',
-  'publicUrl',
-];
-
-const validationsProto = {};
-viewCreateFieldDefinitions.forEach((field) => {
-  const validators = createFieldValidator(field);
-  validationsProto[`allFieldsValues.create.${field.name}`] = validators;
-});
-viewCreateFieldDefinitions.concat(viewEditFieldDefinitions).forEach((field) => {
-  const validators = createFieldValidator(field);
-  validationsProto[`allFieldsValues.edit.${field.name}`] = validators;
-});
-
-export default OneForm.extend(I18n, buildValidations(validationsProto), {
+export default Component.extend(I18n, {
   classNames: ['harvester-configuration-general'],
 
   i18n: service(),
   harvesterManager: service(),
   harvesterActions: service(),
+  onedataConnection: service(),
   router: service(),
 
   /**
@@ -120,89 +66,237 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
   _location: location,
 
   /**
-   * @override
+   * @type {ComputedProperty<String>}
    */
-  currentFieldsPrefix: computed(
-    'mode',
-    'allFieldsValues.edit.public',
-    function currentFieldsPrefix() {
-      const mode = this.get('mode');
-      const isPublic = this.get('allFieldsValues.edit.public');
-      switch (mode) {
-        case 'view':
-        case 'edit': {
-          const prefixes = [mode];
-          if (isPublic) {
-            prefixes.push('publicUrl');
-          }
-          return prefixes;
-        }
-        case 'create':
-          return ['create'];
-      }
-    }
+  defaultHarvestingBackendType: reads('onedataConnection.defaultHarvestingBackendType'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  defaultHarvestingBackendEndpoint: reads('onedataConnection.defaultHarvestingBackendEndpoint'),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  hasDefaultHarvestingBackendSetup: and(
+    'defaultHarvestingBackendType',
+    'defaultHarvestingBackendEndpoint'
   ),
 
   /**
-   * @type {Object}
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
-  formLayoutConfig: layoutConfig,
-  /**
-   * @type {Ember.ComputedProperty<Array<FieldType>>}
-   */
-  viewFields: computed(function viewFields() {
-    return viewCreateFieldDefinitions.concat(viewEditFieldDefinitions)
-      .map(field => this.preprocessField(field, 'view', true));
+  fields: computed(function fields() {
+    const component = this;
+    const {
+      nameField,
+      typeField,
+      useDefaultHarvestingBackendField,
+      endpointField,
+      autoSetupField,
+      publicField,
+      publicUrlField,
+    } = this.getProperties(
+      'nameField',
+      'typeField',
+      'useDefaultHarvestingBackendField',
+      'endpointField',
+      'autoSetupField',
+      'publicField',
+      'publicUrlField'
+    );
+
+    return FormFieldsRootGroup.extend({
+      i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
+      ownerSource: reads('component'),
+      isEnabled: not('component.disabled'),
+      onValueChange(value, field) {
+        this._super(...arguments);
+
+        if (this.get('component.mode') === 'create' &&
+          get(field, 'name') === 'useDefaultHarvestingBackend' && value
+        ) {
+          scheduleOnce(
+            'afterRender',
+            this,
+            () => this.getFieldByPath('harvestingBackendFields').reset()
+          );
+        }
+      },
+    }).create({
+      component,
+      fields: [
+        nameField,
+        useDefaultHarvestingBackendField,
+        FormFieldsGroup.extend({
+          isEnabled: or(
+            notEqual('component.mode', raw('create')),
+            not('component.hasDefaultHarvestingBackendSetup'),
+            not('parent.value.useDefaultHarvestingBackend')
+          ),
+        }).create({
+          component,
+          name: 'harvestingBackendFields',
+          fields: [
+            typeField,
+            endpointField,
+          ],
+        }),
+        autoSetupField,
+        publicField,
+        FormFieldsGroup.extend({
+          isExpanded: reads('parent.value.public'),
+          isVisible: notEqual('component.mode', raw('create')),
+        }).create({
+          component,
+          name: 'publicFields',
+          fields: [
+            publicUrlField,
+          ],
+        }),
+      ],
+    });
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
-  createFields: computed(function createFields() {
-    return [...viewCreateFieldDefinitions, ...createOnlyFieldDefinitions]
-      .map(field => this.preprocessField(field, 'create'));
+  nameField: computed(function nameField() {
+    const component = this;
+    return TextField.extend({
+      defaultValue: conditional(
+        equal('component.mode', raw('create')),
+        raw(''),
+        'component.harvester.name',
+      ),
+    }).create({
+      component,
+      name: 'name',
+    });
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
    */
-  editFields: computed(function editFields() {
-    return viewCreateFieldDefinitions.concat(viewEditFieldDefinitions)
-      .map(field => this.preprocessField(field, 'edit'));
+  useDefaultHarvestingBackendField: computed(function useDefaultHarvestingBackendField() {
+    const component = this;
+    return ToggleField.extend({
+      isVisible: and(
+        equal('component.mode', raw('create')),
+        'component.hasDefaultHarvestingBackendSetup'
+      ),
+    }).create({
+      component,
+      name: 'useDefaultHarvestingBackend',
+      defaultValue: true,
+    });
   }),
 
   /**
-   * @type {Ember.ComputedProperty<Array<FieldType>>}
+   * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
+   */
+  typeField: computed(function typeField() {
+    const component = this;
+    return DropdownField.extend({
+      options: computed(
+        'component.backendTypesListProxy.isFulfilled',
+        function options() {
+          const backendTypesListProxy = this.get('component.backendTypesListProxy');
+          if (get(backendTypesListProxy, 'isFulfilled')) {
+            return backendTypesListProxy
+              .map(({ id, name }) => ({ value: id, label: name }));
+          } else {
+            return [];
+          }
+        }
+      ),
+      defaultValue: conditional(
+        equal('component.mode', raw('create')),
+        conditional(
+          'component.hasDefaultHarvestingBackendSetup',
+          'component.defaultHarvestingBackendType',
+          'options.firstObject.value'
+        ),
+        'component.harvester.harvestingBackendType'
+      ),
+    }).create({
+      component,
+      name: 'type',
+      showSearch: false,
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
+   */
+  endpointField: computed(function endpointField() {
+    const component = this;
+    return TextField.extend({
+      defaultValue: conditional(
+        equal('component.mode', raw('create')),
+        conditional(
+          'component.hasDefaultHarvestingBackendSetup',
+          'component.defaultHarvestingBackendEndpoint',
+          raw('')
+        ),
+        'component.harvester.harvestingBackendEndpoint',
+      ),
+    }).create({
+      component,
+      name: 'endpoint',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
+   */
+  autoSetupField: computed(function autoSetupField() {
+    const component = this;
+    return ToggleField.extend({
+      isVisible: equal('component.mode', raw('create')),
+    }).create({
+      component,
+      name: 'autoSetup',
+      defaultValue: true,
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
+   */
+  publicField: computed(function publicField() {
+    const component = this;
+    return ToggleField.extend({
+      isVisible: notEqual('component.mode', raw('create')),
+      defaultValue: conditional(
+        equal('component.mode', raw('create')),
+        raw(false),
+        'component.harvester.public',
+      ),
+    }).create({
+      component,
+      name: 'public',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ClipboardField>}
    */
   publicUrlField: computed(function publicUrlField() {
-    return publicUrlFieldDefinitions
-      .map(field => this.preprocessField(field, 'publicUrl'));
+    const component = this;
+    return ClipboardField.extend({
+      text: reads('component.publicUrlValue'),
+    }).create({
+      component,
+      name: 'publicUrl',
+    });
   }),
 
   /**
-   * @override
-   */
-  allFields: union(
-    'viewFields',
-    'createFields',
-    'editFields',
-    'publicUrlField'
-  ),
-
-  /**
-   * @override
-   */
-  allFieldsValues: computed('provider', 'allFields', function () {
-    const values = EmberObject.create();
-    allPrefixes.forEach((prefix) => values.set(prefix, EmberObject.create()));
-    return values;
-  }),
-
-  /**
-   * Available harvester plugins list
+   * Available harvesting backend types list
    * @returns {Ember.ComputedProperty<PromiseArray<string>>}
    */
-  pluginsListProxy: reads('harvesterManager.pluginsListProxy'),
+  backendTypesListProxy: reads('harvesterManager.backendTypesListProxy'),
 
   /**
    * @type {Ember.ComputedProperty<string|null>}
@@ -227,184 +321,98 @@ export default OneForm.extend(I18n, buildValidations(validationsProto), {
     }
   }),
 
-  harvesterObserver: observer(
-    'harvester.{name,plugin,endpoint,public}',
-    function harvesterObserver() {
-      const {
-        harvester,
-        allFields,
-        allFieldsValues,
-        publicUrlValue,
-      } = this.getProperties(
-        'harvester',
-        'allFields',
-        'allFieldsValues',
-        'publicUrlValue'
-      );
-      if (harvester) {
-        [
-          'name',
-          'plugin',
-          'endpoint',
-          'public',
-        ].forEach(valueName => {
-          let value = get(harvester, valueName);
-
-          const editorFieldName = `edit.${valueName}`;
-          const editorField = allFields.findBy('name', editorFieldName);
-          set(editorField, 'defaultValue', value);
-          if (!get(editorField, 'changed')) {
-            set(allFieldsValues, editorFieldName, value);
-          }
-
-          const viewFieldName = `view.${valueName}`;
-          const viewField = allFields.findBy('name', viewFieldName);
-          // Plugin static field needs human-readable string
-          if (valueName === 'plugin') {
-            value = get(
-              (get(editorField, 'options').findBy('value', value) || {}),
-              'label'
-            );
-          }
-          set(viewField, 'defaultValue', value);
-          set(allFieldsValues, viewFieldName, value);
-        });
-        const publicUrlFieldName = 'publicUrl.publicUrl';
-        const publicUrlField = allFields.findBy('name', publicUrlFieldName);
-        set(publicUrlField, 'defaultValue', publicUrlValue);
-        set(allFieldsValues, publicUrlFieldName, publicUrlValue);
-      }
+  harvesterObserver: observer('harvester', function harvesterObserver() {
+    if (this.get('harvester')) {
+      this.set('mode', 'view');
     }
-  ),
+  }),
 
   modeObserver: observer('mode', function modeObserver() {
     const {
       mode,
-      pluginsListProxy,
-      allFields,
-    } = this.getProperties('mode', 'pluginsListProxy', 'allFields');
-    pluginsListProxy.then(pluginsList => safeExec(this, () => {
-      if (mode === 'create') {
-        const defaultPlugin = pluginsList.objectAt(0);
-        set(
-          allFields.findBy('name', 'create.plugin'),
-          'defaultValue',
-          defaultPlugin ? get(defaultPlugin, 'id') : undefined
-        );
-      }
-      this.resetFormValues(allPrefixes);
-    }));
+      fields,
+    } = this.getProperties('mode', 'fields');
+
+    fields.changeMode(mode === 'view' ? 'view' : 'edit');
+    fields.reset();
   }),
 
   init() {
     this._super(...arguments);
-    this.get('pluginsListProxy').then(pluginsList => safeExec(this, () => {
-      const options = pluginsList.map(({ id, name }) => ({
-        label: name,
-        value: id,
-      }));
-      const allFields = this.get('allFields');
-      set(allFields.findBy('name', 'create.plugin'), 'options', options);
-      set(allFields.findBy('name', 'edit.plugin'), 'options', options);
 
-      this.prepareFields();
-      this.harvesterObserver();
-      next(() => this.modeObserver());
+    this.get('backendTypesListProxy').then(() => safeExec(this, () => {
+      this.modeObserver();
     }));
   },
 
   didInsertElement() {
     this._super(...arguments);
 
-    const mode = this.get('mode');
-    if (mode !== 'view') {
-      this.get('pluginsListProxy').then(() => {
+    const {
+      mode,
+      backendTypesListProxy,
+    } = this.getProperties('mode', 'backendTypesListProxy');
+    if (mode === 'create') {
+      backendTypesListProxy.then(() => {
         scheduleOnce(
           'afterRender',
           this,
-          () => this.$(`.field-${mode}-name`).focus()
+          () => this.$('.name-field input').focus()
         );
       });
     }
-  },
-
-  /**
-   * Performs initial field setup.
-   * @param {FieldType} field Field
-   * @param {string} prefix Field prefix
-   * @param {boolean} isStatic Should field be static
-   * @returns {object} prepared field
-   */
-  preprocessField(field, prefix, isStatic = false) {
-    field = EmberObject.create(field);
-    const {
-      name,
-      tip,
-      type,
-    } = getProperties(field, 'name', 'tip', 'type');
-    setProperties(field, {
-      name: `${prefix}.${name}`,
-      label: this.t(`fields.${name}.label`),
-      tip: tip ? this.t(`fields.${name}.tip`) : undefined,
-      type: isStatic ? 'static' : type,
-    });
-
-    return field;
   },
 
   actions: {
     edit() {
       this.set('mode', 'edit');
     },
-
     cancel() {
       this.set('mode', 'view');
     },
-
-    inputChanged(fieldName, value) {
-      this.changeFormValue(fieldName, value);
-    },
-
-    focusOut(field) {
-      field.set('changed', true);
-      this.recalculateErrors();
-    },
-
     submit() {
       const {
-        formValues,
+        fields,
         mode,
         harvester,
         harvesterActions,
       } = this.getProperties(
-        'formValues',
+        'fields',
         'mode',
         'harvester',
         'harvesterActions'
       );
-      const valueNames = ['name', 'plugin', 'endpoint'];
+      const fieldsValues = fields.dumpValue();
+      const normalizedFieldsValues = {
+        name: fieldsValues.name,
+        harvestingBackendType: fieldsValues.harvestingBackendFields.type,
+        harvestingBackendEndpoint: fieldsValues.harvestingBackendFields.endpoint,
+      };
       if (mode === 'edit') {
-        valueNames.push('public');
+        normalizedFieldsValues.public = fieldsValues.public;
       }
-      const values = getProperties(get(formValues, mode), ...valueNames);
-      const preconfigureGui =
-        mode === 'create' && get(formValues, 'create.preconfigureGui');
+      const preconfigureGui = mode === 'create' && fieldsValues.autoSetup;
 
       this.set('disabled', true);
       let promise;
       switch (mode) {
         case 'edit': {
-          const oldValues = getProperties(harvester, ...valueNames);
-          setProperties(harvester, values);
-          promise = harvesterActions.updateHarvester(harvester)
-            .then(() => safeExec(this, () => {
-              this.set('mode', 'view');
-            }))
-            .catch(() => setProperties(harvester, oldValues));
+          const oldValues =
+            getProperties(harvester, ...Object.keys(normalizedFieldsValues));
+          if (_.isEqual(oldValues, normalizedFieldsValues)) {
+            promise = resolve()
+              .then(() => safeExec(this, () => this.set('mode', 'view')));
+          } else {
+            setProperties(harvester, normalizedFieldsValues);
+            promise = harvesterActions.updateHarvester(harvester)
+              .then(() => safeExec(this, () => this.set('mode', 'view')))
+              .catch(() => setProperties(harvester, oldValues));
+          }
           break;
         }
         case 'create':
-          promise = harvesterActions.createHarvester(values, preconfigureGui);
+          promise =
+            harvesterActions.createHarvester(normalizedFieldsValues, preconfigureGui);
       }
       return promise.finally(() =>
         safeExec(this, () => this.set('disabled', false))
