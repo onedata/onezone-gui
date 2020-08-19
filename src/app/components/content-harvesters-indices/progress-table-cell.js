@@ -169,7 +169,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Function>}
    */
-  parentScrollEventListener: computed(function () {
+  parentScrollEventListener: computed(function parentScrollEventListener() {
     return () => {
       const popoverApi = this.get('popoverApi');
       if (popoverApi) {

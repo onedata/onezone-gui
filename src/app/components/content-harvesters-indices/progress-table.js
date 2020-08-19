@@ -412,10 +412,10 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
   recalculateTableLayout() {
     if (this.get('element')) {
-      const scrollLeftOffset = this.$('.ps').scrollLeft();
-      const scrollTopOffset = this.$('.ps').scrollTop();
-      const $constantRowLabels =
-        this.$('.row-label.constant-row-label');
+      const $ps = this.$('.ps');
+      const scrollLeftOffset = $ps.scrollLeft();
+      const scrollTopOffset = $ps.scrollTop();
+      const $constantRowLabels = this.$('.row-label.constant-row-label');
       const $floatingRowLabels = this.$('.row-label.floating-row-label');
       const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
       const $floatingColumnLabelsRow = this.$('.floating-column-labels');
