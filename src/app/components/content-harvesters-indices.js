@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import EmberObject, { computed, observer, get, getProperties, set } from '@ember/object';
+import { computed, observer, get, getProperties, set } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -16,7 +16,6 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { Promise, reject } from 'rsvp';
-import Messages from 'ember-cp-validations/validators/messages';
 import { A } from '@ember/array';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 
@@ -43,16 +42,6 @@ export default Component.extend(
     harvester: undefined,
 
     /**
-     * @type {boolean}
-     */
-    isCreating: false,
-
-    /**
-     * @type {Ember.ComputedProperty<EmberObject>}
-     */
-    createIndexData: undefined,
-
-    /**
      * @type {Models.Index}
      */
     indexToRemove: null,
@@ -66,61 +55,6 @@ export default Component.extend(
      * @type {boolean}
      */
     isCreateIndexFormVisible: false,
-
-    /**
-     * @type {EmberObject}
-     * Now only `name` field is validated
-     */
-    createIndexFormErrors: undefined,
-
-    /**
-     * @type {EmberObject}
-     */
-    createIndexFormChangedFields: undefined,
-
-    /**
-     * @type {boolean}
-     */
-    isCreateIndexFormValid: false,
-
-    /**
-     * @type {Ember.ComputedProperty<EmberObject>}
-     */
-    validationMessages: computed(function validationMessages() {
-      return Messages.create();
-    }),
-
-    /**
-     * @type {Ember.ComputedProperty<string>}
-     */
-    newIndexNameInputId: computed('elementId', function newIndexNameInputId() {
-      return this.get('elementId') + '-new-index-name';
-    }),
-
-    /**
-     * @type {Ember.ComputedProperty<string>}
-     */
-    newIndexSchemaInputId: computed('elementId', function newIndexSchemaInputId() {
-      return this.get('elementId') + '-new-index-schema';
-    }),
-
-    /**
-     * Property dedicated for name field (due to the lack of other fields,
-     * so the hbs can be simplified). true == error, false == value ok,
-     * undefined == value not changed (no feedback)
-     * @type {Ember.ComputedProperty<boolean|undefined>}
-     */
-    hasNameErrorToShow: computed(
-      'createIndexFormChangedFields.name',
-      'createIndexFormErrors.name',
-      function showNameError() {
-        if (this.get('createIndexFormChangedFields.name')) {
-          return Boolean(this.get('createIndexFormErrors.name'));
-        } else {
-          return undefined;
-        }
-      }
-    ),
 
     /**
      * @type {Ember.ComputedProperty<PromiseArray>}
@@ -168,14 +102,6 @@ export default Component.extend(
       return this.t('harvesterIndices');
     }),
 
-    isCreateIndexFormVisibleObserver: observer(
-      'isCreateIndexFormVisible',
-      function isCreateIndexFormVisibleObserver() {
-        if (this.get('isCreateIndexFormVisible')) {
-          this.resetCreateIndexForm();
-        }
-      }),
-
     indicesProxyObserver: observer(
       'indicesProxy.length',
       function indicesProxyObserver() {
@@ -192,11 +118,6 @@ export default Component.extend(
         }
       }
     ),
-
-    init() {
-      this._super(...arguments);
-      this.resetCreateIndexForm();
-    },
 
     /**
      * @returns {Promise}
@@ -223,74 +144,16 @@ export default Component.extend(
         reject({ id: 'forbidden' });
     },
 
-    /**
-     * @returns {undefined}
-     */
-    resetCreateIndexForm() {
-      this.setProperties({
-        createIndexData: EmberObject.create({
-          name: '',
-          schema: '',
-        }),
-        createIndexFormErrors: EmberObject.create(),
-        createIndexFormChangedFields: EmberObject.create(),
-      });
-      this.validateCreateIndexForm();
-    },
-
-    /**
-     * @returns {undefined}
-     */
-    validateCreateIndexForm() {
-      const {
-        createIndexData,
-        createIndexFormErrors,
-        createIndexFormChangedFields,
-        validationMessages,
-      } = this.getProperties(
-        'createIndexData',
-        'createIndexFormErrors',
-        'createIndexFormChangedFields',
-        'validationMessages'
-      );
-      let nameError = null;
-      const name = get(createIndexData, 'name');
-      if (!name) {
-        nameError = validationMessages.getMessageFor('blank', {
-          description: get(validationMessages, 'defaultDescription'),
-        });
-      }
-      if (get(createIndexFormChangedFields, 'name')) {
-        set(createIndexFormErrors, 'name', nameError);
-      }
-      this.set('isCreateIndexFormValid', !nameError);
-    },
-
     actions: {
-      changeNewIndexValue(fieldName, value) {
-        this.set(`createIndexData.${fieldName}`, value);
-        this.set(`createIndexFormChangedFields.${fieldName}`, true);
-        this.validateCreateIndexForm();
-      },
-      focusOutNewIndexField(fieldName) {
-        this.set(`createIndexFormChangedFields.${fieldName}`, true);
-        this.validateCreateIndexForm();
-      },
-      createIndex() {
+      createIndex(indexRepresentation) {
         const {
           harvesterActions,
           harvester,
-          createIndexData,
         } = this.getProperties(
           'harvesterActions',
-          'harvester',
-          'createIndexData'
+          'harvester'
         );
-        const indexRepresentation = getProperties(createIndexData, 'name', 'schema');
         set(indexRepresentation, 'guiPluginName', null);
-        if (get(indexRepresentation, 'schema') === '') {
-          delete indexRepresentation.schema;
-        }
         return harvesterActions.createIndex(harvester, indexRepresentation)
           .then(() => safeExec(this, () => {
             this.set('isCreateIndexFormVisible', false);

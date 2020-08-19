@@ -1,4 +1,101 @@
 .content-harvesters-indices {
+  .form-component {
+    .schema-field textarea {
+      font-family: monospace;
+      height: 200px;
+    }
+
+    .includeFileDetails-field,
+    .includeMetadata-field {
+      margin-bottom: $form-group-margin-bottom;
+
+      .toggle-field-renderer {
+        margin-bottom: $padding-small-vertical;
+        transition: transition-linear(color);
+
+        .control-label {
+          @include font-regular;
+        }
+
+        &.has-error {
+          color: $color-one-danger;
+        }
+      }
+    }
+
+    .btn-toolbar {
+      float: none;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .content-harvesters-indices-index-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .form-component {
+      width: calc(100% - #{$padding-large-horizontal});
+
+      .control-label {
+        min-width: 180px;
+      }
+
+      .includeFileDetails-field,
+      .includeMetadata-field {
+        justify-content: flex-end;
+
+        > .control-label {
+          flex-basis: 20%;
+          margin-bottom: 0;
+        }
+
+        > .field-component {
+          flex-basis: calc(80% - 180px);
+        }
+
+        > .field-message {
+          flex-basis: 80%;
+          max-width: calc(100% - 180px);
+          text-align: left;
+        }
+
+        .toggle-field-renderer {
+          display: inline-flex;
+          min-width: 190px;
+  
+          .control-label {
+            order: 1;
+            flex-grow: 1;
+            flex-shrink: 1;
+            min-width: initial;
+            width: initial;
+            margin-left: 1.5 * $padding-xs-horizontal;
+            padding-right: 3 * $padding-base-vertical;
+            text-align: left;
+          }
+      
+          .field-component {
+            flex-grow: initial;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .form-component {
+      .includeFileDetails-field,
+      .includeMetadata-field {
+        &.field-view-mode > .control-label {
+          margin-bottom: $form-component-view-margin;
+        }
+      }
+    }
+  }
+
   .schema-textarea {
     font-family: monospace;
     resize: none;
@@ -22,7 +119,7 @@
   .id-presenter-trigger {
     @include vertical-align-middle();
     right: 60px;
-    font-size: 1.3em;
+    font-size: 2.1em;
     display: none;
     @media (max-width: $screen-xs-max) {
       display: block;
@@ -64,7 +161,6 @@
 
       .one-icon {
         margin-left: 3px;
-        vertical-align: middle;
       }
     }
 
