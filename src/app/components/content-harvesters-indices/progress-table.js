@@ -156,24 +156,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
     const activeProviders =
       _.flatten(progressData.map(({ progress }) => progress))
-      .rejectBy('archival')
+      .filter(progress => !get(progress, 'archival') && get(progress, 'isSupported'))
       .mapBy('provider')
       .uniq();
     return providers.filter(provider => activeProviders.includes(provider));
   }),
-
-  /**
-   * @type {Ember.ComputedProperty<null>}
-   */
-  basicTableSetupTrigger: computed(
-    'spaces',
-    'providers',
-    'activeProgressData',
-    'showOnlyActive',
-    function basicTableSetupTrigger() {
-      return {};
-    }
-  ),
 
   /**
    * Progress data ready to render. Format:
