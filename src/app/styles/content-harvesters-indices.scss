@@ -7,7 +7,11 @@
 
     .includeFileDetails-field,
     .includeMetadata-field {
-      margin-bottom: $form-group-margin-bottom;
+      margin-bottom: $form-group-margin-bottom - $padding-small-vertical;
+
+      &.field-view-mode {
+        margin-bottom: $form-component-view-margin - $padding-small-vertical;
+      }
 
       .toggle-field-renderer {
         margin-bottom: $padding-small-vertical;
