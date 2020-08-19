@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6610 Better visualisation of large matrices in harvester index progress
 * VFS-6629 Refactor of harvester and harvester index forms
 * VFS-6554 Added space owners concept
 * VFS-6541 Improvements in showing harvester-space relation
