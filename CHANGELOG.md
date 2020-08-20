@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6609 Added identity tokens section in "Clean obsolete tokens" modal
 * VFS-6447 Redirect directly to other Onepanel cluster
 * VFS-6629 Refactor of harvester and harvester index forms
 * VFS-6554 Added space owners concept

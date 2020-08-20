@@ -4,6 +4,9 @@ export default {
   accessTokensSection: {
     header: 'Access tokens',
   },
+  identityTokensSection: {
+    header: 'Identity tokens',
+  },
   inviteTokensSection: {
     header: 'Invitation tokens',
   },
