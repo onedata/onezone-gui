@@ -64,14 +64,14 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
-  itemTransfers: computed(function itemTransfers() {
-    const hasPrivileges = this.get('space.privileges.viewTransfers') === true;
+  itemTransfers: computed('space.privileges.viewTransfers', function itemTransfers() {
+    const forbidden = this.get('space.privileges.viewTransfers') === false;
     return {
       id: 'transfers',
       label: this.t('aspects.transfers'),
       icon: 'transfers',
-      forbidden: !hasPrivileges,
-      tip: hasPrivileges ? undefined : this.t('insufficientTransferPrivileges'),
+      forbidden,
+      tip: forbidden ? this.t('insufficientTransferPrivileges') : undefined,
     };
   }),
 

@@ -8,18 +8,24 @@
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
-import { computed } from '@ember/object';
-import { equal } from '@ember/object/computed';
+import { computed, get } from '@ember/object';
+import { equal, reads } from '@ember/object/computed';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
+import { promise } from 'ember-awesome-macros';
+import { flags as allSpacePrivilegeFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import { currentUserSpacePrivileges } from 'onedata-gui-common/utils/computed-current-user-space-privileges';
+import { all as allFulfilled } from 'rsvp';
 
 export const entityType = 'space';
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   onedataGraphUtils: service(),
+  currentUser: service(),
+  privilegeManager: service(),
 
   name: attr('string'),
   scope: attr('string'),
@@ -63,6 +69,55 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   totalSize: computed('supportSizes', function getTotalSize() {
     return _.sum(_.values(this.get('supportSizes')));
   }),
+
+  currentUserIsOwnerProxy: promise.object(computed('ownerList.list.@each.entityId',
+    function currentUserIsOwnerProxy() {
+      const currentUserId = this.get('currentUser.userId');
+      return this.get('ownerList').then(ownerList => {
+        const owners = get(ownerList, 'list').mapBy('entityId');
+        return owners.includes(currentUserId);
+      });
+    }
+  )),
+
+  currentUserEffPrivilegesProxy: promise.object(computed(
+    'currentUser.userId',
+    'entityId',
+    function currentUserEffPrivileges() {
+      const {
+        currentUser,
+        entityId,
+        store,
+        privilegeManager,
+      } = this.getProperties('currentUser', 'entityId', 'store', 'privilegeManager');
+      const userId = get(currentUser, 'userId');
+      const privilegeGri =
+        privilegeManager.generateGri('space', entityId, 'user', userId);
+      return store.findRecord('privilege', privilegeGri)
+        .then(privilege => get(privilege, 'privileges'));
+    }
+  )),
+
+  privilegesProxy: promise.object(computed(
+    'currentUserIsOwnerProxy',
+    'currentUserEffPrivilegesProxy',
+    function privilegesProxy() {
+      const {
+        currentUserIsOwnerProxy,
+        currentUserEffPrivilegesProxy,
+      } = this.getProperties('currentUserIsOwnerProxy', 'currentUserEffPrivilegesProxy');
+      return allFulfilled([currentUserIsOwnerProxy, currentUserEffPrivilegesProxy])
+        .then(([currentUserIsOwner, currentUserEffPrivileges]) => {
+          return currentUserSpacePrivileges(
+            allSpacePrivilegeFlags,
+            currentUserEffPrivileges,
+            currentUserIsOwner
+          );
+        });
+    },
+  )),
+
+  privileges: reads('privilegesProxy.content'),
 
   //#endregion
 
