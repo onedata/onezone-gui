@@ -8,52 +8,11 @@
 </div>
 <div class="row content-row row-small {{unless isCreateIndexFormVisible "row-hidden"}}">
   <h1 class="form-title">{{tt this "createNewIndex"}}</h1>
-  {{#bs-form class="form-horizontal col-md-10 col-lg-8 col-centered" as |form|}}
-    {{#form.group
-      validation=(if (not-eq hasNameErrorToShow undefined) (if hasNameErrorToShow "error" "success"))
-      class=(if hasNameErrorToShow "has-message")}}
-      <div class="row">
-        <label for={{newIndexNameInputId}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.name"}}:</label>
-        <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
-          <input
-            id={{newIndexNameInputId}}
-            value={{createIndexData.name}}
-            oninput={{action (action "changeNewIndexValue" "name") value="target.value"}}
-            onblur={{action "focusOutNewIndexField" "name"}}
-            class="form-control"
-            disabled={{isCreating}}>
-        </div>
-      </div>
-      <div class="form-message">{{get createIndexFormErrors "name"}}</div>
-    {{/form.group}}
-    {{#form.group validation=(if (get createIndexFormChangedFields "name") "success")}}
-      <div class="row">
-        <label for={{newIndexSchemaInputId}} class="control-label col-xs-12 col-sm-4 col-md-3 col-lg-2">{{tt this "createIndexForm.schema"}}:</label>
-        <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
-          <textarea
-            id={{newIndexSchemaInputId}}
-            value={{createIndexData.schema}}
-            oninput={{action (action "changeNewIndexValue" "schema") value="target.value"}}
-            onblur={{action "focusOutNewIndexField" "schema"}}
-            disabled={{isCreating}}
-            spellcheck="false"
-            rows="10"
-            class="form-control schema-textarea"></textarea>
-        </div>
-      </div>
-    {{/form.group}}
-    {{#form.group class="text-center"}}
-      {{#if (or indicesProxy.length (not dataProxy.isFulfilled))}}
-        {{#bs-button type="default" onClick=(action (mut isCreateIndexFormVisible) false)}}
-          {{tt this "createIndexForm.cancel"}}
-        {{/bs-button}}
-        <span class="space"></span>
-      {{/if}}
-      {{#one-spin-button type="submit" class="btn btn-primary" disabled=(not isCreateIndexFormValid) action=(action "createIndex")}}
-        {{tt this "createIndexForm.create"}}  
-      {{/one-spin-button}}
-    {{/form.group}}
-  {{/bs-form}}
+  {{content-harvesters-indices/index-form
+    mode="create"
+    onCreate=(action "createIndex")
+    onCancel=(action (mut isCreateIndexFormVisible) false)
+  }}
 </div>
 <div class="row">
   {{#promise-proxy-container proxy=dataProxy}}
