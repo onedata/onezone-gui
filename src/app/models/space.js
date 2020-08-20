@@ -80,7 +80,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
     }
   )),
 
-  currentUserEffPrivilegesProxy: promise.object(computed(
+  currentUserPrivilegesRecordProxy: promise.object(computed(
     'currentUser.userId',
     'entityId',
     function currentUserEffPrivileges() {
@@ -93,24 +93,26 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
       const userId = get(currentUser, 'userId');
       const privilegeGri =
         privilegeManager.generateGri('space', entityId, 'user', userId);
-      return store.findRecord('privilege', privilegeGri)
-        .then(privilege => get(privilege, 'privileges'));
+      return store.findRecord('privilege', privilegeGri);
     }
   )),
 
   privilegesProxy: promise.object(computed(
     'currentUserIsOwnerProxy',
-    'currentUserEffPrivilegesProxy',
+    'currentUserPrivilegesRecordProxy.privileges.[]',
     function privilegesProxy() {
       const {
         currentUserIsOwnerProxy,
-        currentUserEffPrivilegesProxy,
-      } = this.getProperties('currentUserIsOwnerProxy', 'currentUserEffPrivilegesProxy');
-      return allFulfilled([currentUserIsOwnerProxy, currentUserEffPrivilegesProxy])
-        .then(([currentUserIsOwner, currentUserEffPrivileges]) => {
+        currentUserPrivilegesRecordProxy,
+      } = this.getProperties(
+        'currentUserIsOwnerProxy',
+        'currentUserPrivilegesRecordProxy'
+      );
+      return allFulfilled([currentUserIsOwnerProxy, currentUserPrivilegesRecordProxy])
+        .then(([currentUserIsOwner, currentUserPrivilegesRecord]) => {
           return currentUserSpacePrivileges(
             allSpacePrivilegeFlags,
-            currentUserEffPrivileges,
+            get(currentUserPrivilegesRecord, 'privileges'),
             currentUserIsOwner
           );
         });
