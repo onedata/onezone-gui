@@ -229,12 +229,12 @@ function mockEmptyHarvestersList(testSuite) {
 }
 
 function testAddingHarvester(testSuite, triggerActionCallback) {
+  testSuite.render(hbs `{{content-spaces-harvesters space=space}}`);
+
   const executeStub = sinon.stub(AddHarvesterToSpaceAction.prototype, 'execute')
     .callsFake(function () {
       expect(this.get('context.space.name')).to.equal('space1');
     });
-
-  testSuite.render(hbs `{{content-spaces-harvesters space=space}}`);
 
   return wait()
     .then(triggerActionCallback)
@@ -242,13 +242,13 @@ function testAddingHarvester(testSuite, triggerActionCallback) {
 }
 
 function testInvitingHarvesterUsingToken(testSuite, triggerActionCallback) {
+  testSuite.render(hbs `{{content-spaces-harvesters space=space}}`);
+
   const executeStub = sinon.stub(GenerateInviteTokenAction.prototype, 'execute')
     .callsFake(function () {
       expect(this.get('context.inviteType')).to.equal('harvesterJoinSpace');
       expect(this.get('context.targetRecord.name')).to.equal('space1');
     });
-
-  testSuite.render(hbs `{{content-spaces-harvesters space=space}}`);
 
   return wait()
     .then(triggerActionCallback)
