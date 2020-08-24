@@ -5,14 +5,14 @@ import Service from '@ember/service';
 import { get, set } from '@ember/object';
 import { lookupService, registerService } from '../../helpers/stub-service';
 import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
+import sinon from 'sinon';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { resolve } from 'rsvp';
 
 describe('Unit | Model | space', function () {
   setupModelTest('space', {
     needs: [
-      'service:store',
       'service:onedata-token-api',
-      'model:shared-user-list',
-      'model:shared-user',
     ],
   });
 
@@ -32,16 +32,15 @@ describe('Unit | Model | space', function () {
   describe('computes its ownership by current user', function () {
     beforeEach(function () {
       this.record = this.subject();
-      const store = lookupService(this, 'store');
-      set(this.record, 'ownerList', store.createRecord('sharedUserList', {
+      sinon.stub(this.record, 'ownerList').value(promiseObject(resolve({
         list: [
-          store.createRecord('sharedUser', { id: 's.b1.instance' }),
-          store.createRecord('sharedUser', { id: 's.b2.instance' }),
+          { entityId: 'b1' },
+          { entityId: 'b2' },
         ],
-      }));
+      })));
     });
 
-    it('as false if the user is not on owners list', function () {
+    it('as true if the user is on owners list', function () {
       set(lookupService(this, 'current-user'), 'userId', 'b2');
 
       return get(this.record, 'currentUserIsOwnerProxy').then(currentUserIsOwner => {
@@ -49,7 +48,7 @@ describe('Unit | Model | space', function () {
       });
     });
 
-    it('as true if the user is on owners list', function () {
+    it('as false if the user is not on owners list', function () {
       set(lookupService(this, 'current-user'), 'userId', 'a1');
 
       return get(this.record, 'currentUserIsOwnerProxy').then(currentUserIsOwner => {
