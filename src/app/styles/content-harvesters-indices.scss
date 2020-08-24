@@ -120,6 +120,9 @@
   .one-collapsible-list-item-content.opened {
     max-height: 4000px;
   }
+  .one-collapsible-list-item {
+    max-height: 4200px;
+  }
   .id-presenter-trigger {
     @include vertical-align-middle();
     right: 60px;
