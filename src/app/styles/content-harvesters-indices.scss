@@ -223,10 +223,6 @@
       margin-right: $padding-base-horizontal;
     }
 
-    .pulse-green {
-      @extend .pulse-mint;
-    }
-
     .progress-table-container.list-layout {
       .progress-row {
         position: relative;
@@ -255,7 +251,6 @@
         max-width: 100%;
         max-height: 70vh;
         min-height: 400px;
-        overflow: auto;
       }
   
       .progress-table-cell {
@@ -304,6 +299,13 @@
       .constant-column-labels {
         visibility: hidden;
       }
+
+      .constant-column-labels,
+      .floating-column-labels {
+        .floating-row-label {
+          @include hide-after-shadow;
+        }
+      }
   
       .floating-row-label {
         position: absolute;
@@ -315,6 +317,11 @@
         // Is initially hidden to not present labels in non-calculated state at the beginning.
         visibility: hidden;
         background-color: $main-content-hover-background;
+        @include after-left-shadow;
+        &::after {
+          left: initial;
+          right: 0;
+        }
       }
   
       .floating-column-labels {
@@ -322,10 +329,48 @@
         display: flex;
         top: 0;
         z-index: 2;
+        @include before-top-shadow;
+        &::before {
+          top: initial;
+          bottom: 0;
+        }
         td {
           display: block;
           background-color: $main-content-hover-background;
         }
+      }
+
+      .progress-table-inner-container {
+        @include before-bottom-shadow;
+        @include after-right-shadow;
+
+        &.scroll-on-bottom {
+          @include hide-before-shadow;
+        }
+
+        &.scroll-on-right {
+          @include hide-after-shadow;
+        }
+      }
+
+      .scroll-on-top {
+        .floating-column-labels {
+          @include hide-before-shadow;
+        }
+      }
+
+      .scroll-on-left .floating-row-label {
+        @include hide-after-shadow;
+      }
+
+      .right-shadow-overlay {
+        position: absolute;
+        width: $top-shadow-height;
+        background-color: $main-content-hover-background;
+        top: 0;
+        right: -$top-shadow-height;
+        height: 0;
+        z-index: $top-shadow-zindex + 1;
       }
 
       .ps {

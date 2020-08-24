@@ -181,15 +181,21 @@ export default Component.extend(I18n, {
   didInsertElement() {
     this._super(...arguments);
 
-    this.$().closest('.perfect-scrollbar-element')[0]
-      .addEventListener('scroll', this.get('parentScrollEventListener'));
+    const perfectScrollbar = this.$().closest('.perfect-scrollbar-element')[0];
+    if (perfectScrollbar) {
+      perfectScrollbar
+        .addEventListener('scroll', this.get('parentScrollEventListener'));
+    }
   },
 
   willDestroyElement() {
     this._super(...arguments);
 
-    this.$().closest('.perfect-scrollbar-element')[0]
-      .removeEventListener('scroll', this.get('parentScrollEventListener'));
+    const perfectScrollbar = this.$().closest('.perfect-scrollbar-element')[0];
+    if (perfectScrollbar) {
+      perfectScrollbar
+        .removeEventListener('scroll', this.get('parentScrollEventListener'));
+    }
   },
 
   actions: {

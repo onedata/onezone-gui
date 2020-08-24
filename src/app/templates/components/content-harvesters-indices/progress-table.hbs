@@ -22,8 +22,20 @@
       class="progress-table-container {{if useTableLayout "table-layout" "list-layout"}}"
     >
       {{#if useTableLayout}}
-        <div class="progress-table-inner-container">
-        {{#perfect-scrollbar-element onScroll=(action "scroll")}}
+        <div class={{concat-classes
+          (if isTableScrolledTop "scroll-on-top")
+          (if isTableScrolledBottom "scroll-on-bottom")
+          (if isTableScrolledLeft "scroll-on-left")
+          (if isTableScrolledRight "scroll-on-right")
+          "progress-table-inner-container"}}
+        >
+          {{#perfect-scrollbar-element
+            onTopEdgeScroll=(action "tableTopEdgeScroll")
+            onBottomEdgeScroll=(action "tableBottomEdgeScroll")
+            onLeftEdgeScroll=(action "tableLeftEdgeScroll")
+            onRightEdgeScroll=(action "tableRightEdgeScroll")
+            onScroll=(action "scroll")
+          }}
             <table>
               <tr class="table-row constant-column-labels">
                 <td class="table-cell"></td>
@@ -80,6 +92,7 @@
               {{/each}}
             </table>
           {{/perfect-scrollbar-element}}
+          <div class="right-shadow-overlay"></div>
         </div>      
       {{else}}
         {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
@@ -90,7 +103,7 @@
             )}}
               <div class="row content-row progress-row">
                 {{#truncated-string}}
-                  {{progress.space.name}} - {{progress.provider.name}}
+                  {{progress.space.name}} – {{progress.provider.name}}
                 {{/truncated-string}}
                 {{content-harvesters-indices/progress-table-cell
                   tagName="div"

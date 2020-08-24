@@ -61,6 +61,26 @@ export default Component.extend(I18n, WindowResizeHandler, {
   previousSeqSum: null,
 
   /**
+   * @type {boolean}
+   */
+  isTableScrolledTop: false,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledBottom: false,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledLeft: false,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledRight: false,
+
+  /**
    * @type {Ember.ComputedProperty<number>}
    */
   changesCounter: subtract('currentSeqSum', 'previousSeqSum'),
@@ -403,53 +423,82 @@ export default Component.extend(I18n, WindowResizeHandler, {
       previousSeqSum: currentSeqSum,
     });
     if (this.get('element')) {
-      this.$('.activity-indicator').removeClass('pulse-green');
+      this.$('.activity-indicator').removeClass('pulse-mint');
       next(() => {
-        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-green'));
+        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-mint'));
       });
     }
   },
 
   recalculateTableLayout() {
-    if (this.get('element')) {
-      const $ps = this.$('.ps');
-      const scrollLeftOffset = $ps.scrollLeft();
-      const scrollTopOffset = $ps.scrollTop();
-      const $constantRowLabels = this.$('.row-label.constant-row-label');
-      const $floatingRowLabels = this.$('.row-label.floating-row-label');
-      const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
-      const $floatingColumnLabelsRow = this.$('.floating-column-labels');
-      const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
+    const {
+      element,
+      useTableLayout,
+    } = this.getProperties('element', 'useTableLayout');
 
-      $constantRowLabels.each(function each(index) {
-        $floatingRowLabels.eq(index).css({
-          height: `${parseFloat($(this).css('height'))}px`,
-        });
+    if (!element || !useTableLayout) {
+      this.setProperties({
+        isTableScrolledTop: false,
+        isTableScrolledBottom: false,
+        isTableScrolledLeft: false,
+        isTableScrolledRight: false,
       });
-      $floatingRowLabels.css({
-        left: `${scrollLeftOffset}px`,
-        width: $constantRowLabels.css('width'),
-        visibility: 'visible',
-      });
-
-      $constantColumnLabels.each(function each(index) {
-        $floatingColumnLabels.eq(index).css({
-          width: `${parseFloat($(this).css('width'))}px`,
-        });
-      });
-      $floatingColumnLabels.css({
-        height: $constantColumnLabels.css('height'),
-        visibility: 'visible',
-      });
-      $floatingColumnLabelsRow.css({
-        top: `${scrollTopOffset}px`,
-      });
+      return;
     }
+
+    const $ps = this.$('.ps');
+    const scrollLeftOffset = $ps.scrollLeft();
+    const scrollTopOffset = $ps.scrollTop();
+    const $constantRowLabels = this.$('.row-label.constant-row-label');
+    const $floatingRowLabels = this.$('.row-label.floating-row-label');
+    const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
+    const $floatingColumnLabelsRow = this.$('.floating-column-labels');
+    const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
+    const $rightShadowOverlay = this.$('.right-shadow-overlay');
+
+    $constantRowLabels.each(function each(index) {
+      $floatingRowLabels.eq(index).css({
+        height: `${parseFloat($(this).css('height'))}px`,
+      });
+    });
+    $floatingRowLabels.css({
+      left: `${scrollLeftOffset}px`,
+      width: $constantRowLabels.css('width'),
+      visibility: 'visible',
+    });
+
+    $constantColumnLabels.each(function each(index) {
+      $floatingColumnLabels.eq(index).css({
+        width: `${parseFloat($(this).css('width'))}px`,
+      });
+    });
+    $floatingColumnLabels.css({
+      height: $constantColumnLabels.css('height'),
+      visibility: 'visible',
+    });
+    $floatingColumnLabelsRow.css({
+      top: `${scrollTopOffset}px`,
+    });
+    $rightShadowOverlay.css({
+      height: $constantColumnLabels.css('height'),
+    });
   },
 
   actions: {
     scroll() {
       this.recalculateTableLayout();
+    },
+    tableTopEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledTop', reachedEdge);
+    },
+    tableBottomEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledBottom', reachedEdge);
+    },
+    tableLeftEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledLeft', reachedEdge);
+    },
+    tableRightEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledRight', reachedEdge);
     },
     showArchivalChanged(showArchival) {
       this.set('showOnlyActive', !showArchival);
