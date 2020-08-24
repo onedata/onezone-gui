@@ -7,6 +7,8 @@ CHANGELOG
 ### Latest changes
 
 * VFS-6610 Better visualisation of large matrices in harvester index progress
+* VFS-6609 Added identity tokens section in "Clean obsolete tokens" modal
+* VFS-6447 Redirect directly to other Onepanel cluster
 * VFS-6629 Refactor of harvester and harvester index forms
 * VFS-6554 Added space owners concept
 * VFS-6541 Improvements in showing harvester-space relation

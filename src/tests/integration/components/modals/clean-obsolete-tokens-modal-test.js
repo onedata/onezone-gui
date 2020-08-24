@@ -28,8 +28,20 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       typeName: 'invite',
       isObsolete: true,
     }, {
+      name: 'invite token 3',
+      typeName: 'invite',
+      isObsolete: true,
+    }, {
       name: 'access token 1',
       typeName: 'access',
+      isObsolete: true,
+    }, {
+      name: 'identity token 1',
+      typeName: 'identity',
+      isObsolete: true,
+    }, {
+      name: 'identity token 2',
+      typeName: 'identity',
       isObsolete: true,
     }];
     this.setProperties({
@@ -64,18 +76,22 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
   );
 
   it(
-    'renders sections "Access tokens" and "Invitation tokens"',
+    'renders sections "Access tokens", "Identity tokens" and "Invitation tokens"',
     function () {
       return showModal(this)
         .then(() => {
           const $modalBody = getModalBody();
           const $accessTokensSection = $modalBody.find('.access-tokens-list');
+          const $identityTokensSection = $modalBody.find('.identity-tokens-list');
           const $inviteTokensSection = $modalBody.find('.invite-tokens-list');
 
           expect($accessTokensSection).to.exist;
+          expect($identityTokensSection).to.exist;
           expect($inviteTokensSection).to.exist;
           expect($accessTokensSection.find('.header-text').text().trim())
             .to.equal('Access tokens');
+          expect($identityTokensSection.find('.header-text').text().trim())
+            .to.equal('Identity tokens');
           expect($inviteTokensSection.find('.header-text').text().trim())
             .to.equal('Invitation tokens');
         });
@@ -88,6 +104,8 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
         const $modalBody = getModalBody();
         expect($modalBody.find('.access-tokens-list .checkbox-list-collapse'))
           .to.not.have.class('in');
+        expect($modalBody.find('.identity-tokens-list .checkbox-list-collapse'))
+          .to.not.have.class('in');
         expect($modalBody.find('.invite-tokens-list .checkbox-list-collapse'))
           .to.not.have.class('in');
       });
@@ -97,13 +115,18 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
     return showModal(this, true)
       .then(() => {
         const $accessTokenItems = getAccessTokenItems();
+        const $identityTokenItems = getIdentityTokenItems();
         const $inviteTokenItems = getInviteTokenItems();
 
         expect($accessTokenItems).to.have.length(1);
-        expect($inviteTokenItems).to.have.length(2);
+        expect($identityTokenItems).to.have.length(2);
+        expect($inviteTokenItems).to.have.length(3);
         expect($accessTokenItems.text().trim()).to.equal('access token 1');
+        expect($identityTokenItems.eq(0).text().trim()).to.equal('identity token 1');
+        expect($identityTokenItems.eq(1).text().trim()).to.equal('identity token 2');
         expect($inviteTokenItems.eq(0).text().trim()).to.equal('invite token 1');
         expect($inviteTokenItems.eq(1).text().trim()).to.equal('invite token 2');
+        expect($inviteTokenItems.eq(2).text().trim()).to.equal('invite token 3');
       });
   });
 
@@ -112,8 +135,8 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => {
         const $modalBody = getModalBody();
         expect($modalBody.find('.one-checkbox:not(.checked)')).to.not.exist;
-        // 3 token checkboxes + 2 section checkboxes
-        expect($modalBody.find('.one-checkbox')).to.have.length(5);
+        // 6 token checkboxes + 3 section checkboxes
+        expect($modalBody.find('.one-checkbox')).to.have.length(9);
       });
   });
 
@@ -135,6 +158,15 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => click(getAccessTokenItems().eq(0).find('.one-checkbox')[0]))
       .then(() => {
         expect(getAccessTokenItems().eq(0).find('.one-checkbox'))
+          .to.not.have.class('checked');
+      });
+  });
+
+  it('responds to identity token checkbox selection change', function () {
+    return showModal(this, true)
+      .then(() => click(getIdentityTokenItems().eq(0).find('.one-checkbox')[0]))
+      .then(() => {
+        expect(getIdentityTokenItems().eq(0).find('.one-checkbox'))
           .to.not.have.class('checked');
       });
   });
@@ -178,14 +210,14 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => click($submitButton[0]))
       .then(() => {
         expect($submitButton).to.have.class('in-flight');
-        expect(submitStub.lastCall.args[0].toArray())
-          .to.deep.equal(this.get('tokens').toArray());
+        expect(submitStub.lastCall.args[0]).to.have.same.members(this.get('tokens'));
       });
   });
 
   it('submits modified selected tokens', function () {
     const submitStub = sinon.stub().returns(new Promise(() => {}));
     this.set('modalOptions.onSubmit', submitStub);
+    const tokens = this.get('tokens');
 
     let $submitButton;
     return showModal(this)
@@ -194,8 +226,8 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => click($submitButton[0]))
       .then(() => {
         expect($submitButton).to.have.class('in-flight');
-        expect(submitStub.lastCall.args[0].toArray())
-          .to.deep.equal(this.get('tokens').slice(0, 2));
+        expect(submitStub.lastCall.args[0])
+          .to.have.same.members(tokens.without(tokens[3]));
       });
   });
 
@@ -264,6 +296,10 @@ function expandSections() {
 
 function getAccessTokenItems() {
   return getModalBody().find('.access-tokens-list .checkbox-list-item');
+}
+
+function getIdentityTokenItems() {
+  return getModalBody().find('.identity-tokens-list .checkbox-list-item');
 }
 
 function getInviteTokenItems() {
