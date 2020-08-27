@@ -63,22 +63,22 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @type {boolean}
    */
-  isTableScrolledTop: false,
+  isTableScrolledTop: true,
 
   /**
    * @type {boolean}
    */
-  isTableScrolledBottom: false,
+  isTableScrolledBottom: true,
 
   /**
    * @type {boolean}
    */
-  isTableScrolledLeft: false,
+  isTableScrolledLeft: true,
 
   /**
    * @type {boolean}
    */
-  isTableScrolledRight: false,
+  isTableScrolledRight: true,
 
   /**
    * @type {Ember.ComputedProperty<number>}
@@ -438,10 +438,10 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
     if (!element || !useTableLayout) {
       this.setProperties({
-        isTableScrolledTop: false,
-        isTableScrolledBottom: false,
-        isTableScrolledLeft: false,
-        isTableScrolledRight: false,
+        isTableScrolledTop: true,
+        isTableScrolledBottom: true,
+        isTableScrolledLeft: true,
+        isTableScrolledRight: true,
       });
       return;
     }
