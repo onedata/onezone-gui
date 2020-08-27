@@ -320,11 +320,7 @@
         // Is initially hidden to not present labels in non-calculated state at the beginning.
         visibility: hidden;
         background-color: $main-content-hover-background;
-        @include after-left-shadow;
-        &::after {
-          left: initial;
-          right: 0;
-        }
+        @include after-right-shadow;
       }
   
       .floating-column-labels {
@@ -332,11 +328,7 @@
         display: flex;
         top: 0;
         z-index: 2;
-        @include before-top-shadow;
-        &::before {
-          top: initial;
-          bottom: 0;
-        }
+        @include before-bottom-shadow;
         td {
           display: block;
           background-color: $main-content-hover-background;
@@ -344,8 +336,20 @@
       }
 
       .progress-table-inner-container {
-        @include before-bottom-shadow;
-        @include after-right-shadow;
+        @include before-top-shadow;
+        @include after-left-shadow;
+
+        &::before {
+          top: initial;
+          bottom: 0;
+        }
+
+        &::after {
+          right: 0;
+          left: initial;
+          // be under the scrollbar
+          z-index: 0;
+        }
 
         &.scroll-on-bottom {
           @include hide-before-shadow;
@@ -371,9 +375,9 @@
         width: $top-shadow-height;
         background-color: $main-content-hover-background;
         top: 0;
-        right: -$top-shadow-height;
+        right: 0;
         height: 0;
-        z-index: $top-shadow-zindex + 1;
+        z-index: 1;
       }
 
       .ps {
