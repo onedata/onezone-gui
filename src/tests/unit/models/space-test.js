@@ -2,12 +2,9 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupModelTest } from 'ember-mocha';
 import Service from '@ember/service';
-import { get, set } from '@ember/object';
-import { lookupService, registerService } from '../../helpers/stub-service';
+import { get } from '@ember/object';
+import { registerService } from '../../helpers/stub-service';
 import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
-import sinon from 'sinon';
-import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { resolve } from 'rsvp';
 
 describe('Unit | Model | space', function () {
   setupModelTest('space', {
@@ -29,31 +26,27 @@ describe('Unit | Model | space', function () {
     expect(record.getInviteToken).to.be.instanceOf(Function);
   });
 
-  describe('computes its ownership by current user', function () {
-    beforeEach(function () {
-      this.record = this.subject();
-      sinon.stub(this.record, 'ownerList').value(promiseObject(resolve({
-        list: [
-          { entityId: 'b1' },
-          { entityId: 'b2' },
-        ],
-      })));
+  it('computes current user privileges without owner flag', function () {
+    const model = this.subject({
+      currentUserEffPrivileges: ['space_view_qos'],
+      currentUserIsOwner: false,
     });
 
-    it('as true if the user is on owners list', function () {
-      set(lookupService(this, 'current-user'), 'userId', 'b2');
+    const privileges = get(model, 'privileges');
 
-      return get(this.record, 'currentUserIsOwnerProxy').then(currentUserIsOwner => {
-        expect(currentUserIsOwner).to.equal(true);
-      });
+    expect(privileges).to.have.property('viewQos', true);
+    expect(privileges).to.have.property('viewTransfers', false);
+  });
+
+  it('computes current user privileges with owner flag', function () {
+    const model = this.subject({
+      currentUserEffPrivileges: [],
+      currentUserIsOwner: true,
     });
 
-    it('as false if the user is not on owners list', function () {
-      set(lookupService(this, 'current-user'), 'userId', 'a1');
+    const privileges = get(model, 'privileges');
 
-      return get(this.record, 'currentUserIsOwnerProxy').then(currentUserIsOwner => {
-        expect(currentUserIsOwner).to.equal(false);
-      });
-    });
+    expect(privileges).to.have.property('viewQos', true);
+    expect(privileges).to.have.property('viewTransfers', true);
   });
 });

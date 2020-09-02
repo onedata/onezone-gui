@@ -16,7 +16,7 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
-import computedCurrentUserSpacePrivileges from 'onedata-gui-common/utils/computed-current-user-space-privileges';
+import computedCurrentUserPrivileges from 'onedata-gui-common/utils/computed-current-user-privileges';
 
 export const entityType = 'space';
 
@@ -71,7 +71,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
     return _.sum(_.values(this.get('supportSizes')));
   }),
 
-  privileges: computedCurrentUserSpacePrivileges(spacePrivilegesFlags),
+  privileges: computedCurrentUserPrivileges({ allFlags: spacePrivilegesFlags }),
 
   //#endregion
 
