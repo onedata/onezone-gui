@@ -19,6 +19,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
 import moment from 'moment';
 import { scheduleOnce, next } from '@ember/runloop';
+import $ from 'jquery';
 
 export default Component.extend(I18n, WindowResizeHandler, {
   classNames: ['content-harvesters-indices-progress-table'],
@@ -47,16 +48,6 @@ export default Component.extend(I18n, WindowResizeHandler, {
   /**
    * @type {boolean}
    */
-  isTableCollapsed: false,
-
-  /**
-   * @type {number}
-   */
-  breakpoint: 1200,
-
-  /**
-   * @type {boolean}
-   */
   showOnlyActive: true,
 
   /**
@@ -70,11 +61,24 @@ export default Component.extend(I18n, WindowResizeHandler, {
   previousSeqSum: null,
 
   /**
-   * @type {Ember.ComputedProperty<Ember.A>}
+   * @type {boolean}
    */
-  expandedRows: computed(function expandedRows() {
-    return A();
-  }),
+  isTableScrolledTop: true,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledBottom: true,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledLeft: true,
+
+  /**
+   * @type {boolean}
+   */
+  isTableScrolledRight: true,
 
   /**
    * @type {Ember.ComputedProperty<number>}
@@ -172,24 +176,11 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
     const activeProviders =
       _.flatten(progressData.map(({ progress }) => progress))
-      .rejectBy('archival')
+      .filter(progress => !get(progress, 'archival') && get(progress, 'isSupported'))
       .mapBy('provider')
       .uniq();
     return providers.filter(provider => activeProviders.includes(provider));
   }),
-
-  /**
-   * @type {Ember.ComputedProperty<null>}
-   */
-  basicTableSetupTrigger: computed(
-    'spaces',
-    'providers',
-    'activeProgressData',
-    'showOnlyActive',
-    function basicTableSetupTrigger() {
-      return {};
-    }
-  ),
 
   /**
    * Progress data ready to render. Format:
@@ -335,7 +326,14 @@ export default Component.extend(I18n, WindowResizeHandler, {
       if (showOnlyActive) {
         meaningfulData = meaningfulData.rejectBy('archival');
       }
-      return get(meaningfulData, 'length') > 4;
+
+      const meaningfulCellsCount = get(meaningfulData, 'length');
+      // At least 5 non-empty cells and minimum 2 spaces and 2 providers. Having a
+      // table with only one row or one column does not have any sense.
+      // > 15 to deal with a finite height of a collapsible-list item
+      return (meaningfulCellsCount > 4 &&
+        meaningfulData.mapBy('space').uniq().length > 1 &&
+        meaningfulData.mapBy('provider').uniq().length > 1) || meaningfulCellsCount > 15;
     }
   ),
 
@@ -358,16 +356,17 @@ export default Component.extend(I18n, WindowResizeHandler, {
     }
   },
 
+  didRender() {
+    this._super(...arguments);
+
+    this.recalculateTableLayout();
+  },
+
   /**
    * @override
    */
-  onWindowResize(event) {
-    const window = event.target;
-    const breakpoint = this.get('breakpoint');
-
-    safeExec(this, () => {
-      this.set('isTableCollapsed', get(window, 'innerWidth') <= breakpoint);
-    });
+  onWindowResize() {
+    this.recalculateTableLayout();
   },
 
   /**
@@ -424,21 +423,82 @@ export default Component.extend(I18n, WindowResizeHandler, {
       previousSeqSum: currentSeqSum,
     });
     if (this.get('element')) {
-      this.$('.activity-indicator').removeClass('pulse-green');
+      this.$('.activity-indicator').removeClass('pulse-mint');
       next(() => {
-        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-green'));
+        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-mint'));
       });
     }
   },
 
+  recalculateTableLayout() {
+    const {
+      element,
+      useTableLayout,
+    } = this.getProperties('element', 'useTableLayout');
+
+    if (!element || !useTableLayout) {
+      this.setProperties({
+        isTableScrolledTop: true,
+        isTableScrolledBottom: true,
+        isTableScrolledLeft: true,
+        isTableScrolledRight: true,
+      });
+      return;
+    }
+
+    const $ps = this.$('.ps');
+    const scrollLeftOffset = $ps.scrollLeft();
+    const scrollTopOffset = $ps.scrollTop();
+    const $constantRowLabels = this.$('.row-label.constant-row-label');
+    const $floatingRowLabels = this.$('.row-label.floating-row-label');
+    const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
+    const $floatingColumnLabelsRow = this.$('.floating-column-labels');
+    const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
+    const $rightShadowOverlay = this.$('.right-shadow-overlay');
+
+    $constantRowLabels.each(function each(index) {
+      $floatingRowLabels.eq(index).css({
+        height: `${parseFloat($(this).css('height'))}px`,
+      });
+    });
+    $floatingRowLabels.css({
+      left: `${scrollLeftOffset}px`,
+      width: $constantRowLabels.css('width'),
+      visibility: 'visible',
+    });
+
+    $constantColumnLabels.each(function each(index) {
+      $floatingColumnLabels.eq(index).css({
+        width: `${parseFloat($(this).css('width'))}px`,
+      });
+    });
+    $floatingColumnLabels.css({
+      height: $constantColumnLabels.css('height'),
+      visibility: 'visible',
+    });
+    $floatingColumnLabelsRow.css({
+      top: `${scrollTopOffset}px`,
+    });
+    $rightShadowOverlay.css({
+      height: $constantColumnLabels.css('height'),
+    });
+  },
+
   actions: {
-    rowHeaderClick(space) {
-      const expandedRows = this.get('expandedRows');
-      if (expandedRows.includes(space)) {
-        expandedRows.removeObject(space);
-      } else {
-        expandedRows.addObject(space);
-      }
+    scroll() {
+      this.recalculateTableLayout();
+    },
+    tableTopEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledTop', reachedEdge);
+    },
+    tableBottomEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledBottom', reachedEdge);
+    },
+    tableLeftEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledLeft', reachedEdge);
+    },
+    tableRightEdgeScroll(reachedEdge) {
+      this.set('isTableScrolledRight', reachedEdge);
     },
     showArchivalChanged(showArchival) {
       this.set('showOnlyActive', !showArchival);
