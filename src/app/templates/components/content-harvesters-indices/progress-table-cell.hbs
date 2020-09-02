@@ -14,6 +14,7 @@
       class="progress-more-info"
       triggerSelector=(concat ".more-info-trigger-" elementId)
       open=isMoreInfoVisible
+      registerApi=(action "registerPopoverApi")
       as |popover|}}
       {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat ".more-info-trigger-" elementId)}}
         <ul class="description-items">

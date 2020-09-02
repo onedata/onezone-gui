@@ -7,7 +7,11 @@
 
     .includeFileDetails-field,
     .includeMetadata-field {
-      margin-bottom: $form-group-margin-bottom;
+      margin-bottom: $form-group-margin-bottom - $padding-small-vertical;
+
+      &.field-view-mode {
+        margin-bottom: $form-component-view-margin - $padding-small-vertical;
+      }
 
       .toggle-field-renderer {
         margin-bottom: $padding-small-vertical;
@@ -116,6 +120,9 @@
   .one-collapsible-list-item-content.opened {
     max-height: 4000px;
   }
+  .one-collapsible-list-item {
+    max-height: 4200px;
+  }
   .id-presenter-trigger {
     @include vertical-align-middle();
     right: 60px;
@@ -152,143 +159,16 @@
     margin-top: 40px;
   }
   .content-harvesters-indices-progress-table {
-    $table-breakpoint: 1200px;
-    $space-name-width: 120px;
     $chart-size: 65px;
-
     min-height: 120px;
-    position: relative;
-
-    .progress-table-container.list-layout {
-      .progress-row:last-child {
-        margin-bottom: -$padding-base-vertical;
-      }
-    }
-
-    @media (min-width: $table-breakpoint + 1) {
-      $labels-font-size: 90%;
-
-      .progress-table-container {
-        &.table-layout {
-          width: calc(100% - #{$space-name-width});
-          margin-left: $space-name-width;
-          overflow-x: auto;
-          overflow-y: visible;
-        }
-      }
-
-      .table {
-        width: initial;
-        max-width: initial;
-        margin-left: 30px;
-        margin-bottom: 80px;
-        .space-name {
-          position: absolute;
-          top: auto;
-          left: 0;
-          transform: translateY(20px);
-          padding-right: $padding-base-vertical;
-          padding-left: 0;
-          width: $space-name-width;
-          height: $chart-size * 1.5;
-          min-width: $space-name-width;
-          overflow: hidden;
-          text-align: right;
-          font-size: $labels-font-size;
-          word-break: break-all;
-          line-height: 1;
-        }
-      }
-      
-      .provider-name {
-        transform: translateX(-40%) rotate(-45deg);
-        transform-origin: right center;
-        overflow: hidden;
-        word-break: break-all;
-        line-height: 1;
-        text-align: right;
-        font-size: $labels-font-size;
-      }
-      .progress-table-cell {
-        height: $chart-size * 1.5;
-        width: $chart-size * 1.5;
-      }
-      td {
-        max-width: $chart-size * 1.7;
-        width: $chart-size * 1.7;
-        min-width: $chart-size * 1.7;
-      }
-    }
-
-    @media (max-width: $table-breakpoint) {
-      .table {
-        width: 100%;
-        font-size: 100%;
-        margin-bottom: -$table-cell-padding;
-        .progress-chart {
-          left: initial;
-          right: 0;
-          transform: translateY(-50%);
-        }
-        tbody {
-          tr, tr.active {
-            td {
-              &.row-header {
-                padding: $table-cell-padding 3em $table-cell-padding 0;
-                &::before {
-                  width: auto;
-                  right: 0;
-                }
-              }
-              &.progress-table-cell {
-                &::before {
-                  width: calc(100% - #{$chart-size * 1.5});
-                  line-height: $chart-size * 1.5 - 2 * $table-cell-padding;
-                  font-weight: normal;
-                  white-space: nowrap;
-                  text-align: left;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                }
-              }
-            }
-          }
-        }
-      }
-      .space-name {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: left;
-        @include font-semibold();
-        white-space: nowrap;
-      }
-      tr.active td {
-        padding: $table-cell-padding 0;
-      }
-    }
-
-    .table {
-      table-layout: fixed;
-      & > tbody > tr > td.active {
-        background-color: inherit;
-      }
-    }
 
     .visible-stats-label {
       margin-right: 0;
       margin-left: $padding-xs-horizontal;
-    }
 
-    // Chrome hack
-    .table:not(.bt) .space-name {
-      position: absolute;
-    }
-
-    td {
-      border: 0;
+      .one-icon {
+        margin-left: 3px;
+      }
     }
 
     .progress-table-cell {
@@ -298,9 +178,6 @@
       }
     }
 
-    .provider-names td {
-      padding: 0 0 0 0;
-    }
     .progress-chart {
       @include absolute-align-middle-center();
       width: $chart-size;
@@ -344,6 +221,11 @@
         background-position: right center;
       }
     }
+    .last-update-info {
+      margin-bottom: $padding-base-vertical;
+      margin-right: $padding-base-horizontal;
+    }
+
     .progress-table-container.list-layout {
       .progress-row {
         position: relative;
@@ -359,17 +241,153 @@
         width: $chart-size;
       }
     }
-    .last-update-info {
-      margin-bottom: $padding-base-vertical;
-      margin-right: $padding-base-horizontal;
-    }
-    .visible-stats-label {
-      .one-icon {
-        margin-left: 3px;
+
+    .progress-table-container.table-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .progress-table-inner-container {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        max-width: 100%;
+        max-height: 70vh;
+        min-height: 400px;
       }
-    }
-    .pulse-green {
-      @extend .pulse-mint;
+  
+      .progress-table-cell {
+        height: $chart-size * 1.5;
+        width: $chart-size * 1.5;
+        min-width: $chart-size * 1.5;
+      }
+  
+      .row-label,
+      .column-label {
+        word-wrap: break-word;
+        line-height: 1;
+      }
+  
+      .row-label {
+        vertical-align: middle;
+        text-align: right;
+        padding: $padding-base-vertical $padding-large-horizontal $padding-base-vertical 0;
+        max-width: 120px;
+    
+        .one-label {
+          width: 100%;
+        }
+      }
+  
+      .column-label {
+        vertical-align: bottom;
+        text-align: center;
+        padding-top: $padding-large-vertical;
+        padding-bottom: $padding-large-vertical;
+    
+        .one-label {
+          display: inline-block;
+          vertical-align: top;
+          transform: translateX(50%) rotate(-45deg);
+          transform-origin: bottom left;
+          writing-mode: vertical-rl;
+          max-height: 120px;
+          text-align: right;
+          max-width: 4 * $font-size-base;
+          overflow: hidden;
+        }
+      }
+  
+      .constant-row-label,
+      .constant-column-labels {
+        visibility: hidden;
+      }
+
+      .constant-column-labels,
+      .floating-column-labels {
+        .floating-row-label {
+          @include hide-after-shadow;
+        }
+      }
+  
+      .floating-row-label {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        z-index: 1;
+        // Is initially hidden to not present labels in non-calculated state at the beginning.
+        visibility: hidden;
+        background-color: $main-content-hover-background;
+        @include after-right-shadow;
+      }
+  
+      .floating-column-labels {
+        position: absolute;
+        display: flex;
+        top: 0;
+        z-index: 2;
+        @include before-bottom-shadow;
+        td {
+          display: block;
+          background-color: $main-content-hover-background;
+        }
+      }
+
+      .progress-table-inner-container {
+        @include before-top-shadow;
+        @include after-left-shadow;
+
+        &::before {
+          top: initial;
+          bottom: 0;
+        }
+
+        &::after {
+          right: 0;
+          left: initial;
+          // be under the scrollbar
+          z-index: 0;
+        }
+
+        &.scroll-on-bottom {
+          @include hide-before-shadow;
+        }
+
+        &.scroll-on-right {
+          @include hide-after-shadow;
+        }
+      }
+
+      .scroll-on-top {
+        .floating-column-labels {
+          @include hide-before-shadow;
+        }
+      }
+
+      .scroll-on-left .floating-row-label {
+        @include hide-after-shadow;
+      }
+
+      .right-shadow-overlay {
+        position: absolute;
+        width: $top-shadow-height;
+        background-color: $main-content-hover-background;
+        top: 0;
+        right: 0;
+        height: 0;
+        z-index: 1;
+      }
+
+      .ps {
+        height: 100%;
+      }
+  
+      .ps__rail-x,
+      .ps__rail-y {
+        z-index: 2;
+      }
     }
   }
 }

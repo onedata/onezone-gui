@@ -58,9 +58,14 @@
       elementId=(concat parentView.elementId "-progress-tab")
       title=(tt this "harvestingProgress")
     }}
-      {{#render-later triggerRender=listItem.isActive}}
+      {{!-- Hiding progress table when it is hidden by any parent. Fixes 0 size of the table
+      and incorrect calculation of labels positions. --}}
+      {{#if (and
+        (eq (concat parentView.elementId "-progress-tab") tab.activeId)
+        listItem.isActive
+      )}}
         {{content-harvesters-indices/progress-table index=index harvester=harvester}}
-      {{/render-later}}
+      {{/if}}
     {{/tab.pane}}
     {{#tab.pane
       elementId=(concat parentView.elementId "-settings-tab")
