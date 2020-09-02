@@ -4,7 +4,6 @@ export default {
     supportCountHint: 'Number of supporting providers: {{{count}}}',
   },
   secondLevelItems: {
-    insufficientTransferPrivileges: 'You have insufficient privileges to view transfers',
     aspects: {
       index: 'Overview',
       data: 'Data',

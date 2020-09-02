@@ -13,6 +13,7 @@ import layout from 'onedata-gui-common/templates/components/one-sidebar/second-l
 import { computed } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default SecondLevelItems.extend(I18n, {
   layout,
@@ -65,13 +66,18 @@ export default SecondLevelItems.extend(I18n, {
   }),
 
   itemTransfers: computed('space.privileges.viewTransfers', function itemTransfers() {
+    const i18n = this.get('i18n');
     const forbidden = this.get('space.privileges.viewTransfers') === false;
     return {
       id: 'transfers',
       label: this.t('aspects.transfers'),
       icon: 'transfers',
       forbidden,
-      tip: forbidden ? this.t('insufficientTransferPrivileges') : undefined,
+      tip: forbidden ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_view_transfers',
+      }) : undefined,
     };
   }),
 
