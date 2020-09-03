@@ -43,9 +43,7 @@
               triggerEvents="hover"
             }}
           </span>
-          <span class="one-label">
-            {{memberProxy.member.name}}
-          </span>
+          {{member-record member=memberProxy.member}}
           <span class="labels-container">
             {{#if memberProxy.isYou}}
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>

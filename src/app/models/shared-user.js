@@ -13,6 +13,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 
 export default Model.extend(GraphSingleModelMixin, {
   fullName: attr('string'),
+  username: attr('string'),
 
   /**
    * @type {Ember.ComputedProperty<string>}

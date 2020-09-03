@@ -618,7 +618,10 @@ function createHarvesterRecords(store) {
 
 function createSharedUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
-    return store.createRecord('sharedUser', { name: `sharedUser${index}` }).save();
+    return store.createRecord('sharedUser', {
+      name: `sharedUser${index}`,
+      username: `username${index}`,
+    }).save();
   }));
 }
 
