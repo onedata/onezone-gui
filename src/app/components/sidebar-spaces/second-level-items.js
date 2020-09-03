@@ -49,37 +49,60 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
-  itemData: computed(function itemData() {
+  itemData: computed('space.privileges.readData', function itemData() {
+    const i18n = this.get('i18n');
+    const privileges = this.get('space.privileges');
+    const forbidden = privileges.readData === false;
     return {
       id: 'data',
       label: this.t('aspects.data'),
       icon: 'browser-directory',
-    };
-  }),
-
-  itemShares: computed(function itemShares() {
-    return {
-      id: 'shares',
-      label: this.t('aspects.shares'),
-      icon: 'share',
-    };
-  }),
-
-  itemTransfers: computed('space.privileges.viewTransfers', function itemTransfers() {
-    const i18n = this.get('i18n');
-    const forbidden = this.get('space.privileges.viewTransfers') === false;
-    return {
-      id: 'transfers',
-      label: this.t('aspects.transfers'),
-      icon: 'transfers',
       forbidden,
       tip: forbidden ? insufficientPrivilegesMessage({
         i18n,
         modelName: 'space',
-        privilegeFlag: 'space_view_transfers',
+        privilegeFlag: 'space_read_data',
       }) : undefined,
     };
   }),
+
+  itemShares: computed('space.privileges.view', function itemShares() {
+    const i18n = this.get('i18n');
+    const privileges = this.get('space.privileges');
+    const forbidden = privileges.view === false;
+    return {
+      id: 'shares',
+      label: this.t('aspects.shares'),
+      icon: 'share',
+      forbidden,
+      tip: forbidden ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_view',
+      }) : undefined,
+    };
+  }),
+
+  itemTransfers: computed(
+    'space.privileges.{view,viewTransfers}',
+    function itemTransfers() {
+      const i18n = this.get('i18n');
+      const privileges = this.get('space.privileges');
+      const forbidden = privileges.viewTransfers === false ||
+        privileges.view === false;
+      return {
+        id: 'transfers',
+        label: this.t('aspects.transfers'),
+        icon: 'transfers',
+        forbidden,
+        tip: forbidden ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: ['space_view', 'space_view_transfers'],
+        }) : undefined,
+      };
+    }
+  ),
 
   itemProviders: computed(function itemProviders() {
     return {
@@ -89,19 +112,37 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
-  itemMembers: computed(function itemMembers() {
+  itemMembers: computed('space.privileges.view', function itemMembers() {
+    const i18n = this.get('i18n');
+    const privileges = this.get('space.privileges');
+    const forbidden = privileges.view === false;
     return {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',
+      forbidden,
+      tip: forbidden ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_view',
+      }) : undefined,
     };
   }),
 
-  itemHarvesters: computed(function itemHarvesters() {
+  itemHarvesters: computed('space.privileges.view', function itemHarvesters() {
+    const i18n = this.get('i18n');
+    const privileges = this.get('space.privileges');
+    const forbidden = privileges.view === false;
     return {
       id: 'harvesters',
       label: this.t('aspects.harvesters'),
       icon: this.get('oneiconAlias').getName('harvester'),
+      forbidden,
+      tip: forbidden ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_view',
+      }) : undefined,
     };
   }),
 
