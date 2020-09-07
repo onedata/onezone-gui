@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6652 Enabled assets fingerprinting for more resources
 * VFS-6610 Better visualisation of large matrices in harvester index progress
 * VFS-6609 Added identity tokens section in "Clean obsolete tokens" modal
 * VFS-6447 Redirect directly to other Onepanel cluster
