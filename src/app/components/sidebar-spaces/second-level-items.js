@@ -84,12 +84,11 @@ export default SecondLevelItems.extend(I18n, {
   }),
 
   itemTransfers: computed(
-    'space.privileges.{view,viewTransfers}',
+    'space.privileges.viewTransfers',
     function itemTransfers() {
       const i18n = this.get('i18n');
       const privileges = this.get('space.privileges');
-      const forbidden = privileges.viewTransfers === false ||
-        privileges.view === false;
+      const forbidden = privileges.viewTransfers === false;
       return {
         id: 'transfers',
         label: this.t('aspects.transfers'),
@@ -98,7 +97,7 @@ export default SecondLevelItems.extend(I18n, {
         tip: forbidden ? insufficientPrivilegesMessage({
           i18n,
           modelName: 'space',
-          privilegeFlag: ['space_view', 'space_view_transfers'],
+          privilegeFlag: 'space_view_transfers',
         }) : undefined,
       };
     }
