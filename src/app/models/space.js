@@ -9,21 +9,26 @@ import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import { computed } from '@ember/object';
-import { equal } from '@ember/object/computed';
+import { reads } from '@ember/object/computed';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
+import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
+import computedCurrentUserPrivileges from 'onedata-gui-common/utils/computed-current-user-privileges';
 
 export const entityType = 'space';
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   onedataGraphUtils: service(),
+  currentUser: service(),
+  privilegeManager: service(),
 
   name: attr('string'),
   scope: attr('string'),
-  canViewPrivileges: attr('boolean', { defaultValue: false }),
+  currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
+  currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
 
   /**
@@ -52,17 +57,21 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   ownerList: belongsTo('sharedUserList'),
   harvesterList: belongsTo('harvesterList'),
 
+  //#region utils
+
   /**
    * True, if user has a "View space" privilege
    * @type {Ember.ComputedProperty<boolean>}
    */
-  hasViewPrivilege: equal('scope', 'private'),
+  hasViewPrivilege: reads('privileges.view'),
 
-  //#region utils
+  canViewPrivileges: reads('privileges.viewPrivileges'),
 
   totalSize: computed('supportSizes', function getTotalSize() {
     return _.sum(_.values(this.get('supportSizes')));
   }),
+
+  privileges: computedCurrentUserPrivileges({ allFlags: spacePrivilegesFlags }),
 
   //#endregion
 

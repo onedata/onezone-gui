@@ -1,5 +1,9 @@
 import _ from 'lodash';
 import privilegesAspectBase from '../mixins/members-aspect-base';
+import privileges from '../onedata-gui-common/common/privileges';
+import { capitalize } from '@ember/string';
+
+const spacePrivileges = privileges.space;
 
 export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {
@@ -12,44 +16,10 @@ export default _.merge({}, privilegesAspectBase, {
     supportManagement: 'Support management',
     harvesterManagement: 'Harvester management',
   },
-  privileges: {
-    space_view: 'View space',
-    space_update: 'Modify space',
-    space_delete: 'Remove space',
-    space_view_privileges: 'View privileges',
-    space_set_privileges: 'Set privileges',
-
-    space_read_data: 'Read files',
-    space_write_data: 'Write files',
-    space_register_files: 'Register files',
-    space_manage_shares: 'Manage shares',
-    space_view_views: 'View database views',
-    space_manage_views: 'Manage database views',
-    space_query_views: 'Query database views',
-    space_view_statistics: 'View statistics',
-    space_view_changes_stream: 'View changes stream',
-
-    space_view_transfers: 'View transfers',
-    space_schedule_replication: 'Schedule replication',
-    space_cancel_replication: 'Cancel replication',
-    space_schedule_eviction: 'Schedule eviction',
-    space_cancel_eviction: 'Cancel eviction',
-
-    space_view_qos: 'View QoS',
-    space_manage_qos: 'Manage QoS',
-
-    space_add_user: 'Add user',
-    space_remove_user: 'Remove user',
-
-    space_add_group: 'Add group',
-    space_remove_group: 'Remove group',
-
-    space_add_support: 'Add support',
-    space_remove_support: 'Remove support',
-
-    space_add_harvester: 'Add harvester',
-    space_remove_harvester: 'Remove harvester',
-  },
+  privileges: Object.keys(privileges.space).reduce((obj, key) => {
+    obj[key] = capitalize(spacePrivileges[key]);
+    return obj;
+  }, {}),
   noGroupsStart: 'This space has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',
   noGroupsEnd: ' and send it to the group owner.',

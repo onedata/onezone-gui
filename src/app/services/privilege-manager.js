@@ -19,18 +19,20 @@ export default Service.extend({
    * @param {string} parentRecordEntityId
    * @param {string} memberType `group`, `child` or `user`
    * @param {string} memberRecordEntityId
+   * @param {boolean} effective if true, fetch effective privileges
    * @returns {string}
    */
   generateGri(
     parentType,
     parentRecordEntityId,
     memberType,
-    memberRecordEntityId
+    memberRecordEntityId,
+    effective,
   ) {
     return gri({
       entityType: parentType,
       entityId: parentRecordEntityId,
-      aspect: memberType + '_privileges',
+      aspect: memberType + (effective ? '_eff' : '') + '_privileges',
       aspectId: memberRecordEntityId,
     });
   },
