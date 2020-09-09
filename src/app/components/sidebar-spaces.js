@@ -9,7 +9,6 @@
 
 import OneSidebar from 'onedata-gui-common/components/one-sidebar';
 import layout from 'onedata-gui-common/templates/components/one-sidebar';
-import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
@@ -47,44 +46,10 @@ export default OneSidebar.extend(I18n, UserProxyMixin, {
   /**
    * @override
    */
+  secondLevelItemsComponent: 'sidebar-spaces/second-level-items',
+
+  /**
+   * @override
+   */
   sidebarType: 'spaces',
-
-  secondLevelItems: computed(function getSecondLevelItems() {
-    const oneiconAlias = this.get('oneiconAlias');
-
-    return [{
-        id: 'index',
-        label: this.t('aspects.index'),
-        icon: 'overview',
-      },
-      {
-        id: 'data',
-        label: this.t('aspects.data'),
-        icon: 'browser-directory',
-      },
-      {
-        id: 'shares',
-        label: this.t('aspects.shares'),
-        icon: 'share',
-      },
-      {
-        id: 'transfers',
-        label: this.t('aspects.transfers'),
-        icon: 'transfers',
-      },
-      {
-        id: 'providers',
-        label: this.t('aspects.providers'),
-        icon: 'provider',
-      }, {
-        id: 'members',
-        label: this.t('aspects.members'),
-        icon: 'group',
-      }, {
-        id: 'harvesters',
-        label: this.t('aspects.harvesters'),
-        icon: oneiconAlias.getName('harvester'),
-      },
-    ];
-  }),
 });
