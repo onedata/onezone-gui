@@ -440,8 +440,8 @@ function createSpacesRecords(store) {
       }),
       name: `Space ${index}`,
       scope: 'private',
+      currentUserEffPrivileges: spacePrivilegesFlags,
       directMembership: true,
-      canViewPrivileges: true,
       info: {
         creatorType: 'root',
         creationTime: 1540995468,
