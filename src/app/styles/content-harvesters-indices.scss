@@ -100,10 +100,6 @@
     }
   }
 
-  .schema-textarea {
-    font-family: $font-family-monospace;
-    resize: none;
-  }
   .one-collapsible-list .list-header-row {
     padding-right: 170px;
   }
@@ -144,9 +140,6 @@
   }
   .index-details-container {
     margin: $padding-large-horizontal;
-    .schema-textarea {
-      resize: none;
-    }
   }
   .nav-tabs {
     padding: 0 $padding-large-horizontal;
