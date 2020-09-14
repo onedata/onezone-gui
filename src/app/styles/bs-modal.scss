@@ -1,0 +1,24 @@
+.modal.in .modal-dialog {
+  .modal-content {
+    // a fix for the semi-transparent border of modal
+    background-clip: unset;
+    border: 3px white solid;
+    width: calc(100% + 6px);
+  }
+
+  .btn-toolbar {
+    margin-left: 0px;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .modal.in .modal-dialog {
+    width: calc(100% - 16px);
+    .modal-content {
+      padding: 0;
+    }
+    .btn {
+      padding: 8px 24px;
+    }
+  }
+}
