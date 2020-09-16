@@ -21,7 +21,7 @@
     }
   }
 
-  .labels-container {
+  .right-container {
     @include vertical-align-middle();
     right: 50px;
   }
@@ -44,7 +44,7 @@
 
   .member-item .item-modified-header {
     @media (min-width: $screen-sm-min) {
-      padding-right: 250px;
+      padding-right: 370px;
     }
     .one-label {
       @include font-bold();

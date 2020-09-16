@@ -44,7 +44,7 @@
             }}
           </span>
           {{record-name record=memberProxy.member}}
-          <div class="labels-container">
+          <div class="right-container">
             {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
               <span class="hidden-xs">
                 {{#one-spin-button
@@ -66,15 +66,17 @@
                 <span class="space"></span><span class="space"></span>
               </span>
             {{/if}}
-            {{#if memberProxy.isYou}}
+            <span class="labels-container">
+              {{#if memberProxy.isYou}}
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
-            {{/if}}
-            {{#if memberProxy.isYou}}
-              <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
-            {{/if}}
-            {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
-              <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
-            {{/if}}
+              {{/if}}
+              {{#if memberProxy.isOwner}}
+                <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
+              {{/if}}
+              {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
+                <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
+              {{/if}}
+            </span>
           </div>
           {{#if memberProxy.actions.length}}
             {{actions-toolbar
