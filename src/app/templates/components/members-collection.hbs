@@ -43,39 +43,41 @@
               triggerEvents="hover"
             }}
           </span>
-          <span class="one-label">
-            {{memberProxy.member.name}}
-          </span>
-          <span class="labels-container">
-            {{#if memberProxy.isYou}}
+          {{record-name record=memberProxy.member}}
+          <div class="right-container">
+            {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
+              <span class="hidden-xs">
+                {{#one-spin-button
+                  action=(action "savePrivileges" memberProxy)
+                  class="btn btn-sm btn-primary save-btn"
+                }}
+                  {{tt this "save"}}
+                {{/one-spin-button}}
+                <span class="space"></span>
+                {{#bs-button
+                  size="sm"
+                  type="warning"
+                  class="discard-btn"
+                  disabled=memberProxy.privilegesProxy.isSaving
+                  onClick=(action "discardChanges" memberProxy)
+                }}
+                  {{tt this "discard"}}
+                {{/bs-button}}
+                <span class="space"></span><span class="space"></span>
+              </span>
+            {{/if}}
+            <span class="labels-container">
+              {{#if memberProxy.isYou}}
               <span class="space"></span><span class="label label-primary">{{tt this "you"}}</span>
-            {{/if}}
-            {{#if memberProxy.isOwner}}
-              <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
-            {{/if}}
-            {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
-              <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
-            {{/if}}
-          </span>
-          {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
-            <div class="btn-toolbar hidden-xs">
-              {{#one-spin-button
-                action=(action "savePrivileges" memberProxy)
-                class="btn btn-sm btn-primary save-btn"
-              }}
-                {{tt this "save"}}
-              {{/one-spin-button}}
-              {{#bs-button
-                size="sm"
-                type="warning"
-                class="discard-btn"
-                disabled=memberProxy.privilegesProxy.isSaving
-                onClick=(action "discardChanges" memberProxy)
-              }}
-                {{tt this "discard"}}
-              {{/bs-button}}
-            </div>
-          {{/if}}
+              {{/if}}
+              {{#if memberProxy.isOwner}}
+                <span class="space"></span><span class="label label-info">{{tt this "owner"}}</span>
+              {{/if}}
+              {{#if (and (not onlyDirect) (contains memberProxy.member directMembers))}}
+                <span class="space"></span><span class="label label-default">{{tt this "direct"}}</span>
+              {{/if}}
+            </span>
+          </div>
           {{#if memberProxy.actions.length}}
             {{actions-toolbar
               isMinimized=true

@@ -440,8 +440,8 @@ function createSpacesRecords(store) {
       }),
       name: `Space ${index}`,
       scope: 'private',
+      currentUserEffPrivileges: spacePrivilegesFlags,
       directMembership: true,
-      canViewPrivileges: true,
       info: {
         creatorType: 'root',
         creationTime: 1540995468,
@@ -618,7 +618,10 @@ function createHarvesterRecords(store) {
 
 function createSharedUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
-    return store.createRecord('sharedUser', { name: `sharedUser${index}` }).save();
+    return store.createRecord('sharedUser', {
+      name: `sharedUser${index}`,
+      username: `username${index}`,
+    }).save();
   }));
 }
 

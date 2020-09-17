@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6679 Added username to users in members list
 * VFS-6732 Using new monospace font
 * VFS-6456 Handling lack of privileges for transfers actions
 * VFS-6652 Enabled assets fingerprinting for more resources
