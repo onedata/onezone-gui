@@ -29,7 +29,10 @@ module.exports = function (defaults) {
         'svg',
         'eot',
       ],
-      exclude: ['assets/images/auth-providers/**'],
+      exclude: [
+        'assets/images/auth-providers/**',
+        'assets/images/os-logo/**',
+      ],
       replaceExtensions: ['html', 'css', 'js', 'webmanifest'],
     },
     'ember-cli-babel': {

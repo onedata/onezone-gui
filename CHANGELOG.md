@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6793 Fixed broken graphics of supporting OS in production builds
 * VFS-6679 Added username to users in members list
 * VFS-6732 Using new monospace font
 * VFS-6456 Handling lack of privileges for transfers actions
