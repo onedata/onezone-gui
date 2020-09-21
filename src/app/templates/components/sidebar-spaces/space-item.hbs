@@ -1,5 +1,5 @@
 {{one-icon class="sidebar-item-icon" icon="space"}}
-{{#truncated-string class="after-icon before-status"}}
+{{#truncated-string class="after-icon"}}
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
 {{#status-toolbar as |toolbar|}}
@@ -13,3 +13,19 @@
     hint=(tt this "supportCountHint" count=_providersCount)
   }}
 {{/status-toolbar}}
+{{actions-toolbar
+  isMinimized=true
+  dropdownPlacement="auto"
+  actionsArray=itemActions}}
+
+{{#unless inSidenav}}
+  {{#render-later triggerRender=leaveSpaceModalOpen as |renderLater|}}
+    {{leave-modal
+      opened=leaveSpaceModalOpen
+      close=(action "closeLeaveModal")
+      proceed=(action "leave")
+      processing=isLeaving
+      record=space
+      onHidden=renderLater.resetRenderTrigger}}
+  {{/render-later}}
+{{/unless}}

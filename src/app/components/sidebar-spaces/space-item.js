@@ -8,18 +8,24 @@
  */
 
 import { computed, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Component from '@ember/component';
 import _ from 'lodash';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { next } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   tagName: '',
 
   i18n: service(),
+  globalNotify: service(),
+  spaceActions: service(),
+  router: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -43,6 +49,16 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   inSidenav: false,
+
+  /**
+   * @type {boolean}
+   */
+  leaveSpaceModalOpen: false,
+
+  /**
+   * @type {boolean}
+   */
+  isLeaving: false,
 
   /**
    * Just an one-way alias
@@ -107,4 +123,64 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  leaveAction: computed(function leaveAction() {
+    return {
+      action: () => this.send('showLeaveModal'),
+      title: this.t('leave'),
+      class: 'leave-record-trigger',
+      icon: 'leave-space',
+    };
+  }),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.Action>>}
+   */
+  itemActions: collect('leaveAction'),
+
+  /**
+   * If actual space disappeared from the sidebar, redirects to spaces main page
+   * @returns {Promise}
+   */
+  redirectOnSpaceDeletion() {
+    const {
+      navigationState,
+      router,
+    } = this.getProperties('navigationState', 'router');
+    const spaceId = get(navigationState, 'activeResource.id');
+    return navigationState
+      .resourceCollectionContainsId(spaceId)
+      .then(contains => {
+        if (!contains) {
+          next(() => router.transitionTo('onedata.sidebar', 'spaces'));
+        }
+      });
+  },
+
+  actions: {
+    showLeaveModal() {
+      this.set('leaveSpaceModalOpen', true);
+    },
+    closeLeaveModal() {
+      this.set('leaveSpaceModalOpen', false);
+    },
+    leave() {
+      const {
+        space,
+        spaceActions,
+      } = this.getProperties('space', 'spaceActions');
+      this.set('isLeaving', true);
+      return spaceActions.leaveSpace(space)
+        .then(() => this.redirectOnSpaceDeletion())
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            isLeaving: false,
+            leaveSpaceModalOpen: false,
+          })
+        );
+    },
+  },
 });

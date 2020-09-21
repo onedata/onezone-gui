@@ -1,1 +1,11 @@
-// TODO: refactor to eliminate redundancy with sidebar-providers
+.sidebar-spaces {
+  .one-list-item .item-header {
+    .truncated-string {
+      padding-right: 115px;
+    }
+
+    .status-toolbar {
+      right: 45px;
+    }
+  }
+}

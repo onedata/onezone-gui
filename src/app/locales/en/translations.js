@@ -33,7 +33,6 @@ import contentSpacesTransfers from './components/content-spaces-transfers';
 import contentSpacesHarvesters from './components/content-spaces-harvesters';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentProviderEmpty from './components/content-provider-empty';
-import leaveSpaceConfirm from './components/leave-space-confirm';
 import contentGroupsNew from './components/content-groups-new';
 import contentGroupsEmpty from './components/content-groups-empty';
 import contentGroupsMembers from './components/content-groups-members';
@@ -154,7 +153,6 @@ const translations = {
     contentSpacesTransfers,
     contentSpacesHarvesters,
     oneproviderViewContainer,
-    leaveSpaceConfirm,
     contentGroupsNew,
     contentGroupsEmpty,
     contentGroupsMembers,
