@@ -99,6 +99,7 @@ import uploadManager from './services/upload-manager';
 import uploadObject from './utils/upload-object';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
+import removeSpaceAction from './utils/space-actions/remove-space-action';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
@@ -219,6 +220,7 @@ const translations = {
     spaceActions: {
       addHarvesterToSpaceAction,
       removeHarvesterFromSpaceAction,
+      removeSpaceAction,
     },
     tokenActions: {
       cleanObsoleteTokensAction,

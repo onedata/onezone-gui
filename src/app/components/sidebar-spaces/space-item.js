@@ -16,7 +16,6 @@ import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { next } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -125,7 +124,7 @@ export default Component.extend(I18n, {
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
 
   /**
-   * @type {Ember.ComputedProperty<Action>}
+   * @type {Ember.ComputedProperty<Utils.Action>}
    */
   leaveAction: computed(function leaveAction() {
     return {
@@ -137,28 +136,21 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<Array<Utils.Action>>}
+   * @type {Ember.ComputedProperty<Utils.Action>}
    */
-  itemActions: collect('leaveAction'),
+  removeAction: computed('space', function removeAction() {
+    const {
+      spaceActions,
+      space,
+    } = this.getProperties('spaceActions', 'space');
+
+    return spaceActions.createRemoveSpaceAction({ space });
+  }),
 
   /**
-   * If actual space disappeared from the sidebar, redirects to spaces main page
-   * @returns {Promise}
+   * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  redirectOnSpaceDeletion() {
-    const {
-      navigationState,
-      router,
-    } = this.getProperties('navigationState', 'router');
-    const spaceId = get(navigationState, 'activeResource.id');
-    return navigationState
-      .resourceCollectionContainsId(spaceId)
-      .then(contains => {
-        if (!contains) {
-          next(() => router.transitionTo('onedata.sidebar', 'spaces'));
-        }
-      });
-  },
+  itemActions: collect('leaveAction', 'removeAction'),
 
   actions: {
     showLeaveModal() {
@@ -171,10 +163,11 @@ export default Component.extend(I18n, {
       const {
         space,
         spaceActions,
-      } = this.getProperties('space', 'spaceActions');
+        navigationState,
+      } = this.getProperties('space', 'spaceActions', 'navigationState');
       this.set('isLeaving', true);
       return spaceActions.leaveSpace(space)
-        .then(() => this.redirectOnSpaceDeletion())
+        .then(() => navigationState.redirectToCollectionIfResourceNotExist())
         .finally(() =>
           safeExec(this, 'setProperties', {
             isLeaving: false,

@@ -1,7 +1,7 @@
 /**
  * Adds harvester to space.
  *
- * @module utils/token-actions/add-harvester-to-space-action
+ * @module utils/space-actions/add-harvester-to-space-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.

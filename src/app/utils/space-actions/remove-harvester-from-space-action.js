@@ -1,7 +1,7 @@
 /**
  * Removes harvester from space.
  *
- * @module utils/token-actions/remove-harvester-from-space-action
+ * @module utils/space-actions/remove-harvester-from-space-action
  * @author Michał Borzęcki
  * @copyright (C) 2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
