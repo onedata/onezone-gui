@@ -22,6 +22,7 @@ export default Service.extend({
   groupManager: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
+  recordManager: service(),
 
   /**
    * Fetches collection of all spaces
@@ -72,6 +73,24 @@ export default Service.extend({
           .save()
           .then(space => this.reloadList().then(() => space));
       });
+  },
+
+  /**
+   * Removes space
+   * @param {String} spaceId 
+   * @returns {Promise}
+   */
+  removeSpace(spaceId) {
+    const recordManager = this.get('recordManager');
+    return recordManager.removeRecordById('space', spaceId)
+      .then(() => allFulfilled([
+        recordManager.reloadUserRecordList('space'),
+        recordManager.reloadUserRecordList('provider').then(() =>
+          recordManager.reloadRecordListInAllRecords('provider')
+        ),
+        recordManager.reloadRecordListInAllRecords('group'),
+        recordManager.reloadRecordListInAllRecords('harvester'),
+      ]));
   },
 
   /**

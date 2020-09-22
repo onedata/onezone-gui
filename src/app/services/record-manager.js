@@ -1,5 +1,5 @@
 /**
- * Has generic functions to get and reload records and relations.
+ * Has generic functions to manage records and relations.
  *
  * @module services/record-manager
  * @author Michał Borzęcki
@@ -57,6 +57,20 @@ export default Service.extend({
   },
 
   /**
+   * Reloads *List relations of all record specified by modelName. Only already
+   * loaded lists containing specified model will be reloaded
+   * @param {String} modelName 
+   * @param {String} modelNameInList
+   * @returns {Promise}
+   */
+  reloadRecordListInAllRecords(modelName, modelNameInList) {
+    const allRecords = this.getAllLoadedRecords(modelName);
+    return allFulfilled(
+      allRecords.map(record => this.reloadRecordList(record, modelNameInList))
+    ).catch(ignoreForbiddenError);
+  },
+
+  /**
    * Reloads *List relations of given record. Only already loaded lists containing
    * specified model will be reloaded
    * @param {GraphSingleModel} record
@@ -96,25 +110,25 @@ export default Service.extend({
    * Loads record by modelName and gri
    * @param {String} modelName
    * @param {String} gri
-   * @param {boolean} [backgroundReload=true]
+   * @param {boolean} [backgroundReload=false]
    * @returns {Promise<GraphModel>}
    */
-  getRecord(modelName, gri, backgroundReload = true) {
+  getRecord(modelName, gri, backgroundReload = false) {
     return this.get('store').findRecord(modelName, gri, { backgroundReload })
       .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
   },
 
   /**
-   * Loads record by modelName and gri
+   * Loads record by modelName and recordId
    * @param {String} modelName
-   * @param {String} id
-   * @param {boolean} [backgroundReload=true]
+   * @param {String} recordId
+   * @param {boolean} [backgroundReload=false]
    * @returns {Promise<GraphModel>}
    */
-  getRecordById(modelName, id, backgroundReload = true) {
+  getRecordById(modelName, recordId, backgroundReload = false) {
     const recordGri = gri({
       entityType: this.getEntityTypeForModelName(modelName),
-      entityId: id,
+      entityId: recordId,
       aspect: 'instance',
       scope: 'auto',
     });
@@ -131,6 +145,15 @@ export default Service.extend({
    */
   getLoadedRecordById(modelName, recordId) {
     return this.get('store').peekAll(modelName).findBy('entityId', recordId);
+  },
+
+  /**
+   * Returns an array with all records of the passed type
+   * @param {String} modelName
+   * @returns {Array<GraphSingleModel>}
+   */
+  getAllLoadedRecords(modelName) {
+    return this.get('store').peekAll(modelName);
   },
 
   /**
@@ -205,6 +228,31 @@ export default Service.extend({
       this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
       this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
+  },
+
+  /**
+   * Removes passed record
+   * @param {GraphSingleModel} record 
+   * @returns {Promise}
+   */
+  removeRecord(record) {
+    if (get(record, 'isDeleted')) {
+      return resolve();
+    }
+
+    return record.destroyRecord();
+  },
+
+  /**
+   * Removes record by modelName and recordId
+   * @param {String} modelName 
+   * @param {String} recordId
+   * @returns {Promise}
+   */
+  removeRecordById(modelName, recordId) {
+    return resolve(this.getLoadedRecordById(modelName, recordId))
+      .then(record => record || this.getRecordById(modelName, recordId))
+      .then(record => this.removeRecord(record));
   },
 
   /**
