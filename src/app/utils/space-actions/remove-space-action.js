@@ -18,7 +18,6 @@ export default Action.extend({
   spaceManager: service(),
   modalManager: service(),
   navigationState: service(),
-  router: service(),
 
   /**
    * @override

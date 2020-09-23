@@ -86,10 +86,10 @@ export default Service.extend({
       .then(() => allFulfilled([
         recordManager.reloadUserRecordList('space'),
         recordManager.reloadUserRecordList('provider').then(() =>
-          recordManager.reloadRecordListInAllRecords('provider')
+          recordManager.reloadRecordListInAllRecords('provider', 'space')
         ),
-        recordManager.reloadRecordListInAllRecords('group'),
-        recordManager.reloadRecordListInAllRecords('harvester'),
+        recordManager.reloadRecordListInAllRecords('group', 'space'),
+        recordManager.reloadRecordListInAllRecords('harvester', 'space'),
       ]));
   },
 
