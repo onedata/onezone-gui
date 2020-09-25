@@ -57,9 +57,10 @@ describe(
         expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
         expect(getModalHeader().find('h1').text().trim())
           .to.equal('Remove space');
-        expect(getModalBody().text().trim()).to.equal(
-          'Are you sure you want to remove space "space1"?'
+        expect(getModalBody().text().trim()).to.contain(
+          'You are about to delete the space space1.'
         );
+        expect(getModalBody().find('.one-checkbox')).to.exist;
         const $yesButton = getModalFooter().find('.question-yes');
         expect($yesButton.text().trim()).to.equal('Remove');
         expect($yesButton).to.have.class('btn-danger');
@@ -109,6 +110,7 @@ describe(
         const actionResultPromise = action.execute();
 
         return wait()
+          .then(() => click(getModalBody().find('.one-checkbox')[0]))
           .then(() => click(getModalFooter().find('.question-yes')[0]))
           .then(() => actionResultPromise)
           .then(actionResult => {
@@ -143,6 +145,7 @@ describe(
         const actionResultPromise = action.execute();
 
         return wait()
+          .then(() => click(getModalBody().find('.one-checkbox')[0]))
           .then(() => click(getModalFooter().find('.question-yes')[0]))
           .then(() => {
             rejectRemove('someError');

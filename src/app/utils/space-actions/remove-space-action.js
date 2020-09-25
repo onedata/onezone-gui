@@ -69,7 +69,10 @@ export default Action.extend({
           text: this.t('modalDescription', {
             spaceName: get(space, 'name'),
           }),
+        }, {
+          text: this.t('modalDisclaimer'),
         }],
+        checkboxMessage: this.t('modalCheckboxMessage'),
         yesButtonText: this.t('modalYes'),
         yesButtonClassName: 'btn-danger',
         onSubmit: () =>

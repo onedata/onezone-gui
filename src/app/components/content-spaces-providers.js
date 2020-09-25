@@ -128,7 +128,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
         spaceActions,
       } = this.getProperties('space', 'spaceActions');
 
-      this.set('ceaseModalOpened');
+      this.set('ceaseModalOpened', false);
       spaceActions.createRemoveSpaceAction({ space }).execute();
     },
   },
