@@ -20,12 +20,12 @@ export default Service.extend({
 
   /**
    * Returns loaded *List relation of current user
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise<GraphListModel>}
    */
-  getUserRecordList(modelNameInList) {
+  getUserRecordList(listItemModelName) {
     const user = this.getCurrentUserRecord();
-    const listRelationName = `${modelNameInList}List`;
+    const listRelationName = `${listItemModelName}List`;
     return user.getRelation(listRelationName)
       .then(recordList => get(recordList, 'list').then(list =>
         allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
@@ -36,37 +36,37 @@ export default Service.extend({
   /**
    * Reloads *List relations of current user containing specified model. Only already
    * loaded lists will be reloaded
-   * @param {String} modelNameInList 
+   * @param {String} listItemModelName 
    * @returns {Promise}
    */
-  reloadUserRecordList(modelNameInList) {
-    return this.reloadRecordList(this.getCurrentUserRecord(), modelNameInList);
+  reloadUserRecordList(listItemModelName) {
+    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName);
   },
 
   /**
-   * Reloads *List relations of record specified by modelName and recordId. Only already
-   * loaded lists containing specified model will be reloaded
-   * @param {String} modelName 
+   * Reloads *List relations of record specified by listOwnerModelName and recordId.
+   * Only already loaded lists containing specified model will be reloaded
+   * @param {String} listOwnerModelName 
    * @param {String} recordId
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
-  reloadRecordListById(modelName, recordId, modelNameInList) {
-    const record = this.getLoadedRecordById(modelName, recordId);
-    return record ? this.reloadRecordList(record, modelNameInList) : resolve();
+  reloadRecordListById(listOwnerModelName, recordId, listItemModelName) {
+    const record = this.getLoadedRecordById(listOwnerModelName, recordId);
+    return record ? this.reloadRecordList(record, listItemModelName) : resolve();
   },
 
   /**
-   * Reloads *List relations of all record specified by modelName. Only already
+   * Reloads *List relations of all record specified by listOwnerModelName. Only already
    * loaded lists containing specified model will be reloaded
-   * @param {String} modelName 
-   * @param {String} modelNameInList
+   * @param {String} listOwnerModelName 
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
-  reloadRecordListInAllRecords(modelName, modelNameInList) {
-    const allRecords = this.getAllLoadedRecords(modelName);
+  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName) {
+    const allRecords = this.getAllLoadedRecords(listOwnerModelName);
     return allFulfilled(
-      allRecords.map(record => this.reloadRecordList(record, modelNameInList))
+      allRecords.map(record => this.reloadRecordList(record, listItemModelName))
     ).catch(ignoreForbiddenError);
   },
 
@@ -74,10 +74,10 @@ export default Service.extend({
    * Reloads *List relations of given record. Only already loaded lists containing
    * specified model will be reloaded
    * @param {GraphSingleModel} record
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
-  reloadRecordList(record, modelNameInList) {
+  reloadRecordList(record, listItemModelName) {
     const store = this.get('store');
     const modelClass = record.constructor;
 
@@ -90,7 +90,7 @@ export default Service.extend({
           get(modelClass, 'relationshipsByName').get(relationName).type;
         const listModelClass = store.modelFor(listModelName);
         const listHasManyRelation = get(listModelClass, 'relationshipsByName').get('list');
-        return listHasManyRelation && listHasManyRelation.type === modelNameInList;
+        return listHasManyRelation && listHasManyRelation.type === listItemModelName;
       });
 
     return allFulfilled(

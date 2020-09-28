@@ -1,8 +1,8 @@
 {{one-icon class="sidebar-item-icon" icon="space"}}
-{{#truncated-string class="after-icon"}}
+{{#truncated-string class="after-icon before-status with-place-for-dots"}}
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
-{{#status-toolbar as |toolbar|}}
+{{#status-toolbar class="with-place-for-dots" as |toolbar|}}
   {{toolbar.icon
     outerText=_totalSupportSizeHumanReadable
     hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
@@ -16,7 +16,8 @@
 {{actions-toolbar
   isMinimized=true
   dropdownPlacement="auto"
-  actionsArray=itemActions}}
+  actionsArray=itemActions
+}}
 
 {{#unless inSidenav}}
   {{#render-later triggerRender=leaveSpaceModalOpen as |renderLater|}}
@@ -26,6 +27,7 @@
       proceed=(action "leave")
       processing=isLeaving
       record=space
-      onHidden=renderLater.resetRenderTrigger}}
+      onHidden=renderLater.resetRenderTrigger
+    }}
   {{/render-later}}
 {{/unless}}
