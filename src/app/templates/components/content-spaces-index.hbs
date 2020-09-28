@@ -1,16 +1,7 @@
 <div class="row content-row header-row hidden-xs">
-  <h1 class="normal-case with-menu">
+  <h1 class="normal-case">
     {{#truncated-string class="one-label"}}{{space.name}}{{/truncated-string}}
-    {{actions-toolbar actionsArray=globalActions isMinimized=true renderImmediately=true}}
   </h1>
-  {{#one-switchable-popover-modal
-    triggersConfiguration=leaveSpaceModalTriggers
-    popoverClass="popover-leave-space"
-    submit=(action "leave")
-    as |ospm|
-  }}
-    {{leave-space-confirm submitAction=ospm.submit closeAction=ospm.close}}
-  {{/one-switchable-popover-modal}}
 </div>
 
 <div class="row content-row">

@@ -23,6 +23,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   router: service(),
   i18n: service(),
   guiUtils: service(),
+  spaceActions: service(),
 
   i18nPrefix: 'components.contentSpacesProviders',
 
@@ -120,6 +121,15 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
         'providers',
         guiUtils.getRoutableIdFor(provider)
       );
+    },
+    openRemoveSpace() {
+      const {
+        space,
+        spaceActions,
+      } = this.getProperties('space', 'spaceActions');
+
+      this.set('ceaseModalOpened', false);
+      spaceActions.createRemoveSpaceAction({ space }).execute();
     },
   },
 });

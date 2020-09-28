@@ -2,7 +2,7 @@
  * Default content for single space - overview of space aspects
  *
  * @module components/content-spaces-index
- * @author Jakub Liput, Michal Borzecki
+ * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
@@ -13,26 +13,21 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { get, computed, set } from '@ember/object';
 import { reads, gt } from '@ember/object/computed';
 import { reject } from 'rsvp';
-import { next } from '@ember/runloop';
-import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
-import { collect, promise } from 'ember-awesome-macros';
+import { promise } from 'ember-awesome-macros';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 
 export default Component.extend(
   I18n,
-  GlobalActions,
   ProvidersColors,
   ChooseDefaultOneprovider, {
     classNames: ['content-spaces-index'],
 
     globalNotify: service(),
-    spaceActions: service(),
     router: service(),
     guiUtils: service(),
-    media: service(),
     i18n: service(),
 
     /**
@@ -47,21 +42,9 @@ export default Component.extend(
     space: undefined,
 
     /**
-     * @type {string}
-     */
-    leaveSpaceModalTriggers: '',
-
-    /**
      * @type {boolean}
      */
     showResourceMembershipTile: true,
-
-    /**
-     * @type {Ember.ComputedProperty<string>}
-     */
-    globalActionsTitle: computed(function () {
-      return this.t('space');
-    }),
 
     /**
      * @type {Ember.ComputedProperty<string>}
@@ -72,24 +55,6 @@ export default Component.extend(
      * @type {Ember.ComputedProperty<boolean>}
      */
     isSupported: gt('space.providerList.list.length', 0),
-
-    /**
-     * @type {Ember.ComputedProperty<AspectAction>}
-     */
-    openLeaveModalAction: computed(function () {
-      return {
-        action: () => {},
-        title: this.t('leave'),
-        class: 'btn-leave-space',
-        buttonStyle: 'danger',
-        icon: 'leave-space',
-      };
-    }),
-
-    /**
-     * @type {Ember.ComputedProperty<Array<AspectAction>>}
-     */
-    globalActions: collect('openLeaveModalAction'),
 
     /**
      * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
@@ -117,12 +82,18 @@ export default Component.extend(
             guiUtils,
             router,
             space,
+            spaceId,
             dataProviderProxy,
-          } = this.getProperties('guiUtils', 'router', 'space', 'dataProviderProxy');
+          } = this.getProperties(
+            'guiUtils',
+            'router',
+            'space',
+            'spaceId',
+            'dataProviderProxy'
+          );
           return dataProviderProxy.then(dataProvider => {
             const oneproviderId = guiUtils.getRoutableIdFor(dataProvider);
             return get(dataProvider, 'versionProxy').then(version => {
-              const spaceId = get(space, 'entityId');
               if (isStandaloneGuiOneprovider(version)) {
                 return router.urlFor(
                   'provider-redirect',
@@ -148,16 +119,6 @@ export default Component.extend(
       )
     ),
 
-    init() {
-      this._super(...arguments);
-      next(() => {
-        this.set(
-          'leaveSpaceModalTriggers',
-          '.btn-leave-space.btn;a.btn-leave-space:modal'
-        );
-      });
-    },
-
     /**
      * Shows global info about save error.
      * @param {object} error 
@@ -181,9 +142,6 @@ export default Component.extend(
     },
 
     actions: {
-      leave() {
-        return this.get('spaceActions').leaveSpace(this.get('space'));
-      },
       saveSpaceName(name) {
         const space = this.get('space');
         if (!name || !name.length) {

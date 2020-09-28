@@ -1,12 +1,7 @@
 export default {
   space: 'Space',
-  leave: 'Leave space',
-  setHome: 'Set as home',
-  isHome: 'Home space',
   saving: 'saving space options',
   editSpaceNameHint: 'Change space name',
-  toggleDefault: 'Toggle default space',
-  changingDefaultSpace: 'changing default space',
   tileDataTitle: 'Data',
   tileSpaceTitle: 'Space size',
   tileProvidersTitle: 'Providers',

@@ -23,11 +23,19 @@
 
   .zone-name {
     word-break: break-word;
+    width: 25vw;
+    max-width: 350px;
   }
 
   .zone-subtitle {
     font-size: 0.8em;
     opacity: 0.8;
     word-break: break-word;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .zone-name {
+      width: calc(50vw - 35px);
+    }
   }
 }

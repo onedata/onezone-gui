@@ -1,5 +1,5 @@
 /**
- * Has generic functions to get and reload records and relations.
+ * Has generic functions to manage records and relations.
  *
  * @module services/record-manager
  * @author Michał Borzęcki
@@ -20,12 +20,12 @@ export default Service.extend({
 
   /**
    * Returns loaded *List relation of current user
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise<GraphListModel>}
    */
-  getUserRecordList(modelNameInList) {
+  getUserRecordList(listItemModelName) {
     const user = this.getCurrentUserRecord();
-    const listRelationName = `${modelNameInList}List`;
+    const listRelationName = `${listItemModelName}List`;
     return user.getRelation(listRelationName)
       .then(recordList => get(recordList, 'list').then(list =>
         allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
@@ -36,34 +36,48 @@ export default Service.extend({
   /**
    * Reloads *List relations of current user containing specified model. Only already
    * loaded lists will be reloaded
-   * @param {String} modelNameInList 
+   * @param {String} listItemModelName 
    * @returns {Promise}
    */
-  reloadUserRecordList(modelNameInList) {
-    return this.reloadRecordList(this.getCurrentUserRecord(), modelNameInList);
+  reloadUserRecordList(listItemModelName) {
+    return this.reloadRecordList(this.getCurrentUserRecord(), listItemModelName);
   },
 
   /**
-   * Reloads *List relations of record specified by modelName and recordId. Only already
-   * loaded lists containing specified model will be reloaded
-   * @param {String} modelName 
+   * Reloads *List relations of record specified by listOwnerModelName and recordId.
+   * Only already loaded lists containing specified model will be reloaded
+   * @param {String} listOwnerModelName 
    * @param {String} recordId
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
-  reloadRecordListById(modelName, recordId, modelNameInList) {
-    const record = this.getLoadedRecordById(modelName, recordId);
-    return record ? this.reloadRecordList(record, modelNameInList) : resolve();
+  reloadRecordListById(listOwnerModelName, recordId, listItemModelName) {
+    const record = this.getLoadedRecordById(listOwnerModelName, recordId);
+    return record ? this.reloadRecordList(record, listItemModelName) : resolve();
+  },
+
+  /**
+   * Reloads *List relations of all record specified by listOwnerModelName. Only already
+   * loaded lists containing specified model will be reloaded
+   * @param {String} listOwnerModelName 
+   * @param {String} listItemModelName
+   * @returns {Promise}
+   */
+  reloadRecordListInAllRecords(listOwnerModelName, listItemModelName) {
+    const allRecords = this.getAllLoadedRecords(listOwnerModelName);
+    return allFulfilled(
+      allRecords.map(record => this.reloadRecordList(record, listItemModelName))
+    ).catch(ignoreForbiddenError);
   },
 
   /**
    * Reloads *List relations of given record. Only already loaded lists containing
    * specified model will be reloaded
    * @param {GraphSingleModel} record
-   * @param {String} modelNameInList
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
-  reloadRecordList(record, modelNameInList) {
+  reloadRecordList(record, listItemModelName) {
     const store = this.get('store');
     const modelClass = record.constructor;
 
@@ -76,7 +90,7 @@ export default Service.extend({
           get(modelClass, 'relationshipsByName').get(relationName).type;
         const listModelClass = store.modelFor(listModelName);
         const listHasManyRelation = get(listModelClass, 'relationshipsByName').get('list');
-        return listHasManyRelation && listHasManyRelation.type === modelNameInList;
+        return listHasManyRelation && listHasManyRelation.type === listItemModelName;
       });
 
     return allFulfilled(
@@ -96,25 +110,25 @@ export default Service.extend({
    * Loads record by modelName and gri
    * @param {String} modelName
    * @param {String} gri
-   * @param {boolean} [backgroundReload=true]
+   * @param {boolean} [backgroundReload=false]
    * @returns {Promise<GraphModel>}
    */
-  getRecord(modelName, gri, backgroundReload = true) {
+  getRecord(modelName, gri, backgroundReload = false) {
     return this.get('store').findRecord(modelName, gri, { backgroundReload })
       .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
   },
 
   /**
-   * Loads record by modelName and gri
+   * Loads record by modelName and recordId
    * @param {String} modelName
-   * @param {String} id
-   * @param {boolean} [backgroundReload=true]
+   * @param {String} recordId
+   * @param {boolean} [backgroundReload=false]
    * @returns {Promise<GraphModel>}
    */
-  getRecordById(modelName, id, backgroundReload = true) {
+  getRecordById(modelName, recordId, backgroundReload = false) {
     const recordGri = gri({
       entityType: this.getEntityTypeForModelName(modelName),
-      entityId: id,
+      entityId: recordId,
       aspect: 'instance',
       scope: 'auto',
     });
@@ -131,6 +145,15 @@ export default Service.extend({
    */
   getLoadedRecordById(modelName, recordId) {
     return this.get('store').peekAll(modelName).findBy('entityId', recordId);
+  },
+
+  /**
+   * Returns an array with all records of the passed type
+   * @param {String} modelName
+   * @returns {Array<GraphSingleModel>}
+   */
+  getAllLoadedRecords(modelName) {
+    return this.get('store').peekAll(modelName);
   },
 
   /**
@@ -205,6 +228,31 @@ export default Service.extend({
       this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
       this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
     ]).catch(ignoreForbiddenError));
+  },
+
+  /**
+   * Removes passed record
+   * @param {GraphSingleModel} record 
+   * @returns {Promise}
+   */
+  removeRecord(record) {
+    if (get(record, 'isDeleted')) {
+      return resolve();
+    }
+
+    return record.destroyRecord();
+  },
+
+  /**
+   * Removes record by modelName and recordId
+   * @param {String} modelName 
+   * @param {String} recordId
+   * @returns {Promise}
+   */
+  removeRecordById(modelName, recordId) {
+    return resolve(this.getLoadedRecordById(modelName, recordId))
+      .then(record => record || this.getRecordById(modelName, recordId))
+      .then(record => this.removeRecord(record));
   },
 
   /**

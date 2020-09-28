@@ -72,10 +72,8 @@
     
     {{cease-oneprovider-support-modal
       opened=ceaseModalOpened
-      provider=ceaseModalProvider
-      space=space
+      removeSpaceClick=(action "openRemoveSpace")
       close=(action (mut ceaseModalOpened) false)
-      onHidden=(action (mut ceaseModalProvider) null)
     }}
 
   {{else}}
