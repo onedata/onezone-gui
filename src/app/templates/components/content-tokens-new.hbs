@@ -2,9 +2,16 @@
   <h1>{{tt this "header"}}</h1>
 </div>
 <div class="row content-row">
-  {{token-editor
-    mode="create"
-    predefinedValues=navigationState.aspectOptions
-    onSubmit=(action "submit")
-  }}
+  {{#one-carousel activeSlideId=activeStep as |carousel|}}
+    {{#carousel.slide slideId="templates"}}
+      {{token-template-selector generateTemplateUrl=(action "generateTemplateUrl")}}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="form"}}
+      {{token-editor
+        mode="create"
+        predefinedValues=navigationState.aspectOptions
+        onSubmit=(action "submit")
+      }}
+    {{/carousel.slide}}
+  {{/one-carousel}}
 </div>
