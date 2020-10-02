@@ -68,6 +68,7 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
+import ArrayProxy from '@ember/array/proxy';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -197,6 +198,7 @@ export default Component.extend(I18n, {
   oneiconAlias: service(),
   guiContext: service(),
   recordManager: service(),
+  onedataConnection: service(),
 
   /**
    * @override
@@ -1130,6 +1132,9 @@ export default Component.extend(I18n, {
       ModelTagsFieldPrototype.extend({
         recordManager: service(),
         isVisible: reads('parent.isCaveatEnabled'),
+        servicesProxy: promise.array(computed(function servicesProxy() {
+          return component.getServices();
+        })),
         clustersProxy: promise.array(computed(function clustersProxy() {
           return this.get('recordManager').getUserRecordList('cluster')
             .then(clusters => get(clusters, 'list'));
@@ -1137,7 +1142,7 @@ export default Component.extend(I18n, {
         models: computed(function models() {
           return [{
             name: 'service',
-            getRecords: () => this.get('clustersProxy'),
+            getRecords: () => this.get('servicesProxy'),
           }, {
             name: 'serviceOnepanel',
             getRecords: () => this.get('clustersProxy'),
@@ -1622,16 +1627,40 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {String} modelName one of user, space, group, provider, cluster
-   * @param {String} entityId entityId or 'onezone' (only for cluster model)
+   * @param {String} modelName one of user, space, group, provider, onezone, cluster
+   * @param {String} entityId entityId or 'onezone' (only for cluster and onezone model)
    * @returns {Promise<GraphSingleModel>}
    */
   getRecord(modelName, entityId) {
-    if (modelName === 'cluster' && entityId === 'onezone') {
-      entityId = this.get('guiContext.clusterId');
+    if (entityId === 'onezone') {
+      if (modelName === 'onezone') {
+        return resolve(this.get('onedataConnection.onezoneRecord'));
+      } else if (modelName === 'cluster') {
+        entityId = this.get('guiContext.clusterId');
+      }
     }
 
     return this.get('recordManager').getRecordById(modelName, entityId);
+  },
+
+  /**
+   * @returns {Promise<ArrayProxy>}
+   */
+  getServices() {
+    const {
+      recordManager,
+      onedataConnection,
+    } = this.getProperties('recordManager', 'onedataConnection');
+    const onezoneRecord = get(onedataConnection, 'onezoneRecord');
+
+    return recordManager.getUserRecordList('provider')
+      .then(providerList => get(providerList, 'list'))
+      .then(providers => {
+        return ArrayProxy.extend({
+          providers,
+          content: array.sort(array.concat('providers', raw([onezoneRecord])), ['name']),
+        }).create();
+      });
   },
 
   /**

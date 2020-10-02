@@ -243,6 +243,10 @@ describe('Integration | Component | token editor', function () {
     mockedRecords['cluster'].forEach(cluster => cluster.type = 'oneprovider');
     const ozCluster = mockedRecords['cluster'][0];
     ozCluster.type = 'onezone';
+    set(lookupService(this, 'onedata-connection'), 'onezoneRecord', {
+      name: 'onezone',
+      type: 'onezone',
+    });
     set(lookupService(this, 'gui-context'), 'clusterId', ozCluster.entityId);
     const changeSpy = sinon.spy();
     this.on('change', changeSpy);
@@ -1244,35 +1248,53 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  [
-    'service',
-    'service onepanel',
-  ].forEach((typeName, index) => {
-    it(
-      `shows ${typeName} list in service caveat`,
-      function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+  it(
+    'shows service list in service caveat',
+    function () {
+      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
-        let typeSelectorHelper;
-        // Remove tag to clean default
-        return click('.service-field .tags-input .tag-remove')
-          .then(() => click('.service-field .tags-input'))
-          .then(() => {
-            typeSelectorHelper = new TagsSelectorDropdownHelper();
-            return typeSelectorHelper.selectOption(index + 1);
-          }).then(() => {
-            expect(typeSelectorHelper.getTrigger().innerText.trim())
-              .to.equal(_.startCase(typeName));
-            const $selectorItems = getTagsSelector().find('.selector-item');
-            expect($selectorItems).to.have.length(4);
-            // 3 because one selector-item is an "all" item
-            _.times(3, i => {
-              expect($selectorItems.filter(`:contains(cluster${i})`)).to.exist;
-            });
+      let typeSelectorHelper;
+      // Remove tag to clean default
+      return click('.service-field .tags-input .tag-remove')
+        .then(() => click('.service-field .tags-input'))
+        .then(() => {
+          typeSelectorHelper = new TagsSelectorDropdownHelper();
+          return typeSelectorHelper.selectOption(1);
+        }).then(() => {
+          expect(typeSelectorHelper.getTrigger().innerText.trim()).to.equal('Service');
+          const $selectorItems = getTagsSelector().find('.selector-item');
+          expect($selectorItems).to.have.length(5);
+          _.times(3, i => {
+            expect($selectorItems.filter(`:contains(provider${i})`)).to.exist;
           });
-      }
-    );
-  });
+          expect($selectorItems.filter(':contains(onezone)')).to.exist;
+        });
+    }
+  );
+
+  it(
+    'shows service onepanel list in service caveat',
+    function () {
+      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+
+      let typeSelectorHelper;
+      // Remove tag to clean default
+      return click('.service-field .tags-input .tag-remove')
+        .then(() => click('.service-field .tags-input'))
+        .then(() => {
+          typeSelectorHelper = new TagsSelectorDropdownHelper();
+          return typeSelectorHelper.selectOption(2);
+        }).then(() => {
+          expect(typeSelectorHelper.getTrigger().innerText.trim())
+            .to.equal('Service Onepanel');
+          const $selectorItems = getTagsSelector().find('.selector-item');
+          expect($selectorItems).to.have.length(4);
+          _.times(3, i => {
+            expect($selectorItems.filter(`:contains(cluster${i})`)).to.exist;
+          });
+        });
+    }
+  );
 
   it('notifies about adding new service in service caveat', function () {
     this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
@@ -1280,11 +1302,11 @@ describe('Integration | Component | token editor', function () {
     // Remove tag to clean default
     return click('.service-field .tags-input .tag-remove')
       .then(() => click('.service-field .tags-input'))
-      .then(() => click(getTagsSelector().find('.record-item')[0]))
+      .then(() => click(getTagsSelector().find('.record-item')[1]))
       .then(() => {
         expectCaveatToHaveValue(this, 'service', true, [{
           model: 'service',
-          record: this.get('mockedRecords.cluster')[2],
+          record: this.get('mockedRecords.provider')[2],
         }]);
         expectToBeValid(this, 'service');
       });
@@ -1303,8 +1325,8 @@ describe('Integration | Component | token editor', function () {
         return click('.service-field .tags-input .tag-remove')
           .then(() => click('.service-field .tags-input'))
           .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
-          .then(() => click(getTagsSelector().find('.record-item')[0]))
-          .then(() => click(getTagsSelector().find('.record-item')[0]))
+          .then(() => click(getTagsSelector().find('.record-item:contains("0")')[0]))
+          .then(() => click(getTagsSelector().find('.record-item:contains("1")')[0]))
           .then(() => {
             expect(getFieldElement(this, 'service').find('.tag-item')).to.have.length(2);
             return click(getTagsSelector().find('.all-item')[0]);
@@ -1324,12 +1346,12 @@ describe('Integration | Component | token editor', function () {
     // Remove tag to clean default
     return click('.service-field .tags-input .tag-remove')
       .then(() => click('.service-field .tags-input'))
+      .then(() => click(getTagsSelector().find('.record-item')[2]))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
-      .then(() => click(getTagsSelector().find('.record-item')[0]))
       .then(() => {
         const $tagItems = getFieldElement(this, 'service').find('.tag-item');
-        expect($tagItems.eq(0).text().trim()).to.equal('cluster0');
-        expect($tagItems.eq(1).text().trim()).to.equal('cluster1');
+        expect($tagItems.eq(0).text().trim()).to.equal('provider0');
+        expect($tagItems.eq(1).text().trim()).to.equal('provider1');
       });
   });
 
@@ -1649,7 +1671,7 @@ describe('Integration | Component | token editor', function () {
       this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
       return click('.service-field .tags-input')
-        .then(() => click(getTagsSelector().find('.record-item:contains("cluster2")')[0]))
+        .then(() => click(getTagsSelector().find('.record-item:contains("onezone")')[0]))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
     }
   );
@@ -1818,7 +1840,7 @@ describe('Integration | Component | token editor', function () {
         // service
         .then(() => click('.service-field .tags-input .tag-remove'))
         .then(() => click('.service-field .tags-input'))
-        .then(() => click(getTagsSelector().find('.record-item')[0]))
+        .then(() => click(getTagsSelector().find('.record-item')[1]))
         // interface
         .then(() => toggleCaveat('interface'))
         .then(() => click('.option-oneclient'))
@@ -1870,7 +1892,7 @@ describe('Integration | Component | token editor', function () {
             whitelist: ['usr-currentuser'],
           });
           expect(caveats.findBy('type', 'service')).to.deep.include({
-            whitelist: ['opw-cluster0'],
+            whitelist: ['opw-provider0'],
           });
           expect(caveats.findBy('type', 'interface'))
             .to.have.property('interface', 'oneclient');
@@ -2060,7 +2082,7 @@ describe('Integration | Component | token editor', function () {
         }, {
           type: 'service',
           whitelist: [
-            'opw-cluster0',
+            'opw-provider0',
             'opw-prvunknown',
             'ozw-onezone',
             'opw-*',
@@ -2122,15 +2144,15 @@ describe('Integration | Component | token editor', function () {
         ].forEach(consumer => expect(consumerCaveatText).to.contain(consumer));
         const serviceCaveatText = getFieldElement(this, 'service').text();
         [
-          'cluster0',
+          'provider0',
           'ID: prvunknown',
+          'onezone',
           'Any Oneprovider',
           'cluster1',
           'ID: prvpunknown',
+          'cluster2',
           'Any Oneprovider Onepanel',
         ].forEach(service => expect(serviceCaveatText).to.contain(service));
-        // onezone cluster should occur twice
-        expect(serviceCaveatText.split('cluster2')).to.have.length(3);
         expect(getFieldElement(this, 'interface').text()).to.contain('Oneclient');
         expect(getFieldElement(this, 'readonlyView').find('.one-way-toggle'))
           .to.have.class('checked');
