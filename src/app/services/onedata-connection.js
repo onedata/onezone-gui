@@ -13,31 +13,6 @@ import DevelopmentSymbol from 'onezone-gui/services/mocks/onedata-connection';
 import EmberObject, { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
-const OnezoneModel = EmberObject.extend({
-  /**
-   * @virtual
-   * @type {Service}
-   */
-  onedataConnection: undefined,
-
-  /**
-   * Custom property similar to the `type` in cluster model. Used to check whether record
-   * represents Onezone or Oneprovider.
-   * @type {String}
-   */
-  type: 'onezone',
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  name: reads('onedataConnection.zoneName'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  domain: reads('onedataConnection.zoneDomain'),
-});
-
 const OnezoneConnection = ProductionSymbol.extend({
   /**
    * Name of zone instance
@@ -84,3 +59,28 @@ const OnezoneConnection = ProductionSymbol.extend({
 });
 
 export default environmentExport(config, OnezoneConnection, DevelopmentSymbol);
+
+const OnezoneModel = EmberObject.extend({
+  /**
+   * @virtual
+   * @type {Service}
+   */
+  onedataConnection: undefined,
+
+  /**
+   * Custom property similar to the `serviceType` in cluster model. Used to check whether
+   * record represents Onezone or Oneprovider.
+   * @type {String}
+   */
+  serviceType: 'onezone',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  name: reads('onedataConnection.zoneName'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  domain: reads('onedataConnection.zoneDomain'),
+});

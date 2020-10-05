@@ -27,7 +27,7 @@ export default OnedataConnection.extend({
     return EmberObject.create({
       name: zoneName,
       domain: zoneDomain,
-      type: 'onezone',
+      serviceType: 'onezone',
     });
   }),
 });

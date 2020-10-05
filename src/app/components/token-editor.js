@@ -162,9 +162,10 @@ const ModelTagsFieldPrototype = TagsField.extend({
   sortTags(tags) {
     const modelsOrder = this.get('models').mapBy('name');
     const sortKeyDecoratedTags = tags.map(tag => {
+      const isOnezone = get(tag, 'value.record.serviceType') === 'onezone';
       const modelIndex = modelsOrder.indexOf(get(tag, 'value.model'));
       const label = get(tag, 'label');
-      const sortKey = `${modelIndex}-${label}`;
+      const sortKey = `${isOnezone ? '0': '1'}-${modelIndex}-${label}`;
       return { sortKey, tag };
     });
     return sortKeyDecoratedTags.sortBy('sortKey').mapBy('tag');
@@ -1410,7 +1411,7 @@ export default Component.extend(I18n, {
       isEmpty('serviceCaveatGroup.value.service'),
       array.find(
         'serviceCaveatGroup.value.service',
-        option => get(option, 'record.type') === 'onezone'
+        option => get(option, 'record.serviceType') === 'onezone'
       )
     ),
     // interface caveat is disabled or enabled with selection != oneclient

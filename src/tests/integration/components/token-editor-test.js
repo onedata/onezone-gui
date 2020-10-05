@@ -240,12 +240,13 @@ describe('Integration | Component | token editor', function () {
         getRecordByIdStub.withArgs(modelName, record.entityId).resolves(record)
       );
     });
-    mockedRecords['cluster'].forEach(cluster => cluster.type = 'oneprovider');
+    mockedRecords['cluster'].concat(mockedRecords['provider'])
+      .forEach(record => record.serviceType = 'oneprovider');
     const ozCluster = mockedRecords['cluster'][0];
-    ozCluster.type = 'onezone';
+    ozCluster.serviceType = 'onezone';
     set(lookupService(this, 'onedata-connection'), 'onezoneRecord', {
       name: 'onezone',
-      type: 'onezone',
+      serviceType: 'onezone',
     });
     set(lookupService(this, 'gui-context'), 'clusterId', ozCluster.entityId);
     const changeSpy = sinon.spy();

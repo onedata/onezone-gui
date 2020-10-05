@@ -189,7 +189,7 @@ export default function creatorDataToToken(editorData, currentUser) {
           id: recordId,
           model,
         } = getProperties(value, 'record', 'id', 'model');
-        const serviceType = record && get(record, 'type') || 'oneprovider';
+        const serviceType = record && get(record, 'serviceType') || 'oneprovider';
         const prefix = (serviceType === 'onezone' ? 'oz' : 'op') +
           (model === 'serviceOnepanel' ? 'p' : 'w');
         let id = serviceType === 'onezone' ? 'onezone' : recordId;
