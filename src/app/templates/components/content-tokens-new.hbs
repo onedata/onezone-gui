@@ -4,7 +4,7 @@
 <div class="row content-row">
   {{#one-carousel activeSlideId=activeStep as |carousel|}}
     {{#carousel.slide slideId="templates"}}
-      {{token-template-selector generateTemplateUrl=(action "generateTemplateUrl")}}
+      {{token-template-selector onTemplateSelected=(action "templateSelected")}}
     {{/carousel.slide}}
     {{#carousel.slide slideId="form"}}
       {{token-editor

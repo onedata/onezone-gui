@@ -11,7 +11,6 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import $ from 'jquery';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import { array, conditional, raw } from 'ember-awesome-macros';
 import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -53,17 +52,8 @@ export default Component.extend(I18n, {
   }),
 
   actions: {
-    generateTemplateUrl(tokenDefaults = {}) {
-      const aspectOptions = Object.assign({}, tokenDefaults, { step: 'form' });
-      return this.get('router').urlFor(
-        'onedata.sidebar.content',
-        'tokens',
-        'new', {
-          queryParams: {
-            options: serializeAspectOptions(aspectOptions),
-          },
-        }
-      );
+    templateSelected() {
+
     },
     submit(rawToken) {
       const createTokenAction = this.get('tokenActions')

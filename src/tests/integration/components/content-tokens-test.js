@@ -46,10 +46,13 @@ describe('Integration | Component | content tokens', function () {
   it('shows token editor component in view mode with token data', function () {
     this.render(hbs `{{content-tokens token=token}}`);
 
-    expect(this.$('.token-editor')).to.have.class('view-mode');
-    // Not have to test other fields - we only need to check if token is passed to
-    // token-editor component. Token data rendering is deeply tested in token-editor tests.
-    expect(this.$('.name-field').text()).to.contain('token name');
+    return wait()
+      .then(() => {
+        expect(this.$('.token-editor')).to.have.class('view-mode');
+        // Not have to test other fields - we only need to check if token is passed to
+        // token-editor component. Token data rendering is deeply tested in token-editor tests.
+        expect(this.$('.name-field').text()).to.contain('token name');
+      });
   });
 
   it('changes mode to "edit" after clicking "Modify" button', function () {
@@ -167,7 +170,7 @@ describe('Integration | Component | content tokens', function () {
       this.render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
-        .then(() => fillIn('.name-field input'), 'test')
+        .then(() => fillIn('.name-field input', 'test'))
         .then(() => click('.revoked-field .one-way-toggle'))
         .then(() => click('.cancel-edition'))
         .then(() => {
