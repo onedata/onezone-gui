@@ -9,15 +9,16 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import generateShellCommand from 'onezone-gui/utils/generate-shell-command';
-import { all as allFulfilled } from 'rsvp';
-import { not, array, raw } from 'ember-awesome-macros';
+import { resolve, all as allFulfilled } from 'rsvp';
+import { not, array, raw, promise } from 'ember-awesome-macros';
 
 const inviteTypesWithoutSubjectDescription = [
   'supportSpace',
@@ -68,6 +69,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
+  targetRecordId: reads('targetRecord.entityId'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
   subjectDescription: computed('inviteType', function subjectDescription() {
     const inviteType = this.get('inviteType');
     if (!inviteTypesWithoutSubjectDescription.includes(inviteType)) {
@@ -96,38 +102,50 @@ export default Component.extend(I18n, {
   )),
 
   /**
-   * @type {ComputedProperty<String>}
+   * @type {ComputedProperty<PromiseObject<String>>}
    */
-  customTokenUrl: computed('inviteType', 'targetRecord', function goToAdvancedUrl() {
-    const {
-      router,
-      inviteType,
-      targetRecord,
-      showCustomTokenLink,
-    } = this.getProperties('router', 'inviteType', 'targetRecord', 'showCustomTokenLink');
+  customTokenUrlProxy: promise.object(
+    computed('inviteType', 'targetRecord', function customTokenUrlProxy() {
+      const {
+        router,
+        inviteType,
+        targetRecordId,
+        showCustomTokenLink,
+        tokenManager,
+      } = this.getProperties(
+        'router',
+        'inviteType',
+        'targetRecordId',
+        'showCustomTokenLink',
+        'tokenManager'
+      );
 
-    if (!showCustomTokenLink) {
-      return;
-    }
-
-    const options = {
-      type: 'invite',
-      inviteType,
-      expire: Math.floor(new Date().valueOf() / 1000) + 24 * 60 * 60,
-    };
-    if (targetRecord) {
-      options.inviteTargetId = get(targetRecord, 'entityId');
-    }
-    return router.urlFor(
-      'onedata.sidebar.content',
-      'tokens',
-      'new', {
-        queryParams: {
-          options: serializeAspectOptions(options),
-        },
+      if (!showCustomTokenLink) {
+        return resolve();
+      } else {
+        return tokenManager.createTemporaryInviteTokenTemplate(inviteType, targetRecordId)
+          .then(tokenTemplate => router.urlFor(
+            'onedata.sidebar.content',
+            'tokens',
+            'new', {
+              queryParams: {
+                options: serializeAspectOptions({
+                  tokenTemplate: encodeURIComponent(JSON.stringify(tokenTemplate)),
+                }),
+              },
+            }
+          ));
       }
-    );
-  }),
+    })
+  ),
+
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  dataLoadingProxy: promise.object(promise.all(
+    'generatedTokenProxy',
+    'customTokenUrlProxy'
+  )),
 
   init() {
     this._super(...arguments);
@@ -137,11 +155,11 @@ export default Component.extend(I18n, {
   generateToken() {
     const {
       tokenManager,
-      targetRecord,
+      targetRecordId,
       inviteType,
     } = this.getProperties(
       'tokenManager',
-      'targetRecord',
+      'targetRecordId',
       'inviteType'
     );
 
@@ -149,7 +167,7 @@ export default Component.extend(I18n, {
     if (['onedatify', 'onedatifyWithImport'].includes(inviteType)) {
       tokenPromise = allFulfilled([
         tokenManager.createTemporaryInviteToken('registerOneprovider'),
-        tokenManager.createTemporaryInviteToken('supportSpace', targetRecord),
+        tokenManager.createTemporaryInviteToken('supportSpace', targetRecordId),
       ]).then(([onezoneRegistrationToken, supportToken]) =>
         generateShellCommand(inviteType === 'onedatify' ? 'oneprovider' : 'onedatify', {
           onezoneRegistrationToken,
@@ -157,7 +175,7 @@ export default Component.extend(I18n, {
         })
       );
     } else {
-      tokenPromise = tokenManager.createTemporaryInviteToken(inviteType, targetRecord);
+      tokenPromise = tokenManager.createTemporaryInviteToken(inviteType, targetRecordId);
     }
     this.set('generatedTokenProxy', PromiseObject.create({
       promise: tokenPromise,
