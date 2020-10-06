@@ -11,9 +11,8 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import $ from 'jquery';
-import { array, conditional, raw } from 'ember-awesome-macros';
+import { conditional, raw } from 'ember-awesome-macros';
 import { observer } from '@ember/object';
-import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, {
   classNames: ['content-tokens-new'],
@@ -29,21 +28,21 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentTokensNew',
 
   /**
-   * @type {Object}
+   * @type {String}
    */
-  tokenTemplate: undefined,
+  activeTemplateName: undefined,
 
   /**
-   * @type {ComputedProperty<String>}
+   * @type {Object}
    */
-  urlStep: reads('navigationState.aspectOptions.step'),
+  activeTemplate: undefined,
 
   /**
    * @type {ComputedProperty<String>}
    */
   activeStep: conditional(
-    array.includes(raw(['templates', 'form']), 'urlStep'),
-    'urlStep',
+    'activeTemplateName',
+    raw('form'),
     raw('templates')
   ),
 
@@ -70,7 +69,10 @@ export default Component.extend(I18n, {
         const tokenTemplate = JSON.parse(stringifiedTokenTemplate);
         // Create a real (but unsaved) record to provide token-related computed properties
         const token = this.get('store').createRecord('token', tokenTemplate);
-        this.set('tokenTemplate', token);
+        this.setProperties({
+          activeTemplate: token,
+          activeTemplateName: 'custom',
+        });
       } catch (error) {
         console.error('Incorrect token template passed via aspect options:', error);
       }
