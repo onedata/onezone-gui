@@ -59,7 +59,15 @@ export default Model.extend(
      */
     info: attr('object'),
 
+    /**
+     * @type {ComputedProperty<Number>}
+     */
     creationTime: reads('info.creationTime'),
+
+    /**
+     * @type {ComputedProperty<String>}
+     */
+    serviceType: reads('type'),
 
     oneproviderEntityId: computed(function oneproviderEntityId() {
       return parseGri(this.belongsTo('provider').id()).entityId;

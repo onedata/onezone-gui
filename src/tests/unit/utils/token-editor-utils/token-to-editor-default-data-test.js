@@ -238,29 +238,45 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
 
     return get(result, 'caveats.service')
       .then(consumer => {
-        const correctResult = _.flatten(
-          ['service', 'serviceOnepanel'].map(modelName => [{
-            record: {
-              entityId: '1',
-              type: 'oneprovider',
-            },
-            model: modelName,
-          }, {
-            id: 'unknown',
-            model: modelName,
-          }, {
-            record: {
-              entityId: 'ozid',
-              type: 'onezone',
-            },
-            model: modelName,
-          }, {
-            record: {
-              representsAll: modelName,
-            },
-            model: modelName,
-          }])
-        );
+        const correctResult = [{
+          record: {
+            entityId: '1',
+          },
+          model: 'service',
+        }, {
+          id: 'unknown',
+          model: 'service',
+        }, {
+          record: {
+            name: 'onezone',
+          },
+          model: 'service',
+        }, {
+          record: {
+            representsAll: 'service',
+          },
+          model: 'service',
+        }, {
+          record: {
+            entityId: '1',
+            type: 'oneprovider',
+          },
+          model: 'serviceOnepanel',
+        }, {
+          id: 'unknown',
+          model: 'serviceOnepanel',
+        }, {
+          record: {
+            entityId: 'ozid',
+            type: 'onezone',
+          },
+          model: 'serviceOnepanel',
+        }, {
+          record: {
+            representsAll: 'serviceOnepanel',
+          },
+          model: 'serviceOnepanel',
+        }];
         expect(consumer).to.deep.equal(correctResult);
       });
   });
@@ -343,21 +359,29 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
 });
 
 function getRecordMock(modelName, entityId) {
-  if (modelName === 'cluster') {
-    if (entityId === 'unknown') {
-      return reject();
-    } else if (entityId === 'onezone') {
-      return resolve({
-        entityId: 'ozid',
-        type: 'onezone',
-      });
-    } else {
-      return resolve({
-        entityId,
-        type: 'oneprovider',
-      });
+  if (entityId === 'unknown') {
+    return reject();
+  }
+
+  switch (modelName) {
+    case 'cluster': {
+      if (entityId === 'onezone') {
+        return resolve({
+          entityId: 'ozid',
+          type: 'onezone',
+        });
+      } else {
+        return resolve({
+          entityId,
+          type: 'oneprovider',
+        });
+      }
     }
-  } else {
-    return entityId === 'unknown' ? reject() : resolve({ entityId });
+    case 'onezone':
+      return resolve({
+        name: 'onezone',
+      });
+    default:
+      return resolve({ entityId });
   }
 }

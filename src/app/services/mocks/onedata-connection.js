@@ -3,20 +3,31 @@
  * For properties description see non-mocked `services/onedata-connection`
  *
  * @module services/mocks/onedata-connection
- * @author Jakub Liput, Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import OnedataConnection from 'onedata-gui-websocket-client/services/mocks/onedata-connection';
+import EmberObject, { computed } from '@ember/object';
+
+const zoneName = 'Hello world';
+const zoneDomain = location.hostname;
 
 export default OnedataConnection.extend({
-  zoneName: 'Hello world',
-  zoneDomain: location.hostname,
+  zoneName,
+  zoneDomain,
   serviceVersion: '19.02.9',
   serviceBuildVersion: 'm-23493894y7238',
   brandSubtitle: 'Isolated zone',
   maxTemporaryTokenTtl: 7 * 24 * 60 * 60,
   defaultHarvestingBackendType: 'elasticsearch_harvesting_backend',
   defaultHarvestingBackendEndpoint: '172.17.0.8:9200',
+  onezoneRecord: computed(function onezoneRecord() {
+    return EmberObject.create({
+      name: zoneName,
+      domain: zoneDomain,
+      serviceType: 'onezone',
+    });
+  }),
 });
