@@ -541,7 +541,7 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       .map(model => ([{
         model,
         record: {
-          type: 'oneprovider',
+          serviceType: 'oneprovider',
           entityId: 'op0',
         },
       }, {
@@ -550,7 +550,7 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       }, {
         model,
         record: {
-          type: 'onezone',
+          serviceType: 'onezone',
           entityId: 'oz0',
         },
       }, {
