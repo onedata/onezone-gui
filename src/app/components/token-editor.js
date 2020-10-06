@@ -12,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { scheduleOnce, next } from '@ember/runloop';
+import { scheduleOnce } from '@ember/runloop';
 import { Promise, all as allFulfilled, resolve } from 'rsvp';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
@@ -1452,7 +1452,7 @@ export default Component.extend(I18n, {
     this._super(...arguments);
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.modeObserver();
-      this.setPredefinedValues();
+      // this.setPredefinedValues();
       this.autoNameGenerator();
       if (this.get('expandCaveats') === undefined) {
         this.expandCaveatsDependingOnCaveatsExistence();
@@ -1465,85 +1465,85 @@ export default Component.extend(I18n, {
     this.get('fields').destroy();
   },
 
-  setPredefinedValues() {
-    const {
-      predefinedValues,
-      mode,
-      fields,
-      caveatsGroup,
-    } = this.getProperties('predefinedValues', 'mode', 'fields', 'caveatsGroup');
+  // setPredefinedValues() {
+  //   const {
+  //     predefinedValues,
+  //     mode,
+  //     fields,
+  //     caveatsGroup,
+  //   } = this.getProperties('predefinedValues', 'mode', 'fields', 'caveatsGroup');
 
-    if (!(mode === 'create' && predefinedValues)) {
-      return;
-    }
-    const typeField = fields.getFieldByPath('basic.type');
-    const inviteTypeField = fields.getFieldByPath('basic.inviteDetails.inviteType');
-    const {
-      type,
-      inviteType,
-      inviteTargetId,
-      expire,
-    } = getProperties(
-      predefinedValues,
-      'type',
-      'inviteType',
-      'inviteTargetId',
-      'expire'
-    );
-    if (type && ['access', 'identity', 'invite'].includes(type)) {
-      typeField.valueChanged(type);
-    }
-    if (
-      get(typeField, 'value') === 'invite' &&
-      inviteType &&
-      tokenInviteTypeOptions.findBy('value', inviteType)
-    ) {
-      inviteTypeField.valueChanged(inviteType);
-    }
-    if (expire) {
-      let expireDate;
-      try {
-        const expireNumber = typeof expire === 'number' ? expire : parseInt(expire);
-        expireDate = expireNumber ? new Date(Math.floor(expireNumber) * 1000) : null;
-      } catch (err) {
-        expireDate = null;
-      }
-      if (expireDate) {
-        caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
-        caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
-      }
-    }
+  //   if (!(mode === 'create' && predefinedValues)) {
+  //     return;
+  //   }
+  //   const typeField = fields.getFieldByPath('basic.type');
+  //   const inviteTypeField = fields.getFieldByPath('basic.inviteDetails.inviteType');
+  //   const {
+  //     type,
+  //     inviteType,
+  //     inviteTargetId,
+  //     expire,
+  //   } = getProperties(
+  //     predefinedValues,
+  //     'type',
+  //     'inviteType',
+  //     'inviteTargetId',
+  //     'expire'
+  //   );
+  //   if (type && ['access', 'identity', 'invite'].includes(type)) {
+  //     typeField.valueChanged(type);
+  //   }
+  //   if (
+  //     get(typeField, 'value') === 'invite' &&
+  //     inviteType &&
+  //     tokenInviteTypeOptions.findBy('value', inviteType)
+  //   ) {
+  //     inviteTypeField.valueChanged(inviteType);
+  //   }
+  //   if (expire) {
+  //     let expireDate;
+  //     try {
+  //       const expireNumber = typeof expire === 'number' ? expire : parseInt(expire);
+  //       expireDate = expireNumber ? new Date(Math.floor(expireNumber) * 1000) : null;
+  //     } catch (err) {
+  //       expireDate = null;
+  //     }
+  //     if (expireDate) {
+  //       caveatsGroup.getFieldByPath('expireCaveat.expireEnabled').valueChanged(true);
+  //       caveatsGroup.getFieldByPath('expireCaveat.expire').valueChanged(expireDate);
+  //     }
+  //   }
 
-    // observers must have time to launch after changing inviteType
-    next(() => this.selectInviteTargetById(inviteTargetId));
-  },
+  //   // observers must have time to launch after changing inviteType
+  //   next(() => this.selectInviteTargetById(inviteTargetId));
+  // },
 
-  selectInviteTargetById(inviteTargetId) {
-    const inviteTargetField = this.get('fields')
-      .getFieldByPath('basic.inviteDetails.inviteTargetDetails.target');
-    const {
-      cachedTargetsModelName,
-      cachedTargetsProxy,
-    } = getProperties(
-      inviteTargetField,
-      'cachedTargetsModelName',
-      'cachedTargetsProxy'
-    );
+  // selectInviteTargetById(inviteTargetId) {
+  //   const inviteTargetField = this.get('fields')
+  //     .getFieldByPath('basic.inviteDetails.inviteTargetDetails.target');
+  //   const {
+  //     cachedTargetsModelName,
+  //     cachedTargetsProxy,
+  //   } = getProperties(
+  //     inviteTargetField,
+  //     'cachedTargetsModelName',
+  //     'cachedTargetsProxy'
+  //   );
 
-    if (cachedTargetsModelName && inviteTargetId) {
-      cachedTargetsProxy.then(() => safeExec(this, () => {
-        if (
-          get(inviteTargetField, 'cachedTargetsModelName') === cachedTargetsModelName
-        ) {
-          const optionToSelect =
-            cachedTargetsProxy.findBy('value.entityId', inviteTargetId);
-          if (optionToSelect) {
-            inviteTargetField.valueChanged(get(optionToSelect, 'value'));
-          }
-        }
-      }));
-    }
-  },
+  //   if (cachedTargetsModelName && inviteTargetId) {
+  //     cachedTargetsProxy.then(() => safeExec(this, () => {
+  //       if (
+  //         get(inviteTargetField, 'cachedTargetsModelName') === cachedTargetsModelName
+  //       ) {
+  //         const optionToSelect =
+  //           cachedTargetsProxy.findBy('value.entityId', inviteTargetId);
+  //         if (optionToSelect) {
+  //           inviteTargetField.valueChanged(get(optionToSelect, 'value'));
+  //         }
+  //       }
+  //     }));
+  //   }
+  // },
 
   expandCaveatsDependingOnCaveatsExistence() {
     this.set('caveatsGroup.isExpanded', this.get('isAnyVisibleCaveatEnabled'));

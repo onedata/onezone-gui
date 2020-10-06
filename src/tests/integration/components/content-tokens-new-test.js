@@ -9,6 +9,7 @@ import { resolve, Promise } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import { fillIn, click } from 'ember-native-dom-helpers';
 import { set } from '@ember/object';
+import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Component | content tokens new', function () {
   setupComponentTest('content-tokens-new', {
@@ -16,6 +17,13 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   beforeEach(function () {
+    const harvesters = [{
+      entityId: 'harvester0',
+      name: 'harvester0',
+    }, {
+      entityId: 'harvester1',
+      name: 'harvester1',
+    }];
     const recordManager = lookupService(this, 'record-manager');
     sinon.stub(recordManager, 'getCurrentUserRecord').resolves({ entityId: 'user1' });
     sinon.stub(recordManager, 'getUserRecordList')
@@ -26,15 +34,23 @@ describe('Integration | Component | content tokens new', function () {
       })
       .withArgs('harvester').resolves({
         list: PromiseArray.create({
-          promise: resolve([{
-            entityId: 'harvester0',
-            name: 'harvester0',
-          }, {
-            entityId: 'harvester1',
-            name: 'harvester1',
-          }]),
+          promise: resolve(harvesters),
         }),
       });
+    const harvester1Gri = gri({
+      entityType: 'harvester',
+      entityId: harvesters[1].entityId,
+      aspect: 'instance',
+      scope: 'auto',
+    });
+    const findRecordStub = sinon.stub(lookupService(this, 'store'), 'findRecord');
+    findRecordStub.callsFake(function (modelName, gri) {
+      if (gri === harvester1Gri) {
+        return resolve(harvesters[1]);
+      } else {
+        return findRecordStub.wrappedMethod.apply(this, arguments);
+      }
+    });
   });
 
   it('has class "content-tokens-new', function () {
@@ -106,10 +122,18 @@ describe('Integration | Component | content tokens new', function () {
     'injects values passed via aspectOptions to form',
     function () {
       set(lookupService(this, 'navigation-state'), 'aspectOptions', {
-        type: 'invite',
-        inviteType: 'userJoinHarvester',
-        inviteTargetId: 'harvester1',
-        expire: '1584525600',
+        tokenTemplate: encodeURIComponent(JSON.stringify({
+          type: {
+            inviteToken: {
+              inviteType: 'userJoinHarvester',
+              harvesterId: 'harvester1',
+            },
+          },
+          caveats: [{
+            type: 'time',
+            validUntil: 1584525600,
+          }],
+        })),
       });
 
       this.render(hbs `{{content-tokens-new}}`);
