@@ -15,5 +15,9 @@ export default Component.extend({
   /**
    * @type {Object}
    */
-  template: Object.freeze({}),
+  template: Object.freeze({
+    caveats: [{
+      type: 'data.readonly',
+    }],
+  }),
 });

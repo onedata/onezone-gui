@@ -182,14 +182,27 @@ describe('Integration | Component | content tokens new', function () {
     expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
   });
 
+  it('allows to select "Oneclient" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-oneclient');
+    expect(isFormSlideActive(this)).to.be.true;
+    expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
+  });
+
+  it('allows to select "Read only data" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-readonlyData');
+    expect(isFormSlideActive(this)).to.be.true;
+    expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
+  });
+
   it('allows to select "Custom" template', async function () {
     this.render(hbs `{{content-tokens-new}}`);
 
     await click('.template-custom');
     expect(isFormSlideActive(this)).to.be.true;
-    const $serviceCaveatTags = this.$('.service-field .tag-item');
-    expect($serviceCaveatTags).to.have.length(1);
-    expect($serviceCaveatTags.text().trim()).to.equal('Any Oneprovider');
   });
 });
 

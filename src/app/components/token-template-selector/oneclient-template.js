@@ -15,5 +15,10 @@ export default Component.extend({
   /**
    * @type {Object}
    */
-  template: Object.freeze({}),
+  template: Object.freeze({
+    caveats: [{
+      type: 'interface',
+      interface: 'oneclient',
+    }],
+  }),
 });

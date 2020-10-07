@@ -8,6 +8,10 @@ const templates = [{
 }, {
   name: 'oneproviderRest',
 }, {
+  name: 'oneclient',
+}, {
+  name: 'readonlyData',
+}, {
   name: 'custom',
 }];
 

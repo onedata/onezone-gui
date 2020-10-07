@@ -30,12 +30,8 @@ describe(
       }}`);
 
       await click('.one-tile');
-      expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith('custom', sinon.match({
-        caveats: [sinon.match({
-          type: 'service',
-          whitelist: ['opw-*'],
-        })],
-      }));
+      expect(selectedSpy)
+        .to.be.calledOnce.and.to.be.calledWith('custom', sinon.match({}));
     });
   }
 );
