@@ -1,7 +1,10 @@
 export default {
-  tiles: {
+  templates: {
     onezoneRest: {
       title: 'Onezone REST',
+    },
+    custom: {
+      title: 'Custom',
     },
   },
 };

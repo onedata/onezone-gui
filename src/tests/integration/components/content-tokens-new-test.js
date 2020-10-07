@@ -51,6 +51,10 @@ describe('Integration | Component | content tokens new', function () {
         return findRecordStub.wrappedMethod.apply(this, arguments);
       }
     });
+    set(lookupService(this, 'onedata-connection'), 'onezoneRecord', {
+      name: 'onezone',
+      serviceType: 'onezone',
+    });
   });
 
   it('has class "content-tokens-new', function () {
@@ -59,6 +63,13 @@ describe('Integration | Component | content tokens new', function () {
     expect(this.$('.content-tokens-new')).to.exist;
   });
 
+  it('shows list of token templates at the beginning', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    expect(isTemplatesSlideActive(this)).to.be.true;
+  });
+
+  // FIXME move to the "custom" template case
   it(
     'passess raw token to CreateTokenAction instance and executes it',
     function () {
@@ -140,6 +151,7 @@ describe('Integration | Component | content tokens new', function () {
 
       return wait()
         .then(() => {
+          expect(isFormSlideActive(this)).to.be.true;
           expect(this.$('.type-field .option-invite input').prop('checked')).to.be.true;
           expect(this.$('.inviteType-field').text()).to.contain('Invite user to harvester');
           expect(this.$('.target-field').text()).to.contain('harvester1');
@@ -147,4 +159,38 @@ describe('Integration | Component | content tokens new', function () {
         });
     }
   );
+
+  it('allows to select "Onezone REST" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-onezoneRest');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $serviceCaveatTags = this.$('.service-field .tag-item');
+    expect($serviceCaveatTags).to.have.length(1);
+    expect($serviceCaveatTags.text().trim()).to.equal('onezone');
+    expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
+  });
+
+  it('allows to select "Custom" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-custom');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $serviceCaveatTags = this.$('.service-field .tag-item');
+    expect($serviceCaveatTags).to.have.length(1);
+    expect($serviceCaveatTags.text().trim()).to.equal('Any Oneprovider');
+  });
 });
+
+function isTemplatesSlideActive(testCase) {
+  return isSlideActive(testCase, 'templates');
+}
+
+function isFormSlideActive(testCase) {
+  return isSlideActive(testCase, 'form');
+}
+
+function isSlideActive(testCase, slideName) {
+  const slide = testCase.$(`[data-one-carousel-slide-id="${slideName}"]`)[0];
+  return [...slide.classList].any(cls => cls.startsWith('active'));
+}

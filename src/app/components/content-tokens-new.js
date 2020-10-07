@@ -80,8 +80,15 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    templateSelected() {
+    templateSelected(templateName, template) {
+      this.set('activeTemplateName', templateName);
 
+      // Change template only to another non-empty one. There always should be non-empty
+      // active template (except component init) to let the token template values stay visible
+      // while carousel animation.
+      if (template) {
+        this.set('activeTemplate', template);
+      }
     },
     submit(rawToken) {
       const createTokenAction = this.get('tokenActions')

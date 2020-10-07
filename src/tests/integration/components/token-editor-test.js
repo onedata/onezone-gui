@@ -725,35 +725,36 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  it(
-    'has expanded caveats section on init by default',
-    function () {
-      this.render(hbs `{{token-editor mode="create"}}`);
+  // FIXME: these tests will be problably removed after collapsing mechanism refactor
+  // it(
+  //   'has expanded caveats section on init by default',
+  //   function () {
+  //     this.render(hbs `{{token-editor mode="create"}}`);
 
-      return wait()
-        .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
-    }
-  );
+  //     return wait()
+  //       .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
+  //   }
+  // );
 
-  it(
-    'has collapsed caveats section on init when expandCaveats is false',
-    function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=false}}`);
+  // it(
+  //   'has collapsed caveats section on init when expandCaveats is false',
+  //   function () {
+  //     this.render(hbs `{{token-editor mode="create" expandCaveats=false}}`);
 
-      return wait()
-        .then(() => expect(this.$('.caveats-collapse')).to.not.have.class('in'));
-    }
-  );
+  //     return wait()
+  //       .then(() => expect(this.$('.caveats-collapse')).to.not.have.class('in'));
+  //   }
+  // );
 
-  it(
-    'has expanded caveats section on init when expandCaveats is true',
-    function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+  // it(
+  //   'has expanded caveats section on init when expandCaveats is true',
+  //   function () {
+  //     this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
 
-      return wait()
-        .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
-    }
-  );
+  //     return wait()
+  //       .then(() => expect(this.$('.caveats-collapse')).to.have.class('in'));
+  //   }
+  // );
 
   caveats.forEach(({
     name,

@@ -1,11 +1,4 @@
-{{#one-tile
-  title=(tt this "tiles.onezoneRest.title")
-  moreText=null
-  customLink=onezoneRestTemplateLink
-}}
-  <figure class="main-figure">
-    <img class="main-image" src="assets/images/space-data.svg">
-  </figure>
-{{/one-tile}}
+{{token-template-selector/onezone-rest-template onSelected=onTemplateSelected}}
+{{token-template-selector/custom-template onSelected=onTemplateSelected}}
 
 {{yield}}

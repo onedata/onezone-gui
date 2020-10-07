@@ -1,7 +1,6 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   classNames: ['token-template-selector', 'one-tile-container'],
@@ -12,19 +11,10 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.tokenTemplateSelector',
 
   /**
+   * @virtual
    * @type {Function}
-   * @param {Object} tokenDefaults values for aspectOptions
-   * @returns {String} url
+   * @param {String} templateName
+   * @param {Object} template
    */
-  generateTemplateUrl: notImplementedIgnore,
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  onezoneRestTemplateLink: computed(
-    'generateTemplateUrl',
-    function onezoneRestTemplateLink() {
-      return this.get('generateTemplateUrl')();
-    }
-  ),
+  onTemplateSelected: notImplementedIgnore,
 });
