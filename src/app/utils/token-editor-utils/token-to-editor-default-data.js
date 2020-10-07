@@ -160,22 +160,24 @@ function serviceConverter(caveat, getRecord) {
   const whitelist = get(caveat, 'whitelist') || [];
   return Promise.all(whitelist.map(recordIdentifier => {
     const [modelAbbrev, entityId] = recordIdentifier.split('-');
-    const modelName = ['opp', 'ozp'].includes(modelAbbrev) ?
+    const editorModelName = ['opp', 'ozp'].includes(modelAbbrev) ?
       'serviceOnepanel' : 'service';
+    const recordModelName = editorModelName === 'serviceOnepanel' ?
+      'cluster' : (modelAbbrev === 'opw' ? 'provider' : 'onezone');
     if (entityId === '*') {
       return resolve({
-        record: { representsAll: modelName },
-        model: modelName,
+        record: { representsAll: editorModelName },
+        model: editorModelName,
       });
     } else {
-      return getRecord('cluster', entityId)
+      return getRecord(recordModelName, entityId)
         .then(record => ({
           record,
-          model: modelName,
+          model: editorModelName,
         }))
         .catch(() => ({
           id: entityId,
-          model: modelName,
+          model: editorModelName,
         }));
     }
   }));

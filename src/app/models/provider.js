@@ -30,6 +30,13 @@ export default Model.extend(GraphSingleModelMixin, {
 
   spaceList: belongsTo('space-list'),
 
+  /**
+   * Custom property similar to the `serviceType` in cluster model. Used to check whether
+   * record represents Onezone or Oneprovider.
+   * @type {String}
+   */
+  serviceType: 'oneprovider',
+
   onezoneHostedBaseUrl: computed('cluster.id', function onezoneHostedBaseUrl() {
     const clusterId =
       parseGri(this.belongsTo('cluster').id()).entityId;
