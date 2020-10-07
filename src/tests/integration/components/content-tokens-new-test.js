@@ -171,6 +171,17 @@ describe('Integration | Component | content tokens new', function () {
     expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
   });
 
+  it('allows to select "Oneprovider REST" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-oneproviderRest');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $serviceCaveatTags = this.$('.service-field .tag-item');
+    expect($serviceCaveatTags).to.have.length(1);
+    expect($serviceCaveatTags.text().trim()).to.equal('Any Oneprovider');
+    expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
+  });
+
   it('allows to select "Custom" template', async function () {
     this.render(hbs `{{content-tokens-new}}`);
 
