@@ -1,4 +1,5 @@
 import Component from '@ember/component';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend({
   tagName: '',
@@ -11,27 +12,13 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Object}
-   */
-  template: undefined,
-
-  /**
-   * @virtual
    * @type {String}
    */
   imagePath: undefined,
 
-  actions: {
-    onClick() {
-      const {
-        templateName,
-        template,
-        onClick,
-      } = this.getProperties('templateName', 'template', 'onClick');
-
-      if (onClick) {
-        onClick(templateName, template);
-      }
-    },
-  },
+  /**
+   * @type {Function}
+   * @returns {any}
+   */
+  onClick: notImplementedIgnore,
 });

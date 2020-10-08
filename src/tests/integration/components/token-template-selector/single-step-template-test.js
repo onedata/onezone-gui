@@ -43,25 +43,16 @@ describe(
       expect(this.$('.main-image')).to.have.attr('src', 'some-path.svg');
     });
 
-    it('passes template name and template via click handler', async function () {
-      const {
-        template,
-        clickSpy,
-      } = this.setProperties({
-        template: {
-          some: 'template',
-        },
-        clickSpy: sinon.spy(),
-      });
+    it('notifies about click', async function () {
+      const clickSpy = this.set('clickSpy', sinon.spy());
 
       this.render(hbs `{{token-template-selector/single-step-template
         templateName="custom"
-        template=template
         onClick=clickSpy
       }}`);
 
       await click('.one-tile');
-      expect(clickSpy).to.be.calledOnce.and.to.be.calledWith('custom', template);
+      expect(clickSpy).to.be.calledOnce;
     });
   }
 );

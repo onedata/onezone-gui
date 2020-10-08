@@ -1,4 +1,8 @@
 export default {
+  recordSelectorTemplate: {
+    back: 'Back',
+    noRecordsAfterInfo: 'No results match your filter.',
+  },
   templates: {
     onezoneRest: {
       title: 'Onezone REST access',

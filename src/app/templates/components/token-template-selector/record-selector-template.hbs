@@ -1,0 +1,44 @@
+{{#token-template-selector/template-tile
+  templateName=templateName
+  onClick=(if (eq activeSlideId "intro") (action "onIntroClick"))
+}}
+  {{#one-carousel activeSlideId=activeSlideId as |carousel|}}
+    {{#carousel.slide slideId="intro"}}
+      <figure class="main-figure">
+        <img class="main-image" src={{imagePath}}>
+      </figure>
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="selector"}}
+      <a class="template-back" onClick={{action "onTemplateBackClick"}}>
+        {{t (concat i18nGenericPrefix "back")}}
+      </a>
+      <input
+        class="records-filter"
+        value={{filter}}
+        oninput={{action (mut filter) value="target.value"}}
+      >
+      {{#render-later triggerRender=(eq activeSlideId "selector")}}
+        <div class="records-container">
+          {{#promise-proxy-container proxy=recordsProxy}}
+            {{#if filteredRecords.length}}
+              <ul class="records-list">
+                {{#each filteredRecords as |record|}}
+                  <li class="record-item" {{action onRecordSelected record}}>
+                    {{one-icon icon=modelIcon}}
+                    {{#truncated-string}}{{record-name record=record}}{{/truncated-string}}
+                  </li>
+                {{/each}}
+              </ul>
+            {{else if recordsProxy.length}}
+              <p class="no-records-after-filter-info">
+                {{t (concat i18nGenericPrefix "noRecordsAfterInfo")}}
+              </p>
+            {{else}}
+              <p class="no-records-info">{{tt this "noRecordsInfo"}}</p>
+            {{/if}}
+          {{/promise-proxy-container}}
+        </div>
+      {{/render-later}}
+    {{/carousel.slide}}
+  {{/one-carousel}}
+{{/token-template-selector/template-tile}}
