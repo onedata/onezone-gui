@@ -10,6 +10,8 @@ const templates = [{
 }, {
   name: 'oneclient',
 }, {
+  name: 'oneclientInOneprovider',
+}, {
   name: 'readonlyData',
 }, {
   name: 'custom',

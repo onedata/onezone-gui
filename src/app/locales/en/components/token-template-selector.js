@@ -13,6 +13,10 @@ export default {
     oneclient: {
       title: 'Oneclient access',
     },
+    oneclientInOneprovider: {
+      title: 'Oneclient access in specific Oneprovider',
+      noRecordsInfo: 'You have no providers.',
+    },
     readonlyData: {
       title: 'Read only data access',
     },

@@ -195,6 +195,18 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(record);
     });
 
+    it('comes back to intro slide after record selection', async function () {
+      this.set('fetchRecords', () => resolve([{ name: 'p1' }]));
+
+      this.render(hbs `{{token-template-selector/record-selector-template
+        fetchRecords=fetchRecords
+      }}`);
+
+      await click('.one-tile');
+      await click('.record-item');
+      expect(isSlideActive(this, 'intro')).to.be.true;
+    });
+
     it('allows to filter records', async function () {
       this.set('fetchRecords', () => resolve([{
         name: 'p1',

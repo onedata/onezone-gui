@@ -382,7 +382,7 @@ function getCoordinates(index) {
 }
 
 function getProviderId(index) {
-  return `oneprovider-${index + 1}`;
+  return `oneprovider${index + 1}`;
 }
 
 function getProviderRecordId(index) {

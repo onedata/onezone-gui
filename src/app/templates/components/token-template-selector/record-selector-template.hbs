@@ -23,7 +23,7 @@
             {{#if filteredRecords.length}}
               <ul class="records-list">
                 {{#each filteredRecords as |record|}}
-                  <li class="record-item" {{action onRecordSelected record}}>
+                  <li class="record-item" {{action "onRecordSelected" record}}>
                     {{one-icon icon=modelIcon}}
                     {{#truncated-string}}{{record-name record=record}}{{/truncated-string}}
                   </li>

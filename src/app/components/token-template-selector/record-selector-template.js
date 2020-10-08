@@ -6,6 +6,7 @@ import { inject as service } from '@ember/service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import $ from 'jquery';
 
 function defaultFetchRecord() {
   return resolve([]);
@@ -141,13 +142,26 @@ export default Component.extend(I18n, {
     }
   },
 
-  actions: {
-    onIntroClick() {
-      this.set('activeSlideId', 'selector');
+  changeToSlide(slideId) {
+    this.set('activeSlideId', slideId);
+    if (slideId === 'selector') {
       this.loadRecordsIfNeeded();
+    }
+  },
+
+  actions: {
+    onIntroClick(event) {
+      const $eventTargetParentSlide = $(event.target).closest('.one-carousel-slide');
+      if ($eventTargetParentSlide.data('one-carousel-slide-id') !== 'selector') {
+        this.changeToSlide('selector');
+      }
     },
     onTemplateBackClick() {
-      this.set('activeSlideId', 'intro');
+      this.changeToSlide('intro');
+    },
+    onRecordSelected(record) {
+      this.get('onRecordSelected')(record);
+      this.changeToSlide('intro');
     },
   },
 });

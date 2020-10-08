@@ -17,6 +17,13 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   beforeEach(function () {
+    const oneproviders = [{
+      name: 'provider0',
+      entityId: 'provider0',
+    }, {
+      name: 'provider1',
+      entityId: 'provider1',
+    }];
     const harvesters = [{
       entityId: 'harvester0',
       name: 'harvester0',
@@ -27,6 +34,11 @@ describe('Integration | Component | content tokens new', function () {
     const recordManager = lookupService(this, 'record-manager');
     sinon.stub(recordManager, 'getCurrentUserRecord').resolves({ entityId: 'user1' });
     sinon.stub(recordManager, 'getUserRecordList')
+      .withArgs('provider').resolves({
+        list: PromiseArray.create({
+          promise: resolve(oneproviders),
+        }),
+      })
       .withArgs('group').resolves({
         list: PromiseArray.create({
           promise: resolve([]),
@@ -37,6 +49,8 @@ describe('Integration | Component | content tokens new', function () {
           promise: resolve(harvesters),
         }),
       });
+    sinon.stub(recordManager, 'getRecordById')
+      .withArgs('provider', 'provider0').resolves(oneproviders[0]);
     const harvester1Gri = gri({
       entityType: 'harvester',
       entityId: harvesters[1].entityId,
@@ -187,6 +201,18 @@ describe('Integration | Component | content tokens new', function () {
 
     await click('.template-oneclient');
     expect(isFormSlideActive(this)).to.be.true;
+    expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
+  });
+
+  it('allows to select "Oneclient in Oneprovider" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-oneclientInOneprovider');
+    await click('.record-item:first-child');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $serviceCaveatTags = this.$('.service-field .tag-item');
+    expect($serviceCaveatTags).to.have.length(1);
+    expect($serviceCaveatTags.text().trim()).to.equal('provider0');
     expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
   });
 
