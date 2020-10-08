@@ -1,17 +1,28 @@
-<div class="row content-row header-row hidden-xs">
-  <h1>{{tt this "header"}}</h1>
-</div>
-<div class="row content-row">
-  {{#one-carousel activeSlideId=activeStep as |carousel|}}
-    {{#carousel.slide slideId="templates"}}
+{{#one-carousel activeSlideId=activeStep as |carousel|}}
+  {{#carousel.slide slideId="templates"}}
+    <div class="row content-row header-row hidden-xs">
+      <h1>{{tt this "header"}}</h1>
+    </div>
+    <div class="row content-row">
       {{token-template-selector onTemplateSelected=(action "templateSelected")}}
-    {{/carousel.slide}}
-    {{#carousel.slide slideId="form"}}
+    </div>
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="form"}}
+    <div class="row content-row header-row hidden-xs">
+      <h1 class="with-back relative">
+        <a class="content-back-link" {{action "backToTemplates"}}>
+          {{one-icon icon="tokens" class="content-back-resource-icon"}}
+          {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+        </a>
+        <span class="resource-name">{{tt this "header"}}</span>
+      </h1>
+    </div>
+    <div class="row content-row">
       {{token-editor
         mode="create"
         token=activeTemplate
         onSubmit=(action "submit")
       }}
-    {{/carousel.slide}}
-  {{/one-carousel}}
-</div>
+    </div>
+  {{/carousel.slide}}
+{{/one-carousel}}

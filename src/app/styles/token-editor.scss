@@ -183,11 +183,11 @@
     }
   }
 
-  .regionCaveat-field,
-  .asnCaveat-field,
-  .consumerCaveat-field,
-  .readonlyCaveat-field {
-    &:not(:first-child)::before {
+  .regionCaveat-field:not(:first-child),
+  .asnCaveat-field:not(:first-child),
+  .consumerCaveat-field:not(:first-child),
+  .dataAccessCaveats-field:not(:first-child) .readonlyCaveat-field {
+    &::before {
       content: '';
       display: block;
       position: absolute;

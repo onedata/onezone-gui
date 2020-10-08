@@ -204,6 +204,28 @@ describe('Integration | Component | content tokens new', function () {
     await click('.template-custom');
     expect(isFormSlideActive(this)).to.be.true;
   });
+
+  it('allows to come back from the form to templates list', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-onezoneRest');
+    await click('.content-back-link');
+    expect(isTemplatesSlideActive(this)).to.be.true;
+  });
+
+  it(
+    'resets form back to the templates default after user choose template, modified form, came back to templates list and selected the same template again',
+    async function () {
+      this.render(hbs `{{content-tokens-new}}`);
+
+      await click('.template-onezoneRest');
+      await click('.interface-field .option-oneclient');
+      await click('.content-back-link');
+      await click('.template-onezoneRest');
+      expect(this.$('.interface-field .option-oneclient input').prop('checked'))
+        .to.be.false;
+    }
+  );
 });
 
 function isTemplatesSlideActive(testCase) {
