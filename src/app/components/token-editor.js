@@ -13,8 +13,7 @@ import { inject as service } from '@ember/service';
 import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
-import { Promise, all as allFulfilled, resolve } from 'rsvp';
-import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import { Promise, resolve } from 'rsvp';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
@@ -996,80 +995,15 @@ export default Component.extend(I18n, {
     }).create(generateCaveatFormGroupBody('consumer', [
       ModelTagsFieldPrototype.extend({
         recordManager: service(),
+        userManager: service(),
+        groupManager: service(),
         isVisible: reads('parent.isCaveatEnabled'),
-        groupsProxy: promise.array(computed(function groupsProxy() {
-          return this.get('recordManager').getUserRecordList('group')
-            .then(groups => get(groups, 'list'));
-        })),
-        spacesProxy: promise.array(computed(function spacesProxy() {
-          return this.get('recordManager').getUserRecordList('space')
-            .then(groups => get(groups, 'list'));
-        })),
-        users: promise.array(computed(
-          'groupsUsersListsProxy.[]',
-          'spacesUsersListsProxy.[]',
-          function users() {
-            const {
-              recordManager,
-              groupsUsersListsProxy,
-              spacesUsersListsProxy,
-            } = this.getProperties(
-              'recordManager',
-              'groupsUsersListsProxy',
-              'spacesUsersListsProxy'
-            );
-            const usersArray = [];
-            return allFulfilled([
-              groupsUsersListsProxy,
-              spacesUsersListsProxy,
-            ]).then(([
-              groupsUserLists,
-              spacesUsersListsProxy,
-            ]) => {
-              usersArray.push(recordManager.getCurrentUserRecord());
-              groupsUserLists
-                .concat(spacesUsersListsProxy)
-                .forEach(usersList =>
-                  usersArray.push(...usersList.toArray())
-                );
-              return usersArray.uniqBy('entityId');
-            });
-          }
-        )),
-        groups: promise.array(computed(
-          'groupsProxy',
-          'groupsGroupsListsProxy.[]',
-          'spacesGroupsListsProxy.[]',
-          function users() {
-            const {
-              groupsProxy,
-              groupsGroupsListsProxy,
-              spacesGroupsListsProxy,
-            } = this.getProperties(
-              'groupsProxy',
-              'groupsGroupsListsProxy',
-              'spacesGroupsListsProxy'
-            );
-            const groupsArray = [];
-            return allFulfilled([
-              groupsProxy,
-              groupsGroupsListsProxy,
-              spacesGroupsListsProxy,
-            ]).then(([
-              userGroups,
-              groupsGroupsLists,
-              spacesGroupsLists,
-            ]) => {
-              groupsArray.push(...userGroups.toArray());
-              groupsGroupsLists
-                .concat(spacesGroupsLists)
-                .forEach(groupsList =>
-                  groupsArray.push(...groupsList.toArray())
-                );
-              return groupsArray.uniqBy('entityId');
-            });
-          }
-        )),
+        usersProxy: computed(function usersProxy() {
+          return this.get('userManager').getAllKnownUsers();
+        }),
+        groupsProxy: computed(function groupsProxy() {
+          return this.get('groupManager').getAllKnownGroups();
+        }),
         oneprovidersProxy: promise.array(computed(function oneprovidersProxy() {
           return this.get('recordManager').getUserRecordList('provider')
             .then(providers => get(providers, 'list'));
@@ -1077,10 +1011,10 @@ export default Component.extend(I18n, {
         models: computed(function models() {
           return [{
             name: 'user',
-            getRecords: () => this.get('users'),
+            getRecords: () => this.get('usersProxy'),
           }, {
             name: 'group',
-            getRecords: () => this.get('groups'),
+            getRecords: () => this.get('groupsProxy'),
           }, {
             name: 'provider',
             getRecords: () => this.get('oneprovidersProxy'),
@@ -1090,29 +1024,6 @@ export default Component.extend(I18n, {
           'parent.valueFromToken',
           raw([])
         ),
-        init() {
-          this._super(...arguments);
-
-          ['group', 'space'].forEach(parentRecordName => {
-            ['user', 'group'].forEach(childRecordName => {
-              const upperChildRecordName = _.upperFirst(childRecordName);
-              const computedLists = computed(
-                `${parentRecordName}sProxy.@each.isReloading`,
-                function computedLists() {
-                  return this.get(`${parentRecordName}sProxy`)
-                    .then(parents =>
-                      onlyFulfilledValues(parents.mapBy(`eff${upperChildRecordName}List`))
-                    )
-                    .then(effLists => onlyFulfilledValues(effLists.mapBy('list')));
-                }
-              );
-              this.set(
-                `${parentRecordName}s${upperChildRecordName}sListsProxy`,
-                promise.array(computedLists)
-              );
-            });
-          });
-        },
       }).create({ name: 'consumer' }),
     ]));
   }),

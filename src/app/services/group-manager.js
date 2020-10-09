@@ -9,13 +9,17 @@
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { computed, get, getProperties, observer } from '@ember/object';
 import _ from 'lodash';
-import { Promise, resolve, reject } from 'rsvp';
+import { Promise, resolve, reject, all as allFulfilled } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promise } from 'ember-awesome-macros';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import ArrayProxy from '@ember/array/proxy';
 
 export default Service.extend({
   store: service(),
@@ -26,6 +30,7 @@ export default Service.extend({
   clusterManager: service(),
   providerManager: service(),
   harvesterManager: service(),
+  recordManager: service(),
 
   /**
    * Fetches collection of all groups
@@ -59,6 +64,18 @@ export default Service.extend({
       scope: 'auto',
     });
     return this.getRecord(recordGri);
+  },
+
+  /**
+   * @returns {PromiseArray<Models.User>}
+   */
+  getAllKnownGroups() {
+    const knownGroupsProxy = AllKnownGroupsProxyArray.create({
+      recordManager: this.get('recordManager'),
+    });
+    return promiseArray(
+      get(knownGroupsProxy, 'allGroupsProxy').then(() => knownGroupsProxy)
+    );
   },
 
   /**
@@ -397,5 +414,87 @@ export default Service.extend({
    */
   reloadSpaceList(entityId) {
     return this.reloadRecordList(entityId, 'spaceList');
+  },
+});
+
+const AllKnownGroupsProxyArray = ArrayProxy.extend({
+  /**
+   * @type {Service}
+   * @virtual
+   */
+  recordManager: undefined,
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Models.Group>>}
+   */
+  allGroupsProxy: promise.array(computed(
+    'groupsProxy',
+    'groupsGroupsListsProxy.[]',
+    'spacesGroupsListsProxy.[]',
+    function allGroupsProxy() {
+      const {
+        groupsProxy,
+        groupsGroupsListsProxy,
+        spacesGroupsListsProxy,
+      } = this.getProperties(
+        'groupsProxy',
+        'groupsGroupsListsProxy',
+        'spacesGroupsListsProxy'
+      );
+      const groupsArray = [];
+      return allFulfilled([
+        groupsProxy,
+        groupsGroupsListsProxy,
+        spacesGroupsListsProxy,
+      ]).then(([
+        userGroups,
+        groupsGroupsLists,
+        spacesGroupsLists,
+      ]) => {
+        groupsArray.push(...userGroups.toArray());
+        groupsGroupsLists
+          .concat(spacesGroupsLists)
+          .forEach(groupsList =>
+            groupsArray.push(...groupsList.toArray())
+          );
+        return groupsArray.uniqBy('entityId');
+      });
+    }
+  )),
+
+  allGroupsProxyObserver: observer(
+    'allGroupsProxy.[]',
+    function allGroupsProxyObserver() {
+      const {
+        isFulfilled,
+        content,
+      } = getProperties(this.get('allGroupsProxy'), 'isFulfilled', 'content');
+
+      if (isFulfilled) {
+        this.set('content', content);
+      }
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+
+    const toSet = {};
+    ['group', 'space'].forEach(modelName => {
+      toSet[`${modelName}sProxy`] = promise.array(computed(function proxy() {
+        return this.get('recordManager').getUserRecordList(modelName)
+          .then(recordList => get(recordList, 'list'));
+      }));
+      toSet[`${modelName}sGroupsListsProxy`] = computed(
+        `${modelName}sProxy.@each.isReloading`,
+        function computedLists() {
+          return this.get(`${modelName}sProxy`)
+            .then(parents => onlyFulfilledValues(parents.mapBy('effGroupList')))
+            .then(effLists => onlyFulfilledValues(effLists.mapBy('list')));
+        }
+      );
+    });
+
+    this.setProperties(toSet);
   },
 });

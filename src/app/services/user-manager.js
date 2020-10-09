@@ -10,10 +10,17 @@
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as userEntityType } from 'onezone-gui/models/user';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promise } from 'ember-awesome-macros';
+import { computed, get, getProperties, observer } from '@ember/object';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import { all as allFulfilled } from 'rsvp';
+import ArrayProxy from '@ember/array/proxy';
 
 export default Service.extend({
   onedataGraph: service(),
   store: service(),
+  recordManager: service(),
 
   /**
    * Changes user password
@@ -70,5 +77,91 @@ export default Service.extend({
    */
   remove(user) {
     return user.destroyRecord();
+  },
+
+  /**
+   * @returns {PromiseArray<Models.User>}
+   */
+  getAllKnownUsers() {
+    const knownUsersProxy = AllKnownUsersProxyArray.create({
+      recordManager: this.get('recordManager'),
+    });
+    return promiseArray(
+      get(knownUsersProxy, 'allUsersProxy').then(() => knownUsersProxy)
+    );
+  },
+});
+
+const AllKnownUsersProxyArray = ArrayProxy.extend({
+  /**
+   * @type {Service}
+   * @virtual
+   */
+  recordManager: undefined,
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Models.User>>}
+   */
+  allUsersProxy: promise.array(computed(
+    'groupsUsersListsProxy.[]',
+    'spacesUsersListsProxy.[]',
+    function usersProxy() {
+      const {
+        recordManager,
+        groupsUsersListsProxy,
+        spacesUsersListsProxy,
+      } = this.getProperties(
+        'recordManager',
+        'groupsUsersListsProxy',
+        'spacesUsersListsProxy'
+      );
+      const usersArray = [];
+      return allFulfilled([
+        groupsUsersListsProxy,
+        spacesUsersListsProxy,
+      ]).then(([
+        groupsUserLists,
+        spacesUsersListsProxy,
+      ]) => {
+        usersArray.push(recordManager.getCurrentUserRecord());
+        groupsUserLists.concat(spacesUsersListsProxy).forEach(usersList =>
+          usersArray.push(...usersList.toArray())
+        );
+        return usersArray.uniqBy('entityId');
+      });
+    }
+  )),
+
+  allUsersProxyObserver: observer('allUsersProxy.[]', function allUsersProxyObserver() {
+    const {
+      isFulfilled,
+      content,
+    } = getProperties(this.get('allUsersProxy'), 'isFulfilled', 'content');
+
+    if (isFulfilled) {
+      this.set('content', content);
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+
+    const toSet = {};
+    ['group', 'space'].forEach(modelName => {
+      toSet[`${modelName}sProxy`] = promise.array(computed(function proxy() {
+        return this.get('recordManager').getUserRecordList(modelName)
+          .then(recordList => get(recordList, 'list'));
+      }));
+      toSet[`${modelName}sUsersListsProxy`] = computed(
+        `${modelName}sProxy.@each.isReloading`,
+        function computedLists() {
+          return this.get(`${modelName}sProxy`)
+            .then(parents => onlyFulfilledValues(parents.mapBy('effUserList')))
+            .then(effLists => onlyFulfilledValues(effLists.mapBy('list')));
+        }
+      );
+    });
+
+    this.setProperties(toSet);
   },
 });
