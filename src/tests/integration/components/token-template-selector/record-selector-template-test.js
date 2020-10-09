@@ -72,7 +72,7 @@ describe(
 
       await click('.one-tile');
       const $link = getSlide(this, 'selector').find('.template-back');
-      expect($link.text().trim()).to.equal('Back');
+      expect($link.text().trim()).to.equal('« Back');
 
       await click($link[0]);
       expect(isSlideActive(this, 'intro')).to.be.true;
@@ -143,14 +143,19 @@ describe(
 
     it('shows records', async function () {
       this.set('fetchRecords', () => resolve([{
+        constructor: {
+          modelName: 'provider',
+        },
         name: 'p1',
       }, {
+        constructor: {
+          modelName: 'provider',
+        },
         name: 'p2',
       }]));
 
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecords
-        modelIcon="provider"
       }}`);
 
       await click('.one-tile');
@@ -220,7 +225,7 @@ describe(
 
       await click('.one-tile');
       const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.records-filter')[0], '2');
+      await fillIn($selectorSlide.find('.search-bar')[0], '2');
       const $records = $selectorSlide.find('.record-item');
       expect($records).to.have.length(1);
       expect($records.text().trim()).to.equal('p2');
@@ -246,7 +251,7 @@ describe(
 
       await click('.one-tile');
       const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.records-filter')[0], '2');
+      await fillIn($selectorSlide.find('.search-bar')[0], '2');
       const $records = $selectorSlide.find('.record-item');
       expect($records).to.have.length(1);
       expect($records.text().trim()).to.equal('p1');
@@ -265,7 +270,7 @@ describe(
 
       await click('.one-tile');
       const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.records-filter')[0], '3');
+      await fillIn($selectorSlide.find('.search-bar')[0], '3');
       expect($selectorSlide.find('.record-item')).to.have.length(0);
       expect($selectorSlide.find('.no-records-after-filter-info').text().trim())
         .to.equal('No results match your filter.');
@@ -292,7 +297,7 @@ describe(
 
       await click('.one-tile');
       const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.records-filter')[0], '3');
+      await fillIn($selectorSlide.find('.search-bar')[0], '3');
       set(records[0], 'otherName', 'o3');
       await wait();
       const $records = $selectorSlide.find('.record-item');

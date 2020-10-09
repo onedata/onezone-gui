@@ -1,0 +1,85 @@
+.token-template-selector {
+  .one-carousel {
+    position: absolute;
+    @include fill-container();
+  }
+
+  [data-one-carousel-slide-id='selector'] {
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      order: 2;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      order: 0;
+      margin-bottom: $padding-base-vertical;
+    }
+
+    .search-bar {
+      width: 13em;
+    }
+
+    .scroll-top-shadow {
+      order: 1;
+    }
+
+    .records-info {
+      align-self: center;
+    }
+  }
+
+  .records-container {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+
+    &:not(.on-top) {
+      ~ .scroll-top-shadow {
+        position: relative;
+        @include before-bottom-shadow();
+      }
+    }
+
+    &:not(.on-bottom) {
+      ~ .scroll-bottom-shadow {
+        position: relative;
+        @include before-top-shadow();
+      }
+    }
+  }
+
+  .records-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    min-width: 0;
+
+    .record-item {
+      padding: $padding-small-vertical * 1.5 $padding-xs-horizontal;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid $main-border-color;
+      font-size: 90%;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      &:hover {
+        background-color: $main-content-hover-background;
+      }
+    }
+
+    .record-icon {
+      margin-right: $padding-xs-horizontal;
+      line-height: 0;
+      font-size: 1.7em;
+    }
+  }
+}

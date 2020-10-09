@@ -18,9 +18,15 @@ describe(
 
     beforeEach(function () {
       const oneproviders = [{
+        constructor: {
+          modelName: 'provider',
+        },
         name: 'p1',
         entityId: 'p1id',
       }, {
+        constructor: {
+          modelName: 'provider',
+        },
         name: 'p2',
         entityId: 'p2id',
       }];

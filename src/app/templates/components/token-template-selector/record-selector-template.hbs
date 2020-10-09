@@ -9,35 +9,44 @@
       </figure>
     {{/carousel.slide}}
     {{#carousel.slide slideId="selector"}}
-      <a class="template-back" onClick={{action "onTemplateBackClick"}}>
-        {{t (concat i18nGenericPrefix "back")}}
-      </a>
-      <input
-        class="records-filter"
-        value={{filter}}
-        oninput={{action (mut filter) value="target.value"}}
-      >
+      <div class="top-bar">
+        <a class="template-back" onClick={{action "onTemplateBackClick"}}>
+          &laquo; {{t (concat i18nGenericPrefix "back")}}
+        </a>
+        {{#if recordsProxy.length}}
+          <div class="form-group-light">
+            <div class="input-group input-group-sm with-icon-addon">
+              {{search-bar search=(action (mut filter)) class="form-control"}}
+              <div class="input-group-addon">
+                {{one-icon icon="search"}}
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      </div>
       {{#render-later triggerRender=(eq activeSlideId "selector")}}
-        <div class="records-container">
+        {{#perfect-scrollbar-element class="records-container"}}
           {{#promise-proxy-container proxy=recordsProxy}}
             {{#if filteredRecords.length}}
               <ul class="records-list">
                 {{#each filteredRecords as |record|}}
                   <li class="record-item" {{action "onRecordSelected" record}}>
-                    {{one-icon icon=modelIcon}}
+                    {{record-icon record=record}}
                     {{#truncated-string}}{{record-name record=record}}{{/truncated-string}}
                   </li>
                 {{/each}}
               </ul>
             {{else if recordsProxy.length}}
-              <p class="no-records-after-filter-info">
+              <p class="records-info no-records-after-filter-info">
                 {{t (concat i18nGenericPrefix "noRecordsAfterInfo")}}
               </p>
             {{else}}
-              <p class="no-records-info">{{tt this "noRecordsInfo"}}</p>
+              <p class="records-info no-records-info">{{tt this "noRecordsInfo"}}</p>
             {{/if}}
           {{/promise-proxy-container}}
-        </div>
+        {{/perfect-scrollbar-element}}
+        <div class="scroll-top-shadow"></div>
+        <div class="scroll-bottom-shadow"></div>
       {{/render-later}}
     {{/carousel.slide}}
   {{/one-carousel}}
