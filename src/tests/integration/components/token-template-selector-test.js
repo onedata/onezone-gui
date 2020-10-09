@@ -14,6 +14,8 @@ const templates = [{
 }, {
   name: 'readonlyData',
 }, {
+  name: 'restrictedData',
+}, {
   name: 'custom',
 }];
 

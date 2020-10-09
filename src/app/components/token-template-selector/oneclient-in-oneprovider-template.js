@@ -17,7 +17,7 @@ export default Component.extend({
   onSelected: notImplementedIgnore,
 
   /**
-   * @type {CommputedProperty<Function>}
+   * @type {ComputedProperty<Function>}
    * @returns {Promise<Array<Models.Provider>>}
    */
   fetchOneprovidersCallback: computed(function fetchOneprovidersCallback() {
@@ -34,7 +34,7 @@ export default Component.extend({
 
   actions: {
     onRecordSelected(oneprovider) {
-      this.get('onSelected')('oneclient-in-oneprovider', {
+      this.get('onSelected')('oneclientInOneprovider', {
         caveats: [{
           type: 'interface',
           interface: 'oneclient',

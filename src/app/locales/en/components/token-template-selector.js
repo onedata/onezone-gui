@@ -20,6 +20,10 @@ export default {
     readonlyData: {
       title: 'Read only data access',
     },
+    restrictedData: {
+      title: 'Restricted data access',
+      noRecordsInfo: 'You have no spaces.',
+    },
     custom: {
       title: 'Custom',
     },

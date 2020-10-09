@@ -83,7 +83,7 @@ describe(
       await click('.one-tile');
       await click('.record-item:first-child');
       expect(selectedSpy)
-        .to.be.calledOnce.and.to.be.calledWith('oneclient-in-oneprovider', sinon.match({
+        .to.be.calledOnce.and.to.be.calledWith('oneclientInOneprovider', sinon.match({
           caveats: [
             sinon.match({
               type: 'interface',

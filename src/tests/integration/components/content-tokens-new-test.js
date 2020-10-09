@@ -17,6 +17,13 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   beforeEach(function () {
+    const spaces = [{
+      name: 'space0',
+      entityId: 'space0',
+    }, {
+      name: 'space1',
+      entityId: 'space1',
+    }];
     const oneproviders = [{
       name: 'provider0',
       entityId: 'provider0',
@@ -34,6 +41,11 @@ describe('Integration | Component | content tokens new', function () {
     const recordManager = lookupService(this, 'record-manager');
     sinon.stub(recordManager, 'getCurrentUserRecord').resolves({ entityId: 'user1' });
     sinon.stub(recordManager, 'getUserRecordList')
+      .withArgs('space').resolves({
+        list: PromiseArray.create({
+          promise: resolve(spaces),
+        }),
+      })
       .withArgs('provider').resolves({
         list: PromiseArray.create({
           promise: resolve(oneproviders),
@@ -50,6 +62,7 @@ describe('Integration | Component | content tokens new', function () {
         }),
       });
     sinon.stub(recordManager, 'getRecordById')
+      .withArgs('space', 'space0').resolves(spaces[0])
       .withArgs('provider', 'provider0').resolves(oneproviders[0]);
     const harvester1Gri = gri({
       entityType: 'harvester',
@@ -222,6 +235,18 @@ describe('Integration | Component | content tokens new', function () {
     await click('.template-readonlyData');
     expect(isFormSlideActive(this)).to.be.true;
     expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
+  });
+
+  it('allows to select "Restricted data" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-restrictedData');
+    await click('.record-item:first-child');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $pathEntries = this.$('.pathEntry-field');
+    expect($pathEntries).to.have.length(1);
+    expect($pathEntries.find('.pathSpace-field').text()).to.contain('space0');
+    expect($pathEntries.find('.pathString-field input')).to.have.value('/');
   });
 
   it('allows to select "Custom" template', async function () {

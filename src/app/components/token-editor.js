@@ -1217,40 +1217,56 @@ export default Component.extend(I18n, {
       oneiconAlias: service(),
       component,
       valueFromToken: reads('component.tokenDataSource.caveats.path'),
-      spacesProxy: computed(
+      spacesProxyIsForMode: undefined,
+      spacesProxy: undefined,
+      spacesProxySetter: observer(
         'isCaveatEnabled',
         'isInViewMode',
         'valueFromToken',
-        function spacesProxy() {
+        function spacesProxySetter() {
           const {
             isCaveatEnabled,
             isInViewMode,
             valueFromToken,
+            spacesProxy,
+            spacesProxyIsForMode,
           } = this.getProperties(
             'isCaveatEnabled',
             'isInViewMode',
-            'valueFromToken'
+            'valueFromToken',
+            'spacesProxy',
+            'spacesProxyIsForMode'
           );
           const oneiconAlias = this.get('component.oneiconAlias');
           if (isCaveatEnabled) {
             if (isInViewMode) {
-              return PromiseArray.create({
-                promise: resolve(Object.keys(valueFromToken).without('__fieldsValueNames')
-                  .map(key => {
-                    const record = get(valueFromToken, `${key}.pathSpace`);
-                    return {
-                      value: record,
-                      label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
-                      icon: oneiconAlias.getName('space'),
-                    };
-                  })),
+              this.setProperties({
+                spacesProxy: PromiseArray.create({
+                  promise: resolve(Object.keys(valueFromToken).without('__fieldsValueNames')
+                    .map(key => {
+                      const record = get(valueFromToken, `${key}.pathSpace`);
+                      return {
+                        value: record,
+                        label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
+                        icon: oneiconAlias.getName('space'),
+                      };
+                    })),
+                }),
+                spacesProxyIsForMode: 'view',
               });
-            } else {
-              return component.getRecordOptionsForModel('space');
+            } else if (!spacesProxy || spacesProxyIsForMode === 'view') {
+              this.setProperties({
+                spacesProxy: component.getRecordOptionsForModel('space'),
+                spacesProxyIsForMode: 'edit',
+              });
             }
           }
         }
       ),
+      init() {
+        this._super(...arguments);
+        this.spacesProxySetter();
+      },
     }).create(generateCaveatFormGroupBody('path', [
       SiblingLoadingField.extend({
         loadingProxy: reads('parent.spacesProxy'),
