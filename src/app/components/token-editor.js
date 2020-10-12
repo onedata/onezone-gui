@@ -185,13 +185,6 @@ function createWhiteBlackListDropdown(fieldName) {
   });
 }
 
-const initToken = {
-  caveats: [{
-    type: 'service',
-    whitelist: ['opw-*'],
-  }],
-};
-
 export default Component.extend(I18n, {
   classNames: ['token-editor'],
   classNameBindings: ['modeClass'],
@@ -225,15 +218,7 @@ export default Component.extend(I18n, {
    * @virtual optional
    * @type {Models.Token}
    */
-  token: initToken,
-
-  /**
-   * If true, then form will have expanded caveats at first render. When not specified,
-   * then caveats section will be expanded according to the initial form values.
-   * @virtual optional
-   * @type {boolean}
-   */
-  expandCaveats: undefined,
+  token: Object.freeze({}),
 
   /**
    * @type {Function}
@@ -698,7 +683,6 @@ export default Component.extend(I18n, {
       serviceCaveatGroup,
       interfaceCaveatGroup,
       dataAccessCaveatsGroup,
-      expandCaveats,
     } = this.getProperties(
       'expireCaveatGroup',
       'regionCaveatGroup',
@@ -709,12 +693,10 @@ export default Component.extend(I18n, {
       'serviceCaveatGroup',
       'interfaceCaveatGroup',
       'dataAccessCaveatsGroup',
-      'expandCaveats'
     );
 
     return FormFieldsGroup.create({
       name: 'caveats',
-      isExpanded: expandCaveats,
       fields: [
         expireCaveatGroup,
         regionCaveatGroup,
@@ -1386,9 +1368,6 @@ export default Component.extend(I18n, {
     this.get('tokenDataSource').then(() => safeExec(this, () => {
       this.modeObserver();
       this.autoNameGenerator();
-      if (this.get('expandCaveats') === undefined) {
-        this.expandCaveatsDependingOnCaveatsExistence();
-      }
     }));
   },
 

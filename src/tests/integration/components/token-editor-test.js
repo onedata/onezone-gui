@@ -143,8 +143,6 @@ const caveats = [{
   label: 'Service',
   disabledDescription: 'This token can be used to interact with any service.',
   tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request - e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
-  isEnabledByDefault: true,
-  dontTestValue: true,
 }, {
   name: 'readonly',
   label: 'Read only',
@@ -767,9 +765,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `renders unchecked toggle, label, tip and disabled description for ${name} caveat${isEnabledByDefault ? '' : ' on init'}`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+        this.render(hbs `{{token-editor mode="create"}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => (isEnabledByDefault ? toggleCaveat(name) : resolve()))
           .then(() => {
             const $disabledDescription = this.$(`.${name}DisabledText-field`);
@@ -787,9 +786,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `has valid and ${isEnabledByDefault ? 'enabled' : 'disabled'} ${name} caveat on init`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => {
             expectToBeValid(this, name);
             if (!dontTestValue) {
@@ -805,9 +805,10 @@ describe('Integration | Component | token editor', function () {
       it(
         `hides disabled description and shows form field on ${name} caveat toggle change`,
         function () {
-          this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+          this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
           return wait()
+            .then(() => expandCaveatsSection())
             .then(() => toggleCaveat(name))
             .then(() => {
               expectCaveatToggleState(this, name, true);
@@ -831,9 +832,10 @@ describe('Integration | Component | token editor', function () {
       const tomorrow = moment().add(1, 'day').endOf('day');
       const dayAfterTomorrow = moment(tomorrow).add(1, 'day');
 
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('expire'))
         .then(() => {
           expectCaveatToHaveValue(this, 'expire', true, sinon.match(value =>
@@ -847,10 +849,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about expire caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       let oldExpire;
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('expire'))
         .then(() => {
           oldExpire =
@@ -869,9 +872,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders interface caveat form elements when that caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('interface'))
         .then(() => {
           const $restOption = this.$('.option-rest');
@@ -890,9 +894,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about interface caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('interface'))
         .then(() => click('.option-oneclient'))
         .then(() => {
@@ -914,9 +919,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `renders empty, invalid ${caveatName} caveat when it is enabled`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat(caveatName))
           .then(() => {
             expectCaveatToHaveValue(this, caveatName, true, sinon.match([]));
@@ -929,9 +935,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about asn caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('asn'))
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', '123,2,123,'))
@@ -945,9 +952,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid asn',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('asn'))
         .then(() => click('.asn-field .tags-input'))
         .then(() => fillIn('.asn-field .text-editor-input', 'abc,'))
@@ -961,9 +969,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about ip caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn(
@@ -985,9 +994,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid ip',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('ip'))
         .then(() => click('.ip-field .tags-input'))
         .then(() => fillIn('.ip-field .text-editor-input', '123.123.123.123/33,'))
@@ -1001,9 +1011,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid region caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('region'))
         .then(() => {
           expectCaveatToHaveValue(this, 'region', true,
@@ -1019,9 +1030,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about region caveat change to ["${value}"]`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat('region'))
           .then(() => click('.region-field .tags-input'))
           .then(() => click(
@@ -1039,10 +1051,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about region caveat type change to "deny"',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       let regionTypeHelper;
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('region'))
         .then(() => {
           regionTypeHelper = new RegionTypeHelper();
@@ -1060,9 +1073,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'sorts tags in region caveat input',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('region'))
         .then(() => click('.region-field .tags-input'))
         .then(() => click(
@@ -1086,9 +1100,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid country caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('country'))
         .then(() => {
           expectCaveatToHaveValue(this, 'country', true,
@@ -1108,9 +1123,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('country'))
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'pl,cz,pl,DK,dk,'))
@@ -1125,9 +1141,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'not allows to input invalid country',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('country'))
         .then(() => click('.country-field .tags-input'))
         .then(() => fillIn('.country-field .text-editor-input', 'a1,usa,b,a_,'))
@@ -1142,10 +1159,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about country caveat type change to "deny"',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       let countryTypeHelper;
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('country'))
         .then(() => {
           countryTypeHelper = new CountryTypeHelper();
@@ -1163,9 +1181,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, invalid consumer caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('consumer'))
         .then(() => {
           expectCaveatToHaveValue(this, 'consumer', true, []);
@@ -1212,10 +1231,11 @@ describe('Integration | Component | token editor', function () {
     it(
       `shows ${model} list in consumer caveat`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+        this.render(hbs `{{token-editor mode="create"}}`);
 
         let typeSelectorHelper;
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat('consumer'))
           .then(() => click('.consumer-field .tags-input'))
           .then(() => {
@@ -1235,9 +1255,10 @@ describe('Integration | Component | token editor', function () {
   });
 
   it('notifies about adding new consumer in consumer caveat', function () {
-    this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+    this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
     return wait()
+      .then(() => expandCaveatsSection())
       .then(() => toggleCaveat('consumer'))
       .then(() => click('.consumer-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[0]))
@@ -1258,9 +1279,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in consumer caveat`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+        this.render(hbs `{{token-editor mode="create"}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat('consumer'))
           .then(() => click('.consumer-field .tags-input'))
           .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
@@ -1280,9 +1302,10 @@ describe('Integration | Component | token editor', function () {
   });
 
   it('sorts selected tags in consumer caveat', function () {
-    this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+    this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
     return wait()
+      .then(() => expandCaveatsSection())
       .then(() => toggleCaveat('consumer'))
       .then(() => click('.consumer-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
@@ -1295,34 +1318,14 @@ describe('Integration | Component | token editor', function () {
   });
 
   it(
-    'renders valid service caveat with "Any Oneprovider" preselected on init',
-    function () {
-      this.render(hbs `
-        {{token-editor mode="create" expandCaveats=true onChange=(action "change")}}
-      `);
-
-      return wait()
-        .then(() => {
-          expectCaveatToHaveValue(this, 'service', true, sinon.match([
-            sinon.match({
-              record: sinon.match({ representsAll: 'service' }),
-              model: 'service',
-            }),
-          ]));
-          expectToBeValid(this, 'service');
-        });
-    }
-  );
-
-  it(
     'shows service list in service caveat',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       let typeSelectorHelper;
       return wait()
-        // Remove tag to clean default
-        .then(() => click('.service-field .tags-input .tag-remove'))
+        .then(() => expandCaveatsSection())
+        .then(() => toggleCaveat('service'))
         .then(() => click('.service-field .tags-input'))
         .then(() => {
           typeSelectorHelper = new TagsSelectorDropdownHelper();
@@ -1342,12 +1345,12 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service onepanel list in service caveat',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       let typeSelectorHelper;
-      // Remove tag to clean default
       return wait()
-        .then(() => click('.service-field .tags-input .tag-remove'))
+        .then(() => expandCaveatsSection())
+        .then(() => toggleCaveat('service'))
         .then(() => click('.service-field .tags-input'))
         .then(() => {
           typeSelectorHelper = new TagsSelectorDropdownHelper();
@@ -1365,11 +1368,11 @@ describe('Integration | Component | token editor', function () {
   );
 
   it('notifies about adding new service in service caveat', function () {
-    this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+    this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
     return wait()
-      // Remove tag to clean default
-      .then(() => click('.service-field .tags-input .tag-remove'))
+      .then(() => expandCaveatsSection())
+      .then(() => toggleCaveat('service'))
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
       .then(() => {
@@ -1388,11 +1391,11 @@ describe('Integration | Component | token editor', function () {
     it(
       `removes concrete ${typeName} tags when "all" ${typeName} tag has been selected in service caveat`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+        this.render(hbs `{{token-editor mode="create"}}`);
 
         return wait()
-          // Remove tag to clean default
-          .then(() => click('.service-field .tags-input .tag-remove'))
+          .then(() => expandCaveatsSection())
+          .then(() => toggleCaveat('service'))
           .then(() => click('.service-field .tags-input'))
           .then(() => new TagsSelectorDropdownHelper().selectOption(index + 1))
           .then(() => click(getTagsSelector().find('.record-item:contains("0")')[0]))
@@ -1411,11 +1414,11 @@ describe('Integration | Component | token editor', function () {
   });
 
   it('sorts selected tags in service caveat', function () {
-    this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+    this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
     return wait()
-      // Remove tag to clean default
-      .then(() => click('.service-field .tags-input .tag-remove'))
+      .then(() => expandCaveatsSection())
+      .then(() => toggleCaveat('service'))
       .then(() => click('.service-field .tags-input'))
       .then(() => click(getTagsSelector().find('.record-item')[2]))
       .then(() => click(getTagsSelector().find('.record-item')[1]))
@@ -1429,9 +1432,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid path caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => {
           expectCaveatToHaveValue(this, 'path', true,
@@ -1444,9 +1448,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'preselects first available space and path "" with placeholder for new entry in path caveat',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
@@ -1470,10 +1475,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'allows to choose between available spaces in path caveat entry',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       let pathSpaceHelper;
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
@@ -1493,10 +1499,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about path caveat entry space change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       let pathSpaceHelper;
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => {
@@ -1525,9 +1532,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about correct path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat('path'))
           .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
           .then(() => fillIn(
@@ -1548,9 +1556,10 @@ describe('Integration | Component | token editor', function () {
     it(
       `notifies about incorrect path caveat string ${JSON.stringify(pathString)}`,
       function () {
-        this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+        this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
         return wait()
+          .then(() => expandCaveatsSection())
           .then(() => toggleCaveat('path'))
           .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
           .then(() => fillIn(
@@ -1565,9 +1574,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'hides enabled description when readonly caveat is disabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => expect(this.$('.readonlyEnabledText-field')).to.not.exist);
     }
   );
@@ -1575,9 +1585,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders readonly caveat form elements when that caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('readonly'))
         .then(() => {
           expect(this.$('.readonlyEnabledText-field').text().trim())
@@ -1591,9 +1602,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'renders empty, valid objectId caveat when it is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() => {
           expectCaveatToHaveValue(this, 'objectId', true,
@@ -1606,9 +1618,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'notifies about objectId caveat change',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
@@ -1625,9 +1638,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'informs about invalid (empty) objectId entry',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
@@ -1645,7 +1659,7 @@ describe('Integration | Component | token editor', function () {
         'objectId',
       ];
 
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
         .then(() => {
@@ -1663,10 +1677,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows access token caveats when token type is changed to access',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
         .then(() => click('.type-field .option-access'))
+        .then(() => expandCaveatsSection())
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
@@ -1678,10 +1693,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows indentity token caveats when token type is changed to identity',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
         .then(() => click('.type-field .option-identity'))
+        .then(() => expandCaveatsSection())
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
@@ -1693,10 +1709,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows invite token caveats when token type is changed to invite',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
         .then(() => click('.type-field .option-invite'))
+        .then(() => expandCaveatsSection())
         .then(() => {
           expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
           expect(this.$('.interfaceCaveat-collapse')).to.not.have.class('in');
@@ -1708,9 +1725,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'ignores validation errors in access only caveats when token type is not access',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onChange=(action "change")}}`);
+      this.render(hbs `{{token-editor mode="create" onChange=(action "change")}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() =>
           click(getFieldElement(this, 'objectId').find('.add-field-button')[0])
@@ -1727,19 +1745,20 @@ describe('Integration | Component | token editor', function () {
     }
   );
 
-  it('does not show service caveat warning in initial values configuration', function () {
+  it('shows service caveat warning in initial values configuration', function () {
     this.render(hbs `{{token-editor mode="create"}}`);
 
     return wait()
-      .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
+      .then(() => expect(this.$('.service-caveat-warning')).to.exist);
   });
 
   it(
-    'shows service caveat warning when service caveat is disabled',
+    'does not show service caveat warning when service caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('service'))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
     }
@@ -1748,10 +1767,9 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not show service caveat warning when service caveat is disabled and not available',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
         .then(() => click('.type-field .option-invite'))
         .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
     }
@@ -1760,9 +1778,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service caveat warning when service caveat has Onezone service selected',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
+        .then(() => expandCaveatsSection())
+        .then(() => toggleCaveat('service'))
         .then(() => click('.service-field .tags-input'))
         .then(() => click(getTagsSelector().find('.record-item:contains("onezone")')[0]))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
@@ -1772,10 +1792,11 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service caveat warning when service caveat is enabled, but empty',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => click('.service-field .tags-input .tag-remove'))
+        .then(() => expandCaveatsSection())
+        .then(() => toggleCaveat('service'))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
     }
   );
@@ -1783,10 +1804,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not show service caveat warning when service caveat is disabled and interface caveat is set to oneclient',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('interface'))
         .then(() => click('.interface-field .option-oneclient'))
         .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
@@ -1796,10 +1817,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service caveat warning when service caveat is disabled and interface caveat is set to REST',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('interface'))
         .then(() => click('.interface-field .option-rest'))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
@@ -1809,10 +1830,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not show service caveat warning when service caveat is disabled and readonly caveat is enabled',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('readonly'))
         .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
     }
@@ -1821,10 +1842,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service caveat warning when service caveat is disabled and path caveat is enabled without any path',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
     }
@@ -1833,10 +1854,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not show service caveat warning when service caveat is disabled and path caveat is enabled with one path included',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('path'))
         .then(() => click(getFieldElement(this, 'path').find('.add-field-button')[0]))
         .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
@@ -1846,10 +1867,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'shows service caveat warning when service caveat is disabled and objectId caveat is enabled without any object id',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() => expect(this.$('.service-caveat-warning')).to.exist);
     }
@@ -1858,10 +1879,10 @@ describe('Integration | Component | token editor', function () {
   it(
     'does not show service caveat warning when service caveat is disabled and objectId caveat is enabled with one object id included',
     function () {
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true}}`);
+      this.render(hbs `{{token-editor mode="create"}}`);
 
       return wait()
-        .then(() => toggleCaveat('service'))
+        .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('objectId'))
         .then(() => click(getFieldElement(this, 'objectId').find('.add-field-button')[0]))
         .then(() => expect(this.$('.service-caveat-warning')).to.not.exist);
@@ -1909,11 +1930,12 @@ describe('Integration | Component | token editor', function () {
     function () {
       const submitStub = sinon.stub().resolves();
       this.on('submit', submitStub);
-      this.render(hbs `{{token-editor mode="create" expandCaveats=true onSubmit=(action "submit")}}`);
+      this.render(hbs `{{token-editor mode="create" onSubmit=(action "submit")}}`);
 
       return wait()
         .then(() => fillIn('.name-field input', 'somename'))
         .then(() => click('.type-field .option-access'))
+        .then(() => expandCaveatsSection())
         // expire
         .then(() => toggleCaveat('expire'))
         // region
@@ -1943,7 +1965,7 @@ describe('Integration | Component | token editor', function () {
         .then(() => click('.consumer-field .tags-input'))
         .then(() => click(getTagsSelector().find('.record-item')[0]))
         // service
-        .then(() => click('.service-field .tags-input .tag-remove'))
+        .then(() => toggleCaveat('service'))
         .then(() => click('.service-field .tags-input'))
         .then(() => click(getTagsSelector().find('.record-item')[1]))
         // interface
@@ -2727,6 +2749,10 @@ function expectCaveatToggleState(testCase, caveatName, isChecked) {
 
 function toggleCaveat(caveatName) {
   return click(`.${caveatName}Enabled-field .one-way-toggle`);
+}
+
+function expandCaveatsSection() {
+  return click('.caveats-expand');
 }
 
 function getFieldElement(testCase, fieldName) {
