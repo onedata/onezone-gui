@@ -7,7 +7,7 @@
   }
 
   .caveat-group {
-    > .field-component > .fields-group-collapse {
+    > .field-component > .fields-group-collapse > .fields-group-children {
       display: flex;
 
       &.collapse:not(.in) {
@@ -39,10 +39,10 @@
     vertical-align: middle;
   }
 
-  .usageLimit-collapse.in,
-  .region-collapse.in,
-  .country-collapse.in,
-  .pathEntry-collapse.in {
+  .usageLimit-children,
+  .region-children,
+  .country-children,
+  .pathEntry-children {
     display: flex;
   }
 
@@ -142,7 +142,7 @@
       width: initial;
     }
     
-    &.pathEntry-field .pathEntry-collapse.in {
+    &.pathEntry-field .pathEntry-children {
       align-items: flex-start;
     }
 
@@ -293,7 +293,7 @@
         padding-top: 0;
       }
 
-      > .field-component > .fields-group-collapse {
+      > .field-component > .fields-group-collapse > .fields-group-children {
         flex-wrap: wrap;
       }
     }

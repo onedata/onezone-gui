@@ -5,7 +5,7 @@
       <h1
         class={{concat-classes
           "toggle-expand caveats-expand"
-          (if caveatsGroup.isExpanded "opened")
+          (if areAllCaveatsExpanded "opened")
           (if (not disableCaveatsCollapse) "clickable")
         }}
         onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
@@ -13,7 +13,7 @@
         {{tt this "fields.caveats.header"}}
         {{#if (not disableCaveatsCollapse)}}
           {{one-icon
-            icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
+            icon=(if areAllCaveatsExpanded "arrow-up" "arrow-down")
             class="toggle-icon"
           }}
         {{/if}}

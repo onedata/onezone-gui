@@ -135,11 +135,26 @@ const CaveatFormGroup = FormFieldsGroup.extend({
    * @type {any}
    */
   valueFromToken: undefined,
+
+  /**
+   * @type {Ember.Component}
+   */
+  component: undefined,
+
+  /**
+   * @type {Boolean}
+   */
+  isApplicable: true,
+
   classes: computed('isCaveatEnabled', function classes() {
     return 'caveat-group' + (this.get('isCaveatEnabled') ? ' is-enabled' : '');
   }),
   isVisible: or('isInEditMode', 'valueFromToken'),
   isCaveatEnabled: getBy(array.findBy('fields', raw('isGroupToggle')), raw('value')),
+  isExpanded: and(
+    or('isCaveatEnabled', 'component.areAllCaveatsExpanded'),
+    'isApplicable'
+  ),
 });
 
 const ModelTagsFieldPrototype = TagsField.extend({
@@ -245,6 +260,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isSubmitting: false,
+
+  /**
+   * @type {Boolean}
+   */
+  areAllCaveatsExpanded: false,
 
   /**
    * @type {booleal}
@@ -1018,7 +1038,7 @@ export default Component.extend(I18n, {
     const component = this;
     return CaveatFormGroup.extend({
       component,
-      isExpanded: equal('valuesSource.basic.type', raw('access')),
+      isApplicable: equal('valuesSource.basic.type', raw('access')),
       valueFromToken: reads('component.tokenDataSource.caveats.service'),
     }).create(generateCaveatFormGroupBody('service', [
       ModelTagsFieldPrototype.extend({
@@ -1056,7 +1076,7 @@ export default Component.extend(I18n, {
     const component = this;
     return CaveatFormGroup.extend({
       component,
-      isExpanded: not(equal('valuesSource.basic.type', raw('invite'))),
+      isApplicable: not(equal('valuesSource.basic.type', raw('invite'))),
       valueFromToken: reads('component.tokenDataSource.caveats.interface'),
     }).create(generateCaveatFormGroupBody('interface', [
       RadioField.extend({
@@ -1313,7 +1333,6 @@ export default Component.extend(I18n, {
     if (['view', 'edit'].includes(mode)) {
       fields.changeMode('view');
       fields.reset();
-      this.expandCaveatsDependingOnCaveatsExistence();
     }
     if (mode === 'edit') {
       [
@@ -1334,7 +1353,6 @@ export default Component.extend(I18n, {
 
       if (get(tokenDataSource, 'isFulfilled') && mode !== 'edit') {
         fields.reset();
-        this.expandCaveatsDependingOnCaveatsExistence();
       }
     }
   ),
@@ -1374,10 +1392,6 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     this._super(...arguments);
     this.get('fields').destroy();
-  },
-
-  expandCaveatsDependingOnCaveatsExistence() {
-    this.set('caveatsGroup.isExpanded', this.get('isAnyVisibleCaveatEnabled'));
   },
 
   notifyAboutChange() {
@@ -1475,7 +1489,7 @@ export default Component.extend(I18n, {
 
   actions: {
     toggleCaveatsGroup() {
-      this.toggleProperty('caveatsGroup.isExpanded');
+      this.toggleProperty('areAllCaveatsExpanded');
     },
     submit() {
       const {
