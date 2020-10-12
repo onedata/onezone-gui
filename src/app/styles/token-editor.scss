@@ -83,8 +83,21 @@
     &.caveat-group-toggle {
       margin-bottom: 0;
 
+      .control-label {
+        padding-top: 0.2em;
+      }
+
       .field-component {
         display: none;
+      }
+    }
+
+    &.expireCaveat-field,
+    &.interfaceCaveat-field,
+    &.readonlyCaveat-field,
+    &.objectIdCaveat-field {
+      .caveat-group-toggle .control-label {
+        padding-top: 0;
       }
     }
 
@@ -101,30 +114,6 @@
 
     &.inviteType-field.needs-target-model .text::after {
       content: ':';
-    }
-
-    &.regionCaveat-field,
-    &.countryCaveat-field,
-    &.asnCaveat-field,
-    &.ipCaveat-field,
-    &.consumerCaveat-field,
-    &.serviceCaveat-field {
-      .caveat-group-toggle .control-label {
-        padding-top: 0.2em;
-      }
-    }
-
-    &.regionCaveat-field,
-    &.asnCaveat-field,
-    &.consumerCaveat-field,
-    &.readonlyCaveat-field {
-      &:not(:first-child) {
-        padding-top: $form-component-view-margin;
-
-        &::before {
-          top: 0px;
-        }
-      }
     }
 
     &.regionType-field,
@@ -181,22 +170,37 @@
         flex-wrap: nowrap;
       }
     }
+
+    @media (max-width: $screen-xs-max) {
+      &.caveat-group-toggle {
+        .control-label {
+          padding-top: 0;
+        }
+      }
+    }
   }
 
-  .regionCaveat-field:not(:first-child),
-  .asnCaveat-field:not(:first-child),
-  .consumerCaveat-field:not(:first-child),
-  .dataAccessCaveats-field:not(:first-child) .readonlyCaveat-field {
+  .has-top-separator {
+    padding-top: $padding-base-vertical;
+
+    &.field-view-mode {
+      padding-top: $form-component-view-margin;
+
+      &::before {
+        top: 0;
+      }
+    }
+    
     &::before {
       content: '';
       display: block;
       position: absolute;
-      top: -5px;
+      top: -4px;
       width: 100%;
       border-top: 1px solid $main-border-color;
     }
   }
-
+  
   .path-field .collection-item:last-child .field-view-mode {
     margin: 0;
   }
@@ -242,33 +246,15 @@
       flex-basis: 300px;
     }
 
-    .field-edit-mode {
-      &.regionCaveat-field,
-      &.asnCaveat-field,
-      &.consumerCaveat-field,
-      &.readonlyCaveat-field {
-        .caveat-group-toggle,
-        .static-text-field {
-          padding-top: $padding-base-vertical;
-        }
+    .field-edit-mode.caveat-group.is-enabled {
+      .caveat-group-toggle {
+        padding-top: $padding-base-vertical;
       }
 
-      &.is-enabled {
-        &.regionCaveat-field,
-        &.asnCaveat-field,
-        &.consumerCaveat-field {
-          padding-top: $padding-base-vertical;
-        }
-
-        &.expireCaveat-field,
-        &.countryCaveat-field,
-        &.ipCaveat-field,
-        &.serviceCaveat-field,
-        &.pathCaveat-field,
-        &.objectIdCaveat-field {
-          .caveat-group-toggle {
-            padding-top: $padding-base-vertical;
-          }
+      &.interfaceCaveat-field,
+      &.readonlyCaveat-field {
+        .caveat-group-toggle {
+          padding-top: 0;
         }
       }
     }
@@ -300,13 +286,6 @@
 
     .pathSpace-field {
       width: 150px;
-    }
-
-    .regionCaveat-field,
-    .asnCaveat-field,
-    .consumerCaveat-field,
-    .readonlyCaveat-field {
-      padding-top: $padding-base-vertical;
     }
   }
 }

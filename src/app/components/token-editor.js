@@ -157,6 +157,18 @@ const CaveatFormGroup = FormFieldsGroup.extend({
   ),
 });
 
+const CaveatsSectionFormGroup = FormFieldsGroup.extend({
+  hasExpandedCaveats: and(
+    'isExpanded',
+    array.isAny('fields', raw('isExpanded'), raw(true))
+  ),
+  hasTopSeparator: and(
+    'hasExpandedCaveats',
+    not(equal('name', 'parent.firstGroupWithExpandedCaveatName'))
+  ),
+  classes: conditional('hasTopSeparator', raw('has-top-separator'), raw('')),
+});
+
 const ModelTagsFieldPrototype = TagsField.extend({
   tagEditorComponentName: 'tags-input/model-selector-editor',
   sort: true,
@@ -694,39 +706,112 @@ export default Component.extend(I18n, {
    */
   caveatsGroup: computed(function caveatsGroup() {
     const {
-      expireCaveatGroup,
-      regionCaveatGroup,
-      countryCaveatGroup,
-      asnCaveatGroup,
-      ipCaveatGroup,
-      consumerCaveatGroup,
-      serviceCaveatGroup,
-      interfaceCaveatGroup,
+      timeCaveatsGroup,
+      geoCaveatsGroup,
+      networkCaveatsGroup,
+      endpointCaveatsGroup,
       dataAccessCaveatsGroup,
     } = this.getProperties(
-      'expireCaveatGroup',
-      'regionCaveatGroup',
-      'countryCaveatGroup',
-      'asnCaveatGroup',
-      'ipCaveatGroup',
-      'consumerCaveatGroup',
-      'serviceCaveatGroup',
-      'interfaceCaveatGroup',
+      'timeCaveatsGroup',
+      'geoCaveatsGroup',
+      'networkCaveatsGroup',
+      'endpointCaveatsGroup',
       'dataAccessCaveatsGroup',
     );
 
-    return FormFieldsGroup.create({
+    return FormFieldsGroup.extend({
+      firstGroupWithExpandedCaveatName: getBy(
+        array.findBy('fields', raw('hasExpandedCaveats'), raw(true)),
+        raw('name')
+      ),
+    }).create({
       name: 'caveats',
       fields: [
-        expireCaveatGroup,
+        timeCaveatsGroup,
+        geoCaveatsGroup,
+        networkCaveatsGroup,
+        endpointCaveatsGroup,
+        dataAccessCaveatsGroup,
+      ],
+    });
+  }),
+
+  /**
+   * Aggregates all "time caveat"-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  timeCaveatsGroup: computed(function timeCaveatsGroup() {
+    return CaveatsSectionFormGroup.create({
+      name: 'timeCaveats',
+      fields: [this.get('expireCaveatGroup')],
+    });
+  }),
+
+  /**
+   * Aggregates all "geo caveat"-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  geoCaveatsGroup: computed(function geoCaveatsGroup() {
+    const {
+      regionCaveatGroup,
+      countryCaveatGroup,
+    } = this.getProperties(
+      'regionCaveatGroup',
+      'countryCaveatGroup',
+    );
+
+    return CaveatsSectionFormGroup.create({
+      name: 'geoCaveats',
+      fields: [
         regionCaveatGroup,
         countryCaveatGroup,
+      ],
+    });
+  }),
+
+  /**
+   * Aggregates all "network caveat"-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  networkCaveatsGroup: computed(function networkCaveatsGroup() {
+    const {
+      asnCaveatGroup,
+      ipCaveatGroup,
+    } = this.getProperties(
+      'asnCaveatGroup',
+      'ipCaveatGroup',
+    );
+
+    return CaveatsSectionFormGroup.create({
+      name: 'networkCaveats',
+      fields: [
         asnCaveatGroup,
         ipCaveatGroup,
+      ],
+    });
+  }),
+
+  /**
+   * Aggregates all "endpoint caveat"-related form elements
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  endpointCaveatsGroup: computed(function endpointCaveatsGroup() {
+    const {
+      consumerCaveatGroup,
+      serviceCaveatGroup,
+      interfaceCaveatGroup,
+    } = this.getProperties(
+      'consumerCaveatGroup',
+      'serviceCaveatGroup',
+      'interfaceCaveatGroup',
+    );
+
+    return CaveatsSectionFormGroup.create({
+      name: 'endpointCaveats',
+      fields: [
         consumerCaveatGroup,
         serviceCaveatGroup,
         interfaceCaveatGroup,
-        dataAccessCaveatsGroup,
       ],
     });
   }),
@@ -746,7 +831,7 @@ export default Component.extend(I18n, {
       'objectIdCaveatGroup',
     );
 
-    return FormFieldsGroup.extend({
+    return CaveatsSectionFormGroup.extend({
       isExpanded: equal('valuesSource.basic.type', raw('access')),
     }).create({
       name: 'dataAccessCaveats',
@@ -1264,21 +1349,6 @@ export default Component.extend(I18n, {
       }),
     ]));
   }),
-
-  /**
-   * @type {ComputedProperty<boolean>}
-   */
-  isAnyVisibleCaveatEnabled: or(
-    and(notEqual('mode', raw('create')), 'tokenDataSource.hasCaveats'),
-    array.isAny(
-      array.filterBy('caveatsGroup.fields', raw('isExpanded')),
-      raw('isCaveatEnabled')
-    ),
-    and(
-      'dataAccessCaveatsGroup.isExpanded',
-      array.isAny('dataAccessCaveatsGroup.fields', raw('isCaveatEnabled'))
-    )
-  ),
 
   /**
    * @type {ComputedProperty<String>}

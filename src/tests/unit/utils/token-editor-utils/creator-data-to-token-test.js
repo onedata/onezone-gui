@@ -305,43 +305,48 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
           basic: {
             type,
           },
-          caveats: Object.assign(
-            generateCaveatEntry('expire', false, new Date()),
-            generateCaveatEntry('asn', false, [23]),
-            generateCaveatEntry('ip', false, ['1.1.1.1']),
-            generateCaveatEntry('region', false, {
-              regionType: 'whitelist',
-              regionList: ['Europe'],
-            }),
-            generateCaveatEntry('country', false, {
-              countryType: 'whitelist',
-              countryList: ['PL'],
-            }),
-            generateCaveatEntry('consumer', false, [{
-              model: 'user',
-              id: 'test',
-            }]),
-            generateCaveatEntry('service', false, [{
-              model: 'service',
-              id: 'test',
-            }]),
-            generateCaveatEntry('interface', false, 'rest'), {
-              dataAccessCaveats: Object.assign(
-                generateCaveatEntry('readonly', false),
-                generateCaveatEntry('path', false, {
-                  pathEntry0: {
-                    pathSpace: { entityId: 's1' },
-                    pathString: '/abc/def',
-                  },
-                  __fieldsValueNames: ['pathEntry0'],
-                }),
-                generateCaveatEntry('objectId', false, {
-                  objectIdEntry0: '1234567890',
-                  __fieldsValueNames: ['objectIdEntry0'],
-                }),
-              ),
-            }
-          ),
+          caveats: {
+            timeCaveats: generateCaveatEntry('expire', false, new Date()),
+            geoCaveats: Object.assign(
+              generateCaveatEntry('region', false, {
+                regionType: 'whitelist',
+                regionList: ['Europe'],
+              }),
+              generateCaveatEntry('country', false, {
+                countryType: 'whitelist',
+                countryList: ['PL'],
+              })
+            ),
+            networkCaveats: Object.assign(
+              generateCaveatEntry('asn', false, [23]),
+              generateCaveatEntry('ip', false, ['1.1.1.1'])
+            ),
+            endpointCaveats: Object.assign(
+              generateCaveatEntry('consumer', false, [{
+                model: 'user',
+                id: 'test',
+              }]),
+              generateCaveatEntry('service', false, [{
+                model: 'service',
+                id: 'test',
+              }]),
+              generateCaveatEntry('interface', false, 'rest')
+            ),
+            dataAccessCaveats: Object.assign(
+              generateCaveatEntry('readonly', false),
+              generateCaveatEntry('path', false, {
+                pathEntry0: {
+                  pathSpace: { entityId: 's1' },
+                  pathString: '/abc/def',
+                },
+                __fieldsValueNames: ['pathEntry0'],
+              }),
+              generateCaveatEntry('objectId', false, {
+                objectIdEntry0: '1234567890',
+                __fieldsValueNames: ['objectIdEntry0'],
+              })
+            ),
+          },
         });
         expect(result).to.not.have.property('caveats');
       }
@@ -354,31 +359,36 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
           basic: {
             type,
           },
-          caveats: Object.assign(
-            generateCaveatEntry('expire', true),
-            generateCaveatEntry('asn', true, []),
-            generateCaveatEntry('ip', true, []),
-            generateCaveatEntry('region', true, {
-              regionType: undefined,
-              regionList: [],
-            }),
-            generateCaveatEntry('country', true, {
-              countryType: undefined,
-              countryList: [],
-            }),
-            generateCaveatEntry('service', true, []),
-            generateCaveatEntry('consumer', true, []),
-            generateCaveatEntry('interface', true), {
-              dataAccessCaveats: Object.assign(
-                generateCaveatEntry('path', true, {
-                  __fieldsValueNames: [],
-                }),
-                generateCaveatEntry('objectId', true, {
-                  __fieldsValueNames: [],
-                }),
-              ),
-            }
-          ),
+          caveats: {
+            timeCaveats: generateCaveatEntry('expire', true),
+            geoCaveats: Object.assign(
+              generateCaveatEntry('region', true, {
+                regionType: undefined,
+                regionList: [],
+              }),
+              generateCaveatEntry('country', true, {
+                countryType: undefined,
+                countryList: [],
+              })
+            ),
+            networkCaveats: Object.assign(
+              generateCaveatEntry('asn', true, []),
+              generateCaveatEntry('ip', true, [])
+            ),
+            endpointCaveats: Object.assign(
+              generateCaveatEntry('service', true, []),
+              generateCaveatEntry('consumer', true, []),
+              generateCaveatEntry('interface', true)
+            ),
+            dataAccessCaveats: Object.assign(
+              generateCaveatEntry('path', true, {
+                __fieldsValueNames: [],
+              }),
+              generateCaveatEntry('objectId', true, {
+                __fieldsValueNames: [],
+              }),
+            ),
+          },
         });
         expect(result).to.not.have.property('caveats');
       }
@@ -389,7 +399,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
     const expireDate = new Date();
     const expireTimestamp = Math.floor(expireDate.valueOf() / 1000);
     const result = creatorDataToToken({
-      caveats: generateCaveatEntry('expire', true, expireDate),
+      caveats: {
+        timeCaveats: generateCaveatEntry('expire', true, expireDate),
+      },
     });
 
     expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -405,7 +417,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
     it(`converts ${caveatName} caveat`, function () {
       const whitelist = ['A', 'B'];
       const result = creatorDataToToken({
-        caveats: generateCaveatEntry(caveatName, true, whitelist),
+        caveats: {
+          networkCaveats: generateCaveatEntry(caveatName, true, whitelist),
+        },
       });
 
       expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -418,7 +432,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       `does not convert ${caveatName} caveat when whitelist is empty`,
       function () {
         const result = creatorDataToToken({
-          caveats: generateCaveatEntry(caveatName, true, []),
+          caveats: {
+            networkCaveats: generateCaveatEntry(caveatName, true, []),
+          },
         });
 
         expect(result).to.not.have.property('caveats');
@@ -437,10 +453,12 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       it(`converts ${caveatName} caveat with ${type}`, function () {
         const list = ['A', 'B'];
         const result = creatorDataToToken({
-          caveats: generateCaveatEntry(caveatName, true, {
-            [`${caveatName}Type`]: type,
-            [`${caveatName}List`]: list,
-          }),
+          caveats: {
+            geoCaveats: generateCaveatEntry(caveatName, true, {
+              [`${caveatName}Type`]: type,
+              [`${caveatName}List`]: list,
+            }),
+          },
         });
 
         expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -454,10 +472,12 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
         `does not convert ${caveatName} caveat with ${type} when countries list is empty`,
         function () {
           const result = creatorDataToToken({
-            caveats: generateCaveatEntry(caveatName, true, {
-              [`${caveatName}Type`]: type,
-              [`${caveatName}List`]: [],
-            }),
+            caveats: {
+              geoCaveats: generateCaveatEntry(caveatName, true, {
+                [`${caveatName}Type`]: type,
+                [`${caveatName}List`]: [],
+              }),
+            },
           });
 
           expect(result).to.not.have.property('caveats');
@@ -469,10 +489,12 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       `does not convert ${caveatName} caveat when filter type is not provided`,
       function () {
         const result = creatorDataToToken({
-          caveats: generateCaveatEntry(caveatName, true, {
-            [`${caveatName}Type`]: undefined,
-            [`${caveatName}List`]: ['A'],
-          }),
+          caveats: {
+            geoCaveats: generateCaveatEntry(caveatName, true, {
+              [`${caveatName}Type`]: undefined,
+              [`${caveatName}List`]: ['A'],
+            }),
+          },
         });
 
         expect(result).to.not.have.property('caveats');
@@ -498,7 +520,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       }]))
     );
     const result = creatorDataToToken({
-      caveats: generateCaveatEntry('consumer', true, selectedValues),
+      caveats: {
+        endpointCaveats: generateCaveatEntry('consumer', true, selectedValues),
+      },
     });
 
     expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -526,10 +550,12 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
         basic: {
           type,
         },
-        caveats: generateCaveatEntry('service', true, [{
-          model: 'service',
-          id: 'test',
-        }]),
+        caveats: {
+          endpointCaveats: generateCaveatEntry('service', true, [{
+            model: 'service',
+            id: 'test',
+          }]),
+        },
       });
 
       expect(result).to.not.have.property('caveats');
@@ -564,7 +590,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
       basic: {
         type: 'access',
       },
-      caveats: generateCaveatEntry('service', true, selectedValues),
+      caveats: {
+        endpointCaveats: generateCaveatEntry('service', true, selectedValues),
+      },
     });
 
     expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -589,7 +617,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
         basic: {
           type: 'invite',
         },
-        caveats: generateCaveatEntry('interface', true, 'rest'),
+        caveats: {
+          endpointCaveats: generateCaveatEntry('interface', true, 'rest'),
+        },
       });
 
       expect(result).to.not.have.property('caveats');
@@ -607,7 +637,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
           basic: {
             type,
           },
-          caveats: generateCaveatEntry('interface', true, 'rest'),
+          caveats: {
+            endpointCaveats: generateCaveatEntry('interface', true, 'rest'),
+          },
         });
 
         expect(result).to.have.deep.nested.property('caveats[0]', {
@@ -625,7 +657,9 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
         basic: {
           type: 'access',
         },
-        caveats: generateCaveatEntry('interface', true, undefined),
+        caveats: {
+          endpointCaveats: generateCaveatEntry('interface', true, undefined),
+        },
       });
 
       expect(result).to.not.have.property('caveats');
@@ -655,7 +689,7 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
     'identity',
   ].forEach(type => {
     it(
-      `does not convert readonly caveat, when token is not of type "${type}"`,
+      `does not convert readonly caveat, when token is of type "${type}"`,
       function () {
         const result = creatorDataToToken({
           basic: {
@@ -865,42 +899,48 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
         basic: {
           type: 'access',
         },
-        caveats: Object.assign(
-          generateCaveatEntry('expire', true, new Date()),
-          generateCaveatEntry('asn', true, [23]),
-          generateCaveatEntry('ip', true, ['1.1.1.1']),
-          generateCaveatEntry('region', true, {
-            regionType: 'whitelist',
-            regionList: ['Europe'],
-          }),
-          generateCaveatEntry('country', true, {
-            countryType: 'whitelist',
-            countryList: ['PL'],
-          }),
-          generateCaveatEntry('consumer', true, [{
-            model: 'user',
-            id: 'test',
-          }]),
-          generateCaveatEntry('service', true, [{
-            model: 'service',
-            id: 'test',
-          }]),
-          generateCaveatEntry('interface', true, 'rest'), {
-            dataAccessCaveats: Object.assign(
-              generateCaveatEntry('readonly', true),
-              generateCaveatEntry('path', true, {
-                pathEntry0: {
-                  pathSpace: { entityId: 's1' },
-                  pathString: '/abc/def',
-                },
-                __fieldsValueNames: ['pathEntry0'],
-              }),
-              generateCaveatEntry('objectId', true, {
-                objectIdEntry0: '1234567890',
-                __fieldsValueNames: ['objectIdEntry0'],
-              }),
-            ),
-          }),
+        caveats: {
+          timeCaveats: generateCaveatEntry('expire', true, new Date()),
+          geoCaveats: Object.assign(
+            generateCaveatEntry('region', true, {
+              regionType: 'whitelist',
+              regionList: ['Europe'],
+            }),
+            generateCaveatEntry('country', true, {
+              countryType: 'whitelist',
+              countryList: ['PL'],
+            })
+          ),
+          networkCaveats: Object.assign(
+            generateCaveatEntry('asn', true, [23]),
+            generateCaveatEntry('ip', true, ['1.1.1.1'])
+          ),
+          endpointCaveats: Object.assign(
+            generateCaveatEntry('consumer', true, [{
+              model: 'user',
+              id: 'test',
+            }]),
+            generateCaveatEntry('service', true, [{
+              model: 'service',
+              id: 'test',
+            }]),
+            generateCaveatEntry('interface', true, 'rest')
+          ),
+          dataAccessCaveats: Object.assign(
+            generateCaveatEntry('readonly', true),
+            generateCaveatEntry('path', true, {
+              pathEntry0: {
+                pathSpace: { entityId: 's1' },
+                pathString: '/abc/def',
+              },
+              __fieldsValueNames: ['pathEntry0'],
+            }),
+            generateCaveatEntry('objectId', true, {
+              objectIdEntry0: '1234567890',
+              __fieldsValueNames: ['objectIdEntry0'],
+            })
+          ),
+        },
       });
       expect(get(result, 'caveats')).to.be.an('array').with.length(11);
     }

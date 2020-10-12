@@ -856,8 +856,8 @@ describe('Integration | Component | token editor', function () {
         .then(() => expandCaveatsSection())
         .then(() => toggleCaveat('expire'))
         .then(() => {
-          oldExpire =
-            this.get('changeSpy').lastCall.args[0].values.caveats.expireCaveat.expire;
+          oldExpire = this.get('changeSpy').lastCall.args[0]
+            .values.caveats.timeCaveats.expireCaveat.expire;
           return new OneDatetimePickerHelper(this.$('.expire-field input')).selectToday();
         })
         .then(() => {
@@ -2643,11 +2643,19 @@ const caveatsWithAllowDenyMode = [
   'country',
 ];
 
-const dataAccessCaveats = [
-  'readonly',
-  'path',
-  'objectId',
-];
+const caveatGroups = {
+  expire: 'timeCaveats',
+  region: 'geoCaveats',
+  country: 'geoCaveats',
+  asn: 'networkCaveats',
+  ip: 'networkCaveats',
+  consumer: 'endpointCaveats',
+  service: 'endpointCaveats',
+  interface: 'endpointCaveats',
+  readonly: 'dataAccessCaveats',
+  path: 'dataAccessCaveats',
+  objectId: 'dataAccessCaveats',
+};
 
 function expectToBeValid(testCase, fieldName) {
   expectValidationState(testCase, fieldName, true);
@@ -2677,16 +2685,16 @@ function expectValidationState(testCase, fieldName, shouldBeValid) {
 }
 
 function caveatEnabledFieldPath(caveatName) {
-  if (dataAccessCaveats.includes(caveatName)) {
-    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatName}Enabled`;
+  if (caveatGroups[caveatName]) {
+    return `caveats.${caveatGroups[caveatName]}.${caveatName}Caveat.${caveatName}Enabled`;
   } else {
     return `caveats.${caveatName}Caveat.${caveatName}Enabled`;
   }
 }
 
 function caveatValueFieldPath(caveatName) {
-  if (dataAccessCaveats.includes(caveatName)) {
-    return `caveats.dataAccessCaveats.${caveatName}Caveat.${caveatName}`;
+  if (caveatGroups[caveatName]) {
+    return `caveats.${caveatGroups[caveatName]}.${caveatName}Caveat.${caveatName}`;
   } else {
     return `caveats.${caveatName}Caveat.${caveatName}`;
   }
