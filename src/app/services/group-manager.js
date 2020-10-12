@@ -490,7 +490,7 @@ const AllKnownGroupsProxyArray = ArrayProxy.extend({
         function computedLists() {
           return this.get(`${modelName}sProxy`)
             .then(parents => onlyFulfilledValues(parents.mapBy('effGroupList')))
-            .then(effLists => onlyFulfilledValues(effLists.mapBy('list')));
+            .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
         }
       );
     });

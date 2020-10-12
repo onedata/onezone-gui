@@ -266,6 +266,14 @@ describe('Integration | Component | content tokens new', function () {
     expect($pathEntries.find('.pathString-field input')).to.have.value('/');
   });
 
+  it('allows to select "Identity" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-identity');
+    expect(isFormSlideActive(this)).to.be.true;
+    expect(this.$('.type-field .option-identity input').prop('checked')).to.be.true;
+  });
+
   it('allows to select "Custom" template', async function () {
     this.render(hbs `{{content-tokens-new}}`);
 

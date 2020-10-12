@@ -18,6 +18,8 @@ const templates = [{
 }, {
   name: 'restrictedData',
 }, {
+  name: 'identity',
+}, {
   name: 'custom',
 }];
 

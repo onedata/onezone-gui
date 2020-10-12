@@ -87,7 +87,7 @@ export default Component.extend(I18n, {
       // active template (except component init) to let the token template values stay visible
       // while carousel animation.
       if (template) {
-        this.set('activeTemplate', Object.assign({}, template));
+        this.set('activeTemplate', this.get('store').createRecord('token', template));
       }
     },
     backToTemplates() {

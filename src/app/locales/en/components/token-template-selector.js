@@ -28,6 +28,9 @@ export default {
       title: 'Restricted data access',
       noRecordsInfo: 'You have no spaces.',
     },
+    identity: {
+      title: 'Identity proof',
+    },
     custom: {
       title: 'Custom',
     },
