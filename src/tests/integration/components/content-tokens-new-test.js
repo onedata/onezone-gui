@@ -39,7 +39,11 @@ describe('Integration | Component | content tokens new', function () {
       name: 'harvester1',
     }];
     const recordManager = lookupService(this, 'record-manager');
-    sinon.stub(recordManager, 'getCurrentUserRecord').resolves({ entityId: 'user1' });
+    const currentUser = {
+      entityId: 'user1',
+      name: 'me',
+    };
+    sinon.stub(recordManager, 'getCurrentUserRecord').returns(currentUser);
     sinon.stub(recordManager, 'getUserRecordList')
       .withArgs('space').resolves({
         list: PromiseArray.create({
@@ -62,6 +66,7 @@ describe('Integration | Component | content tokens new', function () {
         }),
       });
     sinon.stub(recordManager, 'getRecordById')
+      .withArgs('user', 'user1').resolves(currentUser)
       .withArgs('space', 'space0').resolves(spaces[0])
       .withArgs('provider', 'provider0').resolves(oneproviders[0]);
     const harvester1Gri = gri({
@@ -234,6 +239,18 @@ describe('Integration | Component | content tokens new', function () {
 
     await click('.template-readonlyData');
     expect(isFormSlideActive(this)).to.be.true;
+    expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
+  });
+
+  it('allows to select "Read only data for user" template', async function () {
+    this.render(hbs `{{content-tokens-new}}`);
+
+    await click('.template-readonlyDataForUser');
+    await click('.record-item:first-child');
+    expect(isFormSlideActive(this)).to.be.true;
+    const $consumerCaveatTags = this.$('.consumer-field .tag-item');
+    expect($consumerCaveatTags).to.have.length(1);
+    expect($consumerCaveatTags.text().trim()).to.equal('me');
     expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
   });
 

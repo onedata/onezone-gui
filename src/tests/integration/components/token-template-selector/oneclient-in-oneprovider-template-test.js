@@ -21,14 +21,14 @@ describe(
         constructor: {
           modelName: 'provider',
         },
-        name: 'p1',
-        entityId: 'p1id',
+        name: 'p2',
+        entityId: 'p2id',
       }, {
         constructor: {
           modelName: 'provider',
         },
-        name: 'p2',
-        entityId: 'p2id',
+        name: 'p1',
+        entityId: 'p1id',
       }];
       const recordManagerService = lookupService(this, 'record-manager');
       sinon.stub(recordManagerService, 'getUserRecordList')

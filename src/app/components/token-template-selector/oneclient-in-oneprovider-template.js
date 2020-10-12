@@ -2,6 +2,8 @@ import Component from '@ember/component';
 import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import ArrayProxy from '@ember/array/proxy';
+import { array } from 'ember-awesome-macros';
 
 export default Component.extend({
   tagName: '',
@@ -29,7 +31,11 @@ export default Component.extend({
    */
   fetchOneproviders() {
     return this.get('recordManager').getUserRecordList('provider')
-      .then(oneproviderList => get(oneproviderList, 'list'));
+      .then(oneproviderList => get(oneproviderList, 'list'))
+      .then(oneproviders => ArrayProxy.extend({
+        oneproviders,
+        content: array.sort('oneproviders', ['name']),
+      }).create());
   },
 
   actions: {

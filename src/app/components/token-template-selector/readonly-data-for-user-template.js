@@ -8,7 +8,7 @@ import { array } from 'ember-awesome-macros';
 export default Component.extend({
   tagName: '',
 
-  recordManager: service(),
+  userManager: service(),
 
   /**
    * @virtual
@@ -20,30 +20,30 @@ export default Component.extend({
 
   /**
    * @type {ComputedProperty<Function>}
-   * @returns {Promise<Array<Models.Space>>}
+   * @returns {Promise<Array<Models.User>>}
    */
-  fetchSpacesCallback: computed(function fetchSpacesCallback() {
-    return this.fetchSpaces.bind(this);
+  fetchUsersCallback: computed(function fetchUsersCallback() {
+    return this.fetchUsers.bind(this);
   }),
 
   /**
-   * @returns {Promise<Array<Models.Space>>}
+   * @returns {Promise<Array<Models.User>>}
    */
-  fetchSpaces() {
-    return this.get('recordManager').getUserRecordList('space')
-      .then(spacesList => get(spacesList, 'list'))
-      .then(spaces => ArrayProxy.extend({
-        spaces,
-        content: array.sort('spaces', ['name']),
-      }).create());
+  fetchUsers() {
+    return this.get('userManager').getAllKnownUsers().then(users => ArrayProxy.extend({
+      users,
+      content: array.sort('users', ['name', 'username']),
+    }).create());
   },
 
   actions: {
-    onRecordSelected(space) {
-      this.get('onSelected')('restrictedData', {
+    onRecordSelected(user) {
+      this.get('onSelected')('readonlyDataForUser', {
         caveats: [{
-          type: 'data.path',
-          whitelist: [btoa(`/${get(space, 'entityId')}`)],
+          type: 'consumer',
+          whitelist: [`usr-${get(user, 'entityId')}`],
+        }, {
+          type: 'data.readonly',
         }],
       });
     },
