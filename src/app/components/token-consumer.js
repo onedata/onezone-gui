@@ -352,10 +352,7 @@ export default Component.extend(I18n, {
     return PromiseArray.create({
       promise: this.get('recordManager').getUserRecordList(modelName)
         .then(recordsList => get(recordsList, 'list'))
-        .then(records => RecordOptionsArrayProxy.create({
-          ownerSource: this,
-          records,
-        })),
+        .then(records => RecordOptionsArrayProxy.create({ records })),
     });
   },
 

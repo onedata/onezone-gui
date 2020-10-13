@@ -11,16 +11,14 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-block'],
   classNameBindings: ['recordTypeClass', 'actionsOpened'],
-
-  oneiconAlias: service(),
 
   /**
    * @override
@@ -93,19 +91,8 @@ export default Component.extend(I18n, {
    * Block icon
    * @type {Ember.ComputerProperty<string>}
    */
-  iconName: computed('recordType', 'record.type', function iconName() {
-    const {
-      recordType,
-      oneiconAlias,
-    } = this.getProperties('recordType', 'oneiconAlias');
-    switch (recordType) {
-      case 'group':
-        return oneiconAlias.getName(this.get('record.type'));
-      case 'harvester':
-        return oneiconAlias.getName('harvester');
-      default:
-        return recordType;
-    }
+  iconName: computed('record', function iconName() {
+    return recordIcon(this.get('record'), true);
   }),
 
   actions: {

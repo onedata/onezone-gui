@@ -69,6 +69,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import ArrayProxy from '@ember/array/proxy';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 const tokenInviteTypeOptions = [{
   value: 'userJoinGroup',
@@ -218,7 +219,6 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   privilegeManager: service(),
-  oneiconAlias: service(),
   guiContext: service(),
   recordManager: service(),
   onedataConnection: service(),
@@ -380,9 +380,14 @@ export default Component.extend(I18n, {
         FormFieldsGroup.extend({
           isExpanded: equal('parent.value.type', raw('invite')),
           inviteType: reads('value.inviteType'),
-          inviteTypeSpec: computed('inviteType', function inviteTypeSpec() {
-            return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
-          }),
+          inviteTypeSpec: computed(
+            // Absolute path to value because "inviteType" path does not always recompute.
+            // Probably an Ember bug
+            'valuesSource.basic.inviteDetails.inviteType',
+            function inviteTypeSpec() {
+              return tokenInviteTypeOptions.findBy('value', this.get('inviteType'));
+            }
+          ),
           targetModelName: reads('inviteTypeSpec.targetModelName'),
         }).create({
           name: 'inviteDetails',
@@ -453,7 +458,7 @@ export default Component.extend(I18n, {
         'isInEditMode',
         'initTokenTarget',
         function inviteTypeSpecObserver() {
-          scheduleOnce('afterRender', this, 'inviteTypeSpecObserverFunc');
+          this.inviteTypeSpecObserverFunc();
         }
       ),
       init() {
@@ -1212,7 +1217,6 @@ export default Component.extend(I18n, {
   pathCaveatGroup: computed(function pathCaveatGroup() {
     const component = this;
     return CaveatFormGroup.extend({
-      oneiconAlias: service(),
       component,
       valueFromToken: reads('component.tokenDataSource.caveats.path'),
       spacesProxyIsForMode: undefined,
@@ -1235,7 +1239,6 @@ export default Component.extend(I18n, {
             'spacesProxy',
             'spacesProxyIsForMode'
           );
-          const oneiconAlias = this.get('component.oneiconAlias');
           if (isCaveatEnabled) {
             if (isInViewMode) {
               this.setProperties({
@@ -1246,7 +1249,7 @@ export default Component.extend(I18n, {
                       return {
                         value: record,
                         label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
-                        icon: oneiconAlias.getName('space'),
+                        icon: recordIcon(record),
                       };
                     })),
                 }),
@@ -1497,10 +1500,7 @@ export default Component.extend(I18n, {
     return PromiseArray.create({
       promise: this.get('recordManager').getUserRecordList(modelName)
         .then(recordsList => get(recordsList, 'list'))
-        .then(records => RecordOptionsArrayProxy.create({
-          ownerSource: this,
-          records,
-        })),
+        .then(records => RecordOptionsArrayProxy.create({ records })),
     });
   },
 
@@ -1558,7 +1558,7 @@ export default Component.extend(I18n, {
       label: reads('value.name'),
     }).create({
       value: record,
-      icon: this.get('oneiconAlias').getName(get(record, 'entityType')),
+      icon: recordIcon(record),
     });
   },
 

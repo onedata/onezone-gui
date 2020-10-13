@@ -91,8 +91,10 @@ export default function tokenToEditorDefaultData(token, getRecord) {
     .catch(() => null)
     .then(record => {
       set(defaultData, 'inviteTarget', record ? record : {
+        constructor: {
+          modelName: targetModelName,
+        },
         entityId: targetRecordId,
-        entityType: targetModelName,
         name: `ID: ${targetRecordId ? targetRecordId : 'unknown'}`,
       });
     });
@@ -203,7 +205,12 @@ function pathConverter(caveat, getRecord) {
       })
       .catch(() => {
         caveatDefaultData[valueName] = {
-          pathSpace: { entityId: spaceEntityId },
+          pathSpace: {
+            constructor: {
+              modelName: 'space',
+            },
+            entityId: spaceEntityId,
+          },
           pathString,
         };
       });

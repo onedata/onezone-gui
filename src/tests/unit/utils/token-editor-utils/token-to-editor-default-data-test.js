@@ -45,8 +45,10 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
       tokenTargetProxy,
       targetModelName: 'space',
     }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
       entityId: undefined,
-      entityType: 'space',
       name: 'ID: unknown',
     }));
   });
@@ -58,8 +60,10 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
       targetModelName: 'space',
       targetRecordId: 'space1',
     }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
       entityId: 'space1',
-      entityType: 'space',
       name: 'ID: space1',
     }));
   });
@@ -71,8 +75,10 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
       targetModelName: 'space',
       targetRecordId: 'space1',
     }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
       entityId: 'space1',
-      entityType: 'space',
       name: 'ID: space1',
     }));
   });
@@ -292,6 +298,9 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
         },
         pathEntry2: {
           pathSpace: {
+            constructor: {
+              modelName: 'space',
+            },
             entityId: 'unknown',
           },
           pathString: '/abc/def/ghi',

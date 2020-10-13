@@ -31,7 +31,9 @@ describe(
     Object.keys(icons).forEach(modelType => {
       it(`renders icon for ${modelType}`, function () {
         this.set('record', EmberObject.create({
-          entityType: modelType,
+          constructor: {
+            modelName: modelType,
+          },
           type: 'team',
         }));
         this.render(hbs `
