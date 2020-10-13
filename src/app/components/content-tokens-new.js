@@ -10,7 +10,6 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import $ from 'jquery';
 import { conditional, raw } from 'ember-awesome-macros';
 import { observer } from '@ember/object';
 
@@ -19,7 +18,6 @@ export default Component.extend(I18n, {
 
   tokenActions: service(),
   navigationState: service(),
-  router: service(),
   store: service(),
 
   /**
@@ -28,28 +26,33 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentTokensNew',
 
   /**
+   * @type {Boolean}
+   */
+  hasSelectedTemplate: false,
+
+  /**
    * @type {String}
    */
-  activeTemplateName: undefined,
+  lastSelectedTemplateName: undefined,
 
   /**
    * @type {Object}
    */
-  activeTemplate: undefined,
+  lastSelectedTemplate: undefined,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  activeStep: conditional(
-    'activeTemplateName',
+  activeSlide: conditional(
+    'hasSelectedTemplate',
     raw('form'),
     raw('templates')
   ),
 
-  activeStepObserver: observer('activeStep', function activeStepObserver() {
-    const colContent = $('.col-content')[0];
-    if (colContent) {
-      colContent.scroll({
+  activeSlideObserver: observer('activeSlide', function activeSlideObserver() {
+    const scrollableParent = this.$().parents('.ps')[0];
+    if (scrollableParent) {
+      scrollableParent.scroll({
         top: 0,
         behavior: 'smooth',
       });
@@ -67,31 +70,30 @@ export default Component.extend(I18n, {
     if (stringifiedTokenTemplate) {
       try {
         const tokenTemplate = JSON.parse(stringifiedTokenTemplate);
-        // Create a real (but unsaved) record to provide token-related computed properties
-        const token = this.get('store').createRecord('token', tokenTemplate);
-        this.setProperties({
-          activeTemplate: token,
-          activeTemplateName: 'custom',
-        });
+        this.selectTemplate('custom', tokenTemplate);
       } catch (error) {
         console.error('Incorrect token template passed via aspect options:', error);
       }
     }
   },
 
+  selectTemplate(templateName, template) {
+    if (templateName && template) {
+      this.setProperties({
+        lastSelectedTemplateName: templateName,
+        // Create a real (but unsaved) record to provide token-related computed properties
+        lastSelectedTemplate: this.get('store').createRecord('token', template),
+        hasSelectedTemplate: true,
+      });
+    }
+  },
+
   actions: {
     templateSelected(templateName, template) {
-      this.set('activeTemplateName', templateName);
-
-      // Change template only to another non-empty one. There always should be non-empty
-      // active template (except component init) to let the token template values stay visible
-      // while carousel animation.
-      if (template) {
-        this.set('activeTemplate', this.get('store').createRecord('token', template));
-      }
+      this.selectTemplate(templateName, template);
     },
     backToTemplates() {
-      this.set('activeTemplateName', undefined);
+      this.set('hasSelectedTemplate', false);
     },
     submit(rawToken) {
       const createTokenAction = this.get('tokenActions')

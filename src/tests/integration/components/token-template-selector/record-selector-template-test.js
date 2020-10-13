@@ -10,6 +10,7 @@ import { Promise, resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import suppressRejections from '../../../helpers/suppress-rejections';
 import EmberObject, { set } from '@ember/object';
+import { isSlideActive, getSlide } from '../../../helpers/one-carousel';
 
 describe(
   'Integration | Component | token template selector/record selector template',
@@ -47,45 +48,46 @@ describe(
         imagePath="some-path.svg"
       }}`);
 
-      expect(isSlideActive(this, 'intro')).to.be.true;
-      expect(getSlide(this, 'intro').find('.main-image'))
-        .to.have.attr('src', 'some-path.svg');
+      expect(isSlideActive('intro')).to.be.true;
+      expect(getSlide('intro').querySelector('.main-image').getAttribute('src'))
+        .to.equal('some-path.svg');
     });
 
     it('shows selector slide on click', async function () {
       this.render(hbs `{{token-template-selector/record-selector-template}}`);
-
       await click('.one-tile');
-      expect(isSlideActive(this, 'selector')).to.be.true;
+
+      expect(isSlideActive('selector')).to.be.true;
     });
 
     it('does not change slide on click when selector slide is active', async function () {
       this.render(hbs `{{token-template-selector/record-selector-template}}`);
+      await click('.one-tile');
+      await click('.one-tile');
 
-      await click('.one-tile');
-      await click('.one-tile');
-      expect(isSlideActive(this, 'selector')).to.be.true;
+      expect(isSlideActive('selector')).to.be.true;
     });
 
     it('allows to come back to the intro slide using "Back" link', async function () {
       this.render(hbs `{{token-template-selector/record-selector-template}}`);
-
       await click('.one-tile');
-      const $link = getSlide(this, 'selector').find('.template-back');
-      expect($link.text().trim()).to.equal('« Back');
 
-      await click($link[0]);
-      expect(isSlideActive(this, 'intro')).to.be.true;
+      const link = getSlide('selector').querySelector('.template-back');
+      expect(link.textContent.trim()).to.equal('« Back');
+      await click(link);
+
+      expect(isSlideActive('intro')).to.be.true;
     });
 
     it('does not render list of records, when the intro slide is active', function () {
       const fetchRecordsSpy = this.set('fetchRecordsSpy', sinon.spy());
+
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecordsSpy
       }}`);
 
       expect(fetchRecordsSpy).to.be.not.called;
-      expect(getSlide(this, 'selector').find('.records-container')).to.not.exist;
+      expect(getSlide('selector').querySelector('.records-container')).to.not.exist;
     });
 
     it('shows spinner when records are being loaded', async function () {
@@ -97,10 +99,10 @@ describe(
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecordsSpy
       }}`);
-
       await click('.one-tile');
+
       expect(fetchRecordsSpy).to.be.calledOnce;
-      expect(getSlide(this, 'selector').find('.records-container .spinner')).to.exist;
+      expect(getSlide('selector').querySelector('.records-container .spinner')).to.exist;
     });
 
     it(
@@ -114,10 +116,10 @@ describe(
         this.render(hbs `{{token-template-selector/record-selector-template
           fetchRecords=fetchRecordsSpy
         }}`);
-
         await click('.one-tile');
         await click('.template-back');
         await click('.one-tile');
+
         expect(fetchRecordsSpy).to.be.calledOnce;
       }
     );
@@ -133,10 +135,10 @@ describe(
         this.render(hbs `{{token-template-selector/record-selector-template
           fetchRecords=fetchRecordsSpy
         }}`);
-
         await click('.one-tile');
         await click('.template-back');
         await click('.one-tile');
+
         expect(fetchRecordsSpy).to.be.calledOnce;
       }
     );
@@ -157,15 +159,16 @@ describe(
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      const $records = $selectorSlide.find('.record-item');
-      expect($records).to.have.length(2);
-      expect($records.eq(0).text().trim()).to.equal('p1');
-      expect($records.eq(1).text().trim()).to.equal('p2');
-      expect($records.find('.oneicon-provider')).to.have.length(2);
-      expect($selectorSlide.find('.no-records-info')).to.not.exist;
+
+      const selectorSlide = getSlide('selector');
+      const records = selectorSlide.querySelectorAll('.record-item');
+      expect(records).to.have.length(2);
+      expect(records[0].textContent.trim()).to.equal('p1');
+      expect(records[1].textContent.trim()).to.equal('p2');
+      expect(selectorSlide.querySelectorAll('.record-item .oneicon-provider'))
+        .to.have.length(2);
+      expect(selectorSlide.querySelector('.no-records-info')).to.not.exist;
     });
 
     it('shows information about no records available', async function () {
@@ -175,11 +178,11 @@ describe(
         templateName="custom"
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      expect($selectorSlide.find('.record-item')).to.not.exist;
-      expect($selectorSlide.find('.no-records-info').text().trim())
+      const selectorSlide = getSlide('selector');
+
+      expect(selectorSlide.querySelector('.record-item')).to.not.exist;
+      expect(selectorSlide.querySelector('.no-records-info').textContent.trim())
         .to.equal('No records');
     });
 
@@ -194,9 +197,9 @@ describe(
         fetchRecords=fetchRecords
         onRecordSelected=selectedSpy
       }}`);
-
       await click('.one-tile');
       await click('.record-item');
+
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(record);
     });
 
@@ -206,10 +209,10 @@ describe(
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
       await click('.record-item');
-      expect(isSlideActive(this, 'intro')).to.be.true;
+
+      expect(isSlideActive('intro')).to.be.true;
     });
 
     it('allows to filter records', async function () {
@@ -222,14 +225,14 @@ describe(
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.search-bar')[0], '2');
-      const $records = $selectorSlide.find('.record-item');
-      expect($records).to.have.length(1);
-      expect($records.text().trim()).to.equal('p2');
-      expect($selectorSlide.find('.no-records-after-filter-info')).to.not.exist;
+      const selectorSlide = getSlide('selector');
+      await fillIn(selectorSlide.querySelector('.search-bar'), '2');
+
+      const records = selectorSlide.querySelectorAll('.record-item');
+      expect(records).to.have.length(1);
+      expect(records[0].textContent.trim()).to.equal('p2');
+      expect(selectorSlide.querySelector('.no-records-after-filter-info')).to.not.exist;
     });
 
     it('allows to filter records using custom matcher', async function () {
@@ -248,13 +251,13 @@ describe(
         filterMatcher=filterMatcher
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.search-bar')[0], '2');
-      const $records = $selectorSlide.find('.record-item');
-      expect($records).to.have.length(1);
-      expect($records.text().trim()).to.equal('p1');
+      const selectorSlide = getSlide('selector');
+      await fillIn(selectorSlide.querySelector('.search-bar'), '2');
+
+      const records = selectorSlide.querySelectorAll('.record-item');
+      expect(records).to.have.length(1);
+      expect(records[0].textContent.trim()).to.equal('p1');
     });
 
     it('shows info when there are no records matching the filter', async function () {
@@ -267,17 +270,18 @@ describe(
       this.render(hbs `{{token-template-selector/record-selector-template
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.search-bar')[0], '3');
-      expect($selectorSlide.find('.record-item')).to.have.length(0);
-      expect($selectorSlide.find('.no-records-after-filter-info').text().trim())
-        .to.equal('No results match your filter.');
+      const selectorSlide = getSlide('selector');
+      await fillIn(selectorSlide.querySelector('.search-bar'), '3');
+
+      expect(selectorSlide.querySelectorAll('.record-item')).to.have.length(0);
+      expect(
+        selectorSlide.querySelector('.no-records-after-filter-info').textContent.trim()
+      ).to.equal('No results match your filter.');
     });
 
     it('recalculates filtered records on filtered field value change', async function () {
-      const records = [EmberObject.create({
+      const recordEntries = [EmberObject.create({
         name: 'p1',
         otherName: 'o2',
       }), EmberObject.create({
@@ -285,7 +289,7 @@ describe(
         otherName: 'o1',
       })];
       this.setProperties({
-        fetchRecords: () => resolve(records),
+        fetchRecords: () => resolve(recordEntries),
         filterMatcher: ({ otherName }, filter) => otherName.includes(filter),
       });
 
@@ -294,15 +298,15 @@ describe(
         filterMatcher=filterMatcher
         fetchRecords=fetchRecords
       }}`);
-
       await click('.one-tile');
-      const $selectorSlide = getSlide(this, 'selector');
-      await fillIn($selectorSlide.find('.search-bar')[0], '3');
-      set(records[0], 'otherName', 'o3');
+      const selectorSlide = getSlide('selector');
+      await fillIn(selectorSlide.querySelector('.search-bar'), '3');
+      set(recordEntries[0], 'otherName', 'o3');
       await wait();
-      const $records = $selectorSlide.find('.record-item');
-      expect($records).to.have.length(1);
-      expect($records.text().trim()).to.equal('p1');
+
+      const records = selectorSlide.querySelectorAll('.record-item');
+      expect(records).to.have.length(1);
+      expect(records[0].textContent.trim()).to.equal('p1');
     });
 
     context('handles errors', function () {
@@ -318,14 +322,13 @@ describe(
         this.render(hbs `{{token-template-selector/record-selector-template
           fetchRecords=fetchRecordsSpy
         }}`);
-
         await click('.one-tile');
         rejectPromise('recordserror');
         await wait();
 
         expect(fetchRecordsSpy).to.be.calledOnce;
-        expect(getSlide(this, 'selector')
-          .find('.records-container .resource-load-error').text()
+        expect(getSlide('selector')
+          .querySelector('.records-container .resource-load-error').textContent
         ).to.contain('recordserror');
       });
 
@@ -338,9 +341,8 @@ describe(
           );
 
           this.render(hbs `{{token-template-selector/record-selector-template
-          fetchRecords=fetchRecordsSpy
-        }}`);
-
+            fetchRecords=fetchRecordsSpy
+          }}`);
           await click('.one-tile');
           rejectPromise('recordserror');
           await wait();
@@ -348,16 +350,8 @@ describe(
           await click('.one-tile');
 
           expect(fetchRecordsSpy).to.be.calledTwice;
-        });
+        }
+      );
     });
   }
 );
-
-function isSlideActive(testCase, slideName) {
-  const slide = getSlide(testCase, slideName)[0];
-  return [...slide.classList].any(cls => cls.startsWith('active'));
-}
-
-function getSlide(testCase, slideName) {
-  return testCase.$(`[data-one-carousel-slide-id="${slideName}"]`);
-}
