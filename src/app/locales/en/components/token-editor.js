@@ -286,6 +286,11 @@ export default {
       },
     },
   },
+  hideCaveats: 'Hide inactive caveats',
+  showCaveats: 'Show inactive caveats',
+  noCaveatsBeforeExpand: 'This token has no active caveats.',
+  noCaveatsExpand: 'Show possible options',
+  noCaveatsAfterExpand: 'and customize caveats setup to make the token more secure.',
   serviceCaveatWarning: {
     basicText: 'This is a powerful token granting full access to your account ‐ <strong>can be safely used only in Onezone REST API</strong>.',
     showDetailsLink: 'Show details...',

@@ -1351,6 +1351,11 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasExpandedCaveats: array.isAny('caveatsGroup.fields', raw('hasExpandedCaveats')),
+
+  /**
    * @type {ComputedProperty<String>}
    */
   submitBtnText: conditional(

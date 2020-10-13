@@ -1,9 +1,9 @@
 .token-editor {
   max-width: 1000px;
 
-  .form-horizontal .caveats-expand {
-    margin-top: $padding-base-vertical;
-    margin-bottom: $padding-base-vertical;
+  .form-horizontal .caveats-header {
+    display: inline-block;
+    margin: $padding-base-vertical $padding-small-horizontal $padding-base-vertical 0;
   }
 
   .caveat-group {

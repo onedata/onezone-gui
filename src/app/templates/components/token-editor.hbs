@@ -2,22 +2,28 @@
   <form class="form form-horizontal form-component">
     {{form-component/field-renderer field=basicGroup}}
     {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
-      <h1
-        class={{concat-classes
-          "toggle-expand caveats-expand"
-          (if areAllCaveatsExpanded "opened")
-          (if (not disableCaveatsCollapse) "clickable")
-        }}
-        onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
-      >
+      <h1 class="caveats-header">
         {{tt this "fields.caveats.header"}}
-        {{#if (not disableCaveatsCollapse)}}
+      </h1>
+      {{#if (not disableCaveatsCollapse)}}
+        <a
+          class="toggle-expand caveats-expand"
+          onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
+        >
+          {{tt this (if areAllCaveatsExpanded "hideCaveats" "showCaveats")}}
           {{one-icon
             icon=(if areAllCaveatsExpanded "arrow-up" "arrow-down")
             class="toggle-icon"
           }}
+        </a>
+        {{#if (and (not areAllCaveatsExpanded) (not hasExpandedCaveats))}}
+          <p>
+            {{tt this "noCaveatsBeforeExpand"}}
+            <a onClick={{action "toggleCaveatsGroup"}}>{{tt this "noCaveatsExpand"}}</a>
+            {{tt this "noCaveatsAfterExpand"}}
+          </p>
         {{/if}}
-      </h1>
+      {{/if}}
       {{form-component/field-renderer field=caveatsGroup}}
     {{/if}}
     {{#if isServiceCaveatWarningVisible}}
