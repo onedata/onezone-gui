@@ -17,7 +17,7 @@
           }}
         </a>
         {{#if (and (not areAllCaveatsExpanded) (not hasExpandedCaveats))}}
-          <p>
+          <p class="no-caveats-warning">
             {{tt this "noCaveatsBeforeExpand"}}
             <a onClick={{action "toggleCaveatsGroup"}}>{{tt this "noCaveatsExpand"}}</a>
             {{tt this "noCaveatsAfterExpand"}}
