@@ -12,13 +12,21 @@ export default Component.extend({
 
   /**
    * @virtual
+   * @type {Object}
+   */
+  template: undefined,
+
+  /**
+   * @virtual
    * @type {String}
    */
   imagePath: undefined,
 
   /**
+   * @virtual
    * @type {Function}
-   * @returns {any}
+   * @param {String} templateName
+   * @param {Object} template
    */
-  onClick: notImplementedIgnore,
+  onSelected: notImplementedIgnore,
 });

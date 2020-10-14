@@ -1,35 +1,29 @@
-import Component from '@ember/component';
-import { get, computed } from '@ember/object';
+import RecordSelectorTemplate from 'onezone-gui/components/token-template-selector/record-selector-template';
+import layout from 'onezone-gui/templates/components/token-template-selector/record-selector-template';
+import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import ArrayProxy from '@ember/array/proxy';
 import { array } from 'ember-awesome-macros';
 
-export default Component.extend({
-  tagName: '',
+export default RecordSelectorTemplate.extend({
+  layout,
 
   recordManager: service(),
 
   /**
-   * @virtual
-   * @type {Function}
-   * @param {String} templateName
-   * @param {Object} template
+   * @override
    */
-  onSelected: notImplementedIgnore,
+  templateName: 'restrictedData',
 
   /**
-   * @type {ComputedProperty<Function>}
-   * @returns {Promise<Array<Models.Space>>}
+   * @override
    */
-  fetchSpacesCallback: computed(function fetchSpacesCallback() {
-    return this.fetchSpaces.bind(this);
-  }),
+  imagePath: 'assets/images/space-data.svg',
 
   /**
-   * @returns {Promise<Array<Models.Space>>}
+   * @override
    */
-  fetchSpaces() {
+  fetchRecords() {
     return this.get('recordManager').getUserRecordList('space')
       .then(spacesList => get(spacesList, 'list'))
       .then(spaces => ArrayProxy.extend({
@@ -38,14 +32,15 @@ export default Component.extend({
       }).create());
   },
 
-  actions: {
-    onRecordSelected(space) {
-      this.get('onSelected')('restrictedData', {
-        caveats: [{
-          type: 'data.path',
-          whitelist: [btoa(`/${get(space, 'entityId')}`)],
-        }],
-      });
-    },
+  /**
+   * @override
+   */
+  generateTemplateFromRecord(record) {
+    return {
+      caveats: [{
+        type: 'data.path',
+        whitelist: [btoa(`/${get(record, 'entityId')}`)],
+      }],
+    };
   },
 });

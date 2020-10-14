@@ -60,6 +60,7 @@ import {
   isEmpty,
   notEmpty,
   notEqual,
+  number,
 } from 'ember-awesome-macros';
 import moment from 'moment';
 import _ from 'lodash';
@@ -663,7 +664,10 @@ export default Component.extend(I18n, {
         RadioField.extend({
           component,
           defaultValue: conditional(
-            'component.tokenDataSource.usageLimit',
+            equal(
+              number('component.tokenDataSource.usageLimit'),
+              'component.tokenDataSource.usageLimit'
+            ),
             raw('number'),
             raw('infinity')
           ),
@@ -678,7 +682,14 @@ export default Component.extend(I18n, {
         NumberField.extend({
           component,
           isEnabled: equal('parent.value.usageLimitType', raw('number')),
-          defaultValue: reads('component.tokenDataSource.usageLimit'),
+          defaultValue: conditional(
+            equal(
+              number('component.tokenDataSource.usageLimit'),
+              'component.tokenDataSource.usageLimit'
+            ),
+            'component.tokenDataSource.usageLimit',
+            raw('')
+          ),
         }).create({
           name: 'usageLimitNumber',
           gte: 1,

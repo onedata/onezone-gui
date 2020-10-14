@@ -1,19 +1,16 @@
-import Component from '@ember/component';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import SingleStepTemplate from 'onezone-gui/components/token-template-selector/single-step-template';
+import layout from 'onezone-gui/templates/components/token-template-selector/single-step-template';
 
-export default Component.extend({
-  tagName: '',
+export default SingleStepTemplate.extend({
+  layout,
 
   /**
-   * @virtual
-   * @type {Function}
-   * @param {String} templateName
-   * @param {Object} template
+   * @override
    */
-  onSelected: notImplementedIgnore,
+  templateName: 'oneclient',
 
   /**
-   * @type {Object}
+   * @override
    */
   template: Object.freeze({
     caveats: [{
@@ -21,4 +18,9 @@ export default Component.extend({
       interface: 'oneclient',
     }],
   }),
+
+  /**
+   * @override
+   */
+  imagePath: 'assets/images/space-data.svg',
 });

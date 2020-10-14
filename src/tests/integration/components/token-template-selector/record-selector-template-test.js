@@ -194,13 +194,15 @@ describe(
       });
 
       this.render(hbs `{{token-template-selector/record-selector-template
+        templateName="custom"
         fetchRecords=fetchRecords
-        onRecordSelected=selectedSpy
+        onSelected=selectedSpy
       }}`);
       await click('.one-tile');
       await click('.record-item');
 
-      expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(record);
+      expect(selectedSpy).to.be.calledOnce
+        .and.to.be.calledWith('custom', sinon.match({ record }));
     });
 
     it('comes back to intro slide after record selection', async function () {
@@ -332,7 +334,8 @@ describe(
         ).to.contain('recordserror');
       });
 
-      it('tries to fetch records again when the first time failed and user entered selector slide second time',
+      it(
+        'tries to fetch records again when the first time failed and user entered selector slide second time',
         async function () {
           let rejectPromise;
           const fetchRecordsSpy = this.set(

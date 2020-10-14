@@ -1,51 +1,69 @@
-import Component from '@ember/component';
-import { get, computed } from '@ember/object';
+import RecordSelectorTemplate from 'onezone-gui/components/token-template-selector/record-selector-template';
+import layout from 'onezone-gui/templates/components/token-template-selector/record-selector-template';
+import { get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import ArrayProxy from '@ember/array/proxy';
 import { array } from 'ember-awesome-macros';
 
-export default Component.extend({
-  tagName: '',
+export default RecordSelectorTemplate.extend({
+  layout,
 
   userManager: service(),
 
   /**
-   * @virtual
-   * @type {Function}
-   * @param {String} templateName
-   * @param {Object} template
+   * @override
    */
-  onSelected: notImplementedIgnore,
+  templateName: 'readonlyDataForUser',
 
   /**
-   * @type {ComputedProperty<Function>}
-   * @returns {Promise<Array<Models.User>>}
+   * @override
    */
-  fetchUsersCallback: computed(function fetchUsersCallback() {
-    return this.fetchUsers.bind(this);
-  }),
+  imagePath: 'assets/images/space-data.svg',
 
   /**
-   * @returns {Promise<Array<Models.User>>}
+   * @override
    */
-  fetchUsers() {
+  filterDependentKeys: Object.freeze(['name', 'username']),
+
+  /**
+   * @override
+   */
+  fetchRecords() {
     return this.get('userManager').getAllKnownUsers().then(users => ArrayProxy.extend({
       users,
       content: array.sort('users', ['name', 'username']),
     }).create());
   },
 
-  actions: {
-    onRecordSelected(user) {
-      this.get('onSelected')('readonlyDataForUser', {
-        caveats: [{
-          type: 'consumer',
-          whitelist: [`usr-${get(user, 'entityId')}`],
-        }, {
-          type: 'data.readonly',
-        }],
-      });
-    },
+  /**
+   * @override
+   */
+  filterMatcher(record, filter) {
+    if (!filter) {
+      return true;
+    }
+    const normalizedFilter = filter.toLocaleLowerCase();
+
+    const {
+      name,
+      username,
+    } = getProperties(record, 'name', 'username');
+
+    return (name || '').toLocaleLowerCase().includes(normalizedFilter) ||
+      (username || '').toLocaleLowerCase().includes(normalizedFilter);
+  },
+
+  /**
+   * @override
+   */
+  generateTemplateFromRecord(record) {
+    return {
+      caveats: [{
+        type: 'consumer',
+        whitelist: [`usr-${get(record, 'entityId')}`],
+      }, {
+        type: 'data.readonly',
+      }],
+    };
   },
 });

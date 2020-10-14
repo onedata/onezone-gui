@@ -8,18 +8,6 @@ import { resolve } from 'rsvp';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
 
-function defaultFetchRecord() {
-  return resolve([]);
-}
-
-function defaultFilterMatcher(record, filter) {
-  if (!filter) {
-    return true;
-  }
-
-  return (get(record, 'name') || '').toLocaleLowerCase().includes(filter);
-}
-
 export default Component.extend(I18n, {
   tagName: '',
 
@@ -48,39 +36,18 @@ export default Component.extend(I18n, {
   imagePath: undefined,
 
   /**
-   * @virtual
-   * @type {String}
-   */
-  modelIcon: undefined,
-
-  /**
-   * @virtual
-   * @type {Function}
-   * @returns {Promise<Array<GraphSingleModel>>}
-   */
-  fetchRecords: defaultFetchRecord,
-
-  /**
    * @virtual optional
    * @type {Array<String>}
    */
   filterDependentKeys: Object.freeze(['name']),
 
   /**
-   * @type {Function}
-   * @param {GraphSingleModel} record
-   * @param {String} filter
-   * @returns {boolean}
-   */
-  filterMatcher: defaultFilterMatcher,
-
-  /**
    * @virtual
    * @type {Function}
-   * @param {GraphSingleModel} record
-   * @returns {any}
+   * @param {String} templateName
+   * @param {Object} template
    */
-  onRecordSelected: notImplementedIgnore,
+  onSelected: notImplementedIgnore,
 
   /**
    * @type {String}
@@ -111,20 +78,18 @@ export default Component.extend(I18n, {
         'filteredRecords',
         computed(
           `recordsProxy.@each.{${this.get('filterDependentKeys').join(',')}}`,
-          'filterMatcher',
           'filter',
           function filteredRecords() {
             const {
               recordsProxy,
-              filterMatcher,
               filter,
-            } = this.getProperties('recordsProxy', 'filterMatcher', 'filter');
+            } = this.getProperties('recordsProxy', 'filter');
 
             if (!get(recordsProxy, 'isFulfilled')) {
               return [];
             }
 
-            return recordsProxy.filter(record => filterMatcher(record, filter));
+            return recordsProxy.filter(record => this.filterMatcher(record, filter));
           }
         )
       );
@@ -136,9 +101,41 @@ export default Component.extend(I18n, {
     this.filteredRecordsSetter();
   },
 
+  /**
+   * @virtual
+   * @returns {Promise<Array<GraphSingleModel>>}
+   */
+  fetchRecords() {
+    return resolve([]);
+  },
+
+  /**
+   * @virtual
+   * @param {GraphSingleModel} record
+   * @returns {Object}
+   */
+  generateTemplateFromRecord(record) {
+    return { record };
+  },
+
+  /**
+   * @virtual optional
+   * @param {GraphSingleModel} record
+   * @param {String} filter
+   * @returns {boolean}
+   */
+  filterMatcher(record, filter) {
+    if (!filter) {
+      return true;
+    }
+    const normalizedFilter = filter.toLocaleLowerCase();
+
+    return (get(record, 'name') || '').toLocaleLowerCase().includes(normalizedFilter);
+  },
+
   loadRecordsIfNeeded() {
     if (!this.get('recordsProxy') || this.get('recordsProxy.isRejected')) {
-      this.set('recordsProxy', promiseArray(this.get('fetchRecords')()));
+      this.set('recordsProxy', promiseArray(this.fetchRecords()));
     }
   },
 
@@ -160,7 +157,12 @@ export default Component.extend(I18n, {
       this.changeToSlide('intro');
     },
     onRecordSelected(record) {
-      this.get('onRecordSelected')(record);
+      const {
+        onSelected,
+        templateName,
+      } = this.getProperties('onSelected', 'templateName');
+
+      onSelected(templateName, this.generateTemplateFromRecord(record));
       this.changeToSlide('intro');
     },
   },

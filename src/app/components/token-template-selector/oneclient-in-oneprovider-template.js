@@ -1,35 +1,29 @@
-import Component from '@ember/component';
-import { get, computed } from '@ember/object';
+import RecordSelectorTemplate from 'onezone-gui/components/token-template-selector/record-selector-template';
+import layout from 'onezone-gui/templates/components/token-template-selector/record-selector-template';
+import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import ArrayProxy from '@ember/array/proxy';
 import { array } from 'ember-awesome-macros';
 
-export default Component.extend({
-  tagName: '',
+export default RecordSelectorTemplate.extend({
+  layout,
 
   recordManager: service(),
 
   /**
-   * @virtual
-   * @type {Function}
-   * @param {String} templateName
-   * @param {Object} template
+   * @override
    */
-  onSelected: notImplementedIgnore,
+  templateName: 'oneclientInOneprovider',
 
   /**
-   * @type {ComputedProperty<Function>}
-   * @returns {Promise<Array<Models.Provider>>}
+   * @override
    */
-  fetchOneprovidersCallback: computed(function fetchOneprovidersCallback() {
-    return this.fetchOneproviders.bind(this);
-  }),
+  imagePath: 'assets/images/space-data.svg',
 
   /**
-   * @returns {Promise<Array<Models.Provider>>}
+   * @override
    */
-  fetchOneproviders() {
+  fetchRecords() {
     return this.get('recordManager').getUserRecordList('provider')
       .then(oneproviderList => get(oneproviderList, 'list'))
       .then(oneproviders => ArrayProxy.extend({
@@ -38,17 +32,18 @@ export default Component.extend({
       }).create());
   },
 
-  actions: {
-    onRecordSelected(oneprovider) {
-      this.get('onSelected')('oneclientInOneprovider', {
-        caveats: [{
-          type: 'interface',
-          interface: 'oneclient',
-        }, {
-          type: 'service',
-          whitelist: [`opw-${get(oneprovider, 'entityId')}`],
-        }],
-      });
-    },
+  /**
+   * @override
+   */
+  generateTemplateFromRecord(record) {
+    return {
+      caveats: [{
+        type: 'interface',
+        interface: 'oneclient',
+      }, {
+        type: 'service',
+        whitelist: [`opw-${get(record, 'entityId')}`],
+      }],
+    };
   },
 });

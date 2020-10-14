@@ -43,16 +43,16 @@ describe(
       expect(this.$('.main-image')).to.have.attr('src', 'some-path.svg');
     });
 
-    it('notifies about click', async function () {
-      const clickSpy = this.set('clickSpy', sinon.spy());
+    it('notifies about selection', async function () {
+      const selectedSpy = this.set('selectedSpy', sinon.spy());
 
       this.render(hbs `{{token-template-selector/single-step-template
         templateName="custom"
-        onClick=clickSpy
+        onSelected=selectedSpy
       }}`);
 
       await click('.one-tile');
-      expect(clickSpy).to.be.calledOnce;
+      expect(selectedSpy).to.be.calledOnce;
     });
   }
 );
