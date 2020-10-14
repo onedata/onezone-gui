@@ -455,7 +455,7 @@ export default Component.extend(I18n, {
       }),
       inviteTypeSpecObserver: observer(
         'inviteTypeSpec',
-        'isInEditMode',
+        'component.mode',
         'initTokenTarget',
         function inviteTypeSpecObserver() {
           this.inviteTypeSpecObserverFunc();
@@ -469,13 +469,11 @@ export default Component.extend(I18n, {
         const {
           inviteTypeSpec,
           initTokenTarget,
-          isInEditMode,
           cachedTargetsModelName,
           cachedPrivilegesModelName,
         } = this.getProperties(
           'inviteTypeSpec',
           'initTokenTarget',
-          'isInEditMode',
           'cachedTargetsModelName',
           'cachedPrivilegesModelName'
         );
@@ -485,7 +483,7 @@ export default Component.extend(I18n, {
         const newTargetsModelName = inviteTypeSpec.targetModelName;
         const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
           newTargetsModelName;
-        if (isInEditMode) {
+        if (get(component, 'mode') === 'create') {
           if (newTargetsModelName) {
             this.set('latestInviteTypeWithTargets', inviteTypeSpec.value);
             if (cachedTargetsModelName !== newTargetsModelName) {
