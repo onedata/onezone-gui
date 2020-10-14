@@ -22,12 +22,6 @@ export default Component.extend({
 
   /**
    * @virtual
-   * @type {Object}
-   */
-  template: undefined,
-
-  /**
-   * @virtual
    * @type {String}
    */
   imagePath: undefined,
@@ -39,4 +33,23 @@ export default Component.extend({
    * @param {Object} template
    */
   onSelected: notImplementedIgnore,
+
+  /**
+   * @virtual
+   * @returns {Object}
+   */
+  generateTemplate() {
+    return {};
+  },
+
+  actions: {
+    onSelected() {
+      const {
+        onSelected,
+        templateName,
+      } = this.getProperties('onSelected', 'templateName');
+
+      onSelected(templateName, this.generateTemplate());
+    },
+  },
 });

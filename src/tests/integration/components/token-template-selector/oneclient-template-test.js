@@ -36,6 +36,7 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
         'oneclient',
         sinon.match({
+          name: sinon.match(/Oneclient .+/),
           caveats: [
             sinon.match({
               type: 'interface',

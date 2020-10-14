@@ -197,6 +197,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'onezoneRest');
 
     checkShowsTemplate('Onezone REST');
+    checkTokenEditorHasName(this, /Onezone REST .+/);
     const $serviceCaveatTags = this.$('.service-field .tag-item');
     expect($serviceCaveatTags).to.have.length(1);
     expect($serviceCaveatTags.text().trim()).to.equal('onezone');
@@ -207,6 +208,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'oneproviderRest');
 
     checkShowsTemplate('Oneprovider REST/CDMI');
+    checkTokenEditorHasName(this, /Oneprovider REST .+/);
     const $serviceCaveatTags = this.$('.service-field .tag-item');
     expect($serviceCaveatTags).to.have.length(1);
     expect($serviceCaveatTags.text().trim()).to.equal('Any Oneprovider');
@@ -217,6 +219,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'oneclient');
 
     checkShowsTemplate('Oneclient access');
+    checkTokenEditorHasName(this, /Oneclient .+/);
     expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
   });
 
@@ -225,6 +228,7 @@ describe('Integration | Component | content tokens new', function () {
     await click('.record-item:first-child');
 
     checkShowsTemplate('Oneclient access in specific Oneprovider');
+    checkTokenEditorHasName(this, /Oneclient in provider0 .+/);
     const $serviceCaveatTags = this.$('.service-field .tag-item');
     expect($serviceCaveatTags).to.have.length(1);
     expect($serviceCaveatTags.text().trim()).to.equal('provider0');
@@ -235,6 +239,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'readonlyData');
 
     checkShowsTemplate('Read only data access');
+    checkTokenEditorHasName(this, /Read only data .+/);
     expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
   });
 
@@ -243,6 +248,7 @@ describe('Integration | Component | content tokens new', function () {
     await click('.record-item:first-child');
 
     checkShowsTemplate('Read only data access for specific user');
+    checkTokenEditorHasName(this, /Read only data for me .+/);
     const $consumerCaveatTags = this.$('.consumer-field .tag-item');
     expect($consumerCaveatTags).to.have.length(1);
     expect($consumerCaveatTags.text().trim()).to.equal('me');
@@ -254,6 +260,7 @@ describe('Integration | Component | content tokens new', function () {
     await click('.record-item:first-child');
 
     checkShowsTemplate('Restricted data access');
+    checkTokenEditorHasName(this, /Restricted data acc\. space0 .+/);
     const $pathEntries = this.$('.pathEntry-field');
     expect($pathEntries).to.have.length(1);
     expect($pathEntries.find('.pathSpace-field').text()).to.contain('space0');
@@ -264,6 +271,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'identity');
 
     checkShowsTemplate('Identity proof');
+    checkTokenEditorHasName(this, /Identity .+/);
     expect(this.$('.type-field .option-identity input').prop('checked')).to.be.true;
   });
 
@@ -271,6 +279,7 @@ describe('Integration | Component | content tokens new', function () {
     await renderAndSelectTemplate(this, 'custom');
 
     checkShowsTemplate('Custom');
+    checkTokenEditorHasName(this, /Access .+/);
   });
 
   it('allows to come back from the form to templates list', async function () {
@@ -311,4 +320,8 @@ function checkShowsTemplate(readableTemplateName) {
 function checkTemplateNameInHeader(expectedName) {
   expect(getSlide('form').querySelector('.header-row .template-name').textContent)
     .to.contain(expectedName);
+}
+
+function checkTokenEditorHasName(testCase, nameRegexp) {
+  expect(testCase.$('.name-field input').val()).to.match(nameRegexp);
 }

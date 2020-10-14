@@ -36,6 +36,7 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
         'onezoneRest',
         sinon.match({
+          name: sinon.match(/Onezone REST .+/),
           caveats: [
             sinon.match({
               type: 'service',

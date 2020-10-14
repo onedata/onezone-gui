@@ -14,6 +14,7 @@ import { get, getProperties } from '@ember/object';
 import { inject as service } from '@ember/service';
 import ArrayProxy from '@ember/array/proxy';
 import { array } from 'ember-awesome-macros';
+import { constructTokenName } from 'onezone-gui/utils/token-editor-utils';
 
 export default RecordSelectorTemplate.extend({
   layout,
@@ -68,6 +69,7 @@ export default RecordSelectorTemplate.extend({
    */
   generateTemplateFromRecord(record) {
     return {
+      name: constructTokenName('Read only data for ', get(record, 'name')),
       caveats: [{
         type: 'consumer',
         whitelist: [`usr-${get(record, 'entityId')}`],

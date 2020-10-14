@@ -21,14 +21,16 @@ export default SingleStepTemplate.extend({
   /**
    * @override
    */
-  template: Object.freeze({
-    type: {
-      identityToken: {},
-    },
-  }),
+  imagePath: 'assets/images/space-data.svg',
 
   /**
    * @override
    */
-  imagePath: 'assets/images/space-data.svg',
+  generateTemplate() {
+    return {
+      type: {
+        identityToken: {},
+      },
+    };
+  },
 });

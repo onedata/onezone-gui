@@ -14,6 +14,7 @@ import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import ArrayProxy from '@ember/array/proxy';
 import { array } from 'ember-awesome-macros';
+import { constructTokenName } from 'onezone-gui/utils/token-editor-utils';
 
 export default RecordSelectorTemplate.extend({
   layout,
@@ -47,6 +48,7 @@ export default RecordSelectorTemplate.extend({
    */
   generateTemplateFromRecord(record) {
     return {
+      name: constructTokenName('Oneclient in ', get(record, 'name')),
       caveats: [{
         type: 'interface',
         interface: 'oneclient',

@@ -84,6 +84,7 @@ describe(
       await click('.record-item:first-child');
       expect(selectedSpy)
         .to.be.calledOnce.and.to.be.calledWith('restrictedData', sinon.match({
+          name: sinon.match(/Restricted data acc\. s1 .+/),
           caveats: [
             sinon.match({
               type: 'data.path',

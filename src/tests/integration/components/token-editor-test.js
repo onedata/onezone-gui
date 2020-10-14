@@ -2644,6 +2644,7 @@ describe('Integration | Component | token editor', function () {
     function () {
       const now = new Date();
       const token = {
+        name: 'my token',
         typeName: 'access',
         caveats: [{
           type: 'time',
@@ -2711,6 +2712,7 @@ describe('Integration | Component | token editor', function () {
       this.render(hbs `{{token-editor mode="create" token=token}}`);
 
       return wait().then(() => {
+        expect(getFieldElement(this, 'name').find('input')).to.have.value('my token');
         expect(getFieldElement(this, 'type').find('.option-access input').prop('checked'))
           .to.be.true;
         expect(areAllCaveatsExpanded(this)).to.be.true;
@@ -2768,6 +2770,7 @@ describe('Integration | Component | token editor', function () {
     'prefills form with injected token in "create" mode (invite token with no caveats)',
     function () {
       const token = {
+        name: 'my token',
         typeName: 'invite',
         inviteType: 'userJoinSpace',
         tokenTargetProxy: PromiseObject.create({
@@ -2779,6 +2782,7 @@ describe('Integration | Component | token editor', function () {
       this.render(hbs `{{token-editor mode="create" token=token}}`);
 
       return wait().then(() => {
+        expect(getFieldElement(this, 'name').find('input')).to.have.value('my token');
         expect(getFieldElement(this, 'type').find('.option-invite input').prop('checked'))
           .to.be.true;
         expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');

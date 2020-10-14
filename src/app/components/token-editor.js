@@ -1453,7 +1453,8 @@ export default Component.extend(I18n, {
         fields,
       } = this.getProperties('mode', 'fields');
       const nameField = fields.getFieldByPath('basic.name');
-      if (mode !== 'create' || get(nameField, 'isModified')) {
+      const nameFromData = this.get('tokenDataSource.name');
+      if (mode !== 'create' || nameFromData || get(nameField, 'isModified')) {
         return;
       }
 

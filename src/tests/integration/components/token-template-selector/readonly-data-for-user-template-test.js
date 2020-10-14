@@ -92,6 +92,7 @@ describe(
       await click('.record-item:first-child');
       expect(selectedSpy)
         .to.be.calledOnce.and.to.be.calledWith('readonlyDataForUser', sinon.match({
+          name: sinon.match(/Read only data for duplicated .+/),
           caveats: [
             sinon.match({
               type: 'consumer',

@@ -9,6 +9,7 @@
 
 import SingleStepTemplate from 'onezone-gui/components/token-template-selector/single-step-template';
 import layout from 'onezone-gui/templates/components/token-template-selector/single-step-template';
+import { constructTokenName } from 'onezone-gui/utils/token-editor-utils';
 
 export default SingleStepTemplate.extend({
   layout,
@@ -31,4 +32,16 @@ export default SingleStepTemplate.extend({
    * @override
    */
   imagePath: 'assets/images/space-data.svg',
+
+  /**
+   * @override
+   */
+  generateTemplate() {
+    return {
+      name: constructTokenName('Read only data'),
+      caveats: [{
+        type: 'data.readonly',
+      }],
+    };
+  },
 });

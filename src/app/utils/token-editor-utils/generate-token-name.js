@@ -39,26 +39,42 @@ const inviteTypesWithoutTarget = [
  * @returns {String}
  */
 export default function generateTokenName(type, inviteType, inviteTargetName) {
-  const timeString = moment().format('YYYY.MM.DD-HH.mm');
-
   switch (type) {
     case 'access':
     case 'identity':
-      return `${_.upperFirst(type)} ${timeString}`;
+      return constructTokenName(_.upperFirst(type));
     case 'invite': {
       if (!possibleInviteTypes.includes(inviteType)) {
-        return `${_.upperFirst(type)} ${timeString}`;
+        return constructTokenName(_.upperFirst(type));
+      } else {
+        const varNamePart =
+          inviteTargetName && !inviteTypesWithoutTarget.includes(inviteType) ?
+          inviteTargetName : '';
+        return constructTokenName(
+          inviteTypeNames[inviteType] + (varNamePart ? ' ' : ''),
+          varNamePart
+        );
       }
-      let name = inviteTypeNames[inviteType];
-      if (inviteTargetName && !inviteTypesWithoutTarget.includes(inviteType)) {
-        // 2 for spaces before name and time string
-        const maxNameLength = maxLength - name.length - timeString.length - 2;
-        name += ` ${inviteTargetName.slice(0, maxNameLength)}`;
-      }
-      name += ` ${timeString}`;
-      return name;
     }
     default:
-      return `Token ${timeString}`;
+      return constructTokenName('Token');
   }
+}
+
+/**
+ * Constructs token name from three passed parts and a generated time string.
+ * `varName` part can have dynamic length and will be cut to the size appropriate for
+ * the max token name length.
+ * @param {String} [preVarName='']
+ * @param {String} [varName=''] 
+ * @param {String} [postVarName='']
+ * @returns {String}
+ */
+export function constructTokenName(preVarName = '', varName = '', postVarName = '') {
+  const timeString = moment().format('YYYY.MM.DD-HH.mm');
+  const constNamePartsTotalLength = preVarName.length + postVarName.length;
+  const maxNameLength = maxLength - constNamePartsTotalLength - timeString.length - 1;
+  const cutVarName = varName.slice(0, maxNameLength);
+
+  return `${preVarName}${cutVarName || ''}${postVarName || ''} ${timeString}`;
 }

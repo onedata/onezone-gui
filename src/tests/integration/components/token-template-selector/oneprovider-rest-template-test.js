@@ -36,6 +36,7 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
         'oneproviderRest',
         sinon.match({
+          name: sinon.match(/Oneprovider REST .+/),
           caveats: [
             sinon.match({
               type: 'service',

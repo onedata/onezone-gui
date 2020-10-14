@@ -36,6 +36,7 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
         'readonlyData',
         sinon.match({
+          name: sinon.match(/Read only data .+/),
           caveats: [
             sinon.match({
               type: 'data.readonly',

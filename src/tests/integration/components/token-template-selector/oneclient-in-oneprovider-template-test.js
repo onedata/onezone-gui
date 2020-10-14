@@ -84,6 +84,7 @@ describe(
       await click('.record-item:first-child');
       expect(selectedSpy)
         .to.be.calledOnce.and.to.be.calledWith('oneclientInOneprovider', sinon.match({
+          name: sinon.match(/Oneclient in p1 .+/),
           caveats: [
             sinon.match({
               type: 'interface',

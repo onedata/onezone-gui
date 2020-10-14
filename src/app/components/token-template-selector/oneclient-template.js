@@ -9,6 +9,7 @@
 
 import SingleStepTemplate from 'onezone-gui/components/token-template-selector/single-step-template';
 import layout from 'onezone-gui/templates/components/token-template-selector/single-step-template';
+import { constructTokenName } from 'onezone-gui/utils/token-editor-utils';
 
 export default SingleStepTemplate.extend({
   layout,
@@ -21,15 +22,18 @@ export default SingleStepTemplate.extend({
   /**
    * @override
    */
-  template: Object.freeze({
-    caveats: [{
-      type: 'interface',
-      interface: 'oneclient',
-    }],
-  }),
+  imagePath: 'assets/images/space-data.svg',
 
   /**
    * @override
    */
-  imagePath: 'assets/images/space-data.svg',
+  generateTemplate() {
+    return {
+      name: constructTokenName('Oneclient'),
+      caveats: [{
+        type: 'interface',
+        interface: 'oneclient',
+      }],
+    };
+  },
 });
