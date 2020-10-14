@@ -1,3 +1,13 @@
+/**
+ * Token template base component. Allows to construct templates, which do not require any
+ * additional adjustments.
+ *
+ * @module components/token-template-selector/single-step-template
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 

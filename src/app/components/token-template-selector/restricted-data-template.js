@@ -1,3 +1,13 @@
+/**
+ * Restricted data access token template. Narrows allowed data paths to a single space
+ * selected from a list.
+ *
+ * @module components/token-template-selector/restricted-data-template
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import RecordSelectorTemplate from 'onezone-gui/components/token-template-selector/record-selector-template';
 import layout from 'onezone-gui/templates/components/token-template-selector/record-selector-template';
 import { get } from '@ember/object';

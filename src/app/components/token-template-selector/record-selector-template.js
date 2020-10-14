@@ -1,3 +1,13 @@
+/**
+ * Token template base component with record selection feature. Allows to construct
+ * templates, which require selection of record from a list.
+ *
+ * @module components/token-template-selector/record-selector-template
+ * @author Michał Borzęcki
+ * @copyright (C) 2020 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { get, computed, observer } from '@ember/object';
 import { tag } from 'ember-awesome-macros';

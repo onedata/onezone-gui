@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
+import sinon from 'sinon';
+import { click } from 'ember-native-dom-helpers';
 
 const templates = [{
   name: 'onezoneRest',
@@ -42,5 +44,14 @@ describe('Integration | Component | token template selector', function () {
       const tile = tiles[index];
       expect([...tile.classList]).to.include(`template-${name}`);
     });
+  });
+
+  it('notifies about selected template', async function () {
+    const selectedSpy = this.set('selectedSpy', sinon.spy());
+
+    this.render(hbs `{{token-template-selector onTemplateSelected=selectedSpy}}`);
+    await click('.template-custom');
+
+    expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith('custom', sinon.match({}));
   });
 });
