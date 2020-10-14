@@ -12,10 +12,9 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as userEntityType } from 'onezone-gui/models/user';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promise } from 'ember-awesome-macros';
-import { computed, get, getProperties, observer } from '@ember/object';
-import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import { computed, get } from '@ember/object';
 import { all as allFulfilled } from 'rsvp';
-import ArrayProxy from '@ember/array/proxy';
+import AllKnownMembersProxyArrayBase from 'onezone-gui/utils/all-known-members-proxy-array-base';
 
 export default Service.extend({
   onedataGraph: service(),
@@ -87,22 +86,21 @@ export default Service.extend({
       recordManager: this.get('recordManager'),
     });
     return promiseArray(
-      get(knownUsersProxy, 'allUsersProxy').then(() => knownUsersProxy)
+      get(knownUsersProxy, 'allRecordsProxy').then(() => knownUsersProxy)
     );
   },
 });
 
-const AllKnownUsersProxyArray = ArrayProxy.extend({
+const AllKnownUsersProxyArray = AllKnownMembersProxyArrayBase.extend({
   /**
-   * @type {Service}
-   * @virtual
+   * @override
    */
-  recordManager: undefined,
+  memberModelName: 'user',
 
   /**
-   * @type {ComputedProperty<PromiseArray<Models.User>>}
+   * @override
    */
-  allUsersProxy: promise.array(computed(
+  allRecordsProxy: promise.array(computed(
     'groupsUsersListsProxy.[]',
     'spacesUsersListsProxy.[]',
     function usersProxy() {
@@ -131,37 +129,4 @@ const AllKnownUsersProxyArray = ArrayProxy.extend({
       });
     }
   )),
-
-  allUsersProxyObserver: observer('allUsersProxy.[]', function allUsersProxyObserver() {
-    const {
-      isFulfilled,
-      content,
-    } = getProperties(this.get('allUsersProxy'), 'isFulfilled', 'content');
-
-    if (isFulfilled) {
-      this.set('content', content);
-    }
-  }),
-
-  init() {
-    this._super(...arguments);
-
-    const toSet = {};
-    ['group', 'space'].forEach(modelName => {
-      toSet[`${modelName}sProxy`] = promise.array(computed(function proxy() {
-        return this.get('recordManager').getUserRecordList(modelName)
-          .then(recordList => get(recordList, 'list'));
-      }));
-      toSet[`${modelName}sUsersListsProxy`] = computed(
-        `${modelName}sProxy.@each.isReloading`,
-        function computedLists() {
-          return this.get(`${modelName}sProxy`)
-            .then(parents => onlyFulfilledValues(parents.mapBy('effUserList')))
-            .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
-        }
-      );
-    });
-
-    this.setProperties(toSet);
-  },
 });

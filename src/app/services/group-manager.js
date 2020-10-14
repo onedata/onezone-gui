@@ -3,13 +3,13 @@
  *
  * @module services/group-manager
  * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { computed, get, getProperties, observer } from '@ember/object';
+import { computed, get } from '@ember/object';
 import _ from 'lodash';
 import { Promise, resolve, reject, all as allFulfilled } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -18,8 +18,7 @@ import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-erro
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promise } from 'ember-awesome-macros';
-import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
-import ArrayProxy from '@ember/array/proxy';
+import AllKnownMembersProxyArrayBase from 'onezone-gui/utils/all-known-members-proxy-array-base';
 
 export default Service.extend({
   store: service(),
@@ -74,7 +73,7 @@ export default Service.extend({
       recordManager: this.get('recordManager'),
     });
     return promiseArray(
-      get(knownGroupsProxy, 'allGroupsProxy').then(() => knownGroupsProxy)
+      get(knownGroupsProxy, 'allRecordsProxy').then(() => knownGroupsProxy)
     );
   },
 
@@ -417,17 +416,16 @@ export default Service.extend({
   },
 });
 
-const AllKnownGroupsProxyArray = ArrayProxy.extend({
+const AllKnownGroupsProxyArray = AllKnownMembersProxyArrayBase.extend({
   /**
-   * @type {Service}
-   * @virtual
+   * @override
    */
-  recordManager: undefined,
+  memberModelName: 'group',
 
   /**
-   * @type {ComputedProperty<PromiseArray<Models.Group>>}
+   * @override
    */
-  allGroupsProxy: promise.array(computed(
+  allRecordsProxy: promise.array(computed(
     'groupsProxy',
     'groupsGroupsListsProxy.[]',
     'spacesGroupsListsProxy.[]',
@@ -461,40 +459,4 @@ const AllKnownGroupsProxyArray = ArrayProxy.extend({
       });
     }
   )),
-
-  allGroupsProxyObserver: observer(
-    'allGroupsProxy.[]',
-    function allGroupsProxyObserver() {
-      const {
-        isFulfilled,
-        content,
-      } = getProperties(this.get('allGroupsProxy'), 'isFulfilled', 'content');
-
-      if (isFulfilled) {
-        this.set('content', content);
-      }
-    }
-  ),
-
-  init() {
-    this._super(...arguments);
-
-    const toSet = {};
-    ['group', 'space'].forEach(modelName => {
-      toSet[`${modelName}sProxy`] = promise.array(computed(function proxy() {
-        return this.get('recordManager').getUserRecordList(modelName)
-          .then(recordList => get(recordList, 'list'));
-      }));
-      toSet[`${modelName}sGroupsListsProxy`] = computed(
-        `${modelName}sProxy.@each.isReloading`,
-        function computedLists() {
-          return this.get(`${modelName}sProxy`)
-            .then(parents => onlyFulfilledValues(parents.mapBy('effGroupList')))
-            .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
-        }
-      );
-    });
-
-    this.setProperties(toSet);
-  },
 });
