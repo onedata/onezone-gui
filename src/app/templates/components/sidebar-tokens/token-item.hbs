@@ -1,16 +1,16 @@
 {{one-icon icon=iconName class="sidebar-item-icon"}}
 {{#if isRenaming}}
   {{one-inline-editor
-    isEditing=isRenaming
+    isEditing=true
     value=item.name
     showEmptyInfo=false
     onSave=(action "rename")
     editOnClick=false
     onEdit=(action "toggleRename")
-    class="one-label name-editor token-name"
+    class="one-label name-editor token-name sidebar-item-title"
     click=(action "editorClick")}}
 {{else}}
-  {{#truncated-string}}
+  {{#truncated-string class="sidebar-item-title"}}
     {{name-conflict item=item tagName="span" class="one-label token-name"}}
   {{/truncated-string}}
 {{/if}}
