@@ -2795,31 +2795,31 @@ describe('Integration | Component | token editor', function () {
 
 class InviteTypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.inviteType-field .ember-basic-dropdown');
+    super('.inviteType-field', '.ember-basic-dropdown-content');
   }
 }
 
 class TargetHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.target-field .ember-basic-dropdown');
+    super('.target-field', '.ember-basic-dropdown-content');
   }
 }
 
 class RegionTypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.regionType-field .ember-basic-dropdown');
+    super('.regionType-field', '.ember-basic-dropdown-content');
   }
 }
 
 class CountryTypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.countryType-field .ember-basic-dropdown');
+    super('.countryType-field', '.ember-basic-dropdown-content');
   }
 }
 
 class PathSpaceHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.pathSpace-field .ember-basic-dropdown');
+    super('.pathSpace-field', '.ember-basic-dropdown-content');
   }
 }
 
