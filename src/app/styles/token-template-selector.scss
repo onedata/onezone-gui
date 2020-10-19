@@ -1,7 +1,37 @@
 .token-template-selector {
+  .one-collapsible-list {
+    margin-top: $padding-large-vertical;
+  }
+
+  .one-collapsible-list-item-header h1 {
+    line-height: 1;
+  }
+
+  .one-tile-container {
+    margin: 0;
+    justify-content: flex-start;
+    padding: 0 $padding-base-horizontal $padding-base-horizontal 0;
+  }
+
+  @media (max-width: $screen-sm-max) {
+    .one-tile-container {
+      justify-content: center;
+    }
+  }
+
   .one-carousel {
     position: absolute;
     @include fill-container();
+  }
+
+  .one-tile {
+    margin: $padding-base-horizontal 0 0 $padding-base-horizontal;
+    width: 240px;
+    height: 240px;
+
+    .tile-title {
+      @include font-semibold();
+    }
   }
 
   [data-one-carousel-slide-id='selector'] {
@@ -21,7 +51,7 @@
     }
 
     .search-bar {
-      width: 13em;
+      width: 11em;
     }
 
     .scroll-top-shadow {

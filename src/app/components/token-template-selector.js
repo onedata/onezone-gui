@@ -14,7 +14,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
-  classNames: ['token-template-selector', 'one-tile-container'],
+  classNames: ['token-template-selector'],
 
   /**
    * @override
@@ -28,4 +28,10 @@ export default Component.extend(I18n, {
    * @param {Object} template
    */
   onTemplateSelected: notImplementedIgnore,
+
+  didInsertElement() {
+    this._super(...arguments);
+
+    this.$('.one-collapsible-list-item-header').eq(0).click();
+  },
 });
