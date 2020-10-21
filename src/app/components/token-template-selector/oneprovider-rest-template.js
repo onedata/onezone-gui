@@ -30,7 +30,7 @@ export default SingleStepTemplate.extend({
    */
   generateTemplate() {
     return {
-      name: constructTokenName('Oneprovider REST'),
+      name: constructTokenName(String(this.t('newTokenNamePrefix'))),
       caveats: [{
         type: 'service',
         whitelist: ['opw-*'],

@@ -88,6 +88,10 @@ describe('Integration | Component | content tokens new', function () {
       name: 'onezone',
       serviceType: 'onezone',
     });
+    sinon.stub(lookupService(this, 'navigation-state'), 'changeRouteAspectOptions')
+      .callsFake(function (newOptions) {
+        this.set('aspectOptions', newOptions);
+      });
   });
 
   it('has class "content-tokens-new', function () {
@@ -158,7 +162,7 @@ describe('Integration | Component | content tokens new', function () {
     'injects values passed via aspectOptions to form',
     async function () {
       set(lookupService(this, 'navigation-state'), 'aspectOptions', {
-        tokenTemplate: encodeURIComponent(JSON.stringify({
+        tokenTemplate: btoa(JSON.stringify({
           type: {
             inviteToken: {
               inviteType: 'userJoinHarvester',
@@ -235,20 +239,20 @@ describe('Integration | Component | content tokens new', function () {
     expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
   });
 
-  it('allows to select "Read only data" template', async function () {
+  it('allows to select "Read-only data" template', async function () {
     await renderAndSelectTemplate(this, 'readonlyData');
 
-    checkShowsTemplate('Read only data access');
-    checkTokenEditorHasName(this, /Read only data .+/);
+    checkShowsTemplate('Read‐only data access');
+    checkTokenEditorHasName(this, /Read-only data .+/);
     expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
   });
 
-  it('allows to select "Read only data for user" template', async function () {
+  it('allows to select "Read-only data for user" template', async function () {
     await renderAndSelectTemplate(this, 'readonlyDataForUser');
     await click('.record-item:first-child');
 
-    checkShowsTemplate('Read only data access for specific user');
-    checkTokenEditorHasName(this, /Read only data for me .+/);
+    checkShowsTemplate('Read‐only data access for specific user');
+    checkTokenEditorHasName(this, /Read-only data for me .+/);
     const $consumerCaveatTags = this.$('.consumer-field .tag-item');
     expect($consumerCaveatTags).to.have.length(1);
     expect($consumerCaveatTags.text().trim()).to.equal('me');
@@ -290,7 +294,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it(
-    'resets form back to the templates default after user choose template, modified form, came back to templates list and selected the same template again',
+    'resets form back to the templates default after user chose template, modified form, came back to templates list and selected the same template again',
     async function () {
       await renderAndSelectTemplate(this, 'onezoneRest');
       await click('.interface-field .option-oneclient');

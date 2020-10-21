@@ -8,8 +8,15 @@
  */
 
 import EmberObject, { getProperties, get, set } from '@ember/object';
-import { Promise, resolve, all as allFulfilled } from 'rsvp';
+import { resolve, all as allFulfilled } from 'rsvp';
 
+/**
+ * Set of converters for each token caveat. Used to convert array of caveats from a token
+ * to a form consumable by the token editor. Its is a mapping:
+ * token caveat type (from raw token) ->
+ *  (rawCaveat: Object, getRecord: Function) => Promise<Object>
+ * where returned promise resolves to a caveat object ready to use by token editor.
+ */
 const caveatConverters = {
   'time': caveat => resolve(new Date((get(caveat, 'validUntil') || 0) * 1000)),
   'geo.region': regionCountryConverter,
@@ -133,7 +140,7 @@ function regionCountryConverter(caveat) {
 
 function consumerConverter(caveat, getRecord) {
   const whitelist = get(caveat, 'whitelist') || [];
-  return Promise.all(whitelist.map(recordIdentifier => {
+  return allFulfilled(whitelist.map(recordIdentifier => {
     const [modelAbbrev, entityId] = recordIdentifier.split('-');
     const modelName = prefixToConsumerModel[modelAbbrev];
     if (!modelName) {
@@ -160,7 +167,7 @@ function consumerConverter(caveat, getRecord) {
 
 function serviceConverter(caveat, getRecord) {
   const whitelist = get(caveat, 'whitelist') || [];
-  return Promise.all(whitelist.map(recordIdentifier => {
+  return allFulfilled(whitelist.map(recordIdentifier => {
     const [modelAbbrev, entityId] = recordIdentifier.split('-');
     const editorModelName = ['opp', 'ozp'].includes(modelAbbrev) ?
       'serviceOnepanel' : 'service';

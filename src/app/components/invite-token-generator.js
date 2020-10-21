@@ -130,7 +130,8 @@ export default Component.extend(I18n, {
             'new', {
               queryParams: {
                 options: serializeAspectOptions({
-                  tokenTemplate: encodeURIComponent(JSON.stringify(tokenTemplate)),
+                  activeSlide: 'form',
+                  tokenTemplate: btoa(JSON.stringify(tokenTemplate)),
                 }),
               },
             }

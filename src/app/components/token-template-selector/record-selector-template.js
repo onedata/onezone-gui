@@ -139,8 +139,11 @@ export default Component.extend(I18n, {
       return true;
     }
     const normalizedFilter = filter.toLocaleLowerCase();
-
-    return (get(record, 'name') || '').toLocaleLowerCase().includes(normalizedFilter);
+    const filterDependentKeys = this.get('filterDependentKeys');
+    return filterDependentKeys.map(key => get(record, key))
+      .compact()
+      .map(value => value.toLocaleLowerCase().includes(normalizedFilter))
+      .includes(true);
   },
 
   loadRecordsIfNeeded() {

@@ -29,7 +29,7 @@ export default SingleStepTemplate.extend({
    */
   generateTemplate() {
     return {
-      name: constructTokenName('Oneclient'),
+      name: constructTokenName(String(this.t('newTokenNamePrefix'))),
       caveats: [{
         type: 'interface',
         interface: 'oneclient',

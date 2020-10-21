@@ -1,11 +1,9 @@
-{{!-- FIXME: i18n czekamy na ŁO z tekstem --}}
-<p>
-  A token is a short text information, which can be used to grant access to specific operations and data (like files, statistics, etc.), work as an user identity proof or be an invitation to become a member of some resource (e.g. space). To create a token, please choose one of predefined templates below. Then you will see details of the choosen token with a possibility to adjust it's properties before creation.
-  <br><strong>Notice:</strong> invitation token templates are available through members view of each resource.
-</p>
+<p>{{tt this "intro.tokenDefinition"}} {{one-doc-see-more docPath="using_onedata/tokens.html"}}</p>
+<p>{{tt this "intro.templatesDescription"}}</p>
+<p>{{tt this "intro.inviteTokensNote"}}</p>
 {{#one-collapsible-list as |list|}}
   {{#list.item as |listItem|}}
-    {{#listItem.header}}<h1>Basic</h1>{{/listItem.header}}
+    {{#listItem.header}}<h1>{{tt this "templateCategories.basic"}}</h1>{{/listItem.header}}
     {{#listItem.content}}
       <div class="one-tile-container">
         {{token-template-selector/onezone-rest-template onSelected=onTemplateSelected}}
@@ -15,7 +13,7 @@
     {{/listItem.content}}
   {{/list.item}}
   {{#list.item as |listItem|}}
-    {{#listItem.header}}<h1>Advanced</h1>{{/listItem.header}}
+    {{#listItem.header}}<h1>{{tt this "templateCategories.advanced"}}</h1>{{/listItem.header}}
     {{#listItem.content}}
       <div class="one-tile-container">
         {{token-template-selector/oneclient-in-oneprovider-template onSelected=onTemplateSelected}}
@@ -27,12 +25,16 @@
     {{/listItem.content}}
   {{/list.item}}
   {{#list.item as |listItem|}}
-    {{#listItem.header}}<h1>Custom</h1>{{/listItem.header}}
-    {{#listItem.content}}
-      <div class="one-tile-container">
-        {{token-template-selector/custom-template onSelected=onTemplateSelected}}
-      </div>
-    {{/listItem.content}}
+    {{#listItem.header
+      click=(action "onCustomTemplateSelected")
+      disableToggleIcon=true
+      class="template-custom"
+    }}
+      <h1>
+        {{tt this "templateCategories.custom"}}
+        {{one-icon icon="arrow-right" class="category-link-arrow"}}
+      </h1>
+    {{/listItem.header}}
   {{/list.item}}
 {{/one-collapsible-list}}
 

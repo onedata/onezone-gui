@@ -145,7 +145,7 @@ const caveats = [{
   tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request - e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
 }, {
   name: 'readonly',
-  label: 'Read only',
+  label: 'Read‐only',
   disabledDescription: 'This token can be used for both reading and writing user files.',
   tip: 'Allows only read access to user files.',
   dontTestValue: true,

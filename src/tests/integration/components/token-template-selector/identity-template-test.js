@@ -29,8 +29,8 @@ describe(
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
       this.render(hbs `{{token-template-selector/identity-template
-      onSelected=selectedSpy
-    }}`);
+        onSelected=selectedSpy
+      }}`);
 
       await click('.one-tile');
       expect(selectedSpy)

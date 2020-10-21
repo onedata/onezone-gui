@@ -63,7 +63,7 @@ describe(
         const $tile = this.$('.one-tile');
         expect($tile).to.have.class('template-readonlyDataForUser');
         expect($tile.find('.tile-title').text().trim())
-          .to.equal('Read only data access for specific user');
+          .to.equal('Read‐only data access for specific user');
         expect($tile.find('.main-image'))
           .to.have.attr('src', 'assets/images/space-data.svg');
       }
@@ -92,7 +92,7 @@ describe(
       await click('.record-item:first-child');
       expect(selectedSpy)
         .to.be.calledOnce.and.to.be.calledWith('readonlyDataForUser', sinon.match({
-          name: sinon.match(/Read only data for duplicated .+/),
+          name: sinon.match(/Read-only data for duplicated .+/),
           caveats: [
             sinon.match({
               type: 'consumer',

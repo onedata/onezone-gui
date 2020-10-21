@@ -10,9 +10,19 @@
 
 import Component from '@ember/component';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { inject as service } from '@ember/service';
+import { tag } from 'ember-awesome-macros';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: '',
+
+  i18n: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: tag `components.tokenTemplateSelector.templates.${'templateName'}`,
 
   /**
    * @virtual

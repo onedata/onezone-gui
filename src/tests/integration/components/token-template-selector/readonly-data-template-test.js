@@ -19,7 +19,7 @@ describe(
 
         const $tile = this.$('.one-tile');
         expect($tile).to.have.class('template-readonlyData');
-        expect($tile.find('.tile-title').text().trim()).to.equal('Read only data access');
+        expect($tile.find('.tile-title').text().trim()).to.equal('Read‐only data access');
         expect($tile.find('.main-image'))
           .to.have.attr('src', 'assets/images/space-data.svg');
       }
@@ -36,7 +36,7 @@ describe(
       expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith(
         'readonlyData',
         sinon.match({
-          name: sinon.match(/Read only data .+/),
+          name: sinon.match(/Read-only data .+/),
           caveats: [
             sinon.match({
               type: 'data.readonly',

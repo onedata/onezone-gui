@@ -10,14 +10,19 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { conditional, raw } from 'ember-awesome-macros';
+import { conditional, raw, array } from 'ember-awesome-macros';
 import { observer } from '@ember/object';
+import { reads } from '@ember/object/computed';
+import { next } from '@ember/runloop';
+
+const possibleSlideIds = ['templates', 'form'];
 
 export default Component.extend(I18n, {
   classNames: ['content-tokens-new'],
 
   tokenActions: service(),
   navigationState: service(),
+  router: service(),
   store: service(),
 
   /**
@@ -26,26 +31,26 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentTokensNew',
 
   /**
-   * @type {Boolean}
-   */
-  hasSelectedTemplate: false,
-
-  /**
    * @type {String}
    */
-  lastSelectedTemplateName: undefined,
+  lastSelectedTemplateName: 'custom',
 
   /**
    * @type {Object}
    */
-  lastSelectedTemplate: undefined,
+  lastSelectedTemplate: Object.freeze({}),
+
+  /**
+   * @type {ComputedProperty<String|undefined>}
+   */
+  activeSlideFromUrl: reads('navigationState.aspectOptions.activeSlide'),
 
   /**
    * @type {ComputedProperty<String>}
    */
   activeSlide: conditional(
-    'hasSelectedTemplate',
-    raw('form'),
+    array.includes(raw(possibleSlideIds), 'activeSlideFromUrl'),
+    'activeSlideFromUrl',
     raw('templates')
   ),
 
@@ -66,7 +71,7 @@ export default Component.extend(I18n, {
 
   loadTokenTemplateFromUrl() {
     const stringifiedTokenTemplate =
-      decodeURIComponent(this.get('navigationState.aspectOptions.tokenTemplate') || '');
+      atob(this.get('navigationState.aspectOptions.tokenTemplate') || '');
     if (stringifiedTokenTemplate) {
       try {
         const tokenTemplate = JSON.parse(stringifiedTokenTemplate);
@@ -83,7 +88,15 @@ export default Component.extend(I18n, {
         lastSelectedTemplateName: templateName,
         // Create a real (but unsaved) record to provide token-related computed properties
         lastSelectedTemplate: this.get('store').createRecord('token', template),
-        hasSelectedTemplate: true,
+      });
+      // `next` fixes scrool-top animation and double transition error, when token
+      // template is given via url (see `init` and `loadTokenTemplateFromUrl`)
+      next(() => {
+        if (this.get('activeSlide') !== 'form') {
+          this.get('navigationState').changeRouteAspectOptions({
+            activeSlide: 'form',
+          });
+        }
       });
     }
   },
@@ -93,7 +106,10 @@ export default Component.extend(I18n, {
       this.selectTemplate(templateName, template);
     },
     backToTemplates() {
-      this.set('hasSelectedTemplate', false);
+      this.get('navigationState').changeRouteAspectOptions({
+        activeSlide: 'templates',
+        tokenTemplate: null,
+      });
     },
     submit(rawToken) {
       const createTokenAction = this.get('tokenActions')

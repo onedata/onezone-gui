@@ -1,5 +1,5 @@
 /**
- * Allows to selected onr of predefined token templates, which then can be used in
+ * Allows to select one of predefined token templates, which then can be used in
  * the token form. Each template is token-compatible object with some fields containing
  * default data.
  *
@@ -32,6 +32,12 @@ export default Component.extend(I18n, {
   didInsertElement() {
     this._super(...arguments);
 
-    this.$('.one-collapsible-list-item-header').eq(0).click();
+    this.get('element').querySelector('.one-collapsible-list-item-header').click();
+  },
+
+  actions: {
+    onCustomTemplateSelected() {
+      this.get('onTemplateSelected')('custom', {});
+    },
   },
 });

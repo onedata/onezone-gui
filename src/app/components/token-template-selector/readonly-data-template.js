@@ -1,5 +1,5 @@
 /**
- * Read only data token template. Sets token readonly caveat.
+ * Read-only data token template. Sets token readonly caveat.
  *
  * @module components/token-template-selector/readonly-data-template
  * @author Michał Borzęcki
@@ -22,15 +22,6 @@ export default SingleStepTemplate.extend({
   /**
    * @override
    */
-  template: Object.freeze({
-    caveats: [{
-      type: 'data.readonly',
-    }],
-  }),
-
-  /**
-   * @override
-   */
   imagePath: 'assets/images/space-data.svg',
 
   /**
@@ -38,7 +29,7 @@ export default SingleStepTemplate.extend({
    */
   generateTemplate() {
     return {
-      name: constructTokenName('Read only data'),
+      name: constructTokenName(String(this.t('newTokenNamePrefix'))),
       caveats: [{
         type: 'data.readonly',
       }],

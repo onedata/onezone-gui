@@ -120,7 +120,8 @@ describe('Integration | Component | invite token generator', function () {
       shouldAdvanceTime: true,
     }));
     const correctRouteOptions = {
-      tokenTemplate: encodeURIComponent(JSON.stringify({
+      activeSlide: 'form',
+      tokenTemplate: btoa(JSON.stringify({
         type: {
           inviteToken: {
             inviteType: 'userJoinGroup',

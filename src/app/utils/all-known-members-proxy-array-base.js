@@ -33,6 +33,42 @@ export default ArrayProxy.extend({
    */
   allRecordsProxy: undefined,
 
+  /**
+   * Set in `init`
+   * @type {PromiseArray<Models.Group>}
+   */
+  groupsProxy: undefined,
+
+  /**
+   * Set in `init`
+   * @type {PromiseArray<Models.Space>}
+   */
+  spacesProxy: undefined,
+
+  /**
+   * Set in `init` (only when `memberModelName` is `user`)
+   * @type {PromiseArray<PromiseArray<Models.User>>|undefined}
+   */
+  groupsUsersListsProxy: undefined,
+
+  /**
+   * Set in `init` (only when `memberModelName` is `user`)
+   * @type {PromiseArray<PromiseArray<Models.User>>|undefined}
+   */
+  spacesUsersListsProxy: undefined,
+
+  /**
+   * Set in `init` (only when `memberModelName` is `group`)
+   * @type {PromiseArray<PromiseArray<Models.Group>>|undefined}
+   */
+  groupsGroupsListsProxy: undefined,
+
+  /**
+   * Set in `init` (only when `memberModelName` is `group`)
+   * @type {PromiseArray<PromiseArray<Models.Group>>|undefined}
+   */
+  spacesGroupsListsProxy: undefined,
+
   allRecordsProxyObserver: observer(
     'allRecordsProxy.[]',
     function allRecordsProxyObserver() {
@@ -59,15 +95,14 @@ export default ArrayProxy.extend({
         return this.get('recordManager').getUserRecordList(modelName)
           .then(recordList => get(recordList, 'list'));
       }));
-      toSet[`${modelName}s${upperFirstMemberModelName}sListsProxy`] = computed(
-        `${modelName}sProxy.@each.isReloading`,
-        function computedLists() {
+      toSet[`${modelName}s${upperFirstMemberModelName}sListsProxy`] = promise.array(
+        computed(`${modelName}sProxy.@each.isReloading`, function computedLists() {
           return this.get(`${modelName}sProxy`)
             .then(parents => onlyFulfilledValues(
               parents.mapBy(`eff${upperFirstMemberModelName}List`)
             ))
             .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
-        }
+        })
       );
     });
 

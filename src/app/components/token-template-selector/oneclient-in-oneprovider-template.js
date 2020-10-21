@@ -48,7 +48,7 @@ export default RecordSelectorTemplate.extend({
    */
   generateTemplateFromRecord(record) {
     return {
-      name: constructTokenName('Oneclient in ', get(record, 'name')),
+      name: constructTokenName(String(this.t('newTokenNamePrefix')), get(record, 'name')),
       caveats: [{
         type: 'interface',
         interface: 'oneclient',

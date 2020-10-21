@@ -48,7 +48,7 @@ export default RecordSelectorTemplate.extend({
    */
   generateTemplateFromRecord(record) {
     return {
-      name: constructTokenName('Restricted data acc. ', get(record, 'name')),
+      name: constructTokenName(String(this.t('newTokenNamePrefix')), get(record, 'name')),
       caveats: [{
         type: 'data.path',
         whitelist: [btoa(`/${get(record, 'entityId')}`)],

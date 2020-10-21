@@ -33,7 +33,7 @@ export default Service.extend({
 
   /**
    * Fetches collection of all groups
-   * 
+   *
    * @return {Promise<DS.RecordArray<GroupList>>} resolves to an array of groups
    */
   getGroups() {
@@ -66,7 +66,7 @@ export default Service.extend({
   },
 
   /**
-   * @returns {PromiseArray<Models.User>}
+   * @returns {PromiseArray<Models.Group>}
    */
   getAllKnownGroups() {
     const knownGroupsProxy = AllKnownGroupsProxyArray.create({
@@ -174,7 +174,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {string} childEntityId
    * @returns {Promise}
    */
@@ -198,7 +198,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} groupEntityId 
+   * @param {string} groupEntityId
    * @param {string} userEntityId
    * @returns {Promise}
    */
@@ -225,7 +225,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {string} childEntityId
    * @returns {Promise}
    */
@@ -250,7 +250,7 @@ export default Service.extend({
 
   /**
    * Creates parent for specified child group
-   * @param {string} childEntityId 
+   * @param {string} childEntityId
    * @param {Object} parentGroupRepresentation
    * @return {Promise}
    */
@@ -273,7 +273,7 @@ export default Service.extend({
 
   /**
    * Creates child for specified parent group
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {Object} childGroupRepresentation
    * @return {Promise}
    */
@@ -300,7 +300,7 @@ export default Service.extend({
 
   /**
    * Adds group to the children of another group
-   * @param {string} groupEntityId 
+   * @param {string} groupEntityId
    * @param {string} futureChildEntityId
    * @return {Promise}
    */

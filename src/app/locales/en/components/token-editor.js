@@ -248,7 +248,7 @@ export default {
       dataAccessCaveats: {
         readonlyCaveat: {
           readonlyEnabled: {
-            label: 'Read only',
+            label: 'Read‐only',
             tip: 'Allows only read access to user files.',
           },
           readonlyEnabledText: {
@@ -298,7 +298,7 @@ export default {
     detailsIntro: 'To obtain a token that can be securely used for accessing other services (e.g. Oneprovider REST/CDMI API or mounting Oneclient), you should add <strong>at least one</strong> of the following caveats:',
     detailsServiceItem: 'Service (but without Onezone service whitelisted)',
     detailsInterfaceItem: 'Interface = Oneclient',
-    detailsReadonlyItem: 'Read only',
+    detailsReadonlyItem: 'Read‐only',
     detailsPathItem: 'Path',
     detailsObjectIdItem: 'Object ID',
     detailsNeverEnclose: 'Never enclose your tokens (even those secured with proper caveats) to services that are not trusted.',

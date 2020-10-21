@@ -71,7 +71,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {Models.User} user 
+   * @param {Models.User} user
    * @returns {Promise}
    */
   remove(user) {

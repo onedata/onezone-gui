@@ -5,6 +5,15 @@
 
   .one-collapsible-list-item-header h1 {
     line-height: 1;
+    // reset padding in mobile view
+    padding: 0;
+  }
+
+  .category-link-arrow {
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 0;
+    vertical-align: middle;
   }
 
   .one-tile-container {
@@ -34,7 +43,7 @@
     }
   }
 
-  [data-one-carousel-slide-id='selector'] {
+  .record-selector-slide {
     display: flex;
     flex-direction: column;
 
