@@ -24,7 +24,7 @@ const tokenTypeToIconNameMapping = {
 };
 
 export default Component.extend(I18n, {
-  classNames: ['token-item'],
+  classNames: ['token-item', 'item-header-inner-container'],
   classNameBindings: ['isTokenActive::inactive-token'],
 
   i18n: service(),

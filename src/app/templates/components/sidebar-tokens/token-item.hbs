@@ -8,7 +8,8 @@
     editOnClick=false
     onEdit=(action "toggleRename")
     class="one-label name-editor token-name sidebar-item-title"
-    click=(action "editorClick")}}
+    click=(action "editorClick")
+  }}
 {{else}}
   {{#truncated-string class="sidebar-item-title"}}
     {{name-conflict item=item tagName="span" class="one-label token-name"}}
@@ -20,7 +21,8 @@
     isMinimized=true
     dropdownPlacement="auto"
     actionsArray=actionsArray
-    toolbarToggleClasses="token-menu-trigger"}}
+    toolbarToggleClasses="token-menu-trigger"
+  }}
 
   {{#render-later triggerRender=isRemoveTokenModalOpened as |renderLater|}}
     {{remove-token-modal
@@ -29,7 +31,8 @@
       close=(action "closeRemoveTokenModal")
       processing=isRemovingToken
       token=token
-      onHidden=renderLater.resetRenderTrigger}}
+      onHidden=renderLater.resetRenderTrigger
+    }}
   {{/render-later}}
 {{/unless}}
 {{yield}}

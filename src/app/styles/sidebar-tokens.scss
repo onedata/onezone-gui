@@ -1,11 +1,4 @@
 .sidebar-tokens {
-  .token-item {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    min-width: 0;
-  }
-
   .token-item.inactive-token {
     .sidebar-item-icon, .token-name:not(.editor) {
       opacity: 0.6;
