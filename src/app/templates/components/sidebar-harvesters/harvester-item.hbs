@@ -1,16 +1,17 @@
 {{one-icon class="sidebar-item-icon" icon=(oneicon-alias "harvester")}}
 {{#if isRenaming}}
   {{one-inline-editor
-    isEditing=isRenaming
+    isEditing=true
     value=item.name
     showEmptyInfo=false
     onSave=(action "rename")
     editOnClick=false
     onEdit=(action "toggleRename")
-    class="one-label name-editor"
-    click=(action "editorClick")}}
+    class="one-label name-editor sidebar-item-title"
+    click=(action "editorClick")
+  }}
 {{else}}
-  {{#truncated-string}}
+  {{#truncated-string class="sidebar-item-title"}}
     {{name-conflict item=item tagName="span" class="one-label"}}
   {{/truncated-string}}
 {{/if}}
@@ -19,7 +20,8 @@
   {{actions-toolbar
     isMinimized=true
     dropdownPlacement="auto"
-    actionsArray=itemActions}}
+    actionsArray=itemActions
+  }}
 
   {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
     {{leave-modal
@@ -28,7 +30,8 @@
       proceed=(action "leave")
       processing=isLeaving
       record=harvester
-      onHidden=renderLater.resetRenderTrigger}}
+      onHidden=renderLater.resetRenderTrigger
+    }}
   {{/render-later}}
 
   {{#render-later triggerRender=isRemoveModalOpened as |renderLater|}}
@@ -38,6 +41,7 @@
       proceed=(action "remove")
       processing=isRemoving
       record=harvester
-      onHidden=renderLater.resetRenderTrigger}}
+      onHidden=renderLater.resetRenderTrigger
+    }}
   {{/render-later}}
 {{/unless}}
