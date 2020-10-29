@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6935 Fixed blank content page when resource access is forbidden
 * VFS-6835 Sidebar items layout changed to use flexbox
 * VFS-6852 Fixed Oneprovider and Onezone services not showing in tokens creator's service caveat list when user had no access to service cluster
 * VFS-6801 Disabled ceasing space support feature in favour of removing space in GUI
