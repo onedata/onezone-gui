@@ -1,5 +1,5 @@
 <svg
-  class={{concat progressChartClassNames " more-info-trigger-" elementId}}
+  class={{concat-classes progressChartClassNames moreInfoTriggerClass}}
   viewBox="0 0 100 100"
   {{action "toggleMoreInfo" (not isMoreInfoVisible)}}>
   {{#if isSupported}}
@@ -9,14 +9,21 @@
   {{/if}}
 </svg>
 <div>
+  {{#if error}}
+    <img
+      class={{concat-classes "warning-icon" moreInfoTriggerClass}}
+      src={{root-url "assets/images/sign-warning-large.svg"}}
+      {{action "toggleMoreInfo" (not isMoreInfoVisible)}}
+    >
+  {{/if}}
   {{#render-later triggerRender=isMoreInfoVisible}}
     {{#one-webui-popover
       class="progress-more-info"
-      triggerSelector=(concat ".more-info-trigger-" elementId)
+      triggerSelector=(concat "." progressChartIdClass)
       open=isMoreInfoVisible
       registerApi=(action "registerPopoverApi")
       as |popover|}}
-      {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat ".more-info-trigger-" elementId)}}
+      {{#click-outside action=(action "toggleMoreInfo" false) except-selector=(concat "." moreInfoTriggerClass)}}
         <ul class="description-items">
           <li><strong>{{tt this "space"}}:</strong> <span class="space-name">{{space.name}}</span></li>
           <li><strong>{{tt this "provider"}}:</strong> <span class="provider-name">{{provider.name}}</span></li>

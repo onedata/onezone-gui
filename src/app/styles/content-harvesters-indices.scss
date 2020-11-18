@@ -39,7 +39,7 @@
       flex-direction: column;
       align-items: center;
     }
-  
+
     .form-component {
       width: calc(100% - #{$padding-large-horizontal});
 
@@ -69,7 +69,7 @@
         .toggle-field-renderer {
           display: inline-flex;
           min-width: 190px;
-  
+
           .control-label {
             order: 1;
             flex-grow: 1;
@@ -80,7 +80,7 @@
             padding-right: 3 * $padding-base-vertical;
             text-align: left;
           }
-      
+
           .field-component {
             flex-grow: initial;
           }
@@ -166,8 +166,14 @@
 
     .progress-table-cell {
       position: relative;
+
       &.inactive {
         opacity: 0.4;
+      }
+
+      .warning-icon {
+        position: absolute;
+        width: 18px;
       }
     }
 
@@ -232,6 +238,11 @@
         transform: translateY(-50%);
         height: $chart-size;
         width: $chart-size;
+
+        .warning-icon {
+          top: -10px;
+          right: -12px;
+        }
       }
     }
 
@@ -248,36 +259,41 @@
         max-height: 70vh;
         min-height: 400px;
       }
-  
+
       .progress-table-cell {
         height: $chart-size * 1.5;
         width: $chart-size * 1.5;
         min-width: $chart-size * 1.5;
+
+        .warning-icon {
+          top: 4px;
+          right: 4px;
+        }
       }
-  
+
       .row-label,
       .column-label {
         word-wrap: break-word;
         line-height: 1;
       }
-  
+
       .row-label {
         vertical-align: middle;
         text-align: right;
         padding: $padding-base-vertical $padding-large-horizontal $padding-base-vertical 0;
         max-width: 120px;
-    
+
         .one-label {
           width: 100%;
         }
       }
-  
+
       .column-label {
         vertical-align: bottom;
         text-align: center;
         padding-top: $padding-large-vertical;
         padding-bottom: $padding-large-vertical;
-    
+
         .one-label {
           display: inline-block;
           vertical-align: top;
@@ -290,7 +306,7 @@
           overflow: hidden;
         }
       }
-  
+
       .constant-row-label,
       .constant-column-labels {
         visibility: hidden;
@@ -302,7 +318,7 @@
           @include hide-after-shadow;
         }
       }
-  
+
       .floating-row-label {
         position: absolute;
         left: 0;
@@ -315,7 +331,7 @@
         background-color: $main-content-hover-background;
         @include after-right-shadow;
       }
-  
+
       .floating-column-labels {
         position: absolute;
         display: flex;
@@ -376,7 +392,7 @@
       .ps {
         height: 100%;
       }
-  
+
       .ps__rail-x,
       .ps__rail-y {
         z-index: 2;
