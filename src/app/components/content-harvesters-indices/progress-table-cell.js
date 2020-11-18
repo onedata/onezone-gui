@@ -82,6 +82,16 @@ export default Component.extend(I18n, {
   isActive: not('progress.archival'),
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  moreInfoTriggerClass: tag `more-info-trigger-${'elementId'}`,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  progressChartIdClass: tag `progress-chart-${'elementId'}`,
+
+  /**
    * @type {Ember.ComputedProperty<number>}
    *
    * Integer between 0 and 100 calculated using currentSeq and maxSeq
@@ -158,16 +168,6 @@ export default Component.extend(I18n, {
       return classes.join(' ');
     }
   ),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  moreInfoTriggerClass: tag `more-info-trigger-${'elementId'}`,
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  progressChartIdClass: tag `progress-chart-${'elementId'}`,
 
   /**
    * @type {Ember.ComputedProperty<string>}
