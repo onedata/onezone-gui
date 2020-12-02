@@ -1250,17 +1250,19 @@ export default Component.extend(I18n, {
           );
           if (isCaveatEnabled) {
             if (isInViewMode) {
+              const spaceEntries = valueFromToken ?
+                Object.keys(valueFromToken).without('__fieldsValueNames')
+                .map(key => {
+                  const record = get(valueFromToken, `${key}.pathSpace`);
+                  return {
+                    value: record,
+                    label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
+                    icon: recordIcon(record),
+                  };
+                }) : [];
               this.setProperties({
                 spacesProxy: PromiseArray.create({
-                  promise: resolve(Object.keys(valueFromToken).without('__fieldsValueNames')
-                    .map(key => {
-                      const record = get(valueFromToken, `${key}.pathSpace`);
-                      return {
-                        value: record,
-                        label: get(record, 'name') || `ID: ${get(record, 'entityId')}`,
-                        icon: recordIcon(record),
-                      };
-                    })),
+                  promise: resolve(spaceEntries),
                 }),
                 spacesProxyIsForMode: 'view',
               });
@@ -1503,7 +1505,7 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {String} modelName 
+   * @param {String} modelName
    * @returns {PromiseArray<FieldOption>}
    */
   getRecordOptionsForModel(modelName) {
@@ -1552,7 +1554,7 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {String} modelName 
+   * @param {String} modelName
    * @returns {PromiseArray<String>}
    */
   getPrivilegesPresetForModel(modelName) {
