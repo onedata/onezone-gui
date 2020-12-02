@@ -22,7 +22,7 @@ export default SingleStepTemplate.extend({
   /**
    * @override
    */
-  imagePath: 'assets/images/space-data.svg',
+  imagePath: 'assets/images/token-templates/oneclient.svg',
 
   /**
    * @override

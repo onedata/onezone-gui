@@ -21,7 +21,7 @@ describe(
         expect($tile).to.have.class('template-readonlyData');
         expect($tile.find('.tile-title').text().trim()).to.equal('Read‐only data access');
         expect($tile.find('.main-image'))
-          .to.have.attr('src', 'assets/images/space-data.svg');
+          .to.have.attr('src', 'assets/images/token-templates/readonly-data-access.svg');
       }
     );
 

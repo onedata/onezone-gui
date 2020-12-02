@@ -48,8 +48,8 @@ describe(
         expect($tile).to.have.class('template-restrictedData');
         expect($tile.find('.tile-title').text().trim())
           .to.equal('Restricted data access');
-        expect($tile.find('.main-image'))
-          .to.have.attr('src', 'assets/images/space-data.svg');
+        expect($tile.find('.main-image')).to.have
+          .attr('src', 'assets/images/token-templates/restricted-data-access.svg');
       }
     );
 

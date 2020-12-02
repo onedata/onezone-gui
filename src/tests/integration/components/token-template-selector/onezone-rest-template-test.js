@@ -21,7 +21,7 @@ describe(
         expect($tile).to.have.class('template-onezoneRest');
         expect($tile.find('.tile-title').text().trim()).to.equal('Onezone REST access');
         expect($tile.find('.main-image'))
-          .to.have.attr('src', 'assets/images/space-data.svg');
+          .to.have.attr('src', 'assets/images/token-templates/onezone-rest.svg');
       }
     );
 

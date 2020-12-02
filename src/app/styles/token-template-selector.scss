@@ -41,7 +41,32 @@
     .tile-title {
       @include font-semibold();
     }
+
+    .main-image {
+      max-width: 110px;
+    }
   }
+
+  .template-oneproviderRest .main-image {
+    max-width: 101px;
+    margin-top: -17px;
+  }
+
+  .template-oneclientInOneprovider .main-image {
+    max-width: 115px;
+  }
+
+  .template-readonlyData,
+  .template-readonlyDataForUser {
+    .main-image {
+      max-width: 101px;
+    }
+  }
+
+  .template-restrictedData .main-image {
+    max-width: 160px;
+  }
+
 
   .record-selector-slide {
     display: flex;

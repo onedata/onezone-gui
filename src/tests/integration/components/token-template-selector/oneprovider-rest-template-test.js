@@ -21,7 +21,7 @@ describe(
         expect($tile).to.have.class('template-oneproviderRest');
         expect($tile.find('.tile-title').text().trim()).to.equal('Oneprovider REST/CDMI access');
         expect($tile.find('.main-image'))
-          .to.have.attr('src', 'assets/images/space-data.svg');
+          .to.have.attr('src', 'assets/images/token-templates/oneprovider-rest.svg');
       }
     );
 
