@@ -1,8 +1,8 @@
 {{one-icon class="sidebar-item-icon" icon="space"}}
-{{#truncated-string class="after-icon before-status with-place-for-dots"}}
+{{#truncated-string class="sidebar-item-title"}}
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
-{{#status-toolbar class="with-place-for-dots" as |toolbar|}}
+{{#status-toolbar as |toolbar|}}
   {{toolbar.icon
     outerText=_totalSupportSizeHumanReadable
     hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)

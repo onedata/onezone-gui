@@ -14,6 +14,7 @@ import { inject as service } from '@ember/service';
 import { computed, getProperties } from '@ember/object';
 import { reads, not } from '@ember/object/computed';
 import moment from 'moment';
+import { tag } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'td',
@@ -30,7 +31,7 @@ export default Component.extend(I18n, {
   /**
    * @virtual
    * @type {Object}
-   * 
+   *
    * Object in format:
    * `
    * {
@@ -49,7 +50,7 @@ export default Component.extend(I18n, {
 
   /**
    * @type {boolean}
-   * 
+   *
    * If true, popover with additional info will be visible
    */
   isMoreInfoVisible: false,
@@ -81,8 +82,18 @@ export default Component.extend(I18n, {
   isActive: not('progress.archival'),
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  moreInfoTriggerClass: tag `more-info-trigger-${'elementId'}`,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  progressChartIdClass: tag `progress-chart-${'elementId'}`,
+
+  /**
    * @type {Ember.ComputedProperty<number>}
-   * 
+   *
    * Integer between 0 and 100 calculated using currentSeq and maxSeq
    */
   percent: computed(
@@ -113,7 +124,7 @@ export default Component.extend(I18n, {
 
   /**
    * @type {Ember.ComputedProperty<string|undefined>}
-   * 
+   *
    * Last index update time converted from unix timestamp to readable format
    */
   lastUpdate: computed('progress.lastUpdate', function lastUpdate() {
@@ -135,14 +146,16 @@ export default Component.extend(I18n, {
     'isSupported',
     'percent',
     'error',
+    'progressChartIdClass',
     function valueClass() {
       const {
         isSupported,
         percent,
         error,
-      } = this.getProperties('isSupported', 'percent', 'error');
+        progressChartIdClass,
+      } = this.getProperties('isSupported', 'percent', 'error', 'progressChartIdClass');
 
-      const classes = ['progress-chart'];
+      const classes = ['progress-chart', progressChartIdClass];
       if (isSupported) {
         if (error) {
           classes.push('danger');
