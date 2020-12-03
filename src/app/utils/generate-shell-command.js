@@ -2,8 +2,8 @@
  * Functions to generate shell commands that are presented to user 
  *
  * @module utils/generate-shell-command
- * @author Jakub Liput
- * @copyright (C) 2017-2019 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -11,10 +11,13 @@ function _onezoneUrl(windowLocation = window.location) {
   return windowLocation.origin.toString();
 }
 
+function escapeCommandString(string) {
+  return (string || '').replace(/'/g, '\\\'');
+}
+
 function _curlCommand(url, supportToken, onezoneRegistrationToken, suffix = '') {
-  const escapedSupportToken = supportToken.replace(/'/g, '\\\'');
   const onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
-  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${onezoneRegistrationToken}' --token '${escapedSupportToken}'${suffix ? ' ' + suffix : ''}`;
+  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${escapeCommandString(onezoneRegistrationToken)}' --token '${escapeCommandString(supportToken)}'${suffix ? ' ' + suffix : ''}`;
 }
 
 const GENERATORS = {

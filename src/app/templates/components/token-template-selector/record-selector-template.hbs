@@ -1,0 +1,53 @@
+{{#token-template-selector/template-tile
+  templateName=templateName
+  onClick=(if (eq activeSlideId "intro") (action "onIntroClick"))
+}}
+  {{#one-carousel activeSlideId=activeSlideId as |carousel|}}
+    {{#carousel.slide slideId="intro"}}
+      <figure class="main-figure">
+        <img class="main-image" src={{imagePath}}>
+      </figure>
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="selector" class="record-selector-slide"}}
+      <div class="top-bar">
+        <a class="template-back" onClick={{action "onTemplateBackClick"}}>
+          &laquo; {{t (concat i18nGenericPrefix "back")}}
+        </a>
+        {{#if recordsProxy.length}}
+          <div class="form-group-light">
+            <div class="input-group input-group-sm with-icon-addon">
+              {{search-bar search=(action (mut filter)) class="form-control"}}
+              <div class="input-group-addon">
+                {{one-icon icon="search"}}
+              </div>
+            </div>
+          </div>
+        {{/if}}
+      </div>
+      {{#render-later triggerRender=(eq activeSlideId "selector")}}
+        {{#perfect-scrollbar-element class="records-container"}}
+          {{#promise-proxy-container proxy=recordsProxy}}
+            {{#if filteredRecords.length}}
+              <ul class="records-list">
+                {{#each filteredRecords as |record|}}
+                  <li class="record-item" {{action "onRecordSelected" record}}>
+                    {{record-icon record=record}}
+                    {{#truncated-string}}{{record-name record=record}}{{/truncated-string}}
+                  </li>
+                {{/each}}
+              </ul>
+            {{else if recordsProxy.length}}
+              <p class="records-info no-records-after-filter-info">
+                {{t (concat i18nGenericPrefix "noRecordsAfterInfo")}}
+              </p>
+            {{else}}
+              <p class="records-info no-records-info">{{tt this "noRecordsInfo"}}</p>
+            {{/if}}
+          {{/promise-proxy-container}}
+        {{/perfect-scrollbar-element}}
+        <div class="scroll-top-shadow"></div>
+        <div class="scroll-bottom-shadow"></div>
+      {{/render-later}}
+    {{/carousel.slide}}
+  {{/one-carousel}}
+{{/token-template-selector/template-tile}}

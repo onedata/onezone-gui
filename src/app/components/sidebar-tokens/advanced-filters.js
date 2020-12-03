@@ -15,12 +15,12 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import { computed, observer, get } from '@ember/object';
 import { equal, raw } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, {
   classNames: ['advanced-filters', 'advanced-token-filters'],
 
   i18n: service(),
-  oneiconAlias: service(),
 
   /**
    * @override
@@ -98,9 +98,8 @@ export default Component.extend(I18n, {
     function targetModelOptions() {
       const {
         collection,
-        oneiconAlias,
         allModelOption,
-      } = this.getProperties('collection', 'oneiconAlias', 'allModelOption');
+      } = this.getProperties('collection', 'allModelOption');
       if (collection) {
         const modelNames = collection.mapBy('targetModelName').compact().uniq();
         const modelOptions = modelNames.map(modelName => ({
@@ -108,7 +107,7 @@ export default Component.extend(I18n, {
           modelNameTranslation: this.t(
             `targetFilter.model.options.${modelName}`
           ).string,
-          icon: oneiconAlias.getName(modelName),
+          icon: recordIcon(modelName),
         })).sortBy('modelNameTranslation');
 
         return [allModelOption, ...modelOptions];

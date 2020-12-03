@@ -3,19 +3,22 @@
  *
  * @module services/group-manager
  * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { computed, get } from '@ember/object';
 import _ from 'lodash';
-import { Promise, resolve, reject } from 'rsvp';
+import { Promise, resolve, reject, all as allFulfilled } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { entityType as groupEntityType } from 'onezone-gui/models/group';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promise } from 'ember-awesome-macros';
+import AllKnownMembersProxyArrayBase from 'onezone-gui/utils/all-known-members-proxy-array-base';
 
 export default Service.extend({
   store: service(),
@@ -26,10 +29,11 @@ export default Service.extend({
   clusterManager: service(),
   providerManager: service(),
   harvesterManager: service(),
+  recordManager: service(),
 
   /**
    * Fetches collection of all groups
-   * 
+   *
    * @return {Promise<DS.RecordArray<GroupList>>} resolves to an array of groups
    */
   getGroups() {
@@ -59,6 +63,18 @@ export default Service.extend({
       scope: 'auto',
     });
     return this.getRecord(recordGri);
+  },
+
+  /**
+   * @returns {PromiseArray<Models.Group>}
+   */
+  getAllKnownGroups() {
+    const knownGroupsProxy = AllKnownGroupsProxyArray.create({
+      recordManager: this.get('recordManager'),
+    });
+    return promiseArray(
+      get(knownGroupsProxy, 'allRecordsProxy').then(() => knownGroupsProxy)
+    );
   },
 
   /**
@@ -158,7 +174,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {string} childEntityId
    * @returns {Promise}
    */
@@ -182,7 +198,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} groupEntityId 
+   * @param {string} groupEntityId
    * @param {string} userEntityId
    * @returns {Promise}
    */
@@ -209,7 +225,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {string} childEntityId
    * @returns {Promise}
    */
@@ -234,7 +250,7 @@ export default Service.extend({
 
   /**
    * Creates parent for specified child group
-   * @param {string} childEntityId 
+   * @param {string} childEntityId
    * @param {Object} parentGroupRepresentation
    * @return {Promise}
    */
@@ -257,7 +273,7 @@ export default Service.extend({
 
   /**
    * Creates child for specified parent group
-   * @param {string} parentEntityId 
+   * @param {string} parentEntityId
    * @param {Object} childGroupRepresentation
    * @return {Promise}
    */
@@ -284,7 +300,7 @@ export default Service.extend({
 
   /**
    * Adds group to the children of another group
-   * @param {string} groupEntityId 
+   * @param {string} groupEntityId
    * @param {string} futureChildEntityId
    * @return {Promise}
    */
@@ -398,4 +414,49 @@ export default Service.extend({
   reloadSpaceList(entityId) {
     return this.reloadRecordList(entityId, 'spaceList');
   },
+});
+
+const AllKnownGroupsProxyArray = AllKnownMembersProxyArrayBase.extend({
+  /**
+   * @override
+   */
+  memberModelName: 'group',
+
+  /**
+   * @override
+   */
+  allRecordsProxy: promise.array(computed(
+    'groupsProxy',
+    'groupsGroupsListsProxy.[]',
+    'spacesGroupsListsProxy.[]',
+    function allGroupsProxy() {
+      const {
+        groupsProxy,
+        groupsGroupsListsProxy,
+        spacesGroupsListsProxy,
+      } = this.getProperties(
+        'groupsProxy',
+        'groupsGroupsListsProxy',
+        'spacesGroupsListsProxy'
+      );
+      const groupsArray = [];
+      return allFulfilled([
+        groupsProxy,
+        groupsGroupsListsProxy,
+        spacesGroupsListsProxy,
+      ]).then(([
+        userGroups,
+        groupsGroupsLists,
+        spacesGroupsLists,
+      ]) => {
+        groupsArray.push(...userGroups.toArray());
+        groupsGroupsLists
+          .concat(spacesGroupsLists)
+          .forEach(groupsList =>
+            groupsArray.push(...groupsList.toArray())
+          );
+        return groupsArray.uniqBy('entityId');
+      });
+    }
+  )),
 });

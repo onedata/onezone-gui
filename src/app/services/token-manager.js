@@ -52,7 +52,7 @@ const TokenManager = Service.extend({
    * @returns {Promise<Models.Token>}
    */
   createToken(tokenPrototype) {
-    const currestUserEntityId = this.get('currentUser.userId');
+    const currentUserEntityId = this.get('currentUser.userId');
     const additionalData = {};
     // New token prototype object is not compatible with Ember Data token model
     // specification, because create request body differs from the get request body.
@@ -70,7 +70,7 @@ const TokenManager = Service.extend({
       .createRecord('token', _.merge(compatibleTokenPrototype, {
         _meta: {
           aspect: 'user_named_token',
-          aspectId: currestUserEntityId,
+          aspectId: currentUserEntityId,
           additionalData,
         },
       }))
@@ -80,52 +80,72 @@ const TokenManager = Service.extend({
 
   /**
    * @param {String} inviteType 
-   * @param {GraphSingleModel} targetRecord
+   * @param {String} targetRecordId
    * @returns {Promise<String>}
    */
-  createTemporaryInviteToken(inviteType, targetRecord) {
+  createTemporaryInviteToken(inviteType, targetRecordId) {
     const {
       currentUser,
       onedataGraph,
+    } = this.getProperties(
+      'currentUser',
+      'onedataGraph',
+    );
+    const currentUserEntityId = get(currentUser, 'userId');
+
+    return this.createTemporaryInviteTokenTemplate(inviteType, targetRecordId)
+      .then(tokenTemplate =>
+        onedataGraph.request({
+          gri: gri({
+            entityId: null,
+            entityType: tokenEntityType,
+            aspect: 'user_temporary_token',
+            aspectId: currentUserEntityId,
+          }),
+          operation: 'create',
+          data: tokenTemplate,
+          subscribe: false,
+        })
+      );
+  },
+
+  /**
+   * Resolves to temporary token template (a plain object, which can be used to create
+   * token record).
+   * @param {String} inviteType 
+   * @param {String} targetRecordId
+   * @returns {Promise<Object>}
+   */
+  createTemporaryInviteTokenTemplate(inviteType, targetRecordId) {
+    const {
+      currentUser,
       onedataConnection,
       onezoneServer,
     } = this.getProperties(
       'currentUser',
-      'onedataGraph',
       'onedataConnection',
       'onezoneServer'
     );
 
-    const currestUserEntityId = get(currentUser, 'userId');
-    const targetRecordId = inviteType === 'registerOneprovider' ?
-      currestUserEntityId : get(targetRecord, 'entityId');
+    const currentUserEntityId = get(currentUser, 'userId');
+    const normalizedTargetRecordId = inviteType === 'registerOneprovider' ?
+      currentUserEntityId : targetRecordId;
     const maxTtl = get(onedataConnection, 'maxTemporaryTokenTtl');
     const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
 
-    return onezoneServer.getServerTime().then(serverTimestamp =>
-      onedataGraph.request({
-        gri: gri({
-          entityId: null,
-          entityType: tokenEntityType,
-          aspect: 'user_temporary_token',
-          aspectId: currestUserEntityId,
-        }),
-        operation: 'create',
-        data: {
-          type: {
-            inviteToken: {
-              inviteType,
-              [inviteTypeSpec.idFieldName]: targetRecordId,
-            },
+    return onezoneServer.getServerTime()
+      .then(serverTimestamp => ({
+        type: {
+          inviteToken: {
+            inviteType,
+            [inviteTypeSpec.idFieldName]: normalizedTargetRecordId,
           },
-          caveats: [{
-            type: 'time',
-            validUntil: serverTimestamp + Math.min(maxTtl, 24 * 60 * 60),
-          }],
         },
-        subscribe: false,
-      })
-    );
+        caveats: [{
+          type: 'time',
+          validUntil: serverTimestamp + Math.min(maxTtl, 24 * 60 * 60),
+        }],
+      }));
   },
 
   /**

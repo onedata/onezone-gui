@@ -1,88 +1,96 @@
-<form class="form form-horizontal form-component">
-  {{form-component/field-renderer field=basicGroup}}
-  {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
-    <h1
-      class={{concat-classes
-        "toggle-expand caveats-expand"
-        (if caveatsGroup.isExpanded "opened")
-        (if (not disableCaveatsCollapse) "clickable")
-      }}
-      onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
-    >
-      {{tt this "fields.caveats.header"}}
+{{#promise-proxy-container proxy=tokenDataSource}}
+  <form class="form form-horizontal form-component">
+    {{form-component/field-renderer field=basicGroup}}
+    {{#if (or (eq mode "create") tokenDataSource.hasCaveats)}}
+      <h1 class="caveats-header">
+        {{tt this "fields.caveats.header"}}
+      </h1>
       {{#if (not disableCaveatsCollapse)}}
-        {{one-icon
-          icon=(if caveatsGroup.isExpanded "arrow-up" "arrow-down")
-          class="toggle-icon"
-        }}
-      {{/if}}
-    </h1>
-    {{form-component/field-renderer field=caveatsGroup}}
-  {{/if}}
-  {{#if isServiceCaveatWarningVisible}}
-    <div class="service-caveat-warning alert alert-warning">
-      <p>
-        {{tt this "serviceCaveatWarning.basicText"}}
         <a
-          class="clickable"
-          {{action
-            (mut areServiceCaveatWarningDetailsVisible)
-            (not areServiceCaveatWarningDetailsVisible)
-          }}
+          class="toggle-expand caveats-expand"
+          onClick={{if (not disableCaveatsCollapse) (action "toggleCaveatsGroup")}}
         >
-          {{tt this (concat
-            "serviceCaveatWarning."
-            (if areServiceCaveatWarningDetailsVisible "hideDetailsLink" "showDetailsLink")
-          )}}
+          {{tt this (if areAllCaveatsExpanded "hideCaveats" "showCaveats")}}
+          {{one-icon
+            icon=(if areAllCaveatsExpanded "arrow-up" "arrow-down")
+            class="toggle-icon"
+          }}
         </a>
-      </p>
-      {{#if areServiceCaveatWarningDetailsVisible}}
-        <div class="service-caveat-warning-details">
-          <p>
-            {{tt this "serviceCaveatWarning.detailsIntro"}}
-            <ul>
-              {{#each
-                (array "Service" "Interface" "Readonly" "Path" "ObjectId")
-                as |tPart|
-              }}
-                <li>{{tt this (concat "serviceCaveatWarning.details" tPart "Item")}}</li>
-              {{/each}}
-            </ul>
+        {{#if (and (not areAllCaveatsExpanded) (not hasExpandedCaveats))}}
+          <p class="no-caveats-warning">
+            {{tt this "noCaveatsBeforeExpand"}}
+            <a onClick={{action "toggleCaveatsGroup"}}>{{tt this "noCaveatsExpand"}}</a>
+            {{tt this "noCaveatsAfterExpand"}}
           </p>
-          <p>
-            {{tt this "serviceCaveatWarning.detailsNeverEnclose"}}
-          </p>
-          <p>
-            {{one-doc-see-more
-              linkName=(tt this "serviceCaveatWarning.documentationLink")
-              docPath="using_onedata/tokens[security-and-privacy-considerations].html"
+        {{/if}}
+      {{/if}}
+      {{form-component/field-renderer field=caveatsGroup}}
+    {{/if}}
+    {{#if isServiceCaveatWarningVisible}}
+      <div class="service-caveat-warning alert alert-warning">
+        <p>
+          {{tt this "serviceCaveatWarning.basicText"}}
+          <a
+            class="clickable"
+            {{action
+              (mut areServiceCaveatWarningDetailsVisible)
+              (not areServiceCaveatWarningDetailsVisible)
             }}
-          </p>
-        </div>
+          >
+            {{tt this (concat
+              "serviceCaveatWarning."
+              (if areServiceCaveatWarningDetailsVisible "hideDetailsLink" "showDetailsLink")
+            )}}
+          </a>
+        </p>
+        {{#if areServiceCaveatWarningDetailsVisible}}
+          <div class="service-caveat-warning-details">
+            <p>
+              {{tt this "serviceCaveatWarning.detailsIntro"}}
+              <ul>
+                {{#each
+                  (array "Service" "Interface" "Readonly" "Path" "ObjectId")
+                  as |tPart|
+                }}
+                  <li>{{tt this (concat "serviceCaveatWarning.details" tPart "Item")}}</li>
+                {{/each}}
+              </ul>
+            </p>
+            <p>
+              {{tt this "serviceCaveatWarning.detailsNeverEnclose"}}
+            </p>
+            <p>
+              {{one-doc-see-more
+                linkName=(tt this "serviceCaveatWarning.documentationLink")
+                docPath="using_onedata/tokens[security-and-privacy-considerations].html"
+              }}
+            </p>
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
+    <div class="btn-toolbar footer-buttons">
+      {{#if (not-eq mode "view")}}
+        {{#one-spin-button
+          class="btn btn-primary submit-token"
+          disabled=(not fields.isValid)
+          type="button"
+          action=(action "submit")
+        }}
+          {{submitBtnText}}
+        {{/one-spin-button}}
+      {{/if}}
+      {{#if (eq mode "edit")}}
+        {{#bs-button
+          type="warning"
+          class="cancel-edition"
+          disabled=isSubmitting
+          onClick=onCancel
+        }}
+          {{tt this "cancel"}}
+        {{/bs-button}}
       {{/if}}
     </div>
-  {{/if}}
-  <div class="btn-toolbar footer-buttons">
-    {{#if (not-eq mode "view")}}
-      {{#one-spin-button
-        class="btn btn-primary submit-token"
-        disabled=(not fields.isValid)
-        type="button"
-        action=(action "submit")
-      }}
-        {{submitBtnText}}
-      {{/one-spin-button}}
-    {{/if}}
-    {{#if (eq mode "edit")}}
-      {{#bs-button
-        type="warning"
-        class="cancel-edition"
-        disabled=isSubmitting
-        onClick=onCancel
-      }}
-        {{tt this "cancel"}}
-      {{/bs-button}}
-    {{/if}}
-  </div>
-</form>
-{{yield}}
+  </form>
+  {{yield}}
+{{/promise-proxy-container}}

@@ -17,9 +17,9 @@ import { resolve } from 'rsvp';
 import { promise } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
-  oneiconAlias: service(),
   spaceActions: service(),
 
   /**
@@ -45,9 +45,7 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @override
    */
-  icon: computed(function icon() {
-    return this.get('oneiconAlias').getName('harvester');
-  }),
+  icon: recordIcon('harvester'),
 
   /**
    * @override

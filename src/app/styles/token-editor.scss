@@ -1,13 +1,15 @@
 .token-editor {
   max-width: 1000px;
+  min-height: 200px;
+  position: relative;
 
-  .form-horizontal .caveats-expand {
-    margin-top: $padding-base-vertical;
-    margin-bottom: $padding-base-vertical;
+  .form-horizontal .caveats-header {
+    display: inline-block;
+    margin: $padding-base-vertical $padding-small-horizontal $padding-base-vertical 0;
   }
 
   .caveat-group {
-    > .field-component > .fields-group-collapse {
+    > .field-component > .fields-group-collapse > .fields-group-children {
       display: flex;
 
       &.collapse:not(.in) {
@@ -18,6 +20,7 @@
 
   .caveat-group-toggle {
     flex-grow: 0;
+    align-items: flex-start;
 
     .control-label {
       flex-grow: 1;
@@ -38,10 +41,10 @@
     vertical-align: middle;
   }
 
-  .usageLimit-collapse.in,
-  .region-collapse.in,
-  .country-collapse.in,
-  .pathEntry-collapse.in {
+  .usageLimit-children,
+  .region-children,
+  .country-children,
+  .pathEntry-children {
     display: flex;
   }
 
@@ -82,8 +85,21 @@
     &.caveat-group-toggle {
       margin-bottom: 0;
 
+      .control-label {
+        padding-top: 0.2em;
+      }
+
       .field-component {
         display: none;
+      }
+    }
+
+    &.expireCaveat-field,
+    &.interfaceCaveat-field,
+    &.readonlyCaveat-field,
+    &.objectIdCaveat-field {
+      .caveat-group-toggle .control-label {
+        padding-top: 0;
       }
     }
 
@@ -102,30 +118,6 @@
       content: ':';
     }
 
-    &.regionCaveat-field,
-    &.countryCaveat-field,
-    &.asnCaveat-field,
-    &.ipCaveat-field,
-    &.consumerCaveat-field,
-    &.serviceCaveat-field {
-      .caveat-group-toggle .control-label {
-        padding-top: 0.2em;
-      }
-    }
-
-    &.regionCaveat-field,
-    &.asnCaveat-field,
-    &.consumerCaveat-field,
-    &.readonlyCaveat-field {
-      &:not(:first-child) {
-        padding-top: $form-component-view-margin;
-
-        &::before {
-          top: 0px;
-        }
-      }
-    }
-
     &.regionType-field,
     &.countryType-field {
       padding-top: 0.2em;
@@ -140,8 +132,8 @@
     &.pathSpace-field {
       width: initial;
     }
-    
-    &.pathEntry-field .pathEntry-collapse.in {
+
+    &.pathEntry-field .pathEntry-children {
       align-items: flex-start;
     }
 
@@ -164,7 +156,7 @@
       padding-left: $padding-xs-horizontal;
       word-break: break-all;
     }
-    
+
     &.objectId-field .collection-item:not(:last-child) {
       margin-bottom: $form-component-view-margin;
     }
@@ -180,17 +172,32 @@
         flex-wrap: nowrap;
       }
     }
+
+    @media (max-width: $screen-xs-max) {
+      &.caveat-group-toggle {
+        .control-label {
+          padding-top: 0;
+        }
+      }
+    }
   }
 
-  .regionCaveat-field,
-  .asnCaveat-field,
-  .consumerCaveat-field,
-  .readonlyCaveat-field {
-    &:not(:first-child)::before {
+  .has-top-separator {
+    padding-top: $padding-base-vertical;
+
+    &.field-view-mode {
+      padding-top: $form-component-view-margin;
+
+      &::before {
+        top: 0;
+      }
+    }
+
+    &::before {
       content: '';
       display: block;
       position: absolute;
-      top: -5px;
+      top: -4px;
       width: 100%;
       border-top: 1px solid $main-border-color;
     }
@@ -214,7 +221,7 @@
   .service-caveat-warning {
     p {
       margin-bottom: $padding-base-vertical;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -241,33 +248,15 @@
       flex-basis: 300px;
     }
 
-    .field-edit-mode {
-      &.regionCaveat-field,
-      &.asnCaveat-field,
-      &.consumerCaveat-field,
-      &.readonlyCaveat-field {
-        .caveat-group-toggle,
-        .static-text-field {
-          padding-top: $padding-base-vertical;
-        }
+    .field-edit-mode.caveat-group.is-enabled {
+      .caveat-group-toggle {
+        padding-top: $padding-base-vertical;
       }
 
-      &.is-enabled {
-        &.regionCaveat-field,
-        &.asnCaveat-field,
-        &.consumerCaveat-field {
-          padding-top: $padding-base-vertical;
-        }
-
-        &.expireCaveat-field,
-        &.countryCaveat-field,
-        &.ipCaveat-field,
-        &.serviceCaveat-field,
-        &.pathCaveat-field,
-        &.objectIdCaveat-field {
-          .caveat-group-toggle {
-            padding-top: $padding-base-vertical;
-          }
+      &.interfaceCaveat-field,
+      &.readonlyCaveat-field {
+        .caveat-group-toggle {
+          padding-top: 0;
         }
       }
     }
@@ -292,20 +281,13 @@
         padding-top: 0;
       }
 
-      > .field-component > .fields-group-collapse {
+      > .field-component > .fields-group-collapse > .fields-group-children {
         flex-wrap: wrap;
       }
     }
 
     .pathSpace-field {
       width: 150px;
-    }
-
-    .regionCaveat-field,
-    .asnCaveat-field,
-    .consumerCaveat-field,
-    .readonlyCaveat-field {
-      padding-top: $padding-base-vertical;
     }
   }
 }

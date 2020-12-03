@@ -3,20 +3,20 @@
     {{subjectDescription}}
   </p>
 {{/if}}
-<p class="limitations-description">
-  <span class="limitations-text">{{limitationsDescription}}</span>
-  {{#if showCustomTokenLink}}
-    <a
-      href={{customTokenUrl}}
-      class="custom-token-action"
-      {{action onCustomTokenClick preventDefault=false}}
-    >
-      {{tt this "customTokenLabel"}}
-    </a>
-    {{tt this "postCustomTokenLabel"}}
-  {{/if}}
-</p>
-{{#promise-proxy-container proxy=generatedTokenProxy sizeClass="sm"}}
+{{#promise-proxy-container proxy=dataLoadingProxy sizeClass="sm"}}
+  <p class="limitations-description">
+    <span class="limitations-text">{{limitationsDescription}}</span>
+    {{#if showCustomTokenLink}}
+      <a
+        href={{customTokenUrlProxy.content}}
+        class="custom-token-action"
+        {{action onCustomTokenClick preventDefault=false}}
+      >
+        {{tt this "customTokenLabel"}}
+      </a>
+      {{tt this "postCustomTokenLabel"}}
+    {{/if}}
+  </p>
   {{one-clipboard-line
     value=generatedTokenProxy.content
     type="textarea"

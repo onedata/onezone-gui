@@ -12,7 +12,10 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
 
   beforeEach(function () {
     this.set('harvester', {
-      name: 'space1',
+      constructor: {
+        modelName: 'harvester',
+      },
+      name: 'harvester1',
     });
   });
 

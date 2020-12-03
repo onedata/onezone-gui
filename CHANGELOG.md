@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6745 Added new view with token templates in tokens creator GUI
 * VFS-6998 Added warning icon to harvesting progress chart, when harvesting error occurred
 * VFS-6935 Fixed blank content page when resource access is forbidden
 * VFS-6835 Sidebar items layout changed to use flexbox

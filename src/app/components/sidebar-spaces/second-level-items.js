@@ -14,12 +14,12 @@ import { computed } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default SecondLevelItems.extend(I18n, {
   layout,
 
   i18n: service(),
-  oneiconAlias: service(),
 
   /**
    * @override
@@ -135,7 +135,7 @@ export default SecondLevelItems.extend(I18n, {
     return {
       id: 'harvesters',
       label: this.t('aspects.harvesters'),
-      icon: this.get('oneiconAlias').getName('harvester'),
+      icon: recordIcon('harvester'),
       forbidden,
       tip: forbidden ? insufficientPrivilegesMessage({
         i18n,

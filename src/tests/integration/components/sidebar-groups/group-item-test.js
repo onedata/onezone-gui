@@ -12,6 +12,9 @@ describe('Integration | Component | sidebar groups/group item', function () {
 
   beforeEach(function () {
     this.set('group', {
+      constructor: {
+        modelName: 'group',
+      },
       name: 'group1',
       type: 'group',
     });

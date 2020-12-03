@@ -1,10 +1,35 @@
-<div class="row content-row header-row hidden-xs">
-  <h1>{{tt this "header"}}</h1>
-</div>
-<div class="row content-row">
-  {{token-editor
-    mode="create"
-    predefinedValues=navigationState.aspectOptions
-    onSubmit=(action "submit")
-  }}
-</div>
+{{#one-carousel activeSlideId=activeSlide as |carousel|}}
+  {{#carousel.slide slideId="templates"}}
+    <div class="row content-row header-row hidden-xs">
+      <h1>{{tt this "header"}}</h1>
+    </div>
+    <div class="row content-row">
+      {{token-template-selector onTemplateSelected=(action "templateSelected")}}
+    </div>
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="form"}}
+    <div class="row content-row header-row hidden-xs">
+      <h1 class="with-back relative nowrap">
+        <a class="content-back-link" {{action "backToTemplates"}}>
+          {{one-icon icon="tokens" class="content-back-resource-icon"}}
+          {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+        </a>
+        <div class="resource-name">
+          {{tt this "header"}}
+            {{#truncated-string tagName="small" class="template-name"}}
+              {{tt this "fromTemplateHeader"
+                templateName=(t (concat "components.tokenTemplateSelector.templates." lastSelectedTemplateName ".title"))
+              }}
+            {{/truncated-string}}
+        </div>
+      </h1>
+    </div>
+    <div class="row content-row">
+      {{token-editor
+        mode="create"
+        token=lastSelectedTemplate
+        onSubmit=(action "submit")
+      }}
+    </div>
+  {{/carousel.slide}}
+{{/one-carousel}}

@@ -9,135 +9,117 @@ import moment from 'moment';
 
 describe('Unit | Utility | token editor utils/token to editor default data', function () {
   it('converts name', function () {
-    const result = tokenToEditorDefaultData({ name: 't1' });
-
-    expect(get(result, 'name')).to.equal('t1');
+    return tokenToEditorDefaultData({ name: 't1' })
+      .then(result => expect(get(result, 'name')).to.equal('t1'));
   });
 
   it('converts revoked', function () {
-    const result = tokenToEditorDefaultData({ revoked: true });
-
-    expect(get(result, 'revoked')).to.be.true;
+    return tokenToEditorDefaultData({ revoked: true })
+      .then(result => expect(get(result, 'revoked')).to.be.true);
   });
 
   it('converts token string', function () {
-    const result = tokenToEditorDefaultData({ token: 'abc' });
-
-    expect(get(result, 'tokenString')).to.equal('abc');
+    return tokenToEditorDefaultData({ token: 'abc' })
+      .then(result => expect(get(result, 'tokenString')).to.equal('abc'));
   });
 
   it('converts type', function () {
-    const result = tokenToEditorDefaultData({ typeName: 'identity' });
-
-    expect(get(result, 'type')).to.equal('identity');
+    return tokenToEditorDefaultData({ typeName: 'identity' })
+      .then(result => expect(get(result, 'type')).to.equal('identity'));
   });
 
   it('converts invite type', function () {
-    const result = tokenToEditorDefaultData({ inviteType: 'userJoinSpace' });
-
-    expect(get(result, 'inviteType')).to.equal('userJoinSpace');
+    return tokenToEditorDefaultData({ inviteType: 'userJoinSpace' })
+      .then(result => expect(get(result, 'inviteType')).to.equal('userJoinSpace'));
   });
 
   it('converts invite target (fetch success)', function () {
     const tokenTargetProxy = PromiseObject.create({ promise: resolve('sth') });
-    const result = tokenToEditorDefaultData({ tokenTargetProxy });
-
-    return get(result, 'inviteTargetProxy').then(record =>
-      expect(record).to.equal('sth')
-    );
+    return tokenToEditorDefaultData({ tokenTargetProxy })
+      .then(result => expect(get(result, 'inviteTarget')).to.equal('sth'));
   });
 
   it('converts invite target (id not specified, fetched null)', function () {
     const tokenTargetProxy = PromiseObject.create({ promise: resolve(null) });
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       tokenTargetProxy,
       targetModelName: 'space',
-    });
-
-    return get(result, 'inviteTargetProxy').then(record =>
-      expect(record).to.deep.equal({
-        entityId: undefined,
-        entityType: 'space',
-        name: 'ID: unknown',
-      })
-    );
+    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
+      entityId: undefined,
+      name: 'ID: unknown',
+    }));
   });
 
   it('converts invite target (id specified, fetched null)', function () {
     const tokenTargetProxy = PromiseObject.create({ promise: resolve(null) });
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       tokenTargetProxy,
       targetModelName: 'space',
       targetRecordId: 'space1',
-    });
-
-    return get(result, 'inviteTargetProxy').then(record =>
-      expect(record).to.deep.equal({
-        entityId: 'space1',
-        entityType: 'space',
-        name: 'ID: space1',
-      })
-    );
+    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
+      entityId: 'space1',
+      name: 'ID: space1',
+    }));
   });
 
   it('converts invite target (fetch error)', function () {
     const tokenTargetProxy = PromiseObject.create({ promise: reject('error') });
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       tokenTargetProxy,
       targetModelName: 'space',
       targetRecordId: 'space1',
-    });
-
-    return get(result, 'inviteTargetProxy').then(record =>
-      expect(record).to.deep.equal({
-        entityId: 'space1',
-        entityType: 'space',
-        name: 'ID: space1',
-      })
-    );
+    }).then(result => expect(get(result, 'inviteTarget')).to.deep.equal({
+      constructor: {
+        modelName: 'space',
+      },
+      entityId: 'space1',
+      name: 'ID: space1',
+    }));
   });
 
   it('converts privileges', function () {
     const privileges = ['space_view'];
-    const result = tokenToEditorDefaultData({ privileges });
-
-    expect(get(result, 'privileges')).to.equal(privileges);
+    return tokenToEditorDefaultData({ privileges })
+      .then(result => expect(get(result, 'privileges')).to.equal(privileges));
   });
 
   it('converts usageLimit', function () {
-    const result = tokenToEditorDefaultData({ usageLimit: 4 });
-
-    expect(get(result, 'usageLimit')).to.equal(4);
+    return tokenToEditorDefaultData({ usageLimit: 4 })
+      .then(result => expect(get(result, 'usageLimit')).to.equal(4));
   });
 
   it('converts usageCount', function () {
-    const result = tokenToEditorDefaultData({ usageCount: 3 });
-
-    expect(get(result, 'usageCount')).to.equal(3);
+    return tokenToEditorDefaultData({ usageCount: 3 })
+      .then(result => expect(get(result, 'usageCount')).to.equal(3));
   });
 
   it(
     'returns result with empty caveats object, when no caveats were passed',
     function () {
-      const result = tokenToEditorDefaultData({ caveats: [] });
-
-      expect(Object.keys(get(result, 'caveats'))).to.be.empty;
+      return tokenToEditorDefaultData({ caveats: [] })
+        .then(result => expect(Object.keys(get(result, 'caveats'))).to.be.empty);
     }
   );
 
   it('converts time caveat', function () {
     const expireTimestamp = Math.floor(new Date().valueOf() / 1000);
 
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'time',
         validUntil: expireTimestamp,
       }],
+    }).then(result => {
+      const caveatValue = get(result, 'caveats.expire');
+      expect(caveatValue).to.be.an.instanceof(Date);
+      expect(moment(caveatValue).unix()).to.equal(expireTimestamp);
     });
-
-    const caveatValue = get(result, 'caveats.expire');
-    expect(caveatValue).to.be.an.instanceof(Date);
-    expect(moment(caveatValue).unix()).to.equal(expireTimestamp);
   });
 
   [
@@ -147,17 +129,17 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
     it(`converts ${caveatName} caveat`, function () {
       const list = ['abc', 'def'];
 
-      const result = tokenToEditorDefaultData({
+      return tokenToEditorDefaultData({
         caveats: [{
           type: `geo.${caveatName}`,
           filter: 'blacklist',
           list,
         }],
+      }).then(result => {
+        const caveatValue = get(result, `caveats.${caveatName}`);
+        expect(get(caveatValue, 'type')).to.equal('blacklist');
+        expect(get(caveatValue, 'list')).to.equal(list);
       });
-
-      const caveatValue = get(result, `caveats.${caveatName}`);
-      expect(get(caveatValue, 'type')).to.equal('blacklist');
-      expect(get(caveatValue, 'list')).to.equal(list);
     });
   });
 
@@ -168,19 +150,17 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
     it(`converts ${caveatName} caveat`, function () {
       const whitelist = ['abc', 'def'];
 
-      const result = tokenToEditorDefaultData({
+      return tokenToEditorDefaultData({
         caveats: [{
           type: caveatName,
           whitelist,
         }],
-      });
-
-      expect(get(result, `caveats.${caveatName}`)).to.equal(whitelist);
+      }).then(result => expect(get(result, `caveats.${caveatName}`)).to.equal(whitelist));
     });
   });
 
   it('converts consumer caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'consumer',
         whitelist: [
@@ -195,32 +175,29 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
           'prv-*',
         ],
       }],
-    }, getRecordMock);
-
-    return get(result, 'caveats.consumer')
-      .then(consumer => {
-        const correctResult = _.flatten(
-          ['user', 'group', 'provider'].map(modelName => [{
-            record: {
-              entityId: '1',
-            },
-            model: modelName,
-          }, {
-            id: 'unknown',
-            model: modelName,
-          }, {
-            record: {
-              representsAll: modelName,
-            },
-            model: modelName,
-          }])
-        );
-        expect(consumer).to.deep.equal(correctResult);
-      });
+    }, getRecordMock).then(result => {
+      const correctResult = _.flatten(
+        ['user', 'group', 'provider'].map(modelName => [{
+          record: {
+            entityId: '1',
+          },
+          model: modelName,
+        }, {
+          id: 'unknown',
+          model: modelName,
+        }, {
+          record: {
+            representsAll: modelName,
+          },
+          model: modelName,
+        }])
+      );
+      expect(get(result, 'caveats.consumer')).to.deep.equal(correctResult);
+    });
   });
 
   it('converts service caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'service',
         whitelist: [
@@ -234,76 +211,69 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
           'opp-*',
         ],
       }],
-    }, getRecordMock);
-
-    return get(result, 'caveats.service')
-      .then(consumer => {
-        const correctResult = [{
-          record: {
-            entityId: '1',
-          },
-          model: 'service',
-        }, {
-          id: 'unknown',
-          model: 'service',
-        }, {
-          record: {
-            name: 'onezone',
-          },
-          model: 'service',
-        }, {
-          record: {
-            representsAll: 'service',
-          },
-          model: 'service',
-        }, {
-          record: {
-            entityId: '1',
-            type: 'oneprovider',
-          },
-          model: 'serviceOnepanel',
-        }, {
-          id: 'unknown',
-          model: 'serviceOnepanel',
-        }, {
-          record: {
-            entityId: 'ozid',
-            type: 'onezone',
-          },
-          model: 'serviceOnepanel',
-        }, {
-          record: {
-            representsAll: 'serviceOnepanel',
-          },
-          model: 'serviceOnepanel',
-        }];
-        expect(consumer).to.deep.equal(correctResult);
-      });
+    }, getRecordMock).then(result => {
+      const correctResult = [{
+        record: {
+          entityId: '1',
+        },
+        model: 'service',
+      }, {
+        id: 'unknown',
+        model: 'service',
+      }, {
+        record: {
+          name: 'onezone',
+        },
+        model: 'service',
+      }, {
+        record: {
+          representsAll: 'service',
+        },
+        model: 'service',
+      }, {
+        record: {
+          entityId: '1',
+          type: 'oneprovider',
+        },
+        model: 'serviceOnepanel',
+      }, {
+        id: 'unknown',
+        model: 'serviceOnepanel',
+      }, {
+        record: {
+          entityId: 'ozid',
+          type: 'onezone',
+        },
+        model: 'serviceOnepanel',
+      }, {
+        record: {
+          representsAll: 'serviceOnepanel',
+        },
+        model: 'serviceOnepanel',
+      }];
+      expect(get(result, 'caveats.service')).to.deep.equal(correctResult);
+    });
   });
 
   it('converts interface caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'interface',
         interface: 'oneclient',
       }],
-    });
-
-    expect(get(result, 'caveats.interface')).to.equal('oneclient');
+    }).then(result => expect(get(result, 'caveats.interface')).to.equal('oneclient'));
   });
 
   it('converts readonly caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'data.readonly',
       }],
-    });
-
-    expect(get(result, 'caveats.readonly')).to.equal(true);
+    }).then(result => expect(get(result, 'caveats.readonly')).to.equal(true));
   });
 
   it('converts path caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'data.path',
         whitelist: [
@@ -312,10 +282,8 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
           'L3Vua25vd24vYWJjL2RlZi9naGk=', // /unknown/abc/def/ghi (non-existing space)
         ],
       }],
-    }, getRecordMock);
-
-    return get(result, 'caveats.path').then(pathCaveat => {
-      expect(pathCaveat).to.deep.equal({
+    }, getRecordMock).then(result => {
+      expect(get(result, 'caveats.path')).to.deep.equal({
         pathEntry0: {
           pathSpace: {
             entityId: 's1',
@@ -330,6 +298,9 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
         },
         pathEntry2: {
           pathSpace: {
+            constructor: {
+              modelName: 'space',
+            },
             entityId: 'unknown',
           },
           pathString: '/abc/def/ghi',
@@ -340,7 +311,7 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
   });
 
   it('converts objectId caveat', function () {
-    const result = tokenToEditorDefaultData({
+    return tokenToEditorDefaultData({
       caveats: [{
         type: 'data.objectid',
         whitelist: [
@@ -348,13 +319,11 @@ describe('Unit | Utility | token editor utils/token to editor default data', fun
           'def',
         ],
       }],
-    });
-
-    expect(get(result, 'caveats.objectId')).to.deep.equal({
+    }).then(result => expect(get(result, 'caveats.objectId')).to.deep.equal({
       objectIdEntry0: 'abc',
       objectIdEntry1: 'def',
       __fieldsValueNames: ['objectIdEntry0', 'objectIdEntry1'],
-    });
+    }));
   });
 });
 

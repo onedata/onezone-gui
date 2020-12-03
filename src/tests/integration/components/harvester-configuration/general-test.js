@@ -684,7 +684,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
 class TypeHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.type-field .ember-basic-dropdown');
+    super('.type-field', '.ember-basic-dropdown-content');
   }
 }
 

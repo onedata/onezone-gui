@@ -32,9 +32,10 @@
           class=(if memberProxy.privilegesProxy.isModified "item-modified-header")
         }}
           <span class="item-icon-container">
-            {{one-icon
+            {{record-icon
               class="item-icon"
-              icon=(if (eq subjectType "group") (oneicon-alias memberProxy.member.type) "user")
+              record=memberProxy.member
+              useSubtypeIcon=true
             }}
             {{one-tooltip
               title=memberProxy.member.name

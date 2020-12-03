@@ -37,14 +37,13 @@ export default function creatorDataToToken(editorData, currentUser) {
     'name',
     'type'
   );
+  const expireCaveat = get(caveats, 'timeCaveats.expireCaveat');
   const {
-    expireCaveat,
     consumerCaveat,
     interfaceCaveat,
     serviceCaveat,
   } = getProperties(
-    caveats,
-    'expireCaveat',
+    get(caveats, 'endpointCaveats') || {},
     'consumerCaveat',
     'interfaceCaveat',
     'serviceCaveat'
@@ -110,7 +109,7 @@ export default function creatorDataToToken(editorData, currentUser) {
     'asn',
     'ip',
   ].forEach(caveatName => {
-    const caveatFormObj = get(caveats, `${caveatName}Caveat`);
+    const caveatFormObj = get(caveats, `networkCaveats.${caveatName}Caveat`);
     if (caveatFormObj && get(caveatFormObj, `${caveatName}Enabled`)) {
       const whitelist = get(caveatFormObj, caveatName);
       if (whitelist && whitelist.length) {
@@ -125,7 +124,7 @@ export default function creatorDataToToken(editorData, currentUser) {
     'region',
     'country',
   ].forEach(caveatName => {
-    const caveatFormObj = get(caveats, `${caveatName}Caveat`);
+    const caveatFormObj = get(caveats, `geoCaveats.${caveatName}Caveat`);
     if (caveatFormObj && get(caveatFormObj, `${caveatName}Enabled`)) {
       const filter = get(caveatFormObj, `${caveatName}.${caveatName}Type`);
       const list = get(caveatFormObj, `${caveatName}.${caveatName}List`);
