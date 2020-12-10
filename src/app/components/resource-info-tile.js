@@ -152,6 +152,9 @@ export default Component.extend(I18n, {
         return reject();
       }
       const oldName = get(record, 'name');
+      if (oldName === name) {
+        return resolve();
+      }
       set(record, 'name', name);
       return record.save().catch(error => {
         this.get('globalNotify').backendError(this.t('changingName'), error);

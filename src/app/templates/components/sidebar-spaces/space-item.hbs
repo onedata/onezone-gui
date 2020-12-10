@@ -1,18 +1,33 @@
 {{one-icon class="sidebar-item-icon" icon="space"}}
-{{#truncated-string class="sidebar-item-title"}}
-  {{name-conflict item=item tagName="span" class="one-label"}}
-{{/truncated-string}}
-{{#status-toolbar as |toolbar|}}
-  {{toolbar.icon
-    outerText=_totalSupportSizeHumanReadable
-    hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=true
+    value=item.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor sidebar-item-title"
+    click=(action "editorClick")
   }}
-  {{toolbar.icon
-    icon="provider"
-    outerText=_providersCount
-    hint=(tt this "supportCountHint" count=_providersCount)
-  }}
-{{/status-toolbar}}
+{{else}}
+  {{#truncated-string class="sidebar-item-title"}}
+    {{name-conflict item=item tagName="span" class="one-label"}}
+  {{/truncated-string}}
+{{/if}}
+{{#if (not isRenaming)}}
+  {{#status-toolbar as |toolbar|}}
+    {{toolbar.icon
+      outerText=_totalSupportSizeHumanReadable
+      hint=(tt this "totalStorageHint" size=_totalSupportSizeHumanReadable)
+    }}
+    {{toolbar.icon
+      icon="provider"
+      outerText=_providersCount
+      hint=(tt this "supportCountHint" count=_providersCount)
+    }}
+  {{/status-toolbar}}
+{{/if}}
 
 {{#unless inSidenav}}
   {{actions-toolbar

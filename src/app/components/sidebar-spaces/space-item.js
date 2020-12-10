@@ -7,15 +7,17 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed, get } from '@ember/object';
+import { computed, get, set } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
+import { next } from '@ember/runloop';
 import Component from '@ember/component';
 import _ from 'lodash';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { reject, resolve } from 'rsvp';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -58,6 +60,11 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   isLeaving: false,
+
+  /**
+   * @type {boolean}
+   */
+  isRenaming: false,
 
   /**
    * Just an one-way alias
@@ -148,16 +155,65 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  renameAction: computed('isRenaming', function renameAction() {
+    return {
+      action: () => this.send('toggleRename', true),
+      title: this.t('rename'),
+      class: 'rename-space-action',
+      icon: 'rename',
+      disabled: this.get('isRenaming'),
+    };
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  itemActions: collect('leaveAction', 'removeAction'),
+  itemActions: collect('renameAction', 'leaveAction', 'removeAction'),
 
   actions: {
+    editorClick(event) {
+      if (this.get('isRenaming')) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    },
     showLeaveModal() {
       this.set('leaveSpaceModalOpen', true);
     },
     closeLeaveModal() {
       this.set('leaveSpaceModalOpen', false);
+    },
+    toggleRename(value) {
+      next(() => safeExec(this, 'set', 'isRenaming', value));
+    },
+    rename(name) {
+      if (!name || !name.length) {
+        return reject();
+      }
+
+      const {
+        space,
+        globalNotify,
+      } = this.getProperties('space', 'globalNotify');
+
+      const oldName = get(space, 'name');
+      if (oldName === name) {
+        this.send('toggleRename', false);
+        return resolve();
+      }
+      set(space, 'name', name);
+      return space.save()
+        .then(() => {
+          this.send('toggleRename', false);
+        })
+        .catch((error) => {
+          globalNotify.backendError(this.t('groupPersistence'), error);
+          // Restore old space name
+          set(space, 'name', oldName);
+          throw error;
+        });
     },
     leave() {
       const {

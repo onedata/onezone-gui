@@ -13,7 +13,7 @@ import { next } from '@ember/runloop';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
@@ -152,6 +152,10 @@ export default Component.extend(I18n, {
       } = this.getProperties('group', 'globalNotify');
 
       const oldName = get(group, 'name');
+      if (oldName === name) {
+        this.send('toggleRename', false);
+        return resolve();
+      }
       set(group, 'name', name);
       return group.save()
         .then(() => {
