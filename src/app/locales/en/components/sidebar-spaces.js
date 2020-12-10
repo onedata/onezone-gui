@@ -4,6 +4,7 @@ export default {
     leave: 'Leave',
     totalStorageHint: 'Total size of the space: {{{size}}}',
     supportCountHint: 'Number of supporting providers: {{{count}}}',
+    spacePersistence: 'space persistence',
   },
   secondLevelItems: {
     aspects: {

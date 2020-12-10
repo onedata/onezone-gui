@@ -14,8 +14,6 @@
   {{#truncated-string class="sidebar-item-title"}}
     {{name-conflict item=item tagName="span" class="one-label"}}
   {{/truncated-string}}
-{{/if}}
-{{#if (not isRenaming)}}
   {{#status-toolbar as |toolbar|}}
     {{toolbar.icon
       outerText=_totalSupportSizeHumanReadable

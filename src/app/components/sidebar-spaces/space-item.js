@@ -209,7 +209,7 @@ export default Component.extend(I18n, {
           this.send('toggleRename', false);
         })
         .catch((error) => {
-          globalNotify.backendError(this.t('groupPersistence'), error);
+          globalNotify.backendError(this.t('spacePersistence'), error);
           // Restore old space name
           set(space, 'name', oldName);
           throw error;
