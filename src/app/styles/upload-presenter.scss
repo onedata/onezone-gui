@@ -115,29 +115,29 @@
     border-radius: 0;
     box-shadow: none;
     background-color: initial;
+    transition: transition-ease(background-color, .4s);
 
     &.cancelled {
-      box-shadow: none;
-      background-color: lighten($color-one-yellow, 40%) !important;
+      background-color: lighten($color-one-yellow, 40%);
     }
 
     &.failed {
-      box-shadow: none;
-      background-color: lighten($color-one-red, 38%) !important;
+      background-color: lighten($color-one-red, 38%);
+      .progress-bar {
+        background-color: lighten($color-one-red, 30%);
+      }
     }
+
+    &.uploaded {
+      background-color: lighten($color-one-mint, 30%);
+      .progress-bar {
+        background-color: lighten($color-one-mint, 30%);
+    }}
 
     .progress-bar {
       box-shadow: none;
       background-color: $color-one-light-blue;
-    }
-    
-    .progress-bar-failed {
-      background-color: lighten($color-one-red, 30%) !important;
-    }
-
-    .progress-bar-uploaded {
-      box-shadow: none;
-      background-color: lighten($color-one-mint, 30%) !important;
+      transition: transition-ease(background-color, .4s);
     }
   }
 
@@ -165,7 +165,7 @@
   .upload-summary-header-toggle-minimize {
     display: inline-block;
     transform: rotate(45deg);
-    color: $color-one-light-gray;
+    color: darken($color-one-light-gray, 5%);
     font-weight: bold;
     transition: transition-ease(transform);
 
@@ -295,7 +295,7 @@
   .cancel-action {
     vertical-align: middle;
     font-weight: bold;
-    color: $color-one-light-gray;
+    color: darken($color-one-light-gray, 5%);
 
     &:hover {
       color: $color-one-danger;
