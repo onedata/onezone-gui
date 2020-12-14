@@ -2,7 +2,7 @@
  * A first-level item component for spaces sidebar
  *
  * @module components/sidebar-spaces/space-item
- * @author Jakub Liput, Michał Borzęcki
+ * @author Jakub Liput, Michał Borzęcki, Agnieszka Warchoł
  * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */

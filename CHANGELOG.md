@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7070 Added rename space to sidebar
 * VFS-6745 Added new view with token templates in tokens creator GUI
 * VFS-6998 Added warning icon to harvesting progress chart, when harvesting error occurred
 * VFS-6935 Fixed blank content page when resource access is forbidden

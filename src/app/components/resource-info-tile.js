@@ -3,8 +3,8 @@
  * to place in overview page.
  *
  * @module components/resource-info-tile
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michal Borzecki, Agnieszka Warchoł
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 

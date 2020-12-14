@@ -2,8 +2,8 @@
  * A first-level item component for groups sidebar
  *
  * @module components/sidebar-groups/group-item
- * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
