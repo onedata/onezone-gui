@@ -8,6 +8,7 @@ import $ from 'jquery';
 import { registerService, lookupService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
 import sinon from 'sinon';
+import { setProperties } from '@ember/object';
 
 describe('Integration | Component | sidebar tokens/token item', function () {
   setupComponentTest('sidebar-tokens/token-item', {
@@ -53,6 +54,44 @@ describe('Integration | Component | sidebar tokens/token item', function () {
     this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
 
     expect(this.$('.oneicon-tokens')).to.exist;
+  });
+
+  it('shows "revoked" text for revoked token', function () {
+    setProperties(this.get('token'), {
+      isActive: false,
+      revoked: true,
+    });
+
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
+
+    expect(this.$('.sidebar-item-title-upper')).to.contain(this.get('token.name'));
+    expect(this.$('.sidebar-item-title-lower')).to.contain('revoked');
+  });
+
+  it('shows "expired" text for expired token', function () {
+    setProperties(this.get('token'), {
+      isActive: false,
+      isObsolete: true,
+    });
+
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
+
+    expect(this.$('.sidebar-item-title-upper')).to.contain(this.get('token.name'));
+    expect(this.$('.sidebar-item-title-lower')).to.contain('expired');
+  });
+
+  it('shows "expired" text for expired and revoked token', function () {
+    setProperties(this.get('token'), {
+      isActive: false,
+      isObsolete: true,
+      revoked: true,
+    });
+
+    this.render(hbs `{{sidebar-tokens/token-item item=token}}`);
+
+    expect(this.$('.sidebar-item-title-upper')).to.contain(this.get('token.name'));
+    expect(this.$('.sidebar-item-title-lower')).to.contain('expired');
+    expect(this.$('.sidebar-item-title-lower')).to.not.contain('revoked');
   });
 
   it('does not add class "inactive-token" when token is active', function () {

@@ -17,7 +17,7 @@
     {{/truncated-string}}
     {{#if (not token.isActive)}}
       {{#truncated-string class="sidebar-item-title-lower"}}
-        {{t (if token.isObsolete "components.sidebarTokens.tokenItem.expired" "components.sidebarTokens.tokenItem.revoked")}}
+        {{tt this (if token.isObsolete "expired" "revoked")}}
       {{/truncated-string}}
     {{/if}}
   </div>
