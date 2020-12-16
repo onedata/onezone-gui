@@ -3,8 +3,8 @@
  * to place in overview page.
  *
  * @module components/resource-info-tile
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @author Michal Borzecki, Agnieszka Warchoł
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -152,6 +152,9 @@ export default Component.extend(I18n, {
         return reject();
       }
       const oldName = get(record, 'name');
+      if (oldName === name) {
+        return resolve();
+      }
       set(record, 'name', name);
       return record.save().catch(error => {
         this.get('globalNotify').backendError(this.t('changingName'), error);

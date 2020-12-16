@@ -2,8 +2,8 @@
  * A first-level item component for groups sidebar
  *
  * @module components/sidebar-groups/group-item
- * @author Michał Borzęcki
- * @copyright (C) 2018-2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2018-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,7 +13,7 @@ import { next } from '@ember/runloop';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
@@ -152,6 +152,10 @@ export default Component.extend(I18n, {
       } = this.getProperties('group', 'globalNotify');
 
       const oldName = get(group, 'name');
+      if (oldName === name) {
+        this.send('toggleRename', false);
+        return resolve();
+      }
       set(group, 'name', name);
       return group.save()
         .then(() => {
