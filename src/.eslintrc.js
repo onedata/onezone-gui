@@ -45,6 +45,11 @@ module.exports = {
       },
     ],
     'semi': 2,
+    'no-restricted-globals': [
+      2,
+      'name',
+      'blur'
+    ],
     'valid-jsdoc': [
       1,
       {
