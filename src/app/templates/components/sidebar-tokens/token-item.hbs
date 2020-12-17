@@ -11,9 +11,16 @@
     click=(action "editorClick")
   }}
 {{else}}
-  {{#truncated-string class="sidebar-item-title"}}
-    {{name-conflict item=item tagName="span" class="one-label token-name"}}
-  {{/truncated-string}}
+  <div class="sidebar-item-title">
+    {{#truncated-string class=(if (not token.isActive) "sidebar-item-title-upper")}}
+      {{name-conflict item=item tagName="span" class="one-label token-name"}}
+    {{/truncated-string}}
+    {{#if (not token.isActive)}}
+      {{#truncated-string class="sidebar-item-title-lower"}}
+        {{tt this (if token.isObsolete "expired" "revoked")}}
+      {{/truncated-string}}
+    {{/if}}
+  </div>
 {{/if}}
 
 {{#unless inSidenav}}

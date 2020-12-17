@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7093 Added info about inactive token in sidebar
 * VFS-7070 Added rename space to sidebar
 * VFS-6571 Added status colors to the upload main progress bar
 * VFS-6745 Added new view with token templates in tokens creator GUI
