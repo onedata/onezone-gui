@@ -11,6 +11,7 @@ const defineSassBreakpoints = require(
 const colors = require('./lib/onedata-gui-common/addon/colors').default;
 const breakpointValues =
   require('./lib/onedata-gui-common/addon/breakpoint-values').default;
+const sass = require('sass');
 
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
@@ -39,6 +40,7 @@ module.exports = function (defaults) {
       includePolyfill: true,
     },
     'sassOptions': {
+      implementation: sass,
       includePaths: [
         'app/styles',
         // onedata-gui-common addon
@@ -51,7 +53,7 @@ module.exports = function (defaults) {
     },
     // a "bootstrap" should be imported into app.scss
     'ember-cli-bootstrap-sassy': {
-      // import SASS styles and some JS that is used outside of ember-bootstrap components 
+      // import SASS styles and some JS that is used outside of ember-bootstrap components
       js: [
         'transition',
         // TODO: rewrite collapses to ember-bootstrap components
