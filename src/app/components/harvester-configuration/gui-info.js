@@ -90,4 +90,24 @@ export default Component.extend(I18n, {
       }
     }
   ),
+
+  /**
+   * @type {Ember.ComputedProperty<Object>}
+   */
+  name: computed(
+    'manifestProxy.manifest',
+    function name() {
+      if (this.get('manifestProxy.name')) {
+        return {
+          class: '',
+          name: this.get('manifestProxy.name'),
+        };
+      } else {
+        return {
+          class: 'unknown-name',
+          name: this.t('unknown'),
+        };
+      }
+    }
+  ),
 });

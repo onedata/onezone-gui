@@ -34,6 +34,11 @@ export default PromiseObject.extend({
   version: reads('manifest.onedata.version'),
 
   /**
+   * @type {Ember.ComputedProperty<string|undefined>}
+   */
+  name: reads('manifest.onedata.name'),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Object>>}
    */
   indices: computed('manifest.onedata.indices', function indices() {

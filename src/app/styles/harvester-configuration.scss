@@ -7,6 +7,9 @@
     height: 22px;
     margin-right: $padding-xs-horizontal;
   }
+  .unknown-name {
+    font-style: italic;
+  }
   .harvester-configuration-gui-upload {
     .upload-form {
       margin: ($line-height-computed / 2) 0;
