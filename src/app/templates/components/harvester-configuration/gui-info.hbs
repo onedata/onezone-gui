@@ -1,8 +1,8 @@
 <h1>{{tt this "header"}}</h1>
 {{#promise-proxy-container proxy=manifestProxy}}
   <p>
-    <strong>{{tt this "status"}}:</strong> <span class="gui-status {{status.class}}">{{status.name}}</span><br>
-    <strong>{{tt this "name"}}:</strong> <span class="gui-name {{name.class}}">{{name.name}}</span><br>
-    <strong>{{tt this "version"}}:</strong> <span class="gui-version {{version.class}}">{{version.version}}</span>
+    <strong>{{tt this "status"}}:</strong> <span class="gui-status {{statusSpec.class}}">{{statusSpec.name}}</span><br>
+    <strong>{{tt this "name"}}:</strong> <span class="gui-name {{nameSpec.class}}">{{nameSpec.name}}</span><br>
+    <strong>{{tt this "version"}}:</strong> <span class="gui-version {{versionSpec.class}}">{{versionSpec.version}}</span>
   </p>
 {{/promise-proxy-container}}
