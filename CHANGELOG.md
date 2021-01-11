@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7162 Added animation to the upload main progress bar
 * VFS-6802 Updated commons
 * VFS-7042 Updated common libs
 * VFS-7093 Added info about inactive token in sidebar
