@@ -137,7 +137,7 @@
     .progress-bar {
       box-shadow: none;
       background-color: $color-one-light-blue;
-      transition: transition-ease(background-color, .4s);
+      transition: transition-ease(background-color, .4s), transition-ease(width, .6s);
     }
   }
 
