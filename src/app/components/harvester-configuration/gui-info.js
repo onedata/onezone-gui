@@ -36,10 +36,10 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Object>}
    */
-  status: computed(
+  statusSpec: computed(
     'manifestProxy.manifest',
     'isUploadingGui',
-    function status() {
+    function statusSpec() {
       const {
         manifestProxy,
         isUploadingGui,
@@ -68,10 +68,10 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Object>}
    */
-  version: computed(
+  versionSpec: computed(
     'manifestProxy.manifest',
     'isUploadingGui',
-    function version() {
+    function versionSpec() {
       const {
         manifestProxy,
         isUploadingGui,
@@ -86,6 +86,27 @@ export default Component.extend(I18n, {
         return {
           class: '',
           version: guiVersion,
+        };
+      }
+    }
+  ),
+
+  /**
+   * @type {Ember.ComputedProperty<Object>}
+   */
+  nameSpec: computed(
+    'manifestProxy.manifest',
+    function nameSpec() {
+      const guiPluginName = this.get('manifestProxy.name');
+      if (guiPluginName) {
+        return {
+          class: '',
+          name: guiPluginName,
+        };
+      } else {
+        return {
+          class: 'unspecified',
+          name: this.t('unknown'),
         };
       }
     }

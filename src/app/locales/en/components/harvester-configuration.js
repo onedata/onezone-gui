@@ -56,6 +56,7 @@ export default {
     guiInfo: {
       header: 'Current GUI plugin',
       status: 'Status',
+      name: 'Name',
       uploading: 'uploading',
       uploaded: 'uploaded',
       cannotLoadManifest: 'cannot load manifest - upload correct GUI plugin',
