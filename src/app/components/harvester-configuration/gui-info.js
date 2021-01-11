@@ -96,7 +96,7 @@ export default Component.extend(I18n, {
    */
   nameSpec: computed(
     'manifestProxy.manifest',
-    function name() {
+    function nameSpec() {
       const guiPluginName = this.get('manifestProxy.name');
       if (guiPluginName) {
         return {
