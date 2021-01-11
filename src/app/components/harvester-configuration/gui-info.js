@@ -39,7 +39,7 @@ export default Component.extend(I18n, {
   statusSpec: computed(
     'manifestProxy.manifest',
     'isUploadingGui',
-    function status() {
+    function statusSpec() {
       const {
         manifestProxy,
         isUploadingGui,
@@ -71,7 +71,7 @@ export default Component.extend(I18n, {
   versionSpec: computed(
     'manifestProxy.manifest',
     'isUploadingGui',
-    function version() {
+    function versionSpec() {
       const {
         manifestProxy,
         isUploadingGui,
