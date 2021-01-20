@@ -35,5 +35,6 @@ export default {
     copyAction: 'Copy to clipboard',
     revoked: 'revoked',
     expired: 'expired',
+    token: 'token',
   },
 };
