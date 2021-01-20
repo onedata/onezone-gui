@@ -115,8 +115,10 @@ export default Component.extend(I18n, {
    */
   copyAction: computed(function () {
     return {
-      action: () => this.get('globalClipboard').copy(this.get('token.data.token'),
-        this.t('token')),
+      action: () => this.get('globalClipboard').copy(
+        this.get('token.data.token'),
+        this.t('token')
+      ),
       title: this.t('copyAction'),
       class: 'copy-token-action-trigger',
       icon: 'copy',
