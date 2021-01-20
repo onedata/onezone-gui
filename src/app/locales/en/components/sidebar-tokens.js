@@ -32,7 +32,9 @@ export default {
     savingToken: 'saving token',
     renameAction: 'Rename',
     removeAction: 'Remove',
+    copyAction: 'Copy to clipboard',
     revoked: 'revoked',
     expired: 'expired',
+    token: 'token',
   },
 };
