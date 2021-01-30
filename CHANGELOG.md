@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6915 Added copy token to clipboard action in tokens sidebar
+* VFS-7202 Updated "bad data" backend error translation
 * VFS-7162 Added animation to the upload main progress bar
 * VFS-6802 Updated commons
 * VFS-7042 Updated common libs

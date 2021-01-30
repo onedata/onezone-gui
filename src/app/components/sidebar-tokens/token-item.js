@@ -32,6 +32,7 @@ export default Component.extend(I18n, {
   navigationState: service(),
   router: service(),
   globalNotify: service(),
+  globalClipboard: service(),
 
   /**
    * @override
@@ -110,9 +111,24 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyAction: computed(function () {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('token.data.token'),
+        this.t('token')
+      ),
+      title: this.t('copyAction'),
+      class: 'copy-token-action-trigger',
+      icon: 'copy',
+    };
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  actionsArray: collect('renameAction', 'removeAction'),
+  actionsArray: collect('renameAction', 'removeAction', 'copyAction'),
 
   /**
    * If actual token disappeared from the sidebar, redirects to token main page
