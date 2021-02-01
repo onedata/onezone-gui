@@ -21,6 +21,8 @@ import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   spaceActions: service(),
+  router: service(),
+  guiUtils: service(),
 
   /**
    * @virtual
@@ -46,6 +48,19 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
    * @override
    */
   icon: recordIcon('harvester'),
+
+  link: computed(function link() {
+    const {
+      router,
+      harvester,
+      guiUtils,
+    } = this.getProperties('router', 'harvester', 'guiUtils');
+    return router.urlFor(
+      'onedata.sidebar.content.aspect',
+      'harvesters',
+      guiUtils.getRoutableIdFor(harvester),
+      'plugin');
+  }),
 
   /**
    * @override
