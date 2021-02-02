@@ -66,7 +66,7 @@ export default Component.extend(I18n, {
     oneproviderIdChanged(oneproviderId) {
       this.get('navigationState').setAspectOptions({ oneproviderId });
     },
-    showShareList() {
+    onShowShareList() {
       this.$('.content-back-link').click();
     },
   },
