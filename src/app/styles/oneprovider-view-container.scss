@@ -4,6 +4,10 @@
 
   transform: translateZ(0);
 
+  .oneprovider-view-container-inner {
+    justify-content: center;
+  }
+  
   > *:not(.oneprovider-view-container-inner) {
     pointer-events: auto;
   }
@@ -98,21 +102,7 @@
   .tab-bar-ul-container-space {
     height: 44px;
   }
-  
-  .content-info {
-    &.preserve-header {
-      .world-map {
-        top: $content-header-row-mobile-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
-        @media (min-width: $screen-md-min) {
-          top: $content-header-row-height + 2 * $content-col-padding + 2 * $padding-base-vertical;
-        }
-        @media (max-width: $screen-xs-max) {
-          top: 0;
-        }
-      }
-    }
-  }
-  
+    
   .current-oneprovider-bar {
     position: relative;
     height: 44px;
