@@ -49,7 +49,10 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
    */
   icon: recordIcon('harvester'),
 
-  link: computed(function link() {
+  /**
+   * @override
+   */
+  link: computed('harvester', function link() {
     const {
       router,
       harvester,
@@ -59,7 +62,8 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
       'onedata.sidebar.content.aspect',
       'harvesters',
       guiUtils.getRoutableIdFor(harvester),
-      'plugin');
+      'plugin'
+    );
   }),
 
   /**

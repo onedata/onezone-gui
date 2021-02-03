@@ -51,36 +51,33 @@ export default Action.extend({
   /**
    * @override
    */
-  execute() {
-    if (!this.get('disabled')) {
-      const {
-        harvester,
-        space,
-        modalManager,
-      } = this.getProperties('harvester', 'space', 'modalManager');
-      const result = ActionResult.create();
+  onExecute() {
+    const {
+      harvester,
+      space,
+      modalManager,
+    } = this.getProperties('harvester', 'space', 'modalManager');
+    const result = ActionResult.create();
 
-      return modalManager
-        .show('question-modal', {
-          headerIcon: 'sign-warning-rounded',
-          headerText: this.t('modalHeader'),
-          descriptionParagraphs: [{
-            text: this.t('modalDescription', {
-              spaceName: get(space, 'name'),
-              harvesterName: get(harvester, 'name'),
-            }),
-          }],
-          yesButtonText: this.t('modalYes'),
-          yesButtonClassName: 'btn-danger',
-          onSubmit: () =>
-            result.interceptPromise(this.removeSpaceFromHarvester()),
-        }).hiddenPromise
-        .then(() => {
-          result.cancelIfPending();
-          this.notifyResult(result);
-          return result;
-        });
-    }
+    return modalManager
+      .show('question-modal', {
+        headerIcon: 'sign-warning-rounded',
+        headerText: this.t('modalHeader'),
+        descriptionParagraphs: [{
+          text: this.t('modalDescription', {
+            spaceName: get(space, 'name'),
+            harvesterName: get(harvester, 'name'),
+          }),
+        }],
+        yesButtonText: this.t('modalYes'),
+        yesButtonClassName: 'btn-danger',
+        onSubmit: () =>
+          result.interceptPromise(this.removeSpaceFromHarvester()),
+      }).hiddenPromise
+      .then(() => {
+        result.cancelIfPending();
+        return result;
+      });
   },
 
   /**
@@ -98,5 +95,4 @@ export default Action.extend({
       get(space, 'entityId')
     );
   },
-
 });

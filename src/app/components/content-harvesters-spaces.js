@@ -50,13 +50,15 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
    */
   icon: recordIcon('space'),
 
-  link: computed(function link() {
+  /**
+   * @override
+   */
+  link: computed('space', function link() {
     const {
       router,
       space,
       guiUtils,
     } = this.getProperties('router', 'space', 'guiUtils');
-    console.log(space);
     return router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
@@ -65,7 +67,7 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
     );
   }),
 
-  actions: computed(function actions() {
+  actions: computed('parentHarvester', 'space', function actions() {
     const {
       harvesterActions,
       parentHarvester,

@@ -96,9 +96,9 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import uploadObject from './utils/upload-object';
+import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
-import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import removeSpaceAction from './utils/space-actions/remove-space-action';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';

@@ -14,10 +14,18 @@ import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harve
 import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
 import $ from 'jquery';
 import EmberObject from '@ember/object';
+import { registerService } from '../../helpers/stub-service';
+import Service from '@ember/service';
 
 describe('Integration | Component | content spaces harvesters', function () {
   setupComponentTest('content-spaces-harvesters', {
     integration: true,
+  });
+
+  const Router = Service.extend({
+    urlFor() {
+      return '#/url';
+    },
   });
 
   beforeEach(function () {
@@ -37,6 +45,7 @@ describe('Integration | Component | content spaces harvesters', function () {
         }
       },
     }));
+    registerService(this, 'router', Router);
   });
 
   afterEach(function () {
@@ -115,7 +124,9 @@ describe('Integration | Component | content spaces harvesters', function () {
   });
 
   it('shows list of space harvesters', function () {
-    this.render(hbs `{{content-spaces-harvesters space=space}}`);
+    const link = sinon.stub().returns('');
+    this.set('link', link);
+    this.render(hbs `{{content-spaces-harvesters space=space link=link}}`);
 
     return wait()
       .then(() => {

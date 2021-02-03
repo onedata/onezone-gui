@@ -47,6 +47,10 @@ export default Service.extend(I18n, {
     };
   }),
 
+  createRemoveSpaceFromHarvesterAction(context) {
+    return RemoveSpaceFromHarvesterAction.create({ ownerSource: this, context });
+  },
+
   /**
    * Creates new harvester
    * @param {Object} harvester harvester base object
@@ -163,10 +167,6 @@ export default Service.extend(I18n, {
         globalNotify.backendError(this.t('removingHarvester'), error);
         throw error;
       });
-  },
-
-  createRemoveSpaceFromHarvesterAction(context) {
-    return RemoveSpaceFromHarvesterAction.create({ ownerSource: this, context });
   },
 
   /**
