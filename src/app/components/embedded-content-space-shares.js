@@ -39,7 +39,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
    * @virtual
    * @type {Function}
    */
-  showShareList: notImplementedThrow,
+  onShowShareList: notImplementedThrow,
 
   _location: location,
 
@@ -126,7 +126,7 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
       );
     },
     showShareList() {
-      return this.get('showShareList')();
+      return this.get('onShowShareList')();
     },
   },
 });

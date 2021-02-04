@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6566 Refactored for oneprovider-gui shares refactor
 * VFS-6915 Added copy token to clipboard action in tokens sidebar
 * VFS-7202 Updated "bad data" backend error translation
 * VFS-7162 Added animation to the upload main progress bar

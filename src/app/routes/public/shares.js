@@ -27,7 +27,7 @@ export default Route.extend({
       return new Promise(() => {
         window.location = getOneproviderPath(
           get(model, 'chosenProviderId'),
-          `onedata/shares/${get(model, 'entityId')}`
+          `public/shares/${get(model, 'entityId')}`
         );
       });
     } else {
