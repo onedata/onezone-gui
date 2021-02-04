@@ -2,8 +2,8 @@
  * A component that shows spaces attached to harvester
  *
  * @module components/content-harvesters-spaces
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -19,67 +19,6 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
-
-const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
-  harvesterActions: service(),
-  router: service(),
-  guiUtils: service(),
-
-  /**
-   * @virtual
-   */
-  space: undefined,
-
-  /**
-   * @virtual
-   */
-  parentHarvester: undefined,
-
-  /**
-   * @override
-   */
-  label: reads('space.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('space'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('space'),
-
-  /**
-   * @override
-   */
-  link: computed('space', function link() {
-    const {
-      router,
-      space,
-      guiUtils,
-    } = this.getProperties('router', 'space', 'guiUtils');
-    return router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      guiUtils.getRoutableIdFor(space),
-      'index'
-    );
-  }),
-
-  actions: computed('parentHarvester', 'space', function actions() {
-    const {
-      harvesterActions,
-      parentHarvester,
-      space,
-    } = this.getProperties('harvesterActions', 'parentHarvester', 'space');
-    return [harvesterActions.createRemoveSpaceFromHarvesterAction({
-      harvester: parentHarvester,
-      space,
-    })];
-  }),
-
-});
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-harvesters-spaces'],
@@ -192,4 +131,65 @@ export default Component.extend(I18n, GlobalActions, {
       return this.get('inviteSpaceUsingTokenAction').execute();
     },
   },
+});
+
+const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
+  harvesterActions: service(),
+  router: service(),
+  guiUtils: service(),
+
+  /**
+   * @virtual
+   */
+  space: undefined,
+
+  /**
+   * @virtual
+   */
+  parentHarvester: undefined,
+
+  /**
+   * @override
+   */
+  label: reads('space.name'),
+
+  /**
+   * @override
+   */
+  conflictingLabelSource: reads('space'),
+
+  /**
+   * @override
+   */
+  icon: recordIcon('space'),
+
+  /**
+   * @override
+   */
+  link: computed('space', function link() {
+    const {
+      router,
+      space,
+      guiUtils,
+    } = this.getProperties('router', 'space', 'guiUtils');
+    return router.urlFor(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      guiUtils.getRoutableIdFor(space),
+      'index'
+    );
+  }),
+
+  actions: computed('parentHarvester', 'space', function actions() {
+    const {
+      harvesterActions,
+      parentHarvester,
+      space,
+    } = this.getProperties('harvesterActions', 'parentHarvester', 'space');
+    return [harvesterActions.createRemoveSpaceFromHarvesterAction({
+      harvester: parentHarvester,
+      space,
+    })];
+  }),
+
 });

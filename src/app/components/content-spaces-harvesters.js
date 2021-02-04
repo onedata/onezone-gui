@@ -2,8 +2,8 @@
  * Manages harvesters of specified space
  *
  * @module components/content-spaces-harvesters
- * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -18,69 +18,6 @@ import { promise } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
-
-const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
-  spaceActions: service(),
-  router: service(),
-  guiUtils: service(),
-
-  /**
-   * @virtual
-   */
-  harvester: undefined,
-
-  /**
-   * @virtual
-   */
-  parentSpace: undefined,
-
-  /**
-   * @override
-   */
-  label: reads('harvester.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('harvester'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('harvester'),
-
-  /**
-   * @override
-   */
-  link: computed('harvester', function link() {
-    const {
-      router,
-      harvester,
-      guiUtils,
-    } = this.getProperties('router', 'harvester', 'guiUtils');
-    return router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'harvesters',
-      guiUtils.getRoutableIdFor(harvester),
-      'plugin'
-    );
-  }),
-
-  /**
-   * @override
-   */
-  actions: computed('parentSpace', 'harvester', function actions() {
-    const {
-      spaceActions,
-      parentSpace,
-      harvester,
-    } = this.getProperties('spaceActions', 'parentSpace', 'harvester');
-    return [spaceActions.createRemoveHarvesterFromSpaceAction({
-      space: parentSpace,
-      harvester,
-    })];
-  }),
-});
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-spaces-harvesters'],
@@ -158,4 +95,67 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
   globalActions: collect('addHarvesterAction', 'inviteHarvesterUsingTokenAction'),
+});
+
+const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
+  spaceActions: service(),
+  router: service(),
+  guiUtils: service(),
+
+  /**
+   * @virtual
+   */
+  harvester: undefined,
+
+  /**
+   * @virtual
+   */
+  parentSpace: undefined,
+
+  /**
+   * @override
+   */
+  label: reads('harvester.name'),
+
+  /**
+   * @override
+   */
+  conflictingLabelSource: reads('harvester'),
+
+  /**
+   * @override
+   */
+  icon: recordIcon('harvester'),
+
+  /**
+   * @override
+   */
+  link: computed('harvester', function link() {
+    const {
+      router,
+      harvester,
+      guiUtils,
+    } = this.getProperties('router', 'harvester', 'guiUtils');
+    return router.urlFor(
+      'onedata.sidebar.content.aspect',
+      'harvesters',
+      guiUtils.getRoutableIdFor(harvester),
+      'plugin'
+    );
+  }),
+
+  /**
+   * @override
+   */
+  actions: computed('parentSpace', 'harvester', function actions() {
+    const {
+      spaceActions,
+      parentSpace,
+      harvester,
+    } = this.getProperties('spaceActions', 'parentSpace', 'harvester');
+    return [spaceActions.createRemoveHarvesterFromSpaceAction({
+      space: parentSpace,
+      harvester,
+    })];
+  }),
 });

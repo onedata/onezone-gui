@@ -14,26 +14,28 @@ import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harve
 import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
 import $ from 'jquery';
 import EmberObject from '@ember/object';
-import { registerService } from '../../helpers/stub-service';
+import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
+
+const Router = Service.extend({
+  urlFor() {
+    return '#/url';
+  },
+});
 
 describe('Integration | Component | content spaces harvesters', function () {
   setupComponentTest('content-spaces-harvesters', {
     integration: true,
   });
 
-  const Router = Service.extend({
-    urlFor() {
-      return '#/url';
-    },
-  });
-
   beforeEach(function () {
     const harvesterListPromise = promiseObject(resolve(EmberObject.create({
       list: promiseArray(resolve([{
         name: 'harvester1',
+        id: 'harvester.harvester1id.instance:auto',
       }, {
         name: 'harvester2',
+        id: 'harvester.harvester2id.instance:auto',
       }])),
     })));
     this.set('space', EmberObject.create({
@@ -124,9 +126,7 @@ describe('Integration | Component | content spaces harvesters', function () {
   });
 
   it('shows list of space harvesters', function () {
-    const link = sinon.stub().returns('');
-    this.set('link', link);
-    this.render(hbs `{{content-spaces-harvesters space=space link=link}}`);
+    this.render(hbs `{{content-spaces-harvesters space=space}}`);
 
     return wait()
       .then(() => {
@@ -207,6 +207,26 @@ describe('Integration | Component | content spaces harvesters', function () {
       click('h1 .collapsible-toolbar-toggle')
       .then(() => click($('.dropdown-menu .generate-invite-token-action')[0]))
     );
+  });
+
+  it('has correct link', function () {
+    const router = lookupService(this, 'router');
+    sinon.stub(router, 'urlFor')
+      .withArgs(
+        'onedata.sidebar.content.aspect',
+        'harvesters',
+        'harvester1id',
+        'plugin',
+      ).returns('#correct-url');
+
+    this.render(hbs `{{content-spaces-harvesters space=space}}`);
+
+    return wait()
+      .then(() => {
+        const $harvesterItems = this.$('.resource-item a');
+        expect($harvesterItems).to.have.length(1);
+        expect($harvesterItems.eq(0)).to.have.attr('href', '#correct-url');
+      });
   });
 
   context('handles errors', function () {

@@ -2,8 +2,8 @@
  * A service which provides harvester manipulation functions ready to use for GUI
  *
  * @module services/harvester-actions
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
