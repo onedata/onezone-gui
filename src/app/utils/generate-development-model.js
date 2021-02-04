@@ -28,12 +28,12 @@ import {
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
 const USER_LOGIN = 'stub_user';
-const NUMBER_OF_SHARED_USERS = 0;
-const NUMBER_OF_PROVIDERS = 1;
-const NUMBER_OF_SPACES = 1;
-const NUMBER_OF_TOKENS = 0;
-const NUMBER_OF_GROUPS = 0;
-const NUMBER_OF_HARVESTERS = 0;
+const NUMBER_OF_SHARED_USERS = 3;
+const NUMBER_OF_PROVIDERS = 3;
+const NUMBER_OF_SPACES = 3;
+const NUMBER_OF_TOKENS = 3;
+const NUMBER_OF_GROUPS = 10;
+const NUMBER_OF_HARVESTERS = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -400,7 +400,7 @@ function createProvidersRecords(store) {
       name: PROVIDER_NAMES[index],
       latitude,
       longitude,
-      online: true,
+      online: index <= 1,
       host: `${providerId}.local-onedata.org`,
     }).save();
   }));
