@@ -12,7 +12,6 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { next } from '@ember/runloop';
-import $ from 'jquery';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -70,14 +69,7 @@ export default Service.extend(I18n, {
       })
       .then(harvester => {
         globalNotify.success(this.t('harvesterCreateSuccess'));
-        next(() =>
-          this.redirectToHarvester(harvester, 'config')
-          .then(() => {
-            const sidebarContainer = $('.col-sidebar');
-            $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-              sidebarContainer[0].clientHeight);
-          })
-        );
+        next(() => this.redirectToHarvester(harvester, 'config'));
         return harvester;
       }).catch(error => {
         if (error && error.id === 'temporaryFailure') {

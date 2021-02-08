@@ -11,7 +11,6 @@ import Service, { inject } from '@ember/service';
 import { collect } from '@ember/object/computed';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import $ from 'jquery';
 import { next } from '@ember/runloop';
 
 export default Service.extend(I18n, {
@@ -61,13 +60,7 @@ export default Service.extend(I18n, {
       })
       .then(group => {
         globalNotify.success(this.t('groupCreateSuccess'));
-        next(() =>
-          this.redirectToGroup(group).then(() => {
-            const sidebarContainer = $('.col-sidebar');
-            $('.col-sidebar').scrollTop(sidebarContainer[0].scrollHeight -
-              sidebarContainer[0].clientHeight);
-          })
-        );
+        next(() => this.redirectToGroup(group));
         return group;
       })
       .catch(error => {
