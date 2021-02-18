@@ -67,8 +67,8 @@ export default [{
   {
     iconPath: iconPrefix + 'google.svg',
     id: 'google',
-    iconBackgroundColor: '#F1514F',
-    displayName: 'Google+',
+    iconBackgroundColor: '#FFFFFF',
+    displayName: 'Google',
   },
   {
     iconPath: iconPrefix + 'dropbox.svg',
