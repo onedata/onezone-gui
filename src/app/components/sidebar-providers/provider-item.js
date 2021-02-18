@@ -12,6 +12,7 @@ import { not } from '@ember/object/computed';
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { collect } from 'ember-awesome-macros';
 
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
@@ -22,6 +23,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',
 
   currentUser: service(),
+  globalClipboard: service(),
 
   i18nPrefix: 'components.sidebarProviders.providerItem',
 
@@ -43,6 +45,41 @@ export default Component.extend(I18n, UserProxyMixin, {
   providerId: reads('provider.entityId'),
 
   offline: not('provider.online'),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.Action>>}
+   */
+  itemActions: collect('copyIdAction', 'copyDomainAction'),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed(function () {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('provider.entityId'),
+        this.t('providerId')
+      ),
+      title: this.t('copyIdAction'),
+      class: 'copy-provider-id-action-trigger',
+      icon: 'copy',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyDomainAction: computed(function () {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('provider.domain'),
+        this.t('providerDomain')
+      ),
+      title: this.t('copyDomainAction'),
+      class: 'copy-provider-domain-action-trigger',
+      icon: 'copy',
+    };
+  }),
 
   /**
    * Icon class based on item status

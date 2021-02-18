@@ -49,8 +49,14 @@
   </div>
 {{/if}}
 <div class="content-row">
+  <h1><span class="one-label">{{tt this "userId"}}</span></h1>
+  <div class="indented-row indented-row-more">
+    {{one-clipboard-line value=user.entityId class="user-id-clipboard-line"}}
+  </div>
+</div>
+<div class="content-row">
   <h1>{{tt this "linkedAccounts"}}</h1>
-  <ul class="indented-row linked-accounts-list">
+  <ul class="indented-row indented-row-more linked-accounts-list">
     {{#promise-proxy-container proxy=linkedAccountsProxy}}
       {{#each accountsInfo as |accountInfo|}}
         <li class="linked-account full-social-icon content-row {{accountInfo.account.idp}}-account">

@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6663 Added options for copy user ID and provider ID/domain
 * VFS-7333 Added information about trying to sign-in with blocked account
 * VFS-6566 Refactored for oneprovider-gui shares refactor
 * VFS-6915 Added copy token to clipboard action in tokens sidebar
