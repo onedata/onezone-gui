@@ -54,7 +54,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function () {
+  copyIdAction: computed(function copyIdAction() {
     return {
       action: () => this.get('globalClipboard').copy(
         this.get('provider.entityId'),

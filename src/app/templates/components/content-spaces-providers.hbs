@@ -32,13 +32,25 @@
         {{#unless media.isMobile}}
           <div class="row row-space-providers-map">
             <div class="row content-row loadable-row">
-              <h1>Providers map</h1>
+              <h1>{{tt this "providersMap"}}</h1>
               <div class="row" style="height: 500px;">
                 {{#one-atlas class="space-providers-atlas" as |atlas|}}
                   {{#each providersProxy.content as |provider|}}
-                    {{#atlas.position latitude=provider.latitude longitude=provider.longitude as |position|}}
+                    {{#atlas.position
+                      latitude=provider.latitude
+                      longitude=provider.longitude
+                      as |position|
+                    }}
                       {{#position.point}}
-                        {{#link-to "onedata.sidebar.content.aspect" "providers" (model-routable-id provider) "index"}}
+                        {{#link-to
+                          "onedata.sidebar.content.aspect"
+                          "spaces"
+                          (model-routable-id space)
+                          "data"
+                          (query-params
+                            options=(concat "oneproviderId." provider.entityId)
+                          )
+                        }}
                           {{provider-place
                             provider=provider
                             atlasWidth=atlas.width
@@ -58,7 +70,7 @@
         {{/unless}}
         
         <div class="row content-row row-space-providers-support-chart">
-          <h1>Support by providers</h1>
+          <h1>{{tt this "supportByProviders"}}</h1>
           <div class="inner-row-content">
             {{space-providers-support-chart
               class="space-providers-support-chart"
