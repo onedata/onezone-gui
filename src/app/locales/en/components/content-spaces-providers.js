@@ -7,4 +7,8 @@ export default {
   ceaseSupportItem: 'Cease support',
   providerId: 'provider ID',
   copyProviderIdAction: 'Copy provider ID',
+  providerDomain: 'provider domain',
+  copyProviderDomainAction: 'Copy provider domain',
+  browseFilesAction: 'Browse files',
+  showDetailsAction: 'Show details',
 };

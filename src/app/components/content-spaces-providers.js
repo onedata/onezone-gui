@@ -115,10 +115,86 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   }),
 
   /**
-   * 
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyProviderDomainAction: computed(function copyProviderDomainAction() {
+    return {
+      icon: 'copy',
+      text: this.t('copyProviderDomainAction'),
+      class: 'copy-provider-domain-action-trigger',
+      action: (provider) => this.get('globalClipboard').copy(
+        get(provider, 'domain'),
+        this.t('providerDomain')
+      ),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  browseFilesAction: computed(function browseFilesAction() {
+    return {
+      icon: 'browser-directory',
+      text: this.t('browseFilesAction'),
+      class: 'visit-provider-action-trigger',
+      action: (provider) => this.browseFiles(provider),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  showDetailsAction: computed(function showDetailsAction() {
+    return {
+      icon: 'provider',
+      text: this.t('showDetailsAction'),
+      class: 'show-provider-details-action-trigger',
+      action: (provider) => this.showDetails(provider),
+    };
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Action>>}
    */
-  providerActions: collect('copyProviderIdAction', 'ceaseOneproviderSupportAction'),
+  providerActions: collect(
+    'browseFilesAction',
+    'showDetailsAction',
+    'copyProviderIdAction',
+    'copyProviderDomainAction',
+    'ceaseOneproviderSupportAction'
+  ),
+
+  browseFiles(provider) {
+    const {
+      guiUtils,
+      router,
+      space,
+    } = this.getProperties('guiUtils', 'router', 'space');
+    return router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      guiUtils.getRoutableIdFor(space),
+      'data', {
+        queryParams: {
+          options: serializeAspectOptions({
+            oneproviderId: get(provider, 'entityId'),
+          }),
+        },
+      }
+    );
+  },
+
+  showDetails(provider) {
+    const {
+      guiUtils,
+      router,
+    } = this.getProperties('guiUtils', 'router');
+    return router.transitionTo(
+      'onedata.sidebar.content',
+      'providers',
+      guiUtils.getRoutableIdFor(provider),
+    );
+  },
 
   openCeaseModal(provider) {
     this.setProperties({
@@ -132,25 +208,6 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
       return this.get('router').transitionTo(
         'onedata.sidebar.content.aspect',
         'support'
-      );
-    },
-    providerClicked(provider) {
-      const {
-        guiUtils,
-        router,
-        space,
-      } = this.getProperties('guiUtils', 'router', 'space');
-      return router.transitionTo(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        guiUtils.getRoutableIdFor(space),
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions({
-              oneproviderId: get(provider, 'entityId'),
-            }),
-          },
-        }
       );
     },
     openRemoveSpace() {

@@ -1,4 +1,9 @@
 .content-spaces-providers {
+  .provider-item {
+    .provider-item-name-line {
+      max-width: calc(100% - 3em);
+    }
+  }
   .row-space-providers-support-chart .inner-row-content {
     padding-top: $padding-large-vertical;
     padding-left: $padding-large-horizontal;
