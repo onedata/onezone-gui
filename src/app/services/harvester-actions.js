@@ -1,5 +1,5 @@
 /**
- * A service which provides harvester manipulation functions ready to use for GUI 
+ * A service which provides harvester manipulation functions ready to use for GUI
  *
  * @module services/harvester-actions
  * @author Michał Borzęcki
@@ -72,9 +72,6 @@ export default Service.extend(I18n, {
         next(() => this.redirectToHarvester(harvester, 'config'));
         return harvester;
       }).catch(error => {
-        if (error && error.id === 'temporaryFailure') {
-          error.id = 'cannotConnectToElasticsearch';
-        }
         globalNotify.backendError(this.t('harvesterCreating'), error);
         throw error;
       });
@@ -169,7 +166,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes space form harvester
-   * @param {Model.Harvester} harvester 
+   * @param {Model.Harvester} harvester
    * @param {Model.Space} space
    * @returns {Promise}
    */
@@ -194,7 +191,7 @@ export default Service.extend(I18n, {
 
   /**
    * Adds space to harvester
-   * @param {Model.Harvester} harvester 
+   * @param {Model.Harvester} harvester
    * @param {Model.Space} space
    * @return {Promise}
    */
@@ -219,7 +216,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes group from space
-   * @param {Model.Harvester} harvester 
+   * @param {Model.Harvester} harvester
    * @param {Model.Group} group
    * @returns {Promise}
    */
@@ -244,7 +241,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes user from harvester
-   * @param {Model.Harvester} harvester 
+   * @param {Model.Harvester} harvester
    * @param {Model.User} user
    * @returns {Promise}
    */
@@ -286,7 +283,7 @@ export default Service.extend(I18n, {
 
   /**
    * Creates member group for specified harvester
-   * @param {Model.Harvester} harvester 
+   * @param {Model.Harvester} harvester
    * @param {Object} groupRepresentation
    * @return {Promise}
    */
