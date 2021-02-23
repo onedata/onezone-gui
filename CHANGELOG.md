@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-6638 Detecting unreachable duplicated clusters
 * VFS-7281 Fixed scrolling to active items in sidebar
 * VFS-7333 Added information about trying to sign-in with blocked account
 * VFS-6566 Refactored for oneprovider-gui shares refactor
