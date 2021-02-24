@@ -56,6 +56,7 @@ describe('Integration | Component | content users', function () {
     const MOCKED_USER = EmberObject.create({
       fullName: 'some name',
       username: 'some login',
+      entityId: 'user_id',
       basicAuthEnabled: true,
     });
     this.set('user', MOCKED_USER);
@@ -77,6 +78,14 @@ describe('Integration | Component | content users', function () {
         .to.equal(this.get('user.username'));
       done();
     });
+  });
+
+  it('renders copiable user id', async function () {
+    this.render(hbs `{{content-users user=user}}`);
+    await wait();
+
+    expect(this.$('.user-id-clipboard-line input').val())
+      .to.equal(this.get('user.entityId'));
   });
 
   it('renders linked account', function () {
