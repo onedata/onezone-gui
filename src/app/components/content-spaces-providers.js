@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { get, computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
@@ -24,6 +24,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   i18n: service(),
   guiUtils: service(),
   spaceActions: service(),
+  globalClipboard: service(),
 
   i18nPrefix: 'components.contentSpacesProviders',
 
@@ -98,7 +99,102 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
     }
   ),
 
-  providerActions: collect('ceaseOneproviderSupportAction'),
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyProviderIdAction: computed(function copyProviderIdAction() {
+    return {
+      icon: 'copy',
+      text: this.t('copyProviderIdAction'),
+      class: 'copy-provider-id-action-trigger',
+      action: (provider) => this.get('globalClipboard').copy(
+        get(provider, 'entityId'),
+        this.t('providerId')
+      ),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyProviderDomainAction: computed(function copyProviderDomainAction() {
+    return {
+      icon: 'copy',
+      text: this.t('copyProviderDomainAction'),
+      class: 'copy-provider-domain-action-trigger',
+      action: (provider) => this.get('globalClipboard').copy(
+        get(provider, 'domain'),
+        this.t('providerDomain')
+      ),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  browseFilesAction: computed(function browseFilesAction() {
+    return {
+      icon: 'browser-directory',
+      text: this.t('browseFilesAction'),
+      class: 'visit-provider-action-trigger',
+      action: (provider) => this.browseFiles(provider),
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  showDetailsAction: computed(function showDetailsAction() {
+    return {
+      icon: 'provider',
+      text: this.t('showDetailsAction'),
+      class: 'show-provider-details-action-trigger',
+      action: (provider) => this.showDetails(provider),
+    };
+  }),
+
+  /**
+   * @type {ComputedProperty<Array<Action>>}
+   */
+  providerActions: collect(
+    'browseFilesAction',
+    'showDetailsAction',
+    'copyProviderIdAction',
+    'copyProviderDomainAction',
+    'ceaseOneproviderSupportAction'
+  ),
+
+  browseFiles(provider) {
+    const {
+      guiUtils,
+      router,
+      space,
+    } = this.getProperties('guiUtils', 'router', 'space');
+    return router.transitionTo(
+      'onedata.sidebar.content.aspect',
+      'spaces',
+      guiUtils.getRoutableIdFor(space),
+      'data', {
+        queryParams: {
+          options: serializeAspectOptions({
+            oneproviderId: get(provider, 'entityId'),
+          }),
+        },
+      }
+    );
+  },
+
+  showDetails(provider) {
+    const {
+      guiUtils,
+      router,
+    } = this.getProperties('guiUtils', 'router');
+    return router.transitionTo(
+      'onedata.sidebar.content',
+      'providers',
+      guiUtils.getRoutableIdFor(provider),
+    );
+  },
 
   openCeaseModal(provider) {
     this.setProperties({
@@ -112,14 +208,6 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
       return this.get('router').transitionTo(
         'onedata.sidebar.content.aspect',
         'support'
-      );
-    },
-    providerClicked(provider) {
-      const guiUtils = this.get('guiUtils');
-      return this.get('router').transitionTo(
-        'onedata.sidebar.content',
-        'providers',
-        guiUtils.getRoutableIdFor(provider)
       );
     },
     openRemoveSpace() {

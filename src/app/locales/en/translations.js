@@ -11,8 +11,6 @@ import harvesters from './tabs/harvesters';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
-import backendErrors from './errors/backend-errors';
-
 import loginBox from './components/login-box';
 import contentTokens from './components/content-tokens';
 import contentProviderRedirect from './components/content-provider-redirect';
@@ -124,9 +122,6 @@ const translations = {
     clusters,
     harvesters,
     uploads,
-  },
-  errors: {
-    backendErrors,
   },
   components: {
     alerts: {

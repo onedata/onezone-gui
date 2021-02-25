@@ -1,4 +1,6 @@
 .content-users {
+  $linked-account-name-padding-left: $large-social-box-size + $padding-base-horizontal;
+  $clipboard-line-width: 30em;
   .linked-accounts-list {
     position: relative;
     min-height: 100px;
@@ -9,7 +11,7 @@
   .linked-account {
     position: relative;
     min-height: $large-social-box-size + 2 * $content-row-vertical-padding;
-    padding-left: $large-social-box-size + $padding-base-horizontal;
+    padding-left: $linked-account-name-padding-left;
   }
   .login-icon-box:not(.add) {
     cursor: default !important;
@@ -54,8 +56,17 @@
   }
   .authorizers-dropdown {
     max-width: 300px;
+    min-width: calc(#{$clipboard-line-width} - #{$linked-account-name-padding-left});
     .ember-power-select-placeholder {
       margin-left: -30px;
+    }
+  }
+  .user-id-clipboard-line {
+    margin-top: $padding-base-vertical;
+    margin-bottom: $padding-base-vertical;
+    max-width: $clipboard-line-width;
+    @media (max-width: $screen-xs-min) {
+      margin-bottom: 0;
     }
   }
   @media (min-width: $screen-sm-min) {
@@ -72,7 +83,7 @@
       vertical-align: middle;
       max-width: 270px;
     }
-    .linked-accounts-list {
+    .indented-row-more {
       margin-left: 40px;
     }
   }

@@ -10,7 +10,6 @@
 import Service, { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import $ from 'jquery';
 import { collect } from '@ember/object/computed';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
@@ -81,17 +80,11 @@ export default Service.extend(I18n, {
       .then(space => {
         globalNotify.success(this.t('spaceCreateSuccess'));
         return router.transitionTo(
-            'onedata.sidebar.content.aspect',
-            'spaces',
-            guiUtils.getRoutableIdFor(space),
-            'index',
-          )
-          .then(() => {
-            const sidebarContainer = $('.col-sidebar');
-            sidebarContainer.scrollTop(
-              sidebarContainer[0].scrollHeight - sidebarContainer[0].clientHeight
-            );
-          });
+          'onedata.sidebar.content.aspect',
+          'spaces',
+          guiUtils.getRoutableIdFor(space),
+          'index',
+        );
       });
   },
 
