@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import { observer, get, set, computed } from '@ember/object';
+import { observer, get, getProperties, set, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -237,13 +237,14 @@ export default Component.extend(I18n, {
   }),
 
   membersObserver: observer(
-    'members.@each.name',
+    'members.@each.{entityId,name,username}',
     'onlyDirect',
     function membersObserver() {
       const {
         owners,
         directMembers,
         effectiveMembers,
+        subjectType,
         members,
         membersProxyList,
         groupedPrivilegesFlags,
@@ -257,6 +258,7 @@ export default Component.extend(I18n, {
         'owners',
         'directMembers',
         'effectiveMembers',
+        'subjectType',
         'members',
         'membersProxyList',
         'groupedPrivilegesFlags',
@@ -279,9 +281,18 @@ export default Component.extend(I18n, {
         members.findBy('entityId', get(currentUser, 'userId'));
       const membersSortKeys = new Map();
       members.forEach(member => {
+        const {
+          entityId,
+          name,
+          username,
+        } = getProperties(member, 'entityId', 'name', 'username');
         let key = member === currentUserMember ? '0\n' : '1\n';
         key += (owners || []).includes(member) ? '0\n' : '1\n';
-        key += get(member, 'name');
+        key += `${name}\n`;
+        if (subjectType === 'user') {
+          key += `${username || '\n'}\n`;
+        }
+        key += entityId;
         membersSortKeys.set(key, member);
       });
       const orderedMembers = [...membersSortKeys.keys()].sort()
