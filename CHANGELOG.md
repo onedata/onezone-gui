@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7413 Fixed missing members with duplicated names
 * VFS-6663 Added options for copy user ID and provider ID/domain
 * VFS-6638 Detecting unreachable duplicated clusters
 * VFS-7281 Fixed scrolling to active items in sidebar
