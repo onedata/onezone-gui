@@ -27,6 +27,7 @@ export default SidebarResources.extend({
   harvesterManager: service(),
   harvesterActions: service(),
   uploadManager: service(),
+  recordManager: service(),
 
   /**
    * @param {string} type
@@ -48,6 +49,8 @@ export default SidebarResources.extend({
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
+      case 'workflows':
+        return this.get('recordManager').getUserRecordList('workflowDirectory');
       case 'uploads':
         return resolve({
           list: this.get('uploadManager.sidebarOneproviders'),

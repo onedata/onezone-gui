@@ -37,6 +37,7 @@ export default Model.extend(GraphSingleModelMixin, {
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
   harvesterList: belongsTo('harvesterList'),
+  workflowDirectoryList: belongsTo('workflowDirectoryList'),
 
   name: alias('fullName'),
 
@@ -86,8 +87,8 @@ export default Model.extend(GraphSingleModelMixin, {
   },
 
   /**
-   * @param {*} entityType 
-   * @param {*} token 
+   * @param {*} entityType
+   * @param {*} token
    * @returns {Object} joined record
    */
   _joinRelation(entityType, token) {

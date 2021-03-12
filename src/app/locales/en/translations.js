@@ -81,6 +81,7 @@ import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
+import sidebarWorkflows from './components/sidebar-workflows';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -202,6 +203,7 @@ const translations = {
     tokenConsumer,
     contentTokensConsumer,
     tokenTemplateSelector,
+    sidebarWorkflows,
   },
   services: {
     tokenActions,

@@ -34,6 +34,7 @@ const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
+const NUMBER_OF_WORKFLOW_DIRECTORIES = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -51,6 +52,7 @@ const types = [
   'cluster',
   'harvester',
   'token',
+  'workflowDirectory',
 ];
 const names = ['one', 'two', 'three'];
 
@@ -349,6 +351,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createClusterRecords(store, additionalInfo);
     case 'harvester':
       return createHarvesterRecords(store, additionalInfo);
+    case 'workflowDirectory':
+      return createWorkflowDirectoryRecords(store, additionalInfo);
     default:
       return allFulfilled(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -613,6 +617,15 @@ function createHarvesterRecords(store) {
         .then(listRecord => record.set('indexList', listRecord))
         .then(() => record);
     });
+  }));
+}
+
+function createWorkflowDirectoryRecords(store) {
+  return allFulfilled(_.range(NUMBER_OF_WORKFLOW_DIRECTORIES).map((index) => {
+    return store.createRecord('workflowDirectory', {
+      name: `Directory ${index}`,
+      scope: 'private',
+    }).save();
   }));
 }
 
