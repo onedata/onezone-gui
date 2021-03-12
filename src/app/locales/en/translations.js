@@ -8,6 +8,7 @@ import spaces from './tabs/spaces';
 import shares from './tabs/shares';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
+import workflows from './tabs/workflows';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
@@ -121,6 +122,7 @@ const translations = {
     users,
     clusters,
     harvesters,
+    workflows,
     uploads,
   },
   components: {
