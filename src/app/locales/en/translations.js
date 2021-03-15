@@ -110,6 +110,7 @@ import openConsumeTokenViewAction from './utils/token-actions/open-consume-token
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
 import modifyWorkflowDirectoryAction from './utils/workflow-actions/modify-workflow-directory-action';
+import removeWorkflowDirectoryAction from './utils/workflow-actions/remove-workflow-directory-action';
 
 const translations = {
   tabs: {
@@ -238,6 +239,7 @@ const translations = {
     },
     workflowActions: {
       modifyWorkflowDirectoryAction,
+      removeWorkflowDirectoryAction,
     },
   },
 };

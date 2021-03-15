@@ -62,9 +62,22 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  removeAction: computed('workflowDirectory', function removeAction() {
+    const {
+      workflowDirectory,
+      workflowActions,
+    } = this.getProperties('workflowDirectory', 'workflowActions');
+    return workflowActions.createRemoveWorkflowDirectoryAction({
+      workflowDirectory,
+    });
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  itemActions: collect('renameAction'),
+  itemActions: collect('renameAction', 'removeAction'),
 
   actions: {
     toggleRename(value) {

@@ -9,6 +9,7 @@
 
 import Service from '@ember/service';
 import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
+import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
 
 export default Service.extend({
   /**
@@ -23,5 +24,18 @@ export default Service.extend({
    */
   createModifyWorkflowDirectoryAction(context) {
     return ModifyWorkflowDirectoryAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     workflowDirectory: Models.WorkflowDirectory,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.RemoveWorkflowDirectoryAction}
+   */
+  createRemoveWorkflowDirectoryAction(context) {
+    return RemoveWorkflowDirectoryAction.create({ ownerSource: this, context });
   },
 });

@@ -3,6 +3,7 @@ import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
+import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
 import sinon from 'sinon';
 import $ from 'jquery';
 import { click, fillIn } from 'ember-native-dom-helpers';
@@ -19,6 +20,7 @@ describe(
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
       ModifyWorkflowDirectoryAction.create();
+      RemoveWorkflowDirectoryAction.create();
     });
 
     beforeEach(function () {
@@ -34,6 +36,7 @@ describe(
       // Reset stubbed actions
       [
         ModifyWorkflowDirectoryAction,
+        RemoveWorkflowDirectoryAction,
       ].forEach(action => {
         if (action.prototype.execute.restore) {
           action.prototype.execute.restore();
@@ -60,11 +63,15 @@ describe(
         selector: '.rename-workflow-directory-action-trigger',
         name: 'Rename',
         icon: 'rename',
-      }].forEach(({ selector, name }) => {
+      }, {
+        selector: '.remove-workflow-directory-action-trigger',
+        name: 'Remove',
+        icon: 'remove',
+      }].forEach(({ selector, name, icon }) => {
         const $trigger = popoverContent.find(selector);
         expect($trigger).to.exist;
         expect($trigger).to.contain(name);
-        expect($trigger.find('.one-icon')).to.have.class('oneicon-rename');
+        expect($trigger.find('.one-icon')).to.have.class(`oneicon-${icon}`);
       });
     });
 
@@ -91,6 +98,25 @@ describe(
 
       const $workflowDirectoryNameNode = this.$('.workflow-directory-name');
       expect($workflowDirectoryNameNode).to.not.have.class('editor');
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows to remove workflow directory through "Remove" action', async function () {
+      const workflowDirectory = this.get('workflowDirectory');
+      const executeStub = sinon.stub(
+        RemoveWorkflowDirectoryAction.prototype,
+        'execute'
+      ).callsFake(function () {
+        expect(this.get('context.workflowDirectory'))
+          .to.equal(workflowDirectory);
+      });
+
+      render(this);
+      await click('.workflow-directory-menu-trigger');
+      const removeTrigger =
+        $('body .webui-popover.in .remove-workflow-directory-action-trigger')[0];
+      await click(removeTrigger);
+
       expect(executeStub).to.be.calledOnce;
     });
   }
