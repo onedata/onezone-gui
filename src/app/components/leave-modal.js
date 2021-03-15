@@ -11,6 +11,7 @@ import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-m
 import { computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 import _ from 'lodash';
+import { string } from 'ember-awesome-macros';
 
 export default ProceedProcessModal.extend({
   /**
@@ -28,16 +29,16 @@ export default ProceedProcessModal.extend({
    */
   headerText: computed(function headerText() {
     return this.t('headerText', {
-      recordType: this.t(this.get('record.entityType')),
+      recordType: this.t(this.get('recordType')),
     });
   }),
 
   /**
    * @override
    */
-  messageText: computed('record.{name,recordType}', function messageText() {
+  messageText: computed('record.name', 'recordType', function messageText() {
     const recordName = this.get('record.name');
-    const recordType = this.get('record.entityType');
+    const recordType = this.get('recordType');
     const recordTypeI18n = this.t(recordType);
     return htmlSafe(
       this.t('areYouSure', { recordName, recordType: recordTypeI18n }) +
@@ -53,4 +54,9 @@ export default ProceedProcessModal.extend({
    * @override
    */
   modalClass: 'leave-modal',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  recordType: string.camelize('record.constructor.modelName'),
 });

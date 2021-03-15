@@ -64,6 +64,10 @@ describe(
         name: 'Rename',
         icon: 'rename',
       }, {
+        selector: '.leave-workflow-directory-action-trigger',
+        name: 'Leave',
+        icon: 'group-leave-group',
+      }, {
         selector: '.remove-workflow-directory-action-trigger',
         name: 'Remove',
         icon: 'remove',

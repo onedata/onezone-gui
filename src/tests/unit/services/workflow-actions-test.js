@@ -6,7 +6,12 @@ import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/re
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow actions', function () {
-  setupTest('service:workflow-actions', {});
+  setupTest('service:workflow-actions', {
+    needs: [
+      'service:workflowManager',
+      'service:globalNotify',
+    ],
+  });
 
   it('creates ModifyWorkflowDirectoryAction instance', function () {
     const service = this.subject();

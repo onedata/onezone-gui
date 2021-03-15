@@ -20,6 +20,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   workflowActions: service(),
+  navigationState: service(),
 
   /**
    * @override
@@ -43,6 +44,16 @@ export default Component.extend(I18n, {
   isRenaming: false,
 
   /**
+   * @type {Boolean}
+   */
+  isLeaveModalOpened: false,
+
+  /**
+   * @type {Boolean}
+   */
+  isLeaving: false,
+
+  /**
    * Alias for `item` to make code more verbose
    * @type {ComputedProperty<Models.WorkflowDirectory>}
    */
@@ -64,6 +75,18 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
+  leaveAction: computed(function leaveAction() {
+    return {
+      action: () => this.send('showLeaveModal'),
+      title: this.t('actions.leave.title'),
+      class: 'leave-workflow-directory-action-trigger',
+      icon: 'group-leave-group',
+    };
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
   removeAction: computed('workflowDirectory', function removeAction() {
     const {
       workflowDirectory,
@@ -77,7 +100,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  itemActions: collect('renameAction', 'removeAction'),
+  itemActions: collect('renameAction', 'leaveAction', 'removeAction'),
 
   actions: {
     toggleRename(value) {
@@ -111,6 +134,32 @@ export default Component.extend(I18n, {
           safeExec(this, () => this.send('toggleRename', false));
         }
       });
+    },
+    showLeaveModal() {
+      this.set('isLeaveModalOpened', true);
+    },
+    closeLeaveModal() {
+      this.set('isLeaveModalOpened', false);
+    },
+    leave() {
+      const {
+        workflowDirectory,
+        workflowActions,
+        navigationState,
+      } = this.getProperties(
+        'workflowDirectory',
+        'workflowActions',
+        'navigationState'
+      );
+      this.set('isLeaving', true);
+      return workflowActions.leaveWorkflowDirectory(workflowDirectory)
+        .then(() => navigationState.redirectToCollectionIfResourceNotExist())
+        .finally(() =>
+          safeExec(this, 'setProperties', {
+            isLeaving: false,
+            isLeaveModalOpened: false,
+          })
+        );
     },
   },
 });

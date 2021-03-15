@@ -7,6 +7,9 @@ export default {
       rename: {
         title: 'Rename',
       },
+      leave: {
+        title: 'Leave',
+      },
     },
   },
 };

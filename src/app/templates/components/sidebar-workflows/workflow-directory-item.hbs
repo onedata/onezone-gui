@@ -26,5 +26,15 @@
     actionsArray=itemActions
     toolbarToggleClasses="workflow-directory-menu-trigger"
   }}
+  {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
+    {{leave-modal
+      opened=isLeaveModalOpened
+      close=(action "closeLeaveModal")
+      proceed=(action "leave")
+      processing=isLeaving
+      record=workflowDirectory
+      onHidden=renderLater.resetRenderTrigger
+    }}
+  {{/render-later}}
 {{/unless}}
 {{yield}}

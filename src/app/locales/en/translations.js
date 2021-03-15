@@ -93,6 +93,7 @@ import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
 import tokenActions from './services/token-actions';
 import harvesterActions from './services/harvester-actions';
+import workflowActions from './services/workflow-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
@@ -214,6 +215,7 @@ const translations = {
     clusterActions,
     privilegeActions,
     harvesterActions,
+    workflowActions,
     userActions,
     guiUtils,
     uploadManager,
