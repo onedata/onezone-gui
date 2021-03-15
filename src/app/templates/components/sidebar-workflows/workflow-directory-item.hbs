@@ -1,12 +1,29 @@
 {{one-icon icon="view-grid" class="sidebar-item-icon"}}
-{{#truncated-string class="sidebar-item-title"}}
-  {{name-conflict item=workflowDirectory tagName="span" class="one-label"}}
-{{/truncated-string}}
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=true
+    value=workflowDirectory.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor workflow-directory-name sidebar-item-title"
+    click=(action "editorClick")
+  }}
+{{else}}
+  {{#truncated-string class="sidebar-item-title"}}
+    {{name-conflict
+      item=workflowDirectory
+      tagName="span"
+      class="one-label workflow-directory-name"
+    }}
+  {{/truncated-string}}
+{{/if}}
 {{#unless inSidenav}}
   {{actions-toolbar
     isMinimized=true
     dropdownPlacement="auto"
-    actionsArray=actionsArray
+    actionsArray=itemActions
     toolbarToggleClasses="workflow-directory-menu-trigger"
   }}
 {{/unless}}
