@@ -29,6 +29,8 @@ export default Component.extend(I18n, {
   tokenManager: service(),
   tokenActions: service(),
   recordManager: service(),
+  currentUser: service(),
+  errorExtractor: service(),
   i18n: service(),
 
   /**
@@ -61,6 +63,16 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   error: undefined,
+
+  /**
+   * @type {boolean}
+   */
+  resetInput: false,
+
+  /**
+   * @type {Array<String>}
+   */
+  knownCaveatErrors: Array('time', 'ip', 'asn', 'geo.region', 'geo.country', 'consumer'),
 
   /**
    * Set by joiningRecordSelectorModelNameObserver
@@ -125,6 +137,20 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
+  inviteType: computed('type', function inviteType() {
+    return this.get('type.inviteToken.inviteType').replace(/Join.*/i, '');
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteName: computed('currentUser', function inviteName() {
+    return this.get('currentUser.userProxy.username');
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
   inviteTargetModelName: reads('inviteTypeSpec.modelName'),
 
   /**
@@ -151,7 +177,6 @@ export default Component.extend(I18n, {
         inviteTargetName,
         inviteTypeSpec,
       } = this.getProperties('type', 'typeName', 'inviteTargetName', 'inviteTypeSpec');
-
       if (!type) {
         return null;
       }
@@ -160,9 +185,15 @@ export default Component.extend(I18n, {
         const inviteType = get(type, 'inviteToken.inviteType');
         if (inviteTypeSpec) {
           const targetName = inviteTargetName || this.t('unknownTargetName');
-          return this.t(
-            `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
-          );
+          if (this.get('media.isMobile')) {
+            return this.t(
+              `type.${typeName}.mobile.${inviteType}`, { targetName }, { defaultValue: null }
+            );
+          } else {
+            return this.t(
+              `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
+            );
+          }
         } else {
           return null;
         }
@@ -270,6 +301,29 @@ export default Component.extend(I18n, {
     not('selectedJoiningRecordOption')
   ),
 
+  errorTranslator: computed('error', function errorTranslator() {
+    const error = this.get('error');
+    if (error.id == 'tokenRevoked') {
+      return this.t('tokenRevokedInfo');
+    } else {
+      return this.get('errorExtractor').getMessage(error).message;
+    }
+  }),
+
+  knownErrors: computed('error', function knownErrors() {
+    const {
+      error,
+      knownCaveatErrors,
+    } = this.getProperties('error', 'knownCaveatErrors');
+    if ((error.id == 'tokenCaveatUnverified' &&
+        knownCaveatErrors.includes(error.details.caveat.type)) ||
+      error.id == 'tokenRevoked') {
+      return true;
+    } else {
+      return false;
+    }
+  }),
+
   joiningRecordSelectorModelNameObserver: observer(
     'joiningRecordSelectorModelName',
     function joiningRecordSelectorModelNameObserver() {
@@ -320,7 +374,22 @@ export default Component.extend(I18n, {
           if (this.get('pendingCheckTime') === lastInputTime) {
             this.set('pendingCheckTime', 0);
           }
-        }));
+        }))
+        .then(() => {
+          safeExec(this, () => {
+            if (!this.get('noJoinMessage') && !this.get('invalidTokenErrorOccured')) {
+              return tokenManager.verifyInviteToken(trimmedToken)
+                .then(() => {
+                  this.get('passToken')(token);
+                  this.$('.token-container input')[0].disabled = true;
+                })
+                .catch(error => {
+                  this.resetState();
+                  this.set('error', error);
+                });
+            }
+          });
+        });
     }
   },
 
@@ -367,6 +436,7 @@ export default Component.extend(I18n, {
   actions: {
     tokenChanged(token) {
       this.setProperties({
+        resetInput: false,
         token,
         lastInputTime: new Date().valueOf(),
       });
@@ -397,6 +467,14 @@ export default Component.extend(I18n, {
         targetModelName: inviteTargetModelName,
         token,
       }).execute();
+    },
+
+    cancel() {
+      this.resetState();
+      this.set('token', '');
+      this.$('.token-container input')[0].value = '';
+      this.get('passToken')(this.get('token'));
+      this.$('.token-container input')[0].disabled = false;
     },
   },
 });

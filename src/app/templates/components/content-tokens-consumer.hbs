@@ -1,8 +1,9 @@
-{{#content-info
-  class="scroll-breakpoint-600"
-  header=(tt this "header")
-  text=(tt this "description")
-}}
-  {{token-consumer}}
-{{/content-info}}
-
+{{#one-collapse collapsed=token}}
+  {{#content-info
+    class="scroll-breakpoint-600"
+    header=(tt this "header")
+    text=(if token "" (tt this "description"))
+  }}
+    {{token-consumer passToken=(action "passToken")}}
+  {{/content-info}}
+{{/one-collapse}}

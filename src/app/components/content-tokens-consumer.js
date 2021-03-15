@@ -20,4 +20,16 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.contentTokensConsumer',
+
+  /**
+   * @type {String}
+   */
+  token: '',
+
+  actions: {
+    passToken(token) {
+      this.set('token', token);
+    },
+  },
+
 });

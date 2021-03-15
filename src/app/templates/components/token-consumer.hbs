@@ -14,8 +14,15 @@
     {{tt this "invalidTokenMessage"}}
   </div>
 {{else if error}}
-  {{resource-load-error reason=error}}
-{{else}}
+  {{#if knownErrors}}
+    <div class="alert alert-info" role="alert">
+      {{errorTranslator}}
+    </div>
+  {{else}}
+    {{resource-load-error reason=error}}
+  {{/if}}
+{{/if}}
+{{#one-collapse collapsed=(and invalidTokenErrorOccured error)}}
   {{#if typeText}}
     <div class="type-info">
       <p class="token-type">
@@ -32,6 +39,36 @@
           }}
         {{/if}}
       </p>
+      {{#unless (or media.isMobile noJoinMessage)}}
+        <figure class="consume-token-image">
+          <figure class="invite-subject-image">
+            <img width=150 class="subject-image" src="assets/images/consume-token/{{inviteType}}.svg">
+            <figcaption class={{concat-classes (if (and joiningRecordSelectorModelName (not selectedJoiningRecordOption)) "select-below-label" "subject-name")}}>
+              {{#truncated-string class="text"}}
+                {{#if (and joiningRecordSelectorModelName selectedJoiningRecordOption)}}
+                  {{selectedJoiningRecordOption.label}}
+                {{else if joiningRecordSelectorModelName}}
+                  {{tt this "descriptionPicture"}}
+                {{else}}
+                  {{inviteName}}
+                {{/if}}
+              {{/truncated-string}}
+            </figcaption>
+          </figure>
+          <figure class="join-arrow-image">
+            <figcaption class="arrow-label">{{tt this "arrowLabel"}}</figcaption>
+            <div class="arrow"></div>
+          </figure>
+          <figure class="invite-target-image">
+            <img width=150 class="subject-image" src="assets/images/consume-token/{{inviteTargetModelName}}.svg">
+            <figcaption class="subject-name">
+              {{#truncated-string class="text"}}
+                {{inviteTargetName}}
+              {{/truncated-string}}
+            </figcaption>
+          </figure>
+        </figure>
+      {{/unless}}
     </div>
   {{/if}}
   {{#if noJoinMessage}}
@@ -56,7 +93,7 @@
           }}
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
-              {{#truncated-string class="text"}}
+              {{#truncated-string class="text" style="line-height=22px"}}
                 {{recordOption.label}}
               {{/truncated-string}}
             </div>
@@ -67,6 +104,12 @@
   {{/if}}
   {{#if showJoinBtn}}
     {{#one-spin-button
+      class="discard-btn btn btn-lg btn-warning"
+      action=(action "cancel")
+    }}
+      {{tt this "cancelBtn"}}
+    {{/one-spin-button}}
+    {{#one-spin-button
       class="join-btn btn btn-lg btn-primary"
       disabled=isJoinBtnDisabled
       action=(action "join")
@@ -74,5 +117,5 @@
       {{tt this "joinBtn"}}
     {{/one-spin-button}}
   {{/if}}
-{{/if}}
+{{/one-collapse}}
 {{yield}}
