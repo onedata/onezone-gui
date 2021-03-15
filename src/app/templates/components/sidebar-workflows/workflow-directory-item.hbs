@@ -1,0 +1,13 @@
+{{one-icon icon="view-grid" class="sidebar-item-icon"}}
+{{#truncated-string class="sidebar-item-title"}}
+  {{name-conflict item=workflowDirectory tagName="span" class="one-label"}}
+{{/truncated-string}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=actionsArray
+    toolbarToggleClasses="workflow-directory-menu-trigger"
+  }}
+{{/unless}}
+{{yield}}

@@ -34,6 +34,11 @@ export default OneSidebar.extend(I18n, {
   /**
    * @override
    */
+  firstLevelItemComponent: 'sidebar-workflows/workflow-directory-item',
+
+  /**
+   * @override
+   */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
       id: 'members',
