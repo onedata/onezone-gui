@@ -119,9 +119,9 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    */
   join() {
     const {
-      harvesterActions,
-      harvester,
-    } = this.getProperties('harvesterActions', 'harvester');
-    return harvesterActions.joinHarvesterAsUser(harvester);
+      workflowActions,
+      workflowDirectory,
+    } = this.getProperties('workflowActions', 'workflowDirectory');
+    return workflowActions.joinWorkflowDirectoryAsUser(workflowDirectory);
   },
 });

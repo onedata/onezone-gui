@@ -64,12 +64,32 @@ export default Service.extend(I18n, {
     return recordManager.removeUserRelation(workflowDirectory)
       .then(() => {
         globalNotify.success(this.t(
-          'leaveWorkflowDirectoryrSuccess', {
+          'leaveWorkflowDirectorySuccess', {
             workflowDirectoryName: get(workflowDirectory, 'name'),
           }));
       })
       .catch(error => {
         globalNotify.backendError(this.t('leavingWorkflowDirectory'), error);
+        throw error;
+      });
+  },
+
+  /**
+   * Joins current user to a workflow directory (without token)
+   * @param {Model.WorkflowDirectory} workflowDirectory
+   * @returns {Promise}
+   */
+  joinWorkflowDirectoryAsUser(workflowDirectory) {
+    const {
+      workflowManager,
+      globalNotify,
+    } = this.getProperties('workflowManager', 'globalNotify');
+    return workflowManager.joinWorkflowDirectoryAsUser(get(workflowDirectory, 'entityId'))
+      .then(() => {
+        globalNotify.info(this.t('joinedWorkflowDirectorySuccess'));
+      })
+      .catch(error => {
+        globalNotify.backendError(this.t('joiningWorkflowDirectory'), error);
         throw error;
       });
   },

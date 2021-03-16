@@ -8,5 +8,6 @@ export default _.merge({}, proceedProcessModal, {
   space: 'space',
   group: 'group',
   harvester: 'harvester',
+  workflowDirectory: 'workflow directory',
   cluster: 'cluster',
 });

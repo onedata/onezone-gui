@@ -17,4 +17,6 @@ export default {
   memberGroupAddition: 'member group addition',
   leavingSpace: 'leaving space',
   spaceLeftSuccess: 'Space left successfully',
+  joiningSpace: 'joining space',
+  joinedSpaceSuccess: 'You have joined the space successfully.',
 };

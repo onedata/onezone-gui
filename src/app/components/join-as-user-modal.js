@@ -9,6 +9,7 @@
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
 import { computed } from '@ember/object';
+import { camelize } from '@ember/string';
 
 export default ProceedProcessModal.extend({
   /**
@@ -37,7 +38,9 @@ export default ProceedProcessModal.extend({
    * @override
    */
   headerText: computed('modelType', function headerText() {
-    return this.t('headerText', { modelType: this.t(this.get('modelType')) });
+    return this.t('headerText', {
+      modelType: this.t(camelize(this.get('modelType'))),
+    });
   }),
 
   /**
@@ -45,7 +48,7 @@ export default ProceedProcessModal.extend({
    */
   messageText: computed('modelType', 'model.name', function messageText() {
     return this.t('messageText', {
-      modelType: this.t(this.get('modelType')),
+      modelType: this.t(camelize(this.get('modelType'))),
       modelName: this.get('model.name'),
     });
   }),

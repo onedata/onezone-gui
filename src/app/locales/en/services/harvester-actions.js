@@ -27,4 +27,6 @@ export default {
   creatingIndex: 'creating index',
   removeIndexSuccess: 'Index "{{indexName}}" has been removed',
   removingIndex: 'removing index',
+  joiningHarvester: 'joining harvester',
+  joinedHarvesterSuccess: 'You have joined the harvester successfully.',
 };
