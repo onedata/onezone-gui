@@ -14,6 +14,7 @@ import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/re
 
 export default Service.extend({
   workflowManager: service(),
+  recordManager: service(),
   globalNotify: service(),
 
   /**
@@ -49,11 +50,11 @@ export default Service.extend({
    */
   leaveWorkflowDirectory(workflowDirectory) {
     const {
-      workflowManager,
+      recordManager,
       globalNotify,
-    } = this.getProperties('workflowManager', 'globalNotify');
+    } = this.getProperties('recordManager', 'globalNotify');
 
-    return workflowManager.leaveWorkflowDirectory(get(workflowDirectory, 'entityId'))
+    return recordManager.removeUserRelation(workflowDirectory)
       .then(() => {
         globalNotify.success(this.t(
           'leaveWorkflowDirectoryrSuccess', {

@@ -9,10 +9,10 @@
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
 import { computed, get, getProperties } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import { isArray } from '@ember/array';
 import _ from 'lodash';
+import { string } from 'ember-awesome-macros';
 
 export default ProceedProcessModal.extend({
   /**
@@ -55,7 +55,8 @@ export default ProceedProcessModal.extend({
    * @override
    */
   messageText: computed(
-    'parent.{name,entityType}',
+    'parent.name',
+    'parentType',
     'child.{name,entityType}',
     function messageText() {
       const {
@@ -78,8 +79,9 @@ export default ProceedProcessModal.extend({
       } else {
         childName = get(child || {}, 'name');
       }
+      const parentDesc = this.t(parentType, { name: parentName });
       let message = this.t('areYouSure', {
-        parent: this.t(parentType, { name: parentName }),
+        parent: parentDesc,
         child: this.t(
           childType,
           Object.assign({ name: childName }, childrenNumber)
@@ -94,9 +96,9 @@ export default ProceedProcessModal.extend({
         message += this.t('operationCauseMulti');
       }
       if (parentType === 'group') {
-        message += this.t('allInherited', { parentType, parentName });
+        message += this.t('allInherited', { parent: parentDesc });
       } else {
-        message += this.t('onlyParent', { parentType, parentName });
+        message += this.t('onlyParent', { parent: parentDesc });
       }
       message += '</strong>';
       return htmlSafe(message);
@@ -106,7 +108,7 @@ export default ProceedProcessModal.extend({
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  parentType: reads('parent.entityType'),
+  parentType: string.camelize('parent.constructor.modelName'),
 
   /**
    * Object: {
@@ -147,9 +149,11 @@ export default ProceedProcessModal.extend({
    * When there are no users: '[sub]group[s]'
    * @type {Ember.ComputedProperty<string>}
    */
-  childType: computed('parent.entityType', 'childrenNumber', function () {
-    const parentType = this.get('parent.entityType');
-    const childrenNumber = this.get('childrenNumber');
+  childType: computed('parentType', 'childrenNumber', function () {
+    const {
+      parentType,
+      childrenNumber,
+    } = this.getProperties('parentType', 'childrenNumber');
     const {
       users,
       groups,

@@ -8,7 +8,7 @@
  *
  */
 
-import { camelize } from '@ember/string';
+import { camelize, dasherize } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
@@ -16,6 +16,7 @@ import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
+import workflowDirectoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -60,6 +61,7 @@ const privileges = {
   space: spacePrivilegesFlags,
   group: groupPrivilegesFlags,
   harvester: harvesterPrivilegesFlags,
+  workflowDirectory: workflowDirectoryPrivilegesFlags,
 };
 
 const perProviderSize = Math.pow(1024, 4);
@@ -266,7 +268,30 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => allFulfilled(['space', 'group', 'harvester'].map(modelType => {
+      .then(() => listRecords.workflowDirectory.get('list')
+        .then(records =>
+          allFulfilled(records.map(record =>
+            allFulfilled([
+              attachSharedUsersGroupsToModel(
+                store, record, 'workflowDirectory', false,
+                sharedUsers.slice(0, 2), groups.slice(0, 2)
+              ),
+              attachSharedUsersGroupsToModel(
+                store, record, 'workflowDirectory', true, sharedUsers, groups
+              ),
+              attachMembershipsToModel(
+                store, record, 'workflowDirectory', groups
+              ),
+            ])
+          ))
+        )
+      )
+      .then(() => allFulfilled([
+        'space',
+        'group',
+        'harvester',
+        'workflowDirectory',
+      ].map(modelType => {
         return listRecords[modelType].get('list')
           .then(records =>
             allFulfilled(records.map(record =>
@@ -625,6 +650,8 @@ function createWorkflowDirectoryRecords(store) {
     return store.createRecord('workflowDirectory', {
       name: `Directory ${index}`,
       scope: 'private',
+      directMembership: true,
+      currentUserEffPrivileges: workflowDirectoryPrivilegesFlags,
     }).save();
   }));
 }
@@ -781,7 +808,7 @@ function createPrivilegesRecords(
   return allFulfilled(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
-      entityType: modelType,
+      entityType: dasherize(modelType),
       entityId: recordId,
       aspect,
       aspectId: subjectId,

@@ -31,7 +31,7 @@ export const entityTypeToModelNameMap = Object.freeze(new Map([
   [providerEntityType, 'provider'],
   [clusterEntityType, 'cluster'],
   [tokenEntityType, 'token'],
-  [workflowDirectoryEntityType, 'workflowDirectory'],
+  [workflowDirectoryEntityType, 'workflow-directory'],
 ]));
 
 export default OnedataAdapter.extend({

@@ -12,11 +12,22 @@ import { resolve, all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import RecordManagerConfiguration from 'onezone-gui/utils/record-manager-configuration';
 
 export default Service.extend({
   currentUser: service(),
   store: service(),
   onedataGraphUtils: service(),
+
+  /**
+   * @type {Utils.RecordManagerConfiguration}
+   */
+  configuration: undefined,
+
+  init() {
+    this._super(...arguments);
+    this.set('configuration', new RecordManagerConfiguration(this));
+  },
 
   /**
    * Returns loaded *List relation of current user
@@ -36,7 +47,7 @@ export default Service.extend({
   /**
    * Reloads *List relations of current user containing specified model. Only already
    * loaded lists will be reloaded
-   * @param {String} listItemModelName 
+   * @param {String} listItemModelName
    * @returns {Promise}
    */
   reloadUserRecordList(listItemModelName) {
@@ -46,7 +57,7 @@ export default Service.extend({
   /**
    * Reloads *List relations of record specified by listOwnerModelName and recordId.
    * Only already loaded lists containing specified model will be reloaded
-   * @param {String} listOwnerModelName 
+   * @param {String} listOwnerModelName
    * @param {String} recordId
    * @param {String} listItemModelName
    * @returns {Promise}
@@ -59,7 +70,7 @@ export default Service.extend({
   /**
    * Reloads *List relations of all record specified by listOwnerModelName. Only already
    * loaded lists containing specified model will be reloaded
-   * @param {String} listOwnerModelName 
+   * @param {String} listOwnerModelName
    * @param {String} listItemModelName
    * @returns {Promise}
    */
@@ -139,7 +150,7 @@ export default Service.extend({
   /**
    * Returns record specified by modelName and recordId. Will return record only if it was
    * loaded earlier.
-   * @param {String} modelName 
+   * @param {String} modelName
    * @param {String} recordId
    * @returns {Models.User}
    */
@@ -159,7 +170,7 @@ export default Service.extend({
   /**
    * Loads all relations essential for given record (so should be considered as a part of
    * the record loading process).
-   * @param {GraphSingleModel} record 
+   * @param {GraphSingleModel} record
    * @returns {Promise}
    */
   loadRequiredRelationsOfRecord(record) {
@@ -168,13 +179,13 @@ export default Service.extend({
 
   /**
    * Adds new owner the the record
-   * @param {GraphSingleModel} recordBeingOwned 
+   * @param {GraphSingleModel} recordBeingOwned
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
   addOwnerToRecord(recordBeingOwned, ownerRecord) {
     return this.addOwnerToRecordById(
-      get(recordBeingOwned, 'constructor.modelName'),
+      this.getModelNameForRecord(recordBeingOwned),
       get(recordBeingOwned, 'entityId'),
       get(ownerRecord, 'entityId')
     );
@@ -183,7 +194,7 @@ export default Service.extend({
   /**
    * Adds new owner the the record
    * @param {String} modelBeingOwnedName
-   * @param {String} recordBeingOwnedId 
+   * @param {String} recordBeingOwnedId
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
@@ -199,23 +210,23 @@ export default Service.extend({
   },
 
   /**
-   * Removes an owner from the the record
-   * @param {GraphSingleModel} recordBeingOwned 
+   * Removes an owner from the record
+   * @param {GraphSingleModel} recordBeingOwned
    * @param {Models.User} ownerRecord
    * @returns {Promise}
    */
   removeOwnerFromRecord(recordBeingOwned, ownerRecord) {
     return this.removeOwnerFromRecordById(
-      get(recordBeingOwned, 'constructor.modelName'),
+      this.getModelNameForRecord(recordBeingOwned),
       get(recordBeingOwned, 'entityId'),
       get(ownerRecord, 'entityId')
     );
   },
 
   /**
-   * Removes an owner from the the record
+   * Removes an owner from the record
    * @param {String} modelBeingOwnedName
-   * @param {String} recordBeingOwnedId 
+   * @param {String} recordBeingOwnedId
    * @param {String} ownerRecordId
    * @returns {Promise}
    */
@@ -232,7 +243,7 @@ export default Service.extend({
 
   /**
    * Removes passed record
-   * @param {GraphSingleModel} record 
+   * @param {GraphSingleModel} record
    * @returns {Promise}
    */
   removeRecord(record) {
@@ -245,7 +256,7 @@ export default Service.extend({
 
   /**
    * Removes record by modelName and recordId
-   * @param {String} modelName 
+   * @param {String} modelName
    * @param {String} recordId
    * @returns {Promise}
    */
@@ -263,5 +274,143 @@ export default Service.extend({
   getEntityTypeForModelName(modelName) {
     // Get application adapter. It's not important for which model it is
     return this.get('store').adapterFor('user').getEntityTypeForModelName(modelName);
+  },
+
+  /**
+   * Returns model name for passed record.
+   * @param {GraphSingleModel} record
+   * @returns {String}
+   */
+  getModelNameForRecord(record) {
+    return get(record, 'constructor.modelName');
+  },
+
+  /**
+   * Removes relation between current user and given record.
+   * @param {GraphSingleModel} relationTargetRecord
+   * @param {String|undefined} [relationType=undefined]
+   */
+  async removeUserRelation(
+    relationTargetRecord,
+    relationType = undefined
+  ) {
+    const currentUser = this.getCurrentUserRecord();
+    await this.removeRelation(
+      currentUser,
+      relationTargetRecord,
+      relationType
+    );
+  },
+
+  /**
+   * Removes relation between current user and given record.
+   * @param {String} relationTargetModelName
+   * @param {String} relationTargetRecordId
+   * @param {String|undefined} [relationType=undefined]
+   */
+  async removeUserRelationById(
+    relationTargetModelName,
+    relationTargetRecordId,
+    relationType = undefined
+  ) {
+    const currentUser = this.getCurrentUserRecord();
+    await this.removeRelationById(
+      'user',
+      get(currentUser, 'entityId'),
+      relationTargetModelName,
+      relationTargetRecordId,
+      relationType
+    );
+  },
+
+  /**
+   * Removes relation between two records.
+   * @param {GraphSingleModel} relationOriginRecord
+   * @param {GraphSingleModel} relationTargetRecord
+   * @param {String|undefined} [relationType=undefined]
+   */
+  async removeRelation(
+    relationOriginRecord,
+    relationTargetRecord,
+    relationType = undefined
+  ) {
+    await this.removeRelationById(
+      this.getModelNameForRecord(relationOriginRecord),
+      get(relationOriginRecord, 'entityId'),
+      this.getModelNameForRecord(relationTargetRecord),
+      get(relationTargetRecord, 'entityId'),
+      relationType
+    );
+  },
+
+  /**
+   * Removes relation between two records.
+   * @param {String} relationOriginModelName
+   * @param {String} relationOriginRecordId
+   * @param {String} relationTargetModelName
+   * @param {String} relationTargetRecordId
+   * @param {String|undefined} [relationType=undefined]
+   */
+  async removeRelationById(
+    relationOriginModelName,
+    relationOriginRecordId,
+    relationTargetModelName,
+    relationTargetRecordId,
+    relationType = undefined
+  ) {
+    const {
+      configuration,
+      onedataGraphUtils,
+    } = this.getProperties('configuration', 'onedataGraphUtils');
+
+    const removeRelationPossibilities =
+      await configuration.getRemoveRelationPossibilities(
+        relationOriginModelName,
+        relationOriginRecordId,
+        relationTargetModelName,
+        relationTargetRecordId,
+        relationType
+      );
+
+    if (!removeRelationPossibilities.length) {
+      throw { id: 'forbidden' };
+    }
+
+    const errors = [];
+    // Try to remove relation using calculated possibilities one after another
+    // until some of them will work
+    for (const removeRelationPossibility of removeRelationPossibilities) {
+      try {
+        await onedataGraphUtils.leaveRelation(
+          removeRelationPossibility.entityType,
+          removeRelationPossibility.entityId,
+          removeRelationPossibility.aspect,
+          removeRelationPossibility.aspectId,
+        );
+        // Loop should break when the request was successfull
+        break;
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+
+    // All requests failed
+    if (errors.length >= removeRelationPossibilities.length) {
+      const meaningfulErrors = errors.compact().rejectBy('id', 'forbidden');
+      meaningfulErrors.slice(1).forEach(error => console.error(
+        'service:record-manager.removeRelation:',
+        error
+      ));
+
+      throw (meaningfulErrors[0] || { id: 'forbidden' });
+    }
+
+    await configuration.onRelationRemove(
+      relationOriginModelName,
+      relationOriginRecordId,
+      relationTargetModelName,
+      relationTargetRecordId,
+      relationType
+    );
   },
 });
