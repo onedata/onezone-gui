@@ -491,7 +491,25 @@ function createTokensRecords(store) {
           },
         }).save();
       });
-    promises.push(accessTokenPromise, ...inviteTokenPromises);
+    const inviteType = inviteTypes[0];
+    const revokedInviteTokenPromise = store.createRecord('token', {
+      name: 'Revoked invite token ' + i,
+      revoked: true,
+      type: {
+        inviteToken: { inviteType },
+      },
+    }).save();
+    const notExpiriedInviteTokenPromise = store.createRecord('token', {
+      name: 'Not expiried invite token ' + i,
+      revoked: false,
+      type: {
+        inviteToken: { inviteType },
+      },
+    }).save();
+    promises.push(accessTokenPromise,
+      revokedInviteTokenPromise,
+      notExpiriedInviteTokenPromise,
+      ...inviteTokenPromises);
   });
   return allFulfilled(promises);
 }
