@@ -62,6 +62,10 @@ export default class RecordManagerConfiguration {
     }
   }
 
+  async onRecordRemove(modelName /**, recordId */ ) {
+    await this.recordManager.reloadUserRecordList(modelName);
+  }
+
   async onRelationRemove(
     relationOriginModelName,
     relationOriginRecordId,

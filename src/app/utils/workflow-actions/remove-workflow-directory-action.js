@@ -14,7 +14,7 @@ import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 
 export default Action.extend({
-  workflowManager: service(),
+  recordManager: service(),
   modalManager: service(),
   navigationState: service(),
 
@@ -73,17 +73,16 @@ export default Action.extend({
 
   async removeWorkflowDirectory() {
     const {
-      workflowManager,
+      recordManager,
       workflowDirectory,
       navigationState,
     } = this.getProperties(
-      'workflowManager',
+      'recordManager',
       'workflowDirectory',
       'navigationState'
     );
-    const workflowDirectoryId = get(workflowDirectory, 'entityId');
 
-    await workflowManager.removeWorkflowDirectory(workflowDirectoryId);
+    await recordManager.removeRecord(workflowDirectory);
     await navigationState.redirectToCollectionIfResourceNotExist();
   },
 });

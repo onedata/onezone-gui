@@ -9,7 +9,6 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
 import { inject as service } from '@ember/service';
@@ -25,7 +24,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   i18n: service(),
   navigationState: service(),
   workflowActions: service(),
-  workflowManager: service(),
+  recordManager: service(),
   globalNotify: service(),
 
   /**
@@ -51,54 +50,40 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  removeMember(type, member) {
+  async removeMember(type, member) {
     const {
-      harvesterActions,
-      harvester,
+      recordManager,
+      workflowDirectory,
     } = this.getProperties(
-      'harvesterActions',
-      'harvester'
+      'recordManager',
+      'workflowDirectory'
     );
-    return type === 'group' ?
-      harvesterActions.removeGroupFromHarvester(harvester, member) :
-      harvesterActions.removeUserFromHarvester(harvester, member);
+
+    await recordManager.removeRelation(workflowDirectory, member);
   },
 
   /**
    * @override
    */
-  removeMembers(members) {
+  async removeMembers(members) {
     const {
-      harvesterManager,
+      recordManager,
       globalNotify,
-      harvester,
+      workflowDirectory,
     } = this.getProperties(
-      'harvesterManager',
+      'recordManager',
       'globalNotify',
-      'harvester'
+      'workflowDirectory'
     );
 
-    const harvesterEntityId = get(harvester, 'entityId');
-    return Promise.all(members.map(member => {
-        const memberEntityId = get(member, 'entityId');
-        if (get(member, 'entityType') === 'user') {
-          return harvesterManager.removeUserFromHarvester(
-            harvesterEntityId,
-            memberEntityId
-          );
-        } else {
-          return harvesterManager.removeGroupFromHarvester(
-            harvesterEntityId,
-            memberEntityId
-          );
-        }
-      }))
-      .then(() => {
-        globalNotify.success(this.t('removeMembersSuccess'));
-      }).catch(error => {
-        globalNotify.backendError(this.t('membersDeletion'), error);
-        throw error;
-      });
+    return Promise.all(members.map(member =>
+      recordManager.removeRelation(workflowDirectory, member)
+    )).then(() => {
+      globalNotify.success(this.t('removeMembersSuccess'));
+    }).catch(error => {
+      globalNotify.backendError(this.t('membersDeletion'), error);
+      throw error;
+    });
   },
 
   /**

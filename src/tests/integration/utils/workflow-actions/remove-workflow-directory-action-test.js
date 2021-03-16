@@ -19,16 +19,19 @@ describe(
     });
 
     beforeEach(function () {
-      this.set('context', {
+      const context = {
         workflowDirectory: {
           name: 'directory1',
           entityId: 'directoryId',
         },
+      };
+      this.setProperties({
+        action: RemoveWorkflowDirectoryAction.create({
+          ownerSource: this,
+          context,
+        }),
+        workflowDirectory: context.workflowDirectory,
       });
-      this.set('action', RemoveWorkflowDirectoryAction.create({
-        ownerSource: this,
-        context: this.get('context'),
-      }));
     });
 
     it('has correct className, icon and title', function () {
@@ -76,8 +79,8 @@ describe(
     it(
       'executes removing workflow directory on submit - success status and notification on success',
       async function () {
-        const removeDirectoryStub = sinon
-          .stub(lookupService(this, 'workflow-manager'), 'removeWorkflowDirectory')
+        const removeRecordStub = sinon
+          .stub(lookupService(this, 'record-manager'), 'removeRecord')
           .resolves();
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -94,8 +97,8 @@ describe(
         await click(getModalFooter().find('.question-yes')[0]);
         const actionResult = await actionResultPromise;
 
-        expect(removeDirectoryStub).to.be.calledOnce;
-        expect(removeDirectoryStub).to.be.calledWith('directoryId');
+        expect(removeRecordStub).to.be.calledOnce;
+        expect(removeRecordStub).to.be.calledWith(this.get('workflowDirectory'));
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
           'The workflow directory has been sucessfully removed.'
@@ -109,7 +112,7 @@ describe(
       'executes removing workflow directory on submit - error status and notification on failure',
       async function () {
         let rejectRemove;
-        sinon.stub(lookupService(this, 'workflow-manager'), 'removeWorkflowDirectory')
+        sinon.stub(lookupService(this, 'record-manager'), 'removeRecord')
           .returns(new Promise((resolve, reject) => rejectRemove = reject));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),

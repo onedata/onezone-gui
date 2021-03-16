@@ -244,14 +244,17 @@ export default Service.extend({
   /**
    * Removes passed record
    * @param {GraphSingleModel} record
-   * @returns {Promise}
    */
-  removeRecord(record) {
+  async removeRecord(record) {
     if (get(record, 'isDeleted')) {
-      return resolve();
+      return;
     }
 
-    return record.destroyRecord();
+    await record.destroyRecord();
+    await this.get('configuration').onRecordRemove(
+      this.getModelNameForRecord(record),
+      get(record, 'entityId')
+    );
   },
 
   /**
