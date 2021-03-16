@@ -32,9 +32,35 @@
       @include font-semibold();
     }
 
+    $mobile-view-breakpoint: $screen-sm-min + 180;
+    @media (min-width: $mobile-view-breakpoint) {
+      .arrow {
+        width: 210px;
+      }
+      .arrow::after, .arrow::before {
+        width: 10%;
+      }
+      .join-arrow-image {
+        width: 217px;
+      }
+    }
+    @media (max-width: $mobile-view-breakpoint) {
+      .arrow {
+        width: 130px;
+      }
+      .arrow::after, .arrow::before {
+        width: 15%;
+      }
+      .join-arrow-image {
+        width: 136px;
+      }
+      .subject-name {
+        max-width: 200px;
+      }
+    }
+
     .arrow {
       position: absolute;
-      width: 250px;
       height: 5px;
       background-color: #303e51;
       max-width: 100%;
@@ -43,49 +69,40 @@
     .arrow::after, .arrow::before {
       content: '';
       position: absolute;
-      width: 10%;
       height: 5px;
-      right: -8px;
+      right: -6px;
       background-color: #303e51;
     }
-    
+
     .arrow::after {
-      top: -7px;
+      top: -6px;
       transform: rotate(45deg);
     }
     
     .arrow::before {
-      top: 7px;
+      top: 6px;
       transform: rotate(-45deg);
     }
 
     .join-arrow-image {
       display: inline-block;
       vertical-align: top;
-      width: 250px;
       padding-top: $padding-base-vertical + 31px;
+    }
 
-      .arrow-label {
-        padding-bottom: 10px;
-        font-weight: bold;
-        color: #303e51;
-      }
+    .arrow-label {
+      padding-bottom: $padding-xs-horizontal;
+      font-weight: bold;
+      color: #303e51;
     }
 
     .subject-image {
-      display: inline-block;
+      display: block;
       padding: $padding-base-vertical;
     }
 
-    .invite-subject-image {
-      display: inline-block;
-      vertical-align: middle;
-      max-width: 200px;
-    }
-
-    .invite-target-image {
-      display: inline-block;
-      vertical-align: top;
+    .invite-subject-image, .invite-target-image {
+      position: relative;
       max-width: 200px;
     }
   }
@@ -103,7 +120,9 @@
   }
 
   .consume-token-image {
+    display: flex;
     color: #303e51;
+    justify-content: center;
   }
 
   .select-below-label {
@@ -112,7 +131,10 @@
 
   .subject-name {
     font-weight: bold;
-    align-items: center;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    max-width: 300px;
   }
 
   .joining-record-selector {
