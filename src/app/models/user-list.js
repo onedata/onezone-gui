@@ -1,5 +1,5 @@
 /**
- * @module models/shared-user-list
+ * @module models/user-list
  * @author Jakub Liput
  * @copyright (C) 2017-2018 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,5 +12,5 @@ import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-c
 import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-list-model';
 
 export default Model.extend(GraphListModelMixin, listConflictModel, {
-  list: hasMany('sharedUser'),
+  list: hasMany('user'),
 }).reopenClass(StaticGraphModelMixin);

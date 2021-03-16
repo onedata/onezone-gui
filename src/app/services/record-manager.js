@@ -203,10 +203,10 @@ export default Service.extend({
       this.getEntityTypeForModelName(modelBeingOwnedName),
       recordBeingOwnedId,
       ownerRecordId
-    ).then(() => allFulfilled([
-      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
-      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
-    ]).catch(ignoreForbiddenError));
+    ).then(() =>
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user')
+      .catch(ignoreForbiddenError)
+    );
   },
 
   /**
@@ -235,10 +235,10 @@ export default Service.extend({
       this.getEntityTypeForModelName(modelBeingOwnedName),
       recordBeingOwnedId,
       ownerRecordId
-    ).then(() => allFulfilled([
-      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user'),
-      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'shared-user'),
-    ]).catch(ignoreForbiddenError));
+    ).then(() =>
+      this.reloadRecordListById(modelBeingOwnedName, recordBeingOwnedId, 'user')
+      .catch(ignoreForbiddenError)
+    );
   },
 
   /**

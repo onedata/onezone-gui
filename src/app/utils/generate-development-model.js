@@ -84,16 +84,16 @@ const providerClusterDefaultData = {
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers;
+  let users;
   let groups;
   let spaces;
   let providers;
   let harvesters;
 
   return createGuiMessages(store)
-    // create shared users
-    .then(() => createSharedUsersRecords(store))
-    .then(su => sharedUsers = su)
+    // create users
+    .then(() => createUsersRecords(store))
+    .then(u => users = u)
     // create main resources lists
     .then(() => hashFulfilled(
       types.reduce((promiseHash, type) => {
@@ -218,11 +218,11 @@ export default function generateDevelopmentModel(store) {
       .then(records =>
         allFulfilled(records.map(record =>
           allFulfilled([
-            attachSharedUsersGroupsToModel(
-              store, record, 'group', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
+            attachUsersGroupsToModel(
+              store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
             ),
-            attachSharedUsersGroupsToModel(
-              store, record, 'group', true, sharedUsers, groups
+            attachUsersGroupsToModel(
+              store, record, 'group', true, users, groups
             ),
             attachMembershipsToModel(
               store, record, 'group', groups
@@ -234,13 +234,13 @@ export default function generateDevelopmentModel(store) {
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
-              attachSharedUsersGroupsToModel(
-                store, record, 'space', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
+              attachUsersGroupsToModel(
+                store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
               ),
-              attachSharedUsersGroupsToModel(
-                store, record, 'space', true, sharedUsers, groups
+              attachUsersGroupsToModel(
+                store, record, 'space', true, users, groups
               ),
-              attachOwnersToModel(store, record, sharedUsers.slice(1, 2)),
+              attachOwnersToModel(store, record, users.slice(1, 2)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
@@ -253,12 +253,12 @@ export default function generateDevelopmentModel(store) {
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
-              attachSharedUsersGroupsToModel(
+              attachUsersGroupsToModel(
                 store, record, 'harvester', false,
-                sharedUsers.slice(0, 2), groups.slice(0, 2)
+                users.slice(0, 2), groups.slice(0, 2)
               ),
-              attachSharedUsersGroupsToModel(
-                store, record, 'harvester', true, sharedUsers, groups
+              attachUsersGroupsToModel(
+                store, record, 'harvester', true, users, groups
               ),
               attachMembershipsToModel(
                 store, record, 'harvester', groups
@@ -272,12 +272,12 @@ export default function generateDevelopmentModel(store) {
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
-              attachSharedUsersGroupsToModel(
+              attachUsersGroupsToModel(
                 store, record, 'workflowDirectory', false,
-                sharedUsers.slice(0, 2), groups.slice(0, 2)
+                users.slice(0, 2), groups.slice(0, 2)
               ),
-              attachSharedUsersGroupsToModel(
-                store, record, 'workflowDirectory', true, sharedUsers, groups
+              attachUsersGroupsToModel(
+                store, record, 'workflowDirectory', true, users, groups
               ),
               attachMembershipsToModel(
                 store, record, 'workflowDirectory', groups
@@ -299,7 +299,7 @@ export default function generateDevelopmentModel(store) {
                 store,
                 record,
                 modelType,
-                sharedUsers,
+                users,
                 groups,
                 privileges[modelType]
               )
@@ -656,10 +656,10 @@ function createWorkflowDirectoryRecords(store) {
   }));
 }
 
-function createSharedUsersRecords(store) {
+function createUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
-    return store.createRecord('sharedUser', {
-      name: `sharedUser${index}`,
+    return store.createRecord('user', {
+      name: `user${index}`,
       username: `username${index}`,
     }).save();
   }));
@@ -694,12 +694,12 @@ function attachModelsToInviteTokens(listRecords) {
   );
 }
 
-function attachSharedUsersGroupsToModel(
+function attachUsersGroupsToModel(
   store,
   record,
   modelType,
   isEffective,
-  sharedUsers,
+  users,
   groups
 ) {
   return createListRecord(store, 'group', groups)
@@ -716,7 +716,7 @@ function attachSharedUsersGroupsToModel(
           .then(list => record.set('parentList', list));
       }
     })
-    .then(() => createListRecord(store, 'sharedUser', sharedUsers))
+    .then(() => createListRecord(store, 'user', users))
     .then(list => {
       const listName = isEffective ? 'effUserList' : 'userList';
       record.set(listName, list);
@@ -729,7 +729,7 @@ function attachOwnersToModel(
   record,
   owners
 ) {
-  return createListRecord(store, 'sharedUser', owners)
+  return createListRecord(store, 'user', owners)
     .then(list => {
       record.set('ownerList', list);
       return record.save();
@@ -767,13 +767,13 @@ function createPrivilegesForModel(
   store,
   record,
   modelType,
-  sharedUsers,
+  users,
   groups,
   privilegesFlags
 ) {
   return allFulfilled([
     createPrivilegesRecords(
-      store, record, modelType, sharedUsers, privilegesFlags, 'user'
+      store, record, modelType, users, privilegesFlags, 'user'
     ),
     createPrivilegesRecords(
       store, record, modelType, groups, privilegesFlags, 'group'

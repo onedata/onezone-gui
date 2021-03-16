@@ -115,7 +115,6 @@ export default ProceedProcessModal.extend({
    *   users: <number>,
    *   groups: <number>,
    * } - contains info about number of passed children.
-   * sharedUser is treated as user.
    * @type {Ember.ComputedProperty<object>}
    */
   childrenNumber: computed(
@@ -124,7 +123,6 @@ export default ProceedProcessModal.extend({
       let child = this.get('child');
       const childrenTypes = {
         users: 0,
-        sharedUsers: 0,
         groups: 0,
       };
       if (!child) {
@@ -135,8 +133,6 @@ export default ProceedProcessModal.extend({
         }
         child.mapBy('entityType')
           .forEach(type => childrenTypes[_.camelCase(type) + 's']++);
-        childrenTypes['users'] += childrenTypes['sharedUsers'];
-        delete childrenTypes['sharedUsers'];
         return childrenTypes;
       }
     }

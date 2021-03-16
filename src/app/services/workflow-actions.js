@@ -13,7 +13,6 @@ import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/mo
 import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
 
 export default Service.extend({
-  workflowManager: service(),
   recordManager: service(),
   globalNotify: service(),
 

@@ -57,7 +57,7 @@ describe('Unit | Utility | generate development model', function () {
     return generateDevelopmentModel(StoreStub)
       .then(() => {
         [
-          'user', 'sharedUser',
+          'user',
           'spaceList', 'groupList', 'providerList', 'tokenList',
           'linkedAccountList', 'harvesterList', 'indexList', 'shareList',
           'space', 'group', 'provider', 'token', 'linkedAccount',

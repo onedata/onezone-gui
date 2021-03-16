@@ -8,7 +8,7 @@ import { get } from '@ember/object';
 describe('Unit | Service | workflow actions', function () {
   setupTest('service:workflow-actions', {
     needs: [
-      'service:workflowManager',
+      'service:recordManager',
       'service:globalNotify',
     ],
   });

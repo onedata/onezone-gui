@@ -25,9 +25,9 @@ export default Model.extend(GraphSingleModelMixin, {
   directMembership: attr('boolean', { defaultValue: false }),
 
   groupList: belongsTo('groupList'),
-  userList: belongsTo('sharedUserList'),
+  userList: belongsTo('userList'),
   effGroupList: belongsTo('groupList'),
-  effUserList: belongsTo('sharedUserList'),
+  effUserList: belongsTo('userList'),
 
   /**
    * @type {ComputedProperty<Object>}
