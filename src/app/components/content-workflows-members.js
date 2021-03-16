@@ -91,10 +91,13 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    */
   createChildGroup(name) {
     const {
-      harvesterActions,
-      harvester,
-    } = this.getProperties('harvesterActions', 'harvester');
-    return harvesterActions.createMemberGroupForHarvester(harvester, { name });
+      workflowActions,
+      workflowDirectory,
+    } = this.getProperties('workflowActions', 'workflowDirectory');
+    return workflowActions.createMemberGroupForWorkflowDirectory(
+      workflowDirectory, {
+        name,
+      });
   },
 
   /**
@@ -102,10 +105,13 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    */
   addMemberGroup(group) {
     const {
-      harvesterActions,
-      harvester,
-    } = this.getProperties('harvesterActions', 'harvester');
-    return harvesterActions.addMemberGroupToHarvester(harvester, group);
+      workflowActions,
+      workflowDirectory,
+    } = this.getProperties('workflowActions', 'workflowDirectory');
+    return workflowActions.addMemberGroupToWorkflowDirectory(
+      workflowDirectory,
+      group
+    );
   },
 
   /**

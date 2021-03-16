@@ -3,11 +3,12 @@
  *
  * @module services/record-manager
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import Service, { inject as service } from '@ember/service';
+import { dasherize, camelize } from '@ember/string';
 import { resolve, all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -36,7 +37,9 @@ export default Service.extend({
    */
   getUserRecordList(listItemModelName) {
     const user = this.getCurrentUserRecord();
-    const listRelationName = `${listItemModelName}List`;
+    const normalizedListItemModelName =
+      this.normalizeModelName(listItemModelName);
+    const listRelationName = `${camelize(normalizedListItemModelName)}List`;
     return user.getRelation(listRelationName)
       .then(recordList => get(recordList, 'list').then(list =>
         allFulfilled(list.map(record => this.loadRequiredRelationsOfRecord(record)))
@@ -91,6 +94,8 @@ export default Service.extend({
   reloadRecordList(record, listItemModelName) {
     const store = this.get('store');
     const modelClass = record.constructor;
+    const normalizedListItemModelName =
+      this.normalizeModelName(listItemModelName);
 
     const relationsToReload = get(modelClass, 'relationshipNames.belongsTo')
       .filter(relationName => {
@@ -101,7 +106,8 @@ export default Service.extend({
           get(modelClass, 'relationshipsByName').get(relationName).type;
         const listModelClass = store.modelFor(listModelName);
         const listHasManyRelation = get(listModelClass, 'relationshipsByName').get('list');
-        return listHasManyRelation && listHasManyRelation.type === listItemModelName;
+        return listHasManyRelation &&
+          listHasManyRelation.type === normalizedListItemModelName;
       });
 
     return allFulfilled(
@@ -125,7 +131,8 @@ export default Service.extend({
    * @returns {Promise<GraphModel>}
    */
   getRecord(modelName, gri, backgroundReload = false) {
-    return this.get('store').findRecord(modelName, gri, { backgroundReload })
+    return this.get('store')
+      .findRecord(this.normalizeModelName(modelName), gri, { backgroundReload })
       .then(record => this.loadRequiredRelationsOfRecord(record).then(() => record));
   },
 
@@ -155,7 +162,7 @@ export default Service.extend({
    * @returns {Models.User}
    */
   getLoadedRecordById(modelName, recordId) {
-    return this.get('store').peekAll(modelName).findBy('entityId', recordId);
+    return this.getAllLoadedRecords(modelName).findBy('entityId', recordId);
   },
 
   /**
@@ -164,7 +171,7 @@ export default Service.extend({
    * @returns {Array<GraphSingleModel>}
    */
   getAllLoadedRecords(modelName) {
-    return this.get('store').peekAll(modelName);
+    return this.get('store').peekAll(this.normalizeModelName(modelName));
   },
 
   /**
@@ -276,7 +283,8 @@ export default Service.extend({
    */
   getEntityTypeForModelName(modelName) {
     // Get application adapter. It's not important for which model it is
-    return this.get('store').adapterFor('user').getEntityTypeForModelName(modelName);
+    return this.get('store').adapterFor('user')
+      .getEntityTypeForModelName(this.normalizeModelName(modelName));
   },
 
   /**
@@ -286,6 +294,16 @@ export default Service.extend({
    */
   getModelNameForRecord(record) {
     return get(record, 'constructor.modelName');
+  },
+
+  /**
+   * Returns normalized model name that can be safely used with
+   * Ember Data methods.
+   * @param {String} modelName
+   * @returns {String}
+   */
+  normalizeModelName(modelName) {
+    return dasherize(modelName);
   },
 
   /**
@@ -366,11 +384,16 @@ export default Service.extend({
       onedataGraphUtils,
     } = this.getProperties('configuration', 'onedataGraphUtils');
 
+    const normalizedRelationOriginModelName =
+      this.normalizeModelName(relationOriginModelName);
+    const normalizedRelationTargetModelName =
+      this.normalizeModelName(relationTargetModelName);
+
     const removeRelationPossibilities =
       await configuration.getRemoveRelationPossibilities(
-        relationOriginModelName,
+        normalizedRelationOriginModelName,
         relationOriginRecordId,
-        relationTargetModelName,
+        normalizedRelationTargetModelName,
         relationTargetRecordId,
         relationType
       );
@@ -409,9 +432,9 @@ export default Service.extend({
     }
 
     await configuration.onRelationRemove(
-      relationOriginModelName,
+      normalizedRelationOriginModelName,
       relationOriginRecordId,
-      relationTargetModelName,
+      normalizedRelationTargetModelName,
       relationTargetRecordId,
       relationType
     );

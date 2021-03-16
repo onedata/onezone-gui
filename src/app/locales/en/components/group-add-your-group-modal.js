@@ -6,6 +6,7 @@ export default {
   space: 'space',
   group: 'group',
   harvester: 'harvester',
+  workflowDirectory: 'workflow directory',
   cluster: 'cluster',
   child: 'child',
   parent: 'parent',

@@ -9,7 +9,9 @@ describe('Unit | Service | workflow actions', function () {
   setupTest('service:workflow-actions', {
     needs: [
       'service:recordManager',
+      'service:workflowManager',
       'service:globalNotify',
+      'service:i18n',
     ],
   });
 
