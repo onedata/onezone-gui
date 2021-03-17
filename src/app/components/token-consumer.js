@@ -21,6 +21,7 @@ import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import trimToken from 'onedata-gui-common/utils/trim-token';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
   classNames: ['token-consumer'],
@@ -68,6 +69,8 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   resetInput: false,
+
+  passToken: notImplementedIgnore,
 
   /**
    * @type {Array<String>}
@@ -187,7 +190,7 @@ export default Component.extend(I18n, {
           const targetName = inviteTargetName || this.t('unknownTargetName');
           if (this.get('media.isMobile')) {
             return this.t(
-              `type.${typeName}.mobile.${inviteType}`, { targetName }, { defaultValue: null }
+              `type.${typeName}.mobile.${inviteType}`, { targetName }, { defaultValue: null },
             );
           } else {
             return this.t(

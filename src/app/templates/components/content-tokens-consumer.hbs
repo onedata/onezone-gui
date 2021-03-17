@@ -1,6 +1,6 @@
 {{#one-collapse collapsed=token}}
   {{#content-info
-    class="scroll-breakpoint-400"
+    class=(if token "scroll-breakpoint-600" "scroll-breakpoint-400")
     header=(tt this "header")
     text=(if token "" (tt this "description"))
   }}

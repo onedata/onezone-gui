@@ -27,6 +27,8 @@ describe('Integration | Component | token consumer', function () {
 
     const tokenManager = lookupService(this, 'token-manager');
     const examineStub = sinon.stub(tokenManager, 'examineToken').returns(resolve());
+    const verifyInviteTokenStub = sinon.stub(tokenManager, 'verifyInviteToken')
+      .returns(resolve());
     const recordManager = lookupService(this, 'record-manager');
     const getUserRecordListStub = sinon.stub(recordManager, 'getUserRecordList');
 
@@ -54,6 +56,7 @@ describe('Integration | Component | token consumer', function () {
     this.setProperties({
       examineStub,
       mockedRecords,
+      verifyInviteTokenStub,
     });
   });
 
@@ -151,14 +154,14 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite user to group someRecord',
+    typeText: 'Invitation for my user to join group',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite group to parent group someRecord',
+    typeText: 'Invitation for my group to join another group',
     modelToSelect: 'group',
     selectorIcon: 'group',
     selectorDescription: selectorDescription('parent group', 'group'),
@@ -168,14 +171,14 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite user to space someRecord',
+    typeText: 'Invitation for my user to join space',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite group to space someRecord',
+    typeText: 'Invitation for my group to join space',
     modelToSelect: 'group',
     selectorIcon: 'group',
     selectorDescription: selectorDescription('space', 'group'),
@@ -185,7 +188,7 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'harvesterJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite harvester to space someRecord',
+    typeText: 'Invitation for my harvester to join space',
     modelToSelect: 'harvester',
     selectorIcon: 'light-bulb',
     selectorDescription: selectorDescription('space', 'harvester'),
@@ -195,14 +198,14 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite user to cluster someRecord',
+    typeText: 'Invitation for my user to join cluster',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite group to cluster someRecord',
+    typeText: 'Invitation for my group to join cluster',
     modelToSelect: 'group',
     selectorIcon: 'group',
     selectorDescription: selectorDescription('cluster', 'group'),
@@ -212,14 +215,14 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite user to harvester someRecord',
+    typeText: 'Invitation for my user to join harvester',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite group to harvester someRecord',
+    typeText: 'Invitation for my group to join harvester',
     modelToSelect: 'group',
     selectorIcon: 'group',
     selectorDescription: selectorDescription('harvester', 'group'),
@@ -229,7 +232,7 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'spaceJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite space to harvester someRecord',
+    typeText: 'Invitation for my space to join harvester',
     modelToSelect: 'space',
     selectorIcon: 'space',
     selectorDescription: selectorDescription('harvester', 'space'),
@@ -430,7 +433,7 @@ describe('Integration | Component | token consumer', function () {
       return fillIn('.token-string', 'token')
         .then(() => {
           expect(this.$('.token-type').text().trim())
-            .to.equal('Invite user to space unknown');
+            .to.equal('Invitation for my user to join space');
           const $warningIcon = this.$('.type-info .warning-icon');
           expect($warningIcon).to.exist;
           return new OneTooltipHelper($warningIcon[0]).getText();
