@@ -10,13 +10,13 @@ const basicCategory = 'Basic';
 const advancedCategory = 'Advanced';
 
 const templates = [{
-  name: 'onezoneRest',
+  name: 'oneclient',
   category: basicCategory,
 }, {
   name: 'oneproviderRest',
   category: basicCategory,
 }, {
-  name: 'oneclient',
+  name: 'onezoneRest',
   category: basicCategory,
 }, {
   name: 'oneclientInOneprovider',

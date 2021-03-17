@@ -18,11 +18,10 @@ import { hash, resolve } from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
-import checkImg from 'onedata-gui-common/utils/check-img';
+import validateOnepanelConnection from 'onedata-gui-common/utils/validate-onepanel-connection';
 import { Promise } from 'rsvp';
 import {
   onepanelAbbrev,
-  onepanelTestImagePath,
 } from 'onedata-gui-common/utils/onedata-urls';
 
 export const entityType = 'cluster';
@@ -146,8 +145,12 @@ export default Model.extend(
     },
 
     _fetchIsOnline() {
-      return this.get('standaloneOriginProxy').then(standaloneOrigin => {
-        return checkImg(`${standaloneOrigin}${onepanelTestImagePath}`);
+      const {
+        standaloneOriginProxy,
+        entityId,
+      } = this.getProperties('standaloneOriginProxy', 'entityId');
+      return standaloneOriginProxy.then(standaloneOrigin => {
+        return validateOnepanelConnection(standaloneOrigin, entityId);
       });
     },
 

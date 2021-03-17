@@ -6,6 +6,10 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7413 Fixed missing members with duplicated names
+* VFS-6663 Added options for copy user ID and provider ID/domain
+* VFS-6638 Detecting unreachable duplicated clusters
+* VFS-7281 Fixed scrolling to active items in sidebar
 * VFS-7333 Added information about trying to sign-in with blocked account
 * VFS-6566 Refactored for oneprovider-gui shares refactor
 * VFS-6915 Added copy token to clipboard action in tokens sidebar

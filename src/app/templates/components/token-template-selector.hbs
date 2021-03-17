@@ -6,9 +6,9 @@
     {{#listItem.header}}<h1>{{tt this "templateCategories.basic"}}</h1>{{/listItem.header}}
     {{#listItem.content}}
       <div class="one-tile-container">
-        {{token-template-selector/onezone-rest-template onSelected=onTemplateSelected}}
-        {{token-template-selector/oneprovider-rest-template onSelected=onTemplateSelected}}
         {{token-template-selector/oneclient-template onSelected=onTemplateSelected}}
+        {{token-template-selector/oneprovider-rest-template onSelected=onTemplateSelected}}
+        {{token-template-selector/onezone-rest-template onSelected=onTemplateSelected}}
       </div>
     {{/listItem.content}}
   {{/list.item}}
