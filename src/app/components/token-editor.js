@@ -72,67 +72,43 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import ArrayProxy from '@ember/array/proxy';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
-const tokenInviteTypeOptions = [{
-  value: 'userJoinGroup',
-  icon: 'group',
-  targetModelName: 'group',
-}, {
-  value: 'groupJoinGroup',
-  icon: 'group',
-  targetModelName: 'group',
-}, {
-  value: 'userJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-}, {
-  value: 'groupJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-}, {
-  value: 'harvesterJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-  noPrivileges: true,
-}, {
-  value: 'userJoinCluster',
-  icon: 'cluster',
-  targetModelName: 'cluster',
-}, {
-  value: 'groupJoinCluster',
-  icon: 'cluster',
-  targetModelName: 'cluster',
-}, {
-  value: 'userJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-}, {
-  value: 'groupJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-}, {
-  value: 'spaceJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-  noPrivileges: true,
-}, {
-  value: 'userJoinWorkflowDirectory',
-  icon: 'view-grid',
-  targetModelName: 'workflowDirectory',
-}, {
-  value: 'groupJoinWorkflowDirectory',
-  icon: 'view-grid',
-  targetModelName: 'workflowDirectory',
-}, {
-  value: 'supportSpace',
-  icon: 'space',
-  targetModelName: 'space',
-  noPrivileges: true,
-}, {
-  value: 'registerOneprovider',
-  icon: 'provider',
-  noPrivileges: true,
-}];
+const tokenInviteTypesWithoutTarget = [
+  'registerOneprovider',
+];
+
+const customTokenInviteTypeIcons = {
+  registerOneprovider: 'provider',
+};
+
+const tokenInviteTypeOptions = [
+  'userJoinGroup',
+  'groupJoinGroup',
+  'userJoinSpace',
+  'groupJoinSpace',
+  'harvesterJoinSpace',
+  'userJoinCluster',
+  'groupJoinCluster',
+  'userJoinHarvester',
+  'groupJoinHarvester',
+  'spaceJoinHarvester',
+  'userJoinWorkflowDirectory',
+  'groupJoinWorkflowDirectory',
+  'supportSpace',
+  'registerOneprovider',
+].map(inviteType => {
+  const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+  return {
+    value: inviteType,
+    targetModelName: tokenInviteTypesWithoutTarget.includes(inviteType) ?
+      undefined : inviteTypeSpec.modelName,
+    icon: customTokenInviteTypeIcons[inviteType] || recordIcon(
+      inviteTypeSpec.modelName
+    ),
+    privileges: inviteTypeSpec.privileges,
+  };
+});
 
 const privilegesForModels = {
   space: spaceFlags,
@@ -492,7 +468,7 @@ export default Component.extend(I18n, {
           return;
         }
         const newTargetsModelName = inviteTypeSpec.targetModelName;
-        const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
+        const newPrivilegesModelName = inviteTypeSpec.privileges &&
           newTargetsModelName;
         if (get(component, 'mode') === 'create') {
           if (newTargetsModelName) {
@@ -540,7 +516,7 @@ export default Component.extend(I18n, {
         }),
         this.get('targetField'),
         FormFieldsGroup.extend({
-          isExpanded: not('parent.inviteTypeSpec.noPrivileges'),
+          isExpanded: reads('parent.inviteTypeSpec.privileges'),
         }).create({
           name: 'invitePrivilegesDetails',
           fields: [
