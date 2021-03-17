@@ -42,7 +42,7 @@
       {{#unless (or media.isMobile noJoinMessage)}}
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
-            <img width=150 class="subject-image" src="assets/images/consume-token/{{inviteType}}.svg">
+            <img class="subject-image" src="assets/images/consume-token/{{inviteType}}.svg">
             <figcaption class={{concat-classes (if (and joiningRecordSelectorModelName (not selectedJoiningRecordOption)) "select-below-label" "subject-name")}}>
               {{#truncated-string class="text"}}
                 {{#if (and joiningRecordSelectorModelName selectedJoiningRecordOption)}}
@@ -60,7 +60,7 @@
             <div class="arrow"></div>
           </figure>
           <figure class="invite-target-image">
-            <img width=150 class="subject-image" src="assets/images/consume-token/{{inviteTargetModelName}}.svg">
+            <img class="subject-image" src="assets/images/consume-token/{{inviteTargetModelName}}.svg">
             <figcaption class="subject-name">
               {{#truncated-string class="text"}}
                 {{inviteTargetName}}
@@ -93,7 +93,7 @@
           }}
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
-              {{#truncated-string class="text" style="line-height=22px"}}
+              {{#truncated-string class="text"}}
                 {{recordOption.label}}
               {{/truncated-string}}
             </div>
