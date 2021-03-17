@@ -15,7 +15,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 import workflowDirectoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
 import computedCurrentUserPrivileges from 'onedata-gui-common/utils/computed-current-user-privileges';
 
-export const entityType = 'workflowDirectory';
+export const entityType = 'workflow_directory';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),

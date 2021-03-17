@@ -84,6 +84,12 @@ describe('Integration | Component | modals/generate invite token modal', functio
   }, {
     inviteType: 'spaceJoinHarvester',
     header: spaceHeader,
+  }, {
+    inviteType: 'userJoinWorkflowDirectory',
+    header: userHeader,
+  }, {
+    inviteType: 'groupJoinWorkflowDirectory',
+    header: groupHeader,
   }].forEach(({ inviteType, header }) => {
     it(
       `shows correct header for ${inviteType} invite type`,

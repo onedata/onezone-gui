@@ -24,6 +24,7 @@ import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
 import { and, or, not, array, raw, equal, conditional } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import { classify } from '@ember/string';
 
 export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
@@ -375,7 +376,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     } = this.getProperties('record', 'tokenActions');
 
     return tokenActions.createGenerateInviteTokenAction({
-      inviteType: `groupJoin${_.upperFirst(get(record, 'entityType'))}`,
+      inviteType: `groupJoin${classify(get(record, 'constructor.modelName'))}`,
       targetRecord: record,
     });
   }),
@@ -421,7 +422,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     } = this.getProperties('record', 'tokenActions');
 
     return tokenActions.createGenerateInviteTokenAction({
-      inviteType: `userJoin${_.upperFirst(get(record, 'entityType'))}`,
+      inviteType: `userJoin${classify(get(record, 'constructor.modelName'))}`,
       targetRecord: record,
     });
   }),
@@ -445,7 +446,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   ),
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<string>}
    */
   globalActionsTitle: computed(function globalActionsTitle() {
@@ -453,7 +454,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   }),
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: computed(

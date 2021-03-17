@@ -94,6 +94,14 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     inviteType: 'spaceJoinHarvester',
     nameWithTarget: 'Inv. spc. hrv. recordName',
     nameWithoutTarget: 'Inv. spc. hrv.',
+  }, {
+    inviteType: 'userJoinWorkflowDirectory',
+    nameWithTarget: 'Inv. usr. wrk. dir. recordName',
+    nameWithoutTarget: 'Inv. usr. wrk. dir.',
+  }, {
+    inviteType: 'groupJoinWorkflowDirectory',
+    nameWithTarget: 'Inv. grp. wrk. dir. recordName',
+    nameWithoutTarget: 'Inv. grp. wrk. dir.',
   }].forEach(({ inviteType, nameWithTarget, nameWithoutTarget }) => {
     it(
       `returns "${nameWithoutTarget} DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is not provided`,

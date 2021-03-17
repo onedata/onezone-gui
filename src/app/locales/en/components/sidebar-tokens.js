@@ -14,6 +14,7 @@ export default {
       model: {
         options: {
           all: 'All',
+          workflowDirectory: 'Workflow dir.',
           cluster: 'Cluster',
           group: 'Group',
           harvester: 'Harvester',

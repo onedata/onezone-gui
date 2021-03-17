@@ -34,6 +34,10 @@ const possibleTargetModels = [{
   modelName: 'user',
   name: 'User',
   icon: 'user',
+}, {
+  modelName: 'workflowDirectory',
+  name: 'Workflow dir.',
+  icon: 'view-grid',
 }];
 
 describe('Integration | Component | sidebar tokens/advanced filters', function () {

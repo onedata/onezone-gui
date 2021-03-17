@@ -15,6 +15,8 @@ export default {
     userJoinHarvester: userHeader,
     groupJoinHarvester: groupHeader,
     spaceJoinHarvester: spaceHeader,
+    userJoinWorkflowDirectory: userHeader,
+    groupJoinWorkflowDirectory: groupHeader,
   },
   close: 'Close',
 };

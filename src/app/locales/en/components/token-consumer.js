@@ -15,6 +15,8 @@ export default {
       userJoinHarvester: '<strong>Invite user</strong> to harvester <strong>{{targetName}}</strong>',
       groupJoinHarvester: '<strong>Invite group</strong> to harvester <strong>{{targetName}}</strong>',
       spaceJoinHarvester: '<strong>Invite space</strong> to harvester <strong>{{targetName}}</strong>',
+      userJoinWorkflowDirectory: '<strong>Invite user</strong> to workflow directory <strong>{{targetName}}</strong>',
+      groupJoinWorkflowDirectory: '<strong>Invite group</strong> to workflow directory <strong>{{targetName}}</strong>',
       supportSpace: '<strong>Support</strong> space <strong>{{targetName}}</strong>',
       registerOneprovider: '<strong>Register Oneprovider</strong>',
     },
@@ -33,6 +35,7 @@ export default {
     space: 'space',
     cluster: 'cluster',
     harvester: 'harvester',
+    workflowDirectory: 'workflow directory',
   },
   recordSelectorPlaceholder: {
     group: 'Select group...',

@@ -58,6 +58,12 @@ export default {
             spaceJoinHarvester: {
               label: 'Invite space to harvester',
             },
+            userJoinWorkflowDirectory: {
+              label: 'Invite user to workflow directory',
+            },
+            groupJoinWorkflowDirectory: {
+              label: 'Invite group to workflow directory',
+            },
             supportSpace: {
               label: 'Support space',
             },
@@ -83,6 +89,8 @@ export default {
               userJoinHarvester: 'Select harvester...',
               groupJoinHarvester: 'Select harvester...',
               spaceJoinHarvester: 'Select harvester...',
+              userJoinWorkflowDirectory: 'Select workflow directory...',
+              groupJoinWorkflowDirectory: 'Select workflow directory...',
               supportSpace: 'Select space...',
             },
           },

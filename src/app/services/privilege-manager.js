@@ -12,6 +12,7 @@ import gri from 'onedata-gui-websocket-client/utils/gri';
 
 export default Service.extend({
   onedataGraph: service(),
+  recordManager: service(),
 
   /**
    * Generates privilege record GRI
@@ -51,9 +52,13 @@ export default Service.extend({
    * @returns {Promise<Object>}
    */
   getPrivilegesPresetForModel(modelName) {
-    return this.get('onedataGraph').request({
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+    return onedataGraph.request({
       gri: gri({
-        entityType: modelName,
+        entityType: recordManager.getEntityTypeForModelName(modelName),
         entityId: 'null',
         aspect: 'privileges',
         scope: 'private',

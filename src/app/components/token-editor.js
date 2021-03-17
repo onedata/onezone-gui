@@ -36,6 +36,7 @@ import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/g
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
+import { groupedFlags as workflowDirectoryFlags } from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import {
@@ -115,6 +116,14 @@ const tokenInviteTypeOptions = [{
   targetModelName: 'harvester',
   noPrivileges: true,
 }, {
+  value: 'userJoinWorkflowDirectory',
+  icon: 'view-grid',
+  targetModelName: 'workflowDirectory',
+}, {
+  value: 'groupJoinWorkflowDirectory',
+  icon: 'view-grid',
+  targetModelName: 'workflowDirectory',
+}, {
   value: 'supportSpace',
   icon: 'space',
   targetModelName: 'space',
@@ -130,6 +139,7 @@ const privilegesForModels = {
   group: groupFlags,
   harvester: harvesterFlags,
   cluster: clusterFlags,
+  workflowDirectory: workflowDirectoryFlags,
 };
 
 const CaveatFormGroup = FormFieldsGroup.extend({
@@ -600,7 +610,7 @@ export default Component.extend(I18n, {
       component,
       cachedPrivilegesModelName: or(
         'parent.parent.cachedPrivilegesModelName',
-        raw('userJoinGroup')
+        raw('space')
       ),
       cachedPrivilegesPresetProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
       privilegesGroups: computed(
@@ -609,19 +619,24 @@ export default Component.extend(I18n, {
           return privilegesForModels[this.get('cachedPrivilegesModelName')];
         }
       ),
+      modelNameForTranslations: conditional(
+        equal('cachedPrivilegesModelName', raw('workflowDirectory')),
+        raw('workflow'),
+        'cachedPrivilegesModelName'
+      ),
       privilegeGroupsTranslationsPath: computed(
-        'cachedPrivilegesModelName',
+        'modelNameForTranslations',
         function privilegeGroupsTranslationsPath() {
-          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
+          const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
             `components.content${modelName}sMembers.privilegeGroups` :
             undefined;
         }
       ),
       privilegesTranslationsPath: computed(
-        'cachedPrivilegesModelName',
+        'modelNameForTranslations',
         function privilegesTranslationsPath() {
-          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
+          const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
             `components.content${modelName}sMembers.privileges` :
             undefined;

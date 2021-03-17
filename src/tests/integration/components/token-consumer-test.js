@@ -13,6 +13,7 @@ import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
 import TestAdapter from '@ember/test/adapter';
 import Ember from 'ember';
 import OneTooltipHelper from '../../helpers/one-tooltip';
+import { dasherize } from '@ember/string';
 
 describe('Integration | Component | token consumer', function () {
   setupComponentTest('token-consumer', {
@@ -35,13 +36,14 @@ describe('Integration | Component | token consumer', function () {
       'space',
       'group',
       'harvester',
+      'workflowDirectory',
     ].forEach(modelName => {
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
         constructor: {
-          modelName,
+          modelName: dasherize(modelName),
         },
       }));
       getUserRecordListStub.withArgs(modelName).resolves({
@@ -234,6 +236,23 @@ describe('Integration | Component | token consumer', function () {
     selectorIcon: 'space',
     selectorDescription: selectorDescription('harvester', 'space'),
     selectorPlaceholder: 'Select space...',
+  }, {
+    inviteSpec: {
+      inviteType: 'userJoinWorkflowDirectory',
+      workflowDirectoryName: 'someRecord',
+    },
+    typeText: 'Invite user to workflow directory someRecord',
+    modelToSelect: null,
+  }, {
+    inviteSpec: {
+      inviteType: 'groupJoinWorkflowDirectory',
+      workflowDirectoryName: 'someRecord',
+    },
+    typeText: 'Invite group to workflow directory someRecord',
+    modelToSelect: 'group',
+    selectorIcon: 'group',
+    selectorDescription: selectorDescription('workflow directory', 'group'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'supportSpace',

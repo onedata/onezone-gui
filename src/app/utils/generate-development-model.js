@@ -8,7 +8,7 @@
  *
  */
 
-import { camelize, dasherize } from '@ember/string';
+import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
@@ -808,7 +808,7 @@ function createPrivilegesRecords(
   return allFulfilled(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
-      entityType: dasherize(modelType),
+      entityType: underscore(modelType),
       entityId: recordId,
       aspect,
       aspectId: subjectId,

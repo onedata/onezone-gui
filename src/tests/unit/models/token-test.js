@@ -7,6 +7,7 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
+import { underscore } from '@ember/string';
 
 describe('Unit | Model | token', function () {
   setupModelTest('token', {
@@ -79,7 +80,7 @@ describe('Unit | Model | token', function () {
       function () {
         const targetModelEntityId = 'someId';
         const targetModelGri = gri({
-          entityType: targetModelMapping.modelName,
+          entityType: underscore(targetModelMapping.modelName),
           entityId: targetModelEntityId,
           aspect: 'instance',
           scope: 'auto',
@@ -95,7 +96,7 @@ describe('Unit | Model | token', function () {
           .withArgs(targetModelMapping.modelName)
           .returns({
             getEntityTypeForModelName(modelName) {
-              return modelName;
+              return underscore(modelName);
             },
           });
         const model = this.subject();

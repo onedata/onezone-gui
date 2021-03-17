@@ -132,6 +132,18 @@ const clusterHandlers = {
   },
 };
 
+const workflowDirectoryHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['directory_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
+};
+
 const userHandlers = {
   client_tokens(operation) {
     if (operation === 'create') {
@@ -223,6 +235,7 @@ export default OnedataGraphMock.extend({
       provider: providerHandlers,
       cluster: clusterHandlers,
       token: tokenHandlers,
+      workflow_directory: workflowDirectoryHandlers,
     });
     this.set(
       'handlers',

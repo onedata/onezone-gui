@@ -27,29 +27,35 @@ import moment from 'moment';
 const standardGroupMapping = {
   idFieldName: 'groupId',
   modelName: 'group',
-  privileges: 'group',
+  privileges: true,
 };
 
 const standardSpaceMapping = {
   idFieldName: 'spaceId',
   modelName: 'space',
-  privileges: 'space',
+  privileges: true,
 };
 
 const standardHarvesterMapping = {
   idFieldName: 'harvesterId',
   modelName: 'harvester',
-  privileges: 'harvester',
+  privileges: true,
 };
 
 const standardClusterMapping = {
   idFieldName: 'clusterId',
   modelName: 'cluster',
-  privileges: 'cluster',
+  privileges: true,
+};
+
+const standardWorkflowDirectoryMapping = {
+  idFieldName: 'workflowDirectoryId',
+  modelName: 'workflowDirectory',
+  privileges: true,
 };
 
 function mappingWithoutPrivileges(mapping) {
-  return Object.assign({}, mapping, { privileges: undefined });
+  return Object.assign({}, mapping, { privileges: false });
 }
 
 export const tokenInviteTypeToTargetModelMapping = {
@@ -68,6 +74,8 @@ export const tokenInviteTypeToTargetModelMapping = {
   userJoinHarvester: standardHarvesterMapping,
   groupJoinHarvester: standardHarvesterMapping,
   spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
+  userJoinWorkflowDirectory: standardWorkflowDirectoryMapping,
+  groupJoinWorkflowDirectory: standardWorkflowDirectoryMapping,
 };
 
 const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
