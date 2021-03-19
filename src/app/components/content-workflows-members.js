@@ -52,14 +52,17 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
    */
   async removeMember(type, member) {
     const {
-      recordManager,
+      workflowActions,
       workflowDirectory,
     } = this.getProperties(
-      'recordManager',
+      'workflowActions',
       'workflowDirectory'
     );
 
-    await recordManager.removeRelation(workflowDirectory, member);
+    await workflowActions.removeMemberFromWorkflowDirectory(
+      workflowDirectory,
+      member
+    );
   },
 
   /**
@@ -76,39 +79,41 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
       'workflowDirectory'
     );
 
-    return Promise.all(members.map(member =>
-      recordManager.removeRelation(workflowDirectory, member)
-    )).then(() => {
+    try {
+      await Promise.all(members.map(member =>
+        recordManager.removeRelation(workflowDirectory, member)
+      ));
       globalNotify.success(this.t('removeMembersSuccess'));
-    }).catch(error => {
+    } catch (error) {
       globalNotify.backendError(this.t('membersDeletion'), error);
       throw error;
-    });
+    }
   },
 
   /**
    * @override
    */
-  createChildGroup(name) {
+  async createChildGroup(name) {
     const {
       workflowActions,
       workflowDirectory,
     } = this.getProperties('workflowActions', 'workflowDirectory');
-    return workflowActions.createMemberGroupForWorkflowDirectory(
+    await workflowActions.createMemberGroupForWorkflowDirectory(
       workflowDirectory, {
         name,
-      });
+      }
+    );
   },
 
   /**
    * @override
    */
-  addMemberGroup(group) {
+  async addMemberGroup(group) {
     const {
       workflowActions,
       workflowDirectory,
     } = this.getProperties('workflowActions', 'workflowDirectory');
-    return workflowActions.addMemberGroupToWorkflowDirectory(
+    await workflowActions.addMemberGroupToWorkflowDirectory(
       workflowDirectory,
       group
     );
@@ -117,11 +122,11 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  join() {
+  async join() {
     const {
       workflowActions,
       workflowDirectory,
     } = this.getProperties('workflowActions', 'workflowDirectory');
-    return workflowActions.joinWorkflowDirectoryAsUser(workflowDirectory);
+    await workflowActions.joinWorkflowDirectoryAsUser(workflowDirectory);
   },
 });

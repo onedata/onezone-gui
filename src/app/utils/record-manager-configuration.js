@@ -1,5 +1,14 @@
+/**
+ * Provides project-specific, custom logic to record-manager service.
+ *
+ * @module utils/record-manager-configuration
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import { get } from '@ember/object';
-import { Promise, resolve } from 'rsvp';
+import { Promise } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default class RecordManagerConfiguration {
@@ -32,32 +41,57 @@ export default class RecordManagerConfiguration {
     relationTargetRecordId,
     relationType = undefined
   ) {
-    const relationOriginEntityType = this.recordManager
-      .getEntityTypeForModelName(relationOriginModelName);
-    const relationTargetEntityType = this.recordManager
-      .getEntityTypeForModelName(relationTargetModelName);
+    const currentUserId = get(
+      this.recordManager.getCurrentUserRecord(),
+      'entityId'
+    );
+
+    const relationSides = [{
+      modelName: relationOriginModelName,
+      recordId: relationOriginRecordId,
+    }, {
+      modelName: relationTargetModelName,
+      recordId: relationTargetRecordId,
+    }];
+    relationSides.forEach(side => {
+      side.entityType = this.recordManager
+        .getEntityTypeForModelName(side.modelName);
+      side.isUser = side.modelName === 'user';
+      side.isCurrentUser = side.isUser && side.recordId == currentUserId;
+    });
 
     switch (relationType) {
       default: {
-        const currentUserId = get(
-          this.recordManager.getCurrentUserRecord(),
-          'entityId'
-        );
-        const isCurrentUserATarget = relationTargetModelName === 'user' &&
-          relationTargetRecordId === currentUserId;
-        const orderReversed = isCurrentUserATarget;
-
-        const possibilities = [{
-          entityType: relationOriginEntityType,
-          entityId: relationOriginRecordId,
-          aspect: relationTargetEntityType,
-          aspectId: relationTargetRecordId,
-        }];
-        if (orderReversed) {
-          possibilities.reverse();
+        let relationsRemoveOrder;
+        if (relationSides[0].isUser && !relationSides[0].isCurrentUser) {
+          // Cannot remove relation as a user other than current.
+          relationsRemoveOrder = [
+            [1, 0],
+          ];
+        } else if (relationSides[1].isUser && !relationSides[1].isCurrentUser) {
+          // The same as above.
+          relationsRemoveOrder = [
+            [0, 1],
+          ];
+        } else {
+          // None of the relations sides are a non-current user.
+          relationsRemoveOrder = [
+            [0, 1],
+            [1, 0],
+          ];
+          if (relationSides[1].isCurrentUser) {
+            // Removing relation should start with removing it from the side of
+            // current user.
+            relationsRemoveOrder.reverse();
+          }
         }
 
-        return resolve(possibilities);
+        return relationsRemoveOrder.map(([a, b]) => ({
+          entityType: relationSides[a].entityType,
+          entityId: relationSides[a].recordId,
+          aspect: relationSides[b].entityType,
+          aspectId: relationSides[b].recordId,
+        }));
       }
     }
   }

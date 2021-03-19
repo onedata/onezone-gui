@@ -12,6 +12,8 @@ import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
 import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
+import { reject } from 'rsvp';
+import { classify } from '@ember/string';
 
 export default Service.extend(I18n, {
   recordManager: service(),
@@ -141,5 +143,34 @@ export default Service.extend(I18n, {
       globalNotify.backendError(this.t('addingMemberGroup'), error);
       throw error;
     });
+  },
+
+  /**
+   * Removes member from workflow directory
+   * @param {WorkflowDirectory} workflowDirectory
+   * @param {Models.User|Models.Group} member
+   * @returns {Promise}
+   */
+  async removeMemberFromWorkflowDirectory(workflowDirectory, member) {
+    const {
+      recordManager,
+      globalNotify,
+    } = this.getProperties('recordManager', 'globalNotify');
+
+    const memberModelName = recordManager.getModelNameForRecord(member);
+    if (!['user', 'group'].includes(memberModelName)) {
+      return reject();
+    }
+
+    try {
+      await recordManager.removeRelation(workflowDirectory, member);
+      globalNotify.success(this.t(`remove${classify(memberModelName)}Success`, {
+        workflowDirectoryName: get(workflowDirectory, 'name'),
+        [`${memberModelName}Name`]: get(member, 'name'),
+      }));
+    } catch (error) {
+      globalNotify.backendError(this.t(`${memberModelName}Deletion`), error);
+      throw error;
+    }
   },
 });

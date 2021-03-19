@@ -7,4 +7,8 @@ export default {
   addingMemberGroup: 'adding member group',
   joiningWorkflowDirectory: 'joining workflow directory',
   joinedWorkflowDirectorySuccess: 'You have joined the workflow directory successfully.',
+  removeGroupSuccess: 'Group "{{groupName}}" has been removed from workflow directory "{{workflowDirectoryName}}"',
+  removeUserSuccess: 'User "{{userName}}" has been removed from workflow directory "{{workflowDirectoryName}}"',
+  groupDeletion: 'group deletion',
+  userDeletion: 'user deletion',
 };
