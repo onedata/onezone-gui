@@ -1,9 +1,7 @@
-{{#one-collapse collapsed=token}}
-  {{#content-info
-    class=(if token "scroll-breakpoint-600" "scroll-breakpoint-400")
-    header=(tt this "header")
-    text=(if token "" (tt this "description"))
-  }}
-    {{token-consumer passToken=(action "passToken")}}
-  {{/content-info}}
-{{/one-collapse}}
+{{#content-info
+  class=(if token "scroll-breakpoint-600" "scroll-breakpoint-400")
+  header=(tt this "header")
+  text=(if isTokenAccepted "" (tt this "description"))
+}}
+  {{token-consumer onTokenAccept=(action "onTokenAccept")}}
+{{/content-info}}

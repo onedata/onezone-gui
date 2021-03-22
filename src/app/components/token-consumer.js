@@ -30,9 +30,9 @@ export default Component.extend(I18n, {
   tokenManager: service(),
   tokenActions: service(),
   recordManager: service(),
-  currentUser: service(),
   errorExtractor: service(),
   i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -43,6 +43,21 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   token: '',
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenInputDisabled: false,
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenAccepted: false,
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenChecked: false,
 
   /**
    * @type {number}
@@ -65,17 +80,19 @@ export default Component.extend(I18n, {
    */
   error: undefined,
 
-  /**
-   * @type {boolean}
-   */
-  resetInput: false,
-
-  passToken: notImplementedIgnore,
+  onTokenAccept: notImplementedIgnore,
 
   /**
    * @type {Array<String>}
    */
-  knownCaveatErrors: Array('time', 'ip', 'asn', 'geo.region', 'geo.country', 'consumer'),
+  knownCaveatErrors: Object.freeze([
+    'time',
+    'ip',
+    'asn',
+    'geo.region',
+    'geo.country',
+    'consumer',
+  ]),
 
   /**
    * Set by joiningRecordSelectorModelNameObserver
@@ -98,6 +115,16 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   trimmedToken: computedPipe('token', trimToken),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isTokenValid: not('error'),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isTokenConsumable: and(not('noJoinMessage'), 'isTokenValid'),
 
   /**
    * @type {ComputedProperty<String>}
@@ -140,15 +167,27 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  inviteType: computed('type', function inviteType() {
-    return this.get('type.inviteToken.inviteType').replace(/Join.*/i, '');
+  invitedModelImagePath: computed('type', function invitedModelImagePath() {
+    const invitedModelType = this.get('type.inviteToken.inviteType').replace(/Join.*/i, '');
+    return `assets/images/consume-token/${invitedModelType}.svg`;
   }),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  inviteName: computed('currentUser', function inviteName() {
-    return this.get('currentUser.userProxy.username');
+  inviteTargetModelImagePath: computed(
+    'type',
+    'inviteTargetModelName',
+    function inviteTargetModelImagePath() {
+      const inviteTargetModelName = this.get('inviteTargetModelName');
+      return `assets/images/consume-token/${inviteTargetModelName}.svg`;
+    }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  currentUser: computed(function currentUser() {
+    return this.get('recordManager').getCurrentUserRecord();
   }),
 
   /**
@@ -173,6 +212,7 @@ export default Component.extend(I18n, {
     'inviteTargetName',
     'typeName',
     'targetName',
+    'media.isMobile',
     function typeText() {
       const {
         type,
@@ -183,20 +223,18 @@ export default Component.extend(I18n, {
       if (!type) {
         return null;
       }
-
       if (typeName === 'invite') {
         const inviteType = get(type, 'inviteToken.inviteType');
         if (inviteTypeSpec) {
           const targetName = inviteTargetName || this.t('unknownTargetName');
-          if (this.get('media.isMobile')) {
-            return this.t(
-              `type.${typeName}.mobile.${inviteType}`, { targetName }, { defaultValue: null },
-            );
-          } else {
-            return this.t(
-              `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
-            );
-          }
+          const isMobile = this.get('media.isMobile');
+          return this.t(
+            `type.${typeName}${isMobile ? '.mobile' : ''}.${inviteType}`, {
+              targetName,
+            }, {
+              defaultValue: null,
+            }
+          );
         } else {
           return null;
         }
@@ -304,28 +342,33 @@ export default Component.extend(I18n, {
     not('selectedJoiningRecordOption')
   ),
 
-  errorTranslator: computed('error', function errorTranslator() {
+  errorTranslation: computed('error', function errorTranslation() {
     const error = this.get('error');
-    if (error.id == 'tokenRevoked') {
+    if (!error) {
+      return;
+    }
+    if (error.id === 'tokenRevoked') {
       return this.t('tokenRevokedInfo');
     } else {
       return this.get('errorExtractor').getMessage(error).message;
     }
   }),
 
-  knownErrors: computed('error', function knownErrors() {
-    const {
-      error,
-      knownCaveatErrors,
-    } = this.getProperties('error', 'knownCaveatErrors');
-    if ((error.id == 'tokenCaveatUnverified' &&
-        knownCaveatErrors.includes(error.details.caveat.type)) ||
-      error.id == 'tokenRevoked') {
-      return true;
-    } else {
-      return false;
-    }
-  }),
+  knownVerificationErrorOccurred: computed(
+    'error',
+    function knownVerificationErrorOccurred() {
+      const {
+        error,
+        knownCaveatErrors,
+      } = this.getProperties('error', 'knownCaveatErrors');
+      if ((error.id === 'tokenCaveatUnverified' &&
+          knownCaveatErrors.includes(error.details.caveat.type)) ||
+        error.id === 'tokenRevoked') {
+        return true;
+      } else {
+        return false;
+      }
+    }),
 
   joiningRecordSelectorModelNameObserver: observer(
     'joiningRecordSelectorModelName',
@@ -358,11 +401,12 @@ export default Component.extend(I18n, {
       lastInputTime,
     } = this.getProperties('token', 'trimmedToken', 'tokenManager', 'lastInputTime');
 
+    this.resetState();
+    this.set('pendingCheckTime', 0);
     if (token.trim().length === 0) {
-      this.resetState();
+      return;
     } else if (!trimmedToken) {
       // has only incorrect characters
-      this.resetState();
       this.set('error', { id: 'badValueToken' });
     } else {
       this.set('pendingCheckTime', lastInputTime);
@@ -371,33 +415,36 @@ export default Component.extend(I18n, {
           safeExec(this, 'processExaminationResult', result, lastInputTime)
         )
         .catch(error =>
-          safeExec(this, 'processExaminationError', error, lastInputTime)
+          safeExec(this, 'processTokenCheckError', error, lastInputTime)
         )
-        .finally(() => safeExec(this, () => {
-          if (this.get('pendingCheckTime') === lastInputTime) {
-            this.set('pendingCheckTime', 0);
+        .then(() => safeExec(this, () => {
+          if (this.get('isTokenConsumable')) {
+            return tokenManager.verifyInviteToken(trimmedToken)
+              .then(() =>
+                safeExec(this, 'processVerificationSuccess', lastInputTime)
+              )
+              .catch(error =>
+                safeExec(this, 'processTokenCheckError', error, lastInputTime)
+              );
           }
         }))
-        .then(() => {
-          safeExec(this, () => {
-            if (!this.get('noJoinMessage') && !this.get('invalidTokenErrorOccured')) {
-              return tokenManager.verifyInviteToken(trimmedToken)
-                .then(() => {
-                  this.get('passToken')(token);
-                  this.$('.token-container input')[0].disabled = true;
-                })
-                .catch(error => {
-                  this.resetState();
-                  this.set('error', error);
-                });
-            }
-          });
-        });
+        .finally(() => safeExec(this, () => {
+          if (this.get('pendingCheckTime') === lastInputTime) {
+            this.setProperties({
+              pendingCheckTime: 0,
+              isTokenChecked: true,
+            });
+          }
+        }));
     }
   },
 
+  isInputTimeForCurrentCheck(inputTime) {
+    return inputTime === this.get('lastInputTime');
+  },
+
   processExaminationResult(result, inputTime) {
-    if (inputTime < this.get('lastInputTime')) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
       // Another token has been provided, this result should be ignored.
       return;
     }
@@ -406,13 +453,22 @@ export default Component.extend(I18n, {
     this.set('type', get(result || {}, 'type'));
   },
 
-  processExaminationError(error, inputTime) {
-    if (inputTime < this.get('lastInputTime')) {
+  processVerificationSuccess(inputTime) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
       // Another token has been provided, this result should be ignored.
       return;
     }
 
-    this.resetState();
+    this.get('onTokenAccept')(this.get('isTokenConsumable'));
+    this.set('isTokenInputDisabled', true);
+  },
+
+  processTokenCheckError(error, inputTime) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
+      // Another token has been provided, this result should be ignored.
+      return;
+    }
+
     this.set('error', error);
   },
 
@@ -432,16 +488,15 @@ export default Component.extend(I18n, {
     this.setProperties({
       type: null,
       error: null,
-      pendingCheckTime: 0,
     });
   },
 
   actions: {
     tokenChanged(token) {
       this.setProperties({
-        resetInput: false,
         token,
         lastInputTime: new Date().valueOf(),
+        isTokenChecked: false,
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
     },
@@ -475,9 +530,9 @@ export default Component.extend(I18n, {
     cancel() {
       this.resetState();
       this.set('token', '');
-      this.$('.token-container input')[0].value = '';
-      this.get('passToken')(this.get('token'));
-      this.$('.token-container input')[0].disabled = false;
+      this.set('isTokenInputDisabled', false);
+      this.set('isTokenChecked', false);
+      this.get('onTokenAccept')(false);
     },
   },
 });

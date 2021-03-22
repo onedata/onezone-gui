@@ -214,8 +214,7 @@ const tokenHandlers = {
     if (operation === 'create') {
       const token = get(data, 'token');
       const tokenRecord = this.get('store').peekAll('token').findBy('token', token);
-      console.log(tokenRecord);
-      if (tokenRecord.get('revoked') == true) {
+      if (tokenRecord.get('revoked')) {
         return {
           success: false,
           error: { id: 'tokenRevoked' },

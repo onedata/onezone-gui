@@ -22,14 +22,13 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentTokensConsumer',
 
   /**
-   * @type {String}
+   * @type {Boolean}
    */
-  token: '',
+  isTokenAccepted: false,
 
   actions: {
-    passToken(token) {
-      this.set('token', token);
+    onTokenAccept(isAccepted) {
+      this.set('isTokenAccepted', isAccepted);
     },
   },
-
 });

@@ -4,6 +4,8 @@
     class="token-string form-control"
     placeholder={{tt this "tokenInputPlaceholder"}}
     oninput={{action "tokenChanged" value="target.value"}}
+    value={{token}}
+    disabled={{isTokenInputDisabled}}
   >
   {{#if pendingCheckTime}}
     {{spin-spinner-block sizeClass="xs"}}
@@ -14,15 +16,15 @@
     {{tt this "invalidTokenMessage"}}
   </div>
 {{else if error}}
-  {{#if knownErrors}}
+  {{#if knownVerificationErrorOccurred}}
     <div class="alert alert-info" role="alert">
-      {{errorTranslator}}
+      {{errorTranslation}}
     </div>
   {{else}}
     {{resource-load-error reason=error}}
   {{/if}}
 {{/if}}
-{{#one-collapse collapsed=(and invalidTokenErrorOccured error)}}
+{{#one-collapse collapsed=(not (and isTokenChecked isTokenValid))}}
   {{#if typeText}}
     <div class="type-info">
       <p class="token-type">
@@ -42,7 +44,7 @@
       {{#unless (or media.isMobile noJoinMessage)}}
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
-            <img class="subject-image" src="assets/images/consume-token/{{inviteType}}.svg">
+            <img class="subject-image" src={{root-url invitedModelImagePath}}>
             <figcaption class={{concat-classes (if (and joiningRecordSelectorModelName (not selectedJoiningRecordOption)) "select-below-label" "subject-name")}}>
               {{#truncated-string class="text"}}
                 {{#if (and joiningRecordSelectorModelName selectedJoiningRecordOption)}}
@@ -50,7 +52,7 @@
                 {{else if joiningRecordSelectorModelName}}
                   {{tt this "descriptionPicture"}}
                 {{else}}
-                  {{inviteName}}
+                  {{record-name record=currentUser}}
                 {{/if}}
               {{/truncated-string}}
             </figcaption>
@@ -60,7 +62,7 @@
             <div class="arrow"></div>
           </figure>
           <figure class="invite-target-image">
-            <img class="subject-image" src="assets/images/consume-token/{{inviteTargetModelName}}.svg">
+            <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
             <figcaption class="subject-name">
               {{#truncated-string class="text"}}
                 {{inviteTargetName}}
@@ -103,19 +105,21 @@
     </div>
   {{/if}}
   {{#if showJoinBtn}}
-    {{#one-spin-button
-      class="discard-btn btn btn-lg btn-warning"
-      action=(action "cancel")
-    }}
-      {{tt this "cancelBtn"}}
-    {{/one-spin-button}}
-    {{#one-spin-button
-      class="join-btn btn btn-lg btn-primary"
-      disabled=isJoinBtnDisabled
-      action=(action "join")
-    }}
-      {{tt this "joinBtn"}}
-    {{/one-spin-button}}
+    <div class="option-buttons">
+      {{#one-spin-button
+        class="discard-btn btn btn-lg btn-warning"
+        action=(action "cancel")
+      }}
+        {{tt this "cancelBtn"}}
+      {{/one-spin-button}}
+      {{#one-spin-button
+        class="join-btn btn btn-lg btn-primary"
+        disabled=isJoinBtnDisabled
+        action=(action "join")
+      }}
+        {{tt this "joinBtn"}}
+      {{/one-spin-button}}
+    </div>
   {{/if}}
 {{/one-collapse}}
 {{yield}}

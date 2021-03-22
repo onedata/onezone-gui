@@ -499,17 +499,19 @@ function createTokensRecords(store) {
         inviteToken: { inviteType },
       },
     }).save();
-    const notExpiriedInviteTokenPromise = store.createRecord('token', {
-      name: 'Not expiried invite token ' + i,
+    const notExpiredInviteTokenPromise = store.createRecord('token', {
+      name: 'Not expired invite token ' + i,
       revoked: false,
       type: {
         inviteToken: { inviteType },
       },
     }).save();
-    promises.push(accessTokenPromise,
+    promises.push(
+      accessTokenPromise,
       revokedInviteTokenPromise,
-      notExpiriedInviteTokenPromise,
-      ...inviteTokenPromises);
+      notExpiredInviteTokenPromise,
+      ...inviteTokenPromises
+    );
   });
   return allFulfilled(promises);
 }
