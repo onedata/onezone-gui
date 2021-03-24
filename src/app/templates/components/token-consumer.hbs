@@ -45,14 +45,16 @@
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
             <img class="subject-image" src={{root-url invitedModelImagePath}}>
-            <figcaption class={{concat-classes (if (and joiningRecordSelectorModelName (not selectedJoiningRecordOption)) "select-below-label" "subject-name")}}>
+            <figcaption>
               {{#truncated-string class="text"}}
-                {{#if (and joiningRecordSelectorModelName selectedJoiningRecordOption)}}
-                  {{selectedJoiningRecordOption.label}}
-                {{else if joiningRecordSelectorModelName}}
-                  {{tt this "descriptionPicture"}}
+                {{#if joiningRecordSelectorModelName}}
+                  {{#if selectedJoiningRecordOption}} 
+                    <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
+                  {{else}}
+                    <span class="select-below-label">{{tt this "placeholderUnderSubjectImage"}}</span>
+                  {{/if}}
                 {{else}}
-                  {{record-name record=currentUser}}
+                  <span class="subject-name">{{record-name record=currentUser}}</span>
                 {{/if}}
               {{/truncated-string}}
             </figcaption>
@@ -106,12 +108,12 @@
   {{/if}}
   {{#if showJoinBtn}}
     <div class="option-buttons">
-      {{#one-spin-button
+      {{#bs-button
         class="discard-btn btn btn-lg btn-warning"
-        action=(action "cancel")
+        onClick=(action "cancel")
       }}
         {{tt this "cancelBtn"}}
-      {{/one-spin-button}}
+      {{/bs-button}}
       {{#one-spin-button
         class="join-btn btn btn-lg btn-primary"
         disabled=isJoinBtnDisabled

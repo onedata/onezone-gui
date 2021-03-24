@@ -13,7 +13,7 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
+import { conditional, array, raw, equal, and, notEqual, isEmpty, not, tag } from 'ember-awesome-macros';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
@@ -38,6 +38,14 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.tokenConsumer',
+
+  /**
+   * @virtual
+   * @type {Function}
+   * @param {Boolean} isTokenAccepted
+   * @returns {undefined}
+   */
+  onTokenAccept: notImplementedIgnore,
 
   /**
    * @type {String}
@@ -79,8 +87,6 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   error: undefined,
-
-  onTokenAccept: notImplementedIgnore,
 
   /**
    * @type {Array<String>}
@@ -167,21 +173,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  invitedModelImagePath: computed('type', function invitedModelImagePath() {
-    const invitedModelType = this.get('type.inviteToken.inviteType').replace(/Join.*/i, '');
-    return `assets/images/consume-token/${invitedModelType}.svg`;
-  }),
+  invitedModelImagePath: tag `assets/images/consume-token/${'joiningModelName'}.svg`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  inviteTargetModelImagePath: computed(
-    'type',
-    'inviteTargetModelName',
-    function inviteTargetModelImagePath() {
-      const inviteTargetModelName = this.get('inviteTargetModelName');
-      return `assets/images/consume-token/${inviteTargetModelName}.svg`;
-    }),
+  inviteTargetModelImagePath: tag `assets/images/consume-token/${'inviteTargetModelName'}.svg`,
 
   /**
    * @type {ComputedProperty<String>}
@@ -361,13 +358,9 @@ export default Component.extend(I18n, {
         error,
         knownCaveatErrors,
       } = this.getProperties('error', 'knownCaveatErrors');
-      if ((error.id === 'tokenCaveatUnverified' &&
+      return (error.id === 'tokenCaveatUnverified' &&
           knownCaveatErrors.includes(error.details.caveat.type)) ||
-        error.id === 'tokenRevoked') {
-        return true;
-      } else {
-        return false;
-      }
+        error.id === 'tokenRevoked';
     }),
 
   joiningRecordSelectorModelNameObserver: observer(
@@ -529,9 +522,11 @@ export default Component.extend(I18n, {
 
     cancel() {
       this.resetState();
-      this.set('token', '');
-      this.set('isTokenInputDisabled', false);
-      this.set('isTokenChecked', false);
+      this.setProperties({
+        token: '',
+        isTokenInputDisabled: false,
+        isTokenChecked: false,
+      });
       this.get('onTokenAccept')(false);
     },
   },

@@ -39,7 +39,7 @@ export default {
   supportSpaceTokenInfo: 'This token can be consumed only while giving a support to a space in Oneprovider Panel.',
   tokenRevokedInfo: 'Provided token has been revoked.',
   joiningRecordSelectorDescription: 'To use this token you have to select which {{joiningModelName}} should join {{targetModelName}} <strong>{{targetRecordName}}</strong>:',
-  descriptionPicture: 'Select below...',
+  placeholderUnderSubjectImage: 'Select below...',
   arrowLabel: 'join',
   joiningModelName: {
     group: 'group',

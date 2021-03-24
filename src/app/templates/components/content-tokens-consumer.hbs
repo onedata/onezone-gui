@@ -1,5 +1,5 @@
 {{#content-info
-  class=(if token "scroll-breakpoint-600" "scroll-breakpoint-400")
+  class=(if isTokenAccepted "scroll-breakpoint-700" "scroll-breakpoint-500")
   header=(tt this "header")
   text=(if isTokenAccepted "" (tt this "description"))
 }}
