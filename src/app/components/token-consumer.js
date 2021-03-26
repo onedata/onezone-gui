@@ -132,6 +132,11 @@ export default Component.extend(I18n, {
    */
   isTokenConsumable: and(not('noJoinMessage'), 'isTokenValid'),
 
+  tokenWithHarvester: array.includes(
+    ['spaceJoinHarvester', 'harvesterJoinSpace'],
+    'type.inviteToken.inviteType'
+  ),
+
   /**
    * @type {ComputedProperty<String>}
    */
@@ -272,21 +277,27 @@ export default Component.extend(I18n, {
     'latestJoiningRecordSelectorModelName',
     'type',
     'inviteTargetName',
+    'tokenWithHarvester',
     function joiningRecordSelectorDescription() {
       const {
         latestJoiningRecordSelectorModelName,
         inviteTargetName,
+        tokenWithHarvester,
       } = this.getProperties(
         'latestJoiningRecordSelectorModelName',
-        'inviteTargetName'
+        'inviteTargetName',
+        'tokenWithHarvester',
       );
-
+      const actionOnSubject = tokenWithHarvester ?
+        this.t('beAddedLabel') :
+        this.t('joinLabel');
       const inviteTypeSpec = this.get('inviteTypeSpec');
       if (latestJoiningRecordSelectorModelName && inviteTypeSpec) {
         return this.t('joiningRecordSelectorDescription', {
           joiningModelName: this.t(
             `joiningModelName.${latestJoiningRecordSelectorModelName}`
           ),
+          actionOnSubject,
           targetModelName: this.t(`targetModelName.${inviteTypeSpec.modelName}`),
           targetRecordName: inviteTargetName || this.t('unknownTargetName'),
         });
@@ -334,7 +345,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isJoinBtnDisabled: and(
+  isConfirmBtnDisabled: and(
     'joiningRecordSelectorModelName',
     not('selectedJoiningRecordOption')
   ),
@@ -493,7 +504,7 @@ export default Component.extend(I18n, {
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
     },
-    join() {
+    confirm() {
       const {
         recordManager,
         tokenActions,

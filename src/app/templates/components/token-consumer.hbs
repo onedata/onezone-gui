@@ -17,7 +17,7 @@
   </div>
 {{else if error}}
   {{#if knownVerificationErrorOccurred}}
-    <div class="alert alert-info" role="alert">
+    <div class="alert alert-warning" role="alert">
       {{errorTranslation}}
     </div>
   {{else}}
@@ -60,7 +60,13 @@
             </figcaption>
           </figure>
           <figure class="join-arrow-image">
-            <figcaption class="arrow-label">{{tt this "arrowLabel"}}</figcaption>
+            <figcaption class="arrow-label">
+              {{#if tokenWithHarvester}}
+                {{tt this "addLabel"}}
+              {{else}}
+                {{tt this "joinLabel"}}
+              {{/if}}
+            </figcaption>
             <div class="arrow"></div>
           </figure>
           <figure class="invite-target-image">
@@ -76,7 +82,7 @@
     </div>
   {{/if}}
   {{#if noJoinMessage}}
-    <div class="no-join-message alert alert-info" role="alert">
+    <div class="no-join-message alert alert-warning" role="alert">
       {{noJoinMessage}}
     </div>
   {{/if}}
@@ -98,7 +104,7 @@
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
               {{#truncated-string class="text"}}
-                {{recordOption.label}}
+                {{name-conflict item=recordOption.value}}
               {{/truncated-string}}
             </div>
           {{/one-dropdown}}
@@ -115,11 +121,11 @@
         {{tt this "cancelBtn"}}
       {{/bs-button}}
       {{#one-spin-button
-        class="join-btn btn btn-lg btn-primary"
-        disabled=isJoinBtnDisabled
-        action=(action "join")
+        class="confirm-btn btn btn-lg btn-primary"
+        disabled=isConfirmBtnDisabled
+        action=(action "confirm")
       }}
-        {{tt this "joinBtn"}}
+        {{tt this "confirmBtn"}}
       {{/one-spin-button}}
     </div>
   {{/if}}
