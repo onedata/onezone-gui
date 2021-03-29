@@ -58,7 +58,7 @@
       .join-arrow-image {
         width: 136px;
       }
-      .subject-name {
+      .subject-image-label {
         max-width: 200px;
       }
     }
@@ -130,19 +130,19 @@
     padding-bottom: 6 * $padding-base-vertical;
   }
 
-  .select-below-label {
-    font-style: italic;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 0);
-  }
-
-  .subject-name {
-    font-weight: bold;
+  .subject-image-label {
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
     max-width: 300px;
+  }
+
+  .select-below-label {
+    font-style: italic;
+  }
+
+  .subject-name {
+    font-weight: bold;
   }
 
   .joining-record-selector {

@@ -45,7 +45,7 @@
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
             <img class="subject-image" src={{root-url invitedModelImagePath}}>
-            <figcaption>
+            <figcaption class="subject-image-label">
               {{#truncated-string class="text"}}
                 {{#if joiningRecordSelectorModelName}}
                   {{#if selectedJoiningRecordOption}} 
@@ -71,7 +71,7 @@
           </figure>
           <figure class="invite-target-image">
             <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
-            <figcaption class="subject-name">
+            <figcaption class="subject-image-label subject-name">
               {{#truncated-string class="text"}}
                 {{inviteTargetName}}
               {{/truncated-string}}
