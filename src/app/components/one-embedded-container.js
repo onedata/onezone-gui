@@ -289,7 +289,7 @@ export default Component.extend({
   },
 
   actions: {
-    showOneproviderConnectionError({ oneproviderUrl }) {
+    showOneproviderConnectionError({ oneproviderUrl, setFastPollingCallback }) {
       const {
         alertService,
         i18n,
@@ -301,6 +301,7 @@ export default Component.extend({
           i18n.t('components.alerts.endpointError.oneprovider'),
         url: oneproviderUrl,
         serverType: 'oneprovider',
+        setFastPollingCallback,
       });
     },
     getManageClusterUrl({ clusterId }) {

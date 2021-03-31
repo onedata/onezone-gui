@@ -121,7 +121,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
               i18n.t('components.alerts.endpointError.onepanel'),
             url: standaloneOrigin,
             serverType: 'onepanel',
-            changeFrequency: false,
+            setFastPollingCallback: this.setFastPolling.bind(this),
           });
         });
       }
@@ -136,23 +136,26 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     }
   },
 
+  setFastPolling(setInterval) {
+    if (setInterval) {
+      this.set('timeUpdater.interval', this.get('requestFastInterval'));
+      this.set('requestCounter', 0);
+    }
+  },
+
   checkConnectionToProvider() {
     resolve($.get(this.get('onepanelConfigurationUrl')))
       .then(() => {
         this.destroyTimeUpdater();
-        const _location = this.get('_location');
-        _location.reload();
+        this.get('_location').reload();
       })
       .catch(() => []);
-    const requestCounter = this.get('requestCounter');
-    if (this.get('alertService.options.changeFrequency')) {
+    if (this.get('timeUpdater.interval') === this.get('requestFastInterval')) {
+      const requestCounter = this.get('requestCounter');
       if (requestCounter < 10) {
-        this.set('timeUpdater.interval', this.get('requestFastInterval'));
         this.set('requestCounter', requestCounter + 1);
       } else {
         this.set('timeUpdater.interval', this.get('requestSlowInterval'));
-        this.set('requestCounter', 0);
-        this.set('alertService.options.changeFrequency', false);
       }
     }
   },
@@ -162,5 +165,11 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     if (timeUpdater) {
       timeUpdater.destroy();
     }
+  },
+
+  actions: {
+    setFastPolling() {
+      this.setFastPolling(true);
+    },
   },
 });
