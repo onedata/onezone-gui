@@ -7,6 +7,8 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7401 Updated commons
+* VFS-7477 Fixed removing space from harvester
+* VFS-6779 Added links to harvesters/spaces from list of harvesters/spaces
 * VFS-7413 Fixed missing members with duplicated names
 * VFS-6663 Added options for copy user ID and provider ID/domain
 * VFS-6638 Detecting unreachable duplicated clusters

@@ -1,4 +1,4 @@
-{{#unless (eq spacesProxy.length 0)}}
+{{#unless (eq harvesterSpacesProxy.length 0)}}
   <div class="row content-row header-row hidden-xs">
     <h1 class="with-menu">
       <span class="one-label">
@@ -8,8 +8,8 @@
     </h1>
   </div>
 {{/unless}}
-{{#promise-proxy-container proxy=spacesProxy}}
-  {{#if (eq spacesProxy.length 0)}}
+{{#promise-proxy-container proxy=harvesterSpacesProxy}}
+  {{#if (eq harvesterSpacesProxy.length 0)}}
     {{#content-info
       imagePath=(root-url "assets/images/harvester-space-new.svg")
       class="scroll-breakpoint-800"
@@ -30,43 +30,10 @@
       </div>
     {{/content-info}}
   {{else}}
-    <div class="row">
-      {{#one-collapsible-list as |list|}}
-        {{#each spacesProxy key="id" as |space|}}
-          {{#list.item as |listItem|}}
-            {{#listItem.header isCollapsible=false}}
-              <span class="item-icon-container">
-                {{one-icon class="item-icon" icon="space"}}
-                {{one-tooltip
-                  title=space.name
-                  placement="top"
-                  arrowPlacement="left"
-                  triggerEvents="hover"
-                }}
-              </span>
-              <span class="one-label">{{space.name}}</span>
-              {{actions-toolbar
-                isMinimized=true
-                toolbarClasses=""
-                toolbarToggleClasses="btn-menu-toggle"
-                dropdownPlacement="auto"
-                actionsArray=spaceActions
-                actionsArg=space}}
-            {{/listItem.header}}
-          {{/list.item}}
-        {{/each}}
-      {{/one-collapsible-list}}
-    </div>
+    {{resources-list items=spaceItems}}
   {{/if}}
 {{/promise-proxy-container}}
 
-{{content-harvesters-spaces/remove-space-modal
-  opened=(and spaceToRemove (not spaceToRemove.isDeleted))
-  close=(action (mut spaceToRemove) null)
-  proceed=(action "removeSpace")
-  processing=isRemovingSpace
-  space=spaceToRemove
-  harvester=harvester}}
 {{add-your-space-modal
   opened=isAddYourSpaceModalOpened
   close=(action (mut isAddYourSpaceModalOpened) false)
