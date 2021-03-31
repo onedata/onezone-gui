@@ -96,6 +96,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import uploadObject from './utils/upload-object';
+import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
 import removeSpaceAction from './utils/space-actions/remove-space-action';
@@ -214,6 +215,9 @@ const translations = {
   },
   utils: {
     uploadObject,
+    harvesterActions: {
+      removeSpaceFromHarvesterAction,
+    },
     spaceActions: {
       addHarvesterToSpaceAction,
       removeHarvesterFromSpaceAction,
