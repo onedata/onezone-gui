@@ -36,7 +36,6 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
   checkErrorType: 'clusterEndpoint',
 
   /**
-   * For test purposes. Do not change it except when testing!
    * @type {Location}
    */
   _location: location,
@@ -136,8 +135,8 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     }
   },
 
-  setFastPolling(setInterval) {
-    if (setInterval) {
+  setFastPolling(setFastInterval) {
+    if (setFastInterval) {
       this.set('timeUpdater.interval', this.get('requestFastInterval'));
       this.set('requestCounter', 0);
     }
