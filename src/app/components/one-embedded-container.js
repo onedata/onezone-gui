@@ -97,6 +97,7 @@ export default Component.extend({
    */
   commonCallParentActionNames: Object.freeze([
     'showOneproviderConnectionError',
+    'hideOneproviderConnectionError',
     'getManageClusterUrl',
     'callGlobalNotify',
   ]),
@@ -304,6 +305,13 @@ export default Component.extend({
         setFastPollingCallback,
       });
     },
+
+    hideOneproviderConnectionError() {
+      if (this.get('alertService.opened')) {
+        this.set('alertService.opened', false);
+      }
+    },
+
     getManageClusterUrl({ clusterId }) {
       const {
         recordManager,
