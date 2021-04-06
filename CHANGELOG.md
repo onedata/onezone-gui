@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7401 Updated commons
 * VFS-7477 Fixed removing space from harvester
 * VFS-6779 Added links to harvesters/spaces from list of harvesters/spaces
 * VFS-7413 Fixed missing members with duplicated names
