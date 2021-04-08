@@ -11,7 +11,9 @@ import OneTooltipHelper from '../../../helpers/one-tooltip';
 const metadataTypes = ['xattrs', 'json', 'rdf'];
 const fileDetailsFields = [
   'fileName',
+  'fileType',
   'spaceId',
+  'datasetInfo',
   'metadataExistenceFlags',
 ];
 
@@ -89,7 +91,7 @@ describe('Integration | Component | content harvesters indices/index form', func
     );
 
     it(
-      'shows three preselected toggles: "file name", "space id" and "metadata existence flags" with "Include file details" label and tooltip',
+      'shows 5 preselected toggles: "file name", "file type", "space id", "dataset info" and "metadata existence flags" with "Include file details" label and tooltip',
       function () {
         this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
@@ -98,10 +100,12 @@ describe('Integration | Component | content harvesters indices/index form', func
         expect($formGroup).to.exist;
         expect($formGroup.find('.control-label').eq(0).text().trim())
           .to.equal('Include file details:');
-        expect($toggleGroups).to.have.length(3);
+        expect($toggleGroups).to.have.length(5);
         [
           'File name',
+          'File type',
           'Space ID',
+          'Dataset info',
           'Metadata existence flags',
         ].forEach((fieldLabel, index) => {
           const $toggleGroup = $toggleGroups.eq(index);
@@ -343,7 +347,13 @@ describe('Integration | Component | content harvesters indices/index form', func
                 name: 'abc',
                 schema: 'someschema',
                 includeMetadata: ['xattrs', 'json', 'rdf'],
-                includeFileDetails: ['fileName', 'spaceId', 'metadataExistenceFlags'],
+                includeFileDetails: [
+                  'fileName',
+                  'fileType',
+                  'spaceId',
+                  'datasetInfo',
+                  'metadataExistenceFlags',
+                ],
                 includeRejectionReason: true,
                 retryOnRejection: true,
               }, alteredRecordProps))
@@ -378,7 +388,13 @@ describe('Integration | Component | content harvesters indices/index form', func
       this.set('index', {
         schema: 'indexSchema',
         includeMetadata: ['xattrs', 'json', 'rdf'],
-        includeFileDetails: ['fileName', 'spaceId', 'metadataExistenceFlags'],
+        includeFileDetails: [
+          'fileName',
+          'fileType',
+          'spaceId',
+          'datasetInfo',
+          'metadataExistenceFlags',
+        ],
         includeRejectionReason: true,
         retryOnRejection: true,
       });
@@ -449,7 +465,9 @@ describe('Integration | Component | content harvesters indices/index form', func
           'metadataJson',
           'metadataRdf',
           'fileName',
+          'fileType',
           'spaceId',
+          'datasetInfo',
           'metadataExistenceFlags',
           'includeRejectionReason',
           'retryOnRejection',
