@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import DS from 'ember-data';
+import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
@@ -24,7 +24,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 /**
  * @typedef {Object} MountSpaceOptions
  * @property {Boolean} enabled
- * @property {String} mountPath
+ * @property {String} mountPoint
  * @property {Boolean} readOnly
  * @property {String} oneclientOptions
  */
@@ -35,6 +35,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  * @property {String} type
  * @property {Boolean} array
  * @property {Boolean} optional
+ * @property {String} defaultValue
  */
 
 /**
@@ -45,7 +46,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  * @property {Boolean} optional
  */
 
-export default DS.Model.extend(GraphSingleModelMixin, {
+export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {ComputedProperty<String>}
    */

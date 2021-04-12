@@ -5,6 +5,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
+import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
@@ -30,6 +31,8 @@ export default Component.extend(I18n, {
       shortDescriptionField,
       engineField,
       openfaasOptionsFieldsGroup,
+      argumentsFieldsCollectionGroup,
+      resultsFieldsCollectionGroup,
       mountSpaceField,
       mountSpaceOptionsFieldsGroup,
     } = this.getProperties(
@@ -37,6 +40,8 @@ export default Component.extend(I18n, {
       'shortDescriptionField',
       'engineField',
       'openfaasOptionsFieldsGroup',
+      'argumentsFieldsCollectionGroup',
+      'resultsFieldsCollectionGroup',
       'mountSpaceField',
       'mountSpaceOptionsFieldsGroup'
     );
@@ -53,6 +58,8 @@ export default Component.extend(I18n, {
         shortDescriptionField,
         engineField,
         openfaasOptionsFieldsGroup,
+        argumentsFieldsCollectionGroup,
+        resultsFieldsCollectionGroup,
         mountSpaceField,
         mountSpaceOptionsFieldsGroup,
       ],
@@ -111,6 +118,98 @@ export default Component.extend(I18n, {
   dockerImageField: computed(function dockerImageField() {
     return TextField.create({
       name: 'dockerImage',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
+   */
+  argumentsFieldsCollectionGroup: computed(function () {
+    return FormFieldsCollectionGroup.create({
+      name: 'arguments',
+      fieldFactoryMethod(uniqueFieldValueName) {
+        return FormFieldsGroup.create({
+          name: 'argument',
+          valueName: uniqueFieldValueName,
+          fields: [
+            TextField.create({
+              name: 'argumentName',
+              defaultValue: '',
+            }),
+            DropdownField.extend({
+              defaultValue: reads('options.firstObject.value'),
+            }).create({
+              name: 'argumentType',
+              options: [
+                { value: 'string' },
+                { value: 'object' },
+                { value: 'listStream' },
+                { value: 'mapStream' },
+                { value: 'filesTreeStream' },
+                { value: 'histogram' },
+              ],
+            }),
+            ToggleField.create({
+              name: 'argumentArray',
+              defaultValue: false,
+            }),
+            ToggleField.create({
+              name: 'argumentOptional',
+              defaultValue: false,
+            }),
+            TextField.create({
+              name: 'argumentDefaultValue',
+              defaultValue: '',
+              isOptional: true,
+            }),
+          ],
+        });
+      },
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
+   */
+  resultsFieldsCollectionGroup: computed(function () {
+    return FormFieldsCollectionGroup.create({
+      name: 'results',
+      fieldFactoryMethod(uniqueFieldValueName) {
+        return FormFieldsGroup.create({
+          name: 'result',
+          valueName: uniqueFieldValueName,
+          fields: [
+            TextField.create({
+              name: 'resultName',
+              defaultValue: '',
+            }),
+            DropdownField.extend({
+              defaultValue: reads('options.firstObject.value'),
+            }).create({
+              name: 'resultType',
+              options: [
+                { value: 'string' },
+                { value: 'object' },
+                { value: 'listStreamOperation' },
+                { value: 'mapStreamOperation' },
+                { value: 'filesTreeStreamOperation' },
+                { value: 'dataReadStats' },
+                { value: 'dataWriteStats' },
+                { value: 'networkTransferStats' },
+                { value: 'auditLogRecord' },
+              ],
+            }),
+            ToggleField.create({
+              name: 'resultArray',
+              defaultValue: false,
+            }),
+            ToggleField.create({
+              name: 'resultOptional',
+              defaultValue: false,
+            }),
+          ],
+        });
+      },
     });
   }),
 
