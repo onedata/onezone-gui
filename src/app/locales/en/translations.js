@@ -83,6 +83,7 @@ import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
 import sidebarWorkflows from './components/sidebar-workflows';
 import contentWorkflowsMembers from './components/content-workflows-members';
+import contentWorkflowsFunctions from './components/content-workflows-functions';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -209,6 +210,7 @@ const translations = {
     tokenTemplateSelector,
     sidebarWorkflows,
     contentWorkflowsMembers,
+    contentWorkflowsFunctions,
   },
   services: {
     tokenActions,
