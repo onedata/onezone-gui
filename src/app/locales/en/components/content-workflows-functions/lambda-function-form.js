@@ -21,11 +21,11 @@ export default {
     },
     arguments: {
       label: 'Arguments',
-      argument: {
-        argumentName: {
+      entry: {
+        entryName: {
           placeholder: 'Name',
         },
-        argumentType: {
+        entryType: {
           options: {
             string: {
               label: 'String',
@@ -47,24 +47,24 @@ export default {
             },
           },
         },
-        argumentArray: {
+        entryArray: {
           label: 'Array',
         },
-        argumentOptional: {
+        entryOptional: {
           label: 'Optional',
         },
-        argumentDefaultValue: {
+        entryDefaultValue: {
           placeholder: 'Default value (optional)',
         },
       },
     },
     results: {
       label: 'Results',
-      result: {
-        resultName: {
+      entry: {
+        entryName: {
           placeholder: 'Name',
         },
-        resultType: {
+        entryType: {
           options: {
             string: {
               label: 'String',
@@ -95,10 +95,10 @@ export default {
             },
           },
         },
-        resultArray: {
+        entryArray: {
           label: 'Array',
         },
-        resultOptional: {
+        entryOptional: {
           label: 'Optional',
         },
       },
