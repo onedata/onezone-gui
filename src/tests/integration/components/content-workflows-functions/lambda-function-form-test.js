@@ -4,29 +4,58 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { fillIn, focus, blur, click } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
-import { clickTrigger } from '../../../helpers/ember-power-select';
+import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
+import sinon from 'sinon';
 
-const argumentTypes = [
-  'String',
-  'Object',
-  'List stream',
-  'Map stream',
-  'Files tree stream',
-  'Histogram',
-];
+const argumentTypes = [{
+  value: 'string',
+  label: 'String',
+}, {
+  value: 'object',
+  label: 'Object',
+}, {
+  value: 'listStream',
+  label: 'List stream',
+}, {
+  value: 'mapStream',
+  label: 'Map stream',
+}, {
+  value: 'filesTreeStream',
+  label: 'Files tree stream',
+}, {
+  value: 'histogram',
+  label: 'Histogram',
+}];
 
-const resultTypes = [
-  'String',
-  'Object',
-  'List stream operation',
-  'Map stream operation',
-  'Files tree stream operation',
-  'Data read stats',
-  'Data write stats',
-  'Network transfer stats',
-  'Audit log record',
-];
+const resultTypes = [{
+  value: 'string',
+  label: 'String',
+}, {
+  value: 'object',
+  label: 'Object',
+}, {
+  value: 'listStreamOperation',
+  label: 'List stream operation',
+}, {
+  value: 'mapStreamOperation',
+  label: 'Map stream operation',
+}, {
+  value: 'filesTreeStreamOperation',
+  label: 'Files tree stream operation',
+}, {
+  value: 'dataReadStats',
+  label: 'Data read stats',
+}, {
+  value: 'dataWriteStats',
+  label: 'Data write stats',
+}, {
+  value: 'networkTransferStats',
+  label: 'Network transfer stats',
+}, {
+  value: 'auditLogRecord',
+  label: 'Audit log record',
+}];
 
 describe(
   'Integration | Component | content workflows functions/lambda function form',
@@ -69,23 +98,23 @@ describe(
       expect(this.$('.name-field')).to.have.class('has-success');
     });
 
-    it('renders empty "short description" field', async function () {
+    it('renders empty "summary" field', async function () {
       await render(this);
 
-      const $label = this.$('.shortDescription-field .control-label');
-      const $field = this.$('.shortDescription-field .form-control');
-      expect($label.text().trim()).to.equal('Short description (optional):');
+      const $label = this.$('.summary-field .control-label');
+      const $field = this.$('.summary-field .form-control');
+      expect($label.text().trim()).to.equal('Summary (optional):');
       expect($field).to.match('textarea');
       expect($field).to.have.value('');
     });
 
-    it('marks "short description" field as valid when it is empty', async function () {
+    it('marks "summary" field as valid when it is empty', async function () {
       await render(this);
 
-      await focus('.shortDescription-field .form-control');
-      await blur('.shortDescription-field .form-control');
+      await focus('.summary-field .form-control');
+      await blur('.summary-field .form-control');
 
-      expect(this.$('.shortDescription-field')).to.have.class('has-success');
+      expect(this.$('.summary-field')).to.have.class('has-success');
     });
 
     it('renders "engine" field with preselected "openfaas" option', async function () {
@@ -211,8 +240,8 @@ describe(
 
       const $options = $('.ember-power-select-option');
       expect($options).to.have.length(argumentTypes.length);
-      argumentTypes.forEach((type, i) =>
-        expect($options.eq(i).text().trim()).to.equal(type)
+      argumentTypes.forEach(({ label }, i) =>
+        expect($options.eq(i).text().trim()).to.equal(label)
       );
     });
 
@@ -297,9 +326,18 @@ describe(
 
       const $options = $('.ember-power-select-option');
       expect($options).to.have.length(resultTypes.length);
-      resultTypes.forEach((type, i) =>
-        expect($options.eq(i).text().trim()).to.equal(type)
+      resultTypes.forEach(({ label }, i) =>
+        expect($options.eq(i).text().trim()).to.equal(label)
       );
+    });
+
+    it('renders checked "readonly" toggle', async function () {
+      await render(this);
+
+      const $label = this.$('.readonly-field .control-label');
+      const $field = this.$('.readonly-field .form-control');
+      expect($label.text().trim()).to.equal('Read-only:');
+      expect($field).to.have.class('checked');
     });
 
     it('renders checked "mount space" toggle', async function () {
@@ -363,16 +401,6 @@ describe(
 
         expect(this.$('.oneclientOptions-field')).to.have.class('has-success');
       });
-
-      it('renders checked "read only" toggle', async function () {
-        await render(this);
-
-        const $fieldsGroup = this.$('.mountSpaceOptions-field');
-        const $label = $fieldsGroup.find('.readOnly-field .control-label');
-        const $field = $fieldsGroup.find('.readOnly-field .form-control');
-        expect($label.text().trim()).to.equal('Read-only:');
-        expect($field).to.have.class('checked');
-      });
     });
 
     context('when "mount space" is unchecked', function () {
@@ -385,11 +413,147 @@ describe(
           expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
         });
     });
+
+    it('creates simple lambda function on submit button click', async function () {
+      await render(this);
+
+      const lambdaFunction = await fillWithMinimumData(this);
+      await click('.btn-submit');
+
+      expect(this.get('submitStub')).to.be.calledOnce
+        .and.to.be.calledWith(lambdaFunction);
+    });
+
+    it('creates complex lambda function on submit button click', async function () {
+      await render(this);
+
+      await fillIn('.name-field .form-control', 'myname');
+      await fillIn('.summary-field .form-control', 'mysummary');
+      await fillIn('.dockerImage-field .form-control', 'myimage');
+
+      for (let i = 0; i < 2; i++) {
+        await addArgument();
+        const nthArgSelector = `.arguments-field .collection-item:nth-child(${i + 1})`;
+        await fillIn(`${nthArgSelector} .argumentName-field .form-control`, `arg${i}`);
+        await selectChoose(
+          `${nthArgSelector} .argumentType-field`,
+          argumentTypes[i].label
+        );
+        if (i === 0) {
+          await click(`${nthArgSelector} .argumentArray-field .form-control`);
+          await click(`${nthArgSelector} .argumentOptional-field .form-control`);
+          await fillIn(`${nthArgSelector} .argumentDefaultValue-field .form-control`, `val${i}`);
+        }
+
+        await addResult();
+        const nthResSelector = `.results-field .collection-item:nth-child(${i + 1})`;
+        await fillIn(`${nthResSelector} .resultName-field .form-control`, `res${i}`);
+        await selectChoose(`${nthResSelector} .resultType-field`, resultTypes[i].label);
+        if (i === 1) {
+          await click(`${nthResSelector} .resultArray-field .form-control`);
+          await click(`${nthResSelector} .resultOptional-field .form-control`);
+        }
+      }
+
+      await fillIn('.mountPoint-field .form-control', '/mount/point');
+      await fillIn('.oneclientOptions-field .form-control', 'oc-options');
+      await click('.btn-submit');
+
+      expect(this.get('submitStub')).to.be.calledOnce.and.to.be.calledWith({
+        name: 'myname',
+        summary: 'mysummary',
+        description: '',
+        engine: 'openfaas',
+        operationRef: 'myimage',
+        executionOptions: {
+          readonly: true,
+          mountSpaceOptions: {
+            mountOneclient: true,
+            mountPoint: '/mount/point',
+            oneclientOptions: 'oc-options',
+          },
+        },
+        arguments: argumentTypes.slice(0, 2).map(({ value: type }, idx) => ({
+          name: `arg${idx}`,
+          type,
+          array: idx === 0,
+          optional: idx === 0,
+          defaultValue: idx === 0 ? `val${idx}` : '',
+        })),
+        results: resultTypes.slice(0, 2).map(({ value: type }, idx) => ({
+          name: `res${idx}`,
+          type,
+          array: idx === 1,
+          optional: idx === 1,
+        })),
+      });
+    });
+
+    argumentTypes.forEach(({ value: typeValue, label: typeLabel }) => {
+      it(`creates lambda function with "${typeLabel}"-typed argument on submit button click`,
+        async function () {
+          await render(this);
+
+          const lambdaFunction = await fillWithMinimumData(this);
+          await addArgument();
+          const argSelector = '.arguments-field .collection-item:first-child';
+          await fillIn(`${argSelector} .argumentName-field .form-control`, 'arg');
+          await selectChoose(`${argSelector} .argumentType-field`, typeLabel);
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith(Object.assign(lambdaFunction, {
+              arguments: [{
+                name: 'arg',
+                type: typeValue,
+                array: false,
+                optional: false,
+                defaultValue: '',
+              }],
+            }));
+        });
+    });
+
+    resultTypes.forEach(({ value: typeValue, label: typeLabel }) => {
+      it(`creates lambda function with "${typeLabel}"-typed result on submit button click`,
+        async function () {
+          await render(this);
+
+          const lambdaFunction = await fillWithMinimumData(this);
+          await addResult();
+          const resSelector = '.results-field .collection-item:first-child';
+          await fillIn(`${resSelector} .resultName-field .form-control`, 'res');
+          await selectChoose(`${resSelector} .resultType-field`, typeLabel);
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith(Object.assign(lambdaFunction, {
+              results: [{
+                name: 'res',
+                type: typeValue,
+                array: false,
+                optional: false,
+              }],
+            }));
+        });
+    });
+
+    it('disables sumbit button when one of fields is invalid', async function () {
+      await render(this);
+
+      await fillWithMinimumData(this);
+      await fillIn('.name-field .form-control', '');
+
+      expect(this.$('.btn-submit')).to.have.attr('disabled');
+    });
   }
 );
 
 async function render(testCase) {
-  testCase.render(hbs `{{content-workflows-functions/lambda-function-form}}`);
+  testCase.set('submitStub', sinon.stub().resolves());
+  testCase.render(hbs `{{content-workflows-functions/lambda-function-form
+    onSubmit=submitStub
+  }}`);
   await wait();
 }
 
@@ -406,4 +570,26 @@ async function addArgument() {
 
 async function addResult() {
   await click('.results-field .add-field-button');
+}
+
+async function fillWithMinimumData(testCase) {
+  await fillIn('.name-field .form-control', 'myname');
+  await fillIn('.dockerImage-field .form-control', 'myimage');
+  await toggleMountSpace(testCase, false);
+
+  return {
+    name: 'myname',
+    summary: '',
+    description: '',
+    engine: 'openfaas',
+    operationRef: 'myimage',
+    executionOptions: {
+      readonly: true,
+      mountSpaceOptions: {
+        mountOneclient: false,
+      },
+    },
+    arguments: [],
+    results: [],
+  };
 }

@@ -1,4 +1,11 @@
 <form class="form form-horizontal form-component">
   {{form-component/field-renderer field=fields}}
+  {{#one-spin-button
+    class="btn btn-primary btn-submit"
+    action=(action "submit")
+    disabled=(not fields.isValid)
+  }}
+    {{tt this "submit.create"}}
+  {{/one-spin-button}}
 </form>
 {{yield}}

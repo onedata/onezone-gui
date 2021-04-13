@@ -1,5 +1,5 @@
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, getProperties, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -11,6 +11,7 @@ import TextareaField from 'onedata-gui-common/utils/form-component/textarea-fiel
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import { tag } from 'ember-awesome-macros';
+import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default Component.extend(I18n, {
   classNames: ['lambda-function-form'],
@@ -23,25 +24,34 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentWorkflowsFunctions.lambdaFunctionForm',
 
   /**
+   * @type {Function}
+   * @param {Object} lambdaFunction function representation
+   * @returns {Promise}
+   */
+  onSubmit: notImplementedReject,
+
+  /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
   fields: computed(function fields() {
     const {
       nameField,
-      shortDescriptionField,
+      summaryField,
       engineField,
       openfaasOptionsFieldsGroup,
       argumentsFieldsCollectionGroup,
       resultsFieldsCollectionGroup,
+      readonlyField,
       mountSpaceField,
       mountSpaceOptionsFieldsGroup,
     } = this.getProperties(
       'nameField',
-      'shortDescriptionField',
+      'summaryField',
       'engineField',
       'openfaasOptionsFieldsGroup',
       'argumentsFieldsCollectionGroup',
       'resultsFieldsCollectionGroup',
+      'readonlyField',
       'mountSpaceField',
       'mountSpaceOptionsFieldsGroup'
     );
@@ -55,11 +65,12 @@ export default Component.extend(I18n, {
       component,
       fields: [
         nameField,
-        shortDescriptionField,
+        summaryField,
         engineField,
         openfaasOptionsFieldsGroup,
         argumentsFieldsCollectionGroup,
         resultsFieldsCollectionGroup,
+        readonlyField,
         mountSpaceField,
         mountSpaceOptionsFieldsGroup,
       ],
@@ -78,10 +89,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.TextareaField>}
    */
-  shortDescriptionField: computed(function shortDescriptionField() {
+  summaryField: computed(function summaryField() {
     return TextareaField.create({
-      name: 'shortDescription',
+      name: 'summary',
       isOptional: true,
+      defaultValue: '',
     });
   }),
 
@@ -216,6 +228,16 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
    */
+  readonlyField: computed(function readonlyField() {
+    return ToggleField.create({
+      name: 'readonly',
+      defaultValue: true,
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
+   */
   mountSpaceField: computed(function mountSpaceField() {
     return ToggleField.create({
       name: 'mountSpace',
@@ -230,8 +252,7 @@ export default Component.extend(I18n, {
     const {
       mountPointField,
       oneclientOptionsField,
-      readOnlyField,
-    } = this.getProperties('mountPointField', 'oneclientOptionsField', 'readOnlyField');
+    } = this.getProperties('mountPointField', 'oneclientOptionsField');
 
     return FormFieldsGroup.extend({
       isExpanded: reads('valuesSource.mountSpace'),
@@ -240,7 +261,6 @@ export default Component.extend(I18n, {
       fields: [
         mountPointField,
         oneclientOptionsField,
-        readOnlyField,
       ],
     });
   }),
@@ -262,16 +282,7 @@ export default Component.extend(I18n, {
     return TextField.create({
       name: 'oneclientOptions',
       isOptional: true,
-    });
-  }),
-
-  /**
-   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
-   */
-  readOnlyField: computed(function readOnlyField() {
-    return ToggleField.create({
-      name: 'readOnly',
-      defaultValue: true,
+      defaultValue: '',
     });
   }),
 
@@ -280,4 +291,116 @@ export default Component.extend(I18n, {
 
     this.get('fields').reset();
   },
+
+  actions: {
+    submit() {
+      const {
+        fields,
+        onSubmit,
+      } = this.getProperties('fields', 'onSubmit');
+
+      const lambdaFunction = formValueToLambdaFunction(fields.dumpValue());
+      return onSubmit(lambdaFunction);
+    },
+  },
 });
+
+function formValueToLambdaFunction(formValue) {
+  const {
+    name,
+    summary,
+    engine,
+    openfaasOptions,
+    readonly,
+    mountSpace,
+    mountSpaceOptions: formMountSpaceOptions,
+    arguments: formArguments,
+    results: formResults,
+  } = getProperties(
+    formValue,
+    'name',
+    'summary',
+    'engine',
+    'openfaasOptions',
+    'readonly',
+    'mountSpace',
+    'mountSpaceOptions',
+    'arguments',
+    'results'
+  );
+  const operationRef = get(openfaasOptions, 'dockerImage');
+  const mountSpaceOptions = {
+    mountOneclient: mountSpace,
+  };
+  if (mountSpace) {
+    const {
+      mountPoint,
+      oneclientOptions,
+    } = getProperties(
+      formMountSpaceOptions,
+      'mountPoint',
+      'oneclientOptions',
+    );
+    Object.assign(mountSpaceOptions, {
+      mountPoint,
+      oneclientOptions,
+    });
+  }
+  const executionOptions = {
+    readonly,
+    mountSpaceOptions,
+  };
+  const functionArguments = get(formArguments, '__fieldsValueNames').map(valueName => {
+    const {
+      argumentName,
+      argumentType,
+      argumentArray,
+      argumentOptional,
+      argumentDefaultValue,
+    } = getProperties(
+      get(formArguments, valueName) || {},
+      'argumentName',
+      'argumentType',
+      'argumentArray',
+      'argumentOptional',
+      'argumentDefaultValue'
+    );
+    return {
+      name: argumentName,
+      type: argumentType,
+      array: argumentArray,
+      optional: argumentOptional,
+      defaultValue: argumentDefaultValue,
+    };
+  });
+  const functionResults = get(formResults, '__fieldsValueNames').map(valueName => {
+    const {
+      resultName,
+      resultType,
+      resultArray,
+      resultOptional,
+    } = getProperties(
+      get(formResults, valueName) || {},
+      'resultName',
+      'resultType',
+      'resultArray',
+      'resultOptional',
+    );
+    return {
+      name: resultName,
+      type: resultType,
+      array: resultArray,
+      optional: resultOptional,
+    };
+  });
+  return {
+    name,
+    summary,
+    description: '',
+    engine,
+    operationRef,
+    executionOptions,
+    arguments: functionArguments,
+    results: functionResults,
+  };
+}

@@ -3,8 +3,8 @@ export default {
     name: {
       label: 'Name',
     },
-    shortDescription: {
-      label: 'Short description (optional)',
+    summary: {
+      label: 'Summary (optional)',
     },
     engine: {
       label: 'Engine',
@@ -103,6 +103,9 @@ export default {
         },
       },
     },
+    readonly: {
+      label: 'Read-only',
+    },
     mountSpace: {
       label: 'Mount space',
     },
@@ -113,9 +116,9 @@ export default {
       oneclientOptions: {
         label: 'Oneclient options',
       },
-      readOnly: {
-        label: 'Read-only',
-      },
     },
+  },
+  submit: {
+    create: 'Create',
   },
 };
