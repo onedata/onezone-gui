@@ -15,6 +15,7 @@ import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
 import _ from 'lodash';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 
 /**
  * This object MUST BE initialzed asychronuosly using `asyncInit()`, eg.
@@ -61,19 +62,37 @@ export const VirtualShareList = EmberObject.extend({
     })
   ),
 
-  list: promise.array(computed('shareListRelations.@each.[]',
-    function list() {
+  list: promise.array(
+    computed('shareListRelations.@each.[]', function list() {
       return this.get('shareListRelations')
         .then(lists => _.flatten(lists.invoke('toArray')));
-    })),
+    })
+  ),
+
+  listWithConflictLabels: promise.array(
+    computed('list.content.@each.{name,conflictLabel}',
+      function listWithConflictLabels() {
+        return this.get('list')
+          .then(lists => {
+            lists.forEach(element => {
+              element.set('idForConflicts', element.id.replace(/share./g, ''));
+            });
+            return lists;
+          })
+          .then(lists => addConflictLabels(lists, 'data.name', 'idForConflicts'));
+      }
+    )
+  ),
 
   idsCache: Object.freeze([]),
 
-  rebuildIdsCache: observer('list.@each.id', function rebuildIdsCache() {
-    return this.get('list').then(list => {
-      this.set('idsCache', list.mapBy('id'));
-    });
-  }),
+  rebuildIdsCache: observer(
+    'listWithConflictLabels.@each.id',
+    function rebuildIdsCache() {
+      return this.get('listWithConflictLabels').then(list => {
+        this.set('idsCache', list.mapBy('id'));
+      });
+    }),
 
   /**
    * This method MUST BE invoked to properly initialize the object.
