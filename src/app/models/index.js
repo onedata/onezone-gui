@@ -1,6 +1,6 @@
 /**
  * Harvester index model
- * 
+ *
  * @module models/index
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
@@ -22,7 +22,9 @@ export const includeMetadataCorrectValues = [
 
 export const includeFileDetailsCorrectValues = [
   'fileName',
+  'fileType',
   'spaceId',
+  'datasetInfo',
   'metadataExistenceFlags',
 ];
 
@@ -49,7 +51,13 @@ export default Model.extend(GraphSingleModelMixin, {
   includeMetadata: attr('array'),
 
   /**
-   * Example: `['fileName', 'spaceId', 'metadataExistenceFlags']`
+   * Example: `[
+   *   'fileName',
+   *   'fileType',
+   *   'spaceId',
+   *   'datasetInfo',
+   *   'metadataExistenceFlags'
+   * ]`
    * @type {Array<String>}
    */
   includeFileDetails: attr('array'),
