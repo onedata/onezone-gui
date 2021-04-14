@@ -7,6 +7,7 @@ import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
 import sinon from 'sinon';
+import { Promise } from 'rsvp';
 
 const argumentTypes = [{
   value: 'string',
@@ -548,6 +549,16 @@ describe(
 
         await fillWithMinimumData(this);
         await fillIn('.name-field .form-control', '');
+
+        expect(this.$('.btn-submit')).to.have.attr('disabled');
+      });
+
+      it('disables sumbit button when submission is pending', async function () {
+        await renderCreate(this);
+        this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
+
+        await fillWithMinimumData(this);
+        await click('.btn-submit');
 
         expect(this.$('.btn-submit')).to.have.attr('disabled');
       });
