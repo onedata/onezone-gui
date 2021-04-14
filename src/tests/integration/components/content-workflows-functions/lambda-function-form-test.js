@@ -26,6 +26,9 @@ const argumentTypes = [{
 }, {
   value: 'histogram',
   label: 'Histogram',
+}, {
+  value: 'onedatafsOptions',
+  label: 'OnedataFS options',
 }];
 
 const resultTypes = [{
@@ -560,7 +563,7 @@ describe(
       it('shows simple openfaas function', async function () {
         this.set('lambdaFunction', {
           name: 'myname',
-          summary: '',
+          summary: 'summary',
           description: '',
           engine: 'openfaas',
           operationRef: 'myimage',
@@ -581,11 +584,45 @@ describe(
         expect(this.$('.summary-field')).to.not.exist;
         expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
         expect(this.$('.dockerImage-field .field-component').text().trim()).to.equal('myimage');
+        expect(this.$('.onedataFunctionOptions-field')).to.not.exist;
         expect(this.$('.arguments-field')).to.not.exist;
         expect(this.$('.results-field')).to.not.exist;
         expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-        expect(this.$('.mountSpace-field .form-control')).to.not.have.class('checked');
+        expect(this.$('.mountSpace-field .form-control')).to.exist
+          .and.to.not.have.class('checked');
         expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+      });
+
+      it('shows simple onedata function', async function () {
+        this.set('lambdaFunction', {
+          name: 'myname',
+          summary: 'summary',
+          description: '',
+          engine: 'onedataFunction',
+          operationRef: 'myfunc',
+          executionOptions: {
+            readonly: true,
+            mountSpaceOptions: {
+              mountOneclient: false,
+            },
+          },
+          arguments: [],
+          results: [],
+        });
+
+        await renderView(this);
+
+        expect(this.$('.field-edit-mode')).to.not.exist;
+        expect(this.$('.name-field')).to.not.exist;
+        expect(this.$('.summary-field')).to.not.exist;
+        expect(this.$('.engine-field .field-component').text().trim()).to.equal('Onedata function');
+        expect(this.$('.onedataFunctionName-field .field-component').text().trim()).to.equal('myfunc');
+        expect(this.$('.openfaasOptions-field')).to.not.exist;
+        expect(this.$('.arguments-field')).to.not.exist;
+        expect(this.$('.results-field')).to.not.exist;
+        expect(this.$('.readonly-field .form-control')).to.have.class('checked');
+        expect(this.$('.mountSpace-field')).to.not.exist;
+        expect(this.$('.mountSpaceOptions-field')).to.not.exist;
       });
 
       it('shows mount space options when passed function has "mount space" enabled',

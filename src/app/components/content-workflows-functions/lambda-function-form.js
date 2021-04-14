@@ -10,7 +10,7 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, not, and, raw, isEmpty, conditional } from 'ember-awesome-macros';
+import { tag, eq, or, not, and, raw, isEmpty, conditional } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 
 export default Component.extend(I18n, {
@@ -62,6 +62,7 @@ export default Component.extend(I18n, {
       summaryField,
       engineField,
       openfaasOptionsFieldsGroup,
+      onedataFunctionOptionsFieldsGroup,
       argumentsFieldsCollectionGroup,
       resultsFieldsCollectionGroup,
       readonlyField,
@@ -72,6 +73,7 @@ export default Component.extend(I18n, {
       'summaryField',
       'engineField',
       'openfaasOptionsFieldsGroup',
+      'onedataFunctionOptionsFieldsGroup',
       'argumentsFieldsCollectionGroup',
       'resultsFieldsCollectionGroup',
       'readonlyField',
@@ -91,6 +93,7 @@ export default Component.extend(I18n, {
         summaryField,
         engineField,
         openfaasOptionsFieldsGroup,
+        onedataFunctionOptionsFieldsGroup,
         argumentsFieldsCollectionGroup,
         resultsFieldsCollectionGroup,
         readonlyField,
@@ -128,12 +131,22 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
    */
   engineField: computed(function engineField() {
-    return DropdownField.create({
+    const viewOptions = [
+      { value: 'openfaas' },
+      { value: 'onedataFunction' },
+    ];
+    const editOptions = viewOptions.rejectBy('value', 'onedataFunction');
+
+    return DropdownField.extend({
+      options: conditional('isInViewMode', raw(viewOptions), raw(editOptions)),
+      defaultValue: conditional(
+        'isInViewMode',
+        viewValuePath('engine'),
+        raw('openfaas')
+      ),
+    }).create({
+      component: this,
       name: 'engine',
-      options: [
-        { value: 'openfaas' },
-      ],
-      defaultValue: 'openfaas',
       showSearch: false,
     });
   }),
@@ -143,7 +156,9 @@ export default Component.extend(I18n, {
    */
   openfaasOptionsFieldsGroup: computed(function openfaasOptionsFieldsGroup() {
     const dockerImageField = this.get('dockerImageField');
-    return FormFieldsGroup.create({
+    return FormFieldsGroup.extend({
+      isVisible: eq('valuesSource.engine', raw('openfaas')),
+    }).create({
       name: 'openfaasOptions',
       fields: [
         dockerImageField,
@@ -164,6 +179,39 @@ export default Component.extend(I18n, {
     }).create({
       component: this,
       name: 'dockerImage',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  onedataFunctionOptionsFieldsGroup: computed(
+    function onedataFunctionOptionsFieldsGroup() {
+      const onedataFunctionNameField = this.get('onedataFunctionNameField');
+      return FormFieldsGroup.extend({
+        isVisible: eq('valuesSource.engine', raw('onedataFunction')),
+      }).create({
+        name: 'onedataFunctionOptions',
+        fields: [
+          onedataFunctionNameField,
+        ],
+      });
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
+   */
+  onedataFunctionNameField: computed(function onedataFunctionNameField() {
+    return TextField.extend({
+      defaultValue: conditional(
+        'isInViewMode',
+        viewValuePath('onedataFunctionOptions.onedataFunctionName'),
+        raw('')
+      ),
+    }).create({
+      component: this,
+      name: 'onedataFunctionName',
     });
   }),
 
@@ -207,6 +255,7 @@ export default Component.extend(I18n, {
         viewValuePath('mountSpace'),
         raw(true)
       ),
+      isVisible: eq('valuesSource.engine', raw('openfaas')),
     }).create({
       component: this,
       name: 'mountSpace',
@@ -223,7 +272,8 @@ export default Component.extend(I18n, {
     } = this.getProperties('mountPointField', 'oneclientOptionsField');
 
     return FormFieldsGroup.extend({
-      isExpanded: reads('valuesSource.mountSpace'),
+      isVisible: or('isInEditMode', 'valuesSource.mountSpace'),
+      isExpanded: or('isInViewMode', 'valuesSource.mountSpace'),
     }).create({
       name: 'mountSpaceOptions',
       fields: [
@@ -328,6 +378,7 @@ function createFunctionIOGroup(component, ioType) {
               { value: 'mapStream' },
               { value: 'filesTreeStream' },
               { value: 'histogram' },
+              { value: 'onedatafsOptions' },
             ] : [
               { value: 'string' },
               { value: 'object' },
@@ -417,8 +468,8 @@ function formValueToLambdaFunction(formValue) {
     readonly,
     mountSpaceOptions,
   };
-  const functionArguments = formIOToFunctionIO('argument', formArguments);
-  const functionResults = formIOToFunctionIO('result', formResults);
+  const functionArguments = formArgResToFunctionArgRes('argument', formArguments);
+  const functionResults = formArgResToFunctionArgRes('result', formResults);
   return {
     name,
     summary,
@@ -431,7 +482,7 @@ function formValueToLambdaFunction(formValue) {
   };
 }
 
-function formIOToFunctionIO(ioType, formData) {
+function formArgResToFunctionArgRes(dataType, formData) {
   return get(formData, '__fieldsValueNames').map(valueName => {
     const {
       entryName,
@@ -453,7 +504,7 @@ function formIOToFunctionIO(ioType, formData) {
       array: entryArray,
       optional: entryOptional,
     };
-    if (ioType === 'argument') {
+    if (dataType === 'argument') {
       functionData.defaultValue = entryDefaultValue;
     }
     return functionData;
@@ -463,6 +514,7 @@ function formIOToFunctionIO(ioType, formData) {
 function lambdaFunctionToFormValue(lambdaFunction) {
   const {
     name,
+    engine,
     operationRef,
     executionOptions,
     arguments: funcArguments,
@@ -470,6 +522,7 @@ function lambdaFunctionToFormValue(lambdaFunction) {
   } = getProperties(
     lambdaFunction || {},
     'name',
+    'engine',
     'operationRef',
     'executionOptions',
     'arguments',
@@ -492,14 +545,26 @@ function lambdaFunctionToFormValue(lambdaFunction) {
     'oneclientOptions'
   );
 
-  const formArguments = functionIOToFormIO('argument', funcArguments);
-  const formResults = functionIOToFormIO('result', funcResults);
+  const formArguments = functionArgResToFormArgRes('argument', funcArguments);
+  const formResults = functionArgResToFormArgRes('result', funcResults);
 
-  return {
+  const engineOptions = {};
+  switch (engine) {
+    case 'openfaas':
+      engineOptions.openfaasOptions = {
+        dockerImage: operationRef,
+      };
+      break;
+    case 'onedataFunction':
+      engineOptions.onedataFunctionOptions = {
+        onedataFunctionName: operationRef,
+      };
+      break;
+  }
+
+  return Object.assign({
     name,
-    openfaasOptions: {
-      dockerImage: operationRef,
-    },
+    engine,
     readonly: Boolean(readonly),
     mountSpace: Boolean(mountOneclient),
     mountSpaceOptions: {
@@ -508,10 +573,10 @@ function lambdaFunctionToFormValue(lambdaFunction) {
     },
     arguments: formArguments,
     results: formResults,
-  };
+  }, engineOptions);
 }
 
-function functionIOToFormIO(ioType, functionData) {
+function functionArgResToFormArgRes(dataType, functionData) {
   const formData = {
     __fieldsValueNames: [],
   };
@@ -543,7 +608,7 @@ function functionIOToFormIO(ioType, functionData) {
       entryOptional: Boolean(optional),
       entryDefaultValue: defaultValue,
     };
-    if (ioType === 'argument') {
+    if (dataType === 'argument') {
       formData[valueName].entryDefaultValue = defaultValue;
     }
   });

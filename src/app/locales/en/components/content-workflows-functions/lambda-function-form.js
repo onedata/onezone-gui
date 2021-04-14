@@ -12,11 +12,19 @@ export default {
         openfaas: {
           label: 'OpenFaaS',
         },
+        onedataFunction: {
+          label: 'Onedata function',
+        },
       },
     },
     openfaasOptions: {
       dockerImage: {
         label: 'Docker image',
+      },
+    },
+    onedataFunctionOptions: {
+      onedataFunctionName: {
+        label: 'Onedata function name',
       },
     },
     arguments: {
@@ -44,6 +52,9 @@ export default {
             },
             histogram: {
               label: 'Histogram',
+            },
+            onedatafsOptions: {
+              label: 'OnedataFS options',
             },
           },
         },
