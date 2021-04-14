@@ -1,0 +1,14 @@
+<input
+  type="text"
+  class="form-control search-input"
+  value={{searchValue}}
+  oninput={{action (mut searchValue) value="target.value"}}
+/>
+<ul>
+  {{#each sortedCollection as |lambdaFunction|}}
+    {{content-workflows-functions/lambda-functions-list-entry
+      lambdaFunction=lambdaFunction
+    }}
+  {{/each}}
+</ul>
+{{yield}}

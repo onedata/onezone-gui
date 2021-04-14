@@ -13,20 +13,11 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 /**
- * @typedef {Object} OpenfaasOptions
- * @property {String} dockerImage
- */
-
-/**
- * @typedef {Object} OnedataFunctionOptions
- */
-
-/**
- * @typedef {Object} MountSpaceOptions
- * @property {Boolean} enabled
- * @property {String} mountPoint
- * @property {Boolean} readOnly
- * @property {String} oneclientOptions
+ * @typedef {Object} LambdaFunctionExecutionOptions
+ * @property {Boolean} readonly
+ * @property {Boolean} mountSpaceOptions.mountOneclient
+ * @property {String} mountSpaceOptions.mountPoint
+ * @property {String} mountSpaceOptions.oneclientOptions
  */
 
 /**
@@ -55,7 +46,7 @@ export default Model.extend(GraphSingleModelMixin, {
   /**
    * @type {ComputedProperty<String>}
    */
-  shortDescription: attr('string'),
+  summary: attr('string'),
 
   /**
    * Is in markdown format
@@ -70,15 +61,14 @@ export default Model.extend(GraphSingleModelMixin, {
   engine: attr('string'),
 
   /**
-   * Its structure depends on the value of `engine` property
-   * @type {ComputedProperty<OpenfaasOptions|OnedataFunctionOptions>}
+   * @type {ComputedProperty<String>}
    */
-  engineOptions: attr('object'),
+  operationRef: attr('string'),
 
   /**
-   * @type {ComputedProperty<MountSpaceOptions>}
+   * @type {ComputedProperty<LambdaFunctionExecutionOptions>}
    */
-  mountSpaceOptions: attr('object'),
+  executionOptions: attr('object'),
 
   /**
    * @type {ComputedProperty<Array<LambdaFunctionArgument>>}

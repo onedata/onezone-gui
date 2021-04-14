@@ -1,0 +1,14 @@
+<span class="name">{{lambdaFunction.name}}</span>
+{{#if lambdaFunction.summary}}
+  <span class="summary">{{lambdaFunction.summary}}</span>
+{{/if}}
+<span class="details-toggle" {{action "toggleDetails"}}></span>
+{{#one-collapse class="details-collapse" collapsed=(not isExpanded)}}
+  {{#render-later triggerRender=isExpanded}}
+    {{content-workflows-functions/lambda-function-form
+      mode="view"
+      lambdaFunction=lambdaFunction
+    }}
+  {{/render-later}}
+{{/one-collapse}}
+{{yield}}
