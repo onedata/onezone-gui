@@ -132,7 +132,7 @@ export default Component.extend(I18n, {
    */
   isTokenConsumable: and(not('noJoinMessage'), 'isTokenValid'),
 
-  tokenWithHarvester: array.includes(
+  spaceHarvesterRelationToken: array.includes(
     ['spaceJoinHarvester', 'harvesterJoinSpace'],
     'type.inviteToken.inviteType'
   ),
@@ -277,18 +277,18 @@ export default Component.extend(I18n, {
     'latestJoiningRecordSelectorModelName',
     'type',
     'inviteTargetName',
-    'tokenWithHarvester',
+    'spaceHarvesterRelationToken',
     function joiningRecordSelectorDescription() {
       const {
         latestJoiningRecordSelectorModelName,
         inviteTargetName,
-        tokenWithHarvester,
+        spaceHarvesterRelationToken,
       } = this.getProperties(
         'latestJoiningRecordSelectorModelName',
         'inviteTargetName',
-        'tokenWithHarvester',
+        'spaceHarvesterRelationToken',
       );
-      const actionOnSubject = tokenWithHarvester ?
+      const actionOnSubject = spaceHarvesterRelationToken ?
         this.t('beAddedLabel') :
         this.t('joinLabel');
       const inviteTypeSpec = this.get('inviteTypeSpec');
