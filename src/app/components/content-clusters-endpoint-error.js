@@ -36,6 +36,11 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
   checkErrorType: 'clusterEndpoint',
 
   /**
+   * @override
+   */
+  resourceId: reads('clusterEntityId'),
+
+  /**
    * @type {Location}
    */
   _location: location,
@@ -48,7 +53,7 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
   /**
    * @type {number}
    */
-  requestSlowInterval: 5000,
+  requestSlowInterval: 10000,
 
   /**
    * @type {number}
@@ -56,9 +61,9 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
   requestFastInterval: 500,
 
   /**
-   * @override
+   * @type {Looper}
    */
-  resourceId: reads('clusterEntityId'),
+  connectionChecker: undefined,
 
   emergencyOnepanelUrl: computed('cluster.standaloneOriginProxy.content',
     function emergencyOnepanelUrl() {
@@ -96,12 +101,12 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
 
   init() {
     this._super(...arguments);
-    const timeUpdater = new Looper({
+    const connectionChecker = new Looper({
       immediate: false,
       interval: this.get('requestSlowInterval'),
     });
-    timeUpdater.on('tick', () => this.checkConnectionToProvider());
-    this.set('timeUpdater', timeUpdater);
+    connectionChecker.on('tick', () => this.checkConnectionToProvider());
+    this.set('connectionChecker', connectionChecker);
   },
 
   didInsertElement() {
@@ -129,15 +134,15 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
 
   destroy() {
     try {
-      this.destroyTimeUpdater();
+      this.destroyConnectionChecker();
     } finally {
       this._super(...arguments);
     }
   },
 
-  setFastPolling(setFastInterval) {
-    if (setFastInterval) {
-      this.set('timeUpdater.interval', this.get('requestFastInterval'));
+  setFastPolling(enabled) {
+    if (enabled) {
+      this.set('connectionChecker.interval', this.get('requestFastInterval'));
       this.set('requestCounter', 0);
     }
   },
@@ -145,24 +150,24 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
   checkConnectionToProvider() {
     resolve($.get(this.get('onepanelConfigurationUrl')))
       .then(() => {
-        this.destroyTimeUpdater();
+        this.destroyConnectionChecker();
         this.get('_location').reload();
       })
-      .catch(() => []);
-    if (this.get('timeUpdater.interval') === this.get('requestFastInterval')) {
+      .catch(() => {});
+    if (this.get('connectionChecker.interval') === this.get('requestFastInterval')) {
       const requestCounter = this.get('requestCounter');
       if (requestCounter < 10) {
-        this.set('requestCounter', requestCounter + 1);
+        this.incrementProperty('requestCounter');
       } else {
-        this.set('timeUpdater.interval', this.get('requestSlowInterval'));
+        this.set('connectionChecker.interval', this.get('requestSlowInterval'));
       }
     }
   },
 
-  destroyTimeUpdater() {
-    const timeUpdater = this.get('timeUpdater');
-    if (timeUpdater) {
-      timeUpdater.destroy();
+  destroyConnectionChecker() {
+    const connectionChecker = this.get('connectionChecker');
+    if (connectionChecker) {
+      connectionChecker.destroy();
     }
   },
 

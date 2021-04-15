@@ -23,7 +23,11 @@
         </li>
         <li>
           {{tt this "liMakeSure1"}}
-          <a href={{emergencyOnepanelUrl}} target="_blank" onmousedown={{action "setFastPolling"}}>{{tt this "liMakeSureLink"}}</a>.
+          <a 
+            href={{emergencyOnepanelUrl}} 
+            target="_blank" 
+            onmousedown={{action "setFastPolling"}}
+          >{{tt this "liMakeSureLink"}}</a>.
         </li>
         {{#if (eq cluster.type "oneprovider")}}
           <li>
