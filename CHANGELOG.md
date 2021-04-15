@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7491 Fixed column labels overflow in harvesting progress table
 * VFS-7228 Better UX of token consumer page
 * VFS-7516 Added new file details to harvester indices: "file type" and "dataset info"
 * VFS-7401 Updated commons
