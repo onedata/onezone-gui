@@ -13,7 +13,7 @@ import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { get, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { conditional, array, raw, equal, and, notEqual, isEmpty, not } from 'ember-awesome-macros';
+import { conditional, array, raw, equal, and, notEqual, isEmpty, not, getBy } from 'ember-awesome-macros';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
@@ -21,6 +21,15 @@ import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import trimToken from 'onedata-gui-common/utils/trim-token';
 import computedPipe from 'onedata-gui-common/utils/ember/computed-pipe';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+
+const recordImages = {
+  user: 'assets/images/consume-token/user.svg',
+  group: 'assets/images/consume-token/group.svg',
+  space: 'assets/images/consume-token/space.svg',
+  harvester: 'assets/images/consume-token/harvester.svg',
+  cluster: 'assets/images/consume-token/cluster.svg',
+};
 
 export default Component.extend(I18n, {
   classNames: ['token-consumer'],
@@ -29,7 +38,9 @@ export default Component.extend(I18n, {
   tokenManager: service(),
   tokenActions: service(),
   recordManager: service(),
+  errorExtractor: service(),
   i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -37,9 +48,32 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.tokenConsumer',
 
   /**
+   * @virtual
+   * @type {Function}
+   * @param {Boolean} isTokenAccepted
+   * @returns {undefined}
+   */
+  onTokenAccept: notImplementedIgnore,
+
+  /**
    * @type {String}
    */
   token: '',
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenInputDisabled: false,
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenAccepted: false,
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenChecked: false,
 
   /**
    * @type {number}
@@ -63,6 +97,18 @@ export default Component.extend(I18n, {
   error: undefined,
 
   /**
+   * @type {Array<String>}
+   */
+  knownCaveatErrors: Object.freeze([
+    'time',
+    'ip',
+    'asn',
+    'geo.region',
+    'geo.country',
+    'consumer',
+  ]),
+
+  /**
    * Set by joiningRecordSelectorModelNameObserver
    * @type {String}
    */
@@ -83,6 +129,21 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   trimmedToken: computedPipe('token', trimToken),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isTokenValid: not('error'),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isTokenConsumable: and(not('noJoinMessage'), 'isTokenValid'),
+
+  spaceHarvesterRelationToken: array.includes(
+    ['spaceJoinHarvester', 'harvesterJoinSpace'],
+    'type.inviteToken.inviteType'
+  ),
 
   /**
    * @type {ComputedProperty<String>}
@@ -125,6 +186,23 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
+  invitedModelImagePath: getBy(raw(recordImages), 'joiningModelName'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteTargetModelImagePath: getBy(raw(recordImages), 'inviteTargetModelName'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  currentUser: computed(function currentUser() {
+    return this.get('recordManager').getCurrentUserRecord();
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
   inviteTargetModelName: reads('inviteTypeSpec.modelName'),
 
   /**
@@ -144,6 +222,7 @@ export default Component.extend(I18n, {
     'inviteTargetName',
     'typeName',
     'targetName',
+    'media.isMobile',
     function typeText() {
       const {
         type,
@@ -151,17 +230,20 @@ export default Component.extend(I18n, {
         inviteTargetName,
         inviteTypeSpec,
       } = this.getProperties('type', 'typeName', 'inviteTargetName', 'inviteTypeSpec');
-
       if (!type) {
         return null;
       }
-
       if (typeName === 'invite') {
         const inviteType = get(type, 'inviteToken.inviteType');
         if (inviteTypeSpec) {
           const targetName = inviteTargetName || this.t('unknownTargetName');
+          const isMobile = this.get('media.isMobile');
           return this.t(
-            `type.${typeName}.${inviteType}`, { targetName }, { defaultValue: null }
+            `type.${typeName}${isMobile ? '.mobile' : ''}.${inviteType}`, {
+              targetName,
+            }, {
+              defaultValue: null,
+            }
           );
         } else {
           return null;
@@ -203,21 +285,27 @@ export default Component.extend(I18n, {
     'latestJoiningRecordSelectorModelName',
     'type',
     'inviteTargetName',
+    'spaceHarvesterRelationToken',
     function joiningRecordSelectorDescription() {
       const {
         latestJoiningRecordSelectorModelName,
         inviteTargetName,
+        spaceHarvesterRelationToken,
       } = this.getProperties(
         'latestJoiningRecordSelectorModelName',
-        'inviteTargetName'
+        'inviteTargetName',
+        'spaceHarvesterRelationToken',
       );
-
+      const actionOnSubject = spaceHarvesterRelationToken ?
+        this.t('beAddedLabel') :
+        this.t('joinLabel');
       const inviteTypeSpec = this.get('inviteTypeSpec');
       if (latestJoiningRecordSelectorModelName && inviteTypeSpec) {
         return this.t('joiningRecordSelectorDescription', {
           joiningModelName: this.t(
             `joiningModelName.${latestJoiningRecordSelectorModelName}`
           ),
+          actionOnSubject,
           targetModelName: this.t(`targetModelName.${inviteTypeSpec.modelName}`),
           targetRecordName: inviteTargetName || this.t('unknownTargetName'),
         });
@@ -265,10 +353,34 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isJoinBtnDisabled: and(
+  isConfirmBtnDisabled: and(
     'joiningRecordSelectorModelName',
     not('selectedJoiningRecordOption')
   ),
+
+  errorTranslation: computed('error', function errorTranslation() {
+    const error = this.get('error');
+    if (!error) {
+      return;
+    }
+    if (error.id === 'tokenRevoked') {
+      return this.t('tokenRevokedInfo');
+    } else {
+      return this.get('errorExtractor').getMessage(error).message;
+    }
+  }),
+
+  knownVerificationErrorOccurred: computed(
+    'error',
+    function knownVerificationErrorOccurred() {
+      const {
+        error,
+        knownCaveatErrors,
+      } = this.getProperties('error', 'knownCaveatErrors');
+      return (error.id === 'tokenCaveatUnverified' &&
+          knownCaveatErrors.includes(error.details.caveat.type)) ||
+        error.id === 'tokenRevoked';
+    }),
 
   joiningRecordSelectorModelNameObserver: observer(
     'joiningRecordSelectorModelName',
@@ -301,11 +413,12 @@ export default Component.extend(I18n, {
       lastInputTime,
     } = this.getProperties('token', 'trimmedToken', 'tokenManager', 'lastInputTime');
 
+    this.resetState();
+    this.set('pendingCheckTime', 0);
     if (token.trim().length === 0) {
-      this.resetState();
+      return;
     } else if (!trimmedToken) {
       // has only incorrect characters
-      this.resetState();
       this.set('error', { id: 'badValueToken' });
     } else {
       this.set('pendingCheckTime', lastInputTime);
@@ -314,18 +427,36 @@ export default Component.extend(I18n, {
           safeExec(this, 'processExaminationResult', result, lastInputTime)
         )
         .catch(error =>
-          safeExec(this, 'processExaminationError', error, lastInputTime)
+          safeExec(this, 'processTokenCheckError', error, lastInputTime)
         )
+        .then(() => safeExec(this, () => {
+          if (this.get('isTokenConsumable')) {
+            return tokenManager.verifyInviteToken(trimmedToken)
+              .then(() =>
+                safeExec(this, 'processVerificationSuccess', lastInputTime)
+              )
+              .catch(error =>
+                safeExec(this, 'processTokenCheckError', error, lastInputTime)
+              );
+          }
+        }))
         .finally(() => safeExec(this, () => {
           if (this.get('pendingCheckTime') === lastInputTime) {
-            this.set('pendingCheckTime', 0);
+            this.setProperties({
+              pendingCheckTime: 0,
+              isTokenChecked: true,
+            });
           }
         }));
     }
   },
 
+  isInputTimeForCurrentCheck(inputTime) {
+    return inputTime === this.get('lastInputTime');
+  },
+
   processExaminationResult(result, inputTime) {
-    if (inputTime < this.get('lastInputTime')) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
       // Another token has been provided, this result should be ignored.
       return;
     }
@@ -334,13 +465,22 @@ export default Component.extend(I18n, {
     this.set('type', get(result || {}, 'type'));
   },
 
-  processExaminationError(error, inputTime) {
-    if (inputTime < this.get('lastInputTime')) {
+  processVerificationSuccess(inputTime) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
       // Another token has been provided, this result should be ignored.
       return;
     }
 
-    this.resetState();
+    this.get('onTokenAccept')(this.get('isTokenConsumable'));
+    this.set('isTokenInputDisabled', true);
+  },
+
+  processTokenCheckError(error, inputTime) {
+    if (!this.isInputTimeForCurrentCheck(inputTime)) {
+      // Another token has been provided, this result should be ignored.
+      return;
+    }
+
     this.set('error', error);
   },
 
@@ -360,7 +500,6 @@ export default Component.extend(I18n, {
     this.setProperties({
       type: null,
       error: null,
-      pendingCheckTime: 0,
     });
   },
 
@@ -369,10 +508,11 @@ export default Component.extend(I18n, {
       this.setProperties({
         token,
         lastInputTime: new Date().valueOf(),
+        isTokenChecked: false,
       });
       debounce(this, 'examineToken', config.environment === 'test' ? 1 : 500);
     },
-    join() {
+    confirm() {
       const {
         recordManager,
         tokenActions,
@@ -397,6 +537,16 @@ export default Component.extend(I18n, {
         targetModelName: inviteTargetModelName,
         token,
       }).execute();
+    },
+
+    cancel() {
+      this.resetState();
+      this.setProperties({
+        token: '',
+        isTokenInputDisabled: false,
+        isTokenChecked: false,
+      });
+      this.get('onTokenAccept')(false);
     },
   },
 });
