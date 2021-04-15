@@ -2,7 +2,7 @@ export default {
   menuItem: 'Data',
   aspects: {
     index: 'Space overview',
-    data: 'Data',
+    data: 'Files',
     shares: 'Shares',
     transfers: 'Transfers',
     providers: 'Space providers',

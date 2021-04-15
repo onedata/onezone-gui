@@ -9,7 +9,7 @@ export default {
   secondLevelItems: {
     aspects: {
       index: 'Overview',
-      data: 'Data',
+      data: 'Files',
       transfers: 'Transfers',
       shares: 'Shares',
       providers: 'Providers',
