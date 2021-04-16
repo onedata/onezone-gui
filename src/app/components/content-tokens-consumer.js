@@ -20,4 +20,15 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.contentTokensConsumer',
+
+  /**
+   * @type {Boolean}
+   */
+  isTokenAccepted: false,
+
+  actions: {
+    onTokenAccept(isAccepted) {
+      this.set('isTokenAccepted', isAccepted);
+    },
+  },
 });

@@ -36,8 +36,14 @@ export default {
         fileName: {
           label: 'File name',
         },
+        fileType: {
+          label: 'File type',
+        },
         spaceId: {
           label: 'Space ID',
+        },
+        datasetInfo: {
+          label: 'Dataset info',
         },
         metadataExistenceFlags: {
           label: 'Metadata existence flags',
