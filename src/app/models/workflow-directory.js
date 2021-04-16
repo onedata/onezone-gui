@@ -29,6 +29,8 @@ export default Model.extend(GraphSingleModelMixin, {
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('userList'),
 
+  lambdaFunctionList: belongsTo('lambdaFunctionList'),
+
   /**
    * @type {ComputedProperty<Object>}
    */
