@@ -19,6 +19,7 @@ export default Component.extend(I18n, GlobalActions, {
   i18nPrefix: 'components.contentWorkflowsFunctions.listView',
 
   /**
+   * @virtual
    * @type {Models.WorkflowDirectory}
    */
   workflowDirectory: undefined,

@@ -3,6 +3,7 @@ import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
 import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
+import CreateLambdaFunctionAction from 'onezone-gui/utils/workflow-actions/create-lambda-function-action';
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow actions', function () {
@@ -40,6 +41,21 @@ describe('Unit | Service | workflow actions', function () {
     });
 
     expect(action).to.be.instanceOf(RemoveWorkflowDirectoryAction);
+    expect(get(action, 'workflowDirectory')).to.equal(workflowDirectory);
+  });
+
+  it('creates CreateLambdaFunctionAction instance', function () {
+    const service = this.subject();
+
+    const workflowDirectory = {};
+    const rawLambdaFunction = {};
+    const action = service.createCreateLambdaFunctionAction({
+      rawLambdaFunction,
+      workflowDirectory,
+    });
+
+    expect(action).to.be.instanceOf(CreateLambdaFunctionAction);
+    expect(get(action, 'rawLambdaFunction')).to.equal(rawLambdaFunction);
     expect(get(action, 'workflowDirectory')).to.equal(workflowDirectory);
   });
 });

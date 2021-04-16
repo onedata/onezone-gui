@@ -95,7 +95,7 @@ describe(
       await toggleFunctionDetails(1);
 
       const $detailsForms = this.$('.lambda-functions-list-entry .lambda-function-form');
-      expect($detailsForms).to.have.length(2);
+      expect($detailsForms).to.have.length(2).and.to.have.class('mode-view');
       expect($detailsForms.eq(0).text()).to.contain('f0Function');
       expect($detailsForms.eq(1).text()).to.contain('f1Image');
     });

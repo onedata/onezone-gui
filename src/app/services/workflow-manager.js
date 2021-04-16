@@ -124,4 +124,14 @@ export default Service.extend({
       ).catch(ignoreForbiddenError),
     ]));
   },
+
+  /**
+   * @param {String} workflowDirectoryId
+   * @param {Object} functionPrototype
+   * @returns {Promise<Models.LambdaFunction>}
+   */
+  createLambdaFunction(workflowDirectoryId, functionPrototype) {
+    // FIXME: VFS-7538 implement lambda function creation
+    return resolve(functionPrototype);
+  },
 });

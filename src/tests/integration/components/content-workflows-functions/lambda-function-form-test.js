@@ -76,6 +76,12 @@ describe(
     });
 
     context('in "create" mode', function () {
+      it('has class "mode-create', async function () {
+        await renderCreate(this);
+
+        expect(this.$('.lambda-function-form')).to.have.class('mode-create');
+      });
+
       it('renders empty "name" field', async function () {
         await renderCreate(this);
 
@@ -565,6 +571,12 @@ describe(
     });
 
     context('in "view" mode', function () {
+      it('has class "mode-view', async function () {
+        await renderView(this);
+
+        expect(this.$('.lambda-function-form')).to.have.class('mode-view');
+      });
+
       it('does not show submit button', async function () {
         await renderView(this);
 

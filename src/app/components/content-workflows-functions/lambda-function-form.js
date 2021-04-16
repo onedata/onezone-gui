@@ -30,6 +30,7 @@ import {
 
 export default Component.extend(I18n, {
   classNames: ['lambda-function-form'],
+  classNameBindings: ['modeClass'],
 
   i18n: service(),
 
@@ -60,6 +61,11 @@ export default Component.extend(I18n, {
    * @returns {Promise}
    */
   onSubmit: notImplementedReject,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  modeClass: tag `mode-${'mode'}`,
 
   /**
    * @type {ComputedProperty<Object>}

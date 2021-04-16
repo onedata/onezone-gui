@@ -114,6 +114,7 @@ import consumeInviteTokenAction from './utils/token-actions/consume-invite-token
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
 import modifyWorkflowDirectoryAction from './utils/workflow-actions/modify-workflow-directory-action';
 import removeWorkflowDirectoryAction from './utils/workflow-actions/remove-workflow-directory-action';
+import createLambdaFunctionAction from './utils/workflow-actions/create-lambda-function-action';
 
 const translations = {
   tabs: {
@@ -246,6 +247,7 @@ const translations = {
     workflowActions: {
       modifyWorkflowDirectoryAction,
       removeWorkflowDirectoryAction,
+      createLambdaFunctionAction,
     },
   },
 };

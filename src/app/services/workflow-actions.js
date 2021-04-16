@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
 import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
+import CreateLambdaFunctionAction from 'onezone-gui/utils/workflow-actions/create-lambda-function-action';
 import { reject } from 'rsvp';
 import { classify } from '@ember/string';
 
@@ -51,6 +52,20 @@ export default Service.extend(I18n, {
    */
   createRemoveWorkflowDirectoryAction(context) {
     return RemoveWorkflowDirectoryAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     rawLambdaFunction: Object,
+   *     workflowDirectory: Models.WorkflowDirectory,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.CreateLambdaFunctionAction}
+   */
+  createCreateLambdaFunctionAction(context) {
+    return CreateLambdaFunctionAction.create({ ownerSource: this, context });
   },
 
   /**
