@@ -12,7 +12,7 @@ import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
-import { get, set, setProperties } from '@ember/object';
+import { get, getProperties, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -282,6 +282,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'workflowDirectory', groups
               ),
+              attachLambdaFunctionsToWorkflowDirectory(store, record),
             ])
           ))
         )
@@ -876,4 +877,39 @@ function attachProgressToHarvesterIndices(
         }));
       });
   }));
+}
+
+function attachLambdaFunctionsToWorkflowDirectory(store, workflowDirectory) {
+  const {
+    entityType,
+    entityId,
+  } = getProperties(workflowDirectory, 'entityType', 'entityId');
+  return allFulfilled(_.range(5).map((index) => {
+    return store.createRecord('lambdaFunction', {
+      id: gri({
+        entityType,
+        entityId,
+        aspect: 'function',
+        aspectId: `function${index}`,
+        scope: 'private',
+      }),
+      name: `Function ${index}`,
+      summary: `Some very complicated function #${index}`,
+      engine: 'openfaas',
+      operationRef: `some-super-docker-image:${index}`,
+      executionOptions: {
+        readonly: true,
+        mountSpaceOptions: {
+          mountOneclient: true,
+          mountPoint: '/mnt/oneclient',
+          oneclientOptions: '-k',
+        },
+      },
+    }).save();
+  })).then(lambdaFunctions =>
+    createListRecord(store, 'lambdaFunction', lambdaFunctions)
+  ).then(listRecord => {
+    set(workflowDirectory, 'lambdaFunctionList', listRecord);
+    return workflowDirectory.save();
+  });
 }

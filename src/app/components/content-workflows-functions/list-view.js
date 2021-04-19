@@ -31,7 +31,7 @@ export default Component.extend(I18n, GlobalActions, {
   onAddFunction: notImplementedIgnore,
 
   /**
-   * @type {ComputedProperty<Models.LambdaFunction>}
+   * @type {ComputedProperty<PromiseArray<Models.LambdaFunction>>}
    */
   lambdaFunctionsProxy: promise.array(
     computed('workflowDirectory', function lambdaFunctions() {
@@ -49,7 +49,7 @@ export default Component.extend(I18n, GlobalActions, {
       action: () => this.get('onAddFunction')(),
       title: this.t('addFunctionButton'),
       class: 'open-add-function-trigger',
-      icon: 'plus',
+      icon: 'add-filled',
     };
   }),
 

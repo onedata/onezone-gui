@@ -77,6 +77,7 @@ describe(
       await toggleFunctionDetails(0);
 
       expect(this.$('.details-collapse').eq(0)).to.have.class('in');
+      expect(this.$('.details-toggle').eq(0).text().trim()).to.equal('Hide details');
     });
 
     it('allows to collapse function details', async function () {
@@ -86,6 +87,7 @@ describe(
       await toggleFunctionDetails(0);
 
       expect(this.$('.details-collapse').eq(0)).to.not.have.class('in');
+      expect(this.$('.details-toggle').eq(0).text().trim()).to.equal('Show details...');
     });
 
     it('shows function details when function is expanded', async function () {
@@ -103,13 +105,13 @@ describe(
     it('has empty search input on init', async function () {
       await render(this);
 
-      expect(this.$('.search-input')).to.have.value('');
+      expect(this.$('.search-bar')).to.have.value('');
     });
 
     it('filters functions by name when search input is not empty', async function () {
       await render(this);
 
-      await fillIn('.search-input', 'f1');
+      await fillIn('.search-bar', 'f1');
 
       const $functions = this.$('.lambda-functions-list-entry');
       expect($functions).to.have.length(1);

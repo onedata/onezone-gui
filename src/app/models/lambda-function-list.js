@@ -12,5 +12,5 @@ import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-c
 import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-list-model';
 
 export default Model.extend(GraphListModelMixin, listConflictModel, {
-  list: hasMany('lambda-function'),
+  list: hasMany('lambdaFunction'),
 }).reopenClass(StaticGraphModelMixin);
