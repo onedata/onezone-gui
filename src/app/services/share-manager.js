@@ -68,10 +68,10 @@ export const VirtualShareList = EmberObject.extend({
         .then(lists => _.flatten(lists.invoke('toArray')));
     })),
 
-  listWithConflictLabels: observer('list.content.@each.{name,conflictLabel}',
-    function listWithConflictLabels() {
+  globalListConflictLabelsObserver: observer('list.content.@each.{name,conflictLabel}',
+    function globalListConflictLabelsObserver() {
       this.get('list')
-        .then(lists => addConflictLabels(lists, 'data.name', 'entityId'));
+        .then(list => addConflictLabels(list, 'name', 'entityId'));
     }
   ),
 
