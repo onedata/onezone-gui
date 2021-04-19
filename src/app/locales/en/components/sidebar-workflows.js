@@ -1,5 +1,6 @@
 export default {
   aspects: {
+    functions: 'Functions',
     members: 'Members',
   },
   workflowDirectoryItem: {
