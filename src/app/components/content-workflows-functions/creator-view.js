@@ -57,9 +57,12 @@ export default Component.extend(I18n, {
       const {
         status,
         result: record,
-      } = getProperties(result, 'status', 'result');
+        error,
+      } = getProperties(result, 'status', 'result', 'error');
       if (status === 'done') {
         onFunctionAdded(record);
+      } else {
+        throw error;
       }
     },
   },

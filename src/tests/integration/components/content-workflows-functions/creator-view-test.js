@@ -58,7 +58,7 @@ describe(
       expect(backSlideSpy).to.be.calledOnce;
     });
 
-    it('calls "onFunctionAdded" when lambda function has been created',
+    it('calls "onFunctionAdded" and resets form when lambda function has been created',
       async function () {
         const {
           workflowDirectory,
@@ -91,9 +91,10 @@ describe(
           });
         expect(functionAddedSpy).to.be.calledOnce
           .and.to.be.calledWith(sinon.match.same(createdRecord));
+        expect(this.$('.name-field .form-control')).to.have.value('');
       });
 
-    it('does not call "onFunctionAdded" when lambda function creation failed',
+    it('does not call "onFunctionAdded" and does not reset form when lambda function creation failed',
       async function () {
         this.get('createCreateLambdaFunctionActionStub').returns({
           execute: () => resolve({ status: 'failed' }),
@@ -105,6 +106,7 @@ describe(
         await click('.btn-submit');
 
         expect(this.get('functionAddedSpy')).to.be.not.called;
+        expect(this.$('.name-field .form-control')).to.not.have.value('');
       });
   }
 );

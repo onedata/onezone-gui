@@ -436,6 +436,30 @@ describe(
           .and.to.be.calledWith(lambdaFunction);
       });
 
+      it('resets form on successfull submission', async function () {
+        await renderCreate(this);
+
+        await fillWithMinimumData(this);
+        await click('.btn-submit');
+
+        expect(this.$('.name-field .form-control')).to.have.value('');
+      });
+
+      it('does not reset form on failed submission', async function () {
+        await renderCreate(this);
+        let rejectSubmit;
+        this.get('submitStub').returns(
+          new Promise((resolve, reject) => rejectSubmit = reject)
+        );
+
+        await fillWithMinimumData(this);
+        await click('.btn-submit');
+        rejectSubmit();
+        await wait();
+
+        expect(this.$('.name-field .form-control')).to.not.have.value('');
+      });
+
       it('creates complex lambda function on submit button click', async function () {
         await renderCreate(this);
 

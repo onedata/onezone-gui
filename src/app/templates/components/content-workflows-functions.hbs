@@ -1,0 +1,16 @@
+{{#one-carousel activeSlideId=activeSlide as |carousel|}}
+  {{#carousel.slide slideId="list"}}
+    {{content-workflows-functions/list-view
+      workflowDirectory=workflowDirectory
+      onAddFunction=(action "showCreatorView")
+    }}
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="creator"}}
+    {{content-workflows-functions/creator-view
+      workflowDirectory=workflowDirectory
+      onBackSlide=(action "showListView")
+      onFunctionAdded=(action "showListView")
+    }}
+  {{/carousel.slide}}
+{{/one-carousel}}
+{{yield}}

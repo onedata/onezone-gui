@@ -281,7 +281,8 @@ export default Component.extend(I18n, {
       } = this.getProperties('fields', 'onSubmit');
 
       const lambdaFunction = formDataToRecord(fields.dumpValue());
-      return onSubmit(lambdaFunction);
+      return onSubmit(lambdaFunction)
+        .then(() => fields.reset());
     },
   },
 });
