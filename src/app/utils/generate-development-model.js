@@ -905,6 +905,24 @@ function attachLambdaFunctionsToWorkflowDirectory(store, workflowDirectory) {
           oneclientOptions: '-k',
         },
       },
+      arguments: [{
+        name: 'arg1',
+        type: 'string',
+        array: true,
+        optional: true,
+        defaultValue: '"some value"',
+      }, {
+        name: 'arg2',
+        type: 'onedatafsOptions',
+        array: true,
+        optional: true,
+      }],
+      results: [{
+        name: 'res1',
+        type: 'string',
+        array: false,
+        optional: true,
+      }],
     }).save();
   })).then(lambdaFunctions =>
     createListRecord(store, 'lambdaFunction', lambdaFunctions)

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, context } from 'mocha';
+import { describe, it, context, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { fillIn, focus, blur, click } from 'ember-native-dom-helpers';
@@ -8,6 +8,8 @@ import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select'
 import $ from 'jquery';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
+import { registerService } from '../../../helpers/stub-service';
+import Service from '@ember/service';
 
 const argumentTypes = [{
   value: 'string',
@@ -66,6 +68,13 @@ describe(
   function () {
     setupComponentTest('content-workflows-functions/lambda-function-form', {
       integration: true,
+    });
+
+    beforeEach(function () {
+      registerService(this, 'media', Service.extend({
+        isMobile: false,
+        isTablet: false,
+      }));
     });
 
     it('has class "lambda-function-form"', async function () {
@@ -196,29 +205,29 @@ describe(
 
         const $entryNameLabel = $entry.find('.entryName-field .control-label');
         const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameLabel).to.not.exist;
+        expect($entryNameLabel.text().trim()).to.equal('Name:');
         expect($entryNameField).to.have.attr('type', 'text');
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
         const $entryTypeLabel = $entry.find('.entryType-field .control-label');
         const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
-        expect($entryTypeLabel).to.not.exist;
+        expect($entryTypeLabel.text().trim()).to.equal('Type:');
         expect($entryTypeField.text().trim()).to.equal('String');
 
         const $entryArrayLabel = $entry.find('.entryArray-field .control-label');
         const $entryArrayField = $entry.find('.entryArray-field .form-control');
-        expect($entryArrayLabel.text().trim()).to.equal('Array:');
+        expect($entryArrayLabel.text().trim()).to.equal('Array');
         expect($entryArrayField).to.not.have.class('checked');
 
         const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
         const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
-        expect($entryOptionalLabel.text().trim()).to.equal('Optional:');
+        expect($entryOptionalLabel.text().trim()).to.equal('Optional');
         expect($entryOptionalField).to.not.have.class('checked');
 
         const $entryDefaultValueLabel = $entry.find('.entryDefaultValue-field .control-label');
         const $entryDefaultValueField = $entry.find('.entryDefaultValue-field .form-control');
-        expect($entryDefaultValueLabel).to.not.exist;
+        expect($entryDefaultValueLabel.text().trim()).to.equal('Default value:');
         expect($entryDefaultValueField).to.have.attr('type', 'text');
         expect($entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
         expect($entryDefaultValueField).to.have.value('');
@@ -289,24 +298,24 @@ describe(
 
         const $entryNameLabel = $entry.find('.entryName-field .control-label');
         const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameLabel).to.not.exist;
+        expect($entryNameLabel.text().trim()).to.equal('Name:');
         expect($entryNameField).to.have.attr('type', 'text');
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
         const $entryTypeLabel = $entry.find('.entryType-field .control-label');
         const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
-        expect($entryTypeLabel).to.not.exist;
+        expect($entryTypeLabel.text().trim()).to.equal('Type:');
         expect($entryTypeField.text().trim()).to.equal('String');
 
         const $entryArrayLabel = $entry.find('.entryArray-field .control-label');
         const $entryArrayField = $entry.find('.entryArray-field .form-control');
-        expect($entryArrayLabel.text().trim()).to.equal('Array:');
+        expect($entryArrayLabel.text().trim()).to.equal('Array');
         expect($entryArrayField).to.not.have.class('checked');
 
         const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
         const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
-        expect($entryOptionalLabel.text().trim()).to.equal('Optional:');
+        expect($entryOptionalLabel.text().trim()).to.equal('Optional');
         expect($entryOptionalField).to.not.have.class('checked');
       });
 

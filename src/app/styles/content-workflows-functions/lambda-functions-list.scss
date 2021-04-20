@@ -40,8 +40,24 @@
     }
   }
 
+  .content-section {
+    flex-grow: 1;
+    min-width: 0;
+
+    .form {
+      margin: 0;
+      margin-top: $padding-base-vertical;
+      padding: 0;
+    }
+  }
+
   .name {
     @include font-semibold();
     margin-bottom: $padding-small-vertical;
+  }
+
+  .name,
+  .summary {
+    word-break: break-word;
   }
 }

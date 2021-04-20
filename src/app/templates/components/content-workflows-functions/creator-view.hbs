@@ -7,8 +7,10 @@
     <div class="resource-name">{{tt this "header"}}</div>
   </h1>
 </div>
-{{content-workflows-functions/lambda-function-form
-  mode="create"
-  onSubmit=(action "onFormSubmit")
-}}
+<div class="row content-row">
+  {{content-workflows-functions/lambda-function-form
+    mode="create"
+    onSubmit=(action "onFormSubmit")
+  }}
+</div>
 {{yield}}

@@ -31,9 +31,11 @@ export default {
       label: 'Arguments',
       entry: {
         entryName: {
+          label: 'Name',
           placeholder: 'Name',
         },
         entryType: {
+          label: 'Type',
           options: {
             string: {
               label: 'String',
@@ -65,6 +67,7 @@ export default {
           label: 'Optional',
         },
         entryDefaultValue: {
+          label: 'Default value',
           placeholder: 'Default value (optional)',
         },
       },
@@ -73,9 +76,11 @@ export default {
       label: 'Results',
       entry: {
         entryName: {
+          label: 'Name',
           placeholder: 'Name',
         },
         entryType: {
+          label: 'Type',
           options: {
             string: {
               label: 'String',

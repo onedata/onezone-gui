@@ -33,6 +33,7 @@ export default Component.extend(I18n, {
   classNameBindings: ['modeClass'],
 
   i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -354,15 +355,21 @@ function createFunctionArgResGroup(component, dataType) {
                 { value: 'auditLogRecord' },
               ],
             }),
-            ToggleField.create({
+            ToggleField.extend({
+              addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+            }).create({
               mode,
               name: 'entryArray',
               defaultValue: false,
+              component,
             }),
-            ToggleField.create({
+            ToggleField.extend({
+              addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+            }).create({
               mode,
               name: 'entryOptional',
               defaultValue: false,
+              component,
             }),
             ...(isForArguments ? [
               TextField.extend({
