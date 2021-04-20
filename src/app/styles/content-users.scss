@@ -15,6 +15,9 @@
   }
   .login-icon-box:not(.add) {
     cursor: default !important;
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
   }
   .login-icon-box.add:hover {
     background-color: transparentize($color: #026381, $amount: 0.9)

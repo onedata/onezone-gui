@@ -78,11 +78,6 @@ export default Component.extend({
   _window: window,
 
   /**
-   * @type {number}
-   */
-  frameSize: 0,
-
-  /**
    * @type {Ember.ComputedProperty<string>}
    */
   socialIconStyle: computed(
@@ -101,19 +96,15 @@ export default Component.extend({
    */
   aStyle: computed(
     'iconBackgroundColor',
-    'frameSize',
     function aStyle() {
       const iconBackgroundColor = this.get('iconBackgroundColor') ||
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
-      const frameSize = this.get('frameSize');
-      let style = style = `background-color: ${iconBackgroundColor}; color: ${fgColor};`;
-      if (frameSize != 0) {
-        const color = new Color(iconBackgroundColor);
-        const newColor = color.darken(0.15);
-        style += `border: ${frameSize}px solid ${newColor}`;
-      }
+      const color = new Color(iconBackgroundColor);
+      const borderColor = color.darken(0.15);
+      const style =
+        `background-color: ${iconBackgroundColor}; color: ${fgColor}; border-color: ${borderColor};`;
       return htmlSafe(style);
     }
   ),
