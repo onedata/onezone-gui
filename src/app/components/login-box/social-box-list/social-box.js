@@ -18,6 +18,7 @@ import {
   darkFgColor,
   lightFgColor,
 } from 'onezone-gui/utils/auth-box-config';
+import Color from 'npm:color';
 
 export default Component.extend({
   tagName: 'div',
@@ -77,6 +78,11 @@ export default Component.extend({
   _window: window,
 
   /**
+   * @type {number}
+   */
+  frameSize: 0,
+
+  /**
    * @type {Ember.ComputedProperty<string>}
    */
   socialIconStyle: computed(
@@ -95,12 +101,19 @@ export default Component.extend({
    */
   aStyle: computed(
     'iconBackgroundColor',
+    'frameSize',
     function aStyle() {
       const iconBackgroundColor = this.get('iconBackgroundColor') ||
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
-      const style = `background-color: ${iconBackgroundColor}; color: ${fgColor};`;
+      const frameSize = this.get('frameSize');
+      let style = style = `background-color: ${iconBackgroundColor}; color: ${fgColor};`;
+      if (frameSize != 0) {
+        const color = new Color(iconBackgroundColor);
+        const newColor = color.darken(0.15);
+        style += `border: ${frameSize}px solid ${newColor}`;
+      }
       return htmlSafe(style);
     }
   ),
