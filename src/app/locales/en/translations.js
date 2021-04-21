@@ -82,6 +82,7 @@ import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
 import sidebarInventories from './components/sidebar-inventories';
+import contentInventoriesEmpty from './components/content-inventories-empty';
 import contentInventoriesNew from './components/content-inventories-new';
 import contentInventoriesMembers from './components/content-inventories-members';
 
@@ -211,6 +212,7 @@ const translations = {
     contentTokensConsumer,
     tokenTemplateSelector,
     sidebarInventories,
+    contentInventoriesEmpty,
     contentInventoriesNew,
     contentInventoriesMembers,
   },
