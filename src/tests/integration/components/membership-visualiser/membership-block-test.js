@@ -9,6 +9,9 @@ const icons = {
   group: 'team',
   space: 'space',
   provider: 'provider',
+  cluster: 'cluster',
+  harvester: 'light-bulb',
+  atmInventory: 'view-grid',
 };
 
 describe(
@@ -21,7 +24,9 @@ describe(
     it('renders record name', function () {
       const testName = 'testName';
       this.set('record', EmberObject.create({
-        entityType: 'group',
+        constructor: {
+          modelName: 'group',
+        },
         name: testName,
       }));
       this.render(hbs `{{membership-visualiser/membership-block record=record}}`);

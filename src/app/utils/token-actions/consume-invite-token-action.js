@@ -21,6 +21,7 @@ export default Action.extend({
   tokenManager: service(),
   router: service(),
   guiUtils: service(),
+  sidebarResources: service(),
 
   /**
    * @override
@@ -110,12 +111,14 @@ export default Action.extend({
       dontRedirect,
       router,
       guiUtils,
+      sidebarResources,
     } = this.getProperties(
       'joiningRecord',
       'targetModelName',
       'dontRedirect',
       'router',
-      'guiUtils'
+      'guiUtils',
+      'sidebarResources'
     );
     const joiningModelName = get(joiningRecord, 'constructor.modelName');
 
@@ -124,15 +127,17 @@ export default Action.extend({
     }
     const promiseResult = get(result, 'result');
 
-    let transitionModelName = targetModelName + 's';
+    let transitionResourceType =
+      sidebarResources.getRouteResourceTypeForModelName(targetModelName);
     let transitionRecordId = promiseResult && guiUtils.getRoutableIdFor(promiseResult);
     let transitionAspect = 'index';
     if (
       (targetModelName === 'harvester' && joiningModelName === 'space') ||
       (targetModelName === 'space' && joiningModelName === 'harvester')
     ) {
-      transitionAspect = transitionModelName;
-      transitionModelName = joiningModelName + 's';
+      transitionAspect = transitionResourceType;
+      transitionResourceType =
+        sidebarResources.getRouteResourceTypeForModelName(joiningModelName);
       transitionRecordId = guiUtils.getRoutableIdFor(joiningRecord);
     }
 
@@ -140,7 +145,7 @@ export default Action.extend({
       next(() => {
         router.transitionTo(
           'onedata.sidebar.content.aspect',
-          transitionModelName,
+          transitionResourceType,
           transitionRecordId,
           transitionAspect
         );

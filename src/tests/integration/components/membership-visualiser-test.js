@@ -51,8 +51,11 @@ function generateNGroups(context, n) {
   const groups = _.times(n, index => {
     const group = EmberObject.create({
       gri: groupGri(index),
-      entityType: 'group',
       name: `groups${index}`,
+      entityType: 'group',
+      constructor: {
+        modelName: 'group',
+      },
     });
     groupsMap[get(group, 'gri')] = group;
     return group;
@@ -86,6 +89,9 @@ describe('Integration | Component | membership visualiser', function () {
       entityType: 'user',
       entityId: userEntityId,
       name: 'user1',
+      constructor: {
+        modelName: 'user',
+      },
     });
     generateNGroups(this, 3);
     this.set('user', user);

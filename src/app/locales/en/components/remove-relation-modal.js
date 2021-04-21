@@ -38,5 +38,5 @@ export default _.merge({}, proceedProcessModal, {
   headerSubgroups: 'subgroups',
   headerMembers: 'members',
   headerCluster: 'cluster',
-  headerAtmInventory: 'automation inventory',
+  headerAtmInventory: 'atm. inventory',
 });

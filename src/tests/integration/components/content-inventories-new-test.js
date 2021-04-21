@@ -38,7 +38,11 @@ describe('Integration | Component | content inventories new', function () {
     await click('.btn-primary');
 
     expect(createCreateAtmInventoryActionStub).to.be.calledOnce
-      .and.to.be.calledWith({ name: 'someName' });
+      .and.to.be.calledWith({
+        rawAtmInventory: {
+          name: 'someName',
+        },
+      });
     expect(executeStub).to.be.calledOnce;
   });
 });

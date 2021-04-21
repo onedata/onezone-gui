@@ -15,6 +15,7 @@ import { all as allFulfilled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
+  store: service(),
   recordManager: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
@@ -37,8 +38,8 @@ export default Service.extend({
           authHint: ['asUser', currentUserId],
         },
       })
-    ).save().then(harvester =>
-      recordManager.getUserRecordList('atmInventory').then(() => harvester)
+    ).save().then(atmInventory =>
+      recordManager.reloadUserRecordList('atmInventory').then(() => atmInventory)
     );
   },
 

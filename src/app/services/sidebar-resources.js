@@ -31,6 +31,13 @@ export default SidebarResources.extend({
   workflowActions: service(),
 
   /**
+   * @override
+   */
+  modelNameToRouteResourceTypeMapping: Object.freeze(new Map([
+    ['atmInventory', 'inventories'],
+  ])),
+
+  /**
    * @param {string} type
    * @returns {GraphListModel}
    */

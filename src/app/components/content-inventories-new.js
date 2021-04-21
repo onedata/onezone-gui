@@ -39,7 +39,9 @@ export default Component.extend(I18n, {
       } = this.getProperties('atmInventoryName', 'workflowActions');
 
       return workflowActions.createCreateAtmInventoryAction({
-        name: atmInventoryName,
+        rawAtmInventory: {
+          name: atmInventoryName,
+        },
       }).execute();
     },
   },
