@@ -20,6 +20,29 @@ export default Service.extend({
   onedataGraphUtils: service(),
 
   /**
+   * Creates new automation inventory.
+   * @param {Object} rawAtmInventory
+   * @returns {Promise<Models.AtmInventory>}
+   */
+  createAtmInventory(rawAtmInventory) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+    const currentUserId = get(recordManager.getCurrentUserRecord(), 'entityId');
+    return store.createRecord(
+      'atmInventory',
+      Object.assign({}, rawAtmInventory, {
+        _meta: {
+          authHint: ['asUser', currentUserId],
+        },
+      })
+    ).save().then(harvester =>
+      recordManager.getUserRecordList('atmInventory').then(() => harvester)
+    );
+  },
+
+  /**
    * Joins current user to a automation inventory without token
    * @param {String} atmInventoryId
    * @returns {Promise}

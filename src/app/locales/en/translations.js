@@ -82,6 +82,7 @@ import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
 import sidebarInventories from './components/sidebar-inventories';
+import contentInventoriesNew from './components/content-inventories-new';
 import contentInventoriesMembers from './components/content-inventories-members';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
@@ -111,6 +112,8 @@ import generateInviteTokenAction from './utils/token-actions/generate-invite-tok
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
+import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-create-atm-inventory-view-action';
+import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 
@@ -208,6 +211,7 @@ const translations = {
     contentTokensConsumer,
     tokenTemplateSelector,
     sidebarInventories,
+    contentInventoriesNew,
     contentInventoriesMembers,
   },
   services: {
@@ -242,6 +246,8 @@ const translations = {
       toggleBeingOwnerAction,
     },
     workflowActions: {
+      openCreateAtmInventoryViewAction,
+      createAtmInventoryAction,
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
     },

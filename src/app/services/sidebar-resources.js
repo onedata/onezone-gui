@@ -28,6 +28,7 @@ export default SidebarResources.extend({
   harvesterActions: service(),
   uploadManager: service(),
   recordManager: service(),
+  workflowActions: service(),
 
   /**
    * @param {string} type
@@ -79,6 +80,8 @@ export default SidebarResources.extend({
         return this.get('groupActions.buttons');
       case 'harvesters':
         return this.get('harvesterActions.buttons');
+      case 'inventories':
+        return this.get('workflowActions').createGlobalActions(context);
       default:
         return [];
     }

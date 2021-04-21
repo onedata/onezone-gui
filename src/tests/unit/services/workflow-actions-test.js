@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupTest } from 'ember-mocha';
+import OpenCreateAtmInventoryViewAction from 'onezone-gui/utils/workflow-actions/open-create-atm-inventory-view-action';
+import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-atm-inventory-action';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import { get } from '@ember/object';
@@ -13,6 +15,26 @@ describe('Unit | Service | workflow actions', function () {
       'service:globalNotify',
       'service:i18n',
     ],
+  });
+
+  it('creates OpenCreateAtmInventoryViewAction instance', function () {
+    const service = this.subject();
+
+    const action = service.createOpenCreateAtmInventoryViewAction();
+
+    expect(action).to.be.instanceOf(OpenCreateAtmInventoryViewAction);
+  });
+
+  it('creates CreateAtmInventoryAction instance', function () {
+    const service = this.subject();
+
+    const rawAtmInventory = { name: 'someName' };
+    const action = service.createCreateAtmInventoryAction({
+      rawAtmInventory,
+    });
+
+    expect(action).to.be.instanceOf(CreateAtmInventoryAction);
+    expect(get(action, 'rawAtmInventory')).to.equal(rawAtmInventory);
   });
 
   it('creates ModifyAtmInventoryAction instance', function () {
