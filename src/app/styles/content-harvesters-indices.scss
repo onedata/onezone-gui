@@ -342,6 +342,9 @@
           display: block;
           background-color: $main-content-hover-background;
         }
+        .column-label .one-label {
+          height: 100%;
+        }
       }
 
       .progress-table-inner-container {

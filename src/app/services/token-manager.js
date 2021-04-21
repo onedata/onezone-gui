@@ -181,6 +181,25 @@ const TokenManager = Service.extend({
   },
 
   /**
+   * Verify given invite token
+   * @param {String} token 
+   * @returns {Promise}
+   */
+  verifyInviteToken(token) {
+    return this.get('onedataGraph').request({
+      gri: gri({
+        entityType: tokenEntityType,
+        entityId: 'null',
+        aspect: 'verify_invite_token',
+        scope: 'public',
+      }),
+      operation: 'create',
+      data: { token },
+      subscribe: false,
+    });
+  },
+
+  /**
    * @param {String} token
    * @param {String} targetModelName
    * @param {String} joiningModelName

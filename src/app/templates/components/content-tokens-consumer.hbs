@@ -1,8 +1,7 @@
 {{#content-info
-  class="scroll-breakpoint-600"
+  class=(if isTokenAccepted "scroll-breakpoint-700" "scroll-breakpoint-500")
   header=(tt this "header")
-  text=(tt this "description")
+  text=(if isTokenAccepted "" (tt this "description"))
 }}
-  {{token-consumer}}
+  {{token-consumer onTokenAccept=(action "onTokenAccept")}}
 {{/content-info}}
-
