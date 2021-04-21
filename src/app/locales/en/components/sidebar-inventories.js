@@ -2,7 +2,7 @@ export default {
   aspects: {
     members: 'Members',
   },
-  workflowDirectoryItem: {
+  atmInventoryItem: {
     actions: {
       rename: {
         title: 'Rename',

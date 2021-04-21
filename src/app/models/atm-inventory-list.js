@@ -1,5 +1,5 @@
 /**
- * @module models/workflow-directory-list
+ * @module models/atm-inventory-list
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,5 +12,5 @@ import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-c
 import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-list-model';
 
 export default Model.extend(GraphListModelMixin, listConflictModel, {
-  list: hasMany('workflow-directory'),
+  list: hasMany('atm-inventory'),
 }).reopenClass(StaticGraphModelMixin);

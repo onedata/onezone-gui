@@ -49,8 +49,8 @@ export default SidebarResources.extend({
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
-      case 'workflows':
-        return this.get('recordManager').getUserRecordList('workflowDirectory');
+      case 'inventories':
+        return this.get('recordManager').getUserRecordList('atmInventory');
       case 'uploads':
         return resolve({
           list: this.get('uploadManager.sidebarOneproviders'),

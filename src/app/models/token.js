@@ -48,9 +48,9 @@ const standardClusterMapping = {
   privileges: true,
 };
 
-const standardWorkflowDirectoryMapping = {
-  idFieldName: 'workflowDirectoryId',
-  modelName: 'workflowDirectory',
+const standardAtmInventoryMapping = {
+  idFieldName: 'atmInventoryId',
+  modelName: 'atmInventory',
   privileges: true,
 };
 
@@ -74,8 +74,8 @@ export const tokenInviteTypeToTargetModelMapping = {
   userJoinHarvester: standardHarvesterMapping,
   groupJoinHarvester: standardHarvesterMapping,
   spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
-  userJoinWorkflowDirectory: standardWorkflowDirectoryMapping,
-  groupJoinWorkflowDirectory: standardWorkflowDirectoryMapping,
+  userJoinAtmInventory: standardAtmInventoryMapping,
+  groupJoinAtmInventory: standardAtmInventoryMapping,
 };
 
 const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);

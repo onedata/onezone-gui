@@ -10,8 +10,8 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
-import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
+import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
+import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import { reject } from 'rsvp';
 import { classify } from '@ember/string';
 
@@ -30,86 +30,86 @@ export default Service.extend(I18n, {
    * @param {Object} context context specification:
    *   ```
    *   {
-   *     workflowDirectory: Models.WorkflowDirectory,
-   *     workflowDirectoryDiff: Object,
+   *     atmInventory: Models.AtmInventory,
+   *     atmInventoryDiff: Object,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.ModifyWorkflowDirectoryAction}
+   * @returns {Utils.WorkflowActions.ModifyAtmInventoryAction}
    */
-  createModifyWorkflowDirectoryAction(context) {
-    return ModifyWorkflowDirectoryAction.create({ ownerSource: this, context });
+  createModifyAtmInventoryAction(context) {
+    return ModifyAtmInventoryAction.create({ ownerSource: this, context });
   },
 
   /**
    * @param {Object} context context specification:
    *   ```
    *   {
-   *     workflowDirectory: Models.WorkflowDirectory,
+   *     atmInventory: Models.AtmInventory,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.RemoveWorkflowDirectoryAction}
+   * @returns {Utils.WorkflowActions.RemoveAtmInventoryAction}
    */
-  createRemoveWorkflowDirectoryAction(context) {
-    return RemoveWorkflowDirectoryAction.create({ ownerSource: this, context });
+  createRemoveAtmInventoryAction(context) {
+    return RemoveAtmInventoryAction.create({ ownerSource: this, context });
   },
 
   /**
-   * @param {Model.WorkflowDirectory} workflowDirectory
+   * @param {Model.AtmInventory} atmInventory
    * @returns {Promise}
    */
-  leaveWorkflowDirectory(workflowDirectory) {
+  leaveAtmInventory(atmInventory) {
     const {
       recordManager,
       globalNotify,
     } = this.getProperties('recordManager', 'globalNotify');
 
-    return recordManager.removeUserRelation(workflowDirectory)
+    return recordManager.removeUserRelation(atmInventory)
       .then(() => {
         globalNotify.success(this.t(
-          'leaveWorkflowDirectorySuccess', {
-            workflowDirectoryName: get(workflowDirectory, 'name'),
+          'leaveAtmInventorySuccess', {
+            atmInventoryName: get(atmInventory, 'name'),
           }));
       })
       .catch(error => {
-        globalNotify.backendError(this.t('leavingWorkflowDirectory'), error);
+        globalNotify.backendError(this.t('leavingAtmInventory'), error);
         throw error;
       });
   },
 
   /**
-   * Joins current user to a workflow directory (without token)
-   * @param {Model.WorkflowDirectory} workflowDirectory
+   * Joins current user to a automation inventory (without token)
+   * @param {Model.AtmInventory} atmInventory
    * @returns {Promise}
    */
-  joinWorkflowDirectoryAsUser(workflowDirectory) {
+  joinAtmInventoryAsUser(atmInventory) {
     const {
       workflowManager,
       globalNotify,
     } = this.getProperties('workflowManager', 'globalNotify');
-    return workflowManager.joinWorkflowDirectoryAsUser(get(workflowDirectory, 'entityId'))
+    return workflowManager.joinAtmInventoryAsUser(get(atmInventory, 'entityId'))
       .then(() => {
-        globalNotify.info(this.t('joinedWorkflowDirectorySuccess'));
+        globalNotify.info(this.t('joinedAtmInventorySuccess'));
       })
       .catch(error => {
-        globalNotify.backendError(this.t('joiningWorkflowDirectory'), error);
+        globalNotify.backendError(this.t('joiningAtmInventory'), error);
         throw error;
       });
   },
 
   /**
-   * Creates member group for specified workflow directory
-   * @param {Model.WorkflowDirectory} workflowDirectory
+   * Creates member group for specified automation inventory
+   * @param {Model.AtmInventory} atmInventory
    * @param {Object} groupRepresentation
    * @return {Promise}
    */
-  createMemberGroupForWorkflowDirectory(workflowDirectory, groupRepresentation) {
+  createMemberGroupForAtmInventory(atmInventory, groupRepresentation) {
     const {
       workflowManager,
       globalNotify,
     } = this.getProperties('workflowManager', 'globalNotify');
     return workflowManager
-      .createMemberGroupForWorkflowDirectory(
-        get(workflowDirectory, 'entityId'),
+      .createMemberGroupForAtmInventory(
+        get(atmInventory, 'entityId'),
         groupRepresentation
       ).then(() => {
         globalNotify.success(this.t('createMemberGroupSuccess', {
@@ -122,18 +122,18 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Adds existing group to a workflow directory
-   * @param {Model.WorkflowDirectory} workflowDirectory
+   * Adds existing group to a automation inventory
+   * @param {Model.AtmInventory} atmInventory
    * @param {Model.Group} group
    * @return {Promise}
    */
-  addMemberGroupToWorkflowDirectory(workflowDirectory, group) {
+  addMemberGroupToAtmInventory(atmInventory, group) {
     const {
       workflowManager,
       globalNotify,
     } = this.getProperties('workflowManager', 'globalNotify');
-    return workflowManager.addMemberGroupToWorkflowDirectory(
-      get(workflowDirectory, 'entityId'),
+    return workflowManager.addMemberGroupToAtmInventory(
+      get(atmInventory, 'entityId'),
       get(group, 'entityId')
     ).then(() => {
       globalNotify.success(this.t('addMemberGroupSuccess', {
@@ -146,12 +146,12 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * Removes member from workflow directory
-   * @param {WorkflowDirectory} workflowDirectory
+   * Removes member from automation inventory
+   * @param {AtmInventory} atmInventory
    * @param {Models.User|Models.Group} member
    * @returns {Promise}
    */
-  async removeMemberFromWorkflowDirectory(workflowDirectory, member) {
+  async removeMemberFromAtmInventory(atmInventory, member) {
     const {
       recordManager,
       globalNotify,
@@ -163,9 +163,9 @@ export default Service.extend(I18n, {
     }
 
     try {
-      await recordManager.removeRelation(workflowDirectory, member);
+      await recordManager.removeRelation(atmInventory, member);
       globalNotify.success(this.t(`remove${classify(memberModelName)}Success`, {
-        workflowDirectoryName: get(workflowDirectory, 'name'),
+        atmInventoryName: get(atmInventory, 'name'),
         [`${memberModelName}Name`]: get(member, 'name'),
       }));
     } catch (error) {

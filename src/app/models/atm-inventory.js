@@ -1,5 +1,5 @@
 /**
- * @module models/workflow-directory
+ * @module models/atm-invetnory
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,16 +12,15 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import workflowDirectoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
+import atmInventoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import computedCurrentUserPrivileges from 'onedata-gui-common/utils/computed-current-user-privileges';
 
-export const entityType = 'workflow_directory';
+export const entityType = 'atm_inventory';
 
 export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   scope: attr('string'),
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
-  currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
 
   groupList: belongsTo('groupList'),
@@ -33,7 +32,7 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {ComputedProperty<Object>}
    */
   privileges: computedCurrentUserPrivileges({
-    allFlags: workflowDirectoryPrivilegesFlags,
+    allFlags: atmInventoryPrivilegesFlags,
   }),
 
   /**
@@ -42,7 +41,7 @@ export default Model.extend(GraphSingleModelMixin, {
   hasViewPrivilege: reads('privileges.view'),
 
   /**
-   * True if user is an effective member of that workflow directory
+   * True if user is an effective member of that automation inventory
    * @type {Ember.ComputedProperty<boolean>}
    */
   isEffectiveMember: computed('scope', function isEffectiveMember() {

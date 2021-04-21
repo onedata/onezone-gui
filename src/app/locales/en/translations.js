@@ -8,7 +8,7 @@ import spaces from './tabs/spaces';
 import shares from './tabs/shares';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
-import workflows from './tabs/workflows';
+import inventories from './tabs/inventories';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
@@ -81,8 +81,8 @@ import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
-import sidebarWorkflows from './components/sidebar-workflows';
-import contentWorkflowsMembers from './components/content-workflows-members';
+import sidebarInventories from './components/sidebar-inventories';
+import contentInventoriesMembers from './components/content-inventories-members';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -111,8 +111,8 @@ import generateInviteTokenAction from './utils/token-actions/generate-invite-tok
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
-import modifyWorkflowDirectoryAction from './utils/workflow-actions/modify-workflow-directory-action';
-import removeWorkflowDirectoryAction from './utils/workflow-actions/remove-workflow-directory-action';
+import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
+import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 
 const translations = {
   tabs: {
@@ -127,7 +127,7 @@ const translations = {
     users,
     clusters,
     harvesters,
-    workflows,
+    inventories,
     uploads,
   },
   components: {
@@ -207,8 +207,8 @@ const translations = {
     tokenConsumer,
     contentTokensConsumer,
     tokenTemplateSelector,
-    sidebarWorkflows,
-    contentWorkflowsMembers,
+    sidebarInventories,
+    contentInventoriesMembers,
   },
   services: {
     tokenActions,
@@ -242,8 +242,8 @@ const translations = {
       toggleBeingOwnerAction,
     },
     workflowActions: {
-      modifyWorkflowDirectoryAction,
-      removeWorkflowDirectoryAction,
+      modifyAtmInventoryAction,
+      removeAtmInventoryAction,
     },
   },
 };

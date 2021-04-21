@@ -132,11 +132,11 @@ const clusterHandlers = {
   },
 };
 
-const workflowDirectoryHandlers = {
+const atmInventoryHandlers = {
   privileges(operation) {
     if (operation === 'get') {
       return {
-        member: ['directory_view'],
+        member: ['atm_inventory_view'],
       };
     } else {
       throw messageNotSupported;
@@ -235,7 +235,7 @@ export default OnedataGraphMock.extend({
       provider: providerHandlers,
       cluster: clusterHandlers,
       token: tokenHandlers,
-      workflow_directory: workflowDirectoryHandlers,
+      atm_inventory: atmInventoryHandlers,
     });
     this.set(
       'handlers',

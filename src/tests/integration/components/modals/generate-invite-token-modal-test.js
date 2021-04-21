@@ -85,10 +85,10 @@ describe('Integration | Component | modals/generate invite token modal', functio
     inviteType: 'spaceJoinHarvester',
     header: spaceHeader,
   }, {
-    inviteType: 'userJoinWorkflowDirectory',
+    inviteType: 'userJoinAtmInventory',
     header: userHeader,
   }, {
-    inviteType: 'groupJoinWorkflowDirectory',
+    inviteType: 'groupJoinAtmInventory',
     header: groupHeader,
   }].forEach(({ inviteType, header }) => {
     it(

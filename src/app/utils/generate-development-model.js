@@ -16,7 +16,7 @@ import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
-import workflowDirectoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
+import atmInventoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -35,7 +35,7 @@ const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
-const NUMBER_OF_WORKFLOW_DIRECTORIES = 3;
+const NUMBER_OF_ATM_INVENTORIES = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -53,7 +53,7 @@ const types = [
   'cluster',
   'harvester',
   'token',
-  'workflowDirectory',
+  'atmInventory',
 ];
 const names = ['one', 'two', 'three'];
 
@@ -61,7 +61,7 @@ const privileges = {
   space: spacePrivilegesFlags,
   group: groupPrivilegesFlags,
   harvester: harvesterPrivilegesFlags,
-  workflowDirectory: workflowDirectoryPrivilegesFlags,
+  atmInventory: atmInventoryPrivilegesFlags,
 };
 
 const perProviderSize = Math.pow(1024, 4);
@@ -268,19 +268,19 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => listRecords.workflowDirectory.get('list')
+      .then(() => listRecords.atmInventory.get('list')
         .then(records =>
           allFulfilled(records.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
-                store, record, 'workflowDirectory', false,
+                store, record, 'atmInventory', false,
                 users.slice(0, 2), groups.slice(0, 2)
               ),
               attachUsersGroupsToModel(
-                store, record, 'workflowDirectory', true, users, groups
+                store, record, 'atmInventory', true, users, groups
               ),
               attachMembershipsToModel(
-                store, record, 'workflowDirectory', groups
+                store, record, 'atmInventory', groups
               ),
             ])
           ))
@@ -290,7 +290,7 @@ export default function generateDevelopmentModel(store) {
         'space',
         'group',
         'harvester',
-        'workflowDirectory',
+        'atmInventory',
       ].map(modelType => {
         return listRecords[modelType].get('list')
           .then(records =>
@@ -376,8 +376,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createClusterRecords(store, additionalInfo);
     case 'harvester':
       return createHarvesterRecords(store, additionalInfo);
-    case 'workflowDirectory':
-      return createWorkflowDirectoryRecords(store, additionalInfo);
+    case 'atmInventory':
+      return createAtmInventoryRecords(store, additionalInfo);
     default:
       return allFulfilled(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -645,13 +645,13 @@ function createHarvesterRecords(store) {
   }));
 }
 
-function createWorkflowDirectoryRecords(store) {
-  return allFulfilled(_.range(NUMBER_OF_WORKFLOW_DIRECTORIES).map((index) => {
-    return store.createRecord('workflowDirectory', {
-      name: `Directory ${index}`,
+function createAtmInventoryRecords(store) {
+  return allFulfilled(_.range(NUMBER_OF_ATM_INVENTORIES).map((index) => {
+    return store.createRecord('atmInventory', {
+      name: `Inventory ${index}`,
       scope: 'private',
       directMembership: true,
-      currentUserEffPrivileges: workflowDirectoryPrivilegesFlags,
+      currentUserEffPrivileges: atmInventoryPrivilegesFlags,
     }).save();
   }));
 }

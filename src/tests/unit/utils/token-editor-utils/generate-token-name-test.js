@@ -95,13 +95,13 @@ describe('Unit | Utility | token editor utils/generate token name', function () 
     nameWithTarget: 'Inv. spc. hrv. recordName',
     nameWithoutTarget: 'Inv. spc. hrv.',
   }, {
-    inviteType: 'userJoinWorkflowDirectory',
-    nameWithTarget: 'Inv. usr. wrk. dir. recordName',
-    nameWithoutTarget: 'Inv. usr. wrk. dir.',
+    inviteType: 'userJoinAtmInventory',
+    nameWithTarget: 'Inv. usr. atm. inv. recordName',
+    nameWithoutTarget: 'Inv. usr. atm. inv.',
   }, {
-    inviteType: 'groupJoinWorkflowDirectory',
-    nameWithTarget: 'Inv. grp. wrk. dir. recordName',
-    nameWithoutTarget: 'Inv. grp. wrk. dir.',
+    inviteType: 'groupJoinAtmInventory',
+    nameWithTarget: 'Inv. grp. atm. inv. recordName',
+    nameWithoutTarget: 'Inv. grp. atm. inv.',
   }].forEach(({ inviteType, nameWithTarget, nameWithoutTarget }) => {
     it(
       `returns "${nameWithoutTarget} DATE" when type is "invite", inviteType is "${inviteType}" and inviteTargetName is not provided`,

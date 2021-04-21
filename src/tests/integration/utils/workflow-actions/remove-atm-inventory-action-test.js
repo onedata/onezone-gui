@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import RemoveWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/remove-workflow-directory-action';
+import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
@@ -12,7 +12,7 @@ import { Promise } from 'rsvp';
 import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
 
 describe(
-  'Integration | Util | workflow actions/remove workflow directory action',
+  'Integration | Util | workflow actions/remove atm inventory action',
   function () {
     setupComponentTest('global-modal-mounter', {
       integration: true,
@@ -20,17 +20,17 @@ describe(
 
     beforeEach(function () {
       const context = {
-        workflowDirectory: {
-          name: 'directory1',
-          entityId: 'directoryId',
+        atmInventory: {
+          name: 'inventory1',
+          entityId: 'inventoryId',
         },
       };
       this.setProperties({
-        action: RemoveWorkflowDirectoryAction.create({
+        action: RemoveAtmInventoryAction.create({
           ownerSource: this,
           context,
         }),
-        workflowDirectory: context.workflowDirectory,
+        atmInventory: context.atmInventory,
       });
     });
 
@@ -40,7 +40,7 @@ describe(
         icon,
         title,
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
-      expect(className).to.equal('remove-workflow-directory-action-trigger');
+      expect(className).to.equal('remove-atm-inventory-action-trigger');
       expect(icon).to.equal('remove');
       expect(String(title)).to.equal('Remove');
     });
@@ -53,9 +53,9 @@ describe(
       expect(getModal()).to.have.class('question-modal');
       expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
       expect(getModalHeader().find('h1').text().trim())
-        .to.equal('Remove workflow directory');
+        .to.equal('Remove automation inventory');
       expect(getModalBody().text().trim()).to.contain(
-        'You are about to delete the workflow directory directory1.'
+        'You are about to delete the automation inventory inventory1.'
       );
       const $yesButton = getModalFooter().find('.question-yes');
       expect($yesButton.text().trim()).to.equal('Remove');
@@ -77,7 +77,7 @@ describe(
     );
 
     it(
-      'executes removing workflow directory on submit - success status and notification on success',
+      'executes removing automation inventory on submit - success status and notification on success',
       async function () {
         const removeRecordStub = sinon
           .stub(lookupService(this, 'record-manager'), 'removeRecord')
@@ -98,10 +98,10 @@ describe(
         const actionResult = await actionResultPromise;
 
         expect(removeRecordStub).to.be.calledOnce;
-        expect(removeRecordStub).to.be.calledWith(this.get('workflowDirectory'));
+        expect(removeRecordStub).to.be.calledWith(this.get('atmInventory'));
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The workflow directory has been sucessfully removed.'
+          'The automation inventory has been sucessfully removed.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
         expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;
@@ -109,7 +109,7 @@ describe(
     );
 
     it(
-      'executes removing workflow directory on submit - error status and notification on failure',
+      'executes removing automation inventory on submit - error status and notification on failure',
       async function () {
         let rejectRemove;
         sinon.stub(lookupService(this, 'record-manager'), 'removeRecord')
@@ -128,7 +128,7 @@ describe(
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'removing the workflow directory'),
+          sinon.match.has('string', 'removing the automation inventory'),
           'someError'
         );
         const {

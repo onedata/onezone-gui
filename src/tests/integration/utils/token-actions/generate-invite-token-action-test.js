@@ -65,10 +65,10 @@ describe('Integration | Util | token actions/generate invite token action', func
     inviteType: 'spaceJoinHarvester',
     title: spaceTitle,
   }, {
-    inviteType: 'userJoinWorkflowDirectory',
+    inviteType: 'userJoinAtmInventory',
     title: userTitle,
   }, {
-    inviteType: 'groupJoinWorkflowDirectory',
+    inviteType: 'groupJoinAtmInventory',
     title: groupTitle,
   }].forEach(({ inviteType, title }) => {
     it(

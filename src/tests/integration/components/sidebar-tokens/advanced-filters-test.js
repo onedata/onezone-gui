@@ -15,6 +15,10 @@ const possibleTargetModels = [{
   name: 'All',
   icon: '',
 }, {
+  modelName: 'atmInventory',
+  name: 'Atm. inventory',
+  icon: 'view-grid',
+}, {
   modelName: 'cluster',
   name: 'Cluster',
   icon: 'cluster',
@@ -34,10 +38,6 @@ const possibleTargetModels = [{
   modelName: 'user',
   name: 'User',
   icon: 'user',
-}, {
-  modelName: 'workflowDirectory',
-  name: 'Workflow dir.',
-  icon: 'view-grid',
 }];
 
 describe('Integration | Component | sidebar tokens/advanced filters', function () {
@@ -276,7 +276,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     const targetModelHelper = new TargetModelHelper();
     const targetRecordHelper = new TargetRecordHelper();
     return selectType('invite')
-      .then(() => targetModelHelper.selectOption(2))
+      .then(() => targetModelHelper.selectOption(3))
       .then(() => targetRecordHelper.selectOption(2))
       .then(() => {
         expect(changeSpy.lastCall).to.be.calledWith({
@@ -337,9 +337,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     const targetModelHelper = new TargetModelHelper();
     const targetRecordHelper = new TargetRecordHelper();
     return selectType('invite')
-      .then(() => targetModelHelper.selectOption(2))
-      .then(() => targetRecordHelper.selectOption(2))
       .then(() => targetModelHelper.selectOption(3))
+      .then(() => targetRecordHelper.selectOption(2))
+      .then(() => targetModelHelper.selectOption(4))
       .then(() => {
         expect(changeSpy.lastCall).to.be.calledWith({
           type: 'invite',
@@ -365,7 +365,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
       return selectType('invite')
-        .then(() => targetModelHelper.selectOption(2))
+        .then(() => targetModelHelper.selectOption(3))
         .then(() => targetRecordHelper.selectOption(2))
         .then(() => {
           changesCount = changeSpy.callCount;
@@ -402,7 +402,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
       return selectType('invite')
-        .then(() => targetModelHelper.selectOption(2))
+        .then(() => targetModelHelper.selectOption(3))
         .then(() => targetRecordHelper.selectOption(2))
         .then(() => {
           changesCount = changeSpy.callCount;
@@ -444,7 +444,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
       return selectType('invite')
-        .then(() => targetModelHelper.selectOption(2))
+        .then(() => targetModelHelper.selectOption(3))
         .then(() => targetRecordHelper.selectOption(2))
         .then(() => {
           changesCount = changeSpy.callCount;

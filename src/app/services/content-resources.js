@@ -47,8 +47,8 @@ export default Service.extend({
         return this.get('groupManager').getRecord(id);
       case 'harvesters':
         return this.get('harvesterManager').getRecord(id);
-      case 'workflows':
-        return this.get('recordManager').getRecord('workflowDirectory', id);
+      case 'inventories':
+        return this.get('recordManager').getRecord('atmInventory', id);
       case 'uploads': {
         const oneprovider = this.get('uploadManager.sidebarOneproviders')
           .findBy('id', id);

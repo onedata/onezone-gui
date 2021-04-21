@@ -1,7 +1,7 @@
 /**
- * A first-level item component for workflow directories sidebar.
+ * A first-level item component for automation inventories sidebar.
  *
- * @module components/sidebar-workflows/workflow-directory-item
+ * @module components/sidebar-inventories/atm-inventory-item
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -25,10 +25,10 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarWorkflows.workflowDirectoryItem',
+  i18nPrefix: 'components.sidebarInventories.atmInventoryItem',
 
   /**
-   * @type {Models.WorkflowDirectory}
+   * @type {Models.AtmInventory}
    */
   item: undefined,
 
@@ -55,9 +55,9 @@ export default Component.extend(I18n, {
 
   /**
    * Alias for `item` to make code more verbose
-   * @type {ComputedProperty<Models.WorkflowDirectory>}
+   * @type {ComputedProperty<Models.AtmInventory>}
    */
-  workflowDirectory: reads('item'),
+  atmInventory: reads('item'),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
@@ -66,7 +66,7 @@ export default Component.extend(I18n, {
     return {
       action: () => this.send('toggleRename', true),
       title: this.t('actions.rename.title'),
-      className: 'rename-workflow-directory-action-trigger',
+      className: 'rename-atm-inventory-action-trigger',
       icon: 'rename',
       disabled: this.get('isRenaming'),
     };
@@ -79,7 +79,7 @@ export default Component.extend(I18n, {
     return {
       action: () => this.send('showLeaveModal'),
       title: this.t('actions.leave.title'),
-      class: 'leave-workflow-directory-action-trigger',
+      class: 'leave-atm-inventory-action-trigger',
       icon: 'group-leave-group',
     };
   }),
@@ -87,13 +87,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  removeAction: computed('workflowDirectory', function removeAction() {
+  removeAction: computed('atmInventory', function removeAction() {
     const {
-      workflowDirectory,
+      atmInventory,
       workflowActions,
-    } = this.getProperties('workflowDirectory', 'workflowActions');
-    return workflowActions.createRemoveWorkflowDirectoryAction({
-      workflowDirectory,
+    } = this.getProperties('atmInventory', 'workflowActions');
+    return workflowActions.createRemoveAtmInventoryAction({
+      atmInventory,
     });
   }),
 
@@ -118,13 +118,13 @@ export default Component.extend(I18n, {
       }
 
       const {
-        workflowDirectory,
+        atmInventory,
         workflowActions,
-      } = this.getProperties('workflowDirectory', 'workflowActions');
-      const workflowDirectoryDiff = { name };
-      const action = workflowActions.createModifyWorkflowDirectoryAction({
-        workflowDirectory,
-        workflowDirectoryDiff,
+      } = this.getProperties('atmInventory', 'workflowActions');
+      const atmInventoryDiff = { name };
+      const action = workflowActions.createModifyAtmInventoryAction({
+        atmInventory,
+        atmInventoryDiff,
       });
 
       return action.execute().then(result => {
@@ -143,16 +143,16 @@ export default Component.extend(I18n, {
     },
     leave() {
       const {
-        workflowDirectory,
+        atmInventory,
         workflowActions,
         navigationState,
       } = this.getProperties(
-        'workflowDirectory',
+        'atmInventory',
         'workflowActions',
         'navigationState'
       );
       this.set('isLeaving', true);
-      return workflowActions.leaveWorkflowDirectory(workflowDirectory)
+      return workflowActions.leaveAtmInventory(atmInventory)
         .then(() => navigationState.redirectToCollectionIfResourceNotExist())
         .finally(() =>
           safeExec(this, 'setProperties', {

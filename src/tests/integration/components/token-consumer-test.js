@@ -36,7 +36,7 @@ describe('Integration | Component | token consumer', function () {
       'space',
       'group',
       'harvester',
-      'workflowDirectory',
+      'atmInventory',
     ].forEach(modelName => {
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
@@ -238,20 +238,20 @@ describe('Integration | Component | token consumer', function () {
     selectorPlaceholder: 'Select space...',
   }, {
     inviteSpec: {
-      inviteType: 'userJoinWorkflowDirectory',
-      workflowDirectoryName: 'someRecord',
+      inviteType: 'userJoinAtmInventory',
+      atmInventoryName: 'someRecord',
     },
-    typeText: 'Invite user to workflow directory someRecord',
+    typeText: 'Invite user to automation inventory someRecord',
     modelToSelect: null,
   }, {
     inviteSpec: {
-      inviteType: 'groupJoinWorkflowDirectory',
-      workflowDirectoryName: 'someRecord',
+      inviteType: 'groupJoinAtmInventory',
+      atmInventoryName: 'someRecord',
     },
-    typeText: 'Invite group to workflow directory someRecord',
+    typeText: 'Invite group to automation inventory someRecord',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('workflow directory', 'group'),
+    selectorDescription: selectorDescription('automation inventory', 'group'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {

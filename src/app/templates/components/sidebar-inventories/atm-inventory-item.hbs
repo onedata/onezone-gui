@@ -1,21 +1,21 @@
-{{record-icon record=workflowDirectory class="sidebar-item-icon"}}
+{{record-icon record=atmInventory class="sidebar-item-icon"}}
 {{#if isRenaming}}
   {{one-inline-editor
     isEditing=true
-    value=workflowDirectory.name
+    value=atmInventory.name
     showEmptyInfo=false
     onSave=(action "rename")
     editOnClick=false
     onEdit=(action "toggleRename")
-    class="one-label name-editor workflow-directory-name sidebar-item-title"
+    class="one-label name-editor atm-inventory-name sidebar-item-title"
     click=(action "editorClick")
   }}
 {{else}}
   {{#truncated-string class="sidebar-item-title"}}
     {{name-conflict
-      item=workflowDirectory
+      item=atmInventory
       tagName="span"
-      class="one-label workflow-directory-name"
+      class="one-label atm-inventory-name"
     }}
   {{/truncated-string}}
 {{/if}}
@@ -24,7 +24,7 @@
     isMinimized=true
     dropdownPlacement="auto"
     actionsArray=itemActions
-    toolbarToggleClasses="workflow-directory-menu-trigger"
+    toolbarToggleClasses="atm-inventory-menu-trigger"
   }}
   {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
     {{leave-modal
@@ -32,7 +32,7 @@
       close=(action "closeLeaveModal")
       proceed=(action "leave")
       processing=isLeaving
-      record=workflowDirectory
+      record=atmInventory
       onHidden=renderLater.resetRenderTrigger
     }}
   {{/render-later}}

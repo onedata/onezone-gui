@@ -1,7 +1,7 @@
 /**
- * Removes workflow directory.
+ * Removes automation inventory.
  *
- * @module utils/workflow-actions/remove-workflow-directory-action
+ * @module utils/workflow-actions/remove-atm-inventory-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -21,7 +21,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.workflowActions.removeWorkflowDirectoryAction',
+  i18nPrefix: 'utils.workflowActions.removeAtmInventoryAction',
 
   /**
    * @override
@@ -31,22 +31,22 @@ export default Action.extend({
   /**
    * @override
    */
-  className: 'remove-workflow-directory-action-trigger',
+  className: 'remove-atm-inventory-action-trigger',
 
   /**
-   * @type {ComputedProperty<Models.WorkflowDirectory>}
+   * @type {ComputedProperty<Models.AtmInventory>}
    */
-  workflowDirectory: reads('context.workflowDirectory'),
+  atmInventory: reads('context.atmInventory'),
 
   /**
    * @override
    */
   onExecute() {
     const {
-      workflowDirectory,
+      atmInventory,
       modalManager,
     } = this.getProperties(
-      'workflowDirectory',
+      'atmInventory',
       'modalManager'
     );
 
@@ -57,13 +57,13 @@ export default Action.extend({
         headerText: this.t('modalHeader'),
         descriptionParagraphs: [{
           text: this.t('modalDescription', {
-            workflowDirectoryName: get(workflowDirectory, 'name'),
+            atmInventoryName: get(atmInventory, 'name'),
           }),
         }],
         yesButtonText: this.t('modalYes'),
         yesButtonClassName: 'btn-danger',
         onSubmit: () =>
-          result.interceptPromise(this.removeWorkflowDirectory()),
+          result.interceptPromise(this.removeAtmInventory()),
       }).hiddenPromise
       .then(() => {
         result.cancelIfPending();
@@ -71,18 +71,18 @@ export default Action.extend({
       });
   },
 
-  async removeWorkflowDirectory() {
+  async removeAtmInventory() {
     const {
       recordManager,
-      workflowDirectory,
+      atmInventory,
       navigationState,
     } = this.getProperties(
       'recordManager',
-      'workflowDirectory',
+      'atmInventory',
       'navigationState'
     );
 
-    await recordManager.removeRecord(workflowDirectory);
+    await recordManager.removeRecord(atmInventory);
     await navigationState.redirectToCollectionIfResourceNotExist();
   },
 });

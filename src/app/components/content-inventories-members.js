@@ -1,7 +1,7 @@
 /**
- * A members aspect of workflow directory.
+ * A members aspect of automation inventory.
  *
- * @module components/content-workflows-members
+ * @module components/content-inventories-members
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reads } from '@ember/object/computed';
-import { groupedFlags } from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
+import { groupedFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
@@ -19,7 +19,7 @@ import { Promise } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   layout,
-  classNames: ['members-aspect-base', 'content-workflows-members'],
+  classNames: ['members-aspect-base', 'content-inventories-members'],
 
   i18n: service(),
   navigationState: service(),
@@ -30,7 +30,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentWorkflowsMembers',
+  i18nPrefix: 'components.contentInventoriesMembers',
 
   /**
    * @override
@@ -40,12 +40,12 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  modelType: 'workflowDirectory',
+  modelType: 'atmInventory',
 
   /**
    * @override
    */
-  record: reads('workflowDirectory'),
+  record: reads('atmInventory'),
 
   /**
    * @override
@@ -53,14 +53,14 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   async removeMember(type, member) {
     const {
       workflowActions,
-      workflowDirectory,
+      atmInventory,
     } = this.getProperties(
       'workflowActions',
-      'workflowDirectory'
+      'atmInventory'
     );
 
-    await workflowActions.removeMemberFromWorkflowDirectory(
-      workflowDirectory,
+    await workflowActions.removeMemberFromAtmInventory(
+      atmInventory,
       member
     );
   },
@@ -72,16 +72,16 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
     const {
       recordManager,
       globalNotify,
-      workflowDirectory,
+      atmInventory,
     } = this.getProperties(
       'recordManager',
       'globalNotify',
-      'workflowDirectory'
+      'atmInventory'
     );
 
     try {
       await Promise.all(members.map(member =>
-        recordManager.removeRelation(workflowDirectory, member)
+        recordManager.removeRelation(atmInventory, member)
       ));
       globalNotify.success(this.t('removeMembersSuccess'));
     } catch (error) {
@@ -96,10 +96,10 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   async createChildGroup(name) {
     const {
       workflowActions,
-      workflowDirectory,
-    } = this.getProperties('workflowActions', 'workflowDirectory');
-    await workflowActions.createMemberGroupForWorkflowDirectory(
-      workflowDirectory, {
+      atmInventory,
+    } = this.getProperties('workflowActions', 'atmInventory');
+    await workflowActions.createMemberGroupForAtmInventory(
+      atmInventory, {
         name,
       }
     );
@@ -111,10 +111,10 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   async addMemberGroup(group) {
     const {
       workflowActions,
-      workflowDirectory,
-    } = this.getProperties('workflowActions', 'workflowDirectory');
-    await workflowActions.addMemberGroupToWorkflowDirectory(
-      workflowDirectory,
+      atmInventory,
+    } = this.getProperties('workflowActions', 'atmInventory');
+    await workflowActions.addMemberGroupToAtmInventory(
+      atmInventory,
       group
     );
   },
@@ -125,8 +125,8 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   async join() {
     const {
       workflowActions,
-      workflowDirectory,
-    } = this.getProperties('workflowActions', 'workflowDirectory');
-    await workflowActions.joinWorkflowDirectoryAsUser(workflowDirectory);
+      atmInventory,
+    } = this.getProperties('workflowActions', 'atmInventory');
+    await workflowActions.joinAtmInventoryAsUser(atmInventory);
   },
 });

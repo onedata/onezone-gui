@@ -1,7 +1,7 @@
 /**
- * A sidebar for workflow directories (extension of `one-sidebar`)
+ * A sidebar for automation inventories (extension of `one-sidebar`)
  *
- * @module components/sidebar-workflows
+ * @module components/sidebar-inventories
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -14,12 +14,12 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default OneSidebar.extend(I18n, {
   layout,
-  classNames: ['sidebar-workflows'],
+  classNames: ['sidebar-inventories'],
 
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarWorkflows',
+  i18nPrefix: 'components.sidebarInventories',
 
   /**
    * @override
@@ -29,12 +29,12 @@ export default OneSidebar.extend(I18n, {
   /**
    * @override
    */
-  sidebarType: 'workflows',
+  sidebarType: 'inventories',
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-workflows/workflow-directory-item',
+  firstLevelItemComponent: 'sidebar-inventories/atm-inventory-item',
 
   /**
    * @override

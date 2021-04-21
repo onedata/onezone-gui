@@ -14,7 +14,7 @@ export default {
       model: {
         options: {
           all: 'All',
-          workflowDirectory: 'Workflow dir.',
+          atmInventory: 'Atm. inventory',
           cluster: 'Cluster',
           group: 'Group',
           harvester: 'Harvester',

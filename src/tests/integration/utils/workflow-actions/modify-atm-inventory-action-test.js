@@ -1,36 +1,36 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
-import ModifyWorkflowDirectoryAction from 'onezone-gui/utils/workflow-actions/modify-workflow-directory-action';
+import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import sinon from 'sinon';
 import { resolve, reject } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get } from '@ember/object';
 
 describe(
-  'Unit | Utility | workflow actions/modify workflow directory action',
+  'Unit | Utility | workflow actions/modify atm inventory action',
   function () {
     setupComponentTest('test-component', {
       integration: true,
     });
 
-    it('executes modifying workflow directory (success scenario)', function () {
-      const workflowDirectoryDiff = {
-        name: 'directory2',
+    it('executes modifying automation inventory (success scenario)', function () {
+      const atmInventoryDiff = {
+        name: 'inventory2',
       };
-      const workflowDirectory = {
-        name: 'directory1',
+      const atmInventory = {
+        name: 'inventory1',
         save: sinon.stub().callsFake(() => {
-          if (workflowDirectory.name === workflowDirectoryDiff.name) {
+          if (atmInventory.name === atmInventoryDiff.name) {
             return resolve();
           }
         }),
       };
-      const action = ModifyWorkflowDirectoryAction.create({
+      const action = ModifyAtmInventoryAction.create({
         ownerSource: this,
         context: {
-          workflowDirectory,
-          workflowDirectoryDiff,
+          atmInventory,
+          atmInventoryDiff,
         },
       });
       const successNotifySpy = sinon.spy(
@@ -40,36 +40,36 @@ describe(
 
       return action.execute()
         .then(actionResult => {
-          expect(workflowDirectory.save).to.be.calledOnce;
-          expect(workflowDirectory.name).to.equal('directory2');
+          expect(atmInventory.save).to.be.calledOnce;
+          expect(atmInventory.name).to.equal('inventory2');
           expect(successNotifySpy).to.be.calledWith(
-            sinon.match.has('string', 'Workflow directory has been modified successfully.')
+            sinon.match.has('string', 'Automation inventory has been modified successfully.')
           );
           expect(get(actionResult, 'status')).to.equal('done');
-          expect(get(actionResult, 'result')).to.equal(workflowDirectory);
+          expect(get(actionResult, 'result')).to.equal(atmInventory);
         });
     });
 
-    it('executes modifying workflow directory (failure scenario)', function () {
-      const workflowDirectoryDiff = {
-        name: 'directory2',
+    it('executes modifying automation inventory (failure scenario)', function () {
+      const atmInventoryDiff = {
+        name: 'inventory2',
       };
-      const workflowDirectory = {
-        name: 'directory1',
+      const atmInventory = {
+        name: 'inventory1',
         save: sinon.stub().callsFake(() => {
-          if (workflowDirectory.name === workflowDirectoryDiff.name) {
+          if (atmInventory.name === atmInventoryDiff.name) {
             return reject('error');
           }
         }),
         rollbackAttributes() {
-          workflowDirectory.name = 'directory1';
+          atmInventory.name = 'inventory1';
         },
       };
-      const action = ModifyWorkflowDirectoryAction.create({
+      const action = ModifyAtmInventoryAction.create({
         ownerSource: this,
         context: {
-          workflowDirectory,
-          workflowDirectoryDiff,
+          atmInventory,
+          atmInventoryDiff,
         },
       });
       const failureNotifySpy = sinon.spy(
@@ -79,9 +79,9 @@ describe(
 
       return action.execute()
         .then(actionResult => {
-          expect(workflowDirectory.name).to.equal('directory1');
+          expect(atmInventory.name).to.equal('inventory1');
           expect(failureNotifySpy).to.be.calledWith(
-            sinon.match.has('string', 'modifying workflow directory'),
+            sinon.match.has('string', 'modifying automation inventory'),
             'error'
           );
           expect(get(actionResult, 'status')).to.equal('failed');
