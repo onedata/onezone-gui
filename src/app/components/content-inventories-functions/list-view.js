@@ -15,10 +15,9 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
-import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
-export default Component.extend(I18n, GlobalActions, {
+export default Component.extend(I18n, {
   classNames: ['content-inventories-functions-list-view'],
 
   i18n: service(),
@@ -39,6 +38,12 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {Function}
    */
   onAddFunction: notImplementedIgnore,
+
+  /**
+   * @virtual
+   * @type {Boolean}
+   */
+  onRegisterViewActions: notImplementedIgnore,
 
   /**
    * @type {ComputedProperty<PromiseArray<Models.LambdaFunction>>}
@@ -68,4 +73,18 @@ export default Component.extend(I18n, GlobalActions, {
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
   globalActions: collect('addNewFunctionAction'),
+
+  init() {
+    this._super(...arguments);
+    this.registerViewActions();
+  },
+
+  registerViewActions() {
+    const {
+      onRegisterViewActions,
+      globalActions,
+    } = this.getProperties('onRegisterViewActions', 'globalActions');
+
+    onRegisterViewActions(globalActions);
+  },
 });

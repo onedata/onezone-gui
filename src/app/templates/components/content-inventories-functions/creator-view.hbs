@@ -8,6 +8,12 @@
   </h1>
 </div>
 <div class="row content-row">
+  <p class="hidden-sm hidden-md hidden-lg">
+    <button class="btn btn-default btn-sm" {{action "backSlide"}}>
+      {{one-icon icon="arrow-left"}}
+      <span class="text">{{tt this "backSlide"}}</span>
+    </button>
+  </p>
   {{content-inventories-functions/lambda-function-form
     mode="create"
     onSubmit=(action "onFormSubmit")

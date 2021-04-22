@@ -10,9 +10,11 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { conditional, array } from 'ember-awesome-macros';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
-export default Component.extend({
+export default Component.extend(GlobalActions, {
   classNames: ['content-inventories-functions'],
 
   navigationState: service(),
@@ -22,6 +24,13 @@ export default Component.extend({
    * @type {Models.AtmInventory}
    */
   atmInventory: undefined,
+
+  /**
+   * Mapping:
+   * string -> Array<Utils.Action>
+   * @type {Object}
+   */
+  actionsPerSlide: undefined,
 
   /**
    * @type {Array<String>}
@@ -42,10 +51,27 @@ export default Component.extend({
     'possibleSlideIds.firstObject'
   ),
 
+  /**
+   * @override
+   */
+  globalActions: computed('actionsPerSlide', 'activeSlide', function globalActions() {
+    const {
+      actionsPerSlide,
+      activeSlide,
+    } = this.getProperties('actionsPerSlide', 'activeSlide');
+
+    return actionsPerSlide[activeSlide];
+  }),
+
   changeSlideViaUrl(newSlide) {
     this.get('navigationState').changeRouteAspectOptions({
       view: newSlide,
     });
+  },
+
+  init() {
+    this._super(...arguments);
+    this.set('actionsPerSlide', {});
   },
 
   actions: {
@@ -54,6 +80,11 @@ export default Component.extend({
     },
     showCreatorView() {
       this.changeSlideViaUrl('creator');
+    },
+    registerViewActions(slideId, actions) {
+      this.set('actionsPerSlide', Object.assign({}, this.get('actionsPerSlide'), {
+        [slideId]: actions,
+      }));
     },
   },
 });
