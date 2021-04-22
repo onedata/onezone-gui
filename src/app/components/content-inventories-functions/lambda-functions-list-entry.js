@@ -1,3 +1,12 @@
+/**
+ * Shows single lambda function.
+ *
+ * @module components/content-inventories-functions/lambda-functions-list-entry
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { conditional } from 'ember-awesome-macros';

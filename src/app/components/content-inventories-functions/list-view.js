@@ -1,3 +1,13 @@
+/**
+ * Lists lambda functions. It is a whole view component - may be used for
+ * a full page carousel.
+ *
+ * @module components/content-inventories-functions/list-view
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

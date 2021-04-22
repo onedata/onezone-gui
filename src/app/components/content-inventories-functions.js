@@ -1,3 +1,12 @@
+/**
+ * Allows to view and create lambda functions for automation inventory.
+ *
+ * @module components/content-inventories-functions
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { conditional, array } from 'ember-awesome-macros';

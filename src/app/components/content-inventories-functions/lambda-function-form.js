@@ -3,9 +3,9 @@
  * NOTE: it does not persist data. To save created lambda function, you need
  * to do it on your own by providing `onSubmit` (which should return a promise).
  *
- * @module components/authorizers-dropdown
- * @author Michal Borzecki
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @module components/lambda-function-form
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
