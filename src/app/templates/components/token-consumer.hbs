@@ -4,6 +4,8 @@
     class="token-string form-control"
     placeholder={{tt this "tokenInputPlaceholder"}}
     oninput={{action "tokenChanged" value="target.value"}}
+    value={{token}}
+    disabled={{isTokenInputDisabled}}
   >
   {{#if pendingCheckTime}}
     {{spin-spinner-block sizeClass="xs"}}
@@ -14,8 +16,15 @@
     {{tt this "invalidTokenMessage"}}
   </div>
 {{else if error}}
-  {{resource-load-error reason=error}}
-{{else}}
+  {{#if knownVerificationErrorOccurred}}
+    <div class="alert alert-warning" role="alert">
+      {{errorTranslation}}
+    </div>
+  {{else}}
+    {{resource-load-error reason=error}}
+  {{/if}}
+{{/if}}
+{{#one-collapse collapsed=(not (and isTokenChecked isTokenValid))}}
   {{#if typeText}}
     <div class="type-info">
       <p class="token-type">
@@ -32,10 +41,48 @@
           }}
         {{/if}}
       </p>
+      {{#unless (or media.isMobile noJoinMessage)}}
+        <figure class="consume-token-image">
+          <figure class="invite-subject-image">
+            <img class="subject-image" src={{root-url invitedModelImagePath}}>
+            <figcaption class="subject-image-label">
+              {{#truncated-string class="text"}}
+                {{#if joiningRecordSelectorModelName}}
+                  {{#if selectedJoiningRecordOption}} 
+                    <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
+                  {{else}}
+                    <span class="select-below-label">{{tt this "placeholderUnderSubjectImage"}}</span>
+                  {{/if}}
+                {{else}}
+                  <span class="subject-name">{{record-name record=currentUser}}</span>
+                {{/if}}
+              {{/truncated-string}}
+            </figcaption>
+          </figure>
+          <figure class="join-arrow-image">
+            <figcaption class="arrow-label">
+              {{#if spaceHarvesterRelationToken}}
+                {{tt this "addLabel"}}
+              {{else}}
+                {{tt this "joinLabel"}}
+              {{/if}}
+            </figcaption>
+            <div class="arrow"></div>
+          </figure>
+          <figure class="invite-target-image">
+            <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
+            <figcaption class="subject-image-label subject-name">
+              {{#truncated-string class="text"}}
+                {{inviteTargetName}}
+              {{/truncated-string}}
+            </figcaption>
+          </figure>
+        </figure>
+      {{/unless}}
     </div>
   {{/if}}
   {{#if noJoinMessage}}
-    <div class="no-join-message alert alert-info" role="alert">
+    <div class="no-join-message alert alert-warning" role="alert">
       {{noJoinMessage}}
     </div>
   {{/if}}
@@ -57,7 +104,7 @@
             <div class="option-container">
               {{one-icon icon=recordOption.icon}}
               {{#truncated-string class="text"}}
-                {{recordOption.label}}
+                {{name-conflict item=recordOption.value}}
               {{/truncated-string}}
             </div>
           {{/one-dropdown}}
@@ -66,13 +113,21 @@
     </div>
   {{/if}}
   {{#if showJoinBtn}}
-    {{#one-spin-button
-      class="join-btn btn btn-lg btn-primary"
-      disabled=isJoinBtnDisabled
-      action=(action "join")
-    }}
-      {{tt this "joinBtn"}}
-    {{/one-spin-button}}
+    <div class="option-buttons">
+      {{#bs-button
+        class="discard-btn btn btn-lg btn-warning"
+        onClick=(action "cancel")
+      }}
+        {{tt this "cancelBtn"}}
+      {{/bs-button}}
+      {{#one-spin-button
+        class="confirm-btn btn btn-lg btn-primary"
+        disabled=isConfirmBtnDisabled
+        action=(action "confirm")
+      }}
+        {{tt this "confirmBtn"}}
+      {{/one-spin-button}}
+    </div>
   {{/if}}
-{{/if}}
+{{/one-collapse}}
 {{yield}}

@@ -14,7 +14,7 @@ import isRecord from 'onedata-gui-common/utils/is-record';
 import modelRoutableId from 'onezone-gui/utils/model-routable-id';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { underscore } from '@ember/string';
+import { inject as service } from '@ember/service';
 
 /**
  * Finds GRI in griIds using pure entityId.
@@ -35,6 +35,13 @@ function findGri(griIds, entityId) {
 }
 
 export default OnedataSidebarContentRoute.extend({
+  recordManager: service(),
+  sidebarResources: service(),
+
+  nonStandardResourceTypeToModelName: Object.freeze({
+    inventories: 'atmInventory',
+  }),
+
   /**
    * @override
    */
@@ -49,7 +56,13 @@ export default OnedataSidebarContentRoute.extend({
    * @override
    */
   findOutResourceId(resourceId, resourceType) {
-    const entityType = underscore(resourceType).replace(/s$/, '');
+    const {
+      recordManager,
+      sidebarResources,
+    } = this.getProperties('recordManager', 'sidebarResources');
+
+    const modelName = sidebarResources.getModelNameForRouteResourceType(resourceType);
+    const entityType = recordManager.getEntityTypeForModelName(modelName);
     if (entityType) {
       return gri({
         entityId: resourceId,

@@ -21,6 +21,7 @@
 @import 'content-clusters-add';
 @import 'content-harvesters-plugin';
 @import 'content-harvesters-config';
+@import 'content-tokens-consumer.scss';
 @import 'harvester-configuration';
 @import 'content-harvesters-indices';
 @import 'content-clusters-deregister';
@@ -38,4 +39,4 @@
 @import 'record-name';
 @import 'token-template-selector';
 @import 'content-tokens-new';
-@import 'content-workflows-functions';
+@import 'content-inventories-functions';

@@ -1,0 +1,169 @@
+.content-inventories-functions .lambda-function-form {
+  $padding-right: 15em;
+  $space-for-remove-entry: 1em;
+  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) / 2;
+  $nested-fields-indent: 2em;
+
+  .one-way-toggle {
+    display: inline-flex;
+  }
+
+  .arguments-field,
+  .results-field {
+    .collection-item + .collection-item {
+      border-top: 1px solid $main-border-color;
+    }
+
+    &.field-edit-mode {
+      .collection-item + .collection-item {
+        padding-top: $form-group-margin-bottom;
+      }
+
+      .entryName-field,
+      .entryType-field,
+      .entryDefaultValue-field {
+        .control-label {
+          display: none;
+        }
+      }
+    }
+
+    &.field-view-mode {
+      flex-wrap: wrap;
+
+      .form-fields-collection-group {
+        flex: 0 1 100%;
+        margin-left: $nested-fields-indent;
+      }
+
+      .entry-field {
+        min-width: 0;
+      }
+
+      .collection-item {
+        padding-top: $form-component-view-margin;
+      }
+    }
+  }
+
+  .mountSpaceOptions-field {
+    margin-left: $nested-fields-indent;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .arguments-field,
+    .results-field {
+      &.field-edit-mode {
+        .form-fields-collection-group {
+          margin-left: $nested-fields-indent;
+        }
+      }
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .control-label {
+      width: 11em;
+      text-align: left;
+    }
+
+    .arguments-field,
+    .results-field {
+      &.field-edit-mode {
+        flex-wrap: nowrap;
+
+        .entry-children {
+          display: flex;
+          flex-wrap: wrap;
+        }
+      }
+    }
+
+    @media (max-width: $screen-sm-max) {
+      .entryName-field,
+      .entryType-field,
+      .entryDefaultValue-field {
+        flex: 1 1 100%;
+      }
+
+      .entryArray-field,
+      .entryOptional-field {
+        &.field-edit-mode {
+          .control-label {
+            width: initial;
+            min-width: initial;
+          }
+        }
+      }
+    }
+  }
+
+  @media (min-width: $screen-md-min) {
+    .fields-group-children.-children {
+      > * {
+        margin-right: $padding-right;
+      }
+
+      .arguments-field,
+      .results-field {
+        margin-right: 0;
+      }
+    }
+
+    .arguments-field,
+    .results-field {
+      &.field-edit-mode {
+        .entryName-field {
+          flex: 0 1 calc(50% - #{$padding-right / 2});
+        }
+
+        .entryType-field {
+          flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
+          min-width: 15em;
+          margin-left: $padding-base-vertical;
+        }
+
+        .entryArray-field,
+        .entryOptional-field {
+          flex: 0 1 $entry-toggle-container-width;
+
+          .control-label {
+            position: absolute;
+            min-width: initial;
+            width: initial;
+            max-width: initial;
+            padding: 0;
+            top: -1em;
+            left: 50%;
+            transform: translateX(-50%);
+          }
+
+          .field-component {
+            text-align: center;
+          }
+        }
+
+        .entryArray-field {
+          transform: translateX(#{($entry-toggle-container-width - $toggle-width) / 6});
+        }
+
+        .entryOptional-field {
+          transform: translateX(-#{($entry-toggle-container-width - $toggle-width) / 6});
+        }
+
+        .entryDefaultValue-field {
+          margin-right: $padding-right;
+        }
+
+        .remove-field-button-container {
+          position: absolute;
+          right: 0;
+        }
+
+        .remove-icon {
+          margin-top: initial;
+        }
+      }
+    }
+  }
+}

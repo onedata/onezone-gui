@@ -132,11 +132,11 @@ const clusterHandlers = {
   },
 };
 
-const workflowDirectoryHandlers = {
+const atmInventoryHandlers = {
   privileges(operation) {
     if (operation === 'get') {
       return {
-        member: ['directory_view'],
+        member: ['atm_inventory_view'],
       };
     } else {
       throw messageNotSupported;
@@ -214,7 +214,38 @@ const tokenHandlers = {
       } else {
         return {
           success: false,
-          error: { id: 'badToken' },
+          error: { id: 'badValueToken' },
+          data: {},
+        };
+      }
+    } else {
+      return messageNotSupported;
+    }
+  },
+  verify_invite_token(operation, entityId, data) {
+    if (operation === 'create') {
+      const token = get(data, 'token');
+      const tokenRecord = this.get('store').peekAll('token').findBy('token', token);
+      if (tokenRecord.get('revoked')) {
+        return {
+          success: false,
+          error: { id: 'tokenRevoked' },
+          data: {},
+        };
+      } else if (tokenRecord.get('caveats').length > 0) {
+        return {
+          success: false,
+          error: {
+            id: 'tokenCaveatUnverified',
+            details: {
+              caveat: tokenRecord.get('caveats')[0],
+            },
+          },
+          data: {},
+        };
+      } else {
+        return {
+          success: true,
           data: {},
         };
       }
@@ -235,7 +266,7 @@ export default OnedataGraphMock.extend({
       provider: providerHandlers,
       cluster: clusterHandlers,
       token: tokenHandlers,
-      workflow_directory: workflowDirectoryHandlers,
+      atm_inventory: atmInventoryHandlers,
     });
     this.set(
       'handlers',

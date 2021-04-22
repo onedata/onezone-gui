@@ -1,7 +1,7 @@
 /**
  * Creates new lambda function. Needs:
  * - `rawLambdaFunction` - will be used to create new lambda function record,
- * - `workflowDirectory` - parent directory for newly created lambda function.
+ * - `atmInventory` - parent inventory for newly created lambda function.
  *
  * @module utils/workflow-actions/create-lambda-function-action
  * @author Michał Borzęcki
@@ -29,9 +29,9 @@ export default Action.extend({
   rawLambdaFunction: reads('context.rawLambdaFunction'),
 
   /**
-   * @type {ComputedProperty<Models.WorkflowDirectory>}
+   * @type {ComputedProperty<Models.AtmInventory>}
    */
-  workflowDirectory: reads('context.workflowDirectory'),
+  atmInventory: reads('context.atmInventory'),
 
   /**
    * @override
@@ -39,18 +39,18 @@ export default Action.extend({
   onExecute() {
     const {
       rawLambdaFunction,
-      workflowDirectory,
+      atmInventory,
       workflowManager,
     } = this.getProperties(
       'rawLambdaFunction',
-      'workflowDirectory',
+      'atmInventory',
       'workflowManager',
     );
-    const workflowDirectoryId = get(workflowDirectory, 'entityId');
+    const atmInventoryId = get(atmInventory, 'entityId');
 
     const result = ActionResult.create();
     return result.interceptPromise(
-      workflowManager.createLambdaFunction(workflowDirectoryId, rawLambdaFunction)
+      workflowManager.createLambdaFunction(atmInventoryId, rawLambdaFunction)
     ).then(() => result, () => result);
   },
 });

@@ -6,6 +6,14 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-5690 Added opening cluster invalid cert link in new tab and countdown for retry
+* VFS-7491 Fixed column labels overflow in harvesting progress table
+* VFS-7228 Better UX of token consumer page
+* VFS-7516 Added new file details to harvester indices: "file type" and "dataset info"
+* VFS-7401 Updated commons
+* VFS-7477 Fixed removing space from harvester
+* VFS-6779 Added links to harvesters/spaces from list of harvesters/spaces
+* VFS-7413 Fixed missing members with duplicated names
 * VFS-6663 Added options for copy user ID and provider ID/domain
 * VFS-6638 Detecting unreachable duplicated clusters
 * VFS-7281 Fixed scrolling to active items in sidebar

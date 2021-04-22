@@ -37,7 +37,7 @@ export default Model.extend(GraphSingleModelMixin, {
   linkedAccountList: belongsTo('linkedAccountList'),
   clusterList: belongsTo('clusterList'),
   harvesterList: belongsTo('harvesterList'),
-  workflowDirectoryList: belongsTo('workflowDirectoryList'),
+  atmInventoryList: belongsTo('atmInventoryList'),
 
   name: alias('fullName'),
 

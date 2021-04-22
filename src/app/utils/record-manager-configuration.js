@@ -149,14 +149,19 @@ export default class RecordManagerConfiguration {
       ).catch(ignoreForbiddenError)
     );
 
-    // Reload users list in the one side of the relation if the other side was
-    // a group
+    // Reload:
+    // - users list in the one side of the relation,
+    // - records list of the current user related to the one side of the relation,
+    // when the other side of the relation was a group.
     if (relationOriginModelName === 'group') {
       reloadPromises.push(
         this.recordManager.reloadRecordListById(
           relationTargetModelName,
           relationTargetRecordId,
           'user'
+        ).catch(ignoreForbiddenError),
+        this.recordManager.reloadUserRecordList(
+          relationTargetModelName
         ).catch(ignoreForbiddenError)
       );
     }
@@ -166,6 +171,9 @@ export default class RecordManagerConfiguration {
           relationOriginModelName,
           relationOriginRecordId,
           'user'
+        ).catch(ignoreForbiddenError),
+        this.recordManager.reloadUserRecordList(
+          relationOriginModelName
         ).catch(ignoreForbiddenError)
       );
     }

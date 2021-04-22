@@ -1,0 +1,25 @@
+{{#content-info
+  class="scroll-breakpoint-700"
+  header=(tt this "title")
+  imagePath=(root-url "assets/images/atm-inventory-new.svg")
+  text=(tt this "text")
+  buttonLabel=(tt this "createButton")
+  buttonAction=(action "createAtmInventory")
+  buttonDisabled=(not atmInventoryName)
+  as |contentInfo|
+}}
+  <div class="row">
+    <div class="col-xs-12">
+      <input
+        id="new-atm-inventory-name"
+        value={{atmInventoryName}}
+        oninput={{action (mut atmInventoryName) value="target.value"}}
+        onkeydown={{invoke-on-enter contentInfo.buttonAction}}
+        placeholder={{tt this "atmInventoryName"}}
+        disabled={{contentInfo.actionInProgress}}
+        class="form-control new-atm-inventory-name"
+      >
+    </div>
+  </div>
+{{/content-info}}
+{{yield}}

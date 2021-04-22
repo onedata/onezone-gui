@@ -18,7 +18,7 @@ import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester'
 import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 import { entityType as tokenEntityType } from 'onezone-gui/models/token';
-import { entityType as workflowDirectoryEntityType } from 'onezone-gui/models/workflow-directory';
+import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
 
 const OnedataAdapter = environmentExport(config, ProductionAdapter, DevelopmentAdapter);
 
@@ -31,7 +31,7 @@ export const entityTypeToModelNameMap = Object.freeze(new Map([
   [providerEntityType, 'provider'],
   [clusterEntityType, 'cluster'],
   [tokenEntityType, 'token'],
-  [workflowDirectoryEntityType, 'workflow-directory'],
+  [atmInventoryEntityType, 'atm-inventory'],
 ]));
 
 export default OnedataAdapter.extend({

@@ -64,9 +64,9 @@ const resultTypes = [{
 }];
 
 describe(
-  'Integration | Component | content workflows functions/lambda function form',
+  'Integration | Component | content inventories functions/lambda function form',
   function () {
-    setupComponentTest('content-workflows-functions/lambda-function-form', {
+    setupComponentTest('content-inventories-functions/lambda-function-form', {
       integration: true,
     });
 
@@ -78,7 +78,7 @@ describe(
     });
 
     it('has class "lambda-function-form"', async function () {
-      this.render(hbs `{{content-workflows-functions/lambda-function-form}}`);
+      this.render(hbs `{{content-inventories-functions/lambda-function-form}}`);
 
       expect(this.$().children()).to.have.class('lambda-function-form')
         .and.to.have.length(1);
@@ -782,7 +782,7 @@ describe(
 
 async function renderCreate(testCase) {
   testCase.set('submitStub', sinon.stub().resolves());
-  testCase.render(hbs `{{content-workflows-functions/lambda-function-form
+  testCase.render(hbs `{{content-inventories-functions/lambda-function-form
     mode="create"
     onSubmit=submitStub
   }}`);
@@ -791,7 +791,7 @@ async function renderCreate(testCase) {
 
 async function renderView(testCase) {
   testCase.set('submitStub', sinon.stub().resolves());
-  testCase.render(hbs `{{content-workflows-functions/lambda-function-form
+  testCase.render(hbs `{{content-inventories-functions/lambda-function-form
     mode="view"
     lambdaFunction=lambdaFunction
   }}`);

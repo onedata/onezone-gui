@@ -192,7 +192,13 @@ export default Component.extend(I18n, {
     return FormFieldsGroup.create({
       name: 'includeFileDetails',
       classes: 'no-label-top-padding',
-      fields: ['fileName', 'spaceId', 'metadataExistenceFlags'].map(fieldName =>
+      fields: [
+        'fileName',
+        'fileType',
+        'spaceId',
+        'datasetInfo',
+        'metadataExistenceFlags',
+      ].map(fieldName =>
         ToggleField.extend({
           defaultValue: conditional(
             'component.inViewMode',

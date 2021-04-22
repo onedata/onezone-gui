@@ -10,35 +10,59 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { entityType as workflowDirectoryEntityType } from 'onezone-gui/models/workflow-directory';
+import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
 import { all as allFulfilled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 
 export default Service.extend({
+  store: service(),
   recordManager: service(),
   onedataGraph: service(),
   onedataGraphUtils: service(),
 
   /**
-   * Joins current user to a workflow directory without token
-   * @param {String} workflowDirectoryId
+   * Creates new automation inventory.
+   * @param {Object} rawAtmInventory
+   * @returns {Promise<Models.AtmInventory>}
+   */
+  createAtmInventory(rawAtmInventory) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+    const currentUserId = get(recordManager.getCurrentUserRecord(), 'entityId');
+    return store.createRecord(
+      'atmInventory',
+      Object.assign({}, rawAtmInventory, {
+        _meta: {
+          authHint: ['asUser', currentUserId],
+        },
+      })
+    ).save().then(atmInventory =>
+      recordManager.reloadUserRecordList('atmInventory').then(() => atmInventory)
+    );
+  },
+
+  /**
+   * Joins current user to a automation inventory without token
+   * @param {String} atmInventoryId
    * @returns {Promise}
    */
-  joinWorkflowDirectoryAsUser(workflowDirectoryId) {
+  joinAtmInventoryAsUser(atmInventoryId) {
     const {
       recordManager,
       onedataGraph,
     } = this.getProperties('recordManager', 'onedataGraph');
     const currentUser = recordManager.getCurrentUserRecord();
-    const loadedWorkflowDirectory = recordManager.getLoadedRecordById(
-      'workflowDirectory',
-      workflowDirectoryId
+    const loadedAtmInventory = recordManager.getLoadedRecordById(
+      'atmInventory',
+      atmInventoryId
     );
 
     return onedataGraph.request({
       gri: gri({
-        entityType: workflowDirectoryEntityType,
-        entityId: workflowDirectoryId,
+        entityType: atmInventoryEntityType,
+        entityId: atmInventoryId,
         aspect: 'user',
         aspectId: get(currentUser, 'entityId'),
         scope: 'private',
@@ -46,22 +70,22 @@ export default Service.extend({
       operation: 'create',
       subscribe: false,
     }).then(() => allFulfilled([
-      loadedWorkflowDirectory ? loadedWorkflowDirectory.reload() : resolve(),
+      loadedAtmInventory ? loadedAtmInventory.reload() : resolve(),
       recordManager.reloadRecordListById(
-        'workflowDirectory',
-        workflowDirectoryId,
+        'atmInventory',
+        atmInventoryId,
         'user'
       ).catch(ignoreForbiddenError),
     ]));
   },
 
   /**
-   * Creates member group for specified workflow directory
-   * @param {String} workflowDirectoryId
+   * Creates member group for specified automation inventory
+   * @param {String} atmInventoryId
    * @param {Object} groupRepresentation
    * @return {Promise}
    */
-  createMemberGroupForWorkflowDirectory(workflowDirectoryId, groupRepresentation) {
+  createMemberGroupForAtmInventory(atmInventoryId, groupRepresentation) {
     const {
       recordManager,
       onedataGraph,
@@ -70,8 +94,8 @@ export default Service.extend({
 
     return onedataGraph.request({
       gri: gri({
-        entityType: workflowDirectoryEntityType,
-        entityId: workflowDirectoryId,
+        entityType: atmInventoryEntityType,
+        entityId: atmInventoryId,
         aspect: 'group',
         scope: 'auto',
       }),
@@ -81,22 +105,22 @@ export default Service.extend({
     }).then(() => {
       return allFulfilled([
         recordManager.reloadRecordListById(
-          'workflowDirectory',
-          workflowDirectoryId,
+          'atmInventory',
+          atmInventoryId,
           'group'
         ).catch(ignoreForbiddenError),
-        recordManager.reloadUserRecordList('workflowDirectory'),
+        recordManager.reloadUserRecordList('atmInventory'),
       ]);
     });
   },
 
   /**
-   * Adds group to the members of a workflow directory
-   * @param {String} workflowDirectoryId
+   * Adds group to the members of a automation inventory
+   * @param {String} atmInventoryId
    * @param {String} groupId
    * @return {Promise}
    */
-  addMemberGroupToWorkflowDirectory(workflowDirectoryId, groupId) {
+  addMemberGroupToAtmInventory(atmInventoryId, groupId) {
     const {
       recordManager,
       onedataGraph,
@@ -104,8 +128,8 @@ export default Service.extend({
 
     return onedataGraph.request({
       gri: gri({
-        entityType: workflowDirectoryEntityType,
-        entityId: workflowDirectoryId,
+        entityType: atmInventoryEntityType,
+        entityId: atmInventoryId,
         aspect: 'group',
         aspectId: groupId,
         scope: 'auto',
@@ -113,24 +137,24 @@ export default Service.extend({
       operation: 'create',
     }).then(() => allFulfilled([
       recordManager.reloadRecordListById(
-        'workflowDirectory',
-        workflowDirectoryId,
+        'atmInventory',
+        atmInventoryId,
         'group'
       ).catch(ignoreForbiddenError),
       recordManager.reloadRecordListById(
-        'workflowDirectory',
-        workflowDirectoryId,
+        'atmInventory',
+        atmInventoryId,
         'user'
       ).catch(ignoreForbiddenError),
     ]));
   },
 
   /**
-   * @param {String} workflowDirectoryId
+   * @param {String} atmInventoryId
    * @param {Object} functionPrototype
    * @returns {Promise<Models.LambdaFunction>}
    */
-  createLambdaFunction(workflowDirectoryId, functionPrototype) {
+  createLambdaFunction(atmInventoryId, functionPrototype) {
     // FIXME: VFS-7538 implement lambda function creation
     return resolve(functionPrototype);
   },

@@ -1,0 +1,16 @@
+{{#one-carousel activeSlideId=activeSlide as |carousel|}}
+  {{#carousel.slide slideId="list"}}
+    {{content-inventories-functions/list-view
+      atmInventory=atmInventory
+      onAddFunction=(action "showCreatorView")
+    }}
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="creator"}}
+    {{content-inventories-functions/creator-view
+      atmInventory=atmInventory
+      onBackSlide=(action "showListView")
+      onFunctionAdded=(action "showListView")
+    }}
+  {{/carousel.slide}}
+{{/one-carousel}}
+{{yield}}

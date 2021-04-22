@@ -101,21 +101,21 @@ const tokenInviteTypes = [{
   tokenName: /Inv\. spc\. hrv\..*/,
   modelNameInPrivileges: 'harvester',
 }, {
-  inviteType: 'userJoinWorkflowDirectory',
-  label: 'Invite user to workflow directory',
+  inviteType: 'userJoinAtmInventory',
+  label: 'Invite user to automation inventory',
   icon: 'view-grid',
-  targetModelName: 'workflowDirectory',
-  targetPlaceholder: 'Select workflow directory...',
-  tokenName: /Inv\. usr\. wrk\. dir\..*/,
-  modelNameInPrivileges: 'directory',
+  targetModelName: 'atmInventory',
+  targetPlaceholder: 'Select automation inventory...',
+  tokenName: /Inv\. usr\. atm\. inv\..*/,
+  modelNameInPrivileges: 'inventory',
 }, {
-  inviteType: 'groupJoinWorkflowDirectory',
-  label: 'Invite group to workflow directory',
+  inviteType: 'groupJoinAtmInventory',
+  label: 'Invite group to automation inventory',
   icon: 'view-grid',
-  targetModelName: 'workflowDirectory',
-  targetPlaceholder: 'Select workflow directory...',
-  tokenName: /Inv\. grp\. wrk\. dir\..*/,
-  modelNameInPrivileges: 'directory',
+  targetModelName: 'atmInventory',
+  targetPlaceholder: 'Select automation inventory...',
+  tokenName: /Inv\. grp\. atm\. inv\..*/,
+  modelNameInPrivileges: 'inventory',
 }, {
   inviteType: 'supportSpace',
   label: 'Support space',
@@ -223,10 +223,10 @@ describe('Integration | Component | token editor', function () {
       'harvester',
       'provider',
       'cluster',
-      'workflowDirectory',
+      'atmInventory',
     ].forEach(modelName => {
-      const viewPrivilege = modelName === 'workflowDirectory' ?
-        'directory_view' : `${modelName}_view`;
+      const viewPrivilege = modelName === 'atmInventory' ?
+        'atm_inventory_view' : `${modelName}_view`;
       onedataGraphStub.withArgs({
         gri: `${underscore(modelName)}.null.privileges:private`,
         operation: 'get',
@@ -610,9 +610,10 @@ describe('Integration | Component | token editor', function () {
                 `.node-text:contains(Modify ${modelNameInPrivileges}) + .form-group .one-way-toggle`
               )[0]))
               .then(() => {
+                const underscoredModelName = _.snakeCase(targetModelName);
                 expectToHaveValue(this, 'privileges', [
-                  `${modelNameInPrivileges}_view`,
-                  `${modelNameInPrivileges}_update`,
+                  `${underscoredModelName}_view`,
+                  `${underscoredModelName}_update`,
                 ]);
                 expectToBeValid(this, 'privileges');
               });

@@ -36,7 +36,7 @@ import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/g
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
-import { groupedFlags as workflowDirectoryFlags } from 'onedata-gui-websocket-client/utils/workflow-directory-privileges-flags';
+import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import {
@@ -93,8 +93,8 @@ const tokenInviteTypeOptions = [
   'userJoinHarvester',
   'groupJoinHarvester',
   'spaceJoinHarvester',
-  'userJoinWorkflowDirectory',
-  'groupJoinWorkflowDirectory',
+  'userJoinAtmInventory',
+  'groupJoinAtmInventory',
   'supportSpace',
   'registerOneprovider',
 ].map(inviteType => {
@@ -115,7 +115,7 @@ const privilegesForModels = {
   group: groupFlags,
   harvester: harvesterFlags,
   cluster: clusterFlags,
-  workflowDirectory: workflowDirectoryFlags,
+  atmInventory: atmInventoryFlags,
 };
 
 const CaveatFormGroup = FormFieldsGroup.extend({
@@ -596,16 +596,16 @@ export default Component.extend(I18n, {
         }
       ),
       modelNameForTranslations: conditional(
-        equal('cachedPrivilegesModelName', raw('workflowDirectory')),
-        raw('workflow'),
-        'cachedPrivilegesModelName'
+        equal('cachedPrivilegesModelName', raw('atmInventory')),
+        raw('inventories'),
+        tag `${'cachedPrivilegesModelName'}s`,
       ),
       privilegeGroupsTranslationsPath: computed(
         'modelNameForTranslations',
         function privilegeGroupsTranslationsPath() {
           const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
-            `components.content${modelName}sMembers.privilegeGroups` :
+            `components.content${modelName}Members.privilegeGroups` :
             undefined;
         }
       ),
@@ -614,7 +614,7 @@ export default Component.extend(I18n, {
         function privilegesTranslationsPath() {
           const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
-            `components.content${modelName}sMembers.privileges` :
+            `components.content${modelName}Members.privileges` :
             undefined;
         }
       ),

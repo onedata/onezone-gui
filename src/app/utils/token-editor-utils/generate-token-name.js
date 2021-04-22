@@ -24,8 +24,8 @@ const inviteTypeNames = {
   userJoinHarvester: 'Inv. usr. hrv.',
   groupJoinHarvester: 'Inv. grp. hrv.',
   spaceJoinHarvester: 'Inv. spc. hrv.',
-  userJoinWorkflowDirectory: 'Inv. usr. wrk. dir.',
-  groupJoinWorkflowDirectory: 'Inv. grp. wrk. dir.',
+  userJoinAtmInventory: 'Inv. usr. atm. inv.',
+  groupJoinAtmInventory: 'Inv. grp. atm. inv.',
 };
 const possibleInviteTypes = Object.keys(inviteTypeNames);
 const inviteTypesWithoutTarget = [

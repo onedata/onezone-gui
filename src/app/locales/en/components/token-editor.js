@@ -58,11 +58,11 @@ export default {
             spaceJoinHarvester: {
               label: 'Invite space to harvester',
             },
-            userJoinWorkflowDirectory: {
-              label: 'Invite user to workflow directory',
+            userJoinAtmInventory: {
+              label: 'Invite user to automation inventory',
             },
-            groupJoinWorkflowDirectory: {
-              label: 'Invite group to workflow directory',
+            groupJoinAtmInventory: {
+              label: 'Invite group to automation inventory',
             },
             supportSpace: {
               label: 'Support space',
@@ -89,8 +89,8 @@ export default {
               userJoinHarvester: 'Select harvester...',
               groupJoinHarvester: 'Select harvester...',
               spaceJoinHarvester: 'Select harvester...',
-              userJoinWorkflowDirectory: 'Select workflow directory...',
-              groupJoinWorkflowDirectory: 'Select workflow directory...',
+              userJoinAtmInventory: 'Select automation inventory...',
+              groupJoinAtmInventory: 'Select automation inventory...',
               supportSpace: 'Select space...',
             },
           },

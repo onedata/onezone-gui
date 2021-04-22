@@ -9,16 +9,16 @@ import { lookupService } from '../../../helpers/stub-service';
 import { resolve } from 'rsvp';
 
 describe(
-  'Integration | Component | content workflows functions/creator view',
+  'Integration | Component | content inventories functions/creator view',
   function () {
-    setupComponentTest('content-workflows-functions/creator-view', {
+    setupComponentTest('content-inventories-functions/creator-view', {
       integration: true,
     });
 
     beforeEach(function () {
       const workflowActions = lookupService(this, 'workflow-actions');
       this.setProperties({
-        workflowDirectory: {
+        atmInventory: {
           entityId: 'someId',
         },
         backSlideSpy: sinon.spy(),
@@ -27,10 +27,10 @@ describe(
       });
     });
 
-    it('has class "content-workflows-functions-creator-view"', function () {
-      this.render(hbs `{{content-workflows-functions/creator-view}}`);
+    it('has class "content-inventories-functions-creator-view"', function () {
+      this.render(hbs `{{content-inventories-functions/creator-view}}`);
 
-      expect(this.$().children()).to.have.class('content-workflows-functions-creator-view')
+      expect(this.$().children()).to.have.class('content-inventories-functions-creator-view')
         .and.to.have.length(1);
     });
 
@@ -61,11 +61,11 @@ describe(
     it('calls "onFunctionAdded" and resets form when lambda function has been created',
       async function () {
         const {
-          workflowDirectory,
+          atmInventory,
           createCreateLambdaFunctionActionStub,
           functionAddedSpy,
         } = this.getProperties(
-          'workflowDirectory',
+          'atmInventory',
           'createCreateLambdaFunctionActionStub',
           'functionAddedSpy'
         );
@@ -86,7 +86,7 @@ describe(
 
         expect(createCreateLambdaFunctionActionStub).to.be.calledOnce
           .and.to.be.calledWith({
-            workflowDirectory,
+            atmInventory,
             rawLambdaFunction: sinon.match({ name: 'someName' }),
           });
         expect(functionAddedSpy).to.be.calledOnce
@@ -112,8 +112,8 @@ describe(
 );
 
 async function render(testCase) {
-  testCase.render(hbs `{{content-workflows-functions/creator-view
-    workflowDirectory=workflowDirectory
+  testCase.render(hbs `{{content-inventories-functions/creator-view
+    atmInventory=atmInventory
     onBackSlide=backSlideSpy
     onFunctionAdded=functionAddedSpy
   }}`);

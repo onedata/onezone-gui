@@ -28,6 +28,8 @@ describe('Integration | Component | token consumer', function () {
 
     const tokenManager = lookupService(this, 'token-manager');
     const examineStub = sinon.stub(tokenManager, 'examineToken').returns(resolve());
+    const verifyInviteTokenStub = sinon.stub(tokenManager, 'verifyInviteToken')
+      .returns(resolve());
     const recordManager = lookupService(this, 'record-manager');
     const getUserRecordListStub = sinon.stub(recordManager, 'getUserRecordList');
 
@@ -36,7 +38,7 @@ describe('Integration | Component | token consumer', function () {
       'space',
       'group',
       'harvester',
-      'workflowDirectory',
+      'atmInventory',
     ].forEach(modelName => {
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
@@ -56,6 +58,7 @@ describe('Integration | Component | token consumer', function () {
     this.setProperties({
       examineStub,
       mockedRecords,
+      verifyInviteTokenStub,
     });
   });
 
@@ -139,13 +142,13 @@ describe('Integration | Component | token consumer', function () {
           expect(this.$('.no-join-message').text().trim()).to.equal(
             'This is not an invite token and cannot be used to join to any resource.'
           );
-          expect(this.$('.join-btn')).to.not.exist;
+          expect(this.$('.confirm-btn')).to.not.exist;
         });
     });
   });
 
-  function selectorDescription(targetModelName, joiningModelName) {
-    return `To use this token you have to select which ${joiningModelName} should join ${targetModelName} someRecord:`;
+  function selectorDescription(targetModelName, joiningModelName, actionOnSubject) {
+    return `To consume this token, please select a ${joiningModelName} of yours that will ${actionOnSubject} the ${targetModelName} someRecord:`;
   }
 
   [{
@@ -153,105 +156,105 @@ describe('Integration | Component | token consumer', function () {
       inviteType: 'userJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite user to group someRecord',
+    typeText: 'Invitation to join a group',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinGroup',
       groupName: 'someRecord',
     },
-    typeText: 'Invite group to parent group someRecord',
+    typeText: 'Invitation for your group to join a parent group',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('parent group', 'group'),
+    selectorDescription: selectorDescription('parent group', 'group', 'join'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite user to space someRecord',
+    typeText: 'Invitation to join a space',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite group to space someRecord',
+    typeText: 'Invitation for your group to join a space',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('space', 'group'),
+    selectorDescription: selectorDescription('space', 'group', 'join'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'harvesterJoinSpace',
       spaceName: 'someRecord',
     },
-    typeText: 'Invite harvester to space someRecord',
+    typeText: 'Invitation for your harvester to become a metadata consumer for a space',
     modelToSelect: 'harvester',
     selectorIcon: 'light-bulb',
-    selectorDescription: selectorDescription('space', 'harvester'),
+    selectorDescription: selectorDescription('space', 'harvester', 'be added to'),
     selectorPlaceholder: 'Select harvester...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite user to cluster someRecord',
+    typeText: 'Invitation to join a cluster',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinCluster',
       clusterName: 'someRecord',
     },
-    typeText: 'Invite group to cluster someRecord',
+    typeText: 'Invitation for your group to join a cluster',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('cluster', 'group'),
+    selectorDescription: selectorDescription('cluster', 'group', 'join'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'userJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite user to harvester someRecord',
+    typeText: 'Invitation to join a harvester',
     modelToSelect: null,
   }, {
     inviteSpec: {
       inviteType: 'groupJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite group to harvester someRecord',
+    typeText: 'Invitation for your group to join a harvester',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('harvester', 'group'),
+    selectorDescription: selectorDescription('harvester', 'group', 'join'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'spaceJoinHarvester',
       harvesterName: 'someRecord',
     },
-    typeText: 'Invite space to harvester someRecord',
+    typeText: 'Invitation for your space to become a metadata source for a harvester',
     modelToSelect: 'space',
     selectorIcon: 'space',
-    selectorDescription: selectorDescription('harvester', 'space'),
+    selectorDescription: selectorDescription('harvester', 'space', 'be added to'),
     selectorPlaceholder: 'Select space...',
   }, {
     inviteSpec: {
-      inviteType: 'userJoinWorkflowDirectory',
-      workflowDirectoryName: 'someRecord',
+      inviteType: 'userJoinAtmInventory',
+      atmInventoryName: 'someRecord',
     },
-    typeText: 'Invite user to workflow directory someRecord',
+    typeText: 'Invitation to join an automation inventory',
     modelToSelect: null,
   }, {
     inviteSpec: {
-      inviteType: 'groupJoinWorkflowDirectory',
-      workflowDirectoryName: 'someRecord',
+      inviteType: 'groupJoinAtmInventory',
+      atmInventoryName: 'someRecord',
     },
-    typeText: 'Invite group to workflow directory someRecord',
+    typeText: 'Invitation for your group to join an automation inventory',
     modelToSelect: 'group',
     selectorIcon: 'group',
-    selectorDescription: selectorDescription('workflow directory', 'group'),
+    selectorDescription: selectorDescription('automation inventory', 'group', 'join'),
     selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
@@ -280,7 +283,7 @@ describe('Integration | Component | token consumer', function () {
     const inviteType = inviteSpec.inviteType;
 
     if (noJoinMessage) {
-      it(`does not show "Join" button for invite ${inviteType} token`, function () {
+      it(`does not show "Confirm" button for invite ${inviteType} token`, function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
@@ -292,11 +295,11 @@ describe('Integration | Component | token consumer', function () {
         return fillIn('.token-string', 'token')
           .then(() => {
             expect(this.$('.no-join-message').text().trim()).to.equal(noJoinMessage);
-            expect(this.$('.join-btn')).to.not.exist;
+            expect(this.$('.confirm-btn')).to.not.exist;
           });
       });
     } else {
-      it(`shows "Join" button for invite ${inviteType} token`, function () {
+      it(`shows "Confirm" button for invite ${inviteType} token`, function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
@@ -308,7 +311,7 @@ describe('Integration | Component | token consumer', function () {
         return fillIn('.token-string', 'token')
           .then(() => {
             expect(this.$('.no-join-message')).to.not.exist;
-            expect(this.$('.join-btn')).to.exist;
+            expect(this.$('.confirm-btn')).to.exist;
           });
       });
     }
@@ -365,7 +368,7 @@ describe('Integration | Component | token consumer', function () {
       );
 
       it(
-        `has disabled "Join" button for invite ${inviteType} token when no target record is selected`,
+        `has disabled "Confirm" button for invite ${inviteType} token when no target record is selected`,
         function () {
           stubExamine(this, 'token', resolve({
             type: {
@@ -376,12 +379,12 @@ describe('Integration | Component | token consumer', function () {
           this.render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
-            .then(() => expect(this.$('.join-btn')).to.have.attr('disabled'));
+            .then(() => expect(this.$('.confirm-btn')).to.have.attr('disabled'));
         }
       );
 
       it(
-        `has enabled "Join" button for invite ${inviteType} token when target record is selected`,
+        `has enabled "Confirm" button for invite ${inviteType} token when target record is selected`,
         function () {
           stubExamine(this, 'token', resolve({
             type: {
@@ -393,7 +396,7 @@ describe('Integration | Component | token consumer', function () {
 
           return fillIn('.token-string', 'token')
             .then(() => new JoiningRecordHelper().selectOption(1))
-            .then(() => expect(this.$('.join-btn')).to.not.have.attr('disabled'));
+            .then(() => expect(this.$('.confirm-btn')).to.not.have.attr('disabled'));
         }
       );
     } else {
@@ -415,7 +418,7 @@ describe('Integration | Component | token consumer', function () {
       );
 
       it(
-        `has enabled "Join" button for invite ${inviteType} token`,
+        `has enabled "Confirm" button for invite ${inviteType} token`,
         function () {
           stubExamine(this, 'token', resolve({
             type: {
@@ -426,7 +429,7 @@ describe('Integration | Component | token consumer', function () {
           this.render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
-            .then(() => expect(this.$('.join-btn')).to.not.have.attr('disabled'));
+            .then(() => expect(this.$('.confirm-btn')).to.not.have.attr('disabled'));
         }
       );
     }
@@ -449,7 +452,7 @@ describe('Integration | Component | token consumer', function () {
       return fillIn('.token-string', 'token')
         .then(() => {
           expect(this.$('.token-type').text().trim())
-            .to.equal('Invite user to space unknown');
+            .to.equal('Invitation to join a space');
           const $warningIcon = this.$('.type-info .warning-icon');
           expect($warningIcon).to.exist;
           return new OneTooltipHelper($warningIcon[0]).getText();
@@ -547,7 +550,7 @@ describe('Integration | Component | token consumer', function () {
       const joiningRecordHelper = new JoiningRecordHelper();
       return fillIn('.token-string', 'token')
         .then(() => joiningRecordHelper.selectOption(1))
-        .then(() => click('.join-btn'))
+        .then(() => click('.confirm-btn'))
         .then(() => {
           expect(createConsumeInviteTokenActionStub).to.be.calledOnce;
           expect(createConsumeInviteTokenActionStub).to.be.calledWith(sinon.match({
@@ -561,7 +564,7 @@ describe('Integration | Component | token consumer', function () {
   );
 
   it(
-    'has join button blocked until ConsumeInviteTokenAction execution is done',
+    'has confirm button blocked until ConsumeInviteTokenAction execution is done',
     function () {
       stubExamine(this, 'token', resolve({
         type: {
@@ -582,14 +585,14 @@ describe('Integration | Component | token consumer', function () {
       this.render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
-        .then(() => click('.join-btn'))
+        .then(() => click('.confirm-btn'))
         .then(() => {
-          expect(this.$('.join-btn [role="progressbar"]')).to.exist;
+          expect(this.$('.confirm-btn [role="progressbar"]')).to.exist;
           resolveSubmit();
           return wait();
         })
         .then(() =>
-          expect(this.$('.join-btn [role="progressbar"]')).to.not.exist
+          expect(this.$('.confirm-btn [role="progressbar"]')).to.not.exist
         );
     }
   );

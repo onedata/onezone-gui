@@ -22,7 +22,7 @@ describe(
         createLambdaFunctionStub: sinon.stub(workflowManager, 'createLambdaFunction'),
         successNotifySpy: sinon.spy(globalNotify, 'success'),
         failureNotifySpy: sinon.spy(globalNotify, 'backendError'),
-        workflowDirectory: {
+        atmInventory: {
           entityId: 'someid',
         },
         rawLambdaFunction: {
@@ -35,22 +35,22 @@ describe(
       const {
         createLambdaFunctionStub,
         successNotifySpy,
-        workflowDirectory,
+        atmInventory,
         rawLambdaFunction,
       } = this.getProperties(
         'createLambdaFunctionStub',
         'successNotifySpy',
-        'workflowDirectory',
+        'atmInventory',
         'rawLambdaFunction'
       );
       const lambdaFunctionRecord = {};
       createLambdaFunctionStub
-        .withArgs(workflowDirectory.entityId, rawLambdaFunction)
+        .withArgs(atmInventory.entityId, rawLambdaFunction)
         .resolves(lambdaFunctionRecord);
       const action = CreateLambdaFunctionAction.create({
         ownerSource: this,
         context: {
-          workflowDirectory,
+          atmInventory,
           rawLambdaFunction,
         },
       });
@@ -67,18 +67,18 @@ describe(
       const {
         createLambdaFunctionStub,
         failureNotifySpy,
-        workflowDirectory,
+        atmInventory,
         rawLambdaFunction,
       } = this.getProperties(
         'createLambdaFunctionStub',
         'failureNotifySpy',
-        'workflowDirectory',
+        'atmInventory',
         'rawLambdaFunction'
       );
       const action = CreateLambdaFunctionAction.create({
         ownerSource: this,
         context: {
-          workflowDirectory,
+          atmInventory,
           rawLambdaFunction,
         },
       });

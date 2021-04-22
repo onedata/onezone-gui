@@ -1,0 +1,28 @@
+{{#content-info
+  class="scroll-breakpoint-500"
+  header=(tt this "title")
+  text=(tt this "text")
+}}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{#link-to "onedata.sidebar.content" "inventories" "new"}}
+          {{tt this "aCreateAtmInventory"}}
+        {{/link-to}}
+      </li>
+      <li>
+        {{tt this "pJoinAtmInventory"}}
+        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+          {{tt this "aJoinAtmInventory"}}
+        {{/link-to}}
+      </li>
+      <li>
+        {{tt this "p1JoinGroup"}}
+        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
+          {{tt this "aJoinGroup"}}
+        {{/link-to}}
+        {{tt this "p2JoinGroup"}}
+      </li>
+    </ul>
+  </p>
+{{/content-info}}

@@ -14,6 +14,8 @@ import { reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import ErrorCheckViewMixin from 'onedata-gui-common/mixins/error-check-view';
+import Looper from 'onedata-gui-common/utils/looper';
+import { resolve } from 'rsvp';
 
 export default Component.extend(I18n, ErrorCheckViewMixin, {
   classNames: 'content-clusters-endpoint-error',
@@ -38,9 +40,41 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
    */
   resourceId: reads('clusterEntityId'),
 
+  /**
+   * @type {Location}
+   */
+  _location: location,
+
+  /**
+   * @type {number}
+   */
+  requestCounter: 0,
+
+  /**
+   * @type {number}
+   */
+  requestSlowInterval: 10000,
+
+  /**
+   * @type {number}
+   */
+  requestFastInterval: 500,
+
+  /**
+   * @type {Looper}
+   */
+  connectionChecker: undefined,
+
   emergencyOnepanelUrl: computed('cluster.standaloneOriginProxy.content',
     function emergencyOnepanelUrl() {
       return this.get('cluster.standaloneOriginProxy.content') + ':9443';
+    }
+  ),
+
+  onepanelConfigurationUrl: computed('cluster.standaloneOriginProxy.content',
+    function onepanelConfigurationUrl() {
+      return this.get('cluster.standaloneOriginProxy.content') +
+        '/api/v3/onepanel/configuration';
     }
   ),
 
@@ -65,6 +99,16 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
     );
   },
 
+  init() {
+    this._super(...arguments);
+    const connectionChecker = new Looper({
+      immediate: false,
+      interval: this.get('requestSlowInterval'),
+    });
+    connectionChecker.on('tick', () => this.checkConnectionToProvider());
+    this.set('connectionChecker', connectionChecker);
+  },
+
   didInsertElement() {
     this._super(...arguments);
     this.getTryErrorCheckProxy().then(isError => {
@@ -81,9 +125,55 @@ export default Component.extend(I18n, ErrorCheckViewMixin, {
               i18n.t('components.alerts.endpointError.onepanel'),
             url: standaloneOrigin,
             serverType: 'onepanel',
+            setFastPollingCallback: this.setFastPolling.bind(this),
           });
         });
       }
     });
+  },
+
+  destroy() {
+    try {
+      this.destroyConnectionChecker();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  setFastPolling(enabled) {
+    if (enabled) {
+      this.set('connectionChecker.interval', this.get('requestFastInterval'));
+      this.set('requestCounter', 0);
+    }
+  },
+
+  checkConnectionToProvider() {
+    resolve($.get(this.get('onepanelConfigurationUrl')))
+      .then(() => {
+        this.destroyConnectionChecker();
+        this.get('_location').reload();
+      })
+      .catch(() => {});
+    if (this.get('connectionChecker.interval') === this.get('requestFastInterval')) {
+      const requestCounter = this.get('requestCounter');
+      if (requestCounter < 10) {
+        this.incrementProperty('requestCounter');
+      } else {
+        this.set('connectionChecker.interval', this.get('requestSlowInterval'));
+      }
+    }
+  },
+
+  destroyConnectionChecker() {
+    const connectionChecker = this.get('connectionChecker');
+    if (connectionChecker) {
+      connectionChecker.destroy();
+    }
+  },
+
+  actions: {
+    setFastPolling() {
+      this.setFastPolling(true);
+    },
   },
 });

@@ -6,9 +6,9 @@ import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
 
 describe(
-  'Integration | Component | content workflows functions/lambda functions list',
+  'Integration | Component | content inventories functions/lambda functions list',
   function () {
-    setupComponentTest('content-workflows-functions/lambda-functions-list', {
+    setupComponentTest('content-inventories-functions/lambda-functions-list', {
       integration: true,
     });
 
@@ -43,7 +43,7 @@ describe(
     });
 
     it('has class "lambda-functions-list"', function () {
-      this.render(hbs `{{content-workflows-functions/lambda-functions-list}}`);
+      this.render(hbs `{{content-inventories-functions/lambda-functions-list}}`);
 
       expect(this.$().children()).to.have.class('lambda-functions-list')
         .and.to.have.length(1);
@@ -121,7 +121,7 @@ describe(
 );
 
 async function render(testCase) {
-  testCase.render(hbs `{{content-workflows-functions/lambda-functions-list
+  testCase.render(hbs `{{content-inventories-functions/lambda-functions-list
     collection=collection
   }}`);
   await wait();

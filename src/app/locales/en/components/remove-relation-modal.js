@@ -13,7 +13,7 @@ export default _.merge({}, proceedProcessModal, {
   harvester: 'harvester&nbsp;"{{name}}"',
   space: 'space&nbsp;"{{name}}"',
   cluster: 'cluster&nbsp;"{{name}}"',
-  workflowDirectory: 'workflow directory&nbsp;"{{name}}"',
+  atmInventory: 'automation inventory&nbsp;"{{name}}"',
   group: 'group&nbsp;"{{name}}"',
   subgroup: 'subgroup&nbsp;"{{name}}"',
   user: 'user&nbsp;"{{name}}"',
@@ -38,5 +38,5 @@ export default _.merge({}, proceedProcessModal, {
   headerSubgroups: 'subgroups',
   headerMembers: 'members',
   headerCluster: 'cluster',
-  headerWorkflowDirectory: 'workflow directory',
+  headerAtmInventory: 'atm. inventory',
 });

@@ -2,8 +2,8 @@
  * A service which provides harvester manipulation functions ready to use for GUI
  *
  * @module services/harvester-actions
- * @author Michał Borzęcki
- * @copyright (C) 2019 ACK CYFRONET AGH
+ * @author Michał Borzęcki, Agnieszka Warchoł
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -12,6 +12,7 @@ import { computed, get } from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { next } from '@ember/runloop';
+import RemoveSpaceFromHarvesterAction from 'onezone-gui/utils/harvester-actions/remove-space-from-harvester-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -45,6 +46,10 @@ export default Service.extend(I18n, {
         'new'),
     };
   }),
+
+  createRemoveSpaceFromHarvesterAction(context) {
+    return RemoveSpaceFromHarvesterAction.create({ ownerSource: this, context });
+  },
 
   /**
    * Creates new harvester
@@ -162,31 +167,6 @@ export default Service.extend(I18n, {
         globalNotify.backendError(this.t('removingHarvester'), error);
         throw error;
       });
-  },
-
-  /**
-   * Removes space form harvester
-   * @param {Model.Harvester} harvester
-   * @param {Model.Space} space
-   * @returns {Promise}
-   */
-  removeSpaceFromHarvester(harvester, space) {
-    const {
-      harvesterManager,
-      globalNotify,
-    } = this.getProperties('harvesterManager', 'globalNotify');
-    return harvesterManager.removeSpaceFromHarvester(
-      get(harvester, 'entityId'),
-      get(space, 'entityId')
-    ).then(() => {
-      globalNotify.success(this.t('removeSpaceFromHarvesterSuccess', {
-        harvesterName: get(harvester, 'name'),
-        spaceName: get(space, 'name'),
-      }));
-    }).catch(error => {
-      globalNotify.backendError(this.t('removingSpaceFromHarvester'), error);
-      throw error;
-    });
   },
 
   /**
