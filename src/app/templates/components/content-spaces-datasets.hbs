@@ -1,0 +1,20 @@
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-datasets-content"
+  space=space
+  oneproviderId=oneproviderId
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  as |container|
+}}
+  {{#container.header class="content-spaces-datasets-header"}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-space-datasets
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceId=space.entityId
+    }}
+  {{/container.body}}
+{{/oneprovider-view-container}}

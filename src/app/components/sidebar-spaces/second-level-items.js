@@ -103,6 +103,26 @@ export default SecondLevelItems.extend(I18n, {
     }
   ),
 
+  itemDatasets: computed(
+    'space.privileges.manageDatasets',
+    function itemDatasets() {
+      const i18n = this.get('i18n');
+      const privileges = this.get('space.privileges');
+      const forbidden = privileges.manageDatasets === false;
+      return {
+        id: 'datasets',
+        label: this.t('aspects.datasets'),
+        icon: 'browser-dataset',
+        forbidden,
+        tip: forbidden ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_manage_datasets',
+        }) : undefined,
+      };
+    }
+  ),
+
   itemProviders: computed(function itemProviders() {
     return {
       id: 'providers',
@@ -150,6 +170,7 @@ export default SecondLevelItems.extend(I18n, {
     'itemData',
     'itemShares',
     'itemTransfers',
+    'itemDatasets',
     'itemProviders',
     'itemMembers',
     'itemHarvesters',
