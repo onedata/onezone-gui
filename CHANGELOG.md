@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7470 Fixed text selection in resource name editors in sidebar
 * VFS-7491 Fixed column labels overflow in harvesting progress table
 * VFS-7413 Fixed missing members with duplicated names
 * VFS-6663 Added options for copy user ID and provider ID/domain
