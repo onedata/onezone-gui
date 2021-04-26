@@ -7,14 +7,13 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
+import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
-export default OneEmbeddedContainer.extend({
+export default OneproviderEmbeddedContainer.extend({
   layout,
 
   globalNotify: service(),
@@ -99,15 +98,6 @@ export default OneEmbeddedContainer.extend({
     'getDataUrl',
   ]),
 
-  // FIXME: redundancy with embedded-content-file-browser, embedded-content-space-shares
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  iframeId: computed('oneprovider.entityId', function iframeId() {
-    const oneproviderId = this.get('oneprovider.entityId');
-    return `iframe-oneprovider-${oneproviderId}`;
-  }),
-
   _location: location,
 
   actions: {
@@ -119,60 +109,6 @@ export default OneEmbeddedContainer.extend({
     },
     updateSelectedDatasetsIds(selected) {
       this.set('selectedDatasetsIds', selected);
-    },
-    // FIXME: redundancy with other components
-    getDataUrl({ fileId, selected }) {
-      const {
-        _location,
-        router,
-        navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({
-                dir: fileId,
-                selected: (selected instanceof Array) ?
-                  selected.join(',') : selected || '',
-              })
-            ),
-          },
-        });
-    },
-    getTransfersUrl({ fileId, tabId }) {
-      const {
-        _location,
-        router,
-      } = this.getProperties('_location', 'router');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'transfers', {
-          queryParams: {
-            options: serializeAspectOptions({
-              fileId,
-              tab: tabId,
-            }),
-          },
-        }
-      );
-    },
-    getShareUrl({ shareId }) {
-      const {
-        _location,
-        router,
-      } = this.getProperties('_location', 'router');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'shares', {
-          queryParams: {
-            options: serializeAspectOptions({
-              shareId,
-            }),
-          },
-        }
-      );
     },
   },
 });

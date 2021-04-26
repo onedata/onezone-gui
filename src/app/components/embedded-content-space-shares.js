@@ -7,16 +7,15 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
+import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
 
-export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
+export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, {
   layout,
 
   navigationState: service(),
@@ -93,14 +92,6 @@ export default OneEmbeddedContainer.extend(EmbeddedContentShareActions, {
    * @override implements OneEmbeddedContainer
    */
   relatedData: reads('oneprovider'),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  iframeId: computed('oneprovider.entityId', function iframeId() {
-    const oneproviderId = this.get('oneprovider.entityId');
-    return `iframe-oneprovider-${oneproviderId}`;
-  }),
 
   actions: {
     updateShareId(shareId) {
