@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
+import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
@@ -12,7 +12,7 @@ import { Promise } from 'rsvp';
 import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
 
 describe(
-  'Integration | Utility | workflow actions/remove atm inventory action',
+  'Integration | Utility | workflow actions/remove atm workflow schema action',
   function () {
     setupComponentTest('global-modal-mounter', {
       integration: true,
@@ -20,17 +20,17 @@ describe(
 
     beforeEach(function () {
       const context = {
-        atmInventory: {
-          name: 'inventory1',
-          entityId: 'inventoryId',
+        atmWorkflowSchema: {
+          name: 'workflow1',
+          entityId: 'workflowId',
         },
       };
       this.setProperties({
-        action: RemoveAtmInventoryAction.create({
+        action: RemoveAtmWorkflowSchemaAction.create({
           ownerSource: this,
           context,
         }),
-        atmInventory: context.atmInventory,
+        atmWorkflowSchema: context.atmWorkflowSchema,
       });
     });
 
@@ -40,7 +40,7 @@ describe(
         icon,
         title,
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
-      expect(className).to.equal('remove-atm-inventory-action-trigger');
+      expect(className).to.equal('remove-atm-workflow-schema-action-trigger');
       expect(icon).to.equal('remove');
       expect(String(title)).to.equal('Remove');
     });
@@ -52,10 +52,9 @@ describe(
 
       expect(getModal()).to.have.class('question-modal');
       expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
-      expect(getModalHeader().find('h1').text().trim())
-        .to.equal('Remove automation inventory');
+      expect(getModalHeader().find('h1').text().trim()).to.equal('Remove workflow');
       expect(getModalBody().text().trim()).to.contain(
-        'You are about to delete the automation inventory inventory1.'
+        'You are about to delete the workflow workflow1.'
       );
       const $yesButton = getModalFooter().find('.question-yes');
       expect($yesButton.text().trim()).to.equal('Remove');
@@ -77,7 +76,7 @@ describe(
     );
 
     it(
-      'executes removing automation inventory on submit - success status and notification on success',
+      'executes removing workflow on submit - success status and notification on success',
       async function () {
         const removeRecordStub = sinon
           .stub(lookupService(this, 'record-manager'), 'removeRecord')
@@ -85,10 +84,6 @@ describe(
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'success'
-        );
-        const redirectToCollectionIfResourceNotExistSpy = sinon.spy(
-          lookupService(this, 'navigation-state'),
-          'redirectToCollectionIfResourceNotExist'
         );
         this.render(hbs `{{global-modal-mounter}}`);
 
@@ -98,18 +93,17 @@ describe(
         const actionResult = await actionResultPromise;
 
         expect(removeRecordStub).to.be.calledOnce;
-        expect(removeRecordStub).to.be.calledWith(this.get('atmInventory'));
+        expect(removeRecordStub).to.be.calledWith(this.get('atmWorkflowSchema'));
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The automation inventory has been sucessfully removed.'
+          'The workflow has been sucessfully removed.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
-        expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;
       }
     );
 
     it(
-      'executes removing automation inventory on submit - error status and notification on failure',
+      'executes removing workflow on submit - error status and notification on failure',
       async function () {
         let rejectRemove;
         sinon.stub(lookupService(this, 'record-manager'), 'removeRecord')
@@ -128,7 +122,7 @@ describe(
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'removing the automation inventory'),
+          sinon.match.has('string', 'removing the workflow'),
           'someError'
         );
         const {

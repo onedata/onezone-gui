@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { get } from '@ember/object';
 
 describe(
-  'Unit | Utility | workflow actions/modify atm inventory action',
+  'Integration | Utility | workflow actions/modify atm inventory action',
   function () {
     setupComponentTest('test-component', {
       integration: true,
