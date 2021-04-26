@@ -120,6 +120,7 @@ import createAtmInventoryAction from './utils/workflow-actions/create-atm-invent
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 import createLambdaFunctionAction from './utils/workflow-actions/create-lambda-function-action';
+import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 
 const translations = {
   tabs: {
@@ -260,6 +261,7 @@ const translations = {
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
       createLambdaFunctionAction,
+      modifyAtmWorkflowSchemaAction,
     },
   },
 };
