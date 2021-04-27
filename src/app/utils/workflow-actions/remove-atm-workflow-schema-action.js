@@ -25,7 +25,7 @@ export default Action.extend({
   /**
    * @override
    */
-  icon: 'remove',
+  icon: 'x',
 
   /**
    * @override

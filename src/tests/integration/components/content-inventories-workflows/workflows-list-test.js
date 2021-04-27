@@ -8,15 +8,16 @@ import $ from 'jquery';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
+import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
   label: 'Change details',
   icon: 'rename',
-  // }, {
-  //   className: 'remove-atm-workflow-schema-action-trigger',
-  //   label: 'Remove',
-  //   icon: 'x',
+}, {
+  className: 'remove-atm-workflow-schema-action-trigger',
+  label: 'Remove',
+  icon: 'x',
 }];
 
 describe('Integration | Component | content inventories workflows/workflows list',
@@ -198,6 +199,36 @@ describe('Integration | Component | content inventories workflows/workflows list
 
       expect(this.$('.has-error')).to.not.exist;
       expect($saveBtn).to.not.have.attr('disabled');
+    });
+
+    it('allows to remove workflow', async function () {
+      const workflowActions = lookupService(this, 'workflow-actions');
+      let removeCalled = false;
+      const createRemoveAtmWorkflowSchemaActionStub =
+        sinon.stub(workflowActions, 'createRemoveAtmWorkflowSchemaAction')
+        .returns(RemoveAtmWorkflowSchemaAction.create({
+          ownerSource: this,
+          onExecute() {
+            removeCalled = true;
+            return resolve({
+              status: 'done',
+            });
+          },
+        }));
+
+      await render(this);
+      const $workflows = this.$('.workflows-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .remove-atm-workflow-schema-action-trigger')[0]
+      );
+
+      expect(createRemoveAtmWorkflowSchemaActionStub).to.be.calledWith({
+        atmWorkflowSchema: this.get('collection.1'),
+      });
+      expect(removeCalled).to.be.true;
     });
 
     it('has empty search input on init', async function () {

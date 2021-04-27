@@ -41,7 +41,7 @@ describe(
         title,
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
       expect(className).to.equal('remove-atm-workflow-schema-action-trigger');
-      expect(icon).to.equal('remove');
+      expect(icon).to.equal('x');
       expect(String(title)).to.equal('Remove');
     });
 

@@ -81,9 +81,18 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  removeAction: computed('workflow', function removeAction() {
+    return this.get('workflowActions').createRemoveAtmWorkflowSchemaAction({
+      atmWorkflowSchema: this.get('workflow'),
+    });
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  workflowActionsArray: collect('changeDetailsAction'),
+  workflowActionsArray: collect('changeDetailsAction', 'removeAction'),
 
   fieldsUpdateTrigger: observer(
     'workflow.{name,description}',
