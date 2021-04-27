@@ -86,6 +86,7 @@ import contentInventoriesEmpty from './components/content-inventories-empty';
 import contentInventoriesNew from './components/content-inventories-new';
 import contentInventoriesMembers from './components/content-inventories-members';
 import contentInventoriesFunctions from './components/content-inventories-functions';
+import contentInventoriesWorkflows from './components/content-inventories-workflows';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -221,6 +222,7 @@ const translations = {
     contentInventoriesNew,
     contentInventoriesMembers,
     contentInventoriesFunctions,
+    contentInventoriesWorkflows,
   },
   services: {
     tokenActions,
