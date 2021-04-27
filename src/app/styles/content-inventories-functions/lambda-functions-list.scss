@@ -1,9 +1,7 @@
 .content-inventories-functions .lambda-functions-list {
-  $item-border: 2px solid darken($color-one-light-blue, 10%);
-
   .search-form-group {
     max-width: 50em;
-    margin-bottom: $padding-base-vertical;
+    margin-bottom: $iconified-block-padding;
   }
 
   .functions-list {
@@ -11,39 +9,7 @@
     padding: 0;
   }
 
-  .lambda-functions-list-entry {
-    display: flex;
-    border: $item-border;
-    border-radius: $border-radius-base;
-
-    + .lambda-functions-list-entry {
-      margin-top: $padding-base-vertical;
-    }
-  }
-
-  .icon-section,
   .content-section {
-    padding: $padding-base-vertical;
-  }
-
-  .icon-section {
-    text-align: center;
-    background-color: $color-one-light-blue;
-    border-right: $item-border;
-
-    .one-icon {
-      font-size: 2.5em;
-      color: $color-one-blue-gray;
-      margin: -0.2em;
-      display: block;
-      width: 1em;
-    }
-  }
-
-  .content-section {
-    flex-grow: 1;
-    min-width: 0;
-
     .form {
       margin: 0;
       margin-top: $padding-base-vertical;

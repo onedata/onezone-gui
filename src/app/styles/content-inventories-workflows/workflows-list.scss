@@ -1,0 +1,35 @@
+.content-inventories-workflows .workflows-list {
+  .search-form-group {
+    max-width: 50em;
+    margin-bottom: $iconified-block-padding;
+  }
+
+  .workflows-list-entries {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .content-section {
+    display: flex;
+    align-items: flex-start;
+
+    .form {
+      margin: 0;
+      padding: 0;
+      flex-grow: 1;
+      min-width: 0;
+    }
+  }
+
+  .name-field.field-view-mode {
+    @include font-semibold();
+  }
+
+  .fields-group-children.-children > .form-group.field-view-mode:last-child {
+    margin-bottom: 0;
+  }
+
+  .one-menu-toggle {
+    margin-right: -$iconified-block-padding;
+  }
+}

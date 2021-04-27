@@ -10,7 +10,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
-  classNames: ['workflows-list-entry'],
+  classNames: ['workflows-list-entry', 'iconified-block'],
 
   i18n: service(),
   workflowActions: service(),

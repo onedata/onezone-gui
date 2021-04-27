@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   tagName: 'li',
-  classNames: ['lambda-functions-list-entry'],
+  classNames: ['lambda-functions-list-entry', 'iconified-block'],
 
   i18n: service(),
 
