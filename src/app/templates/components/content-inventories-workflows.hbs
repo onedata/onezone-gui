@@ -1,0 +1,10 @@
+{{#one-carousel activeSlideId=activeSlide as |carousel|}}
+  {{#carousel.slide slideId="list"}}
+    {{content-inventories-workflows/list-view
+      atmInventory=atmInventory
+      onAddFunction=(action "showCreatorView")
+      onRegisterViewActions=(action "registerViewActions" "list")
+    }}
+  {{/carousel.slide}}
+{{/one-carousel}}
+{{yield}}

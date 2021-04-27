@@ -283,6 +283,7 @@ export default function generateDevelopmentModel(store) {
                 store, record, 'atmInventory', groups
               ),
               attachLambdaFunctionsToAtmInventory(store, record),
+              attachWorkflowSchemasToAtmInventory(store, record),
             ])
           ))
         )
@@ -948,6 +949,31 @@ function attachLambdaFunctionsToAtmInventory(store, atmInventory) {
     createListRecord(store, 'lambdaFunction', lambdaFunctions)
   ).then(listRecord => {
     set(atmInventory, 'lambdaFunctionList', listRecord);
+    return atmInventory.save();
+  });
+}
+
+function attachWorkflowSchemasToAtmInventory(store, atmInventory) {
+  const {
+    entityType,
+    entityId,
+  } = getProperties(atmInventory, 'entityType', 'entityId');
+  return allFulfilled(_.range(5).map((index) => {
+    return store.createRecord('atmWorkflowSchema', {
+      id: gri({
+        entityType,
+        entityId,
+        aspect: 'workflow_schema',
+        aspectId: `workflow${index}`,
+        scope: 'private',
+      }),
+      name: `Workflow ${index}`,
+      description: `Some very complicated workflow #${index}`,
+    }).save();
+  })).then(workflowSchemas =>
+    createListRecord(store, 'atmWorkflowSchema', workflowSchemas)
+  ).then(listRecord => {
+    set(atmInventory, 'workflowSchemaList', listRecord);
     return atmInventory.save();
   });
 }

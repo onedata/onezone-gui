@@ -41,6 +41,10 @@ export default OneSidebar.extend(I18n, {
    */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
+      id: 'workflows',
+      label: this.t('aspects.workflows'),
+      icon: 'lambda',
+    }, {
       id: 'functions',
       label: this.t('aspects.functions'),
       icon: 'lambda',
