@@ -27,13 +27,16 @@ describe('Integration | Component | content inventories workflows/workflows list
     });
 
     beforeEach(function () {
-      this.set('collection', [{
-        name: 'w1',
-        description: 'w1 description',
-      }, {
-        name: 'w0',
-        description: 'w0 description',
-      }]);
+      this.setProperties({
+        collection: [{
+          name: 'w1',
+          description: 'w1 description',
+        }, {
+          name: 'w0',
+          description: 'w0 description',
+        }],
+        workflowClickedSpy: sinon.spy(),
+      });
     });
 
     it('has class "workflows-list"', function () {
@@ -246,11 +249,41 @@ describe('Integration | Component | content inventories workflows/workflows list
       expect($workflows).to.have.length(1);
       expect($workflows.text()).to.contain('w1');
     });
+
+    it('notifies about workflow click', async function () {
+      await render(this);
+
+      await click('.workflows-list-entry');
+
+      expect(this.get('workflowClickedSpy')).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'));
+    });
+
+    it('does not notify about workflow click, when workflow actions were clicked',
+      async function () {
+        await render(this);
+
+        await click('.workflow-actions-trigger');
+
+        expect(this.get('workflowClickedSpy')).to.not.be.called;
+      });
+
+    it('does not notify about workflow click, when workflow is being edited',
+      async function () {
+        await render(this);
+
+        await click('.workflow-actions-trigger');
+        await click($('body .webui-popover.in .change-details-action-trigger')[0]);
+        await click('.workflows-list-entry');
+
+        expect(this.get('workflowClickedSpy')).to.not.be.called;
+      });
   });
 
 async function render(testCase) {
   testCase.render(hbs `{{content-inventories-workflows/workflows-list
     collection=collection
+    onWorkflowClick=workflowClickedSpy
   }}`);
   await wait();
 }

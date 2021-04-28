@@ -8,7 +8,10 @@
 </div>
 <ul class="workflows-list-entries">
   {{#each sortedCollection as |workflow|}}
-    {{content-inventories-workflows/workflows-list-entry workflow=workflow}}
+    {{content-inventories-workflows/workflows-list-entry
+      workflow=workflow
+      onWorkflowClick=(action onWorkflowClick workflow)
+    }}
   {{/each}}
 </ul>
 {{yield}}

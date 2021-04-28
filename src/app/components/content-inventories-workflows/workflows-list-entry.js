@@ -8,9 +8,11 @@ import { tag, or } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
   classNames: ['workflows-list-entry', 'iconified-block'],
+  classNameBindings: ['isEditing:is-editing:hoverable'],
 
   i18n: service(),
   workflowActions: service(),
@@ -25,6 +27,13 @@ export default Component.extend(I18n, {
    * @type {Models.AtmWorkflowSchema}
    */
   workflow: undefined,
+
+  /**
+   * @virtual
+   * @type {Function}
+   * @returns {any}
+   */
+  onWorkflowClick: notImplementedIgnore,
 
   /**
    * @type {Boolean}
@@ -120,6 +129,19 @@ export default Component.extend(I18n, {
     this.get('fields').changeMode('view');
     this.fieldsUpdateTrigger();
     this.isEditingObserver();
+  },
+
+  click(event) {
+    const {
+      isEditing,
+      onWorkflowClick,
+    } = this.getProperties('isEditing', 'onWorkflowClick');
+
+    if (isEditing || [...this.$('.clickable')].includes(event.target)) {
+      // Should be handled by nested clickable element.
+      return;
+    }
+    onWorkflowClick();
   },
 
   actions: {

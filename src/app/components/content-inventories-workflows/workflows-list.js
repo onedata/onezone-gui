@@ -3,6 +3,7 @@ import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 const isInTestingEnv = config.environment === 'test';
 
@@ -14,6 +15,14 @@ export default Component.extend({
    * @type {Array<Models.AtmWorkflowSchema>}
    */
   collection: undefined,
+
+  /**
+   * @virtual
+   * @type {Function}
+   * @param {Models.AtmWorkflowSchema}
+   * @returns {any}
+   */
+  onWorkflowClick: notImplementedIgnore,
 
   /**
    * @type {String}

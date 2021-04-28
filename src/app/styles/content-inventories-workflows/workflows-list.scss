@@ -9,6 +9,12 @@
     padding: 0;
   }
 
+  .workflows-list-entry {
+    &.is-editing {
+      cursor: initial !important;
+    }
+  }
+
   .content-section {
     display: flex;
     align-items: flex-start;
