@@ -76,6 +76,7 @@ import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/g
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
+import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import MembershipPath from 'onezone-gui/utils/membership-visualiser/membership-path';
 
@@ -96,6 +97,7 @@ export default Component.extend(I18n, {
   groupActions: service(),
   harvesterActions: service(),
   clusterActions: service(),
+  workflowActions: service(),
   currentUser: service(),
   recordManager: service(),
   sidebarResources: service(),
@@ -240,6 +242,8 @@ export default Component.extend(I18n, {
           return groupFlags;
         case 'harvester':
           return harvesterFlags;
+        case 'atmInventory':
+          return atmInventoryFlags;
         case 'cluster':
         default:
           return clusterFlags;
@@ -253,9 +257,10 @@ export default Component.extend(I18n, {
   privilegeGroupsTranslationsPath: computed(
     'relationPrivilegesToChange.parentType',
     function privilegeGroupsTranslationsPath() {
-      const modelName =
-        _.upperFirst(this.get('relationPrivilegesToChange.parentType'));
-      return `components.content${modelName}sMembers.privilegeGroups`;
+      const parentType = this.get('relationPrivilegesToChange.parentType');
+      const modelsName = parentType === 'atmInventory' ?
+        'atmInventories' : `${parentType}s`;
+      return `components.content${_.upperFirst(modelsName)}Members.privilegeGroups`;
     }
   ),
 
@@ -265,9 +270,10 @@ export default Component.extend(I18n, {
   privilegesTranslationsPath: computed(
     'relationPrivilegesToChange.parentType',
     function privilegesTranslationsPath() {
-      const modelName =
-        _.upperFirst(this.get('relationPrivilegesToChange.parentType'));
-      return `components.content${modelName}sMembers.privileges`;
+      const parentType = this.get('relationPrivilegesToChange.parentType');
+      const modelsName = parentType === 'atmInventory' ?
+        'atmInventories' : `${parentType}s`;
+      return `components.content${_.upperFirst(modelsName)}Members.privileges`;
     }
   ),
 
@@ -702,12 +708,14 @@ export default Component.extend(I18n, {
         groupActions,
         harvesterActions,
         clusterActions,
+        workflowActions,
       } = this.getProperties(
         'relationToRemove',
         'spaceActions',
         'groupActions',
         'harvesterActions',
-        'clusterActions'
+        'clusterActions',
+        'workflowActions'
       );
       const {
         parentType,
@@ -742,6 +750,9 @@ export default Component.extend(I18n, {
           promise = childType === 'group' ?
             clusterActions.removeMemberGroupFromCluster(parent, child) :
             clusterActions.removeMemberUserFromCluster(parent, child);
+          break;
+        case 'atmInventory':
+          promise = workflowActions.removeMemberFromAtmInventory(parent, child);
           break;
         default:
           promise = reject('membership-visualiser: cannot remove, unknown relation');

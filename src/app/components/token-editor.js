@@ -106,7 +106,7 @@ const tokenInviteTypeOptions = [
     icon: customTokenInviteTypeIcons[inviteType] || recordIcon(
       inviteTypeSpec.modelName
     ),
-    privileges: inviteTypeSpec.privileges,
+    hasPrivileges: inviteTypeSpec.hasPrivileges,
   };
 });
 
@@ -468,7 +468,7 @@ export default Component.extend(I18n, {
           return;
         }
         const newTargetsModelName = inviteTypeSpec.targetModelName;
-        const newPrivilegesModelName = inviteTypeSpec.privileges &&
+        const newPrivilegesModelName = inviteTypeSpec.hasPrivileges &&
           newTargetsModelName;
         if (get(component, 'mode') === 'create') {
           if (newTargetsModelName) {
@@ -516,7 +516,7 @@ export default Component.extend(I18n, {
         }),
         this.get('targetField'),
         FormFieldsGroup.extend({
-          isExpanded: reads('parent.inviteTypeSpec.privileges'),
+          isExpanded: reads('parent.inviteTypeSpec.hasPrivileges'),
         }).create({
           name: 'invitePrivilegesDetails',
           fields: [
@@ -597,7 +597,7 @@ export default Component.extend(I18n, {
       ),
       modelNameForTranslations: conditional(
         equal('cachedPrivilegesModelName', raw('atmInventory')),
-        raw('inventories'),
+        raw('atmInventories'),
         tag `${'cachedPrivilegesModelName'}s`,
       ),
       privilegeGroupsTranslationsPath: computed(

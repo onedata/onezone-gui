@@ -10,9 +10,9 @@ import { click, fillIn } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
 
 describe(
-  'Integration | Component | sidebar workflows/atm inventory item',
+  'Integration | Component | sidebar atm inventories/atm inventory item',
   function () {
-    setupComponentTest('sidebar-workflows/atm-inventory-item', {
+    setupComponentTest('sidebar-atm-inventories/atm-inventory-item', {
       integration: true,
     });
 
@@ -49,7 +49,7 @@ describe(
 
       expect(this.$()).to.contain(this.get('atmInventory.name'));
       // TODO VFS-7455 change icon
-      expect(this.$('.oneicon-view-grid')).to.exist;
+      expect(this.$('.oneicon-atm-inventory')).to.exist;
       expect(this.$('.collapsible-toolbar-toggle')).to.exist;
     });
 
@@ -130,6 +130,6 @@ describe(
 
 function render(testCase) {
   testCase.render(hbs `
-    {{sidebar-inventories/atm-inventory-item item=atmInventory}}
+    {{sidebar-atm-inventories/atm-inventory-item item=atmInventory}}
   `);
 }

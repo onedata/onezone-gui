@@ -30,10 +30,12 @@ export default Service.extend({
     memberRecordEntityId,
     effective,
   ) {
+    const recordManager = this.get('recordManager');
     return gri({
-      entityType: parentType,
+      entityType: recordManager.getEntityTypeForModelName(parentType),
       entityId: parentRecordEntityId,
-      aspect: memberType + (effective ? '_eff' : '') + '_privileges',
+      aspect: recordManager.getEntityTypeForModelName(memberType) +
+        (effective ? '_eff' : '') + '_privileges',
       aspectId: memberRecordEntityId,
     });
   },

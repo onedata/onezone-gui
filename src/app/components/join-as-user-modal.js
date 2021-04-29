@@ -9,19 +9,15 @@
 
 import ProceedProcessModal from 'onedata-gui-common/components/proceed-process-modal';
 import { computed } from '@ember/object';
-import { camelize } from '@ember/string';
+import { inject as service } from '@ember/service';
 
 export default ProceedProcessModal.extend({
+  recordManager: service(),
+
   /**
    * @override
    */
   i18nPrefix: 'components.joinAsUserModal',
-
-  /**
-   * @type {string}
-   * @virtual
-   */
-  modelType: undefined,
 
   /**
    * @type {GriSingleModel}
@@ -37,18 +33,18 @@ export default ProceedProcessModal.extend({
   /**
    * @override
    */
-  headerText: computed('modelType', function headerText() {
+  headerText: computed('modelName', function headerText() {
     return this.t('headerText', {
-      modelType: this.t(camelize(this.get('modelType'))),
+      modelType: this.t(this.get('modelName')),
     });
   }),
 
   /**
    * @override
    */
-  messageText: computed('modelType', 'model.name', function messageText() {
+  messageText: computed('modelName', 'model.name', function messageText() {
     return this.t('messageText', {
-      modelType: this.t(camelize(this.get('modelType'))),
+      modelType: this.t(this.get('modelName')),
       modelName: this.get('model.name'),
     });
   }),
@@ -57,4 +53,15 @@ export default ProceedProcessModal.extend({
    * @override
    */
   modalClass: 'join-as-user-modal',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  modelName: computed('model', function modelName() {
+    const {
+      recordManager,
+      model,
+    } = this.getProperties('recordManager', 'model');
+    return recordManager.getModelNameForRecord(model);
+  }),
 });

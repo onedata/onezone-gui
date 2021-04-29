@@ -103,7 +103,7 @@ const tokenInviteTypes = [{
 }, {
   inviteType: 'userJoinAtmInventory',
   label: 'Invite user to automation inventory',
-  icon: 'view-grid',
+  icon: 'atm-inventory',
   targetModelName: 'atmInventory',
   targetPlaceholder: 'Select automation inventory...',
   tokenName: /Inv\. usr\. atm\. inv\..*/,
@@ -111,7 +111,7 @@ const tokenInviteTypes = [{
 }, {
   inviteType: 'groupJoinAtmInventory',
   label: 'Invite group to automation inventory',
-  icon: 'view-grid',
+  icon: 'atm-inventory',
   targetModelName: 'atmInventory',
   targetPlaceholder: 'Select automation inventory...',
   tokenName: /Inv\. grp\. atm\. inv\..*/,

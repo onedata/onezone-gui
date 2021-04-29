@@ -8,7 +8,7 @@ import spaces from './tabs/spaces';
 import shares from './tabs/shares';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
-import inventories from './tabs/inventories';
+import atmInventories from './tabs/atm-inventories';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
@@ -81,10 +81,11 @@ import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
-import sidebarInventories from './components/sidebar-inventories';
-import contentInventoriesEmpty from './components/content-inventories-empty';
-import contentInventoriesNew from './components/content-inventories-new';
-import contentInventoriesMembers from './components/content-inventories-members';
+import sidebarAtmInventories from './components/sidebar-atm-inventories';
+import contentAtmInventoriesEmpty from './components/content-atm-inventories-empty';
+import contentAtmInventoriesNew from './components/content-atm-inventories-new';
+import contentAtmInventoriesMembers from './components/content-atm-inventories-members';
+import emptyCollectionSidebar from './components/empty-collection-sidebar';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -132,7 +133,7 @@ const translations = {
     users,
     clusters,
     harvesters,
-    inventories,
+    atmInventories,
     uploads,
   },
   components: {
@@ -212,10 +213,11 @@ const translations = {
     tokenConsumer,
     contentTokensConsumer,
     tokenTemplateSelector,
-    sidebarInventories,
-    contentInventoriesEmpty,
-    contentInventoriesNew,
-    contentInventoriesMembers,
+    sidebarAtmInventories,
+    contentAtmInventoriesEmpty,
+    contentAtmInventoriesNew,
+    contentAtmInventoriesMembers,
+    emptyCollectionSidebar,
   },
   services: {
     tokenActions,

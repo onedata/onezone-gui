@@ -52,7 +52,7 @@ export default Action.extend({
         next(() => {
           router.transitionTo(
             'onedata.sidebar.content',
-            'inventories',
+            'atm-inventories',
             guiUtils.getRoutableIdFor(get(result, 'result'))
           );
         });

@@ -1,7 +1,7 @@
 /**
  * Creates new automation inventory.
  *
- * @module components/content-inventories-new
+ * @module components/content-atm-inventories-new
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -12,14 +12,14 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
-  classNames: ['content-inventories-new'],
+  classNames: ['content-atm-inventories-new'],
 
   workflowActions: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.contentInventoriesNew',
+  i18nPrefix: 'components.contentAtmInventoriesNew',
 
   /**
    * @type {string}

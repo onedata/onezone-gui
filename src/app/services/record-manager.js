@@ -96,7 +96,7 @@ export default Service.extend({
     const store = this.get('store');
     const modelClass = record.constructor;
     const listItemEmberModelName =
-      this.getEmberModelNameForModelName(listItemModelName);
+      this.emberifyModelName(listItemModelName);
 
     const relationsToReload = get(modelClass, 'relationshipNames.belongsTo')
       .filter(relationName => {
@@ -286,7 +286,7 @@ export default Service.extend({
   getEntityTypeForModelName(modelName) {
     // Get application adapter. It's not important for which model it is
     return this.get('store').adapterFor('user')
-      .getEntityTypeForModelName(this.getEmberModelNameForModelName(modelName));
+      .getEntityTypeForModelName(this.emberifyModelName(modelName));
   },
 
   /**
@@ -294,7 +294,7 @@ export default Service.extend({
    * @param {String} modelName
    * @returns {String}
    */
-  getEmberModelNameForModelName(modelName) {
+  emberifyModelName(modelName) {
     return dasherize(modelName);
   },
 
@@ -311,6 +311,8 @@ export default Service.extend({
    * Removes relation between current user and given record.
    * @param {GraphSingleModel} relationTargetRecord
    * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
    */
   async removeUserRelation(
     relationTargetRecord,
@@ -329,6 +331,8 @@ export default Service.extend({
    * @param {String} relationTargetModelName
    * @param {String} relationTargetRecordId
    * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
    */
   async removeUserRelationById(
     relationTargetModelName,
@@ -350,6 +354,8 @@ export default Service.extend({
    * @param {GraphSingleModel} relationOriginRecord
    * @param {GraphSingleModel} relationTargetRecord
    * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
    */
   async removeRelation(
     relationOriginRecord,
@@ -372,6 +378,8 @@ export default Service.extend({
    * @param {String} relationTargetModelName
    * @param {String} relationTargetRecordId
    * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
    */
   async removeRelationById(
     relationOriginModelName,

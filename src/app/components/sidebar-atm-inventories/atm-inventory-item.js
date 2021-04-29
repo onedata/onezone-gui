@@ -11,7 +11,7 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { reject } from 'rsvp';
+import { reject, resolve } from 'rsvp';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
@@ -25,7 +25,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarInventories.atmInventoryItem',
+  i18nPrefix: 'components.sidebarAtmInventories.atmInventoryItem',
 
   /**
    * @type {Models.AtmInventory}
@@ -64,7 +64,7 @@ export default Component.extend(I18n, {
    */
   renameAction: computed('isRenaming', function renameAction() {
     return {
-      action: () => this.send('toggleRename', true),
+      action: () => this.toggleRename(true),
       title: this.t('actions.rename.title'),
       className: 'rename-atm-inventory-action-trigger',
       icon: 'rename',
@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
    */
   leaveAction: computed(function leaveAction() {
     return {
-      action: () => this.send('showLeaveModal'),
+      action: () => this.showLeaveModal(),
       title: this.t('actions.leave.title'),
       class: 'leave-atm-inventory-action-trigger',
       icon: 'group-leave-group',
@@ -102,9 +102,17 @@ export default Component.extend(I18n, {
    */
   itemActions: collect('renameAction', 'leaveAction', 'removeAction'),
 
+  toggleRename(value) {
+    this.set('isRenaming', value);
+  },
+
+  showLeaveModal() {
+    this.set('isLeaveModalOpened', true);
+  },
+
   actions: {
     toggleRename(value) {
-      this.set('isRenaming', value);
+      this.toggleRename(value);
     },
     editorClick(event) {
       if (this.get('isRenaming')) {
@@ -121,6 +129,13 @@ export default Component.extend(I18n, {
         atmInventory,
         workflowActions,
       } = this.getProperties('atmInventory', 'workflowActions');
+
+      const oldName = get(atmInventory, 'name');
+      if (oldName === name) {
+        this.toggleRename(false);
+        return resolve();
+      }
+
       const atmInventoryDiff = { name };
       const action = workflowActions.createModifyAtmInventoryAction({
         atmInventory,
@@ -131,12 +146,12 @@ export default Component.extend(I18n, {
         if (get(result, 'status') === 'failed') {
           return reject();
         } else {
-          safeExec(this, () => this.send('toggleRename', false));
+          safeExec(this, () => this.toggleRename(false));
         }
       });
     },
     showLeaveModal() {
-      this.set('isLeaveModalOpened', true);
+      this.showLeaveModal();
     },
     closeLeaveModal() {
       this.set('isLeaveModalOpened', false);

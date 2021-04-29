@@ -33,6 +33,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   userActions: service(),
   media: service(),
   navigationState: service(),
+  recordManager: service(),
 
   /**
    * @type {DS.Model}
@@ -372,11 +373,12 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   inviteGroupUsingTokenAction: computed('record', function inviteGroupUsingTokenAction() {
     const {
       record,
+      recordManager,
       tokenActions,
-    } = this.getProperties('record', 'tokenActions');
+    } = this.getProperties('record', 'recordManager', 'tokenActions');
 
     return tokenActions.createGenerateInviteTokenAction({
-      inviteType: `groupJoin${classify(get(record, 'constructor.modelName'))}`,
+      inviteType: `groupJoin${_.upperFirst(recordManager.getModelNameForRecord(record))}`,
       targetRecord: record,
     });
   }),
