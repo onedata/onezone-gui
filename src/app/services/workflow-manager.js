@@ -158,4 +158,14 @@ export default Service.extend({
     // FIXME: VFS-7538 implement lambda function creation
     return resolve(functionPrototype);
   },
+
+  /**
+   * @param {String} atmInventoryId
+   * @param {Object} workflowSchemaPrototype
+   * @returns {Promise<Models.AtmWorkflowSchema>}
+   */
+  createAtmWorkflowSchema(atmInventoryId, workflowSchemaPrototype) {
+    // FIXME: VFS-7597 implement workflow schema creation
+    return resolve(workflowSchemaPrototype);
+  },
 });

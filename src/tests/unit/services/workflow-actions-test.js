@@ -8,6 +8,7 @@ import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-
 import CreateLambdaFunctionAction from 'onezone-gui/utils/workflow-actions/create-lambda-function-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
+import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow actions', function () {
@@ -109,5 +110,20 @@ describe('Unit | Service | workflow actions', function () {
 
     expect(action).to.be.instanceOf(RemoveAtmWorkflowSchemaAction);
     expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+  });
+
+  it('creates CreateAtmWorkflowSchemaAction instance', function () {
+    const service = this.subject();
+
+    const atmInventory = {};
+    const rawAtmWorkflowSchema = {};
+    const action = service.createCreateAtmWorkflowSchemaAction({
+      rawAtmWorkflowSchema,
+      atmInventory,
+    });
+
+    expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaAction);
+    expect(get(action, 'rawAtmWorkflowSchema')).to.equal(rawAtmWorkflowSchema);
+    expect(get(action, 'atmInventory')).to.equal(atmInventory);
   });
 });

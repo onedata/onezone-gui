@@ -17,6 +17,7 @@ import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-
 import CreateLambdaFunctionAction from 'onezone-gui/utils/workflow-actions/create-lambda-function-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
+import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
 import { reject } from 'rsvp';
 import { classify } from '@ember/string';
 
@@ -117,6 +118,20 @@ export default Service.extend(I18n, {
    */
   createRemoveAtmWorkflowSchemaAction(context) {
     return RemoveAtmWorkflowSchemaAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     rawAtmWorkflowSchema: Object,
+   *     atmInventory: Models.AtmInventory,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.CreateAtmWorkflowSchemaAction}
+   */
+  createCreateAtmWorkflowSchemaAction(context) {
+    return CreateAtmWorkflowSchemaAction.create({ ownerSource: this, context });
   },
 
   createGlobalActions() {
