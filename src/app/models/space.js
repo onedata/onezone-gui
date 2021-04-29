@@ -51,10 +51,10 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   // members of this space
   shareList: belongsTo('shareList'),
   groupList: belongsTo('groupList'),
-  userList: belongsTo('sharedUserList'),
+  userList: belongsTo('userList'),
   effGroupList: belongsTo('groupList'),
-  effUserList: belongsTo('sharedUserList'),
-  ownerList: belongsTo('sharedUserList'),
+  effUserList: belongsTo('userList'),
+  ownerList: belongsTo('userList'),
   harvesterList: belongsTo('harvesterList'),
 
   //#region utils

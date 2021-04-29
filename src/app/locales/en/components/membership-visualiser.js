@@ -5,6 +5,7 @@ export default {
   space: 'space',
   harvester: 'harvester',
   cluster: 'cluster',
+  atmInventory: 'automation inventory',
   showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
@@ -13,6 +14,7 @@ export default {
     viewProvider: 'View provider',
     viewHarvester: 'View harvester',
     viewCluster: 'View cluster',
+    viewAtmInventory: 'View automation inventory',
   },
   membershipRelation: {
     isMemberOf: 'is member of',
@@ -42,5 +44,6 @@ export default {
     provider: 'provider',
     harvester: 'harvester',
     cluster: 'cluster',
+    atmInventory: 'automation inventory',
   },
 };

@@ -15,6 +15,8 @@ export default {
     userJoinHarvester: userHeader,
     groupJoinHarvester: groupHeader,
     spaceJoinHarvester: spaceHeader,
+    userJoinAtmInventory: userHeader,
+    groupJoinAtmInventory: groupHeader,
   },
   close: 'Close',
 };

@@ -17,7 +17,7 @@ export default {
   inviteGroupUsingToken: 'Invite group using token',
   inviteUserUsingToken: 'Invite user using token',
   removeSelected: 'Remove selected',
-  removeMembersSuccess: 'Members has been removed',
+  removeMembersSuccess: 'Members have been removed',
   membersDeletion: 'deleting members',
   direct: 'Direct',
   effective: 'Effective',

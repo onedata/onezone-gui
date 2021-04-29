@@ -14,6 +14,7 @@ export default {
       model: {
         options: {
           all: 'All',
+          atmInventory: 'Atm. inventory',
           cluster: 'Cluster',
           group: 'Group',
           harvester: 'Harvester',

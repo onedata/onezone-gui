@@ -13,6 +13,7 @@ import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
 import TestAdapter from '@ember/test/adapter';
 import Ember from 'ember';
 import OneTooltipHelper from '../../helpers/one-tooltip';
+import { dasherize } from '@ember/string';
 
 describe('Integration | Component | token consumer', function () {
   setupComponentTest('token-consumer', {
@@ -37,13 +38,14 @@ describe('Integration | Component | token consumer', function () {
       'space',
       'group',
       'harvester',
+      'atmInventory',
     ].forEach(modelName => {
       mockedRecords[modelName] = _.range(3).map(index => ({
         entityId: `${modelName}${index}`,
         entityType: modelName,
         name: `${modelName}${index}`,
         constructor: {
-          modelName,
+          modelName: dasherize(modelName),
         },
       }));
       getUserRecordListStub.withArgs(modelName).resolves({
@@ -237,6 +239,23 @@ describe('Integration | Component | token consumer', function () {
     selectorIcon: 'space',
     selectorDescription: selectorDescription('harvester', 'space', 'be added to'),
     selectorPlaceholder: 'Select space...',
+  }, {
+    inviteSpec: {
+      inviteType: 'userJoinAtmInventory',
+      atmInventoryName: 'someRecord',
+    },
+    typeText: 'Invitation to join an automation inventory',
+    modelToSelect: null,
+  }, {
+    inviteSpec: {
+      inviteType: 'groupJoinAtmInventory',
+      atmInventoryName: 'someRecord',
+    },
+    typeText: 'Invitation for your group to join an automation inventory',
+    modelToSelect: 'group',
+    selectorIcon: 'group',
+    selectorDescription: selectorDescription('automation inventory', 'group', 'join'),
+    selectorPlaceholder: 'Select group...',
   }, {
     inviteSpec: {
       inviteType: 'supportSpace',

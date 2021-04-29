@@ -8,7 +8,7 @@
  *
  */
 
-import { camelize } from '@ember/string';
+import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
@@ -16,6 +16,7 @@ import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
+import atmInventoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -34,6 +35,7 @@ const NUMBER_OF_SPACES = 3;
 const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
+const NUMBER_OF_ATM_INVENTORIES = 3;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -51,6 +53,7 @@ const types = [
   'cluster',
   'harvester',
   'token',
+  'atmInventory',
 ];
 const names = ['one', 'two', 'three'];
 
@@ -58,6 +61,7 @@ const privileges = {
   space: spacePrivilegesFlags,
   group: groupPrivilegesFlags,
   harvester: harvesterPrivilegesFlags,
+  atmInventory: atmInventoryPrivilegesFlags,
 };
 
 const perProviderSize = Math.pow(1024, 4);
@@ -80,16 +84,16 @@ const providerClusterDefaultData = {
  * @returns {Promise<undefined, any>}
  */
 export default function generateDevelopmentModel(store) {
-  let sharedUsers;
+  let users;
   let groups;
   let spaces;
   let providers;
   let harvesters;
 
   return createGuiMessages(store)
-    // create shared users
-    .then(() => createSharedUsersRecords(store))
-    .then(su => sharedUsers = su)
+    // create users
+    .then(() => createUsersRecords(store))
+    .then(u => users = u)
     // create main resources lists
     .then(() => hashFulfilled(
       types.reduce((promiseHash, type) => {
@@ -211,14 +215,14 @@ export default function generateDevelopmentModel(store) {
     })
     // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords.group.get('list')
-      .then(records =>
-        allFulfilled(records.map(record =>
+      .then(groups =>
+        allFulfilled(groups.map(record =>
           allFulfilled([
-            attachSharedUsersGroupsToModel(
-              store, record, 'group', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
+            attachUsersGroupsToModel(
+              store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
             ),
-            attachSharedUsersGroupsToModel(
-              store, record, 'group', true, sharedUsers, groups
+            attachUsersGroupsToModel(
+              store, record, 'group', true, users, groups
             ),
             attachMembershipsToModel(
               store, record, 'group', groups
@@ -227,16 +231,16 @@ export default function generateDevelopmentModel(store) {
         ))
       )
       .then(() => listRecords.space.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(spaces =>
+          allFulfilled(spaces.map(record =>
             allFulfilled([
-              attachSharedUsersGroupsToModel(
-                store, record, 'space', false, sharedUsers.slice(0, 2), groups.slice(0, 2)
+              attachUsersGroupsToModel(
+                store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
               ),
-              attachSharedUsersGroupsToModel(
-                store, record, 'space', true, sharedUsers, groups
+              attachUsersGroupsToModel(
+                store, record, 'space', true, users, groups
               ),
-              attachOwnersToModel(store, record, sharedUsers.slice(1, 2)),
+              attachOwnersToModel(store, record, users.slice(1, 2)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
@@ -246,15 +250,15 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => listRecords.harvester.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(harvesters =>
+          allFulfilled(harvesters.map(record =>
             allFulfilled([
-              attachSharedUsersGroupsToModel(
+              attachUsersGroupsToModel(
                 store, record, 'harvester', false,
-                sharedUsers.slice(0, 2), groups.slice(0, 2)
+                users.slice(0, 2), groups.slice(0, 2)
               ),
-              attachSharedUsersGroupsToModel(
-                store, record, 'harvester', true, sharedUsers, groups
+              attachUsersGroupsToModel(
+                store, record, 'harvester', true, users, groups
               ),
               attachMembershipsToModel(
                 store, record, 'harvester', groups
@@ -264,7 +268,30 @@ export default function generateDevelopmentModel(store) {
           ))
         )
       )
-      .then(() => allFulfilled(['space', 'group', 'harvester'].map(modelType => {
+      .then(() => listRecords.atmInventory.get('list')
+        .then(atmInventories =>
+          allFulfilled(atmInventories.map(record =>
+            allFulfilled([
+              attachUsersGroupsToModel(
+                store, record, 'atmInventory', false,
+                users.slice(0, 2), groups.slice(0, 2)
+              ),
+              attachUsersGroupsToModel(
+                store, record, 'atmInventory', true, users, groups
+              ),
+              attachMembershipsToModel(
+                store, record, 'atmInventory', groups
+              ),
+            ])
+          ))
+        )
+      )
+      .then(() => allFulfilled([
+        'space',
+        'group',
+        'harvester',
+        'atmInventory',
+      ].map(modelType => {
         return listRecords[modelType].get('list')
           .then(records =>
             allFulfilled(records.map(record =>
@@ -272,7 +299,7 @@ export default function generateDevelopmentModel(store) {
                 store,
                 record,
                 modelType,
-                sharedUsers,
+                users,
                 groups,
                 privileges[modelType]
               )
@@ -349,6 +376,8 @@ function createEntityRecords(store, type, names, additionalInfo) {
       return createClusterRecords(store, additionalInfo);
     case 'harvester':
       return createHarvesterRecords(store, additionalInfo);
+    case 'atmInventory':
+      return createAtmInventoryRecords(store, additionalInfo);
     default:
       return allFulfilled(names.map(number =>
         store.createRecord(type, { name: `${type} ${number}` }).save()
@@ -491,7 +520,7 @@ function createTokensRecords(store) {
           },
         }).save();
       });
-    const inviteType = inviteTypes[0];
+    const inviteType = 'userJoinAtmInventory';
     const revokedInviteTokenPromise = store.createRecord('token', {
       name: 'Revoked invite token ' + i,
       revoked: true,
@@ -636,10 +665,21 @@ function createHarvesterRecords(store) {
   }));
 }
 
-function createSharedUsersRecords(store) {
+function createAtmInventoryRecords(store) {
+  return allFulfilled(_.range(NUMBER_OF_ATM_INVENTORIES).map((index) => {
+    return store.createRecord('atmInventory', {
+      name: `Inventory ${index}`,
+      scope: 'private',
+      directMembership: true,
+      currentUserEffPrivileges: atmInventoryPrivilegesFlags,
+    }).save();
+  }));
+}
+
+function createUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
-    return store.createRecord('sharedUser', {
-      name: `sharedUser${index}`,
+    return store.createRecord('user', {
+      name: `user${index}`,
       username: `username${index}`,
     }).save();
   }));
@@ -674,12 +714,12 @@ function attachModelsToInviteTokens(listRecords) {
   );
 }
 
-function attachSharedUsersGroupsToModel(
+function attachUsersGroupsToModel(
   store,
   record,
   modelType,
   isEffective,
-  sharedUsers,
+  users,
   groups
 ) {
   return createListRecord(store, 'group', groups)
@@ -696,7 +736,7 @@ function attachSharedUsersGroupsToModel(
           .then(list => record.set('parentList', list));
       }
     })
-    .then(() => createListRecord(store, 'sharedUser', sharedUsers))
+    .then(() => createListRecord(store, 'user', users))
     .then(list => {
       const listName = isEffective ? 'effUserList' : 'userList';
       record.set(listName, list);
@@ -709,7 +749,7 @@ function attachOwnersToModel(
   record,
   owners
 ) {
-  return createListRecord(store, 'sharedUser', owners)
+  return createListRecord(store, 'user', owners)
     .then(list => {
       record.set('ownerList', list);
       return record.save();
@@ -747,13 +787,13 @@ function createPrivilegesForModel(
   store,
   record,
   modelType,
-  sharedUsers,
+  users,
   groups,
   privilegesFlags
 ) {
   return allFulfilled([
     createPrivilegesRecords(
-      store, record, modelType, sharedUsers, privilegesFlags, 'user'
+      store, record, modelType, users, privilegesFlags, 'user'
     ),
     createPrivilegesRecords(
       store, record, modelType, groups, privilegesFlags, 'group'
@@ -788,7 +828,7 @@ function createPrivilegesRecords(
   return allFulfilled(_.range(sharedGriArray.length).map((index) => {
     subjectId = parseGri(sharedGriArray[index]).entityId;
     recordData.id = gri({
-      entityType: modelType,
+      entityType: underscore(modelType),
       entityId: recordId,
       aspect,
       aspectId: subjectId,

@@ -7,7 +7,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { computed, get, getProperties } from '@ember/object';
+import { computed, get } from '@ember/object';
+import { camelize } from '@ember/string';
 import { inject as service } from '@ember/service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import layout from 'onezone-gui/templates/components/select-model-modal';
@@ -69,14 +70,10 @@ export default SelectModelModal.extend({
         return;
       }
 
-      const {
-        name,
-        entityType,
-      } = getProperties(relatedRecord, 'name', 'entityType');
       return this.t('message', {
         relation: this.t(relation),
-        recordType: this.t(entityType),
-        recordName: name,
+        recordType: this.t(camelize(get(relatedRecord, 'constructor.modelName'))),
+        recordName: get(relatedRecord, 'name'),
       });
     }
   ),

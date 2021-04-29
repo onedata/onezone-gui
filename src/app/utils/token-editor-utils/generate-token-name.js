@@ -24,6 +24,8 @@ const inviteTypeNames = {
   userJoinHarvester: 'Inv. usr. hrv.',
   groupJoinHarvester: 'Inv. grp. hrv.',
   spaceJoinHarvester: 'Inv. spc. hrv.',
+  userJoinAtmInventory: 'Inv. usr. atm. inv.',
+  groupJoinAtmInventory: 'Inv. grp. atm. inv.',
 };
 const possibleInviteTypes = Object.keys(inviteTypeNames);
 const inviteTypesWithoutTarget = [
@@ -66,7 +68,7 @@ export default function generateTokenName(type, inviteType, inviteTargetName) {
  * `varName` part can have dynamic length and will be cut to the size appropriate for
  * the max token name length.
  * @param {String} [preVarName='']
- * @param {String} [varName=''] 
+ * @param {String} [varName='']
  * @param {String} [postVarName='']
  * @returns {String}
  */

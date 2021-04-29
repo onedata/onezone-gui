@@ -14,6 +14,8 @@ export default {
     userJoinHarvester: createSubjectDescription('user'),
     groupJoinHarvester: createSubjectDescription('owner of group'),
     spaceJoinHarvester: createSubjectDescription('owner of space'),
+    userJoinAtmInventory: createSubjectDescription('user'),
+    groupJoinAtmInventory: createSubjectDescription('owner of group'),
   },
   limitationsDescription: '<strong>This token will expire in 24 hours and has no usage count limit.</strong> ',
   onedatifyLimitationsDescription: '<strong>Tokens used below will expire in 24 hours and have no usage count limit.</strong>',

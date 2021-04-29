@@ -38,9 +38,9 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   parentList: belongsTo('groupList'),
   childList: belongsTo('groupList'),
-  userList: belongsTo('sharedUserList'),
+  userList: belongsTo('userList'),
   effChildList: belongsTo('groupList'),
-  effUserList: belongsTo('sharedUserList'),
+  effUserList: belongsTo('userList'),
   spaceList: belongsTo('spaceList'),
 
   /**

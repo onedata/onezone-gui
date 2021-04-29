@@ -139,7 +139,7 @@ describe('Unit | Utility | token editor utils/creator data to token', function (
 
   Object.keys(tokenInviteTypeToTargetModelMapping).forEach(inviteType => {
     const privilegesModel =
-      get(tokenInviteTypeToTargetModelMapping, `${inviteType}.privileges`);
+      get(tokenInviteTypeToTargetModelMapping, `${inviteType}.hasPrivileges`);
 
     if (privilegesModel) {
       it(

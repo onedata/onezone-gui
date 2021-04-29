@@ -48,6 +48,7 @@ module.exports = function (environment) {
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
       { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
+      { id: 'atmInventories', icon: 'atm-inventory', defaultAspect: 'members' },
       {
         id: 'clusters',
         icon: 'cluster',
@@ -122,7 +123,7 @@ module.exports = function (environment) {
   }
 
   if (environment === 'production') {
-    // empty 
+    // empty
   }
 
   return ENV;

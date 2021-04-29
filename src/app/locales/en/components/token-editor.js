@@ -58,6 +58,12 @@ export default {
             spaceJoinHarvester: {
               label: 'Invite space to harvester',
             },
+            userJoinAtmInventory: {
+              label: 'Invite user to automation inventory',
+            },
+            groupJoinAtmInventory: {
+              label: 'Invite group to automation inventory',
+            },
             supportSpace: {
               label: 'Support space',
             },
@@ -83,6 +89,8 @@ export default {
               userJoinHarvester: 'Select harvester...',
               groupJoinHarvester: 'Select harvester...',
               spaceJoinHarvester: 'Select harvester...',
+              userJoinAtmInventory: 'Select automation inventory...',
+              groupJoinAtmInventory: 'Select automation inventory...',
               supportSpace: 'Select space...',
             },
           },

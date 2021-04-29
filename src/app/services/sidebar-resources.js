@@ -27,6 +27,15 @@ export default SidebarResources.extend({
   harvesterManager: service(),
   harvesterActions: service(),
   uploadManager: service(),
+  recordManager: service(),
+  workflowActions: service(),
+
+  /**
+   * @override
+   */
+  modelNameToRouteResourceTypeMapping: Object.freeze(new Map([
+    ['atmInventory', 'atm-inventories'],
+  ])),
 
   /**
    * @param {string} type
@@ -48,6 +57,8 @@ export default SidebarResources.extend({
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
+      case 'atm-inventories':
+        return this.get('recordManager').getUserRecordList('atmInventory');
       case 'uploads':
         return resolve({
           list: this.get('uploadManager.sidebarOneproviders'),
@@ -76,6 +87,8 @@ export default SidebarResources.extend({
         return this.get('groupActions.buttons');
       case 'harvesters':
         return this.get('harvesterActions.buttons');
+      case 'atm-inventories':
+        return this.get('workflowActions').createGlobalActions(context);
       default:
         return [];
     }

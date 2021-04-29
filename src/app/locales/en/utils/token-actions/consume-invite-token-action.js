@@ -28,6 +28,10 @@ export default {
       user: createSuccessNotificationText('harvester'),
       space: createSuccessNotificationText('harvester', 'space'),
     },
+    atmInventory: {
+      group: createSuccessNotificationText('automation inventory', 'group'),
+      user: createSuccessNotificationText('automation inventory'),
+    },
   },
   failureNotificationActionName: 'consuming token',
 };

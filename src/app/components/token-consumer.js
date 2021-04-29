@@ -29,6 +29,7 @@ const recordImages = {
   space: 'assets/images/consume-token/space.svg',
   harvester: 'assets/images/consume-token/harvester.svg',
   cluster: 'assets/images/consume-token/cluster.svg',
+  atmInventory: 'assets/images/consume-token/atm-inventory.svg',
 };
 
 export default Component.extend(I18n, {
@@ -485,7 +486,7 @@ export default Component.extend(I18n, {
   },
 
   /**
-   * @param {String} modelName 
+   * @param {String} modelName
    * @returns {PromiseArray<FieldOption>}
    */
   getRecordOptionsForModel(modelName) {

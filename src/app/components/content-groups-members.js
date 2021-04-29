@@ -90,7 +90,7 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     const groupEntityId = get(group, 'entityId');
     const promise = Promise.all(members.map(member => {
       const memberEntityId = get(member, 'entityId');
-      if (['user', 'shared-user'].includes(get(member, 'entityType'))) {
+      if (get(member, 'entityType') === 'user') {
         return groupManager.removeUserFromGroup(
           groupEntityId,
           memberEntityId
