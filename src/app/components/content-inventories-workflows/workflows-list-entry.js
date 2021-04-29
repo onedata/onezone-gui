@@ -1,10 +1,6 @@
 import Component from '@ember/component';
-import { computed, observer, get, getProperties, trySet } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
-import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
-import TextField from 'onedata-gui-common/utils/form-component/text-field';
-import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
-import { tag, or } from 'ember-awesome-macros';
+import { computed, get, trySet } from '@ember/object';
+import { collect } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -41,40 +37,27 @@ export default Component.extend(I18n, {
   areActionsOpened: false,
 
   /**
+   * New data, that should be applied to the model on "Save" click. Yielded
+   * by the form
+   * @type {Object}
+   */
+  changesToApply: undefined,
+
+  /**
+   * If true, then `changesToApply` contains valid data.
+   * @type {Boolean}
+   */
+  areChangesValid: true,
+
+  /**
+   * @type {Boolean}
+   */
+  isSavingChanges: false,
+
+  /**
    * @type {Boolean}
    */
   isEditing: false,
-
-  /**
-   * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
-   */
-  fields: computed(function fields() {
-    return FormFieldsRootGroup
-      .extend({
-        i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
-      })
-      .create({
-        component: this,
-        ownerSource: this,
-        fields: [
-          TextField.extend({
-            defaultValue: reads('component.workflow.name'),
-          }).create({
-            component: this,
-            name: 'name',
-          }),
-          TextareaField.extend({
-            defaultValue: reads('component.workflow.description'),
-            isVisible: or('isInEditMode', 'value'),
-          }).create({
-            component: this,
-            name: 'description',
-            viewModeAsStaticText: true,
-            isOptional: true,
-          }),
-        ],
-      });
-  }),
 
   /**
    * @type {ComputedProperty<Utils.Action>}
@@ -103,34 +86,6 @@ export default Component.extend(I18n, {
    */
   workflowActionsArray: collect('changeDetailsAction', 'removeAction'),
 
-  fieldsUpdateTrigger: observer(
-    'workflow.{name,description}',
-    function fieldsUpdateTrigger() {
-      const fields = this.get('fields');
-
-      if (get(fields, 'isInViewMode')) {
-        fields.reset();
-      }
-    }
-  ),
-
-  isEditingObserver: observer('isEditing', function isEditingObserver() {
-    const {
-      fields,
-      isEditing,
-    } = this.getProperties('fields', 'isEditing');
-
-    fields.changeMode(isEditing ? 'edit' : 'view');
-  }),
-
-  init() {
-    this._super(...arguments);
-
-    this.get('fields').changeMode('view');
-    this.fieldsUpdateTrigger();
-    this.isEditingObserver();
-  },
-
   click(event) {
     const {
       isEditing,
@@ -148,26 +103,31 @@ export default Component.extend(I18n, {
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
     },
+    detailsChanged({ data, isValid }) {
+      this.setProperties({
+        changesToApply: isValid ? data : undefined,
+        areChangesValid: isValid,
+      });
+    },
     saveChanges() {
+      this.set('isSavingChanges', true);
       const {
-        fields,
+        changesToApply,
         workflow,
         workflowActions,
-      } = this.getProperties('fields', 'workflow', 'workflowActions');
-
-      const formValues = fields.dumpValue();
+      } = this.getProperties('changesToApply', 'workflow', 'workflowActions');
 
       return workflowActions.createModifyAtmWorkflowSchemaAction({
         atmWorkflowSchema: workflow,
-        atmWorkflowSchemaDiff: getProperties(formValues, 'name', 'description'),
+        atmWorkflowSchemaDiff: changesToApply,
       }).execute().then(result => {
         if (get(result, 'status') === 'done') {
           trySet(this, 'isEditing', false);
         }
+        trySet(this, 'isSavingChanges', false);
       });
     },
     cancelChanges() {
-      this.get('fields').reset();
       this.set('isEditing', false);
     },
   },

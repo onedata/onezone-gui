@@ -2,13 +2,17 @@
   {{one-icon icon="lambda"}}
 </div>
 <div class="content-section">
-  <form class="form form-horizontal form-component">
-    {{form-component/field-renderer field=fields}}
+  {{#content-inventories-workflows/workflow-details-form
+    atmWorkflowSchema=workflow
+    mode=(if isEditing "edit" "view")
+    isDisabled=isSavingChanges
+    onChange=(action "detailsChanged")
+  }}
     {{#if isEditing}}
       {{#one-spin-button
         class="btn btn-sm btn-success btn-save"
         action=(action "saveChanges")
-        disabled=(not fields.isValid)
+        disabled=(not areChangesValid)
       }}
         {{tt this "saveBtn"}}
       {{/one-spin-button}}
@@ -24,7 +28,7 @@
         {{tt this "cancelBtn"}}
       {{/bs-button}}
     {{/if}}
-  </form>
+  {{/content-inventories-workflows/workflow-details-form}}
   {{one-menu-toggle
     class=(concat-classes
       "workflow-actions-trigger clickable"

@@ -52,18 +52,10 @@ describe('Integration | Component | content inventories workflows/workflows list
       const $workflows = this.$('.workflows-list-entry');
       expect($workflows).to.have.length(2);
       [0, 1].forEach(idx => {
-        expect($workflows.eq(idx).find('.name-field').text().trim()).to.equal(`w${idx}`);
-        expect($workflows.eq(idx).find('.description-field').text().trim())
-          .to.equal(`w${idx} description`);
+        expect($workflows.eq(idx).find('.name-field').text()).to.contain(`w${idx}`);
+        expect($workflows.eq(idx).find('.description-field').text())
+          .to.contain(`w${idx} description`);
       });
-    });
-
-    it('does not show description when workflow does not have any', async function () {
-      this.get('collection').setEach('description', '');
-
-      await render(this);
-
-      expect(this.$('.description-field')).to.not.exist;
     });
 
     it('shows workflows in view mode on init', async function () {
@@ -102,14 +94,7 @@ describe('Integration | Component | content inventories workflows/workflows list
 
       expect($('body .webui-popover.in .change-details-action-trigger').parent())
         .to.have.class('disabled');
-      const $nameInput = $firstWorkflow.find('.name-field .form-control');
-      const $descriptionInput = $firstWorkflow.find('.description-field .form-control');
-      expect($nameInput).to.exist;
-      expect($nameInput).to.have.attr('placeholder', 'Name');
-      expect($nameInput).to.have.value('w0');
-      expect($descriptionInput).to.exist;
-      expect($descriptionInput).to.have.attr('placeholder', 'Description');
-      expect($descriptionInput).to.have.value('w0 description');
+      expect($firstWorkflow.find('.field-edit-mode')).to.exist;
       expect($firstWorkflow.find('.btn-save').text().trim()).to.equal('Save');
       expect($firstWorkflow.find('.btn-cancel').text().trim()).to.equal('Cancel');
       expect($secondWorkflow.find('.field-edit-mode')).to.not.exist;
@@ -176,12 +161,12 @@ describe('Integration | Component | content inventories workflows/workflows list
       await fillIn('.description-field .form-control', 'newDescription');
       await click('.btn-cancel');
 
-      expect($firstWorkflow.find('.name-field').text().trim()).to.equal('w0');
-      expect($firstWorkflow.find('.description-field').text().trim())
-        .to.equal('w0 description');
+      expect($firstWorkflow.find('.name-field').text()).to.contain('w0');
+      expect($firstWorkflow.find('.description-field').text())
+        .to.contain('w0 description');
     });
 
-    it('validates user input in modification form', async function () {
+    it('blocks saving modifications when form is invalid', async function () {
       await render(this);
       const $workflows = this.$('.workflows-list-entry');
       const $firstWorkflow = $workflows.eq(0);
@@ -189,19 +174,11 @@ describe('Integration | Component | content inventories workflows/workflows list
       await click($('body .webui-popover.in .change-details-action-trigger')[0]);
       const $saveBtn = this.$('.btn-save');
 
-      expect(this.$('.has-error')).to.not.exist;
       expect($saveBtn).to.not.have.attr('disabled');
 
       await fillIn('.name-field .form-control', '');
 
-      expect(this.$('.has-error')).to.have.class('name-field');
       expect($saveBtn).to.have.attr('disabled');
-
-      await fillIn('.name-field .form-control', 'someName');
-      await fillIn('.description-field .form-control', '');
-
-      expect(this.$('.has-error')).to.not.exist;
-      expect($saveBtn).to.not.have.attr('disabled');
     });
 
     it('allows to remove workflow', async function () {
