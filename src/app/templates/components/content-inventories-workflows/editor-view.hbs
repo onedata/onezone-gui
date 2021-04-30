@@ -1,0 +1,16 @@
+<div class="row content-row header-row">
+  <h1 class="with-back relative nowrap">
+    <a class="content-back-link" {{action "backSlide"}}>
+      {{one-icon icon="lambda" class="content-back-resource-icon"}}
+      {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+    </a>
+    <div class="resource-name">
+      {{one-inline-editor
+        class="workflow-schema-name"
+        value=atmWorkflowSchema.name
+        onSave=(action "changeName")
+      }}
+    </div>
+  </h1>
+</div>
+{{yield}}
