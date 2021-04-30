@@ -24,12 +24,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
 
   /**
    * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
-   * @virtual
    * @type {String}
    */
   spaceId: undefined,
@@ -66,11 +60,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeType: 'oneprovider',
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze([
     'spaceId',
     'shareId',
@@ -87,11 +76,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
     'getDataUrl',
     'showShareList',
   ]),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 
   actions: {
     updateShareId(shareId) {

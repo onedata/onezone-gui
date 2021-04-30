@@ -1,9 +1,9 @@
 /**
- * Proxy component for Oneprovider's `content-file-browser`.
+ * Proxy component for Oneprovider's `content-space-datasets`.
  * 
- * @module components/embedded-content-file-browser
- * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @module components/embedded-content-space-datasets
+ * @author Jakub Liput
+ * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -21,16 +21,11 @@ export default OneproviderEmbeddedContainer.extend({
   navigationState: service(),
 
   /**
-   * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
    * Entity ID of `space` record that is space of directory displayed in files
    * browser.
    * 
    * **Injected to embedded iframe.**
+   * @virtual
    * @type {string}
    */
   spaceId: undefined,
@@ -73,16 +68,6 @@ export default OneproviderEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeType: 'oneprovider',
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze([
     'spaceId',
     'datasetId',
@@ -95,7 +80,6 @@ export default OneproviderEmbeddedContainer.extend({
   callParentActionNames: Object.freeze([
     'updateDatasetId',
     'updateSelectedDatasetsIds',
-    'getDataUrl',
   ]),
 
   _location: location,

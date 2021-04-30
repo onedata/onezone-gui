@@ -22,12 +22,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
 
   /**
    * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
-   * @virtual
    * @type {string}
    */
   shareId: undefined,
@@ -57,11 +51,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeType: 'oneprovider',
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze([
     'shareId',
     'dirId',
@@ -73,9 +62,4 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
   callParentActionNames: Object.freeze([
     'updateDirId',
   ]),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 });

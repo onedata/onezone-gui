@@ -23,12 +23,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
 
   /**
    * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
-   * @virtual
    * @type {string}
    */
   shareId: undefined,
@@ -64,11 +58,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeType: 'oneprovider',
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze([
     'shareId',
     'spaceId',
@@ -84,11 +73,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
     'showSharesIndex',
     'reloadShareList',
   ]),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 
   actions: {
     showSharesIndex() {

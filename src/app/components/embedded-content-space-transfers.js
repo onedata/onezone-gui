@@ -20,12 +20,6 @@ export default OneproviderEmbeddedContainer.extend({
   router: service(),
 
   /**
-   * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
    * Entity ID of `space` record that is space of directory displayed in files
    * browser.
    * @virtual
@@ -54,11 +48,6 @@ export default OneproviderEmbeddedContainer.extend({
   /**
    * @override implements OneEmbeddedContainer
    */
-  iframeType: 'oneprovider',
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
   iframeInjectedProperties: Object.freeze([
     'spaceEntityId',
     'fileEntityId',
@@ -73,11 +62,6 @@ export default OneproviderEmbeddedContainer.extend({
     'resetQueryParams',
     'changeListTab',
   ]),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 
   actions: {
     closeFileTab() {

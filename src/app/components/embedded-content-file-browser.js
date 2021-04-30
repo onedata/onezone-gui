@@ -22,12 +22,6 @@ export default OneproviderEmbeddedContainer.extend({
   navigationState: service(),
 
   /**
-   * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
-
-  /**
    * Entity ID of `space` record that is space of directory displayed in files
    * browser.
    * @type {string}
@@ -64,17 +58,7 @@ export default OneproviderEmbeddedContainer.extend({
    */
   embeddedComponentName: 'content-file-browser',
 
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  iframeType: 'oneprovider',
-
   _location: location,
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 
   /**
    * @override implements OneEmbeddedContainer
