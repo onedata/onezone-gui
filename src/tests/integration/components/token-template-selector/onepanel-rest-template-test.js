@@ -60,9 +60,10 @@ describe(
       await click('.one-tile');
       const $records = this.$('.record-item');
       expect($records).to.have.length(2);
-      expect($records.eq(0).text().trim()).to.equal('oneprovider1');
-      expect($records.eq(1).text().trim()).to.equal('onezone2');
-      expect($records.find('.oneicon-cluster')).to.exist;
+      expect($records.eq(0).text().trim()).to.equal('onezone2');
+      expect($records.eq(1).text().trim()).to.equal('oneprovider1');
+      expect($records.find('.oneicon-onezone')).to.exist;
+      expect($records.find('.oneicon-provider')).to.exist;
     });
 
     it('passes template name and template for oneprovider via selection handler',
@@ -74,7 +75,7 @@ describe(
         }}`);
 
         await click('.one-tile');
-        await click('.record-item:first-child');
+        await click('.record-item:last-child');
         expect(selectedSpy)
           .to.be.calledOnce.and.to.be.calledWith('onepanelRest', sinon.match({
             name: sinon.match(/Onepanel REST .+/),
@@ -100,14 +101,14 @@ describe(
         }}`);
 
         await click('.one-tile');
-        await click('.record-item:last-child');
+        await click('.record-item:first-child');
         expect(selectedSpy)
           .to.be.calledOnce.and.to.be.calledWith('onepanelRest', sinon.match({
             name: sinon.match(/Onepanel REST .+/),
             caveats: [
               sinon.match({
                 type: 'service',
-                whitelist: ['ozp-onezone2id'],
+                whitelist: ['ozp-onezone'],
               }),
               sinon.match({
                 type: 'interface',
