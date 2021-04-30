@@ -94,6 +94,11 @@ export default Component.extend(I18n, {
   /**
    * @type {Object}
    */
+  subject: undefined,
+
+  /**
+   * @type {Object}
+   */
   error: undefined,
 
   /**
@@ -181,6 +186,27 @@ export default Component.extend(I18n, {
     if (inviteTypeSpec) {
       return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Name`);
     }
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  inviteTargetId: computed('type', function inviteTargetId() {
+    const inviteTypeSpec = this.get('inviteTypeSpec');
+    if (inviteTypeSpec) {
+      return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Id`);
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  joiningId: computed('selectedJoiningRecordOption', function joiningId() {
+    const id = this.get('selectedJoiningRecordOption.value.id');
+    if (id) {
+      return id.split('.')[1];
+    }
+    return null;
   }),
 
   /**
@@ -463,6 +489,7 @@ export default Component.extend(I18n, {
 
     this.resetState();
     this.set('type', get(result || {}, 'type'));
+    this.set('subject', get(result || {}, 'subject'));
   },
 
   processVerificationSuccess(inputTime) {

@@ -61,6 +61,10 @@
       .subject-image-label {
         max-width: 200px;
       }
+      .token-type {
+        display: flex;
+        justify-content: center;
+      }
     }
 
     .arrow {
@@ -164,5 +168,13 @@
     @media (min-width: $mobile-view-breakpoint) {
       padding-top: 2 * $padding-base-vertical;
     }
+  }
+  .id-trigger {
+    font-size: 140%;
+  }
+
+  .subject-icon-popover {
+    display: flex;
+    padding-left: 5px;
   }
 }

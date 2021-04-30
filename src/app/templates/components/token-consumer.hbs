@@ -40,6 +40,11 @@
             triggerEvent="hover"
           }}
         {{/if}}
+        {{#if media.isMobile}}
+          {{id-info-icon-popover
+            subjectIdType=inviteTargetModelName
+            subjectValue=inviteTargetId}}
+        {{/if}}
       </p>
       {{#unless (or media.isMobile noJoinMessage)}}
         <figure class="consume-token-image">
@@ -48,13 +53,24 @@
             <figcaption class="subject-image-label">
               {{#truncated-string class="text"}}
                 {{#if joiningRecordSelectorModelName}}
-                  {{#if selectedJoiningRecordOption}} 
-                    <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
+                  {{#if selectedJoiningRecordOption}}
+                    <div class="subject-icon-popover">
+                      <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
+                      {{id-info-icon-popover
+                        subjectIdType=joiningModelName
+                        subjectValue=joiningId}}
+                    </div>
                   {{else}}
                     <span class="select-below-label">{{tt this "placeholderUnderSubjectImage"}}</span>
                   {{/if}}
                 {{else}}
-                  <span class="subject-name">{{record-name record=currentUser}}</span>
+                  <div class="subject-icon-popover">
+                    <span class="subject-name">{{record-name record=currentUser}}</span>
+                    {{#id-info-icon-popover
+                      subjectIdType=joiningModelName
+                      subjectValue=subject.id}}
+                    {{/id-info-icon-popover}}
+                  </div>
                 {{/if}}
               {{/truncated-string}}
             </figcaption>
@@ -72,9 +88,14 @@
           <figure class="invite-target-image">
             <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
             <figcaption class="subject-image-label subject-name">
-              {{#truncated-string class="text"}}
-                {{inviteTargetName}}
-              {{/truncated-string}}
+              <div class="subject-icon-popover">
+                {{#truncated-string class="text"}}
+                  {{inviteTargetName}}
+                {{/truncated-string}}
+                {{id-info-icon-popover
+                  subjectIdType=inviteTargetModelName
+                  subjectValue=inviteTargetId}}
+              </div>
             </figcaption>
           </figure>
         </figure>
