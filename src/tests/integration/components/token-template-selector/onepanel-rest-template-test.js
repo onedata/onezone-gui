@@ -70,8 +70,8 @@ describe(
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
         this.render(hbs `{{token-template-selector/onepanel-rest-template
-        onSelected=selectedSpy
-      }}`);
+          onSelected=selectedSpy
+        }}`);
 
         await click('.one-tile');
         await click('.record-item:first-child');
@@ -96,8 +96,8 @@ describe(
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
         this.render(hbs `{{token-template-selector/onepanel-rest-template
-        onSelected=selectedSpy
-      }}`);
+          onSelected=selectedSpy
+        }}`);
 
         await click('.one-tile');
         await click('.record-item:last-child');

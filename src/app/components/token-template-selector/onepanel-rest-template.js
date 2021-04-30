@@ -44,7 +44,7 @@ export default RecordSelectorTemplate.extend({
       .then(clusterList => get(clusterList, 'list'))
       .then(clusterList => ArrayProxy.extend({
         clusterList,
-        content: array.sort('clusterList', ['name']),
+        content: array.sort('clusterList', ['type:desc', 'name']),
       }).create());
   },
 
@@ -52,12 +52,14 @@ export default RecordSelectorTemplate.extend({
    * @override
    */
   generateTemplateFromRecord(record) {
-    const servicePrefix = get(record, 'type') === 'onezone' ? 'ozp' : 'opp';
+    const service = get(record, 'type') === 'onezone' ?
+      'ozp-onezone' :
+      `opp-${get(record, 'entityId')}`;
     return {
       name: constructTokenName(String(this.t('newTokenNamePrefix')), get(record, 'name')),
       caveats: [{
         type: 'service',
-        whitelist: [`${servicePrefix}-${get(record, 'entityId')}`],
+        whitelist: [service],
       }, {
         type: 'interface',
         interface: 'rest',
