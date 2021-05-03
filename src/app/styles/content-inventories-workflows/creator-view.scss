@@ -1,18 +1,7 @@
 .content-inventories-workflows-creator-view {
+  @include full-col-content-as-min-height();
   display: flex;
   flex-direction: column;
-
-  @media (min-width: $screen-md-min) {
-    min-height: calc(100vh - #{2 * $content-col-padding});
-  }
-
-  @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
-    min-height: calc(100vh - #{$mobile-top-height + 2 * $content-col-padding});
-  }
-
-  @media (max-width: $screen-xs-max) {
-    min-height: calc(100vh - #{$mobile-top-height + $mobile-resource-name-height});
-  }
 
   .content-info {
     flex-grow: 1;
