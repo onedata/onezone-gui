@@ -6,5 +6,13 @@
       onRegisterViewActions=(action "registerViewActions" "list")
     }}
   {{/carousel.slide}}
+  {{#carousel.slide slideId="editor"}}
+    {{#if activeAtmWorkflowSchemaId}}
+    {{else}}
+      {{content-inventories-workflows/creator-view
+        atmInventory=atmInventory
+      }}
+    {{/if}}
+  {{/carousel.slide}}
 {{/one-carousel}}
 {{yield}}

@@ -9,8 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { conditional, array } from 'ember-awesome-macros';
-import { computed } from '@ember/object';
+import { conditional, array, promise } from 'ember-awesome-macros';
+import { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
@@ -18,6 +18,7 @@ export default Component.extend(GlobalActions, {
   classNames: ['content-inventories-workflows'],
 
   navigationState: service(),
+  recordManager: service(),
 
   /**
    * @virtual
@@ -33,14 +34,24 @@ export default Component.extend(GlobalActions, {
   actionsPerSlide: undefined,
 
   /**
+   * @type {String|undefined}
+   */
+  activeAtmWorkflowSchemaId: undefined,
+
+  /**
    * @type {Array<String>}
    */
-  possibleSlideIds: Object.freeze(['list']),
+  possibleSlideIds: Object.freeze(['list', 'editor']),
 
   /**
    * @type {ComputedProperty<String|undefined>}
    */
   activeSlideFromUrl: reads('navigationState.aspectOptions.view'),
+
+  /**
+   * @type {ComputedProperty<String|undefined>}
+   */
+  activeAtmWorkflowSchemaIdFromUrl: reads('navigationState.aspectOptions.workflowId'),
 
   /**
    * @type {ComputedProperty<String>}
@@ -51,6 +62,35 @@ export default Component.extend(GlobalActions, {
     'possibleSlideIds.firstObject'
   ),
 
+  activeAtmWorkflowSchemaProxy: promise.object(computed(
+    'activeAtmWorkflowSchemaId',
+    'atmInventory',
+    async function activeAtmWorkflowSchema() {
+      const {
+        activeAtmWorkflowSchemaId,
+        atmInventory,
+        recordManager,
+      } = this.getProperties(
+        'activeAtmWorkflowSchemaId',
+        'atmInventory',
+        'recordManager'
+      );
+      if (!activeAtmWorkflowSchemaId) {
+        return;
+      }
+
+      const atmWorkflowSchema = await recordManager.getRecordById(
+        'atmWorkflowSchema',
+        activeAtmWorkflowSchemaId
+      );
+      const parentInventory = await get(atmWorkflowSchema, 'atmInventory');
+      if (parentInventory !== atmInventory) {
+        throw { id: 'notFound' };
+      }
+      return atmWorkflowSchema;
+    }
+  )),
+
   /**
    * @override
    */
@@ -60,8 +100,25 @@ export default Component.extend(GlobalActions, {
       activeSlide,
     } = this.getProperties('actionsPerSlide', 'activeSlide');
 
-    return actionsPerSlide[activeSlide];
+    return actionsPerSlide[activeSlide] || [];
   }),
+
+  activeAtmWorkflowSchemaIdFromUrlObserver: observer(
+    'activeAtmWorkflowSchemaIdFromUrl',
+    function activeAtmWorkflowSchemaIdFromUrlObserver() {
+      const {
+        activeAtmWorkflowSchemaId,
+        activeAtmWorkflowSchemaIdFromUrl,
+      } = this.getProperties(
+        'activeAtmWorkflowSchemaId',
+        'activeAtmWorkflowSchemaIdFromUrl'
+      );
+
+      if (activeAtmWorkflowSchemaId !== activeAtmWorkflowSchemaIdFromUrl) {
+        this.set('activeAtmWorkflowSchemaId', 'activeAtmWorkflowSchemaIdFromUrl');
+      }
+    }
+  ),
 
   changeSlideViaUrl(newSlide) {
     this.get('navigationState').changeRouteAspectOptions({

@@ -9,6 +9,7 @@ import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
+import { set } from '@ember/object';
 
 describe('Integration | Component | content inventories workflows', function () {
   setupComponentTest('content-inventories-workflows', {
@@ -42,24 +43,61 @@ describe('Integration | Component | content inventories workflows', function () 
       .and.to.have.length(1);
   });
 
-  it('contains carousel with one slide', async function () {
+  it('contains carousel with two slides', async function () {
     await render(this);
 
     const $slides = this.$('.one-carousel-slide');
-    expect($slides).to.have.length(1);
+    expect($slides).to.have.length(2);
     expect(getSlide('list')).to.exist;
-    expect(isSlideActive('list')).to.be.true;
+    expect(getSlide('editor')).to.exist;
   });
 
-  it('shows workflow schemas list in "list" slide', async function () {
+  it('shows workflow schemas list when "view" query param is empty', async function () {
     await render(this);
 
+    expect(isSlideActive('list')).to.be.true;
     const listSlide = getSlide('list');
     const listView = listSlide.querySelector('.content-inventories-workflows-list-view');
     expect(listView).to.exist;
     expect(listView.innerText).to.contain('w0');
     expect(listView.innerText).to.contain('w1');
   });
+
+  it('shows workflow schemas list when "view" query param is equal to "list"',
+    async function () {
+      set(lookupService(this, 'navigation-state'), 'aspectOptions', { view: 'list' });
+
+      await render(this);
+
+      expect(isSlideActive('list')).to.be.true;
+    });
+
+  it('shows workflow schemas list when "view" query param is equal to "list" and "workflowId" is not empty',
+    async function () {
+      set(lookupService(this, 'navigation-state'), 'aspectOptions', {
+        view: 'list',
+        workflowId: 'someId',
+      });
+
+      await render(this);
+
+      expect(isSlideActive('list')).to.be.true;
+    });
+
+  it('shows workflow schema creator when "view" query param is "editor" and "workflowId" is empty',
+    async function () {
+      set(lookupService(this, 'navigation-state'), 'aspectOptions', {
+        view: 'editor',
+        workflowId: '',
+      });
+
+      await render(this);
+
+      expect(isSlideActive('editor')).to.be.true;
+      const editorSlide = getSlide('editor');
+      expect(editorSlide.querySelector('.content-inventories-workflows-creator-view'))
+        .to.exist;
+    });
 });
 
 async function render(testCase) {
