@@ -91,8 +91,13 @@ export default Component.extend(I18n, {
       isEditing,
       onWorkflowClick,
     } = this.getProperties('isEditing', 'onWorkflowClick');
+    const clickableElements = [...this.$('.clickable')];
 
-    if (isEditing || [...this.$('.clickable')].includes(event.target)) {
+    if (
+      isEditing ||
+      clickableElements.includes(event.target) ||
+      clickableElements.some(element => element.contains(event.target))
+    ) {
       // Should be handled by nested clickable element.
       return;
     }

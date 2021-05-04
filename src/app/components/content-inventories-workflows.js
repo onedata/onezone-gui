@@ -120,6 +120,16 @@ export default Component.extend(GlobalActions, {
     }
   ),
 
+  activeSlideObserver: observer('activeSlide', function activeSlideObserver() {
+    const scrollableParent = this.$().parents('.ps')[0];
+    if (scrollableParent) {
+      scrollableParent.scroll({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  }),
+
   changeSlideViaUrl(newSlide, slideParams = {}) {
     this.get('navigationState').changeRouteAspectOptions(Object.assign({}, slideParams, {
       view: newSlide,
