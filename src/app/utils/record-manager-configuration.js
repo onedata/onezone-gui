@@ -96,8 +96,24 @@ export default class RecordManagerConfiguration {
     }
   }
 
-  async onRecordRemove(modelName /**, recordId */ ) {
+  async onRecordRemove(modelName, recordId, record) {
     await this.recordManager.reloadUserRecordList(modelName);
+
+    switch (modelName) {
+      case 'atmWorkflowSchema': {
+        if (!record) {
+          return;
+        }
+        const atmInventory = record.belongsTo('atmInventory').value();
+        if (atmInventory) {
+          // FIXME: VFS-7597 to check: Attempted to handle event `loadingData`
+          // while in state root.deleted.saved. - Don't know if it is due to some
+          // mock bugs or is a general issue
+          await this.recordManager.reloadRecordList(atmInventory, modelName);
+        }
+        break;
+      }
+    }
   }
 
   async onRelationRemove(
