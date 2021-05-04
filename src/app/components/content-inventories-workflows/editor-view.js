@@ -10,6 +10,7 @@ export default Component.extend({
   workflowActions: service(),
 
   /**
+   * @virtual
    * @type {Models.AtmWorkflowSchema}
    */
   atmWorkflowSchema: undefined,

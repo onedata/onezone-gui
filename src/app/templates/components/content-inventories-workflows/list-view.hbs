@@ -8,6 +8,7 @@
   {{#promise-proxy-container proxy=workflowSchemasProxy}}
     {{content-inventories-workflows/workflows-list
       collection=workflowSchemasProxy.content
+      onWorkflowClick=onOpenWorkflowSchema
     }}
   {{/promise-proxy-container}}
 </div>

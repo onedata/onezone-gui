@@ -954,21 +954,11 @@ function attachLambdaFunctionsToAtmInventory(store, atmInventory) {
 }
 
 function attachWorkflowSchemasToAtmInventory(store, atmInventory) {
-  const {
-    entityType,
-    entityId,
-  } = getProperties(atmInventory, 'entityType', 'entityId');
   return allFulfilled(_.range(5).map((index) => {
     return store.createRecord('atmWorkflowSchema', {
-      id: gri({
-        entityType,
-        entityId,
-        aspect: 'workflow_schema',
-        aspectId: `workflow${index}`,
-        scope: 'private',
-      }),
       name: `Workflow ${index}`,
       description: `Some very complicated workflow #${index}`,
+      atmInventory,
     }).save();
   })).then(workflowSchemas =>
     createListRecord(store, 'atmWorkflowSchema', workflowSchemas)

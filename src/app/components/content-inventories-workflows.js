@@ -115,24 +115,37 @@ export default Component.extend(GlobalActions, {
       );
 
       if (activeAtmWorkflowSchemaId !== activeAtmWorkflowSchemaIdFromUrl) {
-        this.set('activeAtmWorkflowSchemaId', 'activeAtmWorkflowSchemaIdFromUrl');
+        this.set('activeAtmWorkflowSchemaId', activeAtmWorkflowSchemaIdFromUrl);
       }
     }
   ),
 
-  changeSlideViaUrl(newSlide) {
-    this.get('navigationState').changeRouteAspectOptions({
+  changeSlideViaUrl(newSlide, slideParams = {}) {
+    this.get('navigationState').changeRouteAspectOptions(Object.assign({}, slideParams, {
       view: newSlide,
-    });
+    }));
   },
 
   init() {
     this._super(...arguments);
     this.set('actionsPerSlide', {});
+    this.activeAtmWorkflowSchemaIdFromUrlObserver();
   },
 
   actions: {
-    showCreatorView() {},
+    showCreatorView() {
+      this.changeSlideViaUrl('editor', { workflowId: null });
+    },
+    showEditorView(atmWorkflowSchema) {
+      const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
+      this.changeSlideViaUrl('editor', { workflowId });
+    },
+    backSlide() {
+      if (this.get('activeSlide') === 'list') {
+        return;
+      }
+      this.changeSlideViaUrl('list');
+    },
     registerViewActions(slideId, actions) {
       this.set('actionsPerSlide', Object.assign({}, this.get('actionsPerSlide'), {
         [slideId]: actions,

@@ -31,6 +31,14 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Function}
+   * @param {Models.AtmWorkflowSchema}
+   * @returns {any}
+   */
+  onOpenWorkflowSchema: notImplementedIgnore,
+
+  /**
+   * @virtual
    * @type {Boolean}
    */
   onRegisterViewActions: notImplementedIgnore,
