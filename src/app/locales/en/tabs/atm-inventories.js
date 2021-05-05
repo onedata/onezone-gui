@@ -1,7 +1,7 @@
 export default {
   menuItem: 'Automation',
   aspects: {
-    functions: 'Functions',
+    lambdas: 'Lambdas',
     members: 'Members',
     notFound: 'Automation inventory not found',
   },

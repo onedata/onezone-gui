@@ -1,0 +1,21 @@
+<div class="icon-section">
+  {{one-icon icon="lambda"}}
+</div>
+<div class="content-section">
+  <div class="name">{{atmLambda.name}}</div>
+  <div class="summary-container">
+    {{#if atmLambda.summary}}
+      <span class="summary">{{atmLambda.summary}}</span>
+    {{/if}}
+    <a class="details-toggle" {{action "toggleDetails"}}>{{toggleDetailsText}}</a>
+  </div>
+  {{#one-collapse class="details-collapse" collapsed=(not isExpanded)}}
+    {{#render-later triggerRender=isExpanded}}
+      {{content-atm-inventories-lambdas/atm-lambda-form
+        mode="view"
+        atmLambda=atmLambda
+      }}
+    {{/render-later}}
+  {{/one-collapse}}
+</div>
+{{yield}}

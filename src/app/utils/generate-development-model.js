@@ -282,7 +282,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'atmInventory', groups
               ),
-              attachLambdaFunctionsToAtmInventory(store, record),
+              attachAtmLambdasToAtmInventory(store, record),
             ])
           ))
         )
@@ -899,13 +899,13 @@ function attachProgressToHarvesterIndices(
   }));
 }
 
-function attachLambdaFunctionsToAtmInventory(store, atmInventory) {
+function attachAtmLambdasToAtmInventory(store, atmInventory) {
   const {
     entityType,
     entityId,
   } = getProperties(atmInventory, 'entityType', 'entityId');
   return allFulfilled(_.range(5).map((index) => {
-    return store.createRecord('lambdaFunction', {
+    return store.createRecord('atmLambda', {
       id: gri({
         entityType,
         entityId,
@@ -944,10 +944,10 @@ function attachLambdaFunctionsToAtmInventory(store, atmInventory) {
         optional: true,
       }],
     }).save();
-  })).then(lambdaFunctions =>
-    createListRecord(store, 'lambdaFunction', lambdaFunctions)
+  })).then(atmLambdas =>
+    createListRecord(store, 'atmLambda', atmLambdas)
   ).then(listRecord => {
-    set(atmInventory, 'lambdaFunctionList', listRecord);
+    set(atmInventory, 'atmLambdaList', listRecord);
     return atmInventory.save();
   });
 }

@@ -1,6 +1,6 @@
 export default {
   aspects: {
-    functions: 'Functions',
+    lambdas: 'Lambdas',
     members: 'Members',
   },
   atmInventoryItem: {

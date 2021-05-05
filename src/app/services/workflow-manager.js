@@ -151,11 +151,11 @@ export default Service.extend({
 
   /**
    * @param {String} atmInventoryId
-   * @param {Object} functionPrototype
-   * @returns {Promise<Models.LambdaFunction>}
+   * @param {Object} atmLambdaPrototype
+   * @returns {Promise<Models.AtmLambda>}
    */
-  createLambdaFunction(atmInventoryId, functionPrototype) {
+  createAtmLambda(atmInventoryId, atmLambdaPrototype) {
     // FIXME: VFS-7538 implement lambda function creation
-    return resolve(functionPrototype);
+    return resolve(atmLambdaPrototype);
   },
 });
