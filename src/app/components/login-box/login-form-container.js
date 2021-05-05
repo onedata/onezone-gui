@@ -40,6 +40,11 @@ export default LoginFormContainer.extend(
     i18nPrefix: 'components.loginBox.loginFormContainer',
 
     /**
+     * @type {Location}
+     */
+    _location: location,
+
+    /**
      * @type {boolean}
      */
     testMode: equal('router.currentRouteName', 'test.login'),
@@ -132,6 +137,14 @@ export default LoginFormContainer.extend(
       } else {
         return [];
       }
+    }),
+
+    /**
+     * @type {computed.boolean}
+     */
+    showIpWarning: computed(function showIpWarning() {
+      const hostname = this.get('_location.hostname');
+      return /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/.test(hostname);
     }),
 
     /**
