@@ -1,12 +1,5 @@
 .content-inventories-workflows-editor-view {
-  @include full-col-content-as-min-height();
-
   .header-row .one-inline-editor {
-    margin-top: initial;
-
-    .form-control {
-      margin-top: initial;
-      margin-bottom: initial;
-    }
+    margin-top: -4px;
   }
 }

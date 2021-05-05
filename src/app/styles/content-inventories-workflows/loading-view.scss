@@ -1,5 +1,5 @@
 .content-inventories-workflows-loading-view {
-  @include full-col-content-as-min-height();
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 
