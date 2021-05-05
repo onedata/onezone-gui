@@ -12,7 +12,7 @@ import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
-import { get, getProperties, set, setProperties } from '@ember/object';
+import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -900,19 +900,8 @@ function attachProgressToHarvesterIndices(
 }
 
 function attachAtmLambdasToAtmInventory(store, atmInventory) {
-  const {
-    entityType,
-    entityId,
-  } = getProperties(atmInventory, 'entityType', 'entityId');
   return allFulfilled(_.range(5).map((index) => {
     return store.createRecord('atmLambda', {
-      id: gri({
-        entityType,
-        entityId,
-        aspect: 'function',
-        aspectId: `function${index}`,
-        scope: 'private',
-      }),
       name: `Function ${index}`,
       summary: `Some very complicated function #${index}`,
       engine: 'openfaas',
