@@ -41,9 +41,9 @@
           }}
         {{/if}}
         {{#if media.isMobile}}
-          {{id-info-icon-popover
-            subjectIdType=inviteTargetModelName
-            subjectValue=inviteTargetId}}
+          {{id-info
+            idType=inviteTargetModelName
+            idValue=inviteTargetId}}
         {{/if}}
       </p>
       {{#unless (or media.isMobile noJoinMessage)}}
@@ -51,28 +51,31 @@
           <figure class="invite-subject-image">
             <img class="subject-image" src={{root-url invitedModelImagePath}}>
             <figcaption class="subject-image-label">
-              {{#truncated-string class="text"}}
-                {{#if joiningRecordSelectorModelName}}
-                  {{#if selectedJoiningRecordOption}}
-                    <div class="subject-icon-popover">
-                      <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
-                      {{id-info-icon-popover
-                        subjectIdType=joiningModelName
-                        subjectValue=joiningId}}
-                    </div>
-                  {{else}}
-                    <span class="select-below-label">{{tt this "placeholderUnderSubjectImage"}}</span>
-                  {{/if}}
-                {{else}}
-                  <div class="subject-icon-popover">
-                    <span class="subject-name">{{record-name record=currentUser}}</span>
-                    {{#id-info-icon-popover
-                      subjectIdType=joiningModelName
-                      subjectValue=subject.id}}
-                    {{/id-info-icon-popover}}
+              {{#if joiningRecordSelectorModelName}}
+                {{#if selectedJoiningRecordOption}}
+                  <div class="subject-description">
+                    {{#truncated-string class="text subject-name"}}
+                      {{selectedJoiningRecordOption.label}}
+                    {{/truncated-string}}
+                    {{id-info
+                      idType=joiningModelName
+                      idValue=joiningId}}
                   </div>
+                {{else}}
+                  {{#truncated-string class="text select-below-label"}}
+                    {{tt this "placeholderUnderSubjectImage"}}
+                  {{/truncated-string}}
                 {{/if}}
-              {{/truncated-string}}
+              {{else}}
+                <div class="subject-description">
+                  {{#truncated-string class="text subject-name"}}
+                    {{record-name record=currentUser}}
+                  {{/truncated-string}}
+                  {{id-info
+                    idType=joiningModelName
+                    idValue=subject.id}}
+                </div>
+              {{/if}}
             </figcaption>
           </figure>
           <figure class="join-arrow-image">
@@ -88,13 +91,13 @@
           <figure class="invite-target-image">
             <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
             <figcaption class="subject-image-label subject-name">
-              <div class="subject-icon-popover">
+              <div class="subject-description">
                 {{#truncated-string class="text"}}
                   {{inviteTargetName}}
                 {{/truncated-string}}
-                {{id-info-icon-popover
-                  subjectIdType=inviteTargetModelName
-                  subjectValue=inviteTargetId}}
+                {{id-info
+                  idType=inviteTargetModelName
+                  idValue=inviteTargetId}}
               </div>
             </figcaption>
           </figure>

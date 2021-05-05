@@ -61,10 +61,6 @@
       .subject-image-label {
         max-width: 200px;
       }
-      .token-type {
-        display: flex;
-        justify-content: center;
-      }
     }
 
     .arrow {
@@ -170,10 +166,12 @@
     }
   }
   .id-trigger {
-    font-size: 140%;
+    font-size: 150%;
+    color: $color-one-light-gray;
+    vertical-align: text-bottom;
   }
 
-  .subject-icon-popover {
+  .subject-description {
     display: flex;
     padding-left: 5px;
   }

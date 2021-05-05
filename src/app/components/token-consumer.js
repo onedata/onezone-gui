@@ -202,11 +202,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   joiningId: computed('selectedJoiningRecordOption', function joiningId() {
-    const id = this.get('selectedJoiningRecordOption.value.id');
-    if (id) {
-      return id.split('.')[1];
-    }
-    return null;
+    return this.get('selectedJoiningRecordOption.value.entityId');
   }),
 
   /**
