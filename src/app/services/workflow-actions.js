@@ -15,7 +15,6 @@ import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateLambdaFunctionAction from 'onezone-gui/utils/workflow-actions/create-lambda-function-action';
-import { reject } from 'rsvp';
 import { classify } from '@ember/string';
 
 export default Service.extend(I18n, {
@@ -190,7 +189,6 @@ export default Service.extend(I18n, {
    * Removes member from automation inventory
    * @param {AtmInventory} atmInventory
    * @param {Models.User|Models.Group} member
-   * @returns {Promise}
    */
   async removeMemberFromAtmInventory(atmInventory, member) {
     const {
@@ -200,7 +198,9 @@ export default Service.extend(I18n, {
 
     const memberModelName = recordManager.getModelNameForRecord(member);
     if (!['user', 'group'].includes(memberModelName)) {
-      return reject();
+      throw new Error(
+        `service:workflow-actions#removeMemberFromAtmInventory: not supported member model "${memberModelName}"`
+      );
     }
 
     try {

@@ -215,8 +215,8 @@ export default function generateDevelopmentModel(store) {
     })
     // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords.group.get('list')
-      .then(records =>
-        allFulfilled(records.map(record =>
+      .then(groups =>
+        allFulfilled(groups.map(record =>
           allFulfilled([
             attachUsersGroupsToModel(
               store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
@@ -231,8 +231,8 @@ export default function generateDevelopmentModel(store) {
         ))
       )
       .then(() => listRecords.space.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(spaces =>
+          allFulfilled(spaces.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
@@ -250,8 +250,8 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => listRecords.harvester.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(harvesters =>
+          allFulfilled(harvesters.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'harvester', false,
@@ -269,8 +269,8 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => listRecords.atmInventory.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(atmInventories =>
+          allFulfilled(atmInventories.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'atmInventory', false,
@@ -521,7 +521,7 @@ function createTokensRecords(store) {
           },
         }).save();
       });
-    const inviteType = inviteTypes[0];
+    const inviteType = 'userJoinAtmInventory';
     const revokedInviteTokenPromise = store.createRecord('token', {
       name: 'Revoked invite token ' + i,
       revoked: true,

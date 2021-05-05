@@ -22,7 +22,7 @@ import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inv
 
 const OnedataAdapter = environmentExport(config, ProductionAdapter, DevelopmentAdapter);
 
-export const entityTypeToModelNameMap = Object.freeze(new Map([
+export const entityTypeToEmberModelNameMap = Object.freeze(new Map([
   [groupEntityType, 'group'],
   [spaceEntityType, 'space'],
   [userEntityType, 'user'],
@@ -38,5 +38,5 @@ export default OnedataAdapter.extend({
   /**
    * @override
    */
-  entityTypeToModelNameMap,
+  entityTypeToEmberModelNameMap,
 });

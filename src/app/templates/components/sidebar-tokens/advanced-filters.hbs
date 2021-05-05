@@ -36,12 +36,12 @@
         renderInPlace=true
         as |option|
       }}
-        <div class="option-container">
+        {{#truncated-string class="option-container"}}
           {{#if option.icon}}
             {{one-icon class="model-icon" icon=option.icon}}
           {{/if}}
           <span class="text model-name">{{tt this (concat "targetFilter.model.options." option.modelName)}}</span>
-        </div>
+        {{/truncated-string}}
       {{/power-select}}
       {{#power-select
         tagName="div"

@@ -6,20 +6,20 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { fillIn, click } from 'ember-native-dom-helpers';
 
-describe('Integration | Component | content inventories new', function () {
-  setupComponentTest('content-inventories-new', {
+describe('Integration | Component | content atm inventories new', function () {
+  setupComponentTest('content-atm-inventories-new', {
     integration: true,
   });
 
-  it('has class "content-inventories-new', function () {
-    this.render(hbs `{{content-inventories-new}}`);
+  it('has class "content-atm-inventories-new', function () {
+    this.render(hbs `{{content-atm-inventories-new}}`);
 
-    expect(this.$('.content-inventories-new')).to.exist;
+    expect(this.$('.content-atm-inventories-new')).to.exist;
   });
 
   it('does not allow to create new automation inventory when name is empty',
     async function () {
-      this.render(hbs `{{content-inventories-new}}`);
+      this.render(hbs `{{content-atm-inventories-new}}`);
 
       await fillIn('.new-atm-inventory-name', '');
 
@@ -32,7 +32,7 @@ describe('Integration | Component | content inventories new', function () {
       lookupService(this, 'workflow-actions'),
       'createCreateAtmInventoryAction'
     ).callsFake(() => ({ execute: executeStub }));
-    this.render(hbs `{{content-inventories-new}}`);
+    this.render(hbs `{{content-atm-inventories-new}}`);
 
     await fillIn('.new-atm-inventory-name', 'someName');
     await click('.btn-primary');

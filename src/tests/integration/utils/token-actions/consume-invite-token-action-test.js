@@ -78,7 +78,7 @@ describe('Integration | Util | token actions/consume invite token action', funct
     }],
   }, {
     targetModelName: 'atmInventory',
-    targetRouteResourceType: 'inventories',
+    targetRouteResourceType: 'atm-inventories',
     joiningModels: [{
       modelName: 'group',
       notifyText: 'Group "abc" has joined to automation inventory "target" successfully.',

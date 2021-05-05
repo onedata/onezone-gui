@@ -1,7 +1,7 @@
 /**
  * A members aspect of automation inventory.
  *
- * @module components/content-inventories-members
+ * @module components/content-atm-inventories-members
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -15,11 +15,11 @@ import { inject as service } from '@ember/service';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import PrivilegesAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
-import { Promise } from 'rsvp';
+import { all as allFulfilled } from 'rsvp';
 
 export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   layout,
-  classNames: ['members-aspect-base', 'content-inventories-members'],
+  classNames: ['members-aspect-base', 'content-atm-inventories-members'],
 
   i18n: service(),
   navigationState: service(),
@@ -30,7 +30,13 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentInventoriesMembers',
+  i18nPrefix: 'components.contentAtmInventoriesMembers',
+
+  /**
+   * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * @override
@@ -80,7 +86,7 @@ export default Component.extend(I18n, GlobalActions, PrivilegesAspectBase, {
     );
 
     try {
-      await Promise.all(members.map(member =>
+      await allFulfilled(members.map(member =>
         recordManager.removeRelation(atmInventory, member)
       ));
       globalNotify.success(this.t('removeMembersSuccess'));

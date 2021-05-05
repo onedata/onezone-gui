@@ -41,7 +41,7 @@ export default Action.extend({
   execute() {
     const result = ActionResult.create();
     return result.interceptPromise(
-      this.get('router').transitionTo('onedata.sidebar.content', 'inventories', 'new')
+      this.get('router').transitionTo('onedata.sidebar.content', 'atm-inventories', 'new')
     ).then(() => result, () => result);
   },
 });

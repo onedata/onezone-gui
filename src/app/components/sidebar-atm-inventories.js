@@ -1,7 +1,7 @@
 /**
  * A sidebar for automation inventories (extension of `one-sidebar`)
  *
- * @module components/sidebar-inventories
+ * @module components/sidebar-atm-inventories
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -14,12 +14,12 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 export default OneSidebar.extend(I18n, {
   layout,
-  classNames: ['sidebar-inventories'],
+  classNames: ['sidebar-atm-inventories'],
 
   /**
    * @override
    */
-  i18nPrefix: 'components.sidebarInventories',
+  i18nPrefix: 'components.sidebarAtmInventories',
 
   /**
    * @override
@@ -29,12 +29,12 @@ export default OneSidebar.extend(I18n, {
   /**
    * @override
    */
-  sidebarType: 'inventories',
+  sidebarType: 'atm-inventories',
 
   /**
    * @override
    */
-  firstLevelItemComponent: 'sidebar-inventories/atm-inventory-item',
+  firstLevelItemComponent: 'sidebar-atm-inventories/atm-inventory-item',
 
   /**
    * @override

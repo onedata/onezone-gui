@@ -17,7 +17,7 @@ const possibleTargetModels = [{
 }, {
   modelName: 'atmInventory',
   name: 'Atm. inventory',
-  icon: 'view-grid',
+  icon: 'atm-inventory',
 }, {
   modelName: 'cluster',
   name: 'Cluster',
