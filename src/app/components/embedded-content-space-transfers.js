@@ -10,7 +10,6 @@
 import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { reads } from '@ember/object/computed';
 
 export default OneproviderEmbeddedContainer.extend({
   layout,
