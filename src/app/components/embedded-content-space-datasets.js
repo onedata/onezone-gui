@@ -12,6 +12,7 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default OneproviderEmbeddedContainer.extend({
   layout,
@@ -80,6 +81,7 @@ export default OneproviderEmbeddedContainer.extend({
   callParentActionNames: Object.freeze([
     'updateDatasetId',
     'updateSelectedDatasetsIds',
+    'getDataUrl',
   ]),
 
   _location: location,
@@ -93,6 +95,29 @@ export default OneproviderEmbeddedContainer.extend({
     },
     updateSelectedDatasetsIds(selected) {
       this.set('selectedDatasetsIds', selected);
+    },
+    getDataUrl({ selected }) {
+      const {
+        _location,
+        router,
+        navigationState,
+        spaceId,
+      } = this.getProperties('_location', 'router', 'navigationState', 'spaceId');
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        spaceId,
+        'data', {
+          queryParams: {
+            options: serializeAspectOptions(
+              navigationState.mergedAspectOptions({
+                selected: (selected instanceof Array) ?
+                  selected.join(',') : selected || '',
+              })
+            ),
+          },
+        }
+      );
     },
   },
 });

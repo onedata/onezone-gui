@@ -23,7 +23,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentSpacesData',
+  i18nPrefix: 'components.contentSpacesDatasets',
 
   navigationState: service(),
 
