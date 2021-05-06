@@ -39,6 +39,14 @@ export default OneproviderEmbeddedContainer.extend({
    */
   datasetId: reads('navigationState.aspectOptions.dataset'),
 
+  /**
+   * Dataset state tree to show. One of: attached, detached.
+   * 
+   * **Injected to embedded iframe.**
+   * @type {String}
+   */
+  attachmentState: undefined,
+
   // FIXME: redundancy; create computed util for getting array from aspectOptions
   // create computed property for navigation state lists
   /**
@@ -73,6 +81,7 @@ export default OneproviderEmbeddedContainer.extend({
     'spaceId',
     'datasetId',
     'selectedDatasetsIds',
+    'attachmentState',
   ]),
 
   /**
@@ -94,7 +103,9 @@ export default OneproviderEmbeddedContainer.extend({
       });
     },
     updateSelectedDatasetsIds(selected) {
-      this.set('selectedDatasetsIds', selected);
+      this.get('navigationState').setAspectOptions({
+        selected,
+      });
     },
     getDataUrl({ selected }) {
       const {
