@@ -134,5 +134,7 @@ export default {
   },
   submit: {
     create: 'Create',
+    edit: 'Save',
   },
+  cancel: 'Cancel',
 };

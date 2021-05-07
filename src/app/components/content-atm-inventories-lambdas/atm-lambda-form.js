@@ -10,7 +10,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer } from '@ember/object';
+import { computed, observer, get, trySet } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -21,12 +21,14 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, eq, or, not, and, raw, isEmpty, conditional, getBy } from 'ember-awesome-macros';
+import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import {
   formDataToRecord,
   recordToFormData,
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form-utils';
+import _ from 'lodash';
 
 export default Component.extend(I18n, {
   classNames: ['atm-lambda-form'],
@@ -41,7 +43,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentAtmInventoriesLambdas.atmLambdaForm',
 
   /**
-   * One of: `create`, `view`
+   * One of: `'create'`, `'view'`, `'edit'`
    * @virtual
    * @type {String}
    */
@@ -55,13 +57,26 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
-   * Required when `mode` is `create`
+   * Required when `mode` is `create` or `edit`
    * @virtual optional
    * @type {Function}
    * @param {Object} rawAtmLambda lambda representation
    * @returns {Promise}
    */
   onSubmit: notImplementedReject,
+
+  /**
+   * Required when `mode` is `edit`
+   * @virtual optional
+   * @type {Function}
+   * @returns {any}
+   */
+  onCancel: notImplementedIgnore,
+
+  /**
+   * @type {Boolean}
+   */
+  isSubmitting: false,
 
   /**
    * @type {ComputedProperty<String>}
@@ -71,7 +86,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Object>}
    */
-  fieldsViewValues: computed('atmLambda', function fieldsViewValues() {
+  fieldsValuesFromRecord: computed('atmLambda', function fieldsValuesFromRecord() {
     return recordToFormData(this.get('atmLambda'));
   }),
 
@@ -129,7 +144,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   nameField: computed(function nameField() {
-    return TextField.extend({
+    return TextField.extend(defaultValueGenerator(this, raw('')), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'name',
@@ -140,12 +155,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextareaField>}
    */
   summaryField: computed(function summaryField() {
-    return TextareaField.extend({
+    return TextareaField.extend(defaultValueGenerator(this, raw('')), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'summary',
       isOptional: true,
-      defaultValue: '',
     });
   }),
 
@@ -159,21 +173,21 @@ export default Component.extend(I18n, {
     ];
     const editOptions = viewOptions.rejectBy('value', 'onedataFunction');
 
-    return DropdownField
-      .extend(defaultValueGenerator(this, 'options.firstObject.value'), {
+    return DropdownField.extend(
+      defaultValueGenerator(this, 'options.firstObject.value'),
+      disableFieldInEditMode(this), {
         options: conditional('isInViewMode', raw(viewOptions), raw(editOptions)),
-      })
-      .create({
-        name: 'engine',
-        showSearch: false,
-      });
+      }).create({
+      name: 'engine',
+      showSearch: false,
+    });
   }),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   openfaasOptionsFieldsGroup: computed(function openfaasOptionsFieldsGroup() {
-    return FormFieldsGroup.extend({
+    return FormFieldsGroup.extend(disableFieldInEditMode(this), {
       isVisible: eq('valuesSource.engine', raw('openfaas')),
     }).create({
       name: 'openfaasOptions',
@@ -190,7 +204,7 @@ export default Component.extend(I18n, {
    */
   onedataFunctionOptionsFieldsGroup: computed(
     function onedataFunctionOptionsFieldsGroup() {
-      return FormFieldsGroup.extend({
+      return FormFieldsGroup.extend(disableFieldInEditMode(this), {
         isVisible: eq('valuesSource.engine', raw('onedataFunction')),
       }).create({
         name: 'onedataFunctionOptions',
@@ -221,7 +235,10 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
    */
   readonlyField: computed(function readonlyField() {
-    return ToggleField.extend(defaultValueGenerator(this, raw(true))).create({
+    return ToggleField.extend(
+      defaultValueGenerator(this, raw(true)),
+      disableFieldInEditMode(this)
+    ).create({
       name: 'readonly',
     });
   }),
@@ -230,9 +247,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
    */
   mountSpaceField: computed(function mountSpaceField() {
-    return ToggleField.extend(defaultValueGenerator(this, raw(true)), {
-      isVisible: eq('valuesSource.engine', raw('openfaas')),
-    }).create({
+    return ToggleField.extend(
+      defaultValueGenerator(this, raw(true)),
+      disableFieldInEditMode(this), {
+        isVisible: eq('valuesSource.engine', raw('openfaas')),
+      }).create({
       name: 'mountSpace',
     });
   }),
@@ -241,7 +260,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   mountSpaceOptionsFieldsGroup: computed(function mountSpaceOptionsFieldsGroup() {
-    return FormFieldsGroup.extend({
+    return FormFieldsGroup.extend(disableFieldInEditMode(this), {
       isVisible: or('isInEditMode', 'valuesSource.mountSpace'),
       isExpanded: or('isInViewMode', 'valuesSource.mountSpace'),
     }).create({
@@ -267,25 +286,46 @@ export default Component.extend(I18n, {
     } = this.getProperties('mode', 'fields');
 
     fields.changeMode(mode === 'view' ? 'view' : 'edit');
+    fields.reset();
   }),
 
   init() {
     this._super(...arguments);
 
     this.modeObserver();
-    this.get('fields').reset();
   },
 
   actions: {
+    cancel() {
+      this.get('onCancel')();
+    },
     submit() {
+      this.set('isSubmitting', true);
       const {
+        mode,
+        atmLambda,
         fields,
         onSubmit,
-      } = this.getProperties('fields', 'onSubmit');
+      } = this.getProperties('mode', 'atmLambda', 'fields', 'onSubmit');
 
-      const rawAtmLambda = formDataToRecord(fields.dumpValue());
-      return onSubmit(rawAtmLambda)
-        .then(() => fields.reset());
+      const rawAtmLambdaFromForm = formDataToRecord(fields.dumpValue());
+      const objectToSubmit = {};
+
+      if (mode === 'create') {
+        Object.assign(objectToSubmit, rawAtmLambdaFromForm);
+      } else if (mode === 'edit' && atmLambda) {
+        ['name', 'summary'].forEach(propName => {
+          const origPropVal = get(atmLambda, propName);
+          const newPropVal = get(rawAtmLambdaFromForm, propName);
+          if (!_.isEqual(origPropVal, newPropVal)) {
+            objectToSubmit[propName] = newPropVal;
+          }
+        });
+      }
+
+      return onSubmit(objectToSubmit)
+        .then(() => fields.reset())
+        .finally(() => trySet(this, 'isSubmitting', false));
     },
   },
 });
@@ -295,17 +335,30 @@ export default Component.extend(I18n, {
  * is taken from component, in "edit" mode is equal to passed `editDefaultValue`.
  * It's result should be passed to *Field.extend.
  * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
- * @param {any} editDefaultValue
+ * @param {any} createDefaultValue
  * @returns {Object}
  */
-function defaultValueGenerator(component, editDefaultValue) {
+function defaultValueGenerator(component, createDefaultValue) {
   return {
     defaultValueSource: component,
+    modeSource: component,
     defaultValue: conditional(
-      'isInViewMode',
-      getBy('defaultValueSource', tag `fieldsViewValues.${'path'}`),
-      editDefaultValue
+      eq('modeSource.mode', raw('create')),
+      createDefaultValue,
+      getBy('defaultValueSource', tag `fieldsValuesFromRecord.${'path'}`)
     ),
+  };
+}
+
+/**
+ * Generates mixin-like object, that blocks field when component is in `edit` mode.
+ * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
+ * @returns {Object}
+ */
+function disableFieldInEditMode(component) {
+  return {
+    isEnabled: neq('modeSource.mode', raw('edit')),
+    modeSource: component,
   };
 }
 
@@ -319,76 +372,78 @@ function defaultValueGenerator(component, editDefaultValue) {
 function createFunctionArgResGroup(component, dataType) {
   const isForArguments = dataType === 'argument';
   return FormFieldsCollectionGroup
-    .extend(defaultValueGenerator(component, raw(undefined)), {
-      isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
-      fieldFactoryMethod(uniqueFieldValueName) {
-        const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
-        return FormFieldsGroup.create({
-          name: 'entry',
-          valueName: uniqueFieldValueName,
-          fields: [
-            TextField.create({
-              mode,
-              name: 'entryName',
-              defaultValue: '',
-            }),
-            DropdownField.extend({
-              defaultValue: reads('options.firstObject.value'),
-            }).create({
-              mode,
-              name: 'entryType',
-              options: [
-                { value: 'integer' },
-                { value: 'string' },
-                { value: 'object' },
-                { value: 'histogram' },
-                { value: 'anyFile' },
-                { value: 'regularFile' },
-                { value: 'directory' },
-                { value: 'dataset' },
-                { value: 'archive' },
-                { value: 'singleValueStore' },
-                { value: 'listStore' },
-                { value: 'mapStore' },
-                { value: 'treeForestStore' },
-                { value: 'rangeStore' },
-                { value: 'histogramStore' },
-                { value: 'onedatafsOptions' },
-              ],
-            }),
-            ToggleField.extend({
-              addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-            }).create({
-              mode,
-              name: 'entryBatch',
-              defaultValue: false,
-              component,
-            }),
-            ...(isForArguments ? [
+    .extend(
+      defaultValueGenerator(component, raw(undefined)),
+      disableFieldInEditMode(component), {
+        isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
+        fieldFactoryMethod(uniqueFieldValueName) {
+          const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
+          return FormFieldsGroup.create({
+            name: 'entry',
+            valueName: uniqueFieldValueName,
+            fields: [
+              TextField.create({
+                mode,
+                name: 'entryName',
+                defaultValue: '',
+              }),
+              DropdownField.extend({
+                defaultValue: reads('options.firstObject.value'),
+              }).create({
+                mode,
+                name: 'entryType',
+                options: [
+                  { value: 'integer' },
+                  { value: 'string' },
+                  { value: 'object' },
+                  { value: 'histogram' },
+                  { value: 'anyFile' },
+                  { value: 'regularFile' },
+                  { value: 'directory' },
+                  { value: 'dataset' },
+                  { value: 'archive' },
+                  { value: 'singleValueStore' },
+                  { value: 'listStore' },
+                  { value: 'mapStore' },
+                  { value: 'treeForestStore' },
+                  { value: 'rangeStore' },
+                  { value: 'histogramStore' },
+                  { value: 'onedatafsOptions' },
+                ],
+              }),
               ToggleField.extend({
                 addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
               }).create({
                 mode,
-                name: 'entryOptional',
+                name: 'entryBatch',
                 defaultValue: false,
                 component,
               }),
-              TextField.extend({
-                isVisible: not(and('isInViewMode', isEmpty('value'))),
-              }).create({
-                mode,
-                name: 'entryDefaultValue',
-                defaultValue: '',
-                isOptional: true,
-              }),
-            ] : []),
-          ],
-        });
-      },
-      dumpDefaultValue() {
-        return this.get('defaultValue') || this._super(...arguments);
-      },
-    })
+              ...(isForArguments ? [
+                ToggleField.extend({
+                  addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+                }).create({
+                  mode,
+                  name: 'entryOptional',
+                  defaultValue: false,
+                  component,
+                }),
+                TextField.extend({
+                  isVisible: not(and('isInViewMode', isEmpty('value'))),
+                }).create({
+                  mode,
+                  name: 'entryDefaultValue',
+                  defaultValue: '',
+                  isOptional: true,
+                }),
+              ] : []),
+            ],
+          });
+        },
+        dumpDefaultValue() {
+          return this.get('defaultValue') || this._super(...arguments);
+        },
+      })
     .create({
       name: isForArguments ? 'arguments' : 'results',
     });

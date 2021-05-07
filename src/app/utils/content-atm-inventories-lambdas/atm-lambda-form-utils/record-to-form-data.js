@@ -17,6 +17,7 @@ import { dataSpecToType } from './data-spec-converters';
 export default function recordToFormData(record) {
   const {
     name,
+    summary,
     engine,
     operationRef,
     executionOptions,
@@ -25,6 +26,7 @@ export default function recordToFormData(record) {
   } = getProperties(
     record || {},
     'name',
+    'summary',
     'engine',
     'operationRef',
     'executionOptions',
@@ -67,6 +69,7 @@ export default function recordToFormData(record) {
 
   return Object.assign({
     name,
+    summary,
     engine,
     readonly: Boolean(readonly),
     mountSpace: Boolean(mountOneclient),

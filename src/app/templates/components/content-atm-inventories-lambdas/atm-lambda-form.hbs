@@ -1,13 +1,22 @@
 <form class="form form-horizontal form-component">
   {{form-component/field-renderer field=fields}}
-  {{#if (eq mode "create")}}
+  {{#if (or (eq mode "create") (eq mode "edit"))}}
     {{#one-spin-button
       class="btn btn-primary btn-submit"
       action=(action "submit")
       disabled=(not fields.isValid)
     }}
-      {{tt this "submit.create"}}
+      {{tt this (concat "submit." mode)}}
     {{/one-spin-button}}
+    {{#if (eq mode "edit")}}
+      {{#bs-button
+        class="btn-cancel"
+        disabled=isSubmitting
+        onClick=(action "cancel")
+      }}
+        {{tt this "cancel"}}
+      {{/bs-button}}
+    {{/if}}
   {{/if}}
 </form>
 {{yield}}

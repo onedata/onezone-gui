@@ -128,7 +128,7 @@ describe(
     });
 
     context('in "create" mode', function () {
-      it('has class "mode-create', async function () {
+      it('has class "mode-create"', async function () {
         await renderCreate(this);
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-create');
@@ -642,7 +642,7 @@ describe(
     });
 
     context('in "view" mode', function () {
-      it('has class "mode-view', async function () {
+      it('has class "mode-view"', async function () {
         await renderView(this);
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-view');
@@ -811,6 +811,140 @@ describe(
         });
       });
     });
+
+    context('in "edit" mode', function () {
+      beforeEach(function () {
+        this.set('atmLambda', {
+          name: 'someName',
+          summary: 'someSummary',
+        });
+      });
+
+      it('has class "mode-edit"', async function () {
+        await renderEdit(this);
+
+        expect(this.$('.atm-lambda-form')).to.have.class('mode-edit');
+      });
+
+      it('renders two buttons - save and cancel', async function () {
+        await renderEdit(this);
+
+        const $saveBtn = this.$('.btn-submit');
+        const $cancelBtn = this.$('.btn-cancel');
+        expect($saveBtn).to.exist;
+        expect($saveBtn.text().trim()).to.equal('Save');
+        expect($cancelBtn).to.exist;
+        expect($cancelBtn.text().trim()).to.equal('Cancel');
+      });
+
+      it('shows lambda values and only two fields enabled - name and summary',
+        async function () {
+          this.set('atmLambda', {
+            name: 'myname',
+            summary: 'summary',
+            description: '',
+            engine: 'openfaas',
+            operationRef: 'myimage',
+            executionOptions: {
+              readonly: true,
+              mountSpaceOptions: {
+                mountOneclient: true,
+                mountPoint: '/some/path',
+                oneclientOptions: 'oc-options',
+              },
+            },
+            argumentSpecs: [{
+              name: 'arg',
+              dataSpec: { type: 'string' },
+              isBatch: true,
+              isOptional: true,
+              defaultValue: 'default',
+            }],
+            resultSpecs: [{
+              name: 'res',
+              dataSpec: { type: 'integer' },
+              isBatch: true,
+            }],
+          });
+
+          await renderEdit(this);
+
+          const $enabledFields =
+            this.$('.field-enabled:not(.form-fields-group-renderer)');
+          expect($enabledFields).to.have.length(2);
+          expect($enabledFields.eq(0)).to.have.class('name-field');
+          expect($enabledFields.eq(1)).to.have.class('summary-field');
+
+          expect(this.$('.name-field .form-control')).to.have.value('myname');
+          expect(this.$('.summary-field .form-control')).to.have.value('summary');
+          expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
+          expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          const $argument = this.$('.arguments-field .entry-field');
+          expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
+          expect($argument.find('.entryType-field .field-component').text().trim())
+            .to.equal('String');
+          expect($argument.find('.entryBatch-field .form-control'))
+            .to.have.class('checked');
+          expect($argument.find('.entryOptional-field .form-control'))
+            .to.have.class('checked');
+          expect($argument.find('.entryDefaultValue-field .form-control'))
+            .to.have.value('default');
+          const $result = this.$('.results-field .entry-field');
+          expect($result.find('.entryName-field .form-control')).to.have.value('res');
+          expect($result.find('.entryType-field .field-component').text().trim())
+            .to.equal('Integer');
+          expect($result.find('.entryBatch-field .form-control'))
+            .to.have.class('checked');
+          expect(this.$('.readonly-field .form-control')).to.have.class('checked');
+          expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
+          expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
+          expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+        });
+
+      it('modifies lambda on submit button click (all enabled fields modified)',
+        async function () {
+          await renderEdit(this);
+
+          await fillIn('.name-field .form-control', 'anothername');
+          await fillIn('.summary-field .form-control', 'anothersummary');
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith({
+              name: 'anothername',
+              summary: 'anothersummary',
+            });
+        });
+
+      it('modifies lambda on submit button click (no fields modified)',
+        async function () {
+          await renderEdit(this);
+
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith({});
+        });
+
+      it('calls onCancel on "cancel" click', async function () {
+        await renderEdit(this);
+
+        await click('.btn-cancel');
+
+        expect(this.get('cancelSpy')).to.be.calledOnce;
+      });
+
+      it('disables sumbit and cancel buttons when submission is pending',
+        async function () {
+          await renderEdit(this);
+          this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
+
+          await click('.btn-submit');
+
+          expect(this.$('.btn-submit')).to.have.attr('disabled');
+          expect(this.$('.btn-cancel')).to.have.attr('disabled');
+        });
+    });
   }
 );
 
@@ -827,6 +961,20 @@ async function renderView(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="view"
     atmLambda=atmLambda
+  }}`);
+  await wait();
+}
+
+async function renderEdit(testCase) {
+  testCase.setProperties({
+    submitStub: sinon.stub().resolves(),
+    cancelSpy: sinon.spy(),
+  });
+  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+    mode="edit"
+    atmLambda=atmLambda
+    onSubmit=submitStub
+    onCancel=cancelSpy
   }}`);
   await wait();
 }
