@@ -12,9 +12,9 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneproviderEmbeddedContainer.extend({
+export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
 
   globalNotify: service(),
@@ -91,6 +91,7 @@ export default OneproviderEmbeddedContainer.extend({
     'updateDatasetId',
     'updateSelectedDatasetsIds',
     'getDataUrl',
+    'getDatasetsUrl',
   ]),
 
   _location: location,
@@ -107,28 +108,23 @@ export default OneproviderEmbeddedContainer.extend({
         selected,
       });
     },
-    getDataUrl({ selected }) {
-      const {
-        _location,
-        router,
-        navigationState,
-        spaceId,
-      } = this.getProperties('_location', 'router', 'navigationState', 'spaceId');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'spaces',
-        spaceId,
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({
-                selected: (selected instanceof Array) ?
-                  selected.join(',') : selected || '',
-              })
-            ),
-          },
-        }
-      );
+    /**
+     * @param {Object} options
+     * @param {String} options.fileId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in file browser
+     */
+    getDataUrl(options) {
+      return this.getBrowserUrl('data', options);
+    },
+    /**
+     * @param {Object} options
+     * @param {String} options.datasetId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in dataset browser
+     */
+    getDatasetsUrl(options) {
+      return this.getBrowserUrl('datasets', options);
     },
   },
 });

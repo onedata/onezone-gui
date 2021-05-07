@@ -13,8 +13,9 @@ import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneproviderEmbeddedContainer.extend({
+export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
 
   globalNotify: service(),
@@ -72,6 +73,7 @@ export default OneproviderEmbeddedContainer.extend({
     'updateDirEntityId',
     'updateSelected',
     'getDataUrl',
+    'getDatasetsUrl',
     'getTransfersUrl',
     'getShareUrl',
   ]),
@@ -83,25 +85,23 @@ export default OneproviderEmbeddedContainer.extend({
     updateSelected(selected) {
       this.set('selected', selected);
     },
-    getDataUrl({ fileId, selected }) {
-      const {
-        _location,
-        router,
-        navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({
-                dir: fileId,
-                selected: (selected instanceof Array) ?
-                  selected.join(',') : selected || '',
-              })
-            ),
-          },
-        });
+    /**
+     * @param {Object} options
+     * @param {String} options.fileId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in file browser
+     */
+    getDataUrl(options) {
+      return this.getBrowserUrl('data', options);
+    },
+    /**
+     * @param {Object} options
+     * @param {String} options.datasetId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in dataset browser
+     */
+    getDatasetsUrl(options) {
+      return this.getBrowserUrl('datasets', options);
     },
     getTransfersUrl({ fileId, tabId }) {
       const {
