@@ -15,6 +15,7 @@ import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
+import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
 import { classify } from '@ember/string';
 
 export default Service.extend(I18n, {
@@ -87,6 +88,20 @@ export default Service.extend(I18n, {
    */
   createCreateAtmLambdaAction(context) {
     return CreateAtmLambdaAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmLambda: Models.AtmLambda,
+   *     atmLambdaDiff: Object,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.ModifyAtmLambdaAction}
+   */
+  createModifyAtmLambdaAction(context) {
+    return ModifyAtmLambdaAction.create({ ownerSource: this, context });
   },
 
   createGlobalActions() {
