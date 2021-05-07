@@ -250,7 +250,9 @@ export default Component.extend(I18n, {
         TextField.extend(defaultValueGenerator(this, raw('/mnt/onedata'))).create({
           name: 'mountPoint',
         }),
-        TextField.extend(defaultValueGenerator(this, raw(''))).create({
+        TextField.extend(defaultValueGenerator(this, raw('')), {
+          isVisible: not(and('isInViewMode', isEmpty('value'))),
+        }).create({
           name: 'oneclientOptions',
           isOptional: true,
         }),
