@@ -8,6 +8,7 @@
  */
 
 import { get, getProperties } from '@ember/object';
+import { typeToDataSpec } from './data-spec-converters';
 
 /**
  * @param {Object} formData
@@ -67,8 +68,8 @@ export default function formDataToRecord(formData) {
     engine,
     operationRef,
     executionOptions,
-    arguments: lambdaArguments,
-    results: lambdaResults,
+    argumentSpecs: lambdaArguments,
+    resultSpecs: lambdaResults,
   };
 }
 
@@ -83,25 +84,26 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     const {
       entryName,
       entryType,
-      entryArray,
+      entryBatch,
       entryOptional,
       entryDefaultValue,
     } = getProperties(
       get(formArgRes, valueName) || {},
       'entryName',
       'entryType',
-      'entryArray',
+      'entryBatch',
       'entryOptional',
       'entryDefaultValue'
     );
+
     const lambdaData = {
       name: entryName,
-      type: entryType,
-      array: entryArray,
-      optional: entryOptional,
+      dataSpec: typeToDataSpec(entryType),
+      isBatch: entryBatch,
     };
     if (dataType === 'argument') {
       lambdaData.defaultValue = entryDefaultValue;
+      lambdaData.isOptional = entryOptional;
     }
     return lambdaData;
   });

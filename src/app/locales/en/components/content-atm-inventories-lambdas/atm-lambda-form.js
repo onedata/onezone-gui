@@ -1,3 +1,54 @@
+const argumentAndResultTypes = {
+  integer: {
+    label: 'Integer',
+  },
+  string: {
+    label: 'String',
+  },
+  object: {
+    label: 'Object',
+  },
+  histogram: {
+    label: 'Histogram',
+  },
+  anyFile: {
+    label: 'Any file',
+  },
+  regularFile: {
+    label: 'Regular file',
+  },
+  directory: {
+    label: 'Directory',
+  },
+  dataset: {
+    label: 'Dataset',
+  },
+  archive: {
+    label: 'Archive',
+  },
+  singleValueStore: {
+    label: 'Single value store',
+  },
+  listStore: {
+    label: 'List store',
+  },
+  mapStore: {
+    label: 'Map store',
+  },
+  treeForestStore: {
+    label: 'Tree forest store',
+  },
+  rangeStore: {
+    label: 'Range store',
+  },
+  histogramStore: {
+    label: 'Histogram store',
+  },
+  onedatafsOptions: {
+    label: 'OnedataFS options',
+  },
+};
+
 export default {
   fields: {
     name: {
@@ -36,32 +87,10 @@ export default {
         },
         entryType: {
           label: 'Type',
-          options: {
-            string: {
-              label: 'String',
-            },
-            object: {
-              label: 'Object',
-            },
-            listStream: {
-              label: 'List stream',
-            },
-            mapStream: {
-              label: 'Map stream',
-            },
-            filesTreeStream: {
-              label: 'Files tree stream',
-            },
-            histogram: {
-              label: 'Histogram',
-            },
-            onedatafsOptions: {
-              label: 'OnedataFS options',
-            },
-          },
+          options: argumentAndResultTypes,
         },
-        entryArray: {
-          label: 'Array',
+        entryBatch: {
+          label: 'Batch',
         },
         entryOptional: {
           label: 'Optional',
@@ -81,41 +110,10 @@ export default {
         },
         entryType: {
           label: 'Type',
-          options: {
-            string: {
-              label: 'String',
-            },
-            object: {
-              label: 'Object',
-            },
-            listStreamOperation: {
-              label: 'List stream operation',
-            },
-            mapStreamOperation: {
-              label: 'Map stream operation',
-            },
-            filesTreeStreamOperation: {
-              label: 'Files tree stream operation',
-            },
-            dataReadStats: {
-              label: 'Data read stats',
-            },
-            dataWriteStats: {
-              label: 'Data write stats',
-            },
-            networkTransferStats: {
-              label: 'Network transfer stats',
-            },
-            auditLogRecord: {
-              label: 'Audit log record',
-            },
-          },
+          options: argumentAndResultTypes,
         },
-        entryArray: {
-          label: 'Array',
-        },
-        entryOptional: {
-          label: 'Optional',
+        entryBatch: {
+          label: 'Batch',
         },
       },
     },

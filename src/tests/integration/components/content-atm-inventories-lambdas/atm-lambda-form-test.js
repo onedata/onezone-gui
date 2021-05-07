@@ -11,56 +11,99 @@ import { Promise } from 'rsvp';
 import { registerService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
 
-const argumentTypes = [{
-  value: 'string',
+const argumentAndResultTypes = [{
+  dataSpec: { type: 'integer' },
+  label: 'Integer',
+}, {
+  dataSpec: { type: 'string' },
   label: 'String',
 }, {
-  value: 'object',
+  dataSpec: { type: 'object' },
   label: 'Object',
 }, {
-  value: 'listStream',
-  label: 'List stream',
-}, {
-  value: 'mapStream',
-  label: 'Map stream',
-}, {
-  value: 'filesTreeStream',
-  label: 'Files tree stream',
-}, {
-  value: 'histogram',
+  dataSpec: { type: 'histogram' },
   label: 'Histogram',
 }, {
-  value: 'onedatafsOptions',
+  dataSpec: {
+    type: 'file',
+    valueConstraints: {
+      fileType: 'ANY',
+    },
+  },
+  label: 'Any file',
+}, {
+  dataSpec: {
+    type: 'file',
+    valueConstraints: {
+      fileType: 'REG',
+    },
+  },
+  label: 'Regular file',
+}, {
+  dataSpec: {
+    type: 'file',
+    valueConstraints: {
+      fileType: 'DIR',
+    },
+  },
+  label: 'Directory',
+}, {
+  dataSpec: { type: 'dataset' },
+  label: 'Dataset',
+}, {
+  dataSpec: { type: 'archive' },
+  label: 'Archive',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'singleValue',
+    },
+  },
+  label: 'Single value store',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'list',
+    },
+  },
+  label: 'List store',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'map',
+    },
+  },
+  label: 'Map store',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'treeForest',
+    },
+  },
+  label: 'Tree forest store',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'range',
+    },
+  },
+  label: 'Range store',
+}, {
+  dataSpec: {
+    type: 'storeCredentials',
+    valueConstraints: {
+      storeType: 'histogram',
+    },
+  },
+  label: 'Histogram store',
+}, {
+  dataSpec: { type: 'onedatafsOptions' },
   label: 'OnedataFS options',
-}];
-
-const resultTypes = [{
-  value: 'string',
-  label: 'String',
-}, {
-  value: 'object',
-  label: 'Object',
-}, {
-  value: 'listStreamOperation',
-  label: 'List stream operation',
-}, {
-  value: 'mapStreamOperation',
-  label: 'Map stream operation',
-}, {
-  value: 'filesTreeStreamOperation',
-  label: 'Files tree stream operation',
-}, {
-  value: 'dataReadStats',
-  label: 'Data read stats',
-}, {
-  value: 'dataWriteStats',
-  label: 'Data write stats',
-}, {
-  value: 'networkTransferStats',
-  label: 'Network transfer stats',
-}, {
-  value: 'auditLogRecord',
-  label: 'Audit log record',
 }];
 
 describe(
@@ -213,12 +256,12 @@ describe(
         const $entryTypeLabel = $entry.find('.entryType-field .control-label');
         const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
         expect($entryTypeLabel.text().trim()).to.equal('Type:');
-        expect($entryTypeField.text().trim()).to.equal('String');
+        expect($entryTypeField.text().trim()).to.equal('Integer');
 
-        const $entryArrayLabel = $entry.find('.entryArray-field .control-label');
-        const $entryArrayField = $entry.find('.entryArray-field .form-control');
-        expect($entryArrayLabel.text().trim()).to.equal('Array');
-        expect($entryArrayField).to.not.have.class('checked');
+        const $entryBatchLabel = $entry.find('.entryBatch-field .control-label');
+        const $entryBatchField = $entry.find('.entryBatch-field .form-control');
+        expect($entryBatchLabel.text().trim()).to.equal('Batch');
+        expect($entryBatchField).to.not.have.class('checked');
 
         const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
         const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
@@ -259,8 +302,8 @@ describe(
         await clickTrigger('.entryType-field');
 
         const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(argumentTypes.length);
-        argumentTypes.forEach(({ label }, i) =>
+        expect($options).to.have.length(argumentAndResultTypes.length);
+        argumentAndResultTypes.forEach(({ label }, i) =>
           expect($options.eq(i).text().trim()).to.equal(label)
         );
       });
@@ -306,17 +349,12 @@ describe(
         const $entryTypeLabel = $entry.find('.entryType-field .control-label');
         const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
         expect($entryTypeLabel.text().trim()).to.equal('Type:');
-        expect($entryTypeField.text().trim()).to.equal('String');
+        expect($entryTypeField.text().trim()).to.equal('Integer');
 
-        const $entryArrayLabel = $entry.find('.entryArray-field .control-label');
-        const $entryArrayField = $entry.find('.entryArray-field .form-control');
-        expect($entryArrayLabel.text().trim()).to.equal('Array');
-        expect($entryArrayField).to.not.have.class('checked');
-
-        const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
-        const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
-        expect($entryOptionalLabel.text().trim()).to.equal('Optional');
-        expect($entryOptionalField).to.not.have.class('checked');
+        const $entryBatchLabel = $entry.find('.entryBatch-field .control-label');
+        const $entryBatchField = $entry.find('.entryBatch-field .form-control');
+        expect($entryBatchLabel.text().trim()).to.equal('Batch');
+        expect($entryBatchField).to.not.have.class('checked');
       });
 
       it('marks "result name" field as invalid when it is empty', async function () {
@@ -345,8 +383,8 @@ describe(
         await clickTrigger('.entryType-field');
 
         const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(resultTypes.length);
-        resultTypes.forEach(({ label }, i) =>
+        expect($options).to.have.length(argumentAndResultTypes.length);
+        argumentAndResultTypes.forEach(({ label }, i) =>
           expect($options.eq(i).text().trim()).to.equal(label)
         );
       });
@@ -482,10 +520,10 @@ describe(
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
           await selectChoose(
             `${nthArgSelector} .entryType-field`,
-            argumentTypes[i].label
+            argumentAndResultTypes[i].label
           );
           if (i === 0) {
-            await click(`${nthArgSelector} .entryArray-field .form-control`);
+            await click(`${nthArgSelector} .entryBatch-field .form-control`);
             await click(`${nthArgSelector} .entryOptional-field .form-control`);
             await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, 'val0');
           }
@@ -493,10 +531,12 @@ describe(
           await addResult();
           const nthResSelector = `.results-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthResSelector} .entryName-field .form-control`, `res${i}`);
-          await selectChoose(`${nthResSelector} .entryType-field`, resultTypes[i].label);
+          await selectChoose(
+            `${nthResSelector} .entryType-field`,
+            argumentAndResultTypes[i].label
+          );
           if (i === 1) {
-            await click(`${nthResSelector} .entryArray-field .form-control`);
-            await click(`${nthResSelector} .entryOptional-field .form-control`);
+            await click(`${nthResSelector} .entryBatch-field .form-control`);
           }
         }
 
@@ -518,24 +558,23 @@ describe(
               oneclientOptions: 'oc-options',
             },
           },
-          arguments: argumentTypes.slice(0, 2).map(({ value: type }, idx) => ({
+          argumentSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `arg${idx}`,
-            type,
-            array: idx === 0,
-            optional: idx === 0,
+            dataSpec,
+            isBatch: idx === 0,
+            isOptional: idx === 0,
             defaultValue: idx === 0 ? 'val0' : '',
           })),
-          results: resultTypes.slice(0, 2).map(({ value: type }, idx) => ({
+          resultSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `res${idx}`,
-            type,
-            array: idx === 1,
-            optional: idx === 1,
+            dataSpec,
+            isBatch: idx === 1,
           })),
         });
       });
 
-      argumentTypes.forEach(({ value: typeValue, label: typeLabel }) => {
-        it(`creates lambda with "${typeLabel}"-typed argument on submit button click`,
+      argumentAndResultTypes.forEach(({ dataSpec, label }) => {
+        it(`creates lambda with "${label}"-typed argument on submit button click`,
           async function () {
             await renderCreate(this);
 
@@ -543,24 +582,24 @@ describe(
             await addArgument();
             const argSelector = '.arguments-field .collection-item:first-child';
             await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
-            await selectChoose(`${argSelector} .entryType-field`, typeLabel);
+            await selectChoose(`${argSelector} .entryType-field`, label);
             await click('.btn-submit');
 
             expect(this.get('submitStub')).to.be.calledOnce
               .and.to.be.calledWith(Object.assign(atmLambda, {
-                arguments: [{
+                argumentSpecs: [{
                   name: 'entry',
-                  type: typeValue,
-                  array: false,
-                  optional: false,
+                  dataSpec,
+                  isBatch: false,
+                  isOptional: false,
                   defaultValue: '',
                 }],
               }));
           });
       });
 
-      resultTypes.forEach(({ value: typeValue, label: typeLabel }) => {
-        it(`creates lambda with "${typeLabel}"-typed result on submit button click`,
+      argumentAndResultTypes.forEach(({ dataSpec, label }) => {
+        it(`creates lambda with "${label}"-typed result on submit button click`,
           async function () {
             await renderCreate(this);
 
@@ -568,16 +607,15 @@ describe(
             await addResult();
             const resSelector = '.results-field .collection-item:first-child';
             await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-            await selectChoose(`${resSelector} .entryType-field`, typeLabel);
+            await selectChoose(`${resSelector} .entryType-field`, label);
             await click('.btn-submit');
 
             expect(this.get('submitStub')).to.be.calledOnce
               .and.to.be.calledWith(Object.assign(atmLambda, {
-                results: [{
+                resultSpecs: [{
                   name: 'entry',
-                  type: typeValue,
-                  array: false,
-                  optional: false,
+                  dataSpec,
+                  isBatch: false,
                 }],
               }));
           });
@@ -629,8 +667,8 @@ describe(
               mountOneclient: false,
             },
           },
-          arguments: [],
-          results: [],
+          argumentSpecs: [],
+          resultSpecs: [],
         });
 
         await renderView(this);
@@ -662,8 +700,8 @@ describe(
               mountOneclient: false,
             },
           },
-          arguments: [],
-          results: [],
+          argumentSpecs: [],
+          resultSpecs: [],
         });
 
         await renderView(this);
@@ -705,11 +743,11 @@ describe(
       it('shows arguments of passed lambda', async function () {
         this.set('atmLambda', {
           engine: 'openfaas',
-          arguments: argumentTypes.map(({ value: type }, idx) => ({
-            name: `arg${idx}`,
-            type,
-            array: idx === 0,
-            optional: idx === 0,
+          argumentSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
+            name: `entry${idx}`,
+            dataSpec,
+            isBatch: idx === 0,
+            isOptional: idx === 0,
             defaultValue: idx === 0 ? 'val0' : '',
           })),
         });
@@ -719,22 +757,22 @@ describe(
         expect(this.$('.field-edit-mode')).to.not.exist;
         expect(this.$('.arguments-field')).to.exist;
         const $entries = this.$('.arguments-field .entry-field');
-        expect($entries).to.have.length(argumentTypes.length);
-        argumentTypes.forEach(({ label: type }, idx) => {
+        expect($entries).to.have.length(argumentAndResultTypes.length);
+        argumentAndResultTypes.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .field-component').text().trim())
-            .to.equal(`arg${idx}`);
+            .to.equal(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
-          const $arrayToggle = $entry.find('.entryArray-field .form-control');
+          const $batchToggle = $entry.find('.entryBatch-field .form-control');
           const $optionalToggle = $entry.find('.entryOptional-field .form-control');
           const $defaultValueField = $entry.find('.entryDefaultValue-field .field-component');
           if (idx === 0) {
-            expect($arrayToggle).to.have.class('checked');
+            expect($batchToggle).to.have.class('checked');
             expect($optionalToggle).to.have.class('checked');
             expect($defaultValueField.text().trim()).to.equal('val0');
           } else {
-            expect($arrayToggle).to.not.have.class('checked');
+            expect($batchToggle).to.not.have.class('checked');
             expect($optionalToggle).to.not.have.class('checked');
             expect($defaultValueField).to.not.exist;
           }
@@ -744,11 +782,10 @@ describe(
       it('shows results of passed lambda', async function () {
         this.set('atmLambda', {
           engine: 'openfaas',
-          results: resultTypes.map(({ value: type }, idx) => ({
+          resultSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
-            type,
-            array: idx === 1,
-            optional: idx === 1,
+            dataSpec,
+            isBatch: idx === 1,
           })),
         });
 
@@ -757,22 +794,19 @@ describe(
         expect(this.$('.field-edit-mode')).to.not.exist;
         expect(this.$('.results-field')).to.exist;
         const $entries = this.$('.results-field .entry-field');
-        expect($entries).to.have.length(resultTypes.length);
+        expect($entries).to.have.length(argumentAndResultTypes.length);
 
-        resultTypes.forEach(({ label: type }, idx) => {
+        argumentAndResultTypes.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .field-component').text().trim())
             .to.equal(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
-          const $arrayToggle = $entry.find('.entryArray-field .form-control');
-          const $optionalToggle = $entry.find('.entryOptional-field .form-control');
+          const $batchToggle = $entry.find('.entryBatch-field .form-control');
           if (idx === 1) {
-            expect($arrayToggle).to.have.class('checked');
-            expect($optionalToggle).to.have.class('checked');
+            expect($batchToggle).to.have.class('checked');
           } else {
-            expect($arrayToggle).to.not.have.class('checked');
-            expect($optionalToggle).to.not.have.class('checked');
+            expect($batchToggle).to.not.have.class('checked');
           }
         });
       });
@@ -829,7 +863,7 @@ async function fillWithMinimumData(testCase) {
         mountOneclient: false,
       },
     },
-    arguments: [],
-    results: [],
+    argumentSpecs: [],
+    resultSpecs: [],
   };
 }

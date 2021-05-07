@@ -335,43 +335,42 @@ function createFunctionArgResGroup(component, dataType) {
             }).create({
               mode,
               name: 'entryType',
-              options: isForArguments ? [
+              options: [
+                { value: 'integer' },
                 { value: 'string' },
                 { value: 'object' },
-                { value: 'listStream' },
-                { value: 'mapStream' },
-                { value: 'filesTreeStream' },
                 { value: 'histogram' },
+                { value: 'anyFile' },
+                { value: 'regularFile' },
+                { value: 'directory' },
+                { value: 'dataset' },
+                { value: 'archive' },
+                { value: 'singleValueStore' },
+                { value: 'listStore' },
+                { value: 'mapStore' },
+                { value: 'treeForestStore' },
+                { value: 'rangeStore' },
+                { value: 'histogramStore' },
                 { value: 'onedatafsOptions' },
-              ] : [
-                { value: 'string' },
-                { value: 'object' },
-                { value: 'listStreamOperation' },
-                { value: 'mapStreamOperation' },
-                { value: 'filesTreeStreamOperation' },
-                { value: 'dataReadStats' },
-                { value: 'dataWriteStats' },
-                { value: 'networkTransferStats' },
-                { value: 'auditLogRecord' },
               ],
             }),
             ToggleField.extend({
               addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
             }).create({
               mode,
-              name: 'entryArray',
-              defaultValue: false,
-              component,
-            }),
-            ToggleField.extend({
-              addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-            }).create({
-              mode,
-              name: 'entryOptional',
+              name: 'entryBatch',
               defaultValue: false,
               component,
             }),
             ...(isForArguments ? [
+              ToggleField.extend({
+                addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+              }).create({
+                mode,
+                name: 'entryOptional',
+                defaultValue: false,
+                component,
+              }),
               TextField.extend({
                 isVisible: not(and('isInViewMode', isEmpty('value'))),
               }).create({

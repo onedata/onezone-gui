@@ -8,6 +8,7 @@
  */
 
 import { getProperties } from '@ember/object';
+import { dataSpecToType } from './data-spec-converters';
 
 /**
  * @param {Models.AtmLambda} record
@@ -19,16 +20,16 @@ export default function recordToFormData(record) {
     engine,
     operationRef,
     executionOptions,
-    arguments: lambdaArguments,
-    results: lambdaResults,
+    argumentSpecs,
+    resultSpecs,
   } = getProperties(
     record || {},
     'name',
     'engine',
     'operationRef',
     'executionOptions',
-    'arguments',
-    'results'
+    'argumentSpecs',
+    'resultSpecs'
   );
 
   const {
@@ -47,8 +48,8 @@ export default function recordToFormData(record) {
     'oneclientOptions'
   );
 
-  const formArguments = recordArgResToFormArgRes('argument', lambdaArguments);
-  const formResults = recordArgResToFormArgRes('result', lambdaResults);
+  const formArguments = recordArgResToFormArgRes('argument', argumentSpecs);
+  const formResults = recordArgResToFormArgRes('result', resultSpecs);
 
   const engineOptions = {};
   switch (engine) {
@@ -91,19 +92,19 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
   (recordArgRes || []).forEach((entry, idx) => {
     const {
       name,
-      type,
-      array,
-      optional,
+      dataSpec,
+      isBatch,
+      isOptional,
       defaultValue,
     } = getProperties(
       entry || {},
       'name',
-      'type',
-      'array',
-      'optional',
+      'dataSpec',
+      'isBatch',
+      'isOptional',
       'defaultValue'
     );
-    if (!name || !type) {
+    if (!name || !dataSpec) {
       return;
     }
 
@@ -111,13 +112,14 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     formData.__fieldsValueNames.push(valueName);
     formData[valueName] = {
       entryName: name,
-      entryType: type,
-      entryArray: Boolean(array),
-      entryOptional: Boolean(optional),
+      entryType: dataSpecToType(dataSpec),
+      entryBatch: Boolean(isBatch),
+      entryOptional: Boolean(isOptional),
       entryDefaultValue: defaultValue,
     };
     if (dataType === 'argument') {
       formData[valueName].entryDefaultValue = defaultValue;
+      formData[valueName].entryOptional = isOptional;
     }
   });
   return formData;

@@ -21,21 +21,73 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  */
 
 /**
- * @typedef {Object} AtmLambdaArgument
+ * @typedef {Object} AtmLambdaArgumentSpec
  * @property {String} name
- * @property {String} type
- * @property {Boolean} array
- * @property {Boolean} optional
+ * @property {AtmDataSpec} dataSpec
+ * @property {Boolean} isBatch
+ * @property {Boolean} isOptional
  * @property {String} defaultValue
  */
 
 /**
- * @typedef {Object} AtmLambdaResult
+ * @typedef {Object} AtmLambdaResultSpec
  * @property {String} name
- * @property {String} type
- * @property {Boolean} array
- * @property {Boolean} optional
+ * @property {AtmDataSpec} dataSpec
+ * @property {Boolean} isBatch
  */
+
+/**
+ * @typedef {Object} AtmDataSpec
+ * @property {String} type one of: `'integer'`, `'string'`, `'object'`, `'file'`,
+ *   `'histogram'`, `'dataset'`, `'archive'`, `'storeCredentials'`, `'onedatafsOptions'`
+ * @property {AtmDataTypeValueConstraints} valueConstraints its structure depends
+ *   on `type` value and its corresponding Atm*TypeValueConstraints
+ */
+
+/**
+ * @typedef {Object} AtmDataTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmArchiveTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmDatasetTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmFileTypeValueConstraints
+ * @param {String} fileType one of: `'REG'`, `'DIR'`, `'ANY'`
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmHistogramTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmIntegerTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmObjectTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmOnedatafsCredentialsTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmStoreCredentialsValueConstraints
+ * @param {String} storeType one of: `'singleValue'`, `'list'`, `'map'`, `'treeForest'`,
+ *   `'range'`, `'histogram'`
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmStringTypeValueConstraints
+ */
+
+export const entityType = 'atm_lambda';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
@@ -71,12 +123,12 @@ export default Model.extend(GraphSingleModelMixin, {
   executionOptions: attr('object'),
 
   /**
-   * @type {ComputedProperty<Array<AtmLambdaArgument>>}
+   * @type {ComputedProperty<Array<AtmLambdaArgumentSpec>>}
    */
-  arguments: attr('array'),
+  argumentSpecs: attr('array'),
 
   /**
-   * @type {ComputedProperty<Array<AtmLambdaResult>>}
+   * @type {ComputedProperty<Array<AtmLambdaResultSpec>>}
    */
-  results: attr('array'),
+  resultSpecs: attr('array'),
 }).reopenClass(StaticGraphModelMixin);
