@@ -2,16 +2,23 @@
   {{form-component/field-renderer field=fields}}
   {{#if (or (eq mode "create") (eq mode "edit"))}}
     {{#one-spin-button
-      class="btn btn-primary btn-submit"
+      class=(concat-classes
+        "btn btn-primary btn-submit"
+        (if btnSize (concat "btn-" btnSize))
+      )
       action=(action "submit")
       disabled=(not fields.isValid)
     }}
       {{tt this (concat "submit." mode)}}
     {{/one-spin-button}}
     {{#if (eq mode "edit")}}
+      {{!-- adding space as HTML entity, because template compiler removes spaces
+        from between buttons --}}
+      &#32;
       {{#bs-button
         class="btn-cancel"
         disabled=isSubmitting
+        size=btnSize
         onClick=(action "cancel")
       }}
         {{tt this "cancel"}}

@@ -74,6 +74,11 @@ export default Component.extend(I18n, {
   onCancel: notImplementedIgnore,
 
   /**
+   * @type {String}
+   */
+  btnSize: undefined,
+
+  /**
    * @type {Boolean}
    */
   isSubmitting: false,
@@ -86,9 +91,12 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Object>}
    */
-  fieldsValuesFromRecord: computed('atmLambda', function fieldsValuesFromRecord() {
-    return recordToFormData(this.get('atmLambda'));
-  }),
+  fieldsValuesFromRecord: computed(
+    'atmLambda.{name,summary,description,engine,operationRef,executionOptions,argumentSpecs,resultSpecs}',
+    function fieldsValuesFromRecord() {
+      return recordToFormData(this.get('atmLambda'));
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
@@ -123,6 +131,7 @@ export default Component.extend(I18n, {
     return FormFieldsRootGroup.extend({
       i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
       ownerSource: reads('component'),
+      isEnabled: not('component.isSubmitting'),
     }).create({
       component,
       fields: [
@@ -300,13 +309,13 @@ export default Component.extend(I18n, {
       this.get('onCancel')();
     },
     submit() {
-      this.set('isSubmitting', true);
       const {
         mode,
         atmLambda,
         fields,
         onSubmit,
       } = this.getProperties('mode', 'atmLambda', 'fields', 'onSubmit');
+      this.set('isSubmitting', true);
 
       const rawAtmLambdaFromForm = formDataToRecord(fields.dumpValue());
       const objectToSubmit = {};
@@ -325,7 +334,9 @@ export default Component.extend(I18n, {
 
       return onSubmit(objectToSubmit)
         .then(() => fields.reset())
-        .finally(() => trySet(this, 'isSubmitting', false));
+        .finally(() => {
+          trySet(this, 'isSubmitting', false);
+        });
     },
   },
 });
