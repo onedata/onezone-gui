@@ -18,6 +18,7 @@ import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'npm:dompurify';
+import isIp from 'npm:is-ip';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -144,7 +145,7 @@ export default LoginFormContainer.extend(
      */
     showIpWarning: computed(function showIpWarning() {
       const hostname = this.get('_location.hostname');
-      return /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/.test(hostname);
+      return isIp(hostname);
     }),
 
     /**
