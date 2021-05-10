@@ -4,6 +4,10 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
+import $ from 'jquery';
+import sinon from 'sinon';
+import { resolve } from 'rsvp';
+import { lookupService } from '../../../helpers/stub-service';
 
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambdas list',
@@ -55,11 +59,13 @@ describe(
       const $lambdas = this.$('.atm-lambdas-list-entry');
       expect($lambdas).to.have.length(2);
       [0, 1].forEach(idx => {
-        expect($lambdas.eq(idx).find('.name').text().trim()).to.equal(`f${idx}`);
-        expect($lambdas.eq(idx).find('.summary').text().trim())
+        const $lambda = $lambdas.eq(idx);
+        expect($lambda.find('.view-data-collapse')).to.have.class('in');
+        expect($lambda.find('.name').text().trim()).to.equal(`f${idx}`);
+        expect($lambda.find('.summary').text().trim())
           .to.equal(`f${idx} summary`);
-        expect($lambdas.eq(idx).find('.details-collapse')).to.not.have.class('in');
-        expect($lambdas.eq(idx).find('.atm-lambda-form')).to.not.exist;
+        expect($lambda.find('.details-collapse')).to.not.have.class('in');
+        expect($lambda.find('.atm-lambda-form')).to.not.exist;
       });
     });
 
@@ -116,6 +122,55 @@ describe(
       const $lambdas = this.$('.atm-lambdas-list-entry');
       expect($lambdas).to.have.length(1);
       expect($lambdas.text()).to.contain('f1');
+    });
+
+    it('allows to turn on edition mode for lambda', async function () {
+      await render(this);
+
+      await click('.atm-lambda-actions-trigger');
+      await click($('body .webui-popover.in .modify-action-trigger')[0]);
+
+      expect(this.$('.view-data-collapse').eq(0)).to.not.have.class('in');
+      expect(this.$('.details-collapse').eq(0)).to.have.class('in');
+      expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-edit');
+    });
+
+    it('saves modified lambda and closes edition mode', async function () {
+      const workflowActions = lookupService(this, 'workflow-actions');
+      const createModifyAtmLambdaActionStub =
+        sinon.stub(workflowActions, 'createModifyAtmLambdaAction')
+        .returns({
+          execute: () => resolve({
+            status: 'done',
+          }),
+        });
+      await render(this);
+
+      await click('.atm-lambda-actions-trigger');
+      await click($('body .webui-popover.in .modify-action-trigger')[0]);
+      await fillIn('.name-field .form-control', 'randomname');
+      await fillIn('.summary-field .form-control', 'randomsummary');
+      await click('.btn-submit');
+
+      expect(createModifyAtmLambdaActionStub).to.be.calledOnce
+        .and.to.be.calledWith({
+          atmLambda: this.get('collection.1'),
+          atmLambdaDiff: sinon.match({
+            name: 'randomname',
+            summary: 'randomsummary',
+          }),
+        });
+      expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
+    });
+
+    it('cancels lambda modification', async function () {
+      await render(this);
+
+      await click('.atm-lambda-actions-trigger');
+      await click($('body .webui-popover.in .modify-action-trigger')[0]);
+      await click('.btn-cancel');
+
+      expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
     });
   }
 );
