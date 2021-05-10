@@ -57,6 +57,9 @@ export function typeToDataSpec(type) {
       },
     };
   } else {
-    return { type };
+    return {
+      type,
+      valueConstraints: {},
+    };
   }
 }

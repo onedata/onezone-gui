@@ -23,29 +23,25 @@ describe('Integration | Component | content atm inventories lambdas', function (
           list: promiseArray(resolve([{
             name: 'f1',
             summary: 'f1 summary',
-            engine: 'openfaas',
-            operationRef: 'f1Image',
-            executionOptions: {
-              readonly: false,
-              mountSpaceOptions: {
-                mouncOneclient: false,
+            operationSpec: {
+              engine: 'openfaas',
+              dockerImage: 'f1Image',
+              dockerExecutionOptions: {
+                readonly: false,
+                mountOneclient: false,
               },
             },
-            arguments: [],
-            results: [],
+            argumentSpecs: [],
+            resultSpecs: [],
           }, {
             name: 'f0',
             summary: 'f0 summary',
-            engine: 'onedataFunction',
-            operationRef: 'f0Function',
-            executionOptions: {
-              readonly: false,
-              mountSpaceOptions: {
-                mouncOneclient: false,
-              },
+            operationSpec: {
+              engine: 'onedataFunction',
+              functionId: 'f0Function',
             },
-            arguments: [],
-            results: [],
+            argumentSpecs: [],
+            resultSpecs: [],
           }])),
         })),
       },

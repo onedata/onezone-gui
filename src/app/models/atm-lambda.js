@@ -13,11 +13,23 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 /**
- * @typedef {Object} AtmLambdaExecutionOptions
+ * @typedef {Object} AtmLambdaOperationSpec
+ * @property {String} engine one of:
+ *   `'onedataFunction'`, `'openfaas'`, `'atmWorkflow'`, `'userForm'`
+ * @property {String} [functionId] available when `engine` == `'onedataFunction'`
+ * @property {String} [dockerImage] available when `engine` == `'openfaas'`
+ * @property {String} [workflowId] available when `engine` == `'atmWorkflow'`
+ * @property {String} [userFormId] available when `engine` == `'userForm'`
+ * @property {AtmLambdaDockerExecutionOptions} dockerExecutionOptions
+ *   available when `engine` == `'openfaas'`
+ */
+
+/**
+ * @typedef {Object} AtmLambdaDockerExecutionOptions
  * @property {Boolean} readonly
- * @property {Boolean} mountSpaceOptions.mountOneclient
- * @property {String} mountSpaceOptions.mountPoint
- * @property {String} mountSpaceOptions.oneclientOptions
+ * @property {Boolean} mountOneclient
+ * @property {String} [oneclientMountPoint] available when `mountOneclient` is `true`
+ * @property {String} [oneclientOptions] available when `mountOneclient` is `true`
  */
 
 /**
@@ -39,7 +51,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 /**
  * @typedef {Object} AtmDataSpec
  * @property {String} type one of: `'integer'`, `'string'`, `'object'`, `'file'`,
- *   `'histogram'`, `'dataset'`, `'archive'`, `'storeCredentials'`, `'onedatafsOptions'`
+ *   `'histogram'`, `'dataset'`, `'archive'`, `'storeCredentials'`, `'onedatafsCredentials'`
  * @property {AtmDataTypeValueConstraints} valueConstraints its structure depends
  *   on `type` value and its corresponding Atm*TypeValueConstraints
  */
@@ -107,20 +119,9 @@ export default Model.extend(GraphSingleModelMixin, {
   description: attr('string'),
 
   /**
-   * One of: `openfaas`, `onedataFunction`
-   * @type {ComputedProperty<String>}
+   * @type {ComputedProperty<AtmLambdaOperationSpec>}
    */
-  engine: attr('string'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  operationRef: attr('string'),
-
-  /**
-   * @type {ComputedProperty<AtmLambdaExecutionOptions>}
-   */
-  executionOptions: attr('object'),
+  operationSpec: attr('object'),
 
   /**
    * @type {ComputedProperty<Array<AtmLambdaArgumentSpec>>}

@@ -20,9 +20,6 @@ export default function formDataToRecord(formData) {
     summary,
     engine,
     openfaasOptions,
-    readonly,
-    mountSpace,
-    mountSpaceOptions: formMountSpaceOptions,
     arguments: formArguments,
     results: formResults,
   } = getProperties(
@@ -31,43 +28,57 @@ export default function formDataToRecord(formData) {
     'summary',
     'engine',
     'openfaasOptions',
-    'readonly',
-    'mountSpace',
-    'mountSpaceOptions',
     'arguments',
     'results'
   );
-  const operationRef = get(openfaasOptions, 'dockerImage');
-  const mountSpaceOptions = {
-    mountOneclient: mountSpace,
+  const operationSpec = {
+    engine,
   };
-  if (mountSpace) {
-    const {
-      mountPoint,
-      oneclientOptions,
-    } = getProperties(
-      formMountSpaceOptions,
-      'mountPoint',
-      'oneclientOptions',
-    );
-    Object.assign(mountSpaceOptions, {
-      mountPoint,
-      oneclientOptions,
-    });
+  switch (engine) {
+    case 'openfaas': {
+      const {
+        dockerImage,
+        readonly,
+        mountSpace,
+        mountSpaceOptions,
+      } = getProperties(
+        openfaasOptions || {},
+        'dockerImage',
+        'readonly',
+        'mountSpace',
+        'mountSpaceOptions'
+      );
+      operationSpec.dockerImage = dockerImage;
+      const dockerExecutionOptions = {
+        readonly,
+        mountOneclient: mountSpace,
+      };
+      if (mountSpace) {
+        const {
+          mountPoint,
+          oneclientOptions,
+        } = getProperties(
+          mountSpaceOptions,
+          'mountPoint',
+          'oneclientOptions',
+        );
+        dockerExecutionOptions.oneclientMountPoint = mountPoint;
+        dockerExecutionOptions.oneclientOptions = oneclientOptions;
+      }
+      operationSpec.dockerExecutionOptions = dockerExecutionOptions;
+      break;
+    }
+    // More options - `'atmWorkflow'` and `'userForm'` - will be available
+    // when backend will be ready.
   }
-  const executionOptions = {
-    readonly,
-    mountSpaceOptions,
-  };
+
   const lambdaArguments = formArgResToRecordArgRes('argument', formArguments);
   const lambdaResults = formArgResToRecordArgRes('result', formResults);
   return {
     name,
     summary,
     description: '',
-    engine,
-    operationRef,
-    executionOptions,
+    operationSpec,
     argumentSpecs: lambdaArguments,
     resultSpecs: lambdaResults,
   };

@@ -92,7 +92,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Object>}
    */
   fieldsValuesFromRecord: computed(
-    'atmLambda.{name,summary,description,engine,operationRef,executionOptions,argumentSpecs,resultSpecs}',
+    'atmLambda.{name,summary,description,operationSpec,argumentSpecs,resultSpecs}',
     function fieldsValuesFromRecord() {
       return recordToFormData(this.get('atmLambda'));
     }
@@ -110,9 +110,6 @@ export default Component.extend(I18n, {
       onedataFunctionOptionsFieldsGroup,
       argumentsFieldsCollectionGroup,
       resultsFieldsCollectionGroup,
-      readonlyField,
-      mountSpaceField,
-      mountSpaceOptionsFieldsGroup,
     } = this.getProperties(
       'nameField',
       'summaryField',
@@ -121,9 +118,6 @@ export default Component.extend(I18n, {
       'onedataFunctionOptionsFieldsGroup',
       'argumentsFieldsCollectionGroup',
       'resultsFieldsCollectionGroup',
-      'readonlyField',
-      'mountSpaceField',
-      'mountSpaceOptionsFieldsGroup'
     );
 
     const component = this;
@@ -142,9 +136,6 @@ export default Component.extend(I18n, {
         onedataFunctionOptionsFieldsGroup,
         argumentsFieldsCollectionGroup,
         resultsFieldsCollectionGroup,
-        readonlyField,
-        mountSpaceField,
-        mountSpaceOptionsFieldsGroup,
       ],
     });
   }),
@@ -196,6 +187,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
    */
   openfaasOptionsFieldsGroup: computed(function openfaasOptionsFieldsGroup() {
+    const mountSpaceOptionsFieldsGroup = this.get('mountSpaceOptionsFieldsGroup');
     return FormFieldsGroup.extend(disableFieldInEditMode(this), {
       isVisible: eq('valuesSource.engine', raw('openfaas')),
     }).create({
@@ -203,6 +195,36 @@ export default Component.extend(I18n, {
       fields: [
         TextField.extend(defaultValueGenerator(this, raw(''))).create({
           name: 'dockerImage',
+        }),
+        ToggleField.extend(defaultValueGenerator(this, raw(true))).create({
+          name: 'readonly',
+        }),
+        ToggleField.extend(defaultValueGenerator(this, raw(true))).create({
+          name: 'mountSpace',
+        }),
+        mountSpaceOptionsFieldsGroup,
+      ],
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  mountSpaceOptionsFieldsGroup: computed(function mountSpaceOptionsFieldsGroup() {
+    return FormFieldsGroup.extend({
+      isVisible: or('isInEditMode', 'valuesSource.openfaasOptions.mountSpace'),
+      isExpanded: or('isInViewMode', 'valuesSource.openfaasOptions.mountSpace'),
+    }).create({
+      name: 'mountSpaceOptions',
+      fields: [
+        TextField.extend(defaultValueGenerator(this, raw('/mnt/onedata'))).create({
+          name: 'mountPoint',
+        }),
+        TextField.extend(defaultValueGenerator(this, raw('')), {
+          isVisible: not(and('isInViewMode', isEmpty('value'))),
+        }).create({
+          name: 'oneclientOptions',
+          isOptional: true,
         }),
       ],
     });
@@ -238,54 +260,6 @@ export default Component.extend(I18n, {
    */
   resultsFieldsCollectionGroup: computed(function resultsFieldsCollectionGroup() {
     return createFunctionArgResGroup(this, 'result');
-  }),
-
-  /**
-   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
-   */
-  readonlyField: computed(function readonlyField() {
-    return ToggleField.extend(
-      defaultValueGenerator(this, raw(true)),
-      disableFieldInEditMode(this)
-    ).create({
-      name: 'readonly',
-    });
-  }),
-
-  /**
-   * @type {ComputedProperty<Utils.FormComponent.ToggleField>}
-   */
-  mountSpaceField: computed(function mountSpaceField() {
-    return ToggleField.extend(
-      defaultValueGenerator(this, raw(true)),
-      disableFieldInEditMode(this), {
-        isVisible: eq('valuesSource.engine', raw('openfaas')),
-      }).create({
-      name: 'mountSpace',
-    });
-  }),
-
-  /**
-   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
-   */
-  mountSpaceOptionsFieldsGroup: computed(function mountSpaceOptionsFieldsGroup() {
-    return FormFieldsGroup.extend(disableFieldInEditMode(this), {
-      isVisible: or('isInEditMode', 'valuesSource.mountSpace'),
-      isExpanded: or('isInViewMode', 'valuesSource.mountSpace'),
-    }).create({
-      name: 'mountSpaceOptions',
-      fields: [
-        TextField.extend(defaultValueGenerator(this, raw('/mnt/onedata'))).create({
-          name: 'mountPoint',
-        }),
-        TextField.extend(defaultValueGenerator(this, raw('')), {
-          isVisible: not(and('isInViewMode', isEmpty('value'))),
-        }).create({
-          name: 'oneclientOptions',
-          isOptional: true,
-        }),
-      ],
-    });
   }),
 
   modeObserver: observer('mode', function modeObserver() {
@@ -419,7 +393,7 @@ function createFunctionArgResGroup(component, dataType) {
                   { value: 'treeForestStore' },
                   { value: 'rangeStore' },
                   { value: 'histogramStore' },
-                  { value: 'onedatafsOptions' },
+                  { value: 'onedatafsCredentials' },
                 ],
               }),
               ToggleField.extend({

@@ -44,8 +44,8 @@ const argumentAndResultTypes = {
   histogramStore: {
     label: 'Histogram store',
   },
-  onedatafsOptions: {
-    label: 'OnedataFS options',
+  onedatafsCredentials: {
+    label: 'OnedataFS credentials',
   },
 };
 
@@ -71,6 +71,20 @@ export default {
     openfaasOptions: {
       dockerImage: {
         label: 'Docker image',
+      },
+      readonly: {
+        label: 'Read-only',
+      },
+      mountSpace: {
+        label: 'Mount space',
+      },
+      mountSpaceOptions: {
+        mountPoint: {
+          label: 'Mount point',
+        },
+        oneclientOptions: {
+          label: 'Oneclient options',
+        },
       },
     },
     onedataFunctionOptions: {
@@ -115,20 +129,6 @@ export default {
         entryBatch: {
           label: 'Batch',
         },
-      },
-    },
-    readonly: {
-      label: 'Read-only',
-    },
-    mountSpace: {
-      label: 'Mount space',
-    },
-    mountSpaceOptions: {
-      mountPoint: {
-        label: 'Mount point',
-      },
-      oneclientOptions: {
-        label: 'Oneclient options',
       },
     },
   },

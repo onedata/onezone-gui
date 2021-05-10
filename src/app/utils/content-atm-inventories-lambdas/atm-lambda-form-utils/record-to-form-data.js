@@ -18,35 +18,41 @@ export default function recordToFormData(record) {
   const {
     name,
     summary,
-    engine,
-    operationRef,
-    executionOptions,
+    operationSpec,
     argumentSpecs,
     resultSpecs,
   } = getProperties(
     record || {},
     'name',
     'summary',
-    'engine',
-    'operationRef',
-    'executionOptions',
+    'operationSpec',
     'argumentSpecs',
     'resultSpecs'
   );
 
   const {
-    readonly,
-    mountSpaceOptions,
-  } = getProperties(executionOptions || {}, 'readonly', 'mountSpaceOptions');
+    engine,
+    dockerImage,
+    functionId,
+    dockerExecutionOptions,
+  } = getProperties(
+    operationSpec || {},
+    'engine',
+    'dockerImage',
+    'functionId',
+    'dockerExecutionOptions'
+  );
 
   const {
+    readonly,
     mountOneclient,
-    mountPoint,
+    oneclientMountPoint,
     oneclientOptions,
   } = getProperties(
-    mountSpaceOptions || {},
+    dockerExecutionOptions || {},
+    'readonly',
     'mountOneclient',
-    'mountPoint',
+    'oneclientMountPoint',
     'oneclientOptions'
   );
 
@@ -57,12 +63,20 @@ export default function recordToFormData(record) {
   switch (engine) {
     case 'openfaas':
       engineOptions.openfaasOptions = {
-        dockerImage: operationRef,
+        dockerImage,
+        readonly: Boolean(readonly),
+        mountSpace: Boolean(mountOneclient),
       };
+      if (mountOneclient) {
+        engineOptions.openfaasOptions.mountSpaceOptions = {
+          mountPoint: oneclientMountPoint,
+          oneclientOptions,
+        };
+      }
       break;
     case 'onedataFunction':
       engineOptions.onedataFunctionOptions = {
-        onedataFunctionName: operationRef,
+        onedataFunctionName: functionId,
       };
       break;
   }
@@ -71,12 +85,6 @@ export default function recordToFormData(record) {
     name,
     summary,
     engine,
-    readonly: Boolean(readonly),
-    mountSpace: Boolean(mountOneclient),
-    mountSpaceOptions: {
-      mountPoint,
-      oneclientOptions,
-    },
     arguments: formArguments,
     results: formResults,
   }, engineOptions);

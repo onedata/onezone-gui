@@ -12,16 +12,28 @@ import { registerService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
 
 const argumentAndResultTypes = [{
-  dataSpec: { type: 'integer' },
+  dataSpec: {
+    type: 'integer',
+    valueConstraints: {},
+  },
   label: 'Integer',
 }, {
-  dataSpec: { type: 'string' },
+  dataSpec: {
+    type: 'string',
+    valueConstraints: {},
+  },
   label: 'String',
 }, {
-  dataSpec: { type: 'object' },
+  dataSpec: {
+    type: 'object',
+    valueConstraints: {},
+  },
   label: 'Object',
 }, {
-  dataSpec: { type: 'histogram' },
+  dataSpec: {
+    type: 'histogram',
+    valueConstraints: {},
+  },
   label: 'Histogram',
 }, {
   dataSpec: {
@@ -48,10 +60,16 @@ const argumentAndResultTypes = [{
   },
   label: 'Directory',
 }, {
-  dataSpec: { type: 'dataset' },
+  dataSpec: {
+    type: 'dataset',
+    valueConstraints: {},
+  },
   label: 'Dataset',
 }, {
-  dataSpec: { type: 'archive' },
+  dataSpec: {
+    type: 'archive',
+    valueConstraints: {},
+  },
   label: 'Archive',
 }, {
   dataSpec: {
@@ -102,8 +120,11 @@ const argumentAndResultTypes = [{
   },
   label: 'Histogram store',
 }, {
-  dataSpec: { type: 'onedatafsOptions' },
-  label: 'OnedataFS options',
+  dataSpec: {
+    type: 'onedatafsCredentials',
+    valueConstraints: {},
+  },
+  label: 'OnedataFS credentials',
 }];
 
 describe(
@@ -199,31 +220,124 @@ describe(
         expect($options.eq(0).text().trim()).to.equal('OpenFaaS');
       });
 
-      it('renders empty "docker image" field', async function () {
-        await renderCreate(this);
+      context('when selected engine is "openfaas"', function () {
+        it('shows only openfaas-related fields', async function () {
+          await renderCreate(this);
 
-        const $label = this.$('.dockerImage-field .control-label');
-        const $field = this.$('.dockerImage-field .form-control');
-        expect($label.text().trim()).to.equal('Docker image:');
-        expect($field).to.have.attr('type', 'text');
-        expect($field).to.have.value('');
-      });
+          expect(this.$('.openfaasOptions-collapse')).to.have.class('in');
+          expect(this.$('.onedataFunctionOptions-collapse')).to.not.have.class('in');
+        });
 
-      it('marks "docker image" field as invalid when it is empty', async function () {
-        await renderCreate(this);
+        it('renders empty "docker image" field', async function () {
+          await renderCreate(this);
 
-        await focus('.dockerImage-field .form-control');
-        await blur('.dockerImage-field .form-control');
+          const $label = this.$('.dockerImage-field .control-label');
+          const $field = this.$('.dockerImage-field .form-control');
+          expect($label.text().trim()).to.equal('Docker image:');
+          expect($field).to.have.attr('type', 'text');
+          expect($field).to.have.value('');
+        });
 
-        expect(this.$('.dockerImage-field')).to.have.class('has-error');
-      });
+        it('marks "docker image" field as invalid when it is empty', async function () {
+          await renderCreate(this);
 
-      it('marks "docker image" field as valid when it is not empty', async function () {
-        await renderCreate(this);
+          await focus('.dockerImage-field .form-control');
+          await blur('.dockerImage-field .form-control');
 
-        await fillIn('.dockerImage-field .form-control', 'somename');
+          expect(this.$('.dockerImage-field')).to.have.class('has-error');
+        });
 
-        expect(this.$('.dockerImage-field')).to.have.class('has-success');
+        it('marks "docker image" field as valid when it is not empty', async function () {
+          await renderCreate(this);
+
+          await fillIn('.dockerImage-field .form-control', 'somename');
+
+          expect(this.$('.dockerImage-field')).to.have.class('has-success');
+        });
+
+        it('renders checked "readonly" toggle', async function () {
+          await renderCreate(this);
+
+          const $label = this.$('.readonly-field .control-label');
+          const $field = this.$('.readonly-field .form-control');
+          expect($label.text().trim()).to.equal('Read-only:');
+          expect($field).to.have.class('checked');
+        });
+
+        it('renders checked "mount space" toggle', async function () {
+          await renderCreate(this);
+
+          const $label = this.$('.mountSpace-field .control-label');
+          const $field = this.$('.mountSpace-field .form-control');
+          expect($label.text().trim()).to.equal('Mount space:');
+          expect($field).to.have.class('checked');
+        });
+
+        context('when "mount space" is checked', function () {
+          it('renders expanded mount space options',
+            async function () {
+              await renderCreate(this);
+
+              await toggleMountSpace(this, true);
+
+              expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
+            });
+
+          it('renders "mount point" field with "/mnt/onedata" as a default value',
+            async function () {
+              await renderCreate(this);
+              await toggleMountSpace(this, true);
+
+              const $fieldsGroup = this.$('.mountSpaceOptions-field');
+              const $label = $fieldsGroup.find('.mountPoint-field .control-label');
+              const $field = $fieldsGroup.find('.mountPoint-field .form-control');
+              expect($label.text().trim()).to.equal('Mount point:');
+              expect($field).to.have.attr('type', 'text');
+              expect($field).to.have.value('/mnt/onedata');
+            });
+
+          it('marks "mount point" field as invalid when it is empty', async function () {
+            await renderCreate(this);
+            await toggleMountSpace(this, true);
+
+            await fillIn('.mountPoint-field .form-control', '');
+
+            expect(this.$('.mountPoint-field')).to.have.class('has-error');
+          });
+
+          it('renders empty "oneclient options" field', async function () {
+            await renderCreate(this);
+            await toggleMountSpace(this, true);
+
+            const $fieldsGroup = this.$('.mountSpaceOptions-field');
+            const $label = $fieldsGroup.find('.oneclientOptions-field .control-label');
+            const $field = $fieldsGroup.find('.oneclientOptions-field .form-control');
+            expect($label.text().trim()).to.equal('Oneclient options:');
+            expect($field).to.have.attr('type', 'text');
+            expect($field).to.have.value('');
+          });
+
+          it('marks "oneclient options" field as valid when it is empty',
+            async function () {
+              await renderCreate(this);
+
+              await focus('.oneclientOptions-field .form-control');
+              await blur('.oneclientOptions-field .form-control');
+
+              expect(this.$('.oneclientOptions-field')).to.have.class('has-success');
+            });
+        });
+
+        context('when "mount space" is unchecked', function () {
+          it('renders collapsed mount space options',
+            async function () {
+              await renderCreate(this);
+
+              await toggleMountSpace(this, false);
+
+              expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+            });
+        });
       });
 
       it('renders "arguments" field with no argument defined', async function () {
@@ -389,90 +503,6 @@ describe(
         );
       });
 
-      it('renders checked "readonly" toggle', async function () {
-        await renderCreate(this);
-
-        const $label = this.$('.readonly-field .control-label');
-        const $field = this.$('.readonly-field .form-control');
-        expect($label.text().trim()).to.equal('Read-only:');
-        expect($field).to.have.class('checked');
-      });
-
-      it('renders checked "mount space" toggle', async function () {
-        await renderCreate(this);
-
-        const $label = this.$('.mountSpace-field .control-label');
-        const $field = this.$('.mountSpace-field .form-control');
-        expect($label.text().trim()).to.equal('Mount space:');
-        expect($field).to.have.class('checked');
-      });
-
-      context('when "mount space" is checked', function () {
-        it('renders expanded mount space options',
-          async function () {
-            await renderCreate(this);
-
-            await toggleMountSpace(this, true);
-
-            expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
-          });
-
-        it('renders "mount point" field with "/mnt/onedata" as a default value',
-          async function () {
-            await renderCreate(this);
-            await toggleMountSpace(this, true);
-
-            const $fieldsGroup = this.$('.mountSpaceOptions-field');
-            const $label = $fieldsGroup.find('.mountPoint-field .control-label');
-            const $field = $fieldsGroup.find('.mountPoint-field .form-control');
-            expect($label.text().trim()).to.equal('Mount point:');
-            expect($field).to.have.attr('type', 'text');
-            expect($field).to.have.value('/mnt/onedata');
-          });
-
-        it('marks "mount point" field as invalid when it is empty', async function () {
-          await renderCreate(this);
-          await toggleMountSpace(this, true);
-
-          await fillIn('.mountPoint-field .form-control', '');
-
-          expect(this.$('.mountPoint-field')).to.have.class('has-error');
-        });
-
-        it('renders empty "oneclient options" field', async function () {
-          await renderCreate(this);
-          await toggleMountSpace(this, true);
-
-          const $fieldsGroup = this.$('.mountSpaceOptions-field');
-          const $label = $fieldsGroup.find('.oneclientOptions-field .control-label');
-          const $field = $fieldsGroup.find('.oneclientOptions-field .form-control');
-          expect($label.text().trim()).to.equal('Oneclient options:');
-          expect($field).to.have.attr('type', 'text');
-          expect($field).to.have.value('');
-        });
-
-        it('marks "oneclient options" field as valid when it is empty',
-          async function () {
-            await renderCreate(this);
-
-            await focus('.oneclientOptions-field .form-control');
-            await blur('.oneclientOptions-field .form-control');
-
-            expect(this.$('.oneclientOptions-field')).to.have.class('has-success');
-          });
-      });
-
-      context('when "mount space" is unchecked', function () {
-        it('renders collapsed mount space options',
-          async function () {
-            await renderCreate(this);
-
-            await toggleMountSpace(this, false);
-
-            expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
-          });
-      });
-
       it('creates simple lambda on submit button click', async function () {
         await renderCreate(this);
 
@@ -548,13 +578,13 @@ describe(
           name: 'myname',
           summary: 'mysummary',
           description: '',
-          engine: 'openfaas',
-          operationRef: 'myimage',
-          executionOptions: {
-            readonly: true,
-            mountSpaceOptions: {
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: 'myimage',
+            dockerExecutionOptions: {
+              readonly: true,
               mountOneclient: true,
-              mountPoint: '/mount/point',
+              oneclientMountPoint: '/mount/point',
               oneclientOptions: 'oc-options',
             },
           },
@@ -659,11 +689,11 @@ describe(
           name: 'myname',
           summary: 'summary',
           description: '',
-          engine: 'openfaas',
-          operationRef: 'myimage',
-          executionOptions: {
-            readonly: true,
-            mountSpaceOptions: {
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: 'myimage',
+            dockerExecutionOptions: {
+              readonly: true,
               mountOneclient: false,
             },
           },
@@ -692,13 +722,9 @@ describe(
           name: 'myname',
           summary: 'summary',
           description: '',
-          engine: 'onedataFunction',
-          operationRef: 'myfunc',
-          executionOptions: {
-            readonly: true,
-            mountSpaceOptions: {
-              mountOneclient: false,
-            },
+          operationSpec: {
+            engine: 'onedataFunction',
+            functionId: 'myfunc',
           },
           argumentSpecs: [],
           resultSpecs: [],
@@ -714,19 +740,16 @@ describe(
         expect(this.$('.openfaasOptions-field')).to.not.exist;
         expect(this.$('.arguments-field')).to.not.exist;
         expect(this.$('.results-field')).to.not.exist;
-        expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-        expect(this.$('.mountSpace-field')).to.not.exist;
-        expect(this.$('.mountSpaceOptions-field')).to.not.exist;
       });
 
       it('shows mount space options when passed lambda has "mount space" enabled',
         async function () {
           this.set('atmLambda', {
-            engine: 'openfaas',
-            executionOptions: {
-              mountSpaceOptions: {
+            operationSpec: {
+              engine: 'openfaas',
+              dockerExecutionOptions: {
                 mountOneclient: true,
-                mountPoint: '/some/path',
+                oneclientMountPoint: '/some/path',
                 oneclientOptions: 'oc-options',
               },
             },
@@ -742,7 +765,9 @@ describe(
 
       it('shows arguments of passed lambda', async function () {
         this.set('atmLambda', {
-          engine: 'openfaas',
+          operationSpec: {
+            engine: 'openfaas',
+          },
           argumentSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
@@ -781,7 +806,9 @@ describe(
 
       it('shows results of passed lambda', async function () {
         this.set('atmLambda', {
-          engine: 'openfaas',
+          operationSpec: {
+            engine: 'openfaas',
+          },
           resultSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
@@ -843,13 +870,13 @@ describe(
             name: 'myname',
             summary: 'summary',
             description: '',
-            engine: 'openfaas',
-            operationRef: 'myimage',
-            executionOptions: {
-              readonly: true,
-              mountSpaceOptions: {
+            operationSpec: {
+              engine: 'openfaas',
+              dockerImage: 'myimage',
+              dockerExecutionOptions: {
+                readonly: true,
                 mountOneclient: true,
-                mountPoint: '/some/path',
+                oneclientMountPoint: '/some/path',
                 oneclientOptions: 'oc-options',
               },
             },
@@ -1003,11 +1030,11 @@ async function fillWithMinimumData(testCase) {
     name: 'myname',
     summary: '',
     description: '',
-    engine: 'openfaas',
-    operationRef: 'myimage',
-    executionOptions: {
-      readonly: true,
-      mountSpaceOptions: {
+    operationSpec: {
+      engine: 'openfaas',
+      dockerImage: 'myimage',
+      dockerExecutionOptions: {
+        readonly: true,
         mountOneclient: false,
       },
     },

@@ -904,33 +904,31 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
     return store.createRecord('atmLambda', {
       name: `Function ${index}`,
       summary: `Some very complicated function #${index}`,
-      engine: 'openfaas',
-      operationRef: `some-super-docker-image:${index}`,
-      executionOptions: {
-        readonly: true,
-        mountSpaceOptions: {
+      operationSpec: {
+        engine: 'openfaas',
+        dockerImage: `some-super-docker-image:${index}`,
+        dockerExecutionOptions: {
+          readonly: true,
           mountOneclient: true,
-          mountPoint: '/mnt/oneclient',
+          oneclientMountPoint: '/mnt/oneclient',
           oneclientOptions: '-k',
         },
       },
-      arguments: [{
+      argumentSpecs: [{
         name: 'arg1',
-        type: 'string',
-        array: true,
-        optional: true,
+        dataSpec: { type: 'string' },
+        isBatch: true,
+        isOptional: true,
         defaultValue: '"some value"',
       }, {
         name: 'arg2',
-        type: 'onedatafsOptions',
-        array: true,
-        optional: true,
+        dataSpec: { type: 'onedatafsCredentials' },
+        isBatch: true,
       }],
-      results: [{
+      resultSpecs: [{
         name: 'res1',
-        type: 'string',
-        array: false,
-        optional: true,
+        dataSpec: { type: 'string' },
+        isBatch: false,
       }],
     }).save();
   })).then(atmLambdas =>
