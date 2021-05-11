@@ -359,7 +359,7 @@ function createFunctionArgResGroup(component, dataType) {
   const isForArguments = dataType === 'argument';
   return FormFieldsCollectionGroup
     .extend(
-      defaultValueGenerator(component, raw(undefined)),
+      defaultValueGenerator(component, raw({})),
       disableFieldInEditMode(component), {
         isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
         usedEntryNames: undefined,
@@ -399,6 +399,10 @@ function createFunctionArgResGroup(component, dataType) {
                 defaultValue: '',
                 customValidators: [
                   validator(function (value, options, model) {
+                    if (!value) {
+                      return true;
+                    }
+
                     const field = get(model, 'field');
                     const errorMsg =
                       String(field.t(`${get(field, 'path')}.errors.notUnique`));
