@@ -10,7 +10,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, trySet } from '@ember/object';
+import { computed, observer, get, trySet, defineProperty } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -29,6 +29,7 @@ import {
   recordToFormData,
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form-utils';
 import _ from 'lodash';
+import { validator } from 'ember-cp-validations';
 
 export default Component.extend(I18n, {
   classNames: ['atm-lambda-form'],
@@ -361,6 +362,31 @@ function createFunctionArgResGroup(component, dataType) {
       defaultValueGenerator(component, raw(undefined)),
       disableFieldInEditMode(component), {
         isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
+        usedEntryNames: undefined,
+        valueStructureObserver: observer(
+          'value.__fieldsValueNames',
+          function valueStructureObserver() {
+            const namePropsPaths = (this.get('value.__fieldsValueNames') || [])
+              .map(entryValueName => `value.${entryValueName}.entryName`);
+            // Using `set` causes some weird ember errors. Using `defineProperty`
+            // as mentioned here `https://github.com/emberjs/ember.js/issues/16504#issuecomment-380793961`
+            defineProperty(
+              this,
+              'usedEntryNames',
+              computed(...namePropsPaths, function usedEntryNames() {
+                const value = this.get('value') || {};
+                const entryValueNames = get(value, '__fieldsValueNames') || [];
+                return entryValueNames
+                  .map(entryValueName => get(value, `${entryValueName}.entryName`))
+                  .compact();
+              })
+            );
+          }
+        ),
+        init() {
+          this._super(...arguments);
+          this.valueStructureObserver();
+        },
         fieldFactoryMethod(uniqueFieldValueName) {
           const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
           return FormFieldsGroup.create({
@@ -371,6 +397,19 @@ function createFunctionArgResGroup(component, dataType) {
                 mode,
                 name: 'entryName',
                 defaultValue: '',
+                customValidators: [
+                  validator(function (value, options, model) {
+                    const field = get(model, 'field');
+                    const errorMsg =
+                      String(field.t(`${get(field, 'path')}.errors.notUnique`));
+                    const usedEntryNames = get(model, 'field.parent.parent.usedEntryNames');
+                    return usedEntryNames
+                      .filter(name => name.trim() === value.trim())
+                      .length <= 1 ? true : errorMsg;
+                  }, {
+                    dependentKeys: ['model.field.parent.parent.usedEntryNames'],
+                  }),
+                ],
               }),
               DropdownField.extend({
                 defaultValue: reads('options.firstObject.value'),

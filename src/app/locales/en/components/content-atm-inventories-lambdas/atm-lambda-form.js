@@ -98,6 +98,9 @@ export default {
         entryName: {
           label: 'Name',
           placeholder: 'Name',
+          errors: {
+            notUnique: 'This field must have a unique value',
+          },
         },
         entryType: {
           label: 'Type',
@@ -121,6 +124,9 @@ export default {
         entryName: {
           label: 'Name',
           placeholder: 'Name',
+          errors: {
+            notUnique: 'This field must have a unique value',
+          },
         },
         entryType: {
           label: 'Type',

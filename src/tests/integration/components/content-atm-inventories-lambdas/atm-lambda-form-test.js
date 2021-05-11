@@ -405,9 +405,29 @@ describe(
         await addArgument();
 
         await fillIn('.entryName-field .form-control', 'somename');
+        await wait();
 
         expect(this.$('.entryName-field')).to.have.class('has-success');
       });
+
+      it('marks "argument name" field as invalid when there are two arguments with the same name',
+        async function () {
+          await renderCreate(this);
+          await addArgument();
+          await addArgument();
+
+          const nthArgSelector = i => `.arguments-field .collection-item:nth-child(${i + 1})`;
+          await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
+          await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
+
+          const $fieldMessages = this.$('.arguments-field .collection-item .field-message');
+          expect($fieldMessages).to.have.length(2);
+          [0, 1].forEach(i =>
+            expect($fieldMessages.eq(i).text().trim())
+            .to.equal('This field must have a unique value')
+          );
+          expect(this.$('.entryName-field.has-error')).to.have.length(2);
+        });
 
       it('provides argument types options for "argument type" field', async function () {
         await renderCreate(this);
@@ -489,6 +509,25 @@ describe(
 
         expect(this.$('.entryName-field')).to.have.class('has-success');
       });
+
+      it('marks "result name" field as invalid when there are two results with the same name',
+        async function () {
+          await renderCreate(this);
+          await addResult();
+          await addResult();
+
+          const nthArgSelector = i => `.results-field .collection-item:nth-child(${i + 1})`;
+          await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
+          await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
+
+          const $fieldMessages = this.$('.results-field .collection-item .field-message');
+          expect($fieldMessages).to.have.length(2);
+          [0, 1].forEach(i =>
+            expect($fieldMessages.eq(i).text().trim())
+            .to.equal('This field must have a unique value')
+          );
+          expect(this.$('.entryName-field.has-error')).to.have.length(2);
+        });
 
       it('provides result types options for "result type" field', async function () {
         await renderCreate(this);
