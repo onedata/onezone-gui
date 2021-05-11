@@ -11,6 +11,7 @@ export default _.merge({}, privilegesAspectBase, {
   privileges: {
     atm_inventory_view: 'View inventory',
     atm_inventory_update: 'Modify inventory',
+    atm_inventory_manage_lambdas: 'Manage lambdas',
     atm_inventory_delete: 'Remove inventory',
     atm_inventory_view_privileges: 'View privileges',
     atm_inventory_set_privileges: 'Set privileges',
