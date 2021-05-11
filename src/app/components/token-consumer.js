@@ -94,11 +94,6 @@ export default Component.extend(I18n, {
   /**
    * @type {Object}
    */
-  subject: undefined,
-
-  /**
-   * @type {Object}
-   */
   error: undefined,
 
   /**
@@ -485,7 +480,6 @@ export default Component.extend(I18n, {
 
     this.resetState();
     this.set('type', get(result || {}, 'type'));
-    this.set('subject', get(result || {}, 'subject'));
   },
 
   processVerificationSuccess(inputTime) {

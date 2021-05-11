@@ -43,7 +43,8 @@
         {{#if media.isMobile}}
           {{id-info
             idType=inviteTargetModelName
-            idValue=inviteTargetId}}
+            idValue=inviteTargetId
+          }}
         {{/if}}
       </p>
       {{#unless (or media.isMobile noJoinMessage)}}
@@ -59,7 +60,8 @@
                     {{/truncated-string}}
                     {{id-info
                       idType=joiningModelName
-                      idValue=joiningId}}
+                      idValue=joiningId
+                    }}
                   </div>
                 {{else}}
                   {{#truncated-string class="text select-below-label"}}
@@ -73,7 +75,8 @@
                   {{/truncated-string}}
                   {{id-info
                     idType=joiningModelName
-                    idValue=subject.id}}
+                    idValue=currentUser.entityId
+                  }}
                 </div>
               {{/if}}
             </figcaption>
@@ -97,7 +100,8 @@
                 {{/truncated-string}}
                 {{id-info
                   idType=inviteTargetModelName
-                  idValue=inviteTargetId}}
+                  idValue=inviteTargetId
+                }}
               </div>
             </figcaption>
           </figure>
@@ -119,7 +123,6 @@
             options=joiningRecordSelectorOptionsProxy
             onchange=(action (mut selectedJoiningRecordOption))
             selected=selectedJoiningRecordOption
-            renderInPlace=true
             placeholder=(tt this
               (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
             )
