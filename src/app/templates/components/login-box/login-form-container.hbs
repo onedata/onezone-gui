@@ -51,6 +51,14 @@
     {{tt this "sessionExpired"}}.
   </div>
 {{/if}}
+{{#if showIpWarning}}
+  <div class="login-notification login-notification-warning">
+    <div class="inline-icon-container session-expired-icon-container">
+      {{one-icon icon="sign-warning-rounded" class="ip-warning-icon"}}  
+    </div>
+    {{tt this "ipWarning"}}
+  </div>
+{{/if}}
 {{#if testMode}}
   <div class="login-notification test-mode-notification login-notification-warning">
     <span>{{tt this "signInTestMode"}}</span><br>
