@@ -97,6 +97,7 @@ export default Component.extend({
    */
   commonCallParentActionNames: Object.freeze([
     'showOneproviderConnectionError',
+    'hideOneproviderConnectionError',
     'getManageClusterUrl',
     'callGlobalNotify',
   ]),
@@ -290,7 +291,7 @@ export default Component.extend({
   },
 
   actions: {
-    showOneproviderConnectionError({ oneproviderUrl }) {
+    showOneproviderConnectionError({ oneproviderUrl, setFastPollingCallback }) {
       const {
         alertService,
         i18n,
@@ -302,8 +303,24 @@ export default Component.extend({
           i18n.t('components.alerts.endpointError.oneprovider'),
         url: oneproviderUrl,
         serverType: 'oneprovider',
+        setFastPollingCallback,
       });
     },
+
+    hideOneproviderConnectionError({ oneproviderUrl }) {
+      if (this.get('alertService.opened') &&
+        this.get('alertService.options.componentName') === 'alerts/endpoint-error' &&
+        this.get('alertService.options.serverType') === 'oneprovider') {
+        if (oneproviderUrl) {
+          if (oneproviderUrl === this.get('alertService.options.url')) {
+            this.set('alertService.opened', false);
+          }
+        } else {
+          this.set('alertService.opened', false);
+        }
+      }
+    },
+
     getManageClusterUrl({ clusterId }) {
       const {
         recordManager,

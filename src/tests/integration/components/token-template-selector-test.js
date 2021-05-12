@@ -31,6 +31,9 @@ const templates = [{
   name: 'restrictedData',
   category: advancedCategory,
 }, {
+  name: 'onepanelRest',
+  category: advancedCategory,
+}, {
   name: 'identity',
   category: advancedCategory,
 }];

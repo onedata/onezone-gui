@@ -22,6 +22,10 @@ export default {
       title: 'Oneprovider REST/CDMI access',
       newTokenNamePrefix: 'Oneprovider REST',
     },
+    onepanelRest: {
+      title: 'Onepanel REST access',
+      newTokenNamePrefix: 'Onepanel REST ',
+    },
     oneclient: {
       title: 'Oneclient access',
       newTokenNamePrefix: 'Oneclient',

@@ -15,6 +15,7 @@ import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
 import _ from 'lodash';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 
 /**
  * This object MUST BE initialzed asychronuosly using `asyncInit()`, eg.
@@ -66,6 +67,13 @@ export const VirtualShareList = EmberObject.extend({
       return this.get('shareListRelations')
         .then(lists => _.flatten(lists.invoke('toArray')));
     })),
+
+  globalListConflictLabelsObserver: observer('list.content.@each.{name,conflictLabel}',
+    function globalListConflictLabelsObserver() {
+      this.get('list')
+        .then(list => addConflictLabels(list, 'name', 'entityId'));
+    }
+  ),
 
   idsCache: Object.freeze([]),
 
