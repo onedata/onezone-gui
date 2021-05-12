@@ -22,8 +22,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   navigationState: service(),
 
   /**
-   * Entity ID of `space` record that is space of directory displayed in files
-   * browser.
+   * Entity ID of space for which datasets browser is displayed.
    * 
    * **Injected to embedded iframe.**
    * @virtual
@@ -47,8 +46,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   attachmentState: undefined,
 
-  // FIXME: redundancy; create computed util for getting array from aspectOptions
-  // create computed property for navigation state lists
+  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of dataset entity ids that are selected
    * 

@@ -1,7 +1,7 @@
 /**
- * Container for remote file browser of single space with Oneprovider selector
+ * Container for datasets views for single space (with Oneprovider selector)
  * 
- * @module components/content-spaces-data
+ * @module components/content-spaces-datasets
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -21,12 +21,12 @@ export default Component.extend(I18n, {
     'no-pointer-events',
   ],
 
+  navigationState: service(),
+
   /**
    * @override
    */
   i18nPrefix: 'components.contentSpacesDatasets',
-
-  navigationState: service(),
 
   /**
    * @type {string}

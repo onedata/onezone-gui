@@ -36,6 +36,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   dirEntityId: reads('navigationState.aspectOptions.dir'),
 
+  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of file entity ids that are selected
    * @type {Array<String>}

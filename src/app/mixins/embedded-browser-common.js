@@ -1,7 +1,21 @@
+/**
+ * Adds methods commonly used in embedded containers, whose are item browsers (eg.
+ * file-browser).
+ *
+ * @module mixins/embedded-browser-common
+ * @author Jakub Liput
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Mixin from '@ember/object/mixin';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Mixin.create({
+  // required property: _location: Location
+  // required property: router: Ember.Router
+  // required property: navigationState: Ember.Service
+
   /**
    * @param {String} type one of: data, datasets
    * @param {Object} options 
