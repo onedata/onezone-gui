@@ -84,6 +84,7 @@ import tokenTemplateSelector from './components/token-template-selector';
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
+import shareNotFound from './components/errors/share-not-found';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -130,6 +131,9 @@ const translations = {
     modals: {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
+    },
+    errors: {
+      shareNotFound,
     },
     loginBox,
     contentTokens,
