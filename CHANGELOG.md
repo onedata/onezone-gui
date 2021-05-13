@@ -6,6 +6,10 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7319 Added warning when signing-in using IP address
+* VFS-7588 Added onepanel rest token template
+* VFS-7470 Fixed text selection in resource name editors in sidebar
+* VFS-7450 Added frames for auth providers on account screen
 * VFS-5690 Added opening cluster invalid cert link in new tab and countdown for retry
 * VFS-7491 Fixed column labels overflow in harvesting progress table
 * VFS-7228 Better UX of token consumer page

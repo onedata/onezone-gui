@@ -18,6 +18,7 @@ import {
   darkFgColor,
   lightFgColor,
 } from 'onezone-gui/utils/auth-box-config';
+import Color from 'npm:color';
 
 export default Component.extend({
   tagName: 'div',
@@ -100,7 +101,10 @@ export default Component.extend({
         defaultIconBackgroundColor;
       const fgColor = contrast(iconBackgroundColor) === 'light' ? darkFgColor :
         lightFgColor;
-      const style = `background-color: ${iconBackgroundColor}; color: ${fgColor};`;
+      const color = new Color(iconBackgroundColor);
+      const borderColor = color.darken(0.15);
+      const style =
+        `background-color: ${iconBackgroundColor}; color: ${fgColor}; border-color: ${borderColor};`;
       return htmlSafe(style);
     }
   ),
