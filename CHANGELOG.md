@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7514 Added displaying IDs in token consumer
 * VFS-7319 Added warning when signing-in using IP address
 * VFS-7588 Added onepanel rest token template
 * VFS-7470 Fixed text selection in resource name editors in sidebar
