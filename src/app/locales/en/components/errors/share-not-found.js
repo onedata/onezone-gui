@@ -1,4 +1,4 @@
 export default {
   shareNotFound: 'Share not found',
-  shareNotFoundDescription: 'Most likely share or space has been deleted.',
+  shareNotFoundDescription: 'This share points to an inexistent file/directory. Most likely it has been deleted.',
 };
