@@ -27,9 +27,11 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import {
   formDataToRecord,
   recordToFormData,
-} from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form-utils';
+} from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import _ from 'lodash';
 import { validator } from 'ember-cp-validations';
+
+// TODO: VFS-7655 Add tooltips and placeholders
 
 export default Component.extend(I18n, {
   classNames: ['atm-lambda-form'],
@@ -357,122 +359,129 @@ function disableFieldInEditMode(component) {
  */
 function createFunctionArgResGroup(component, dataType) {
   const isForArguments = dataType === 'argument';
-  return FormFieldsCollectionGroup
-    .extend(
-      defaultValueGenerator(component, raw({})),
-      disableFieldInEditMode(component), {
-        isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
-        usedEntryNames: undefined,
-        valueStructureObserver: observer(
-          'value.__fieldsValueNames',
-          function valueStructureObserver() {
-            const namePropsPaths = (this.get('value.__fieldsValueNames') || [])
-              .map(entryValueName => `value.${entryValueName}.entryName`);
-            // Using `set` causes some weird ember errors. Using `defineProperty`
-            // as mentioned here `https://github.com/emberjs/ember.js/issues/16504#issuecomment-380793961`
-            defineProperty(
-              this,
-              'usedEntryNames',
-              computed(...namePropsPaths, function usedEntryNames() {
-                const value = this.get('value') || {};
-                const entryValueNames = get(value, '__fieldsValueNames') || [];
-                return entryValueNames
-                  .map(entryValueName => get(value, `${entryValueName}.entryName`))
-                  .compact();
-              })
-            );
-          }
-        ),
-        init() {
-          this._super(...arguments);
-          this.valueStructureObserver();
-        },
-        fieldFactoryMethod(uniqueFieldValueName) {
-          const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
-          return FormFieldsGroup.create({
-            name: 'entry',
-            valueName: uniqueFieldValueName,
-            fields: [
-              TextField.create({
-                mode,
-                name: 'entryName',
-                defaultValue: '',
-                customValidators: [
-                  validator(function (value, options, model) {
-                    if (!value) {
-                      return true;
-                    }
+  const generateEntryNameField = mode => TextField.create({
+    mode,
+    name: 'entryName',
+    defaultValue: '',
+    customValidators: [
+      validator(function (value, options, model) {
+        if (!value) {
+          return true;
+        }
 
-                    const field = get(model, 'field');
-                    const errorMsg =
-                      String(field.t(`${get(field, 'path')}.errors.notUnique`));
-                    const usedEntryNames = get(model, 'field.parent.parent.usedEntryNames');
-                    return usedEntryNames
-                      .filter(name => name.trim() === value.trim())
-                      .length <= 1 ? true : errorMsg;
-                  }, {
-                    dependentKeys: ['model.field.parent.parent.usedEntryNames'],
-                  }),
-                ],
-              }),
-              DropdownField.extend({
-                defaultValue: reads('options.firstObject.value'),
-              }).create({
-                mode,
-                name: 'entryType',
-                options: [
-                  { value: 'integer' },
-                  { value: 'string' },
-                  { value: 'object' },
-                  { value: 'histogram' },
-                  { value: 'anyFile' },
-                  { value: 'regularFile' },
-                  { value: 'directory' },
-                  { value: 'dataset' },
-                  { value: 'archive' },
-                  { value: 'singleValueStore' },
-                  { value: 'listStore' },
-                  { value: 'mapStore' },
-                  { value: 'treeForestStore' },
-                  { value: 'rangeStore' },
-                  { value: 'histogramStore' },
-                  { value: 'onedatafsCredentials' },
-                ],
-              }),
-              ToggleField.extend({
-                addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-              }).create({
-                mode,
-                name: 'entryBatch',
-                defaultValue: false,
-                component,
-              }),
-              ...(isForArguments ? [
-                ToggleField.extend({
-                  addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-                }).create({
-                  mode,
-                  name: 'entryOptional',
-                  defaultValue: false,
-                  component,
-                }),
-                TextField.extend({
-                  isVisible: not(and('isInViewMode', isEmpty('value'))),
-                }).create({
-                  mode,
-                  name: 'entryDefaultValue',
-                  defaultValue: '',
-                  isOptional: true,
-                }),
-              ] : []),
-            ],
-          });
-        },
-        dumpDefaultValue() {
-          return this.get('defaultValue') || this._super(...arguments);
-        },
-      })
-    .create({
-      name: isForArguments ? 'arguments' : 'results',
-    });
+        const field = get(model, 'field');
+        const errorMsg =
+          String(field.t(`${get(field, 'path')}.errors.notUnique`));
+        const usedEntryNames = get(model, 'field.parent.parent.usedEntryNames');
+        return usedEntryNames
+          .filter(name => name.trim() === value.trim())
+          .length <= 1 ? true : errorMsg;
+      }, {
+        dependentKeys: ['model.field.parent.parent.usedEntryNames'],
+      }),
+    ],
+  });
+  const generateEntryTypeField = mode => DropdownField.extend({
+    defaultValue: reads('options.firstObject.value'),
+  }).create({
+    mode,
+    name: 'entryType',
+    options: [
+      { value: 'integer' },
+      { value: 'string' },
+      { value: 'object' },
+      { value: 'histogram' },
+      { value: 'anyFile' },
+      { value: 'regularFile' },
+      { value: 'directory' },
+      { value: 'dataset' },
+      { value: 'archive' },
+      { value: 'singleValueStore' },
+      { value: 'listStore' },
+      { value: 'mapStore' },
+      { value: 'treeForestStore' },
+      { value: 'rangeStore' },
+      { value: 'histogramStore' },
+      { value: 'onedatafsCredentials' },
+    ],
+  });
+  const generateEntryBatchField = mode => ToggleField.extend({
+    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+  }).create({
+    mode,
+    name: 'entryBatch',
+    defaultValue: false,
+    component,
+  });
+  const generateEntryOptionalField = mode => ToggleField.extend({
+    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+  }).create({
+    mode,
+    name: 'entryOptional',
+    defaultValue: false,
+    component,
+  });
+  const generateEntryDefaultValueField = mode => TextField.extend({
+    isVisible: not(and('isInViewMode', isEmpty('value'))),
+  }).create({
+    mode,
+    name: 'entryDefaultValue',
+    defaultValue: '',
+    isOptional: true,
+  });
+
+  const fieldsCollectionExtension = {
+    isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
+    usedEntryNames: undefined,
+    valueStructureObserver: observer(
+      'value.__fieldsValueNames',
+      function valueStructureObserver() {
+        const namePropsPaths = (this.get('value.__fieldsValueNames') || [])
+          .map(entryValueName => `value.${entryValueName}.entryName`);
+        // Using `set` causes some weird ember errors. Using `defineProperty`
+        // as mentioned here `https://github.com/emberjs/ember.js/issues/16504#issuecomment-380793961`
+        defineProperty(
+          this,
+          'usedEntryNames',
+          computed(...namePropsPaths, function usedEntryNames() {
+            const value = this.get('value') || {};
+            const entryValueNames = get(value, '__fieldsValueNames') || [];
+            return entryValueNames
+              .map(entryValueName => get(value, `${entryValueName}.entryName`))
+              .compact();
+          })
+        );
+      }
+    ),
+    init() {
+      this._super(...arguments);
+      this.valueStructureObserver();
+    },
+    fieldFactoryMethod(uniqueFieldValueName) {
+      const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
+      return FormFieldsGroup.create({
+        name: 'entry',
+        valueName: uniqueFieldValueName,
+        fields: [
+          generateEntryNameField(mode),
+          generateEntryTypeField(mode),
+          generateEntryBatchField(mode),
+          ...(isForArguments ? [
+            generateEntryOptionalField(mode),
+            generateEntryDefaultValueField(mode),
+          ] : []),
+        ],
+      });
+    },
+    dumpDefaultValue() {
+      return this.get('defaultValue') || this._super(...arguments);
+    },
+  };
+  return FormFieldsCollectionGroup.extend(
+    defaultValueGenerator(component, raw({})),
+    disableFieldInEditMode(component),
+    fieldsCollectionExtension
+  ).create({
+    name: isForArguments ? 'arguments' : 'results',
+  });
 }

@@ -50,12 +50,23 @@
     margin-left: $nested-fields-indent;
   }
 
+  .footer-buttons {
+    float: none;
+    text-align: left;
+    .btn {
+      margin-left: $padding-small-horizontal;
+    }
+  }
+
   @media (max-width: $screen-xs-max) {
     .arguments-field,
     .results-field {
       &.field-edit-mode {
         .form-fields-collection-group {
           margin-left: $nested-fields-indent;
+        }
+        > .control-label {
+          margin-bottom: $form-group-margin-bottom / 2;
         }
       }
     }

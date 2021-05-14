@@ -1,5 +1,5 @@
 /**
- * Modifies existing automation lambda. Needs `atmkambda` (model) and
+ * Modifies existing automation lambda. Needs `atmLambda` (model) and
  * `atmLambdaDiff` (changed fields) passed in context.
  *
  * @module utils/workflow-actions/modify-atm-lambda-action

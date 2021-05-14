@@ -52,7 +52,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  * @typedef {Object} AtmDataSpec
  * @property {String} type one of: `'integer'`, `'string'`, `'object'`, `'file'`,
  *   `'histogram'`, `'dataset'`, `'archive'`, `'storeCredentials'`, `'onedatafsCredentials'`
- * @property {AtmDataTypeValueConstraints} valueConstraints its structure depends
+ * @property {AtmDataTypeValueConstraints} valueConstraints { storeType }its structure depends
  *   on `type` value and its corresponding Atm*TypeValueConstraints
  */
 
@@ -90,7 +90,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  */
 
 /**
- * @typedef {AtmDataTypeValueConstraints} AtmStoreCredentialsValueConstraints
+ * @typedef {AtmDataTypeValueConstraints} AtmStoreCredentialsTypeValueConstraints
  * @param {String} storeType one of: `'singleValue'`, `'list'`, `'map'`, `'treeForest'`,
  *   `'range'`, `'histogram'`
  */
@@ -99,6 +99,9 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
  * @typedef {AtmDataTypeValueConstraints} AtmStringTypeValueConstraints
  */
 
+/**
+ * @type {String}
+ */
 export const entityType = 'atm_lambda';
 
 export default Model.extend(GraphSingleModelMixin, {

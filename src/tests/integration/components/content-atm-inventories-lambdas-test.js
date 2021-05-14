@@ -19,6 +19,9 @@ describe('Integration | Component | content atm inventories lambdas', function (
   beforeEach(function () {
     this.setProperties({
       atmInventory: {
+        privileges: {
+          manageLambdas: true,
+        },
         atmLambdaList: promiseObject(resolve({
           list: promiseArray(resolve([{
             name: 'f1',

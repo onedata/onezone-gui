@@ -11,6 +11,10 @@
     {{content-atm-inventories-lambdas/atm-lambdas-list-entry
       atmLambda=atmLambda
     }}
+  {{else}}
+    {{#if searchValue}}
+      <p>{{tt this "noMatchingResults"}}</p>
+    {{/if}}
   {{/each}}
 </ul>
 {{yield}}

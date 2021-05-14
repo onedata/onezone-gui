@@ -35,6 +35,7 @@ export default Model.extend(GraphSingleModelMixin, {
    */
   privileges: computedCurrentUserPrivileges({
     allFlags: atmInventoryPrivilegesFlags,
+    flagsPrefix: 'atm_inventory',
   }),
 
   /**

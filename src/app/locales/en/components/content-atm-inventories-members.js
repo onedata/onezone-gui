@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import privilegesAspectBase from '../mixins/members-aspect-base';
+import privileges from '../onedata-gui-common/common/privileges';
+import { capitalize } from '@ember/string';
 
 export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {
@@ -8,20 +10,10 @@ export default _.merge({}, privilegesAspectBase, {
     groupManagement: 'Group management',
     spaceManagement: 'Space management',
   },
-  privileges: {
-    atm_inventory_view: 'View inventory',
-    atm_inventory_update: 'Modify inventory',
-    atm_inventory_manage_lambdas: 'Manage lambdas',
-    atm_inventory_delete: 'Remove inventory',
-    atm_inventory_view_privileges: 'View privileges',
-    atm_inventory_set_privileges: 'Set privileges',
-
-    atm_inventory_add_user: 'Add user',
-    atm_inventory_remove_user: 'Remove user',
-
-    atm_inventory_add_group: 'Add group',
-    atm_inventory_remove_group: 'Remove group',
-  },
+  privileges: Object.keys(privileges.atmInventory).reduce((obj, key) => {
+    obj[key] = capitalize(privileges.atmInventory[key]);
+    return obj;
+  }, {}),
   noGroupsStart: 'This automation inventory has no groups. To invite a group, ',
   noGroupsInvite: 'generate an invitation token',
   noGroupsEnd: ' and send it to the group owner.',

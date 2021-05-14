@@ -63,6 +63,17 @@
     word-break: break-word;
   }
 
+  .summary::after {
+    content: '';
+    display: inline-block;
+    height: $line-height-computed;
+    width: 2px;
+    margin-left: 0.4em;
+    margin-right: 0.2em;
+    background-color: $main-border-color;
+    vertical-align: top;
+  }
+
   .lambda-content {
     flex-grow: 1;
     min-width: 0;
@@ -70,5 +81,11 @@
 
   .one-menu-toggle {
     margin-right: -$padding-base-vertical;
+  }
+
+  &.filtered-list {
+    .search-form-group .oneicon-search {
+      color: $color-one-success;
+    }
   }
 }

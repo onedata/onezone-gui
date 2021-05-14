@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { conditional, array } from 'ember-awesome-macros';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
@@ -61,6 +61,16 @@ export default Component.extend(GlobalActions, {
     } = this.getProperties('actionsPerSlide', 'activeSlide');
 
     return actionsPerSlide[activeSlide];
+  }),
+
+  activeSlideObserver: observer('activeSlide', function activeSlideObserver() {
+    const scrollableParent = this.$().parents('.ps')[0];
+    if (scrollableParent) {
+      scrollableParent.scroll({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
   }),
 
   changeSlideViaUrl(newSlide) {

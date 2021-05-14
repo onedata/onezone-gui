@@ -2,7 +2,7 @@
  * Provides converters for type <-> data spec. Data specs are used to define type of
  * data accepted by lambda argument/result.
  *
- * @module utils/content-atm-inventories-lambdas/atm-lambda-form-utils/data-spec-converters
+ * @module utils/content-atm-inventories-lambdas/atm-lambda-form/data-spec-converters
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -10,15 +10,15 @@
 
 import _ from 'lodash';
 
-const typeForFileDataSpecFileType = {
+const typeForFileTypeFileType = {
   ANY: 'anyFile',
   REG: 'regularFile',
   DIR: 'directory',
 };
-const fileDataSpecFileTypeForType =
-  _.invert(typeForFileDataSpecFileType);
+const fileTypeFileTypeForType =
+  _.invert(typeForFileTypeFileType);
 
-const typeForStoreCredentialsDataSpecStoreType = {
+const typeForStoreCredentialsTypeStoreType = {
   singleValue: 'singleValueStore',
   list: 'listStore',
   map: 'mapStore',
@@ -26,34 +26,34 @@ const typeForStoreCredentialsDataSpecStoreType = {
   range: 'rangeStore',
   histogram: 'histogramStore',
 };
-const storeCredentialsDataSpecStoreTypeForType =
-  _.invert(typeForStoreCredentialsDataSpecStoreType);
+const storeCredentialsTypeStoreTypeForType =
+  _.invert(typeForStoreCredentialsTypeStoreType);
 
 export function dataSpecToType(dataSpec) {
   const valueConstraints = dataSpec.valueConstraints || {};
   switch (dataSpec.type) {
     case 'file':
-      return typeForFileDataSpecFileType[valueConstraints.fileType];
+      return typeForFileTypeFileType[valueConstraints.fileType];
     case 'storeCredentials':
-      return typeForStoreCredentialsDataSpecStoreType[valueConstraints.storeType];
+      return typeForStoreCredentialsTypeStoreType[valueConstraints.storeType];
     default:
       return dataSpec.type;
   }
 }
 
 export function typeToDataSpec(type) {
-  if (type in fileDataSpecFileTypeForType) {
+  if (type in fileTypeFileTypeForType) {
     return {
       type: 'file',
       valueConstraints: {
-        fileType: fileDataSpecFileTypeForType[type],
+        fileType: fileTypeFileTypeForType[type],
       },
     };
-  } else if (type in storeCredentialsDataSpecStoreTypeForType) {
+  } else if (type in storeCredentialsTypeStoreTypeForType) {
     return {
       type: 'storeCredentials',
       valueConstraints: {
-        storeType: storeCredentialsDataSpecStoreTypeForType[type],
+        storeType: storeCredentialsTypeStoreTypeForType[type],
       },
     };
   } else {

@@ -12,10 +12,12 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get } from '@ember/object';
+import { bool } from '@ember/object/computed';
 import { collect } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-lambdas-list-view'],
@@ -59,14 +61,35 @@ export default Component.extend(I18n, {
     })
   ),
 
-  addNewLambdaAction: computed(function addNewLambdaAction() {
-    return {
-      action: () => this.get('onAddAtmLambda')(),
-      title: this.t('addAtmLambdaButton'),
-      class: 'open-add-atm-lambda-trigger',
-      icon: 'add-filled',
-    };
-  }),
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasManageLambdasPrivilege: bool('atmInventory.privileges.manageLambdas'),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  addNewLambdaAction: computed(
+    'hasManageLambdasPrivilege',
+    function addNewLambdaAction() {
+      const {
+        hasManageLambdasPrivilege,
+        i18n,
+      } = this.getProperties('hasManageLambdasPrivilege', 'i18n');
+      return {
+        action: () => this.get('onAddAtmLambda')(),
+        title: this.t('addAtmLambdaButton'),
+        class: 'open-add-atm-lambda-trigger',
+        disabled: !hasManageLambdasPrivilege,
+        tip: hasManageLambdasPrivilege ? undefined : insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'atmInventory',
+          privilegeFlag: 'atm_inventory_manage_lambdas',
+        }),
+        icon: 'add-filled',
+      };
+    }
+  ),
 
   /**
    * @override

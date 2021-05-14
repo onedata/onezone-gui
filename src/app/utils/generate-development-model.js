@@ -36,6 +36,7 @@ const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const NUMBER_OF_ATM_INVENTORIES = 3;
+const NUMBER_OF_ATM_LAMBDAS = 5;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -900,7 +901,7 @@ function attachProgressToHarvesterIndices(
 }
 
 function attachAtmLambdasToAtmInventory(store, atmInventory) {
-  return allFulfilled(_.range(5).map((index) => {
+  return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
     return store.createRecord('atmLambda', {
       name: `Function ${index}`,
       summary: `Some very complicated function #${index}`,

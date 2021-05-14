@@ -8,15 +8,22 @@
  */
 
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 
-const isInTestingEnv = config.environment === 'test';
+const typingActionDebouce = config.timing.typingActionDebouce;
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: ['atm-lambdas-list'],
+  classNameBindings: ['searchValue:filtered-list'],
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentAtmInventoriesLambdas.atmLambdasList',
 
   /**
    * @virtual
@@ -61,7 +68,7 @@ export default Component.extend({
 
   actions: {
     changeSearchValue(newValue) {
-      debounce(this, 'set', 'searchValue', newValue, isInTestingEnv ? 1 : 300);
+      debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
     },
   },
 });
