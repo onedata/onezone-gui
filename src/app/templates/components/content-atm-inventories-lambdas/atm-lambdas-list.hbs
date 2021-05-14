@@ -1,0 +1,20 @@
+<div class="form-group-light search-form-group">
+  <div class="input-group with-icon-addon">
+    {{search-bar search=(action "changeSearchValue") class="form-control"}}
+    <div class="input-group-addon">
+      {{one-icon icon="search"}}
+    </div>
+  </div>
+</div>
+<ul class="lambdas-list">
+  {{#each sortedCollection as |atmLambda|}}
+    {{content-atm-inventories-lambdas/atm-lambdas-list-entry
+      atmLambda=atmLambda
+    }}
+  {{else}}
+    {{#if searchValue}}
+      <p>{{tt this "noMatchingResults"}}</p>
+    {{/if}}
+  {{/each}}
+</ul>
+{{yield}}

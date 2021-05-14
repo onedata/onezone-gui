@@ -19,6 +19,7 @@ import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 import { entityType as tokenEntityType } from 'onezone-gui/models/token';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
+import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
 
 const OnedataAdapter = environmentExport(config, ProductionAdapter, DevelopmentAdapter);
 
@@ -32,6 +33,7 @@ export const entityTypeToEmberModelNameMap = Object.freeze(new Map([
   [clusterEntityType, 'cluster'],
   [tokenEntityType, 'token'],
   [atmInventoryEntityType, 'atm-inventory'],
+  [atmLambdaEntityType, 'atm-lambda'],
 ]));
 
 export default OnedataAdapter.extend({

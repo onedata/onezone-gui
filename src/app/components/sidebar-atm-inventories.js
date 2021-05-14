@@ -41,6 +41,10 @@ export default OneSidebar.extend(I18n, {
    */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
+      id: 'lambdas',
+      label: this.t('aspects.lambdas'),
+      icon: 'lambda',
+    }, {
       id: 'members',
       label: this.t('aspects.members'),
       icon: 'group',

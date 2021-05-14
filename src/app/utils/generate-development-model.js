@@ -36,6 +36,7 @@ const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const NUMBER_OF_ATM_INVENTORIES = 3;
+const NUMBER_OF_ATM_LAMBDAS = 5;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -282,6 +283,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'atmInventory', groups
               ),
+              attachAtmLambdasToAtmInventory(store, record),
             ])
           ))
         )
@@ -896,4 +898,44 @@ function attachProgressToHarvesterIndices(
         }));
       });
   }));
+}
+
+function attachAtmLambdasToAtmInventory(store, atmInventory) {
+  return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
+    return store.createRecord('atmLambda', {
+      name: `Function ${index}`,
+      summary: `Some very complicated function #${index}`,
+      operationSpec: {
+        engine: 'openfaas',
+        dockerImage: `some-super-docker-image:${index}`,
+        dockerExecutionOptions: {
+          readonly: true,
+          mountOneclient: true,
+          oneclientMountPoint: '/mnt/oneclient',
+          oneclientOptions: '-k',
+        },
+      },
+      argumentSpecs: [{
+        name: 'arg1',
+        dataSpec: { type: 'string' },
+        isBatch: true,
+        isOptional: true,
+        defaultValue: '"some value"',
+      }, {
+        name: 'arg2',
+        dataSpec: { type: 'onedatafsCredentials' },
+        isBatch: true,
+      }],
+      resultSpecs: [{
+        name: 'res1',
+        dataSpec: { type: 'string' },
+        isBatch: false,
+      }],
+    }).save();
+  })).then(atmLambdas =>
+    createListRecord(store, 'atmLambda', atmLambdas)
+  ).then(listRecord => {
+    set(atmInventory, 'atmLambdaList', listRecord);
+    return atmInventory.save();
+  });
 }

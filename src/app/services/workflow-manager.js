@@ -148,4 +148,31 @@ export default Service.extend({
       ).catch(ignoreForbiddenError),
     ]));
   },
+
+  /**
+   * @param {String} atmInventoryId
+   * @param {Object} atmLambdaPrototype
+   * @returns {Promise<Models.AtmLambda>}
+   */
+  async createAtmLambda(atmInventoryId, atmLambdaPrototype) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+
+    const atmLambda = await store.createRecord(
+      'atmLambda',
+      Object.assign({}, atmLambdaPrototype, {
+        _meta: {
+          additionalData: {
+            atmInventoryId,
+          },
+        },
+      })
+    ).save();
+    await recordManager
+      .reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
+      .catch(ignoreForbiddenError);
+    return atmLambda;
+  },
 });

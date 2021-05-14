@@ -1,0 +1,17 @@
+{{#one-carousel activeSlideId=activeSlide as |carousel|}}
+  {{#carousel.slide slideId="list"}}
+    {{content-atm-inventories-lambdas/list-view
+      atmInventory=atmInventory
+      onAddAtmLambda=(action "showCreatorView")
+      onRegisterViewActions=(action "registerViewActions" "list")
+    }}
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="creator"}}
+    {{content-atm-inventories-lambdas/creator-view
+      atmInventory=atmInventory
+      onBackSlide=(action "showListView")
+      onAtmLambdaAdded=(action "showListView")
+    }}
+  {{/carousel.slide}}
+{{/one-carousel}}
+{{yield}}

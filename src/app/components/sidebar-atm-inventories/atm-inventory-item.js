@@ -15,6 +15,9 @@ import { reject, resolve } from 'rsvp';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
+// TODO: VFS-7655 Better inventory icon - now it is too light comparing to other,
+// bolder icons
+
 export default Component.extend(I18n, {
   tagName: '',
 

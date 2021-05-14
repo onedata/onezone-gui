@@ -70,6 +70,9 @@ module.exports = function (environment) {
       formToggleLabelColumns: 'col-xs-9 col-sm-5',
       formToggleInputColumns: 'col-xs-3 col-sm-7 text-xs-right',
     },
+    'timing': {
+      typingActionDebouce: 300,
+    },
     'onedataWebsocket': {
       defaultProtocolVersion: 3,
     },
@@ -112,6 +115,10 @@ module.exports = function (environment) {
 
     // Testem prefers this...
     ENV.locationType = 'none';
+
+    Object.assign(ENV.timing, {
+      typingActionDebouce: 1,
+    });
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;

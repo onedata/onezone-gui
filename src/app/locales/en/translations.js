@@ -85,6 +85,7 @@ import sidebarAtmInventories from './components/sidebar-atm-inventories';
 import contentAtmInventoriesEmpty from './components/content-atm-inventories-empty';
 import contentAtmInventoriesNew from './components/content-atm-inventories-new';
 import contentAtmInventoriesMembers from './components/content-atm-inventories-members';
+import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
@@ -119,6 +120,8 @@ import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-crea
 import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
+import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
+import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
 
 const translations = {
   tabs: {
@@ -217,6 +220,7 @@ const translations = {
     contentAtmInventoriesEmpty,
     contentAtmInventoriesNew,
     contentAtmInventoriesMembers,
+    contentAtmInventoriesLambdas,
     emptyCollectionSidebar,
   },
   services: {
@@ -258,6 +262,8 @@ const translations = {
       createAtmInventoryAction,
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
+      createAtmLambdaAction,
+      modifyAtmLambdaAction,
     },
   },
 };
