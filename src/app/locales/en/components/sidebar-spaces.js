@@ -11,6 +11,7 @@ export default {
       index: 'Overview',
       data: 'Data',
       transfers: 'Transfers',
+      datasets: 'Datasets',
       shares: 'Shares',
       providers: 'Providers',
       members: 'Members',

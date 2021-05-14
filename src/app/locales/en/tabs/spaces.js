@@ -5,6 +5,7 @@ export default {
     data: 'Data',
     shares: 'Shares',
     transfers: 'Transfers',
+    datasets: 'Datasets',
     providers: 'Space providers',
     members: 'Space members',
     membership: 'Membership',
