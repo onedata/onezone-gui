@@ -1,0 +1,58 @@
+.content-atm-inventories-lambdas .atm-lambdas-list {
+  .search-form-group {
+    max-width: 50em;
+    margin-bottom: $iconified-block-padding;
+  }
+
+  .lambdas-list {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .content-section {
+    display: flex;
+    align-items: flex-start;
+
+    .form {
+      margin: 0;
+      margin-top: $padding-base-vertical;
+      padding: 0;
+    }
+  }
+
+  .name {
+    @include font-semibold();
+    margin-bottom: $padding-small-vertical;
+  }
+
+  .name,
+  .summary {
+    word-break: break-word;
+  }
+
+  .summary::after {
+    content: '';
+    display: inline-block;
+    height: $line-height-computed;
+    width: 2px;
+    margin-left: 0.4em;
+    margin-right: 0.2em;
+    background-color: $main-border-color;
+    vertical-align: top;
+  }
+
+  .lambda-content {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .one-menu-toggle {
+    margin-right: -$padding-base-vertical;
+  }
+
+  &.filtered-list {
+    .search-form-group .oneicon-search {
+      color: $color-one-success;
+    }
+  }
+}

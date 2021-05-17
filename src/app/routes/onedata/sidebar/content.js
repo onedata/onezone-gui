@@ -38,10 +38,6 @@ export default OnedataSidebarContentRoute.extend({
   recordManager: service(),
   sidebarResources: service(),
 
-  nonStandardResourceTypeToModelName: Object.freeze({
-    inventories: 'atmInventory',
-  }),
-
   /**
    * @override
    */

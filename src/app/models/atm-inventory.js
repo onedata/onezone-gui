@@ -29,13 +29,14 @@ export default Model.extend(GraphSingleModelMixin, {
   effUserList: belongsTo('userList'),
 
   workflowSchemaList: belongsTo('atmWorkflowSchemaList'),
-  lambdaFunctionList: belongsTo('lambdaFunctionList'),
+  atmLambdaList: belongsTo('atmLambdaList'),
 
   /**
    * @type {ComputedProperty<Object>}
    */
   privileges: computedCurrentUserPrivileges({
     allFlags: atmInventoryPrivilegesFlags,
+    flagsPrefix: 'atm_inventory',
   }),
 
   /**

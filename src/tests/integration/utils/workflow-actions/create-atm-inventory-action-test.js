@@ -55,7 +55,7 @@ describe('Integration | Utility | workflow actions/create atm inventory action',
         })
         .then(() => expect(transitionToStub).to.be.calledWith(
           'onedata.sidebar.content',
-          'inventories',
+          'atm-inventories',
           'newAtmId'
         ));
     });

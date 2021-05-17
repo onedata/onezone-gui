@@ -12,7 +12,7 @@ import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
 import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
-import { get, getProperties, set, setProperties } from '@ember/object';
+import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
@@ -36,6 +36,7 @@ const NUMBER_OF_TOKENS = 3;
 const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const NUMBER_OF_ATM_INVENTORIES = 3;
+const NUMBER_OF_ATM_LAMBDAS = 5;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -215,8 +216,8 @@ export default function generateDevelopmentModel(store) {
     })
     // add groups, memberships, users and privileges to groups
     .then(listRecords => listRecords.group.get('list')
-      .then(records =>
-        allFulfilled(records.map(record =>
+      .then(groups =>
+        allFulfilled(groups.map(record =>
           allFulfilled([
             attachUsersGroupsToModel(
               store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
@@ -231,8 +232,8 @@ export default function generateDevelopmentModel(store) {
         ))
       )
       .then(() => listRecords.space.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(spaces =>
+          allFulfilled(spaces.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
@@ -250,8 +251,8 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => listRecords.harvester.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(harvesters =>
+          allFulfilled(harvesters.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'harvester', false,
@@ -269,8 +270,8 @@ export default function generateDevelopmentModel(store) {
         )
       )
       .then(() => listRecords.atmInventory.get('list')
-        .then(records =>
-          allFulfilled(records.map(record =>
+        .then(atmInventories =>
+          allFulfilled(atmInventories.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
                 store, record, 'atmInventory', false,
@@ -282,7 +283,7 @@ export default function generateDevelopmentModel(store) {
               attachMembershipsToModel(
                 store, record, 'atmInventory', groups
               ),
-              attachLambdaFunctionsToAtmInventory(store, record),
+              attachAtmLambdasToAtmInventory(store, record),
               attachWorkflowSchemasToAtmInventory(store, record),
             ])
           ))
@@ -522,7 +523,7 @@ function createTokensRecords(store) {
           },
         }).save();
       });
-    const inviteType = inviteTypes[0];
+    const inviteType = 'userJoinAtmInventory';
     const revokedInviteTokenPromise = store.createRecord('token', {
       name: 'Revoked invite token ' + i,
       revoked: true,
@@ -900,55 +901,42 @@ function attachProgressToHarvesterIndices(
   }));
 }
 
-function attachLambdaFunctionsToAtmInventory(store, atmInventory) {
-  const {
-    entityType,
-    entityId,
-  } = getProperties(atmInventory, 'entityType', 'entityId');
-  return allFulfilled(_.range(5).map((index) => {
-    return store.createRecord('lambdaFunction', {
-      id: gri({
-        entityType,
-        entityId,
-        aspect: 'function',
-        aspectId: `function${index}`,
-        scope: 'private',
-      }),
+function attachAtmLambdasToAtmInventory(store, atmInventory) {
+  return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
+    return store.createRecord('atmLambda', {
       name: `Function ${index}`,
       summary: `Some very complicated function #${index}`,
-      engine: 'openfaas',
-      operationRef: `some-super-docker-image:${index}`,
-      executionOptions: {
-        readonly: true,
-        mountSpaceOptions: {
+      operationSpec: {
+        engine: 'openfaas',
+        dockerImage: `some-super-docker-image:${index}`,
+        dockerExecutionOptions: {
+          readonly: true,
           mountOneclient: true,
-          mountPoint: '/mnt/oneclient',
+          oneclientMountPoint: '/mnt/oneclient',
           oneclientOptions: '-k',
         },
       },
-      arguments: [{
+      argumentSpecs: [{
         name: 'arg1',
-        type: 'string',
-        array: true,
-        optional: true,
+        dataSpec: { type: 'string' },
+        isBatch: true,
+        isOptional: true,
         defaultValue: '"some value"',
       }, {
         name: 'arg2',
-        type: 'onedatafsOptions',
-        array: true,
-        optional: true,
+        dataSpec: { type: 'onedatafsCredentials' },
+        isBatch: true,
       }],
-      results: [{
+      resultSpecs: [{
         name: 'res1',
-        type: 'string',
-        array: false,
-        optional: true,
+        dataSpec: { type: 'string' },
+        isBatch: false,
       }],
     }).save();
-  })).then(lambdaFunctions =>
-    createListRecord(store, 'lambdaFunction', lambdaFunctions)
+  })).then(atmLambdas =>
+    createListRecord(store, 'atmLambda', atmLambdas)
   ).then(listRecord => {
-    set(atmInventory, 'lambdaFunctionList', listRecord);
+    set(atmInventory, 'atmLambdaList', listRecord);
     return atmInventory.save();
   });
 }

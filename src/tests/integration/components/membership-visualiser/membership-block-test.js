@@ -11,7 +11,7 @@ const icons = {
   provider: 'provider',
   cluster: 'cluster',
   harvester: 'light-bulb',
-  atmInventory: 'view-grid',
+  atmInventory: 'atm-inventory',
 };
 
 describe(

@@ -1,0 +1,7 @@
+.content-atm-inventories-lambdas-list-view {
+  @media (max-width: $screen-xs-max) {
+    .atm-lambdas-list {
+      margin: 0 $padding-base-vertical;
+    }
+  }
+}

@@ -34,7 +34,7 @@ export default SidebarResources.extend({
    * @override
    */
   modelNameToRouteResourceTypeMapping: Object.freeze(new Map([
-    ['atmInventory', 'inventories'],
+    ['atmInventory', 'atm-inventories'],
   ])),
 
   /**
@@ -57,7 +57,7 @@ export default SidebarResources.extend({
         return this.get('groupManager').getGroups();
       case 'harvesters':
         return this.get('harvesterManager').getHarvesters();
-      case 'inventories':
+      case 'atm-inventories':
         return this.get('recordManager').getUserRecordList('atmInventory');
       case 'uploads':
         return resolve({
@@ -87,7 +87,7 @@ export default SidebarResources.extend({
         return this.get('groupActions.buttons');
       case 'harvesters':
         return this.get('harvesterActions.buttons');
-      case 'inventories':
+      case 'atm-inventories':
         return this.get('workflowActions').createGlobalActions(context);
       default:
         return [];

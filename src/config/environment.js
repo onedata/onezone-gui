@@ -48,7 +48,7 @@ module.exports = function (environment) {
       { id: 'groups', icon: 'groups', defaultAspect: 'members' },
       { id: 'tokens', icon: 'tokens' },
       { id: 'harvesters', icon: 'light-bulb', defaultAspect: 'plugin' },
-      { id: 'inventories', icon: 'view-grid', defaultAspect: 'members' },
+      { id: 'atmInventories', icon: 'atm-inventory', defaultAspect: 'members' },
       {
         id: 'clusters',
         icon: 'cluster',
@@ -69,6 +69,9 @@ module.exports = function (environment) {
       formSubmitColumns: 'col-xs-12 col-sm-7 col-sm-offset-5 text-xs-center',
       formToggleLabelColumns: 'col-xs-9 col-sm-5',
       formToggleInputColumns: 'col-xs-3 col-sm-7 text-xs-right',
+    },
+    'timing': {
+      typingActionDebouce: 300,
     },
     'onedataWebsocket': {
       defaultProtocolVersion: 3,
@@ -112,6 +115,10 @@ module.exports = function (environment) {
 
     // Testem prefers this...
     ENV.locationType = 'none';
+
+    Object.assign(ENV.timing, {
+      typingActionDebouce: 1,
+    });
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;

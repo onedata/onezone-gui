@@ -151,12 +151,29 @@ export default Service.extend({
 
   /**
    * @param {String} atmInventoryId
-   * @param {Object} functionPrototype
-   * @returns {Promise<Models.LambdaFunction>}
+   * @param {Object} atmLambdaPrototype
+   * @returns {Promise<Models.AtmLambda>}
    */
-  createLambdaFunction(atmInventoryId, functionPrototype) {
-    // FIXME: VFS-7538 implement lambda function creation
-    return resolve(functionPrototype);
+  async createAtmLambda(atmInventoryId, atmLambdaPrototype) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+
+    const atmLambda = await store.createRecord(
+      'atmLambda',
+      Object.assign({}, atmLambdaPrototype, {
+        _meta: {
+          additionalData: {
+            atmInventoryId,
+          },
+        },
+      })
+    ).save();
+    await recordManager
+      .reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
+      .catch(ignoreForbiddenError);
+    return atmLambda;
   },
 
   /**

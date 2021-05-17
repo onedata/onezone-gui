@@ -1,0 +1,16 @@
+<div class="row content-row header-row">
+  <h1 class="with-back relative nowrap">
+    <a class="content-back-link" {{action "backSlide"}}>
+      {{one-icon icon="lambda" class="content-back-resource-icon"}}
+      {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+    </a>
+    <div class="resource-name">{{tt this "header"}}</div>
+  </h1>
+</div>
+<div class="row content-row">
+  {{content-atm-inventories-lambdas/atm-lambda-form
+    mode="create"
+    onSubmit=(action "onFormSubmit")
+  }}
+</div>
+{{yield}}

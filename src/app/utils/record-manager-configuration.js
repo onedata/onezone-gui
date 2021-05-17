@@ -24,6 +24,8 @@ export default class RecordManagerConfiguration {
    * @param {String} relationTargetModelName
    * @param {String} relationTargetRecordId
    * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
    * @returns {Array<Object>} object format:
    * ```
    * {
@@ -61,23 +63,28 @@ export default class RecordManagerConfiguration {
     });
 
     switch (relationType) {
+      // TODO: VFS-6243 Add other `relationType` values handling
       default: {
+        // Is an array of arrays, where each array has two (ordered) elements
+        // describing relation. Is needed, because relation can be destroyed from
+        // any side of the relation.
         let relationsRemoveOrder;
+
         if (relationSides[0].isUser && !relationSides[0].isCurrentUser) {
           // Cannot remove relation as a user other than current.
           relationsRemoveOrder = [
-            [1, 0],
+            [relationSides[1], relationSides[0]],
           ];
         } else if (relationSides[1].isUser && !relationSides[1].isCurrentUser) {
           // The same as above.
           relationsRemoveOrder = [
-            [0, 1],
+            [relationSides[0], relationSides[1]],
           ];
         } else {
           // None of the relations sides are a non-current user.
           relationsRemoveOrder = [
-            [0, 1],
-            [1, 0],
+            [relationSides[0], relationSides[1]],
+            [relationSides[1], relationSides[0]],
           ];
           if (relationSides[1].isCurrentUser) {
             // Removing relation should start with removing it from the side of
@@ -86,16 +93,22 @@ export default class RecordManagerConfiguration {
           }
         }
 
-        return relationsRemoveOrder.map(([a, b]) => ({
-          entityType: relationSides[a].entityType,
-          entityId: relationSides[a].recordId,
-          aspect: relationSides[b].entityType,
-          aspectId: relationSides[b].recordId,
+        return relationsRemoveOrder.map(([relationSide1, relationSide2]) => ({
+          entityType: relationSide1.entityType,
+          entityId: relationSide1.recordId,
+          aspect: relationSide2.entityType,
+          aspectId: relationSide2.recordId,
         }));
       }
     }
   }
 
+  /**
+   * Performs all needed work after removing record (like reloading other records).
+   * @param {String} modelName
+   * @param {String} recordId
+   * @param {GraphModel} record
+   */
   async onRecordRemove(modelName, recordId, record) {
     await this.recordManager.reloadUserRecordList(modelName);
 
@@ -116,12 +129,21 @@ export default class RecordManagerConfiguration {
     }
   }
 
+  /**
+   * Performs all needed work after removing relation (like reloading records).
+   * @param {String} relationOriginModelName
+   * @param {String} relationOriginRecordId
+   * @param {String} relationTargetModelName
+   * @param {String} relationTargetRecordId
+   * @param {String|undefined} [relationType=undefined]
+   *   one of `'parent'`, `'child'` or undefined (default). Values other than
+   *   `undefined` are not handled yet. TODO: VFS-6243
+   */
   async onRelationRemove(
     relationOriginModelName,
     relationOriginRecordId,
     relationTargetModelName,
     relationTargetRecordId,
-    // relationType will be necessary when dealing with group-group relation
     // relationType,
   ) {
     const currentUserId = get(

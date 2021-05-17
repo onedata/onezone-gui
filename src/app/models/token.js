@@ -24,38 +24,45 @@ import { cancel, later } from '@ember/runloop';
 import { and, or, not } from 'ember-awesome-macros';
 import moment from 'moment';
 
+/**
+ * Describes generalized invite tokens specifications depending on the invite target
+ * model name.
+ * - `idFieldName` - name of a field, where backend places invite target record id
+ * - `modelName` - model name of the invite target
+ * - `hasPrivileges` - if true, then that type of invite has privilege flags included
+ */
 const standardGroupMapping = {
   idFieldName: 'groupId',
   modelName: 'group',
-  privileges: true,
+  hasPrivileges: true,
 };
 
 const standardSpaceMapping = {
   idFieldName: 'spaceId',
   modelName: 'space',
-  privileges: true,
+  hasPrivileges: true,
 };
 
 const standardHarvesterMapping = {
   idFieldName: 'harvesterId',
   modelName: 'harvester',
-  privileges: true,
+  hasPrivileges: true,
 };
 
 const standardClusterMapping = {
   idFieldName: 'clusterId',
   modelName: 'cluster',
-  privileges: true,
+  hasPrivileges: true,
 };
 
 const standardAtmInventoryMapping = {
   idFieldName: 'atmInventoryId',
   modelName: 'atmInventory',
-  privileges: true,
+  hasPrivileges: true,
 };
 
 function mappingWithoutPrivileges(mapping) {
-  return Object.assign({}, mapping, { privileges: false });
+  return Object.assign({}, mapping, { hasPrivileges: false });
 }
 
 export const tokenInviteTypeToTargetModelMapping = {
@@ -68,6 +75,7 @@ export const tokenInviteTypeToTargetModelMapping = {
   registerOneprovider: {
     idFieldName: 'adminUserId',
     modelName: 'user',
+    hasPrivileges: false,
   },
   userJoinCluster: standardClusterMapping,
   groupJoinCluster: standardClusterMapping,
