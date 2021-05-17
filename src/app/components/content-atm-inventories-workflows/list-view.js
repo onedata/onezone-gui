@@ -2,10 +2,11 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get } from '@ember/object';
-import { collect } from '@ember/object/computed';
+import { collect, bool } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-list-view'],
@@ -44,6 +45,11 @@ export default Component.extend(I18n, {
   onRegisterViewActions: notImplementedIgnore,
 
   /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasManageWorkflowSchemasPrivilege: bool('atmInventory.privileges.manageWorkflowSchemas'),
+
+  /**
    * @type {ComputedProperty<PromiseArray<Models.AtmWorkflowSchema>>}
    */
   atmWorkflowSchemasProxy: promise.array(
@@ -57,14 +63,28 @@ export default Component.extend(I18n, {
     })
   ),
 
-  addNewAtmWorkflowSchemaAction: computed(function addNewAtmWorkflowSchemaAction() {
-    return {
-      action: () => this.get('onAddAtmWorkflowSchema')(),
-      title: this.t('addAtmWorkflowSchemaButton'),
-      class: 'open-add-atm-workflow-schema-trigger',
-      icon: 'add-filled',
-    };
-  }),
+  addNewAtmWorkflowSchemaAction: computed(
+    'hasManageWorkflowSchemasPrivilege',
+    function addNewAtmWorkflowSchemaAction() {
+      const {
+        hasManageWorkflowSchemasPrivilege,
+        i18n,
+      } = this.getProperties('hasManageWorkflowSchemasPrivilege', 'i18n');
+      return {
+        action: () => this.get('onAddAtmWorkflowSchema')(),
+        title: this.t('addAtmWorkflowSchemaButton'),
+        class: 'open-add-atm-workflow-schema-trigger',
+        disabled: !hasManageWorkflowSchemasPrivilege,
+        tip: hasManageWorkflowSchemasPrivilege ?
+          undefined : insufficientPrivilegesMessage({
+            i18n,
+            modelName: 'atmInventory',
+            privilegeFlag: 'atm_inventory_manage_workflow_schemas',
+          }),
+        icon: 'add-filled',
+      };
+    }
+  ),
 
   /**
    * @override

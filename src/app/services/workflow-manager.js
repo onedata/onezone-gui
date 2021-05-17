@@ -181,8 +181,25 @@ export default Service.extend({
    * @param {Object} atmWorkflowSchemaPrototype
    * @returns {Promise<Models.AtmWorkflowSchema>}
    */
-  createAtmWorkflowSchema(atmInventoryId, atmWorkflowSchemaPrototype) {
-    // FIXME: VFS-7597 implement workflow schema creation
-    return resolve(atmWorkflowSchemaPrototype);
+  async createAtmWorkflowSchema(atmInventoryId, atmWorkflowSchemaPrototype) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+
+    const atmWorkflowSchema = await store.createRecord(
+      'atmWorkflowSchema',
+      Object.assign({}, atmWorkflowSchemaPrototype, {
+        _meta: {
+          additionalData: {
+            atmInventoryId,
+          },
+        },
+      })
+    ).save();
+    await recordManager
+      .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
+      .catch(ignoreForbiddenError);
+    return atmWorkflowSchema;
   },
 });
