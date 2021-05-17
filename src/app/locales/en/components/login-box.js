@@ -8,6 +8,4 @@ export default {
   socialBoxList,
   unknownZoneName: 'unknown',
   getZoneNameError: 'Failed to get zone name and version',
-  errorBackToSignIn: 'Back to sign-in',
-  errorTitle: 'Authentication error!',
 };
