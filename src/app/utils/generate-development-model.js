@@ -37,6 +37,7 @@ const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const NUMBER_OF_ATM_INVENTORIES = 3;
 const NUMBER_OF_ATM_LAMBDAS = 5;
+const NUMBER_OF_ATM_WORKFLOW_SCHEMAS = 5;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -284,7 +285,7 @@ export default function generateDevelopmentModel(store) {
                 store, record, 'atmInventory', groups
               ),
               attachAtmLambdasToAtmInventory(store, record),
-              attachWorkflowSchemasToAtmInventory(store, record),
+              attachAtmWorkflowSchemasToAtmInventory(store, record),
             ])
           ))
         )
@@ -941,17 +942,17 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
   });
 }
 
-function attachWorkflowSchemasToAtmInventory(store, atmInventory) {
-  return allFulfilled(_.range(5).map((index) => {
+function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
+  return allFulfilled(_.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map((index) => {
     return store.createRecord('atmWorkflowSchema', {
       name: `Workflow ${index}`,
       description: `Some very complicated workflow #${index}`,
       atmInventory,
     }).save();
-  })).then(workflowSchemas =>
-    createListRecord(store, 'atmWorkflowSchema', workflowSchemas)
+  })).then(atmWorkflowSchemas =>
+    createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas)
   ).then(listRecord => {
-    set(atmInventory, 'workflowSchemaList', listRecord);
+    set(atmInventory, 'atmWorkflowSchemaList', listRecord);
     return atmInventory.save();
   });
 }

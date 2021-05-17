@@ -1,0 +1,17 @@
+<div class="form-group-light search-form-group">
+  <div class="input-group with-icon-addon">
+    {{search-bar search=(action "changeSearchValue") class="form-control"}}
+    <div class="input-group-addon">
+      {{one-icon icon="search"}}
+    </div>
+  </div>
+</div>
+<ul class="list-entries">
+  {{#each sortedCollection as |atmWorkflowSchema|}}
+    {{content-atm-inventories-workflows/atm-workflow-schemas-list-entry
+      atmWorkflowSchema=atmWorkflowSchema
+      onAtmWorkflowSchemaClick=(action onAtmWorkflowSchemaClick atmWorkflowSchema)
+    }}
+  {{/each}}
+</ul>
+{{yield}}

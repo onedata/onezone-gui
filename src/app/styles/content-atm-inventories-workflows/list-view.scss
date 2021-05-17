@@ -1,0 +1,7 @@
+.content-atm-inventories-workflows-list-view {
+  @media (max-width: $screen-xs-max) {
+    .atm-workflow-schemas-list {
+      margin: 0 $padding-base-vertical;
+    }
+  }
+}

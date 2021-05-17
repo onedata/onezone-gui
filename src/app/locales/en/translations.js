@@ -86,7 +86,7 @@ import contentAtmInventoriesEmpty from './components/content-atm-inventories-emp
 import contentAtmInventoriesNew from './components/content-atm-inventories-new';
 import contentAtmInventoriesMembers from './components/content-atm-inventories-members';
 import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
-import contentInventoriesWorkflows from './components/content-inventories-workflows';
+import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
@@ -121,7 +121,6 @@ import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-crea
 import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
-import createLambdaFunctionAction from './utils/workflow-actions/create-lambda-function-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
 import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
@@ -226,7 +225,7 @@ const translations = {
     contentAtmInventoriesNew,
     contentAtmInventoriesMembers,
     contentAtmInventoriesLambdas,
-    contentInventoriesWorkflows,
+    contentAtmInventoriesWorkflows,
     emptyCollectionSidebar,
   },
   services: {
@@ -268,7 +267,6 @@ const translations = {
       createAtmInventoryAction,
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
-      createLambdaFunctionAction,
       createAtmLambdaAction,
       modifyAtmLambdaAction,
       modifyAtmWorkflowSchemaAction,

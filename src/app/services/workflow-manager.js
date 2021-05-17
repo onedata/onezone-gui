@@ -178,11 +178,11 @@ export default Service.extend({
 
   /**
    * @param {String} atmInventoryId
-   * @param {Object} workflowSchemaPrototype
+   * @param {Object} atmWorkflowSchemaPrototype
    * @returns {Promise<Models.AtmWorkflowSchema>}
    */
-  createAtmWorkflowSchema(atmInventoryId, workflowSchemaPrototype) {
+  createAtmWorkflowSchema(atmInventoryId, atmWorkflowSchemaPrototype) {
     // FIXME: VFS-7597 implement workflow schema creation
-    return resolve(workflowSchemaPrototype);
+    return resolve(atmWorkflowSchemaPrototype);
   },
 });

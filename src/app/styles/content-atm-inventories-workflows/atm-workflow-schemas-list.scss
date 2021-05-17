@@ -1,0 +1,52 @@
+.content-atm-inventories-workflows .atm-workflow-schemas-list {
+  .search-form-group {
+    max-width: 50em;
+    margin-bottom: $iconified-block-padding;
+  }
+
+  .list-entries {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .atm-workflow-schemas-list-entry {
+    &.is-editing {
+      cursor: initial !important;
+    }
+  }
+
+  .content-section {
+    display: flex;
+    align-items: flex-start;
+
+    .form {
+      margin: 0;
+      padding: 0;
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .field-view-mode {
+      .control-label {
+        display: none;
+      }
+    }
+
+    .control-label {
+      text-align: left;
+      width: 8em;
+    }
+  }
+
+  .name-field.field-view-mode {
+    @include font-semibold();
+  }
+
+  .fields-group-children.-children > .form-group.field-view-mode:last-child {
+    margin-bottom: 0;
+  }
+
+  .one-menu-toggle {
+    margin-right: -$iconified-block-padding;
+  }
+}

@@ -1,0 +1,62 @@
+<div class="icon-section">
+  {{one-icon icon="lambda"}}
+</div>
+<div class="content-section">
+  {{#content-atm-inventories-workflows/atm-workflow-schema-details-form
+    atmWorkflowSchema=atmWorkflowSchema
+    mode=(if isEditing "edit" "view")
+    isDisabled=isSavingChanges
+    onChange=(action "detailsChanged")
+  }}
+    {{#if isEditing}}
+      {{#one-spin-button
+        class="btn btn-sm btn-success btn-save clickable"
+        action=(action "saveChanges")
+        disabled=(not areChangesValid)
+      }}
+        {{tt this "saveBtn"}}
+      {{/one-spin-button}}
+      {{!-- adding space as HTML entity, because template compiler removes spaces
+        from between buttons --}}
+      &#32;
+      {{#bs-button
+        size="sm"
+        type="default"
+        class="btn-cancel clickable"
+        onClick=(action "cancelChanges")
+      }}
+        {{tt this "cancelBtn"}}
+      {{/bs-button}}
+    {{/if}}
+  {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
+  {{one-menu-toggle
+    class=(concat-classes
+      "workflow-actions-trigger clickable"
+      (concat "actions-trigger-" elementId)
+      (if areActionsOpened "active")
+    )
+    click=(action "toggleActionsOpen" (not areActionsOpened))
+  }}
+  {{#render-later triggerRender=areActionsOpened}}
+    {{#one-webui-popover
+      class="workflow-actions"
+      padding=false
+      popoverStyle="with-dropdown"
+      triggerSelector=(concat ".actions-trigger-" elementId)
+      open=areActionsOpened
+      onToggle=(action "toggleActionsOpen")
+      as |popover|
+    }}
+      {{#click-outside
+        action=(action "toggleActionsOpen" false)
+        except-selector=(concat ".actions-trigger-" elementId)
+      }}
+        {{actions-popover-content
+          actionsArray=workflowActionsArray
+          actionClicked=(action "toggleActionsOpen" false)
+        }}
+      {{/click-outside}}
+    {{/one-webui-popover}}
+  {{/render-later}}
+</div>
+{{yield}}
