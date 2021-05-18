@@ -46,6 +46,14 @@
     margin-bottom: 0;
   }
 
+  .footer-buttons {
+    float: none;
+    text-align: left;
+    .btn {
+      margin-left: $padding-small-horizontal;
+    }
+  }
+
   .one-menu-toggle {
     margin-right: -$iconified-block-padding;
   }

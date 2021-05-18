@@ -9,24 +9,23 @@
     onChange=(action "detailsChanged")
   }}
     {{#if isEditing}}
-      {{#one-spin-button
-        class="btn btn-sm btn-success btn-save clickable"
-        action=(action "saveChanges")
-        disabled=(not areChangesValid)
-      }}
-        {{tt this "saveBtn"}}
-      {{/one-spin-button}}
-      {{!-- adding space as HTML entity, because template compiler removes spaces
-        from between buttons --}}
-      &#32;
-      {{#bs-button
-        size="sm"
-        type="default"
-        class="btn-cancel clickable"
-        onClick=(action "cancelChanges")
-      }}
-        {{tt this "cancelBtn"}}
-      {{/bs-button}}
+      <div class="btn-toolbar footer-buttons">
+        {{#one-spin-button
+          class="btn btn-sm btn-success btn-save clickable"
+          action=(action "saveChanges")
+          disabled=(not areChangesValid)
+        }}
+          {{tt this "saveBtn"}}
+        {{/one-spin-button}}
+        {{#bs-button
+          size="sm"
+          type="default"
+          class="btn-cancel clickable"
+          onClick=(action "cancelChanges")
+        }}
+          {{tt this "cancelBtn"}}
+        {{/bs-button}}
+      </div>
     {{/if}}
   {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
   {{one-menu-toggle
