@@ -34,6 +34,9 @@ describe('Integration | Component | content atm inventories workflows', function
           description: 'w0 description',
         }])),
       })),
+      privileges: {
+        manageWorkflowSchemas: true,
+      },
     };
     this.setProperties({
       atmInventory,

@@ -69,9 +69,9 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
-  addNewLambdaAction: computed(
+  addNewAtmLambdaAction: computed(
     'hasManageLambdasPrivilege',
-    function addNewLambdaAction() {
+    function addNewAtmLambdaAction() {
       const {
         hasManageLambdasPrivilege,
         i18n,
@@ -95,7 +95,7 @@ export default Component.extend(I18n, {
    * @override
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  globalActions: collect('addNewLambdaAction'),
+  globalActions: collect('addNewAtmLambdaAction'),
 
   init() {
     this._super(...arguments);

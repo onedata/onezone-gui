@@ -119,9 +119,6 @@ export default class RecordManagerConfiguration {
         }
         const atmInventory = record.belongsTo('atmInventory').value();
         if (atmInventory) {
-          // FIXME: VFS-7597 to check: Attempted to handle event `loadingData`
-          // while in state root.deleted.saved. - Don't know if it is due to some
-          // mock bugs or is a general issue
           await this.recordManager.reloadRecordList(atmInventory, modelName);
         }
         break;

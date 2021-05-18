@@ -13,15 +13,7 @@
     flex-grow: 1;
   }
 
-  @media (min-width: $screen-md-min) {
-    .one-carousel-slide > * {
-      padding: $content-col-padding;
-    }
-  }
-
-  @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
-    .one-carousel-slide > * {
-      padding: $padding-large-horizontal;
-    }
+  .one-carousel-slide > * {
+    @include col-content-padding();
   }
 }

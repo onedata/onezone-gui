@@ -96,7 +96,7 @@ describe(
         expect(removeRecordStub).to.be.calledWith(this.get('atmWorkflowSchema'));
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The workflow has been sucessfully removed.'
+          'The workflow has been removed sucessfully.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
       }

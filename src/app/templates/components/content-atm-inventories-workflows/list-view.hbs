@@ -4,12 +4,39 @@
     {{actions-toolbar isMinimized=false actionsArray=globalActions}}
   </h1>
 </div>
-<div class="row content-row">
-  {{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
-    {{content-atm-inventories-workflows/atm-workflow-schemas-list
-      collection=atmWorkflowSchemasProxy.content
-      onAtmWorkflowSchemaClick=onOpenAtmWorkflowSchema
+{{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
+  {{#if atmWorkflowSchemasProxy.content.length}}
+    <div class="row content-row">
+      {{content-atm-inventories-workflows/atm-workflow-schemas-list
+        collection=atmWorkflowSchemasProxy.content
+        onAtmWorkflowSchemaClick=onOpenAtmWorkflowSchema
+      }}
+    </div>
+  {{else}}
+    {{#content-info
+      class="scroll-breakpoint-500"
+      header=(tt this "noWorkflowsHeader")
+      text=(tt this "noWorkflowsText")
     }}
-  {{/promise-proxy-container}}
-</div>
+      {{#bs-button
+        type="primary"
+        size="lg"
+        class=(concat-classes
+          addNewAtmWorkflowSchemaAction.class
+          (if addNewAtmWorkflowSchemaAction.disabled "disabled")
+        )
+        onClick=(if
+          addNewAtmWorkflowSchemaAction.disabled
+          (no-action)
+          addNewAtmWorkflowSchemaAction.action
+        )
+      }}
+        {{addNewAtmWorkflowSchemaAction.title}}
+        {{#if addNewAtmWorkflowSchemaAction.tip}}
+          {{one-tooltip title=addNewAtmWorkflowSchemaAction.tip}}
+        {{/if}}
+      {{/bs-button}}
+    {{/content-info}}
+  {{/if}}
+{{/promise-proxy-container}}
 {{yield}}

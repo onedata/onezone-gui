@@ -4,12 +4,38 @@
     {{actions-toolbar isMinimized=false actionsArray=globalActions}}
   </h1>
 </div>
-<div class="row content-row">
-  {{#promise-proxy-container proxy=atmLambdasProxy}}
-    {{content-atm-inventories-lambdas/atm-lambdas-list
-      collection=atmLambdasProxy.content
+{{#promise-proxy-container proxy=atmLambdasProxy}}
+  {{#if atmLambdasProxy.content.length}}
+    <div class="row content-row">
+      {{content-atm-inventories-lambdas/atm-lambdas-list
+        collection=atmLambdasProxy.content
+      }}
+    </div>
+  {{else}}
+    {{#content-info
+      class="scroll-breakpoint-500"
+      header=(tt this "noLambdasHeader")
+      text=(tt this "noLambdasText")
     }}
-  {{/promise-proxy-container}}
-  {{!-- TODO: VFS-7597 add content info about no lambda --}}
-</div>
+      {{#bs-button
+        type="primary"
+        size="lg"
+        class=(concat-classes
+          addNewAtmLambdaAction.class
+          (if addNewAtmLambdaAction.disabled "disabled")
+        )
+        onClick=(if
+          addNewAtmLambdaAction.disabled
+          (no-action)
+          addNewAtmLambdaAction.action
+        )
+      }}
+        {{addNewAtmLambdaAction.title}}
+        {{#if addNewAtmLambdaAction.tip}}
+          {{one-tooltip title=addNewAtmLambdaAction.tip}}
+        {{/if}}
+      {{/bs-button}}
+    {{/content-info}}
+  {{/if}}
+{{/promise-proxy-container}}
 {{yield}}

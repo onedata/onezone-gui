@@ -1,3 +1,17 @@
+.content-atm-inventories-lambdas {
+  @include min-size-as-full-col-content();
+  display: flex;
+  flex-direction: column;
+
+  .one-carousel {
+    flex-grow: 1;
+  }
+
+  .one-carousel-slide > * {
+    @include col-content-padding();
+  }
+}
+
 @import './content-atm-inventories-lambdas/atm-lambdas-list';
 @import './content-atm-inventories-lambdas/list-view';
 @import './content-atm-inventories-lambdas/atm-lambda-form';

@@ -1,4 +1,17 @@
 .content-atm-inventories-lambdas-list-view {
+  @include min-size-as-full-col-content($preserve-padding: true);
+  display: flex;
+  flex-direction: column;
+
+  .content-info {
+    flex-grow: 1;
+    position: relative;
+  }
+
+  .content-info .row-yield {
+    text-align: center;
+  }
+
   @media (max-width: $screen-xs-max) {
     .atm-lambdas-list {
       margin: 0 $padding-base-vertical;

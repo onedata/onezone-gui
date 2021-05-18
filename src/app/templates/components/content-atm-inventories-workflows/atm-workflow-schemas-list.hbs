@@ -12,6 +12,10 @@
       atmWorkflowSchema=atmWorkflowSchema
       onAtmWorkflowSchemaClick=(action onAtmWorkflowSchemaClick atmWorkflowSchema)
     }}
+  {{else}}
+    {{#if searchValue}}
+      <p>{{tt this "noMatchingResults"}}</p>
+    {{/if}}
   {{/each}}
 </ul>
 {{yield}}

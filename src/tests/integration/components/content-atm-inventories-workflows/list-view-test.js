@@ -27,6 +27,9 @@ describe('Integration | Component | content atm inventories workflows/list view'
               description: 'w0 description',
             }])),
           })),
+          privileges: {
+            manageWorkflowSchemas: true,
+          },
         },
         addFunctionSpy: sinon.spy(),
       });
