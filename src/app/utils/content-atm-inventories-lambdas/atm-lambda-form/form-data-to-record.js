@@ -8,7 +8,7 @@
  */
 
 import { get, getProperties } from '@ember/object';
-import { typeToDataSpec } from './data-spec-converters';
+import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
 /**
  * @param {Object} formData

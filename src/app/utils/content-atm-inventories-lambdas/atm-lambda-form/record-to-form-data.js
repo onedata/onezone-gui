@@ -8,7 +8,7 @@
  */
 
 import { getProperties } from '@ember/object';
-import { dataSpecToType } from './data-spec-converters';
+import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
 /**
  * @param {Models.AtmLambda} record
