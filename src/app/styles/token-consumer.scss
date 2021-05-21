@@ -165,4 +165,14 @@
       padding-top: 2 * $padding-base-vertical;
     }
   }
+  .id-trigger {
+    font-size: 150%;
+    color: $color-one-light-gray;
+    vertical-align: text-bottom;
+  }
+
+  .subject-description {
+    display: flex;
+    padding-left: 5px;
+  }
 }
