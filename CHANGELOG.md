@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7561 Changed "Space > Data" tab name to "Files"
 * VFS-7663 Changed login background image
 * VFS-7514 Added displaying IDs in token consumer
 * VFS-7319 Added warning when signing-in using IP address
