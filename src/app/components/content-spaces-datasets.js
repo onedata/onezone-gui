@@ -31,6 +31,8 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.contentSpacesDatasets',
 
+  datasetDataMapping: Object.freeze({}),
+
   /**
    * @type {string}
    */
@@ -66,16 +68,26 @@ export default Component.extend(I18n, {
 
   datasetProxy: promise.object('datasetDeferred.promise'),
 
+  dataset: reads('datasetProxy.content'),
+
   /**
    * @type {ComputedProperty<String>}
    */
   backToDatasetsOptions: computed(
     'navigationState.aspectOptions',
-    function blankShareIdOptions() {
-      const options = this.get('navigationState').mergedAspectOptions({
+    'dataset.{entityId,rootDir,rootFileType}',
+    function backToDatasetsOptions() {
+      const dataset = this.get('dataset');
+      const options = {
         viewMode: 'datasets',
-      });
-      return serializeAspectOptions(options);
+        archive: null,
+        dir: null,
+      };
+      if (dataset && get(dataset, 'rootFileType') === 'dir') {
+        options.dataset = get(dataset, 'parentId') || null;
+      }
+      const mergedOptions = this.get('navigationState').mergedAspectOptions(options);
+      return serializeAspectOptions(mergedOptions);
     }
   ),
 
