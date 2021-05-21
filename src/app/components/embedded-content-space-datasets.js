@@ -11,8 +11,8 @@ import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-emb
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
+import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -31,12 +31,23 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   spaceId: undefined,
 
   /**
-   * Entity ID of dataset currently opened in datasets browser.
-   * 
+   * @virtual
+   * @type {(dataset: Dataset) => any}
+   */
+  onUpdateDatasetData: notImplementedWarn,
+
+  /**
    * **Injected to embedded iframe.**
+   * @virtual
    * @type {string}
    */
-  datasetId: reads('navigationState.aspectOptions.dataset'),
+  datasetId: undefined,
+
+  /**
+   * @virtual
+   * @type {String}
+   */
+  viewMode: undefined,
 
   /**
    * Dataset state tree to show. One of: attached, detached.
@@ -53,9 +64,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selectedDatasetsIds: computed('navigationState.aspectOptions.selectedDatasetsIds.[]', {
+  selectedIds: computed('navigationState.aspectOptions.selectedIds.[]', {
     get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selectedDatasetsIds');
+      const rawSelected = this.get('navigationState.aspectOptions.selectedIds');
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
@@ -78,8 +89,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   iframeInjectedProperties: Object.freeze([
     'spaceId',
     'datasetId',
-    'selectedDatasetsIds',
+    'selectedIds',
     'attachmentState',
+    'viewMode',
   ]),
 
   /**
@@ -87,7 +99,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   callParentActionNames: Object.freeze([
     'updateDatasetId',
-    'updateSelectedDatasetsIds',
+    'updateSelectedIds',
+    'updateViewMode',
+    'updateDatasetData',
     'getDataUrl',
     'getDatasetsUrl',
   ]),
@@ -101,10 +115,24 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         selected: null,
       });
     },
-    updateSelectedDatasetsIds(selected) {
+    updateSelectedIds(selected) {
       this.get('navigationState').setAspectOptions({
         selected,
       });
+    },
+    updateViewMode(viewMode) {
+      this.get('navigationState').setAspectOptions({
+        viewMode,
+      });
+    },
+    /**
+     * Sets value of dataset property.
+     * Due to lack of dataset model in Onezone it is provided by Oneprovider
+     * in an iframe.
+     * @param {Object} dataset 
+     */
+    updateDatasetData(dataset) {
+      this.get('onUpdateDatasetData')(dataset);
     },
     /**
      * @param {Object} options

@@ -6,41 +6,71 @@
   as |container|
 }}
   {{#container.header class="content-spaces-datasets-header"}}
-    <h1>
-      <span class="one-label">{{tt this "header"}}</span>
-    </h1>
-    {{#bs-button-group
-      value=effAttachmentState
-      class="datasets-state-selector"
-      type="radio"
-      onChange=(action "attachmentStateChanged") as |bg|
-    }}
-      <div class="btn-group" role="group">
-        {{#bg.button
-          type="default"
-          class="btn-sm select-attached-datasets-btn"
-          value="attached"
-        }}
-          {{tt this "attached"}}
-        {{/bg.button}}
-      </div>
-      <div class="btn-group" role="group">
-        {{#bg.button
-          type="default"
-          class="btn-sm btn-effecitve"
-          value="detached"
-        }}
-          {{tt this "detached"}}
-        {{/bg.button}}
-      </div>
-    {{/bs-button-group}}
+    {{#if (eq viewMode "archives")}}
+      {{#promise-proxy-container
+        proxy=datasetProxy
+        centered=false
+        sizeClass="sm"
+      }}
+        <h1 class="normal-case with-back with-menu">
+          <span class="one-label">
+            {{#truncated-string}}
+              {{#link-to (query-params options=backToDatasetsOptions) class="content-back-link"}}
+                {{one-icon icon="browser-dataset" class="content-back-resource-icon"}}
+                {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+              {{/link-to}}
+              <span class="dataset-name resource-name">
+                {{name-conflict
+                  item=datasetProxy.content
+                  conflictLabel=datasetProxy.content.rootFilePath
+                  tagName="span"
+                  class="one-label"
+                }}
+              </span>
+            {{/truncated-string}}
+          </span>
+        </h1>
+      {{/promise-proxy-container}}
+    {{else}}
+      <h1>
+        <span class="one-label">{{tt this "header"}}</span>
+      </h1>
+      {{#bs-button-group
+        value=effAttachmentState
+        class="datasets-state-selector"
+        type="radio"
+        onChange=(action "attachmentStateChanged") as |bg|
+      }}
+        <div class="btn-group" role="group">
+          {{#bg.button
+            type="default"
+            class="btn-sm select-attached-datasets-btn"
+            value="attached"
+          }}
+            {{tt this "attached"}}
+          {{/bg.button}}
+        </div>
+        <div class="btn-group" role="group">
+          {{#bg.button
+            type="default"
+            class="btn-sm btn-effecitve"
+            value="detached"
+          }}
+            {{tt this "detached"}}
+          {{/bg.button}}
+        </div>
+      {{/bs-button-group}}
+    {{/if}}
   {{/container.header}}
   {{#container.body}}
     {{embedded-content-space-datasets
       oneprovider=container.selectedProvider
       baseUrl=container.contentIframeBaseUrl
       spaceId=space.entityId
+      datasetId=datasetId
       attachmentState=effAttachmentState
+      viewMode=viewMode
+      onUpdateDatasetData=(action "updateDatasetData")
     }}
   {{/container.body}}
 {{/oneprovider-view-container}}
