@@ -14,6 +14,7 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import { or, raw, promise } from 'ember-awesome-macros';
 import { defer } from 'rsvp';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Component.extend(I18n, {
   classNames: [
@@ -63,6 +64,19 @@ export default Component.extend(I18n, {
   }),
 
   datasetProxy: promise.object('datasetDeferred.promise'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  backToDatasetsOptions: computed(
+    'navigationState.aspectOptions',
+    function blankShareIdOptions() {
+      const options = this.get('navigationState').mergedAspectOptions({
+        viewMode: 'datasets',
+      });
+      return serializeAspectOptions(options);
+    }
+  ),
 
   effAttachmentState: computed('attachmentState', function effAttachmentState() {
     const attachmentState = this.get('attachmentState');
