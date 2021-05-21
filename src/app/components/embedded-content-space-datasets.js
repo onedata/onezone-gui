@@ -86,7 +86,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     function blankShareIdOptions() {
       const options = this.get('navigationState').mergedAspectOptions({
         viewMode: 'datasets',
-        // FIXME: it will land inside dataset, not in parent with dataset select
       });
       return serializeAspectOptions(options);
     }

@@ -79,7 +79,6 @@ export default Component.extend(I18n, {
         datasetDataMapping,
       } = this.getProperties('datasetId', 'datasetDeferred', 'datasetDataMapping');
       const datasetData = datasetDataMapping[datasetId];
-      console.log('FIXME: try to resolve', datasetId, datasetData);
       if (datasetData) {
         datasetDeferred.resolve(datasetData);
       }
@@ -108,10 +107,6 @@ export default Component.extend(I18n, {
     },
     updateDatasetData(dataset) {
       const receivedDatasetId = dataset && get(dataset, 'entityId');
-      // const {
-      //   datasetId,
-      //   datasetDeferred,
-      // } = this.getProperties('datasetId', 'datasetDeferred');
       this.set(
         'datasetDataMapping',
         Object.assign({},
@@ -120,26 +115,6 @@ export default Component.extend(I18n, {
           },
         )
       );
-      console.log('FIXME: current mapping', this.get('datasetDataMapping'));
-
-      // this.get('datasetDeferred').resolve(dataset);
-      // FIXME: add cache-object mapping datasetId -> dataset data
-      // and resolve deferred only if currently opened datasetId matches some data
-      // const receivedDatasetId = dataset && get(dataset, 'entityId');
-      // const {
-      //   datasetId,
-      //   datasetDeferred,
-      // } = this.getProperties('datasetId', 'datasetDeferred');
-      // if (receivedDatasetId && receivedDatasetId === datasetId) {
-      //   datasetDeferred.resolve(dataset);
-      //   console.debug(
-      //     `component:embeddedContentSpaceDatasets#updateDatasetData: updated with "${get(dataset, 'name')}"`
-      //   );
-      // } else {
-      //   console.warn(
-      //     `component:embeddedContentSpaceDatasets#updateDatasetData: tried to resolve dataset record for id "${datasetId}" with record received from iframe with id "${receivedDatasetId}"`
-      //   );
-      // }
     },
   },
 });
