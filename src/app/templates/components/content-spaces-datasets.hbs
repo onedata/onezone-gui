@@ -6,7 +6,7 @@
   as |container|
 }}
   {{#container.header class="content-spaces-datasets-header"}}
-    {{#if (eq viewMode "archives")}}
+    {{#if showOpenedDatasetHeader}}
       {{#promise-proxy-container
         proxy=datasetProxy
         centered=false

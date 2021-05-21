@@ -11,6 +11,7 @@ import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-emb
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
@@ -58,6 +59,18 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   attachmentState: undefined,
 
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  archiveId: reads('navigationState.aspectOptions.archive'),
+
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  dirId: reads('navigationState.aspectOptions.dir'),
+
   // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of dataset entity ids that are selected
@@ -104,6 +117,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   iframeInjectedProperties: Object.freeze([
     'spaceId',
     'datasetId',
+    'archiveId',
+    'dirId',
     'selectedIds',
     'attachmentState',
     'viewMode',
@@ -114,6 +129,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   callParentActionNames: Object.freeze([
     'updateDatasetId',
+    'updateArchiveId',
+    'updateDirId',
     'updateSelectedIds',
     'updateViewMode',
     'updateDatasetData',
@@ -127,6 +144,18 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     updateDatasetId(datasetId) {
       this.get('navigationState').setAspectOptions({
         dataset: datasetId,
+        selected: null,
+      });
+    },
+    updateArchiveId(archiveId) {
+      this.get('navigationState').setAspectOptions({
+        archive: archiveId,
+        selected: null,
+      });
+    },
+    updateDirId(dirId) {
+      this.get('navigationState').setAspectOptions({
+        dir: dirId,
         selected: null,
       });
     },

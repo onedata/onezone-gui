@@ -12,7 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { or, raw, promise } from 'ember-awesome-macros';
+import { or, raw, promise, notEqual } from 'ember-awesome-macros';
 import { defer } from 'rsvp';
 
 export default Component.extend(I18n, {
@@ -54,6 +54,7 @@ export default Component.extend(I18n, {
    * - datasets: default, browse datasets; if `datasetId` is provided, open dataset
    *     children listing of this dataset if available
    * - archives: browse list of archives of a single dataset; `datasetId` is required
+   * - files: browse filesystem of archive
    * @type {ComputedProperty<String>}
    */
   viewMode: or('navigationState.aspectOptions.viewMode', raw('datasets')),
@@ -68,6 +69,8 @@ export default Component.extend(I18n, {
     const attachmentState = this.get('attachmentState');
     return this.isValidAttachmentState(attachmentState) ? attachmentState : 'attached';
   }),
+
+  showOpenedDatasetHeader: notEqual('viewMode', raw('datasets')),
 
   tryToResolveDataset: observer(
     'datasetDeferred',
