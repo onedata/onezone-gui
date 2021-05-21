@@ -21,10 +21,22 @@
     {{/bs-tab}}
   </div>
 {{else}}
-  {{content-info
+  {{#content-info
     class="scroll-breakpoint-600"
     header=(tt this "requireAddSupportHeader")
     imagePath=(root-url "assets/images/no-view.svg")
-    text=(tt this "requireAddSupportText")
   }}
+    <p class="lead">
+      {{tt this "requireAddSupportText"}}
+      {{#link-to 
+        "onedata.sidebar.content.aspect" 
+        "spaces" 
+        (model-routable-id space) 
+        "members"
+      }}
+        {{tt this "privilegeManagement"}}
+      {{/link-to}}
+      
+    </p>
+  {{/content-info}}
 {{/if}}
