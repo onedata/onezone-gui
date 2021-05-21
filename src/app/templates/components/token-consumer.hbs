@@ -40,23 +40,45 @@
             triggerEvent="hover"
           }}
         {{/if}}
+        {{#if media.isMobile}}
+          {{id-info
+            idType=inviteTargetModelName
+            idValue=inviteTargetId
+          }}
+        {{/if}}
       </p>
       {{#unless (or media.isMobile noJoinMessage)}}
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
             <img class="subject-image" src={{root-url invitedModelImagePath}}>
             <figcaption class="subject-image-label">
-              {{#truncated-string class="text"}}
-                {{#if joiningRecordSelectorModelName}}
-                  {{#if selectedJoiningRecordOption}} 
-                    <span class="subject-name">{{selectedJoiningRecordOption.label}}</span>
-                  {{else}}
-                    <span class="select-below-label">{{tt this "placeholderUnderSubjectImage"}}</span>
-                  {{/if}}
+              {{#if joiningRecordSelectorModelName}}
+                {{#if selectedJoiningRecordOption}}
+                  <div class="subject-description">
+                    {{#truncated-string class="text subject-name"}}
+                      {{selectedJoiningRecordOption.label}}
+                    {{/truncated-string}}
+                    {{id-info
+                      idType=joiningModelName
+                      idValue=joiningId
+                    }}
+                  </div>
                 {{else}}
-                  <span class="subject-name">{{record-name record=currentUser}}</span>
+                  {{#truncated-string class="text select-below-label"}}
+                    {{tt this "placeholderUnderSubjectImage"}}
+                  {{/truncated-string}}
                 {{/if}}
-              {{/truncated-string}}
+              {{else}}
+                <div class="subject-description">
+                  {{#truncated-string class="text subject-name"}}
+                    {{record-name record=currentUser}}
+                  {{/truncated-string}}
+                  {{id-info
+                    idType=joiningModelName
+                    idValue=currentUser.entityId
+                  }}
+                </div>
+              {{/if}}
             </figcaption>
           </figure>
           <figure class="join-arrow-image">
@@ -72,9 +94,15 @@
           <figure class="invite-target-image">
             <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
             <figcaption class="subject-image-label subject-name">
-              {{#truncated-string class="text"}}
-                {{inviteTargetName}}
-              {{/truncated-string}}
+              <div class="subject-description">
+                {{#truncated-string class="text"}}
+                  {{inviteTargetName}}
+                {{/truncated-string}}
+                {{id-info
+                  idType=inviteTargetModelName
+                  idValue=inviteTargetId
+                }}
+              </div>
             </figcaption>
           </figure>
         </figure>
@@ -95,7 +123,6 @@
             options=joiningRecordSelectorOptionsProxy
             onchange=(action (mut selectedJoiningRecordOption))
             selected=selectedJoiningRecordOption
-            renderInPlace=true
             placeholder=(tt this
               (concat "recordSelectorPlaceholder." joiningRecordSelectorModelName)
             )
