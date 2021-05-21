@@ -186,6 +186,23 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
+  inviteTargetId: computed('type', function inviteTargetId() {
+    const inviteTypeSpec = this.get('inviteTypeSpec');
+    if (inviteTypeSpec) {
+      return this.get(`type.inviteToken.${inviteTypeSpec.modelName}Id`);
+    }
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  joiningId: computed('selectedJoiningRecordOption', function joiningId() {
+    return this.get('selectedJoiningRecordOption.value.entityId');
+  }),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
   invitedModelImagePath: getBy(raw(recordImages), 'joiningModelName'),
 
   /**

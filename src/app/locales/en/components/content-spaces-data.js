@@ -1,3 +1,3 @@
 export default {
-  header: 'data',
+  header: 'files',
 };

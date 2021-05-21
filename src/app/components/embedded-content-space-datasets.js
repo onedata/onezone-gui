@@ -14,7 +14,6 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -90,20 +89,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       return value;
     },
   }),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  backToDatasetsOptions: computed(
-    'navigationState.aspectOptions',
-    function blankShareIdOptions() {
-      const options = this.get('navigationState').mergedAspectOptions({
-        viewMode: 'datasets',
-        // FIXME: it will land inside dataset, not in parent with dataset select
-      });
-      return serializeAspectOptions(options);
-    }
-  ),
 
   /**
    * @override implements OneEmbeddedContainer
