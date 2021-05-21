@@ -75,7 +75,8 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
     'space.currentUserEffPrivileges',
     function hasPrivilegeToAddSupport() {
       return this.get('space.currentUserEffPrivileges').includes('space_add_support');
-    }),
+    }
+  ),
 
   /**
    * @type {Ember.ComputedProperty<AspectAction>}

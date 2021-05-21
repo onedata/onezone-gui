@@ -61,6 +61,13 @@ export default Component.extend(
      */
     providersProxy: reads('space.providerList.list'),
 
+    hasPrivilegeToAddSupport: computed(
+      'space.currentUserEffPrivileges',
+      function hasPrivilegeToAddSupport() {
+        return this.get('space.currentUserEffPrivileges').includes('space_add_support');
+      }
+    ),
+
     /**
      * @type {ComputedProperty<Models.Provider>}
      */
