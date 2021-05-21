@@ -1,22 +1,30 @@
-<div class="row content-row header-row hidden-xs">
-  <h1>
-    <span class="one-label">
-      {{tt this "header"}}
-    </span>
-  </h1>
-</div>
+{{#if isPrivileged}}
+  <div class="row content-row header-row hidden-xs">
+    <h1>
+      <span class="one-label">
+        {{tt this "header"}}
+      </span>
+    </h1>
+  </div>
 
-<div class="row content-row">
-  {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
-    {{#tab.pane title=(tt this "requestSupport.tabName")}}
-      {{content-spaces-support/request-support space=space}}
-    {{/tab.pane}}
-    {{#tab.pane title=(tt this "deployProvider.tabName")}}
-      {{content-spaces-support/deploy-provider space=space}}
-    {{/tab.pane}}
-    {{#tab.pane title=(tt this "exposeData.tabName")}}
-      {{content-spaces-support/expose-data space=space}}
-    {{/tab.pane}}
-  {{/bs-tab}}
-</div>
-
+  <div class="row content-row">
+    {{#bs-tab class="only-tab-bar bs-tab-onedata bs-tab-modern" as |tab|}}
+      {{#tab.pane title=(tt this "requestSupport.tabName")}}
+        {{content-spaces-support/request-support space=space}}
+      {{/tab.pane}}
+      {{#tab.pane title=(tt this "deployProvider.tabName")}}
+        {{content-spaces-support/deploy-provider space=space}}
+      {{/tab.pane}}
+      {{#tab.pane title=(tt this "exposeData.tabName")}}
+        {{content-spaces-support/expose-data space=space}}
+      {{/tab.pane}}
+    {{/bs-tab}}
+  </div>
+{{else}}
+  {{content-info
+    class="scroll-breakpoint-600"
+    header=(tt this "requireAddSupportHeader")
+    imagePath=(root-url "assets/images/no-view.svg")
+    text=(tt this "requireAddSupportText")
+  }}
+{{/if}}

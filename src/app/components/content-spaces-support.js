@@ -9,6 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { computed } from '@ember/object';
 
 export default Component.extend(I18n, {
   i18nPrefix: 'components.contentSpacesSupport',
@@ -17,4 +18,10 @@ export default Component.extend(I18n, {
    * @type {models/Space}
    */
   space: undefined,
+
+  isPrivileged: computed('space', function isPrivileged() {
+    const currentUserEffPrivileges = this.get('space.currentUserEffPrivileges');
+    return currentUserEffPrivileges.includes('space_add_support');
+  }),
+
 });

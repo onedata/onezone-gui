@@ -71,16 +71,25 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
       }
     }),
 
+  hasPrivilegeToAddSupport: computed(
+    'space.currentUserEffPrivileges',
+    function hasPrivilegeToAddSupport() {
+      return this.get('space.currentUserEffPrivileges').includes('space_add_support');
+    }),
+
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
   openAddStorageAction: computed(function () {
+    const disabled = !this.get('hasPrivilegeToAddSupport');
     return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
       class: 'open-add-storage',
       buttonStyle: 'default',
       icon: 'provider-add',
+      disabled,
+      tip: disabled ? this.t('requireAddSupportTip') : null,
     };
   }),
 
@@ -90,11 +99,14 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
 
   ceaseOneproviderSupportAction: computed(
     function ceaseOneproviderSupportAction() {
+      const isDisabled = !this.get('space.currentUserEffPrivileges').includes('space_remove_support');
       return {
         icon: 'leave-space',
         text: this.t('ceaseSupportItem'),
         class: 'cease-oneprovider-support-btn',
         action: (provider) => this.openCeaseModal(provider),
+        isDisabled,
+        tip: isDisabled ? this.t('requireRemoveSupportTip') : null,
       };
     }
   ),
