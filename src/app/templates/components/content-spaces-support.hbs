@@ -26,8 +26,11 @@
     header=(tt this "requireAddSupportHeader")
     imagePath=(root-url "assets/images/no-view.svg")
   }}
-    <p class="lead">
+    <p class="lead insufficient-privileges">
       {{tt this "requireAddSupportText"}}
+    </p>
+    <p class="lead insufficient-privileges">
+      {{tt this "navigateTo"}}
       {{#link-to 
         "onedata.sidebar.content.aspect" 
         "spaces" 
@@ -36,7 +39,6 @@
       }}
         {{tt this "privilegeManagement"}}
       {{/link-to}}
-      
     </p>
   {{/content-info}}
 {{/if}}

@@ -1,8 +1,23 @@
-{{content-info
-  header=(tt this "header")
-  text=(tt this "text")
-  imagePath=(root-url "assets/images/space-get-support.svg")
-  buttonLabel=(tt this "addStorage")
-  class="no-support scroll-breakpoint-600"
-  buttonAction=(action "openAddStorage")
+{{#content-info
+    class="scroll-breakpoint-600"
+    header=(tt this "header")
+    text=(tt this "text")
 }}
+  <p class="lead">
+    <ul class="info">
+      <li>
+        {{tt this "addSupport1"}}
+        <div class="inline-icon-container">
+          {{one-icon icon="provider-add" class="provider-add-icon"}}
+        </div>
+        {{#link-to "onedata.sidebar.content.aspect" "support" class="btn-add-support"}}
+          {{tt this "addSupportLink"}}
+        {{/link-to}}
+        {{tt this "addSupport2"}}
+      </li>
+      <li>
+        {{tt this "contactUser"}}
+      </li>
+    </ul>  
+  </p>
+{{/content-info}}

@@ -29,5 +29,4 @@ export default Component.extend(I18n, {
       return currentUserEffPrivileges.includes('space_add_support');
     }
   ),
-
 });

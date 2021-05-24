@@ -89,7 +89,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
     return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
-      class: 'open-add-storage',
+      class: 'open-add-storage btn-add-support',
       buttonStyle: 'default',
       icon: 'provider-add',
       disabled,

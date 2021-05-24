@@ -25,6 +25,7 @@ export default {
     distributionsSupported: 'The following Linux distributions are officially supported. Hovewer, since the deployment is Docker-based, it is likely to work on other systems.',
   },
   requireAddSupportHeader: 'Insufficient privileges',
-  requireAddSupportText: 'Requires "Add support" privilege in the space. Go to ',
+  requireAddSupportText: 'Requires "Add support" privilege in the space.',
+  navigateTo: 'Navigate to ',
   privilegeManagement: 'privilege management.',
 };
