@@ -275,6 +275,15 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   }),
 
+  /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasAddSupportPrivilege: computed(
+    'space.currentUserEffPrivileges',
+    function hasAddSupportPrivilege() {
+      return this.get('space.currentUserEffPrivileges').includes('space_add_support');
+    }),
+
   init() {
     this._super(...arguments);
     this.get('initialProvidersListProxy').then(list => {

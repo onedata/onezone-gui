@@ -33,11 +33,11 @@
         aspect=(if isSupported "providers" "support")
         footerText=(if isSupported (tt this "addSupport"))
         footerTextIcon=(if isSupported "provider-add")
-        footerLinkToParams=(if (and isSupported hasPrivilegeToAddSupport)
+        footerLinkToParams=(if (and isSupported hasAddSupportPrivilege)
           (array "onedata.sidebar.content.aspect" "spaces" spaceId "support")
         )
-        tooltipText=(tt this "requireAddSupportTip")
-        footerClass="not-allowed"
+        tooltipText=(if (not hasAddSupportPrivilege) (tt this "requireAddSupportTip"))
+        footerClass=(if (not hasAddSupportPrivilege) "not-allowed")
       }}
         {{#loading-container
           isLoading=(not (or space.providerList.isLoaded space.providerList.list.isFulfilled))

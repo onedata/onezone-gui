@@ -19,9 +19,15 @@ export default Component.extend(I18n, {
    */
   space: undefined,
 
-  isPrivileged: computed('space', function isPrivileged() {
-    const currentUserEffPrivileges = this.get('space.currentUserEffPrivileges');
-    return currentUserEffPrivileges.includes('space_add_support');
-  }),
+  /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasAddSupportPrivilege: computed(
+    'space.currentUserEffPrivileges',
+    function hasAddSupportPrivilege() {
+      const currentUserEffPrivileges = this.get('space.currentUserEffPrivileges');
+      return currentUserEffPrivileges.includes('space_add_support');
+    }
+  ),
 
 });
