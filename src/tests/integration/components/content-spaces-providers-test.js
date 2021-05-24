@@ -34,6 +34,7 @@ describe('Integration | Component | content spaces providers', function () {
         p2: 1048576,
         p3: 1048576,
       },
+      currentUserEffPrivileges: ['space_add_support'],
     };
 
     const spaceList = PromiseObject.create({
