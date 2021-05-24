@@ -77,9 +77,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selectedIds: computed('navigationState.aspectOptions.selectedIds.[]', {
+  selected: computed('navigationState.aspectOptions.selected.[]', {
     get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selectedIds');
+      const rawSelected = this.get('navigationState.aspectOptions.selected');
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
@@ -104,7 +104,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'datasetId',
     'archiveId',
     'dirId',
-    'selectedIds',
+    'selected',
     'attachmentState',
     'viewMode',
   ]),
@@ -116,7 +116,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateDatasetId',
     'updateArchiveId',
     'updateDirId',
-    'updateSelectedIds',
+    'updateSelected',
     'updateViewMode',
     'updateDatasetData',
     'getDataUrl',
@@ -144,9 +144,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         selected: null,
       });
     },
-    updateSelectedIds(selected) {
+    updateSelected(selected) {
       this.get('navigationState').setAspectOptions({
-        selected,
+        selected: Array.isArray(selected) ? selected.join(',') : selected || null,
       });
     },
     updateViewMode(viewMode) {
