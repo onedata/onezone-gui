@@ -93,7 +93,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * @returns {String} URL to selected or opened item in file browser
      */
     getDataUrl(options) {
-      return this.getBrowserUrl('data', options);
+      return this.getBrowserUrl('data', 'data', options);
     },
     /**
      * @param {Object} options
@@ -102,7 +102,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * @returns {String} URL to selected or opened item in dataset browser
      */
     getDatasetsUrl(options) {
-      return this.getBrowserUrl('datasets', options);
+      return this.getBrowserUrl('data', 'datasets', options);
     },
     getTransfersUrl({ fileId, tabId }) {
       const {

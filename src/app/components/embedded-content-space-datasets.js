@@ -11,6 +11,7 @@ import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-emb
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 
@@ -57,6 +58,18 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   attachmentState: undefined,
 
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  archiveId: reads('navigationState.aspectOptions.archive'),
+
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  dirId: reads('navigationState.aspectOptions.dir'),
+
   // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of dataset entity ids that are selected
@@ -64,9 +77,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selectedIds: computed('navigationState.aspectOptions.selectedIds.[]', {
+  selected: computed('navigationState.aspectOptions.selected.[]', {
     get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selectedIds');
+      const rawSelected = this.get('navigationState.aspectOptions.selected');
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
@@ -89,7 +102,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   iframeInjectedProperties: Object.freeze([
     'spaceId',
     'datasetId',
-    'selectedIds',
+    'archiveId',
+    'dirId',
+    'selected',
     'attachmentState',
     'viewMode',
   ]),
@@ -99,7 +114,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   callParentActionNames: Object.freeze([
     'updateDatasetId',
-    'updateSelectedIds',
+    'updateArchiveId',
+    'updateDirId',
+    'updateSelected',
     'updateViewMode',
     'updateDatasetData',
     'getDataUrl',
@@ -115,9 +132,21 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         selected: null,
       });
     },
-    updateSelectedIds(selected) {
+    updateArchiveId(archiveId) {
       this.get('navigationState').setAspectOptions({
-        selected,
+        archive: archiveId,
+        selected: null,
+      });
+    },
+    updateDirId(dirId) {
+      this.get('navigationState').setAspectOptions({
+        dir: dirId,
+        selected: null,
+      });
+    },
+    updateSelected(selected) {
+      this.get('navigationState').setAspectOptions({
+        selected: Array.isArray(selected) ? selected.join(',') : selected || null,
       });
     },
     updateViewMode(viewMode) {
@@ -141,7 +170,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * @returns {String} URL to selected or opened item in file browser
      */
     getDataUrl(options) {
-      return this.getBrowserUrl('data', options);
+      return this.getBrowserUrl('datasets', 'data', options);
     },
     /**
      * @param {Object} options
@@ -150,7 +179,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * @returns {String} URL to selected or opened item in dataset browser
      */
     getDatasetsUrl(options) {
-      return this.getBrowserUrl('datasets', options);
+      return this.getBrowserUrl('datasets', 'datasets', options);
     },
   },
 });
