@@ -27,6 +27,7 @@ export default Component.extend(I18n, {
   spaceActions: service(),
   router: service(),
   navigationState: service(),
+  globalClipboard: service(),
 
   /**
    * @override
@@ -168,9 +169,24 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed(function copyIdAction() {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('space.entityId'),
+        this.t('spaceId')
+      ),
+      title: this.t('copyId'),
+      class: 'copy-space-id-action-trigger',
+      icon: 'copy',
+    };
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  itemActions: collect('renameAction', 'leaveAction', 'removeAction'),
+  itemActions: collect('renameAction', 'leaveAction', 'removeAction', 'copyIdAction'),
 
   actions: {
     editorClick(event) {
