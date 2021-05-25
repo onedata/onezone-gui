@@ -56,8 +56,9 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   pointerEvents: service(),
 
   /**
+   * View to show in legacy Oneprovider, eg.spaces, transfers, shares
    * @virtual optional
-   * View to show in legacy Oneprovider, eg. spaces, transfers, shares
+   * @deprecated TODO: VFS-7573 remove support for v19 Oneproviders
    * @type {String}
    */
   resourceType: '',
