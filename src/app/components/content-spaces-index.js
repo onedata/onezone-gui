@@ -65,7 +65,7 @@ export default Component.extend(
      * @type {Ember.ComputedProperty <boolean>}
      */
     hasAddSupportPrivilege: computed(
-      'space.currentUserEffPrivileges',
+      'space.currentUserEffPrivileges.[]',
       function hasAddSupportPrivilege() {
         return this.get('space.currentUserEffPrivileges').includes('space_add_support');
       }

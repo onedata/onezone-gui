@@ -75,7 +75,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
    * @type {Ember.ComputedProperty <boolean>}
    */
   hasAddSupportPrivilege: computed(
-    'space.currentUserEffPrivileges',
+    'space.currentUserEffPrivileges.[]',
     function hasAddSupportPrivilege() {
       return this.get('space.currentUserEffPrivileges').includes('space_add_support');
     }
@@ -84,7 +84,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
-  openAddStorageAction: computed(function () {
+  openAddStorageAction: computed('hasAddSupportPrivilege', function () {
     const disabled = !this.get('hasAddSupportPrivilege');
     return {
       action: () => this.send('openAddStorage'),
@@ -102,7 +102,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   }),
 
   ceaseOneproviderSupportAction: computed(
-    'space.currentUserEffPrivileges',
+    'space.currentUserEffPrivileges.[]',
     function ceaseOneproviderSupportAction() {
       const isDisabled = !this.get('space.currentUserEffPrivileges').includes('space_remove_support');
       return {
