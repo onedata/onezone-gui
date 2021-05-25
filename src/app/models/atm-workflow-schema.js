@@ -28,4 +28,14 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {ComputedProperty<Models.AtmInventory>}
    */
   atmInventory: belongsTo('atm-inventory'),
+
+  /**
+   * @type {ComputedProperty<Array<Object>>}
+   */
+  lanes: attr('array'),
+
+  /**
+   * @type {ComputedProperty<Array<Object>>}
+   */
+  stores: attr('array'),
 }).reopenClass(StaticGraphModelMixin);

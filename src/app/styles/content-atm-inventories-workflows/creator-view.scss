@@ -1,5 +1,5 @@
 .content-atm-inventories-workflows-creator-view {
-  @include min-size-as-full-col-content($preserve-padding: true);
+  @include full-col-content-height($preserve-padding: true);
   display: flex;
   flex-direction: column;
 

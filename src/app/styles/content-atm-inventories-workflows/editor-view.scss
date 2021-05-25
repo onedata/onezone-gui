@@ -1,5 +1,17 @@
 .content-atm-inventories-workflows-editor-view {
+  @include full-col-content-height(
+    $preserve-padding: true,
+    $height-property: 'height'
+  );
+  display: flex;
+  flex-direction: column;
+
   .header-row .one-inline-editor {
     margin-top: -4px;
+  }
+
+  .workflow-visualiser {
+    height: initial;
+    flex-grow: 1;
   }
 }

@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
-import { get, getProperties } from '@ember/object';
+import { get, getProperties, observer } from '@ember/object';
 import { reject } from 'rsvp';
 
 export default Component.extend({
@@ -30,6 +30,37 @@ export default Component.extend({
    * @type {Function}
    */
   onBackSlide: notImplementedIgnore,
+
+  /**
+   * Data injected into the visualiser. Initialized by
+   * `atmWorkflowSchemaObserver`, updated by modifications
+   * @type {Object}
+   */
+  visualiserData: undefined,
+
+  atmWorkflowSchemaObserver: observer(
+    'atmWorkflowSchema',
+    function atmWorkflowSchemaObserver() {
+      const atmWorkflowSchema = this.get('atmWorkflowSchema');
+      if (!atmWorkflowSchema) {
+        return;
+      }
+
+      const {
+        lanes = [],
+          stores = [],
+      } = getProperties(atmWorkflowSchema, 'lanes', 'stores');
+      this.set('visualiserData', {
+        lanes,
+        stores,
+      });
+    }
+  ),
+
+  init() {
+    this._super(...arguments);
+    this.atmWorkflowSchemaObserver();
+  },
 
   actions: {
     backSlide() {
@@ -53,6 +84,33 @@ export default Component.extend({
         atmWorkflowSchemaDiff: {
           name: newName,
         },
+      });
+      const result = await action.execute();
+      const {
+        status,
+        error,
+      } = getProperties(result, 'status', 'error');
+      if (status == 'failed') {
+        throw error;
+      }
+    },
+    visualiserDataChange(newVisualiserData) {
+      this.set('visualiserData', newVisualiserData);
+    },
+    async save() {
+      const {
+        workflowActions,
+        atmWorkflowSchema,
+        visualiserData,
+      } = this.getProperties(
+        'workflowActions',
+        'atmWorkflowSchema',
+        'visualiserData'
+      );
+
+      const action = workflowActions.createModifyAtmWorkflowSchemaAction({
+        atmWorkflowSchema,
+        atmWorkflowSchemaDiff: visualiserData,
       });
       const result = await action.execute();
       const {

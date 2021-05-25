@@ -948,6 +948,8 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
       name: `Workflow ${index}`,
       description: `Some very complicated workflow #${index}`,
       atmInventory,
+      lanes: [],
+      stores: [],
     }).save();
   })).then(atmWorkflowSchemas =>
     createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas)

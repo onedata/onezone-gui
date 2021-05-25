@@ -1,5 +1,5 @@
 .content-atm-inventories-lambdas {
-  @include min-size-as-full-col-content();
+  @include full-col-content-height();
   display: flex;
   flex-direction: column;
 
