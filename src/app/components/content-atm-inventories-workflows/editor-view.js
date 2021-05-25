@@ -9,15 +9,22 @@
  */
 
 import Component from '@ember/component';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
 import { get, getProperties, observer } from '@ember/object';
 import { reject } from 'rsvp';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-editor-view'],
 
+  i18n: service(),
   workflowActions: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentAtmInventoriesWorkflows.editorView',
 
   /**
    * @virtual
@@ -117,7 +124,7 @@ export default Component.extend({
         status,
         error,
       } = getProperties(result, 'status', 'error');
-      if (status == 'failed') {
+      if (status === 'failed') {
         throw error;
       }
     },

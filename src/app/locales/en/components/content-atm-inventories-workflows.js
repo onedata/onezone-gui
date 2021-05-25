@@ -3,6 +3,7 @@ import atmWorkflowSchemasListEntry from './content-atm-inventories-workflows/atm
 import atmWorkflowSchemasList from './content-atm-inventories-workflows/atm-workflow-schemas-list';
 import atmWorkflowSchemaDetailsForm from './content-atm-inventories-workflows/atm-workflow-schema-details-form';
 import creatorView from './content-atm-inventories-workflows/creator-view';
+import editorView from './content-atm-inventories-workflows/editor-view';
 import loadingView from './content-atm-inventories-workflows/loading-view';
 
 export default {
@@ -11,5 +12,6 @@ export default {
   atmWorkflowSchemasListEntry,
   atmWorkflowSchemaDetailsForm,
   creatorView,
+  editorView,
   loadingView,
 };
