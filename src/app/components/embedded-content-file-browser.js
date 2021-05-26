@@ -7,25 +7,20 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
+import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneEmbeddedContainer.extend({
+export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
 
   globalNotify: service(),
   router: service(),
   navigationState: service(),
-
-  /**
-   * @virtual
-   * @type {Models.Provider}
-   */
-  oneprovider: undefined,
 
   /**
    * Entity ID of `space` record that is space of directory displayed in files
@@ -41,6 +36,7 @@ export default OneEmbeddedContainer.extend({
    */
   dirEntityId: reads('navigationState.aspectOptions.dir'),
 
+  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of file entity ids that are selected
    * @type {Array<String>}
@@ -64,17 +60,7 @@ export default OneEmbeddedContainer.extend({
    */
   embeddedComponentName: 'content-file-browser',
 
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  iframeType: 'oneprovider',
-
   _location: location,
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  relatedData: reads('oneprovider'),
 
   /**
    * @override implements OneEmbeddedContainer
@@ -88,17 +74,10 @@ export default OneEmbeddedContainer.extend({
     'updateDirEntityId',
     'updateSelected',
     'getDataUrl',
+    'getDatasetsUrl',
     'getTransfersUrl',
     'getShareUrl',
   ]),
-
-  /**
-   * @override implements OneEmbeddedContainer
-   */
-  iframeId: computed('oneprovider.entityId', function iframeId() {
-    const oneproviderId = this.get('oneprovider.entityId');
-    return `iframe-oneprovider-${oneproviderId}`;
-  }),
 
   actions: {
     updateDirEntityId(dirEntityId) {
@@ -107,25 +86,23 @@ export default OneEmbeddedContainer.extend({
     updateSelected(selected) {
       this.set('selected', selected);
     },
-    getDataUrl({ fileId, selected }) {
-      const {
-        _location,
-        router,
-        navigationState,
-      } = this.getProperties('_location', 'router', 'navigationState');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'data', {
-          queryParams: {
-            options: serializeAspectOptions(
-              navigationState.mergedAspectOptions({
-                dir: fileId,
-                selected: (selected instanceof Array) ?
-                  selected.join(',') : selected || '',
-              })
-            ),
-          },
-        });
+    /**
+     * @param {Object} options
+     * @param {String} options.fileId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in file browser
+     */
+    getDataUrl(options) {
+      return this.getBrowserUrl('data', 'data', options);
+    },
+    /**
+     * @param {Object} options
+     * @param {String} options.datasetId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in dataset browser
+     */
+    getDatasetsUrl(options) {
+      return this.getBrowserUrl('data', 'datasets', options);
     },
     getTransfersUrl({ fileId, tabId }) {
       const {

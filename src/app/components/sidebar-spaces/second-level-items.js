@@ -103,6 +103,14 @@ export default SecondLevelItems.extend(I18n, {
     }
   ),
 
+  itemDatasets: computed(function itemDatasets() {
+    return {
+      id: 'datasets',
+      label: this.t('aspects.datasets'),
+      icon: 'browser-dataset',
+    };
+  }),
+
   itemProviders: computed(function itemProviders() {
     return {
       id: 'providers',
@@ -150,6 +158,7 @@ export default SecondLevelItems.extend(I18n, {
     'itemData',
     'itemShares',
     'itemTransfers',
+    'itemDatasets',
     'itemProviders',
     'itemMembers',
     'itemHarvesters',
