@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7374 Added id copiers for groups, tokens, shares, spaces
 * VFS-7473 Added support for datasets and archives
 * VFS-7561 Changed "Space > Data" tab name to "Files"
 * VFS-7663 Changed login background image

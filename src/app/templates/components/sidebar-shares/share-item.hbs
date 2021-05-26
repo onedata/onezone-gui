@@ -2,3 +2,10 @@
 {{#truncated-string class="sidebar-item-title"}}
   {{name-conflict item=item tagName="span" class="one-label"}}
 {{/truncated-string}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=itemActions
+  }}
+{{/unless}}
