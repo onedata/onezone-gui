@@ -8,11 +8,15 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { observer, get, getProperties } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
 import { all as allFulfilled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import { promise } from 'ember-awesome-macros';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 
 export default Service.extend({
   store: service(),
@@ -202,4 +206,61 @@ export default Service.extend({
       .catch(ignoreForbiddenError);
     return atmWorkflowSchema;
   },
+
+  /**
+   * @returns {PromiseArray<Models.AtmLambda>}
+   */
+  getAllKnownAtmLambdas() {
+    const knownAtmLambdasProxy = AllKnownAtmLambdasProxyArray.create({
+      recordManager: this.get('recordManager'),
+    });
+    return promiseArray(
+      get(knownAtmLambdasProxy, 'atmLambdasProxy').then(() => knownAtmLambdasProxy)
+    );
+  },
+});
+
+const AllKnownAtmLambdasProxyArray = PromiseArray.extend({
+  /**
+   * @virtual
+   */
+  recordManager: undefined,
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmInventory>>}
+   */
+  atmInventoriesProxy: promise.array(function allAtmInventories() {
+    return this.get('recordManager').getUserRecordList('atmInventory')
+      .then(recordList => get(recordList, 'list'));
+  }),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmLambda>>}
+   */
+  atmLambdasProxy: promise.array(
+    'allAtmInventoriesProxy.@each.isReloading',
+    function allAtmLambdas() {
+      return this.get('atmInventoriesProxy')
+        .then(atmInventories => onlyFulfilledValues(
+          atmInventories.mapBy('atmLambdaList')
+        ))
+        .then(atmLambdaLists =>
+          onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'))
+        );
+    }
+  ),
+
+  atmLambdasProxyObserver: observer(
+    'atmLambdasProxy.[]',
+    function atmLambdasProxyObserver() {
+      const {
+        isFulfilled,
+        content,
+      } = getProperties(this.get('atmLambdasProxy'), 'isFulfilled', 'content');
+
+      if (isFulfilled) {
+        this.set('content', content);
+      }
+    }
+  ),
 });
