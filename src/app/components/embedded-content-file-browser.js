@@ -12,7 +12,6 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
@@ -21,6 +20,11 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   globalNotify: service(),
   router: service(),
   navigationState: service(),
+
+  /**
+   * @override
+   */
+  embeddedBrowserType: 'data',
 
   /**
    * Entity ID of `space` record that is space of directory displayed in files
@@ -85,57 +89,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     },
     updateSelected(selected) {
       this.set('selected', selected);
-    },
-    /**
-     * @param {Object} options
-     * @param {String} options.fileId
-     * @param {Array<String>} options.selected
-     * @returns {String} URL to selected or opened item in file browser
-     */
-    getDataUrl(options) {
-      return this.getBrowserUrl('data', 'data', options);
-    },
-    /**
-     * @param {Object} options
-     * @param {String} options.datasetId
-     * @param {Array<String>} options.selected
-     * @returns {String} URL to selected or opened item in dataset browser
-     */
-    getDatasetsUrl(options) {
-      return this.getBrowserUrl('data', 'datasets', options);
-    },
-    getTransfersUrl({ fileId, tabId }) {
-      const {
-        _location,
-        router,
-      } = this.getProperties('_location', 'router');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'transfers', {
-          queryParams: {
-            options: serializeAspectOptions({
-              fileId,
-              tab: tabId,
-            }),
-          },
-        }
-      );
-    },
-    getShareUrl({ shareId }) {
-      const {
-        _location,
-        router,
-      } = this.getProperties('_location', 'router');
-      return _location.origin + _location.pathname + router.urlFor(
-        'onedata.sidebar.content.aspect',
-        'shares', {
-          queryParams: {
-            options: serializeAspectOptions({
-              shareId,
-            }),
-          },
-        }
-      );
     },
   },
 });
