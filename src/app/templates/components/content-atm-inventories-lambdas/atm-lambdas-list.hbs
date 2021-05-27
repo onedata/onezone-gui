@@ -9,7 +9,9 @@
 <ul class="lambdas-list">
   {{#each sortedCollection as |atmLambda|}}
     {{content-atm-inventories-lambdas/atm-lambdas-list-entry
+      mode=mode
       atmLambda=atmLambda
+      onAddToAtmWorkflowSchema=(action "onAddToAtmWorkflowSchema" atmLambda)
     }}
   {{else}}
     {{#if searchValue}}

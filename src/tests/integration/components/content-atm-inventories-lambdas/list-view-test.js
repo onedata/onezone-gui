@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, context } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -16,37 +16,39 @@ describe('Integration | Component | content atm inventories lambdas/list view',
     });
 
     beforeEach(function () {
+      const atmLambdas = [{
+        name: 'f1',
+        summary: 'f1 summary',
+        operationSpec: {
+          engine: 'openfaas',
+          dockerImage: 'f1Image',
+          dockerExecutionOptions: {
+            readonly: false,
+            mountOneclient: false,
+          },
+        },
+        argumentSpecs: [],
+        resultSpecs: [],
+      }, {
+        name: 'f0',
+        summary: 'f0 summary',
+        operationSpec: {
+          engine: 'onedataFunction',
+          functionId: 'f0Function',
+        },
+        argumentSpecs: [],
+        resultSpecs: [],
+      }];
       this.setProperties({
         atmInventory: {
           privileges: {
             manageLambdas: true,
           },
           atmLambdaList: promiseObject(resolve({
-            list: promiseArray(resolve([{
-              name: 'f1',
-              summary: 'f1 summary',
-              operationSpec: {
-                engine: 'openfaas',
-                dockerImage: 'f1Image',
-                dockerExecutionOptions: {
-                  readonly: false,
-                  mountOneclient: false,
-                },
-              },
-              argumentSpecs: [],
-              resultSpecs: [],
-            }, {
-              name: 'f0',
-              summary: 'f0 summary',
-              operationSpec: {
-                engine: 'onedataFunction',
-                functionId: 'f0Function',
-              },
-              argumentSpecs: [],
-              resultSpecs: [],
-            }])),
+            list: promiseArray(resolve(atmLambdas)),
           })),
         },
+        atmLambdas,
         addAtmLambdaSpy: sinon.spy(),
       });
     });
@@ -56,12 +58,6 @@ describe('Integration | Component | content atm inventories lambdas/list view',
 
       expect(this.$().children()).to.have.class('content-atm-inventories-lambdas-list-view')
         .and.to.have.length(1);
-    });
-
-    it('has header "Lambdas"', async function () {
-      await render(this);
-
-      expect(this.$('.header-row h1 .one-label').text().trim()).to.equal('Lambdas');
     });
 
     it('shows list of lambdas of given automation inventory', async function () {
@@ -74,25 +70,77 @@ describe('Integration | Component | content atm inventories lambdas/list view',
       expect($entries.eq(1).text()).to.contain('f1');
     });
 
-    it('has "add new lambda" button, which calls "onAddAtmLambda" callback on click',
-      async function () {
+    context('in "presentation" mode', async function () {
+      beforeEach(function () {
+        this.set('mode', 'presentation');
+      });
+
+      it('has header "Lambdas" and renders list in "presentation" mode',
+        async function () {
+          await render(this);
+
+          expect(this.$('.header-row h1 .one-label').text().trim()).to.equal('Lambdas');
+          expect(this.$('.atm-lambdas-list')).to.have.class('mode-presentation');
+        });
+
+      it('has "add new lambda" button, which calls "onAddAtmLambda" callback on click',
+        async function () {
+          await render(this);
+
+          const $addAtmLambdaBtn = this.$('.header-row .open-add-atm-lambda-trigger');
+          expect($addAtmLambdaBtn.text().trim()).to.equal('Add new lambda');
+          const addAtmLambdaSpy = this.get('addAtmLambdaSpy');
+          expect(addAtmLambdaSpy).to.not.be.called;
+
+          await click($addAtmLambdaBtn[0]);
+
+          expect(addAtmLambdaSpy).to.be.calledOnce;
+        });
+    });
+
+    context('in "selection" mode', async function () {
+      beforeEach(function () {
+        this.setProperties({
+          mode: 'selection',
+          addToAtmWorkflowSchemaSpy: sinon.spy(),
+        });
+      });
+
+      it('has header "Choose lambda" and renders list in "selection" mode',
+        async function () {
+          await render(this);
+
+          expect(this.$('.header-row h1 .one-label').text().trim())
+            .to.equal('Choose lambda');
+          expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
+        });
+
+      it('passes notification about selection done using "add to workflow" button',
+        async function () {
+          await render(this);
+          const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
+
+          expect(addToAtmWorkflowSchemaSpy).to.not.be.called;
+          await click('.add-to-workflow-action-trigger');
+
+          expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
+            .and.to.be.calledWith(this.get('atmLambdas.1'));
+        });
+
+      it('does not render "add lambda" button', async function () {
         await render(this);
 
-        const $addAtmLambdaBtn = this.$('.header-row .open-add-atm-lambda-trigger');
-        expect($addAtmLambdaBtn.text().trim()).to.equal('Add new lambda');
-        const addAtmLambdaSpy = this.get('addAtmLambdaSpy');
-        expect(addAtmLambdaSpy).to.not.be.called;
-
-        await click($addAtmLambdaBtn[0]);
-
-        expect(addAtmLambdaSpy).to.be.calledOnce;
+        expect(this.$('.open-add-atm-lambda-trigger')).to.not.exist;
       });
+    });
   });
 
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/list-view
     atmInventory=atmInventory
     onAddAtmLambda=addAtmLambdaSpy
+    onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
+    mode=mode
   }}`);
   await wait();
 }

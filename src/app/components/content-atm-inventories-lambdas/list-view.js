@@ -36,16 +36,41 @@ export default Component.extend(I18n, {
   atmInventory: undefined,
 
   /**
-   * @virtual
+   * Needed when `mode` is `'presentation'`
+   * @virtual optional
    * @type {Function}
    */
   onAddAtmLambda: notImplementedIgnore,
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   * @param {Model.AtmLambda}
+   * @returns {any}
+   */
+  onAddToAtmWorkflowSchema: notImplementedIgnore,
 
   /**
    * @virtual
    * @type {Boolean}
    */
   onRegisterViewActions: notImplementedIgnore,
+
+  /**
+   * One of: `'presentation'`, `'selection'`
+   * @virtual optional
+   * @type {String}
+   */
+  mode: 'presentation',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  headerText: computed('mode', function headerText() {
+    const mode = this.get('mode');
+    return this.t(`header.${mode === 'selection' ? 'selection' : 'presentation'}`);
+  }),
 
   /**
    * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}

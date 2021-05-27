@@ -55,4 +55,29 @@
       color: $color-one-success;
     }
   }
+
+  &.mode-selection {
+    .view-data-collapse {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .lambda-generics {
+      flex-grow: 1;
+      min-width: 0;
+      padding-right: $padding-base-vertical;
+    }
+
+    @media (max-width: $screen-xs-max) {
+      .view-data-collapse {
+        flex-wrap: wrap;
+      }
+
+      .lambda-generics {
+        flex-basis: 100%;
+        margin-bottom: $padding-base-vertical;
+      }
+    }
+  }
 }

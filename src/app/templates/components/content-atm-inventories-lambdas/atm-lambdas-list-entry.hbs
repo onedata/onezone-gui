@@ -7,15 +7,27 @@
       class="view-data-collapse"
       collapsed=isEditing
     }}
-      <div class="name">{{atmLambda.name}}</div>
-      <div class="summary-container">
-        {{#if atmLambda.summary}}
-          <span class="summary">{{atmLambda.summary}}</span>
-        {{/if}}
-        <a class="details-toggle" {{action "toggleDetails"}}>
-          {{toggleDetailsText}}
-        </a>
+      <div class="lambda-generics">
+        <div class="name">{{atmLambda.name}}</div>
+        <div class="summary-container">
+          {{#if atmLambda.summary}}
+            <span class="summary">{{atmLambda.summary}}</span>
+          {{/if}}
+          <a class="details-toggle" {{action "toggleDetails"}}>
+            {{toggleDetailsText}}
+          </a>
+        </div>
       </div>
+      {{#if (eq mode "selection")}}
+        {{#bs-button
+          class="add-to-workflow-action-trigger pull-right"
+          size="sm"
+          onClick=onAddToAtmWorkflowSchema
+        }}
+          {{one-icon icon="plus"}}
+          <span class="text">{{tt this "addToAtmWorkflowSchemaAction"}}</span>
+        {{/bs-button}}
+      {{/if}}
     {{/one-collapse}}
     {{#one-collapse
       class="details-collapse"
@@ -32,34 +44,36 @@
       {{/render-later}}
     {{/one-collapse}}
   </div>
-  {{one-menu-toggle
-    class=(concat-classes
-      "atm-lambda-actions-trigger clickable"
-      (concat "actions-trigger-" elementId)
-      (if areActionsOpened "active")
-    )
-    click=(action "toggleActionsOpen" (not areActionsOpened))
-  }}
-  {{#render-later triggerRender=areActionsOpened}}
-    {{#one-webui-popover
-      class="atm-lambda-actions"
-      padding=false
-      popoverStyle="with-dropdown"
-      triggerSelector=(concat ".actions-trigger-" elementId)
-      open=areActionsOpened
-      onToggle=(action "toggleActionsOpen")
-      as |popover|
+  {{#if (eq mode "presentation")}}
+    {{one-menu-toggle
+      class=(concat-classes
+        "atm-lambda-actions-trigger clickable"
+        (concat "actions-trigger-" elementId)
+        (if areActionsOpened "active")
+      )
+      click=(action "toggleActionsOpen" (not areActionsOpened))
     }}
-      {{#click-outside
-        action=(action "toggleActionsOpen" false)
-        except-selector=(concat ".actions-trigger-" elementId)
+    {{#render-later triggerRender=areActionsOpened}}
+      {{#one-webui-popover
+        class="atm-lambda-actions"
+        padding=false
+        popoverStyle="with-dropdown"
+        triggerSelector=(concat ".actions-trigger-" elementId)
+        open=areActionsOpened
+        onToggle=(action "toggleActionsOpen")
+        as |popover|
       }}
-        {{actions-popover-content
-          actionsArray=atmLambdaActionsArray
-          actionClicked=(action "toggleActionsOpen" false)
+        {{#click-outside
+          action=(action "toggleActionsOpen" false)
+          except-selector=(concat ".actions-trigger-" elementId)
         }}
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
+          {{actions-popover-content
+            actionsArray=atmLambdaActionsArray
+            actionClicked=(action "toggleActionsOpen" false)
+          }}
+        {{/click-outside}}
+      {{/one-webui-popover}}
+    {{/render-later}}
+  {{/if}}
 </div>
 {{yield}}

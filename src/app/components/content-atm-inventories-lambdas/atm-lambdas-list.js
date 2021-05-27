@@ -13,12 +13,17 @@ import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
+import { tag } from 'ember-awesome-macros';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
   classNames: ['atm-lambdas-list'],
-  classNameBindings: ['searchValue:filtered-list'],
+  classNameBindings: [
+    'searchValue:filtered-list',
+    'modeClass',
+  ],
 
   /**
    * @override
@@ -32,6 +37,22 @@ export default Component.extend(I18n, {
   collection: undefined,
 
   /**
+   * One of: `'presentation'`, `'selection'`
+   * @virtual optional
+   * @type {String}
+   */
+  mode: 'presentation',
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   * @param {Model.AtmLambda}
+   * @returns {any}
+   */
+  onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
    * @type {String}
    */
   searchValue: '',
@@ -40,6 +61,11 @@ export default Component.extend(I18n, {
    * @type {Array<String>}
    */
   collectionOrder: Object.freeze(['name']),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  modeClass: tag `mode-${'mode'}`,
 
   /**
    * @type {ComputedProperty<Array<Models.AtmLambda>>}
@@ -69,6 +95,9 @@ export default Component.extend(I18n, {
   actions: {
     changeSearchValue(newValue) {
       debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
+    },
+    onAddToAtmWorkflowSchema(atmLambda) {
+      this.get('onAddToAtmWorkflowSchema')(atmLambda);
     },
   },
 });

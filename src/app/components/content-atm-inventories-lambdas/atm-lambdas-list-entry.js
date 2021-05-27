@@ -9,17 +9,19 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { conditional } from 'ember-awesome-macros';
+import { conditional, tag } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { collect } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 
 export default Component.extend(I18n, {
   tagName: 'li',
   classNames: ['atm-lambdas-list-entry', 'iconified-block'],
+  classNameBindings: ['modeClass'],
 
   i18n: service(),
   workflowActions: service(),
@@ -36,6 +38,21 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
+   * One of: `'presentation'`, `'selection'`
+   * @virtual optional
+   * @type {String}
+   */
+  mode: 'presentation',
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   * @returns {any}
+   */
+  onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
    * @type {Boolean}
    */
   areActionsOpened: false,
@@ -49,6 +66,11 @@ export default Component.extend(I18n, {
    * @type {Boolean}
    */
   isEditing: false,
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  modeClass: tag `mode-${'mode'}`,
 
   /**
    * @type {ComputedProperty<SafeString>}
