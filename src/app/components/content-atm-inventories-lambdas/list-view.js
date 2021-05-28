@@ -16,6 +16,7 @@ import { bool } from '@ember/object/computed';
 import { collect } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
@@ -23,6 +24,7 @@ export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-lambdas-list-view'],
 
   i18n: service(),
+  workflowManager: service(),
 
   /**
    * @override
@@ -50,6 +52,13 @@ export default Component.extend(I18n, {
    * @returns {any}
    */
   onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   */
+  onBackSlide: notImplementedIgnore,
 
   /**
    * @virtual
@@ -85,6 +94,30 @@ export default Component.extend(I18n, {
         .then(atmLambdaList => get(atmLambdaList, 'list'));
     })
   ),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}
+   */
+  allAtmLambdasProxy: computed('mode', function allAtmLambdasProxy() {
+    const {
+      mode,
+      workflowManager,
+    } = this.getProperties('mode', 'workflowManager');
+
+    if (mode === 'selection') {
+      // Only in selection mode we need to fetch all lambdas
+      return workflowManager.getAllKnownAtmLambdas();
+    }
+    return promiseArray(resolve([]));
+  }),
+
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  loadingDataProxy: promise.object(promise.all(
+    'atmLambdasProxy',
+    'allAtmLambdasProxy'
+  )),
 
   /**
    * @type {ComputedProperty<Boolean>}
@@ -134,5 +167,11 @@ export default Component.extend(I18n, {
     } = this.getProperties('onRegisterViewActions', 'globalActions');
 
     onRegisterViewActions(globalActions);
+  },
+
+  actions: {
+    backSlide() {
+      this.get('onBackSlide')();
+    },
   },
 });

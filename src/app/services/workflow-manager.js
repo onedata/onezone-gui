@@ -8,15 +8,15 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { observer, get, getProperties } from '@ember/object';
+import { computed, observer, get, getProperties } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
 import { all as allFulfilled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { promise } from 'ember-awesome-macros';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
-import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import ArrayProxy from '@ember/array/proxy';
 
 export default Service.extend({
   store: service(),
@@ -220,7 +220,7 @@ export default Service.extend({
   },
 });
 
-const AllKnownAtmLambdasProxyArray = PromiseArray.extend({
+const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
   /**
    * @virtual
    */
@@ -229,26 +229,37 @@ const AllKnownAtmLambdasProxyArray = PromiseArray.extend({
   /**
    * @type {ComputedProperty<PromiseArray<Model.AtmInventory>>}
    */
-  atmInventoriesProxy: promise.array(function allAtmInventories() {
-    return this.get('recordManager').getUserRecordList('atmInventory')
-      .then(recordList => get(recordList, 'list'));
-  }),
+  atmInventoriesProxy: promise.array(computed(async function allAtmInventories() {
+    const atmInventories = await this.get('recordManager').getUserRecordList('atmInventory');
+    return await get(atmInventories, 'list');
+  })),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<DS.RecordArray<Model.AtmLambda>>>}
+   */
+  atmLambdasListsProxy: promise.array(computed(
+    'atmInventoriesProxy.@each.isReloading',
+    async function atmLambdasListsProxy() {
+      const atmInventories = await this.get('atmInventoriesProxy');
+      const atmLambdaLists = await onlyFulfilledValues(
+        atmInventories.mapBy('atmLambdaList')
+      );
+      return await onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'));
+    }
+  )),
 
   /**
    * @type {ComputedProperty<PromiseArray<Model.AtmLambda>>}
    */
-  atmLambdasProxy: promise.array(
-    'allAtmInventoriesProxy.@each.isReloading',
-    function allAtmLambdas() {
-      return this.get('atmInventoriesProxy')
-        .then(atmInventories => onlyFulfilledValues(
-          atmInventories.mapBy('atmLambdaList')
-        ))
-        .then(atmLambdaLists =>
-          onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'))
-        );
+  atmLambdasProxy: promise.array(computed(
+    'atmLambdasListsProxy.@each.isReloading',
+    async function atmLambdasProxy() {
+      const atmLambdasLists = await this.get('atmLambdasListsProxy');
+      const lambdasArray = [];
+      atmLambdasLists.forEach(list => lambdasArray.push(...list.toArray()));
+      return lambdasArray.uniq();
     }
-  ),
+  )),
 
   atmLambdasProxyObserver: observer(
     'atmLambdasProxy.[]',

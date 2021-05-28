@@ -1,16 +1,25 @@
-<div class="row content-row header-row hidden-xs">
+<div class="row content-row header-row {{if (eq mode "presentation") "hidden-xs"}}">
+  {{#if (eq mode "selection")}}
+    <h1 class="with-back relative nowrap">
+      <a class="content-back-link" {{action "backSlide"}}>
+        {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
+        {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+      </a>
+      <div class="resource-name">{{headerText}}</div>
+    </h1>
+  {{else}}
   <h1>
     <span class="one-label">{{headerText}}</span>
-    {{#if (eq mode "presentation")}}
-      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
-    {{/if}}
+    {{actions-toolbar isMinimized=false actionsArray=globalActions}}
   </h1>
+  {{/if}}
 </div>
-{{#promise-proxy-container proxy=atmLambdasProxy}}
+{{#promise-proxy-container proxy=loadingDataProxy}}
   {{#if atmLambdasProxy.content.length}}
     <div class="row content-row">
       {{content-atm-inventories-lambdas/atm-lambdas-list
         collection=atmLambdasProxy.content
+        allCollection=allAtmLambdasProxy.content
         mode=mode
         onAddToAtmWorkflowSchema=onAddToAtmWorkflowSchema
       }}

@@ -13,8 +13,9 @@ import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
-import { tag } from 'ember-awesome-macros';
+import { tag, conditional, eq, raw } from 'ember-awesome-macros';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { inject as service } from '@ember/service';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
@@ -24,6 +25,9 @@ export default Component.extend(I18n, {
     'searchValue:filtered-list',
     'modeClass',
   ],
+
+  i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -35,6 +39,14 @@ export default Component.extend(I18n, {
    * @type {Array<Models.AtmLambda>}
    */
   collection: undefined,
+
+  /**
+   * Needed when `mode` is `'selection'`. Should contain all lambdas from all
+   * inventories.
+   * @virtual optional
+   * @type {Array<Models.AtmLambda>}
+   */
+  allCollection: undefined,
 
   /**
    * One of: `'presentation'`, `'selection'`
@@ -51,6 +63,12 @@ export default Component.extend(I18n, {
    * @returns {any}
    */
   onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
+   * One of: `'thisInventory'`, `'all'`
+   * @type {String}
+   */
+  activeCollectionType: 'thisInventory',
 
   /**
    * @type {String}
@@ -70,17 +88,26 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Models.AtmLambda>>}
    */
+  activeCollection: conditional(
+    eq('activeCollectionType', raw('all')),
+    'allCollection',
+    'collection'
+  ),
+
+  /**
+   * @type {ComputedProperty<Array<Models.AtmLambda>>}
+   */
   filteredCollection: computed(
     'searchValue',
-    'collection.@each.name',
+    'activeCollection.@each.name',
     function filteredCollection() {
       const {
-        collection,
+        activeCollection,
         searchValue,
-      } = this.getProperties('collection', 'searchValue');
+      } = this.getProperties('activeCollection', 'searchValue');
       const normalizedSearchValue = searchValue.trim().toLowerCase();
 
-      return (collection || []).filter(atmLambda => {
+      return (activeCollection || []).filter(atmLambda => {
         const normalizedName = get(atmLambda, 'name').trim().toLowerCase();
         return normalizedName.includes(normalizedSearchValue);
       });

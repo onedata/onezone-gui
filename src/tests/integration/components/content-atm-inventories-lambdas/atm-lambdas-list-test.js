@@ -17,7 +17,7 @@ describe(
     });
 
     beforeEach(function () {
-      this.set('collection', [{
+      const collection = [{
         name: 'f1',
         summary: 'f1 summary',
         operationSpec: {
@@ -39,7 +39,27 @@ describe(
         },
         argumentSpecs: [],
         resultSpecs: [],
-      }]);
+      }];
+      const allCollection = [
+        ...collection, {
+          name: 'f2',
+          summary: 'f2 summary',
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: 'f2Image',
+            dockerExecutionOptions: {
+              readonly: false,
+              mountOneclient: false,
+            },
+          },
+          argumentSpecs: [],
+          resultSpecs: [],
+        },
+      ];
+      this.setProperties({
+        collection,
+        allCollection,
+      });
     });
 
     it('has class "atm-lambdas-list"', function () {
@@ -185,6 +205,12 @@ describe(
 
         expect(this.$('.add-to-workflow-action-trigger')).to.not.exist;
       });
+
+      it('does not have collection type selector', async function () {
+        await render(this);
+
+        expect(this.$('.collection-type-selector')).to.not.exist;
+      });
     });
 
     context('in "selection" mode', function () {
@@ -220,6 +246,64 @@ describe(
         expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
           .and.to.be.calledWith(this.get('collection.1'));
       });
+
+      it('has collection type selector with preselected "this inventory"',
+        async function () {
+          await render(this);
+
+          const $selector = this.$('.collection-type-selector');
+          expect($selector).to.exist.and.to.have.class('btn-group');
+          const $buttons = $selector.find('.btn');
+          expect($buttons.eq(0).text().trim()).to.equal('This inventory');
+          expect($buttons.eq(0)).to.have.class('active');
+          expect($buttons.eq(1).text().trim()).to.equal('All');
+        });
+
+      it('allows to toggle between collection types', async function () {
+        await render(this);
+
+        expect(this.$('.atm-lambdas-list-entry')).to.have.length(2);
+        await click('.btn-all');
+
+        expect(this.$('.atm-lambdas-list-entry')).to.have.length(3);
+        await click('.btn-this-inventory');
+
+        expect(this.$('.atm-lambdas-list-entry')).to.have.length(2);
+      });
+
+      it('does not reset filtering during collection type change', async function () {
+        await render(this);
+
+        await fillIn('.search-bar', 'f2');
+
+        expect(this.$('.atm-lambdas-list-entry')).to.have.length(0);
+        await click('.btn-all');
+
+        expect(this.$('.atm-lambdas-list-entry')).to.have.length(1);
+      });
+
+      it('shows proper message when this inventory collection is empty',
+        async function () {
+          this.set('collection', []);
+
+          await render(this);
+
+          expect(this.$('.empty-message').text().trim()).to.equal(
+            'This automation inventory does not have any lambdas yet. To see lambdas from other inventories, change the listing mode to "All".'
+          );
+        });
+
+      it('shows proper message when all inventories collection is empty',
+        async function () {
+          this.set('allCollection', []);
+
+          await render(this);
+          await click('.btn-all');
+
+          expect(this.$('.empty-message').text().trim()).to.equal(
+            'You do not have access to any lambdas.'
+          );
+        });
     });
   }
 );
@@ -227,6 +311,7 @@ describe(
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
     collection=collection
+    allCollection=allCollection
     mode=mode
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
   }}`);

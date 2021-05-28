@@ -8,6 +8,7 @@ import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import { lookupService } from '../../../helpers/stub-service';
 
 describe('Integration | Component | content atm inventories lambdas/list view',
   function () {
@@ -39,6 +40,24 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         argumentSpecs: [],
         resultSpecs: [],
       }];
+      const allAtmLambdas = [
+        ...atmLambdas, {
+          name: 'f2',
+          summary: 'f2 summary',
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: 'f2Image',
+            dockerExecutionOptions: {
+              readonly: false,
+              mountOneclient: false,
+            },
+          },
+          argumentSpecs: [],
+          resultSpecs: [],
+        },
+      ];
+      sinon.stub(lookupService(this, 'workflow-manager'), 'getAllKnownAtmLambdas')
+        .returns(promiseArray(resolve(allAtmLambdas)));
       this.setProperties({
         atmInventory: {
           privileges: {
@@ -96,6 +115,12 @@ describe('Integration | Component | content atm inventories lambdas/list view',
 
           expect(addAtmLambdaSpy).to.be.calledOnce;
         });
+
+      it('does not show back link', async function () {
+        await render(this);
+
+        expect(this.$('.content-back-link')).to.not.exist;
+      });
     });
 
     context('in "selection" mode', async function () {
@@ -103,17 +128,26 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         this.setProperties({
           mode: 'selection',
           addToAtmWorkflowSchemaSpy: sinon.spy(),
+          backSlideSpy: sinon.spy(),
         });
       });
 
-      it('has header "Choose lambda" and renders list in "selection" mode',
+      it('has header "Choose lambda" and renders list in "selection" mode with current inventory lambdas listed',
         async function () {
           await render(this);
 
-          expect(this.$('.header-row h1 .one-label').text().trim())
+          expect(this.$('.header-row .resource-name').text().trim())
             .to.equal('Choose lambda');
           expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
+          expect(this.$().text()).to.contain('f1').and.to.not.contain('f2');
         });
+
+      it('allows to see all available lambda functions', async function () {
+        await render(this);
+
+        await click('.btn-all');
+        expect(this.$().text()).to.contain('f2');
+      });
 
       it('passes notification about selection done using "add to workflow" button',
         async function () {
@@ -132,15 +166,27 @@ describe('Integration | Component | content atm inventories lambdas/list view',
 
         expect(this.$('.open-add-atm-lambda-trigger')).to.not.exist;
       });
+
+      it('calls "onBackSlide" callback on back link click', async function () {
+        await render(this);
+
+        const backSlideSpy = this.get('backSlideSpy');
+        expect(backSlideSpy).to.be.not.called;
+
+        await click('.content-back-link');
+
+        expect(backSlideSpy).to.be.calledOnce;
+      });
     });
   });
 
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/list-view
+    mode=mode
     atmInventory=atmInventory
     onAddAtmLambda=addAtmLambdaSpy
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
-    mode=mode
+    onBackSlide=backSlideSpy
   }}`);
   await wait();
 }
