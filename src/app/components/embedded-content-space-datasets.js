@@ -51,6 +51,11 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   viewMode: undefined,
 
   /**
+   * @override
+   */
+  embeddedBrowserType: 'datasets',
+
+  /**
    * Dataset state tree to show. One of: attached, detached.
    * 
    * **Injected to embedded iframe.**
@@ -121,6 +126,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateDatasetData',
     'getDataUrl',
     'getDatasetsUrl',
+    'getTransfersUrl',
+    'getShareUrl',
   ]),
 
   _location: location,
@@ -154,6 +161,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         viewMode,
       });
     },
+
     /**
      * Sets value of dataset property.
      * Due to lack of dataset model in Onezone it is provided by Oneprovider
@@ -162,24 +170,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      */
     updateDatasetData(dataset) {
       this.get('onUpdateDatasetData')(dataset);
-    },
-    /**
-     * @param {Object} options
-     * @param {String} options.fileId
-     * @param {Array<String>} options.selected
-     * @returns {String} URL to selected or opened item in file browser
-     */
-    getDataUrl(options) {
-      return this.getBrowserUrl('datasets', 'data', options);
-    },
-    /**
-     * @param {Object} options
-     * @param {String} options.datasetId
-     * @param {Array<String>} options.selected
-     * @returns {String} URL to selected or opened item in dataset browser
-     */
-    getDatasetsUrl(options) {
-      return this.getBrowserUrl('datasets', 'datasets', options);
     },
   },
 });

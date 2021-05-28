@@ -16,35 +16,49 @@ export default Mixin.create({
   // required property: _location: Location
   // required property: router: Ember.Router
   // required property: navigationState: Ember.Service
+  // required property: embeddedBrowserType: String, one of: 'data', 'datsets'
 
   /**
-   * @param {String} sourceViewType one of: data, datasets - type of browser,
-   *   from which the action is invoked
-   * @param {String} type one of: data, datasets
+   * @param {String} type one of: data, datasets, shares, transfers
    * @param {Object} options 
    * @returns {String} URL to browser item (opened or selected)
    */
-  getBrowserUrl(sourceViewType, type, options) {
+  getBrowserUrl(type, options) {
     const {
       _location,
       router,
       navigationState,
-    } = this.getProperties('_location', 'router', 'navigationState');
-    let aspect;
+      embeddedBrowserType,
+    } = this.getProperties(
+      '_location',
+      'router',
+      'navigationState',
+      'embeddedBrowserType'
+    );
+    const aspect = type;
     let aspectOptions = Object.assign({}, options);
     const selected = options.selected;
     aspectOptions.selected = (selected instanceof Array) ?
       selected.join(',') : (selected || null);
-    if (type === 'datasets') {
-      aspect = 'datasets';
-      aspectOptions.dataset = aspectOptions.datasetId || null;
-      delete aspectOptions.datasetId;
-    } else {
-      aspect = 'data';
-      aspectOptions.dir = aspectOptions.fileId || null;
-      delete aspectOptions.fileId;
+    // TODO: VFS-7643 remove compatibility with options used in Oneprovider GUI
+    // and use common names
+    switch (type) {
+      case 'datasets':
+        aspectOptions.dataset = aspectOptions.datasetId || null;
+        delete aspectOptions.datasetId;
+        break;
+      case 'data':
+        aspectOptions.dir = aspectOptions.fileId || null;
+        delete aspectOptions.fileId;
+        break;
+      case 'transfers':
+        aspectOptions.tab = aspectOptions.tabId || null;
+        delete aspectOptions.tabId;
+        break;
+      default:
+        break;
     }
-    if (type === sourceViewType) {
+    if (type === embeddedBrowserType) {
       aspectOptions = navigationState.mergedAspectOptions(aspectOptions);
     } else {
       // preserve oneprovider in case there is view-changing URL (eg. from data to datasets)
@@ -62,5 +76,47 @@ export default Mixin.create({
           options: serializeAspectOptions(aspectOptions),
         },
       });
+  },
+
+  actions: {
+    /**
+     * @param {Object} options
+     * @param {String} options.fileId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in file browser
+     */
+    getDataUrl(options) {
+      return this.getBrowserUrl('data', options);
+    },
+
+    /**
+     * @param {Object} options
+     * @param {String} options.datasetId
+     * @param {Array<String>} options.selected
+     * @returns {String} URL to selected or opened item in dataset browser
+     */
+    getDatasetsUrl(options) {
+      return this.getBrowserUrl('datasets', options);
+    },
+
+    /**
+     * @param {Object} options
+     * @param {String} options.fileId if provided, adds a tab with transfers for specific
+     *  file
+     * @param {String} options.tabId see transfers tabs in oneprovider-gui
+     * @returns {String} URL to transfers view
+     */
+    getTransfersUrl(options) {
+      return this.getBrowserUrl('transfers', options);
+    },
+
+    /**
+     * @param {Object} options
+     * @param {String} options.shareId 
+     * @returns {String} URL to shares view
+     */
+    getShareUrl(options) {
+      return this.getBrowserUrl('shares', options);
+    },
   },
 });
