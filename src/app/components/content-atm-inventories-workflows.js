@@ -10,15 +10,18 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { conditional, array, promise } from 'ember-awesome-macros';
-import { computed, observer, get } from '@ember/object';
+import EmberObject, { computed, observer, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
+import { Promise } from 'rsvp';
 
 export default Component.extend(GlobalActions, {
   classNames: ['content-atm-inventories-workflows'],
 
   navigationState: service(),
   recordManager: service(),
+  workflowManager: service(),
 
   /**
    * @virtual
@@ -39,9 +42,35 @@ export default Component.extend(GlobalActions, {
   activeAtmWorkflowSchemaId: undefined,
 
   /**
+   * One of: `'create'`, `'edit'`
+   * @type {String}
+   */
+  taskDetailsProviderMode: 'create',
+
+  /**
+   * ```
+   * {
+   *   atmLambda: Models.AtmLambda,
+   *   stores: Array<Object>
+   *   task: Object,
+   *   onSuccess: Function,
+   *   onFailure: Function,
+   * }
+   * ```
+   * @type {Object|undefined}
+   */
+  taskDetailsProviderData: undefined,
+
+  /**
+   * Set on init
+   * @type {Utils.WorkflowVisualiser.ActionsFactory}
+   */
+  actionsFactory: undefined,
+
+  /**
    * @type {Array<String>}
    */
-  possibleSlideIds: Object.freeze(['list', 'editor']),
+  possibleSlideIds: Object.freeze(['list', 'editor', 'lambdaSelector', 'taskDetails']),
 
   /**
    * @type {ComputedProperty<String|undefined>}
@@ -87,6 +116,7 @@ export default Component.extend(GlobalActions, {
       if (parentInventory !== atmInventory) {
         throw { id: 'notFound' };
       }
+      await get(await get(atmWorkflowSchema, 'atmLambdaList'), 'list');
       return atmWorkflowSchema;
     }
   )),
@@ -109,13 +139,18 @@ export default Component.extend(GlobalActions, {
       const {
         activeAtmWorkflowSchemaId,
         activeAtmWorkflowSchemaIdFromUrl,
+        activeSlide,
       } = this.getProperties(
         'activeAtmWorkflowSchemaId',
-        'activeAtmWorkflowSchemaIdFromUrl'
+        'activeAtmWorkflowSchemaIdFromUrl',
+        'activeSlide'
       );
 
       if (activeAtmWorkflowSchemaId !== activeAtmWorkflowSchemaIdFromUrl) {
         this.set('activeAtmWorkflowSchemaId', activeAtmWorkflowSchemaIdFromUrl);
+        if (['lambdaSelector', 'taskDetails'].includes(activeSlide)) {
+          this.changeSlideViaUrl('editor');
+        }
       }
     }
   ),
@@ -131,15 +166,68 @@ export default Component.extend(GlobalActions, {
   }),
 
   changeSlideViaUrl(newSlide, slideParams = {}) {
-    this.get('navigationState').changeRouteAspectOptions(Object.assign({}, slideParams, {
-      view: newSlide,
-    }));
+    const workflowId = this.get('activeAtmWorkflowSchemaIdFromUrl');
+    this.get('navigationState')
+      .changeRouteAspectOptions(Object.assign({ workflowId }, slideParams, {
+        view: newSlide,
+      }));
   },
 
   init() {
     this._super(...arguments);
-    this.set('actionsPerSlide', {});
+    const actionsFactory = ActionsFactory.create({ ownerSource: this });
+    actionsFactory.registerTaskDetailsProviderCallback(
+      (...args) => this.runTaskDetailsProvider(...args)
+    );
+    this.setProperties({
+      actionsPerSlide: {},
+      actionsFactory,
+    });
     this.activeAtmWorkflowSchemaIdFromUrlObserver();
+  },
+
+  runTaskDetailsProvider(mode, { stores, task }) {
+    const atmLambdaId = task && get(task, 'lambdaId');
+    const atmLambda = atmLambdaId ?
+      this.get('recordManager').getLoadedRecordById('atmLambda', atmLambdaId) :
+      undefined;
+
+    if (mode === 'edit' && !atmLambda) {
+      console.error(
+        'content-atm-inventories-workflows: cannot load lambda function associated to selected task'
+      );
+      return;
+    }
+
+    let resolvePromise;
+    let rejectPromise;
+    const detailsProviderPromise = new Promise((resolve, reject) => {
+      resolvePromise = resolve;
+      rejectPromise = reject;
+    });
+
+    this.setProperties({
+      taskDetailsProviderMode: mode,
+      taskDetailsProviderData: EmberObject.create({
+        atmLambda,
+        stores,
+        task,
+        onSuccess: resolvePromise,
+        onFailure: rejectPromise,
+      }),
+    });
+
+    this.changeSlideViaUrl('lambdaSelector');
+
+    return detailsProviderPromise;
+  },
+
+  finishTaskDetailsProvider(taskData) {
+    this.get('taskDetailsProviderData.onSuccess')(taskData);
+  },
+
+  cancelTaskDetailsProvider() {
+    this.get('taskDetailsProviderData.onFailure')();
   },
 
   actions: {
@@ -151,15 +239,54 @@ export default Component.extend(GlobalActions, {
       this.changeSlideViaUrl('editor', { workflowId });
     },
     backSlide() {
-      if (this.get('activeSlide') === 'list') {
-        return;
+      switch (this.get('activeSlide')) {
+        case 'editor':
+          this.changeSlideViaUrl('list', { workflowId: null });
+          break;
+        case 'lambdaSelector':
+          this.changeSlideViaUrl('editor');
+          this.cancelTaskDetailsProvider();
+          break;
+        case 'taskDetails':
+          this.changeSlideViaUrl('lambdaSelector');
+          break;
       }
-      this.changeSlideViaUrl('list');
     },
     registerViewActions(slideId, actions) {
       this.set('actionsPerSlide', Object.assign({}, this.get('actionsPerSlide'), {
         [slideId]: actions,
       }));
+    },
+    taskProviderLambdaSelected(atmLambda) {
+      this.set('taskDetailsProviderData.atmLambda', atmLambda);
+      this.changeSlideViaUrl('taskDetails');
+    },
+    async taskProviderDataAccepted(taskData) {
+      try {
+        const atmLambda = this.get('taskDetailsProviderData.atmLambda');
+        const atmLambdaId = get(atmLambda, 'entityId');
+        const atmInventory = this.get('atmInventory');
+        const atmLambdasInInventory = await get(
+          await get(atmInventory, 'atmLambdaList'),
+          'list'
+        );
+        if (!atmLambdasInInventory.includes(atmLambda)) {
+          await this.get('workflowManager').attachAtmLambdaToAtmInventory(
+            atmLambdaId,
+            get(atmInventory, 'entityId')
+          );
+        }
+        this.finishTaskDetailsProvider(
+          Object.assign({ lambdaId: atmLambdaId }, taskData)
+        );
+      } catch (e) {
+        this.cancelTaskDetailsProvider();
+      }
+      this.changeSlideViaUrl('editor');
+    },
+    taskProviderCancel() {
+      this.cancelTaskDetailsProvider();
+      this.changeSlideViaUrl('editor');
     },
   },
 });

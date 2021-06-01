@@ -14,13 +14,14 @@
   </h1>
 </div>
 <div class="row content-row">
-  {{#one-spin-button class="btn btn-sm btn-primary" action=(action "save")}}
+  {{#one-spin-button class="btn btn-save btn-sm btn-primary" action=(action "save")}}
     {{tt this "saveBtn"}}
   {{/one-spin-button}}
 </div>
 {{workflow-visualiser
   mode="edit"
   rawData=visualiserData
+  actionsFactory=actionsFactory
   onChange=(action "visualiserDataChange")
 }}
 {{yield}}

@@ -9,6 +9,7 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
+import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
@@ -135,4 +136,9 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {ComputedProperty<Array<AtmLambdaResultSpec>>}
    */
   resultSpecs: attr('array'),
+
+  /**
+   * @type {ComputedProperty<Models.AtmInventoryList>}
+   */
+  atmInventoryList: belongsTo('atm-inventory-list'),
 }).reopenClass(StaticGraphModelMixin);

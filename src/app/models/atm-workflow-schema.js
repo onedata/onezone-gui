@@ -30,6 +30,11 @@ export default Model.extend(GraphSingleModelMixin, {
   atmInventory: belongsTo('atm-inventory'),
 
   /**
+   * @type {ComputedProperty<Models.AtmLambdaList>}
+   */
+  atmLambdaList: belongsTo('atm-lambda-list'),
+
+  /**
    * @type {ComputedProperty<Array<Object>>}
    */
   lanes: attr('array'),

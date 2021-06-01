@@ -12,6 +12,7 @@
       {{#if activeAtmWorkflowSchemaProxy.isFulfilled}}
         {{content-atm-inventories-workflows/editor-view
           atmWorkflowSchema=activeAtmWorkflowSchemaProxy.content
+          actionsFactory=actionsFactory
           onBackSlide=(action "backSlide")
         }}
       {{else}}
@@ -27,6 +28,25 @@
         onAtmWorkflowSchemaAdded=(action "showEditorView")
       }}
     {{/if}}
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="lambdaSelector"}}
+    {{content-atm-inventories-lambdas/list-view
+      atmInventory=atmInventory
+      mode="selection"
+      onAddToAtmWorkflowSchema=(action "taskProviderLambdaSelected")
+      onBackSlide=(action "backSlide")
+    }}
+  {{/carousel.slide}}
+  {{#carousel.slide slideId="taskDetails"}}
+    {{content-atm-inventories-workflows/task-details-view
+      mode=taskDetailsProviderMode
+      atmLambda=taskDetailsProviderData.atmLambda
+      stores=taskDetailsProviderData.stores
+      task=taskDetailsProviderData.task
+      onApplyChanges=(action "taskProviderDataAccepted")
+      onCancel=(action "taskProviderCancel")
+      onBackSlide=(action "backSlide")
+    }}
   {{/carousel.slide}}
 {{/one-carousel}}
 {{yield}}

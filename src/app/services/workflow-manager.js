@@ -11,7 +11,8 @@ import Service, { inject as service } from '@ember/service';
 import { computed, observer, get, getProperties } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
-import { all as allFulfilled, resolve } from 'rsvp';
+import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
+import { all as allFulfilled, allSettled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { promise } from 'ember-awesome-macros';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
@@ -22,7 +23,6 @@ export default Service.extend({
   store: service(),
   recordManager: service(),
   onedataGraph: service(),
-  onedataGraphUtils: service(),
 
   /**
    * Creates new automation inventory.
@@ -205,6 +205,31 @@ export default Service.extend({
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
       .catch(ignoreForbiddenError);
     return atmWorkflowSchema;
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {String} atmInventoryId
+   */
+  async attachAtmLambdaToAtmInventory(atmLambdaId, atmInventoryId) {
+    const {
+      onedataGraph,
+      recordManager,
+    } = this.getProperties('onedataGraph', 'recordManager');
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: atmInventoryEntityType,
+        aspectId: atmInventoryId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    });
+    await allSettled([
+      recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda'),
+      recordManager.reloadRecordListById('atmLambda', atmLambdaId, 'atmInventory'),
+    ]);
   },
 
   /**

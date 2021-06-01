@@ -7,7 +7,8 @@ import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
-import EmberObject, { set } from '@ember/object';
+import EmberObject, { set, get } from '@ember/object';
+import _ from 'lodash';
 
 describe('Integration | Component | content atm inventories workflows/editor view',
   function () {
@@ -20,6 +21,35 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       this.setProperties({
         atmWorkflowSchema: EmberObject.create({
           name: 'workflow1',
+          lanes: [{
+            id: 'l1',
+            name: 'lane1',
+            storeIteratorSpec: {
+              strategy: {
+                type: 'serial',
+              },
+              storeSchemaId: 's1',
+            },
+            parallelBoxes: [{
+              id: 'pbox1',
+              name: 'pbox1',
+              tasks: [{
+                id: 't1',
+                name: 'task1',
+                argumentMappings: [],
+                resultMappings: [],
+              }],
+            }],
+          }],
+          stores: [{
+            id: 's1',
+            name: 'store1',
+            type: 'list',
+            dataSpec: {
+              type: 'string',
+              valueConstraints: {},
+            },
+          }],
         }),
         backSlideSpy: sinon.spy(),
         createModifyAtmWorkflowSchemaActionStub: sinon.stub(workflowActions,
@@ -118,6 +148,49 @@ describe('Integration | Component | content atm inventories workflows/editor vie
 
       expect(this.$('.workflow-schema-name input')).to.exist;
       expect(executeCalled).to.be.false;
+    });
+
+    it('shows workflow schema elements', async function () {
+      await render(this);
+
+      const $workflowVisualiser = this.$('.workflow-visualiser');
+      expect($workflowVisualiser).to.have.class('mode-edit');
+      ['lane1', 'pbox1', 'task1'].forEach(textContent =>
+        expect($workflowVisualiser.text()).to.contain(textContent)
+      );
+    });
+
+    it('allows to save modified workflow schema elements', async function () {
+      const {
+        createModifyAtmWorkflowSchemaActionStub,
+        atmWorkflowSchema,
+      } = this.getProperties(
+        'createModifyAtmWorkflowSchemaActionStub',
+        'atmWorkflowSchema'
+      );
+      createModifyAtmWorkflowSchemaActionStub.returns({
+        execute: () => {
+          return resolve({
+            status: 'done',
+          });
+        },
+      });
+      await render(this);
+
+      await click('.lane-name .one-label');
+      await fillIn('.lane-name .form-control', 'newName');
+      await click('.lane-name .save-icon');
+      await click('.btn-save');
+
+      const newLanes = _.cloneDeep(get(atmWorkflowSchema, 'lanes'));
+      newLanes[0].name = 'newName';
+      expect(createModifyAtmWorkflowSchemaActionStub).to.be.calledOnce
+        .and.to.be.calledWith({
+          atmWorkflowSchema,
+          atmWorkflowSchemaDiff: sinon.match({
+            lanes: newLanes,
+          }),
+        });
     });
   });
 
