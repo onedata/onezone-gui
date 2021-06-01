@@ -5,6 +5,7 @@ import atmWorkflowSchemaDetailsForm from './content-atm-inventories-workflows/at
 import creatorView from './content-atm-inventories-workflows/creator-view';
 import editorView from './content-atm-inventories-workflows/editor-view';
 import loadingView from './content-atm-inventories-workflows/loading-view';
+import taskDetailsView from './content-atm-inventories-workflows/task-details-view';
 
 export default {
   listView,
@@ -14,4 +15,5 @@ export default {
   creatorView,
   editorView,
   loadingView,
+  taskDetailsView,
 };
