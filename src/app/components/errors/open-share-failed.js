@@ -22,6 +22,11 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.errors.openShareFailed',
 
   /**
+   * @virtual
+   */
+  error: undefined,
+
+  /**
    * @type {Object}
    */
   reason: reads('error.reason'),
