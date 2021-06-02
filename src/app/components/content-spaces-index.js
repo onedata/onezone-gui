@@ -72,8 +72,11 @@ export default Component.extend(
      */
     noAddSupportPrivilegeTooltipText: computed('hasAddSupportPrivilege',
       function noAddSupportPrivilegeTooltipText() {
-        const i18n = this.get('i18n');
-        return !this.get('hasAddSupportPrivilege') ? insufficientPrivilegesMessage({
+        const {
+          i18n,
+          hasAddSupportPrivilege,
+        } = this.getProperties('i18n', 'hasAddSupportPrivilege');
+        return !hasAddSupportPrivilege ? insufficientPrivilegesMessage({
           i18n,
           modelName: 'space',
           privilegeFlag: 'space_add_support',

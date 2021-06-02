@@ -78,19 +78,26 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   hasAddSupportPrivilege: reads('space.privileges.addSupport'),
 
   /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasRemoveSupportPrivilege: reads('space.privileges.removeSupport'),
+
+  /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
   openAddStorageAction: computed('hasAddSupportPrivilege', function () {
-    const noPrivileges = !this.get('hasAddSupportPrivilege');
-    const i18n = this.get('i18n');
+    const {
+      hasAddSupportPrivilege,
+      i18n,
+    } = this.getProperties('hasAddSupportPrivilege', 'i18n');
     return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
       class: 'open-add-storage btn-add-support',
       buttonStyle: 'default',
       icon: 'provider-add',
-      disabled: noPrivileges,
-      tip: noPrivileges ? insufficientPrivilegesMessage({
+      disabled: !hasAddSupportPrivilege,
+      tip: !hasAddSupportPrivilege ? insufficientPrivilegesMessage({
         i18n,
         modelName: 'space',
         privilegeFlag: 'space_add_support',
@@ -105,15 +112,17 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   ceaseOneproviderSupportAction: computed(
     'space.privileges.removeSupport',
     function ceaseOneproviderSupportAction() {
-      const noPrivileges = !this.get('space.privileges.removeSupport');
-      const i18n = this.get('i18n');
+      const {
+        hasRemoveSupportPrivilege,
+        i18n,
+      } = this.getProperties('hasRemoveSupportPrivilege', 'i18n');
       return {
         icon: 'leave-space',
         text: this.t('ceaseSupportItem'),
         class: 'cease-oneprovider-support-btn',
         action: (provider) => this.openCeaseModal(provider),
-        isDisabled: noPrivileges,
-        tip: noPrivileges ? insufficientPrivilegesMessage({
+        isDisabled: !hasRemoveSupportPrivilege,
+        tip: !hasRemoveSupportPrivilege ? insufficientPrivilegesMessage({
           i18n,
           modelName: 'space',
           privilegeFlag: 'space_remove_support',
