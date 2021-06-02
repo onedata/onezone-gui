@@ -11,6 +11,4 @@ export default {
   copyProviderDomainAction: 'Copy provider domain',
   browseFilesAction: 'Browse files',
   showDetailsAction: 'Show details',
-  requireRemoveSupportTip: 'Insufficient privileges (requires "Remove support" privilege in the space)',
-  requireAddSupportTip: 'Insufficient privileges (requires "Add support" privilege in the space)',
 };

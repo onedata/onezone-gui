@@ -9,5 +9,4 @@ export default {
   addSupport: 'Add support',
   browseFiles: 'Browse files',
   sharesCount: 'Shares',
-  requireAddSupportTip: 'Insufficient privileges (requires "Add support" privilege in the space)',
 };

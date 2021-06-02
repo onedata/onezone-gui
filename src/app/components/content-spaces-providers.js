@@ -16,6 +16,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import { collect } from 'ember-awesome-macros';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   classNames: ['content-spaces-providers'],
@@ -74,26 +75,26 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   /**
    * @type {Ember.ComputedProperty <boolean>}
    */
-  hasAddSupportPrivilege: computed(
-    'space.currentUserEffPrivileges.[]',
-    function hasAddSupportPrivilege() {
-      return this.get('space.currentUserEffPrivileges').includes('space_add_support');
-    }
-  ),
+  hasAddSupportPrivilege: reads('space.privileges.addSupport'),
 
   /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
   openAddStorageAction: computed('hasAddSupportPrivilege', function () {
-    const disabled = !this.get('hasAddSupportPrivilege');
+    const noPrivileges = !this.get('hasAddSupportPrivilege');
+    const i18n = this.get('i18n');
     return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
       class: 'open-add-storage btn-add-support',
       buttonStyle: 'default',
       icon: 'provider-add',
-      disabled,
-      tip: disabled ? this.t('requireAddSupportTip') : null,
+      disabled: noPrivileges,
+      tip: noPrivileges ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_add_support',
+      }) : null,
     };
   }),
 
@@ -102,16 +103,21 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   }),
 
   ceaseOneproviderSupportAction: computed(
-    'space.currentUserEffPrivileges.[]',
+    'space.privileges.removeSupport',
     function ceaseOneproviderSupportAction() {
-      const isDisabled = !this.get('space.currentUserEffPrivileges').includes('space_remove_support');
+      const noPrivileges = !this.get('space.privileges.removeSupport');
+      const i18n = this.get('i18n');
       return {
         icon: 'leave-space',
         text: this.t('ceaseSupportItem'),
         class: 'cease-oneprovider-support-btn',
         action: (provider) => this.openCeaseModal(provider),
-        isDisabled,
-        tip: isDisabled ? this.t('requireRemoveSupportTip') : null,
+        isDisabled: noPrivileges,
+        tip: noPrivileges ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_remove_support',
+        }) : null,
       };
     }
   ),

@@ -36,7 +36,7 @@
         footerLinkToParams=(if (and isSupported hasAddSupportPrivilege)
           (array "onedata.sidebar.content.aspect" "spaces" spaceId "support")
         )
-        tooltipText=(if (not hasAddSupportPrivilege) (tt this "requireAddSupportTip"))
+        tooltipText=noAddSupportPrivilegeTooltipText
         footerClass=(if (not hasAddSupportPrivilege) "not-allowed")
       }}
         {{#loading-container

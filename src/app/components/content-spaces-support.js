@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, {
   i18nPrefix: 'components.contentSpacesSupport',
@@ -22,11 +22,5 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty <boolean>}
    */
-  hasAddSupportPrivilege: computed(
-    'space.currentUserEffPrivileges.[]',
-    function hasAddSupportPrivilege() {
-      const currentUserEffPrivileges = this.get('space.currentUserEffPrivileges');
-      return currentUserEffPrivileges.includes('space_add_support');
-    }
-  ),
+  hasAddSupportPrivilege: reads('space.privileges.addSupport'),
 });
