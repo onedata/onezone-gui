@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7264 Changed error page when share could not be opened
 * VFS-7470 Fixed text selection in resource name editors in sidebar
 * VFS-7491 Fixed column labels overflow in harvesting progress table
 * VFS-7413 Fixed missing members with duplicated names
