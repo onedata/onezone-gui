@@ -1,5 +1,5 @@
 /**
- * Component that show info "Share not found".
+ * Component that shows info "Share not found".
  *
  * @module components/share-not-found
  * @author Agnieszka Warchoł
