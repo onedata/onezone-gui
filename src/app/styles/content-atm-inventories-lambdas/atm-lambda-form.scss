@@ -1,10 +1,10 @@
-.content-atm-inventories-lambdas .atm-lambda-form {
+.atm-lambda-form {
   $padding-right: 15em;
   $space-for-remove-entry: 1em;
   $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) / 2;
   $nested-fields-indent: 2em;
 
-  .one-way-toggle {
+  .form .one-way-toggle {
     display: inline-flex;
   }
 
@@ -50,7 +50,7 @@
     margin-left: $nested-fields-indent;
   }
 
-  .footer-buttons {
+  .form .footer-buttons {
     float: none;
     text-align: left;
     .btn {

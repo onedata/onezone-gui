@@ -7,29 +7,31 @@
     <div class="resource-name">{{headerText}}</div>
   </h1>
 </div>
-{{workflow-visualiser/task-form
-  mode=mode
-  atmLambda=atmLambda
-  stores=stores
-  task=task
-  isDisabled=isSubmittingData
-  onChange=(action "formDataChanged")
-}}
-<div class="btn-toolbar">
-  {{#one-spin-button
-    class="btn btn-primary btn-submit clickable"
-    action=(action "submit")
-    disabled=(not isDataValid)
+<div class="task-form-container">
+  {{workflow-visualiser/task-form
+    mode=mode
+    atmLambda=atmLambda
+    stores=stores
+    task=task
+    isDisabled=isSubmittingData
+    onChange=(action "formDataChanged")
   }}
-    {{submitBtnText}}
-  {{/one-spin-button}}
-  {{#bs-button
-    type="default"
-    class="btn-cancel clickable"
-    disabled=isSubmittingData
-    onClick=(action "cancel")
-  }}
-    {{tt this "buttons.cancel"}}
-  {{/bs-button}}
+  <div class="btn-toolbar">
+    {{#one-spin-button
+      class="btn btn-primary btn-submit clickable"
+      action=(action "submit")
+      disabled=(not isDataValid)
+    }}
+      {{submitBtnText}}
+    {{/one-spin-button}}
+    {{#bs-button
+      type="default"
+      class="btn-cancel clickable"
+      disabled=isSubmittingData
+      onClick=(action "cancel")
+    }}
+      {{tt this "buttons.cancel"}}
+    {{/bs-button}}
+  </div>
 </div>
 {{yield}}

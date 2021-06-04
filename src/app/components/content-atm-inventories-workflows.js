@@ -15,6 +15,7 @@ import { reads } from '@ember/object/computed';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
 import { Promise } from 'rsvp';
+import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(GlobalActions, {
   classNames: ['content-atm-inventories-workflows'],
@@ -149,7 +150,7 @@ export default Component.extend(GlobalActions, {
       if (activeAtmWorkflowSchemaId !== activeAtmWorkflowSchemaIdFromUrl) {
         this.set('activeAtmWorkflowSchemaId', activeAtmWorkflowSchemaIdFromUrl);
         if (['lambdaSelector', 'taskDetails'].includes(activeSlide)) {
-          this.changeSlideViaUrl('editor');
+          scheduleOnce('afterRender', this, 'changeSlideViaUrl', 'editor');
         }
       }
     }
@@ -176,8 +177,11 @@ export default Component.extend(GlobalActions, {
   init() {
     this._super(...arguments);
     const actionsFactory = ActionsFactory.create({ ownerSource: this });
-    actionsFactory.registerTaskDetailsProviderCallback(
-      (...args) => this.runTaskDetailsProvider(...args)
+    actionsFactory.registerTaskDetailsCreateProviderCallback(
+      (...args) => this.runTaskDetailsProvider('create', ...args)
+    );
+    actionsFactory.registerTaskDetailsModifyProviderCallback(
+      (...args) => this.runTaskDetailsProvider('edit', ...args)
     );
     this.setProperties({
       actionsPerSlide: {},
@@ -217,7 +221,7 @@ export default Component.extend(GlobalActions, {
       }),
     });
 
-    this.changeSlideViaUrl('lambdaSelector');
+    this.changeSlideViaUrl(mode === 'create' ? 'lambdaSelector' : 'taskDetails');
 
     return detailsProviderPromise;
   },
@@ -239,7 +243,11 @@ export default Component.extend(GlobalActions, {
       this.changeSlideViaUrl('editor', { workflowId });
     },
     backSlide() {
-      switch (this.get('activeSlide')) {
+      const {
+        activeSlide,
+        taskDetailsProviderMode,
+      } = this.getProperties('activeSlide', 'taskDetailsProviderMode');
+      switch (activeSlide) {
         case 'editor':
           this.changeSlideViaUrl('list', { workflowId: null });
           break;
@@ -248,7 +256,12 @@ export default Component.extend(GlobalActions, {
           this.cancelTaskDetailsProvider();
           break;
         case 'taskDetails':
-          this.changeSlideViaUrl('lambdaSelector');
+          if (taskDetailsProviderMode === 'create') {
+            this.changeSlideViaUrl('lambdaSelector');
+          } else {
+            this.changeSlideViaUrl('editor');
+            this.cancelTaskDetailsProvider();
+          }
           break;
       }
     },

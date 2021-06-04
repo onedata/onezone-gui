@@ -93,6 +93,7 @@ describe('Integration | Component | content atm inventories workflows', function
           name: 'pbox1',
           tasks: [{
             id: 't1',
+            lambdaId: 'lambda1',
             name: 'task1',
             argumentMappings: [],
             resultMappings: [],
@@ -134,32 +135,45 @@ describe('Integration | Component | content atm inventories workflows', function
     atmWorkflowSchemas.forEach(atmWorkflowSchema =>
       atmWorkflowSchema.atmInventory = promiseObject(resolve(atmInventory))
     );
+
     const workflowManager = lookupService(this, 'workflow-manager');
-    this.setProperties({
-      atmInventory,
-      atmWorkflowSchemas,
-      getRecordByIdStub: sinon.stub(lookupService(this, 'record-manager'), 'getRecordById')
-        .callsFake((modelName, id) => {
-          if (modelName !== 'atmWorkflowSchema') {
-            return resolve();
-          }
-          const atmWorkflowSchema = atmWorkflowSchemas.findBy('entityId', id);
-          return resolve(atmWorkflowSchema || {
-            name: 'someName',
-            atmInventory: promiseObject(resolve(atmInventory)),
-          });
-        }),
-      attachAtmLambdaToAtmInventoryStub: sinon.stub(
-        workflowManager,
-        'attachAtmLambdaToAtmInventory'
-      ).resolves(),
-    });
-    sinon.stub(lookupService(this, 'navigation-state'), 'changeRouteAspectOptions')
+    const recordManager = lookupService(this, 'record-manager');
+    const navigationState = lookupService(this, 'navigation-state');
+    sinon.stub(navigationState, 'changeRouteAspectOptions')
       .callsFake(function (newOptions) {
         this.set('aspectOptions', newOptions);
       });
     sinon.stub(workflowManager, 'getAllKnownAtmLambdas')
       .returns(promiseArray(resolve(allInventoriesLambdas)));
+    const attachAtmLambdaToAtmInventoryStub = sinon.stub(
+      workflowManager,
+      'attachAtmLambdaToAtmInventory'
+    ).resolves();
+    const getRecordByIdStub = sinon.stub(recordManager, 'getRecordById')
+      .callsFake((modelName, id) => {
+        if (modelName === 'atmWorkflowSchema') {
+          const atmWorkflowSchema = atmWorkflowSchemas.findBy('entityId', id);
+          return resolve(atmWorkflowSchema || {
+            name: 'someName',
+            atmInventory: promiseObject(resolve(atmInventory)),
+          });
+        }
+        return resolve(null);
+      });
+    sinon.stub(recordManager, 'getLoadedRecordById')
+      .callsFake((modelName, id) => {
+        if (modelName === 'atmLambda') {
+          return atmLambdas.findBy('entityId', id) || null;
+        }
+        return null;
+      });
+
+    this.setProperties({
+      atmInventory,
+      atmWorkflowSchemas,
+      getRecordByIdStub,
+      attachAtmLambdaToAtmInventoryStub,
+    });
   });
 
   it('has class "content-atm-inventories-workflows"', function () {
@@ -510,6 +524,71 @@ describe('Integration | Component | content atm inventories workflows', function
 
         await click(editorSlide.querySelector('.create-task-action-trigger'));
         await click(lambdaSelectorSlide.querySelector('.add-to-workflow-action-trigger'));
+        await click(taskDetailsSlide.querySelector('.btn-cancel'));
+
+        expect(isSlideActive('editor')).to.be.true;
+      });
+
+    it('allows to modify existing task', async function () {
+      const navigationsState = lookupService(this, 'navigation-state');
+      set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+      await render(this);
+      const editorSlide = getSlide('editor');
+      const taskDetailsSlide = getSlide('taskDetails');
+
+      await click(editorSlide.querySelector('.task-actions-trigger'));
+      await click('.modify-task-action-trigger');
+
+      expect(isSlideActive('taskDetails')).to.be.true;
+      await fillIn('.name-field .form-control', 'newName');
+      await selectChoose('.valueBuilderType-field', 'Store credentials');
+      await selectChoose('.valueBuilderStore-field', 'store1');
+      await click(taskDetailsSlide.querySelector('.btn-submit'));
+
+      expect(isSlideActive('editor')).to.be.true;
+      const tasks = editorSlide.querySelectorAll('.workflow-visualiser-task');
+      expect(tasks).to.have.length(1);
+      expect(tasks[0].innerText).to.contain('newName');
+      await click(editorSlide.querySelector('.btn-save'));
+
+      const atmWorkflowSchema = this.get('atmWorkflowSchemas').findBy('entityId', 'w1id');
+      expect(atmWorkflowSchema.lanes[0].parallelBoxes[0].tasks[0]).to.deep.include({
+        name: 'newName',
+        argumentMappings: [{
+          argumentName: 'argstore',
+          valueBuilder: {
+            valueBuilderType: 'storeCredentials',
+            valueBuilderRecipe: 's1',
+          },
+        }],
+      });
+    });
+
+    it('allows to go back to editor from task details during task modification',
+      async function () {
+        const navigationsState = lookupService(this, 'navigation-state');
+        set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        await render(this);
+        const editorSlide = getSlide('editor');
+        const taskDetailsSlide = getSlide('taskDetails');
+
+        await click(editorSlide.querySelector('.task-actions-trigger'));
+        await click('.modify-task-action-trigger');
+        await click(taskDetailsSlide.querySelector('.content-back-link'));
+
+        expect(isSlideActive('editor')).to.be.true;
+      });
+
+    it('navigates to editor on "Cancel" click from task details during task modification',
+      async function () {
+        const navigationsState = lookupService(this, 'navigation-state');
+        set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        await render(this);
+        const editorSlide = getSlide('editor');
+        const taskDetailsSlide = getSlide('taskDetails');
+
+        await click(editorSlide.querySelector('.task-actions-trigger'));
+        await click('.modify-task-action-trigger');
         await click(taskDetailsSlide.querySelector('.btn-cancel'));
 
         expect(isSlideActive('editor')).to.be.true;

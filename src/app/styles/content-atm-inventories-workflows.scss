@@ -3,6 +3,7 @@
 @import './content-atm-inventories-workflows/creator-view';
 @import './content-atm-inventories-workflows/editor-view';
 @import './content-atm-inventories-workflows/loading-view';
+@import './content-atm-inventories-workflows/task-details-view';
 
 .content-atm-inventories-workflows {
   @include full-col-content-height();

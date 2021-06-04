@@ -1,0 +1,23 @@
+.content-atm-inventories-workflows-task-details-view {
+  $form-max-width: 900px;
+
+  .task-form-container {
+    margin: $padding-large-vertical 0;
+  }
+
+  .name-field,
+  .form-fields-collection-group {
+    max-width: $form-max-width;
+  }
+
+  .btn-toolbar {
+    margin-top: $padding-base-vertical;
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .task-form-container {
+      margin-left: $mobile-horizontal-content-padding;
+      margin-right: $mobile-horizontal-content-padding;
+    }
+  }
+}

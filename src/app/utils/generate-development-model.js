@@ -285,8 +285,8 @@ export default function generateDevelopmentModel(store) {
                 store, record, 'atmInventory', groups
               ),
               attachAtmLambdasToAtmInventory(store, record),
-              attachAtmWorkflowSchemasToAtmInventory(store, record),
             ])
+            .then(() => attachAtmWorkflowSchemasToAtmInventory(store, record))
           ))
         )
       )
@@ -942,19 +942,46 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
   });
 }
 
-function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
-  return allFulfilled(_.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map((index) => {
-    return store.createRecord('atmWorkflowSchema', {
-      name: `Workflow ${index}`,
-      description: `Some very complicated workflow #${index}`,
-      atmInventory,
-      lanes: [],
-      stores: [],
-    }).save();
-  })).then(atmWorkflowSchemas =>
-    createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas)
-  ).then(listRecord => {
-    set(atmInventory, 'atmWorkflowSchemaList', listRecord);
-    return atmInventory.save();
-  });
+async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
+  const inventoryAtmLambdas = await get(await get(atmInventory, 'atmLambdaList'), 'list');
+  const atmWorkflowSchemas = await allFulfilled(
+    _.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map(async (index) => {
+      const workflowAtmLambdas =
+        await createListRecord(store, 'atmLambda', inventoryAtmLambdas);
+      return await store.createRecord('atmWorkflowSchema', {
+        name: `Workflow ${index}`,
+        description: `Some very complicated workflow #${index}`,
+        atmLambdaList: workflowAtmLambdas,
+        atmInventory,
+        lanes: [{
+          id: 'lane1',
+          name: 'lane 1',
+          storeIteratorSpec: {
+            strategy: {
+              type: 'serial',
+            },
+            storeSchemaId: 'store1',
+          },
+          parallelBoxes: [{
+            id: 'pbox1-1',
+            name: 'Parallel box',
+            tasks: [],
+          }],
+        }],
+        stores: [{
+          id: 'store1',
+          name: 'store 1',
+          type: 'list',
+          dataSpec: {
+            type: 'string',
+            valueConstraints: {},
+          },
+        }],
+      }).save();
+    })
+  );
+  const listRecord =
+    await createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas);
+  set(atmInventory, 'atmWorkflowSchemaList', listRecord);
+  return await atmInventory.save();
 }
