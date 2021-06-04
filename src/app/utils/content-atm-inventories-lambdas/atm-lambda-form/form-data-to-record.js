@@ -107,13 +107,23 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
       'entryDefaultValue'
     );
 
+    const dataSpec = typeToDataSpec(entryType);
     const lambdaData = {
       name: entryName,
-      dataSpec: typeToDataSpec(entryType),
+      dataSpec,
       isBatch: entryBatch,
     };
     if (dataType === 'argument') {
-      lambdaData.defaultValue = entryDefaultValue;
+      if (dataSpec &&
+        !['storeCredentials', 'onedatafsCredentials'].includes(dataSpec.type) &&
+        entryDefaultValue
+      ) {
+        try {
+          lambdaData.defaultValue = JSON.parse(entryDefaultValue);
+        } catch (e) {
+          lambdaData.defaultValue = undefined;
+        }
+      }
       lambdaData.isOptional = entryOptional;
     }
     return lambdaData;

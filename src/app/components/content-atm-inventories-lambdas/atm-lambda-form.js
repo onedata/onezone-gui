@@ -19,9 +19,10 @@ import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
+import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy } from 'ember-awesome-macros';
+import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy, array } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import {
@@ -421,8 +422,18 @@ function createFunctionArgResGroup(component, dataType) {
     defaultValue: false,
     component,
   });
-  const generateEntryDefaultValueField = mode => TextField.extend({
-    isVisible: not(and('isInViewMode', isEmpty('value'))),
+  const generateEntryDefaultValueField = mode => JsonField.extend({
+    isVisible: not(or(
+      and('isInViewMode', isEmpty('value')),
+      array.includes(raw([
+        'singleValueStore',
+        'listStore',
+        'mapStore',
+        'treeForestStore',
+        'histogramStore',
+        'onedatafsCredentials',
+      ]), 'parent.value.entryType')
+    )),
   }).create({
     mode,
     name: 'entryDefaultValue',

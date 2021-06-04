@@ -129,7 +129,7 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       entryDefaultValue: defaultValue,
     };
     if (dataType === 'argument') {
-      formData[valueName].entryDefaultValue = defaultValue;
+      formData[valueName].entryDefaultValue = JSON.stringify(defaultValue);
       formData[valueName].entryOptional = isOptional;
     }
   });
