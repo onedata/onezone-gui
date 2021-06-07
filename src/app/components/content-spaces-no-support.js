@@ -19,13 +19,4 @@ export default Component.extend(I18n, {
   router: service(),
 
   i18nPrefix: 'components.contentSpacesNoSupport',
-
-  actions: {
-    openAddStorage() {
-      return this.get('router').transitionTo(
-        'onedata.sidebar.content.aspect',
-        'support'
-      );
-    },
-  },
 });

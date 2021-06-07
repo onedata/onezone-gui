@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7046 Improved UX of "Add support" views
+* VFS-7264 Changed error page when share could not be opened
 * VFS-7705 Added support for additional file actions in archive file browser
 * VFS-7374 Added id copiers for groups, tokens, shares, spaces
 * VFS-7473 Added support for datasets and archives
