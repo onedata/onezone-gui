@@ -164,6 +164,10 @@ export default Component.extend(GlobalActions, {
         behavior: 'smooth',
       });
     }
+    const activeSlide = this.get('activeSlide');
+    if (!['lambdaSelector', 'taskDetails'].includes(activeSlide)) {
+      this.cancelTaskDetailsProvider();
+    }
   }),
 
   changeSlideViaUrl(newSlide, slideParams = {}) {
@@ -227,11 +231,13 @@ export default Component.extend(GlobalActions, {
   },
 
   finishTaskDetailsProvider(taskData) {
-    this.get('taskDetailsProviderData.onSuccess')(taskData);
+    const onSuccessCallback = this.get('taskDetailsProviderData.onSuccess');
+    onSuccessCallback && onSuccessCallback(taskData);
   },
 
   cancelTaskDetailsProvider() {
-    this.get('taskDetailsProviderData.onFailure')();
+    const onFailureCallback = this.get('taskDetailsProviderData.onFailure');
+    onFailureCallback && onFailureCallback();
   },
 
   actions: {
@@ -240,7 +246,20 @@ export default Component.extend(GlobalActions, {
     },
     showEditorView(atmWorkflowSchema) {
       const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
+      const schemaTheSameAsPrevOne = workflowId === this.get('activeAtmWorkflowSchemaId');
       this.changeSlideViaUrl('editor', { workflowId });
+
+      if (schemaTheSameAsPrevOne) {
+        // Notify about change in case when selected workflow schema is the same
+        // as previously selected. It should reset editor state by treating selected
+        // schema as different one.
+        scheduleOnce(
+          'afterRender',
+          this,
+          'notifyPropertyChange',
+          'activeAtmWorkflowSchemaProxy'
+        );
+      }
     },
     backSlide() {
       const {
@@ -249,7 +268,7 @@ export default Component.extend(GlobalActions, {
       } = this.getProperties('activeSlide', 'taskDetailsProviderMode');
       switch (activeSlide) {
         case 'editor':
-          this.changeSlideViaUrl('list', { workflowId: null });
+          this.changeSlideViaUrl('list');
           break;
         case 'lambdaSelector':
           this.changeSlideViaUrl('editor');

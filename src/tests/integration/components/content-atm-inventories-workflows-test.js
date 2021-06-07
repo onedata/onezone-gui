@@ -325,7 +325,7 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('list')).to.be.true;
       expect(get(navigationState, 'aspectOptions')).to.deep.equal({
         view: 'list',
-        workflowId: null,
+        workflowId: 'abc',
       });
     });
 
@@ -356,7 +356,7 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('list')).to.be.true;
       expect(get(navigationState, 'aspectOptions')).to.deep.equal({
         view: 'list',
-        workflowId: null,
+        workflowId: 'abc',
       });
     });
 
