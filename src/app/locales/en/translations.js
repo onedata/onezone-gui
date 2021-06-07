@@ -30,6 +30,7 @@ import contentSpacesData from './components/content-spaces-data';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import contentSpacesHarvesters from './components/content-spaces-harvesters';
+import contentSpacesAutomation from './components/content-spaces-automation';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentProviderEmpty from './components/content-provider-empty';
 import contentGroupsNew from './components/content-groups-new';
@@ -169,6 +170,7 @@ const translations = {
     contentSpacesShares,
     contentSpacesTransfers,
     contentSpacesHarvesters,
+    contentSpacesAutomation,
     oneproviderViewContainer,
     contentGroupsNew,
     contentGroupsEmpty,
