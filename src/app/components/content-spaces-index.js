@@ -18,6 +18,7 @@ import { promise } from 'ember-awesome-macros';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(
   I18n,
@@ -60,6 +61,27 @@ export default Component.extend(
      * @type {Ember.ComputedProperty<PromiseArray<models/Provider>>}
      */
     providersProxy: reads('space.providerList.list'),
+
+    /**
+     * @type {Ember.ComputedProperty <boolean>}
+     */
+    hasAddSupportPrivilege: reads('space.privileges.addSupport'),
+
+    /**
+     * @type {Ember.ComputedProperty<string|null>}
+     */
+    noAddSupportPrivilegeTooltipText: computed('hasAddSupportPrivilege',
+      function noAddSupportPrivilegeTooltipText() {
+        const {
+          i18n,
+          hasAddSupportPrivilege,
+        } = this.getProperties('i18n', 'hasAddSupportPrivilege');
+        return !hasAddSupportPrivilege ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_add_support',
+        }) : null;
+      }),
 
     /**
      * @type {ComputedProperty<Models.Provider>}

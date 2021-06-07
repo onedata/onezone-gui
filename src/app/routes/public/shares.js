@@ -19,7 +19,15 @@ export default Route.extend({
   navigationState: service(),
 
   model({ share_id: shareId }) {
-    return this.get('shareManager').getShareById(shareId, 'public');
+    return this.get('shareManager').getShareById(shareId, 'public').catch(error => {
+      if (error.id === 'notFound') {
+        throw { isOnedataCustomError: true, type: 'share-not-found' };
+      } else {
+        throw { isOnedataCustomError: true, type: 'open-share-failed', reason: error };
+      }
+
+    });
+
   },
 
   afterModel(model) {
