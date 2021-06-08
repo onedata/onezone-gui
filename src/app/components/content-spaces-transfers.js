@@ -3,22 +3,17 @@
  * 
  * @module components/content-spaces-transfers
  * @author Jakub Liput
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 
-export default Component.extend(I18n, {
-  classNames: [
-    'oneprovider-view-container',
-    'content-spaces-transfers',
-    'absolute-flex-content',
-    'no-pointer-events',
-  ],
+export default ContentOneproviderContainerBase.extend(I18n, {
+  classNames: ['content-spaces-transfers'],
 
   navigationState: service(),
 
@@ -41,10 +36,4 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   tab: reads('navigationState.aspectOptions.tab'),
-
-  actions: {
-    oneproviderIdChanged(oneproviderId) {
-      this.get('navigationState').setAspectOptions({ oneproviderId });
-    },
-  },
 });
