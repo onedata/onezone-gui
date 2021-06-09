@@ -15,7 +15,7 @@ export default Mixin.create({
 
   actions: {
     updateDirId(dirId) {
-      return this.get('navigationState').setAspectOptions({
+      return this.get('navigationState').changeRouteAspectOptions({
         dirId,
       });
     },

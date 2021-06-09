@@ -15,6 +15,7 @@ export default _.merge({}, privilegesAspectBase, {
     groupManagement: 'Group management',
     supportManagement: 'Support management',
     harvesterManagement: 'Harvester management',
+    datasetArchiveManagement: 'Dataset & archive management',
     automationManagement: 'Automation management',
   },
   privileges: Object.keys(privileges.space).reduce((obj, key) => {

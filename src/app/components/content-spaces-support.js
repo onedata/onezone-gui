@@ -9,6 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { reads } from '@ember/object/computed';
 
 export default Component.extend(I18n, {
   i18nPrefix: 'components.contentSpacesSupport',
@@ -17,4 +18,9 @@ export default Component.extend(I18n, {
    * @type {models/Space}
    */
   space: undefined,
+
+  /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasAddSupportPrivilege: reads('space.privileges.addSupport'),
 });

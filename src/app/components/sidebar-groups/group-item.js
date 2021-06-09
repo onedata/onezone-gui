@@ -24,6 +24,7 @@ export default Component.extend(I18n, {
   groupActions: service(),
   router: service(),
   navigationState: service(),
+  globalClipboard: service(),
 
   /**
    * @override
@@ -104,12 +105,28 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed(function copyIdAction() {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('group.entityId'),
+        this.t('groupId')
+      ),
+      title: this.t('copyId'),
+      class: 'copy-group-id-action-trigger',
+      icon: 'copy',
+    };
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   itemActions: collect(
     'renameAction',
     'removeAction',
-    'leaveAction'
+    'leaveAction',
+    'copyIdAction'
   ),
 
   /**

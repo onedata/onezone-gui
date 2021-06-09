@@ -18,6 +18,7 @@ import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import DOMPurify from 'npm:dompurify';
+import isIp from 'npm:is-ip';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -38,6 +39,11 @@ export default LoginFormContainer.extend(
      * @override
      */
     i18nPrefix: 'components.loginBox.loginFormContainer',
+
+    /**
+     * @type {Location}
+     */
+    _location: location,
 
     /**
      * @type {boolean}
@@ -132,6 +138,14 @@ export default LoginFormContainer.extend(
       } else {
         return [];
       }
+    }),
+
+    /**
+     * @type {computed.boolean}
+     */
+    showIpWarning: computed(function showIpWarning() {
+      const hostname = this.get('_location.hostname');
+      return isIp(hostname);
     }),
 
     /**

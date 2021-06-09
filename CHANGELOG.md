@@ -6,6 +6,20 @@ CHANGELOG
 
 ### Latest changes
 
+* VSF-7738 Fixed issues with datasets/archives browser navigation
+* VFS-7046 Improved UX of "Add support" views
+* VFS-7264 Changed error page when share could not be opened
+* VFS-7705 Added support for additional file actions in archive file browser
+* VFS-7374 Added id copiers for groups, tokens, shares, spaces
+* VFS-7473 Added support for datasets and archives
+* VFS-7561 Changed "Space > Data" tab name to "Files"
+* VFS-7663 Changed login background image
+* VFS-7514 Added displaying IDs in token consumer
+* VFS-7319 Added warning when signing-in using IP address
+* VFS-7588 Added onepanel rest token template
+* VFS-7677 Added ID copier to harvester items in sidebar
+* VFS-7470 Fixed text selection in resource name editors in sidebar
+* VFS-7450 Added frames for auth providers on account screen
 * VFS-5690 Added opening cluster invalid cert link in new tab and countdown for retry
 * VFS-7491 Fixed column labels overflow in harvesting progress table
 * VFS-7228 Better UX of token consumer page

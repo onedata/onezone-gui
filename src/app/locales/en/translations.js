@@ -20,6 +20,7 @@ import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
+import sidebarShares from './components/sidebar-shares';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -27,6 +28,7 @@ import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
 import contentSpacesData from './components/content-spaces-data';
+import contentSpacesDatasets from './components/content-spaces-datasets';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import contentSpacesHarvesters from './components/content-spaces-harvesters';
@@ -93,6 +95,8 @@ import emptyCollectionSidebar from './components/empty-collection-sidebar';
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
+import shareNotFound from './components/errors/share-not-found';
+import openShareFailed from './components/errors/open-share-failed';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -152,6 +156,10 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
     },
+    errors: {
+      shareNotFound,
+      openShareFailed,
+    },
     loginBox,
     contentTokens,
     contentProviderRedirect,
@@ -159,6 +167,7 @@ const translations = {
     sidebarSpaces,
     sidebarProviders,
     sidebarGroups,
+    sidebarShares,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,
@@ -167,6 +176,7 @@ const translations = {
     contentSpacesSupport,
     contentSpacesProviders,
     contentSpacesData,
+    contentSpacesDatasets,
     contentSpacesShares,
     contentSpacesTransfers,
     contentSpacesHarvesters,
