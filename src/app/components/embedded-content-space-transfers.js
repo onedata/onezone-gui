@@ -70,13 +70,13 @@ export default OneproviderEmbeddedContainer.extend({
       }, true);
     },
     resetQueryParams() {
-      return this.get('navigationState').setAspectOptions({
+      return this.get('navigationState').changeRouteAspectOptions({
         tab: null,
         fileId: null,
       });
     },
     changeListTab(tab) {
-      return this.get('navigationState').setAspectOptions({
+      return this.get('navigationState').changeRouteAspectOptions({
         tab,
       });
     },

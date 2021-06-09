@@ -109,7 +109,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   },
 
   attachmentStateChanged(attachmentState) {
-    this.get('navigationState').setAspectOptions({
+    this.get('navigationState').changeRouteAspectOptions({
       attachmentState,
       dataset: null,
     });

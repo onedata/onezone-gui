@@ -31,7 +31,7 @@ export default Component.extend(I18n, {
 
   actions: {
     oneproviderIdChanged(oneproviderId, replaceHistory) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         oneproviderId,
       }, replaceHistory);
     },

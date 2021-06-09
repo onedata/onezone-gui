@@ -79,7 +79,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
 
   actions: {
     updateShareId(shareId) {
-      return this.get('navigationState').setAspectOptions({
+      return this.get('navigationState').changeRouteAspectOptions({
         shareId,
       });
     },

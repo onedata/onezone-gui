@@ -51,7 +51,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         selected: value && value.join(',') || null,
       });
       return value;
@@ -85,7 +85,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   actions: {
     updateDirEntityId(dirEntityId) {
-      this.get('navigationState').setAspectOptions({ dir: dirEntityId, selected: null });
+      this.get('navigationState').changeRouteAspectOptions({ dir: dirEntityId, selected: null });
     },
     updateSelected(selected) {
       this.set('selected', selected);
