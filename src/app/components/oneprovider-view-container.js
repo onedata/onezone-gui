@@ -299,7 +299,11 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   selectDefaultProvider(providers = this.get('providers')) {
     return this.chooseDefaultOneprovider(providers).then(defaultProvider => {
       if (defaultProvider) {
-        this.get('oneproviderIdChanged')(get(defaultProvider, 'entityId'));
+        const providerId = get(defaultProvider, 'entityId');
+        this.get('oneproviderIdChanged')(
+          providerId,
+          true,
+        );
       }
     });
   },

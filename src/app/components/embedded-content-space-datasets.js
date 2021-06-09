@@ -88,7 +88,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       return rawSelected && rawSelected.split(',') || [];
     },
     set(key, value) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         selected: value && value.join(',') || null,
       });
       return value;
@@ -134,30 +134,30 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   actions: {
     updateDatasetId(datasetId) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         dataset: datasetId,
         selected: null,
       });
     },
     updateArchiveId(archiveId) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         archive: archiveId,
         selected: null,
       });
     },
     updateDirId(dirId) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         dir: dirId,
         selected: null,
       });
     },
     updateSelected(selected) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         selected: Array.isArray(selected) ? selected.join(',') : selected || null,
       });
     },
     updateViewMode(viewMode) {
-      this.get('navigationState').setAspectOptions({
+      this.get('navigationState').changeRouteAspectOptions({
         viewMode,
       });
     },

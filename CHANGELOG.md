@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VSF-7738 Fixed issues with datasets/archives browser navigation
 * VFS-7046 Improved UX of "Add support" views
 * VFS-7264 Changed error page when share could not be opened
 * VFS-7705 Added support for additional file actions in archive file browser

@@ -3,11 +3,10 @@
  * 
  * @module components/content-spaces-datasets
  * @author Jakub Liput
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -15,14 +14,10 @@ import { inject as service } from '@ember/service';
 import { or, raw, promise, notEqual } from 'ember-awesome-macros';
 import { defer } from 'rsvp';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 
-export default Component.extend(I18n, {
-  classNames: [
-    'oneprovider-view-container',
-    'content-spaces-datasets',
-    'absolute-flex-content',
-    'no-pointer-events',
-  ],
+export default ContentOneproviderContainerBase.extend(I18n, {
+  classNames: ['content-spaces-datasets'],
 
   navigationState: service(),
 
@@ -32,11 +27,6 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentSpacesDatasets',
 
   datasetDataMapping: Object.freeze({}),
-
-  /**
-   * @type {string}
-   */
-  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
 
   /**
    * Entity ID of dataset currently opened in datasets browser.
@@ -119,18 +109,13 @@ export default Component.extend(I18n, {
   },
 
   attachmentStateChanged(attachmentState) {
-    this.get('navigationState').setAspectOptions({
+    this.get('navigationState').changeRouteAspectOptions({
       attachmentState,
       dataset: null,
     });
   },
 
   actions: {
-    oneproviderIdChanged(oneproviderId) {
-      this.get('navigationState').setAspectOptions({
-        oneproviderId,
-      });
-    },
     attachmentStateChanged(attachmentState) {
       this.attachmentStateChanged(attachmentState);
     },

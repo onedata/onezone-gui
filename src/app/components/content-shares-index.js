@@ -3,24 +3,18 @@
  * 
  * @module components/content-shares-index
  * @author Jakub Liput
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { promise } from 'ember-awesome-macros';
+import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 
-export default Component.extend(I18n, {
-  classNames: [
-    'oneprovider-view-container',
-    'content-shares-index',
-    'absolute-flex-content',
-    'no-pointer-events',
-  ],
+export default ContentOneproviderContainerBase.extend(I18n, {
+  classNames: ['content-shares-index'],
   classNameBindings: ['spaceProxy.isFulfilled:is-loaded'],
 
   navigationState: service(),
@@ -47,15 +41,7 @@ export default Component.extend(I18n, {
     return shareManager.getSpaceForShare(share);
   })),
 
-  /**
-   * @type {string}
-   */
-  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
-
   actions: {
-    oneproviderIdChanged(oneproviderId) {
-      this.get('navigationState').setAspectOptions({ oneproviderId });
-    },
     clipboardSuccess() {
       this.get('globalNotify').success(this.t('clipboardSuccess'));
     },
