@@ -7,34 +7,13 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
+import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 
-export default Component.extend(I18n, {
-  classNames: [
-    'oneprovider-view-container',
-    'content-spaces-automation',
-    'absolute-flex-content',
-    'no-pointer-events',
-  ],
-
-  navigationState: service(),
+export default ContentOneproviderContainerBase.extend({
+  classNames: ['content-spaces-automation'],
 
   /**
    * @override
    */
   i18nPrefix: 'components.contentSpacesAutomation',
-
-  /**
-   * @type {string}
-   */
-  oneproviderId: reads('navigationState.aspectOptions.oneproviderId'),
-
-  actions: {
-    oneproviderIdChanged(oneproviderId) {
-      this.get('navigationState').setAspectOptions({ oneproviderId });
-    },
-  },
 });
