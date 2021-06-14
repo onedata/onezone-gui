@@ -604,6 +604,6 @@ function stubExamine(testSuite, token, response) {
 
 class JoiningRecordHelper extends EmberPowerSelectHelper {
   constructor() {
-    super('.joining-record-selector .ember-basic-dropdown');
+    super('.joining-record-selector', '.ember-basic-dropdown-content');
   }
 }

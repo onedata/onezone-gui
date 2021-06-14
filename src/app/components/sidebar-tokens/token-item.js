@@ -126,9 +126,24 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed(function copyIdAction() {
+    return {
+      action: () => this.get('globalClipboard').copy(
+        this.get('token.entityId'),
+        this.t('tokenId')
+      ),
+      title: this.t('copyId'),
+      class: 'copy-token-id-action-trigger',
+      icon: 'copy',
+    };
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  actionsArray: collect('renameAction', 'removeAction', 'copyAction'),
+  actionsArray: collect('renameAction', 'removeAction', 'copyAction', 'copyIdAction'),
 
   /**
    * If actual token disappeared from the sidebar, redirects to token main page

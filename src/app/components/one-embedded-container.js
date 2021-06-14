@@ -256,7 +256,7 @@ export default Component.extend({
         actionFun = actionFun.bind(this);
         set(embeddedIframe, `callParentCallbacks.${actionName}`, actionFun);
       } else {
-        throw new Error(
+        console.error(
           `component:one-embedded-container: no such action: ${actionName}`
         );
       }

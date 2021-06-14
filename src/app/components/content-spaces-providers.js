@@ -16,6 +16,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
 import { collect } from 'ember-awesome-macros';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   classNames: ['content-spaces-providers'],
@@ -72,15 +73,35 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
     }),
 
   /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasAddSupportPrivilege: reads('space.privileges.addSupport'),
+
+  /**
+   * @type {Ember.ComputedProperty <boolean>}
+   */
+  hasRemoveSupportPrivilege: reads('space.privileges.removeSupport'),
+
+  /**
    * @type {Ember.ComputedProperty<AspectAction>}
    */
-  openAddStorageAction: computed(function () {
+  openAddStorageAction: computed('hasAddSupportPrivilege', function () {
+    const {
+      hasAddSupportPrivilege,
+      i18n,
+    } = this.getProperties('hasAddSupportPrivilege', 'i18n');
     return {
       action: () => this.send('openAddStorage'),
       title: this.t('addStorage'),
-      class: 'open-add-storage',
+      class: 'open-add-storage btn-add-support',
       buttonStyle: 'default',
       icon: 'provider-add',
+      disabled: !hasAddSupportPrivilege,
+      tip: !hasAddSupportPrivilege ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_add_support',
+      }) : null,
     };
   }),
 
@@ -89,12 +110,23 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   }),
 
   ceaseOneproviderSupportAction: computed(
+    'space.privileges.removeSupport',
     function ceaseOneproviderSupportAction() {
+      const {
+        hasRemoveSupportPrivilege,
+        i18n,
+      } = this.getProperties('hasRemoveSupportPrivilege', 'i18n');
       return {
         icon: 'leave-space',
         text: this.t('ceaseSupportItem'),
         class: 'cease-oneprovider-support-btn',
         action: (provider) => this.openCeaseModal(provider),
+        isDisabled: !hasRemoveSupportPrivilege,
+        tip: !hasRemoveSupportPrivilege ? insufficientPrivilegesMessage({
+          i18n,
+          modelName: 'space',
+          privilegeFlag: 'space_remove_support',
+        }) : null,
       };
     }
   ),
