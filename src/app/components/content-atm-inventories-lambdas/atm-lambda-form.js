@@ -18,7 +18,6 @@ import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fi
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
-import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
@@ -156,10 +155,10 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<Utils.FormComponent.TextareaField>}
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   summaryField: computed(function summaryField() {
-    return TextareaField.extend(defaultValueGenerator(this, raw('')), {
+    return TextField.extend(defaultValueGenerator(this, raw('')), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'summary',

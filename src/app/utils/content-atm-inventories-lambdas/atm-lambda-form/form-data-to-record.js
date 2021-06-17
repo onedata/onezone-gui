@@ -121,7 +121,7 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         try {
           lambdaData.defaultValue = JSON.parse(entryDefaultValue);
         } catch (e) {
-          lambdaData.defaultValue = undefined;
+          lambdaData.defaultValue = null;
         }
       }
       lambdaData.isOptional = entryOptional;

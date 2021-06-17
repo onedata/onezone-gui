@@ -9,10 +9,11 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { setProperties } from '@ember/object';
+import { get, set } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import { resolve } from 'rsvp';
+import _ from 'lodash';
 
 export default Action.extend({
   /**
@@ -42,10 +43,16 @@ export default Action.extend({
       'atmWorkflowSchemaDiff',
     );
 
+    const changedProperties = Object.keys(atmWorkflowSchemaDiff).filter(key =>
+      !_.isEqual(get(atmWorkflowSchema, key), get(atmWorkflowSchemaDiff, key))
+    );
+
     const result = ActionResult.create();
     let promise;
-    if (Object.keys(atmWorkflowSchemaDiff).length > 0) {
-      setProperties(atmWorkflowSchema, atmWorkflowSchemaDiff);
+    if (changedProperties.length > 0) {
+      changedProperties.forEach(key =>
+        set(atmWorkflowSchema, key, get(atmWorkflowSchemaDiff, key))
+      );
       promise = result.interceptPromise(
         atmWorkflowSchema.save().then(() => atmWorkflowSchema)
       ).catch(() => {

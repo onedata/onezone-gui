@@ -1,5 +1,10 @@
 /**
  * Shows list of lambdas (passed via `collection` property).
+ * Works in two modes:
+ * - `'presentation'` - shows list of lambdas, allows name/description modification
+ * - `'selection'` - shows list of lambdas, allows to select lambda to use it
+ *     in workflow and shows lambdas from other inventories, does not allow any
+ *     modifications.
  *
  * @module components/content-atm-inventories-lambdas/atm-lambdas-list
  * @author Michał Borzęcki
@@ -123,7 +128,7 @@ export default Component.extend(I18n, {
     changeSearchValue(newValue) {
       debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
     },
-    onAddToAtmWorkflowSchema(atmLambda) {
+    addToAtmWorkflowSchema(atmLambda) {
       this.get('onAddToAtmWorkflowSchema')(atmLambda);
     },
   },

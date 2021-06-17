@@ -1,6 +1,6 @@
 /**
- * Shows loading state. It is a whole view component - may be used for
- * a full page carousel.
+ * Shows loading state (including loading errors). It is a whole view
+ * component - may be used for a full page carousel.
  *
  * @module components/content-atm-inventories-workflows/loading-view
  * @author Michał Borzęcki
@@ -39,7 +39,7 @@ export default Component.extend(I18n, {
    * One of: `'loading'`, `'notFound'`, `'forbidden'`, `'otherError'`, `'loaded'`
    * @type {ComputedProperty<String>}
    */
-  state: computed('loadingProxy.{isPending}', function state() {
+  state: computed('loadingProxy.isPending', function state() {
     const {
       isPending,
       isRejected,

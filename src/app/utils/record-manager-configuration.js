@@ -106,10 +106,9 @@ export default class RecordManagerConfiguration {
   /**
    * Performs all needed work after removing record (like reloading other records).
    * @param {String} modelName
-   * @param {String} recordId
    * @param {GraphModel} record
    */
-  async onRecordRemove(modelName, recordId, record) {
+  async onRecordRemove(modelName, record) {
     await this.recordManager.reloadUserRecordList(modelName);
 
     switch (modelName) {

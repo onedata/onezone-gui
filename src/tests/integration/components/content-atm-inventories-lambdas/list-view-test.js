@@ -61,6 +61,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
       this.setProperties({
         atmInventory: {
           privileges: {
+            view: true,
             manageLambdas: true,
           },
           atmLambdaList: promiseObject(resolve({
@@ -160,12 +161,6 @@ describe('Integration | Component | content atm inventories lambdas/list view',
           expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
             .and.to.be.calledWith(this.get('atmLambdas.1'));
         });
-
-      it('does not render "add lambda" button', async function () {
-        await render(this);
-
-        expect(this.$('.open-add-atm-lambda-trigger')).to.not.exist;
-      });
 
       it('calls "onBackSlide" callback on back link click', async function () {
         await render(this);

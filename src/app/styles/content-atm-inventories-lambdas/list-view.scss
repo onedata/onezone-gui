@@ -13,6 +13,10 @@
   }
 
   @media (max-width: $screen-xs-max) {
+    .content-row.header-row {
+      height: initial;
+    }
+
     .atm-lambdas-list {
       margin: 0 $padding-base-vertical;
     }

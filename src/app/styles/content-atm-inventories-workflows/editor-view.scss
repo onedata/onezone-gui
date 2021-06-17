@@ -6,8 +6,21 @@
   display: flex;
   flex-direction: column;
 
-  .header-row .one-inline-editor {
-    margin-top: -4px;
+  .header-row {
+    h1 {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .resource-name {
+      min-width: 0;
+      padding-right: 1em;
+    }
+
+    .one-inline-editor {
+      margin-top: -4px;
+      max-width: 100%;
+    }
   }
 
   .workflow-visualiser {

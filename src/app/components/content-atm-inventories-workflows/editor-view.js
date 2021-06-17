@@ -46,7 +46,7 @@ export default Component.extend(I18n, {
 
   /**
    * Data injected into the visualiser. Initialized by
-   * `atmWorkflowSchemaObserver`, updated by modifications
+   * `atmWorkflowSchemaObserver`, updated by modifications.
    * @type {Object}
    */
   visualiserData: undefined,

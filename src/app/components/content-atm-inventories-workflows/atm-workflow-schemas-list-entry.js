@@ -47,7 +47,7 @@ export default Component.extend(I18n, {
 
   /**
    * New data, that should be applied to the model on "Save" click. Yielded
-   * by the form
+   * by the form.
    * @type {Object}
    */
   changesToApply: undefined,
@@ -85,8 +85,12 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.Action>}
    */
   removeAction: computed('atmWorkflowSchema', function removeAction() {
-    return this.get('workflowActions').createRemoveAtmWorkflowSchemaAction({
-      atmWorkflowSchema: this.get('atmWorkflowSchema'),
+    const {
+      workflowActions,
+      atmWorkflowSchema,
+    } = this.getProperties('workflowActions', 'atmWorkflowSchema');
+    return workflowActions.createRemoveAtmWorkflowSchemaAction({
+      atmWorkflowSchema,
     });
   }),
 
