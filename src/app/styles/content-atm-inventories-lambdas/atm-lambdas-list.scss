@@ -1,9 +1,13 @@
-.content-atm-inventories-lambdas .atm-lambdas-list {
-  $item-border: 2px solid darken($color-one-light-blue, 10%);
+.content-atm-inventories-lambdas-list-view .atm-lambdas-list {
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $iconified-block-padding;
+  }
 
   .search-form-group {
-    max-width: 50em;
-    margin-bottom: $padding-base-vertical;
+    flex-grow: 1;
   }
 
   .lambdas-list {
@@ -11,38 +15,7 @@
     padding: 0;
   }
 
-  .atm-lambdas-list-entry {
-    display: flex;
-    border: $item-border;
-    border-radius: $border-radius-base;
-
-    + .atm-lambdas-list-entry {
-      margin-top: $padding-base-vertical;
-    }
-  }
-
-  .icon-section,
   .content-section {
-    padding: $padding-base-vertical;
-  }
-
-  .icon-section {
-    text-align: center;
-    background-color: $color-one-light-blue;
-    border-right: $item-border;
-
-    .one-icon {
-      font-size: 2.5em;
-      color: $color-one-blue-gray;
-      margin: -0.2em;
-      display: block;
-      width: 1em;
-    }
-  }
-
-  .content-section {
-    flex-grow: 1;
-    min-width: 0;
     display: flex;
     align-items: flex-start;
 
@@ -86,6 +59,48 @@
   &.filtered-list {
     .search-form-group .oneicon-search {
       color: $color-one-success;
+    }
+  }
+
+  &.mode-selection {
+    .view-data-collapse {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .lambda-generics {
+      flex-grow: 1;
+      min-width: 0;
+      padding-right: $padding-base-vertical;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    .list-header {
+      flex-wrap: wrap;
+    }
+
+    .search-form-group {
+      margin-bottom: $iconified-block-padding;
+    }
+
+    &.mode-selection {
+      .view-data-collapse {
+        flex-wrap: wrap;
+      }
+
+      .lambda-generics {
+        flex-basis: 100%;
+        margin-bottom: $padding-base-vertical;
+      }
+    }
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .search-form-group {
+      margin-right: $iconified-block-padding;
+      max-width: 50em;
     }
   }
 }

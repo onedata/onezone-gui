@@ -8,7 +8,7 @@
  */
 
 import { getProperties } from '@ember/object';
-import { dataSpecToType } from './data-spec-converters';
+import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
 /**
  * @param {Models.AtmLambda} record
@@ -125,11 +125,11 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       entryName: name,
       entryType: dataSpecToType(dataSpec),
       entryBatch: Boolean(isBatch),
-      entryOptional: Boolean(isOptional),
-      entryDefaultValue: defaultValue,
     };
     if (dataType === 'argument') {
-      formData[valueName].entryDefaultValue = defaultValue;
+      formData[valueName].entryDefaultValue =
+        defaultValue === null || defaultValue === undefined ?
+        undefined : JSON.stringify(defaultValue);
       formData[valueName].entryOptional = isOptional;
     }
   });

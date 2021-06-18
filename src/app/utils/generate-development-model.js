@@ -37,6 +37,7 @@ const NUMBER_OF_GROUPS = 10;
 const NUMBER_OF_HARVESTERS = 3;
 const NUMBER_OF_ATM_INVENTORIES = 3;
 const NUMBER_OF_ATM_LAMBDAS = 5;
+const NUMBER_OF_ATM_WORKFLOW_SCHEMAS = 5;
 const LINKED_ACCOUNT_TYPES = ['plgrid', 'indigo', 'google'];
 const PROVIDER_NAMES = ['Cracow', 'Paris', 'Lisbon'].concat(
   _.range(3, NUMBER_OF_PROVIDERS).map(i => `${i - 3}. Provider with long name`)
@@ -285,6 +286,7 @@ export default function generateDevelopmentModel(store) {
               ),
               attachAtmLambdasToAtmInventory(store, record),
             ])
+            .then(() => attachAtmWorkflowSchemasToAtmInventory(store, record))
           ))
         )
       )
@@ -938,4 +940,48 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
     set(atmInventory, 'atmLambdaList', listRecord);
     return atmInventory.save();
   });
+}
+
+async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
+  const inventoryAtmLambdas = await get(await get(atmInventory, 'atmLambdaList'), 'list');
+  const atmWorkflowSchemas = await allFulfilled(
+    _.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map(async (index) => {
+      const workflowAtmLambdas =
+        await createListRecord(store, 'atmLambda', inventoryAtmLambdas);
+      return await store.createRecord('atmWorkflowSchema', {
+        name: `Workflow ${index}`,
+        description: `Some very complicated workflow #${index}`,
+        atmLambdaList: workflowAtmLambdas,
+        atmInventory,
+        lanes: [{
+          id: 'lane1',
+          name: 'lane 1',
+          storeIteratorSpec: {
+            strategy: {
+              type: 'serial',
+            },
+            storeSchemaId: 'store1',
+          },
+          parallelBoxes: [{
+            id: 'pbox1-1',
+            name: 'Parallel box',
+            tasks: [],
+          }],
+        }],
+        stores: [{
+          id: 'store1',
+          name: 'store 1',
+          type: 'list',
+          dataSpec: {
+            type: 'string',
+            valueConstraints: {},
+          },
+        }],
+      }).save();
+    })
+  );
+  const listRecord =
+    await createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas);
+  set(atmInventory, 'atmWorkflowSchemaList', listRecord);
+  return await atmInventory.save();
 }

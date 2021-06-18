@@ -12,7 +12,7 @@ import { Promise } from 'rsvp';
 import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
 
 describe(
-  'Integration | Util | workflow actions/remove atm inventory action',
+  'Integration | Utility | workflow actions/remove atm inventory action',
   function () {
     setupComponentTest('global-modal-mounter', {
       integration: true,
@@ -93,7 +93,7 @@ describe(
         this.render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await click(getModalBody().find('.one-checkbox')[0]);
+        await wait();
         await click(getModalFooter().find('.question-yes')[0]);
         const actionResult = await actionResultPromise;
 
@@ -121,7 +121,7 @@ describe(
         this.render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await click(getModalBody().find('.one-checkbox')[0]);
+        await wait();
         await click(getModalFooter().find('.question-yes')[0]);
         rejectRemove('someError');
         await wait();

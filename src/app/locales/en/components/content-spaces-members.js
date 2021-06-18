@@ -16,6 +16,7 @@ export default _.merge({}, privilegesAspectBase, {
     supportManagement: 'Support management',
     harvesterManagement: 'Harvester management',
     datasetArchiveManagement: 'Dataset & archive management',
+    automationManagement: 'Automation management',
   },
   privileges: Object.keys(privileges.space).reduce((obj, key) => {
     obj[key] = capitalize(spacePrivileges[key]);

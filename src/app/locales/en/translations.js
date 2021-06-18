@@ -32,6 +32,7 @@ import contentSpacesDatasets from './components/content-spaces-datasets';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import contentSpacesHarvesters from './components/content-spaces-harvesters';
+import contentSpacesAutomation from './components/content-spaces-automation';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentProviderEmpty from './components/content-provider-empty';
 import contentGroupsNew from './components/content-groups-new';
@@ -88,6 +89,7 @@ import contentAtmInventoriesEmpty from './components/content-atm-inventories-emp
 import contentAtmInventoriesNew from './components/content-atm-inventories-new';
 import contentAtmInventoriesMembers from './components/content-atm-inventories-members';
 import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
+import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
@@ -126,6 +128,9 @@ import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-invent
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
 import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
+import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
+import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
+import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
 
 const translations = {
   tabs: {
@@ -175,6 +180,7 @@ const translations = {
     contentSpacesShares,
     contentSpacesTransfers,
     contentSpacesHarvesters,
+    contentSpacesAutomation,
     oneproviderViewContainer,
     contentGroupsNew,
     contentGroupsEmpty,
@@ -231,6 +237,7 @@ const translations = {
     contentAtmInventoriesNew,
     contentAtmInventoriesMembers,
     contentAtmInventoriesLambdas,
+    contentAtmInventoriesWorkflows,
     emptyCollectionSidebar,
   },
   services: {
@@ -274,6 +281,9 @@ const translations = {
       removeAtmInventoryAction,
       createAtmLambdaAction,
       modifyAtmLambdaAction,
+      modifyAtmWorkflowSchemaAction,
+      removeAtmWorkflowSchemaAction,
+      createAtmWorkflowSchemaAction,
     },
   },
 };

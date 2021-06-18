@@ -94,6 +94,7 @@ export default {
     },
     arguments: {
       label: 'Arguments',
+      addButtonText: 'Add argument',
       entry: {
         entryName: {
           label: 'Name',
@@ -120,6 +121,7 @@ export default {
     },
     results: {
       label: 'Results',
+      addButtonText: 'Add result',
       entry: {
         entryName: {
           label: 'Name',

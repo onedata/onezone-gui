@@ -12,10 +12,10 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get } from '@ember/object';
-import { bool } from '@ember/object/computed';
-import { collect } from '@ember/object/computed';
-import { promise } from 'ember-awesome-macros';
+import { bool, collect } from '@ember/object/computed';
+import { promise, conditional, eq, raw } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-lambdas-list-view'],
 
   i18n: service(),
+  workflowManager: service(),
 
   /**
    * @override
@@ -36,10 +37,27 @@ export default Component.extend(I18n, {
   atmInventory: undefined,
 
   /**
-   * @virtual
+   * Needed when `mode` is `'presentation'`
+   * @virtual optional
    * @type {Function}
    */
   onAddAtmLambda: notImplementedIgnore,
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   * @param {Model.AtmLambda}
+   * @returns {any}
+   */
+  onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   */
+  onBackSlide: notImplementedIgnore,
 
   /**
    * @virtual
@@ -48,18 +66,60 @@ export default Component.extend(I18n, {
   onRegisterViewActions: notImplementedIgnore,
 
   /**
+   * One of: `'presentation'`, `'selection'`
+   * @virtual optional
+   * @type {String}
+   */
+  mode: 'presentation',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  headerText: computed('mode', function headerText() {
+    const mode = this.get('mode');
+    return this.t(`header.${mode === 'selection' ? 'selection' : 'presentation'}`);
+  }),
+
+  /**
    * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}
    */
   atmLambdasProxy: promise.array(
-    computed('atmInventory', function atmLambdas() {
+    computed('atmInventory.privileges.view', async function atmLambdas() {
       const atmInventory = this.get('atmInventory');
       if (!atmInventory) {
         return resolve([]);
       }
-      return get(atmInventory, 'atmLambdaList')
-        .then(atmLambdaList => get(atmLambdaList, 'list'));
+      if (!get(atmInventory, 'privileges.view')) {
+        throw { id: 'forbidden' };
+      }
+      const atmLambdaList = await get(atmInventory, 'atmLambdaList');
+      return atmLambdaList ? (await get(atmLambdaList, 'list')) : [];
     })
   ),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}
+   */
+  allAtmLambdasProxy: computed('mode', function allAtmLambdasProxy() {
+    const {
+      mode,
+      workflowManager,
+    } = this.getProperties('mode', 'workflowManager');
+
+    if (mode === 'selection') {
+      // Only in selection mode we need to fetch all lambdas
+      return workflowManager.getAllKnownAtmLambdas();
+    }
+    return promiseArray(resolve([]));
+  }),
+
+  /**
+   * @type {ComputedProperty<PromiseObject>}
+   */
+  loadingDataProxy: promise.object(promise.all(
+    'atmLambdasProxy',
+    'allAtmLambdasProxy'
+  )),
 
   /**
    * @type {ComputedProperty<Boolean>}
@@ -69,9 +129,9 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
-  addNewLambdaAction: computed(
+  addNewAtmLambdaAction: computed(
     'hasManageLambdasPrivilege',
-    function addNewLambdaAction() {
+    function addNewAtmLambdaAction() {
       const {
         hasManageLambdasPrivilege,
         i18n,
@@ -92,10 +152,19 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasSomeLambdas: conditional(
+    eq('mode', raw('selection')),
+    'allAtmLambdasProxy.content.length',
+    'atmLambdasProxy.content.length'
+  ),
+
+  /**
    * @override
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  globalActions: collect('addNewLambdaAction'),
+  globalActions: collect('addNewAtmLambdaAction'),
 
   init() {
     this._super(...arguments);
@@ -109,5 +178,11 @@ export default Component.extend(I18n, {
     } = this.getProperties('onRegisterViewActions', 'globalActions');
 
     onRegisterViewActions(globalActions);
+  },
+
+  actions: {
+    backSlide() {
+      this.get('onBackSlide')();
+    },
   },
 });

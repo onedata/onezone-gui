@@ -188,7 +188,7 @@ describe(
         const $label = this.$('.summary-field .control-label');
         const $field = this.$('.summary-field .form-control');
         expect($label.text().trim()).to.equal('Summary (optional):');
-        expect($field).to.match('textarea');
+        expect($field).to.have.attr('type', 'text');
         expect($field).to.have.value('');
       });
 
@@ -348,7 +348,7 @@ describe(
         const $addBtn = this.$('.arguments-field .add-field-button');
         expect($label.text().trim()).to.equal('Arguments:');
         expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add');
+        expect($addBtn.text().trim()).to.equal('Add argument');
       });
 
       it('allows to add new, empty argument', async function () {
@@ -385,7 +385,6 @@ describe(
         const $entryDefaultValueLabel = $entry.find('.entryDefaultValue-field .control-label');
         const $entryDefaultValueField = $entry.find('.entryDefaultValue-field .form-control');
         expect($entryDefaultValueLabel.text().trim()).to.equal('Default value:');
-        expect($entryDefaultValueField).to.have.attr('type', 'text');
         expect($entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
         expect($entryDefaultValueField).to.have.value('');
       });
@@ -461,7 +460,7 @@ describe(
         const $addBtn = this.$('.results-field .add-field-button');
         expect($label.text().trim()).to.equal('Results:');
         expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add');
+        expect($addBtn.text().trim()).to.equal('Add result');
       });
 
       it('allows to add new, empty result', async function () {
@@ -594,7 +593,7 @@ describe(
           if (i === 0) {
             await click(`${nthArgSelector} .entryBatch-field .form-control`);
             await click(`${nthArgSelector} .entryOptional-field .form-control`);
-            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, 'val0');
+            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '"val0"');
           }
 
           await addResult();
@@ -612,7 +611,6 @@ describe(
         await fillIn('.mountPoint-field .form-control', '/mount/point');
         await fillIn('.oneclientOptions-field .form-control', 'oc-options');
         await click('.btn-submit');
-
         expect(this.get('submitStub')).to.be.calledOnce.and.to.be.calledWith({
           name: 'myname',
           summary: 'mysummary',
@@ -627,13 +625,19 @@ describe(
               oneclientOptions: 'oc-options',
             },
           },
-          argumentSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
-            name: `arg${idx}`,
-            dataSpec,
-            isBatch: idx === 0,
-            isOptional: idx === 0,
-            defaultValue: idx === 0 ? 'val0' : '',
-          })),
+          argumentSpecs: argumentAndResultTypes.slice(0, 2)
+            .map(({ dataSpec }, idx) => {
+              const arg = {
+                name: `arg${idx}`,
+                dataSpec,
+                isBatch: idx === 0,
+                isOptional: idx === 0,
+              };
+              if (idx === 0) {
+                arg.defaultValue = 'val0';
+              }
+              return arg;
+            }),
           resultSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `res${idx}`,
             dataSpec,
@@ -661,7 +665,6 @@ describe(
                   dataSpec,
                   isBatch: false,
                   isOptional: false,
-                  defaultValue: '',
                 }],
               }));
           });
@@ -812,7 +815,7 @@ describe(
             dataSpec,
             isBatch: idx === 0,
             isOptional: idx === 0,
-            defaultValue: idx === 0 ? 'val0' : '',
+            defaultValue: idx === 0 ? 'val0' : null,
           })),
         });
 
@@ -830,11 +833,11 @@ describe(
             .to.equal(type);
           const $batchToggle = $entry.find('.entryBatch-field .form-control');
           const $optionalToggle = $entry.find('.entryOptional-field .form-control');
-          const $defaultValueField = $entry.find('.entryDefaultValue-field .field-component');
+          const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
           if (idx === 0) {
             expect($batchToggle).to.have.class('checked');
             expect($optionalToggle).to.have.class('checked');
-            expect($defaultValueField.text().trim()).to.equal('val0');
+            expect($defaultValueField).to.have.value('"val0"');
           } else {
             expect($batchToggle).to.not.have.class('checked');
             expect($optionalToggle).to.not.have.class('checked');
@@ -954,7 +957,7 @@ describe(
           expect($argument.find('.entryOptional-field .form-control'))
             .to.have.class('checked');
           expect($argument.find('.entryDefaultValue-field .form-control'))
-            .to.have.value('default');
+            .to.have.value('"default"');
           const $result = this.$('.results-field .entry-field');
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
           expect($result.find('.entryType-field .field-component').text().trim())

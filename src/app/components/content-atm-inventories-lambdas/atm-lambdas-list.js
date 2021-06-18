@@ -1,5 +1,10 @@
 /**
  * Shows list of lambdas (passed via `collection` property).
+ * Works in two modes:
+ * - `'presentation'` - shows list of lambdas, allows name/description modification
+ * - `'selection'` - shows list of lambdas, allows to select lambda to use it
+ *     in workflow and shows lambdas from other inventories, does not allow any
+ *     modifications.
  *
  * @module components/content-atm-inventories-lambdas/atm-lambdas-list
  * @author Michał Borzęcki
@@ -13,12 +18,21 @@ import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
+import { tag, conditional, eq, raw } from 'ember-awesome-macros';
+import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { inject as service } from '@ember/service';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
   classNames: ['atm-lambdas-list'],
-  classNameBindings: ['searchValue:filtered-list'],
+  classNameBindings: [
+    'searchValue:filtered-list',
+    'modeClass',
+  ],
+
+  i18n: service(),
+  media: service(),
 
   /**
    * @override
@@ -32,6 +46,36 @@ export default Component.extend(I18n, {
   collection: undefined,
 
   /**
+   * Needed when `mode` is `'selection'`. Should contain all lambdas from all
+   * inventories.
+   * @virtual optional
+   * @type {Array<Models.AtmLambda>}
+   */
+  allCollection: undefined,
+
+  /**
+   * One of: `'presentation'`, `'selection'`
+   * @virtual optional
+   * @type {String}
+   */
+  mode: 'presentation',
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual optional
+   * @type {Function}
+   * @param {Model.AtmLambda}
+   * @returns {any}
+   */
+  onAddToAtmWorkflowSchema: notImplementedIgnore,
+
+  /**
+   * One of: `'thisInventory'`, `'all'`
+   * @type {String}
+   */
+  activeCollectionType: 'thisInventory',
+
+  /**
    * @type {String}
    */
   searchValue: '',
@@ -42,19 +86,33 @@ export default Component.extend(I18n, {
   collectionOrder: Object.freeze(['name']),
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  modeClass: tag `mode-${'mode'}`,
+
+  /**
+   * @type {ComputedProperty<Array<Models.AtmLambda>>}
+   */
+  activeCollection: conditional(
+    eq('activeCollectionType', raw('all')),
+    'allCollection',
+    'collection'
+  ),
+
+  /**
    * @type {ComputedProperty<Array<Models.AtmLambda>>}
    */
   filteredCollection: computed(
     'searchValue',
-    'collection.@each.name',
+    'activeCollection.@each.name',
     function filteredCollection() {
       const {
-        collection,
+        activeCollection,
         searchValue,
-      } = this.getProperties('collection', 'searchValue');
+      } = this.getProperties('activeCollection', 'searchValue');
       const normalizedSearchValue = searchValue.trim().toLowerCase();
 
-      return (collection || []).filter(atmLambda => {
+      return (activeCollection || []).filter(atmLambda => {
         const normalizedName = get(atmLambda, 'name').trim().toLowerCase();
         return normalizedName.includes(normalizedSearchValue);
       });
@@ -69,6 +127,9 @@ export default Component.extend(I18n, {
   actions: {
     changeSearchValue(newValue) {
       debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
+    },
+    addToAtmWorkflowSchema(atmLambda) {
+      this.get('onAddToAtmWorkflowSchema')(atmLambda);
     },
   },
 });

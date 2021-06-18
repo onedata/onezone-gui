@@ -1,15 +1,55 @@
-<div class="row content-row header-row hidden-xs">
-  <h1>
-    <span class="one-label">{{tt this "header"}}</span>
-    {{actions-toolbar isMinimized=false actionsArray=globalActions}}
-  </h1>
+<div class="row content-row header-row {{if (eq mode "presentation") "hidden-xs"}}">
+  {{#if (eq mode "selection")}}
+    <h1 class="with-back relative nowrap">
+      <a class="content-back-link" {{action "backSlide"}}>
+        {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
+        {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+      </a>
+      <span class="resource-name">{{headerText}}</span>
+      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+    </h1>
+  {{else}}
+    <h1>
+      <span class="one-label">{{headerText}}</span>
+      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+    </h1>
+  {{/if}}
 </div>
-<div class="row content-row">
-  {{#promise-proxy-container proxy=atmLambdasProxy}}
-    {{content-atm-inventories-lambdas/atm-lambdas-list
-      collection=atmLambdasProxy.content
+{{#promise-proxy-container proxy=loadingDataProxy}}
+  {{#if hasSomeLambdas}}
+    <div class="row content-row">
+      {{content-atm-inventories-lambdas/atm-lambdas-list
+        collection=atmLambdasProxy.content
+        allCollection=allAtmLambdasProxy.content
+        mode=mode
+        onAddToAtmWorkflowSchema=onAddToAtmWorkflowSchema
+      }}
+    </div>
+  {{else}}
+    {{#content-info
+      class="scroll-breakpoint-500"
+      header=(tt this "noLambdasHeader")
+      text=(tt this "noLambdasText")
     }}
-  {{/promise-proxy-container}}
-  {{!-- TODO: VFS-7597 add content info about no lambda --}}
-</div>
+      {{#bs-button
+        type="primary"
+        size="lg"
+        class=(concat-classes
+          addNewAtmLambdaAction.class
+          (if addNewAtmLambdaAction.disabled "disabled")
+        )
+        onClick=(if
+          addNewAtmLambdaAction.disabled
+          (no-action)
+          addNewAtmLambdaAction.action
+        )
+      }}
+        {{addNewAtmLambdaAction.title}}
+        {{#if addNewAtmLambdaAction.tip}}
+          {{one-tooltip title=addNewAtmLambdaAction.tip}}
+        {{/if}}
+      {{/bs-button}}
+    {{/content-info}}
+  {{/if}}
+{{/promise-proxy-container}}
 {{yield}}

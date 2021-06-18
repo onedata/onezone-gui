@@ -11,6 +11,7 @@ export default {
     membership: 'Membership',
     support: 'Add support',
     harvesters: 'Space harvesters',
+    automation: 'Automation',
     notFound: 'Space not found',
   },
 };

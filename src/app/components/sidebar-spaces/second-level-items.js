@@ -1,6 +1,6 @@
 /**
  * Second level sidebar items component base for spaces.
- * 
+ *
  * @module component/sidebar-spaces/second-level-items
  * @author Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -153,6 +153,23 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
+  itemAutomation: computed('space.privileges.view', function itemAutomation() {
+    const i18n = this.get('i18n');
+    const privileges = this.get('space.privileges');
+    const forbidden = privileges.view === false;
+    return {
+      id: 'automation',
+      label: this.t('aspects.automation'),
+      icon: recordIcon('atmInventory'),
+      forbidden,
+      tip: forbidden ? insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_view',
+      }) : undefined,
+    };
+  }),
+
   spaceSecondLevelItems: collect(
     'itemIndex',
     'itemData',
@@ -162,6 +179,7 @@ export default SecondLevelItems.extend(I18n, {
     'itemProviders',
     'itemMembers',
     'itemHarvesters',
+    'itemAutomation',
   ),
 
   init() {

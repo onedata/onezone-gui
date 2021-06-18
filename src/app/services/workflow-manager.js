@@ -8,17 +8,21 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get } from '@ember/object';
+import { computed, observer, get, getProperties } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
-import { all as allFulfilled, resolve } from 'rsvp';
+import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
+import { all as allFulfilled, allSettled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import { promise } from 'ember-awesome-macros';
+import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import ArrayProxy from '@ember/array/proxy';
 
 export default Service.extend({
   store: service(),
   recordManager: service(),
   onedataGraph: service(),
-  onedataGraphUtils: service(),
 
   /**
    * Creates new automation inventory.
@@ -175,4 +179,124 @@ export default Service.extend({
       .catch(ignoreForbiddenError);
     return atmLambda;
   },
+
+  /**
+   * @param {String} atmInventoryId
+   * @param {Object} atmWorkflowSchemaPrototype
+   * @returns {Promise<Models.AtmWorkflowSchema>}
+   */
+  async createAtmWorkflowSchema(atmInventoryId, atmWorkflowSchemaPrototype) {
+    const {
+      recordManager,
+      store,
+    } = this.getProperties('recordManager', 'store');
+
+    const atmWorkflowSchema = await store.createRecord(
+      'atmWorkflowSchema',
+      Object.assign({}, atmWorkflowSchemaPrototype, {
+        _meta: {
+          additionalData: {
+            atmInventoryId,
+          },
+        },
+      })
+    ).save();
+    await recordManager
+      .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
+      .catch(ignoreForbiddenError);
+    return atmWorkflowSchema;
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {String} atmInventoryId
+   */
+  async attachAtmLambdaToAtmInventory(atmLambdaId, atmInventoryId) {
+    const {
+      onedataGraph,
+      recordManager,
+    } = this.getProperties('onedataGraph', 'recordManager');
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: atmInventoryEntityType,
+        aspectId: atmInventoryId,
+        scope: 'auto',
+      }),
+      operation: 'create',
+    });
+    await allSettled([
+      recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda'),
+      recordManager.reloadRecordListById('atmLambda', atmLambdaId, 'atmInventory'),
+    ]);
+  },
+
+  /**
+   * @returns {PromiseArray<Models.AtmLambda>}
+   */
+  getAllKnownAtmLambdas() {
+    const knownAtmLambdasProxy = AllKnownAtmLambdasProxyArray.create({
+      recordManager: this.get('recordManager'),
+    });
+    return promiseArray(
+      get(knownAtmLambdasProxy, 'atmLambdasProxy').then(() => knownAtmLambdasProxy)
+    );
+  },
+});
+
+const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
+  /**
+   * @virtual
+   */
+  recordManager: undefined,
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmInventory>>}
+   */
+  atmInventoriesProxy: promise.array(computed(async function allAtmInventories() {
+    const atmInventories = await this.get('recordManager').getUserRecordList('atmInventory');
+    return await get(atmInventories, 'list');
+  })),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<DS.RecordArray<Model.AtmLambda>>>}
+   */
+  atmLambdasListsProxy: promise.array(computed(
+    'atmInventoriesProxy.@each.isReloading',
+    async function atmLambdasListsProxy() {
+      const atmInventories = await this.get('atmInventoriesProxy');
+      const atmLambdaLists = await onlyFulfilledValues(
+        atmInventories.mapBy('atmLambdaList')
+      );
+      return await onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'));
+    }
+  )),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmLambda>>}
+   */
+  atmLambdasProxy: promise.array(computed(
+    'atmLambdasListsProxy.@each.isReloading',
+    async function atmLambdasProxy() {
+      const atmLambdasLists = await this.get('atmLambdasListsProxy');
+      const lambdasArray = [];
+      atmLambdasLists.forEach(list => lambdasArray.push(...list.toArray()));
+      return lambdasArray.uniq();
+    }
+  )),
+
+  atmLambdasProxyObserver: observer(
+    'atmLambdasProxy.[]',
+    function atmLambdasProxyObserver() {
+      const {
+        isFulfilled,
+        content,
+      } = getProperties(this.get('atmLambdasProxy'), 'isFulfilled', 'content');
+
+      if (isFulfilled) {
+        this.set('content', content);
+      }
+    }
+  ),
 });

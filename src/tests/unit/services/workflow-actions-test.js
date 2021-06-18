@@ -7,6 +7,9 @@ import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
+import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
+import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
+import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow actions', function () {
@@ -95,5 +98,48 @@ describe('Unit | Service | workflow actions', function () {
     expect(action).to.be.instanceOf(ModifyAtmLambdaAction);
     expect(get(action, 'atmLambda')).to.equal(atmLambda);
     expect(get(action, 'atmLambdaDiff')).to.equal(atmLambdaDiff);
+  });
+
+  it('creates ModifyAtmWorkflowSchemaAction instance', function () {
+    const service = this.subject();
+
+    const atmWorkflowSchema = {};
+    const atmWorkflowSchemaDiff = {};
+    const action = service.createModifyAtmWorkflowSchemaAction({
+      atmWorkflowSchema,
+      atmWorkflowSchemaDiff,
+    });
+
+    expect(action).to.be.instanceOf(ModifyAtmWorkflowSchemaAction);
+    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(action, 'atmWorkflowSchemaDiff'))
+      .to.equal(atmWorkflowSchemaDiff);
+  });
+
+  it('creates RemoveAtmWorkflowSchemaAction instance', function () {
+    const service = this.subject();
+
+    const atmWorkflowSchema = {};
+    const action = service.createRemoveAtmWorkflowSchemaAction({
+      atmWorkflowSchema,
+    });
+
+    expect(action).to.be.instanceOf(RemoveAtmWorkflowSchemaAction);
+    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+  });
+
+  it('creates CreateAtmWorkflowSchemaAction instance', function () {
+    const service = this.subject();
+
+    const atmInventory = {};
+    const rawAtmWorkflowSchema = {};
+    const action = service.createCreateAtmWorkflowSchemaAction({
+      rawAtmWorkflowSchema,
+      atmInventory,
+    });
+
+    expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaAction);
+    expect(get(action, 'rawAtmWorkflowSchema')).to.equal(rawAtmWorkflowSchema);
+    expect(get(action, 'atmInventory')).to.equal(atmInventory);
   });
 });

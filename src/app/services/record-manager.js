@@ -262,7 +262,7 @@ export default Service.extend({
     await record.destroyRecord();
     await this.get('configuration').onRecordRemove(
       this.getModelNameForRecord(record),
-      get(record, 'entityId')
+      record
     );
   },
 

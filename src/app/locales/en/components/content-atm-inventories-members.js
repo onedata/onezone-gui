@@ -6,9 +6,9 @@ import { capitalize } from '@ember/string';
 export default _.merge({}, privilegesAspectBase, {
   privilegeGroups: {
     inventoryManagement: 'Inventory management',
+    schemaManagement: 'Schema management',
     userManagement: 'User management',
     groupManagement: 'Group management',
-    spaceManagement: 'Space management',
   },
   privileges: Object.keys(privileges.atmInventory).reduce((obj, key) => {
     obj[key] = capitalize(privileges.atmInventory[key]);

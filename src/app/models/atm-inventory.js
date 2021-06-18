@@ -28,6 +28,7 @@ export default Model.extend(GraphSingleModelMixin, {
   effGroupList: belongsTo('groupList'),
   effUserList: belongsTo('userList'),
 
+  atmWorkflowSchemaList: belongsTo('atmWorkflowSchemaList'),
   atmLambdaList: belongsTo('atmLambdaList'),
 
   /**

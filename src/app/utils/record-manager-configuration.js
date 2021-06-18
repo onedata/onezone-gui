@@ -106,10 +106,23 @@ export default class RecordManagerConfiguration {
   /**
    * Performs all needed work after removing record (like reloading other records).
    * @param {String} modelName
-   * @param {String} recordId
+   * @param {GraphModel} record
    */
-  async onRecordRemove(modelName /**, recordId */ ) {
+  async onRecordRemove(modelName, record) {
     await this.recordManager.reloadUserRecordList(modelName);
+
+    switch (modelName) {
+      case 'atmWorkflowSchema': {
+        if (!record) {
+          return;
+        }
+        const atmInventory = record.belongsTo('atmInventory').value();
+        if (atmInventory) {
+          await this.recordManager.reloadRecordList(atmInventory, modelName);
+        }
+        break;
+      }
+    }
   }
 
   /**

@@ -8,7 +8,7 @@
  */
 
 import { get, getProperties } from '@ember/object';
-import { typeToDataSpec } from './data-spec-converters';
+import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
 /**
  * @param {Object} formData
@@ -107,13 +107,23 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
       'entryDefaultValue'
     );
 
+    const dataSpec = typeToDataSpec(entryType);
     const lambdaData = {
       name: entryName,
-      dataSpec: typeToDataSpec(entryType),
+      dataSpec,
       isBatch: entryBatch,
     };
     if (dataType === 'argument') {
-      lambdaData.defaultValue = entryDefaultValue;
+      if (dataSpec &&
+        !['storeCredentials', 'onedatafsCredentials'].includes(dataSpec.type) &&
+        entryDefaultValue
+      ) {
+        try {
+          lambdaData.defaultValue = JSON.parse(entryDefaultValue);
+        } catch (e) {
+          lambdaData.defaultValue = null;
+        }
+      }
       lambdaData.isOptional = entryOptional;
     }
     return lambdaData;

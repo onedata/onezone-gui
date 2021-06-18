@@ -9,7 +9,7 @@ import { get } from '@ember/object';
 import wait from 'ember-test-helpers/wait';
 
 describe(
-  'Unit | Utility | workflow actions/create atm lambda action',
+  'Integration | Utility | workflow actions/create atm lambda action',
   function () {
     setupComponentTest('test-component', {
       integration: true,

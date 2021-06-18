@@ -3,7 +3,7 @@
  * NOTE: it does not persist data. To save created lambda, you need
  * to do it on your own by providing `onSubmit` (which should return a promise).
  *
- * @module components/atm-lambda-form
+ * @module components/content-atm-inventories-lambdas/atm-lambda-form
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -18,10 +18,10 @@ import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fi
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
-import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
+import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy } from 'ember-awesome-macros';
+import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy, array } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import {
@@ -155,10 +155,10 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<Utils.FormComponent.TextareaField>}
+   * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   summaryField: computed(function summaryField() {
-    return TextareaField.extend(defaultValueGenerator(this, raw('')), {
+    return TextField.extend(defaultValueGenerator(this, raw('')), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'summary',
@@ -421,8 +421,18 @@ function createFunctionArgResGroup(component, dataType) {
     defaultValue: false,
     component,
   });
-  const generateEntryDefaultValueField = mode => TextField.extend({
-    isVisible: not(and('isInViewMode', isEmpty('value'))),
+  const generateEntryDefaultValueField = mode => JsonField.extend({
+    isVisible: not(or(
+      and('isInViewMode', isEmpty('value')),
+      array.includes(raw([
+        'singleValueStore',
+        'listStore',
+        'mapStore',
+        'treeForestStore',
+        'histogramStore',
+        'onedatafsCredentials',
+      ]), 'parent.value.entryType')
+    )),
   }).create({
     mode,
     name: 'entryDefaultValue',

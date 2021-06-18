@@ -1,20 +1,56 @@
-<div class="form-group-light search-form-group">
-  <div class="input-group with-icon-addon">
-    {{search-bar search=(action "changeSearchValue") class="form-control"}}
-    <div class="input-group-addon">
-      {{one-icon icon="search"}}
+<div class="list-header">
+  <div class="form-group-light search-form-group">
+    <div class="input-group with-icon-addon">
+      {{search-bar search=(action "changeSearchValue") class="form-control"}}
+      <div class="input-group-addon">
+        {{one-icon icon="search"}}
+      </div>
     </div>
   </div>
-</div>
-<ul class="lambdas-list">
-  {{#each sortedCollection as |atmLambda|}}
-    {{content-atm-inventories-lambdas/atm-lambdas-list-entry
-      atmLambda=atmLambda
+  {{#if (eq mode "selection")}}
+    {{#bs-button-group
+      value=activeCollectionType
+      class="collection-type-selector view-mode-selector"
+      type="radio"
+      justified=media.isMobile
+      onChange=(action (mut activeCollectionType))
+      as |bg|
     }}
-  {{else}}
-    {{#if searchValue}}
-      <p>{{tt this "noMatchingResults"}}</p>
-    {{/if}}
-  {{/each}}
-</ul>
+      {{!-- TODO: VFS-7655 Block all lambdas listing when user does
+      not have manage-lambdas privilege --}}
+      <div class="btn-group" role="group">
+        {{#bg.button
+          type="default"
+          class="btn-sm btn-this-inventory"
+          value="thisInventory"
+        }}
+          {{tt this "collectionTypeSelector.thisInventory"}}
+        {{/bg.button}}
+      </div>
+      <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-all" value="all"}}
+          {{tt this "collectionTypeSelector.all"}}
+        {{/bg.button}}
+      </div>
+    {{/bs-button-group}}
+  {{/if}}
+</div>
+{{#if sortedCollection}}
+  {{!-- TODO: VFS-7655 Add conflict suffixes to duplicates --}}
+  <ul class="lambdas-list">
+    {{#each sortedCollection as |atmLambda|}}
+      {{content-atm-inventories-lambdas/atm-lambdas-list-entry
+        mode=mode
+        atmLambda=atmLambda
+        onAddToAtmWorkflowSchema=(action "addToAtmWorkflowSchema" atmLambda)
+      }}
+    {{/each}}
+  </ul>
+{{else}}
+  {{#if searchValue}}
+    <p class="empty-message">{{tt this "noMatchingResults"}}</p>
+  {{else if (eq mode "selection")}}
+    <p class="empty-message">{{tt this (concat "emptyCollection." activeCollectionType)}}</p>
+  {{/if}}
+{{/if}}
 {{yield}}

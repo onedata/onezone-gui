@@ -11,6 +11,7 @@ import { computed } from '@ember/object';
 import OneSidebar from 'onedata-gui-common/components/one-sidebar';
 import layout from 'onedata-gui-common/templates/components/one-sidebar';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default OneSidebar.extend(I18n, {
   layout,
@@ -41,9 +42,13 @@ export default OneSidebar.extend(I18n, {
    */
   secondLevelItems: computed(function secondLevelItems() {
     return [{
+      id: 'workflows',
+      label: this.t('aspects.workflows'),
+      icon: recordIcon('atmWorkflowSchema'),
+    }, {
       id: 'lambdas',
       label: this.t('aspects.lambdas'),
-      icon: 'lambda',
+      icon: recordIcon('atmLambda'),
     }, {
       id: 'members',
       label: this.t('aspects.members'),
