@@ -108,7 +108,7 @@ export default Component.extend(I18n, {
           }).create({
             component: this,
             name: 'description',
-            viewModeAsStaticText: true,
+            showsStaticTextInViewMode: true,
             isOptional: true,
           }),
         ],
