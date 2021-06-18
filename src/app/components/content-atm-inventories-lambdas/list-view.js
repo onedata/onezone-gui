@@ -12,9 +12,8 @@ import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get } from '@ember/object';
-import { bool } from '@ember/object/computed';
-import { collect } from '@ember/object/computed';
-import { promise } from 'ember-awesome-macros';
+import { bool, collect } from '@ember/object/computed';
+import { promise, conditional, eq, raw } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -85,13 +84,16 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<PromiseArray<Models.AtmLambda>>}
    */
   atmLambdasProxy: promise.array(
-    computed('atmInventory', function atmLambdas() {
+    computed('atmInventory.privileges.view', async function atmLambdas() {
       const atmInventory = this.get('atmInventory');
       if (!atmInventory) {
         return resolve([]);
       }
-      return get(atmInventory, 'atmLambdaList')
-        .then(atmLambdaList => get(atmLambdaList, 'list'));
+      if (!get(atmInventory, 'privileges.view')) {
+        throw { id: 'forbidden' };
+      }
+      const atmLambdaList = await get(atmInventory, 'atmLambdaList');
+      return atmLambdaList ? (await get(atmLambdaList, 'list')) : [];
     })
   ),
 
@@ -147,6 +149,15 @@ export default Component.extend(I18n, {
         icon: 'add-filled',
       };
     }
+  ),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasSomeLambdas: conditional(
+    eq('mode', raw('selection')),
+    'allAtmLambdasProxy.content.length',
+    'atmLambdasProxy.content.length'
   ),
 
   /**

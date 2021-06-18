@@ -52,6 +52,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Boolean}
+   */
+  isShown: false,
+
+  /**
+   * @virtual
    * @type {Function}
    */
   onBackSlide: notImplementedIgnore,

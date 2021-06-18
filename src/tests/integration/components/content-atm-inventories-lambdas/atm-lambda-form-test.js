@@ -188,7 +188,7 @@ describe(
         const $label = this.$('.summary-field .control-label');
         const $field = this.$('.summary-field .form-control');
         expect($label.text().trim()).to.equal('Summary (optional):');
-        expect($field).to.match('textarea');
+        expect($field).to.have.attr('type', 'text');
         expect($field).to.have.value('');
       });
 
@@ -348,7 +348,7 @@ describe(
         const $addBtn = this.$('.arguments-field .add-field-button');
         expect($label.text().trim()).to.equal('Arguments:');
         expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add');
+        expect($addBtn.text().trim()).to.equal('Add argument');
       });
 
       it('allows to add new, empty argument', async function () {
@@ -460,7 +460,7 @@ describe(
         const $addBtn = this.$('.results-field .add-field-button');
         expect($label.text().trim()).to.equal('Results:');
         expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add');
+        expect($addBtn.text().trim()).to.equal('Add result');
       });
 
       it('allows to add new, empty result', async function () {
@@ -815,7 +815,7 @@ describe(
             dataSpec,
             isBatch: idx === 0,
             isOptional: idx === 0,
-            defaultValue: idx === 0 ? 'val0' : undefined,
+            defaultValue: idx === 0 ? 'val0' : null,
           })),
         });
 

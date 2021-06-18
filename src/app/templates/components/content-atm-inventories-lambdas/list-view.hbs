@@ -5,17 +5,18 @@
         {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
         {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
       </a>
-      <div class="resource-name">{{headerText}}</div>
+      <span class="resource-name">{{headerText}}</span>
+      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
     </h1>
   {{else}}
-  <h1>
-    <span class="one-label">{{headerText}}</span>
-    {{actions-toolbar isMinimized=false actionsArray=globalActions}}
-  </h1>
+    <h1>
+      <span class="one-label">{{headerText}}</span>
+      {{actions-toolbar isMinimized=false actionsArray=globalActions}}
+    </h1>
   {{/if}}
 </div>
 {{#promise-proxy-container proxy=loadingDataProxy}}
-  {{#if atmLambdasProxy.content.length}}
+  {{#if hasSomeLambdas}}
     <div class="row content-row">
       {{content-atm-inventories-lambdas/atm-lambdas-list
         collection=atmLambdasProxy.content

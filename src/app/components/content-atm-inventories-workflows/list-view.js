@@ -63,13 +63,16 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<PromiseArray<Models.AtmWorkflowSchema>>}
    */
   atmWorkflowSchemasProxy: promise.array(
-    computed('atmInventory', function atmWorkflowSchemas() {
+    computed('atmInventory.privileges.view', async function atmWorkflowSchemasProxy() {
       const atmInventory = this.get('atmInventory');
       if (!atmInventory) {
         return resolve([]);
       }
-      return get(atmInventory, 'atmWorkflowSchemaList')
-        .then(atmWorkflowSchemaList => get(atmWorkflowSchemaList, 'list'));
+      if (!get(atmInventory, 'privileges.view')) {
+        throw { id: 'forbidden' };
+      }
+      const atmWorkflowSchemaList = await get(atmInventory, 'atmWorkflowSchemaList');
+      return atmWorkflowSchemaList ? (await get(atmWorkflowSchemaList, 'list')) : [];
     })
   ),
 

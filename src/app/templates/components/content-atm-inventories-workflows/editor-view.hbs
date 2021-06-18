@@ -4,19 +4,22 @@
       {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
       {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
     </a>
-    <div class="resource-name">
+    <span class="resource-name">
       {{one-inline-editor
         class="workflow-schema-name"
         value=atmWorkflowSchema.name
         onSave=(action "changeName")
       }}
+    </span>
+    <div class="btn-toolbar">
+      {{#one-spin-button
+        class="btn btn-save btn-sm btn-primary"
+        action=(action "save")
+      }}
+        {{tt this "saveBtn"}}
+      {{/one-spin-button}}
     </div>
   </h1>
-</div>
-<div class="row content-row">
-  {{#one-spin-button class="btn btn-save btn-sm btn-primary" action=(action "save")}}
-    {{tt this "saveBtn"}}
-  {{/one-spin-button}}
 </div>
 {{workflow-visualiser
   mode="edit"

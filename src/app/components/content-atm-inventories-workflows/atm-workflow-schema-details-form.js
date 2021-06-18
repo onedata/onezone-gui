@@ -108,7 +108,7 @@ export default Component.extend(I18n, {
           }).create({
             component: this,
             name: 'description',
-            viewModeAsStaticText: true,
+            showsStaticTextInViewMode: true,
             isOptional: true,
           }),
         ],
@@ -142,10 +142,8 @@ export default Component.extend(I18n, {
 
   updateFormValues() {
     const atmWorkflowSchema = this.get('atmWorkflowSchema') || {};
-    const {
-      name = '',
-        description = '',
-    } = getProperties(atmWorkflowSchema, 'name', 'description');
+    const { name = '', description = '' } =
+    getProperties(atmWorkflowSchema, 'name', 'description');
 
     this.set('formValuesSource', {
       name,

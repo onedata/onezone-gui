@@ -71,7 +71,30 @@ export default Component.extend(GlobalActions, {
   /**
    * @type {Array<String>}
    */
-  possibleSlideIds: Object.freeze(['list', 'editor', 'lambdaSelector', 'taskDetails']),
+  possibleSlideIds: Object.freeze([
+    'list',
+    'editor',
+    'lambdaSelector',
+    'lambdaCreator',
+    'taskDetails',
+  ]),
+
+  /**
+   * @type {Boolean}
+   */
+  isCarouselVisible: true,
+
+  /**
+   * @override
+   */
+  globalActions: computed('actionsPerSlide', 'activeSlide', function globalActions() {
+    const {
+      actionsPerSlide,
+      activeSlide,
+    } = this.getProperties('actionsPerSlide', 'activeSlide');
+
+    return actionsPerSlide[activeSlide] || [];
+  }),
 
   /**
    * @type {ComputedProperty<String|undefined>}
@@ -122,18 +145,6 @@ export default Component.extend(GlobalActions, {
     }
   )),
 
-  /**
-   * @override
-   */
-  globalActions: computed('actionsPerSlide', 'activeSlide', function globalActions() {
-    const {
-      actionsPerSlide,
-      activeSlide,
-    } = this.getProperties('actionsPerSlide', 'activeSlide');
-
-    return actionsPerSlide[activeSlide] || [];
-  }),
-
   activeAtmWorkflowSchemaIdFromUrlObserver: observer(
     'activeAtmWorkflowSchemaIdFromUrl',
     function activeAtmWorkflowSchemaIdFromUrlObserver() {
@@ -165,13 +176,19 @@ export default Component.extend(GlobalActions, {
       });
     }
     const activeSlide = this.get('activeSlide');
-    if (!['lambdaSelector', 'taskDetails'].includes(activeSlide)) {
+    if (!['lambdaSelector', 'lambdaCreator', 'taskDetails'].includes(activeSlide)) {
       this.cancelTaskDetailsProvider();
     }
   }),
 
+  atmInventoryObserver: observer('atmInventory', function atmInventoryObserver() {
+    // rerender carousel from scratch to avoid animations of slide change
+    this.set('isCarouselVisible', false);
+    scheduleOnce('afterRender', this, 'set', 'isCarouselVisible', true);
+  }),
+
   changeSlideViaUrl(newSlide, slideParams = {}) {
-    const workflowId = this.get('activeAtmWorkflowSchemaIdFromUrl');
+    const workflowId = this.get('activeAtmWorkflowSchemaIdFromUrl') || null;
     this.get('navigationState')
       .changeRouteAspectOptions(Object.assign({ workflowId }, slideParams, {
         view: newSlide,
@@ -181,10 +198,10 @@ export default Component.extend(GlobalActions, {
   init() {
     this._super(...arguments);
     const actionsFactory = ActionsFactory.create({ ownerSource: this });
-    actionsFactory.registerTaskDetailsCreateProviderCallback(
+    actionsFactory.registerGetTaskCreationDataCallback(
       (...args) => this.runTaskDetailsProvider('create', ...args)
     );
-    actionsFactory.registerTaskDetailsModifyProviderCallback(
+    actionsFactory.registerGetTaskModificationDataCallback(
       (...args) => this.runTaskDetailsProvider('edit', ...args)
     );
     this.setProperties({
@@ -261,6 +278,9 @@ export default Component.extend(GlobalActions, {
         );
       }
     },
+    showLambdaCreatorView() {
+      this.changeSlideViaUrl('lambdaCreator');
+    },
     backSlide() {
       const {
         activeSlide,
@@ -273,6 +293,9 @@ export default Component.extend(GlobalActions, {
         case 'lambdaSelector':
           this.changeSlideViaUrl('editor');
           this.cancelTaskDetailsProvider();
+          break;
+        case 'lambdaCreator':
+          this.changeSlideViaUrl('lambdaSelector');
           break;
         case 'taskDetails':
           if (taskDetailsProviderMode === 'create') {

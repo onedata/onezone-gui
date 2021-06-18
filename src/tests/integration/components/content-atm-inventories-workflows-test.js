@@ -129,6 +129,7 @@ describe('Integration | Component | content atm inventories workflows', function
         list: promiseArray(resolve(atmLambdas)),
       })),
       privileges: {
+        view: true,
         manageWorkflowSchemas: true,
       },
     };
@@ -183,14 +184,15 @@ describe('Integration | Component | content atm inventories workflows', function
       .and.to.have.length(1);
   });
 
-  it('contains carousel with four slides', async function () {
+  it('contains carousel with five slides', async function () {
     await render(this);
 
     const $slides = this.$('.one-carousel-slide');
-    expect($slides).to.have.length(4);
+    expect($slides).to.have.length(5);
     expect(getSlide('list')).to.exist;
     expect(getSlide('editor')).to.exist;
     expect(getSlide('lambdaSelector')).to.exist;
+    expect(getSlide('lambdaCreator')).to.exist;
     expect(getSlide('taskDetails')).to.exist;
   });
 
@@ -540,7 +542,7 @@ describe('Integration | Component | content atm inventories workflows', function
       await click('.modify-task-action-trigger');
 
       expect(isSlideActive('taskDetails')).to.be.true;
-      await fillIn('.name-field .form-control', 'newName');
+      await fillIn(taskDetailsSlide.querySelector('.name-field .form-control'), 'newName');
       await selectChoose('.valueBuilderType-field', 'Store credentials');
       await selectChoose('.valueBuilderStore-field', 'store1');
       await click(taskDetailsSlide.querySelector('.btn-submit'));

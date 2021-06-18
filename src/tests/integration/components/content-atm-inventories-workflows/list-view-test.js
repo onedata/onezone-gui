@@ -28,6 +28,7 @@ describe('Integration | Component | content atm inventories workflows/list view'
             }])),
           })),
           privileges: {
+            view: true,
             manageWorkflowSchemas: true,
           },
         },
