@@ -390,19 +390,21 @@ function createFunctionArgResGroup(component, dataType) {
       { value: 'integer' },
       { value: 'string' },
       { value: 'object' },
-      { value: 'histogram' },
       { value: 'anyFile' },
       { value: 'regularFile' },
       { value: 'directory' },
+      { value: 'symlink' },
       { value: 'dataset' },
-      { value: 'archive' },
-      { value: 'singleValueStore' },
-      { value: 'listStore' },
-      { value: 'mapStore' },
-      { value: 'treeForestStore' },
-      { value: 'rangeStore' },
-      { value: 'histogramStore' },
       { value: 'onedatafsCredentials' },
+      // TODO: VFS-7816 uncomment or remove future code
+      // { value: 'histogram' },
+      // { value: 'archive' },
+      // { value: 'singleValueStore' },
+      // { value: 'listStore' },
+      // { value: 'mapStore' },
+      // { value: 'treeForestStore' },
+      // { value: 'rangeStore' },
+      // { value: 'histogramStore' },
     ],
   });
   const generateEntryBatchField = mode => ToggleField.extend({
@@ -425,11 +427,12 @@ function createFunctionArgResGroup(component, dataType) {
     isVisible: not(or(
       and('isInViewMode', isEmpty('value')),
       array.includes(raw([
-        'singleValueStore',
-        'listStore',
-        'mapStore',
-        'treeForestStore',
-        'histogramStore',
+        // TODO: VFS-7816 uncomment or remove future code
+        // 'singleValueStore',
+        // 'listStore',
+        // 'mapStore',
+        // 'treeForestStore',
+        // 'histogramStore',
         'onedatafsCredentials',
       ]), 'parent.value.entryType')
     )),

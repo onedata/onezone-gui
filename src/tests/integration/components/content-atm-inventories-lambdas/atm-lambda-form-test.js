@@ -29,12 +29,13 @@ const argumentAndResultTypes = [{
     valueConstraints: {},
   },
   label: 'Object',
-}, {
-  dataSpec: {
-    type: 'histogram',
-    valueConstraints: {},
-  },
-  label: 'Histogram',
+  // TODO: VFS-7816 uncomment or remove future code
+  // }, {
+  //   dataSpec: {
+  //     type: 'histogram',
+  //     valueConstraints: {},
+  //   },
+  //   label: 'Histogram',
 }, {
   dataSpec: {
     type: 'file',
@@ -61,65 +62,74 @@ const argumentAndResultTypes = [{
   label: 'Directory',
 }, {
   dataSpec: {
+    type: 'file',
+    valueConstraints: {
+      fileType: 'SYMLNK',
+    },
+  },
+  label: 'Symbolic link',
+}, {
+  dataSpec: {
     type: 'dataset',
     valueConstraints: {},
   },
   label: 'Dataset',
 }, {
-  dataSpec: {
-    type: 'archive',
-    valueConstraints: {},
-  },
-  label: 'Archive',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'singleValue',
-    },
-  },
-  label: 'Single value store',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'list',
-    },
-  },
-  label: 'List store',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'map',
-    },
-  },
-  label: 'Map store',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'treeForest',
-    },
-  },
-  label: 'Tree forest store',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'range',
-    },
-  },
-  label: 'Range store',
-}, {
-  dataSpec: {
-    type: 'storeCredentials',
-    valueConstraints: {
-      storeType: 'histogram',
-    },
-  },
-  label: 'Histogram store',
-}, {
+  // TODO: VFS-7816 uncomment or remove future code
+  //   dataSpec: {
+  //     type: 'archive',
+  //     valueConstraints: {},
+  //   },
+  //   label: 'Archive',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'singleValue',
+  //     },
+  //   },
+  //   label: 'Single value store',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'list',
+  //     },
+  //   },
+  //   label: 'List store',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'map',
+  //     },
+  //   },
+  //   label: 'Map store',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'treeForest',
+  //     },
+  //   },
+  //   label: 'Tree forest store',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'range',
+  //     },
+  //   },
+  //   label: 'Range store',
+  // }, {
+  //   dataSpec: {
+  //     type: 'storeCredentials',
+  //     valueConstraints: {
+  //       storeType: 'histogram',
+  //     },
+  //   },
+  //   label: 'Histogram store',
+  // }, {
   dataSpec: {
     type: 'onedatafsCredentials',
     valueConstraints: {},
