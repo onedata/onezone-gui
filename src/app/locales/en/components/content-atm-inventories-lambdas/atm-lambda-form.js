@@ -8,9 +8,10 @@ const argumentAndResultTypes = {
   object: {
     label: 'Object',
   },
-  histogram: {
-    label: 'Histogram',
-  },
+  // TODO: VFS-7816 uncomment or remove future code
+  // histogram: {
+  //   label: 'Histogram',
+  // },
   anyFile: {
     label: 'Any file',
   },
@@ -20,30 +21,34 @@ const argumentAndResultTypes = {
   directory: {
     label: 'Directory',
   },
+  symlink: {
+    label: 'Symbolic link',
+  },
   dataset: {
     label: 'Dataset',
   },
-  archive: {
-    label: 'Archive',
-  },
-  singleValueStore: {
-    label: 'Single value store',
-  },
-  listStore: {
-    label: 'List store',
-  },
-  mapStore: {
-    label: 'Map store',
-  },
-  treeForestStore: {
-    label: 'Tree forest store',
-  },
-  rangeStore: {
-    label: 'Range store',
-  },
-  histogramStore: {
-    label: 'Histogram store',
-  },
+  // TODO: VFS-7816 uncomment or remove future code
+  // archive: {
+  //   label: 'Archive',
+  // },
+  // singleValueStore: {
+  //   label: 'Single value store',
+  // },
+  // listStore: {
+  //   label: 'List store',
+  // },
+  // mapStore: {
+  //   label: 'Map store',
+  // },
+  // treeForestStore: {
+  //   label: 'Tree forest store',
+  // },
+  // rangeStore: {
+  //   label: 'Range store',
+  // },
+  // histogramStore: {
+  //   label: 'Histogram store',
+  // },
   onedatafsCredentials: {
     label: 'OnedataFS credentials',
   },

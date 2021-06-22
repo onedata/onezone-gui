@@ -71,7 +71,7 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 
 /**
  * @typedef {AtmDataTypeValueConstraints} AtmFileTypeValueConstraints
- * @param {String} fileType one of: `'REG'`, `'DIR'`, `'ANY'`
+ * @param {String} fileType one of: `'REG'`, `'DIR'`, `'SYMLNK'`, `'ANY'`
  */
 
 /**

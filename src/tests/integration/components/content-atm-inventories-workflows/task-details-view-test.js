@@ -21,16 +21,17 @@ const exampleAtmLambda = {
     },
     isOptional: true,
     isBatch: false,
-  }, {
-    name: 'argstore',
-    dataSpec: {
-      type: 'storeCredentials',
-      valueConstraints: {
-        storeType: 'singleValue',
-      },
-    },
-    isOptional: true,
-    isBatch: false,
+    // TODO: VFS-7816 uncomment or remove future code
+    // }, {
+    //   name: 'argstore',
+    //   dataSpec: {
+    //     type: 'storeCredentials',
+    //     valueConstraints: {
+    //       storeType: 'singleValue',
+    //     },
+    //   },
+    //   isOptional: true,
+    //   isBatch: false,
   }],
   resultSpecs: [{
     name: 'resstring',
@@ -43,15 +44,16 @@ const exampleAtmLambda = {
 };
 
 const exampleStores = [{
-  id: 'singleValueIntegerId',
-  name: 'singleValueIntegerStore',
-  type: 'singleValue',
-  dataSpec: {
-    type: 'integer',
-    valueConstraints: {},
-  },
-  requiresInitialValue: false,
-}, {
+  // TODO: VFS-7816 uncomment or remove future code
+  //   id: 'singleValueIntegerId',
+  //   name: 'singleValueIntegerStore',
+  //   type: 'singleValue',
+  //   dataSpec: {
+  //     type: 'integer',
+  //     valueConstraints: {},
+  //   },
+  //   requiresInitialValue: false,
+  // }, {
   id: 'listStringStoreId',
   name: 'listStringStore',
   type: 'list',
@@ -79,12 +81,12 @@ const exampleTask = {
     valueBuilder: {
       valueBuilderType: 'iteratedItem',
     },
-  }, {
-    argumentName: 'argstore',
-    valueBuilder: {
-      valueBuilderType: 'storeCredentials',
-      valueBuilderRecipe: 'singleValueIntegerId',
-    },
+    // }, {
+    //   argumentName: 'argstore',
+    //   valueBuilder: {
+    //     valueBuilderType: 'storeCredentials',
+    //     valueBuilderRecipe: 'singleValueIntegerId',
+    //   },
   }],
   resultMappings: [{
     resultName: 'resstring',
@@ -166,8 +168,9 @@ describe('Integration | Component | content atm inventories workflows/task detai
         await render(this);
 
         expect(this.$('.name-field .form-control')).to.have.value(exampleTask.name);
-        expect(this.$('.argumentMapping-field .valueBuilderStore-field').text().trim())
-          .to.contain('singleValueIntegerStore');
+        // TODO: VFS-7816 uncomment or remove future code
+        // expect(this.$('.argumentMapping-field .valueBuilderStore-field').text().trim())
+        //   .to.contain('singleValueIntegerStore');
         expect(this.$('.resultMapping-field .targetStore-field').text().trim())
           .to.contain('singleValueStringStore');
       });

@@ -36,12 +36,10 @@ describe('Integration | Component | content atm inventories workflows', function
         },
       },
       argumentSpecs: [{
-        name: 'argstore',
+        name: 'argobject',
         dataSpec: {
-          type: 'storeCredentials',
-          valueConstraints: {
-            storeType: 'singleValue',
-          },
+          type: 'object',
+          valueConstraints: {},
         },
         isOptional: true,
         isBatch: false,
@@ -157,6 +155,9 @@ describe('Integration | Component | content atm inventories workflows', function
           return resolve(atmWorkflowSchema || {
             name: 'someName',
             atmInventory: promiseObject(resolve(atmInventory)),
+            atmLambdaList: promiseObject(resolve({
+              list: promiseArray(resolve(atmLambdas)),
+            })),
           });
         }
         return resolve(null);
@@ -364,8 +365,13 @@ describe('Integration | Component | content atm inventories workflows', function
 
     it('redirects to editor view after workflow creation', async function () {
       set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', null);
+      const {
+        atmWorkflowSchemas,
+        atmInventory,
+      } = this.getProperties('atmWorkflowSchemas', 'atmInventory');
       const createdRecord = {
         entityId: 'someId',
+        atmInventory: promiseObject(resolve(atmInventory)),
         atmLambdaList: promiseObject(resolve({
           list: promiseArray(resolve([])),
         })),
@@ -374,13 +380,15 @@ describe('Integration | Component | content atm inventories workflows', function
         lookupService(this, 'workflow-actions'),
         'createCreateAtmWorkflowSchemaAction'
       ).returns({
-        execute: () => resolve({
-          status: 'done',
-          result: createdRecord,
-        }),
+        execute: () => {
+          atmWorkflowSchemas.push(createdRecord);
+          return resolve({
+            status: 'done',
+            result: createdRecord,
+          });
+        },
       });
       await render(this);
-
       await fillIn('.name-field .form-control', 'someName');
       await click('.btn-content-info');
 
@@ -406,8 +414,7 @@ describe('Integration | Component | content atm inventories workflows', function
       );
 
       expect(isSlideActive('taskDetails')).to.be.true;
-      await selectChoose('.valueBuilderType-field', 'Store credentials');
-      await selectChoose('.valueBuilderStore-field', 'store1');
+      await selectChoose('.valueBuilderType-field', 'Iterated item');
       await click(taskDetailsSlide.querySelector('.btn-submit'));
 
       expect(isSlideActive('editor')).to.be.true;
@@ -421,10 +428,9 @@ describe('Integration | Component | content atm inventories workflows', function
         name: 'f1',
         lambdaId: 'lambda1',
         argumentMappings: [{
-          argumentName: 'argstore',
+          argumentName: 'argobject',
           valueBuilder: {
-            valueBuilderType: 'storeCredentials',
-            valueBuilderRecipe: 's1',
+            valueBuilderType: 'iteratedItem',
           },
         }],
         resultMappings: [],
@@ -543,8 +549,8 @@ describe('Integration | Component | content atm inventories workflows', function
 
       expect(isSlideActive('taskDetails')).to.be.true;
       await fillIn(taskDetailsSlide.querySelector('.name-field .form-control'), 'newName');
-      await selectChoose('.valueBuilderType-field', 'Store credentials');
-      await selectChoose('.valueBuilderStore-field', 'store1');
+      await selectChoose('.valueBuilderType-field', 'Constant value');
+      await fillIn('.valueBuilderConstValue-field .form-control', '{}');
       await click(taskDetailsSlide.querySelector('.btn-submit'));
 
       expect(isSlideActive('editor')).to.be.true;
@@ -557,10 +563,10 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(atmWorkflowSchema.lanes[0].parallelBoxes[0].tasks[0]).to.deep.include({
         name: 'newName',
         argumentMappings: [{
-          argumentName: 'argstore',
+          argumentName: 'argobject',
           valueBuilder: {
-            valueBuilderType: 'storeCredentials',
-            valueBuilderRecipe: 's1',
+            valueBuilderType: 'const',
+            valueBuilderRecipe: {},
           },
         }],
       });
