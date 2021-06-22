@@ -132,6 +132,18 @@ const clusterHandlers = {
   },
 };
 
+const atmInventoryHandlers = {
+  privileges(operation) {
+    if (operation === 'get') {
+      return {
+        member: ['atm_inventory_view'],
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
+};
+
 const userHandlers = {
   client_tokens(operation) {
     if (operation === 'create') {
@@ -254,6 +266,7 @@ export default OnedataGraphMock.extend({
       provider: providerHandlers,
       cluster: clusterHandlers,
       token: tokenHandlers,
+      atm_inventory: atmInventoryHandlers,
     });
     this.set(
       'handlers',

@@ -61,6 +61,7 @@
     "ember-cp-validations": "3.5.1",
     "ember-data": "2.18.0",
     "ember-datetimepicker": "5.0.0",
+    "ember-drag-drop": "0.8.2",
     "ember-export-application-global": "2.0.0",
     "ember-gestures": "0.4.8",
     "ember-get-config": "0.2.4",

@@ -8,6 +8,7 @@ import spaces from './tabs/spaces';
 import shares from './tabs/shares';
 import groups from './tabs/groups';
 import harvesters from './tabs/harvesters';
+import atmInventories from './tabs/atm-inventories';
 import uploads from './tabs/uploads';
 import users from './tabs/users';
 
@@ -31,6 +32,7 @@ import contentSpacesDatasets from './components/content-spaces-datasets';
 import contentSpacesShares from './components/content-spaces-shares';
 import contentSpacesTransfers from './components/content-spaces-transfers';
 import contentSpacesHarvesters from './components/content-spaces-harvesters';
+import contentSpacesAutomation from './components/content-spaces-automation';
 import oneproviderViewContainer from './components/oneprovider-view-container';
 import contentProviderEmpty from './components/content-provider-empty';
 import contentGroupsNew from './components/content-groups-new';
@@ -82,6 +84,13 @@ import inviteTokenGenerator from './components/invite-token-generator';
 import tokenConsumer from './components/token-consumer';
 import contentTokensConsumer from './components/content-tokens-consumer';
 import tokenTemplateSelector from './components/token-template-selector';
+import sidebarAtmInventories from './components/sidebar-atm-inventories';
+import contentAtmInventoriesEmpty from './components/content-atm-inventories-empty';
+import contentAtmInventoriesNew from './components/content-atm-inventories-new';
+import contentAtmInventoriesMembers from './components/content-atm-inventories-members';
+import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
+import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
+import emptyCollectionSidebar from './components/empty-collection-sidebar';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -95,6 +104,7 @@ import clusterActions from './services/cluster-actions';
 import privilegeActions from './services/privilege-actions';
 import tokenActions from './services/token-actions';
 import harvesterActions from './services/harvester-actions';
+import workflowActions from './services/workflow-actions';
 import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
@@ -112,6 +122,15 @@ import generateInviteTokenAction from './utils/token-actions/generate-invite-tok
 import openConsumeTokenViewAction from './utils/token-actions/open-consume-token-view-action';
 import consumeInviteTokenAction from './utils/token-actions/consume-invite-token-action';
 import toggleBeingOwnerAction from './utils/user-actions/toggle-being-owner-action';
+import openCreateAtmInventoryViewAction from './utils/workflow-actions/open-create-atm-inventory-view-action';
+import createAtmInventoryAction from './utils/workflow-actions/create-atm-inventory-action';
+import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
+import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
+import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
+import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
+import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
+import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
+import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
 
 const translations = {
   tabs: {
@@ -126,6 +145,7 @@ const translations = {
     users,
     clusters,
     harvesters,
+    atmInventories,
     uploads,
   },
   components: {
@@ -160,6 +180,7 @@ const translations = {
     contentSpacesShares,
     contentSpacesTransfers,
     contentSpacesHarvesters,
+    contentSpacesAutomation,
     oneproviderViewContainer,
     contentGroupsNew,
     contentGroupsEmpty,
@@ -211,6 +232,13 @@ const translations = {
     tokenConsumer,
     contentTokensConsumer,
     tokenTemplateSelector,
+    sidebarAtmInventories,
+    contentAtmInventoriesEmpty,
+    contentAtmInventoriesNew,
+    contentAtmInventoriesMembers,
+    contentAtmInventoriesLambdas,
+    contentAtmInventoriesWorkflows,
+    emptyCollectionSidebar,
   },
   services: {
     tokenActions,
@@ -219,6 +247,7 @@ const translations = {
     clusterActions,
     privilegeActions,
     harvesterActions,
+    workflowActions,
     userActions,
     guiUtils,
     uploadManager,
@@ -244,6 +273,17 @@ const translations = {
     },
     userActions: {
       toggleBeingOwnerAction,
+    },
+    workflowActions: {
+      openCreateAtmInventoryViewAction,
+      createAtmInventoryAction,
+      modifyAtmInventoryAction,
+      removeAtmInventoryAction,
+      createAtmLambdaAction,
+      modifyAtmLambdaAction,
+      modifyAtmWorkflowSchemaAction,
+      removeAtmWorkflowSchemaAction,
+      createAtmWorkflowSchemaAction,
     },
   },
 };

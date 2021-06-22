@@ -8,5 +8,6 @@ export default _.merge({}, proceedProcessModal, {
   space: 'space',
   group: 'group',
   harvester: 'harvester',
+  atmInventory: 'automation inventory',
   cluster: 'cluster',
 });

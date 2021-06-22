@@ -1,0 +1,20 @@
+@import './content-atm-inventories-workflows/atm-workflow-schemas-list';
+@import './content-atm-inventories-workflows/list-view';
+@import './content-atm-inventories-workflows/creator-view';
+@import './content-atm-inventories-workflows/editor-view';
+@import './content-atm-inventories-workflows/loading-view';
+@import './content-atm-inventories-workflows/task-details-view';
+
+.content-atm-inventories-workflows {
+  @include full-col-content-height();
+  display: flex;
+  flex-direction: column;
+
+  .one-carousel {
+    flex-grow: 1;
+  }
+
+  .one-carousel-slide > * {
+    @include col-content-padding();
+  }
+}

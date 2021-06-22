@@ -1,0 +1,67 @@
+{{#if isCarouselVisible}}
+  {{#one-carousel
+    activeSlideId=activeSlide
+    as |carousel|
+  }}
+    {{#carousel.slide slideId="list"}}
+      {{content-atm-inventories-workflows/list-view
+        atmInventory=atmInventory
+        onAddAtmWorkflowSchema=(action "showCreatorView")
+        onOpenAtmWorkflowSchema=(action "showEditorView")
+        onRegisterViewActions=(action "registerViewActions" "list")
+      }}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="editor"}}
+      {{#if activeAtmWorkflowSchemaId}}
+        {{#if activeAtmWorkflowSchemaProxy.isFulfilled}}
+          {{content-atm-inventories-workflows/editor-view
+            atmWorkflowSchema=activeAtmWorkflowSchemaProxy.content
+            actionsFactory=actionsFactory
+            onBackSlide=(action "backSlide")
+          }}
+        {{else}}
+          {{content-atm-inventories-workflows/loading-view
+            loadingProxy=activeAtmWorkflowSchemaProxy
+            onBackSlide=(action "backSlide")
+          }}
+        {{/if}}
+      {{else}}
+        {{content-atm-inventories-workflows/creator-view
+          atmInventory=atmInventory
+          onBackSlide=(action "backSlide")
+          onAtmWorkflowSchemaAdded=(action "showEditorView")
+        }}
+      {{/if}}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="lambdaSelector"}}
+      {{content-atm-inventories-lambdas/list-view
+        atmInventory=atmInventory
+        mode="selection"
+        onAddAtmLambda=(action "showLambdaCreatorView")
+        onAddToAtmWorkflowSchema=(action "taskProviderLambdaSelected")
+        onBackSlide=(action "backSlide")
+        onRegisterViewActions=(action "registerViewActions" "lambdaSelector")
+      }}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="lambdaCreator"}}
+      {{content-atm-inventories-lambdas/creator-view
+        atmInventory=atmInventory
+        onBackSlide=(action "backSlide")
+        onAtmLambdaAdded=(action "taskProviderLambdaSelected")
+      }}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="taskDetails"}}
+      {{content-atm-inventories-workflows/task-details-view
+        mode=taskDetailsProviderMode
+        atmLambda=taskDetailsProviderData.atmLambda
+        stores=taskDetailsProviderData.stores
+        task=taskDetailsProviderData.task
+        isShown=(eq "taskDetails" activeSlide)
+        onApplyChanges=(action "taskProviderDataAccepted")
+        onCancel=(action "taskProviderCancel")
+        onBackSlide=(action "backSlide")
+      }}
+    {{/carousel.slide}}
+  {{/one-carousel}}
+{{/if}}
+{{yield}}

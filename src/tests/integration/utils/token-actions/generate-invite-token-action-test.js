@@ -64,6 +64,12 @@ describe('Integration | Util | token actions/generate invite token action', func
   }, {
     inviteType: 'spaceJoinHarvester',
     title: spaceTitle,
+  }, {
+    inviteType: 'userJoinAtmInventory',
+    title: userTitle,
+  }, {
+    inviteType: 'groupJoinAtmInventory',
+    title: groupTitle,
   }].forEach(({ inviteType, title }) => {
     it(
       `has correct title for ${inviteType} invite type`,

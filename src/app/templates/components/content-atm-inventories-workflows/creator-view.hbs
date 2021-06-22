@@ -1,0 +1,25 @@
+<div class="row content-row header-row">
+  <h1 class="with-back relative nowrap">
+    <a class="content-back-link" {{action "backSlide"}}>
+      {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
+      {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
+    </a>
+    <div class="resource-name">{{tt this "header"}}</div>
+  </h1>
+</div>
+{{#content-info
+  class="scroll-breakpoint-700"
+  header=(tt this "contentInfoTitle")
+  text=(tt this "contentInfoText")
+  buttonLabel=(tt this "submitBtn")
+  buttonAction=(action "submit")
+  buttonDisabled=(not isNewAtmWorkflowSchemaDataValid)
+  as |contentInfo|
+}}
+  {{content-atm-inventories-workflows/atm-workflow-schema-details-form
+    mode="edit"
+    isDisabled=isSubmitting
+    onChange=(action "detailsChanged")
+  }}
+{{/content-info}}
+{{yield}}

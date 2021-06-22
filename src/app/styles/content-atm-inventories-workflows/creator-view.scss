@@ -1,0 +1,18 @@
+.content-atm-inventories-workflows-creator-view {
+  @include full-col-content-height($preserve-padding: true);
+  display: flex;
+  flex-direction: column;
+
+  .content-info {
+    flex-grow: 1;
+    position: relative;
+  }
+
+  .control-label {
+    width: 8em;
+  }
+
+  .form-group:last-child {
+    margin-bottom: 0;
+  }
+}

@@ -57,9 +57,9 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
 
   // members of this harvester
   groupList: belongsTo('groupList'),
-  userList: belongsTo('sharedUserList'),
+  userList: belongsTo('userList'),
   effGroupList: belongsTo('groupList'),
-  effUserList: belongsTo('sharedUserList'),
+  effUserList: belongsTo('userList'),
   spaceList: belongsTo('spaceList'),
   effProviderList: belongsTo('providerList'),
   indexList: belongsTo('indexList'),

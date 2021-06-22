@@ -76,10 +76,22 @@ describe('Integration | Util | token actions/consume invite token action', funct
       notifyText: 'Space "abc" has joined to harvester "target" successfully.',
       transitionToAspect: true,
     }],
+  }, {
+    targetModelName: 'atmInventory',
+    targetRouteResourceType: 'atm-inventories',
+    joiningModels: [{
+      modelName: 'group',
+      notifyText: 'Group "abc" has joined to automation inventory "target" successfully.',
+    }, {
+      modelName: 'user',
+      notifyText: 'You have joined to automation inventory "target" successfully.',
+    }],
   }].forEach(({
     targetModelName,
+    targetRouteResourceType,
     joiningModels,
   }) => {
+    targetRouteResourceType = targetRouteResourceType || targetModelName + 's';
     joiningModels.forEach(({
       modelName: joiningModelName,
       notifyText,
@@ -141,9 +153,9 @@ describe('Integration | Util | token actions/consume invite token action', funct
             .then(() => {
               expect(transitionToStub).to.be.calledWith(
                 'onedata.sidebar.content.aspect',
-                (transitionToAspect ? `${joiningModelName}s` : `${targetModelName}s`),
+                (transitionToAspect ? `${joiningModelName}s` : targetRouteResourceType),
                 (transitionToAspect ? joiningRecordId : 'recordid'),
-                (transitionToAspect ? `${targetModelName}s` : 'index'),
+                (transitionToAspect ? targetRouteResourceType : 'index'),
               );
             });
         });

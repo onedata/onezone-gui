@@ -6,6 +6,7 @@ export default {
   space: 'space',
   group: 'group',
   harvester: 'harvester',
+  atmInventory: 'automation inventory',
   cluster: 'cluster',
   child: 'child',
   parent: 'parent',

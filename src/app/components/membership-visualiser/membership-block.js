@@ -10,15 +10,18 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { collect } from '@ember/object/computed';
 import _ from 'lodash';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row-element', 'membership-block'],
   classNameBindings: ['recordTypeClass', 'actionsOpened'],
+
+  recordManager: service(),
 
   /**
    * @override
@@ -34,7 +37,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputerProperty<string>}
    */
-  recordType: reads('record.entityType'),
+  recordType: computed('record', function recordType() {
+    const {
+      recordManager,
+      record,
+    } = this.getProperties('recordManager', 'record');
+    return recordManager.getModelNameForRecord(record);
+  }),
 
   /**
    * True if mouse is over block icon

@@ -1,0 +1,28 @@
+<form class="form form-horizontal form-component">
+  {{form-component/field-renderer field=fields}}
+  {{#if (or (eq mode "create") (eq mode "edit"))}}
+    <div class="btn-toolbar footer-buttons">
+      {{#one-spin-button
+        class=(concat-classes
+          "btn btn-primary btn-submit"
+          (if btnSize (concat "btn-" btnSize))
+        )
+        action=(action "submit")
+        disabled=(not fields.isValid)
+      }}
+        {{tt this (concat "submit." mode)}}
+      {{/one-spin-button}}
+      {{#if (eq mode "edit")}}
+        {{#bs-button
+          class="btn-cancel"
+          disabled=isSubmitting
+          size=btnSize
+          onClick=(action "cancel")
+        }}
+          {{tt this "cancel"}}
+        {{/bs-button}}
+      {{/if}}
+    </div>
+  {{/if}}
+</form>
+{{yield}}

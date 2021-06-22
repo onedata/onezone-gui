@@ -29,7 +29,6 @@ right column will always be before left in html --}}
   close=(action (mut groupToJoin) null)
   proceed=(action "joinGroup")
   processing=isJoiningGroup
-  modelType="group"
   model=groupToJoin}}
 {{group-remove-modal
   opened=(and groupToRemove (or isRemovingGroup (not groupToRemove.isDeleted)))

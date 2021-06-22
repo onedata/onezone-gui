@@ -1,0 +1,22 @@
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-automation-content"
+  space=space
+  oneproviderId=oneproviderId
+  mapSelectorEnabled=false
+  resourceType="automation"
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  as |container|
+}}
+  {{#container.header class="content-spaces-automation-header"}}
+    <h1>
+      <span class="one-label">{{tt this "header"}}</span>
+    </h1>
+  {{/container.header}}
+  {{#container.body}}
+    {{embedded-content-space-automation
+      oneprovider=container.selectedProvider
+      baseUrl=container.contentIframeBaseUrl
+      spaceEntityId=space.entityId
+    }}
+  {{/container.body}}
+{{/oneprovider-view-container}}

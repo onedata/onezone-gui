@@ -230,6 +230,14 @@ describe('Integration | Component | invite token generator', function () {
     subjectDescription: 'Copy below token and pass it to the owner of space you would like to invite.',
     limitationsDescription: standardLimitations,
   }, {
+    inviteType: 'userJoinAtmInventory',
+    subjectDescription: passToUserDescription,
+    limitationsDescription: standardLimitations,
+  }, {
+    inviteType: 'groupJoinAtmInventory',
+    subjectDescription: passToGroupDescription,
+    limitationsDescription: standardLimitations,
+  }, {
     inviteType: 'onedatify',
     limitationsDescription: onedatifyLimitations,
     dontShowCustomToken: true,

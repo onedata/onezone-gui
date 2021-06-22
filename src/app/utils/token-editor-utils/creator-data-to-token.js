@@ -81,7 +81,7 @@ export default function creatorDataToToken(editorData, currentUser) {
           tokenData.type.inviteToken[get(inviteTypeSpec, 'idFieldName')] = targetEntityId;
         }
 
-        if (inviteTypeSpec.privileges && privileges) {
+        if (inviteTypeSpec.hasPrivileges && privileges) {
           tokenData.privileges = privileges;
         }
       }

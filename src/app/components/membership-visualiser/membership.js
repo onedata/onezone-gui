@@ -28,6 +28,7 @@ export default Component.extend(I18n, {
   ],
 
   currentUser: service(),
+  recordManager: service(),
 
   /**
    * @override
@@ -143,11 +144,13 @@ export default Component.extend(I18n, {
         pathStart,
         visibleBlocks,
         currentUserId,
+        recordManager,
       } = this.getProperties(
         'recordsProxy',
         'pathStart',
         'visibleBlocks',
-        'currentUserId'
+        'currentUserId',
+        'recordManager'
       );
       if (get(recordsProxy, 'isFulfilled')) {
         // Path is built from the end to the beginning, because some of the first
@@ -197,7 +200,7 @@ export default Component.extend(I18n, {
           const isThisBlock = get(block, 'type') === 'block';
           const child = get(prevBlock, 'record');
           const isChildCurrentUser = Boolean(child) &&
-            get(child, 'entityType') === 'user' &&
+            recordManager.getModelNameForRecord(child) === 'user' &&
             get(child, 'entityId') === currentUserId;
           elements.push({
             id: this.getPathRelationId(prevBlock, block),
@@ -222,14 +225,17 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   membershipDescription: computed(
-    'recordsProxy.content.@each.{name,entityType}',
-    'pathStart.{name,entityType}',
+    'recordsProxy.content.@each.name',
+    'pathStart.name',
     function membershipDescription() {
-      const recordsProxy = this.get('recordsProxy');
+      const {
+        recordsProxy,
+        recordManager,
+      } = this.getProperties('recordsProxy', 'recordManager');
       if (get(recordsProxy, 'isFulfilled')) {
         const pathStart = this.get('pathStart');
         const elementsNumber = get(recordsProxy, 'length');
-        const pathStartType = this.t(get(pathStart, 'entityType'));
+        const pathStartType = this.t(recordManager.getModelNameForRecord(pathStart));
         const pathStartName = get(pathStart, 'name');
         let description = this.t('descBeginning', {
           pathStartType: _.upperFirst(pathStartType),
@@ -251,16 +257,17 @@ export default Component.extend(I18n, {
             }
             const translation = i == 0 || (i >= 2 && !recordsProxy.objectAt(i - 2)) ?
               'descPathIsEffectiveMember' : 'descPathCentralIsEffectiveMember';
+            const nonEmptyElementModelName =
+              recordManager.getModelNameForRecord(nonEmptyElement);
             description += this.t(translation, {
-              elementType: get(nonEmptyElement, 'entityType'),
+              elementType: nonEmptyElementModelName,
               elementName: get(nonEmptyElement, 'name'),
             });
             i = j;
             if (i < elementsNumber - 1) {
               description += '. ' + this.t('descBeginning', {
                 pathStartType: _.upperFirst(
-                  this.t(get(nonEmptyElement,
-                    'entityType'))
+                  this.t(nonEmptyElementModelName)
                 ),
                 pathStartName: get(nonEmptyElement, 'name'),
               });
@@ -268,11 +275,11 @@ export default Component.extend(I18n, {
             }
           } else {
             let membershipType = '';
-            let elementType = get(element, 'entityType');
+            let elementType = recordManager.getModelNameForRecord(element);
             const elementName = get(element, 'name');
             if (
               elementType === 'group' &&
-              get(prevElement, 'entityType') === 'group'
+              recordManager.getModelNameForRecord(prevElement) === 'group'
             ) {
               membershipType = this.t('descSubgroupType');
             }
@@ -294,10 +301,11 @@ export default Component.extend(I18n, {
         description += '.';
 
         const lastElement = recordsProxy.objectAt(elementsNumber - 1);
-        const pathEndType = this.t(get(lastElement, 'entityType'));
+        const lastElementModelName = recordManager.getModelNameForRecord(lastElement);
+        const pathEndType = this.t(lastElementModelName);
         const pathEndName = get(lastElement, 'name');
         if (elementsNumber > 1) {
-          const translation = get(lastElement, 'entityType') === 'provider' ?
+          const translation = lastElementModelName === 'provider' ?
             'descSummaryProvider' : 'descSummary';
           description += this.t(translation, {
             pathStartType,

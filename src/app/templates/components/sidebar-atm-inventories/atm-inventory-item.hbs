@@ -1,0 +1,40 @@
+{{record-icon record=atmInventory class="sidebar-item-icon"}}
+{{#if isRenaming}}
+  {{one-inline-editor
+    isEditing=true
+    value=atmInventory.name
+    showEmptyInfo=false
+    onSave=(action "rename")
+    editOnClick=false
+    onEdit=(action "toggleRename")
+    class="one-label name-editor atm-inventory-name sidebar-item-title"
+    click=(action "editorClick")
+  }}
+{{else}}
+  {{#truncated-string class="sidebar-item-title"}}
+    {{name-conflict
+      item=atmInventory
+      tagName="span"
+      class="one-label atm-inventory-name"
+    }}
+  {{/truncated-string}}
+{{/if}}
+{{#unless inSidenav}}
+  {{actions-toolbar
+    isMinimized=true
+    dropdownPlacement="auto"
+    actionsArray=itemActions
+    toolbarToggleClasses="atm-inventory-menu-trigger"
+  }}
+  {{#render-later triggerRender=isLeaveModalOpened as |renderLater|}}
+    {{leave-modal
+      opened=isLeaveModalOpened
+      close=(action "closeLeaveModal")
+      proceed=(action "leave")
+      processing=isLeaving
+      record=atmInventory
+      onHidden=renderLater.resetRenderTrigger
+    }}
+  {{/render-later}}
+{{/unless}}
+{{yield}}

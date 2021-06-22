@@ -11,9 +11,11 @@ export default _.merge({}, proceedProcessModal, {
   mayCauseSpace: mayCauseGeneric,
   mayCauseCluster: mayCauseGeneric,
   mayCauseHarvester: 'This operation might cause you to lose access to metadata gathered from spaces connected to harvester&nbsp;"{{recordName}}".',
+  mayCauseAtmInventory: mayCauseGeneric,
   group: 'group',
   space: 'space',
   harvester: 'harvester',
   cluster: 'cluster',
+  atmInventory: 'automation inventory',
   proceed: 'Leave',
 });

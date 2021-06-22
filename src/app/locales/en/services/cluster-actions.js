@@ -10,4 +10,6 @@ export default _.merge({}, ClusterActions, {
   removeUserSuccess: 'User "{{userName}}" has been removed from cluster "{{clusterName}}"',
   removingGroup: 'removing group',
   removingUser: 'removing user',
+  joiningCluster: 'joining cluster',
+  joinedClusterSuccess: 'You have joined the cluster successfully.',
 });

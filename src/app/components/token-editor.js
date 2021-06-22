@@ -36,6 +36,7 @@ import { groupedFlags as groupFlags } from 'onedata-gui-websocket-client/utils/g
 import { groupedFlags as spaceFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { groupedFlags as harvesterFlags } from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import { groupedFlags as clusterFlags } from 'onedata-gui-websocket-client/utils/cluster-privileges-flags';
+import { groupedFlags as atmInventoryFlags } from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import {
@@ -71,65 +72,50 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import ArrayProxy from '@ember/array/proxy';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
+import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
 
-const tokenInviteTypeOptions = [{
-  value: 'userJoinGroup',
-  icon: 'group',
-  targetModelName: 'group',
-}, {
-  value: 'groupJoinGroup',
-  icon: 'group',
-  targetModelName: 'group',
-}, {
-  value: 'userJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-}, {
-  value: 'groupJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-}, {
-  value: 'harvesterJoinSpace',
-  icon: 'space',
-  targetModelName: 'space',
-  noPrivileges: true,
-}, {
-  value: 'userJoinCluster',
-  icon: 'cluster',
-  targetModelName: 'cluster',
-}, {
-  value: 'groupJoinCluster',
-  icon: 'cluster',
-  targetModelName: 'cluster',
-}, {
-  value: 'userJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-}, {
-  value: 'groupJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-}, {
-  value: 'spaceJoinHarvester',
-  icon: 'light-bulb',
-  targetModelName: 'harvester',
-  noPrivileges: true,
-}, {
-  value: 'supportSpace',
-  icon: 'space',
-  targetModelName: 'space',
-  noPrivileges: true,
-}, {
-  value: 'registerOneprovider',
-  icon: 'provider',
-  noPrivileges: true,
-}];
+const tokenInviteTypesWithoutTarget = [
+  'registerOneprovider',
+];
+
+const customTokenInviteTypeIcons = {
+  registerOneprovider: 'provider',
+};
+
+const tokenInviteTypeOptions = [
+  'userJoinGroup',
+  'groupJoinGroup',
+  'userJoinSpace',
+  'groupJoinSpace',
+  'harvesterJoinSpace',
+  'userJoinCluster',
+  'groupJoinCluster',
+  'userJoinHarvester',
+  'groupJoinHarvester',
+  'spaceJoinHarvester',
+  'userJoinAtmInventory',
+  'groupJoinAtmInventory',
+  'supportSpace',
+  'registerOneprovider',
+].map(inviteType => {
+  const inviteTypeSpec = tokenInviteTypeToTargetModelMapping[inviteType];
+  return {
+    value: inviteType,
+    targetModelName: tokenInviteTypesWithoutTarget.includes(inviteType) ?
+      undefined : inviteTypeSpec.modelName,
+    icon: customTokenInviteTypeIcons[inviteType] || recordIcon(
+      inviteTypeSpec.modelName
+    ),
+    hasPrivileges: inviteTypeSpec.hasPrivileges,
+  };
+});
 
 const privilegesForModels = {
   space: spaceFlags,
   group: groupFlags,
   harvester: harvesterFlags,
   cluster: clusterFlags,
+  atmInventory: atmInventoryFlags,
 };
 
 const CaveatFormGroup = FormFieldsGroup.extend({
@@ -482,7 +468,7 @@ export default Component.extend(I18n, {
           return;
         }
         const newTargetsModelName = inviteTypeSpec.targetModelName;
-        const newPrivilegesModelName = !inviteTypeSpec.noPrivileges &&
+        const newPrivilegesModelName = inviteTypeSpec.hasPrivileges &&
           newTargetsModelName;
         if (get(component, 'mode') === 'create') {
           if (newTargetsModelName) {
@@ -530,7 +516,7 @@ export default Component.extend(I18n, {
         }),
         this.get('targetField'),
         FormFieldsGroup.extend({
-          isExpanded: not('parent.inviteTypeSpec.noPrivileges'),
+          isExpanded: reads('parent.inviteTypeSpec.hasPrivileges'),
         }).create({
           name: 'invitePrivilegesDetails',
           fields: [
@@ -600,7 +586,7 @@ export default Component.extend(I18n, {
       component,
       cachedPrivilegesModelName: or(
         'parent.parent.cachedPrivilegesModelName',
-        raw('userJoinGroup')
+        raw('space')
       ),
       cachedPrivilegesPresetProxy: reads('parent.parent.cachedPrivilegesPresetProxy'),
       privilegesGroups: computed(
@@ -609,21 +595,26 @@ export default Component.extend(I18n, {
           return privilegesForModels[this.get('cachedPrivilegesModelName')];
         }
       ),
+      modelNameForTranslations: conditional(
+        equal('cachedPrivilegesModelName', raw('atmInventory')),
+        raw('atmInventories'),
+        tag `${'cachedPrivilegesModelName'}s`,
+      ),
       privilegeGroupsTranslationsPath: computed(
-        'cachedPrivilegesModelName',
+        'modelNameForTranslations',
         function privilegeGroupsTranslationsPath() {
-          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
+          const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
-            `components.content${modelName}sMembers.privilegeGroups` :
+            `components.content${modelName}Members.privilegeGroups` :
             undefined;
         }
       ),
       privilegesTranslationsPath: computed(
-        'cachedPrivilegesModelName',
+        'modelNameForTranslations',
         function privilegesTranslationsPath() {
-          const modelName = _.upperFirst(this.get('cachedPrivilegesModelName'));
+          const modelName = _.upperFirst(this.get('modelNameForTranslations'));
           return modelName ?
-            `components.content${modelName}sMembers.privileges` :
+            `components.content${modelName}Members.privileges` :
             undefined;
         }
       ),

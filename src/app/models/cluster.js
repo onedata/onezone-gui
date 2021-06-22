@@ -48,9 +48,9 @@ export default Model.extend(
 
     // members of this cluster
     groupList: belongsTo('groupList'),
-    userList: belongsTo('sharedUserList'),
+    userList: belongsTo('userList'),
     effGroupList: belongsTo('groupList'),
-    effUserList: belongsTo('sharedUserList'),
+    effUserList: belongsTo('userList'),
 
     /**
      * Fields:

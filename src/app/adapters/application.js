@@ -1,8 +1,8 @@
 /**
  * Exports a real onedata-websocket adapter or a development one
  * @module adapters/application
- * @author Jakub Liput
- * @copyright (C) 2017 ACK CYFRONET AGH
+ * @author Jakub Liput, Michał Borzęcki
+ * @copyright (C) 2017-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -18,10 +18,13 @@ import { entityType as harvesterEntityType } from 'onezone-gui/models/harvester'
 import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 import { entityType as tokenEntityType } from 'onezone-gui/models/token';
+import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
+import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
+import { entityType as atmWorkflowSchemaEntityType } from 'onezone-gui/models/atm-workflow-schema';
 
 const OnedataAdapter = environmentExport(config, ProductionAdapter, DevelopmentAdapter);
 
-export const entityTypeToModelNameMap = Object.freeze(new Map([
+export const entityTypeToEmberModelNameMap = Object.freeze(new Map([
   [groupEntityType, 'group'],
   [spaceEntityType, 'space'],
   [userEntityType, 'user'],
@@ -30,11 +33,14 @@ export const entityTypeToModelNameMap = Object.freeze(new Map([
   [providerEntityType, 'provider'],
   [clusterEntityType, 'cluster'],
   [tokenEntityType, 'token'],
+  [atmInventoryEntityType, 'atm-inventory'],
+  [atmLambdaEntityType, 'atm-lambda'],
+  [atmWorkflowSchemaEntityType, 'atm-workflow-schema'],
 ]));
 
 export default OnedataAdapter.extend({
   /**
    * @override
    */
-  entityTypeToModelNameMap,
+  entityTypeToEmberModelNameMap,
 });

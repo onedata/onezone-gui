@@ -1,0 +1,79 @@
+<div class="icon-section">
+  {{record-icon record=atmLambda}}
+</div>
+<div class="content-section">
+  <div class="lambda-content">
+    {{#one-collapse
+      class="view-data-collapse"
+      collapsed=isEditing
+    }}
+      <div class="lambda-generics">
+        <div class="name">{{atmLambda.name}}</div>
+        <div class="summary-container">
+          {{#if atmLambda.summary}}
+            <span class="summary">{{atmLambda.summary}}</span>
+          {{/if}}
+          <a class="details-toggle" {{action "toggleDetails"}}>
+            {{toggleDetailsText}}
+          </a>
+        </div>
+      </div>
+      {{#if (eq mode "selection")}}
+        {{#bs-button
+          class="add-to-workflow-action-trigger pull-right"
+          size="sm"
+          onClick=onAddToAtmWorkflowSchema
+        }}
+          {{one-icon icon="plus"}}
+          <span class="text">{{tt this "addToAtmWorkflowSchemaAction"}}</span>
+        {{/bs-button}}
+      {{/if}}
+    {{/one-collapse}}
+    {{#one-collapse
+      class="details-collapse"
+      collapsed=(not (or isExpanded isEditing))
+    }}
+      {{#render-later triggerRender=(or isExpanded isEditing)}}
+        {{content-atm-inventories-lambdas/atm-lambda-form
+          mode=(if isEditing "edit" "view")
+          atmLambda=atmLambda
+          btnSize="sm"
+          onSubmit=(action "saveChanges")
+          onCancel=(action "cancelChanges")
+        }}
+      {{/render-later}}
+    {{/one-collapse}}
+  </div>
+  {{#if (eq mode "presentation")}}
+    {{one-menu-toggle
+      class=(concat-classes
+        "atm-lambda-actions-trigger clickable"
+        (concat "actions-trigger-" elementId)
+        (if areActionsOpened "active")
+      )
+      click=(action "toggleActionsOpen" (not areActionsOpened))
+    }}
+    {{#render-later triggerRender=areActionsOpened}}
+      {{#one-webui-popover
+        class="atm-lambda-actions"
+        padding=false
+        popoverStyle="with-dropdown"
+        triggerSelector=(concat ".actions-trigger-" elementId)
+        open=areActionsOpened
+        onToggle=(action "toggleActionsOpen")
+        as |popover|
+      }}
+        {{#click-outside
+          action=(action "toggleActionsOpen" false)
+          except-selector=(concat ".actions-trigger-" elementId)
+        }}
+          {{actions-popover-content
+            actionsArray=atmLambdaActionsArray
+            actionClicked=(action "toggleActionsOpen" false)
+          }}
+        {{/click-outside}}
+      {{/one-webui-popover}}
+    {{/render-later}}
+  {{/if}}
+</div>
+{{yield}}

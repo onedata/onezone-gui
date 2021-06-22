@@ -23,4 +23,6 @@ export default {
   childGroupAddition: 'child group addition',
   addChildGroupSuccess: 'Child group "{{childGroupName}}" has been added successfully',
   removeRelationSuccess: 'Relation between "{{parentGroupName}}" and "{{childGroupName}}" has been removed',
+  joiningGroup: 'joining group',
+  joinedGroupSuccess: 'You have joined the group successfully.',
 };

@@ -19,6 +19,7 @@ export default {
       members: 'Members',
       membership: 'Membership',
       harvesters: 'Harvesters',
+      automation: 'Automation',
     },
   },
 };

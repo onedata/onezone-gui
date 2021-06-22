@@ -24,32 +24,45 @@ import { cancel, later } from '@ember/runloop';
 import { and, or, not } from 'ember-awesome-macros';
 import moment from 'moment';
 
+/**
+ * Describes generalized invite tokens specifications depending on the invite target
+ * model name.
+ * - `idFieldName` - name of a field, where backend places invite target record id
+ * - `modelName` - model name of the invite target
+ * - `hasPrivileges` - if true, then that type of invite has privilege flags included
+ */
 const standardGroupMapping = {
   idFieldName: 'groupId',
   modelName: 'group',
-  privileges: 'group',
+  hasPrivileges: true,
 };
 
 const standardSpaceMapping = {
   idFieldName: 'spaceId',
   modelName: 'space',
-  privileges: 'space',
+  hasPrivileges: true,
 };
 
 const standardHarvesterMapping = {
   idFieldName: 'harvesterId',
   modelName: 'harvester',
-  privileges: 'harvester',
+  hasPrivileges: true,
 };
 
 const standardClusterMapping = {
   idFieldName: 'clusterId',
   modelName: 'cluster',
-  privileges: 'cluster',
+  hasPrivileges: true,
+};
+
+const standardAtmInventoryMapping = {
+  idFieldName: 'atmInventoryId',
+  modelName: 'atmInventory',
+  hasPrivileges: true,
 };
 
 function mappingWithoutPrivileges(mapping) {
-  return Object.assign({}, mapping, { privileges: undefined });
+  return Object.assign({}, mapping, { hasPrivileges: false });
 }
 
 export const tokenInviteTypeToTargetModelMapping = {
@@ -62,12 +75,15 @@ export const tokenInviteTypeToTargetModelMapping = {
   registerOneprovider: {
     idFieldName: 'adminUserId',
     modelName: 'user',
+    hasPrivileges: false,
   },
   userJoinCluster: standardClusterMapping,
   groupJoinCluster: standardClusterMapping,
   userJoinHarvester: standardHarvesterMapping,
   groupJoinHarvester: standardHarvesterMapping,
   spaceJoinHarvester: mappingWithoutPrivileges(standardHarvesterMapping),
+  userJoinAtmInventory: standardAtmInventoryMapping,
+  groupJoinAtmInventory: standardAtmInventoryMapping,
 };
 
 const allowedInviteTypes = Object.keys(tokenInviteTypeToTargetModelMapping);
