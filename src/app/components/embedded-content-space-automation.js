@@ -64,15 +64,15 @@ export default OneproviderEmbeddedContainer.extend({
 
   actions: {
     openPreviewTab(workflowExecutionId) {
-      const tab = this.get('tab');
       return this.get('navigationState').changeRouteAspectOptions({
-        tab: tab === 'preview' ? 'waiting' : (tab || null),
+        tab: 'preview',
         workflowExecutionId,
       });
     },
     closePreviewTab() {
+      const tab = this.get('tab');
       return this.get('navigationState').changeRouteAspectOptions({
-        tab: 'waiting',
+        tab: tab === 'preview' ? 'waiting' : (tab || null),
         workflowExecutionId: null,
       }, true);
     },
