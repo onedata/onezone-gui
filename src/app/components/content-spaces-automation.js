@@ -8,6 +8,7 @@
  */
 
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
+import { reads } from '@ember/object/computed';
 
 export default ContentOneproviderContainerBase.extend({
   classNames: ['content-spaces-automation'],
@@ -16,4 +17,14 @@ export default ContentOneproviderContainerBase.extend({
    * @override
    */
   i18nPrefix: 'components.contentSpacesAutomation',
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  tab: reads('navigationState.aspectOptions.tab'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  workflowExecutionId: reads('navigationState.aspectOptions.workflowExecutionId'),
 });
