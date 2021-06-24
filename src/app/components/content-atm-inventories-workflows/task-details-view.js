@@ -58,6 +58,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Utils.WorkflowVisualiser.ActionsFactory}
+   */
+  actionsFactory: undefined,
+
+  /**
+   * @virtual
    * @type {Function}
    */
   onBackSlide: notImplementedIgnore,

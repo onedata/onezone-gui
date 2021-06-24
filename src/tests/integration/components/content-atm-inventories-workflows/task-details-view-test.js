@@ -237,8 +237,8 @@ function itProvidesStoresInTaskForm() {
     await clickTrigger('.targetStore-field');
 
     const $options = $('.ember-power-select-option');
-    expect($options.eq(1).text().trim()).to.equal('listStringStore');
-    expect($options.eq(2).text().trim()).to.equal('singleValueStringStore');
+    expect($options.eq(2).text().trim()).to.equal('listStringStore');
+    expect($options.eq(3).text().trim()).to.equal('singleValueStringStore');
   });
 }
 
