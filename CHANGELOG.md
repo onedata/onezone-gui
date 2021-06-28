@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7835 Commons update
 * VFS-7817 Workflows GUI Service Pack 1
 * VFS-7329 Added automation inventories views and automation aspect in space
 * VFS-7814 Fixed not working directories navigation in public share files browser
