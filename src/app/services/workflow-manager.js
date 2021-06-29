@@ -11,6 +11,7 @@ import Service, { inject as service } from '@ember/service';
 import { computed, observer, get, getProperties } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
+import { entityType as atmWorkflowSchemaEntityType } from 'onezone-gui/models/atm-workflow-schema';
 import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
 import { all as allFulfilled, allSettled, resolve } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
@@ -205,6 +206,22 @@ export default Service.extend({
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
       .catch(ignoreForbiddenError);
     return atmWorkflowSchema;
+  },
+
+  /**
+   * @param {String} atmWorkflowSchemaId
+   * @returns {Promise<Object>} workflow schema dump
+   */
+  async getAtmWorkflowSchemaDump(atmWorkflowSchemaId) {
+    return await this.get('onedataGraph').request({
+      gri: gri({
+        entityType: atmWorkflowSchemaEntityType,
+        entityId: atmWorkflowSchemaId,
+        aspect: 'dump',
+        scope: 'private',
+      }),
+      operation: 'create',
+    });
   },
 
   /**
