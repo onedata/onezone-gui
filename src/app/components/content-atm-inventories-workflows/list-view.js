@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get } from '@ember/object';
+import { computed, get, getProperties } from '@ember/object';
 import { collect, bool } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
@@ -22,6 +22,7 @@ export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-list-view'],
 
   i18n: service(),
+  workflowActions: service(),
 
   /**
    * @override
@@ -76,6 +77,9 @@ export default Component.extend(I18n, {
     })
   ),
 
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
   addNewAtmWorkflowSchemaAction: computed(
     'hasManageWorkflowSchemasPrivilege',
     function addNewAtmWorkflowSchemaAction() {
@@ -87,6 +91,7 @@ export default Component.extend(I18n, {
         action: () => this.get('onAddAtmWorkflowSchema')(),
         title: this.t('addAtmWorkflowSchemaButton'),
         class: 'open-add-atm-workflow-schema-trigger',
+        buttonStyle: 'primary',
         disabled: !hasManageWorkflowSchemasPrivilege,
         tip: hasManageWorkflowSchemasPrivilege ?
           undefined : insufficientPrivilegesMessage({
@@ -100,10 +105,48 @@ export default Component.extend(I18n, {
   ),
 
   /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  uploadAtmWorkflowSchemaAction: computed(
+    'atmInventory',
+    'onOpenAtmWorkflowSchema',
+    function uploadAtmWorkflowSchemaAction() {
+      const {
+        workflowActions,
+        atmInventory,
+        onOpenAtmWorkflowSchema,
+      } = this.getProperties(
+        'workflowActions',
+        'atmInventory',
+        'onOpenAtmWorkflowSchema'
+      );
+
+      const action = workflowActions.createUploadAtmWorkflowSchemaAction({
+        atmInventory,
+      });
+      // After successful workflow schema upload, open it
+      action.addExecuteHook(result => {
+        const {
+          status,
+          result: atmWorkflowSchema,
+        } = getProperties(result, 'status', 'result');
+        if (status === 'done' && atmWorkflowSchema) {
+          onOpenAtmWorkflowSchema(atmWorkflowSchema);
+        }
+      });
+
+      return action;
+    }
+  ),
+
+  /**
    * @override
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  globalActions: collect('addNewAtmWorkflowSchemaAction'),
+  globalActions: collect(
+    'uploadAtmWorkflowSchemaAction',
+    'addNewAtmWorkflowSchemaAction'
+  ),
 
   init() {
     this._super(...arguments);

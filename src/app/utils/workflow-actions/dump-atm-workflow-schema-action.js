@@ -24,7 +24,7 @@ export default Action.extend({
   /**
    * @override
    */
-  className: 'dump-atm-inventory-action-trigger',
+  className: 'dump-atm-workflow-schema-action-trigger',
 
   /**
    * @override
@@ -35,6 +35,7 @@ export default Action.extend({
    * @type {ComputedProperty<Models.AtmWorkflowSchema>}
    */
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
+
   /**
    * @type {Window}
    */

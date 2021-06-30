@@ -21,30 +21,30 @@ describe(
     suppressRejections();
 
     beforeEach(function () {
-        const workflowManager = lookupService(this, 'workflow-manager');
-        this.setProperties({
-          action: DumpAtmWorkflowSchemaAction.create({
-            ownerSource: this,
-            context: {
-              atmWorkflowSchema: {
-                entityId: atmWorkflowSchemaId,
-              },
+      const workflowManager = lookupService(this, 'workflow-manager');
+      this.setProperties({
+        action: DumpAtmWorkflowSchemaAction.create({
+          ownerSource: this,
+          context: {
+            atmWorkflowSchema: {
+              entityId: atmWorkflowSchemaId,
             },
-          }),
-          getAtmWorkflowSchemaDumpStub: sinon.stub(workflowManager, 'getAtmWorkflowSchemaDump'),
-        });
-      }),
-
-      it('has correct className, icon and title', function () {
-        const {
-          className,
-          icon,
-          title,
-        } = getProperties(this.get('action'), 'className', 'icon', 'title');
-        expect(className).to.equal('dump-atm-inventory-action-trigger');
-        expect(icon).to.equal('browser-download');
-        expect(String(title)).to.equal('Download (json)');
+          },
+        }),
+        getAtmWorkflowSchemaDumpStub: sinon.stub(workflowManager, 'getAtmWorkflowSchemaDump'),
       });
+    });
+
+    it('has correct className, icon and title', function () {
+      const {
+        className,
+        icon,
+        title,
+      } = getProperties(this.get('action'), 'className', 'icon', 'title');
+      expect(className).to.equal('dump-atm-workflow-schema-action-trigger');
+      expect(icon).to.equal('browser-download');
+      expect(String(title)).to.equal('Download (json)');
+    });
 
     it('executes dumping workflow (failure scenario)', async function () {
       const {
