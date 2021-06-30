@@ -84,6 +84,19 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
+  dumpAction: computed('atmWorkflowSchema', function dumpAction() {
+    const {
+      workflowActions,
+      atmWorkflowSchema,
+    } = this.getProperties('workflowActions', 'atmWorkflowSchema');
+    return workflowActions.createDumpAtmWorkflowSchemaAction({
+      atmWorkflowSchema,
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
   removeAction: computed('atmWorkflowSchema', function removeAction() {
     const {
       workflowActions,
@@ -97,7 +110,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  workflowActionsArray: collect('changeDetailsAction', 'removeAction'),
+  workflowActionsArray: collect('changeDetailsAction', 'dumpAction', 'removeAction'),
 
   click(event) {
     const {
