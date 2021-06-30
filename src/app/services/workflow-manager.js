@@ -198,13 +198,20 @@ export default Service.extend({
         _meta: {
           additionalData: {
             atmInventoryId,
+            supplementaryAtmLambdas: atmWorkflowSchemaPrototype.supplementaryAtmLambdas,
           },
         },
       })
     ).save();
-    await recordManager
+    await allFulfilled([
+      recordManager
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
-      .catch(ignoreForbiddenError);
+      .catch(ignoreForbiddenError),
+      // If workflow is created from workflow dump, then we need to reload lambdas
+      recordManager
+      .reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
+      .catch(ignoreForbiddenError),
+    ]);
     return atmWorkflowSchema;
   },
 
