@@ -8,7 +8,7 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { get, set, setProperties } from '@ember/object';
+import { get, setProperties } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import { inject as service } from '@ember/service';
@@ -52,7 +52,7 @@ export default Action.extend({
     try {
       file = await this.getJsonFile();
     } catch (e) {
-      set(result, 'status', 'cancelled');
+      result.cancelIfPending();
       return result;
     }
 
@@ -78,11 +78,11 @@ export default Action.extend({
 
   async getJsonFile() {
     return await new Promise((resolve, reject) => {
-      const {
-        _window,
-      } = this.getProperties('_window');
+      const _window = this.get('_window');
 
-      // Based on https://stackoverflow.com/a/63773257
+      // Based on https://stackoverflow.com/a/63773257. It does not detect
+      // "open file" dialog canellation on iOS and it is hard to find any working
+      // solution for that issue. :(
       let lock = false;
       const _document = _window.document;
       const input = _document.createElement('input');
