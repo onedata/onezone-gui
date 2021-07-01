@@ -134,6 +134,14 @@ export default Component.extend(I18n, {
     fields.changeMode(mode);
   }),
 
+  /**
+   * @override
+   */
+  submit(event) {
+    this._super(...arguments);
+    event.preventDefault();
+  },
+
   init() {
     this._super(...arguments);
     this.formValuesUpdater();

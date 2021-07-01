@@ -27,6 +27,18 @@ export default OneproviderEmbeddedContainer.extend({
   spaceEntityId: undefined,
 
   /**
+   * @virtual
+   * @type {String}
+   */
+  tab: undefined,
+
+  /**
+   * @virtual
+   * @type {String}
+   */
+  workflowExecutionId: undefined,
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -37,10 +49,40 @@ export default OneproviderEmbeddedContainer.extend({
    */
   iframeInjectedProperties: Object.freeze([
     'spaceEntityId',
+    'tab',
+    'workflowExecutionId',
   ]),
 
   /**
    * @override implements OneEmbeddedContainer
    */
-  callParentActionNames: Object.freeze([]),
+  callParentActionNames: Object.freeze([
+    'openPreviewTab',
+    'closePreviewTab',
+    'changeTab',
+  ]),
+
+  actions: {
+    openPreviewTab(workflowExecutionId) {
+      return this.get('navigationState').changeRouteAspectOptions({
+        tab: 'preview',
+        workflowExecutionId,
+      });
+    },
+    closePreviewTab() {
+      const tab = this.get('tab');
+      const options = {
+        workflowExecutionId: null,
+      };
+      if (tab === 'preview') {
+        options.tab = 'waiting';
+      }
+      this.get('navigationState').changeRouteAspectOptions(options, true);
+    },
+    changeTab(tab) {
+      return this.get('navigationState').changeRouteAspectOptions({
+        tab,
+      });
+    },
+  },
 });

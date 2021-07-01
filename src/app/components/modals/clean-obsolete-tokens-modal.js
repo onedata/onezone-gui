@@ -32,6 +32,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {String}
+   */
+  modalId: undefined,
+
+  /**
+   * @virtual
    */
   modalOptions: undefined,
 
