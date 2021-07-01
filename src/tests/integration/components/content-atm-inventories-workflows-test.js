@@ -45,6 +45,7 @@ describe('Integration | Component | content atm inventories workflows', function
         isBatch: false,
       }],
       resultSpecs: [],
+      isLoaded: true,
     }, {
       entityId: 'lambda0',
       name: 'f0',
@@ -55,6 +56,7 @@ describe('Integration | Component | content atm inventories workflows', function
       },
       argumentSpecs: [],
       resultSpecs: [],
+      isLoaded: true,
     }];
     const allInventoriesLambdas = [
       ...atmLambdas, {
@@ -71,6 +73,7 @@ describe('Integration | Component | content atm inventories workflows', function
         },
         argumentSpecs: [],
         resultSpecs: [],
+        isLoaded: true,
       },
     ];
     const atmWorkflowSchemas = [{

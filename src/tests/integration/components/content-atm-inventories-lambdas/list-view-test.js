@@ -30,6 +30,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         },
         argumentSpecs: [],
         resultSpecs: [],
+        isLoaded: true,
       }, {
         name: 'f0',
         summary: 'f0 summary',
@@ -39,6 +40,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         },
         argumentSpecs: [],
         resultSpecs: [],
+        isLoaded: true,
       }];
       const allAtmLambdas = [
         ...atmLambdas, {
@@ -54,6 +56,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
           },
           argumentSpecs: [],
           resultSpecs: [],
+          isLoaded: true,
         },
       ];
       sinon.stub(lookupService(this, 'workflow-manager'), 'getAllKnownAtmLambdas')

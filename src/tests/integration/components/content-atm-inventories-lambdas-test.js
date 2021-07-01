@@ -37,6 +37,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
             },
             argumentSpecs: [],
             resultSpecs: [],
+            isLoaded: true,
           }, {
             name: 'f0',
             summary: 'f0 summary',
@@ -46,6 +47,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
             },
             argumentSpecs: [],
             resultSpecs: [],
+            isLoaded: true,
           }])),
         })),
       },
