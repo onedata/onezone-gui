@@ -14,7 +14,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
@@ -113,7 +113,14 @@ export default Component.extend(I18n, {
       const normalizedSearchValue = searchValue.trim().toLowerCase();
 
       return (activeCollection || []).filter(atmLambda => {
-        const normalizedName = get(atmLambda, 'name').trim().toLowerCase();
+        const {
+          isLoaded,
+          name,
+        } = getProperties(atmLambda, 'isLoaded', 'name');
+        if (!isLoaded) {
+          return false;
+        }
+        const normalizedName = (name || '').trim().toLowerCase();
         return normalizedName.includes(normalizedSearchValue);
       });
     }
