@@ -51,7 +51,8 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Boolean}
+   * @type {Function}
+   * @param {Array<Utils.Action>} actions
    */
   onRegisterViewActions: notImplementedIgnore,
 

@@ -12,7 +12,8 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
-import { get, getProperties, observer, computed } from '@ember/object';
+import { get, getProperties, observer, computed, setProperties } from '@ember/object';
+import { collect } from '@ember/object/computed';
 import { reject } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import areWorkflowSchemasEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schemas-equal';
@@ -48,6 +49,12 @@ export default Component.extend(I18n, {
   onBackSlide: notImplementedIgnore,
 
   /**
+   * @virtual
+   * @type {Boolean}
+   */
+  onRegisterViewActions: notImplementedIgnore,
+
+  /**
    * Data injected into the visualiser. Initialized by
    * `atmWorkflowSchemaObserver`, updated by modifications.
    * @type {Object}
@@ -59,6 +66,11 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   unchangedVisualiserData: undefined,
+
+  /**
+   * @override
+   */
+  globalActions: collect('dumpAction'),
 
   /**
    * @type {ComputedProperty<Boolean>}
@@ -89,6 +101,33 @@ export default Component.extend(I18n, {
     }
   }),
 
+  /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  dumpAction: computed(
+    'atmWorkflowSchema',
+    'isVisualiserDataModified',
+    function dumpAction() {
+      const {
+        workflowActions,
+        atmWorkflowSchema,
+        isVisualiserDataModified,
+      } = this.getProperties(
+        'workflowActions',
+        'atmWorkflowSchema',
+        'isVisualiserDataModified'
+      );
+      const action = workflowActions.createDumpAtmWorkflowSchemaAction({
+        atmWorkflowSchema,
+      });
+      setProperties(action, {
+        disabled: isVisualiserDataModified,
+        tip: isVisualiserDataModified ? this.t('cannotDumpModified') : undefined,
+      });
+      return action;
+    }
+  ),
+
   atmWorkflowSchemaObserver: observer(
     'atmWorkflowSchema',
     function atmWorkflowSchemaObserver() {
@@ -112,9 +151,23 @@ export default Component.extend(I18n, {
     }
   ),
 
+  globalActionsObserver: observer('globalActions.[]', function globalActionsObserver() {
+    this.registerViewActions();
+  }),
+
   init() {
     this._super(...arguments);
     this.atmWorkflowSchemaObserver();
+    this.globalActionsObserver();
+  },
+
+  registerViewActions() {
+    const {
+      onRegisterViewActions,
+      globalActions,
+    } = this.getProperties('onRegisterViewActions', 'globalActions');
+
+    onRegisterViewActions(globalActions);
   },
 
   actions: {
