@@ -14,9 +14,13 @@
     <div class="btn-toolbar">
       {{#one-spin-button
         class="btn btn-save btn-sm btn-primary"
+        disabled=isSaveBtnDisabled
         action=(action "save")
       }}
         {{tt this "saveBtn"}}
+        {{#if saveBtnTip}}
+          {{one-tooltip title=saveBtnTip}}
+        {{/if}}
       {{/one-spin-button}}
     </div>
   </h1>

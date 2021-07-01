@@ -12,8 +12,11 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
-import { get, getProperties, observer } from '@ember/object';
+import { get, getProperties, observer, computed } from '@ember/object';
 import { reject } from 'rsvp';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import areWorkflowSchemasEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schemas-equal';
+import { not } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-editor-view'],
@@ -51,6 +54,41 @@ export default Component.extend(I18n, {
    */
   visualiserData: undefined,
 
+  /**
+   * The same as `visualiserData`, but without modifications.
+   * @type {Object}
+   */
+  unchangedVisualiserData: undefined,
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isVisualiserDataModified: computed(
+    'visualiserData',
+    'unchangedVisualiserData',
+    function isVisualiserDataModified() {
+      const {
+        visualiserData,
+        unchangedVisualiserData,
+      } = this.getProperties('visualiserData', 'unchangedVisualiserData');
+      return !areWorkflowSchemasEqual(visualiserData, unchangedVisualiserData);
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isSaveBtnDisabled: not('isVisualiserDataModified'),
+
+  /**
+   * @type {ComputedProperty<String|undefined>}
+   */
+  saveBtnTip: computed('isVisualiserDataModified', function isSaveBtnDisabled() {
+    if (!this.get('isVisualiserDataModified')) {
+      return this.t('noChangesToSave');
+    }
+  }),
+
   atmWorkflowSchemaObserver: observer(
     'atmWorkflowSchema',
     function atmWorkflowSchemaObserver() {
@@ -63,9 +101,13 @@ export default Component.extend(I18n, {
         lanes = [],
           stores = [],
       } = getProperties(atmWorkflowSchema, 'lanes', 'stores');
-      this.set('visualiserData', {
+      const data = {
         lanes,
         stores,
+      };
+      this.setProperties({
+        visualiserData: data,
+        unchangedVisualiserData: data,
       });
     }
   ),
@@ -132,6 +174,9 @@ export default Component.extend(I18n, {
       } = getProperties(result, 'status', 'error');
       if (status === 'failed') {
         throw error;
+      } else if (status === 'done') {
+        // reload modification state
+        safeExec(this, 'atmWorkflowSchemaObserver');
       }
     },
   },
