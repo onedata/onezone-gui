@@ -71,10 +71,13 @@ export default OneproviderEmbeddedContainer.extend({
     },
     closePreviewTab() {
       const tab = this.get('tab');
-      return this.get('navigationState').changeRouteAspectOptions({
-        tab: tab === 'preview' ? 'waiting' : (tab || null),
+      const options = {
         workflowExecutionId: null,
-      }, true);
+      };
+      if (tab === 'preview') {
+        options.tab = 'waiting';
+      }
+      this.get('navigationState').changeRouteAspectOptions(options, true);
     },
     changeTab(tab) {
       return this.get('navigationState').changeRouteAspectOptions({

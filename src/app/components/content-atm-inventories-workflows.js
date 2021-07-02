@@ -198,10 +198,10 @@ export default Component.extend(GlobalActions, {
   init() {
     this._super(...arguments);
     const actionsFactory = ActionsFactory.create({ ownerSource: this });
-    actionsFactory.registerGetTaskCreationDataCallback(
+    actionsFactory.setGetTaskCreationDataCallback(
       (...args) => this.runTaskDetailsProvider('create', ...args)
     );
-    actionsFactory.registerGetTaskModificationDataCallback(
+    actionsFactory.setGetTaskModificationDataCallback(
       (...args) => this.runTaskDetailsProvider('edit', ...args)
     );
     this.setProperties({
