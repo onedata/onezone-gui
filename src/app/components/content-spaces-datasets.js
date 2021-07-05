@@ -28,6 +28,8 @@ export default ContentOneproviderContainerBase.extend(I18n, {
 
   datasetDataMapping: Object.freeze({}),
 
+  archiveDataMapping: Object.freeze({}),
+
   /**
    * Entity ID of dataset currently opened in datasets browser.
    * 
@@ -35,6 +37,12 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    * @type {string}
    */
   datasetId: reads('navigationState.aspectOptions.dataset'),
+
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  archiveId: reads('navigationState.aspectOptions.archive'),
 
   /**
    * One of: attached, detached.
@@ -56,9 +64,22 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     return defer();
   }),
 
+  archiveDeferred: computed('archiveId', function archiveDeferred() {
+    if (!this.get('archiveId')) {
+      const deferred = defer();
+      deferred.resolve(null);
+      return deferred;
+    }
+    return defer();
+  }),
+
   datasetProxy: promise.object('datasetDeferred.promise'),
 
+  archiveProxy: promise.object('archiveDeferred.promise'),
+
   dataset: reads('datasetProxy.content'),
+
+  archive: reads('archiveProxy.content'),
 
   /**
    * @type {ComputedProperty<String>}
@@ -104,6 +125,22 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     }
   ),
 
+  tryToResolveArchive: observer(
+    'archiveDeferred',
+    'archiveDataMapping',
+    function tryToResolveArchive() {
+      const {
+        archiveId,
+        archiveDeferred,
+        archiveDataMapping,
+      } = this.getProperties('archiveId', 'archiveDeferred', 'archiveDataMapping');
+      const archiveData = archiveDataMapping[archiveId];
+      if (archiveData) {
+        archiveDeferred.resolve(archiveData);
+      }
+    }
+  ),
+
   isValidAttachmentState(state) {
     return ['attached', 'detached'].includes(state);
   },
@@ -126,6 +163,17 @@ export default ContentOneproviderContainerBase.extend(I18n, {
         Object.assign({},
           this.get('datasetDataMapping'), {
             [receivedDatasetId]: dataset,
+          },
+        )
+      );
+    },
+    updateArchiveData(archive) {
+      const receivedArchiveId = archive && get(archive, 'entityId');
+      this.set(
+        'archiveDataMapping',
+        Object.assign({},
+          this.get('archiveDataMapping'), {
+            [receivedArchiveId]: archive,
           },
         )
       );
