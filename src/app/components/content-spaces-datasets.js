@@ -111,6 +111,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   effArchiveDipMode: computed(
     'archive',
     'isArchiveDipAvailable',
+    'selectedDipMode',
     function effArchiveDipMode() {
       const {
         archive,
