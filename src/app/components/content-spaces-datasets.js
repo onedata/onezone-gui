@@ -202,6 +202,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     this.set('selectedDipMode', archiveDipMode);
     this.get('navigationState').changeRouteAspectOptions({
       archive: relatedArchiveId,
+      dir: null,
     });
   },
 
