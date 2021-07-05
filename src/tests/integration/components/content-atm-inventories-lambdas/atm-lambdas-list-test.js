@@ -30,6 +30,7 @@ describe(
         },
         argumentSpecs: [],
         resultSpecs: [],
+        isLoaded: true,
       }, {
         name: 'f0',
         summary: 'f0 summary',
@@ -39,6 +40,7 @@ describe(
         },
         argumentSpecs: [],
         resultSpecs: [],
+        isLoaded: true,
       }];
       const allCollection = [
         ...collection, {
@@ -54,6 +56,7 @@ describe(
           },
           argumentSpecs: [],
           resultSpecs: [],
+          isLoaded: true,
         },
       ];
       this.setProperties({

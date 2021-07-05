@@ -12,12 +12,33 @@
       }}
     </span>
     <div class="btn-toolbar">
-      {{#one-spin-button
-        class="btn btn-save btn-sm btn-primary"
-        action=(action "save")
-      }}
-        {{tt this "saveBtn"}}
-      {{/one-spin-button}}
+      <span>
+        {{#bs-button
+          type="default"
+          onClick=dumpAction.executeCallback
+          disabled=dumpAction.disabled
+          size="sm"
+          class=(concat-classes dumpAction.classNames "hidden-xs")
+        }}
+          {{one-icon icon=dumpAction.icon}}
+          <span class="text">{{dumpAction.title}}</span>
+        {{/bs-button}}
+        {{#if dumpAction.tip}}
+          {{one-tooltip title=dumpAction.tip}}
+        {{/if}}
+      </span>
+      <span>
+        {{#one-spin-button
+          class="btn btn-save btn-sm btn-primary"
+          disabled=isSaveBtnDisabled
+          action=(action "save")
+        }}
+          {{tt this "saveBtn"}}
+        {{/one-spin-button}}
+        {{#if saveBtnTip}}
+          {{one-tooltip title=saveBtnTip}}
+        {{/if}}
+      </span>
     </div>
   </h1>
 </div>

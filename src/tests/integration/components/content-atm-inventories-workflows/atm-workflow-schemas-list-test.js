@@ -15,6 +15,10 @@ const workflowActionsSpec = [{
   label: 'Change details',
   icon: 'rename',
 }, {
+  className: 'dump-atm-workflow-schema-action-trigger',
+  label: 'Download (json)',
+  icon: 'browser-download',
+}, {
   className: 'remove-atm-workflow-schema-action-trigger',
   label: 'Remove',
   icon: 'x',

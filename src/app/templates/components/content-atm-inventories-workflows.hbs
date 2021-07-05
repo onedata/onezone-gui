@@ -18,6 +18,7 @@
             atmWorkflowSchema=activeAtmWorkflowSchemaProxy.content
             actionsFactory=actionsFactory
             onBackSlide=(action "backSlide")
+            onRegisterViewActions=(action "registerViewActions" "editor")
           }}
         {{else}}
           {{content-atm-inventories-workflows/loading-view

@@ -19,6 +19,8 @@ import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
+import DumpAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-action';
+import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import { classify } from '@ember/string';
 
 export default Service.extend(I18n, {
@@ -146,6 +148,32 @@ export default Service.extend(I18n, {
    */
   createCreateAtmWorkflowSchemaAction(context) {
     return CreateAtmWorkflowSchemaAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaAction}
+   */
+  createDumpAtmWorkflowSchemaAction(context) {
+    return DumpAtmWorkflowSchemaAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmInventory: Models.AtmInventory,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaAction}
+   */
+  createUploadAtmWorkflowSchemaAction(context) {
+    return UploadAtmWorkflowSchemaAction.create({ ownerSource: this, context });
   },
 
   createGlobalActions() {

@@ -144,6 +144,18 @@ const atmInventoryHandlers = {
   },
 };
 
+const atmWorkflowSchemaHandlers = {
+  dump(operation) {
+    if (operation === 'create') {
+      return {
+        some: 'dump',
+      };
+    } else {
+      throw messageNotSupported;
+    }
+  },
+};
+
 const userHandlers = {
   client_tokens(operation) {
     if (operation === 'create') {
@@ -267,6 +279,7 @@ export default OnedataGraphMock.extend({
       cluster: clusterHandlers,
       token: tokenHandlers,
       atm_inventory: atmInventoryHandlers,
+      atm_workflow_schema: atmWorkflowSchemaHandlers,
     });
     this.set(
       'handlers',

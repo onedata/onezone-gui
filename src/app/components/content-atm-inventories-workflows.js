@@ -308,9 +308,11 @@ export default Component.extend(GlobalActions, {
       }
     },
     registerViewActions(slideId, actions) {
-      this.set('actionsPerSlide', Object.assign({}, this.get('actionsPerSlide'), {
-        [slideId]: actions,
-      }));
+      scheduleOnce('afterRender', this, () => {
+        this.set('actionsPerSlide', Object.assign({}, this.get('actionsPerSlide'), {
+          [slideId]: actions,
+        }));
+      });
     },
     taskProviderLambdaSelected(atmLambda) {
       this.set('taskDetailsProviderData.atmLambda', atmLambda);

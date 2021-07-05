@@ -21,6 +21,12 @@
       margin-top: -1px;
       max-width: 100%;
     }
+
+    .btn-toolbar {
+      .btn {
+        margin-left: 0.5em;
+      }
+    }
   }
 
   .workflow-visualiser {
