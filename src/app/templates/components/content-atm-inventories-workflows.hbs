@@ -24,7 +24,6 @@
           {{content-atm-inventories-workflows/loading-view
             loadingProxy=activeAtmWorkflowSchemaProxy
             onBackSlide=(action "backSlide")
-            onRegisterViewActions=(action "registerViewActions" "editor")
           }}
         {{/if}}
       {{else}}
@@ -32,7 +31,6 @@
           atmInventory=atmInventory
           onBackSlide=(action "backSlide")
           onAtmWorkflowSchemaAdded=(action "showEditorView")
-          onRegisterViewActions=(action "registerViewActions" "editor")
         }}
       {{/if}}
     {{/carousel.slide}}

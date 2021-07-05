@@ -12,6 +12,7 @@ import { get } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import { inject as service } from '@ember/service';
+import { downloadData } from 'onedata-gui-common/utils/download-file';
 
 export default Action.extend({
   workflowManager: service(),
@@ -75,17 +76,11 @@ export default Action.extend({
       _window,
     } = this.getProperties('atmWorkflowSchema', '_window');
 
-    const blobToDownload = new Blob([JSON.stringify(atmWorkflowSchemaDump, null, 2)], {
-      type: 'application/json',
-      name: `${get(atmWorkflowSchema, 'name')}.json`,
+    downloadData({
+      dataString: JSON.stringify(atmWorkflowSchemaDump, null, 2),
+      fileName: `${get(atmWorkflowSchema, 'name')}.json`,
+      mimeType: 'application/json',
+      _window,
     });
-    const downloadUrl = _window.URL.createObjectURL(blobToDownload);
-
-    const link = _window.document.createElement('a');
-    link.dataType = 'json';
-    link.href = downloadUrl;
-    link.download = `${get(atmWorkflowSchema, 'name')}.json`;
-    link.target = '_blank';
-    link.dispatchEvent(new MouseEvent('click'));
   },
 });

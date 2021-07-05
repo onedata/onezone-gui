@@ -40,13 +40,6 @@ export default Component.extend(I18n, {
   /**
    * @virtual
    * @type {Function}
-   * @param {Array<Utils.Action>} actions
-   */
-  onRegisterViewActions: notImplementedIgnore,
-
-  /**
-   * @virtual
-   * @type {Function}
    * @param {Models.AtmWorkflowSchema} createdAtmWorkflowSchema
    */
   onAtmWorkflowSchemaAdded: notImplementedIgnore,
@@ -65,11 +58,6 @@ export default Component.extend(I18n, {
    * @type {Boolean}
    */
   isSubmitting: false,
-
-  init() {
-    this._super(...arguments);
-    this.get('onRegisterViewActions')([]);
-  },
 
   actions: {
     backSlide() {

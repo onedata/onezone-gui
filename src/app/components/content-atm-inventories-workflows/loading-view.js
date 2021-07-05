@@ -36,13 +36,6 @@ export default Component.extend(I18n, {
   onBackSlide: notImplementedIgnore,
 
   /**
-   * @virtual
-   * @type {Function}
-   * @param {Array<Utils.Action>} actions
-   */
-  onRegisterViewActions: notImplementedIgnore,
-
-  /**
    * One of: `'loading'`, `'notFound'`, `'forbidden'`, `'otherError'`, `'loaded'`
    * @type {ComputedProperty<String>}
    */
@@ -76,11 +69,6 @@ export default Component.extend(I18n, {
   headerText: computed('state', function headerText() {
     return this.t(`header.${this.get('state')}`, {}, { defaultValue: '' });
   }),
-
-  init() {
-    this._super(...arguments);
-    this.get('onRegisterViewActions')([]);
-  },
 
   actions: {
     backSlide() {

@@ -60,9 +60,6 @@ export default Action.extend({
     try {
       const fileContent = await this.getFileContent(file);
       atmWorkflowSchemaPrototype = this.generateAtmWorkflowPrototype(fileContent);
-      if (!atmWorkflowSchemaPrototype) {
-        throw new Error();
-      }
     } catch (e) {
       setProperties(result, {
         status: 'failed',
@@ -113,22 +110,16 @@ export default Action.extend({
       reader.onload = () => {
         resolve(reader.result);
       };
-      reader.onerror = () => reject();
+      reader.onerror = () => reject(reader.error);
       reader.readAsText(file);
     });
   },
 
   generateAtmWorkflowPrototype(fileContent) {
-    let spec = null;
-    try {
-      spec = JSON.parse(fileContent);
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+    const spec = JSON.parse(fileContent);
 
     if (!spec || typeof spec !== 'object') {
-      return null;
+      throw new Error('Passed data is not a JSON object.');
     }
 
     return spec;

@@ -161,13 +161,21 @@ export default Component.extend(I18n, {
     this.globalActionsObserver();
   },
 
-  registerViewActions() {
+  willDestroyElement() {
+    try {
+      this.registerViewActions(true);
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  registerViewActions(clear = false) {
     const {
       onRegisterViewActions,
       globalActions,
     } = this.getProperties('onRegisterViewActions', 'globalActions');
 
-    onRegisterViewActions(globalActions);
+    onRegisterViewActions(clear ? [] : globalActions);
   },
 
   actions: {
