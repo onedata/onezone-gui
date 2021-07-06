@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7893 Added support for DIP archives
+* VFS-7880 Added SingleValue store value builder for task argument
 * VFS-7835 Commons update
 * VFS-7817 Workflows GUI Service Pack 1
 * VFS-7329 Added automation inventories views and automation aspect in space
