@@ -85,7 +85,10 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   actions: {
     updateDirEntityId(dirEntityId) {
-      this.get('navigationState').changeRouteAspectOptions({ dir: dirEntityId, selected: null });
+      this.get('navigationState').changeRouteAspectOptions({
+        dir: dirEntityId,
+        selected: null,
+      });
     },
     updateSelected(selected) {
       this.set('selected', selected);
