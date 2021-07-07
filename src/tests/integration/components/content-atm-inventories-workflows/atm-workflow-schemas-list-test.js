@@ -35,9 +35,11 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         collection: [{
           name: 'w1',
           description: 'w1 description',
+          isLoaded: true,
         }, {
           name: 'w0',
           description: 'w0 description',
+          isLoaded: true,
         }],
         workflowClickedSpy: sinon.spy(),
       });

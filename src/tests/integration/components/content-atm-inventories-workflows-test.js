@@ -113,6 +113,7 @@ describe('Integration | Component | content atm inventories workflows', function
       atmLambdaList: promiseObject(resolve({
         list: promiseArray(resolve(atmLambdas)),
       })),
+      isLoaded: true,
     }, {
       entityId: 'w0id',
       name: 'w0',
@@ -120,6 +121,7 @@ describe('Integration | Component | content atm inventories workflows', function
       atmLambdaList: promiseObject(resolve({
         list: promiseArray(resolve(atmLambdas)),
       })),
+      isLoaded: true,
     }];
     const atmInventory = {
       entityId: 'inv1',
