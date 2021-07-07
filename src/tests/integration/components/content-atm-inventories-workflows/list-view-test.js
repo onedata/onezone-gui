@@ -22,9 +22,11 @@ describe('Integration | Component | content atm inventories workflows/list view'
             list: promiseArray(resolve([{
               name: 'w1',
               description: 'w1 description',
+              isLoaded: true,
             }, {
               name: 'w0',
               description: 'w0 description',
+              isLoaded: true,
             }])),
           })),
           privileges: {
