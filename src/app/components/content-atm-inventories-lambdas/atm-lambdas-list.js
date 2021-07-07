@@ -104,7 +104,7 @@ export default Component.extend(I18n, {
    */
   filteredCollection: computed(
     'searchValue',
-    'activeCollection.@each.name',
+    'activeCollection.@each.{name,isLoaded}',
     function filteredCollection() {
       const {
         activeCollection,
