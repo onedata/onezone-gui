@@ -92,12 +92,13 @@ export default Action.extend({
         resolve(file);
       }, { once: true });
       _window.addEventListener('focus', () => {
-        // Wait for input change event to be processed (especially in mobile browsers).
+        // Wait for input change event to be processed (especially in mobile
+        // browsers and macOS).
         setTimeout(() => {
           if (!lock) {
             reject();
           }
-        }, 300);
+        }, 2000);
       }, { once: true });
 
       input.click();

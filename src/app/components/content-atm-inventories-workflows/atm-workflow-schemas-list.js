@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed, getProperties } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
@@ -54,7 +54,7 @@ export default Component.extend(I18n, {
    */
   filteredCollection: computed(
     'searchValue',
-    'collection.@each.name',
+    'collection.@each.{name,isLoaded}',
     function filteredCollection() {
       const {
         collection,
@@ -63,7 +63,14 @@ export default Component.extend(I18n, {
       const normalizedSearchValue = searchValue.trim().toLowerCase();
 
       return (collection || []).filter(atmWorkflowSchema => {
-        const normalizedName = get(atmWorkflowSchema, 'name').trim().toLowerCase();
+        const {
+          isLoaded,
+          name,
+        } = getProperties(atmWorkflowSchema, 'isLoaded', 'name');
+        if (!isLoaded) {
+          return false;
+        }
+        const normalizedName = (name || '').trim().toLowerCase();
         return normalizedName.includes(normalizedSearchValue);
       });
     }
