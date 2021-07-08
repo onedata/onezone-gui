@@ -11,10 +11,11 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed, get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { or, raw, promise, notEqual } from 'ember-awesome-macros';
+import { or, raw, promise, notEqual, and, bool } from 'ember-awesome-macros';
 import { defer } from 'rsvp';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
+import { camelize } from '@ember/string';
 
 export default ContentOneproviderContainerBase.extend(I18n, {
   classNames: ['content-spaces-datasets'],
@@ -28,6 +29,8 @@ export default ContentOneproviderContainerBase.extend(I18n, {
 
   datasetDataMapping: Object.freeze({}),
 
+  archiveDataMapping: Object.freeze({}),
+
   /**
    * Entity ID of dataset currently opened in datasets browser.
    * 
@@ -35,6 +38,12 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    * @type {string}
    */
   datasetId: reads('navigationState.aspectOptions.dataset'),
+
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  archiveId: reads('navigationState.aspectOptions.archive'),
 
   /**
    * One of: attached, detached.
@@ -56,9 +65,22 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     return defer();
   }),
 
+  archiveDeferred: computed('archiveId', function archiveDeferred() {
+    if (!this.get('archiveId')) {
+      const deferred = defer();
+      deferred.resolve(null);
+      return deferred;
+    }
+    return defer();
+  }),
+
   datasetProxy: promise.object('datasetDeferred.promise'),
 
+  archiveProxy: promise.object('archiveDeferred.promise'),
+
   dataset: reads('datasetProxy.content'),
+
+  archive: reads('archiveProxy.content'),
 
   /**
    * @type {ComputedProperty<String>}
@@ -86,6 +108,40 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     return this.isValidAttachmentState(attachmentState) ? attachmentState : 'attached';
   }),
 
+  effArchiveDipMode: computed(
+    'archive',
+    'isArchiveDipAvailable',
+    'selectedDipMode',
+    function effArchiveDipMode() {
+      const {
+        archive,
+        isArchiveDipAvailable,
+        selectedDipMode,
+      } = this.getProperties('archive', 'isArchiveDipAvailable', 'selectedDipMode');
+      if (!archive) {
+        return this.isArchiveDipModeValid(selectedDipMode) ? selectedDipMode : 'aip';
+      }
+      if (!isArchiveDipAvailable) {
+        return 'aip';
+      }
+      return get(archive, 'relatedAipId') ? 'dip' : 'aip';
+    }
+  ),
+
+  /**
+   * Stores last value of archive data mode selected by user - it can be different than
+   * mode used by GUI. One of: aip, dip.
+   * See `effArchiveDipMode`.
+   * @type {String}
+   */
+  selectedDipMode: 'aip',
+
+  renderArchiveDipSwitch: bool('archive'),
+
+  archiveDipModeSwitchEnabled: and('archive', 'isArchiveDipAvailable'),
+
+  isArchiveDipAvailable: bool('archive.config.includeDip'),
+
   showOpenedDatasetHeader: notEqual('viewMode', raw('datasets')),
 
   tryToResolveDataset: observer(
@@ -104,6 +160,22 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     }
   ),
 
+  tryToResolveArchive: observer(
+    'archiveDeferred',
+    'archiveDataMapping',
+    function tryToResolveArchive() {
+      const {
+        archiveId,
+        archiveDeferred,
+        archiveDataMapping,
+      } = this.getProperties('archiveId', 'archiveDeferred', 'archiveDataMapping');
+      const archiveData = archiveDataMapping[archiveId];
+      if (archiveData) {
+        archiveDeferred.resolve(archiveData);
+      }
+    }
+  ),
+
   isValidAttachmentState(state) {
     return ['attached', 'detached'].includes(state);
   },
@@ -115,9 +187,45 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     });
   },
 
+  archiveDipModeChanged(archiveDipMode) {
+    const archive = this.get('archive');
+    // do not allow to change mode if archive is not yet loaded
+    if (!archive) {
+      return;
+    }
+
+    const relatedArchiveId = this.getRelatedArchiveId(archiveDipMode);
+    // do not allow to change mode if cannot get related archive ID
+    if (!relatedArchiveId) {
+      return;
+    }
+
+    this.set('selectedDipMode', archiveDipMode);
+    this.get('navigationState').changeRouteAspectOptions({
+      archive: relatedArchiveId,
+      dir: null,
+    });
+  },
+
+  getRelatedArchiveId(archiveDipMode) {
+    const archive = this.get('archive');
+    if (!archive || !this.isArchiveDipModeValid(archiveDipMode)) {
+      return;
+    }
+    const idKey = camelize(`related-${archiveDipMode}-id`);
+    return get(archive, idKey);
+  },
+
+  isArchiveDipModeValid(archiveDipMode) {
+    return archiveDipMode === 'aip' || archiveDipMode === 'dip';
+  },
+
   actions: {
     attachmentStateChanged(attachmentState) {
       this.attachmentStateChanged(attachmentState);
+    },
+    archiveDipModeChanged(archiveDipMode) {
+      this.archiveDipModeChanged(archiveDipMode);
     },
     updateDatasetData(dataset) {
       const receivedDatasetId = dataset && get(dataset, 'entityId');
@@ -126,6 +234,17 @@ export default ContentOneproviderContainerBase.extend(I18n, {
         Object.assign({},
           this.get('datasetDataMapping'), {
             [receivedDatasetId]: dataset,
+          },
+        )
+      );
+    },
+    updateArchiveData(archive) {
+      const receivedArchiveId = archive && get(archive, 'entityId');
+      this.set(
+        'archiveDataMapping',
+        Object.assign({},
+          this.get('archiveDataMapping'), {
+            [receivedArchiveId]: archive,
           },
         )
       );

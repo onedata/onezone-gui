@@ -33,9 +33,15 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   /**
    * @virtual
-   * @type {(dataset: Dataset) => any}
+   * @type {(dataset: Object) => any}
    */
   onUpdateDatasetData: notImplementedWarn,
+
+  /**
+   * @virtual
+   * @type {(dataset: Object) => any}
+   */
+  onUpdateArchiveData: notImplementedWarn,
 
   /**
    * **Injected to embedded iframe.**
@@ -43,6 +49,13 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * @type {string}
    */
   datasetId: undefined,
+
+  /**
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {string}
+   */
+  archiveId: undefined,
 
   /**
    * @virtual
@@ -62,12 +75,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * @type {String}
    */
   attachmentState: undefined,
-
-  /**
-   * **Injected to embedded iframe.**
-   * @type {string}
-   */
-  archiveId: reads('navigationState.aspectOptions.archive'),
 
   /**
    * **Injected to embedded iframe.**
@@ -124,6 +131,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateSelected',
     'updateViewMode',
     'updateDatasetData',
+    'updateArchiveData',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
@@ -170,6 +178,16 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      */
     updateDatasetData(dataset) {
       this.get('onUpdateDatasetData')(dataset);
+    },
+
+    /**
+     * Sets value of archive property.
+     * Due to lack of archive model in Onezone it is provided by Oneprovider
+     * in an iframe.
+     * @param {Object} archive 
+     */
+    updateArchiveData(archive) {
+      this.get('onUpdateArchiveData')(archive);
     },
   },
 });

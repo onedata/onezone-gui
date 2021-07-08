@@ -12,7 +12,7 @@
         centered=false
         sizeClass="sm"
       }}
-        <h1 class="normal-case with-back with-menu">
+        <h1 class="normal-case with-back with-menu dataset-name-header">
           <span class="one-label">
             {{#truncated-string}}
               {{#link-to (query-params options=backToDatasetsOptions) class="content-back-link"}}
@@ -30,6 +30,35 @@
             {{/truncated-string}}
           </span>
         </h1>
+        {{#if renderArchiveDipSwitch}}
+          {{#bs-button-group
+            value=effArchiveDipMode
+            class="header-selector header-selector-right archive-dip-selector"
+            type="radio"
+            onChange=(action "archiveDipModeChanged") as |bg|
+          }}
+            <div class="btn-group" role="group">
+              {{#bg.button
+                type="default"
+                disabled=(not isArchiveDipAvailable)
+                class="btn-sm select-archive-dip-btn"
+                value="aip"
+              }}
+                {{tt this "aip"}}
+              {{/bg.button}}
+            </div>
+            <div class="btn-group" role="group">
+              {{#bg.button
+                type="default"
+                disabled=(not isArchiveDipAvailable)
+                class="btn-sm select-archive-aip-btn"
+                value="dip"
+              }}
+                {{tt this "dip"}}
+              {{/bg.button}}
+            </div>
+          {{/bs-button-group}}
+        {{/if}}
       {{/promise-proxy-container}}
     {{else}}
       <h1>
@@ -37,7 +66,7 @@
       </h1>
       {{#bs-button-group
         value=effAttachmentState
-        class="datasets-state-selector"
+        class="header-selector datasets-state-selector"
         type="radio"
         onChange=(action "attachmentStateChanged") as |bg|
       }}
@@ -68,9 +97,11 @@
       baseUrl=container.contentIframeBaseUrl
       spaceId=space.entityId
       datasetId=datasetId
+      archiveId=archiveId
       attachmentState=effAttachmentState
       viewMode=viewMode
       onUpdateDatasetData=(action "updateDatasetData")
+      onUpdateArchiveData=(action "updateArchiveData")
     }}
   {{/container.body}}
 {{/oneprovider-view-container}}

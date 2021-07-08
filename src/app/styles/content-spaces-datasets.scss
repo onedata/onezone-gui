@@ -3,8 +3,18 @@
     display: flex;
     align-items: flex-start;
   }
-  .datasets-state-selector {
+  .dataset-name-header {
+    overflow: hidden;
+  }
+  .header-selector {
     margin-left: 2em;
     margin-top: 0.25em;
+  }
+  .header-selector-right {
+    display: flex;
+    justify-content: flex-end;
+    .btn-group {
+      float: none;
+    }
   }
 }
