@@ -86,6 +86,7 @@ import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
+import offlineProviders from './components/errors/offline-providers';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -136,6 +137,7 @@ const translations = {
     errors: {
       shareNotFound,
       openShareFailed,
+      offlineProviders,
     },
     loginBox,
     contentTokens,
