@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7855 Commons update
 * VFS-7950 Showing store used by workflow lane
 * VFS-7893 Added support for DIP archives
 * VFS-7938 Fixed bugs in workflow uploading mechanism in MacOS Chrome and Safari

@@ -21,6 +21,13 @@ import moment from 'moment';
 import { scheduleOnce, next } from '@ember/runloop';
 import $ from 'jquery';
 
+const initialEdgeScrollState = Object.freeze({
+  top: true,
+  bottom: true,
+  left: true,
+  right: true,
+});
+
 export default Component.extend(I18n, WindowResizeHandler, {
   classNames: ['content-harvesters-indices-progress-table'],
 
@@ -61,24 +68,9 @@ export default Component.extend(I18n, WindowResizeHandler, {
   previousSeqSum: null,
 
   /**
-   * @type {boolean}
+   * @type {Object}
    */
-  isTableScrolledTop: true,
-
-  /**
-   * @type {boolean}
-   */
-  isTableScrolledBottom: true,
-
-  /**
-   * @type {boolean}
-   */
-  isTableScrolledLeft: true,
-
-  /**
-   * @type {boolean}
-   */
-  isTableScrolledRight: true,
+  edgeScrollState: initialEdgeScrollState,
 
   /**
    * @type {Ember.ComputedProperty<number>}
@@ -370,9 +362,9 @@ export default Component.extend(I18n, WindowResizeHandler, {
   },
 
   /**
-   * @param {string} proxyName 
-   * @param {string} recordTypeName 
-   * @param {Function} extractIdsFun 
+   * @param {string} proxyName
+   * @param {string} recordTypeName
+   * @param {Function} extractIdsFun
    * @returns {Array<Object>}
    */
   getStatsDescriptionRecords(proxyName, recordTypeName, extractIdsFun) {
@@ -437,12 +429,7 @@ export default Component.extend(I18n, WindowResizeHandler, {
     } = this.getProperties('element', 'useTableLayout');
 
     if (!element || !useTableLayout) {
-      this.setProperties({
-        isTableScrolledTop: true,
-        isTableScrolledBottom: true,
-        isTableScrolledLeft: true,
-        isTableScrolledRight: true,
-      });
+      this.set('edgeScrollState', initialEdgeScrollState);
       return;
     }
 
@@ -488,17 +475,8 @@ export default Component.extend(I18n, WindowResizeHandler, {
     scroll() {
       this.recalculateTableLayout();
     },
-    tableTopEdgeScroll(reachedEdge) {
-      this.set('isTableScrolledTop', reachedEdge);
-    },
-    tableBottomEdgeScroll(reachedEdge) {
-      this.set('isTableScrolledBottom', reachedEdge);
-    },
-    tableLeftEdgeScroll(reachedEdge) {
-      this.set('isTableScrolledLeft', reachedEdge);
-    },
-    tableRightEdgeScroll(reachedEdge) {
-      this.set('isTableScrolledRight', reachedEdge);
+    edgeScroll(edgeScrollState) {
+      this.set('edgeScrollState', edgeScrollState);
     },
     showArchivalChanged(showArchival) {
       this.set('showOnlyActive', !showArchival);

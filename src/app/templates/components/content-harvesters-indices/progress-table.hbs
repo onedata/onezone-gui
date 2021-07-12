@@ -23,18 +23,15 @@
     >
       {{#if useTableLayout}}
         <div class={{concat-classes
-          (if isTableScrolledTop "scroll-on-top")
-          (if isTableScrolledBottom "scroll-on-bottom")
-          (if isTableScrolledLeft "scroll-on-left")
-          (if isTableScrolledRight "scroll-on-right")
+          (if edgeScrollState.top "scroll-on-top")
+          (if edgeScrollState.bottom "scroll-on-bottom")
+          (if edgeScrollState.left "scroll-on-left")
+          (if edgeScrollState.right "scroll-on-right")
           "progress-table-inner-container"}}
         >
           {{#perfect-scrollbar-element
-            onTopEdgeScroll=(action "tableTopEdgeScroll")
-            onBottomEdgeScroll=(action "tableBottomEdgeScroll")
-            onLeftEdgeScroll=(action "tableLeftEdgeScroll")
-            onRightEdgeScroll=(action "tableRightEdgeScroll")
             onScroll=(action "scroll")
+            onEdgeScroll=(action "edgeScroll")
           }}
             <table>
               <tr class="table-row constant-column-labels">
@@ -93,7 +90,7 @@
             </table>
           {{/perfect-scrollbar-element}}
           <div class="right-shadow-overlay"></div>
-        </div>      
+        </div>
       {{else}}
         {{#each (if showOnlyActive activeProgressData progressData) as |spaceProgress|}}
           {{#each spaceProgress.progress as |progress|}}
