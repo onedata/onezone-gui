@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7987 Added missing: cluster, harvester and automation inventory group privileges management
 * VFS-7855 Commons update
 * VFS-7950 Showing store used by workflow lane
 * VFS-7893 Added support for DIP archives
