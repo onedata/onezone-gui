@@ -39,6 +39,12 @@ export default OneproviderEmbeddedContainer.extend({
   workflowExecutionId: undefined,
 
   /**
+   * @virtual
+   * @type {String}
+   */
+  workflowSchemaId: undefined,
+
+  /**
    * @override implements OneEmbeddedContainer
    * @type {string}
    */
@@ -51,6 +57,7 @@ export default OneproviderEmbeddedContainer.extend({
     'spaceEntityId',
     'tab',
     'workflowExecutionId',
+    'workflowSchemaId',
   ]),
 
   /**
@@ -60,6 +67,7 @@ export default OneproviderEmbeddedContainer.extend({
     'openPreviewTab',
     'closePreviewTab',
     'changeTab',
+    'chooseWorkflowSchemaToRun',
   ]),
 
   actions: {
@@ -82,7 +90,13 @@ export default OneproviderEmbeddedContainer.extend({
     changeTab(tab) {
       return this.get('navigationState').changeRouteAspectOptions({
         tab,
+        workflowSchemaId: null,
       });
+    },
+    chooseWorkflowSchemaToRun(workflowSchemaId) {
+      return this.get('navigationState').changeRouteAspectOptions({
+        workflowSchemaId,
+      }, true);
     },
   },
 });

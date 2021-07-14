@@ -1,6 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-file-browser`.
- * 
+ *
  * @module components/embedded-content-file-browser
  * @author Jakub Liput, Michał Borzęcki
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
@@ -10,9 +10,10 @@
 import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -81,6 +82,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getDatasetsUrl',
     'getTransfersUrl',
     'getShareUrl',
+    'getExecuteWorkflowUrl',
   ]),
 
   actions: {
@@ -92,6 +94,32 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     },
     updateSelected(selected) {
       this.set('selected', selected);
+    },
+    getExecuteWorkflowUrl({ workflowSchemaId }) {
+      const {
+        _location,
+        router,
+        navigationState,
+      } = this.getProperties(
+        '_location',
+        'router',
+        'navigationState',
+      );
+      const aspectOptions = {
+        tab: 'create',
+        workflowSchemaId,
+      };
+      const oneproviderId = get(navigationState, 'aspectOptions.oneproviderId');
+      if (oneproviderId) {
+        aspectOptions.oneproviderId = oneproviderId;
+      }
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'automation', {
+          queryParams: {
+            options: serializeAspectOptions(aspectOptions),
+          },
+        });
     },
   },
 });

@@ -20,7 +20,7 @@ export default Mixin.create({
 
   /**
    * @param {String} type one of: data, datasets, shares, transfers
-   * @param {Object} options 
+   * @param {Object} options
    * @returns {String} URL to browser item (opened or selected)
    */
   getBrowserUrl(type, options) {
@@ -62,7 +62,8 @@ export default Mixin.create({
       aspectOptions = navigationState.mergedAspectOptions(aspectOptions);
     } else {
       // preserve oneprovider in case there is view-changing URL (eg. from data to datasets)
-      aspectOptions.oneproviderId = get(navigationState, 'oneproviderId') || null;
+      aspectOptions.oneproviderId =
+        get(navigationState, 'aspectOptions.oneproviderId') || null;
       for (const option in aspectOptions) {
         if (aspectOptions[option] == null) {
           delete aspectOptions[option];
@@ -112,7 +113,7 @@ export default Mixin.create({
 
     /**
      * @param {Object} options
-     * @param {String} options.shareId 
+     * @param {String} options.shareId
      * @returns {String} URL to shares view
      */
     getShareUrl(options) {
