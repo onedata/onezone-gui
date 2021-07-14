@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7741 Added proper error information page when there is no on-line supporting provider for share
 * VFS-7987 Added missing: cluster, harvester and automation inventory group privileges management
 * VFS-7855 Commons update
 * VFS-7950 Showing store used by workflow lane
