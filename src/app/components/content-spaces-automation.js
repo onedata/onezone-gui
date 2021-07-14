@@ -27,4 +27,9 @@ export default ContentOneproviderContainerBase.extend({
    * @type {ComputedProperty<String>}
    */
   workflowExecutionId: reads('navigationState.aspectOptions.workflowExecutionId'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  workflowSchemaId: reads('navigationState.aspectOptions.workflowSchemaId'),
 });
