@@ -31,7 +31,10 @@ export default Route.extend({
   },
 
   afterModel(model) {
-    if (isStandaloneGuiOneprovider(get(model, 'chosenProviderVersion'))) {
+    const chosenProviderVersion = get(model, 'chosenProviderVersion');
+    if (!chosenProviderVersion) {
+      throw { isOnedataCustomError: true, type: 'offline-providers' };
+    } else if (isStandaloneGuiOneprovider(chosenProviderVersion)) {
       return new Promise(() => {
         window.location = getOneproviderPath(
           get(model, 'chosenProviderId'),
