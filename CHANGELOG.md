@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7633 Using URLs to datasets and archives selection
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space
 * VFS-7741 Added proper error information page when there is no on-line supporting provider for share
