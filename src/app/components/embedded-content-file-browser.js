@@ -95,7 +95,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     updateSelected(selected) {
       this.set('selected', selected);
     },
-    getExecuteWorkflowUrl({ workflowSchemaId }) {
+    getExecuteWorkflowUrl({ workflowSchemaId, fillInputStores }) {
       const {
         _location,
         router,
@@ -112,6 +112,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       const oneproviderId = get(navigationState, 'aspectOptions.oneproviderId');
       if (oneproviderId) {
         aspectOptions.oneproviderId = oneproviderId;
+      }
+      if (fillInputStores) {
+        aspectOptions.fillInputStores = 'true';
       }
       return _location.origin + _location.pathname + router.urlFor(
         'onedata.sidebar.content.aspect',
