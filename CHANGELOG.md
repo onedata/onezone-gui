@@ -8,6 +8,7 @@ CHANGELOG
 
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space
+* VFS-7996 Fix for 20.02.x: added missing group privileges management
 * VFS-7741 Added proper error information page when there is no on-line supporting provider for share
 * VFS-7987 Added missing: cluster, harvester and automation inventory group privileges management
 * VFS-7855 Commons update
