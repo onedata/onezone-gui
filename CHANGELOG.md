@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7947 Improved URL routing to running new workflow with initial input stores values
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space
 * VFS-7996 Fix for 20.02.x: added missing group privileges management
