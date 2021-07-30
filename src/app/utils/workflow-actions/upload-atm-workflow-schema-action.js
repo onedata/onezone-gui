@@ -15,6 +15,17 @@ import { inject as service } from '@ember/service';
 import { Promise } from 'rsvp';
 import { defer } from 'rsvp';
 
+const allowedAtmWorkflowSchemaJsonKeys = [
+  'supplementaryAtmLambdas',
+  'stores',
+  'state',
+  'schemaFormatVersion',
+  'name',
+  'lanes',
+  'description',
+  'atmWorkflowSchemaId',
+];
+
 export default Action.extend({
   workflowManager: service(),
 
@@ -49,6 +60,14 @@ export default Action.extend({
   uploadFileDefer: null,
 
   /**
+   * Contains file, which should be processed by next action execution. When present,
+   * file input will not be used.
+   * Is needed to handle action executions triggered by external file input change.
+   * @type {File|null}
+   */
+  fileToUseForNextExecution: null,
+
+  /**
    * @type {Window}
    */
   _window: window,
@@ -80,17 +99,19 @@ export default Action.extend({
    */
   async onExecute() {
     const result = ActionResult.create();
+    const fileToUseForNextExecution = this.get('fileToUseForNextExecution');
 
     let file;
-    try {
-      file = await this.getJsonFile();
-      console.log('selected');
-      alert('selected');
-    } catch (e) {
-      console.log('cancel');
-      alert('cancel');
-      result.cancelIfPending();
-      return result;
+    if (fileToUseForNextExecution) {
+      file = fileToUseForNextExecution;
+      this.set('fileToUseForNextExecution', null);
+    } else {
+      try {
+        file = await this.getJsonFile();
+      } catch (e) {
+        result.cancelIfPending();
+        return result;
+      }
     }
 
     let atmWorkflowSchemaPrototype;
@@ -194,6 +215,11 @@ export default Action.extend({
     if (uploadFileDefer) {
       uploadFileDefer.resolve(file);
       this.set('uploadFileDefer', null);
+    } else {
+      // File selection was triggered from the outside (e.g. by Selenium).
+      // We need to perform full action handling from this place.
+      this.set('fileToUseForNextExecution', file);
+      this.execute();
     }
   },
 
@@ -236,7 +262,14 @@ export default Action.extend({
       throw new Error('Passed data is not a JSON object.');
     }
 
-    return spec;
+    const validatedSpec = allowedAtmWorkflowSchemaJsonKeys.reduce((vs, allowedKey) => {
+      if (allowedKey in spec) {
+        vs[allowedKey] = spec[allowedKey];
+      }
+      return vs;
+    }, {});
+
+    return validatedSpec;
   },
 
   /**
