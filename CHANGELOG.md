@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8076 Rendering workflow upload input in DOM
 * VFS-7947 Improved URL routing to running new workflow with initial input stores values
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space
