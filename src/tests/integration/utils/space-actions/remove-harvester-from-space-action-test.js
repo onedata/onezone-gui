@@ -118,7 +118,7 @@ describe(
             expect(removeHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
             expect(successNotifySpy).to.be.calledWith(sinon.match.has(
               'string',
-              'The harvester has been sucessfully removed from the space.'
+              'The harvester has been successfully removed from the space.'
             ));
             expect(get(actionResult, 'status')).to.equal('done');
           });

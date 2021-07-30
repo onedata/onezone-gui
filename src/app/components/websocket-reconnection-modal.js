@@ -1,6 +1,6 @@
 /**
  * Modal that controls and shows status of WebSocket reconnection attempts
- * 
+ *
  * @module comopnents/websocket-reconnection-modal
  * @author Jakub Liput
  * @copyright (C) 2019 ACK CYFRONET AGH
@@ -217,7 +217,7 @@ export default Component.extend(I18n, {
 
   /**
    * Hook invoked when reconnection fails.
-   * @param {any} error 
+   * @param {any} error
    * @returns {undefined}
    */
   reconnectFailure(error) {
@@ -278,7 +278,7 @@ export default Component.extend(I18n, {
 
   /**
    * Set global reconnector state.
-   * @param {Number} reconnectorState 
+   * @param {Number} reconnectorState
    * @returns {Number} the set state
    */
   setReconnectorState(reconnectorState) {
@@ -292,7 +292,7 @@ export default Component.extend(I18n, {
 
   /**
    * Start reconnection procedure
-   * @returns {Promise} resolves when reconnected sucessfully
+   * @returns {Promise} resolves when reconnected successfully
    */
   reconnectAttempt() {
     this.setReconnectorState(ReconnectorState.connecting);

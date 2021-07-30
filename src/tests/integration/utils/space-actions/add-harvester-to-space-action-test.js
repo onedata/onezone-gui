@@ -119,7 +119,7 @@ describe(
             expect(addHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
             expect(successNotifySpy).to.be.calledWith(sinon.match.has(
               'string',
-              'The harvester has been sucessfully added to the space.'
+              'The harvester has been successfully added to the space.'
             ));
             expect(get(actionResult, 'status')).to.equal('done');
           });

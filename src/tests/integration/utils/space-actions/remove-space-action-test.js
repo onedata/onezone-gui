@@ -118,7 +118,7 @@ describe(
             expect(removeSpaceStub).to.be.calledWith('spaceId');
             expect(successNotifySpy).to.be.calledWith(sinon.match.has(
               'string',
-              'The space has been sucessfully removed.'
+              'The space has been successfully removed.'
             ));
             expect(get(actionResult, 'status')).to.equal('done');
             expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;
