@@ -129,6 +129,7 @@ import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-invent
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
 import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
+import removeAtmLambdaAction from './utils/workflow-actions/remove-atm-lambda-action';
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
@@ -285,6 +286,7 @@ const translations = {
       removeAtmInventoryAction,
       createAtmLambdaAction,
       modifyAtmLambdaAction,
+      removeAtmLambdaAction,
       modifyAtmWorkflowSchemaAction,
       removeAtmWorkflowSchemaAction,
       createAtmWorkflowSchemaAction,
