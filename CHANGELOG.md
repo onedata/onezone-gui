@@ -7,8 +7,11 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7633 Using URLs to datasets and archives selection
+* VFS-7896 Added possibility to define audit log stores in workflows
+* VFS-7947 Improved URL routing to running new workflow with initial input stores values
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space
+* VFS-7996 Fix for 20.02.x: added missing group privileges management
 * VFS-7741 Added proper error information page when there is no on-line supporting provider for share
 * VFS-7987 Added missing: cluster, harvester and automation inventory group privileges management
 * VFS-7855 Commons update

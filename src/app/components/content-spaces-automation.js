@@ -8,6 +8,7 @@
  */
 
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 
 export default ContentOneproviderContainerBase.extend({
@@ -32,4 +33,15 @@ export default ContentOneproviderContainerBase.extend({
    * @type {ComputedProperty<String>}
    */
   workflowSchemaId: reads('navigationState.aspectOptions.workflowSchemaId'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  fillInputStores: computed(
+    'navigationState.aspectOptions.fillInputStores',
+    function fillInputStores() {
+      const queryParam = this.get('navigationState.aspectOptions.fillInputStores');
+      return Boolean(queryParam) && queryParam !== 'false';
+    }
+  ),
 });
