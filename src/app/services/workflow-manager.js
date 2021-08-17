@@ -270,6 +270,20 @@ export default Service.extend({
       get(knownAtmLambdasProxy, 'atmLambdasProxy').then(() => knownAtmLambdasProxy)
     );
   },
+
+  /**
+   * @param {Models.AtmInventory} atmInventory
+   * @returns {PromiseArray<Models.AtmLambda>}
+   */
+  getAtmLambdasUsedByAtmInventory(atmInventory) {
+    const usedAtmLambdasProxy = AtmLambdasUsedByAtmInventoryProxyArray.create({
+      recordManager: this.get('recordManager'),
+      atmInventory,
+    });
+    return promiseArray(
+      get(usedAtmLambdasProxy, 'atmLambdasProxy').then(() => usedAtmLambdasProxy)
+    );
+  },
 });
 
 const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
@@ -281,7 +295,7 @@ const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
   /**
    * @type {ComputedProperty<PromiseArray<Model.AtmInventory>>}
    */
-  atmInventoriesProxy: promise.array(computed(async function allAtmInventories() {
+  atmInventoriesProxy: promise.array(computed(async function atmInventoriesProxy() {
     const atmInventories = await this.get('recordManager').getUserRecordList('atmInventory');
     return await get(atmInventories, 'list');
   })),
@@ -295,6 +309,71 @@ const AllKnownAtmLambdasProxyArray = ArrayProxy.extend({
       const atmInventories = await this.get('atmInventoriesProxy');
       const atmLambdaLists = await onlyFulfilledValues(
         atmInventories.mapBy('atmLambdaList')
+      );
+      return await onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'));
+    }
+  )),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmLambda>>}
+   */
+  atmLambdasProxy: promise.array(computed(
+    'atmLambdasListsProxy.@each.isReloading',
+    async function atmLambdasProxy() {
+      const atmLambdasLists = await this.get('atmLambdasListsProxy');
+      const lambdasArray = [];
+      atmLambdasLists.forEach(list => lambdasArray.push(...list.toArray()));
+      return lambdasArray.uniq();
+    }
+  )),
+
+  atmLambdasProxyObserver: observer(
+    'atmLambdasProxy.[]',
+    function atmLambdasProxyObserver() {
+      const {
+        isFulfilled,
+        content,
+      } = getProperties(this.get('atmLambdasProxy'), 'isFulfilled', 'content');
+
+      if (isFulfilled) {
+        this.set('content', content);
+      }
+    }
+  ),
+});
+
+const AtmLambdasUsedByAtmInventoryProxyArray = ArrayProxy.extend({
+  /**
+   * @virtual
+   */
+  recordManager: undefined,
+
+  /**
+   * @virtual
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Model.AtmWorkflowSchema>>}
+   */
+  atmWorkflowSchemasProxy: promise.array(
+    computed('atmInventory', async function atmWorkflowSchemasProxy() {
+      const atmInventory = this.get('atmInventory');
+      const atmWorkflowSchemas = await get(atmInventory, 'atmWorkflowSchemaList');
+      return await get(atmWorkflowSchemas || {}, 'list');
+    })
+  ),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<DS.RecordArray<Model.AtmLambda>>>}
+   */
+  atmLambdasListsProxy: promise.array(computed(
+    'atmWorkflowSchemasProxy.@each.isReloading',
+    async function atmLambdasListsProxy() {
+      const atmWorkflowSchemas = await this.get('atmWorkflowSchemasProxy');
+      const atmLambdaLists = await onlyFulfilledValues(
+        atmWorkflowSchemas.mapBy('atmLambdaList')
       );
       return await onlyFulfilledValues(atmLambdaLists.compact().mapBy('list'));
     }

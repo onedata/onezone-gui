@@ -4,12 +4,14 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveAtmLambdaAction from 'onezone-gui/utils/workflow-actions/remove-atm-lambda-action';
 import sinon from 'sinon';
-import { Promise } from 'rsvp';
+import { defer, resolve, reject } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get, getProperties } from '@ember/object';
 import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 describe(
   'Integration | Utility | workflow actions/remove atm lambda action',
@@ -19,21 +21,58 @@ describe(
     });
 
     beforeEach(function () {
+      const atmInventory = {
+        name: 'inventory1',
+        entityId: 'inventory1Id',
+        privileges: {
+          manageLambdas: true,
+        },
+      };
+      const atmInventories = [{
+        entityId: 'inventory0Id',
+        privileges: {
+          manageLambdas: false,
+        },
+      }, atmInventory, {
+        entityId: 'inventory2Id',
+        privileges: {
+          manageLambdas: true,
+        },
+      }, {
+        entityId: 'inventory3Id',
+        privileges: {
+          manageLambdas: true,
+        },
+      }];
+      const userAtmInventoriesList = promiseObject(resolve({
+        list: promiseArray(resolve(atmInventories)),
+      }));
+
+      const recordManager = lookupService(this, 'record-manager');
+      sinon.stub(recordManager, 'getUserRecordList')
+        .withArgs('atmInventory').returns(resolve(userAtmInventoriesList));
+      const removeRelationStub = sinon.stub(recordManager, 'removeRelation');
+
+      const workflowManager = lookupService(this, 'workflow-manager');
+      const usedAtmLambdasDefer = defer();
+      sinon.stub(workflowManager, 'getAtmLambdasUsedByAtmInventory')
+        .returns(promiseArray(usedAtmLambdasDefer.promise));
+
       const context = {
         atmLambda: {
           name: 'lambda1',
           entityId: 'lambda1Id',
         },
-        atmInventory: {
-          name: 'inventory1',
-          entityId: 'inventory1Id',
-        },
+        atmInventory,
       };
       this.setProperties(Object.assign({
         action: RemoveAtmLambdaAction.create({
           ownerSource: this,
           context,
         }),
+        usedAtmLambdasDefer,
+        atmInventories,
+        removeRelationStub,
       }, context));
     });
 
@@ -48,6 +87,62 @@ describe(
       expect(String(title)).to.equal('Remove');
     });
 
+    it('is enabled, when user has "manageLambdas" privilege in inventory',
+      function () {
+        this.set('atmInventory.privileges.manageLambdas', true);
+
+        expect(this.get('action.disabled')).to.be.false;
+        expect(String(this.get('action.tip'))).to.be.empty;
+      });
+
+    it('is disabled, when user does not have "manageLambdas" privilege in inventory',
+      function () {
+        this.set('atmInventory.privileges.manageLambdas', false);
+
+        expect(this.get('action.disabled')).to.be.true;
+        expect(String(this.get('action.tip'))).to.equal(
+          'Insufficient privileges (requires &quot;manage lambdas&quot; privilege in this automation inventory).'
+        );
+      });
+
+    it('is enabled, when information about atmLambda usages is being acquired',
+      async function () {
+        await wait();
+        expect(this.get('action.disabled')).to.be.false;
+        expect(String(this.get('action.tip'))).to.be.empty;
+      });
+
+    it('is enabled, when information about atmLambda usages is not available',
+      async function () {
+        this.get('usedAtmLambdasDefer').reject();
+        await wait();
+
+        expect(this.get('action.disabled')).to.be.false;
+        expect(String(this.get('action.tip'))).to.be.empty;
+      });
+
+    it('is enabled, when there are no atmLambda usages', async function () {
+      this.get('usedAtmLambdasDefer').resolve([{}, {}]);
+      await wait();
+
+      expect(this.get('action.disabled')).to.be.false;
+      expect(String(this.get('action.tip'))).to.be.empty;
+    });
+
+    it('is disabled, when there are some atmLambda usages', async function () {
+      const {
+        usedAtmLambdasDefer,
+        atmLambda,
+      } = this.getProperties('usedAtmLambdasDefer', 'atmLambda');
+
+      usedAtmLambdasDefer.resolve([{}, atmLambda, {}]);
+      await wait();
+
+      expect(this.get('action.disabled')).to.be.true;
+      expect(String(this.get('action.tip')))
+        .to.equal('Cannot remove lambda used by some workflow schemas in this inventory.');
+    });
+
     it('shows modal on execute', async function () {
       this.render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
@@ -56,8 +151,11 @@ describe(
       expect(getModal()).to.have.class('question-modal');
       expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
       expect(getModalHeader().find('h1').text().trim()).to.equal('Remove lambda');
-      expect(getModalBody().text().trim()).to.contain(
+      expect(getModalBody().text()).to.contain(
         'You are about to remove the lambda lambda1 from inventory inventory1.'
+      );
+      expect(getModalBody().find('.row-understand-notice').text()).to.contain(
+        'Also remove it from all my other inventories (if possible).'
       );
       const $yesButton = getModalFooter().find('.question-yes');
       expect($yesButton.text().trim()).to.equal('Remove');
@@ -84,17 +182,22 @@ describe(
         const {
           atmLambda,
           atmInventory,
-        } = this.getProperties('atmLambda', 'atmInventory');
-        const removeRelationStub = sinon
-          .stub(lookupService(this, 'record-manager'), 'removeRelation')
-          .resolves();
+          removeRelationStub,
+          action,
+        } = this.getProperties(
+          'atmLambda',
+          'atmInventory',
+          'removeRelationStub',
+          'action'
+        );
+        removeRelationStub.resolves();
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'success'
         );
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = this.get('action').execute();
+        const actionResultPromise = action.execute();
         await wait();
         await click(getModalFooter().find('.question-yes')[0]);
         const actionResult = await actionResultPromise;
@@ -110,21 +213,108 @@ describe(
     );
 
     it(
+      'executes removing lambda from all inventories on submit - success status and notification on success',
+      async function () {
+        const {
+          atmLambda,
+          atmInventories,
+          removeRelationStub,
+          action,
+        } = this.getProperties(
+          'atmLambda',
+          'atmInventories',
+          'removeRelationStub',
+          'action'
+        );
+        removeRelationStub.callsFake((atmInventory) =>
+          atmInventory === atmInventories[3] ? reject() : resolve()
+        );
+        const successNotifySpy = sinon.spy(
+          lookupService(this, 'global-notify'),
+          'success'
+        );
+        this.render(hbs `{{global-modal-mounter}}`);
+
+        const actionResultPromise = action.execute();
+        await wait();
+        await click(getModalBody().find('.one-checkbox-understand')[0]);
+        await click(getModalFooter().find('.question-yes')[0]);
+        const actionResult = await actionResultPromise;
+
+        expect(removeRelationStub).to.be.calledThrice;
+        expect(removeRelationStub).to.be.calledWith(atmInventories[1], atmLambda);
+        expect(removeRelationStub).to.be.calledWith(atmInventories[2], atmLambda);
+        expect(removeRelationStub).to.be.calledWith(atmInventories[3], atmLambda);
+        expect(successNotifySpy).to.be.calledWith(sinon.match.has(
+          'string',
+          'The lambda has been removed sucessfully.'
+        ));
+        expect(get(actionResult, 'status')).to.equal('done');
+      }
+    );
+
+    it(
       'executes removing lambda on submit - error status and notification on failure',
       async function () {
-        let rejectRemove;
-        sinon.stub(lookupService(this, 'record-manager'), 'removeRelation')
-          .returns(new Promise((resolve, reject) => rejectRemove = reject));
+        const {
+          removeRelationStub,
+          action,
+        } = this.getProperties(
+          'removeRelationStub',
+          'action'
+        );
+        removeRelationStub.callsFake(() => reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'backendError'
         );
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = this.get('action').execute();
+        const actionResultPromise = action.execute();
         await wait();
         await click(getModalFooter().find('.question-yes')[0]);
-        rejectRemove('someError');
+        await wait();
+        const actionResult = await actionResultPromise;
+
+        expect(failureNotifySpy).to.be.calledWith(
+          sinon.match.has('string', 'removing the lambda'),
+          'someError'
+        );
+        const {
+          status,
+          error,
+        } = getProperties(actionResult, 'status', 'error');
+        expect(status).to.equal('failed');
+        expect(error).to.equal('someError');
+      }
+    );
+
+    it(
+      'executes removing lambda from all inventories on submit - error status and notification on failure',
+      async function () {
+        const {
+          atmInventories,
+          removeRelationStub,
+          action,
+        } = this.getProperties(
+          'atmInventories',
+          'removeRelationStub',
+          'action'
+        );
+        removeRelationStub.callsFake((atmInventory) =>
+          (atmInventory === atmInventories[1] || atmInventory === atmInventories[3]) ?
+          reject('someError') : resolve()
+        );
+        const failureNotifySpy = sinon.spy(
+          lookupService(this, 'global-notify'),
+          'backendError'
+        );
+        this.render(hbs `{{global-modal-mounter}}`);
+
+        const actionResultPromise = action.execute();
+        await wait();
+        await click(getModalBody().find('.one-checkbox-understand')[0]);
+        await click(getModalFooter().find('.question-yes')[0]);
         await wait();
         const actionResult = await actionResultPromise;
 

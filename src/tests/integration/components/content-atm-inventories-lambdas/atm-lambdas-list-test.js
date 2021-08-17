@@ -9,6 +9,8 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import RemoveAtmLambdaAction from 'onezone-gui/utils/workflow-actions/remove-atm-lambda-action';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambdas list',
@@ -63,7 +65,15 @@ describe(
       this.setProperties({
         collection,
         allCollection,
-        atmInventory: { name: 'inv1' },
+        atmInventory: {
+          name: 'inv1',
+          atmWorkflowSchemaList: promiseObject(resolve({
+            list: promiseArray(resolve([])),
+          })),
+          privileges: {
+            manageLambdas: true,
+          },
+        },
       });
     });
 
@@ -210,7 +220,7 @@ describe(
         let removeCalled = false;
         const createRemoveAtmLambdaActionStub =
           sinon.stub(workflowActions, 'createRemoveAtmLambdaAction')
-          .returns(RemoveAtmLambdaAction.create({
+          .callsFake((context) => RemoveAtmLambdaAction.create(context, {
             ownerSource: this,
             onExecute() {
               removeCalled = true;
