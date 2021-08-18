@@ -1,6 +1,18 @@
 /**
  * Uploads workflow schema from JSON file. Needs `atmInventory` passed in context.
  *
+ * Can be triggered in two ways:
+ * - like all other actions - via execute() method. In that case "open file" dialog
+ *   is programatically triggered and state of that dialog is available via
+ *   `uploadFileDefer`. It provides promise, which resolves after choosing file or
+ *   rejects when dialog is closed without file selection.
+ * - by changing value of hidden input rendered in document body. Typically this input
+ *   is used only to trigger "open file" dialog by execute(), but in some circumstances
+ *   it might be changed directly by e.g. Selenium. In that case the full execution flow
+ *   is triggered (like during execute()), except that "open file" dialog is not being
+ *   triggered (so `uploadFileDefer` is not set). Instead of that, value provided
+ *   to the input is passed via `fileToUseForNextExecution` to the action algorithm.
+ *
  * @module utils/workflow-actions/upload-atm-workflow-schema-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
@@ -145,7 +157,7 @@ export default Action.extend({
     }
 
     const _document = _window.document;
-    const body = _document.body;
+    const _body = _document.body;
     const input = _document.createElement('input');
     input.style.display = 'none';
     input.classList.add('upload-atm-workflow-schema-action-input');
@@ -161,7 +173,7 @@ export default Action.extend({
       // (which, without clearing the input, would not trigger input change).
       input.value = '';
     });
-    body.appendChild(input);
+    _body.appendChild(input);
     this.set('uploadInputElement', input);
   },
 
@@ -194,6 +206,9 @@ export default Action.extend({
     }
     const newUploadFileDefer = this.set('uploadFileDefer', defer());
     _window.addEventListener('focus', () => {
+      // Based on https://stackoverflow.com/a/63773257. It does not detect
+      // "open file" dialog canellation on iOS and it is hard to find any working
+      // solution for that issue. :(
       // Wait for input change event to be processed (especially in mobile
       // browsers and macOS).
       setTimeout(() => {
