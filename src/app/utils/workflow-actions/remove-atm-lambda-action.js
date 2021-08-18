@@ -76,7 +76,7 @@ export default Action.extend({
   ),
 
   /**
-   * @type {ComputedProperty<Models.atmInventory>}
+   * @type {ComputedProperty<Models.AtmInventory>}
    */
   atmInventory: reads('context.atmInventory'),
 
@@ -162,11 +162,11 @@ export default Action.extend({
       'atmLambda',
     );
 
-    const mainRemoveRelationPromise =
+    const removeMainRelationPromise =
       recordManager.removeRelation(atmInventory, atmLambda);
-    let otherRemoveRelationsPromise = resolve();
+    let removeOtherRelationsPromise = resolve();
     if (removeFromOtherAtmInventories) {
-      otherRemoveRelationsPromise = recordManager.getUserRecordList('atmInventory')
+      removeOtherRelationsPromise = recordManager.getUserRecordList('atmInventory')
         .then(atmInventoryList => get(atmInventoryList, 'list'))
         .then(atmInventories => {
           const otherAtmInventoriesToRemoveFrom = atmInventories
@@ -181,8 +181,8 @@ export default Action.extend({
     }
 
     const removalResult = await hashSettled({
-      main: mainRemoveRelationPromise,
-      other: otherRemoveRelationsPromise,
+      main: removeMainRelationPromise,
+      other: removeOtherRelationsPromise,
     });
 
     if (removalResult.main.state === 'rejected') {
