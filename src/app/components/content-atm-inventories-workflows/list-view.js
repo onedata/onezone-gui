@@ -154,6 +154,19 @@ export default Component.extend(I18n, {
     this.registerViewActions();
   },
 
+  willDestroyElement() {
+    try {
+      [
+        'uploadAtmWorkflowSchemaAction',
+      ].forEach(propName => {
+        const prop = this.cacheFor(propName);
+        prop && prop.destroy();
+      });
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
   registerViewActions() {
     const {
       onRegisterViewActions,
