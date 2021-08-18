@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7900 Added removing atm. lambdas
+* VFS-7896 Added possibility to define audit log stores in workflows
 * VFS-7947 Improved URL routing to running new workflow with initial input stores values
 * VFS-7846 Added URL routing to running new workflow
 * VFS-7975 Added cancel workflow privilege in space

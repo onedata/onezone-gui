@@ -86,6 +86,7 @@
         .entry-children {
           display: flex;
           flex-wrap: wrap;
+          align-items: flex-start;
         }
       }
     }
@@ -139,6 +140,7 @@
         .entryBatch-field,
         .entryOptional-field {
           flex: 0 1 $entry-toggle-container-width;
+          height: $input-height-base;
 
           .control-label {
             position: absolute;
@@ -146,7 +148,7 @@
             width: initial;
             max-width: initial;
             padding: 0;
-            top: -1em;
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
           }

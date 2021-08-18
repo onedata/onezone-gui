@@ -60,7 +60,7 @@ export default Component.extend(GlobalActions, {
       activeSlide,
     } = this.getProperties('actionsPerSlide', 'activeSlide');
 
-    return actionsPerSlide[activeSlide];
+    return actionsPerSlide[activeSlide] || [];
   }),
 
   activeSlideObserver: observer('activeSlide', function activeSlideObserver() {
