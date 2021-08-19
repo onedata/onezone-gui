@@ -32,6 +32,7 @@ export default Component.extend(I18n, {
   navigationState: service(),
   router: service(),
   globalNotify: service(),
+  clipboardActions: service(),
   globalClipboard: service(),
 
   /**
@@ -128,16 +129,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('token.entityId'),
-        this.t('tokenId')
-      ),
-      title: this.t('copyId'),
-      class: 'copy-token-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('token', function copyIdAction() {
+    const {
+      token,
+      clipboardActions,
+    } = this.getProperties('token', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: token });
   }),
 
   /**

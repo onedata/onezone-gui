@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   workflowActions: service(),
+  clipboardActions: service(),
   navigationState: service(),
 
   /**
@@ -101,9 +102,26 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed('atmInventory', function copyIdAction() {
+    const {
+      atmInventory,
+      clipboardActions,
+    } = this.getProperties('atmInventory', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: atmInventory });
+  }),
+
+  /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  itemActions: collect('renameAction', 'leaveAction', 'removeAction'),
+  itemActions: collect(
+    'renameAction',
+    'leaveAction',
+    'removeAction',
+    'copyIdAction'
+  ),
 
   toggleRename(value) {
     this.set('isRenaming', value);

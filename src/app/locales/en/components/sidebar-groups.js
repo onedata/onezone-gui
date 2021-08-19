@@ -10,7 +10,5 @@ export default {
     leave: 'Leave',
     remove: 'Remove',
     groupPersistence: 'group persistence',
-    copyId: 'Copy group ID',
-    groupId: 'group ID',
   },
 };

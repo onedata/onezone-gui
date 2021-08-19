@@ -20,7 +20,6 @@ import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
-import sidebarShares from './components/sidebar-shares';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -171,7 +170,6 @@ const translations = {
     sidebarSpaces,
     sidebarProviders,
     sidebarGroups,
-    sidebarShares,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,

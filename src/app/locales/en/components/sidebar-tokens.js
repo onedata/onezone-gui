@@ -34,8 +34,6 @@ export default {
     renameAction: 'Rename',
     removeAction: 'Remove',
     copyAction: 'Copy to clipboard',
-    copyId: 'Copy token ID',
-    tokenId: 'token ID',
     revoked: 'revoked',
     expired: 'expired',
     token: 'token',
