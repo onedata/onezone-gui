@@ -25,6 +25,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   workflowActions: service(),
+  clipboardActions: service(),
 
   /**
    * @override
@@ -95,9 +96,21 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed('atmLambda', function copyIdAction() {
+    const {
+      atmLambda,
+      clipboardActions,
+    } = this.getProperties('atmLambda', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: atmLambda });
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction'),
+  atmLambdaActionsArray: collect('modifyAction', 'copyIdAction'),
 
   startEdition() {
     this.set('isEditing', true);
