@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
@@ -38,7 +37,6 @@ describe('Integration | Component | content atm inventories workflows/editor vie
     });
 
     beforeEach(function () {
-      const workflowActions = lookupService(this, 'workflow-actions');
       this.setProperties({
         atmWorkflowSchema: EmberObject.create({
           name: 'workflow1',
@@ -73,8 +71,6 @@ describe('Integration | Component | content atm inventories workflows/editor vie
           }],
         }),
         backSlideSpy: sinon.spy(),
-        createRemoveAtmWorkflowSchemaActionStub: sinon.stub(workflowActions,
-          'createRemoveAtmWorkflowSchemaAction'),
       });
     });
 

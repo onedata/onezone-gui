@@ -130,6 +130,9 @@ export default Component.extend(GlobalActions, I18n, {
    */
   activeAtmWorkflowSchemaIdFromUrl: reads('navigationState.aspectOptions.workflowId'),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<Model.AtmWorkflowSchema>>}
+   */
   activeAtmWorkflowSchemaProxy: promise.object(computed(
     'activeAtmWorkflowSchemaId',
     'atmInventory',
@@ -274,7 +277,8 @@ export default Component.extend(GlobalActions, I18n, {
       () => nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaId;
     const isActiveSlideChanged = () => nextActiveSlide !== activeSlide;
 
-    // Detect change of `activeAtmWorkflowSchemaId`
+    // Detect change of `activeAtmWorkflowSchemaId`. `Boolean(...)` conditions
+    // are to filter out inequalities like `null !== undefined`
     if (activeAtmWorkflowSchemaIdFromUrl !== activeAtmWorkflowSchemaId && (
         Boolean(activeAtmWorkflowSchemaIdFromUrl) ||
         Boolean(activeAtmWorkflowSchemaId)
@@ -283,7 +287,7 @@ export default Component.extend(GlobalActions, I18n, {
     }
 
     // Detect change of `activeSlide`
-    if (!this.isValidSlideId(activeSlideFromUrl)) {
+    if (!this.isSlideIdValid(activeSlideFromUrl)) {
       nextActiveSlide = this.getDefaultSlideId();
     } else if (activeSlideFromUrl !== activeSlide) {
       nextActiveSlide = activeSlideFromUrl;
@@ -297,9 +301,9 @@ export default Component.extend(GlobalActions, I18n, {
         this.getNextSlideIdWhenActiveAtmWorkflowSchemaChanges(nextActiveSlide);
     }
 
-    // Detect if some changes are unsaved and take care of them.
-    const editorGetsTurnedOff = this.idSlideIdUsedByEditor(activeSlide) &&
-      !this.idSlideIdUsedByEditor(nextActiveSlide);
+    // Detect if some workflow schema changes are unsaved and take care of them.
+    const editorGetsTurnedOff = this.isSlideIdUsedByEditor(activeSlide) &&
+      !this.isSlideIdUsedByEditor(nextActiveSlide);
     const willUpdateClearUnsavedChanges = activeAtmWorkflowSchemaId &&
       (editorGetsTurnedOff || isActiveAtmWorkflowSchemaIdChanged());
     if (
@@ -315,7 +319,7 @@ export default Component.extend(GlobalActions, I18n, {
           workflowId: activeAtmWorkflowSchemaId,
         }, true);
 
-        // Nothing more to do - user choose to abort the transiton.
+        // Nothing more to do - user has chosen to abort the transiton.
         return;
       }
     }
@@ -335,9 +339,7 @@ export default Component.extend(GlobalActions, I18n, {
     // Introduce some post-update adjustments related to changes.
     if (isActiveSlideChanged()) {
       this.scrollTop();
-      if (
-        !this.isSlideIdUsedByTaskDetailsProvider(nextActiveSlide)
-      ) {
+      if (!this.isSlideIdUsedByTaskDetailsProvider(nextActiveSlide)) {
         this.cancelTaskDetailsProvider();
       }
     }
@@ -364,13 +366,13 @@ export default Component.extend(GlobalActions, I18n, {
 
   handlePageUnload(event) {
     if (this.shouldBlockTransitionBecauseOfUnsavedChanges()) {
-      return preventPageUnload(event, this.t('confirmPageClose'));
+      return preventPageUnload(event, String(this.t('confirmPageClose')));
     }
   },
 
   shouldBlockTransitionBecauseOfUnsavedChanges() {
     const isActiveSlideUsedByEditor =
-      this.idSlideIdUsedByEditor(this.get('activeSlide'));
+      this.isSlideIdUsedByEditor(this.get('activeSlide'));
     const isModified = this.get('editorModificationState.isModified');
     const isActiveAtmWorkflowSchemaProxyFulfilled =
       this.cacheFor('activeAtmWorkflowSchemaProxy') &&
@@ -470,7 +472,7 @@ export default Component.extend(GlobalActions, I18n, {
     return 'list';
   },
 
-  isValidSlideId(slideId) {
+  isSlideIdValid(slideId) {
     return this.get('possibleSlideIds').includes(slideId);
   },
 
@@ -482,13 +484,9 @@ export default Component.extend(GlobalActions, I18n, {
     ].includes(slideId);
   },
 
-  idSlideIdUsedByEditor(slideId) {
-    return [
-      'editor',
-      'lambdaSelector',
-      'lambdaCreator',
-      'taskDetails',
-    ].includes(slideId);
+  isSlideIdUsedByEditor(slideId) {
+    return slideId === 'editor' ||
+      this.isSlideIdUsedByTaskDetailsProvider(slideId);
   },
 
   getNextSlideIdWhenActiveAtmWorkflowSchemaChanges(activeSlideId) {

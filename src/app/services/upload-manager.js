@@ -217,7 +217,7 @@ export default Service.extend(I18n, {
    */
   onPageUnload(unloadEvent) {
     if (this.get('hasActiveUploads')) {
-      return preventPageUnload(unloadEvent, this.t('confirmPageClose'));
+      return preventPageUnload(unloadEvent, String(this.t('confirmPageClose')));
     }
   },
 
