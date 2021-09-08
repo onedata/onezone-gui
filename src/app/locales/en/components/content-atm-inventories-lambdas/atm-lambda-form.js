@@ -1,3 +1,5 @@
+import createTaskResourcesFields from '../../onedata-gui-common/utils/workflow-visualiser/create-task-resources-fields';
+
 const argumentAndResultTypes = {
   integer: {
     label: 'Integer',
@@ -144,6 +146,9 @@ export default {
         },
       },
     },
+    resources: Object.assign({}, createTaskResourcesFields, {
+      label: 'Resources',
+    }),
   },
   submit: {
     create: 'Create',

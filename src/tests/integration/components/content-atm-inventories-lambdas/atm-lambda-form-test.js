@@ -703,6 +703,40 @@ describe(
           });
       });
 
+      it('renders "resources" section with cpu, memory and storage fields groups',
+        async function () {
+          await renderCreate(this);
+
+          const $resourcesSection = this.$('.resources-field');
+          expect($resourcesSection.find('.control-label').eq(0).text().trim())
+            .to.equal('Resources');
+          // Check if translations for resources fields are loaded
+          expect($resourcesSection.text()).to.contain('Limit');
+
+          expect($resourcesSection.find('.cpuRequested-field .form-control'))
+            .to.have.value('0.1');
+          expect($resourcesSection.find('.cpuLimit-field .form-control'))
+            .to.have.value('');
+          [{
+            resourceName: 'memory',
+            requested: ['128', 'MiB'],
+            limit: ['', 'MiB'],
+          }, {
+            resourceName: 'ephemeralStorage',
+            requested: ['0', 'MiB'],
+            limit: ['', 'MiB'],
+          }].forEach(({ resourceName, requested, limit }) => {
+            const $requested = this.$(`.${resourceName}Requested-field`);
+            expect($requested.find('input')).to.have.value(requested[0]);
+            expect($requested.find('.ember-power-select-trigger').text())
+              .to.contain(requested[1]);
+            const $limit = this.$(`.${resourceName}Limit-field`);
+            expect($limit.find('input')).to.have.value(limit[0]);
+            expect($limit.find('.ember-power-select-trigger').text())
+              .to.contain(limit[1]);
+          });
+        });
+
       it('disables sumbit button when one of fields is invalid', async function () {
         await renderCreate(this);
 

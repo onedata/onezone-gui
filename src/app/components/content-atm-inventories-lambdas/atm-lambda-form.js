@@ -30,6 +30,7 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import _ from 'lodash';
 import { validator } from 'ember-cp-validations';
+import createTaskResourcesFields from 'onedata-gui-common/utils/workflow-visualiser/create-task-resources-fields';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -113,6 +114,7 @@ export default Component.extend(I18n, {
       onedataFunctionOptionsFieldsGroup,
       argumentsFieldsCollectionGroup,
       resultsFieldsCollectionGroup,
+      resourcesFieldsGroup,
     } = this.getProperties(
       'nameField',
       'summaryField',
@@ -121,6 +123,7 @@ export default Component.extend(I18n, {
       'onedataFunctionOptionsFieldsGroup',
       'argumentsFieldsCollectionGroup',
       'resultsFieldsCollectionGroup',
+      'resourcesFieldsGroup'
     );
 
     const component = this;
@@ -139,6 +142,7 @@ export default Component.extend(I18n, {
         onedataFunctionOptionsFieldsGroup,
         argumentsFieldsCollectionGroup,
         resultsFieldsCollectionGroup,
+        resourcesFieldsGroup,
       ],
     });
   }),
@@ -263,6 +267,29 @@ export default Component.extend(I18n, {
    */
   resultsFieldsCollectionGroup: computed(function resultsFieldsCollectionGroup() {
     return createFunctionArgResGroup(this, 'result');
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormFieldsGroup>}
+   */
+  resourcesFieldsGroup: computed(function resourcesFieldsGroup() {
+    const name = 'resources';
+    return FormFieldsGroup.extend(disableFieldInEditMode(this)).create({
+      name,
+      addColonToLabel: false,
+      fields: createTaskResourcesFields({
+        pathToGroup: name,
+        cpuRequestedDefaultValueMixin: defaultValueGenerator(this, raw('0.1')),
+        cpuLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
+        memoryRequestedDefaultValueMixin: defaultValueGenerator(
+          this,
+          raw(String(128 * 1024 * 1024))
+        ),
+        memoryLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
+        ephemeralStorageRequestedDefaultValueMixin: defaultValueGenerator(this, raw('0')),
+        ephemeralStorageLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
+      }),
+    });
   }),
 
   modeObserver: observer('mode', function modeObserver() {
