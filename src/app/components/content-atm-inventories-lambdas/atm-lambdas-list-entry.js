@@ -104,14 +104,14 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Utils.Action>}
    */
-  removeAction: computed('atmLambda', 'atmInventory', function removeAction() {
+  unlinkAction: computed('atmLambda', 'atmInventory', function unlinkAction() {
     const {
       atmLambda,
       atmInventory,
       workflowActions,
     } = this.getProperties('atmLambda', 'atmInventory', 'workflowActions');
 
-    return workflowActions.createRemoveAtmLambdaAction({
+    return workflowActions.createUnlinkAtmLambdaAction({
       atmLambda,
       atmInventory,
     });
@@ -120,7 +120,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction', 'removeAction'),
+  atmLambdaActionsArray: collect('modifyAction', 'unlinkAction'),
 
   startEdition() {
     this.set('isEditing', true);

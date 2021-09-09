@@ -2,19 +2,18 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import RemoveAtmLambdaAction from 'onezone-gui/utils/workflow-actions/remove-atm-lambda-action';
+import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import sinon from 'sinon';
 import { defer, resolve, reject } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get, getProperties } from '@ember/object';
-import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
+import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
-describe(
-  'Integration | Utility | workflow actions/remove atm lambda action',
+describe('Integration | Utility | workflow actions/unlink atm lambda action',
   function () {
     setupComponentTest('global-modal-mounter', {
       integration: true,
@@ -66,7 +65,7 @@ describe(
         atmInventory,
       };
       this.setProperties(Object.assign({
-        action: RemoveAtmLambdaAction.create({
+        action: UnlinkAtmLambdaAction.create({
           ownerSource: this,
           context,
         }),
@@ -82,9 +81,9 @@ describe(
         icon,
         title,
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
-      expect(className).to.equal('remove-atm-lambda-action-trigger');
+      expect(className).to.equal('unlink-atm-lambda-action-trigger');
       expect(icon).to.equal('x');
-      expect(String(title)).to.equal('Remove');
+      expect(String(title)).to.equal('Unlink');
     });
 
     it('is enabled, when user has "manageLambdas" privilege in inventory',
@@ -139,8 +138,9 @@ describe(
       await wait();
 
       expect(this.get('action.disabled')).to.be.true;
-      expect(String(this.get('action.tip')))
-        .to.equal('Cannot remove lambda used by some workflow schemas in this inventory.');
+      expect(String(this.get('action.tip'))).to.equal(
+        'This lambda cannot be unlinked because it is used by at least one workflow schema in this inventory.'
+      );
     });
 
     it('shows modal on execute', async function () {
@@ -148,36 +148,25 @@ describe(
       this.get('action').execute();
       await wait();
 
-      expect(getModal()).to.have.class('question-modal');
-      expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
-      expect(getModalHeader().find('h1').text().trim()).to.equal('Remove lambda');
-      expect(getModalBody().text()).to.contain(
-        'You are about to remove the lambda lambda1 from inventory inventory1.'
-      );
-      expect(getModalBody().find('.row-understand-notice').text()).to.contain(
-        'Also remove it from all my other inventories (if possible).'
-      );
-      const $yesButton = getModalFooter().find('.question-yes');
-      expect($yesButton.text().trim()).to.equal('Remove');
-      expect($yesButton).to.have.class('btn-danger');
+      expect(getModal()).to.have.class('unlink-atm-lambda-modal');
+      expect(getModalBody().text()).to.contain('inventory1');
+      expect(getModalBody().text()).to.contain('lambda1');
     });
 
-    it(
-      'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
+    it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
         this.render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
         await wait();
-        await click(getModalFooter().find('.question-no')[0]);
+        await click(getModalFooter().find('.cancel-btn')[0]);
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
       }
     );
 
-    it(
-      'executes removing lambda on submit - success status and notification on success',
+    it('executes unlinking lambda on submit - success status and notification on success',
       async function () {
         const {
           atmLambda,
@@ -199,21 +188,21 @@ describe(
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click(getModalFooter().find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledOnce;
         expect(removeRelationStub).to.be.calledWith(atmInventory, atmLambda);
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The lambda has been removed sucessfully.'
+          'The lambda has been unlinked sucessfully.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
       }
     );
 
     it(
-      'executes removing lambda from all inventories on submit - success status and notification on success',
+      'executes unlinking lambda from all inventories on submit - success status and notification on success',
       async function () {
         const {
           atmLambda,
@@ -237,8 +226,8 @@ describe(
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalBody().find('.one-checkbox-understand')[0]);
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click(getModalBody().find('input[value="allInventories"]')[0]);
+        await click(getModalFooter().find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledThrice;
@@ -247,14 +236,14 @@ describe(
         expect(removeRelationStub).to.be.calledWith(atmInventories[3], atmLambda);
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The lambda has been removed sucessfully.'
+          'The lambda has been unlinked sucessfully.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
       }
     );
 
     it(
-      'executes removing lambda on submit - error status and notification on failure',
+      'executes unlinking lambda on submit - error status and notification on failure',
       async function () {
         const {
           removeRelationStub,
@@ -272,12 +261,12 @@ describe(
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click(getModalFooter().find('.submit-btn')[0]);
         await wait();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'removing the lambda'),
+          sinon.match.has('string', 'unlinking the lambda'),
           'someError'
         );
         const {
@@ -290,7 +279,7 @@ describe(
     );
 
     it(
-      'executes removing lambda from all inventories on submit - error status and notification on failure',
+      'executes unlinking lambda from all inventories on submit - error status and notification on failure',
       async function () {
         const {
           atmInventories,
@@ -313,13 +302,13 @@ describe(
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalBody().find('.one-checkbox-understand')[0]);
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click(getModalBody().find('input[value="allInventories"]')[0]);
+        await click(getModalFooter().find('.submit-btn')[0]);
         await wait();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'removing the lambda'),
+          sinon.match.has('string', 'unlinking the lambda'),
           'someError'
         );
         const {

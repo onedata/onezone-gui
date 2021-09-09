@@ -16,7 +16,7 @@ import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
-import RemoveAtmLambdaAction from 'onezone-gui/utils/workflow-actions/remove-atm-lambda-action';
+import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
@@ -118,10 +118,10 @@ export default Service.extend(I18n, {
    *     amtInventory: Models.AtmInventory,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.RemoveAtmLambdaAction}
+   * @returns {Utils.WorkflowActions.UnlinkAtmLambdaAction}
    */
-  createRemoveAtmLambdaAction(context) {
-    return RemoveAtmLambdaAction.create({ ownerSource: this, context });
+  createUnlinkAtmLambdaAction(context) {
+    return UnlinkAtmLambdaAction.create({ ownerSource: this, context });
   },
 
   /**

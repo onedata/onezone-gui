@@ -1,7 +1,7 @@
 /**
- * Removes automation lambda.
+ * Unlinks automation lambda.
  *
- * @module utils/workflow-actions/remove-atm-lambda-action
+ * @module utils/workflow-actions/unlink-atm-lambda-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -24,7 +24,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.workflowActions.removeAtmLambdaAction',
+  i18nPrefix: 'utils.workflowActions.unlinkAtmLambdaAction',
 
   /**
    * @override
@@ -34,7 +34,7 @@ export default Action.extend({
   /**
    * @override
    */
-  className: 'remove-atm-lambda-action-trigger',
+  className: 'unlink-atm-lambda-action-trigger',
 
   /**
    * @override
@@ -68,7 +68,7 @@ export default Action.extend({
           privilegeFlag: 'atm_inventory_manage_lambdas',
         });
       } else if (isAtmLambdaUsedInAtmInventory) {
-        return this.t('tip.cannotRemoveAtmLambdaUsed');
+        return this.t('tip.cannotUnlinkAtmLambdaUsed');
       }
 
       return '';
@@ -129,21 +129,13 @@ export default Action.extend({
 
     const result = ActionResult.create();
     return modalManager
-      .show('question-modal', {
-        headerIcon: 'sign-warning-rounded',
-        headerText: this.t('modalHeader'),
-        descriptionParagraphs: [{
-          text: this.t('modalDescription', {
-            atmLambdaName: get(atmLambda, 'name'),
-            atmInventoryName: get(atmInventory, 'name'),
-          }),
-        }],
-        checkboxMessage: this.t('modalCheckboxDescription'),
-        isCheckboxBlocking: false,
-        yesButtonText: this.t('modalYes'),
-        yesButtonClassName: 'btn-danger',
-        onSubmit: ({ isCheckboxChecked }) =>
-          result.interceptPromise(this.removeAtmLambda(isCheckboxChecked)),
+      .show('unlink-atm-lambda-modal', {
+        atmInventory,
+        atmLambda,
+        onSubmit: ({ inventoriesToUnlink }) =>
+          result.interceptPromise(
+            this.unlinkAtmLambda(inventoriesToUnlink === 'allInventories')
+          ),
       }).hiddenPromise
       .then(() => {
         result.cancelIfPending();
@@ -151,7 +143,7 @@ export default Action.extend({
       });
   },
 
-  async removeAtmLambda(removeFromOtherAtmInventories) {
+  async unlinkAtmLambda(unlinkFromOtherAtmInventories) {
     const {
       recordManager,
       atmInventory,
@@ -165,7 +157,7 @@ export default Action.extend({
     const removeMainRelationPromise =
       recordManager.removeRelation(atmInventory, atmLambda);
     let removeOtherRelationsPromise = resolve();
-    if (removeFromOtherAtmInventories) {
+    if (unlinkFromOtherAtmInventories) {
       removeOtherRelationsPromise = recordManager.getUserRecordList('atmInventory')
         .then(atmInventoryList => get(atmInventoryList, 'list'))
         .then(atmInventories => {

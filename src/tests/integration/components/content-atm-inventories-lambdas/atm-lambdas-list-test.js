@@ -8,7 +8,7 @@ import $ from 'jquery';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
-import RemoveAtmLambdaAction from 'onezone-gui/utils/workflow-actions/remove-atm-lambda-action';
+import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
@@ -218,9 +218,9 @@ describe(
       it('allows to remove lambda', async function () {
         const workflowActions = lookupService(this, 'workflow-actions');
         let removeCalled = false;
-        const createRemoveAtmLambdaActionStub =
-          sinon.stub(workflowActions, 'createRemoveAtmLambdaAction')
-          .callsFake((context) => RemoveAtmLambdaAction.create(context, {
+        const createUnlinkAtmLambdaActionStub =
+          sinon.stub(workflowActions, 'createUnlinkAtmLambdaAction')
+          .callsFake((context) => UnlinkAtmLambdaAction.create(context, {
             ownerSource: this,
             onExecute() {
               removeCalled = true;
@@ -236,10 +236,10 @@ describe(
 
         await click($firstAtmLambda.find('.atm-lambda-actions-trigger')[0]);
         await click(
-          $('body .webui-popover.in .remove-atm-lambda-action-trigger')[0]
+          $('body .webui-popover.in .unlink-atm-lambda-action-trigger')[0]
         );
 
-        expect(createRemoveAtmLambdaActionStub).to.be.calledWith({
+        expect(createUnlinkAtmLambdaActionStub).to.be.calledWith({
           atmLambda: this.get('collection').findBy('name', 'f0'),
           atmInventory: this.get('atmInventory'),
         });
