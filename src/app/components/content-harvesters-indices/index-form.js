@@ -197,6 +197,7 @@ export default Component.extend(I18n, {
         'fileType',
         'spaceId',
         'datasetInfo',
+        'archiveInfo',
         'metadataExistenceFlags',
       ].map(fieldName =>
         ToggleField.extend({

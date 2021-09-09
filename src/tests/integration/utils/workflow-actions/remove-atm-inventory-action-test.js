@@ -101,7 +101,7 @@ describe(
         expect(removeRecordStub).to.be.calledWith(this.get('atmInventory'));
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
-          'The automation inventory has been sucessfully removed.'
+          'The automation inventory has been successfully removed.'
         ));
         expect(get(actionResult, 'status')).to.equal('done');
         expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;

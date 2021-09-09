@@ -198,6 +198,7 @@ export default Service.extend({
         _meta: {
           additionalData: {
             atmInventoryId,
+            atmWorkflowSchemaId: atmWorkflowSchemaPrototype.atmWorkflowSchemaId,
             supplementaryAtmLambdas: atmWorkflowSchemaPrototype.supplementaryAtmLambdas,
             schemaFormatVersion: atmWorkflowSchemaPrototype.schemaFormatVersion,
           },

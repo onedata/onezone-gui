@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import { getProperties } from '@ember/object';
@@ -24,6 +24,10 @@ describe(
           },
         }),
       });
+    });
+
+    afterEach(function () {
+      this.get('action').destroy();
     });
 
     it('has correct className, icon and title', function () {

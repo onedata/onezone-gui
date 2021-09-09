@@ -14,6 +14,7 @@ const fileDetailsFields = [
   'fileType',
   'spaceId',
   'datasetInfo',
+  'archiveInfo',
   'metadataExistenceFlags',
 ];
 
@@ -91,7 +92,7 @@ describe('Integration | Component | content harvesters indices/index form', func
     );
 
     it(
-      'shows 5 preselected toggles: "file name", "file type", "space id", "dataset info" and "metadata existence flags" with "Include file details" label and tooltip',
+      'shows 6 preselected toggles: "file name", "file type", "space id", "dataset info", "archive info" and "metadata existence flags" with "Include file details" label and tooltip',
       function () {
         this.render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
@@ -100,12 +101,13 @@ describe('Integration | Component | content harvesters indices/index form', func
         expect($formGroup).to.exist;
         expect($formGroup.find('.control-label').eq(0).text().trim())
           .to.equal('Include file details:');
-        expect($toggleGroups).to.have.length(5);
+        expect($toggleGroups).to.have.length(6);
         [
           'File name',
           'File type',
           'Space ID',
           'Dataset info',
+          'Archive info',
           'Metadata existence flags',
         ].forEach((fieldLabel, index) => {
           const $toggleGroup = $toggleGroups.eq(index);
@@ -352,6 +354,7 @@ describe('Integration | Component | content harvesters indices/index form', func
                   'fileType',
                   'spaceId',
                   'datasetInfo',
+                  'archiveInfo',
                   'metadataExistenceFlags',
                 ],
                 includeRejectionReason: true,
@@ -393,6 +396,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           'fileType',
           'spaceId',
           'datasetInfo',
+          'archiveInfo',
           'metadataExistenceFlags',
         ],
         includeRejectionReason: true,
@@ -468,6 +472,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           'fileType',
           'spaceId',
           'datasetInfo',
+          'archiveInfo',
           'metadataExistenceFlags',
           'includeRejectionReason',
           'retryOnRejection',
