@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7661 Added timeout for connection check in clusters
 * VFS-8276 Added "archive info" option to harvester indices
 * VFS-8076 Rendering workflow upload input in DOM
 * VFS-7896 Added possibility to define audit log stores in workflows
