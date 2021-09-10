@@ -61,6 +61,32 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    */
   viewMode: or('navigationState.aspectOptions.viewMode', raw('datasets')),
 
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  dirId: reads('navigationState.aspectOptions.dir'),
+
+  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
+  /**
+   * List of dataset entity ids that are selected
+   * 
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selected: computed('navigationState.aspectOptions.selected.[]', {
+    get() {
+      const rawSelected = this.get('navigationState.aspectOptions.selected');
+      return rawSelected && rawSelected.split(',') || [];
+    },
+    set(key, value) {
+      this.get('navigationState').changeRouteAspectOptions({
+        selected: value && value.join(',') || null,
+      });
+      return value;
+    },
+  }),
+
   datasetDeferred: computed('datasetId', function datasetDeferred() {
     return defer();
   }),

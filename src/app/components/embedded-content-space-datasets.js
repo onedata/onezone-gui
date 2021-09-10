@@ -64,9 +64,18 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   viewMode: undefined,
 
   /**
-   * @override
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {String}
    */
-  embeddedBrowserType: 'datasets',
+  dirId: undefined,
+
+  /**
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {Array<String>}
+   */
+  selected: undefined,
 
   /**
    * Dataset state tree to show. One of: attached, detached.
@@ -77,30 +86,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   attachmentState: undefined,
 
   /**
-   * **Injected to embedded iframe.**
-   * @type {string}
+   * @override
    */
-  dirId: reads('navigationState.aspectOptions.dir'),
-
-  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
-  /**
-   * List of dataset entity ids that are selected
-   * 
-   * **Injected to embedded iframe.**
-   * @type {Array<String>}
-   */
-  selected: computed('navigationState.aspectOptions.selected.[]', {
-    get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selected');
-      return rawSelected && rawSelected.split(',') || [];
-    },
-    set(key, value) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selected: value && value.join(',') || null,
-      });
-      return value;
-    },
-  }),
+  embeddedBrowserType: 'datasets',
 
   /**
    * @override implements OneEmbeddedContainer
