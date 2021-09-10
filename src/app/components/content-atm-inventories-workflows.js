@@ -18,6 +18,7 @@ import { Promise } from 'rsvp';
 import { scheduleOnce } from '@ember/runloop';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(GlobalActions, I18n, {
   classNames: ['content-atm-inventories-workflows'],
@@ -104,6 +105,12 @@ export default Component.extend(GlobalActions, I18n, {
   editorModificationState: undefined,
 
   /**
+   * If true, then there is "unsaved changes" modal visible
+   * @type {Boolean}
+   */
+  isAskingUserForUnsavedChanges: false,
+
+  /**
    * @type {Window}
    */
   _window: window,
@@ -180,7 +187,7 @@ export default Component.extend(GlobalActions, I18n, {
   urlParamsObserver: observer(
     'activeAtmWorkflowSchemaIdFromUrl',
     'activeSlideFromUrl',
-    async function urlParamsObserver() {
+    function urlParamsObserver() {
       scheduleOnce('actions', this, 'synchronizeStateWithUrl');
     }
   ),
@@ -225,6 +232,8 @@ export default Component.extend(GlobalActions, I18n, {
       router,
     } = this.getProperties('routeChangeHandler', 'router');
 
+    // Making sure if router has `.on` method (`routeWillChange` hack)
+    // TODO: VFS-8267 Remove this check
     if (typeof router.on === 'function') {
       router.on('routeWillChange', routeChangeHandler);
     }
@@ -236,6 +245,8 @@ export default Component.extend(GlobalActions, I18n, {
       router,
     } = this.getProperties('routeChangeHandler', 'router');
 
+    // Making sure if router has `.on` method (`routeWillChange` hack)
+    // TODO: VFS-8267 Remove this check
     if (typeof router.off === 'function') {
       router.off('routeWillChange', routeChangeHandler);
     }
@@ -271,17 +282,17 @@ export default Component.extend(GlobalActions, I18n, {
       'activeAtmWorkflowSchemaId',
       'activeAtmWorkflowSchemaIdFromUrl',
     );
+
     let nextActiveSlide = activeSlide;
     let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId || null;
     const isActiveAtmWorkflowSchemaIdChanged =
       () => nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaId;
     const isActiveSlideChanged = () => nextActiveSlide !== activeSlide;
 
-    // Detect change of `activeAtmWorkflowSchemaId`. `Boolean(...)` conditions
-    // are to filter out inequalities like `null !== undefined`
+    // Detect change of `activeAtmWorkflowSchemaId`. `||` condition
+    // is to filter out inequalities like `null !== undefined`.
     if (activeAtmWorkflowSchemaIdFromUrl !== activeAtmWorkflowSchemaId && (
-        Boolean(activeAtmWorkflowSchemaIdFromUrl) ||
-        Boolean(activeAtmWorkflowSchemaId)
+        activeAtmWorkflowSchemaIdFromUrl || activeAtmWorkflowSchemaId
       )) {
       nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl || null;
     }
@@ -298,7 +309,7 @@ export default Component.extend(GlobalActions, I18n, {
     // should not be available.
     if (isActiveAtmWorkflowSchemaIdChanged()) {
       nextActiveSlide =
-        this.getNextSlideIdWhenActiveAtmWorkflowSchemaChanges(nextActiveSlide);
+        this.getNextSlideIdOnActiveSchemaChange(nextActiveSlide);
     }
 
     // Detect if some workflow schema changes are unsaved and take care of them.
@@ -308,19 +319,25 @@ export default Component.extend(GlobalActions, I18n, {
       (editorGetsTurnedOff || isActiveAtmWorkflowSchemaIdChanged());
     if (
       willUpdateClearUnsavedChanges &&
-      this.shouldBlockTransitionBecauseOfUnsavedChanges()
+      this.shouldBlockTransitionDueToUnsavedChanges()
     ) {
       const userDecision = await this.askUserAndProcessUnsavedChanges();
-      if (userDecision === 'keepEditing') {
-        // User wants to stay in current state.
-        // Reset url params back to represent actual state of the component
-        this.setUrlParams({
-          view: activeSlide,
-          workflowId: activeAtmWorkflowSchemaId,
-        }, true);
+      switch (userDecision) {
+        case 'keepEditing':
+          // User wants to stay in current state.
+          // Reset url params back to represent actual state of the component
+          this.setUrlParams({
+            view: activeSlide,
+            workflowId: activeAtmWorkflowSchemaId,
+          }, true);
 
-        // Nothing more to do - user has chosen to abort the transiton.
-        return;
+          // Nothing more to do - user has chosen to abort the transiton.
+          return;
+        case 'alreadyAsked':
+          // User triggered next url change when the previous one has not been
+          // commited yet. We have to wait for the first one and ignore current
+          // change.
+          return;
       }
     }
 
@@ -346,8 +363,12 @@ export default Component.extend(GlobalActions, I18n, {
 
     // If url params values are different than used by the component,
     // then url params should be redefined to ensure values consistency.
-    if (nextActiveSlide !== activeSlideFromUrl ||
-      nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaIdFromUrl) {
+    // Using this.get to retrieve the most recent values, as these could change
+    // while asking user what to do with changes.
+    if (
+      nextActiveSlide !== this.get('activeSlideFromUrl') ||
+      nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl')
+    ) {
       this.setUrlParams({
         view: nextActiveSlide,
         workflowId: nextActiveAtmWorkflowSchemaId,
@@ -356,21 +377,22 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   async handleRouteChange(transition) {
-    if (this.shouldBlockTransitionBecauseOfUnsavedChanges()) {
+    if (this.shouldBlockTransitionDueToUnsavedChanges()) {
       transition.abort();
-      if ((await this.askUserAndProcessUnsavedChanges()) !== 'keepEditing') {
+      const userDecision = await this.askUserAndProcessUnsavedChanges();
+      if (userDecision === 'save' || userDecision === 'ignore') {
         transition.retry();
       }
     }
   },
 
   handlePageUnload(event) {
-    if (this.shouldBlockTransitionBecauseOfUnsavedChanges()) {
+    if (this.shouldBlockTransitionDueToUnsavedChanges()) {
       return preventPageUnload(event, String(this.t('confirmPageClose')));
     }
   },
 
-  shouldBlockTransitionBecauseOfUnsavedChanges() {
+  shouldBlockTransitionDueToUnsavedChanges() {
     const isActiveSlideUsedByEditor =
       this.isSlideIdUsedByEditor(this.get('activeSlide'));
     const isModified = this.get('editorModificationState.isModified');
@@ -384,9 +406,17 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   /**
-   * @returns {Promise<String>} one of: `'ignore'`, `'save'`, `'keepEditing'`
+   * @returns {Promise<String>} one of: `'ignore'`, `'save'`, `'keepEditing'`,
+   * `'alreadyAsked'`
    */
   async askUserAndProcessUnsavedChanges() {
+    if (this.get('isAskingUserForUnsavedChanges')) {
+      // User is already in the middle of choosing what to do. It means, that
+      // there was some uncommited url/route change earlier, which needs to
+      // be resolved at the first place.
+      return 'alreadyAsked';
+    }
+    this.set('isAskingUserForUnsavedChanges', true);
     const executeSaveAction =
       this.get('editorModificationState.executeSaveAction');
 
@@ -396,6 +426,9 @@ export default Component.extend(GlobalActions, I18n, {
         if (shouldSaveChanges && executeSaveAction) {
           const saveResult = await executeSaveAction();
           if (saveResult && get(saveResult, 'status') === 'failed') {
+            // In case of failure `executeSaveAction` should show proper error
+            // notification. After fail user should stay in editor view and
+            // decide what to do next. Hence `decision` is `'keepEditing'`.
             return;
           }
           decision = 'save';
@@ -404,9 +437,13 @@ export default Component.extend(GlobalActions, I18n, {
         }
       },
     }).hiddenPromise;
-    if (decision !== 'keepEditing') {
-      this.set('editorModificationState.isModified', false);
-    }
+    safeExec(this, () => {
+      this.set('isAskingUserForUnsavedChanges', false);
+      if (decision !== 'keepEditing') {
+        this.set('editorModificationState.isModified', false);
+      }
+    });
+
     return decision;
   },
 
@@ -489,7 +526,7 @@ export default Component.extend(GlobalActions, I18n, {
       this.isSlideIdUsedByTaskDetailsProvider(slideId);
   },
 
-  getNextSlideIdWhenActiveAtmWorkflowSchemaChanges(activeSlideId) {
+  getNextSlideIdOnActiveSchemaChange(activeSlideId) {
     return this.isSlideIdUsedByTaskDetailsProvider(activeSlideId) ?
       'editor' : activeSlideId;
   },

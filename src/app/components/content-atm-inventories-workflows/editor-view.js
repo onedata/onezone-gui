@@ -61,6 +61,7 @@ export default Component.extend(I18n, {
   onRegisterViewActions: notImplementedIgnore,
 
   /**
+   * @virtual
    * @type {Function}
    * @param {Object}
    */
@@ -107,7 +108,7 @@ export default Component.extend(I18n, {
     function modificationState() {
       const isVisualiserDataModified = this.get('isVisualiserDataModified');
       const state = {
-        isModified: this.get('isVisualiserDataModified'),
+        isModified: isVisualiserDataModified,
       };
       if (isVisualiserDataModified) {
         state.executeSaveAction = async () => await this.save();
@@ -187,7 +188,7 @@ export default Component.extend(I18n, {
   modificationStateNotifier: observer(
     'onModificationStateChange',
     'modificationState',
-    function modificationStateObserver() {
+    function modificationStateNotifier() {
       const {
         onModificationStateChange,
         modificationState,
