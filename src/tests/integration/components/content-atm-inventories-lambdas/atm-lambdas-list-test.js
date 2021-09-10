@@ -16,7 +16,7 @@ const lambdaActionsSpec = [{
   icon: 'rename',
 }, {
   className: 'copy-record-id-action-trigger',
-  label: 'Copy lambda ID',
+  label: 'Copy ID',
   icon: 'copy',
 }];
 

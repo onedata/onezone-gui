@@ -25,7 +25,7 @@ const workflowActionsSpec = [{
   icon: 'x',
 }, {
   className: 'copy-record-id-action-trigger',
-  label: 'Copy workflow ID',
+  label: 'Copy ID',
   icon: 'copy',
 }];
 
