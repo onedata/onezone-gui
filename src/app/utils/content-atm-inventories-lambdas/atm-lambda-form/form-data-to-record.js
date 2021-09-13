@@ -22,6 +22,7 @@ export default function formDataToRecord(formData) {
     openfaasOptions,
     arguments: formArguments,
     results: formResults,
+    resources,
   } = getProperties(
     formData,
     'name',
@@ -29,7 +30,8 @@ export default function formDataToRecord(formData) {
     'engine',
     'openfaasOptions',
     'arguments',
-    'results'
+    'results',
+    'resources'
   );
   const operationSpec = {
     engine,
@@ -74,6 +76,20 @@ export default function formDataToRecord(formData) {
 
   const lambdaArguments = formArgResToRecordArgRes('argument', formArguments);
   const lambdaResults = formArgResToRecordArgRes('result', formResults);
+  const resourceSpec = {
+    cpuRequested: serializeResourceValue(get(resources || {}, 'cpu.cpuRequested')),
+    cpuLimit: serializeResourceValue(get(resources || {}, 'cpu.cpuLimit')),
+    memoryRequested: serializeResourceValue(
+      get(resources || {}, 'memory.memoryRequested')
+    ),
+    memoryLimit: serializeResourceValue(get(resources || {}, 'memory.memoryLimit')),
+    ephemeralStorageRequested: serializeResourceValue(
+      get(resources || {}, 'ephemeralStorage.ephemeralStorageRequested')
+    ),
+    ephemeralStorageLimit: serializeResourceValue(
+      get(resources || {}, 'ephemeralStorage.ephemeralStorageLimit')
+    ),
+  };
   return {
     name,
     summary,
@@ -81,6 +97,7 @@ export default function formDataToRecord(formData) {
     operationSpec,
     argumentSpecs: lambdaArguments,
     resultSpecs: lambdaResults,
+    resourceSpec,
   };
 }
 
@@ -128,4 +145,15 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     }
     return lambdaData;
   });
+}
+
+function serializeResourceValue(value) {
+  if (typeof value === 'number') {
+    return value;
+  } else if (typeof value === 'string' && value) {
+    const parsedValue = parseFloat(value);
+    return Number.isNaN(parsedValue) ? null : parsedValue;
+  } else {
+    return null;
+  }
 }

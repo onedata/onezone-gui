@@ -61,6 +61,12 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
+   * @virtual optional
+   * @type {AtmResourceSpec}
+   */
+  defaultAtmResourceSpec: undefined,
+
+  /**
    * Required when `mode` is `create` or `edit`
    * @virtual optional
    * @type {Function}
@@ -97,8 +103,13 @@ export default Component.extend(I18n, {
    */
   fieldsValuesFromRecord: computed(
     'atmLambda.{name,summary,description,operationSpec,argumentSpecs,resultSpecs}',
+    'defaultAtmResourceSpec',
     function fieldsValuesFromRecord() {
-      return recordToFormData(this.get('atmLambda'));
+      const {
+        defaultAtmResourceSpec,
+        atmLambda,
+      } = this.getProperties('defaultAtmResourceSpec', 'atmLambda');
+      return recordToFormData(atmLambda, defaultAtmResourceSpec);
     }
   ),
 
@@ -151,7 +162,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   nameField: computed(function nameField() {
-    return TextField.extend(defaultValueGenerator(this, raw('')), {
+    return TextField.extend(defaultValueGenerator(this), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'name',
@@ -162,7 +173,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   summaryField: computed(function summaryField() {
-    return TextField.extend(defaultValueGenerator(this, raw('')), {
+    return TextField.extend(defaultValueGenerator(this), {
       isVisible: reads('isInEditMode'),
     }).create({
       name: 'summary',
@@ -181,7 +192,7 @@ export default Component.extend(I18n, {
     const editOptions = viewOptions.rejectBy('value', 'onedataFunction');
 
     return DropdownField.extend(
-      defaultValueGenerator(this, 'options.firstObject.value'),
+      defaultValueGenerator(this),
       disableFieldInEditMode(this), {
         options: conditional('isInViewMode', raw(viewOptions), raw(editOptions)),
       }).create({
@@ -200,13 +211,13 @@ export default Component.extend(I18n, {
     }).create({
       name: 'openfaasOptions',
       fields: [
-        TextField.extend(defaultValueGenerator(this, raw(''))).create({
+        TextField.extend(defaultValueGenerator(this)).create({
           name: 'dockerImage',
         }),
-        ToggleField.extend(defaultValueGenerator(this, raw(true))).create({
+        ToggleField.extend(defaultValueGenerator(this)).create({
           name: 'readonly',
         }),
-        ToggleField.extend(defaultValueGenerator(this, raw(true))).create({
+        ToggleField.extend(defaultValueGenerator(this)).create({
           name: 'mountSpace',
         }),
         mountSpaceOptionsFieldsGroup,
@@ -224,10 +235,10 @@ export default Component.extend(I18n, {
     }).create({
       name: 'mountSpaceOptions',
       fields: [
-        TextField.extend(defaultValueGenerator(this, raw('/mnt/onedata'))).create({
+        TextField.extend(defaultValueGenerator(this)).create({
           name: 'mountPoint',
         }),
-        TextField.extend(defaultValueGenerator(this, raw('')), {
+        TextField.extend(defaultValueGenerator(this), {
           isVisible: not(and('isInViewMode', isEmpty('value'))),
         }).create({
           name: 'oneclientOptions',
@@ -247,7 +258,7 @@ export default Component.extend(I18n, {
       }).create({
         name: 'onedataFunctionOptions',
         fields: [
-          TextField.extend(defaultValueGenerator(this, raw(''))).create({
+          TextField.extend(defaultValueGenerator(this)).create({
             name: 'onedataFunctionName',
           }),
         ],
@@ -279,15 +290,12 @@ export default Component.extend(I18n, {
       addColonToLabel: false,
       fields: createTaskResourcesFields({
         pathToGroup: name,
-        cpuRequestedDefaultValueMixin: defaultValueGenerator(this, raw('0.1')),
-        cpuLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
-        memoryRequestedDefaultValueMixin: defaultValueGenerator(
-          this,
-          raw(String(128 * 1024 * 1024))
-        ),
-        memoryLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
-        ephemeralStorageRequestedDefaultValueMixin: defaultValueGenerator(this, raw('0')),
-        ephemeralStorageLimitDefaultValueMixin: defaultValueGenerator(this, raw('')),
+        cpuRequestedDefaultValueMixin: defaultValueGenerator(this),
+        cpuLimitDefaultValueMixin: defaultValueGenerator(this),
+        memoryRequestedDefaultValueMixin: defaultValueGenerator(this),
+        memoryLimitDefaultValueMixin: defaultValueGenerator(this),
+        ephemeralStorageRequestedDefaultValueMixin: defaultValueGenerator(this),
+        ephemeralStorageLimitDefaultValueMixin: defaultValueGenerator(this),
       }),
     });
   }),
@@ -346,21 +354,17 @@ export default Component.extend(I18n, {
 });
 
 /**
- * Generates mixin-like object, that specifies default value for field. Value in "view" mode
- * is taken from component, in "edit" mode is equal to passed `editDefaultValue`.
+ * Generates mixin-like object, that specifies default value for field.
  * It's result should be passed to *Field.extend.
  * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
- * @param {any} createDefaultValue
  * @returns {Object}
  */
-function defaultValueGenerator(component, createDefaultValue) {
+function defaultValueGenerator(component) {
   return {
     defaultValueSource: component,
-    modeSource: component,
-    defaultValue: conditional(
-      eq('modeSource.mode', raw('create')),
-      createDefaultValue,
-      getBy('defaultValueSource', tag `fieldsValuesFromRecord.${'path'}`)
+    defaultValue: getBy(
+      'defaultValueSource',
+      tag `fieldsValuesFromRecord.${'path'}`
     ),
   };
 }
@@ -518,7 +522,7 @@ function createFunctionArgResGroup(component, dataType) {
     },
   };
   return FormFieldsCollectionGroup.extend(
-    defaultValueGenerator(component, raw({})),
+    defaultValueGenerator(component),
     disableFieldInEditMode(component),
     fieldsCollectionExtension
   ).create({
