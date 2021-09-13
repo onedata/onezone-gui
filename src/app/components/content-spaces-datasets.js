@@ -120,8 +120,8 @@ export default ContentOneproviderContainerBase.extend(I18n, {
         viewMode: 'datasets',
         archive: null,
         dir: null,
-        selected: get(dataset, 'entityId') || null,
-        dataset: get(dataset, 'parentId') || null,
+        selected: dataset && get(dataset, 'entityId') || null,
+        dataset: dataset && get(dataset, 'parentId') || null,
       };
       const mergedOptions = this.get('navigationState').mergedAspectOptions(options);
       return serializeAspectOptions(mergedOptions);
