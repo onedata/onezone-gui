@@ -8,6 +8,9 @@ import $ from 'jquery';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
+import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambdas list',
@@ -62,6 +65,15 @@ describe(
       this.setProperties({
         collection,
         allCollection,
+        atmInventory: {
+          name: 'inv1',
+          atmWorkflowSchemaList: promiseObject(resolve({
+            list: promiseArray(resolve([])),
+          })),
+          privileges: {
+            manageLambdas: true,
+          },
+        },
       });
     });
 
@@ -203,6 +215,37 @@ describe(
         expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
       });
 
+      it('allows to remove lambda', async function () {
+        const workflowActions = lookupService(this, 'workflow-actions');
+        let removeCalled = false;
+        const createUnlinkAtmLambdaActionStub =
+          sinon.stub(workflowActions, 'createUnlinkAtmLambdaAction')
+          .callsFake((context) => UnlinkAtmLambdaAction.create(context, {
+            ownerSource: this,
+            onExecute() {
+              removeCalled = true;
+              return resolve({
+                status: 'done',
+              });
+            },
+          }));
+
+        await render(this);
+        const $atmLambdas = this.$('.atm-lambdas-list-entry');
+        const $firstAtmLambda = $atmLambdas.eq(0);
+
+        await click($firstAtmLambda.find('.atm-lambda-actions-trigger')[0]);
+        await click(
+          $('body .webui-popover.in .unlink-atm-lambda-action-trigger')[0]
+        );
+
+        expect(createUnlinkAtmLambdaActionStub).to.be.calledWith({
+          atmLambda: this.get('collection').findBy('name', 'f0'),
+          atmInventory: this.get('atmInventory'),
+        });
+        expect(removeCalled).to.be.true;
+      });
+
       it('does not have "add to workflow" button', async function () {
         await render(this);
 
@@ -315,6 +358,7 @@ async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
     collection=collection
     allCollection=allCollection
+    atmInventory=atmInventory
     mode=mode
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
   }}`);

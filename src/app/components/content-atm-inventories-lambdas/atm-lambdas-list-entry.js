@@ -38,6 +38,13 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
+   * Needed when `mode` is `'presentation'`.
+   * @virtual optional
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
+
+  /**
    * One of: `'presentation'`, `'selection'`
    * @virtual optional
    * @type {String}
@@ -95,9 +102,25 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  unlinkAction: computed('atmLambda', 'atmInventory', function unlinkAction() {
+    const {
+      atmLambda,
+      atmInventory,
+      workflowActions,
+    } = this.getProperties('atmLambda', 'atmInventory', 'workflowActions');
+
+    return workflowActions.createUnlinkAtmLambdaAction({
+      atmLambda,
+      atmInventory,
+    });
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction'),
+  atmLambdaActionsArray: collect('modifyAction', 'unlinkAction'),
 
   startEdition() {
     this.set('isEditing', true);
