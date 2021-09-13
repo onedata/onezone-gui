@@ -3,17 +3,18 @@
  *
  * @module components/embedded-content-file-browser
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2019-2020 ACK CYFRONET AGH
+ * @copyright (C) 2019-2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
 import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -41,23 +42,13 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    */
   dirEntityId: reads('navigationState.aspectOptions.dir'),
 
-  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
-   * List of file entity ids that are selected
+   * List of dataset entity ids that are selected
+   * 
+   * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selected: computed('navigationState.aspectOptions.selected.[]', {
-    get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selected');
-      return rawSelected && rawSelected.split(',') || [];
-    },
-    set(key, value) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selected: value && value.join(',') || null,
-      });
-      return value;
-    },
-  }),
+  selected: computedAspectOptionsArray('selected'),
 
   /**
    * @override implements OneEmbeddedContainer

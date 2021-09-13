@@ -16,6 +16,7 @@ import { defer } from 'rsvp';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 import { camelize } from '@ember/string';
+import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
 
 export default ContentOneproviderContainerBase.extend(I18n, {
   classNames: ['content-spaces-datasets'],
@@ -67,25 +68,13 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    */
   dirId: reads('navigationState.aspectOptions.dir'),
 
-  // TODO: VFS-7633 redundancy; create computed util for getting array from aspectOptions
   /**
    * List of dataset entity ids that are selected
    * 
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selected: computed('navigationState.aspectOptions.selected.[]', {
-    get() {
-      const rawSelected = this.get('navigationState.aspectOptions.selected');
-      return rawSelected && rawSelected.split(',') || [];
-    },
-    set(key, value) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selected: value && value.join(',') || null,
-      });
-      return value;
-    },
-  }),
+  selected: computedAspectOptionsArray('selected'),
 
   datasetDeferred: computed('datasetId', function datasetDeferred() {
     return defer();
