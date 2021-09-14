@@ -12,18 +12,11 @@ import { conditional, eq, raw } from 'ember-awesome-macros';
 import { reads, collect } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(I18n, {
+export default Component.extend({
   tagName: '',
 
-  globalClipboard: service(),
-  i18n: service(),
-
-  /**
-   * @override
-   */
-  i18nPrefix: 'components.sidebarShares.shareItem',
+  clipboardActions: service(),
 
   /**
    * @virtual optional
@@ -45,16 +38,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('share.entityId'),
-        this.t('shareId')
-      ),
-      title: this.t('copyId'),
-      class: 'copy-share-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('share', function copyIdAction() {
+    const {
+      share,
+      clipboardActions,
+    } = this.getProperties('share', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: share });
   }),
 
   /**

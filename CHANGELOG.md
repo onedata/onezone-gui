@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8053 Added ID copiers to places related to workflows
 * VFS-7900 Added unlinking automation lambdas
 * VFS-7661 Added timeout for connection check in clusters
 * VFS-8276 Added "archive info" option to harvester indices

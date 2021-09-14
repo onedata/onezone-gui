@@ -27,7 +27,7 @@ export default Component.extend(I18n, {
   spaceActions: service(),
   router: service(),
   navigationState: service(),
-  globalClipboard: service(),
+  clipboardActions: service(),
 
   /**
    * @override
@@ -171,16 +171,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('space.entityId'),
-        this.t('spaceId')
-      ),
-      title: this.t('copyId'),
-      class: 'copy-space-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('space', function copyIdAction() {
+    const {
+      space,
+      clipboardActions,
+    } = this.getProperties('space', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: space });
   }),
 
   /**
