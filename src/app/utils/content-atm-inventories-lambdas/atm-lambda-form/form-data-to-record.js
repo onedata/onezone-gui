@@ -9,6 +9,7 @@
 
 import { get, getProperties } from '@ember/object';
 import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
+import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
 /**
  * @param {Object} formData
@@ -76,20 +77,7 @@ export default function formDataToRecord(formData) {
 
   const lambdaArguments = formArgResToRecordArgRes('argument', formArguments);
   const lambdaResults = formArgResToRecordArgRes('result', formResults);
-  const resourceSpec = {
-    cpuRequested: serializeResourceValue(get(resources || {}, 'cpu.cpuRequested')),
-    cpuLimit: serializeResourceValue(get(resources || {}, 'cpu.cpuLimit')),
-    memoryRequested: serializeResourceValue(
-      get(resources || {}, 'memory.memoryRequested')
-    ),
-    memoryLimit: serializeResourceValue(get(resources || {}, 'memory.memoryLimit')),
-    ephemeralStorageRequested: serializeResourceValue(
-      get(resources || {}, 'ephemeralStorage.ephemeralStorageRequested')
-    ),
-    ephemeralStorageLimit: serializeResourceValue(
-      get(resources || {}, 'ephemeralStorage.ephemeralStorageLimit')
-    ),
-  };
+  const resourceSpec = serializeTaskResourcesFieldsValues(resources);
   return {
     name,
     summary,
@@ -145,15 +133,4 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     }
     return lambdaData;
   });
-}
-
-function serializeResourceValue(value) {
-  if (typeof value === 'number') {
-    return value;
-  } else if (typeof value === 'string' && value) {
-    const parsedValue = parseFloat(value);
-    return Number.isNaN(parsedValue) ? null : parsedValue;
-  } else {
-    return null;
-  }
 }

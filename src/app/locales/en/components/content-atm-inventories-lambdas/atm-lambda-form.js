@@ -1,4 +1,4 @@
-import createTaskResourcesFields from '../../onedata-gui-common/utils/workflow-visualiser/create-task-resources-fields';
+import taskResourcesFields from '../../onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
 const argumentAndResultTypes = {
   integer: {
@@ -146,7 +146,7 @@ export default {
         },
       },
     },
-    resources: Object.assign({}, createTaskResourcesFields, {
+    resources: Object.assign({}, taskResourcesFields, {
       label: 'Resources',
     }),
   },

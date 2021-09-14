@@ -30,7 +30,7 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import _ from 'lodash';
 import { validator } from 'ember-cp-validations';
-import createTaskResourcesFields from 'onedata-gui-common/utils/workflow-visualiser/create-task-resources-fields';
+import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
