@@ -23,6 +23,7 @@ export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',
 
   currentUser: service(),
+  clipboardActions: service(),
   globalClipboard: service(),
 
   i18nPrefix: 'components.sidebarProviders.providerItem',
@@ -54,16 +55,13 @@ export default Component.extend(I18n, UserProxyMixin, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('provider.entityId'),
-        this.t('providerId')
-      ),
-      title: this.t('copyIdAction'),
-      class: 'copy-provider-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('provider', function copyIdAction() {
+    const {
+      provider,
+      clipboardActions,
+    } = this.getProperties('provider', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: provider });
   }),
 
   /**

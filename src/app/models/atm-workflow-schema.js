@@ -25,6 +25,12 @@ export default Model.extend(GraphSingleModelMixin, {
   description: attr('string'),
 
   /**
+   * One of: `'incomplete'`, `'ready'`, `'deprecated'`
+   * @type {ComputedProperty<String>}
+   */
+  state: attr('string'),
+
+  /**
    * @type {ComputedProperty<Models.AtmInventory>}
    */
   atmInventory: belongsTo('atm-inventory'),

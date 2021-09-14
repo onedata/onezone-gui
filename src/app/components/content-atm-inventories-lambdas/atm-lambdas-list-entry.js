@@ -25,6 +25,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   workflowActions: service(),
+  clipboardActions: service(),
 
   /**
    * @override
@@ -36,6 +37,13 @@ export default Component.extend(I18n, {
    * @type {Models.AtmLambda}
    */
   atmLambda: undefined,
+
+  /**
+   * Needed when `mode` is `'presentation'`.
+   * @virtual optional
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * One of: `'presentation'`, `'selection'`
@@ -95,9 +103,37 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * @type {ComputedProperty<Utils.Action>}
+   */
+  unlinkAction: computed('atmLambda', 'atmInventory', function unlinkAction() {
+    const {
+      atmLambda,
+      atmInventory,
+      workflowActions,
+    } = this.getProperties('atmLambda', 'atmInventory', 'workflowActions');
+
+    return workflowActions.createUnlinkAtmLambdaAction({
+      atmLambda,
+      atmInventory,
+    });
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Action>}
+   */
+  copyIdAction: computed('atmLambda', function copyIdAction() {
+    const {
+      atmLambda,
+      clipboardActions,
+    } = this.getProperties('atmLambda', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: atmLambda });
+  }),
+
+  /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction'),
+  atmLambdaActionsArray: collect('modifyAction', 'unlinkAction', 'copyIdAction'),
 
   startEdition() {
     this.set('isEditing', true);

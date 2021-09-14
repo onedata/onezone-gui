@@ -10,8 +10,6 @@ export default {
     rename: 'Rename',
     leave: 'Leave',
     remove: 'Remove',
-    copyId: 'Copy harvester ID',
-    harvesterId: 'harvester ID',
     persistingHarvester: 'persisting harvester',
   },
 };

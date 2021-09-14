@@ -8,8 +8,10 @@
  */
 
 import { get } from '@ember/object';
+import _ from 'lodash';
 import { Promise } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
+import ignoreNotFoundError from 'onedata-gui-common/utils/ignore-not-found-error';
 
 export default class RecordManagerConfiguration {
   constructor(recordManager) {
@@ -90,6 +92,18 @@ export default class RecordManagerConfiguration {
             // Removing relation should start with removing it from the side of
             // current user.
             relationsRemoveOrder.reverse();
+          } else if (_.isEqual(
+              relationSides.mapBy('modelName').sort(),
+              ['atmInventory', 'atmLambda']
+            )) {
+            // AtmLambda can be removed from the AtmInventory only via relation
+            // atmLambda -> atmInventory.
+            relationsRemoveOrder = [
+              [
+                relationSides.findBy('modelName', 'atmLambda'),
+                relationSides.findBy('modelName', 'atmInventory'),
+              ],
+            ];
           }
         }
 
@@ -160,12 +174,12 @@ export default class RecordManagerConfiguration {
     // Reload relation records
     if (relationOriginRecord && !isCurrentUserAnOrigin) {
       reloadPromises.push(
-        relationOriginRecord.reload().catch(ignoreForbiddenError)
+        relationOriginRecord.reload().catch(ignoreRelationReloadError)
       );
     }
     if (relationTargetRecord && !isCurrentUserATarget) {
       reloadPromises.push(
-        relationTargetRecord.reload().catch(ignoreForbiddenError)
+        relationTargetRecord.reload().catch(ignoreRelationReloadError)
       );
     }
 
@@ -175,12 +189,12 @@ export default class RecordManagerConfiguration {
         relationOriginModelName,
         relationOriginRecordId,
         relationTargetModelName
-      ).catch(ignoreForbiddenError),
+      ).catch(ignoreRelationReloadError),
       this.recordManager.reloadRecordListById(
         relationTargetModelName,
         relationTargetRecordId,
         relationOriginModelName
-      ).catch(ignoreForbiddenError)
+      ).catch(ignoreRelationReloadError)
     );
 
     // Reload:
@@ -193,7 +207,7 @@ export default class RecordManagerConfiguration {
           relationTargetModelName,
           relationTargetRecordId,
           'user'
-        ).catch(ignoreForbiddenError),
+        ).catch(ignoreRelationReloadError),
         this.recordManager.reloadUserRecordList(
           relationTargetModelName
         ).catch(ignoreForbiddenError)
@@ -205,7 +219,7 @@ export default class RecordManagerConfiguration {
           relationOriginModelName,
           relationOriginRecordId,
           'user'
-        ).catch(ignoreForbiddenError),
+        ).catch(ignoreRelationReloadError),
         this.recordManager.reloadUserRecordList(
           relationOriginModelName
         ).catch(ignoreForbiddenError)
@@ -213,5 +227,13 @@ export default class RecordManagerConfiguration {
     }
 
     await Promise.all(reloadPromises);
+  }
+}
+
+function ignoreRelationReloadError(error) {
+  try {
+    return ignoreForbiddenError(error);
+  } catch (e) {
+    return ignoreNotFoundError(error);
   }
 }
