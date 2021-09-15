@@ -16,4 +16,5 @@ export default {
   editorView,
   loadingView,
   taskDetailsView,
+  confirmPageClose: 'There are unsaved changes. Your changes will be lost if you don\'t save them.',
 };

@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-7633 Using URLs to datasets and archives selection
+* VFS-8263 Showing "unsaved changes" warning when leaving workflows editor
 * VFS-8053 Added ID copiers to places related to workflows
 * VFS-7900 Added unlinking automation lambdas
 * VFS-7661 Added timeout for connection check in clusters
