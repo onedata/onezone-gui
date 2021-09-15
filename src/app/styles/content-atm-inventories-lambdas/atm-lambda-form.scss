@@ -50,6 +50,8 @@
     margin-left: $nested-fields-indent;
   }
 
+  @include taskResourcesFieldsStyles();
+
   .form .footer-buttons {
     float: none;
     text-align: left;
@@ -74,7 +76,7 @@
 
   @media (min-width: $screen-sm-min) {
     .control-label {
-      width: 11em;
+      width: 9em;
       text-align: left;
     }
 

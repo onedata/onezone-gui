@@ -10,6 +10,15 @@
 import { getProperties } from '@ember/object';
 import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
+const fallbackDefaultAtmResourceSpec = {
+  cpuRequested: 0.1,
+  cpuLimit: null,
+  memoryRequested: 100 * 1024 * 1024,
+  memoryLimit: null,
+  ephemeralStorageRequested: 100 * 1024 * 1024,
+  ephemeralStorageLimit: null,
+};
+
 /**
  * @param {Models.AtmLambda|null} record
  * @param {AtmResourceSpec} defaultAtmResourceSpec
@@ -43,43 +52,31 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
         cpu: {
           cpuRequested: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'cpuRequested',
-            '',
-            '0.1'
+            'cpuRequested'
           ),
           cpuLimit: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'cpuLimit',
-            '',
-            ''
+            'cpuLimit'
           ),
         },
         memory: {
           memoryRequested: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'memoryRequested',
-            '',
-            String(128 * 1024 * 1024)
+            'memoryRequested'
           ),
           memoryLimit: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'memoryLimit',
-            '',
-            ''
+            'memoryLimit'
           ),
         },
         ephemeralStorage: {
           ephemeralStorageRequested: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'ephemeralStorageRequested',
-            '',
-            '0'
+            'ephemeralStorageRequested'
           ),
           ephemeralStorageLimit: getDefaultAtmResourceValue(
             defaultAtmResourceSpec,
-            'ephemeralStorageLimit',
-            '',
-            ''
+            'ephemeralStorageLimit'
           ),
         },
       },
@@ -179,18 +176,14 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
   }, engineOptions);
 }
 
-function getDefaultAtmResourceValue(
-  defaultAtmResourceSpec,
-  propName,
-  valueForNull,
-  valueForEmpty
-) {
+function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
   const defaultValue = defaultAtmResourceSpec && defaultAtmResourceSpec[propName];
   switch (defaultValue) {
     case null:
-      return String(valueForNull);
+      return '';
     case undefined:
-      return String(valueForEmpty);
+      return defaultAtmResourceSpec !== fallbackDefaultAtmResourceSpec ?
+        getDefaultAtmResourceValue(fallbackDefaultAtmResourceSpec, propName) : '';
     default:
       return String(defaultValue);
   }
