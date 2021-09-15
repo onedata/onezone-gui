@@ -43,7 +43,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   dirEntityId: reads('navigationState.aspectOptions.dir'),
 
   /**
-   * List of dataset entity ids that are selected
+   * List of file entity ids that are selected
    * 
    * **Injected to embedded iframe.**
    * @type {Array<String>}
