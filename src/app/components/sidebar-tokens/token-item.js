@@ -32,6 +32,7 @@ export default Component.extend(I18n, {
   navigationState: service(),
   router: service(),
   globalNotify: service(),
+  clipboardActions: service(),
   globalClipboard: service(),
 
   /**
@@ -113,13 +114,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyAction: computed(function () {
+  copyTokenAction: computed(function () {
     return {
       action: () => this.get('globalClipboard').copy(
         this.get('token.data.token'),
         this.t('token')
       ),
-      title: this.t('copyAction'),
+      title: this.t('copyTokenAction'),
       class: 'copy-token-action-trigger',
       icon: 'copy',
     };
@@ -128,22 +129,19 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('token.entityId'),
-        this.t('tokenId')
-      ),
-      title: this.t('copyId'),
-      class: 'copy-token-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('token', function copyIdAction() {
+    const {
+      token,
+      clipboardActions,
+    } = this.getProperties('token', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: token });
   }),
 
   /**
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
-  actionsArray: collect('renameAction', 'removeAction', 'copyAction', 'copyIdAction'),
+  actionsArray: collect('renameAction', 'removeAction', 'copyTokenAction', 'copyIdAction'),
 
   /**
    * If actual token disappeared from the sidebar, redirects to token main page

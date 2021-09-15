@@ -7,6 +7,10 @@ CHANGELOG
 ### Latest changes
 
 * VFS-8263 Showing "unsaved changes" warning when leaving workflows editor
+* VFS-8053 Added ID copiers to places related to workflows
+* VFS-7900 Added unlinking automation lambdas
+* VFS-7661 Added timeout for connection check in clusters
+* VFS-8276 Added "archive info" option to harvester indices
 * VFS-8076 Rendering workflow upload input in DOM
 * VFS-7896 Added possibility to define audit log stores in workflows
 * VFS-7947 Improved URL routing to running new workflow with initial input stores values

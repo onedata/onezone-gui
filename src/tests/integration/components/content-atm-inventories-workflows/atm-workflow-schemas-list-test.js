@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
@@ -7,8 +7,9 @@ import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
-import { lookupService } from '../../../helpers/stub-service';
+import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
+import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
@@ -22,7 +23,22 @@ const workflowActionsSpec = [{
   className: 'remove-atm-workflow-schema-action-trigger',
   label: 'Remove',
   icon: 'x',
+}, {
+  className: 'copy-record-id-action-trigger',
+  label: 'Copy ID',
+  icon: 'copy',
 }];
+
+function generateAtmWorkflowSchema(name) {
+  return {
+    constructor: {
+      modelName: 'atmWorkflowSchema',
+    },
+    name,
+    description: `${name} description`,
+    isLoaded: true,
+  };
+}
 
 describe('Integration | Component | content atm inventories workflows/atm workflow schemas list',
   function () {
@@ -30,18 +46,34 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       integration: true,
     });
 
+    before(function () {
+      // Instatiate Action class to make its `prototype.execute` available for
+      // mocking.
+      ModifyAtmWorkflowSchemaAction.create();
+      RemoveAtmWorkflowSchemaAction.create();
+      CopyRecordIdAction.create();
+    });
+
     beforeEach(function () {
       this.setProperties({
-        collection: [{
-          name: 'w1',
-          description: 'w1 description',
-          isLoaded: true,
-        }, {
-          name: 'w0',
-          description: 'w0 description',
-          isLoaded: true,
-        }],
+        collection: [
+          generateAtmWorkflowSchema('w1'),
+          generateAtmWorkflowSchema('w0'),
+        ],
         workflowClickedSpy: sinon.spy(),
+      });
+    });
+
+    afterEach(function () {
+      // Reset stubbed actions
+      [
+        ModifyAtmWorkflowSchemaAction,
+        RemoveAtmWorkflowSchemaAction,
+        CopyRecordIdAction,
+      ].forEach(action => {
+        if (action.prototype.execute.restore) {
+          action.prototype.execute.restore();
+        }
       });
     });
 
@@ -108,13 +140,15 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('allows to modify workflow', async function () {
-      const workflowActions = lookupService(this, 'workflow-actions');
-      const createModifyAtmWorkflowSchemaActionStub =
-        sinon.stub(workflowActions, 'createModifyAtmWorkflowSchemaAction')
-        .returns({
-          execute: () => resolve({
-            status: 'done',
-          }),
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
+        .callsFake(function () {
+          expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+          expect(this.get('context.atmWorkflowSchemaDiff')).to.deep.include({
+            name: 'newName',
+            description: 'newDescription',
+          });
+          return resolve({ status: 'done' });
         });
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
@@ -126,25 +160,13 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await fillIn('.description-field .form-control', 'newDescription');
       await click('.btn-save');
 
-      expect(createModifyAtmWorkflowSchemaActionStub).to.be.calledOnce
-        .and.to.be.calledWith({
-          atmWorkflowSchema: this.get('collection.1'),
-          atmWorkflowSchemaDiff: sinon.match({
-            name: 'newName',
-            description: 'newDescription',
-          }),
-        });
+      expect(executeStub).to.be.calledOnce;
       expect($firstWorkflow.find('.form-control')).to.not.exist;
     });
 
     it('stays in edition mode when workflow modification failed', async function () {
-      const workflowActions = lookupService(this, 'workflow-actions');
-      sinon.stub(workflowActions, 'createModifyAtmWorkflowSchemaAction')
-        .returns({
-          execute: () => resolve({
-            status: 'failed',
-          }),
-        });
+      sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
+        .callsFake(() => resolve({ status: 'failed' }));
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
@@ -188,19 +210,14 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('allows to remove workflow', async function () {
-      const workflowActions = lookupService(this, 'workflow-actions');
-      let removeCalled = false;
-      const createRemoveAtmWorkflowSchemaActionStub =
-        sinon.stub(workflowActions, 'createRemoveAtmWorkflowSchemaAction')
-        .returns(RemoveAtmWorkflowSchemaAction.create({
-          ownerSource: this,
-          onExecute() {
-            removeCalled = true;
-            return resolve({
-              status: 'done',
-            });
-          },
-        }));
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        RemoveAtmWorkflowSchemaAction.prototype,
+        'execute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        return resolve({ status: 'done' });
+      });
 
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
@@ -211,10 +228,29 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         $('body .webui-popover.in .remove-atm-workflow-schema-action-trigger')[0]
       );
 
-      expect(createRemoveAtmWorkflowSchemaActionStub).to.be.calledWith({
-        atmWorkflowSchema: this.get('collection.1'),
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows to copy workflow ID', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        CopyRecordIdAction.prototype,
+        'execute'
+      ).callsFake(function () {
+        expect(this.get('context.record')).to.equal(firstWorkflow);
+        return resolve({ status: 'done' });
       });
-      expect(removeCalled).to.be.true;
+
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .copy-record-id-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
     });
 
     it('has empty search input on init', async function () {

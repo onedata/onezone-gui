@@ -25,6 +25,7 @@ export const includeFileDetailsCorrectValues = [
   'fileType',
   'spaceId',
   'datasetInfo',
+  'archiveInfo',
   'metadataExistenceFlags',
 ];
 
@@ -56,6 +57,7 @@ export default Model.extend(GraphSingleModelMixin, {
    *   'fileType',
    *   'spaceId',
    *   'datasetInfo',
+   *   'archiveInfo',
    *   'metadataExistenceFlags'
    * ]`
    * @type {Array<String>}

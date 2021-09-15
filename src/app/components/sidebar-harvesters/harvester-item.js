@@ -25,7 +25,7 @@ export default Component.extend(I18n, {
   router: service(),
   guiUtils: service(),
   navigationState: service(),
-  globalClipboard: service(),
+  clipboardActions: service(),
 
   /**
    * @override
@@ -108,16 +108,13 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Action>}
    */
-  copyIdAction: computed(function copyIdAction() {
-    return {
-      action: () => this.get('globalClipboard').copy(
-        this.get('harvester.entityId'),
-        this.t('harvesterId')
-      ),
-      title: this.t('copyId'),
-      class: 'copy-harvester-id-action-trigger',
-      icon: 'copy',
-    };
+  copyIdAction: computed('harvester', function copyIdAction() {
+    const {
+      harvester,
+      clipboardActions,
+    } = this.getProperties('harvester', 'clipboardActions');
+
+    return clipboardActions.createCopyRecordIdAction({ record: harvester });
   }),
 
   /**
