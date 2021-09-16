@@ -16,6 +16,7 @@ import { defer } from 'rsvp';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 import { camelize } from '@ember/string';
+import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
 
 export default ContentOneproviderContainerBase.extend(I18n, {
   classNames: ['content-spaces-datasets'],
@@ -61,6 +62,20 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    */
   viewMode: or('navigationState.aspectOptions.viewMode', raw('datasets')),
 
+  /**
+   * **Injected to embedded iframe.**
+   * @type {string}
+   */
+  dirId: reads('navigationState.aspectOptions.dir'),
+
+  /**
+   * List of dataset entity ids that are selected
+   * 
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selected: computedAspectOptionsArray('selected'),
+
   datasetDeferred: computed('datasetId', function datasetDeferred() {
     return defer();
   }),
@@ -94,10 +109,9 @@ export default ContentOneproviderContainerBase.extend(I18n, {
         viewMode: 'datasets',
         archive: null,
         dir: null,
+        selected: dataset && get(dataset, 'entityId') || null,
+        dataset: dataset && get(dataset, 'parentId') || null,
       };
-      if (dataset && get(dataset, 'rootFileType') === 'dir') {
-        options.dataset = get(dataset, 'parentId') || null;
-      }
       const mergedOptions = this.get('navigationState').mergedAspectOptions(options);
       return serializeAspectOptions(mergedOptions);
     }
