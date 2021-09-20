@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
+import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import sinon from 'sinon';
 import $ from 'jquery';
 import { click, fillIn } from 'ember-native-dom-helpers';
@@ -21,6 +22,7 @@ describe(
       // mocking.
       ModifyAtmInventoryAction.create();
       RemoveAtmInventoryAction.create();
+      CopyRecordIdAction.create();
     });
 
     beforeEach(function () {
@@ -37,6 +39,7 @@ describe(
       [
         ModifyAtmInventoryAction,
         RemoveAtmInventoryAction,
+        CopyRecordIdAction,
       ].forEach(action => {
         if (action.prototype.execute.restore) {
           action.prototype.execute.restore();
@@ -71,6 +74,10 @@ describe(
         selector: '.remove-atm-inventory-action-trigger',
         name: 'Remove',
         icon: 'remove',
+      }, {
+        selector: '.copy-record-id-action-trigger',
+        name: 'Copy ID',
+        icon: 'copy',
       }].forEach(({ selector, name, icon }) => {
         const $trigger = popoverContent.find(selector);
         expect($trigger).to.exist;
@@ -121,6 +128,25 @@ describe(
         await click('.atm-inventory-menu-trigger');
         const removeTrigger =
           $('body .webui-popover.in .remove-atm-inventory-action-trigger')[0];
+        await click(removeTrigger);
+
+        expect(executeStub).to.be.calledOnce;
+      });
+
+    it('allows to copy automation inventory ID through "Copy ID" action',
+      async function () {
+        const atmInventory = this.get('atmInventory');
+        const executeStub = sinon.stub(
+          CopyRecordIdAction.prototype,
+          'execute'
+        ).callsFake(function () {
+          expect(this.get('context.record')).to.equal(atmInventory);
+        });
+
+        render(this);
+        await click('.atm-inventory-menu-trigger');
+        const removeTrigger =
+          $('body .webui-popover.in .copy-record-id-action-trigger')[0];
         await click(removeTrigger);
 
         expect(executeStub).to.be.calledOnce;

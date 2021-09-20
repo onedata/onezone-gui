@@ -54,6 +54,13 @@ export default Component.extend(I18n, {
   allCollection: undefined,
 
   /**
+   * Needed when `mode` is `'presentation'`.
+   * @virtual optional
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
+
+  /**
    * One of: `'presentation'`, `'selection'`
    * @virtual optional
    * @type {String}

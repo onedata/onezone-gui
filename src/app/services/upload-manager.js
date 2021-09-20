@@ -25,6 +25,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
 import { getOwner } from '@ember/application';
+import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 
 export default Service.extend(I18n, {
   embeddedIframeManager: service(),
@@ -211,16 +212,12 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Event} unloadEvent 
+   * @param {Event} unloadEvent
    * @returns {undefined}
    */
   onPageUnload(unloadEvent) {
     if (this.get('hasActiveUploads')) {
-      // Code based on https://stackoverflow.com/a/19538231
-      const confirmationMessage = this.t('confirmPageClose');
-      event.preventDefault();
-      (unloadEvent || window.unloadEvent).returnValue = confirmationMessage;
-      return confirmationMessage;
+      return preventPageUnload(unloadEvent, String(this.t('confirmPageClose')));
     }
   },
 
@@ -519,7 +516,7 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Models.Provider} oneprovider 
+   * @param {Models.Provider} oneprovider
    * @returns {Utils.EmbeddedIframe}
    */
   getEmbeddedIframe(oneprovider) {

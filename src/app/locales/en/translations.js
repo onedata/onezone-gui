@@ -20,7 +20,6 @@ import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
-import sidebarShares from './components/sidebar-shares';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
 import contentSpacesNew from './components/content-spaces-new';
@@ -95,6 +94,7 @@ import emptyCollectionSidebar from './components/empty-collection-sidebar';
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
+import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
@@ -129,6 +129,7 @@ import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-invent
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
 import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
+import unlinkAtmLambdaAction from './utils/workflow-actions/unlink-atm-lambda-action';
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
@@ -158,6 +159,7 @@ const translations = {
     modals: {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
+      unlinkAtmLambdaModal,
     },
     errors: {
       shareNotFound,
@@ -171,7 +173,6 @@ const translations = {
     sidebarSpaces,
     sidebarProviders,
     sidebarGroups,
-    sidebarShares,
     contentSpacesEmpty,
     contentSpacesIndex,
     contentSpacesNew,
@@ -285,6 +286,7 @@ const translations = {
       removeAtmInventoryAction,
       createAtmLambdaAction,
       modifyAtmLambdaAction,
+      unlinkAtmLambdaAction,
       modifyAtmWorkflowSchemaAction,
       removeAtmWorkflowSchemaAction,
       createAtmWorkflowSchemaAction,

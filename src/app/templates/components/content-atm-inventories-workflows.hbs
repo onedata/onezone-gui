@@ -17,6 +17,7 @@
           {{content-atm-inventories-workflows/editor-view
             atmWorkflowSchema=activeAtmWorkflowSchemaProxy.content
             actionsFactory=actionsFactory
+            onModificationStateChange=(action "editorModificationStateChange")
             onBackSlide=(action "backSlide")
             onRegisterViewActions=(action "registerViewActions" "editor")
           }}
@@ -26,7 +27,7 @@
             onBackSlide=(action "backSlide")
           }}
         {{/if}}
-      {{else}}
+      {{else if (not-eq activeAtmWorkflowSchemaId undefined)}}
         {{content-atm-inventories-workflows/creator-view
           atmInventory=atmInventory
           onBackSlide=(action "backSlide")
