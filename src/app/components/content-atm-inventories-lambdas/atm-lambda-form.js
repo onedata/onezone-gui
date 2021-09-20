@@ -288,6 +288,7 @@ export default Component.extend(I18n, {
     return FormFieldsGroup.extend(disableFieldInEditMode(this)).create({
       name,
       addColonToLabel: false,
+      classes: 'task-resources-fields',
       fields: createTaskResourcesFields({
         pathToGroup: name,
         cpuRequestedDefaultValueMixin: defaultValueGenerator(this),

@@ -26,61 +26,7 @@ const fallbackDefaultAtmResourceSpec = {
  */
 export default function recordToFormData(record, defaultAtmResourceSpec) {
   if (!record) {
-    return {
-      name: '',
-      summary: '',
-      engine: 'openfaas',
-      openfaasOptions: {
-        dockerImage: '',
-        readonly: true,
-        mountSpace: true,
-        mountSpaceOptions: {
-          mountPoint: '/mnt/onedata',
-          oneclientOptions: '',
-        },
-      },
-      onedataFunctionOptions: {
-        onedataFunctionName: '',
-      },
-      arguments: {
-        __fieldsValueNames: [],
-      },
-      results: {
-        __fieldsValueNames: [],
-      },
-      resources: {
-        cpu: {
-          cpuRequested: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'cpuRequested'
-          ),
-          cpuLimit: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'cpuLimit'
-          ),
-        },
-        memory: {
-          memoryRequested: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'memoryRequested'
-          ),
-          memoryLimit: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'memoryLimit'
-          ),
-        },
-        ephemeralStorage: {
-          ephemeralStorageRequested: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'ephemeralStorageRequested'
-          ),
-          ephemeralStorageLimit: getDefaultAtmResourceValue(
-            defaultAtmResourceSpec,
-            'ephemeralStorageLimit'
-          ),
-        },
-      },
-    };
+    return generateDefaultFormData(defaultAtmResourceSpec);
   }
 
   const {
@@ -174,6 +120,64 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
     results: formResults,
     resources,
   }, engineOptions);
+}
+
+function generateDefaultFormData(defaultAtmResourceSpec) {
+  return {
+    name: '',
+    summary: '',
+    engine: 'openfaas',
+    openfaasOptions: {
+      dockerImage: '',
+      readonly: true,
+      mountSpace: true,
+      mountSpaceOptions: {
+        mountPoint: '/mnt/onedata',
+        oneclientOptions: '',
+      },
+    },
+    onedataFunctionOptions: {
+      onedataFunctionName: '',
+    },
+    arguments: {
+      __fieldsValueNames: [],
+    },
+    results: {
+      __fieldsValueNames: [],
+    },
+    resources: {
+      cpu: {
+        cpuRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'cpuRequested'
+        ),
+        cpuLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'cpuLimit'
+        ),
+      },
+      memory: {
+        memoryRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'memoryRequested'
+        ),
+        memoryLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'memoryLimit'
+        ),
+      },
+      ephemeralStorage: {
+        ephemeralStorageRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'ephemeralStorageRequested'
+        ),
+        ephemeralStorageLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'ephemeralStorageLimit'
+        ),
+      },
+    },
+  };
 }
 
 function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
