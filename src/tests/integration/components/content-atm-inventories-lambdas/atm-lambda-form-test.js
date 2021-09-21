@@ -833,15 +833,15 @@ describe(
           .and.to.not.have.class('checked');
         expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
         expect(this.$('.cpuRequested-field .field-component').text().trim()).to.equal('0.1');
-        expect(this.$('.cpuLimitUnlimitedDesc-field .field-component').text().trim()).to.equal('unlimited');
+        expect(this.$('.cpuLimitUnlimitedDesc-field .field-component').text().trim()).to.equal('Unlimited');
         expect(this.$('.memoryRequested-field .field-component').text().trim()).to.equal('128 MiB');
         expect(this.$('.memoryLimitUnlimitedDesc-field .field-component').text().trim())
-          .to.equal('unlimited');
+          .to.equal('Unlimited');
         expect(this.$('.ephemeralStorageRequested-field .field-component').text().trim()).to.equal('0 B');
         expect(
           this.$('.ephemeralStorageLimitUnlimitedDesc-field .field-component')
           .text().trim()
-        ).to.equal('unlimited');
+        ).to.equal('Unlimited');
       });
 
       it('shows simple onedata function lambda with full resources spec',
