@@ -10,24 +10,40 @@
 import { getProperties } from '@ember/object';
 import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 
+const fallbackDefaultAtmResourceSpec = {
+  cpuRequested: 0.1,
+  cpuLimit: null,
+  memoryRequested: 100 * 1024 * 1024,
+  memoryLimit: null,
+  ephemeralStorageRequested: 100 * 1024 * 1024,
+  ephemeralStorageLimit: null,
+};
+
 /**
- * @param {Models.AtmLambda} record
+ * @param {Models.AtmLambda|null} record
+ * @param {AtmResourceSpec} defaultAtmResourceSpec
  * @returns {Object}
  */
-export default function recordToFormData(record) {
+export default function recordToFormData(record, defaultAtmResourceSpec) {
+  if (!record) {
+    return generateDefaultFormData(defaultAtmResourceSpec);
+  }
+
   const {
     name,
     summary,
     operationSpec,
     argumentSpecs,
     resultSpecs,
+    resourceSpec,
   } = getProperties(
     record || {},
     'name',
     'summary',
     'operationSpec',
     'argumentSpecs',
-    'resultSpecs'
+    'resultSpecs',
+    'resourceSpec'
   );
 
   const {
@@ -81,13 +97,100 @@ export default function recordToFormData(record) {
       break;
   }
 
+  const resources = {
+    cpu: {
+      cpuRequested: (resourceSpec || {}).cpuRequested,
+      cpuLimit: (resourceSpec || {}).cpuLimit,
+    },
+    memory: {
+      memoryRequested: (resourceSpec || {}).memoryRequested,
+      memoryLimit: (resourceSpec || {}).memoryLimit,
+    },
+    ephemeralStorage: {
+      ephemeralStorageRequested: (resourceSpec || {}).ephemeralStorageRequested,
+      ephemeralStorageLimit: (resourceSpec || {}).ephemeralStorageLimit,
+    },
+  };
+
   return Object.assign({
     name,
     summary,
     engine,
     arguments: formArguments,
     results: formResults,
+    resources,
   }, engineOptions);
+}
+
+function generateDefaultFormData(defaultAtmResourceSpec) {
+  return {
+    name: '',
+    summary: '',
+    engine: 'openfaas',
+    openfaasOptions: {
+      dockerImage: '',
+      readonly: true,
+      mountSpace: true,
+      mountSpaceOptions: {
+        mountPoint: '/mnt/onedata',
+        oneclientOptions: '',
+      },
+    },
+    onedataFunctionOptions: {
+      onedataFunctionName: '',
+    },
+    arguments: {
+      __fieldsValueNames: [],
+    },
+    results: {
+      __fieldsValueNames: [],
+    },
+    resources: {
+      cpu: {
+        cpuRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'cpuRequested'
+        ),
+        cpuLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'cpuLimit'
+        ),
+      },
+      memory: {
+        memoryRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'memoryRequested'
+        ),
+        memoryLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'memoryLimit'
+        ),
+      },
+      ephemeralStorage: {
+        ephemeralStorageRequested: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'ephemeralStorageRequested'
+        ),
+        ephemeralStorageLimit: getDefaultAtmResourceValue(
+          defaultAtmResourceSpec,
+          'ephemeralStorageLimit'
+        ),
+      },
+    },
+  };
+}
+
+function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
+  const defaultValue = defaultAtmResourceSpec && defaultAtmResourceSpec[propName];
+  switch (defaultValue) {
+    case null:
+      return '';
+    case undefined:
+      return defaultAtmResourceSpec !== fallbackDefaultAtmResourceSpec ?
+        getDefaultAtmResourceValue(fallbackDefaultAtmResourceSpec, propName) : '';
+    default:
+      return String(defaultValue);
+  }
 }
 
 /**

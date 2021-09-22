@@ -933,6 +933,14 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
         dataSpec: { type: 'string' },
         isBatch: false,
       }],
+      resourceSpec: {
+        cpuRequested: 2,
+        cpuLimit: 10,
+        memoryRequested: 100 * 1024 * 1024,
+        memoryLimit: 200 * 1024 * 1024,
+        ephemeralStorageRequested: 300 * 1024 * 1024,
+        ephemeralStorageLimit: null,
+      },
     }).save();
   })).then(atmLambdas =>
     createListRecord(store, 'atmLambda', atmLambdas)

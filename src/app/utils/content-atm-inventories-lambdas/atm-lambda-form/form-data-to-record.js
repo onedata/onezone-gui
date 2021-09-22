@@ -9,6 +9,7 @@
 
 import { get, getProperties } from '@ember/object';
 import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
+import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
 /**
  * @param {Object} formData
@@ -22,6 +23,7 @@ export default function formDataToRecord(formData) {
     openfaasOptions,
     arguments: formArguments,
     results: formResults,
+    resources,
   } = getProperties(
     formData,
     'name',
@@ -29,7 +31,8 @@ export default function formDataToRecord(formData) {
     'engine',
     'openfaasOptions',
     'arguments',
-    'results'
+    'results',
+    'resources'
   );
   const operationSpec = {
     engine,
@@ -74,6 +77,7 @@ export default function formDataToRecord(formData) {
 
   const lambdaArguments = formArgResToRecordArgRes('argument', formArguments);
   const lambdaResults = formArgResToRecordArgRes('result', formResults);
+  const resourceSpec = serializeTaskResourcesFieldsValues(resources);
   return {
     name,
     summary,
@@ -81,6 +85,7 @@ export default function formDataToRecord(formData) {
     operationSpec,
     argumentSpecs: lambdaArguments,
     resultSpecs: lambdaResults,
+    resourceSpec,
   };
 }
 

@@ -138,6 +138,11 @@ export default Model.extend(GraphSingleModelMixin, {
   resultSpecs: attr('array'),
 
   /**
+   * @type {ComputedProperty<AtmResourceSpec>}
+   */
+  resourceSpec: attr('object'),
+
+  /**
    * @type {ComputedProperty<Models.AtmInventoryList>}
    */
   atmInventoryList: belongsTo('atm-inventory-list'),

@@ -149,6 +149,14 @@ describe(
         isMobile: false,
         isTablet: false,
       }));
+      this.set('defaultAtmResourceSpec', {
+        cpuRequested: 0.1,
+        cpuLimit: null,
+        memoryRequested: 128 * 1024 * 1024,
+        memoryLimit: null,
+        ephemeralStorageRequested: 0,
+        ephemeralStorageLimit: null,
+      });
     });
 
     it('has class "atm-lambda-form"', async function () {
@@ -551,6 +559,40 @@ describe(
         );
       });
 
+      it('renders "resources" section with cpu, memory and storage fields groups',
+        async function () {
+          await renderCreate(this);
+
+          const $resourcesSection = this.$('.resources-field');
+          expect($resourcesSection.find('.control-label').eq(0).text().trim())
+            .to.equal('Resources');
+          // Check if translations for resources fields are loaded
+          expect($resourcesSection.text()).to.contain('Limit');
+
+          expect($resourcesSection.find('.cpuRequested-field .form-control'))
+            .to.have.value('0.1');
+          expect($resourcesSection.find('.cpuLimit-field .form-control'))
+            .to.have.value('');
+          [{
+            resourceName: 'memory',
+            requested: ['128', 'MiB'],
+            limit: ['', 'MiB'],
+          }, {
+            resourceName: 'ephemeralStorage',
+            requested: ['0', 'MiB'],
+            limit: ['', 'MiB'],
+          }].forEach(({ resourceName, requested, limit }) => {
+            const $requested = this.$(`.${resourceName}Requested-field`);
+            expect($requested.find('input')).to.have.value(requested[0]);
+            expect($requested.find('.ember-power-select-trigger').text())
+              .to.contain(requested[1]);
+            const $limit = this.$(`.${resourceName}Limit-field`);
+            expect($limit.find('input')).to.have.value(limit[0]);
+            expect($limit.find('.ember-power-select-trigger').text())
+              .to.contain(limit[1]);
+          });
+        });
+
       it('creates simple lambda on submit button click', async function () {
         await renderCreate(this);
 
@@ -620,6 +662,13 @@ describe(
 
         await fillIn('.mountPoint-field .form-control', '/mount/point');
         await fillIn('.oneclientOptions-field .form-control', 'oc-options');
+
+        await fillIn('.cpuRequested-field .form-control', '2');
+        await fillIn('.cpuLimit-field .form-control', '3');
+        await fillIn('.memoryRequested-field .form-control', '20');
+        await fillIn('.memoryLimit-field .form-control', '30');
+        await fillIn('.ephemeralStorageRequested-field .form-control', '1');
+        await fillIn('.ephemeralStorageLimit-field .form-control', '10');
         await click('.btn-submit');
         expect(this.get('submitStub')).to.be.calledOnce.and.to.be.calledWith({
           name: 'myname',
@@ -653,6 +702,14 @@ describe(
             dataSpec,
             isBatch: idx === 1,
           })),
+          resourceSpec: {
+            cpuRequested: 2,
+            cpuLimit: 3,
+            memoryRequested: 20 * 1024 * 1024,
+            memoryLimit: 30 * 1024 * 1024,
+            ephemeralStorageRequested: 1024 * 1024,
+            ephemeralStorageLimit: 10 * 1024 * 1024,
+          },
         });
       });
 
@@ -736,7 +793,7 @@ describe(
         expect(this.$('.btn-submit')).to.not.exist;
       });
 
-      it('shows simple openfaas lambda', async function () {
+      it('shows simple openfaas lambda with minimal resources spec', async function () {
         this.set('atmLambda', {
           name: 'myname',
           summary: 'summary',
@@ -751,6 +808,14 @@ describe(
           },
           argumentSpecs: [],
           resultSpecs: [],
+          resourceSpec: {
+            cpuRequested: 0.1,
+            cpuLimit: null,
+            memoryRequested: 128 * 1024 * 1024,
+            memoryLimit: null,
+            ephemeralStorageRequested: 0,
+            ephemeralStorageLimit: null,
+          },
         });
 
         await renderView(this);
@@ -767,32 +832,57 @@ describe(
         expect(this.$('.mountSpace-field .form-control')).to.exist
           .and.to.not.have.class('checked');
         expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+        expect(this.$('.cpuRequested-field .field-component').text().trim()).to.equal('0.1');
+        expect(this.$('.cpuLimitUnlimitedDesc-field .field-component').text().trim()).to.equal('Unlimited');
+        expect(this.$('.memoryRequested-field .field-component').text().trim()).to.equal('128 MiB');
+        expect(this.$('.memoryLimitUnlimitedDesc-field .field-component').text().trim())
+          .to.equal('Unlimited');
+        expect(this.$('.ephemeralStorageRequested-field .field-component').text().trim()).to.equal('0 B');
+        expect(
+          this.$('.ephemeralStorageLimitUnlimitedDesc-field .field-component')
+          .text().trim()
+        ).to.equal('Unlimited');
       });
 
-      it('shows simple onedata function lambda', async function () {
-        this.set('atmLambda', {
-          name: 'myname',
-          summary: 'summary',
-          description: '',
-          operationSpec: {
-            engine: 'onedataFunction',
-            functionId: 'myfunc',
-          },
-          argumentSpecs: [],
-          resultSpecs: [],
+      it('shows simple onedata function lambda with full resources spec',
+        async function () {
+          this.set('atmLambda', {
+            name: 'myname',
+            summary: 'summary',
+            description: '',
+            operationSpec: {
+              engine: 'onedataFunction',
+              functionId: 'myfunc',
+            },
+            argumentSpecs: [],
+            resultSpecs: [],
+            resourceSpec: {
+              cpuRequested: 0.1,
+              cpuLimit: 1,
+              memoryRequested: 128 * 1024 * 1024,
+              memoryLimit: 256 * 1024 * 1024,
+              ephemeralStorageRequested: 1024 * 1024,
+              ephemeralStorageLimit: 10 * 1024 * 1024,
+            },
+          });
+
+          await renderView(this);
+
+          expect(this.$('.field-edit-mode')).to.not.exist;
+          expect(this.$('.name-field')).to.not.exist;
+          expect(this.$('.summary-field')).to.not.exist;
+          expect(this.$('.engine-field .field-component').text().trim()).to.equal('Onedata function');
+          expect(this.$('.onedataFunctionName-field .field-component').text().trim()).to.equal('myfunc');
+          expect(this.$('.openfaasOptions-field')).to.not.exist;
+          expect(this.$('.arguments-field')).to.not.exist;
+          expect(this.$('.results-field')).to.not.exist;
+          expect(this.$('.cpuRequested-field .field-component').text().trim()).to.equal('0.1');
+          expect(this.$('.cpuLimit-field .field-component').text().trim()).to.equal('1');
+          expect(this.$('.memoryRequested-field .field-component').text().trim()).to.equal('128 MiB');
+          expect(this.$('.memoryLimit-field .field-component').text().trim()).to.equal('256 MiB');
+          expect(this.$('.ephemeralStorageRequested-field .field-component').text().trim()).to.equal('1 MiB');
+          expect(this.$('.ephemeralStorageLimit-field .field-component').text().trim()).to.equal('10 MiB');
         });
-
-        await renderView(this);
-
-        expect(this.$('.field-edit-mode')).to.not.exist;
-        expect(this.$('.name-field')).to.not.exist;
-        expect(this.$('.summary-field')).to.not.exist;
-        expect(this.$('.engine-field .field-component').text().trim()).to.equal('Onedata function');
-        expect(this.$('.onedataFunctionName-field .field-component').text().trim()).to.equal('myfunc');
-        expect(this.$('.openfaasOptions-field')).to.not.exist;
-        expect(this.$('.arguments-field')).to.not.exist;
-        expect(this.$('.results-field')).to.not.exist;
-      });
 
       it('shows mount space options when passed lambda has "mount space" enabled',
         async function () {
@@ -1032,6 +1122,7 @@ async function renderCreate(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="create"
     onSubmit=submitStub
+    defaultAtmResourceSpec=defaultAtmResourceSpec
   }}`);
   await wait();
 }
@@ -1092,5 +1183,13 @@ async function fillWithMinimumData(testCase) {
     },
     argumentSpecs: [],
     resultSpecs: [],
+    resourceSpec: {
+      cpuRequested: 0.1,
+      cpuLimit: null,
+      memoryRequested: 128 * 1024 * 1024,
+      memoryLimit: null,
+      ephemeralStorageRequested: 0,
+      ephemeralStorageLimit: null,
+    },
   };
 }

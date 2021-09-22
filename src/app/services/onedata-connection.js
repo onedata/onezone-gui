@@ -51,6 +51,12 @@ const OnezoneConnection = ProductionSymbol.extend({
   defaultHarvestingBackendEndpoint: reads('attributes.defaultHarvestingBackendEndpoint'),
 
   /**
+   * Default values for resources spec of atm lambdas/tasks.
+   * @type {ComputedProperty<AtmResourceSpec>}
+   */
+  defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
+
+  /**
    * @type {ComputedProperty<EmberObject>}
    */
   onezoneRecord: computed(function onezoneRecord() {
