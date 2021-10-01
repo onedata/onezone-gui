@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7629 Fixed wrong class names in AIP/DIP switch
 * VFS-8288 Added resources specification to automation lambda and task
 * VFS-7633 Using URLs to datasets and archives selection
 * VFS-8263 Showing "unsaved changes" warning when leaving workflows editor
