@@ -79,7 +79,7 @@ describe('Integration | Component | content atm inventories workflows', function
     const atmWorkflowSchemas = [{
       entityId: 'w1id',
       name: 'w1',
-      description: 'w1 description',
+      summary: 'w1 summary',
       lanes: [{
         id: 'l1',
         name: 'lane1',
@@ -117,7 +117,7 @@ describe('Integration | Component | content atm inventories workflows', function
     }, {
       entityId: 'w0id',
       name: 'w0',
-      description: 'w0 description',
+      summary: 'w0 summary',
       atmLambdaList: promiseObject(resolve({
         list: promiseArray(resolve(atmLambdas)),
       })),
@@ -224,7 +224,7 @@ describe('Integration | Component | content atm inventories workflows', function
       await render(this);
 
       expect(isSlideActive('list')).to.be.true;
-      expect(getSlide('list').innerText).to.contain('w0 description');
+      expect(getSlide('list').innerText).to.contain('w0 summary');
     });
 
     it('shows workflow schemas list when "workflowId" is not empty',

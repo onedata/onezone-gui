@@ -14,6 +14,7 @@ import { scheduleOnce } from '@ember/runloop';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
 export default Component.extend(I18n, {
   classNames: ['atm-workflow-schemas-list-entry', 'iconified-block'],
@@ -136,15 +137,8 @@ export default Component.extend(I18n, {
       onAtmWorkflowSchemaClick,
       element,
     } = this.getProperties('isEditing', 'onAtmWorkflowSchemaClick', 'element');
-    const clickableElements = [...element.querySelectorAll('.clickable')];
 
-    if (
-      isEditing ||
-      clickableElements.includes(event.target) ||
-      clickableElements.some(clkElement => clkElement.contains(event.target)) ||
-      !element.contains(event.target)
-    ) {
-      // Should be handled by another clickable element.
+    if (isEditing || !isDirectlyClicked(event, element)) {
       return;
     }
     onAtmWorkflowSchemaClick();

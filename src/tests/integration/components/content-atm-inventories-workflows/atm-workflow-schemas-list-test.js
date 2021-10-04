@@ -35,7 +35,7 @@ function generateAtmWorkflowSchema(name) {
       modelName: 'atmWorkflowSchema',
     },
     name,
-    description: `${name} description`,
+    summary: `${name} summary`,
     isLoaded: true,
   };
 }
@@ -91,8 +91,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       expect($workflows).to.have.length(2);
       [0, 1].forEach(idx => {
         expect($workflows.eq(idx).find('.name-field').text()).to.contain(`w${idx}`);
-        expect($workflows.eq(idx).find('.description-field').text())
-          .to.contain(`w${idx} description`);
+        expect($workflows.eq(idx).find('.summary-field').text())
+          .to.contain(`w${idx} summary`);
       });
     });
 
@@ -146,7 +146,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
           expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
           expect(this.get('context.atmWorkflowSchemaDiff')).to.deep.include({
             name: 'newName',
-            description: 'newDescription',
+            summary: 'newSummary',
           });
           return resolve({ status: 'done' });
         });
@@ -157,7 +157,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
       await click($('body .webui-popover.in .change-details-action-trigger')[0]);
       await fillIn('.name-field .form-control', 'newName');
-      await fillIn('.description-field .form-control', 'newDescription');
+      await fillIn('.summary-field .form-control', 'newSummary');
       await click('.btn-save');
 
       expect(executeStub).to.be.calledOnce;
@@ -186,12 +186,12 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
       await click($('body .webui-popover.in .change-details-action-trigger')[0]);
       await fillIn('.name-field .form-control', 'newName');
-      await fillIn('.description-field .form-control', 'newDescription');
+      await fillIn('.summary-field .form-control', 'newSummary');
       await click('.btn-cancel');
 
       expect($firstWorkflow.find('.name-field').text()).to.contain('w0');
-      expect($firstWorkflow.find('.description-field').text())
-        .to.contain('w0 description');
+      expect($firstWorkflow.find('.summary-field').text())
+        .to.contain('w0 summary');
     });
 
     it('blocks saving modifications when form is invalid', async function () {

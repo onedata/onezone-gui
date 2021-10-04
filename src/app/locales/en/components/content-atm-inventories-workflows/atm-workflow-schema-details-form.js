@@ -3,8 +3,8 @@ export default {
     name: {
       label: 'Name',
     },
-    description: {
-      label: 'Description',
+    summary: {
+      label: 'Summary',
     },
   },
 };

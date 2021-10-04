@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
    * ```
    * {
    *   name: String,
-   *   description: String
+   *   summary: String
    * }
    * ```
    * @type {Object}
@@ -103,11 +103,11 @@ export default Component.extend(I18n, {
             name: 'name',
           }),
           TextareaField.extend({
-            defaultValue: reads('component.formValuesSource.description'),
+            defaultValue: reads('component.formValuesSource.summary'),
             isVisible: or('isInEditMode', 'value'),
           }).create({
             component: this,
-            name: 'description',
+            name: 'summary',
             showsStaticTextInViewMode: true,
             isOptional: true,
           }),
@@ -117,7 +117,7 @@ export default Component.extend(I18n, {
 
   formValuesUpdater: observer(
     'mode',
-    'atmWorkflowSchema.{name,description}',
+    'atmWorkflowSchema.{name,summary}',
     function formValuesUpdater() {
       if (this.get('mode') === 'view' || this.get('formValuesSource') === undefined) {
         this.updateFormValues();
@@ -150,12 +150,12 @@ export default Component.extend(I18n, {
 
   updateFormValues() {
     const atmWorkflowSchema = this.get('atmWorkflowSchema') || {};
-    const { name = '', description = '' } =
-    getProperties(atmWorkflowSchema, 'name', 'description');
+    const { name = '', summary = '' } =
+    getProperties(atmWorkflowSchema, 'name', 'summary');
 
     this.set('formValuesSource', {
       name,
-      description,
+      summary,
     });
     this.get('fields').reset();
   },

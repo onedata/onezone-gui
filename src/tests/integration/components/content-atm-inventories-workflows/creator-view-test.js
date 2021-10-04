@@ -47,7 +47,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
       expect($form).to.exist;
       expect($form.find('.field-view-mode')).to.not.exist;
       expect($form.find('.name-field .form-control')).to.have.value('');
-      expect($form.find('.description-field .form-control')).to.have.value('');
+      expect($form.find('.summary-field .form-control')).to.have.value('');
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {
@@ -84,7 +84,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
         expect(atmWorkflowSchemaAddedSpy).to.be.not.called;
 
         await fillIn('.name-field .form-control', 'someName');
-        await fillIn('.description-field .form-control', 'someDescription');
+        await fillIn('.summary-field .form-control', 'someSummary');
         await click('.btn-content-info');
 
         expect(createCreateAtmWorkflowSchemaActionStub).to.be.calledOnce
@@ -92,7 +92,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
             atmInventory,
             rawAtmWorkflowSchema: sinon.match({
               name: 'someName',
-              description: 'someDescription',
+              summary: 'someSummary',
             }),
           });
         expect(atmWorkflowSchemaAddedSpy).to.be.calledOnce
