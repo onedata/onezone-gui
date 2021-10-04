@@ -958,33 +958,39 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
         await createListRecord(store, 'atmLambda', inventoryAtmLambdas);
       return await store.createRecord('atmWorkflowSchema', {
         name: `Workflow ${index}`,
-        description: `Some very complicated workflow #${index}`,
+        summary: `Some very complicated workflow #${index}`,
         atmLambdaList: workflowAtmLambdas,
         atmInventory,
-        lanes: [{
-          id: 'lane1',
-          name: 'lane 1',
-          storeIteratorSpec: {
-            strategy: {
-              type: 'serial',
-            },
-            storeSchemaId: 'store1',
+        revisionRegistry: {
+          1: {
+            description: 'My first revision',
+            state: 'draft',
+            lanes: [{
+              id: 'lane1',
+              name: 'lane 1',
+              storeIteratorSpec: {
+                strategy: {
+                  type: 'serial',
+                },
+                storeSchemaId: 'store1',
+              },
+              parallelBoxes: [{
+                id: 'pbox1-1',
+                name: 'Parallel box',
+                tasks: [],
+              }],
+            }],
+            stores: [{
+              id: 'store1',
+              name: 'store 1',
+              type: 'list',
+              dataSpec: {
+                type: 'string',
+                valueConstraints: {},
+              },
+            }],
           },
-          parallelBoxes: [{
-            id: 'pbox1-1',
-            name: 'Parallel box',
-            tasks: [],
-          }],
-        }],
-        stores: [{
-          id: 'store1',
-          name: 'store 1',
-          type: 'list',
-          dataSpec: {
-            type: 'string',
-            valueConstraints: {},
-          },
-        }],
+        },
       }).save();
     })
   );
