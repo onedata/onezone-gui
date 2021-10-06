@@ -1,5 +1,5 @@
 /**
- * A mocked abstraction layer for Onedata Sync API Websocket connection properties 
+ * A mocked abstraction layer for Onedata Sync API Websocket connection properties
  * For properties description see non-mocked `services/onedata-connection`
  *
  * @module services/mocks/onedata-connection
@@ -23,6 +23,14 @@ export default OnedataConnection.extend({
   maxTemporaryTokenTtl: 7 * 24 * 60 * 60,
   defaultHarvestingBackendType: 'elasticsearch_harvesting_backend',
   defaultHarvestingBackendEndpoint: '172.17.0.8:9200',
+  defaultAtmResourceSpec: computed(() => ({
+    cpuRequested: 0.1,
+    cpuLimit: null,
+    memoryRequested: 128 * 1024 * 1024,
+    memoryLimit: null,
+    ephemeralStorageRequested: 0,
+    ephemeralStorageLimit: null,
+  })),
   onezoneRecord: computed(function onezoneRecord() {
     return EmberObject.create({
       name: zoneName,

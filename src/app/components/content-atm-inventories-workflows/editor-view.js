@@ -19,6 +19,12 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import areWorkflowSchemasEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schemas-equal';
 import { not } from 'ember-awesome-macros';
 
+/**
+ * @typedef {Object} WorkflowEditorViewModificationState
+ * @property {Boolean} isModified
+ * @property {Function} [executeSaveAction] available when `isModified` is `true`
+ */
+
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-editor-view'],
 
@@ -50,9 +56,16 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Boolean}
+   * @type {Function}
    */
   onRegisterViewActions: notImplementedIgnore,
+
+  /**
+   * @virtual
+   * @type {Function}
+   * @param {Object}
+   */
+  onModificationStateChange: notImplementedIgnore,
 
   /**
    * Data injected into the visualiser. Initialized by
@@ -84,6 +97,23 @@ export default Component.extend(I18n, {
         unchangedVisualiserData,
       } = this.getProperties('visualiserData', 'unchangedVisualiserData');
       return !areWorkflowSchemasEqual(visualiserData, unchangedVisualiserData);
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<WorkflowEditorViewModificationState>}
+   */
+  modificationState: computed(
+    'isVisualiserDataModified',
+    function modificationState() {
+      const isVisualiserDataModified = this.get('isVisualiserDataModified');
+      const state = {
+        isModified: isVisualiserDataModified,
+      };
+      if (isVisualiserDataModified) {
+        state.executeSaveAction = async () => await this.save();
+      }
+      return state;
     }
   ),
 
@@ -155,10 +185,24 @@ export default Component.extend(I18n, {
     this.registerViewActions();
   }),
 
+  modificationStateNotifier: observer(
+    'onModificationStateChange',
+    'modificationState',
+    function modificationStateNotifier() {
+      const {
+        onModificationStateChange,
+        modificationState,
+      } = this.getProperties('onModificationStateChange', 'modificationState');
+
+      onModificationStateChange && onModificationStateChange(modificationState);
+    }
+  ),
+
   init() {
     this._super(...arguments);
     this.atmWorkflowSchemaObserver();
     this.globalActionsObserver();
+    this.modificationStateNotifier();
   },
 
   willDestroyElement() {
@@ -176,6 +220,35 @@ export default Component.extend(I18n, {
     } = this.getProperties('onRegisterViewActions', 'globalActions');
 
     onRegisterViewActions(clear ? [] : globalActions);
+  },
+
+  async save() {
+    const {
+      workflowActions,
+      atmWorkflowSchema,
+      visualiserData,
+    } = this.getProperties(
+      'workflowActions',
+      'atmWorkflowSchema',
+      'visualiserData'
+    );
+
+    const action = workflowActions.createModifyAtmWorkflowSchemaAction({
+      atmWorkflowSchema,
+      atmWorkflowSchemaDiff: visualiserData,
+    });
+    action.addExecuteHook(result => {
+      if (
+        result &&
+        get(result, 'status') === 'done' &&
+        atmWorkflowSchema === this.get('atmWorkflowSchema')
+      ) {
+        // reload modification state
+        safeExec(this, 'atmWorkflowSchemaObserver');
+      }
+    });
+
+    return await action.execute();
   },
 
   actions: {
@@ -214,31 +287,7 @@ export default Component.extend(I18n, {
       this.set('visualiserData', newVisualiserData);
     },
     async save() {
-      const {
-        workflowActions,
-        atmWorkflowSchema,
-        visualiserData,
-      } = this.getProperties(
-        'workflowActions',
-        'atmWorkflowSchema',
-        'visualiserData'
-      );
-
-      const action = workflowActions.createModifyAtmWorkflowSchemaAction({
-        atmWorkflowSchema,
-        atmWorkflowSchemaDiff: visualiserData,
-      });
-      const result = await action.execute();
-      const {
-        status,
-        error,
-      } = getProperties(result, 'status', 'error');
-      if (status === 'failed') {
-        throw error;
-      } else if (status === 'done') {
-        // reload modification state
-        safeExec(this, 'atmWorkflowSchemaObserver');
-      }
+      return await this.save();
     },
   },
 });

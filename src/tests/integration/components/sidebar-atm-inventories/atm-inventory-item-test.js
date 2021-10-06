@@ -76,7 +76,7 @@ describe(
         icon: 'remove',
       }, {
         selector: '.copy-record-id-action-trigger',
-        name: 'Copy automation inventory ID',
+        name: 'Copy ID',
         icon: 'copy',
       }].forEach(({ selector, name, icon }) => {
         const $trigger = popoverContent.find(selector);
@@ -133,7 +133,7 @@ describe(
         expect(executeStub).to.be.calledOnce;
       });
 
-    it('allows to copy automation inventory ID through "Copy automation inventory ID" action',
+    it('allows to copy automation inventory ID through "Copy ID" action',
       async function () {
         const atmInventory = this.get('atmInventory');
         const executeStub = sinon.stub(

@@ -45,6 +45,9 @@ export default {
         datasetInfo: {
           label: 'Dataset info',
         },
+        archiveInfo: {
+          label: 'Archive info',
+        },
         metadataExistenceFlags: {
           label: 'Metadata existence flags',
         },

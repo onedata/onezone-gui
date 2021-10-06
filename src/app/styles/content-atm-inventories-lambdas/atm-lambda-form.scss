@@ -50,6 +50,20 @@
     margin-left: $nested-fields-indent;
   }
 
+  .resources-field {
+    flex-wrap: wrap;
+
+    > .control-label {
+      @include font-semibold();
+      padding-top: $padding-large-vertical;
+      margin-bottom: 0.7em;
+      flex-basis: 100%;
+      max-width: initial;
+      border-top: 1px solid $main-border-color;
+      text-transform: uppercase;
+    }
+  }
+
   .form .footer-buttons {
     float: none;
     text-align: left;
@@ -74,7 +88,7 @@
 
   @media (min-width: $screen-sm-min) {
     .control-label {
-      width: 11em;
+      width: 9em;
       text-align: left;
     }
 
@@ -112,6 +126,10 @@
 
   @media (min-width: $screen-md-min) {
     $x-offset-to-center-toggles: ($entry-toggle-container-width - $toggle-width) / 6;
+
+    .control-label {
+      width: 11em;
+    }
 
     .fields-group-children.-children {
       > * {

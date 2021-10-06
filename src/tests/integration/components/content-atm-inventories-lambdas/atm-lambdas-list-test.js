@@ -9,14 +9,22 @@ import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
+import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
+import { lookupService } from '../../../helpers/stub-service';
+import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 const lambdaActionsSpec = [{
   className: 'modify-action-trigger',
   label: 'Modify',
   icon: 'rename',
 }, {
+  className: 'unlink-atm-lambda-action-trigger',
+  label: 'Unlink',
+  icon: 'x',
+}, {
   className: 'copy-record-id-action-trigger',
-  label: 'Copy lambda ID',
+  label: 'Copy ID',
   icon: 'copy',
 }];
 
@@ -82,6 +90,15 @@ describe(
       this.setProperties({
         collection,
         allCollection,
+        atmInventory: {
+          name: 'inv1',
+          atmWorkflowSchemaList: promiseObject(resolve({
+            list: promiseArray(resolve([])),
+          })),
+          privileges: {
+            manageLambdas: true,
+          },
+        },
       });
     });
 
@@ -248,6 +265,37 @@ describe(
         expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
       });
 
+      it('allows to remove lambda', async function () {
+        const workflowActions = lookupService(this, 'workflow-actions');
+        let removeCalled = false;
+        const createUnlinkAtmLambdaActionStub =
+          sinon.stub(workflowActions, 'createUnlinkAtmLambdaAction')
+          .callsFake((context) => UnlinkAtmLambdaAction.create(context, {
+            ownerSource: this,
+            onExecute() {
+              removeCalled = true;
+              return resolve({
+                status: 'done',
+              });
+            },
+          }));
+
+        await render(this);
+        const $atmLambdas = this.$('.atm-lambdas-list-entry');
+        const $firstAtmLambda = $atmLambdas.eq(0);
+
+        await click($firstAtmLambda.find('.atm-lambda-actions-trigger')[0]);
+        await click(
+          $('body .webui-popover.in .unlink-atm-lambda-action-trigger')[0]
+        );
+
+        expect(createUnlinkAtmLambdaActionStub).to.be.calledWith({
+          atmLambda: this.get('collection').findBy('name', 'f0'),
+          atmInventory: this.get('atmInventory'),
+        });
+        expect(removeCalled).to.be.true;
+      });
+
       it('allows to copy lambda ID', async function () {
         const firstLambda = this.get('collection.1');
         const executeStub = sinon.stub(
@@ -379,6 +427,7 @@ async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
     collection=collection
     allCollection=allCollection
+    atmInventory=atmInventory
     mode=mode
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
   }}`);
