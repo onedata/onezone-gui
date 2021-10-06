@@ -332,7 +332,6 @@ export default Service.extend(I18n, {
       fileId,
       spaceId,
     });
-    this.updateDataForOneprovider(oneprovider);
   },
 
   /**
