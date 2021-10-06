@@ -41,7 +41,7 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Array<Object>}
    */
-  stores: undefined,
+  definedStores: undefined,
 
   /**
    * Needed when `mode` is `'edit'

@@ -6,12 +6,10 @@ import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { resolve } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get } from '@ember/object';
-import { Promise } from 'rsvp';
-import suppressRejections from '../../helpers/suppress-rejections';
+import { Promise, resolve } from 'rsvp';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
 
@@ -19,8 +17,6 @@ describe('Integration | Component | content atm inventories workflows', function
   setupComponentTest('content-atm-inventories-workflows', {
     integration: true,
   });
-
-  suppressRejections();
 
   beforeEach(function () {
     const atmLambdas = [{
@@ -114,6 +110,7 @@ describe('Integration | Component | content atm inventories workflows', function
         list: promiseArray(resolve(atmLambdas)),
       })),
       isLoaded: true,
+      save: resolve,
     }, {
       entityId: 'w0id',
       name: 'w0',
@@ -122,6 +119,7 @@ describe('Integration | Component | content atm inventories workflows', function
         list: promiseArray(resolve(atmLambdas)),
       })),
       isLoaded: true,
+      save: resolve,
     }];
     const atmInventory = {
       entityId: 'inv1',
@@ -300,11 +298,14 @@ describe('Integration | Component | content atm inventories workflows', function
     it('shows error page when workflowId is not empty and workflow loading failed',
       async function () {
         set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', 'abc');
+        let rejectCallback;
         this.get('getRecordByIdStub')
           .withArgs('atmWorkflowSchema', 'abc')
-          .rejects('someError');
+          .returns(new Promise((resolve, reject) => { rejectCallback = reject; }));
 
         await render(this);
+        rejectCallback();
+        await wait();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'loading');
@@ -356,7 +357,7 @@ describe('Integration | Component | content atm inventories workflows', function
       set(navigationState, 'aspectOptions.workflowId', 'abc');
       this.get('getRecordByIdStub')
         .withArgs('atmWorkflowSchema', 'abc')
-        .rejects('someError');
+        .returns(new Promise(() => {}));
       await render(this);
 
       await click(getSlide('editor').querySelector('.content-back-link'));

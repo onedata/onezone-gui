@@ -62,7 +62,7 @@ export default Component.extend(GlobalActions, I18n, {
    * ```
    * {
    *   atmLambda: Models.AtmLambda,
-   *   stores: Array<Object>
+   *   definedStores: Array<Object>
    *   task: Object,
    *   onSuccess: Function,
    *   onFailure: Function,
@@ -459,7 +459,7 @@ export default Component.extend(GlobalActions, I18n, {
     }));
   },
 
-  runTaskDetailsProvider(mode, { stores, task }) {
+  runTaskDetailsProvider(mode, { definedStores, task }) {
     const atmLambdaId = task && get(task, 'lambdaId');
     const atmLambda = atmLambdaId ?
       this.get('recordManager').getLoadedRecordById('atmLambda', atmLambdaId) :
@@ -483,7 +483,7 @@ export default Component.extend(GlobalActions, I18n, {
       taskDetailsProviderMode: mode,
       taskDetailsProviderData: EmberObject.create({
         atmLambda,
-        stores,
+        definedStores,
         task,
         onSuccess: resolvePromise,
         onFailure: rejectPromise,

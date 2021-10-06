@@ -107,7 +107,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
         cancelSpy: sinon.spy(),
         applyChangesSpy: sinon.stub().resolves(),
         atmLambda: _.cloneDeep(exampleAtmLambda),
-        stores: _.cloneDeep(exampleStores),
+        definedStores: _.cloneDeep(exampleStores),
       });
     });
 
@@ -181,7 +181,7 @@ async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/task-details-view
     mode=mode
     atmLambda=atmLambda
-    stores=stores
+    definedStores=definedStores
     task=task
     onBackSlide=backSlideSpy
     onCancel=cancelSpy
