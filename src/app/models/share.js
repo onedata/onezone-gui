@@ -17,4 +17,5 @@ export default Model.extend(GraphSingleModelMixin, {
   chosenProviderId: attr('string'),
   chosenProviderVersion: attr('string'),
   fileType: attr('string'),
+  space: attr('string'),
 }).reopenClass(StaticGraphModelMixin);
