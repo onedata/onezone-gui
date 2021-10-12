@@ -1,37 +1,41 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
-XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
-.PHONY: deps build_mock build_dev build_prod doc clean test test_xunit_output
+.PHONY: dev mock rel test test_xunit_output deps build_mock build_dev build_prod clean run_tests run_tests_xunit_output submodules
 
-all: build_dev
+all: dev
 
-rel: build_prod
+dev: deps build_dev
+
+mock: deps build_mock
+
+rel: deps build_prod
+
+test: deps run_tests
+
+test_xunit_output: deps run_tests_xunit_output
 
 deps:
 	cd $(SRC_DIR) && npm install
 	cd $(SRC_DIR) && bower install --allow-root
 
-build_mock: deps
+build_mock:
 	cd $(SRC_DIR) && ember build --environment=development --output-path=../$(REL_DIR)
 
-build_dev: deps
+build_dev:
 	cd $(SRC_DIR) && ember build --environment=development-backend --output-path=../$(REL_DIR)
 
-build_prod: deps
+build_prod:
 	cd $(SRC_DIR) && ember build --environment=production --output-path=../$(REL_DIR)
-
-doc:
-	jsdoc -c $(SRC_DIR)/.jsdoc.conf $(SRC_DIR)/app
 
 clean:
 	cd $(SRC_DIR) && rm -rf node_modules bower_components dist tmp ../$(REL_DIR)/*
 
-test:
-	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
+run_tests:
+	cd $(SRC_DIR) && xvfb-run ember test
 
-test_xunit_output: deps
-	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
+run_tests_xunit_output:
+	cd $(SRC_DIR) && xvfb-run ember test -r xunit
 
 ##
 ## Submodules
