@@ -1,5 +1,6 @@
 SRC_DIR	 ?= src
 REL_DIR	 ?= rel
+XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
 .PHONY: dev mock rel test test_xunit_output deps build_mock build_dev build_prod clean run_tests run_tests_xunit_output submodules
 
@@ -32,10 +33,10 @@ clean:
 	cd $(SRC_DIR) && rm -rf node_modules bower_components dist tmp ../$(REL_DIR)/*
 
 run_tests:
-	cd $(SRC_DIR) && xvfb-run ember test
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
 
 run_tests_xunit_output:
-	cd $(SRC_DIR) && xvfb-run ember test -r xunit
+	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
 
 ##
 ## Submodules
