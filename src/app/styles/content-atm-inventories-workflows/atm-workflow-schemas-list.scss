@@ -22,8 +22,6 @@
     .form {
       margin: 0;
       padding: 0;
-      flex-grow: 1;
-      min-width: 0;
     }
 
     .field-view-mode {
@@ -36,6 +34,15 @@
       text-align: left;
       width: 8em;
     }
+  }
+
+  .workflow-schema-content {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .revisions-table {
+    margin-top: 1em;
   }
 
   .name-field.field-view-mode {

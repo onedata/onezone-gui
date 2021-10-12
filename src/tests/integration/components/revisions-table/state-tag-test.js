@@ -10,7 +10,7 @@ describe('Integration | Component | revisions table/state tag', function () {
     integration: true,
   });
 
-  it('has class "revisions-table-state-tag"', async function () {
+  it(`has class "${componentClass}"`, async function () {
     await render(this);
     expect(this.$().children()).to.have.class(componentClass)
       .and.to.have.length(1);
@@ -44,8 +44,8 @@ function itShowsState({ state, label, style }) {
     await render(this);
 
     const $component = this.$(`.${componentClass}`);
-    expect($component).to.have.class(`state-${state}`);
-    expect($component.find('.label')).to.have.class(`label-${style}`);
+    expect($component).to.have.class(`state-${state}`).and
+      .to.have.class(`label-${style}`);
     expect($component.text().trim()).to.equal(label);
   });
 }

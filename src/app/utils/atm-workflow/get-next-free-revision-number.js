@@ -9,8 +9,8 @@
 
 export default function getNextFreeRevisionNumber(existingRevisionNumbers) {
   const normalizedExistingRevisionNumbers = (existingRevisionNumbers || [])
-    .map(value => parseInt(value))
-    .filter(value => value > 0);
+    .map(value => Number(value))
+    .filter(value => Number.isSafeInteger(value) && value > 0);
   if (!normalizedExistingRevisionNumbers.length) {
     return 1;
   }

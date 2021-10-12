@@ -1,0 +1,17 @@
+.revisions-table {
+  $colWidths: (
+    'revision-number': 4em,
+    'state': 7em,
+    'actions': 2em,
+  );
+
+  th {
+    @include font-semibold();
+  }
+
+  @each $colName, $colWidth in $colWidths {
+    .#{$colName}-column {
+      width: $colWidth;
+    }
+  }
+}

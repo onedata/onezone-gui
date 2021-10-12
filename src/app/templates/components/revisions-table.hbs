@@ -1,0 +1,18 @@
+<thead>
+  <tr>
+    <th class="revision-number-column">{{tt this "column.revisionNumber"}}</th>
+    <th class="state-column">{{tt this "column.state"}}</th>
+    <th class="description-column">{{tt this "column.description"}}</th>
+    <th class="actions-column"></th>
+  </tr>
+</thead>
+<tbody>
+  {{#each sortedRevisionNumbers as |revisionNumber|}}
+    {{revisions-table/revision-entry
+      revisionNumber=revisionNumber
+      revision=(get revisionRegistry revisionNumber)
+      revisionActionsFactory=revisionActionsFactory
+    }}
+  {{/each}}
+</tbody>
+{{yield}}
