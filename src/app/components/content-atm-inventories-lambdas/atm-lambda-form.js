@@ -34,6 +34,8 @@ import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-vis
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
+const reservedResultNames = ['exception'];
+
 export default Component.extend(I18n, {
   classNames: ['atm-lambda-form'],
   classNameBindings: ['modeClass'],
@@ -92,6 +94,11 @@ export default Component.extend(I18n, {
    * @type {Boolean}
    */
   isSubmitting: false,
+
+  /**
+   * @type {Array<String>}
+   */
+  reservedResultNames,
 
   /**
    * @type {ComputedProperty<String>}
@@ -277,7 +284,11 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
    */
   resultsFieldsCollectionGroup: computed(function resultsFieldsCollectionGroup() {
-    return createFunctionArgResGroup(this, 'result');
+    return createFunctionArgResGroup(
+      this,
+      'result',
+      this.get('reservedResultNames')
+    );
   }),
 
   /**
@@ -387,9 +398,11 @@ function disableFieldInEditMode(component) {
  * similar).
  * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
  * @param {String} dataType one of: `argument`, `result`
+ * @param {Array<String>} reservedNames values of `entryName` field, which should be
+ * considered incorrect (reserved)
  * @returns {Utils.FormComponent.FormFieldsCollectionGroup}
  */
-function createFunctionArgResGroup(component, dataType) {
+function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   const isForArguments = dataType === 'argument';
   const generateEntryNameField = mode => TextField.create({
     mode,
@@ -411,6 +424,7 @@ function createFunctionArgResGroup(component, dataType) {
       }, {
         dependentKeys: ['model.field.parent.parent.usedEntryNames'],
       }),
+      validator('exclusion', { in: reservedNames }),
     ],
   });
   const generateEntryTypeField = mode => DropdownField.extend({
