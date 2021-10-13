@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8038 Refactored build process to support faster builds on CI
 * VFS-7996 Fix for 20.02.x: added missing group privileges management
 * VFS-7741 Added proper error information page when there is no on-line supporting provider for share
 * VFS-7046 Improved UX of "Add support" views
