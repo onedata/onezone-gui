@@ -12,7 +12,6 @@ import { computed, getProperties } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
@@ -33,11 +32,9 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Function}
-   * @param {Models.AtmWorkflowSchema}
-   * @returns {any}
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, revisionNumber: Number) => void}
    */
-  onAtmWorkflowSchemaClick: notImplementedIgnore,
+  onRevisionClick: undefined,
 
   /**
    * @type {String}

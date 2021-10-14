@@ -15,11 +15,12 @@ import { inject as service } from '@ember/service';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { notEmpty, tag } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
+import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
 export default Component.extend(I18n, {
   tagName: 'tr',
-  classNames: ['revisions-table-revision-entry', 'clickable'],
-  classNameBindings: ['hasDescription::no-description'],
+  classNames: ['revisions-table-revision-entry'],
+  classNameBindings: ['hasDescription::no-description', 'onClick:clickable'],
 
   i18n: service(),
 
@@ -45,6 +46,11 @@ export default Component.extend(I18n, {
    * @type {Utils.AtmWorkflow.RevisionActionsFactory}
    */
   revisionActionsFactory: undefined,
+
+  /**
+   * @type {(revisionNumber: Number) => void}
+   */
+  onClick: undefined,
 
   /**
    * @type {Boolean}
@@ -102,6 +108,19 @@ export default Component.extend(I18n, {
         revisionActionsFactory.createActionsForRevisionNumber(revisionNumber) : [];
     }
   ),
+
+  click(event) {
+    const {
+      onClick,
+      revisionNumber,
+      element,
+    } = this.getProperties('onClick', 'revisionNumber', 'element');
+
+    if (!onClick || !isDirectlyClicked(event, element)) {
+      return;
+    }
+    onClick(revisionNumber);
+  },
 
   actions: {
     toggleActionsOpen(state) {

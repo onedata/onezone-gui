@@ -13,8 +13,6 @@ import { collect } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/revision-actions-factory';
 
 export default Component.extend(I18n, {
@@ -38,10 +36,9 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Function}
-   * @returns {any}
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, revisionNumber: Number) => void}
    */
-  onAtmWorkflowSchemaClick: notImplementedIgnore,
+  onRevisionClick: undefined,
 
   /**
    * @type {Boolean}
@@ -131,19 +128,6 @@ export default Component.extend(I18n, {
     }
   ),
 
-  click(event) {
-    const {
-      isEditing,
-      onAtmWorkflowSchemaClick,
-      element,
-    } = this.getProperties('isEditing', 'onAtmWorkflowSchemaClick', 'element');
-
-    if (isEditing || !isDirectlyClicked(event, element)) {
-      return;
-    }
-    onAtmWorkflowSchemaClick();
-  },
-
   actions: {
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
@@ -174,6 +158,14 @@ export default Component.extend(I18n, {
     },
     cancelChanges() {
       this.set('isEditing', false);
+    },
+    clickRevision(revisionNumber) {
+      const {
+        onRevisionClick,
+        atmWorkflowSchema,
+      } = this.getProperties('onRevisionClick', 'atmWorkflowSchema');
+
+      onRevisionClick && onRevisionClick(atmWorkflowSchema, revisionNumber);
     },
   },
 });

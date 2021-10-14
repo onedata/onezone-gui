@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
+import sinon from 'sinon';
 
 const componentClass = 'revisions-table';
 const headerTexts = ['Rev.', 'State', 'Description', ''];
@@ -209,12 +210,43 @@ describe('Integration | Component | revisions table', function () {
       ]);
     }
   );
+
+  it('does not mark entries as clickable if onRevisionClick callback is not provided',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'stable' },
+        { revisionNumber: 2, state: 'draft' },
+      ]));
+      await render(this);
+
+      expect(this.$('.revisions-table-revision-entry'))
+        .to.not.have.class('clickable');
+    });
+
+  it('marks entries as clickable if onRevisionClick callback is provided and notifies about click',
+    async function () {
+      const { onRevisionClick } = this.setProperties({
+        revisionRegistry: generateRevisionRegistry([
+          { revisionNumber: 1, state: 'stable' },
+          { revisionNumber: 2, state: 'draft' },
+        ]),
+        onRevisionClick: sinon.spy(),
+      });
+      await render(this);
+
+      await click('.revisions-table-revision-entry');
+
+      expect(onRevisionClick).to.be.calledOnce.and.to.be.calledWith(2);
+      expect(this.$('.revisions-table-revision-entry'))
+        .to.have.class('clickable');
+    });
 });
 
 async function render(testCase) {
   testCase.render(hbs `{{revisions-table
     revisionRegistry=revisionRegistry
     revisionActionsFactory=revisionActionsFactory
+    onRevisionClick=onRevisionClick
   }}`);
 }
 

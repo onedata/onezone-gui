@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
+import sinon from 'sinon';
 
 const componentClass = 'revisions-table-revision-entry';
 
@@ -93,6 +94,29 @@ describe('Integration | Component | revisions table/revision entry', function ()
     expect($actions).to.have.length(1);
     expect($actions.text()).to.contain('testAction 3');
   });
+
+  it('triggers "onClick" callback after click', async function () {
+    const { onClick } = this.setProperties({
+      onClick: sinon.spy(),
+      revisionNumber: 2,
+    });
+    await render(this);
+    expect(onClick).not.to.be.called;
+
+    await click(`.${componentClass}`);
+
+    expect(onClick).to.be.calledOnce.and.to.be.calledWith(2);
+  });
+
+  it('does not trigger "onClick" callback after actions trigger click',
+    async function () {
+      const onClick = this.set('onClick', sinon.spy());
+      await render(this);
+
+      await click('.revision-actions-trigger');
+
+      expect(onClick).not.to.be.called;
+    });
 });
 
 async function render(testCase) {
@@ -100,5 +124,6 @@ async function render(testCase) {
     revisionNumber=revisionNumber
     revision=revision
     revisionActionsFactory=revisionActionsFactory
+    onClick=onClick
   }}`);
 }

@@ -38,6 +38,12 @@ export default Component.extend(I18n, {
   revisionActionsFactory: undefined,
 
   /**
+   * @virtual optional
+   * @type {(revisionNumber: Number) => void}
+   */
+  onRevisionClick: undefined,
+
+  /**
    * @type {Boolean}
    */
   areRevNumsBetweenStableAndLatestExpanded: false,

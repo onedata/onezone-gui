@@ -10,7 +10,7 @@
   {{#each sortedCollection as |atmWorkflowSchema|}}
     {{content-atm-inventories-workflows/atm-workflow-schemas-list-entry
       atmWorkflowSchema=atmWorkflowSchema
-      onAtmWorkflowSchemaClick=(action onAtmWorkflowSchemaClick atmWorkflowSchema)
+      onRevisionClick=onRevisionClick
     }}
   {{else}}
     {{#if searchValue}}

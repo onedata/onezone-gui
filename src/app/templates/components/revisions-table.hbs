@@ -12,6 +12,7 @@
       revisionNumber=latestRevNum
       revision=(get revisionRegistry latestRevNum)
       revisionActionsFactory=revisionActionsFactory
+      onClick=onRevisionClick
     }}
   {{/if}}
   {{#if revNumsBetweenStableAndLatest.length}}
@@ -21,6 +22,7 @@
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
+          onClick=onRevisionClick
         }}
       {{/each}}
     {{else}}
@@ -36,6 +38,7 @@
       revisionNumber=latestStableRevNum
       revision=(get revisionRegistry latestStableRevNum)
       revisionActionsFactory=revisionActionsFactory
+      onClick=onRevisionClick
     }}
   {{/if}}
   {{#if revNumsBeforeStable.length}}
@@ -45,6 +48,7 @@
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
+          onClick=onRevisionClick
         }}
       {{/each}}
     {{else}}

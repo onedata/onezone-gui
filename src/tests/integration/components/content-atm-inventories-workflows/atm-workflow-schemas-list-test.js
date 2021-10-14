@@ -66,8 +66,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       ModifyAtmWorkflowSchemaAction.create();
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
-      DumpAtmWorkflowSchemaRevisionAction.create(),
-        RemoveAtmWorkflowSchemaRevisionAction.create();
+      DumpAtmWorkflowSchemaRevisionAction.create();
+      RemoveAtmWorkflowSchemaRevisionAction.create();
     });
 
     beforeEach(function () {
@@ -76,7 +76,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
           generateAtmWorkflowSchema('w1'),
           generateAtmWorkflowSchema('w0'),
         ],
-        workflowClickedSpy: sinon.spy(),
+        workflowRevisionClickedSpy: sinon.spy(),
       });
     });
 
@@ -290,34 +290,14 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       expect($workflows.text()).to.contain('w1');
     });
 
-    it('notifies about workflow click', async function () {
+    it('notifies about workflow revision click', async function () {
       await render(this);
 
-      await click('.atm-workflow-schemas-list-entry');
+      await click('.atm-workflow-schemas-list-entry .revisions-table-revision-entry');
 
-      expect(this.get('workflowClickedSpy')).to.be.calledOnce
-        .and.to.be.calledWith(this.get('collection.1'));
+      expect(this.get('workflowRevisionClickedSpy')).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'), 1);
     });
-
-    it('does not notify about workflow click, when workflow actions were clicked',
-      async function () {
-        await render(this);
-
-        await click('.workflow-actions-trigger');
-
-        expect(this.get('workflowClickedSpy')).to.not.be.called;
-      });
-
-    it('does not notify about workflow click, when workflow is being edited',
-      async function () {
-        await render(this);
-
-        await click('.workflow-actions-trigger');
-        await click($('body .webui-popover.in .change-details-action-trigger')[0]);
-        await click('.atm-workflow-schemas-list-entry');
-
-        expect(this.get('workflowClickedSpy')).to.not.be.called;
-      });
 
     it('allows choosing from workflow revision actions', async function () {
       await render(this);
@@ -385,7 +365,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
     collection=collection
-    onAtmWorkflowSchemaClick=workflowClickedSpy
+    onRevisionClick=workflowRevisionClickedSpy
   }}`);
   await wait();
 }

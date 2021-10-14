@@ -18,8 +18,14 @@
   }
 
   .revisions-table-revision-entry {
-    &:hover {
-      background-color: $main-content-hover-background;
+    &:not(.clickable) {
+      cursor: initial !important;
+    }
+
+    &.clickable {
+      &:hover {
+        background-color: $main-content-hover-background;
+      }
     }
 
     td {
