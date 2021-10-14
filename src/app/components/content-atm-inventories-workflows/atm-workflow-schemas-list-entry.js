@@ -18,7 +18,7 @@ import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
 export default Component.extend(I18n, {
   classNames: ['atm-workflow-schemas-list-entry', 'iconified-block'],
-  classNameBindings: ['isEditing:is-editing:hoverable'],
+  classNameBindings: ['isEditing:is-editing'],
 
   i18n: service(),
   workflowActions: service(),

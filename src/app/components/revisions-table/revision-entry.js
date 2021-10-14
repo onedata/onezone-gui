@@ -1,3 +1,12 @@
+/**
+ * Renders single revision.
+ *
+ * @module components/revisions-table/revision-entry
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -9,7 +18,7 @@ import { scheduleOnce } from '@ember/runloop';
 
 export default Component.extend(I18n, {
   tagName: 'tr',
-  classNames: ['revisions-table-revision-entry'],
+  classNames: ['revisions-table-revision-entry', 'clickable'],
   classNameBindings: ['hasDescription::no-description'],
 
   i18n: service(),

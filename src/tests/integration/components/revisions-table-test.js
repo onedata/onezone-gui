@@ -30,14 +30,14 @@ describe('Integration | Component | revisions table', function () {
     );
   });
 
-  it('shows table entries for each revision', async function () {
+  it('shows revisions content', async function () {
     const revisionsSpec = [{
       revisionNumber: 1,
-      state: 'draft',
+      state: 'stable',
       description: 'myrev 1',
     }, {
       revisionNumber: 2,
-      state: 'stable',
+      state: 'draft',
       description: 'myrev 2',
     }];
     this.setProperties({
@@ -72,6 +72,143 @@ describe('Integration | Component | revisions table', function () {
       expect($actions.text()).to.contain(`testAction ${revisionNumber}`);
     }
   });
+
+  it('shows only latest and latest stable revision in case of many mixed-state revisions',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'draft' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'stable' },
+        { revisionNumber: 4, state: 'draft' },
+        { revisionNumber: 5, state: 'draft' },
+      ]));
+      await render(this);
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'expander', revisionsCount: 1 },
+        { type: 'revision', revisionNumber: 3 },
+        { type: 'expander', revisionsCount: 2 },
+      ]);
+    }
+  );
+
+  it('shows only the latest stable revision, if the latest is also the latest stable and there are many older revisions',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'draft' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'stable' },
+        { revisionNumber: 4, state: 'draft' },
+        { revisionNumber: 5, state: 'stable' },
+      ]));
+      await render(this);
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'expander', revisionsCount: 4 },
+      ]);
+    }
+  );
+
+  it('shows only the latest revision if there is no latest stable revision and there are many older revisions',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'draft' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'draft' },
+        { revisionNumber: 4, state: 'draft' },
+        { revisionNumber: 5, state: 'draft' },
+      ]));
+      await render(this);
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'expander', revisionsCount: 4 },
+      ]);
+    }
+  );
+
+  it('allows to see revisions between the latest and the latest stable',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'draft' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'stable' },
+        { revisionNumber: 4, state: 'draft' },
+        { revisionNumber: 5, state: 'draft' },
+      ]));
+      await render(this);
+
+      await click('.between-revisions-expander .expand-button');
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'revision', revisionNumber: 4 },
+        { type: 'revision', revisionNumber: 3 },
+        { type: 'expander', revisionsCount: 2 },
+      ]);
+    }
+  );
+
+  it('allows to see revisions older than the latest stable', async function () {
+    this.set('revisionRegistry', generateRevisionRegistry([
+      { revisionNumber: 1, state: 'draft' },
+      { revisionNumber: 2, state: 'deprecated' },
+      { revisionNumber: 3, state: 'stable' },
+      { revisionNumber: 4, state: 'draft' },
+      { revisionNumber: 5, state: 'draft' },
+    ]));
+    await render(this);
+
+    await click('.older-revisions-expander .expand-button');
+
+    expectRevisionEntriesLayout(this, [
+      { type: 'revision', revisionNumber: 5 },
+      { type: 'expander', revisionsCount: 1 },
+      { type: 'revision', revisionNumber: 3 },
+      { type: 'revision', revisionNumber: 2 },
+      { type: 'revision', revisionNumber: 1 },
+    ]);
+  });
+
+  it('does not allow to expand revisions between the latest and the latest stable if these are not present',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'draft' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'stable' },
+        { revisionNumber: 4, state: 'stable' },
+        { revisionNumber: 5, state: 'draft' },
+      ]));
+      await render(this);
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'revision', revisionNumber: 4 },
+        { type: 'expander', revisionsCount: 3 },
+      ]);
+    }
+  );
+
+  it('does not allow to expand revisions older than latest stable if these are not present',
+    async function () {
+      this.set('revisionRegistry', generateRevisionRegistry([
+        { revisionNumber: 1, state: 'stable' },
+        { revisionNumber: 2, state: 'deprecated' },
+        { revisionNumber: 3, state: 'draft' },
+        { revisionNumber: 4, state: 'draft' },
+        { revisionNumber: 5, state: 'draft' },
+      ]));
+      await render(this);
+
+      expectRevisionEntriesLayout(this, [
+        { type: 'revision', revisionNumber: 5 },
+        { type: 'expander', revisionsCount: 3 },
+        { type: 'revision', revisionNumber: 1 },
+      ]);
+    }
+  );
 });
 
 async function render(testCase) {
@@ -92,4 +229,19 @@ function generateRevisionRegistry(revisionsSpec) {
     }
   );
   return revisionRegistry;
+}
+
+function expectRevisionEntriesLayout(testCase, layoutSpec) {
+  const $rows = testCase.$(`.${componentClass} tbody tr`);
+  expect($rows).to.have.length(layoutSpec.length);
+  layoutSpec.forEach(({ type, revisionsCount, revisionNumber }, idx) => {
+    const $row = $rows.eq(idx);
+    if (type === 'revision') {
+      expect($row).to.have.class('revisions-table-revision-entry');
+      expect($row.find('.revision-number').text()).to.equal(String(revisionNumber));
+    } else if (type === 'expander') {
+      expect($row).to.have.class('revisions-table-revision-entries-expander');
+      expect($row.find('.expand-button').text()).to.contain(String(revisionsCount));
+    }
+  });
 }

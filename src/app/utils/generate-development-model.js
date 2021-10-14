@@ -963,8 +963,26 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
         atmInventory,
         revisionRegistry: {
           1: {
-            description: 'My first revision',
+            description: 'My 1st revision',
             state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          2: {
+            description: 'My 2nd revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          3: {
+            description: 'My 3rd revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          4: {
+            description: 'My 4th revision',
+            state: 'stable',
             lanes: [{
               id: 'lane1',
               name: 'lane 1',
@@ -989,6 +1007,24 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                 valueConstraints: {},
               },
             }],
+          },
+          5: {
+            description: 'My 5th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          6: {
+            description: 'My 6th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          7: {
+            description: 'My 7th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
           },
         },
       }).save();
