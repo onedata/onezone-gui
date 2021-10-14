@@ -136,6 +136,7 @@ import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-w
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
 import dumpAtmWorkflowSchemaAction from './utils/workflow-actions/dump-atm-workflow-schema-action';
 import uploadAtmWorkflowSchemaAction from './utils/workflow-actions/upload-atm-workflow-schema-action';
+import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
 const translations = {
   tabs: {
@@ -294,6 +295,7 @@ const translations = {
       createAtmWorkflowSchemaAction,
       dumpAtmWorkflowSchemaAction,
       uploadAtmWorkflowSchemaAction,
+      removeAtmWorkflowSchemaRevisionAction,
     },
   },
 };

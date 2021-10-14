@@ -15,6 +15,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
+import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/revision-actions-factory';
 
 export default Component.extend(I18n, {
   classNames: ['atm-workflow-schemas-list-entry', 'iconified-block'],
@@ -129,6 +130,19 @@ export default Component.extend(I18n, {
     'dumpAction',
     'removeAction',
     'copyIdAction'
+  ),
+
+  /**
+   * @type {ComputedProperty<Utils.AtmWorkflow.AtmWorkflowSchema.RevisionActionsFactory>}
+   */
+  revisionActionsFactory: computed(
+    'atmWorkflowSchema',
+    function revisionActionsFactory() {
+      return RevisionActionsFactory.create({
+        ownerSource: this,
+        atmWorkflowSchema: this.get('atmWorkflowSchema'),
+      });
+    }
   ),
 
   click(event) {

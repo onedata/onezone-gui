@@ -29,7 +29,10 @@
         </div>
       {{/if}}
     {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
-    {{revisions-table revisionRegistry=atmWorkflowSchema.revisionRegistry}}
+    {{revisions-table
+      revisionRegistry=atmWorkflowSchema.revisionRegistry
+      revisionActionsFactory=revisionActionsFactory
+    }}
   </div>
   {{one-menu-toggle
     class=(concat-classes
