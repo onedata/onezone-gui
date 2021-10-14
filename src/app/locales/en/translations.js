@@ -134,8 +134,8 @@ import unlinkAtmLambdaAction from './utils/workflow-actions/unlink-atm-lambda-ac
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
-import dumpAtmWorkflowSchemaAction from './utils/workflow-actions/dump-atm-workflow-schema-action';
 import uploadAtmWorkflowSchemaAction from './utils/workflow-actions/upload-atm-workflow-schema-action';
+import dumpAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
 const translations = {
@@ -293,8 +293,8 @@ const translations = {
       modifyAtmWorkflowSchemaAction,
       removeAtmWorkflowSchemaAction,
       createAtmWorkflowSchemaAction,
-      dumpAtmWorkflowSchemaAction,
       uploadAtmWorkflowSchemaAction,
+      dumpAtmWorkflowSchemaRevisionAction,
       removeAtmWorkflowSchemaRevisionAction,
     },
   },

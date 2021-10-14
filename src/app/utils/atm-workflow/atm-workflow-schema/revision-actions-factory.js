@@ -25,8 +25,20 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    */
   createActionsForRevisionNumber(revisionNumber) {
     return [
+      this.createDumpAtmWorkflowSchemaRevisionAction(revisionNumber),
       this.createRemoveAtmWorkflowSchemaRevisionAction(revisionNumber),
     ];
+  },
+
+  /**
+   * @param {Number} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDumpAtmWorkflowSchemaRevisionAction(revisionNumber) {
+    return this.get('workflowActions').createDumpAtmWorkflowSchemaRevisionAction({
+      atmWorkflowSchema: this.get('atmWorkflowSchema'),
+      revisionNumber,
+    });
   },
 
   /**

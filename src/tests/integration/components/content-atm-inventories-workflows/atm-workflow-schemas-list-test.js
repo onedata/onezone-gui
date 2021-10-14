@@ -10,16 +10,13 @@ import { resolve } from 'rsvp';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
+import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
   label: 'Change details',
   icon: 'rename',
-}, {
-  className: 'dump-atm-workflow-schema-action-trigger',
-  label: 'Download (json)',
-  icon: 'browser-download',
 }, {
   className: 'remove-atm-workflow-schema-action-trigger',
   label: 'Remove',
@@ -31,6 +28,10 @@ const workflowActionsSpec = [{
 }];
 
 const revisionActionsSpec = [{
+  className: 'dump-atm-workflow-schema-revision-action-trigger',
+  label: 'Download (json)',
+  icon: 'browser-download',
+}, {
   className: 'remove-atm-workflow-schema-revision-action-trigger',
   label: 'Remove',
   icon: 'x',
@@ -65,7 +66,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       ModifyAtmWorkflowSchemaAction.create();
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
-      RemoveAtmWorkflowSchemaRevisionAction.create();
+      DumpAtmWorkflowSchemaRevisionAction.create(),
+        RemoveAtmWorkflowSchemaRevisionAction.create();
     });
 
     beforeEach(function () {
@@ -84,6 +86,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         ModifyAtmWorkflowSchemaAction,
         RemoveAtmWorkflowSchemaAction,
         CopyRecordIdAction,
+        DumpAtmWorkflowSchemaRevisionAction,
         RemoveAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
         if (action.prototype.execute.restore) {
@@ -332,6 +335,28 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect($action.text().trim()).to.equal(label);
         expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
       });
+    });
+
+    it('allows downloading workflow revision dump', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        DumpAtmWorkflowSchemaRevisionAction.prototype,
+        'execute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.revisionNumber')).to.equal(1);
+        return resolve({ status: 'done' });
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .dump-atm-workflow-schema-revision-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
     });
 
     it('allows removing workflow revision', async function () {

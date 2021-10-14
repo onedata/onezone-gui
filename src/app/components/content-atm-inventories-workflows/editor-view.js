@@ -147,8 +147,10 @@ export default Component.extend(I18n, {
         'atmWorkflowSchema',
         'isVisualiserDataModified'
       );
-      const action = workflowActions.createDumpAtmWorkflowSchemaAction({
+      const action = workflowActions.createDumpAtmWorkflowSchemaRevisionAction({
         atmWorkflowSchema,
+        // TODO: VFS-8255 pass revision
+        // revisionNumber: ...
       });
       setProperties(action, {
         disabled: isVisualiserDataModified,
