@@ -7,15 +7,16 @@
       {{content-atm-inventories-workflows/list-view
         atmInventory=atmInventory
         onAddAtmWorkflowSchema=(action "showCreatorView")
-        onOpenAtmWorkflowSchema=(action "showEditorView")
+        onOpenAtmWorkflowSchemaRevision=(action "showEditorView")
         onRegisterViewActions=(action "registerViewActions" "list")
       }}
     {{/carousel.slide}}
     {{#carousel.slide slideId="editor"}}
       {{#if activeAtmWorkflowSchemaId}}
-        {{#if activeAtmWorkflowSchemaProxy.isFulfilled}}
+        {{#if activeAtmWorkflowSchemaRevisionProxy.isFulfilled}}
           {{content-atm-inventories-workflows/editor-view
             atmWorkflowSchema=activeAtmWorkflowSchemaProxy.content
+            revisionNumber=activeRevisionNumber
             actionsFactory=actionsFactory
             onModificationStateChange=(action "editorModificationStateChange")
             onBackSlide=(action "backSlide")
@@ -23,7 +24,7 @@
           }}
         {{else}}
           {{content-atm-inventories-workflows/loading-view
-            loadingProxy=activeAtmWorkflowSchemaProxy
+            loadingProxy=activeAtmWorkflowSchemaRevisionProxy
             onBackSlide=(action "backSlide")
           }}
         {{/if}}

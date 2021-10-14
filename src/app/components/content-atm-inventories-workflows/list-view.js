@@ -45,9 +45,10 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Function}
    * @param {Models.AtmWorkflowSchema}
+   * @param {Number} revision
    * @returns {any}
    */
-  onOpenAtmWorkflowSchema: notImplementedIgnore,
+  onOpenAtmWorkflowSchemaRevision: notImplementedIgnore,
 
   /**
    * @virtual

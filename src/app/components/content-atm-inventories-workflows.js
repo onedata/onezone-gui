@@ -53,6 +53,11 @@ export default Component.extend(GlobalActions, I18n, {
   activeAtmWorkflowSchemaId: undefined,
 
   /**
+   * @type {Number|undefined}
+   */
+  activeRevisionNumber: undefined,
+
+  /**
    * One of: `'create'`, `'edit'`
    * @type {String}
    */
@@ -138,6 +143,11 @@ export default Component.extend(GlobalActions, I18n, {
   activeAtmWorkflowSchemaIdFromUrl: reads('navigationState.aspectOptions.workflowId'),
 
   /**
+   * @type {ComputedProperty<String|undefined>}
+   */
+  activeRevisionNumberFromUrl: reads('navigationState.aspectOptions.revision'),
+
+  /**
    * @type {ComputedProperty<PromiseObject<Model.AtmWorkflowSchema>>}
    */
   activeAtmWorkflowSchemaProxy: promise.object(computed(
@@ -171,6 +181,28 @@ export default Component.extend(GlobalActions, I18n, {
   )),
 
   /**
+   * @type {ComputedProperty<PromiseObject<AtmWorkflowSchemaRevision>>}
+   */
+  activeAtmWorkflowSchemaRevisionProxy: promise.object(computed(
+    'activeAtmWorkflowSchemaProxy',
+    'activeRevisionNumber',
+    async function activeAtmWorkflowSchemaRevision() {
+      const {
+        activeAtmWorkflowSchemaProxy,
+        activeRevisionNumber,
+      } = this.getProperties('activeAtmWorkflowSchemaProxy', 'activeRevisionNumber');
+
+      const activeAtmWorkflowSchema = await activeAtmWorkflowSchemaProxy;
+      const activeRevision = activeRevisionNumber &&
+        get(activeAtmWorkflowSchema, `revisionRegistry.${activeRevisionNumber}`);
+      if (!activeRevision) {
+        throw { id: 'notFound' };
+      }
+      return activeRevision;
+    }
+  )),
+
+  /**
    * @type {ComputedProperty<Function>}
    */
   routeChangeHandler: computed(function routeChangeHandler() {
@@ -186,6 +218,7 @@ export default Component.extend(GlobalActions, I18n, {
 
   urlParamsObserver: observer(
     'activeAtmWorkflowSchemaIdFromUrl',
+    'activeRevisionNumberFromUrl',
     'activeSlideFromUrl',
     function urlParamsObserver() {
       scheduleOnce('actions', this, 'synchronizeStateWithUrl');
@@ -276,17 +309,24 @@ export default Component.extend(GlobalActions, I18n, {
       activeSlideFromUrl,
       activeAtmWorkflowSchemaId,
       activeAtmWorkflowSchemaIdFromUrl,
+      activeRevisionNumber,
+      activeRevisionNumberFromUrl,
     } = this.getProperties(
       'activeSlide',
       'activeSlideFromUrl',
       'activeAtmWorkflowSchemaId',
       'activeAtmWorkflowSchemaIdFromUrl',
+      'activeRevisionNumber',
+      'activeRevisionNumberFromUrl'
     );
 
     let nextActiveSlide = activeSlide;
     let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId || null;
+    let nextRevisionNumber = activeRevisionNumberFromUrl || null;
     const isActiveAtmWorkflowSchemaIdChanged =
       () => nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaId;
+    const isActiveRevisionNumberChanged =
+      () => nextRevisionNumber !== activeRevisionNumber;
     const isActiveSlideChanged = () => nextActiveSlide !== activeSlide;
 
     // Detect change of `activeAtmWorkflowSchemaId`. `||` condition
@@ -295,6 +335,11 @@ export default Component.extend(GlobalActions, I18n, {
         activeAtmWorkflowSchemaIdFromUrl || activeAtmWorkflowSchemaId
       )) {
       nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl || null;
+    }
+
+    // Convert revision number to integer
+    if (typeof nextRevisionNumber === 'string') {
+      nextRevisionNumber = Number.parseInt(nextRevisionNumber) || null;
     }
 
     // Detect change of `activeSlide`
@@ -349,6 +394,9 @@ export default Component.extend(GlobalActions, I18n, {
     if (isActiveAtmWorkflowSchemaIdChanged()) {
       propsToUpdate.activeAtmWorkflowSchemaId = nextActiveAtmWorkflowSchemaId;
     }
+    if (isActiveRevisionNumberChanged()) {
+      propsToUpdate.activeRevisionNumber = nextRevisionNumber;
+    }
     if (Object.keys(propsToUpdate).length) {
       this.setProperties(propsToUpdate);
     }
@@ -367,11 +415,14 @@ export default Component.extend(GlobalActions, I18n, {
     // while asking user what to do with changes.
     if (
       nextActiveSlide !== this.get('activeSlideFromUrl') ||
-      nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl')
+      nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl') ||
+      nextRevisionNumber !== this.get('activeRevisionNumberFromUrl')
     ) {
       this.setUrlParams({
         view: nextActiveSlide,
         workflowId: nextActiveAtmWorkflowSchemaId,
+        revision: nextRevisionNumber === null ?
+          nextRevisionNumber : String(nextRevisionNumber),
       }, true);
     }
   },
@@ -454,7 +505,8 @@ export default Component.extend(GlobalActions, I18n, {
 
   changeSlideViaUrl(newSlide, slideParams = {}) {
     const workflowId = this.get('activeAtmWorkflowSchemaIdFromUrl') || null;
-    this.setUrlParams(Object.assign({ workflowId }, slideParams, {
+    const revision = this.get('activeRevisionNumberFromUrl') || null;
+    this.setUrlParams(Object.assign({ workflowId, revision }, slideParams, {
       view: newSlide,
     }));
   },
@@ -545,10 +597,13 @@ export default Component.extend(GlobalActions, I18n, {
     showCreatorView() {
       this.changeSlideViaUrl('editor', { workflowId: null });
     },
-    showEditorView(atmWorkflowSchema) {
+    showEditorView(atmWorkflowSchema, revisionNumber) {
       const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
       const schemaTheSameAsPrevOne = workflowId === this.get('activeAtmWorkflowSchemaId');
-      this.changeSlideViaUrl('editor', { workflowId });
+      this.changeSlideViaUrl('editor', {
+        workflowId,
+        revision: String(revisionNumber),
+      });
 
       if (schemaTheSameAsPrevOne) {
         // Notify about change in case when selected workflow schema is the same

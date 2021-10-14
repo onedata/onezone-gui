@@ -43,6 +43,11 @@ export default Component.extend(I18n, {
   atmWorkflowSchema: undefined,
 
   /**
+   * @type {Number}
+   */
+  revisionNumber: undefined,
+
+  /**
    * @virtual
    * @type {Utils.WorkflowVisualiser.ActionsFactory}
    */
@@ -69,7 +74,7 @@ export default Component.extend(I18n, {
 
   /**
    * Data injected into the visualiser. Initialized by
-   * `atmWorkflowSchemaObserver`, updated by modifications.
+   * `atmWorkflowSchemaRevisionObserver`, updated by modifications.
    * @type {Object}
    */
   visualiserData: undefined,
@@ -160,18 +165,23 @@ export default Component.extend(I18n, {
     }
   ),
 
-  atmWorkflowSchemaObserver: observer(
+  atmWorkflowSchemaRevisionObserver: observer(
     'atmWorkflowSchema',
-    function atmWorkflowSchemaObserver() {
-      const atmWorkflowSchema = this.get('atmWorkflowSchema');
-      if (!atmWorkflowSchema) {
+    'revisionNumber',
+    function atmWorkflowSchemaRevisionObserver() {
+      const {
+        atmWorkflowSchema,
+        revisionNumber,
+      } = this.getProperties('atmWorkflowSchema', 'revisionNumber');
+      if (!atmWorkflowSchema || typeof revisionNumber !== 'number') {
         return;
       }
 
+      const revision = get(atmWorkflowSchema, `revisionRegistry.${revisionNumber}`);
       const {
         lanes = [],
           stores = [],
-      } = getProperties(atmWorkflowSchema, 'lanes', 'stores');
+      } = getProperties(revision || {}, 'lanes', 'stores');
       const data = {
         lanes,
         stores,
@@ -202,7 +212,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.atmWorkflowSchemaObserver();
+    this.atmWorkflowSchemaRevisionObserver();
     this.globalActionsObserver();
     this.modificationStateNotifier();
   },
@@ -246,7 +256,7 @@ export default Component.extend(I18n, {
         atmWorkflowSchema === this.get('atmWorkflowSchema')
       ) {
         // reload modification state
-        safeExec(this, 'atmWorkflowSchemaObserver');
+        safeExec(this, 'atmWorkflowSchemaRevisionObserver');
       }
     });
 
