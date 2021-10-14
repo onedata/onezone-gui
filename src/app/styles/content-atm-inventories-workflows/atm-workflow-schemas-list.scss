@@ -16,8 +16,11 @@
   }
 
   .content-section {
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: auto min-content;
+    grid-template-areas:
+        "details actions"
+        "revisions revisions";
 
     .form {
       margin: 0;
@@ -36,12 +39,12 @@
     }
   }
 
-  .workflow-schema-content {
-    flex-grow: 1;
-    min-width: 0;
+  .atm-workflow-schema-details-form {
+    grid-area: details;
   }
 
   .revisions-table {
+    grid-area: revisions;
     margin-top: 1em;
   }
 
@@ -61,7 +64,9 @@
     }
   }
 
-  .one-menu-toggle {
+  .workflow-actions-trigger {
+    grid-area: actions;
+    align-self: start;
     margin-right: -$iconified-block-padding;
   }
 }

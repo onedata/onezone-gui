@@ -2,38 +2,36 @@
   {{record-icon record=atmWorkflowSchema}}
 </div>
 <div class="content-section">
-  <div class="workflow-schema-content">
-    {{#content-atm-inventories-workflows/atm-workflow-schema-details-form
-      atmWorkflowSchema=atmWorkflowSchema
-      mode=(if isEditing "edit" "view")
-      isDisabled=isSavingChanges
-      onChange=(action "detailsChanged")
-    }}
-      {{#if isEditing}}
-        <div class="btn-toolbar footer-buttons">
-          {{#one-spin-button
-            class="btn btn-sm btn-success btn-save clickable"
-            action=(action "saveChanges")
-            disabled=(not areChangesValid)
-          }}
-            {{tt this "saveBtn"}}
-          {{/one-spin-button}}
-          {{#bs-button
-            size="sm"
-            type="default"
-            class="btn-cancel clickable"
-            onClick=(action "cancelChanges")
-          }}
-            {{tt this "cancelBtn"}}
-          {{/bs-button}}
-        </div>
-      {{/if}}
-    {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
-    {{revisions-table
-      revisionRegistry=atmWorkflowSchema.revisionRegistry
-      revisionActionsFactory=revisionActionsFactory
-    }}
-  </div>
+  {{#content-atm-inventories-workflows/atm-workflow-schema-details-form
+    atmWorkflowSchema=atmWorkflowSchema
+    mode=(if isEditing "edit" "view")
+    isDisabled=isSavingChanges
+    onChange=(action "detailsChanged")
+  }}
+    {{#if isEditing}}
+      <div class="btn-toolbar footer-buttons">
+        {{#one-spin-button
+          class="btn btn-sm btn-success btn-save clickable"
+          action=(action "saveChanges")
+          disabled=(not areChangesValid)
+        }}
+          {{tt this "saveBtn"}}
+        {{/one-spin-button}}
+        {{#bs-button
+          size="sm"
+          type="default"
+          class="btn-cancel clickable"
+          onClick=(action "cancelChanges")
+        }}
+          {{tt this "cancelBtn"}}
+        {{/bs-button}}
+      </div>
+    {{/if}}
+  {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
+  {{revisions-table
+    revisionRegistry=atmWorkflowSchema.revisionRegistry
+    revisionActionsFactory=revisionActionsFactory
+  }}
   {{one-menu-toggle
     class=(concat-classes
       "workflow-actions-trigger clickable"
