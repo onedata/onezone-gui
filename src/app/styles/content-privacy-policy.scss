@@ -1,8 +1,6 @@
 .content-privacy-policy {
-  height: 100vh;
   display: flex; 
   flex-direction: column;
-  min-height: 100vh;
 
   .world-map {
     background-position: center center;
@@ -13,17 +11,13 @@
     display: flex; 
     flex-direction: column;
   }
-  .content-info-content-container {
-    overflow: auto;
-  }
+
   .privacy-policy-content {
-    overflow-y: auto;
+    overflow: auto;
     text-align: justify;
     padding: 10px;
     padding-bottom: 30px;
     flex-grow: 1;
-  
-    
 
     .privacy-policy-title {
       @include font-semibold;
@@ -56,20 +50,17 @@
     }
     .onedata-copyright-public {
       font-size: 16px;
-      padding-left: 30px;
+      padding-left: $content-col-padding;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       flex-grow: 1;
-      align-self: baseline;
     }
     .back-to-main-page {
       font-size: 16px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      padding-right: 30px;
-      align-self: center;
     }
     .oneicon-home {
       position: relative;
