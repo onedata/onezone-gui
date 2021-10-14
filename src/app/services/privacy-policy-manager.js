@@ -28,11 +28,6 @@ export default Service.extend(
     areCookiesAccepted: false,
 
     /**
-     * @type {boolean}
-     */
-    isPrivacyPolicyInfoVisible: false,
-
-    /**
      * @override
      */
     showPrivacyPolicyAction: computed(
@@ -69,7 +64,7 @@ export default Service.extend(
           DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            '<a class="clickable privacy-policy-link">$1</a>'
+            '<a class="clickable privacy-policy-link">$1<span class="oneicon oneicon-link-external"></span></a>'
           )
         );
     },
@@ -87,15 +82,11 @@ export default Service.extend(
      */
     showPrivacyPolicyInfo() {
       if (this.get('privacyPolicy')) {
-        this.set('isPrivacyPolicyInfoVisible', true);
+        window.open(
+          this.get('router').urlFor('public.privacy-policy'),
+          '_self'
+        );
       }
-    },
-
-    /**
-     * @returns {undefined}
-     */
-    hidePrivacyPolicyInfo() {
-      this.set('isPrivacyPolicyInfoVisible', false);
     },
   }
 );

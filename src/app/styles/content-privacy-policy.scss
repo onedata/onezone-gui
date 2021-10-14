@@ -1,0 +1,82 @@
+.content-privacy-policy {
+  height: 100vh;
+  display: flex; 
+  flex-direction: column;
+  min-height: 100vh;
+
+  .world-map {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-attachment: fixed;
+    height: 100vh;
+    display: flex; 
+    flex-direction: column;
+  }
+  .content-info-content-container {
+    overflow: auto;
+  }
+  .privacy-policy-content {
+    overflow-y: auto;
+    text-align: justify;
+    padding: 10px;
+    padding-bottom: 30px;
+    flex-grow: 1;
+  
+    
+
+    .privacy-policy-title {
+      @include font-semibold;
+      font-size: 32px;
+      padding-bottom: 80px;
+      padding-top: 80px;
+      text-transform: uppercase;
+    }
+  }
+  
+  .footer-public {
+    height: 88px;
+    width: 100%;
+    border-top: 2px solid $color-one-semiwhite;
+    line-height: 88px;
+    padding-left: $content-col-padding;
+    padding-right: $content-col-padding;
+    margin-top: auto; 
+    background: white;
+    display: flex;
+    .onedata-logo-public {
+      align-self: center;
+      width: 136px;
+      height: 26px;
+      background-image: url($root-url + 'images/logo-dark.svg');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: contain;
+
+    }
+    .onedata-copyright-public {
+      font-size: 16px;
+      padding-left: 30px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      flex-grow: 1;
+      align-self: baseline;
+    }
+    .back-to-main-page {
+      font-size: 16px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 30px;
+      align-self: center;
+    }
+    .oneicon-home {
+      position: relative;
+      top: 5px;
+      font-size: 22px;
+    }
+  }
+}
+
+
