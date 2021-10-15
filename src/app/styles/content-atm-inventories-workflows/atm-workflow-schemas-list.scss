@@ -17,7 +17,7 @@
 
   .content-section {
     display: grid;
-    grid-template-columns: auto min-content;
+    grid-template-columns: 1fr min-content;
     grid-template-areas:
         "details actions"
         "revisions revisions";
@@ -41,6 +41,7 @@
 
   .atm-workflow-schema-details-form {
     grid-area: details;
+    min-width: 0;
   }
 
   .revisions-table {

@@ -17,6 +17,15 @@
     }
   }
 
+  .description-column,
+  .description {
+    max-width: 1px;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .revisions-table-revision-entry {
     &:not(.clickable) {
       cursor: initial !important;
