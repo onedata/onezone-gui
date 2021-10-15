@@ -13,6 +13,7 @@ import { reads, collect } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { computedRelationProxy } from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -44,16 +45,9 @@ export default Component.extend(I18n, {
   ),
 
   /**
-   * @type {Ember.ComputedProperty<Space>}
+   * @type {ComputedProperty<PromiseObject<Space>>}
    */
-  spaceRecord: computed('share', function spaceRecord() {
-    const {
-      spaceManager,
-      share,
-    } = this.getProperties('spaceManager', 'share');
-    const spaceId = share.get('space');
-    return spaceManager.getRecord(spaceId);
-  }),
+  spaceProxy: computedRelationProxy('share', 'space'),
 
   /**
    * @type {Ember.ComputedProperty<Action>}

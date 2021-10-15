@@ -1,5 +1,6 @@
 export default {
   shareItem: {
-    space: 'Space: ',
+    space: 'Space:',
+    unknown: '<em>unknown</em>',
   },
 };
