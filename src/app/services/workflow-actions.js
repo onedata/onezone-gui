@@ -22,6 +22,7 @@ import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/re
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
+import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import { classify } from '@ember/string';
 
@@ -205,6 +206,21 @@ export default Service.extend(I18n, {
    */
   createDumpAtmWorkflowSchemaRevisionAction(context) {
     return DumpAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     revisionNumber: Number,
+   *     revisionDiff: Object,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.ModifyAtmWorkflowSchemaRevisionAction}
+   */
+  createModifyAtmWorkflowSchemaRevisionAction(context) {
+    return ModifyAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
   },
 
   createGlobalActions() {

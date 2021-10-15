@@ -238,22 +238,26 @@ export default Component.extend(I18n, {
     const {
       workflowActions,
       atmWorkflowSchema,
+      revisionNumber,
       visualiserData,
     } = this.getProperties(
       'workflowActions',
       'atmWorkflowSchema',
+      'revisionNumber',
       'visualiserData'
     );
 
-    const action = workflowActions.createModifyAtmWorkflowSchemaAction({
+    const action = workflowActions.createModifyAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
-      atmWorkflowSchemaDiff: visualiserData,
+      revisionNumber,
+      revisionDiff: visualiserData,
     });
     action.addExecuteHook(result => {
       if (
         result &&
         get(result, 'status') === 'done' &&
-        atmWorkflowSchema === this.get('atmWorkflowSchema')
+        atmWorkflowSchema === this.get('atmWorkflowSchema') &&
+        revisionNumber === this.get('revisionNumber')
       ) {
         // reload modification state
         safeExec(this, 'atmWorkflowSchemaRevisionObserver');
