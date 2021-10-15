@@ -4,13 +4,7 @@
       {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
       {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
     </a>
-    <span class="resource-name">
-      {{one-inline-editor
-        class="workflow-schema-name"
-        value=atmWorkflowSchema.name
-        onSave=(action "changeName")
-      }}
-    </span>
+    <span class="resource-name">{{atmWorkflowSchema.name}}</span>
     <div class="btn-toolbar">
       <span>
         {{#bs-button

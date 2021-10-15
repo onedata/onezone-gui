@@ -14,7 +14,6 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import { inject as service } from '@ember/service';
 import { get, getProperties, observer, computed, setProperties } from '@ember/object';
 import { collect } from '@ember/object/computed';
-import { reject } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import areWorkflowSchemasEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schemas-equal';
 import { not } from 'ember-awesome-macros';
@@ -146,16 +145,17 @@ export default Component.extend(I18n, {
       const {
         workflowActions,
         atmWorkflowSchema,
+        revisionNumber,
         isVisualiserDataModified,
       } = this.getProperties(
         'workflowActions',
         'atmWorkflowSchema',
+        'revisionNumber',
         'isVisualiserDataModified'
       );
       const action = workflowActions.createDumpAtmWorkflowSchemaRevisionAction({
         atmWorkflowSchema,
-        // TODO: VFS-8255 pass revision
-        // revisionNumber: ...
+        revisionNumber,
       });
       setProperties(action, {
         disabled: isVisualiserDataModified,
@@ -270,34 +270,6 @@ export default Component.extend(I18n, {
   actions: {
     backSlide() {
       this.get('onBackSlide')();
-    },
-    async changeName(newName) {
-      const {
-        workflowActions,
-        atmWorkflowSchema,
-      } = this.getProperties('workflowActions', 'atmWorkflowSchema');
-
-      if (!newName) {
-        return reject();
-      }
-      if (!get(atmWorkflowSchema, 'name') === newName) {
-        return;
-      }
-
-      const action = workflowActions.createModifyAtmWorkflowSchemaAction({
-        atmWorkflowSchema,
-        atmWorkflowSchemaDiff: {
-          name: newName,
-        },
-      });
-      const result = await action.execute();
-      const {
-        status,
-        error,
-      } = getProperties(result, 'status', 'error');
-      if (status == 'failed') {
-        throw error;
-      }
     },
     visualiserDataChange(newVisualiserData) {
       this.set('visualiserData', newVisualiserData);
