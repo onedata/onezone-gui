@@ -403,7 +403,7 @@ describe('Integration | Component | content atm inventories workflows', function
       });
     });
 
-    it('redirects to editor view after workflow creation', async function () {
+    it('redirects to editor view after workflow creation', async function (done) {
       set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', null);
       const {
         atmWorkflowSchemas,
@@ -411,6 +411,9 @@ describe('Integration | Component | content atm inventories workflows', function
       } = this.getProperties('atmWorkflowSchemas', 'atmInventory');
       const createdRecord = {
         entityId: 'someId',
+        revisionRegistry: {
+          1: {},
+        },
         atmInventory: promiseObject(resolve(atmInventory)),
         atmLambdaList: promiseObject(resolve({
           list: promiseArray(resolve([])),
@@ -435,7 +438,8 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('editor')).to.be.true;
       expectSlideContainsView('editor', 'editor');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-        .to.deep.equal({ view: 'editor', workflowId: 'someId' });
+        .to.deep.equal({ view: 'editor', workflowId: 'someId', revision: '1' });
+      done();
     });
 
     it('allows to add new task', async function () {

@@ -19,6 +19,7 @@ import TextareaField from 'onedata-gui-common/utils/form-component/textarea-fiel
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { scheduleOnce } from '@ember/runloop';
+import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(I18n, {
   tagName: 'form',
@@ -171,9 +172,11 @@ export default Component.extend(I18n, {
       return;
     }
 
-    onChange({
-      data: fields.dumpValue(),
-      isValid: get(fields, 'isValid'),
+    safeExec(this, () => {
+      onChange({
+        data: fields.dumpValue(),
+        isValid: get(fields, 'isValid'),
+      });
     });
   },
 });

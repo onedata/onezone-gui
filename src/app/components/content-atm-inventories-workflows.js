@@ -101,7 +101,7 @@ export default Component.extend(GlobalActions, I18n, {
   /**
    * @type {Boolean}
    */
-  isCarouselVisible: true,
+  isCarouselVisible: false,
 
   /**
    * @type {WorkflowEditorViewModificationState}
@@ -250,6 +250,7 @@ export default Component.extend(GlobalActions, I18n, {
     this.urlParamsObserver();
     this.registerRouteChangeHandler();
     this.registerPageUnloadHandler();
+    scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
   },
 
   willDestroyElement() {
@@ -598,6 +599,9 @@ export default Component.extend(GlobalActions, I18n, {
   actions: {
     showCreatorView() {
       this.changeSlideViaUrl('editor', { workflowId: null });
+    },
+    atmWorkflowSchemaAdded(atmWorkflowSchema) {
+      this.send('showEditorView', atmWorkflowSchema, 1);
     },
     showEditorView(atmWorkflowSchema, revisionNumber) {
       const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;

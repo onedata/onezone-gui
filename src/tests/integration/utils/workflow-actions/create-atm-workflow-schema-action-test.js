@@ -28,6 +28,18 @@ describe(
         rawAtmWorkflowSchema: {
           name: 'someName',
         },
+        completeRawAtmWorkflowSchema: {
+          name: 'someName',
+          initialRevision: {
+            originalRevisionNumber: 1,
+            schema: {
+              state: 'draft',
+              description: '',
+              lanes: [],
+              stores: [],
+            },
+          },
+        },
       });
     });
 
@@ -37,15 +49,17 @@ describe(
         successNotifySpy,
         atmInventory,
         rawAtmWorkflowSchema,
+        completeRawAtmWorkflowSchema,
       } = this.getProperties(
         'createAtmWorkflowSchemaStub',
         'successNotifySpy',
         'atmInventory',
-        'rawAtmWorkflowSchema'
+        'rawAtmWorkflowSchema',
+        'completeRawAtmWorkflowSchema'
       );
       const atmWorkflowSchemaRecord = {};
       createAtmWorkflowSchemaStub
-        .withArgs(atmInventory.entityId, rawAtmWorkflowSchema)
+        .withArgs(atmInventory.entityId, sinon.match(completeRawAtmWorkflowSchema))
         .resolves(atmWorkflowSchemaRecord);
       const action = CreateAtmWorkflowSchemaAction.create({
         ownerSource: this,
