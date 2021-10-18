@@ -26,6 +26,21 @@
     text-overflow: ellipsis;
   }
 
+  .revisions-table-create-revision-entry {
+    color: $color-one-mint;
+
+    .one-icon {
+      display: inline-block;
+      font-size: 130%;
+      vertical-align: text-top;
+      transform: translateX(-0.25em);
+    }
+
+    &:hover {
+      background-color: $main-content-hover-background;
+    }
+  }
+
   .revisions-table-revision-entry {
     &:not(.clickable) {
       cursor: initial !important;

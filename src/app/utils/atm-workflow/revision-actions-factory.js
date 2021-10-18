@@ -8,7 +8,7 @@
  */
 
 import EmberObject from '@ember/object';
-import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
+import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 
 export default EmberObject.extend({
   /**
@@ -16,6 +16,13 @@ export default EmberObject.extend({
    * @returns {Array<Utils.Action>}
    */
   createActionsForRevisionNumber( /* revisionNumber */ ) {
-    return notImplementedReject();
+    return notImplementedThrow();
+  },
+
+  /**
+   * @returns {Utils.Action}
+   */
+  createCreateRevisionAction() {
+    return notImplementedThrow();
   },
 });

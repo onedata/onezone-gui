@@ -9,9 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { promise } from 'ember-awesome-macros';
+import { promise, or, raw } from 'ember-awesome-macros';
 import EmberObject, { computed, observer, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
 import { Promise } from 'rsvp';
@@ -48,14 +47,14 @@ export default Component.extend(GlobalActions, I18n, {
   actionsPerSlide: undefined,
 
   /**
-   * @type {String|undefined}
+   * @type {String|null}
    */
-  activeAtmWorkflowSchemaId: undefined,
+  activeAtmWorkflowSchemaId: null,
 
   /**
-   * @type {Number|undefined}
+   * @type {Number|null}
    */
-  activeRevisionNumber: undefined,
+  activeRevisionNumber: null,
 
   /**
    * One of: `'create'`, `'edit'`
@@ -95,9 +94,9 @@ export default Component.extend(GlobalActions, I18n, {
   ]),
 
   /**
-   * @type {String}
+   * @type {String|null}
    */
-  activeSlide: undefined,
+  activeSlide: null,
 
   /**
    * @type {Boolean}
@@ -133,19 +132,22 @@ export default Component.extend(GlobalActions, I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String|null>}
    */
-  activeSlideFromUrl: reads('navigationState.aspectOptions.view'),
+  activeSlideFromUrl: or('navigationState.aspectOptions.view', raw(null)),
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String|null>}
    */
-  activeAtmWorkflowSchemaIdFromUrl: reads('navigationState.aspectOptions.workflowId'),
+  activeAtmWorkflowSchemaIdFromUrl: or(
+    'navigationState.aspectOptions.workflowId',
+    raw(null)
+  ),
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String|null>}
    */
-  activeRevisionNumberFromUrl: reads('navigationState.aspectOptions.revision'),
+  activeRevisionNumberFromUrl: or('navigationState.aspectOptions.revision', raw(null)),
 
   /**
    * @type {ComputedProperty<PromiseObject<Model.AtmWorkflowSchema>>}
@@ -321,8 +323,8 @@ export default Component.extend(GlobalActions, I18n, {
     );
 
     let nextActiveSlide = activeSlide;
-    let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId || null;
-    let nextRevisionNumber = activeRevisionNumberFromUrl || null;
+    let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId;
+    let nextRevisionNumber = activeRevisionNumberFromUrl;
     const isActiveAtmWorkflowSchemaIdChanged =
       () => nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaId;
     const isActiveRevisionNumberChanged =
@@ -334,7 +336,7 @@ export default Component.extend(GlobalActions, I18n, {
     if (activeAtmWorkflowSchemaIdFromUrl !== activeAtmWorkflowSchemaId && (
         activeAtmWorkflowSchemaIdFromUrl || activeAtmWorkflowSchemaId
       )) {
-      nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl || null;
+      nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl;
     }
 
     // Convert revision number to integer
@@ -416,7 +418,7 @@ export default Component.extend(GlobalActions, I18n, {
     if (
       nextActiveSlide !== this.get('activeSlideFromUrl') ||
       nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl') ||
-      nextRevisionNumber !== this.get('activeRevisionNumberFromUrl')
+      String(nextRevisionNumber) !== String(this.get('activeRevisionNumberFromUrl'))
     ) {
       this.setUrlParams({
         view: nextActiveSlide,
@@ -652,6 +654,9 @@ export default Component.extend(GlobalActions, I18n, {
           [slideId]: actions,
         }));
       });
+    },
+    handleRevisionCreated(atmWorkflowSchema, revisionNumber) {
+      console.log(atmWorkflowSchema, revisionNumber);
     },
     taskProviderLambdaSelected(atmLambda) {
       this.set('taskDetailsProviderData.atmLambda', atmLambda);

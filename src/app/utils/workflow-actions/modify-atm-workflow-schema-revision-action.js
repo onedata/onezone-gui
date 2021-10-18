@@ -9,10 +9,8 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { get, setProperties } from '@ember/object';
+import { get } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
-import ActionResult from 'onedata-gui-common/utils/action-result';
-import { resolve } from 'rsvp';
 import _ from 'lodash';
 import { inject as service } from '@ember/service';
 
@@ -42,7 +40,7 @@ export default Action.extend({
   /**
    * @override
    */
-  onExecute() {
+  async onExecute() {
     const {
       atmWorkflowSchema,
       revisionNumber,
@@ -52,34 +50,24 @@ export default Action.extend({
       'revisionNumber',
       'revisionDiff',
     );
-    const result = ActionResult.create();
 
     const revision = atmWorkflowSchema && revisionNumber &&
       get(atmWorkflowSchema, `revisionRegistry.${revisionNumber}`);
     if (!revision) {
-      setProperties(result, {
-        status: 'failed',
-        error: { id: 'notFound' },
-      });
-      return resolve(result);
+      throw { id: 'notFound' };
     }
 
     const changedProperties = Object.keys(revisionDiff || {}).filter(key =>
       !_.isEqual(revision[key], revisionDiff[key])
     );
 
-    let promise;
     if (changedProperties.length > 0) {
       const updatedRevision = Object.assign({}, revision);
       changedProperties.forEach(key =>
         updatedRevision[key] = revisionDiff[key]
       );
-      promise = result.interceptPromise(this.saveRevision(updatedRevision));
-    } else {
-      promise = result.interceptPromise(resolve(atmWorkflowSchema));
+      return await this.saveRevision(updatedRevision);
     }
-
-    return promise.then(() => result, () => result);
   },
 
   async saveRevision(revision) {

@@ -65,7 +65,7 @@ describe(
         'success'
       );
 
-      const actionResult = await this.get('action').execute();
+      const actionResult = await action.execute();
 
       expect(saveStub).to.be.calledOnce
         .and.to.be.calledWith(workflowSchemaId, revisionNumber, updatedRevision);
@@ -87,7 +87,7 @@ describe(
         'backendError'
       );
 
-      const actionResult = await this.get('action').execute();
+      const actionResult = await action.execute();
 
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'modifying workflow revision'),

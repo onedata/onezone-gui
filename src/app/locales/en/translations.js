@@ -137,6 +137,7 @@ import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-w
 import uploadAtmWorkflowSchemaAction from './utils/workflow-actions/upload-atm-workflow-schema-action';
 import dumpAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import modifyAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/modify-atm-workflow-schema-revision-action';
+import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
 const translations = {
@@ -297,6 +298,7 @@ const translations = {
       uploadAtmWorkflowSchemaAction,
       dumpAtmWorkflowSchemaRevisionAction,
       modifyAtmWorkflowSchemaRevisionAction,
+      createAtmWorkflowSchemaRevisionAction,
       removeAtmWorkflowSchemaRevisionAction,
     },
   },

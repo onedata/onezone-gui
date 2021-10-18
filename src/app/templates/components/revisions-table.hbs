@@ -7,6 +7,9 @@
   </tr>
 </thead>
 <tbody>
+  {{revisions-table/create-revision-entry
+    revisionActionsFactory=revisionActionsFactory
+  }}
   {{#if (not-eq latestRevNum null)}}
     {{revisions-table/revision-entry
       revisionNumber=latestRevNum

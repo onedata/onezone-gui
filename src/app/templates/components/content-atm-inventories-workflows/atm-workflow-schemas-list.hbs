@@ -10,6 +10,7 @@
   {{#each sortedCollection as |atmWorkflowSchema|}}
     {{content-atm-inventories-workflows/atm-workflow-schemas-list-entry
       atmWorkflowSchema=atmWorkflowSchema
+      onRevisionCreated=onRevisionCreated
       onRevisionClick=onRevisionClick
     }}
   {{else}}

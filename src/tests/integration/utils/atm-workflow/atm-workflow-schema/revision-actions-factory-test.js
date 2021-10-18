@@ -5,6 +5,7 @@ import { get } from '@ember/object';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/revision-actions-factory';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
 const revisionActionsClasses = [
   DumpAtmWorkflowSchemaRevisionAction,
@@ -30,6 +31,17 @@ describe('Integration | Utility | atm workflow/atm workflow schema/revision acti
         expect(get(action, 'revisionNumber')).to.equal(3);
         expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
       });
+    });
+
+    it('creates action via createCreateRevisionAction', function () {
+      const atmWorkflowSchema = { entityId: 'someId' };
+      const actionsFactory = RevisionActionsFactory.create({
+        ownerSource: this,
+        atmWorkflowSchema,
+      });
+      const action = actionsFactory.createCreateRevisionAction();
+      expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaRevisionAction);
+      expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
     });
   }
 );

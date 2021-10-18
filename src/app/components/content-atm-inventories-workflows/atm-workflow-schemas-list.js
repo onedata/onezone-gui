@@ -37,6 +37,12 @@ export default Component.extend(I18n, {
   onRevisionClick: undefined,
 
   /**
+   * @virtual
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: Number) => void}
+   */
+  onRevisionCreated: undefined,
+
+  /**
    * @type {String}
    */
   searchValue: '',

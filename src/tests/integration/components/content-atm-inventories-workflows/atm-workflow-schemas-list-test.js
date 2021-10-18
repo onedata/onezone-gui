@@ -10,6 +10,7 @@ import { resolve } from 'rsvp';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
@@ -66,6 +67,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       ModifyAtmWorkflowSchemaAction.create();
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
+      CreateAtmWorkflowSchemaRevisionAction.create();
       DumpAtmWorkflowSchemaRevisionAction.create();
       RemoveAtmWorkflowSchemaRevisionAction.create();
     });
@@ -77,6 +79,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
           generateAtmWorkflowSchema('w0'),
         ],
         workflowRevisionClickedSpy: sinon.spy(),
+        revisionCreatedSpy: sinon.spy(),
       });
     });
 
@@ -86,11 +89,12 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         ModifyAtmWorkflowSchemaAction,
         RemoveAtmWorkflowSchemaAction,
         CopyRecordIdAction,
+        CreateAtmWorkflowSchemaRevisionAction,
         DumpAtmWorkflowSchemaRevisionAction,
         RemoveAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
-        if (action.prototype.execute.restore) {
-          action.prototype.execute.restore();
+        if (action.prototype.onExecute.restore) {
+          action.prototype.onExecute.restore();
         }
       });
     });
@@ -162,7 +166,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
     it('allows to modify workflow', async function () {
       const firstWorkflow = this.get('collection.1');
-      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
+      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'onExecute')
         .callsFake(function () {
           expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
           expect(this.get('context.atmWorkflowSchemaDiff')).to.deep.include({
@@ -186,8 +190,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('stays in edition mode when workflow modification failed', async function () {
-      sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
-        .callsFake(() => resolve({ status: 'failed' }));
+      sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'onExecute').rejects();
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
@@ -234,10 +237,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         RemoveAtmWorkflowSchemaAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
-        return resolve({ status: 'done' });
       });
 
       await render(this);
@@ -256,10 +258,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         CopyRecordIdAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.record')).to.equal(firstWorkflow);
-        return resolve({ status: 'done' });
       });
 
       await render(this);
@@ -288,6 +289,21 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       expect($workflows).to.have.length(1);
       expect($workflows.text()).to.contain('w1');
+    });
+
+    it('allows creating new revision', async function () {
+      const revisionCreatedSpy = this.get('revisionCreatedSpy');
+      sinon.stub(
+        CreateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).resolves(4);
+      await render(this);
+      expect(revisionCreatedSpy).to.not.be.called;
+
+      await click('.atm-workflow-schemas-list-entry .revisions-table-create-revision-entry');
+
+      expect(revisionCreatedSpy).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'), 4);
     });
 
     it('notifies about workflow revision click', async function () {
@@ -321,11 +337,10 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         DumpAtmWorkflowSchemaRevisionAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.revisionNumber')).to.equal(1);
-        return resolve({ status: 'done' });
       });
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
@@ -343,11 +358,10 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         RemoveAtmWorkflowSchemaRevisionAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.revisionNumber')).to.equal(1);
-        return resolve({ status: 'done' });
       });
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
@@ -365,6 +379,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
     collection=collection
+    onRevisionCreated=revisionCreatedSpy
     onRevisionClick=workflowRevisionClickedSpy
   }}`);
   await wait();

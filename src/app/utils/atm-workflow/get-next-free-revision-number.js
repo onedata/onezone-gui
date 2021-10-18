@@ -7,15 +7,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
+import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
+
 export default function getNextFreeRevisionNumber(existingRevisionNumbers) {
-  const normalizedExistingRevisionNumbers = (existingRevisionNumbers || [])
-    .map(value => Number(value))
-    .filter(value => Number.isSafeInteger(value) && value > 0);
-  if (!normalizedExistingRevisionNumbers.length) {
+  const sortedExistingRevisionNumbers = sortRevisionNumbers(existingRevisionNumbers);
+  if (!sortedExistingRevisionNumbers.length) {
     return 1;
   }
-  const sortedExistingRevisionNumbers =
-    normalizedExistingRevisionNumbers.sort((a, b) => b - a);
-  const maxExistingRevisionNumber = sortedExistingRevisionNumbers[0];
+  const maxExistingRevisionNumber =
+    sortedExistingRevisionNumbers[sortedExistingRevisionNumbers.length - 1];
   return maxExistingRevisionNumber + 1;
 }

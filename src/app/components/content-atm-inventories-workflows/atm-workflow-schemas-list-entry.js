@@ -41,6 +41,12 @@ export default Component.extend(I18n, {
   onRevisionClick: undefined,
 
   /**
+   * @virtual
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: Number) => void}
+   */
+  onRevisionCreated: undefined,
+
+  /**
    * @type {Boolean}
    */
   areActionsOpened: false,
@@ -120,10 +126,16 @@ export default Component.extend(I18n, {
    */
   revisionActionsFactory: computed(
     'atmWorkflowSchema',
+    'onRevisionCreated',
     function revisionActionsFactory() {
+      const {
+        atmWorkflowSchema,
+        onRevisionCreated,
+      } = this.getProperties('atmWorkflowSchema', 'onRevisionCreated');
       return RevisionActionsFactory.create({
         ownerSource: this,
-        atmWorkflowSchema: this.get('atmWorkflowSchema'),
+        atmWorkflowSchema,
+        onRevisionCreated,
       });
     }
   ),

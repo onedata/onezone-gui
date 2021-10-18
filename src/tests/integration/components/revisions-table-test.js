@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
+import Action from 'onedata-gui-common/utils/action';
 
 const componentClass = 'revisions-table';
 const headerTexts = ['Rev.', 'State', 'Description', ''];
@@ -240,6 +241,22 @@ describe('Integration | Component | revisions table', function () {
       expect(this.$('.revisions-table-revision-entry'))
         .to.have.class('clickable');
     });
+
+  it('creates new revision', async function () {
+    const createRevisionSpy = sinon.spy();
+    this.set('revisionActionsFactory', {
+      createCreateRevisionAction: () => Action.create({
+        onExecute: createRevisionSpy,
+        ownerSource: this,
+      }),
+    });
+    await render(this);
+    expect(createRevisionSpy).to.be.not.called;
+
+    await click('.revisions-table-create-revision-entry');
+
+    expect(createRevisionSpy).to.be.calledOnce;
+  });
 });
 
 async function render(testCase) {
@@ -265,9 +282,10 @@ function generateRevisionRegistry(revisionsSpec) {
 
 function expectRevisionEntriesLayout(testCase, layoutSpec) {
   const $rows = testCase.$(`.${componentClass} tbody tr`);
-  expect($rows).to.have.length(layoutSpec.length);
+  expect($rows).to.have.length(layoutSpec.length + 1);
+  expect($rows.eq(0)).to.have.class('revisions-table-create-revision-entry');
   layoutSpec.forEach(({ type, revisionsCount, revisionNumber }, idx) => {
-    const $row = $rows.eq(idx);
+    const $row = $rows.eq(idx + 1);
     if (type === 'revision') {
       expect($row).to.have.class('revisions-table-revision-entry');
       expect($row.find('.revision-number').text()).to.equal(String(revisionNumber));

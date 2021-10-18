@@ -14,6 +14,7 @@ import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/cr
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import { get } from '@ember/object';
 
@@ -204,6 +205,20 @@ describe('Unit | Service | workflow actions', function () {
     expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
     expect(get(action, 'revisionNumber')).to.equal(3);
     expect(get(action, 'revisionDiff')).to.equal(revisionDiff);
+  });
+
+  it('creates CreateAtmWorkflowSchemaRevisionAction instance', function () {
+    const service = this.subject();
+
+    const atmWorkflowSchema = {};
+    const action = service.createCreateAtmWorkflowSchemaRevisionAction({
+      atmWorkflowSchema,
+      originRevisionNumber: 3,
+    });
+
+    expect(action).to.be.instanceOf(CreateAtmWorkflowSchemaRevisionAction);
+    expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+    expect(get(action, 'originRevisionNumber')).to.equal(3);
   });
 
   it('creates RemoveAtmWorkflowSchemaRevisionAction instance', function () {
