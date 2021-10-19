@@ -27,16 +27,14 @@ export default Service.extend(
      */
     areCookiesAccepted: false,
 
-    /**
-     * @override
-     */
-    showPrivacyPolicyAction: computed(
+    privacyPolicyUrl: computed(
       'privacyPolicy',
-      function showPrivacyPolicyAction() {
-        return this.get('privacyPolicy') ?
-          () => this.showPrivacyPolicyInfo() : undefined;
-      }
-    ),
+      function privacyPolicyUrl() {
+        if (this.get('privacyPolicy')) {
+          return this.get('router').urlFor('public.privacy-policy');
+        }
+        return null;
+    }),
 
     init() {
       this._super(...arguments);
@@ -59,12 +57,13 @@ export default Service.extend(
      * @override
      */
     fetchCookieConsentNotification() {
+      const privacyPolicyUrl = this.get('router').urlFor('public.privacy-policy');
       return this.get('guiMessageManager').getMessage('cookie_consent_notification')
         .then(message =>
           DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            '<a class="clickable privacy-policy-link">$1<span class="oneicon oneicon-link-external"></span></a>'
+            `<a href="${privacyPolicyUrl}" class="clickable privacy-policy-link">$1</a>`
           )
         );
     },
@@ -75,18 +74,6 @@ export default Service.extend(
     acceptCookies() {
       this.get('cookies').write(cookiesAcceptedCookieName, true, { path: '/' });
       this.set('areCookiesAccepted', true);
-    },
-
-    /**
-     * @returns {undefined}
-     */
-    showPrivacyPolicyInfo() {
-      if (this.get('privacyPolicy')) {
-        window.open(
-          this.get('router').urlFor('public.privacy-policy'),
-          '_self'
-        );
-      }
     },
   }
 );

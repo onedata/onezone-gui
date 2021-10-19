@@ -45,11 +45,7 @@ export default Component.extend(I18n, {
 
     const privacyPolicyManager = this.get('privacyPolicyManager');
 
-    get(privacyPolicyManager, 'cookieConsentNotificationProxy').then(() => {
-      this.$('.privacy-policy-link').click(() => run(() => {
-        this.get('privacyPolicyManager').showPrivacyPolicyInfo();
-      }));
-    });
+    get(privacyPolicyManager, 'cookieConsentNotificationProxy');
   },
 
   actions: {
