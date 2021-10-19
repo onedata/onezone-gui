@@ -4,11 +4,11 @@
     {{name-conflict item=item tagName="span" class="one-label share-name"}}
   {{/truncated-string}}
   {{#truncated-string class="sidebar-item-title-lower"}}
-    <strong>{{tt this "space"}}</strong>
+    <strong>{{tt this "space"}}:</strong>
     {{#if spaceProxy.name}}
       <span class="space-name">{{spaceProxy.name}}</span>
     {{else}}
-      {{tt this "unknown"}}
+      <em>{{tt this "unknown"}}</em>
     {{/if}}
   {{/truncated-string}}
 </div>
