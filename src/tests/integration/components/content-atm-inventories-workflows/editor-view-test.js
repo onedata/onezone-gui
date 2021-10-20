@@ -5,7 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
-import { resolve } from 'rsvp';
+import { selectChoose } from '../../../helpers/ember-power-select';
 import EmberObject, { get } from '@ember/object';
 import _ from 'lodash';
 import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
@@ -27,8 +27,8 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       [
         ModifyAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
-        if (action.prototype.execute.restore) {
-          action.prototype.execute.restore();
+        if (action.prototype.onExecute.restore) {
+          action.prototype.onExecute.restore();
         }
       });
     });
@@ -40,6 +40,8 @@ describe('Integration | Component | content atm inventories workflows/editor vie
           name: 'workflow1',
           revisionRegistry: {
             2: {
+              state: 'stable',
+              description: 'desc',
               lanes: [{
                 id: 'l1',
                 name: 'lane1',
@@ -110,31 +112,80 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       );
     });
 
-    it('allows to save modified workflow schema revision elements', async function () {
-      const {
-        atmWorkflowSchema,
-        revisionNumber,
-      } = this.getProperties('atmWorkflowSchema', 'revisionNumber');
-      const newLanes = _.cloneDeep(get(atmWorkflowSchema, 'revisionRegistry.2.lanes'));
-      newLanes[0].name = 'newName';
-      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaRevisionAction.prototype, 'execute')
-        .callsFake(function () {
-          expect(this.get('atmWorkflowSchema')).to.equal(atmWorkflowSchema);
-          expect(this.get('revisionNumber')).to.equal(revisionNumber);
-          expect(this.get('revisionDiff')).to.deep.include({
-            lanes: newLanes,
+    it('allows to save modified workflow schema revision [modification via visualiser]',
+      async function () {
+        const {
+          atmWorkflowSchema,
+          revisionNumber,
+        } = this.getProperties('atmWorkflowSchema', 'revisionNumber');
+        const newLanes = _.cloneDeep(get(atmWorkflowSchema, 'revisionRegistry.2.lanes'));
+        newLanes[0].name = 'newName';
+        const executeStub = sinon.stub(ModifyAtmWorkflowSchemaRevisionAction.prototype, 'onExecute')
+          .callsFake(function () {
+            expect(this.get('atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+            expect(this.get('revisionNumber')).to.equal(revisionNumber);
+            expect(this.get('revisionDiff')).to.deep.include({
+              lanes: newLanes,
+            });
           });
-          return resolve({ status: 'done' });
-        });
+        await render(this);
+
+        await click('.lane-name .one-label');
+        await fillIn('.lane-name .form-control', 'newName');
+        await click('.lane-name .save-icon');
+        await click('.btn-save');
+
+        expect(executeStub).to.be.calledOnce;
+      });
+
+    it('has two tabs - "editor" (default) and "details"', async function () {
       await render(this);
 
-      await click('.lane-name .one-label');
-      await fillIn('.lane-name .form-control', 'newName');
-      await click('.lane-name .save-icon');
-      await click('.btn-save');
-
-      expect(executeStub).to.be.calledOnce;
+      const $tabs = this.$('.nav-tabs .nav-link');
+      expect($tabs.eq(0).text().trim()).to.equal('Editor');
+      expect($tabs.eq(0)).to.have.class('active');
+      expect(this.$('#editor.tab-pane')).to.have.class('active');
+      expect($tabs.eq(1).text().trim()).to.equal('Details');
     });
+
+    it('shows revision details in "details" tab', async function () {
+      await render(this);
+      const $detailsTabLink = this.$('.nav-link:contains("Details")');
+      const $form = this.$('.revision-details-form');
+
+      await click($detailsTabLink[0]);
+
+      expect($detailsTabLink).to.have.class('active');
+      expect(this.$('#details.tab-pane')).to.have.class('active');
+      expect($form.find('.state-field .dropdown-field-trigger').text())
+        .to.contain('Stable');
+      expect($form.find('.description-field .form-control')).to.have.value('desc');
+    });
+
+    it('allows to save modified workflow schema revision [modification via details]',
+      async function () {
+        const {
+          atmWorkflowSchema,
+          revisionNumber,
+        } = this.getProperties('atmWorkflowSchema', 'revisionNumber');
+        const executeStub = sinon.stub(ModifyAtmWorkflowSchemaRevisionAction.prototype, 'onExecute')
+          .callsFake(function () {
+            expect(this.get('atmWorkflowSchema')).to.equal(atmWorkflowSchema);
+            expect(this.get('revisionNumber')).to.equal(revisionNumber);
+            expect(this.get('revisionDiff')).to.deep.include({
+              state: 'deprecated',
+              description: 'abcd',
+            });
+          });
+        await render(this);
+
+        await click(this.$('.nav-link:contains("Details")')[0]);
+        await selectChoose('.state-field', 'Deprecated');
+        await fillIn('.description-field .form-control', 'abcd');
+        await click('.btn-save');
+
+        expect(executeStub).to.be.calledOnce;
+      });
   });
 
 async function render(testCase) {

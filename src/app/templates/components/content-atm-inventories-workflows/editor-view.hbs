@@ -36,10 +36,27 @@
     </div>
   </h1>
 </div>
-{{workflow-visualiser
-  mode="edit"
-  rawData=visualiserData
-  actionsFactory=actionsFactory
-  onChange=(action "visualiserDataChange")
+{{#bs-tab
+  activeId=activeTab
+  onChange=(action "onTabChange")
+  class="only-tab-bar bs-tab-onedata bs-tab-modern fill-flex-using-column"
+  fade=false
+  as |tab|
 }}
+  {{#tab.pane id="editor" title=(tt this "tabs.editor") class="fill-flex-using-column no-padding"}}
+    {{workflow-visualiser
+      mode="edit"
+      rawData=visualiserData
+      actionsFactory=actionsFactory
+      onChange=(action "visualiserDataChange")
+    }}
+  {{/tab.pane}}
+  {{#tab.pane id="details" title=(tt this "tabs.details")}}
+    {{content-atm-inventories-workflows/revision-details-form
+      atmWorkflowSchema=atmWorkflowSchema
+      revisionNumber=revisionNumber
+      onChange=(action "detailsDataChange")
+    }}
+  {{/tab.pane}}
+{{/bs-tab}}
 {{yield}}
