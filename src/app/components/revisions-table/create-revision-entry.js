@@ -1,18 +1,10 @@
 import Component from '@ember/component';
-import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(I18n, {
+export default Component.extend({
   tagName: 'tr',
   classNames: ['revisions-table-create-revision-entry'],
-
-  i18n: service(),
-
-  /**
-   * @override
-   */
-  i18nPrefix: 'components.revisionsTable.createRevisionEntry',
+  classNameBindings: ['createRevisionAction.className'],
 
   /**
    * @virtual

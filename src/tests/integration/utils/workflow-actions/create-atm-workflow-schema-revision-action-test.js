@@ -5,7 +5,7 @@ import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 import sinon from 'sinon';
 import { reject } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
-import { get, set } from '@ember/object';
+import { get, set, getProperties } from '@ember/object';
 
 describe(
   'Integration | Utility | workflow actions/create atm workflow schema revision action',
@@ -37,6 +37,27 @@ describe(
         revision3,
         atmWorkflowSchema,
       });
+    });
+
+    it('has correct className and icon', function () {
+      const {
+        className,
+        icon,
+      } = getProperties(this.get('action'), 'className', 'icon');
+      expect(className).to.equal('create-atm-workflow-schema-revision-action-trigger');
+      expect(icon).to.equal('plus');
+    });
+
+    it('has correct title when origin revision is not set', function () {
+      this.set('action.originRevisionNumber', null);
+
+      expect(String(this.get('action.title'))).to.equal('Create new revision');
+    });
+
+    it('has correct title when origin revision is set', function () {
+      this.set('action.originRevisionNumber', '3');
+
+      expect(String(this.get('action.title'))).to.equal('Redesign as new revision');
     });
 
     it('executes creating workflow revision (success scenario, no origin revision defined)',

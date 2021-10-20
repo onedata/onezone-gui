@@ -7,10 +7,16 @@ import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-acti
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
-const revisionActionsClasses = [
-  DumpAtmWorkflowSchemaRevisionAction,
-  RemoveAtmWorkflowSchemaRevisionAction,
-];
+const revisionActionsClasses = [{
+  classDef: CreateAtmWorkflowSchemaRevisionAction,
+  revisionNumberField: 'originRevisionNumber',
+}, {
+  classDef: DumpAtmWorkflowSchemaRevisionAction,
+  revisionNumberField: 'revisionNumber',
+}, {
+  classDef: RemoveAtmWorkflowSchemaRevisionAction,
+  revisionNumberField: 'revisionNumber',
+}];
 
 describe('Integration | Utility | atm workflow/atm workflow schema/revision actions factory',
   function () {
@@ -27,8 +33,9 @@ describe('Integration | Utility | atm workflow/atm workflow schema/revision acti
       const revisionActions = actionsFactory.createActionsForRevisionNumber(3);
       expect(revisionActions).to.have.length(revisionActionsClasses.length);
       revisionActions.forEach((action, idx) => {
-        expect(action).to.be.instanceOf(revisionActionsClasses[idx]);
-        expect(get(action, 'revisionNumber')).to.equal(3);
+        expect(action).to.be.instanceOf(revisionActionsClasses[idx].classDef);
+        expect(get(action, revisionActionsClasses[idx].revisionNumberField))
+          .to.equal(3);
         expect(get(action, 'atmWorkflowSchema')).to.equal(atmWorkflowSchema);
       });
     });

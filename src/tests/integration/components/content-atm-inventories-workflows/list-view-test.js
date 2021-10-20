@@ -8,6 +8,7 @@ import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import $ from 'jquery';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
 describe('Integration | Component | content atm inventories workflows/list view',
@@ -117,6 +118,23 @@ describe('Integration | Component | content atm inventories workflows/list view'
         await render(this);
 
         await click('.revisions-table-create-revision-entry');
+
+        expect(this.get('createdAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
+          .and.to.be.calledWith(sinon.match({ name: 'w0' }), 4);
+      });
+
+    it('calls "onCreatedAtmWorkflowSchemaRevision" when "redesign revision" has been clicked',
+      async function () {
+        sinon.stub(
+          CreateAtmWorkflowSchemaRevisionAction.prototype,
+          'onExecute'
+        ).resolves(4);
+        await render(this);
+
+        await click('.revision-actions-trigger');
+        await click($(
+          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        )[0]);
 
         expect(this.get('createdAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
           .and.to.be.calledWith(sinon.match({ name: 'w0' }), 4);

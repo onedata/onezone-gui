@@ -29,6 +29,10 @@ const workflowActionsSpec = [{
 }];
 
 const revisionActionsSpec = [{
+  className: 'create-atm-workflow-schema-revision-action-trigger',
+  label: 'Redesign as new revision',
+  icon: 'plus',
+}, {
   className: 'dump-atm-workflow-schema-revision-action-trigger',
   label: 'Download (json)',
   icon: 'browser-download',
@@ -331,6 +335,27 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect($action.text().trim()).to.equal(label);
         expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
       });
+    });
+
+    it('allows redesigning workflow revision as new revision', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        CreateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.originRevisionNumber')).to.equal(1);
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
     });
 
     it('allows downloading workflow revision dump', async function () {

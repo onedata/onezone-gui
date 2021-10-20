@@ -14,6 +14,8 @@ import { reads } from '@ember/object/computed';
 import { get, computed } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
+import { conditional } from 'ember-awesome-macros';
+import computedT from 'onedata-gui-common/utils/computed-t';
 import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
 import getNextFreeRevisionNumber from 'onezone-gui/utils/atm-workflow/get-next-free-revision-number';
 import createEmptyRevision from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/create-empty-revision';
@@ -25,6 +27,25 @@ export default Action.extend({
    * @override
    */
   i18nPrefix: 'utils.workflowActions.createAtmWorkflowSchemaRevisionAction',
+
+  /**
+   * @override
+   */
+  className: 'create-atm-workflow-schema-revision-action-trigger',
+
+  /**
+   * @override
+   */
+  icon: 'plus',
+
+  /**
+   * @override
+   */
+  title: conditional(
+    'originRevisionNumber',
+    computedT('title.redesign'),
+    computedT('title.new')
+  ),
 
   /**
    * @type {ComputedProperty<Models.AtmWorkflowSchema>}

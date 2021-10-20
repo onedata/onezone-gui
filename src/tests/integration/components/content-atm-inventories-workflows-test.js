@@ -13,6 +13,7 @@ import { set, get, setProperties } from '@ember/object';
 import { Promise } from 'rsvp';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
+import $ from 'jquery';
 
 describe('Integration | Component | content atm inventories workflows', function () {
   setupComponentTest('content-atm-inventories-workflows', {
@@ -283,6 +284,23 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'editor');
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w0id', revision: '1' });
+      });
+
+    it('allows to redesign existing revision and opens it in editor after creation',
+      async function () {
+        await render(this);
+
+        await click(
+          getSlide('list').querySelector('.revision-actions-trigger')
+        );
+        await click($(
+          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        )[0]);
+
+        expect(isSlideActive('editor')).to.be.true;
+        expectSlideContainsView('editor', 'editor');
+        expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
+          .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '3' });
       });
   });
 
