@@ -5,16 +5,14 @@
       {{wysiwyg-editor mode="show" content=content}}
     </div>
   </div>
-  <div class="footer-public">
-    <div class="onedata-logo-public"></div>
-    <div class="onedata-copyright-public">
-      {{tt this "allRightsReserved"}}
-    </div>
+  {{#public-footer}}
     <div class="back-to-main-page">
       {{#link-to "index"}}
         {{one-icon icon="home"}}
-        <span>{{tt this "backToMainPage"}}</span>
+        {{#unless media.isMobile}}
+          <span>{{tt this "backToMainPage"}}</span>
+        {{/unless}}
       {{/link-to}}
     </div>
-  </div>
+  {{/public-footer}}
 </div>

@@ -16,6 +16,7 @@ export default Component.extend(I18n, {
   classNames: ['content-privacy-policy'],
   
   privacyPolicyManager: service(),
+  router: service(),
 
   /**
    * @override
@@ -26,4 +27,13 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<string>}
    */
   content: reads('privacyPolicyManager.privacyPolicy'),
+
+  init() {
+    this._super(...arguments);
+    console.log(this.get('content'));  
+    if (!this.get('content')) {
+      const router = this.get('router');
+      router.transitionTo('index');
+    }
+  },
 });
