@@ -165,6 +165,7 @@ export default function generateDevelopmentModel(store) {
                 chosenProviderId: getProviderId(0),
                 chosenProviderVersion: '20.02.0-beta1',
                 fileType: 'dir',
+                space,
               };
               return store.createRecord(
                   'share',

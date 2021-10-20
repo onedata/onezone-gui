@@ -18,6 +18,7 @@ import contentProviderRedirect from './components/content-provider-redirect';
 import contentClustersEndpointError from './components/content-clusters-endpoint-error';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
+import sidebarShares from './components/sidebar-shares';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
@@ -175,6 +176,7 @@ const translations = {
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
+    sidebarShares,
     sidebarProviders,
     sidebarGroups,
     contentSpacesEmpty,
