@@ -1,0 +1,32 @@
+{{#global-modal
+  classNames="upload-atm-workflow-schema-modal"
+  allowClose=(not isSubmitting)
+  modalId=modalId
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>{{tt this "header"}}</h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+
+  {{/modal.body}}
+
+  {{#modal.footer class="btn-toolbar"}}
+    {{#bs-button
+      type="default"
+      class="cancel-btn"
+      onClick=modal.close
+      disabled=isSubmitting
+    }}
+      {{tt this "buttons.cancel"}}
+    {{/bs-button}}
+    {{#one-spin-button
+      class="btn submit-btn btn-primary"
+      action=(action "submit" modal.submit)
+      disabled=(or (not isReadyToApply) isSubmitting)
+    }}
+      {{tt this "buttons.submit"}}
+    {{/one-spin-button}}
+  {{/modal.footer}}
+{{/global-modal}}

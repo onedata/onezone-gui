@@ -97,6 +97,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
+import uploadAtmWorkflowSchemaModal from './components/modals/upload-atm-workflow-schema-modal';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
@@ -165,6 +166,7 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
+      uploadAtmWorkflowSchemaModal,
     },
     errors: {
       shareNotFound,
