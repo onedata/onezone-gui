@@ -40,14 +40,6 @@ export default Component.extend(I18n, {
    */
   areCookiesAccepted: reads('privacyPolicyManager.areCookiesAccepted'),
 
-  didInsertElement() {
-    this._super(...arguments);
-
-    const privacyPolicyManager = this.get('privacyPolicyManager');
-
-    get(privacyPolicyManager, 'cookieConsentNotificationProxy');
-  },
-
   actions: {
     acceptCookies() {
       this.get('privacyPolicyManager').acceptCookies();

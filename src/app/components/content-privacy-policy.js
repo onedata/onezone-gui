@@ -30,10 +30,8 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    console.log(this.get('content'));  
     if (!this.get('content')) {
-      const router = this.get('router');
-      router.transitionTo('index');
+      this.get('router').transitionTo('index');
     }
   },
 });

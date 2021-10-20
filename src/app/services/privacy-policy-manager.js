@@ -27,6 +27,9 @@ export default Service.extend(
      */
     areCookiesAccepted: false,
 
+    /**
+     * @type {Ember.ComputedProperty<string|null>}
+     */
     privacyPolicyUrl: computed(
       'privacyPolicy',
       function privacyPolicyUrl() {
