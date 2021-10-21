@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
+import wait from 'ember-test-helpers/wait';
 
 const componentClass = 'revisions-table-state-tag';
 
@@ -35,6 +36,7 @@ describe('Integration | Component | revisions table/state tag', function () {
 
 async function render(testCase) {
   testCase.render(hbs `{{revisions-table/state-tag state=state}}`);
+  await wait();
 }
 
 function itShowsState({ state, label, style }) {

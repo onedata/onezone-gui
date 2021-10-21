@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
 import Action from 'onedata-gui-common/utils/action';
+import wait from 'ember-test-helpers/wait';
 
 const componentClass = 'revisions-table-create-revision-entry';
 
@@ -50,4 +51,5 @@ async function render(testCase) {
   testCase.render(hbs `{{revisions-table/create-revision-entry
     revisionActionsFactory=revisionActionsFactory
   }}`);
+  await wait();
 }

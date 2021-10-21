@@ -4,6 +4,7 @@ import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import wait from 'ember-test-helpers/wait';
 
 const componentClass = 'revisions-table-revision-entries-expander';
 
@@ -45,4 +46,5 @@ async function render(testCase) {
     entriesCount=entriesCount
     onExpand=onExpand
   }}`);
+  await wait();
 }

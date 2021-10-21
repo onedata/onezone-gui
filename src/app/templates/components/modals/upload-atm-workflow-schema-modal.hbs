@@ -9,7 +9,10 @@
   {{/modal.header}}
 
   {{#modal.body}}
-
+    {{modals/upload-atm-workflow-schema-modal/uploader
+      uploadedFile=uploadedFile
+      onUploadedFileChange=(action "uploadedFileChanged")
+    }}
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}

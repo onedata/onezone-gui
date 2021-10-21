@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
+import wait from 'ember-test-helpers/wait';
 
 const componentClass = 'revisions-table-revision-entry';
 
@@ -126,4 +127,5 @@ async function render(testCase) {
     revisionActionsFactory=revisionActionsFactory
     onClick=onClick
   }}`);
+  await wait();
 }
