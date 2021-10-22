@@ -106,7 +106,7 @@ async function render(testCase) {
   await wait();
 }
 
-async function triggerUploadInputChange(testCase, filename, fileContent) {
+export async function triggerUploadInputChange(testCase, filename, fileContent) {
   const uploadInputElement = testCase.$('.upload-input')[0];
   const fileContentBlob = new Blob([fileContent], {
     type: 'application/json',
@@ -118,7 +118,7 @@ async function triggerUploadInputChange(testCase, filename, fileContent) {
   await triggerEvent(uploadInputElement, 'change');
 }
 
-function generateExampleDump() {
+export function generateExampleDump() {
   return {
     schemaFormatVersion: 1,
     name: 'w1',

@@ -1,0 +1,17 @@
+{{#if dump}}
+  <div>
+    <span class="name-label">{{tt this "name"}}:</span>
+    <span class="name {{if isNameUnknown "unknown"}}">
+      {{if isNameUnknown (tt this "unknownValue") name}}
+    </span>
+  </div>
+  <div>
+    <span class="revision-number-label">{{tt this "revisionNumber"}}:</span>
+    <span class="revision-number {{if isRevisionNumberUnknown "unknown"}}">
+      {{if isRevisionNumberUnknown (tt this "unknownValue") revisionNumber}}
+    </span>
+  </div>
+{{else}}
+  <p class="error text-danger">{{tt this "error"}}</p>
+{{/if}}
+{{yield}}

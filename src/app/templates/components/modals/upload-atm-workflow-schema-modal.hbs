@@ -13,6 +13,11 @@
       uploadedFile=uploadedFile
       onUploadedFileChange=(action "uploadedFileChanged")
     }}
+    {{#if uploadedFile}}
+      {{modals/upload-atm-workflow-schema-modal/details
+        dump=dump
+      }}
+    {{/if}}
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}

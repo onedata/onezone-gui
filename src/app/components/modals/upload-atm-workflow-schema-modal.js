@@ -2,6 +2,7 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { reads } from '@ember/object/computed';
 
 /**
  * @typedef {Object} AtmWorkflowSchemaUploadedFile
@@ -45,6 +46,11 @@ export default Component.extend(I18n, {
    * @type {Boolean}
    */
   isReadyToApply: false,
+
+  /**
+   * @type {ComputedProperty<Object>}
+   */
+  dump: reads('uploadedFile.content'),
 
   actions: {
     uploadedFileChanged(uploadedFile) {
