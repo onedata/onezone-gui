@@ -1,15 +1,16 @@
+<h2>{{tt this "header"}}</h2>
 {{#if dump}}
-  <div>
-    <span class="name-label">{{tt this "name"}}:</span>
-    <span class="name {{if isNameUnknown "unknown"}}">
+  <div class="detail">
+    <span class="detail-label name-label">{{tt this "name"}}:</span>
+    {{#truncated-string class=(concat "detail-value name " (if isNameUnknown "unknown"))}}
       {{if isNameUnknown (tt this "unknownValue") name}}
-    </span>
+    {{/truncated-string}}
   </div>
-  <div>
-    <span class="revision-number-label">{{tt this "revisionNumber"}}:</span>
-    <span class="revision-number {{if isRevisionNumberUnknown "unknown"}}">
+  <div class="detail">
+    <span class="detail-label revision-number-label">{{tt this "revisionNumber"}}:</span>
+    {{#truncated-string class=(concat "detail-value revision-number " (if isRevisionNumberUnknown "unknown"))}}
       {{if isRevisionNumberUnknown (tt this "unknownValue") revisionNumber}}
-    </span>
+    {{/truncated-string}}
   </div>
 {{else}}
   <p class="error text-danger">{{tt this "error"}}</p>

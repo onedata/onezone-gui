@@ -1,6 +1,7 @@
 export default {
+  header: 'Workflow details',
   name: 'Name',
   revisionNumber: 'Revision',
   unknownValue: 'unknown',
-  error: 'Selected file is not a valid workflow dump.',
+  error: 'Uploaded file is not a valid workflow dump.',
 };

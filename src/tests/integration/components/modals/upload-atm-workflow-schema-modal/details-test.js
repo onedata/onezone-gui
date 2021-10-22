@@ -64,7 +64,7 @@ describe('Integration | Component | modals/upload atm workflow schema modal/deta
         expect(this.$('.name')).to.not.exist;
         expect(this.$('.revision-number')).to.not.exist;
         expect(this.$('.error').text().trim())
-          .to.equal('Selected file is not a valid workflow dump.');
+          .to.equal('Uploaded file is not a valid workflow dump.');
       });
   });
 

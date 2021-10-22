@@ -7,6 +7,7 @@ import config from 'ember-get-config';
 
 export default Component.extend(I18n, {
   classNames: ['uploader'],
+  classNameBindings: ['uploadedFile:uploaded-layout:initial-layout'],
 
   i18n: service(),
 

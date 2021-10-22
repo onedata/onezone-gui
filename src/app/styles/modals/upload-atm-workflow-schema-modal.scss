@@ -1,0 +1,62 @@
+.upload-atm-workflow-schema-modal {
+  .modal-section {
+    + .modal-section {
+      margin-top: 1.2em;
+      padding-top: 1.2em;
+      border-top: 1px solid $main-border-color;
+    }
+
+    h2 {
+      @include font-semibold();
+      margin: 0;
+      font-size: 100%;
+      margin-bottom: 0.5em;
+    }
+  }
+
+  .uploader {
+    &.initial-layout {
+      padding: 4em 0;
+      text-align: center;
+    }
+
+    &.uploaded-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) min-content;
+      grid-template-areas:
+        'header header'
+        'detail upload';
+    }
+
+    .intro {
+      margin-bottom: 3em;
+    }
+
+    h2 {
+      grid-area: header;
+    }
+
+    .detail {
+      grid-area: detail;
+    }
+
+    .upload-btn {
+      grid-area: upload;
+      margin-left: 1em;
+    }
+  }
+
+  .detail {
+    display: flex;
+    align-items: center;
+  }
+
+  .detail-label {
+    @include font-semibold();
+  }
+
+  .detail-value {
+    margin-left: 0.3em;
+    flex-grow: 1;
+  }
+}

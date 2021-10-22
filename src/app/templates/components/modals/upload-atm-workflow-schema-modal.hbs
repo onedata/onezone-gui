@@ -10,11 +10,13 @@
 
   {{#modal.body}}
     {{modals/upload-atm-workflow-schema-modal/uploader
+      class="modal-section"
       uploadedFile=uploadedFile
       onUploadedFileChange=(action "uploadedFileChanged")
     }}
     {{#if uploadedFile}}
       {{modals/upload-atm-workflow-schema-modal/details
+        class="modal-section"
         dump=dump
       }}
     {{/if}}
