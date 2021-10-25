@@ -9,17 +9,30 @@
   {{/modal.header}}
 
   {{#modal.body}}
-    {{modals/upload-atm-workflow-schema-modal/uploader
-      class="modal-section"
-      uploadedFile=uploadedFile
-      onUploadedFileChange=(action "uploadedFileChanged")
-    }}
-    {{#if uploadedFile}}
-      {{modals/upload-atm-workflow-schema-modal/details
+    {{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
+      {{modals/upload-atm-workflow-schema-modal/uploader
         class="modal-section"
-        dump=dump
+        uploadedFile=uploadedFile
+        onUploadedFileChange=(action "uploadedFileChanged")
       }}
-    {{/if}}
+      {{#if uploadedFile}}
+        {{modals/upload-atm-workflow-schema-modal/details
+          class="modal-section"
+          dump=dump
+        }}
+      {{/if}}
+      {{#if uploadedFile.content}}
+        {{modals/upload-atm-workflow-schema-modal/operation-form
+          class="modal-section"
+          dump=dump
+          targetWorkflows=targetWorkflows
+          selectedOperation=selectedOperation
+          selectedTargetWorkflow=selectedTargetWorkflow
+          newWorkflowName=newWorkflowName
+          onValueChange=(action "operationValueChanged")
+        }}
+      {{/if}}
+    {{/promise-proxy-container}}
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}
@@ -34,7 +47,7 @@
     {{#one-spin-button
       class="btn submit-btn btn-primary"
       action=(action "submit" modal.submit)
-      disabled=(or (not isReadyToApply) isSubmitting)
+      disabled=(or (not dataToSubmit) isSubmitting)
     }}
       {{tt this "buttons.submit"}}
     {{/one-spin-button}}

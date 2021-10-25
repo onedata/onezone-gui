@@ -132,4 +132,18 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {ComputedProperty<Models.AtmWorkflowSchema|null>}
    */
   originalAtmWorkflowSchema: belongsTo('atm-workflow-schema'),
+
+  /**
+   * ID taken from `originalAtmWorkflowSchema` relation. Set in `didLoad`.
+   * @type {String}
+   */
+  originalAtmWorkflowSchemaId: undefined,
+
+  didLoad() {
+    this._super(...arguments);
+    this.set(
+      'originalAtmWorkflowSchemaId',
+      this.relationEntityId('originalAtmWorkflowSchema')
+    );
+  },
 }).reopenClass(StaticGraphModelMixin);

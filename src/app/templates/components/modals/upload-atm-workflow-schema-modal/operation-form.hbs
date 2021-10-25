@@ -1,0 +1,23 @@
+<h2>{{tt this "header"}}</h2>
+{{#one-way-radio-group
+  value=selectedOperation
+  options=operationsRadioOptions
+  update=(action "selectedOperationChange")
+  as |option|
+}}
+  {{#if (eq option.value "merge")}}
+    {{#if isMergeDisabled}}
+      <p class="no-target-workflow-warning">{{tt this "operations.merge.noTargetWorkflowWarning"}}</p>
+    {{else}}
+      {{form-component/field-renderer field=targetWorkflowField}}
+      {{#if isRevisionConflictWarningVisible}}
+        <p class="revision-conflict-warning">
+          {{tt this "operations.merge.revisionConflictWarning" revisionNumber=revisionNumber}}
+        </p>
+      {{/if}}
+    {{/if}}
+  {{else if (eq option.value "create")}}
+    {{form-component/field-renderer field=newWorkflowsNameField}}
+  {{/if}}
+{{/one-way-radio-group}}
+{{yield}}
