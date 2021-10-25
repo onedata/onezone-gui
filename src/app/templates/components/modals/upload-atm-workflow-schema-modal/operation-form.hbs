@@ -5,19 +5,23 @@
   update=(action "selectedOperationChange")
   as |option|
 }}
-  {{#if (eq option.value "merge")}}
-    {{#if isMergeDisabled}}
-      <p class="no-target-workflow-warning">{{tt this "operations.merge.noTargetWorkflowWarning"}}</p>
-    {{else}}
-      {{form-component/field-renderer field=targetWorkflowField}}
-      {{#if isRevisionConflictWarningVisible}}
-        <p class="revision-conflict-warning">
-          {{tt this "operations.merge.revisionConflictWarning" revisionNumber=revisionNumber}}
-        </p>
+  <div class="radio-option-subcontent">
+    {{#if (eq option.value "merge")}}
+      {{#if isMergeDisabled}}
+        <div class="no-target-workflow-warning alert alert-info small">
+          {{tt this "operations.merge.noTargetWorkflowWarning"}}
+        </div>
+      {{else}}
+        {{form-component/field-renderer field=targetWorkflowField}}
+        {{#if isRevisionConflictWarningVisible}}
+          <div class="revision-conflict-warning alert alert-warning small">
+            {{tt this "operations.merge.revisionConflictWarning" revisionNumber=revisionNumber}}
+          </div>
+        {{/if}}
       {{/if}}
+    {{else if (eq option.value "create")}}
+      {{form-component/field-renderer field=newWorkflowsNameField}}
     {{/if}}
-  {{else if (eq option.value "create")}}
-    {{form-component/field-renderer field=newWorkflowsNameField}}
-  {{/if}}
+  </div>
 {{/one-way-radio-group}}
 {{yield}}

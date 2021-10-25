@@ -10,7 +10,7 @@
       @include font-semibold();
       margin: 0;
       font-size: 100%;
-      margin-bottom: 0.5em;
+      margin-bottom: 0.8em;
     }
   }
 
@@ -58,5 +58,36 @@
   .detail-value {
     margin-left: 0.3em;
     flex-grow: 1;
+  }
+
+  .one-way-radio-group {
+    width: 100%;
+  }
+
+  .radio-inline {
+    display: flex;
+    align-items: center;
+  }
+
+  .radio-option-subcontent {
+    padding: 1em 0 1em 1.4em;
+
+    .form-group {
+      margin: 0;
+    }
+
+    .alert {
+      margin: 0;
+    }
+
+    .revision-conflict-warning {
+      margin-top: 1em;
+    }
+
+    .control-label {
+      text-align: left;
+      width: initial;
+      min-width: 5em;
+    }
   }
 }

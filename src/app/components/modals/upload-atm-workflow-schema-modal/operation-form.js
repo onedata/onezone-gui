@@ -10,7 +10,7 @@ import { tag, eq, raw, not, and, bool, getBy } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'form',
-  classNames: ['operation-form'],
+  classNames: ['operation-form', 'form-component', 'form-horizontal'],
 
   i18n: service(),
 
@@ -157,6 +157,7 @@ export default Component.extend(I18n, {
       component: this,
       name: 'targetWorkflow',
       notifyChangeName: 'selectedTargetWorkflow',
+      classes: 'form-group-sm',
     });
   }),
 
@@ -169,6 +170,7 @@ export default Component.extend(I18n, {
     }).create({
       component: this,
       name: 'newWorkflowName',
+      classes: 'form-group-sm',
     });
   }),
 
