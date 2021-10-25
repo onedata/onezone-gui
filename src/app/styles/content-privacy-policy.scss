@@ -19,6 +19,11 @@
     padding-bottom: 30px;
     flex-grow: 1;
 
+    @media (max-width: $screen-xs-max) {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
     .privacy-policy-title {
       @include font-semibold;
       font-size: 32px;

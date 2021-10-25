@@ -31,7 +31,7 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     if (!this.get('content')) {
-      this.get('router').transitionTo('index');
+      this.get('router').replaceWith('index');
     }
   },
 });
