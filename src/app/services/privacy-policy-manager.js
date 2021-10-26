@@ -68,7 +68,7 @@ export default Service.extend(
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            `<a href="${privacyPolicyUrl}" class="clickable privacy-policy-link">$1</a>`
+            `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
           )
         );
     },
