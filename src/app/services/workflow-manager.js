@@ -243,23 +243,29 @@ export default Service.extend({
   /**
    * @param {String} atmWorkflowSchemaId
    * @param {Object} atmWorkflowSchemaDump
-   * @returns {Promise}
    */
   async mergeAtmWorkflowSchemaDumpToExistingSchema(
     atmWorkflowSchemaId,
     atmWorkflowSchemaDump
   ) {
-    return await this.get('onedataGraph').request({
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
       gri: gri({
         entityType: atmWorkflowSchemaEntityType,
         entityId: atmWorkflowSchemaId,
-        aspect: 'merge',
+        aspect: 'instance',
         scope: 'private',
       }),
-      operation: 'create',
+      operation: 'update',
       subscribe: false,
       data: atmWorkflowSchemaDump,
     });
+    await recordManager
+      .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
   },
 
   /**

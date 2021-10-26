@@ -11,7 +11,9 @@ import { reads } from '@ember/object/computed';
 import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { resolve } from 'rsvp';
+import { computed, get } from '@ember/object';
+import { bool, not } from 'ember-awesome-macros';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Action.extend({
   workflowManager: service(),
@@ -33,9 +35,41 @@ export default Action.extend({
   icon: 'browser-upload',
 
   /**
+   * @override
+   */
+  disabled: not('hasManageWorkflowSchemasPrivilege'),
+
+  /**
+   * @override
+   */
+  tip: computed(
+    'hasManageWorkflowSchemasPrivilege',
+    function tip() {
+      const {
+        i18n,
+        hasManageWorkflowSchemasPrivilege,
+      } = this.getProperties(
+        'i18n',
+        'hasManageWorkflowSchemasPrivilege'
+      );
+
+      return hasManageWorkflowSchemasPrivilege ? '' : insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'atmInventory',
+        privilegeFlag: 'atm_inventory_manage_workflow_schemas',
+      });
+    }
+  ),
+
+  /**
    * @type {ComputedProperty<Models.AtmInventory>}
    */
   atmInventory: reads('context.atmInventory'),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasManageWorkflowSchemasPrivilege: bool('atmInventory.privileges.manageWorkflowSchemas'),
 
   /**
    * @override
@@ -52,10 +86,65 @@ export default Action.extend({
     const result = ActionResult.create();
     await modalManager.show('upload-atm-workflow-schema-modal', {
       atmInventory,
-      onSubmit: (data) => result.interceptPromise(resolve(data)),
+      onSubmit: (data) => result.interceptPromise(this.persistDump(data)),
     }).hiddenPromise;
 
     result.cancelIfPending();
     return result;
+  },
+
+  /**
+   * @override
+   */
+  getSuccessNotificationText(actionResult) {
+    const operation = get(actionResult, 'result.operation');
+    return this.t(`successNotificationText.${operation}`, {}, {
+      defaultValue: '',
+    });
+  },
+
+  /**
+   * @override
+   */
+  getFailureNotificationActionName(actionResult) {
+    const operation = get(actionResult, 'error.operation');
+    return this.t(`failureNotificationActionName.${operation}`, {}, {
+      defaultValue: '',
+    });
+  },
+
+  async persistDump({
+    operation,
+    atmWorkflowSchemaDump,
+    targetAtmWorkflowSchema,
+    newAtmWorkflowSchemaName,
+  }) {
+    const {
+      workflowManager,
+      atmInventory,
+    } = this.getProperties('workflowManager', 'atmInventory');
+    try {
+      switch (operation) {
+        case 'merge':
+          await workflowManager.mergeAtmWorkflowSchemaDumpToExistingSchema(
+            get(targetAtmWorkflowSchema, 'entityId'),
+            atmWorkflowSchemaDump
+          );
+          break;
+        case 'create':
+          await workflowManager.createAtmWorkflowSchema(
+            get(atmInventory, 'entityId'),
+            Object.assign({}, atmWorkflowSchemaDump, { name: newAtmWorkflowSchemaName })
+          );
+      }
+    } catch (error) {
+      throw {
+        operation,
+        error,
+      };
+    }
+    return {
+      operation,
+    };
   },
 });
