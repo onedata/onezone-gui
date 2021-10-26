@@ -12,6 +12,7 @@ import Service, { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import DOMPurify from 'npm:dompurify';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
+import { Promise } from 'rsvp';
 
 const cookiesAcceptedCookieName = 'cookies-accepted';
 
@@ -60,10 +61,11 @@ export default Service.extend(
      * @override
      */
     fetchCookieConsentNotification() {
-      const privacyPolicyUrl = this.get('router').urlFor('public.privacy-policy');
-      return this.get('guiMessageManager').getMessage('cookie_consent_notification')
-        .then(message =>
-          DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
+      return Promise.all([
+        this.get('privacyPolicyProxy').then(() => this.get('privacyPolicyUrl')),
+        this.get('guiMessageManager').getMessage('cookie_consent_notification'),
+      ]).then(([privacyPolicyUrl, message]) =>
+        DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
             `<a href="${privacyPolicyUrl}" class="clickable privacy-policy-link">$1</a>`
