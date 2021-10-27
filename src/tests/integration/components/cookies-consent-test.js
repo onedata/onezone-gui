@@ -6,7 +6,6 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
 import { set, get } from '@ember/object';
 import { click } from 'ember-native-dom-helpers';
-import sinon from 'sinon';
 import { resolve } from 'rsvp';
 
 const PrivacyPolicyManagerStub = Service.extend({
@@ -55,18 +54,5 @@ describe('Integration | Component | cookies consent', function () {
           'areCookiesAccepted')
       ).to.be.true;
     });
-  });
-
-  it('makes "privacy policy" link clickable', function () {
-    const showPrivacyPolicySpy = sinon.spy(
-      lookupService(this, 'privacyPolicyManager'),
-      'showPrivacyPolicyInfo'
-    );
-
-    this.render(hbs `{{cookies-consent}}`);
-
-    return click('.privacy-policy-link').then(() =>
-      expect(showPrivacyPolicySpy).to.be.calledOnce
-    );
   });
 });
