@@ -13,6 +13,7 @@
       {{modals/upload-atm-workflow-schema-modal/uploader
         class="modal-section"
         uploadedFile=uploadedFile
+        reuploadCallback=reuploadCallback
         onUploadedFileChange=(action "uploadedFileChanged")
       }}
       {{#if uploadedFile}}

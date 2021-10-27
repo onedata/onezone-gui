@@ -1,24 +1,14 @@
-{{#if uploadedFile}}
-  <h2>{{tt this "header"}}</h2>
-  <div class="detail">
-    <span class="detail-label filename-label">{{tt this "filename"}}:</span>
-    {{#truncated-string class="detail-value filename"}}{{filename}}{{/truncated-string}}
-  </div>
-{{else}}
-  <p class="intro">{{tt this "intro"}}</p>
-{{/if}}
+<h2>{{tt this "header"}}</h2>
+<div class="detail">
+  <span class="detail-label filename-label">{{tt this "filename"}}:</span>
+  {{#truncated-string class="detail-value filename"}}{{filename}}{{/truncated-string}}
+</div>
 {{#bs-button
   class="upload-btn"
-  type=(if uploadedFile "default" "primary")
-  size=(if uploadedFile "sm")
-  onClick=(action "triggerFileInput")
+  type="default"
+  size="sm"
+  onClick=(action "triggerReupload")
 }}
-  {{tt this (if uploadedFile "uploadButton.change" "uploadButton.select")}}
+  {{tt this "uploadButton"}}
 {{/bs-button}}
-<input
-  class="upload-input hidden"
-  type="file"
-  accept=".json"
-  onchange={{action "inputChange"}}
-/>
 {{yield}}

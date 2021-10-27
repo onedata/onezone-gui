@@ -1,21 +1,19 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
-import { get, getProperties } from '@ember/object';
-import { getModal, getModalFooter } from '../../../helpers/modal';
+import { getProperties } from '@ember/object';
+import { getModal } from '../../../helpers/modal';
 import wait from 'ember-test-helpers/wait';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, reject } from 'rsvp';
-import { click, fillIn } from 'ember-native-dom-helpers';
-import {
-  triggerUploadInputChange,
-  generateExampleDump,
-} from '../../components/modals/upload-atm-workflow-schema-modal/uploader-test';
+import { click, fillIn, triggerEvent } from 'ember-native-dom-helpers';
+import { generateExampleDump } from '../../components/modals/upload-atm-workflow-schema-modal/uploader-test';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
+import $ from 'jquery';
 
 const atmInventoryId = 'invid';
 
@@ -61,6 +59,10 @@ describe(
       });
     });
 
+    afterEach(function () {
+      this.get('action').destroy();
+    });
+
     it('has correct className, icon and title', function () {
       const {
         className,
@@ -92,34 +94,16 @@ describe(
 
     it('shows modal on execute', async function () {
       this.render(hbs `{{global-modal-mounter}}`);
-      this.get('action').execute();
+      const dump = generateExampleDump();
+      await triggerUploadInputChange('file.json', JSON.stringify(dump));
       await wait();
 
       expect(getModal()).to.have.class('upload-atm-workflow-schema-modal');
     });
 
-    it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
+    it('executes merging workflows on submit - notification on success',
       async function () {
-        this.render(hbs `{{global-modal-mounter}}`);
-
-        const resultPromise = this.get('action').execute();
-        await wait();
-        await click(getModalFooter().find('.cancel-btn')[0]);
-        const actionResult = await resultPromise;
-
-        expect(get(actionResult, 'status')).to.equal('cancelled');
-      }
-    );
-
-    it('executes merging workflows on submit - success status and notification on success',
-      async function () {
-        const {
-          mergeStub,
-          action,
-        } = this.getProperties(
-          'mergeStub',
-          'action'
-        );
+        const mergeStub = this.get('mergeStub');
         mergeStub.resolves();
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -128,29 +112,20 @@ describe(
         const dump = generateExampleDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = action.execute();
+        await triggerUploadInputChange('file.json', JSON.stringify(dump));
         await wait();
-        await triggerUploadInputChange(this, 'file.json', JSON.stringify(dump));
         await click('.submit-btn');
-        const actionResult = await actionResultPromise;
 
         expect(mergeStub).to.be.calledOnce.and.to.be.calledWith('wf1id', dump);
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
           'The workflow has been merged successfully.'
         ));
-        expect(get(actionResult, 'status')).to.equal('done');
       });
 
-    it('executes creating new workflow on submit - success status and notification on success',
+    it('executes creating new workflow on submit - notification on success',
       async function () {
-        const {
-          createStub,
-          action,
-        } = this.getProperties(
-          'createStub',
-          'action'
-        );
+        const createStub = this.get('createStub');
         createStub.resolves();
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -159,13 +134,11 @@ describe(
         const dump = generateExampleDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = action.execute();
+        await triggerUploadInputChange('file.json', JSON.stringify(dump));
         await wait();
-        await triggerUploadInputChange(this, 'file.json', JSON.stringify(dump));
         await click('.option-create');
         await fillIn('.newWorkflowName-field .form-control', 'abcd');
         await click('.submit-btn');
-        const actionResult = await actionResultPromise;
 
         const expectedWorkflowContent = Object.assign({}, dump, { name: 'abcd' });
         expect(createStub).to.be.calledOnce
@@ -174,19 +147,12 @@ describe(
           'string',
           'The workflow has been created successfully.'
         ));
-        expect(get(actionResult, 'status')).to.equal('done');
       });
 
     it(
-      'executes merging workflow dump on submit - error status and notification on failure',
+      'executes merging workflow dump on submit - notification on failure',
       async function () {
-        const {
-          mergeStub,
-          action,
-        } = this.getProperties(
-          'mergeStub',
-          'action'
-        );
+        const mergeStub = this.get('mergeStub');
         mergeStub.callsFake(() => reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -195,36 +161,21 @@ describe(
         const dump = generateExampleDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = action.execute();
+        await triggerUploadInputChange('file.json', JSON.stringify(dump));
         await wait();
-        await triggerUploadInputChange(this, 'file.json', JSON.stringify(dump));
-        await click(getModalFooter().find('.submit-btn')[0]);
-        await wait();
-        const actionResult = await actionResultPromise;
+        await click('.submit-btn');
 
         const expectedError = { error: 'someError', operation: 'merge' };
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'merging workflow'), expectedError
         );
-        const {
-          status,
-          error,
-        } = getProperties(actionResult, 'status', 'error');
-        expect(status).to.equal('failed');
-        expect(error).to.deep.equal(expectedError);
       }
     );
 
     it(
-      'executes creating new workflow on submit - error status and notification on failure',
+      'executes creating new workflow on submit - notification on failure',
       async function () {
-        const {
-          createStub,
-          action,
-        } = this.getProperties(
-          'createStub',
-          'action'
-        );
+        const createStub = this.get('createStub');
         createStub.callsFake(() => reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
@@ -233,25 +184,28 @@ describe(
         const dump = generateExampleDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        const actionResultPromise = action.execute();
+        await triggerUploadInputChange('file.json', JSON.stringify(dump));
         await wait();
-        await triggerUploadInputChange(this, 'file.json', JSON.stringify(dump));
         await click('.option-create');
         await click('.submit-btn');
-        await wait();
-        const actionResult = await actionResultPromise;
 
         const expectedError = { error: 'someError', operation: 'create' };
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'creating workflow'), expectedError
         );
-        const {
-          status,
-          error,
-        } = getProperties(actionResult, 'status', 'error');
-        expect(status).to.equal('failed');
-        expect(error).to.deep.equal(expectedError);
       }
     );
   }
 );
+
+export async function triggerUploadInputChange(filename, fileContent) {
+  const uploadInputElement = $('.upload-atm-workflow-schema-action-input')[0];
+  const fileContentBlob = new Blob([fileContent], {
+    type: 'application/json',
+  });
+  const file = new File([fileContentBlob], filename, { type: 'application/json' });
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  uploadInputElement.files = dataTransfer.files;
+  await triggerEvent(uploadInputElement, 'change');
+}

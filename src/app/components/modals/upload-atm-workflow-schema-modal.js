@@ -38,7 +38,7 @@ export default Component.extend(I18n, {
   /**
    * @type {AtmWorkflowSchemaUploadedFile}
    */
-  uploadedFile: undefined,
+  uploadedFile: reads('uploadedFileProxy.content'),
 
   /**
    * @type {'merge'|'create'}
@@ -69,6 +69,16 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Model.AtmInventory>}
    */
   atmInventory: reads('modalOptions.atmInventory'),
+
+  /**
+   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaUploadedFile>>}
+   */
+  uploadedFileProxy: reads('modalOptions.uploadedFileProxy'),
+
+  /**
+   * @type {ComputedProperty<() => void>}
+   */
+  reuploadCallback: reads('modalOptions.reuploadCallback'),
 
   /**
    * @type {ComputedProperty<Object>}
@@ -148,6 +158,11 @@ export default Component.extend(I18n, {
     scheduleOnce('afterRender', this, 'reinitializeNewWorkflowName');
     scheduleOnce('afterRender', this, 'reinitializeTargetWorkflows');
   }),
+
+  init() {
+    this._super(...arguments);
+    this.dumpObserver();
+  },
 
   async reinitializeTargetWorkflows() {
     let atmWorkflowSchemas;

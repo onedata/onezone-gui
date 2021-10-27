@@ -15,22 +15,11 @@
   }
 
   .uploader {
-    &.initial-layout {
-      padding: 4em 0;
-      text-align: center;
-    }
-
-    &.uploaded-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) min-content;
-      grid-template-areas:
-        'header header'
-        'detail upload';
-    }
-
-    .intro {
-      margin-bottom: 3em;
-    }
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min-content;
+    grid-template-areas:
+      'header header'
+      'detail upload';
 
     h2 {
       grid-area: header;
