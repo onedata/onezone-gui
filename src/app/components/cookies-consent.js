@@ -9,10 +9,9 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { run } from '@ember/runloop';
 import { htmlSafe } from '@ember/template';
 
 export default Component.extend(I18n, {
@@ -39,18 +38,6 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<boolean>}
    */
   areCookiesAccepted: reads('privacyPolicyManager.areCookiesAccepted'),
-
-  didInsertElement() {
-    this._super(...arguments);
-
-    const privacyPolicyManager = this.get('privacyPolicyManager');
-
-    get(privacyPolicyManager, 'cookieConsentNotificationProxy').then(() => {
-      this.$('.privacy-policy-link').click(() => run(() => {
-        this.get('privacyPolicyManager').showPrivacyPolicyInfo();
-      }));
-    });
-  },
 
   actions: {
     acceptCookies() {
