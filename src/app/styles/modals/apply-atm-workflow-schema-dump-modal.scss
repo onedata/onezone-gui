@@ -1,4 +1,4 @@
-.upload-atm-workflow-schema-modal {
+.apply-atm-workflow-schema-dump-modal {
   .modal-section {
     + .modal-section {
       margin-top: 1.2em;
@@ -14,7 +14,7 @@
     }
   }
 
-  .uploader {
+  .upload-details {
     display: grid;
     grid-template-columns: minmax(0, 1fr) min-content;
     grid-template-areas:
@@ -38,6 +38,15 @@
   .detail {
     display: flex;
     align-items: center;
+
+    &.wrap-value {
+      display: initial;
+      word-wrap: break-word;
+
+      .detail-value {
+        margin: 0;
+      }
+    }
   }
 
   .detail-label {
@@ -45,7 +54,7 @@
   }
 
   .detail-value {
-    margin-left: 0.3em;
+    margin-left: 0.25em;
     flex-grow: 1;
   }
 

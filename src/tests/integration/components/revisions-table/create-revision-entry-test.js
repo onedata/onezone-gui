@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
@@ -14,6 +14,21 @@ describe('Integration | Component | revisions table/create revision entry', func
     integration: true,
   });
 
+  beforeEach(function () {
+    const createRevisionSpy = sinon.spy();
+    this.setProperties({
+      createRevisionSpy,
+      revisionActionsFactory: {
+        createCreateRevisionAction: () => Action.create({
+          icon: 'plus',
+          title: 'Create revision',
+          onExecute: createRevisionSpy,
+          ownerSource: this,
+        }),
+      },
+    });
+  });
+
   it(`has class "${componentClass}"`, async function () {
     await render(this);
 
@@ -25,19 +40,12 @@ describe('Integration | Component | revisions table/create revision entry', func
     await render(this);
 
     expect(this.$('.one-icon')).to.have.class('oneicon-plus');
-    expect(this.$().text().trim()).to.equal('Create new revision');
+    expect(this.$().text().trim()).to.equal('Create revision');
   });
 
   it('creates new revision on click',
     async function () {
-      const createRevisionSpy = sinon.spy();
-      this.set('revisionActionsFactory', {
-        createCreateRevisionAction: () => Action.create({
-          onExecute: createRevisionSpy,
-          ownerSource: this,
-        }),
-      });
-
+      const createRevisionSpy = this.get('createRevisionSpy');
       await render(this);
       expect(createRevisionSpy).to.be.not.called;
 

@@ -8,20 +8,21 @@ import { promise } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 
 /**
- * @typedef {Object} AtmWorkflowSchemaUploadedFile
+ * @typedef {Object} AtmWorkflowSchemaDumpSource
  * @property {String} name
- * @property {any} content
+ * @property {any} dump
  */
 
 export default Component.extend(I18n, {
   tagName: '',
 
   i18n: service(),
+  recordManager: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.uploadAtmWorkflowSchemaModal',
+  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal',
 
   /**
    * @virtual
@@ -36,9 +37,9 @@ export default Component.extend(I18n, {
   modalOptions: undefined,
 
   /**
-   * @type {AtmWorkflowSchemaUploadedFile}
+   * @type {Models.AtmInventory}
    */
-  uploadedFile: reads('uploadedFileProxy.content'),
+  selectedTargetAtmInventory: undefined,
 
   /**
    * @type {'merge'|'create'}
@@ -66,35 +67,58 @@ export default Component.extend(I18n, {
   isSubmitting: false,
 
   /**
-   * @type {ComputedProperty<Model.AtmInventory>}
+   * @type {ComputedProperty<'upload'|'duplication'>}
    */
-  atmInventory: reads('modalOptions.atmInventory'),
+  dumpSourceType: reads('modalOptions.dumpSourceType'),
 
   /**
-   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaUploadedFile>>}
+   * @type {ComputedProperty<Model.AtmInventory>}
    */
-  uploadedFileProxy: reads('modalOptions.uploadedFileProxy'),
+  initialAtmInventory: reads('modalOptions.initialAtmInventory'),
+
+  /**
+   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaDumpSource>>}
+   */
+  dumpSourceProxy: reads('modalOptions.dumpSourceProxy'),
+
+  /**
+   * @type {AtmWorkflowSchemaDumpSource}
+   */
+  dumpSource: reads('dumpSourceProxy.content'),
 
   /**
    * @type {ComputedProperty<() => void>}
    */
-  reuploadCallback: reads('modalOptions.reuploadCallback'),
+  onReupload: reads('modalOptions.onReupload'),
 
   /**
    * @type {ComputedProperty<Object>}
    */
-  dump: reads('uploadedFile.content'),
+  dump: reads('dumpSource.dump'),
+
+  /**
+   * @type {ComputedProperty<PromiseArray<Models.AtmInventory>>}
+   */
+  targetAtmInventoriesProxy: promise.array(
+    computed(async function targetAtmInventoriesProxy() {
+      return get(
+        await this.get('recordManager').getUserRecordList('atmInventory'),
+        'list'
+      );
+    })
+  ),
 
   /**
    * @type {ComputedProperty<PromiseArray<Models.AtmWorkflowSchema>>}
    */
   atmWorkflowSchemasProxy: promise.array(
-    computed('atmInventory', async function atmWorkflowSchemasProxy() {
-      const atmInventory = this.get('atmInventory');
-      if (!atmInventory) {
+    computed('selectedTargetAtmInventory', async function atmWorkflowSchemasProxy() {
+      const selectedTargetAtmInventory = this.get('selectedTargetAtmInventory');
+      if (!selectedTargetAtmInventory) {
         throw { id: 'notFound' };
       }
-      const atmWorkflowSchemaList = await get(atmInventory, 'atmWorkflowSchemaList');
+      const atmWorkflowSchemaList =
+        await get(selectedTargetAtmInventory, 'atmWorkflowSchemaList');
       return await get(atmWorkflowSchemaList, 'list');
     })
   ),
@@ -161,6 +185,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
+    this.set('selectedTargetAtmInventory', this.get('initialAtmInventory'));
     this.dumpObserver();
   },
 
@@ -206,8 +231,8 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    uploadedFileChanged(uploadedFile) {
-      this.set('uploadedFile', uploadedFile);
+    targetAtmInventoryChanged(atmInventory) {
+      this.set('selectedTargetAtmInventory', atmInventory);
     },
     operationValueChanged(fieldName, value) {
       this.set(fieldName, value);

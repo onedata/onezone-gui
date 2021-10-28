@@ -33,6 +33,10 @@ const revisionActionsSpec = [{
   label: 'Redesign as new revision',
   icon: 'plus',
 }, {
+  className: 'duplicate-atm-workflow-schema-revision-action-trigger',
+  label: 'Duplicate',
+  icon: 'browser-copy',
+}, {
   className: 'dump-atm-workflow-schema-revision-action-trigger',
   label: 'Download (json)',
   icon: 'browser-download',

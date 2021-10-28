@@ -10,7 +10,7 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, reject } from 'rsvp';
 import { click, fillIn, triggerEvent } from 'ember-native-dom-helpers';
-import { generateExampleDump } from '../../components/modals/upload-atm-workflow-schema-modal/uploader-test';
+import { generateExampleDump } from '../../components/modals/apply-atm-workflow-schema-dump-modal/upload-details-test';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import $ from 'jquery';
@@ -42,6 +42,8 @@ describe(
           manageWorkflowSchemas: true,
         },
       };
+      sinon.stub(lookupService(this, 'record-manager'), 'getUserRecordList')
+        .resolves({ list: promiseArray(resolve([atmInventory])) });
       const workflowManager = lookupService(this, 'workflow-manager');
       const mergeStub =
         sinon.stub(workflowManager, 'mergeAtmWorkflowSchemaDumpToExistingSchema');
@@ -92,14 +94,55 @@ describe(
         );
       });
 
-    it('shows modal on execute', async function () {
+    it('shows modal on file upload', async function () {
+      const filename = 'file.json';
+      this.render(hbs `{{global-modal-mounter}}`);
+      const dump = generateExampleDump();
+      await triggerUploadInputChange(filename, JSON.stringify(dump));
+      await wait();
+
+      expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect(getModal().find('.upload-details').text()).to.contain(filename);
+      expect(getModal().find('.dump-details .error')).to.not.exist;
+    });
+
+    it('allows to reupload another file', async function () {
       this.render(hbs `{{global-modal-mounter}}`);
       const dump = generateExampleDump();
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
+      await triggerUploadInputChange('file2.json', JSON.stringify(dump));
       await wait();
 
-      expect(getModal()).to.have.class('upload-atm-workflow-schema-modal');
+      expect(getModal().find('.upload-details').text()).to.contain('file2.json');
     });
+
+    ['name', 'initialRevision'].forEach(fieldName => {
+      it(`shows info about invalid uploaded file (missing ${fieldName})`,
+        async function () {
+          const filename = 'file.json';
+          this.render(hbs `{{global-modal-mounter}}`);
+
+          const dump = generateExampleDump();
+          delete dump[fieldName];
+          await triggerUploadInputChange(filename, JSON.stringify(dump));
+          await wait();
+
+          expect(getModal().find('.upload-details').text()).to.contain(filename);
+          expect(getModal().find('.dump-details .error')).to.exist;
+        });
+    });
+
+    it('shows info about invalid uploaded file (non-json conten)',
+      async function () {
+        const filename = 'file.json';
+        this.render(hbs `{{global-modal-mounter}}`);
+
+        await triggerUploadInputChange(filename, 'random content');
+        await wait();
+
+        expect(getModal().find('.upload-details').text()).to.contain(filename);
+        expect(getModal().find('.dump-details .error')).to.exist;
+      });
 
     it('executes merging workflows on submit - notification on success',
       async function () {
@@ -165,9 +208,9 @@ describe(
         await wait();
         await click('.submit-btn');
 
-        const expectedError = { error: 'someError', operation: 'merge' };
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'merging workflow'), expectedError
+          sinon.match.has('string', 'merging workflow'),
+          'someError'
         );
       }
     );
@@ -189,9 +232,9 @@ describe(
         await click('.option-create');
         await click('.submit-btn');
 
-        const expectedError = { error: 'someError', operation: 'create' };
         expect(failureNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'creating workflow'), expectedError
+          sinon.match.has('string', 'creating workflow'),
+          'someError'
         );
       }
     );

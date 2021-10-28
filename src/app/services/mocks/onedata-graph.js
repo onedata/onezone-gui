@@ -12,7 +12,8 @@ import OnedataGraphMock, {
   randomToken,
 } from 'onedata-gui-websocket-client/services/mocks/onedata-graph';
 import { resolve } from 'rsvp';
-import { get } from '@ember/object';
+import { get, getProperties } from '@ember/object';
+import { inject as service } from '@ember/service';
 import _ from 'lodash';
 
 const spaceHandlers = {
@@ -145,10 +146,25 @@ const atmInventoryHandlers = {
 };
 
 const atmWorkflowSchemaHandlers = {
-  dump(operation) {
+  dump(operation, entityId, { includeRevision }) {
     if (operation === 'create') {
+      const atmWorkflowSchema = this.get('recordManager')
+        .getLoadedRecordById('atmWorkflowSchema', entityId);
+      const {
+        name,
+        summary,
+        revisionRegistry,
+      } = getProperties(atmWorkflowSchema, 'name', 'summary', 'revisionRegistry');
       return {
-        some: 'dump',
+        schemaFormatVersion: 1,
+        name,
+        summary,
+        initialRevision: {
+          schema: revisionRegistry[includeRevision],
+          originalRevisionNumber: includeRevision,
+          supplementaryAtmLambdas: {},
+        },
+        originalAtmWorkflowSchemaId: entityId,
       };
     } else {
       throw messageNotSupported;
@@ -268,6 +284,8 @@ const tokenHandlers = {
 };
 
 export default OnedataGraphMock.extend({
+  recordManager: service(),
+
   init() {
     this._super(...arguments);
     const _handlers = Object.freeze({

@@ -5,14 +5,14 @@ import { reads } from '@ember/object/computed';
 import { isEmpty } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
-  classNames: ['details'],
+  classNames: ['dump-details'],
 
   i18n: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.uploadAtmWorkflowSchemaModal.details',
+  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.dumpDetails',
 
   /**
    * @type {Object}
@@ -27,12 +27,22 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
+  summary: reads('dump.summary'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
   revisionNumber: reads('dump.initialRevision.originalRevisionNumber'),
 
   /**
    * @type {ComputedProperty<Boolean>}
    */
   isNameUnknown: isEmpty('name'),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  isSummaryUnknown: isEmpty('summary'),
 
   /**
    * @type {ComputedProperty<Boolean>}

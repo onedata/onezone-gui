@@ -1,5 +1,6 @@
 /**
- * Uploads workflow schema from JSON file. Needs `atmInventory` passed in context.
+ * Uploads workflow schema from JSON file. Needs `atmInventory` and `mode` passed
+ * in context.
  *
  * @module utils/workflow-actions/upload-atm-workflow-schema-action
  * @author Michał Borzęcki
@@ -135,11 +136,15 @@ export default Action.extend({
       }
     }
 
-    await modalManager.show('upload-atm-workflow-schema-modal', {
-      atmInventory,
-      uploadedFileProxy,
-      reuploadCallback: () => dumpLoader.loadJsonFile(),
-      onSubmit: (data) => result.interceptPromise(this.persistDump(data)),
+    await modalManager.show('apply-atm-workflow-schema-dump-modal', {
+      initialAtmInventory: atmInventory,
+      dumpSourceType: 'upload',
+      dumpSourceProxy: uploadedFileProxy,
+      onReupload: () => dumpLoader.loadJsonFile(),
+      onSubmit: (data) => {
+        set(result, 'additionalData', { operation: data.operation });
+        return result.interceptPromise(this.persistDump(data));
+      },
     }).hiddenPromise;
 
     return finalizeExecution();
@@ -149,7 +154,7 @@ export default Action.extend({
    * @override
    */
   getSuccessNotificationText(actionResult) {
-    const operation = get(actionResult, 'result.operation');
+    const operation = get(actionResult, 'additionalData.operation');
     return this.t(`successNotificationText.${operation}`, {}, {
       defaultValue: '',
     });
@@ -159,7 +164,7 @@ export default Action.extend({
    * @override
    */
   getFailureNotificationActionName(actionResult) {
-    const operation = get(actionResult, 'error.operation');
+    const operation = get(actionResult, 'additionalData.operation');
     return this.t(`failureNotificationActionName.${operation}`, {}, {
       defaultValue: '',
     });
@@ -175,29 +180,19 @@ export default Action.extend({
       workflowManager,
       atmInventory,
     } = this.getProperties('workflowManager', 'atmInventory');
-    try {
-      switch (operation) {
-        case 'merge':
-          await workflowManager.mergeAtmWorkflowSchemaDumpToExistingSchema(
-            get(targetAtmWorkflowSchema, 'entityId'),
-            atmWorkflowSchemaDump
-          );
-          break;
-        case 'create':
-          await workflowManager.createAtmWorkflowSchema(
-            get(atmInventory, 'entityId'),
-            Object.assign({}, atmWorkflowSchemaDump, { name: newAtmWorkflowSchemaName })
-          );
-      }
-    } catch (error) {
-      throw {
-        operation,
-        error,
-      };
+    switch (operation) {
+      case 'merge':
+        await workflowManager.mergeAtmWorkflowSchemaDumpToExistingSchema(
+          get(targetAtmWorkflowSchema, 'entityId'),
+          atmWorkflowSchemaDump
+        );
+        break;
+      case 'create':
+        await workflowManager.createAtmWorkflowSchema(
+          get(atmInventory, 'entityId'),
+          Object.assign({}, atmWorkflowSchemaDump, { name: newAtmWorkflowSchemaName })
+        );
     }
-    return {
-      operation,
-    };
   },
 });
 
@@ -230,7 +225,7 @@ const DumpLoader = EmberObject.extend({
 
   /**
    * @public
-   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaUploadedFile>>}
+   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaDumpSource>>}
    */
   uploadedFileProxy: computed(() => ObjectProxy.create()),
 
@@ -391,7 +386,7 @@ const DumpLoader = EmberObject.extend({
     const parsedContent = content ? this.parseFileRawContent(content) : null;
     return {
       name: file.name,
-      content: parsedContent,
+      dump: parsedContent,
     };
   },
 

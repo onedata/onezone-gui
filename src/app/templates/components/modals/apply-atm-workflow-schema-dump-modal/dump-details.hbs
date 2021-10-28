@@ -6,6 +6,12 @@
       {{if isNameUnknown (tt this "unknownValue") name}}
     {{/truncated-string}}
   </div>
+  <div class="detail wrap-value">
+    <span class="detail-label summary-label">{{tt this "summary"}}:</span>
+    <span class="detail-value summary {{if isSummaryUnknown "unknown"}}">
+      {{if isSummaryUnknown (tt this "unknownValue") summary}}
+    </span>
+  </div>
   <div class="detail">
     <span class="detail-label revision-number-label">{{tt this "revisionNumber"}}:</span>
     {{#truncated-string class=(concat "detail-value revision-number " (if isRevisionNumberUnknown "unknown"))}}

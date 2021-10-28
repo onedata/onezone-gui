@@ -7,7 +7,8 @@
   class="upload-btn"
   type="default"
   size="sm"
-  onClick=(action "triggerReupload")
+  disabled=isDisabled
+  onClick=(action "reupload")
 }}
   {{tt this "uploadButton"}}
 {{/bs-button}}

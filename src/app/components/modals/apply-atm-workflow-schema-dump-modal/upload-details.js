@@ -4,35 +4,41 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 
 export default Component.extend(I18n, {
-  classNames: ['uploader'],
+  classNames: ['upload-details'],
 
   i18n: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.uploadAtmWorkflowSchemaModal.uploader',
+  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.uploadDetails',
 
   /**
    * @virtual
-   * @type {AtmWorkflowSchemaUploadedFile}
+   * @type {AtmWorkflowSchemaDumpSource}
    */
-  uploadedFile: undefined,
+  dumpSource: undefined,
 
   /**
    * @type {() => void}
    */
-  reuploadCallback: undefined,
+  onReupload: undefined,
+
+  /**
+   * @virtual
+   * @type {Boolean}
+   */
+  isDisabled: false,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  filename: reads('uploadedFile.name'),
+  filename: reads('dumpSource.name'),
 
   actions: {
-    triggerReupload() {
-      const reuploadCallback = this.get('reuploadCallback');
-      reuploadCallback && reuploadCallback();
+    reupload() {
+      const onReupload = this.get('onReupload');
+      onReupload && onReupload();
     },
   },
 });

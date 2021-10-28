@@ -33,6 +33,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   createActionsForRevisionNumber(revisionNumber) {
     return [
       this.createRedesignAsNewAtmWorkflowSchemaRevisionAction(revisionNumber),
+      this.createDuplicateAtmWorkflowSchemaRevisionAction(revisionNumber),
       this.createDumpAtmWorkflowSchemaRevisionAction(revisionNumber),
       this.createRemoveAtmWorkflowSchemaRevisionAction(revisionNumber),
     ];
@@ -85,6 +86,23 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       });
     }
     return action;
+  },
+
+  /**
+   * @private
+   * @param {Number} revisionNumber
+   * @returns {Utils.Action}
+   */
+  createDuplicateAtmWorkflowSchemaRevisionAction(revisionNumber) {
+    const {
+      workflowActions,
+      atmWorkflowSchema,
+    } = this.getProperties('workflowActions', 'atmWorkflowSchema');
+
+    return workflowActions.createDuplicateAtmWorkflowSchemaRevisionAction({
+      atmWorkflowSchema,
+      revisionNumber,
+    });
   },
 
   /**

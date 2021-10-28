@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
@@ -13,6 +13,21 @@ const headerTexts = ['Rev.', 'State', 'Description', ''];
 describe('Integration | Component | revisions table', function () {
   setupComponentTest('revisions-table', {
     integration: true,
+  });
+
+  beforeEach(function () {
+    const createRevisionSpy = sinon.spy();
+    this.setProperties({
+      createRevisionSpy,
+      revisionActionsFactory: {
+        createCreateRevisionAction: () => Action.create({
+          icon: 'plus',
+          title: 'Create revision',
+          onExecute: createRevisionSpy,
+          ownerSource: this,
+        }),
+      },
+    });
   });
 
   it(`has class "${componentClass}"`, async function () {
@@ -42,16 +57,15 @@ describe('Integration | Component | revisions table', function () {
       state: 'draft',
       description: 'myrev 2',
     }];
-    this.setProperties({
-      revisionRegistry: generateRevisionRegistry(revisionsSpec),
-      revisionActionsFactory: {
-        createActionsForRevisionNumber(revisionNumber) {
-          return [{
-            title: `testAction ${revisionNumber}`,
-          }];
-        },
-      },
-    });
+    this.set('revisionRegistry', generateRevisionRegistry(revisionsSpec));
+    this.set(
+      'revisionActionsFactory.createActionsForRevisionNumber',
+      (revisionNumber) => {
+        return [{
+          title: `testAction ${revisionNumber}`,
+        }];
+      }
+    );
     await render(this);
 
     const $revisionEntries = this.$('.revisions-table-revision-entry');
@@ -243,13 +257,7 @@ describe('Integration | Component | revisions table', function () {
     });
 
   it('creates new revision', async function () {
-    const createRevisionSpy = sinon.spy();
-    this.set('revisionActionsFactory', {
-      createCreateRevisionAction: () => Action.create({
-        onExecute: createRevisionSpy,
-        ownerSource: this,
-      }),
-    });
+    const createRevisionSpy = this.get('createRevisionSpy');
     await render(this);
     expect(createRevisionSpy).to.be.not.called;
 

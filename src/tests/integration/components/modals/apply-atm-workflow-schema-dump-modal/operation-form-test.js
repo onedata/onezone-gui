@@ -10,9 +10,9 @@ import { click, fillIn } from 'ember-native-dom-helpers';
 
 const componentClass = 'operation-form';
 
-describe('Integration | Component | modals/upload atm workflow schema modal/operation form',
+describe('Integration | Component | modals/apply atm workflow schema dump modal/operation form',
   function () {
-    setupComponentTest('modals/upload-atm-workflow-schema-modal/operation-form', {
+    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal/operation-form', {
       integration: true,
     });
 
@@ -25,6 +25,7 @@ describe('Integration | Component | modals/upload atm workflow schema modal/oper
         },
         targetWorkflows: generateTargetWorkflows(1),
         onValueChange: sinon.spy((fieldName, newValue) => this.set(fieldName, newValue)),
+        isDisabled: false,
       });
     });
 
@@ -232,16 +233,28 @@ describe('Integration | Component | modals/upload atm workflow schema modal/oper
 
         expect(this.$('.revision-conflict-warning')).to.not.exist;
       });
+
+    it('disables controls when isDisabled is true', async function () {
+      this.set('isDisabled', true);
+
+      await render(this);
+
+      expect(this.$('.one-way-radio-group')).to.have.class('disabled');
+      expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
+        .to.have.attr('aria-disabled');
+      expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
+    });
   });
 
 async function render(testCase) {
-  testCase.render(hbs `{{modals/upload-atm-workflow-schema-modal/operation-form
+  testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
     selectedOperation=selectedOperation
     targetWorkflows=targetWorkflows
     selectedTargetWorkflow=selectedTargetWorkflow
     newWorkflowName=newWorkflowName
     dump=dump
     onValueChange=onValueChange
+    isDisabled=isDisabled
   }}`);
   await wait();
 }

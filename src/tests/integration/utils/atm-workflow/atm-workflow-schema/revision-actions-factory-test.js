@@ -6,10 +6,14 @@ import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 
 const revisionActionsClasses = [{
   classDef: CreateAtmWorkflowSchemaRevisionAction,
   revisionNumberField: 'originRevisionNumber',
+}, {
+  classDef: DuplicateAtmWorkflowSchemaRevisionAction,
+  revisionNumberField: 'revisionNumber',
 }, {
   classDef: DumpAtmWorkflowSchemaRevisionAction,
   revisionNumberField: 'revisionNumber',

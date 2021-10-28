@@ -17,7 +17,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.uploadAtmWorkflowSchemaModal.operationForm',
+  i18nPrefix: 'components.modals.applyAtmWorkflowSchemaDumpModal.operationForm',
 
   /**
    * @virtual
@@ -50,9 +50,16 @@ export default Component.extend(I18n, {
   newWorkflowName: undefined,
 
   /**
+   * @virtual
    * @type {(fieldName: string, value: any) => void}
    */
   onValueChange: undefined,
+
+  /**
+   * @virtual
+   * @type {Boolean}
+   */
+  isDisabled: false,
 
   /**
    * @type {ComputedProperty<Number>}
@@ -129,6 +136,7 @@ export default Component.extend(I18n, {
           } = getProperties(field, 'notifyChangeName', 'name');
           component.notifyAboutChange(notifyChangeName || name, value);
         },
+        isEnabled: not('component.isDisabled'),
       })
       .create({
         component,

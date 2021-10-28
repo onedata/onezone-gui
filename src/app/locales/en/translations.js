@@ -97,7 +97,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
-import uploadAtmWorkflowSchemaModal from './components/modals/upload-atm-workflow-schema-modal';
+import applyAtmWorkflowSchemaDumpModal from './components/modals/apply-atm-workflow-schema-dump-modal';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
@@ -141,6 +141,7 @@ import dumpAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/dump-a
 import modifyAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/modify-atm-workflow-schema-revision-action';
 import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
+import duplicateAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 
 const translations = {
   tabs: {
@@ -166,7 +167,7 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
-      uploadAtmWorkflowSchemaModal,
+      applyAtmWorkflowSchemaDumpModal,
     },
     errors: {
       shareNotFound,
@@ -304,6 +305,7 @@ const translations = {
       modifyAtmWorkflowSchemaRevisionAction,
       createAtmWorkflowSchemaRevisionAction,
       removeAtmWorkflowSchemaRevisionAction,
+      duplicateAtmWorkflowSchemaRevisionAction,
     },
   },
 };
