@@ -163,7 +163,7 @@ export default Component.extend(I18n, {
         spaceId,
         'data', {
           queryParams: {
-            options: serializeAspectOptions({ dir: fileId, selected: fileId }),
+            options: serializeAspectOptions({ selected: fileId }),
           },
         }
       );

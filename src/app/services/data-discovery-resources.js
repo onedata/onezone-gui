@@ -1,6 +1,6 @@
 /**
  * Defines resources that could be used by external harvester application.
- * 
+ *
  * @module services/data-discovery-resources
  * @author Michal Borzecki
  * @copyright (C) 2019 ACK CYFRONET AGH
@@ -230,7 +230,7 @@ export default Service.extend({
         spaceId,
         'data', {
           queryParams: {
-            options: serializeAspectOptions({ dir: fileId, selected: fileId }),
+            options: serializeAspectOptions({ selected: fileId }),
           },
         });
       return onezoneRoute ? `${onezoneUrl}${onezoneRoute}` : '';
