@@ -18,6 +18,7 @@ import { scheduleOnce } from '@ember/runloop';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Component.extend(GlobalActions, I18n, {
   classNames: ['content-atm-inventories-workflows'],
@@ -603,9 +604,42 @@ export default Component.extend(GlobalActions, I18n, {
     atmWorkflowSchemaAdded(atmWorkflowSchema) {
       this.send('showEditorView', atmWorkflowSchema, 1);
     },
-    showEditorView(atmWorkflowSchema, revisionNumber) {
+    async showEditorView(atmWorkflowSchema, revisionNumber) {
+      const {
+        atmInventory,
+        activeAtmWorkflowSchemaId,
+        router,
+      } = this.getProperties('atmInventory', 'activeAtmWorkflowSchemaId', 'router');
+      const atmInventoryOfWorkflowSchema = await get(atmWorkflowSchema || {}, 'atmInventory');
       const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
-      const schemaTheSameAsPrevOne = workflowId === this.get('activeAtmWorkflowSchemaId');
+      if (
+        atmInventoryOfWorkflowSchema &&
+        atmInventoryOfWorkflowSchema !== atmInventory &&
+        workflowId &&
+        revisionNumber
+      ) {
+        // Some event from inside of this component triggered a change in model,
+        // that needs showing editor for a workflow in another inventory.
+        // Example of such an event is duplicating revision to a workflow in
+        // other inventory.
+        router.transitionTo(
+          'onedata.sidebar.content.aspect',
+          'atm-inventories',
+          get(atmInventoryOfWorkflowSchema, 'entityId'),
+          'workflows', {
+            queryParams: {
+              options: serializeAspectOptions({
+                view: 'editor',
+                workflowId,
+                revision: revisionNumber,
+              }),
+            },
+          }
+        );
+        return;
+      }
+
+      const schemaTheSameAsPrevOne = workflowId === activeAtmWorkflowSchemaId;
       this.changeSlideViaUrl('editor', {
         workflowId,
         revision: String(revisionNumber),

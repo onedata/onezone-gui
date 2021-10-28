@@ -10,13 +10,16 @@
     {{#if (eq option.value "merge")}}
       {{#if isMergeDisabled}}
         <div class="no-target-workflow-warning alert alert-info small">
-          {{tt this "operations.merge.noTargetWorkflowWarning"}}
+          {{tt this (concat "operations.merge.noTargetWorkflowWarning." dumpSourceType)}}
         </div>
       {{else}}
         {{form-component/field-renderer field=targetWorkflowField}}
         {{#if isRevisionConflictWarningVisible}}
           <div class="revision-conflict-warning alert alert-warning small">
-            {{tt this "operations.merge.revisionConflictWarning" revisionNumber=revisionNumber}}
+            {{tt this
+              (concat "operations.merge.revisionConflictWarning." dumpSourceType)
+              revisionNumber=revisionNumber
+            }}
           </div>
         {{/if}}
       {{/if}}

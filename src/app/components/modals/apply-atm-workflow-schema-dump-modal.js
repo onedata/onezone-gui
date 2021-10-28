@@ -99,14 +99,24 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<PromiseArray<Models.AtmInventory>>}
    */
-  targetAtmInventoriesProxy: promise.array(
-    computed(async function targetAtmInventoriesProxy() {
+  targetAtmInventoriesProxy: promise.array(computed(
+    'dumpSourceType',
+    'initialAtmInventory',
+    async function targetAtmInventoriesProxy() {
+      const {
+        dumpSourceType,
+        initialAtmInventory,
+      } = this.getProperties('dumpSourceType', 'initialAtmInventory');
+      if (dumpSourceType === 'upload') {
+        // In "upload" mode only one inventory is allowed
+        return [initialAtmInventory];
+      }
+
       return get(
         await this.get('recordManager').getUserRecordList('atmInventory'),
         'list'
       );
-    })
-  ),
+    })),
 
   /**
    * @type {ComputedProperty<PromiseArray<Models.AtmWorkflowSchema>>}
@@ -128,17 +138,20 @@ export default Component.extend(I18n, {
    */
   dataToSubmit: computed(
     'dump',
+    'selectedTargetAtmInventory',
     'selectedOperation',
     'selectedTargetWorkflow',
     'newWorkflowName',
     function dataToSubmit() {
       const {
         dump,
+        selectedTargetAtmInventory,
         selectedOperation,
         selectedTargetWorkflow,
         newWorkflowName,
       } = this.getProperties(
         'dump',
+        'selectedTargetAtmInventory',
         'selectedOperation',
         'selectedTargetWorkflow',
         'newWorkflowName'
@@ -148,6 +161,7 @@ export default Component.extend(I18n, {
       }
 
       const data = {
+        atmInventory: selectedTargetAtmInventory,
         operation: selectedOperation,
         atmWorkflowSchemaDump: dump,
       };

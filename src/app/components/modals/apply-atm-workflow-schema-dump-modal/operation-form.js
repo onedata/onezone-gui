@@ -26,6 +26,11 @@ export default Component.extend(I18n, {
   dump: undefined,
 
   /**
+   * @type {'upload'|'duplication'}
+   */
+  dumpSourceType: undefined,
+
+  /**
    * @virtual
    * @type {'merge'|'create'}
    */

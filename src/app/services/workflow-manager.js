@@ -206,15 +206,13 @@ export default Service.extend({
         },
       })
     ).save();
-    // If workflow is created from workflow dump, then we need to reload lambdas
-    const reloadLambdasPromise = atmWorkflowSchemaPrototype.supplementaryAtmLambdas ?
-      recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
-      .catch(ignoreForbiddenError) : resolve();
     await allFulfilled([
       recordManager
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmWorkflowSchema')
       .catch(ignoreForbiddenError),
-      reloadLambdasPromise,
+      // If workflow is created from workflow dump, then we need to reload lambdas
+      recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
+      .catch(ignoreForbiddenError),
     ]);
     return atmWorkflowSchema;
   },
@@ -243,6 +241,7 @@ export default Service.extend({
   /**
    * @param {String} atmWorkflowSchemaId
    * @param {Object} atmWorkflowSchemaDump
+   * @returns {Promise<Models.AtmWorkflowSchema>}
    */
   async mergeAtmWorkflowSchemaDumpToExistingSchema(
     atmWorkflowSchemaId,
@@ -264,8 +263,13 @@ export default Service.extend({
       subscribe: false,
       data: atmWorkflowSchemaDump,
     });
-    await recordManager
+    let atmWorkflowSchema = await recordManager
       .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
+    if (!atmWorkflowSchema) {
+      atmWorkflowSchema = await recordManager
+        .getRecordById('atmWorkflowSchema', atmWorkflowSchema);
+    }
+    return atmWorkflowSchema;
   },
 
   /**

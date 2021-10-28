@@ -23,7 +23,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @virtual optional
-   * @type {(createdRevisionNumber: Number) => void)}
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: Number) => void)}
    */
   onRevisionCreated: undefined,
 
@@ -97,12 +97,29 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
     const {
       workflowActions,
       atmWorkflowSchema,
-    } = this.getProperties('workflowActions', 'atmWorkflowSchema');
+      onRevisionCreated,
+    } = this.getProperties('workflowActions', 'atmWorkflowSchema', 'onRevisionCreated');
 
-    return workflowActions.createDuplicateAtmWorkflowSchemaRevisionAction({
+    const action = workflowActions.createDuplicateAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
       revisionNumber,
     });
+    if (onRevisionCreated) {
+      action.addExecuteHook((result) => {
+        if (result && get(result, 'status') === 'done') {
+          const {
+            // This workflow schema is different than workflow schema from upper scope.
+            // It is a "target" workflow schema, where the duplicate has been saved.
+            atmWorkflowSchema,
+            revisionNumber,
+          } = get(result, 'result') || {};
+          if (atmWorkflowSchema && revisionNumber) {
+            onRevisionCreated(atmWorkflowSchema, revisionNumber);
+          }
+        }
+      });
+    }
+    return action;
   },
 
   /**

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
-import { getProperties } from '@ember/object';
+import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
+import { getProperties, get } from '@ember/object';
 import { getModal } from '../../../helpers/modal';
 import wait from 'ember-test-helpers/wait';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -18,13 +18,18 @@ import $ from 'jquery';
 const atmInventoryId = 'invid';
 
 describe(
-  'Integration | Utility | workflow actions/upload atm workflow schema action',
+  'Integration | Utility | workflow actions/duplicate atm workflow schema revision action',
   function () {
     setupComponentTest('test-component', {
       integration: true,
     });
 
     beforeEach(function () {
+      const atmWorkflowSchema = {
+        entityId: 'someid',
+      };
+      const atmWorkflowSchemaDump = generateAtmWorkflowSchemaDump();
+
       const atmWorkflowSchemas = [{
         entityId: 'wf1id',
         name: 'wf1',
@@ -42,27 +47,28 @@ describe(
           manageWorkflowSchemas: true,
         },
       };
+      atmWorkflowSchema.atmInventory = promiseObject(resolve(atmInventory));
       sinon.stub(lookupService(this, 'record-manager'), 'getUserRecordList')
         .resolves({ list: promiseArray(resolve([atmInventory])) });
       const workflowManager = lookupService(this, 'workflow-manager');
+      sinon.stub(workflowManager, 'getAtmWorkflowSchemaDump')
+        .withArgs('someid', 1).resolves(atmWorkflowSchemaDump);
       const mergeStub =
         sinon.stub(workflowManager, 'mergeAtmWorkflowSchemaDumpToExistingSchema');
       const createStub = sinon.stub(workflowManager, 'createAtmWorkflowSchema');
       this.setProperties({
-        action: UploadAtmWorkflowSchemaAction.create({
+        action: DuplicateAtmWorkflowSchemaRevisionAction.create({
           ownerSource: this,
           context: {
-            atmInventory,
+            atmWorkflowSchema,
+            revisionNumber: 1,
           },
         }),
         atmInventory,
+        atmWorkflowSchemaDump,
         mergeStub,
         createStub,
       });
-    });
-
-    afterEach(function () {
-      this.get('action').destroy();
     });
 
     it('has correct className, icon and title', function () {
@@ -71,169 +77,143 @@ describe(
         icon,
         title,
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
-      expect(className).to.equal('upload-atm-workflow-schema-action-trigger');
-      expect(icon).to.equal('browser-upload');
-      expect(String(title)).to.equal('Upload (json)');
+      expect(className).to.equal('duplicate-atm-workflow-schema-revision-action-trigger');
+      expect(icon).to.equal('browser-copy');
+      expect(String(title)).to.equal('Duplicate');
     });
 
-    it('is enabled, when user has "manageWorkflowSchemas" privilege in inventory',
-      function () {
-        this.set('atmInventory.privileges.manageWorkflowSchemas', true);
-
-        expect(this.get('action.disabled')).to.be.false;
-        expect(String(this.get('action.tip'))).to.be.empty;
-      });
-
-    it('is disabled, when user does not have "manageWorkflowSchemas" privilege in inventory',
-      function () {
-        this.set('atmInventory.privileges.manageWorkflowSchemas', false);
-
-        expect(this.get('action.disabled')).to.be.true;
-        expect(String(this.get('action.tip'))).to.equal(
-          'Insufficient privileges (requires &quot;manage workflow schemas&quot; privilege in this automation inventory).'
-        );
-      });
-
-    it('shows modal on file upload', async function () {
-      const filename = 'file.json';
+    it('shows modal on execute', async function () {
       this.render(hbs `{{global-modal-mounter}}`);
-      const dump = generateAtmWorkflowSchemaDump();
-      await triggerUploadInputChange(filename, JSON.stringify(dump));
+      this.get('action').execute();
       await wait();
 
       expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
-      expect(getModal().find('.upload-details').text()).to.contain(filename);
-      expect(getModal().find('.dump-details .error')).to.not.exist;
+      expect(getModal().find('.dump-details').text())
+        .to.contain(this.get('atmWorkflowSchemaDump.name'));
     });
 
-    it('allows to reupload another file', async function () {
-      this.render(hbs `{{global-modal-mounter}}`);
-      const dump = generateAtmWorkflowSchemaDump();
-      await triggerUploadInputChange('file.json', JSON.stringify(dump));
-      await triggerUploadInputChange('file2.json', JSON.stringify(dump));
-      await wait();
-
-      expect(getModal().find('.upload-details').text()).to.contain('file2.json');
-    });
-
-    ['name', 'initialRevision'].forEach(fieldName => {
-      it(`shows info about invalid uploaded file (missing ${fieldName})`,
-        async function () {
-          const filename = 'file.json';
-          this.render(hbs `{{global-modal-mounter}}`);
-
-          const dump = generateAtmWorkflowSchemaDump();
-          delete dump[fieldName];
-          await triggerUploadInputChange(filename, JSON.stringify(dump));
-          await wait();
-
-          expect(getModal().find('.upload-details').text()).to.contain(filename);
-          expect(getModal().find('.dump-details .error')).to.exist;
-        });
-    });
-
-    it('shows info about invalid uploaded file (non-json conten)',
+    it('executes merging workflows on submit (success scenario)',
       async function () {
-        const filename = 'file.json';
-        this.render(hbs `{{global-modal-mounter}}`);
-
-        await triggerUploadInputChange(filename, 'random content');
-        await wait();
-
-        expect(getModal().find('.upload-details').text()).to.contain(filename);
-        expect(getModal().find('.dump-details .error')).to.exist;
-      });
-
-    it('executes merging workflows on submit - notification on success',
-      async function () {
-        const mergeStub = this.get('mergeStub');
-        mergeStub.resolves();
+        const {
+          atmWorkflowSchemaDump,
+          mergeStub,
+          action,
+        } = this.getProperties('atmWorkflowSchemaDump', 'mergeStub', 'action');
+        const resultAtmWorkflowSchema = { entityId: '123456' };
+        mergeStub.resolves(resultAtmWorkflowSchema);
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'success'
         );
-        const dump = generateAtmWorkflowSchemaDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        const actionResultPromise = action.execute();
         await wait();
         await click('.submit-btn');
+        const actionResult = await actionResultPromise;
 
-        expect(mergeStub).to.be.calledOnce.and.to.be.calledWith('wf1id', dump);
+        expect(mergeStub).to.be.calledOnce
+          .and.to.be.calledWith('wf1id', atmWorkflowSchemaDump);
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
           'The workflow has been merged successfully.'
         ));
+        expect(get(actionResult, 'status')).to.equal('done');
+        expect(get(actionResult, 'result')).to.deep.equal({
+          atmWorkflowSchema: resultAtmWorkflowSchema,
+          revisionNumber: atmWorkflowSchemaDump.initialRevision.originalRevisionNumber,
+        });
       });
 
     it('executes creating new workflow on submit - notification on success',
       async function () {
-        const createStub = this.get('createStub');
-        createStub.resolves();
+        const {
+          atmWorkflowSchemaDump,
+          createStub,
+          action,
+        } = this.getProperties('atmWorkflowSchemaDump', 'createStub', 'action');
+        const resultAtmWorkflowSchema = { entityId: '123456' };
+        createStub.resolves(resultAtmWorkflowSchema);
         const successNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'success'
         );
-        const dump = generateAtmWorkflowSchemaDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        const actionResultPromise = action.execute();
         await wait();
         await click('.option-create');
         await fillIn('.newWorkflowName-field .form-control', 'abcd');
         await click('.submit-btn');
+        const actionResult = await actionResultPromise;
 
-        const expectedWorkflowContent = Object.assign({}, dump, { name: 'abcd' });
+        const expectedWorkflowContent =
+          Object.assign({}, atmWorkflowSchemaDump, { name: 'abcd' });
         expect(createStub).to.be.calledOnce
           .and.to.be.calledWith(atmInventoryId, expectedWorkflowContent);
         expect(successNotifySpy).to.be.calledWith(sinon.match.has(
           'string',
           'The workflow has been created successfully.'
         ));
+        expect(get(actionResult, 'status')).to.equal('done');
+        expect(get(actionResult, 'result')).to.deep.equal({
+          atmWorkflowSchema: resultAtmWorkflowSchema,
+          revisionNumber: atmWorkflowSchemaDump.initialRevision.originalRevisionNumber,
+        });
       });
 
     it('executes merging workflow dump on submit - notification on failure',
       async function () {
-        const mergeStub = this.get('mergeStub');
+        const {
+          mergeStub,
+          action,
+        } = this.getProperties('mergeStub', 'action');
         mergeStub.callsFake(() => reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        const dump = generateAtmWorkflowSchemaDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        const actionResultPromise = action.execute();
         await wait();
         await click('.submit-btn');
+        const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'merging workflow'),
           'someError'
         );
+        expect(get(actionResult, 'status')).to.equal('failed');
+        expect(get(actionResult, 'error')).to.equal('someError');
       }
     );
 
     it('executes creating new workflow on submit - notification on failure',
       async function () {
-        const createStub = this.get('createStub');
+        const {
+          createStub,
+          action,
+        } = this.getProperties('createStub', 'action');
         createStub.callsFake(() => reject('someError'));
         const failureNotifySpy = sinon.spy(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        const dump = generateAtmWorkflowSchemaDump();
         this.render(hbs `{{global-modal-mounter}}`);
 
-        await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        const actionResultPromise = action.execute();
         await wait();
         await click('.option-create');
         await click('.submit-btn');
+        const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'creating workflow'),
           'someError'
         );
+        expect(get(actionResult, 'status')).to.equal('failed');
+        expect(get(actionResult, 'error')).to.equal('someError');
       }
     );
   }

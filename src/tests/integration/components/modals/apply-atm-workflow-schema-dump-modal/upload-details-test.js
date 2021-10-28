@@ -3,7 +3,6 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
-import { triggerEvent } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
 
@@ -71,35 +70,4 @@ async function render(testCase) {
     isDisabled=isDisabled
   }}`);
   await wait();
-}
-
-export async function triggerUploadInputChange(testCase, filename, fileContent) {
-  const uploadInputElement = testCase.$('.upload-input')[0];
-  const fileContentBlob = new Blob([fileContent], {
-    type: 'application/json',
-  });
-  const file = new File([fileContentBlob], filename, { type: 'application/json' });
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(file);
-  uploadInputElement.files = dataTransfer.files;
-  await triggerEvent(uploadInputElement, 'change');
-}
-
-export function generateExampleDump() {
-  return {
-    schemaFormatVersion: 1,
-    name: 'w1',
-    summary: 'summary',
-    initialRevision: {
-      schema: {
-        state: 'stable',
-        description: 'description',
-        lanes: [],
-        stores: [],
-      },
-      originalRevisionNumber: 3,
-      supplementaryAtmLambdas: {},
-    },
-    originalAtmWorkflowSchemaId: 'w1id',
-  };
 }

@@ -8,14 +8,13 @@
  */
 
 import { reads } from '@ember/object/computed';
-import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { get, set } from '@ember/object';
+import { get } from '@ember/object';
 import ObjectProxy from '@ember/object/proxy';
+import ApplyAtmWorkflowSchemaDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-workflow-schema-dump-action-base';
 
-export default Action.extend({
-  workflowManager: service(),
+export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   modalManager: service(),
 
   /**
@@ -34,7 +33,7 @@ export default Action.extend({
   icon: 'browser-copy',
 
   /**
-   * @type {ComputedProperty<Models.AtmInventory>}
+   * @type {ComputedProperty<Models.AtmWorkflowSchema>}
    */
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
 
@@ -66,10 +65,7 @@ export default Action.extend({
       initialAtmInventory: atmInventory,
       dumpSourceType: 'duplication',
       dumpSourceProxy,
-      onSubmit: (data) => {
-        set(result, 'additionalData', { operation: data.operation });
-        return result.interceptPromise(this.persistDump(data));
-      },
+      onSubmit: (data) => this.handleModalSubmit(data, result),
     }).hiddenPromise;
 
     result.cancelIfPending();
@@ -87,50 +83,5 @@ export default Action.extend({
       atmWorkflowSchemaId,
       revisionNumber
     );
-  },
-
-  /**
-   * @override
-   */
-  getSuccessNotificationText(actionResult) {
-    const operation = get(actionResult, 'additionalData.operation');
-    return this.t(`successNotificationText.${operation}`, {}, {
-      defaultValue: '',
-    });
-  },
-
-  /**
-   * @override
-   */
-  getFailureNotificationActionName(actionResult) {
-    const operation = get(actionResult, 'additionalData.operation');
-    return this.t(`failureNotificationActionName.${operation}`, {}, {
-      defaultValue: '',
-    });
-  },
-
-  async persistDump({
-    operation,
-    atmWorkflowSchemaDump,
-    targetAtmWorkflowSchema,
-    newAtmWorkflowSchemaName,
-  }) {
-    const {
-      workflowManager,
-      atmInventory,
-    } = this.getProperties('workflowManager', 'atmInventory');
-    switch (operation) {
-      case 'merge':
-        await workflowManager.mergeAtmWorkflowSchemaDumpToExistingSchema(
-          get(targetAtmWorkflowSchema, 'entityId'),
-          atmWorkflowSchemaDump
-        );
-        break;
-      case 'create':
-        await workflowManager.createAtmWorkflowSchema(
-          get(atmInventory, 'entityId'),
-          Object.assign({}, atmWorkflowSchemaDump, { name: newAtmWorkflowSchemaName })
-        );
-    }
   },
 });

@@ -54,9 +54,10 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Function}
    * @param {Models.AtmWorkflowSchema} atmWorkflowSchema
+   * @param {Number} revisionNumber
    * @returns {any}
    */
-  onCreateAtmWorkflowSchemaRevision: notImplementedIgnore,
+  onCreatedAtmWorkflowSchemaRevision: notImplementedIgnore,
 
   /**
    * @virtual
@@ -119,29 +120,35 @@ export default Component.extend(I18n, {
    */
   uploadAtmWorkflowSchemaAction: computed(
     'atmInventory',
-    'onOpenAtmWorkflowSchema',
+    'onOpenAtmWorkflowSchemaRevision',
     function uploadAtmWorkflowSchemaAction() {
       const {
         workflowActions,
         atmInventory,
-        onOpenAtmWorkflowSchema,
+        onOpenAtmWorkflowSchemaRevision,
       } = this.getProperties(
         'workflowActions',
         'atmInventory',
-        'onOpenAtmWorkflowSchema'
+        'onOpenAtmWorkflowSchemaRevision'
       );
 
       const action = workflowActions.createUploadAtmWorkflowSchemaAction({
         atmInventory,
       });
       // After successful workflow schema upload, open it
-      action.addExecuteHook(result => {
+      action.addExecuteHook(actionResult => {
         const {
           status,
-          result: atmWorkflowSchema,
-        } = getProperties(result, 'status', 'result');
-        if (status === 'done' && atmWorkflowSchema) {
-          onOpenAtmWorkflowSchema(atmWorkflowSchema);
+          result,
+        } = getProperties(actionResult, 'status', 'result');
+        if (status === 'done' && result) {
+          const {
+            atmWorkflowSchema,
+            revisionNumber,
+          } = result;
+          if (atmWorkflowSchema && revisionNumber) {
+            onOpenAtmWorkflowSchemaRevision(atmWorkflowSchema, revisionNumber);
+          }
         }
       });
 

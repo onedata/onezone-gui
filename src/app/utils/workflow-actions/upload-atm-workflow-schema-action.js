@@ -1,5 +1,5 @@
 /**
- * Uploads workflow schema from JSON file. Needs `atmInventory` and `mode` passed
+ * Uploads workflow schema from JSON file. Needs `atmInventory` passed
  * in context.
  *
  * @module utils/workflow-actions/upload-atm-workflow-schema-action
@@ -9,7 +9,6 @@
  */
 
 import { reads } from '@ember/object/computed';
-import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import EmberObject, { computed, get, set } from '@ember/object';
@@ -18,8 +17,9 @@ import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insuffi
 import { defer, Promise } from 'rsvp';
 import config from 'ember-get-config';
 import ObjectProxy from '@ember/object/proxy';
+import ApplyAtmWorkflowSchemaDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-workflow-schema-dump-action-base';
 
-export default Action.extend({
+export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   workflowManager: service(),
   modalManager: service(),
 
@@ -141,58 +141,10 @@ export default Action.extend({
       dumpSourceType: 'upload',
       dumpSourceProxy: uploadedFileProxy,
       onReupload: () => dumpLoader.loadJsonFile(),
-      onSubmit: (data) => {
-        set(result, 'additionalData', { operation: data.operation });
-        return result.interceptPromise(this.persistDump(data));
-      },
+      onSubmit: (data) => this.handleModalSubmit(data, result),
     }).hiddenPromise;
 
     return finalizeExecution();
-  },
-
-  /**
-   * @override
-   */
-  getSuccessNotificationText(actionResult) {
-    const operation = get(actionResult, 'additionalData.operation');
-    return this.t(`successNotificationText.${operation}`, {}, {
-      defaultValue: '',
-    });
-  },
-
-  /**
-   * @override
-   */
-  getFailureNotificationActionName(actionResult) {
-    const operation = get(actionResult, 'additionalData.operation');
-    return this.t(`failureNotificationActionName.${operation}`, {}, {
-      defaultValue: '',
-    });
-  },
-
-  async persistDump({
-    operation,
-    atmWorkflowSchemaDump,
-    targetAtmWorkflowSchema,
-    newAtmWorkflowSchemaName,
-  }) {
-    const {
-      workflowManager,
-      atmInventory,
-    } = this.getProperties('workflowManager', 'atmInventory');
-    switch (operation) {
-      case 'merge':
-        await workflowManager.mergeAtmWorkflowSchemaDumpToExistingSchema(
-          get(targetAtmWorkflowSchema, 'entityId'),
-          atmWorkflowSchemaDump
-        );
-        break;
-      case 'create':
-        await workflowManager.createAtmWorkflowSchema(
-          get(atmInventory, 'entityId'),
-          Object.assign({}, atmWorkflowSchemaDump, { name: newAtmWorkflowSchemaName })
-        );
-    }
   },
 });
 

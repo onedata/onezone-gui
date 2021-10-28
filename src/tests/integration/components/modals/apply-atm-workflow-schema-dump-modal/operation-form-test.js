@@ -171,20 +171,49 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         .to.have.value('abc');
     });
 
-    it('makes option "merge" disabled when there is no target workflow available',
-      async function () {
-        this.set('targetWorkflows', []);
+    [{
+      dumpSourceType: 'upload',
+      noTargetWarning: 'There are no workflows, which were created based on the workflow from the uploaded file.',
+      overrideWarning: 'Selected workflow already has revision 2. It will be irreversibly replaced by the revision from the uploaded file.',
+    }, {
+      dumpSourceType: 'duplication',
+      noTargetWarning: 'There are no workflows, which were created based on the source workflow.',
+      overrideWarning: 'Selected workflow already has revision 2. It will be irreversibly replaced by the revision from the source workflow.',
+    }].forEach(({ dumpSourceType, noTargetWarning, overrideWarning }) => {
+      it('makes option "merge" disabled when there is no target workflow available',
+        async function () {
+          this.setProperties({
+            dumpSourceType,
+            targetWorkflows: [],
+          });
 
-        await render(this);
+          await render(this);
 
-        expect(this.$('.option-merge')).to.have.class('disabled');
-        expect(this.$('.targetWorkflow-field')).to.not.exist;
-        const $noTargetWorkflowWarning = this.$('.no-target-workflow-warning');
-        expect($noTargetWorkflowWarning).to.exist;
-        expect($noTargetWorkflowWarning.text().trim()).to.equal(
-          'There are no workflows, which were created based on the workflow from the uploaded file.'
-        );
-      });
+          expect(this.$('.option-merge')).to.have.class('disabled');
+          expect(this.$('.targetWorkflow-field')).to.not.exist;
+          const $noTargetWorkflowWarning = this.$('.no-target-workflow-warning');
+          expect($noTargetWorkflowWarning).to.exist;
+          expect($noTargetWorkflowWarning.text().trim()).to.equal(noTargetWarning);
+        });
+
+      it('shows "override" warning when selected target workflow has conflicting revision and selectedOperation is "merge"',
+        async function () {
+          const targetWorkflows = generateTargetWorkflows(1);
+          targetWorkflows[0].revisionRegistry[2] = {};
+          this.setProperties({
+            dumpSourceType,
+            selectedOperation: 'merge',
+            targetWorkflows,
+            selectedTargetWorkflow: targetWorkflows[0],
+          });
+
+          await render(this);
+
+          const $warning = this.$('.revision-conflict-warning');
+          expect($warning).to.exist;
+          expect($warning.text().trim()).to.equal(overrideWarning);
+        });
+    });
 
     it('does not show "override" warning when selected target workflow has no conflicting revision and selectedOperation is "merge"',
       async function () {
@@ -198,25 +227,6 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         await render(this);
 
         expect(this.$('.revision-conflict-warning')).to.not.exist;
-      });
-
-    it('shows "override" warning when selected target workflow has conflicting revision and selectedOperation is "merge"',
-      async function () {
-        const targetWorkflows = generateTargetWorkflows(1);
-        targetWorkflows[0].revisionRegistry[2] = {};
-        this.setProperties({
-          selectedOperation: 'merge',
-          targetWorkflows,
-          selectedTargetWorkflow: targetWorkflows[0],
-        });
-
-        await render(this);
-
-        const $warning = this.$('.revision-conflict-warning');
-        expect($warning).to.exist;
-        expect($warning.text().trim()).to.equal(
-          'Selected workflow already has revision 2. It will be irreversibly replaced by the revision from the uploaded file.'
-        );
       });
 
     it('does not show "override" warning when selected target workflow has conflicting revision and selectedOperation is "create"',
@@ -248,6 +258,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
 async function render(testCase) {
   testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
+    dumpSourceType=dumpSourceType
     selectedOperation=selectedOperation
     targetWorkflows=targetWorkflows
     selectedTargetWorkflow=selectedTargetWorkflow

@@ -11,6 +11,7 @@ import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/mo
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
@@ -76,6 +77,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
       CreateAtmWorkflowSchemaRevisionAction.create();
+      DuplicateAtmWorkflowSchemaRevisionAction.create();
       DumpAtmWorkflowSchemaRevisionAction.create();
       RemoveAtmWorkflowSchemaRevisionAction.create();
     });
@@ -98,6 +100,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         RemoveAtmWorkflowSchemaAction,
         CopyRecordIdAction,
         CreateAtmWorkflowSchemaRevisionAction,
+        DuplicateAtmWorkflowSchemaRevisionAction,
         DumpAtmWorkflowSchemaRevisionAction,
         RemoveAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
@@ -358,6 +361,27 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await click(
         $('body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger')[0]
       );
+
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows duplicating workflow revision', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        DuplicateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.revisionNumber')).to.equal(1);
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click($(
+        'body .webui-popover.in .duplicate-atm-workflow-schema-revision-action-trigger'
+      )[0]);
 
       expect(executeStub).to.be.calledOnce;
     });

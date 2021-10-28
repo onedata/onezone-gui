@@ -3,8 +3,14 @@ export default {
   operations: {
     merge: {
       label: 'Merge into existing workflow',
-      noTargetWorkflowWarning: 'There are no workflows, which were created based on the workflow from the uploaded file.',
-      revisionConflictWarning: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the uploaded file.',
+      noTargetWorkflowWarning: {
+        upload: 'There are no workflows, which were created based on the workflow from the uploaded file.',
+        duplication: 'There are no workflows, which were created based on the source workflow.',
+      },
+      revisionConflictWarning: {
+        upload: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the uploaded file.',
+        duplication: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the source workflow.',
+      },
     },
     create: {
       label: 'Persist as new workflow',
