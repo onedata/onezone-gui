@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
 * VFS-8038 Refactored build process to support faster builds on CI
 * VFS-7996 Fix for 20.02.x: added missing group privileges management
