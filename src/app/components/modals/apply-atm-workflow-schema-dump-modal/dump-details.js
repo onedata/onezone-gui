@@ -32,7 +32,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  revisionNumber: reads('dump.initialRevision.originalRevisionNumber'),
+  revisionNumber: reads('dump.revision.originalRevisionNumber'),
 
   /**
    * @type {ComputedProperty<Boolean>}

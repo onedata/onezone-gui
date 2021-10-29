@@ -49,7 +49,7 @@ export default Action.extend({
   }) {
     const workflowManager = this.get('workflowManager');
     const revisionNumber =
-      get(atmWorkflowSchemaDump, 'initialRevision.originalRevisionNumber');
+      get(atmWorkflowSchemaDump, 'revision.originalRevisionNumber');
     let atmWorkflowSchema;
     switch (operation) {
       case 'merge':

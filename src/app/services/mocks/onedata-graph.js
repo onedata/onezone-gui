@@ -156,11 +156,12 @@ const atmWorkflowSchemaHandlers = {
         revisionRegistry,
       } = getProperties(atmWorkflowSchema, 'name', 'summary', 'revisionRegistry');
       return {
-        schemaFormatVersion: 1,
+        schemaFormatVersion: 2,
         name,
         summary,
-        initialRevision: {
-          schema: revisionRegistry[includeRevision],
+        revision: {
+          schemaFormatVersion: 2,
+          atmWorkflowSchemaRevision: revisionRegistry[includeRevision],
           originalRevisionNumber: includeRevision,
           supplementaryAtmLambdas: {},
         },

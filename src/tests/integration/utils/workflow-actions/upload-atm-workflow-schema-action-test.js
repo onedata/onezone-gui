@@ -116,7 +116,7 @@ describe(
       expect(getModal().find('.upload-details').text()).to.contain('file2.json');
     });
 
-    ['name', 'initialRevision'].forEach(fieldName => {
+    ['name', 'revision'].forEach(fieldName => {
       it(`shows info about invalid uploaded file (missing ${fieldName})`,
         async function () {
           const filename = 'file.json';

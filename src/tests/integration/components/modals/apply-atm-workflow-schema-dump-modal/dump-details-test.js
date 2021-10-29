@@ -23,8 +23,8 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       this.set('dump', {
         name: 'w1',
         summary: 'summary',
-        initialRevision: {
-          schema: {
+        revision: {
+          atmWorkflowSchemaRevision: {
             state: 'stable',
             description: 'description',
           },
@@ -41,8 +41,8 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       this.set('dump', {
         name: '',
         summary: '',
-        initialRevision: {
-          schema: {
+        revision: {
+          atmWorkflowSchemaRevision: {
             state: 'stable',
             description: 'description',
           },

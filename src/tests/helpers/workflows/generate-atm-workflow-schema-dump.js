@@ -1,10 +1,11 @@
 export default function generateAtmWorkflowSchemaDump() {
   return {
-    schemaFormatVersion: 1,
+    schemaFormatVersion: 2,
     name: 'w1',
     summary: 'summary',
-    initialRevision: {
-      schema: {
+    revision: {
+      schemaFormatVersion: 2,
+      atmWorkflowSchemaRevision: {
         state: 'stable',
         description: 'description',
         lanes: [],

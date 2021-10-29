@@ -353,7 +353,7 @@ const DumpLoader = EmberObject.extend({
     if (
       typeof parsedContent !== 'object' || !parsedContent ||
       typeof parsedContent.name !== 'string' ||
-      typeof parsedContent.initialRevision !== 'object' || !parsedContent.initialRevision
+      typeof parsedContent.revision !== 'object' || !parsedContent.revision
     ) {
       return null;
     }

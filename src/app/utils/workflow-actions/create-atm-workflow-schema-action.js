@@ -48,9 +48,9 @@ export default Action.extend({
     );
     const atmInventoryId = get(atmInventory, 'entityId');
     const rawAtmWorkflowSchemaToSave = Object.assign({
-      initialRevision: {
+      revision: {
         originalRevisionNumber: 1,
-        schema: createEmptyRevision(),
+        atmWorkflowSchemaRevision: createEmptyRevision(),
       },
     }, rawAtmWorkflowSchema);
 

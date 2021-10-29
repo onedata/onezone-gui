@@ -200,7 +200,7 @@ export default Service.extend({
             atmInventoryId,
             originalAtmWorkflowSchemaId: atmWorkflowSchemaPrototype
               .originalAtmWorkflowSchemaId,
-            initialRevision: atmWorkflowSchemaPrototype.initialRevision,
+            revision: atmWorkflowSchemaPrototype.revision,
             schemaFormatVersion: atmWorkflowSchemaPrototype.schemaFormatVersion,
           },
         },
@@ -296,7 +296,9 @@ export default Service.extend({
       }),
       operation: 'create',
       subscribe: false,
-      data: revisionData,
+      data: {
+        atmWorkflowSchemaRevision: revisionData,
+      },
     });
     await recordManager
       .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);

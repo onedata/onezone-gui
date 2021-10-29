@@ -19,7 +19,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     beforeEach(function () {
       this.setProperties({
         dump: {
-          initialRevision: {
+          revision: {
             originalRevisionNumber: 2,
           },
         },

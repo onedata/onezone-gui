@@ -121,7 +121,7 @@ describe(
         expect(get(actionResult, 'status')).to.equal('done');
         expect(get(actionResult, 'result')).to.deep.equal({
           atmWorkflowSchema: resultAtmWorkflowSchema,
-          revisionNumber: atmWorkflowSchemaDump.initialRevision.originalRevisionNumber,
+          revisionNumber: atmWorkflowSchemaDump.revision.originalRevisionNumber,
         });
       });
 
@@ -158,7 +158,7 @@ describe(
         expect(get(actionResult, 'status')).to.equal('done');
         expect(get(actionResult, 'result')).to.deep.equal({
           atmWorkflowSchema: resultAtmWorkflowSchema,
-          revisionNumber: atmWorkflowSchemaDump.initialRevision.originalRevisionNumber,
+          revisionNumber: atmWorkflowSchemaDump.revision.originalRevisionNumber,
         });
       });
 

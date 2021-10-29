@@ -30,9 +30,9 @@ describe(
         },
         completeRawAtmWorkflowSchema: {
           name: 'someName',
-          initialRevision: {
+          revision: {
             originalRevisionNumber: 1,
-            schema: {
+            atmWorkflowSchemaRevision: {
               state: 'draft',
               description: '',
               lanes: [],
