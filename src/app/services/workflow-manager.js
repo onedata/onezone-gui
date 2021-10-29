@@ -171,6 +171,9 @@ export default Service.extend({
         _meta: {
           additionalData: {
             atmInventoryId,
+            originalAtmLambdaId: atmLambdaPrototype.originalAtmLambdaId,
+            revision: atmLambdaPrototype.revision,
+            schemaFormatVersion: atmLambdaPrototype.schemaFormatVersion,
           },
         },
       })
@@ -179,6 +182,58 @@ export default Service.extend({
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
       .catch(ignoreForbiddenError);
     return atmLambda;
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {Number} revisionNumber
+   * @param {Object} revisionData
+   */
+  async createAtmLambdaRevision(atmLambdaId, revisionNumber, revisionData) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'create',
+      subscribe: false,
+      data: {
+        atmLambdaRevision: revisionData,
+      },
+    });
+    await recordManager.reloadRecordById('atmLambda', atmLambdaEntityType);
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {Number} revisionNumber
+   * @param {Object} revisionDataUpdate
+   */
+  async updateAtmLambdaRevision(atmLambdaId, revisionNumber, revisionDataUpdate) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'update',
+      subscribe: false,
+      data: revisionDataUpdate,
+    });
+    await recordManager.reloadRecordById('atmLambda', atmLambdaEntityType);
   },
 
   /**

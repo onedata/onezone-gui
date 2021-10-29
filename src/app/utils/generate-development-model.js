@@ -906,42 +906,47 @@ function attachProgressToHarvesterIndices(
 function attachAtmLambdasToAtmInventory(store, atmInventory) {
   return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
     return store.createRecord('atmLambda', {
-      name: `Function ${index}`,
-      summary: `Some very complicated function #${index}`,
-      operationSpec: {
-        engine: 'openfaas',
-        dockerImage: `some-super-docker-image:${index}`,
-        dockerExecutionOptions: {
-          readonly: true,
-          mountOneclient: true,
-          oneclientMountPoint: '/mnt/oneclient',
-          oneclientOptions: '-k',
-        },
-      },
-      argumentSpecs: [{
-        name: 'arg1',
-        dataSpec: { type: 'string' },
-        isBatch: true,
-        isOptional: true,
-        defaultValue: '"some value"',
-      }, {
-        name: 'arg2',
-        dataSpec: { type: 'onedatafsCredentials' },
-        isBatch: true,
-      }],
-      resultSpecs: [{
-        name: 'res1',
-        dataSpec: { type: 'string' },
-        isBatch: false,
-      }],
-      resourceSpec: {
-        cpuRequested: 2,
-        cpuLimit: 10,
-        memoryRequested: 100 * 1024 * 1024,
-        memoryLimit: 200 * 1024 * 1024,
-        ephemeralStorageRequested: 300 * 1024 * 1024,
-        ephemeralStorageLimit: null,
-      },
+      revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
+        registry[revisionNumber] = {
+          name: `Function ${index}.${revisionNumber}`,
+          summary: `Some very complicated function #${index}.${revisionNumber}`,
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: `some-super-docker-image:${index}.${revisionNumber}`,
+            dockerExecutionOptions: {
+              readonly: true,
+              mountOneclient: true,
+              oneclientMountPoint: '/mnt/oneclient',
+              oneclientOptions: '-k',
+            },
+          },
+          argumentSpecs: [{
+            name: 'arg1',
+            dataSpec: { type: 'string' },
+            isBatch: true,
+            isOptional: true,
+            defaultValue: '"some value"',
+          }, {
+            name: 'arg2',
+            dataSpec: { type: 'onedatafsCredentials' },
+            isBatch: true,
+          }],
+          resultSpecs: [{
+            name: 'res1',
+            dataSpec: { type: 'string' },
+            isBatch: false,
+          }],
+          resourceSpec: {
+            cpuRequested: 2,
+            cpuLimit: 10,
+            memoryRequested: 100 * 1024 * 1024,
+            memoryLimit: 200 * 1024 * 1024,
+            ephemeralStorageRequested: 300 * 1024 * 1024,
+            ephemeralStorageLimit: null,
+          },
+        };
+        return registry;
+      }, {}),
     }).save();
   })).then(atmLambdas =>
     createListRecord(store, 'atmLambda', atmLambdas)
