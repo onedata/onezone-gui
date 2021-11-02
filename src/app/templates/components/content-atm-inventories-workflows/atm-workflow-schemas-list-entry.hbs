@@ -29,6 +29,7 @@
     {{/if}}
   {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
   {{revisions-table
+    customColumnSpecs=revisionCustomColumnSpecs
     revisionRegistry=atmWorkflowSchema.revisionRegistry
     revisionActionsFactory=revisionActionsFactory
     onRevisionClick=(action "clickRevision")

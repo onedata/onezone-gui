@@ -16,44 +16,68 @@
   }
 
   .content-section {
-    display: flex;
-    align-items: flex-start;
-
-    .form {
-      margin: 0;
-      margin-top: $padding-base-vertical;
-      padding: 0;
-    }
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas:
+        "details actions"
+        "revisions revisions";
   }
 
-  .name {
+  .details {
+    grid-area: details;
+    min-width: 0;
+  }
+
+  .revisions-table {
+    grid-area: revisions;
+    margin-top: 1em;
+  }
+
+  .atm-lambda-actions-trigger {
+    grid-area: actions;
+    align-self: start;
+    margin-right: -$iconified-block-padding;
+  }
+
+  .lambda-name {
     @include font-semibold();
     margin-bottom: $padding-small-vertical;
   }
 
-  .name,
-  .summary {
+  .lambda-name,
+  .lambda-summary {
     word-break: break-word;
   }
 
-  .summary::after {
-    content: '';
-    display: inline-block;
-    height: $line-height-computed;
-    width: 2px;
-    margin-left: 0.4em;
-    margin-right: 0.2em;
-    background-color: $main-border-color;
-    vertical-align: top;
+  @media (min-width: $screen-sm-min) {
+    .name-column,
+    .name {
+      width: 40%;
+    }
+
+    .summary-column,
+    .summary {
+      width: 60%;
+    }
   }
 
-  .lambda-content {
-    flex-grow: 1;
-    min-width: 0;
+  @media (min-width: $screen-md-min) {
+    .name-column,
+    .name {
+      width: 30%;
+    }
+
+    .summary-column,
+    .summary {
+      width: 70%;
+    }
   }
 
-  .one-menu-toggle {
-    margin-right: -$padding-base-vertical;
+  @media (max-width: $screen-xs-max) {
+    .summary-column,
+    .summary {
+      display: none;
+    }
   }
 
   &.filtered-list {

@@ -908,7 +908,7 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
     return store.createRecord('atmLambda', {
       revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
         registry[revisionNumber] = {
-          name: `Function ${index}.${revisionNumber}`,
+          name: `Function ${index}`,
           summary: `Some very complicated function #${index}.${revisionNumber}`,
           operationSpec: {
             engine: 'openfaas',

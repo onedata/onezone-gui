@@ -2,16 +2,20 @@
   <tr>
     <th class="revision-number-column">{{tt this "column.revisionNumber"}}</th>
     <th class="state-column">{{tt this "column.state"}}</th>
-    <th class="description-column">{{tt this "column.description"}}</th>
+    {{#each customColumnSpecs as |columnSpec|}}
+      <th class="{{columnSpec.name}}-column {{columnSpec.className}}">{{columnSpec.title}}</th>
+    {{/each}}
     <th class="actions-column"></th>
   </tr>
 </thead>
 <tbody>
   {{revisions-table/create-revision-entry
+    columnsCount=columnsCount
     revisionActionsFactory=revisionActionsFactory
   }}
   {{#if (not-eq latestRevNum null)}}
     {{revisions-table/revision-entry
+      customColumnSpecs=customColumnSpecs
       revisionNumber=latestRevNum
       revision=(get revisionRegistry latestRevNum)
       revisionActionsFactory=revisionActionsFactory
@@ -22,6 +26,7 @@
     {{#if areRevNumsBetweenStableAndLatestExpanded}}
       {{#each revNumsBetweenStableAndLatest as |revNum|}}
         {{revisions-table/revision-entry
+          customColumnSpecs=customColumnSpecs
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
@@ -31,6 +36,7 @@
     {{else}}
       {{revisions-table/revision-entries-expander
         class="between-revisions-expander"
+        columnsCount=columnsCount
         entriesCount=revNumsBetweenStableAndLatest.length
         onExpand=(action "expandRevsBetweenStableAndLatest")
       }}
@@ -38,6 +44,7 @@
   {{/if}}
   {{#if (and (not-eq latestStableRevNum null) (not-eq latestStableRevNum latestRevNum))}}
     {{revisions-table/revision-entry
+      customColumnSpecs=customColumnSpecs
       revisionNumber=latestStableRevNum
       revision=(get revisionRegistry latestStableRevNum)
       revisionActionsFactory=revisionActionsFactory
@@ -48,6 +55,7 @@
     {{#if areRevNumsBeforeStableExpanded}}
       {{#each revNumsBeforeStable as |revNum|}}
         {{revisions-table/revision-entry
+          customColumnSpecs=customColumnSpecs
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
@@ -57,6 +65,7 @@
     {{else}}
       {{revisions-table/revision-entries-expander
         class="older-revisions-expander"
+        columnsCount=columnsCount
         entriesCount=revNumsBeforeStable.length
         onExpand=(action "expandRevsBeforeStable")
       }}

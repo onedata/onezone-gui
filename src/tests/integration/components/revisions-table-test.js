@@ -8,7 +8,6 @@ import sinon from 'sinon';
 import Action from 'onedata-gui-common/utils/action';
 
 const componentClass = 'revisions-table';
-const headerTexts = ['Rev.', 'State', 'Description', ''];
 
 describe('Integration | Component | revisions table', function () {
   setupComponentTest('revisions-table', {
@@ -19,6 +18,12 @@ describe('Integration | Component | revisions table', function () {
     const createRevisionSpy = sinon.spy();
     this.setProperties({
       createRevisionSpy,
+      customColumnSpecs: [{
+        name: 'description',
+        title: 'Description',
+        sourceFieldName: 'description',
+        fallbackValue: 'No description.',
+      }],
       revisionActionsFactory: {
         createCreateRevisionAction: () => Action.create({
           icon: 'plus',
@@ -41,6 +46,7 @@ describe('Integration | Component | revisions table', function () {
 
     const $thCells = this.$('th');
 
+    const headerTexts = ['Rev.', 'State', 'Description', ''];
     expect($thCells).to.have.length(headerTexts.length);
     headerTexts.forEach((text, idx) =>
       expect($thCells.eq(idx).text().trim()).to.equal(text)
@@ -269,6 +275,7 @@ describe('Integration | Component | revisions table', function () {
 
 async function render(testCase) {
   testCase.render(hbs `{{revisions-table
+    customColumnSpecs=customColumnSpecs
     revisionRegistry=revisionRegistry
     revisionActionsFactory=revisionActionsFactory
     onRevisionClick=onRevisionClick
@@ -281,8 +288,6 @@ function generateRevisionRegistry(revisionsSpec) {
     revisionRegistry[revisionNumber] = {
       state,
       description,
-      lanes: [],
-      stores: [],
     }
   );
   return revisionRegistry;

@@ -12,7 +12,16 @@ import { computed } from '@ember/object';
 import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { raw, or } from 'ember-awesome-macros';
+import { raw, or, sum } from 'ember-awesome-macros';
+
+/**
+ * @typedef {Object} RevisionsTableColumnSpec
+ * @property {String} name
+ * @property {String} title
+ * @property {String} sourceFieldName
+ * @property {String} fallbackValue
+ * @property {String} className
+ */
 
 export default Component.extend(I18n, {
   tagName: 'table',
@@ -24,6 +33,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.revisionsTable',
+
+  /**
+   * @virtual
+   * @type {Array<RevisionsTableColumnSpec>}
+   */
+  customColumnSpecs: undefined,
 
   /**
    * @virtual
@@ -52,6 +67,11 @@ export default Component.extend(I18n, {
    * @type {Boolean}
    */
   areRevNumsBeforeStableExpanded: false,
+
+  /**
+   * @type {ComputedProperty<Number>}
+   */
+  columnsCount: sum(raw(4), 'customColumnSpecs.length'),
 
   /**
    * @type {ComputedProperty<Array<Number>>}
@@ -132,6 +152,14 @@ export default Component.extend(I18n, {
         sortedRevNums.slice(latestStableRevNumIdx + 1) : [];
     }
   ),
+
+  init() {
+    this._super(...arguments);
+
+    if (!this.get('customColumnSpecs')) {
+      this.set('customColumnSpecs', []);
+    }
+  },
 
   actions: {
     expandRevsBetweenStableAndLatest() {

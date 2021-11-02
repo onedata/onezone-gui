@@ -14,9 +14,11 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { collect } from '@ember/object/computed';
+import { collect, reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
+import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-lambda/revision-actions-factory';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -61,6 +63,12 @@ export default Component.extend(I18n, {
   onAddToAtmWorkflowSchema: notImplementedIgnore,
 
   /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: Number) => void}
+   */
+  onRevisionClick: undefined,
+
+  /**
    * @type {Boolean}
    */
   areActionsOpened: false,
@@ -79,6 +87,69 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   modeClass: tag `mode-${'mode'}`,
+
+  /**
+   * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
+   */
+  revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
+    return [{
+      name: 'name',
+      title: this.t('columns.name.title'),
+      sourceFieldName: 'name',
+      fallbackValue: this.t('columns.name.fallback'),
+      className: 'filling-column',
+    }, {
+      name: 'summary',
+      title: this.t('columns.summary.title'),
+      sourceFieldName: 'summary',
+      fallbackValue: this.t('columns.summary.fallback'),
+      className: 'filling-column',
+    }];
+  }),
+
+  /**
+   * @type {ComputedProperty<AtmLambdaRevision>}
+   */
+  latestRevision: computed(
+    'atmLambda.revisionRegistry',
+    function latestRevision() {
+      const revisionRegistry = this.get('atmLambda.revisionRegistry') || {};
+      const sortedRevisionNumbers =
+        sortRevisionNumbers(Object.keys(revisionRegistry));
+      const latestRevisionNumber =
+        sortedRevisionNumbers[sortedRevisionNumbers.length - 1];
+      return revisionRegistry[latestRevisionNumber];
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  latestRevisionName: reads('latestRevision.name'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  latestRevisionSummary: reads('latestRevision.summary'),
+
+  /**
+   * @type {ComputedProperty<Utils.AtmWorkflow.AtmLambda.RevisionActionsFactory>}
+   */
+  revisionActionsFactory: computed(
+    'atmLambda',
+    'onRevisionCreated',
+    function revisionActionsFactory() {
+      const {
+        atmLambda,
+        onRevisionCreated,
+      } = this.getProperties('atmLambda', 'onRevisionCreated');
+      return RevisionActionsFactory.create({
+        ownerSource: this,
+        atmLambda,
+        onRevisionCreated,
+      });
+    }
+  ),
 
   /**
    * @type {ComputedProperty<SafeString>}
@@ -144,6 +215,14 @@ export default Component.extend(I18n, {
   },
 
   actions: {
+    clickRevision(revisionNumber) {
+      const {
+        onRevisionClick,
+        atmLambda,
+      } = this.getProperties('onRevisionClick', 'atmLambda');
+
+      onRevisionClick && onRevisionClick(atmLambda, revisionNumber);
+    },
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
     },

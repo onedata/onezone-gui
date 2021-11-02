@@ -8,6 +8,12 @@ export default Component.extend({
 
   /**
    * @virtual
+   * @type {Number}
+   */
+  columnsCount: undefined,
+
+  /**
+   * @virtual
    * @type {Utils.AtmWorkflow.RevisionActionsFactory}
    */
   revisionActionsFactory: undefined,

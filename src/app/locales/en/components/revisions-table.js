@@ -9,6 +9,5 @@ export default {
   column: {
     revisionNumber: 'Rev.',
     state: 'State',
-    description: 'Description',
   },
 };

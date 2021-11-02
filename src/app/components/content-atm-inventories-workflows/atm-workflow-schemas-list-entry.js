@@ -75,6 +75,19 @@ export default Component.extend(I18n, {
   isEditing: false,
 
   /**
+   * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
+   */
+  revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
+    return [{
+      name: 'description',
+      title: this.t('columns.description.title'),
+      sourceFieldName: 'description',
+      fallbackValue: this.t('columns.description.fallback'),
+      className: 'filling-column',
+    }];
+  }),
+
+  /**
    * @type {ComputedProperty<Utils.Action>}
    */
   changeDetailsAction: computed('isEditing', function changeDetailsAction() {

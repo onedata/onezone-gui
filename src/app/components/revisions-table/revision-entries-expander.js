@@ -26,6 +26,12 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Number}
    */
+  columnsCount: undefined,
+
+  /**
+   * @virtual
+   * @type {Number}
+   */
   entriesCount: undefined,
 
   /**

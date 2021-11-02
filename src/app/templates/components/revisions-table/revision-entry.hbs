@@ -1,6 +1,8 @@
 <td class="revision-number">{{normalizedRevisionNumber}}</td>
 <td class="state">{{revisions-table/state-tag state=state}}</td>
-<td class="description">{{if hasDescription description fallbackDescription}}</td>
+{{#each customColumns as |customColumn|}}
+  <td class={{customColumn.className}}>{{customColumn.value}}</td>
+{{/each}}
 <td class="actions">
   {{one-menu-toggle
     id=actionsTriggerId

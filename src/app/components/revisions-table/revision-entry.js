@@ -8,12 +8,11 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import computedT from 'onedata-gui-common/utils/computed-t';
-import { notEmpty, tag } from 'ember-awesome-macros';
+import { tag } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
@@ -28,6 +27,12 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.revisionsTable.revisionEntry',
+
+  /**
+   * @virtual
+   * @type {Array<RevisionsTableColumnSpec>}
+   */
+  customColumnSpecs: undefined,
 
   /**
    * @virtual
@@ -48,9 +53,16 @@ export default Component.extend(I18n, {
   revisionActionsFactory: undefined,
 
   /**
+   * @virtual
    * @type {(revisionNumber: Number) => void}
    */
   onClick: undefined,
+
+  /**
+   * Set by customColumnsSetter.
+   * @type {ComputedProperty<Array<{ className: string, value: string }>>}
+   */
+  customColumns: undefined,
 
   /**
    * @type {Boolean}
@@ -76,21 +88,6 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<String>}
    */
-  description: reads('revision.description'),
-
-  /**
-   * @type {ComputedProperty<SafeString>}
-   */
-  fallbackDescription: computedT('fallbackDescription'),
-
-  /**
-   * @type {ComputedProperty<Boolean>}
-   */
-  hasDescription: notEmpty('description'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
   actionsTriggerId: tag `actions-trigger-${'elementId'}`,
 
   /**
@@ -108,6 +105,43 @@ export default Component.extend(I18n, {
         revisionActionsFactory.createActionsForRevisionNumber(revisionNumber) : [];
     }
   ),
+
+  customColumnsSetter: observer('customColumns', function customColumnsSetter() {
+    const customColumnSpecs = this.get('customColumnSpecs') || [];
+    const sourceFieldNames = customColumnSpecs.mapBy('sourceFieldName');
+    let customColumns;
+    if (sourceFieldNames.length) {
+      const observedPropsString = `revision.{${sourceFieldNames.join(',')}}`;
+      customColumns = computed(observedPropsString, function customColumns() {
+        const revision = this.get('revision');
+        return customColumnSpecs.map(({
+          name,
+          sourceFieldName,
+          fallbackValue,
+          className: originalClassName,
+        }) => {
+          let value = revision[sourceFieldName];
+          let className = name;
+          if (originalClassName) {
+            className += ` ${originalClassName}`;
+          }
+          if (!value) {
+            value = fallbackValue;
+            className += ' no-value';
+          }
+          return { value, className };
+        });
+      });
+    } else {
+      customColumns = [];
+    }
+    this.set('customColumns', customColumns);
+  }),
+
+  init() {
+    this._super(...arguments);
+    this.customColumnsSetter();
+  },
 
   click(event) {
     const {

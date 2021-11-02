@@ -9,9 +9,12 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
+import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
+import { getBy } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} AtmLambdaRevision
@@ -141,6 +144,24 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {String}
    */
   originalAtmLambdaId: undefined,
+
+  /**
+   * @type {ComputedProperty<Number>}
+   */
+  latestRevisionNumber: computed(
+    'revisionRegistry',
+    function latestRevisionNumber() {
+      const revisionRegistry = this.get('revisionRegistry') || {};
+      const sortedRevisionNumbers =
+        sortRevisionNumbers(Object.keys(revisionRegistry));
+      return sortedRevisionNumbers[sortedRevisionNumbers.length - 1];
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<AtmLambdaRevision>}
+   */
+  latestRevision: getBy('revisionRegistry', 'latestRevisionNumber'),
 
   didLoad() {
     this._super(...arguments);

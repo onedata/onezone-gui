@@ -54,23 +54,28 @@ describe('Integration | Component | revisions table/revision entry', function ()
     expect(this.$('.revisions-table-state-tag')).to.have.class('state-draft');
   });
 
-  it('shows description when it is available and does not have class "no-description"',
-    async function () {
-      const { description } = this.set('revision', { description: '123' });
-
-      await render(this);
-
-      expect(this.$('.description').text().trim()).to.equal(description);
-      expect(this.$(`.${componentClass}`)).to.not.have.class('no-description');
+  it('shows custom columns', async function () {
+    this.setProperties({
+      customColumnSpecs: [{
+        name: 'name',
+        sourceFieldName: 'name',
+        fallbackValue: 'Unnamed',
+      }, {
+        name: 'description',
+        sourceFieldName: 'description',
+        fallbackValue: 'No description',
+      }],
+      revision: {
+        name: 'somename',
+        description: null,
+      },
     });
 
-  it('shows fallback description when revision does not provide any', async function () {
-    this.set('revision', null);
-
     await render(this);
-
-    expect(this.$('.description').text().trim()).to.equal('No description.');
-    expect(this.$(`.${componentClass}`)).to.have.class('no-description');
+    expect(this.$('.name').text().trim()).to.equal('somename');
+    expect(this.$('.name')).to.not.have.class('no-value');
+    expect(this.$('.description').text().trim()).to.equal('No description');
+    expect(this.$('.description')).to.have.class('no-value');
   });
 
   it('allows to choose from revision actions', async function () {
@@ -122,6 +127,7 @@ describe('Integration | Component | revisions table/revision entry', function ()
 
 async function render(testCase) {
   testCase.render(hbs `{{revisions-table/revision-entry
+    customColumnSpecs=customColumnSpecs
     revisionNumber=revisionNumber
     revision=revision
     revisionActionsFactory=revisionActionsFactory
