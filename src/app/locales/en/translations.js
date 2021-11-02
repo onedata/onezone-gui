@@ -18,6 +18,7 @@ import contentProviderRedirect from './components/content-provider-redirect';
 import contentClustersEndpointError from './components/content-clusters-endpoint-error';
 import contentUsers from './components/content-users';
 import sidebarSpaces from './components/sidebar-spaces';
+import sidebarShares from './components/sidebar-shares';
 import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
@@ -74,7 +75,7 @@ import websocketReconnectionModal from './components/websocket-reconnection-moda
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
-import privacyPolicyModal from './components/privacy-policy-modal';
+import contentPrivacyPolicy from './components/content-privacy-policy';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
@@ -171,6 +172,7 @@ const translations = {
     contentProviderRedirect,
     contentUsers,
     sidebarSpaces,
+    sidebarShares,
     sidebarProviders,
     sidebarGroups,
     contentSpacesEmpty,
@@ -228,7 +230,7 @@ const translations = {
     fatalConnectionErrorModal,
     uploadPresenter,
     cookiesConsent,
-    privacyPolicyModal,
+    contentPrivacyPolicy,
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,

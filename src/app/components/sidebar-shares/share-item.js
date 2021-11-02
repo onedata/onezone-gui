@@ -12,11 +12,20 @@ import { conditional, eq, raw } from 'ember-awesome-macros';
 import { reads, collect } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { computedRelationProxy } from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
 
-export default Component.extend({
+export default Component.extend(I18n, {
   tagName: '',
-
+  
+  i18n: service(),
+  spaceManager: service(),
   clipboardActions: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.sidebarShares.shareItem',
 
   /**
    * @virtual optional
@@ -34,6 +43,11 @@ export default Component.extend({
     raw('browser-file'),
     raw('browser-directory')
   ),
+
+  /**
+   * @type {ComputedProperty<PromiseObject<Space>>}
+   */
+  spaceProxy: computedRelationProxy('share', 'space'),
 
   /**
    * @type {Ember.ComputedProperty<Action>}
