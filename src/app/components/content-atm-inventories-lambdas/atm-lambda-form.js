@@ -28,7 +28,6 @@ import {
   formDataToRecord,
   recordToFormData,
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
-import _ from 'lodash';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
@@ -54,11 +53,11 @@ export default Component.extend(I18n, {
   mode: undefined,
 
   /**
-   * Record to visualise in `view` mode (so in that mode it is a required field).
+   * Contains values, which should be used as default values of form fields.
    * @virtual optional
    * @type {Models.AtmLambda}
    */
-  atmLambda: undefined,
+  revision: undefined,
 
   /**
    * @virtual optional
@@ -84,11 +83,6 @@ export default Component.extend(I18n, {
   onCancel: notImplementedIgnore,
 
   /**
-   * @type {String}
-   */
-  btnSize: undefined,
-
-  /**
    * @type {Boolean}
    */
   isSubmitting: false,
@@ -102,14 +96,14 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Object>}
    */
   fieldsValuesFromRecord: computed(
-    'atmLambda.{name,summary,description,operationSpec,argumentSpecs,resultSpecs}',
+    'revision.{name,state,summary,description,operationSpec,argumentSpecs,resultSpecs}',
     'defaultAtmResourceSpec',
     function fieldsValuesFromRecord() {
       const {
         defaultAtmResourceSpec,
-        atmLambda,
-      } = this.getProperties('defaultAtmResourceSpec', 'atmLambda');
-      return recordToFormData(atmLambda, defaultAtmResourceSpec);
+        revision,
+      } = this.getProperties('defaultAtmResourceSpec', 'revision');
+      return recordToFormData(revision, defaultAtmResourceSpec);
     }
   ),
 
@@ -119,6 +113,7 @@ export default Component.extend(I18n, {
   fields: computed(function fields() {
     const {
       nameField,
+      stateField,
       summaryField,
       engineField,
       openfaasOptionsFieldsGroup,
@@ -128,6 +123,7 @@ export default Component.extend(I18n, {
       resourcesFieldsGroup,
     } = this.getProperties(
       'nameField',
+      'stateField',
       'summaryField',
       'engineField',
       'openfaasOptionsFieldsGroup',
@@ -147,6 +143,7 @@ export default Component.extend(I18n, {
       component,
       fields: [
         nameField,
+        stateField,
         summaryField,
         engineField,
         openfaasOptionsFieldsGroup,
@@ -162,10 +159,22 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   nameField: computed(function nameField() {
-    return TextField.extend(defaultValueGenerator(this), {
-      isVisible: reads('isInEditMode'),
-    }).create({
+    return TextField.extend(
+      defaultValueGenerator(this),
+      disableFieldInEditMode(this)
+    ).create({
       name: 'name',
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
+   */
+  stateField: computed(function stateField() {
+    return DropdownField.extend(defaultValueGenerator(this)).create({
+      name: 'state',
+      showSearch: false,
+      options: [{ value: 'draft' }, { value: 'stable' }, { value: 'deprecated' }],
     });
   }),
 
@@ -173,9 +182,10 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   summaryField: computed(function summaryField() {
-    return TextField.extend(defaultValueGenerator(this), {
-      isVisible: reads('isInEditMode'),
-    }).create({
+    return TextField.extend(
+      defaultValueGenerator(this),
+      disableFieldInEditMode(this)
+    ).create({
       name: 'summary',
       isOptional: true,
     });
@@ -324,10 +334,10 @@ export default Component.extend(I18n, {
     submit() {
       const {
         mode,
-        atmLambda,
+        revision,
         fields,
         onSubmit,
-      } = this.getProperties('mode', 'atmLambda', 'fields', 'onSubmit');
+      } = this.getProperties('mode', 'revision', 'fields', 'onSubmit');
       this.set('isSubmitting', true);
 
       const rawAtmLambdaFromForm = formDataToRecord(fields.dumpValue());
@@ -335,14 +345,12 @@ export default Component.extend(I18n, {
 
       if (mode === 'create') {
         Object.assign(objectToSubmit, rawAtmLambdaFromForm);
-      } else if (mode === 'edit' && atmLambda) {
-        ['name', 'summary'].forEach(propName => {
-          const origPropVal = get(atmLambda, propName);
-          const newPropVal = get(rawAtmLambdaFromForm, propName);
-          if (!_.isEqual(origPropVal, newPropVal)) {
-            objectToSubmit[propName] = newPropVal;
-          }
-        });
+      } else if (mode === 'edit' && revision) {
+        const origStateVal = get(revision, 'state');
+        const newStateVal = get(rawAtmLambdaFromForm, 'state');
+        if (origStateVal !== newStateVal) {
+          objectToSubmit.state = newStateVal;
+        }
       }
 
       return onSubmit(objectToSubmit)

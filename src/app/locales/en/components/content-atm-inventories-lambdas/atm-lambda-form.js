@@ -61,6 +61,20 @@ export default {
     name: {
       label: 'Name',
     },
+    state: {
+      label: 'State',
+      options: {
+        draft: {
+          label: 'Draft',
+        },
+        stable: {
+          label: 'Stable',
+        },
+        deprecated: {
+          label: 'Deprecated',
+        },
+      },
+    },
     summary: {
       label: 'Summary (optional)',
     },

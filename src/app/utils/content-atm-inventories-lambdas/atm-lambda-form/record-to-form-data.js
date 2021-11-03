@@ -31,6 +31,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 
   const {
     name,
+    state,
     summary,
     operationSpec,
     argumentSpecs,
@@ -39,6 +40,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
   } = getProperties(
     record || {},
     'name',
+    'state',
     'summary',
     'operationSpec',
     'argumentSpecs',
@@ -114,6 +116,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 
   return Object.assign({
     name,
+    state,
     summary,
     engine,
     arguments: formArguments,
@@ -125,6 +128,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 function generateDefaultFormData(defaultAtmResourceSpec) {
   return {
     name: '',
+    state: 'draft',
     summary: '',
     engine: 'openfaas',
     openfaasOptions: {
