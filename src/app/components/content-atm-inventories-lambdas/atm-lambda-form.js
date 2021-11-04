@@ -311,20 +311,14 @@ export default Component.extend(I18n, {
     });
   }),
 
-  modeObserver: observer('mode', function modeObserver() {
-    const {
-      mode,
-      fields,
-    } = this.getProperties('mode', 'fields');
-
-    fields.changeMode(mode === 'view' ? 'view' : 'edit');
-    fields.reset();
+  fieldsResetter: observer('mode', 'revision', function fieldsResetter() {
+    this.get('fields').reset();
   }),
 
   init() {
     this._super(...arguments);
 
-    this.modeObserver();
+    this.fieldsResetter();
   },
 
   actions: {
@@ -354,7 +348,7 @@ export default Component.extend(I18n, {
       }
 
       return onSubmit(objectToSubmit)
-        .then(() => fields.reset())
+        .then(() => mode === 'create' && fields.reset())
         .finally(() => {
           trySet(this, 'isSubmitting', false);
         });

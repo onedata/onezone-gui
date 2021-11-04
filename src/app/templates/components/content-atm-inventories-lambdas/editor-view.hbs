@@ -9,7 +9,8 @@
 </div>
 <div class="row content-row">
   {{content-atm-inventories-lambdas/atm-lambda-form
-    mode="create"
+    mode=formMode
+    revision=atmLambdaRevision
     defaultAtmResourceSpec=onedataConnection.defaultAtmResourceSpec
     onSubmit=(action "onFormSubmit")
   }}

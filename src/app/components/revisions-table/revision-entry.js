@@ -106,7 +106,7 @@ export default Component.extend(I18n, {
     }
   ),
 
-  customColumnsSetter: observer('customColumns', function customColumnsSetter() {
+  customColumnsSetter: observer('customColumnSpecs', function customColumnsSetter() {
     const customColumnSpecs = this.get('customColumnSpecs') || [];
     const sourceFieldNames = customColumnSpecs.mapBy('sourceFieldName');
     let customColumns;

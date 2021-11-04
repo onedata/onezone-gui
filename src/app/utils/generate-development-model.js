@@ -903,12 +903,15 @@ function attachProgressToHarvesterIndices(
   }));
 }
 
-function attachAtmLambdasToAtmInventory(store, atmInventory) {
+async function attachAtmLambdasToAtmInventory(store, atmInventory) {
+  const atmInventoryList = await createListRecord(store, 'atmInventory', [atmInventory]);
   return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
     return store.createRecord('atmLambda', {
+      atmInventoryList,
       revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
         registry[revisionNumber] = {
           name: `Function ${index}`,
+          state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
           summary: `Some very complicated function #${index}.${revisionNumber}`,
           operationSpec: {
             engine: 'openfaas',

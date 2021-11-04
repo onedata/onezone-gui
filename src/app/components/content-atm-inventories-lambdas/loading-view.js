@@ -1,7 +1,7 @@
 /**
- * Shows loading state of workflow.
+ * Shows loading state of lambda.
  *
- * @module components/content-atm-inventories-workflows/loading-view
+ * @module components/content-atm-inventories-lambdas/loading-view
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -21,7 +21,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentAtmInventoriesWorkflows.loadingView',
+  i18nPrefix: 'components.contentAtmInventoriesLambdas.loadingView',
 
   /**
    * @virtual
@@ -38,7 +38,7 @@ export default Component.extend(I18n, {
   /**
    * @type {string}
    */
-  backResourceIcon: recordIcon('atmWorkflowSchema'),
+  backResourceIcon: recordIcon('atmLambda'),
 
   /**
    * @type {ComputedProperty<LoadingCarouselViewHeaderTexts>}
