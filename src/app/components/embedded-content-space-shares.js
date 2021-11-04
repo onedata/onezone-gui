@@ -1,6 +1,5 @@
 /**
  * Proxy component for Oneprovider's `content-space-shares`.
- * 
  * @module components/embedded-content-space-shares
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
@@ -14,8 +13,14 @@ import { reads } from '@ember/object/computed';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw';
 import EmbeddedContentShareActions from 'onezone-gui/mixins/embedded-content-share-actions';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, {
+const mixins = [
+  EmbeddedBrowserCommon,
+  EmbeddedContentShareActions,
+];
+
+export default OneproviderEmbeddedContainer.extend(...mixins, {
   layout,
 
   navigationState: service(),
@@ -49,6 +54,11 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
   /**
    * @override
    */
+  embeddedBrowserType: 'share',
+
+  /**
+   * @override
+   */
   isPublic: true,
 
   /**
@@ -74,6 +84,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedContentShareActions, 
     'updateShareId',
     'getShareUrl',
     'getDataUrl',
+    'getDatasetsUrl',
     'showShareList',
   ]),
 
