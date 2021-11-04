@@ -16,7 +16,7 @@ export default Mixin.create({
   // required property: _location: Location
   // required property: router: Ember.Router
   // required property: navigationState: Ember.Service
-  // required property: embeddedBrowserType: String, one of: 'data', 'datsets'
+  // required property: embeddedBrowserType: String, one of: 'data', 'datsets', 'share'
 
   /**
    * @param {String} type one of: data, datasets, shares, transfers
@@ -70,13 +70,22 @@ export default Mixin.create({
         }
       }
     }
-    return _location.origin + _location.pathname + router.urlFor(
-      'onedata.sidebar.content.aspect',
+    const urlFunctionParams = ['onedata.sidebar.content.aspect'];
+    // support for choosing a space (needed eg. in shares browser)
+    if (options.spaceId) {
+      urlFunctionParams.push(
+        'spaces',
+        options.spaceId,
+      );
+    }
+    urlFunctionParams.push(
       aspect, {
         queryParams: {
           options: serializeAspectOptions(aspectOptions),
         },
-      });
+      }
+    );
+    return _location.origin + _location.pathname + router.urlFor(...urlFunctionParams);
   },
 
   actions: {
