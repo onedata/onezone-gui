@@ -1,6 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-spaces-transfers`.
- * 
+ *
  * @module components/embedded-content-spaces-transfers
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
@@ -10,8 +10,13 @@
 import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneproviderEmbeddedContainer.extend({
+const mixins = [
+  EmbeddedBrowserCommon,
+];
+
+export default OneproviderEmbeddedContainer.extend(...mixins, {
   layout,
 
   navigationState: service(),
@@ -60,6 +65,8 @@ export default OneproviderEmbeddedContainer.extend({
     'closeFileTab',
     'resetQueryParams',
     'changeListTab',
+    'getDataUrl',
+    'getDatasetsUrl',
   ]),
 
   actions: {
