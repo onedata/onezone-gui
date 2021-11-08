@@ -10,13 +10,13 @@
     {{/carousel.slide}}
     {{#carousel.slide slideId="editor"}}
       {{#render-later triggerRender=(eq effectiveActiveSlide "editor")}}
-        {{log activeAtmLambdaProxy}}
         {{#if (or activeAtmLambdaRevisionProxy.isFulfilled (eq activeEditorType "creator"))}}
           {{content-atm-inventories-lambdas/editor-view
             atmInventory=atmInventory
+            atmLambda=activeAtmLambdaProxy.content
             atmLambdaRevisionNumber=activeRevisionNumber
-            atmLambdaRevision=activeAtmLambdaRevisionProxy.content
             viewType=activeEditorType
+            visible=(eq effectiveActiveSlide "editor")
             onBackSlide=(action "showListView")
             onAtmLambdaRevisionSaved=(action "showListView")
           }}

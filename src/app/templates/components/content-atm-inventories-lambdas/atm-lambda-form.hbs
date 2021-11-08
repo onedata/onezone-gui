@@ -9,15 +9,13 @@
       }}
         {{tt this (concat "submit." mode)}}
       {{/one-spin-button}}
-      {{#if (eq mode "edit")}}
-        {{#bs-button
-          class="btn-cancel"
-          disabled=isSubmitting
-          onClick=(action "cancel")
-        }}
-          {{tt this "cancel"}}
-        {{/bs-button}}
-      {{/if}}
+      {{#bs-button
+        class="btn-cancel"
+        disabled=isSubmitting
+        onClick=(action "cancel")
+      }}
+        {{tt this "cancel"}}
+      {{/bs-button}}
     </div>
   {{/if}}
 </form>

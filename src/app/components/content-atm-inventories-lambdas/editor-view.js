@@ -9,11 +9,12 @@
  */
 
 import Component from '@ember/component';
-import { getProperties } from '@ember/object';
+import { getProperties, observer } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import { getBy } from 'ember-awesome-macros';
+import { getBy, tag } from 'ember-awesome-macros';
+import { scheduleOnce } from '@ember/runloop';
 
 const viewTypeToFormModeMap = {
   editor: 'edit',
@@ -41,15 +42,15 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Number}
+   * @type {Modals.AtmLambda}
    */
-  atmLambdaRevisionNumber: undefined,
+  atmLambda: undefined,
 
   /**
    * @virtual
-   * @type {AtmLambdaRevision}
+   * @type {Number}
    */
-  atmLambdaRevision: undefined,
+  atmLambdaRevisionNumber: undefined,
 
   /**
    * One of `'editor'`, `'creator'`, `'preview'`
@@ -59,9 +60,10 @@ export default Component.extend(I18n, {
   viewType: undefined,
 
   /**
-   * @type {Object<string,string>}
+   * @virtual
+   * @type {Boolean}
    */
-  viewTypeToFormModeMap,
+  visible: false,
 
   /**
    * @virtual
@@ -76,31 +78,143 @@ export default Component.extend(I18n, {
   onAtmLambdaRevisionSaved: notImplementedIgnore,
 
   /**
+   * @type {Object<string,string>}
+   */
+  viewTypeToFormModeMap,
+
+  /**
+   * @type {String}
+   */
+  activeViewType: undefined,
+
+  /**
+   * @type {Models.AtmLambda|undefined}
+   */
+  activeAtmLambda: undefined,
+
+  /**
+   * @type {Number|undefined}
+   */
+  activeRevisionNumber: undefined,
+
+  /**
+   * @type {AtmLambdaRevision|undefined}
+   */
+  activeRevision: getBy(
+    'atmLambda',
+    tag `revisionRegistry.${'activeRevisionNumber'}`
+  ),
+
+  /**
+   * @type {ComputedProperty<AtmLambdaRevision|undefined>}
+   */
+  atmLambdaRevision: getBy(
+    'atmLambda',
+    tag `revisionRegistry.${'atmLambdaRevisionNumber'}`
+  ),
+
+  /**
    * @type {ComputedProperty<string>}
    */
   formMode: getBy('viewTypeToFormModeMap', 'viewType'),
+
+  activePropsUpdater: observer(
+    'atmLambda',
+    'atmLambdaRevisionNumber',
+    'atmLambdaRevision',
+    'viewType',
+    function activePropsUpdater() {
+      const {
+        atmLambda,
+        activeAtmLambda,
+        atmLambdaRevisionNumber,
+        activeAtmLambdaRevisionNumber,
+        viewType,
+        activeViewType,
+      } = this.getProperties(
+        'atmLambda',
+        'activeAtmLambda',
+        'atmLambdaRevisionNumber',
+        'activeAtmLambdaRevisionNumber',
+        'viewType',
+        'activeViewType'
+      );
+
+      if (
+        viewType !== activeViewType ||
+        viewType === 'preview' ||
+        atmLambda !== activeAtmLambda ||
+        atmLambdaRevisionNumber !== activeAtmLambdaRevisionNumber
+      ) {
+        scheduleOnce('afterRender', this, 'updateActiveProps');
+      }
+    }
+  ),
+
+  visibleObserver: observer('visible', function visibleObserver() {
+    if (this.get('visible')) {
+      scheduleOnce('afterRender', this, 'updateActiveProps');
+    }
+  }),
+
+  init() {
+    this._super(...arguments);
+    scheduleOnce('afterRender', this, 'updateActiveProps');
+  },
+
+  updateActiveProps() {
+    const {
+      viewType,
+      atmLambda,
+      atmLambdaRevisionNumber,
+    } = this.getProperties('viewType', 'atmLambda', 'atmLambdaRevisionNumber');
+
+    this.setProperties({
+      activeViewType: viewType,
+      activeAtmLambda: atmLambda,
+      activeRevisionNumber: atmLambdaRevisionNumber,
+    });
+  },
 
   actions: {
     backSlide() {
       this.get('onBackSlide')();
     },
-    async onFormSubmit(rawAtmLambda) {
+    async onFormSubmit(formData) {
       const {
         workflowActions,
         atmInventory,
+        atmLambda,
+        atmLambdaRevisionNumber,
         onAtmLambdaRevisionSaved,
+        viewType,
       } = this.getProperties(
         'workflowActions',
         'atmInventory',
-        'onAtmLambdaRevisionSaved'
+        'atmLambda',
+        'atmLambdaRevisionNumber',
+        'onAtmLambdaRevisionSaved',
+        'viewType'
       );
 
-      console.log(rawAtmLambda);
-
-      const action = workflowActions.createCreateAtmLambdaAction({
-        atmInventory,
-        rawAtmLambda,
-      });
+      let action;
+      switch (viewType) {
+        case 'creator':
+          action = workflowActions.createCreateAtmLambdaAction({
+            atmInventory,
+            initialRevision: formData,
+          });
+          break;
+        case 'editor':
+          action = workflowActions.createModifyAtmLambdaRevisionAction({
+            atmLambda,
+            revisionNumber: atmLambdaRevisionNumber,
+            revisionDiff: formData,
+          });
+          break;
+        default:
+          return;
+      }
       const result = await action.execute();
 
       const {
