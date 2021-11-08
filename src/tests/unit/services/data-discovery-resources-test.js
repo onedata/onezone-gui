@@ -187,87 +187,94 @@ describe('Unit | Service | data discovery resources', function () {
 
       const appProxy = service.createAppProxyObject();
 
+      <<
+      << << < HEAD
       const url = await appProxy.fileBrowserUrlRequest(cdmiObjectId);
       expect(url).to.equal('https://abcdef.com/ghi#browser');
     }
-  );
+  ); ===
+  === =
+  const url = await appProxy.fileBrowserUrlRequest(cdmiObjectId);
+  expect(url).to.equal('https://abcdef.com/ghi#browser');
+}); >>>
+>>> > e63fbc4a(VFS - 8348 Fixed tests)
 
-  it(
-    'injects no info about how file browser url looks like for specific file when passed cdmiObjectId is incorrect',
-    function () {
-      const cdmiObjectId = null;
+it(
+  'injects no info about how file browser url looks like for specific file when passed cdmiObjectId is incorrect',
+  function () {
+    const cdmiObjectId = null;
 
-      const service = this.subject();
-      const appProxy = service.createAppProxyObject();
-
-      return appProxy.fileBrowserUrlRequest(cdmiObjectId)
-        .then(url => expect(url).to.equal(''));
-    }
-  );
-
-  it('injects info about harvester spaces', function () {
     const service = this.subject();
-    const navigationState = lookupService(this, 'navigation-state');
-    setProperties(navigationState, {
-      activeResourceType: 'harvesters',
-      activeResource: {
-        entityId: 'someId',
-        hasViewPrivilege: true,
-        getRelation(name) {
-          return name === 'spaceList' ? resolve({
-            list: promiseArray(resolve([{
-              entityId: 'space1Id',
-              name: 'space1',
-            }, {
-              entityId: 'space2Id',
-              name: 'space2',
-            }])),
-          }) : reject();
-        },
+    const appProxy = service.createAppProxyObject();
+
+    return appProxy.fileBrowserUrlRequest(cdmiObjectId)
+      .then(url => expect(url).to.equal(''));
+  }
+);
+
+it('injects info about harvester spaces', function () {
+  const service = this.subject();
+  const navigationState = lookupService(this, 'navigation-state');
+  setProperties(navigationState, {
+    activeResourceType: 'harvesters',
+    activeResource: {
+      entityId: 'someId',
+      hasViewPrivilege: true,
+      getRelation(name) {
+        return name === 'spaceList' ? resolve({
+          list: promiseArray(resolve([{
+            entityId: 'space1Id',
+            name: 'space1',
+          }, {
+            entityId: 'space2Id',
+            name: 'space2',
+          }])),
+        }) : reject();
       },
-    });
-
-    const appProxy = service.createAppProxyObject();
-
-    return appProxy.spacesRequest().then(spaces =>
-      expect(spaces).to.deep.equal([{
-        id: 'space1Id',
-        name: 'space1',
-      }, {
-        id: 'space2Id',
-        name: 'space2',
-      }])
-    );
+    },
   });
 
-  it('injects no info about harvester spaces (no harvester specified)', function () {
-    const service = this.subject();
+  const appProxy = service.createAppProxyObject();
 
-    const appProxy = service.createAppProxyObject();
+  return appProxy.spacesRequest().then(spaces =>
+    expect(spaces).to.deep.equal([{
+      id: 'space1Id',
+      name: 'space1',
+    }, {
+      id: 'space2Id',
+      name: 'space2',
+    }])
+  );
+});
 
-    return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+it('injects no info about harvester spaces (no harvester specified)', function () {
+  const service = this.subject();
+
+  const appProxy = service.createAppProxyObject();
+
+  return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+});
+
+context('handles errors', function () {
+suppressRejections();
+
+it('injects no info about harvester spaces (no view privilege)', function () {
+  const service = this.subject();
+  const navigationState = lookupService(this, 'navigation-state');
+  setProperties(navigationState, {
+    activeResourceType: 'harvesters',
+    activeResource: {
+      entityId: 'someId',
+      hasViewPrivilege: false,
+      getRelation() {
+        return reject({ id: 'forbidden ' });
+      },
+    },
   });
 
-  context('handles errors', function () {
-    suppressRejections();
+  const appProxy = service.createAppProxyObject();
 
-    it('injects no info about harvester spaces (no view privilege)', function () {
-      const service = this.subject();
-      const navigationState = lookupService(this, 'navigation-state');
-      setProperties(navigationState, {
-        activeResourceType: 'harvesters',
-        activeResource: {
-          entityId: 'someId',
-          hasViewPrivilege: false,
-          getRelation() {
-            return reject({ id: 'forbidden ' });
-          },
-        },
-      });
-
-      const appProxy = service.createAppProxyObject();
-
-      return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
-    });
-  });
+  return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+});
+});
 });
