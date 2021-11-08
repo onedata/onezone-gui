@@ -427,6 +427,13 @@ export default Component.extend(GlobalActions, {
         revision: null,
       });
     },
+    showRevisionCreatorView(atmLambda, originRevisionNumber) {
+      const lambdaId = atmLambda && get(atmLambda, 'entityId');
+      this.changeSlideViaUrl('creator', {
+        lambdaId,
+        revision: originRevisionNumber,
+      });
+    },
     async showEditorView(atmLambda, revisionNumber) {
       const activeAtmLambdaId = this.get('activeAtmLambdaId');
       const atmLambdaId = get(atmLambda || {}, 'entityId') || null;

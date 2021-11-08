@@ -59,6 +59,12 @@ export default Component.extend(I18n, {
   onRevisionClick: undefined,
 
   /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: Number) => void}
+   */
+  onRevisionCreate: undefined,
+
+  /**
    * Needed when `mode` is `'selection'`
    * @virtual optional
    * @type {Function}

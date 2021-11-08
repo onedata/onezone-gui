@@ -208,7 +208,7 @@ export default Service.extend({
         atmLambdaRevision: revisionData,
       },
     });
-    await recordManager.reloadRecordById('atmLambda', atmLambdaEntityType);
+    await recordManager.reloadRecordById('atmLambda', atmLambdaId);
   },
 
   /**
@@ -233,7 +233,7 @@ export default Service.extend({
       subscribe: false,
       data: revisionDataUpdate,
     });
-    await recordManager.reloadRecordById('atmLambda', atmLambdaEntityType);
+    await recordManager.reloadRecordById('atmLambda', atmLambdaId);
   },
 
   /**

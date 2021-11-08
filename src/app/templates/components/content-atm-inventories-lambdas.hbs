@@ -5,12 +5,16 @@
         atmInventory=atmInventory
         onAddAtmLambda=(action "showCreatorView")
         onRevisionClick=(action "showEditorView")
+        onRevisionCreate=(action "showRevisionCreatorView")
         onRegisterViewActions=(action "registerViewActions" "list")
       }}
     {{/carousel.slide}}
     {{#carousel.slide slideId="editor"}}
       {{#render-later triggerRender=(eq effectiveActiveSlide "editor")}}
-        {{#if (or activeAtmLambdaRevisionProxy.isFulfilled (eq activeEditorType "creator"))}}
+        {{#if (or
+          (and (eq activeEditorType "creator") (not activeAtmLambdaId))
+          activeAtmLambdaRevisionProxy.isFulfilled
+        )}}
           {{content-atm-inventories-lambdas/editor-view
             atmInventory=atmInventory
             atmLambda=activeAtmLambdaProxy.content

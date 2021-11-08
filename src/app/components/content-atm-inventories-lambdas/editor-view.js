@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import { getProperties, observer } from '@ember/object';
+import { getProperties, observer, computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -73,7 +73,6 @@ export default Component.extend(I18n, {
 
   /**
    * @type {Function}
-   * @param {Models.AtmLambda} createdAtmLambda
    */
   onAtmLambdaRevisionSaved: notImplementedIgnore,
 
@@ -117,6 +116,20 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string>}
    */
   formMode: getBy('viewTypeToFormModeMap', 'viewType'),
+
+  /**
+   * @type {ComputedProperty<string>}
+   */
+  headerText: computed('activeViewType', 'atmLambda', function headerText() {
+    const {
+      activeViewType,
+      atmLambda,
+    } = this.getProperties('activeViewType', 'atmLambda');
+
+    const modeForHeader = activeViewType === 'creator' && atmLambda ?
+      'revisionCreator' : activeViewType;
+    return this.t(`header.${modeForHeader}`);
+  }),
 
   activePropsUpdater: observer(
     'atmLambda',
@@ -200,10 +213,17 @@ export default Component.extend(I18n, {
       let action;
       switch (viewType) {
         case 'creator':
-          action = workflowActions.createCreateAtmLambdaAction({
-            atmInventory,
-            initialRevision: formData,
-          });
+          if (atmLambda) {
+            action = workflowActions.createCreateAtmLambdaRevisionAction({
+              atmLambda,
+              revisionContent: formData,
+            });
+          } else {
+            action = workflowActions.createCreateAtmLambdaAction({
+              atmInventory,
+              initialRevision: formData,
+            });
+          }
           break;
         case 'editor':
           action = workflowActions.createModifyAtmLambdaRevisionAction({
@@ -219,11 +239,10 @@ export default Component.extend(I18n, {
 
       const {
         status,
-        result: record,
         error,
-      } = getProperties(result, 'status', 'result', 'error');
+      } = getProperties(result, 'status', 'error');
       if (status === 'done') {
-        onAtmLambdaRevisionSaved(record);
+        onAtmLambdaRevisionSaved();
       } else {
         throw error;
       }

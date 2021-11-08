@@ -237,7 +237,7 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       formData[valueName].entryDefaultValue =
         defaultValue === null || defaultValue === undefined ?
         undefined : JSON.stringify(defaultValue);
-      formData[valueName].entryOptional = isOptional;
+      formData[valueName].entryOptional = isOptional === true;
     }
   });
   return formData;
