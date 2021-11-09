@@ -693,9 +693,6 @@ export default Component.extend(GlobalActions, I18n, {
         }));
       });
     },
-    handleRevisionCreated(atmWorkflowSchema, revisionNumber) {
-      console.log(atmWorkflowSchema, revisionNumber);
-    },
     taskProviderLambdaSelected(atmLambda) {
       this.set('taskDetailsProviderData.atmLambda', atmLambda);
       this.changeSlideViaUrl('taskDetails');

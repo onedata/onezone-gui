@@ -9,15 +9,11 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { conditional, tag } from 'ember-awesome-macros';
-import computedT from 'onedata-gui-common/utils/computed-t';
 import { inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { computed } from '@ember/object';
 import { collect, reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-lambda/revision-actions-factory';
 
 export default Component.extend(I18n, {
@@ -41,18 +37,18 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
-   * Needed when `mode` is `'presentation'`.
-   * @virtual optional
-   * @type {Models.AtmInventory}
-   */
-  atmInventory: undefined,
-
-  /**
    * One of: `'presentation'`, `'selection'`
    * @virtual optional
    * @type {String}
    */
   mode: 'presentation',
+
+  /**
+   * Needed when `mode` is `'presentation'`.
+   * @virtual optional
+   * @type {Models.AtmInventory}
+   */
+  atmInventory: undefined,
 
   /**
    * Needed when `mode` is `'selection'`
@@ -80,21 +76,6 @@ export default Component.extend(I18n, {
   areActionsOpened: false,
 
   /**
-   * @type {Boolean}
-   */
-  isExpanded: false,
-
-  /**
-   * @type {Boolean}
-   */
-  isEditing: false,
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  modeClass: tag `mode-${'mode'}`,
-
-  /**
    * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
    */
   revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
@@ -114,29 +95,14 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<AtmLambdaRevision>}
+   * @type {ComputedProperty<String>}
    */
-  latestRevision: computed(
-    'atmLambda.revisionRegistry',
-    function latestRevision() {
-      const revisionRegistry = this.get('atmLambda.revisionRegistry') || {};
-      const sortedRevisionNumbers =
-        sortRevisionNumbers(Object.keys(revisionRegistry));
-      const latestRevisionNumber =
-        sortedRevisionNumbers[sortedRevisionNumbers.length - 1];
-      return revisionRegistry[latestRevisionNumber];
-    }
-  ),
+  latestRevisionName: reads('atmLambda.latestRevision.name'),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  latestRevisionName: reads('latestRevision.name'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  latestRevisionSummary: reads('latestRevision.summary'),
+  latestRevisionSummary: reads('atmLambda.latestRevision.summary'),
 
   /**
    * @type {ComputedProperty<Utils.AtmWorkflow.AtmLambda.RevisionActionsFactory>}
@@ -157,28 +123,6 @@ export default Component.extend(I18n, {
       });
     }
   ),
-
-  /**
-   * @type {ComputedProperty<SafeString>}
-   */
-  toggleDetailsText: conditional(
-    'isExpanded',
-    computedT('hideDetails'),
-    computedT('showDetails'),
-  ),
-
-  /**
-   * @type {ComputedProperty<Utils.Action>}
-   */
-  modifyAction: computed('isEditing', function modifyAction() {
-    return {
-      action: () => this.startEdition(),
-      title: this.t('modifyAction'),
-      class: 'modify-action-trigger',
-      icon: 'rename',
-      disabled: this.get('isEditing'),
-    };
-  }),
 
   /**
    * @type {ComputedProperty<Utils.Action>}
@@ -211,15 +155,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction', 'unlinkAction', 'copyIdAction'),
-
-  startEdition() {
-    this.set('isEditing', true);
-  },
-
-  stopEdition() {
-    this.set('isEditing', false);
-  },
+  atmLambdaActionsArray: collect('unlinkAction', 'copyIdAction'),
 
   actions: {
     clickRevision(revisionNumber) {
@@ -232,30 +168,6 @@ export default Component.extend(I18n, {
     },
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
-    },
-    toggleDetails() {
-      this.toggleProperty('isExpanded');
-    },
-    async saveChanges(atmLambdaDiff) {
-      const {
-        workflowActions,
-        atmLambda,
-      } = this.getProperties('workflowActions', 'atmLambda');
-
-      if (Object.keys(atmLambdaDiff).length) {
-        const result = await workflowActions.createModifyAtmLambdaAction({
-          atmLambda,
-          atmLambdaDiff,
-        }).execute();
-        if (get(result, 'status') === 'done') {
-          safeExec(this, 'stopEdition');
-        }
-      } else {
-        this.stopEdition();
-      }
-    },
-    cancelChanges() {
-      this.stopEdition();
     },
   },
 });
