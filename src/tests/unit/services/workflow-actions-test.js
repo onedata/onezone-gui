@@ -6,7 +6,8 @@ import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
-import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
+import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
+import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
@@ -81,30 +82,48 @@ describe('Unit | Service | workflow actions', function () {
     const service = this.subject();
 
     const atmInventory = {};
-    const rawAtmLambda = {};
+    const initialRevision = {};
     const action = service.createCreateAtmLambdaAction({
-      rawAtmLambda,
+      initialRevision,
       atmInventory,
     });
 
     expect(action).to.be.instanceOf(CreateAtmLambdaAction);
-    expect(get(action, 'rawAtmLambda')).to.equal(rawAtmLambda);
+    expect(get(action, 'initialRevision')).to.equal(initialRevision);
     expect(get(action, 'atmInventory')).to.equal(atmInventory);
   });
 
-  it('creates ModifyAtmLambdaAction instance', function () {
+  it('creates CreateAtmLambdaRevisionAction instance', function () {
     const service = this.subject();
 
     const atmLambda = {};
-    const atmLambdaDiff = {};
-    const action = service.createModifyAtmLambdaAction({
+    const revisionContent = {};
+    const action = service.createCreateAtmLambdaRevisionAction({
       atmLambda,
-      atmLambdaDiff,
+      revisionContent,
     });
 
-    expect(action).to.be.instanceOf(ModifyAtmLambdaAction);
+    expect(action).to.be.instanceOf(CreateAtmLambdaRevisionAction);
     expect(get(action, 'atmLambda')).to.equal(atmLambda);
-    expect(get(action, 'atmLambdaDiff')).to.equal(atmLambdaDiff);
+    expect(get(action, 'revisionContent')).to.equal(revisionContent);
+  });
+
+  it('creates ModifyAtmLambdaRevisionAction instance', function () {
+    const service = this.subject();
+
+    const atmLambda = {};
+    const revisionNumber = 2;
+    const revisionDiff = {};
+    const action = service.createModifyAtmLambdaRevisionAction({
+      atmLambda,
+      revisionNumber,
+      revisionDiff,
+    });
+
+    expect(action).to.be.instanceOf(ModifyAtmLambdaRevisionAction);
+    expect(get(action, 'atmLambda')).to.equal(atmLambda);
+    expect(get(action, 'revisionNumber')).to.equal(revisionNumber);
+    expect(get(action, 'revisionDiff')).to.equal(revisionDiff);
   });
 
   it('creates UnlinkAtmLambdaAction instance', function () {

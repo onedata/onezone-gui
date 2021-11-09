@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
-import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
+import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
@@ -9,7 +9,7 @@ import { get } from '@ember/object';
 import wait from 'ember-test-helpers/wait';
 
 describe(
-  'Integration | Utility | workflow actions/create atm lambda action',
+  'Integration | Utility | workflow actions/create atm lambda revision action',
   function () {
     setupComponentTest('test-component', {
       integration: true,
@@ -19,76 +19,73 @@ describe(
       const workflowManager = lookupService(this, 'workflow-manager');
       const globalNotify = lookupService(this, 'global-notify');
       this.setProperties({
-        createAtmLambdaStub: sinon.stub(workflowManager, 'createAtmLambda'),
+        createAtmLambdaRevisionStub: sinon.stub(workflowManager, 'createAtmLambdaRevision'),
         successNotifySpy: sinon.spy(globalNotify, 'success'),
         failureNotifySpy: sinon.spy(globalNotify, 'backendError'),
-        atmInventory: {
-          entityId: 'someid',
+        atmLambda: {
+          entityId: 'someId',
+          revisionRegistry: {
+            2: {},
+          },
         },
-        initialRevision: {
+        revisionContent: {
           name: 'someName',
         },
       });
     });
 
-    it('executes creating lambda (success scenario)', async function () {
+    it('executes creating lambda revision (success scenario)', async function () {
       const {
-        createAtmLambdaStub,
+        createAtmLambdaRevisionStub,
         successNotifySpy,
-        atmInventory,
-        initialRevision,
+        atmLambda,
+        revisionContent,
       } = this.getProperties(
-        'createAtmLambdaStub',
+        'createAtmLambdaRevisionStub',
         'successNotifySpy',
-        'atmInventory',
-        'initialRevision'
+        'atmLambda',
+        'revisionContent'
       );
-      const atmLambdaRecord = {};
-      createAtmLambdaStub
-        .withArgs(atmInventory.entityId, {
-          revision: {
-            originalRevisionNumber: 1,
-            atmLambdaRevision: initialRevision,
-          },
-        })
-        .resolves(atmLambdaRecord);
-      const action = CreateAtmLambdaAction.create({
+      createAtmLambdaRevisionStub
+        .withArgs(atmLambda.entityId, 3, revisionContent)
+        .resolves();
+      const action = CreateAtmLambdaRevisionAction.create({
         ownerSource: this,
         context: {
-          atmInventory,
-          initialRevision,
+          atmLambda,
+          revisionContent,
         },
       });
 
       const actionResult = await action.execute();
       expect(get(actionResult, 'status')).to.equal('done');
-      expect(get(actionResult, 'result')).to.equal(atmLambdaRecord);
+      expect(get(actionResult, 'result')).to.equal(3);
       expect(successNotifySpy).to.be.calledWith(
-        sinon.match.has('string', 'Lambda has been created successfully.')
+        sinon.match.has('string', 'Lambda revision has been created successfully.')
       );
     });
 
-    it('executes creating lambda (failure scenario)', async function () {
+    it('executes creating lambda revision (failure scenario)', async function () {
       const {
-        createAtmLambdaStub,
+        createAtmLambdaRevisionStub,
         failureNotifySpy,
-        atmInventory,
-        initialRevision,
+        atmLambda,
+        revisionContent,
       } = this.getProperties(
-        'createAtmLambdaStub',
+        'createAtmLambdaRevisionStub',
         'failureNotifySpy',
-        'atmInventory',
-        'initialRevision'
+        'atmLambda',
+        'revisionContent'
       );
-      const action = CreateAtmLambdaAction.create({
+      const action = CreateAtmLambdaRevisionAction.create({
         ownerSource: this,
         context: {
-          atmInventory,
-          initialRevision,
+          atmLambda,
+          revisionContent,
         },
       });
       let rejectCreate;
-      createAtmLambdaStub.returns(
+      createAtmLambdaRevisionStub.returns(
         new Promise((resolve, reject) => rejectCreate = reject)
       );
 
@@ -100,7 +97,7 @@ describe(
       expect(get(actionResult, 'status')).to.equal('failed');
       expect(get(actionResult, 'error')).to.equal('someError');
       expect(failureNotifySpy).to.be.calledWith(
-        sinon.match.has('string', 'creating lambda'),
+        sinon.match.has('string', 'creating lambda revision'),
         'someError'
       );
     });

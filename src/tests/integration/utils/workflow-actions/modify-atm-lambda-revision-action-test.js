@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { get } from '@ember/object';
 
 describe(
-  'Unit | Utility | workflow actions/modify atm lambda revision action',
+  'Integration | Utility | workflow actions/modify atm lambda revision action',
   function () {
     setupComponentTest('test-component', {
       integration: true,
@@ -90,7 +90,7 @@ describe(
       const actionResult = await action.execute();
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'modifying lambda revision'),
-        'error'
+        'err'
       );
       expect(get(actionResult, 'status')).to.equal('failed');
       expect(get(actionResult, 'error')).to.equal('err');
