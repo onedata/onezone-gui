@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8374 Fixed randomly failing test of content-atm-inventories-workflows component
 * VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
 * VFS-7567 Added showing origin space in general shares sidebar
