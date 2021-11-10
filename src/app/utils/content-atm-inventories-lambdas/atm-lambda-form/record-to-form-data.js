@@ -22,9 +22,10 @@ const fallbackDefaultAtmResourceSpec = {
 /**
  * @param {Models.AtmLambda|null} record
  * @param {AtmResourceSpec} defaultAtmResourceSpec
+ * @param {string} mode
  * @returns {Object}
  */
-export default function recordToFormData(record, defaultAtmResourceSpec) {
+export default function recordToFormData(record, defaultAtmResourceSpec, mode) {
   if (!record) {
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
@@ -101,22 +102,29 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 
   const resources = {
     cpu: {
-      cpuRequested: (resourceSpec || {}).cpuRequested,
-      cpuLimit: (resourceSpec || {}).cpuLimit,
+      cpuRequested: atmResourceValueAsInputString((resourceSpec || {}).cpuRequested),
+      cpuLimit: atmResourceValueAsInputString((resourceSpec || {}).cpuLimit),
     },
     memory: {
-      memoryRequested: (resourceSpec || {}).memoryRequested,
-      memoryLimit: (resourceSpec || {}).memoryLimit,
+      memoryRequested: atmResourceValueAsInputString(
+        (resourceSpec || {}).memoryRequested
+      ),
+      memoryLimit: atmResourceValueAsInputString((resourceSpec || {}).memoryLimit),
     },
     ephemeralStorage: {
-      ephemeralStorageRequested: (resourceSpec || {}).ephemeralStorageRequested,
-      ephemeralStorageLimit: (resourceSpec || {}).ephemeralStorageLimit,
+      ephemeralStorageRequested: atmResourceValueAsInputString(
+        (resourceSpec || {}).ephemeralStorageRequested
+      ),
+      ephemeralStorageLimit: atmResourceValueAsInputString(
+        (resourceSpec || {}).ephemeralStorageLimit
+      ),
     },
   };
+  const formState = mode === 'create' ? 'draft' : state;
 
   return Object.assign({
     name,
-    state,
+    state: formState,
     summary,
     engine,
     arguments: formArguments,
@@ -195,6 +203,10 @@ function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
     default:
       return String(defaultValue);
   }
+}
+
+function atmResourceValueAsInputString(value) {
+  return typeof value === 'number' ? String(value) : '';
 }
 
 /**

@@ -98,12 +98,14 @@ export default Component.extend(I18n, {
   fieldsValuesFromRecord: computed(
     'revision.{name,state,summary,description,operationSpec,argumentSpecs,resultSpecs}',
     'defaultAtmResourceSpec',
+    'mode',
     function fieldsValuesFromRecord() {
       const {
         defaultAtmResourceSpec,
         revision,
-      } = this.getProperties('defaultAtmResourceSpec', 'revision');
-      return recordToFormData(revision, defaultAtmResourceSpec);
+        mode,
+      } = this.getProperties('defaultAtmResourceSpec', 'revision', 'mode');
+      return recordToFormData(revision, defaultAtmResourceSpec, mode);
     }
   ),
 
@@ -138,7 +140,7 @@ export default Component.extend(I18n, {
     return FormFieldsRootGroup.extend({
       i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
       ownerSource: reads('component'),
-      isEnabled: not('component.isSubmitting'),
+      isEnabled: not(or('component.isSubmitting', eq('component.mode', raw('view')))),
     }).create({
       component,
       fields: [

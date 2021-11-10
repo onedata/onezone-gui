@@ -864,7 +864,8 @@ describe(
 
           expect(this.$('.field-disabled')).to.have.length(0);
           expect(this.$('.name-field .form-control')).to.have.value('myname');
-          expect(this.$('.state-field .field-component').text().trim()).to.equal('Stable');
+          // In create mode state is always draft on init
+          expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
           expect(this.$('.summary-field .form-control')).to.have.value('summary');
           expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
           expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
@@ -932,29 +933,28 @@ describe(
 
         await renderView(this);
 
-        expect(this.$('.field-edit-mode')).to.not.exist;
-        expect(this.$('.name-field .field-component').text().trim()).to.equal('myname');
+        expect(this.$('.field-enabled')).to.not.exist;
+        expect(this.$('.name-field .form-control')).to.have.value('myname');
         expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-        expect(this.$('.summary-field .field-component').text().trim()).to.equal('summary');
+        expect(this.$('.summary-field .form-control')).to.have.value('summary');
         expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
-        expect(this.$('.dockerImage-field .field-component').text().trim()).to.equal('myimage');
+        expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
         expect(this.$('.onedataFunctionOptions-field')).to.not.exist;
-        expect(this.$('.arguments-field')).to.not.exist;
-        expect(this.$('.results-field')).to.not.exist;
         expect(this.$('.readonly-field .form-control')).to.have.class('checked');
         expect(this.$('.mountSpace-field .form-control')).to.exist
           .and.to.not.have.class('checked');
         expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
-        expect(this.$('.cpuRequested-field .field-component').text().trim()).to.equal('0.1');
-        expect(this.$('.cpuLimitUnlimitedDesc-field .field-component').text().trim()).to.equal('Unlimited');
-        expect(this.$('.memoryRequested-field .field-component').text().trim()).to.equal('128 MiB');
-        expect(this.$('.memoryLimitUnlimitedDesc-field .field-component').text().trim())
-          .to.equal('Unlimited');
-        expect(this.$('.ephemeralStorageRequested-field .field-component').text().trim()).to.equal('0 B');
+        expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
+        expect(this.$('.cpuLimitUnlimitedDesc-field .form-control'))
+          .to.have.value(undefined);
+        expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
+        expect(this.$('.memoryLimitUnlimitedDesc-field .form-control'))
+          .to.have.value(undefined);
+        expect(this.$('.ephemeralStorageRequested-field .form-control'))
+          .to.have.value('0');
         expect(
-          this.$('.ephemeralStorageLimitUnlimitedDesc-field .field-component')
-          .text().trim()
-        ).to.equal('Unlimited');
+          this.$('.ephemeralStorageLimitUnlimitedDesc-field .form-control')
+        ).to.have.value(undefined);
       });
 
       it('shows simple onedata function lambda with full resources spec',
@@ -982,21 +982,19 @@ describe(
 
           await renderView(this);
 
-          expect(this.$('.field-edit-mode')).to.not.exist;
-          expect(this.$('.name-field .field-component').text().trim()).to.equal('myname');
+          expect(this.$('.field-enabled')).to.not.exist;
+          expect(this.$('.name-field .form-control')).to.have.value('myname');
           expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-          expect(this.$('.summary-field .field-component').text().trim()).to.equal('summary');
-          expect(this.$('.engine-field .field-component').text().trim()).to.equal('Onedata function');
-          expect(this.$('.onedataFunctionName-field .field-component').text().trim()).to.equal('myfunc');
+          expect(this.$('.summary-field .form-control')).to.have.value('summary');
+          expect(this.$('.summary-field .form-control')).to.have.value('summary');
+          expect(this.$('.onedataFunctionName-field .form-control')).to.have.value('myfunc');
           expect(this.$('.openfaasOptions-field')).to.not.exist;
-          expect(this.$('.arguments-field')).to.not.exist;
-          expect(this.$('.results-field')).to.not.exist;
-          expect(this.$('.cpuRequested-field .field-component').text().trim()).to.equal('0.1');
-          expect(this.$('.cpuLimit-field .field-component').text().trim()).to.equal('1');
-          expect(this.$('.memoryRequested-field .field-component').text().trim()).to.equal('128 MiB');
-          expect(this.$('.memoryLimit-field .field-component').text().trim()).to.equal('256 MiB');
-          expect(this.$('.ephemeralStorageRequested-field .field-component').text().trim()).to.equal('1 MiB');
-          expect(this.$('.ephemeralStorageLimit-field .field-component').text().trim()).to.equal('10 MiB');
+          expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
+          expect(this.$('.cpuLimit-field .form-control')).to.have.value('1');
+          expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
+          expect(this.$('.memoryLimit-field .form-control')).to.have.value('256');
+          expect(this.$('.ephemeralStorageRequested-field .form-control')).to.have.value('1');
+          expect(this.$('.ephemeralStorageLimit-field .form-control')).to.have.value('10');
         });
 
       it('shows mount space options when passed lambda has "mount space" enabled',
@@ -1014,10 +1012,10 @@ describe(
 
           await renderView(this);
 
-          expect(this.$('.field-edit-mode')).to.not.exist;
+          expect(this.$('.field-enabled')).to.not.exist;
           expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
-          expect(this.$('.mountPoint-field .field-component').text().trim()).to.equal('/some/path');
-          expect(this.$('.oneclientOptions-field .field-component').text().trim()).to.equal('oc-options');
+          expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
+          expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
         });
 
       it('shows arguments of passed lambda', async function () {
@@ -1036,14 +1034,12 @@ describe(
 
         await renderView(this);
 
-        expect(this.$('.field-edit-mode')).to.not.exist;
-        expect(this.$('.arguments-field')).to.exist;
+        expect(this.$('.field-enabled')).to.not.exist;
         const $entries = this.$('.arguments-field .entry-field');
         expect($entries).to.have.length(argumentAndResultTypes.length);
         argumentAndResultTypes.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
-          expect($entry.find('.entryName-field .field-component').text().trim())
-            .to.equal(`entry${idx}`);
+          expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
           const $batchToggle = $entry.find('.entryBatch-field .form-control');
@@ -1056,7 +1052,9 @@ describe(
           } else {
             expect($batchToggle).to.not.have.class('checked');
             expect($optionalToggle).to.not.have.class('checked');
-            expect($defaultValueField).to.not.exist;
+            if ($defaultValueField.length) {
+              expect($defaultValueField).to.have.value('');
+            }
           }
         });
       });
@@ -1075,15 +1073,14 @@ describe(
 
         await renderView(this);
 
-        expect(this.$('.field-edit-mode')).to.not.exist;
+        expect(this.$('.field-enabled')).to.not.exist;
         expect(this.$('.results-field')).to.exist;
         const $entries = this.$('.results-field .entry-field');
         expect($entries).to.have.length(argumentAndResultTypes.length);
 
         argumentAndResultTypes.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
-          expect($entry.find('.entryName-field .field-component').text().trim())
-            .to.equal(`entry${idx}`);
+          expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
           const $batchToggle = $entry.find('.entryBatch-field .form-control');

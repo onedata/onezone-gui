@@ -12,6 +12,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import { collect, reads } from '@ember/object/computed';
+import { conditional, raw, eq } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-lambda/revision-actions-factory';
@@ -155,7 +156,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('unlinkAction', 'copyIdAction'),
+  atmLambdaActionsArray: conditional(
+    eq('mode', raw('selection')),
+    collect('copyIdAction'),
+    collect('unlinkAction', 'copyIdAction')
+  ),
 
   actions: {
     clickRevision(revisionNumber) {

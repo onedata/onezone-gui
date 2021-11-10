@@ -14,11 +14,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
-const lambdaActionsSpec = [{
-  className: 'modify-action-trigger',
-  label: 'Modify',
-  icon: 'rename',
-}, {
+const lambdaPresentationActionsSpec = [{
   className: 'unlink-atm-lambda-action-trigger',
   label: 'Unlink',
   icon: 'x',
@@ -27,6 +23,8 @@ const lambdaActionsSpec = [{
   label: 'Copy ID',
   icon: 'copy',
 }];
+
+const lambdaSelectionActionsSpec = [lambdaPresentationActionsSpec[1]];
 
 function generateLambda(testCase, name, content) {
   const store = lookupService(testCase, 'store');
@@ -196,23 +194,7 @@ describe(
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-presentation');
       });
 
-      it('allows to choose from lambda actions', async function () {
-        await render(this);
-
-        const $actionsTrigger = this.$('.atm-lambda-actions-trigger');
-        expect($actionsTrigger).to.exist;
-
-        await click($actionsTrigger[0]);
-
-        const $actions = $('body .webui-popover.in .actions-popover-content a');
-        expect($actions).to.have.length(lambdaActionsSpec.length);
-        lambdaActionsSpec.forEach(({ className, label, icon }, index) => {
-          const $action = $actions.eq(index);
-          expect($action).to.have.class(className);
-          expect($action.text().trim()).to.equal(label);
-          expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
-        });
-      });
+      itAllowsToChooseLambdaActions(lambdaPresentationActionsSpec);
 
       it('allows to remove lambda', async function () {
         // const workflowActions = lookup
@@ -285,11 +267,7 @@ describe(
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
       });
 
-      it('does not show lambda actions trigger', async function () {
-        await render(this);
-
-        expect(this.$('.atm-lambda-actions-trigger')).to.not.exist;
-      });
+      itAllowsToChooseLambdaActions(lambdaSelectionActionsSpec);
 
       it('notifies about "add to workflow" button click', async function () {
         const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
@@ -376,4 +354,24 @@ async function render(testCase) {
     onRevisionClick=lambdaRevisionClickedSpy
   }}`);
   await wait();
+}
+
+function itAllowsToChooseLambdaActions(actions) {
+  it('allows to choose from lambda actions', async function () {
+    await render(this);
+
+    const $actionsTrigger = this.$('.atm-lambda-actions-trigger');
+    expect($actionsTrigger).to.exist;
+
+    await click($actionsTrigger[0]);
+
+    const $actions = $('body .webui-popover.in .actions-popover-content a');
+    expect($actions).to.have.length(actions.length);
+    actions.forEach(({ className, label, icon }, index) => {
+      const $action = $actions.eq(index);
+      expect($action).to.have.class(className);
+      expect($action.text().trim()).to.equal(label);
+      expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+    });
+  });
 }

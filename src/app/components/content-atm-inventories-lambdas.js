@@ -161,7 +161,10 @@ export default Component.extend(GlobalActions, {
       } = this.getProperties('activeAtmLambdaProxy', 'activeRevisionNumber');
 
       const activeAtmLambda = await activeAtmLambdaProxy;
-      const activeRevision = activeAtmLambda && activeRevisionNumber &&
+      if (!activeAtmLambda) {
+        return;
+      }
+      const activeRevision = activeRevisionNumber &&
         get(activeAtmLambda, `revisionRegistry.${activeRevisionNumber}`);
       if (!activeRevision) {
         throw { id: 'notFound' };
@@ -267,6 +270,12 @@ export default Component.extend(GlobalActions, {
       nextActiveSlide = defaultSlideId;
     } else if (activeSlideFromUrl !== activeSlide) {
       nextActiveSlide = activeSlideFromUrl;
+    }
+
+    // Entering into editor view with no lambda specified is incorrect.
+    // Redirect to default view.
+    if (!nextActiveAtmLambdaId && nextActiveSlide === 'editor') {
+      nextActiveSlide = defaultSlideId;
     }
 
     // Detect if some lambda changes are unsaved and take care of them.
@@ -431,7 +440,7 @@ export default Component.extend(GlobalActions, {
       const lambdaId = atmLambda && get(atmLambda, 'entityId');
       this.changeSlideViaUrl('creator', {
         lambdaId,
-        revision: originRevisionNumber,
+        revision: String(originRevisionNumber),
       });
     },
     async showEditorView(atmLambda, revisionNumber) {
