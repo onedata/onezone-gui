@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7898 Added support for generating archive-files URLs in shares views and fixed file links in upload and harvester views
 * VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
 * VFS-7567 Added showing origin space in general shares sidebar
