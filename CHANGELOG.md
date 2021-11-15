@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8374 Fixed randomly failing test of content-atm-inventories-workflows component
 * VFS-7898 Added support for generating archive-files URLs in shares views and fixed file links in upload and harvester views
 * VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
