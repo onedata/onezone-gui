@@ -1,6 +1,6 @@
 /**
  * Container for datasets views for single space (with Oneprovider selector)
- * 
+ *
  * @module components/content-spaces-datasets
  * @author Jakub Liput
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
@@ -34,7 +34,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
 
   /**
    * Entity ID of dataset currently opened in datasets browser.
-   * 
+   *
    * **Injected to embedded iframe.**
    * @type {string}
    */
@@ -53,7 +53,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   attachmentState: reads('navigationState.aspectOptions.attachmentState'),
 
   /**
-   * View mode: 
+   * View mode:
    * - datasets: default, browse datasets; if `datasetId` is provided, open dataset
    *     children listing of this dataset if available
    * - archives: browse list of archives of a single dataset; `datasetId` is required
@@ -70,7 +70,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
 
   /**
    * List of dataset entity ids that are selected
-   * 
+   *
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
@@ -218,6 +218,7 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     this.get('navigationState').changeRouteAspectOptions({
       archive: relatedArchiveId,
       dir: null,
+      selected: null,
     });
   },
 
