@@ -243,7 +243,7 @@ describe(
       it('does not have "add to workflow" button', async function () {
         await render(this);
 
-        expect(this.$('.add-to-workflow-action-trigger')).to.not.exist;
+        expect(this.$('.addToWorkflow button')).to.not.exist;
       });
 
       it('does not have collection type selector', async function () {
@@ -275,12 +275,12 @@ describe(
 
         expect(addToAtmWorkflowSchemaSpy).to.be.not.called;
         const $addBtn =
-          this.$('.atm-lambdas-list-entry .add-to-workflow-action-trigger').eq(0);
+          this.$('.atm-lambdas-list-entry .addToWorkflow button').eq(0);
         await click($addBtn[0]);
 
         expect($addBtn.text().trim()).to.equal('Add to workflow');
         expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
-          .and.to.be.calledWith(this.get('collection.1'));
+          .and.to.be.calledWith(this.get('collection.1'), 1);
       });
 
       it('has collection type selector with preselected "this inventory"',

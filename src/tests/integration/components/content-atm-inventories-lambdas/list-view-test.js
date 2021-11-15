@@ -172,10 +172,10 @@ describe('Integration | Component | content atm inventories lambdas/list view',
           const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
 
           expect(addToAtmWorkflowSchemaSpy).to.not.be.called;
-          await click('.add-to-workflow-action-trigger');
+          await click('.addToWorkflow button');
 
           expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
-            .and.to.be.calledWith(this.get('atmLambdas.1'));
+            .and.to.be.calledWith(this.get('atmLambdas.1'), 1);
         });
 
       it('calls "onBackSlide" callback on back link click', async function () {

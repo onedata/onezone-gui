@@ -10,7 +10,7 @@ import { clickTrigger } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
 import { Promise } from 'rsvp';
 
-const exampleAtmLambda = {
+const exampleAtmLambdaRevision = {
   name: 'function1',
   summary: 'function1 summary',
   argumentSpecs: [{
@@ -41,6 +41,12 @@ const exampleAtmLambda = {
     },
     isBatch: false,
   }],
+};
+
+const exampleAtmLambda = {
+  revisionRegistry: {
+    1: exampleAtmLambdaRevision,
+  },
 };
 
 const exampleStores = [{
@@ -107,6 +113,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
         cancelSpy: sinon.spy(),
         applyChangesSpy: sinon.stub().resolves(),
         atmLambda: _.cloneDeep(exampleAtmLambda),
+        revisionNumber: 1,
         stores: _.cloneDeep(exampleStores),
       });
     });
@@ -181,6 +188,7 @@ async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/task-details-view
     mode=mode
     atmLambda=atmLambda
+    revisionNumber=revisionNumber
     stores=stores
     task=task
     onBackSlide=backSlideSpy
@@ -223,10 +231,10 @@ function itShowsAtmLambdaDetailsToTaskForm() {
   it('passes lambda details to task form', async function () {
     await render(this);
 
-    expect(this.$('.task-form .atm-lambda-name').text().trim())
-      .to.equal(exampleAtmLambda.name);
-    expect(this.$('.task-form .atm-lambda-summary').text().trim())
-      .to.equal(exampleAtmLambda.summary);
+    expect(this.$('.task-form .atm-lambda-name').text())
+      .to.contain(exampleAtmLambdaRevision.name);
+    expect(this.$('.task-form .atm-lambda-summary').text())
+      .to.contain(exampleAtmLambdaRevision.summary);
   });
 }
 
