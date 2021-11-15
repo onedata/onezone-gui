@@ -116,9 +116,10 @@ export default Component.extend(I18n, {
     const customColumnSpecs = this.get('customColumnSpecs') || [];
     const sourceFieldNames = customColumnSpecs.mapBy('content.sourceFieldName').compact();
     let customColumns;
-    if (sourceFieldNames.length) {
-      const observedPropsString = `revision.{${sourceFieldNames.join(',')}}`;
-      customColumns = computed(observedPropsString, function customColumns() {
+    if (customColumnSpecs.length) {
+      const observedProps =
+        sourceFieldNames.length ? [`revision.{${sourceFieldNames.join(',')}}`] : [];
+      customColumns = computed(...observedProps, function customColumns() {
         const revision = this.get('revision');
         return customColumnSpecs.map(({
           name,
@@ -132,6 +133,7 @@ export default Component.extend(I18n, {
           },
         }) => {
           const col = {
+            name,
             type,
             className: name,
           };

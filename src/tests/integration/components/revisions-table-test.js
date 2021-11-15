@@ -21,8 +21,11 @@ describe('Integration | Component | revisions table', function () {
       customColumnSpecs: [{
         name: 'description',
         title: 'Description',
-        sourceFieldName: 'description',
-        fallbackValue: 'No description.',
+        content: {
+          type: 'text',
+          sourceFieldName: 'description',
+          fallbackValue: 'No description.',
+        },
       }],
       revisionActionsFactory: {
         createCreateRevisionAction: () => Action.create({
@@ -262,6 +265,28 @@ describe('Integration | Component | revisions table', function () {
         .to.have.class('clickable');
     });
 
+  it('notifies about custom column button click',
+    async function () {
+      const { onRevisionButtonClick } = this.setProperties({
+        revisionRegistry: generateRevisionRegistry([
+          { revisionNumber: 1, state: 'stable' },
+          { revisionNumber: 2, state: 'draft' },
+        ]),
+        customColumnSpecs: [{
+          name: 'btn1',
+          content: {
+            type: 'button',
+          },
+        }],
+        onRevisionButtonClick: sinon.spy(),
+      });
+      await render(this);
+
+      await click('.revisions-table-revision-entry .btn1 button');
+
+      expect(onRevisionButtonClick).to.be.calledOnce.and.to.be.calledWith(2, 'btn1');
+    });
+
   it('creates new revision', async function () {
     const createRevisionSpy = this.get('createRevisionSpy');
     await render(this);
@@ -279,6 +304,7 @@ async function render(testCase) {
     revisionRegistry=revisionRegistry
     revisionActionsFactory=revisionActionsFactory
     onRevisionClick=onRevisionClick
+    onRevisionButtonClick=onRevisionButtonClick
   }}`);
 }
 
