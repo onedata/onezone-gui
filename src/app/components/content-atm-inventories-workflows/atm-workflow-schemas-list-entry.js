@@ -81,9 +81,12 @@ export default Component.extend(I18n, {
     return [{
       name: 'description',
       title: this.t('columns.description.title'),
-      sourceFieldName: 'description',
-      fallbackValue: this.t('columns.description.fallback'),
       className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'description',
+        fallbackValue: this.t('columns.description.fallback'),
+      },
     }];
   }),
 

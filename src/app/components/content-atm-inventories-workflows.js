@@ -10,7 +10,7 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { promise, or, raw } from 'ember-awesome-macros';
-import EmberObject, { computed, observer, get } from '@ember/object';
+import EmberObject, { computed, observer, get, getProperties, setProperties } from '@ember/object';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
 import { Promise } from 'rsvp';
@@ -67,6 +67,7 @@ export default Component.extend(GlobalActions, I18n, {
    * ```
    * {
    *   atmLambda: Models.AtmLambda,
+   *   revisionNumber: number,
    *   stores: Array<Object>
    *   task: Object,
    *   onSuccess: Function,
@@ -76,6 +77,14 @@ export default Component.extend(GlobalActions, I18n, {
    * @type {Object|undefined}
    */
   taskDetailsProviderData: undefined,
+
+  /**
+   * Data passed to editor in `lambdaCreator` slide. If `null`, then new lambda
+   * will be created. Otherwise a new revision based on the specs from this object
+   * will be added to the lambda.
+   * @type {{ atmLambda: Model.AtmLambda, originRevisionNumber: number }}
+   */
+  lambdaCreatorData: null,
 
   /**
    * Set on init
@@ -516,7 +525,10 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   runTaskDetailsProvider(mode, { stores, task }) {
-    const atmLambdaId = task && get(task, 'lambdaId');
+    const {
+      lambdaId: atmLambdaId,
+      lambdaRevisionNumber: revisionNumber,
+    } = getProperties(task || {}, 'lambdaId', 'lambdaRevisionNumber');
     const atmLambda = atmLambdaId ?
       this.get('recordManager').getLoadedRecordById('atmLambda', atmLambdaId) :
       undefined;
@@ -539,6 +551,7 @@ export default Component.extend(GlobalActions, I18n, {
       taskDetailsProviderMode: mode,
       taskDetailsProviderData: EmberObject.create({
         atmLambda,
+        revisionNumber,
         stores,
         task,
         onSuccess: resolvePromise,
@@ -657,7 +670,15 @@ export default Component.extend(GlobalActions, I18n, {
         );
       }
     },
-    showLambdaCreatorView() {
+    showLambdaCreatorView(atmLambda, originRevisionNumber) {
+      let lambdaCreatorData = null;
+      if (atmLambda && originRevisionNumber) {
+        lambdaCreatorData = {
+          atmLambda,
+          originRevisionNumber,
+        };
+        this.set('lambdaCreatorData', lambdaCreatorData);
+      }
       this.changeSlideViaUrl('lambdaCreator');
     },
     backSlide() {
@@ -693,13 +714,17 @@ export default Component.extend(GlobalActions, I18n, {
         }));
       });
     },
-    taskProviderLambdaSelected(atmLambda) {
-      this.set('taskDetailsProviderData.atmLambda', atmLambda);
+    taskProviderLambdaSelected(atmLambda, revisionNumber) {
+      setProperties(this.get('taskDetailsProviderData'), {
+        atmLambda,
+        revisionNumber,
+      });
       this.changeSlideViaUrl('taskDetails');
     },
     async taskProviderDataAccepted(taskData) {
       try {
         const atmLambda = this.get('taskDetailsProviderData.atmLambda');
+        const revisionNumber = this.get('taskDetailsProviderData.revisionNumber');
         const atmLambdaId = get(atmLambda, 'entityId');
         const atmInventory = this.get('atmInventory');
         const atmLambdasInInventory = await get(
@@ -713,7 +738,10 @@ export default Component.extend(GlobalActions, I18n, {
           );
         }
         this.finishTaskDetailsProvider(
-          Object.assign({ lambdaId: atmLambdaId }, taskData)
+          Object.assign({
+            lambdaId: atmLambdaId,
+            lambdaRevisionNumber: revisionNumber,
+          }, taskData)
         );
       } catch (e) {
         this.cancelTaskDetailsProvider();

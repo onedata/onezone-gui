@@ -8,6 +8,9 @@ export default {
       title: 'Summary',
       fallback: 'No summary.',
     },
+    addToWorkflow: {
+      buttonLabel: 'Add to workflow',
+    },
   },
   showDetails: 'Show details...',
   hideDetails: 'Hide details',

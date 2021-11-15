@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
   onBackSlide: notImplementedIgnore,
 
   /**
-   * @type {Function}
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
    */
   onAtmLambdaRevisionSaved: notImplementedIgnore,
 
@@ -235,14 +235,29 @@ export default Component.extend(I18n, {
         default:
           return;
       }
-      const result = await action.execute();
+      const actionResult = await action.execute();
 
       const {
         status,
+        result,
         error,
-      } = getProperties(result, 'status', 'error');
+      } = getProperties(actionResult, 'status', 'result', 'error');
+      let savedAtmLambda;
+      let savedRevisionNumber;
       if (status === 'done') {
-        onAtmLambdaRevisionSaved();
+        if (viewType === 'creator') {
+          if (!atmLambda) {
+            savedAtmLambda = result;
+            savedRevisionNumber = 1;
+          } else {
+            savedAtmLambda = atmLambda;
+            savedRevisionNumber = result;
+          }
+        } else {
+          savedAtmLambda = atmLambda;
+          savedRevisionNumber = atmLambdaRevisionNumber;
+        }
+        onAtmLambdaRevisionSaved(savedAtmLambda, savedRevisionNumber);
       } else {
         throw error;
       }

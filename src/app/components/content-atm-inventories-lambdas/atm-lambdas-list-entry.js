@@ -14,7 +14,6 @@ import { computed } from '@ember/object';
 import { collect, reads } from '@ember/object/computed';
 import { conditional, raw, eq } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-lambda/revision-actions-factory';
 
 export default Component.extend(I18n, {
@@ -53,11 +52,10 @@ export default Component.extend(I18n, {
 
   /**
    * Needed when `mode` is `'selection'`
-   * @virtual optional
-   * @type {Function}
-   * @returns {any}
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
    */
-  onAddToAtmWorkflowSchema: notImplementedIgnore,
+  onAddToAtmWorkflowSchema: undefined,
 
   /**
    * @virtual
@@ -79,20 +77,38 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
    */
-  revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
-    return [{
+  revisionCustomColumnSpecs: computed('mode', function revisionCustomColumnSpecs() {
+    const cols = [{
       name: 'name',
       title: this.t('columns.name.title'),
-      sourceFieldName: 'name',
-      fallbackValue: this.t('columns.name.fallback'),
       className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'name',
+        fallbackValue: this.t('columns.name.fallback'),
+      },
     }, {
       name: 'summary',
       title: this.t('columns.summary.title'),
-      sourceFieldName: 'summary',
-      fallbackValue: this.t('columns.summary.fallback'),
       className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'summary',
+        fallbackValue: this.t('columns.summary.fallback'),
+      },
     }];
+    if (this.get('mode') === 'selection') {
+      cols.push({
+        name: 'addToWorkflow',
+        title: '',
+        content: {
+          type: 'button',
+          buttonLabel: this.t('columns.addToWorkflow.buttonLabel'),
+          buttonIcon: 'plus',
+        },
+      });
+    }
+    return cols;
   }),
 
   /**
@@ -173,6 +189,15 @@ export default Component.extend(I18n, {
     },
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
+    },
+    clickRevisionButton(revisionNumber) {
+      const {
+        onAddToAtmWorkflowSchema,
+        atmLambda,
+      } = this.getProperties('onAddToAtmWorkflowSchema', 'atmLambda');
+      if (onAddToAtmWorkflowSchema) {
+        onAddToAtmWorkflowSchema(atmLambda, revisionNumber);
+      }
     },
   },
 });

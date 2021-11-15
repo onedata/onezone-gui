@@ -43,6 +43,7 @@
         mode="selection"
         onAddAtmLambda=(action "showLambdaCreatorView")
         onAddToAtmWorkflowSchema=(action "taskProviderLambdaSelected")
+        onRevisionCreate=(action "showLambdaCreatorView")
         onBackSlide=(action "backSlide")
         onRegisterViewActions=(action "registerViewActions" "lambdaSelector")
       }}
@@ -50,14 +51,19 @@
     {{#carousel.slide slideId="lambdaCreator"}}
       {{content-atm-inventories-lambdas/editor-view
         atmInventory=atmInventory
+        viewType="creator"
+        atmLambda=lambdaCreatorData.atmLambda
+        atmLambdaRevisionNumber=lambdaCreatorData.originRevisionNumber
+        visible=(eq activeSlide "lambdaCreator")
         onBackSlide=(action "backSlide")
-        onAtmLambdaAdded=(action "taskProviderLambdaSelected")
+        onAtmLambdaRevisionSaved=(action "taskProviderLambdaSelected")
       }}
     {{/carousel.slide}}
     {{#carousel.slide slideId="taskDetails"}}
       {{content-atm-inventories-workflows/task-details-view
         mode=taskDetailsProviderMode
         atmLambda=taskDetailsProviderData.atmLambda
+        revisionNumber=taskDetailsProviderData.revisionNumber
         stores=taskDetailsProviderData.stores
         task=taskDetailsProviderData.task
         isShown=(eq "taskDetails" activeSlide)

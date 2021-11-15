@@ -18,9 +18,22 @@ import { raw, or, sum } from 'ember-awesome-macros';
  * @typedef {Object} RevisionsTableColumnSpec
  * @property {String} name
  * @property {String} title
+ * @property {String} className
+ * @property {RevisionsTableColumnValueContent|RevisionsTableColumnButtonContent} content
+ */
+
+/**
+ * @typedef {Object} RevisionsTableColumnValueContent
+ * @property {'text'} type
  * @property {String} sourceFieldName
  * @property {String} fallbackValue
- * @property {String} className
+ */
+
+/**
+ * @typedef {Object} RevisionsTableColumnButtonContent
+ * @property {'button'} type
+ * @property {String} buttonText
+ * @property {String} buttonIcon
  */
 
 export default Component.extend(I18n, {
@@ -57,6 +70,12 @@ export default Component.extend(I18n, {
    * @type {(revisionNumber: Number) => void}
    */
   onRevisionClick: undefined,
+
+  /**
+   * @virtual
+   * @type {(revisionNumber: Number, colName: string) => void}
+   */
+  onRevisionButtonClick: undefined,
 
   /**
    * @type {Boolean}

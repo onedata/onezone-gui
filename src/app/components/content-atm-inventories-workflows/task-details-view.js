@@ -39,6 +39,12 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
+   * @type {Number}
+   */
+  revisionNumber: undefined,
+
+  /**
+   * @virtual
    * @type {Array<Object>}
    */
   stores: undefined,

@@ -19,7 +19,6 @@ import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import { tag, conditional, eq, raw } from 'ember-awesome-macros';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
@@ -70,11 +69,9 @@ export default Component.extend(I18n, {
   /**
    * Needed when `mode` is `'selection'`
    * @virtual optional
-   * @type {Function}
-   * @param {Model.AtmLambda}
-   * @returns {any}
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
    */
-  onAddToAtmWorkflowSchema: notImplementedIgnore,
+  onAddToAtmWorkflowSchema: undefined,
 
   /**
    * @virtual
@@ -151,9 +148,6 @@ export default Component.extend(I18n, {
   actions: {
     changeSearchValue(newValue) {
       debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
-    },
-    addToAtmWorkflowSchema(atmLambda) {
-      this.get('onAddToAtmWorkflowSchema')(atmLambda);
     },
   },
 });

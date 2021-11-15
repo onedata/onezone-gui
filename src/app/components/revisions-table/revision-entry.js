@@ -59,6 +59,12 @@ export default Component.extend(I18n, {
   onClick: undefined,
 
   /**
+   * @virtual
+   * @type {(revisionNumber: Number, colName: string) => void}
+   */
+  onButtonClick: undefined,
+
+  /**
    * Set by customColumnsSetter.
    * @type {ComputedProperty<Array<{ className: string, value: string }>>}
    */
@@ -108,7 +114,7 @@ export default Component.extend(I18n, {
 
   customColumnsSetter: observer('customColumnSpecs', function customColumnsSetter() {
     const customColumnSpecs = this.get('customColumnSpecs') || [];
-    const sourceFieldNames = customColumnSpecs.mapBy('sourceFieldName');
+    const sourceFieldNames = customColumnSpecs.mapBy('content.sourceFieldName').compact();
     let customColumns;
     if (sourceFieldNames.length) {
       const observedPropsString = `revision.{${sourceFieldNames.join(',')}}`;
@@ -116,20 +122,34 @@ export default Component.extend(I18n, {
         const revision = this.get('revision');
         return customColumnSpecs.map(({
           name,
-          sourceFieldName,
-          fallbackValue,
           className: originalClassName,
+          content: {
+            type,
+            sourceFieldName,
+            fallbackValue,
+            buttonLabel,
+            buttonIcon,
+          },
         }) => {
-          let value = revision[sourceFieldName];
-          let className = name;
+          const col = {
+            type,
+            className: name,
+          };
           if (originalClassName) {
-            className += ` ${originalClassName}`;
+            col.className += ` ${originalClassName}`;
           }
-          if (!value) {
-            value = fallbackValue;
-            className += ' no-value';
+          if (type === 'text') {
+            let value = revision[sourceFieldName];
+            if (!value) {
+              value = fallbackValue;
+              col.className += ' no-value';
+            }
+            col.value = value;
+          } else {
+            col.buttonLabel = buttonLabel;
+            col.buttonIcon = buttonIcon;
           }
-          return { value, className };
+          return col;
         });
       });
     } else {
@@ -159,6 +179,16 @@ export default Component.extend(I18n, {
   actions: {
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
+    },
+    buttonClick(colName) {
+      const {
+        onButtonClick,
+        revisionNumber,
+      } = this.getProperties('onButtonClick', 'revisionNumber');
+
+      if (onButtonClick) {
+        onButtonClick(revisionNumber, colName);
+      }
     },
   },
 });

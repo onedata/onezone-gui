@@ -1,7 +1,21 @@
 <td class="revision-number">{{normalizedRevisionNumber}}</td>
 <td class="state">{{revisions-table/state-tag state=state}}</td>
 {{#each customColumns as |customColumn|}}
-  <td class={{customColumn.className}}>{{customColumn.value}}</td>
+  <td class={{customColumn.className}}>
+    {{#if (eq customColumn.type "button")}}
+      {{#bs-button
+        type="default"
+        size="sm"
+        class="clickable"
+        onClick=(action "buttonClick" customColumn.name)
+      }}
+        {{one-icon icon=customColumn.buttonIcon}}
+        <span class="text">{{customColumn.buttonLabel}}</span>
+      {{/bs-button}}
+    {{else}}
+      {{customColumn.value}}
+    {{/if}}
+  </td>
 {{/each}}
 <td class="actions">
   {{one-menu-toggle
