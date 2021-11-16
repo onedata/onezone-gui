@@ -265,6 +265,22 @@ describe('Integration | Component | revisions table', function () {
 
     expect(createRevisionSpy).to.be.calledOnce;
   });
+
+  it('has class "readonly" and hides all actions when "isReadOnly" is true',
+    async function () {
+      this.setProperties({
+        isReadOnly: true,
+        revisionRegistry: generateRevisionRegistry([
+          { revisionNumber: 1, state: 'stable' },
+          { revisionNumber: 2, state: 'draft' },
+        ]),
+      });
+      await render(this);
+
+      expect(this.$(`.${componentClass}`)).to.have.class('readonly');
+      expect(this.$('.revisions-table-create-revision-entry')).to.not.exist;
+      expect(this.$('.revision-actions-trigger')).to.not.exist;
+    });
 });
 
 async function render(testCase) {
@@ -272,6 +288,7 @@ async function render(testCase) {
     revisionRegistry=revisionRegistry
     revisionActionsFactory=revisionActionsFactory
     onRevisionClick=onRevisionClick
+    isReadOnly=isReadOnly
     as |section data|
   }}
     {{#if (eq section "header")}}

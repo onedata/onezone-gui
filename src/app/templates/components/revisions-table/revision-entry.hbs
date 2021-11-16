@@ -1,34 +1,36 @@
 <td class="revision-number">{{normalizedRevisionNumber}}</td>
 <td class="state">{{revisions-table/state-tag state=state}}</td>
 {{yield revision revisionNumber}}
-<td class="actions">
-  {{one-menu-toggle
-    id=actionsTriggerId
-    class=(concat-classes
-      "revision-actions-trigger clickable"
-      (if areActionsOpened "active")
-    )
-    click=(action "toggleActionsOpen" (not areActionsOpened))
-  }}
-  {{#render-later triggerRender=areActionsOpened}}
-    {{#one-webui-popover
-      class="revision-actions"
-      padding=false
-      popoverStyle="with-dropdown"
-      triggerSelector=(concat "#" actionsTriggerId)
-      open=areActionsOpened
-      onToggle=(action "toggleActionsOpen")
-      as |popover|
+{{#unless isReadOnly}}
+  <td class="actions">
+    {{one-menu-toggle
+      id=actionsTriggerId
+      class=(concat-classes
+        "revision-actions-trigger clickable"
+        (if areActionsOpened "active")
+      )
+      click=(action "toggleActionsOpen" (not areActionsOpened))
     }}
-      {{#click-outside
-        action=(action (mut areActionsOpened) false)
-        except-selector=(concat "#" actionsTriggerId)
+    {{#render-later triggerRender=areActionsOpened}}
+      {{#one-webui-popover
+        class="revision-actions"
+        padding=false
+        popoverStyle="with-dropdown"
+        triggerSelector=(concat "#" actionsTriggerId)
+        open=areActionsOpened
+        onToggle=(action "toggleActionsOpen")
+        as |popover|
       }}
-        {{actions-popover-content
-          actionsArray=revisionActions
-          actionClicked=(action "toggleActionsOpen" false)
+        {{#click-outside
+          action=(action (mut areActionsOpened) false)
+          except-selector=(concat "#" actionsTriggerId)
         }}
-      {{/click-outside}}
-    {{/one-webui-popover}}
-  {{/render-later}}
-</td>
+          {{actions-popover-content
+            actionsArray=revisionActions
+            actionClicked=(action "toggleActionsOpen" false)
+          }}
+        {{/click-outside}}
+      {{/one-webui-popover}}
+    {{/render-later}}
+  </td>
+{{/unless}}

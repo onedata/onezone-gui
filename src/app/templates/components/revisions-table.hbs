@@ -3,20 +3,25 @@
     <th class="revision-number-column">{{tt this "column.revisionNumber"}}</th>
     <th class="state-column">{{tt this "column.state"}}</th>
     {{yield "header"}}
-    <th class="actions-column"></th>
+    {{#unless isReadOnly}}
+      <th class="actions-column"></th>
+    {{/unless}}
   </tr>
 </thead>
 <tbody>
-  {{revisions-table/create-revision-entry
-    columnsCount=columnsCount
-    revisionActionsFactory=revisionActionsFactory
-  }}
+  {{#unless isReadOnly}}
+    {{revisions-table/create-revision-entry
+      columnsCount=columnsCount
+      revisionActionsFactory=revisionActionsFactory
+    }}
+  {{/unless}}
   {{#if (not-eq latestRevNum null)}}
     {{#revisions-table/revision-entry
       revisionNumber=latestRevNum
       revision=(get revisionRegistry latestRevNum)
       revisionActionsFactory=revisionActionsFactory
       onClick=onRevisionClick
+      isReadOnly=isReadOnly
       as |revision revisionNumber|
     }}
       {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
@@ -30,6 +35,7 @@
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
           onClick=onRevisionClick
+          isReadOnly=isReadOnly
           as |revision revisionNumber|
         }}
           {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
@@ -50,6 +56,7 @@
       revision=(get revisionRegistry latestStableRevNum)
       revisionActionsFactory=revisionActionsFactory
       onClick=onRevisionClick
+      isReadOnly=isReadOnly
       as |revision revisionNumber|
     }}
       {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
@@ -63,6 +70,7 @@
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
           onClick=onRevisionClick
+          isReadOnly=isReadOnly
           as |revision revisionNumber|
         }}
           {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}

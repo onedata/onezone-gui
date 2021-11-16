@@ -107,6 +107,17 @@ describe('Integration | Component | revisions table/revision entry', function ()
 
       expect(onClick).not.to.be.called;
     });
+
+  it('has class "readonly" and hides actions trigger when "isReadOnly" is true',
+    async function () {
+      this.set('isReadOnly', true);
+
+      await render(this);
+
+      expect(this.$(`.${componentClass}`)).to.have.class('readonly');
+      expect(this.$('.revision-actions-trigger')).to.not.exist;
+    }
+  );
 });
 
 async function render(testCase) {
@@ -115,6 +126,7 @@ async function render(testCase) {
     revision=revision
     revisionActionsFactory=revisionActionsFactory
     onClick=onClick
+    isReadOnly=isReadOnly
     as |revision revisionNumber|
   }}
     <td class="description">{{revision.description}}</td>

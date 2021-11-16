@@ -12,11 +12,12 @@ import { computed } from '@ember/object';
 import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import { raw, or, sum } from 'ember-awesome-macros';
+import { raw, or, sum, conditional } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'table',
   classNames: ['revisions-table', 'table', 'table-condensed'],
+  classNameBindings: ['isReadOnly:readonly'],
 
   i18n: service(),
 
@@ -50,6 +51,14 @@ export default Component.extend(I18n, {
   onRevisionClick: undefined,
 
   /**
+   * If true then no actions can be made on revision (dots menu is hidden). Also
+   * new revision can't be created
+   * @virtual optional
+   * @type {boolean}
+   */
+  isReadOnly: false,
+
+  /**
    * @type {Boolean}
    */
   areRevNumsBetweenStableAndLatestExpanded: false,
@@ -62,7 +71,11 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Number>}
    */
-  columnsCount: sum(raw(4), 'customColumnsCount'),
+  columnsCount: sum(
+    raw(2),
+    'customColumnsCount',
+    conditional('isReadOnly', raw(0), raw(1))
+  ),
 
   /**
    * @type {ComputedProperty<Array<Number>>}

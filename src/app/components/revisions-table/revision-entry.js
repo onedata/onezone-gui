@@ -19,7 +19,10 @@ import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 export default Component.extend(I18n, {
   tagName: 'tr',
   classNames: ['revisions-table-revision-entry'],
-  classNameBindings: ['hasDescription::no-description', 'onClick:clickable'],
+  classNameBindings: [
+    'onClick:clickable',
+    'isReadOnly:readonly',
+  ],
 
   i18n: service(),
 
@@ -51,6 +54,13 @@ export default Component.extend(I18n, {
    * @type {(revisionNumber: Number) => void}
    */
   onClick: undefined,
+
+  /**
+   * If true then no actions can be made on revision (dots menu is hidden)
+   * @virtual optional
+   * @type {boolean}
+   */
+  isReadOnly: false,
 
   /**
    * @type {Boolean}
