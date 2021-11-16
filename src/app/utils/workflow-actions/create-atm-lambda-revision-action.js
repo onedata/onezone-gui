@@ -12,7 +12,7 @@ import { reads } from '@ember/object/computed';
 import { get } from '@ember/object';
 import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
-import getNextFreeRevisionNumber from 'onezone-gui/utils/atm-workflow/get-next-free-revision-number';
+import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 
 export default Action.extend({
   workflowManager: service(),

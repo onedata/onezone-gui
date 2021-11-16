@@ -7,7 +7,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/revision-actions-factory';
+import RevisionActionsFactory from 'onedata-gui-common/utils/revisions/revision-actions-factory';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import { get } from '@ember/object';

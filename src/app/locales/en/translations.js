@@ -91,7 +91,6 @@ import contentAtmInventoriesMembers from './components/content-atm-inventories-m
 import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
 import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
-import revisionsTable from './components/revisions-table';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -255,7 +254,6 @@ const translations = {
     contentAtmInventoriesLambdas,
     contentAtmInventoriesWorkflows,
     emptyCollectionSidebar,
-    revisionsTable,
   },
   services: {
     tokenActions,

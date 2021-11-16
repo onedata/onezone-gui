@@ -16,8 +16,8 @@ import Action from 'onedata-gui-common/utils/action';
 import { inject as service } from '@ember/service';
 import { conditional } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
-import getNextFreeRevisionNumber from 'onezone-gui/utils/atm-workflow/get-next-free-revision-number';
+import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
+import getNextFreeRevisionNumber from 'onedata-gui-common/utils/revisions/get-next-free-revision-number';
 import createEmptyRevision from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/create-empty-revision';
 
 export default Action.extend({

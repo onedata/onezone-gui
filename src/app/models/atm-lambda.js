@@ -13,7 +13,7 @@ import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
+import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
 import { getBy } from 'ember-awesome-macros';
 
 /**

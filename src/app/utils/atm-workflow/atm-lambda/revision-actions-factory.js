@@ -7,14 +7,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/revision-actions-factory';
+import RevisionActionsFactory from 'onedata-gui-common/utils/revisions/revision-actions-factory';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import { conditional } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
-import sortRevisionNumbers from 'onezone-gui/utils/atm-workflow/sort-revision-numbers';
+import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
 import { reads } from '@ember/object/computed';
 
 export default RevisionActionsFactory.extend(OwnerInjector, {
