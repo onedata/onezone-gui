@@ -46,6 +46,12 @@ export default OneproviderEmbeddedContainer.extend({
 
   /**
    * @virtual
+   * @type {number|null}
+   */
+  workflowSchemaRevision: undefined,
+
+  /**
+   * @virtual
    * @type {Boolean}
    */
   fillInputStores: undefined,
@@ -64,6 +70,7 @@ export default OneproviderEmbeddedContainer.extend({
     'tab',
     'workflowExecutionId',
     'workflowSchemaId',
+    'workflowSchemaRevision',
     'fillInputStores',
   ]),
 
@@ -98,12 +105,14 @@ export default OneproviderEmbeddedContainer.extend({
       return this.get('navigationState').changeRouteAspectOptions({
         tab,
         workflowSchemaId: null,
+        workflowSchemaRevision: null,
         fillInputStores: null,
       });
     },
-    chooseWorkflowSchemaToRun(workflowSchemaId) {
+    chooseWorkflowSchemaToRun(workflowSchemaId, workflowSchemaRevision = null) {
       return this.get('navigationState').changeRouteAspectOptions({
         workflowSchemaId,
+        workflowSchemaRevision,
         fillInputStores: null,
       }, true);
     },

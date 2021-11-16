@@ -10,6 +10,7 @@
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { parseInt, or, raw } from 'ember-awesome-macros';
 
 export default ContentOneproviderContainerBase.extend({
   classNames: ['content-spaces-automation'],
@@ -33,6 +34,14 @@ export default ContentOneproviderContainerBase.extend({
    * @type {ComputedProperty<String>}
    */
   workflowSchemaId: reads('navigationState.aspectOptions.workflowSchemaId'),
+
+  /**
+   * @type {ComputedProperty<number|null>}
+   */
+  workflowSchemaRevision: or(
+    parseInt('navigationState.aspectOptions.workflowSchemaRevision'),
+    raw(null)
+  ),
 
   /**
    * @type {ComputedProperty<String>}
