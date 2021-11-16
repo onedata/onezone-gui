@@ -68,7 +68,7 @@ export default Component.extend(GlobalActions, I18n, {
    * {
    *   atmLambda: Models.AtmLambda,
    *   revisionNumber: number,
-   *   stores: Array<Object>
+   *   definedStores: Array<Object>
    *   task: Object,
    *   onSuccess: Function,
    *   onFailure: Function,
@@ -524,7 +524,7 @@ export default Component.extend(GlobalActions, I18n, {
     }));
   },
 
-  runTaskDetailsProvider(mode, { stores, task }) {
+  runTaskDetailsProvider(mode, { definedStores, task }) {
     const {
       lambdaId: atmLambdaId,
       lambdaRevisionNumber: revisionNumber,
@@ -552,7 +552,7 @@ export default Component.extend(GlobalActions, I18n, {
       taskDetailsProviderData: EmberObject.create({
         atmLambda,
         revisionNumber,
-        stores,
+        definedStores,
         task,
         onSuccess: resolvePromise,
         onFailure: rejectPromise,

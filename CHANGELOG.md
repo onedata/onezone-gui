@@ -6,6 +6,11 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8348 Added support for generating file URLs on transfers view
+* VFS-8374 Fixed randomly failing test of content-atm-inventories-workflows component
+* VFS-7898 Added support for generating archive-files URLs in shares views and fixed file links in upload and harvester views
+* VFS-8326 Updated commons
+* VFS-8482 Added dedicated page for privacy policy content
 * VFS-7567 Added showing origin space in general shares sidebar
 * VFS-8038 Refactored build process to support faster builds on CI
 * VFS-8360 Fixed compatibility between Onezone GUI 21.02 and Oneprovider GUI 20.02 by moving shared properties caching to Oneprovider GUI

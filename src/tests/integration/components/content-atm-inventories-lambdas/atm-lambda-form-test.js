@@ -550,6 +550,17 @@ describe(
         expect(this.$('.entryName-field')).to.have.class('has-error');
       });
 
+      it('marks "result name" field as invalid when it contains reserved name "exception"',
+        async function () {
+          await renderCreate(this);
+          await addResult();
+
+          await fillIn('.entryName-field .form-control', 'exception');
+
+          expect(this.$('.entryName-field')).to.have.class('has-error');
+        }
+      );
+
       it('marks "result name" field as valid when it is not empty', async function () {
         await renderCreate(this);
         await addResult();

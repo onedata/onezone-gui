@@ -12,7 +12,7 @@
     customColumnSpecs=revisionCustomColumnSpecs
     revisionRegistry=atmLambda.revisionRegistry
     revisionActionsFactory=revisionActionsFactory
-    onRevisionClick=(if (eq mode "presentation") (action "clickRevision"))
+    onRevisionClick=(unless (eq mode "selection") (action "clickRevision"))
     onRevisionButtonClick=(action "clickRevisionButton")
   }}
   {{one-menu-toggle

@@ -6,11 +6,10 @@ import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { resolve } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
-import { Promise } from 'rsvp';
+import { Promise, resolve } from 'rsvp';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
 import $ from 'jquery';
@@ -130,6 +129,7 @@ describe('Integration | Component | content atm inventories workflows', function
         list: promiseArray(resolve(atmLambdas)),
       })),
       isLoaded: true,
+      save: resolve,
     }, {
       entityId: 'w0id',
       name: 'w0',
@@ -139,6 +139,7 @@ describe('Integration | Component | content atm inventories workflows', function
         list: promiseArray(resolve(atmLambdas)),
       })),
       isLoaded: true,
+      save: resolve,
     }];
     const atmInventory = {
       entityId: 'inv1',

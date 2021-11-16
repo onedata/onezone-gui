@@ -75,7 +75,7 @@ import websocketReconnectionModal from './components/websocket-reconnection-moda
 import fatalConnectionErrorModal from './components/fatal-connection-error-modal';
 import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
-import privacyPolicyModal from './components/privacy-policy-modal';
+import contentPrivacyPolicy from './components/content-privacy-policy';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
@@ -239,7 +239,7 @@ const translations = {
     fatalConnectionErrorModal,
     uploadPresenter,
     cookiesConsent,
-    privacyPolicyModal,
+    contentPrivacyPolicy,
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,

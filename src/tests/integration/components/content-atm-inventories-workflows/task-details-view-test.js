@@ -114,7 +114,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
         applyChangesSpy: sinon.stub().resolves(),
         atmLambda: _.cloneDeep(exampleAtmLambda),
         revisionNumber: 1,
-        stores: _.cloneDeep(exampleStores),
+        definedStores: _.cloneDeep(exampleStores),
       });
     });
 
@@ -189,7 +189,7 @@ async function render(testCase) {
     mode=mode
     atmLambda=atmLambda
     revisionNumber=revisionNumber
-    stores=stores
+    definedStores=definedStores
     task=task
     onBackSlide=backSlideSpy
     onCancel=cancelSpy
