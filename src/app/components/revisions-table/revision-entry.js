@@ -8,7 +8,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -27,12 +27,6 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.revisionsTable.revisionEntry',
-
-  /**
-   * @virtual
-   * @type {Array<RevisionsTableColumnSpec>}
-   */
-  customColumnSpecs: undefined,
 
   /**
    * @virtual
@@ -57,18 +51,6 @@ export default Component.extend(I18n, {
    * @type {(revisionNumber: Number) => void}
    */
   onClick: undefined,
-
-  /**
-   * @virtual
-   * @type {(revisionNumber: Number, colName: string) => void}
-   */
-  onButtonClick: undefined,
-
-  /**
-   * Set by customColumnsSetter.
-   * @type {ComputedProperty<Array<{ className: string, value: string }>>}
-   */
-  customColumns: undefined,
 
   /**
    * @type {Boolean}
@@ -112,59 +94,6 @@ export default Component.extend(I18n, {
     }
   ),
 
-  customColumnsSetter: observer('customColumnSpecs', function customColumnsSetter() {
-    const customColumnSpecs = this.get('customColumnSpecs') || [];
-    const sourceFieldNames = customColumnSpecs.mapBy('content.sourceFieldName').compact();
-    let customColumns;
-    if (customColumnSpecs.length) {
-      const observedProps =
-        sourceFieldNames.length ? [`revision.{${sourceFieldNames.join(',')}}`] : [];
-      customColumns = computed(...observedProps, function customColumns() {
-        const revision = this.get('revision');
-        return customColumnSpecs.map(({
-          name,
-          className: originalClassName,
-          content: {
-            type,
-            sourceFieldName,
-            fallbackValue,
-            buttonLabel,
-            buttonIcon,
-          },
-        }) => {
-          const col = {
-            name,
-            type,
-            className: name,
-          };
-          if (originalClassName) {
-            col.className += ` ${originalClassName}`;
-          }
-          if (type === 'text') {
-            let value = revision[sourceFieldName];
-            if (!value) {
-              value = fallbackValue;
-              col.className += ' no-value';
-            }
-            col.value = value;
-          } else {
-            col.buttonLabel = buttonLabel;
-            col.buttonIcon = buttonIcon;
-          }
-          return col;
-        });
-      });
-    } else {
-      customColumns = [];
-    }
-    this.set('customColumns', customColumns);
-  }),
-
-  init() {
-    this._super(...arguments);
-    this.customColumnsSetter();
-  },
-
   click(event) {
     const {
       onClick,
@@ -181,16 +110,6 @@ export default Component.extend(I18n, {
   actions: {
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
-    },
-    buttonClick(colName) {
-      const {
-        onButtonClick,
-        revisionNumber,
-      } = this.getProperties('onButtonClick', 'revisionNumber');
-
-      if (onButtonClick) {
-        onButtonClick(revisionNumber, colName);
-      }
     },
   },
 });

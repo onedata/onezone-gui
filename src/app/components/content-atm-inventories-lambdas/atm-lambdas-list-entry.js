@@ -190,7 +190,7 @@ export default Component.extend(I18n, {
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
     },
-    clickRevisionButton(revisionNumber) {
+    addToWorkflowSchema(revisionNumber) {
       const {
         onAddToAtmWorkflowSchema,
         atmLambda,

@@ -172,7 +172,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
           const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
 
           expect(addToAtmWorkflowSchemaSpy).to.not.be.called;
-          await click('.addToWorkflow button');
+          await click('.add-to-workflow-action-trigger');
 
           expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
             .and.to.be.calledWith(this.get('atmLambdas.1'), 1);

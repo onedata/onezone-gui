@@ -28,12 +28,21 @@
       </div>
     {{/if}}
   {{/content-atm-inventories-workflows/atm-workflow-schema-details-form}}
-  {{revisions-table
-    customColumnSpecs=revisionCustomColumnSpecs
+  {{#revisions-table
     revisionRegistry=atmWorkflowSchema.revisionRegistry
     revisionActionsFactory=revisionActionsFactory
+    customColumnsCount=1
     onRevisionClick=(action "clickRevision")
+    as |section data|
   }}
+    {{#if (eq section "header")}}
+      <th class="description-column filling-column">{{tt this "columns.description.title"}}</th>
+    {{else}}
+      <td class="description filling-column {{unless data.revision.description "no-value"}}">
+        {{or data.revision.description (tt this "columns.description.fallback")}}
+      </td>
+    {{/if}}
+  {{/revisions-table}}
   {{one-menu-toggle
     class=(concat-classes
       "workflow-actions-trigger clickable"

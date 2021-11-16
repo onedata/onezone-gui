@@ -8,8 +8,8 @@ export default {
       title: 'Summary',
       fallback: 'No summary.',
     },
-    addToWorkflow: {
-      buttonLabel: 'Add to workflow',
+    buttons: {
+      addToWorkflow: 'Add to workflow',
     },
   },
   showDetails: 'Show details...',

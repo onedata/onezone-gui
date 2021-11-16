@@ -14,28 +14,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { raw, or, sum } from 'ember-awesome-macros';
 
-/**
- * @typedef {Object} RevisionsTableColumnSpec
- * @property {String} name
- * @property {String} title
- * @property {String} className
- * @property {RevisionsTableColumnValueContent|RevisionsTableColumnButtonContent} content
- */
-
-/**
- * @typedef {Object} RevisionsTableColumnValueContent
- * @property {'text'} type
- * @property {String} sourceFieldName
- * @property {String} fallbackValue
- */
-
-/**
- * @typedef {Object} RevisionsTableColumnButtonContent
- * @property {'button'} type
- * @property {String} buttonText
- * @property {String} buttonIcon
- */
-
 export default Component.extend(I18n, {
   tagName: 'table',
   classNames: ['revisions-table', 'table', 'table-condensed'],
@@ -49,9 +27,9 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Array<RevisionsTableColumnSpec>}
+   * @type {number}
    */
-  customColumnSpecs: undefined,
+  customColumnsCount: 0,
 
   /**
    * @virtual
@@ -72,12 +50,6 @@ export default Component.extend(I18n, {
   onRevisionClick: undefined,
 
   /**
-   * @virtual
-   * @type {(revisionNumber: Number, colName: string) => void}
-   */
-  onRevisionButtonClick: undefined,
-
-  /**
    * @type {Boolean}
    */
   areRevNumsBetweenStableAndLatestExpanded: false,
@@ -90,7 +62,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Number>}
    */
-  columnsCount: sum(raw(4), 'customColumnSpecs.length'),
+  columnsCount: sum(raw(4), 'customColumnsCount'),
 
   /**
    * @type {ComputedProperty<Array<Number>>}
@@ -171,14 +143,6 @@ export default Component.extend(I18n, {
         sortedRevNums.slice(latestStableRevNumIdx + 1) : [];
     }
   ),
-
-  init() {
-    this._super(...arguments);
-
-    if (!this.get('customColumnSpecs')) {
-      this.set('customColumnSpecs', []);
-    }
-  },
 
   actions: {
     expandRevsBetweenStableAndLatest() {

@@ -55,47 +55,11 @@ describe('Integration | Component | revisions table/revision entry', function ()
   });
 
   it('shows custom columns', async function () {
-    this.setProperties({
-      customColumnSpecs: [{
-        name: 'name',
-        className: 'custom',
-        content: {
-          type: 'text',
-          sourceFieldName: 'name',
-          fallbackValue: 'Unnamed',
-        },
-      }, {
-        name: 'description',
-        content: {
-          type: 'text',
-          sourceFieldName: 'description',
-          fallbackValue: 'No description',
-        },
-      }, {
-        name: 'button',
-        content: {
-          type: 'button',
-          buttonLabel: 'Click me',
-          buttonIcon: 'space',
-        },
-      }],
-      revision: {
-        name: 'somename',
-        description: null,
-      },
-    });
+    this.set('revision', { description: 'abc' });
 
     await render(this);
-    const $name = this.$('.name');
-    const $description = this.$('.description');
-    const $button = this.$('.button');
-    expect($name.text().trim()).to.equal('somename');
-    expect($name).to.not.have.class('no-value');
-    expect($name).to.have.class('custom');
-    expect($description.text().trim()).to.equal('No description');
-    expect($description).to.have.class('no-value');
-    expect($button.find('button').text().trim()).to.equal('Click me');
-    expect($button.find('.one-icon')).to.have.class('oneicon-space');
+
+    expect(this.$('.description').text().trim()).to.equal('abc');
   });
 
   it('allows to choose from revision actions', async function () {
@@ -121,26 +85,6 @@ describe('Integration | Component | revisions table/revision entry', function ()
     expect($actions.text()).to.contain('testAction 3');
   });
 
-  it('triggers "onButtonClick" callback after custom column button click',
-    async function () {
-      const { onButtonClick } = this.setProperties({
-        onButtonClick: sinon.spy(),
-        revisionNumber: 2,
-        customColumnSpecs: [{
-          name: 'btn1',
-          content: {
-            type: 'button',
-          },
-        }],
-      });
-      await render(this);
-      expect(onButtonClick).not.to.be.called;
-
-      await click(`.${componentClass} .btn1 button`);
-
-      expect(onButtonClick).to.be.calledOnce.and.to.be.calledWith(2, 'btn1');
-    });
-
   it('triggers "onClick" callback after click', async function () {
     const { onClick } = this.setProperties({
       onClick: sinon.spy(),
@@ -163,34 +107,17 @@ describe('Integration | Component | revisions table/revision entry', function ()
 
       expect(onClick).not.to.be.called;
     });
-
-  it('does not trigger "onClick" callback custom column button click',
-    async function () {
-      const { onClick } = this.setProperties({
-        onClick: sinon.spy(),
-        customColumnSpecs: [{
-          name: 'btn1',
-          content: {
-            type: 'button',
-          },
-        }],
-      });
-      await render(this);
-
-      await click(`.${componentClass} .btn1 button`);
-
-      expect(onClick).not.to.be.called;
-    });
 });
 
 async function render(testCase) {
-  testCase.render(hbs `{{revisions-table/revision-entry
-    customColumnSpecs=customColumnSpecs
+  testCase.render(hbs `{{#revisions-table/revision-entry
     revisionNumber=revisionNumber
     revision=revision
     revisionActionsFactory=revisionActionsFactory
     onClick=onClick
-    onButtonClick=onButtonClick
-  }}`);
+    as |revision revisionNumber|
+  }}
+    <td class="description">{{revision.description}}</td>
+  {{/revisions-table/revision-entry}}`);
   await wait();
 }

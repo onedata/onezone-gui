@@ -2,9 +2,7 @@
   <tr>
     <th class="revision-number-column">{{tt this "column.revisionNumber"}}</th>
     <th class="state-column">{{tt this "column.state"}}</th>
-    {{#each customColumnSpecs as |columnSpec|}}
-      <th class="{{columnSpec.name}}-column {{columnSpec.className}}">{{columnSpec.title}}</th>
-    {{/each}}
+    {{yield "header"}}
     <th class="actions-column"></th>
   </tr>
 </thead>
@@ -14,26 +12,28 @@
     revisionActionsFactory=revisionActionsFactory
   }}
   {{#if (not-eq latestRevNum null)}}
-    {{revisions-table/revision-entry
-      customColumnSpecs=customColumnSpecs
+    {{#revisions-table/revision-entry
       revisionNumber=latestRevNum
       revision=(get revisionRegistry latestRevNum)
       revisionActionsFactory=revisionActionsFactory
       onClick=onRevisionClick
-      onButtonClick=onRevisionButtonClick
+      as |revision revisionNumber|
     }}
+      {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
+    {{/revisions-table/revision-entry}}
   {{/if}}
   {{#if revNumsBetweenStableAndLatest.length}}
     {{#if areRevNumsBetweenStableAndLatestExpanded}}
       {{#each revNumsBetweenStableAndLatest as |revNum|}}
-        {{revisions-table/revision-entry
-          customColumnSpecs=customColumnSpecs
+        {{#revisions-table/revision-entry
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
           onClick=onRevisionClick
-          onButtonClick=onRevisionButtonClick
+          as |revision revisionNumber|
         }}
+          {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
+        {{/revisions-table/revision-entry}}
       {{/each}}
     {{else}}
       {{revisions-table/revision-entries-expander
@@ -45,26 +45,28 @@
     {{/if}}
   {{/if}}
   {{#if (and (not-eq latestStableRevNum null) (not-eq latestStableRevNum latestRevNum))}}
-    {{revisions-table/revision-entry
-      customColumnSpecs=customColumnSpecs
+    {{#revisions-table/revision-entry
       revisionNumber=latestStableRevNum
       revision=(get revisionRegistry latestStableRevNum)
       revisionActionsFactory=revisionActionsFactory
       onClick=onRevisionClick
-      onButtonClick=onRevisionButtonClick
+      as |revision revisionNumber|
     }}
+      {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
+    {{/revisions-table/revision-entry}}
   {{/if}}
   {{#if revNumsBeforeStable.length}}
     {{#if areRevNumsBeforeStableExpanded}}
       {{#each revNumsBeforeStable as |revNum|}}
-        {{revisions-table/revision-entry
-          customColumnSpecs=customColumnSpecs
+        {{#revisions-table/revision-entry
           revisionNumber=revNum
           revision=(get revisionRegistry revNum)
           revisionActionsFactory=revisionActionsFactory
           onClick=onRevisionClick
-          onButtonClick=onRevisionButtonClick
+          as |revision revisionNumber|
         }}
+          {{yield "revision" (hash revision=revision revisionNumber=revisionNumber)}}
+        {{/revisions-table/revision-entry}}
       {{/each}}
     {{else}}
       {{revisions-table/revision-entries-expander
@@ -76,4 +78,3 @@
     {{/if}}
   {{/if}}
 </tbody>
-{{yield}}

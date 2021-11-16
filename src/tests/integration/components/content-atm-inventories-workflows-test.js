@@ -501,7 +501,7 @@ describe('Integration | Component | content atm inventories workflows', function
 
       expect(isSlideActive('lambdaSelector')).to.be.true;
       await click(
-        lambdaSelectorSlide.querySelectorAll('.addToWorkflow button')[1]
+        lambdaSelectorSlide.querySelectorAll('.add-to-workflow-action-trigger')[1]
       );
 
       expect(isSlideActive('taskDetails')).to.be.true;
@@ -546,7 +546,7 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(editorSlide.querySelector('.create-task-action-trigger'));
         await click(lambdaSelectorSlide.querySelector('.btn-all'));
         await click(
-          lambdaSelectorSlide.querySelectorAll('.addToWorkflow button')[2]
+          lambdaSelectorSlide.querySelectorAll('.add-to-workflow-action-trigger')[2]
         );
 
         expect(attachAtmLambdaToAtmInventoryStub).to.be.not.called;
@@ -601,7 +601,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const taskDetailsSlide = getSlide('taskDetails');
 
         await click(editorSlide.querySelector('.create-task-action-trigger'));
-        await click(lambdaSelectorSlide.querySelector('.addToWorkflow button'));
+        await click(lambdaSelectorSlide.querySelector('.add-to-workflow-action-trigger'));
         await click(taskDetailsSlide.querySelector('.content-back-link'));
 
         expect(isSlideActive('lambdaSelector')).to.be.true;
@@ -619,7 +619,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const taskDetailsSlide = getSlide('taskDetails');
 
         await click(editorSlide.querySelector('.create-task-action-trigger'));
-        await click(lambdaSelectorSlide.querySelector('.addToWorkflow button'));
+        await click(lambdaSelectorSlide.querySelector('.add-to-workflow-action-trigger'));
         await click(taskDetailsSlide.querySelector('.content-back-link'));
         await click(lambdaSelectorSlide.querySelector('.content-back-link'));
 
@@ -638,7 +638,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const taskDetailsSlide = getSlide('taskDetails');
 
         await click(editorSlide.querySelector('.create-task-action-trigger'));
-        await click(lambdaSelectorSlide.querySelector('.addToWorkflow button'));
+        await click(lambdaSelectorSlide.querySelector('.add-to-workflow-action-trigger'));
         await click(taskDetailsSlide.querySelector('.btn-cancel'));
 
         expect(isSlideActive('editor')).to.be.true;

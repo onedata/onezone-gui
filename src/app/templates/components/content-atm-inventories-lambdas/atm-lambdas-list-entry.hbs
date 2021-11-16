@@ -8,13 +8,41 @@
       <div class="lambda-summary">{{latestRevisionSummary}}</div>
     {{/if}}
   </div>
-  {{revisions-table
-    customColumnSpecs=revisionCustomColumnSpecs
+  {{#revisions-table
     revisionRegistry=atmLambda.revisionRegistry
     revisionActionsFactory=revisionActionsFactory
+    customColumnsCount=(if (eq mode "selection") 3 2)
     onRevisionClick=(unless (eq mode "selection") (action "clickRevision"))
-    onRevisionButtonClick=(action "clickRevisionButton")
+    as |section data|
   }}
+    {{#if (eq section "header")}}
+      <th class="name-column filling-column">{{tt this "columns.name.title"}}</th>
+      <th class="summary-column filling-column">{{tt this "columns.summary.title"}}</th>
+      {{#if (eq mode "selection")}}
+        <th></th>
+      {{/if}}
+    {{else}}
+      <td class="name filling-column {{unless data.revision.name "no-value"}}">
+        {{or data.revision.name (tt this "columns.name.fallback")}}
+      </td>
+      <td class="summary filling-column {{unless data.revision.summary "no-value"}}">
+        {{or data.revision.summary (tt this "columns.summary.fallback")}}
+      </td>
+      {{#if (eq mode "selection")}}
+        <td class="buttons">
+          {{#bs-button
+            type="default"
+            size="sm"
+            class="clickable add-to-workflow-action-trigger"
+            onClick=(action "addToWorkflowSchema" data.revisionNumber)
+          }}
+            {{one-icon icon="plus"}}
+            <span class="text">{{tt this "columns.buttons.addToWorkflow"}}</span>
+          {{/bs-button}}
+        </td>
+      {{/if}}
+    {{/if}}
+  {{/revisions-table}}
   {{one-menu-toggle
     class=(concat-classes
       "atm-lambda-actions-trigger clickable"
