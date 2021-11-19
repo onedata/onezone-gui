@@ -12,7 +12,7 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
-import { conditional } from 'ember-awesome-macros';
+import { conditional, eq, raw } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
 import { reads } from '@ember/object/computed';
@@ -102,6 +102,20 @@ const CreateRevisionAction = Action.extend({
   ),
 
   /**
+   * @override
+   */
+  disabled: reads('isOriginRevisionOnedataFunction'),
+
+  /**
+   * @override
+   */
+  tip: conditional(
+    'isOriginRevisionOnedataFunction',
+    computedT('disabledTip.onedataFunction'),
+    raw(null)
+  ),
+
+  /**
    * @type {ComputedProperty<Models.AtmLambda>}
    */
   atmLambda: reads('context.atmLambda'),
@@ -134,6 +148,24 @@ const CreateRevisionAction = Action.extend({
         return sortedRevisionNumbers[sortedRevisionNumbers.length - 1];
       }
     }
+  ),
+
+  /**
+   * @type {ComputedProperty<AtmLambdaRevision>}
+   */
+  originRevision: computed(
+    'atmLambda.revisionRegistry',
+    'normalizedOriginRevisionNumber',
+    function originRevision() {
+      const revisionRegistry = this.get('atmLambda.revisionRegistry') || {};
+      const normalizedOriginRevisionNumber = this.get('normalizedOriginRevisionNumber');
+      return revisionRegistry[normalizedOriginRevisionNumber] || null;
+    }
+  ),
+
+  isOriginRevisionOnedataFunction: eq(
+    'originRevision.operationSpec.engine',
+    raw('onedataFunction')
   ),
 
   /**

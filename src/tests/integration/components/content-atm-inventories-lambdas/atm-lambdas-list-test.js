@@ -13,6 +13,7 @@ import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import OneTooltipHelper from '../../../helpers/one-tooltip';
 
 const lambdaPresentationActionsSpec = [{
   className: 'unlink-atm-lambda-action-trigger',
@@ -22,6 +23,12 @@ const lambdaPresentationActionsSpec = [{
   className: 'copy-record-id-action-trigger',
   label: 'Copy ID',
   icon: 'copy',
+}];
+
+const revisionActionsSpec = [{
+  className: 'create-atm-lambda-revision-action-trigger',
+  label: 'Redesign as new revision',
+  icon: 'plus',
 }];
 
 const lambdaSelectionActionsSpec = [lambdaPresentationActionsSpec[1]];
@@ -91,6 +98,7 @@ describe(
         collection,
         allCollection,
         lambdaRevisionClickedSpy: sinon.spy(),
+        onRevisionCreate: sinon.spy(),
         atmInventory: {
           name: 'inv1',
           atmWorkflowSchemaList: promiseObject(resolve({
@@ -240,6 +248,88 @@ describe(
         expect(executeStub).to.be.calledOnce;
       });
 
+      it('allows creating new revision', async function () {
+        const onRevisionCreate = this.get('onRevisionCreate');
+        await render(this);
+        expect(onRevisionCreate).to.not.be.called;
+
+        await click(this.$(
+          '.atm-lambdas-list-entry .revisions-table-create-revision-entry'
+        )[1]);
+
+        expect(onRevisionCreate).to.be.calledOnce
+          .and.to.be.calledWith(this.get('collection.0'), 1);
+      });
+
+      it('blocks creating new revision when lambda is onedataFunction',
+        async function () {
+          const onRevisionCreate = this.get('onRevisionCreate');
+          await render(this);
+          const actionTrigger = this.$(
+            '.atm-lambdas-list-entry .revisions-table-create-revision-entry'
+          )[0];
+
+          await click(actionTrigger);
+          expect(onRevisionCreate).to.be.not.called;
+
+          const tooltipHelper =
+            new OneTooltipHelper(actionTrigger.querySelector('.action-title'));
+          expect(await tooltipHelper.getText()).to.equal(
+            'Creating new revision of a lambda with engine "Onedata function" is not allowed.'
+          );
+        });
+
+      it('allows choosing from lambda revision actions', async function () {
+        await render(this);
+
+        const $actionsTrigger = this.$('.revision-actions-trigger');
+        expect($actionsTrigger).to.exist;
+
+        await click($actionsTrigger[0]);
+
+        const $actions = $('body .webui-popover.in .actions-popover-content a');
+        expect($actions).to.have.length(revisionActionsSpec.length);
+        revisionActionsSpec.forEach(({ className, label, icon }, index) => {
+          const $action = $actions.eq(index);
+          expect($action).to.have.class(className);
+          expect($action.text().trim()).to.equal(label);
+          expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+        });
+      });
+
+      it('allows redesigning lambda revision as new revision', async function () {
+        const secondLambda = this.get('collection.0');
+        const onRevisionCreate = this.get('onRevisionCreate');
+        await render(this);
+        const $lambdas = this.$('.atm-lambdas-list-entry');
+        const $secondLambda = $lambdas.eq(1);
+
+        await click($secondLambda.find('.revision-actions-trigger')[0]);
+        await click(
+          $('body .webui-popover.in .create-atm-lambda-revision-action-trigger')[0]
+        );
+
+        expect(onRevisionCreate).to.be.calledOnce
+          .and.to.be.calledWith(secondLambda, 1);
+      });
+
+      it('blocks redesigning lambda revision as new revision when lambda is onedataFunction',
+        async function () {
+          await render(this);
+          const $lambdas = this.$('.atm-lambdas-list-entry');
+          const $firstLambda = $lambdas.eq(0);
+
+          await click($firstLambda.find('.revision-actions-trigger')[0]);
+          const $actionTrigger = $(
+            'body .webui-popover.in .create-atm-lambda-revision-action-trigger'
+          );
+          expect($actionTrigger.parent()).to.have.class('disabled');
+          const tooltipHelper = new OneTooltipHelper($actionTrigger[0]);
+          expect(await tooltipHelper.getText()).to.equal(
+            'Creating new revision of a lambda with engine "Onedata function" is not allowed.'
+          );
+        });
+
       it('does not have "add to workflow" button', async function () {
         await render(this);
 
@@ -352,6 +442,7 @@ async function render(testCase) {
     mode=mode
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
     onRevisionClick=lambdaRevisionClickedSpy
+    onRevisionCreate=onRevisionCreate
   }}`);
   await wait();
 }

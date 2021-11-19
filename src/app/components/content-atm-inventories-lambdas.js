@@ -13,7 +13,6 @@ import { or, raw, promise } from 'ember-awesome-macros';
 import { computed, observer, get } from '@ember/object';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { scheduleOnce } from '@ember/runloop';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 
 export default Component.extend(GlobalActions, {
   classNames: ['content-atm-inventories-lambdas'],
@@ -59,17 +58,6 @@ export default Component.extend(GlobalActions, {
    * @type {Boolean}
    */
   isCarouselVisible: false,
-
-  /**
-   * @type {LambdaEditorViewModificationState}
-   */
-  editorModificationState: undefined,
-
-  /**
-   * If true, then there is "unsaved changes" modal visible
-   * @type {Boolean}
-   */
-  isAskingUserForUnsavedChanges: false,
 
   /**
    * @type {String}
@@ -224,7 +212,7 @@ export default Component.extend(GlobalActions, {
     scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
   },
 
-  async synchronizeStateWithUrl() {
+  synchronizeStateWithUrl() {
     const {
       defaultSlideId,
       activeSlide,
@@ -278,36 +266,6 @@ export default Component.extend(GlobalActions, {
       nextActiveSlide = defaultSlideId;
     }
 
-    // Detect if some lambda changes are unsaved and take care of them.
-    const editorGetsTurnedOff = activeSlide === 'editor' && nextActiveSlide !== 'editor';
-    const willUpdateClearUnsavedChanges = activeAtmLambdaId &&
-      (editorGetsTurnedOff || isActiveAtmLambdaIdChanged());
-    if (
-      willUpdateClearUnsavedChanges &&
-      this.shouldBlockTransitionDueToUnsavedChanges()
-    ) {
-      const userDecision = await this.askUserAndProcessUnsavedChanges();
-      switch (userDecision) {
-        case 'keepEditing':
-          // User wants to stay in current state.
-          // Reset url params back to represent actual state of the component
-          this.setUrlParams({
-            view: activeSlide,
-            lambdaId: activeAtmLambdaId,
-            revision: activeRevisionNumber === null ?
-              activeRevisionNumber : String(activeRevisionNumber),
-          }, true);
-
-          // Nothing more to do - user has chosen to abort the transiton.
-          return;
-        case 'alreadyAsked':
-          // User triggered next url change when the previous one has not been
-          // commited yet. We have to wait for the first one and ignore current
-          // change.
-          return;
-      }
-    }
-
     // Perform update of component properties
     const propsToUpdate = {};
     if (isActiveSlideChanged()) {
@@ -330,12 +288,10 @@ export default Component.extend(GlobalActions, {
 
     // If url params values are different than used by the component,
     // then url params should be redefined to ensure values consistency.
-    // Using this.get to retrieve the most recent values, as these could change
-    // while asking user what to do with changes.
     if (
-      nextActiveSlide !== this.get('activeSlideFromUrl') ||
-      nextActiveAtmLambdaId !== this.get('activeAtmLambdaIdFromUrl') ||
-      String(nextRevisionNumber) !== String(this.get('activeRevisionNumberFromUrl'))
+      nextActiveSlide !== activeSlideFromUrl ||
+      nextActiveAtmLambdaId !== activeAtmLambdaIdFromUrl ||
+      String(nextRevisionNumber) !== String(activeRevisionNumberFromUrl)
     ) {
       this.setUrlParams({
         view: nextActiveSlide,
@@ -344,59 +300,6 @@ export default Component.extend(GlobalActions, {
           nextRevisionNumber : String(nextRevisionNumber),
       }, true);
     }
-  },
-
-  shouldBlockTransitionDueToUnsavedChanges() {
-    const isModified = this.get('editorModificationState.isModified');
-    const isActiveAtmLambdaProxyFulfilled =
-      this.cacheFor('isActiveAtmLambdaProxyFulfilled') &&
-      this.get('isActiveAtmLambdaProxyFulfilled.isFulfilled');
-
-    return isModified &&
-      this.get('activeSlide') === 'editor' &&
-      isActiveAtmLambdaProxyFulfilled;
-  },
-
-  /**
-   * @returns {Promise<String>} one of: `'ignore'`, `'save'`, `'keepEditing'`,
-   * `'alreadyAsked'`
-   */
-  async askUserAndProcessUnsavedChanges() {
-    if (this.get('isAskingUserForUnsavedChanges')) {
-      // User is already in the middle of choosing what to do. It means, that
-      // there was some uncommited url/route change earlier, which needs to
-      // be resolved at the first place.
-      return 'alreadyAsked';
-    }
-    this.set('isAskingUserForUnsavedChanges', true);
-    const executeSaveAction =
-      this.get('editorModificationState.executeSaveAction');
-
-    let decision = 'keepEditing';
-    await this.get('modalManager').show('unsaved-changes-question-modal', {
-      onSubmit: async ({ shouldSaveChanges }) => {
-        if (shouldSaveChanges && executeSaveAction) {
-          const saveResult = await executeSaveAction();
-          if (saveResult && get(saveResult, 'status') === 'failed') {
-            // In case of failure `executeSaveAction` should show proper error
-            // notification. After fail user should stay in editor view and
-            // decide what to do next. Hence `decision` is `'keepEditing'`.
-            return;
-          }
-          decision = 'save';
-        } else {
-          decision = 'ignore';
-        }
-      },
-    }).hiddenPromise;
-    safeExec(this, () => {
-      this.set('isAskingUserForUnsavedChanges', false);
-      if (decision !== 'keepEditing') {
-        this.set('editorModificationState.isModified', false);
-      }
-    });
-
-    return decision;
   },
 
   setUrlParams(params, replaceHistory = false) {
@@ -471,9 +374,6 @@ export default Component.extend(GlobalActions, {
           [slideId]: actions,
         }));
       });
-    },
-    editorModificationStateChange(editorModificationState) {
-      this.set('editorModificationState', editorModificationState);
     },
   },
 });

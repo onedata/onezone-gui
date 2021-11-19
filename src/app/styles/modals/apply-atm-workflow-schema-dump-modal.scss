@@ -56,6 +56,11 @@
   .detail-value {
     margin-left: 0.25em;
     flex-grow: 1;
+
+    &.unknown {
+      font-style: italic;
+      color: $main-text-color-disabled;
+    }
   }
 
   .one-way-radio-group {
