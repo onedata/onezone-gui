@@ -42,11 +42,11 @@
   .atm-workflow-schema-details-form {
     grid-area: details;
     min-width: 0;
+    padding-bottom: 1em;
   }
 
   .revisions-table {
     grid-area: revisions;
-    margin-top: 1em;
   }
 
   .name-field.field-view-mode {
