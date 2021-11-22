@@ -214,13 +214,13 @@ describe('Integration | Component | content atm inventories lambdas', function (
       await render(this);
 
       await click(
-        getSlide('list').querySelector('.revisions-table-create-revision-entry')
+        getSlide('list').querySelectorAll('.revisions-table-create-revision-entry')[1]
       );
 
       expect(isSlideActive('editor')).to.be.true;
       expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-        .to.deep.equal({ view: 'creator', lambdaId: 'lambda0', revision: '1' });
+        .to.deep.equal({ view: 'creator', lambdaId: 'lambda1', revision: '1' });
       done();
     });
 
@@ -229,7 +229,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
         await render(this);
 
         await click(
-          getSlide('list').querySelector('.revision-actions-trigger')
+          getSlide('list').querySelectorAll('.revision-actions-trigger')[1]
         );
         await click($(
           'body .webui-popover.in .create-atm-lambda-revision-action-trigger'
@@ -238,7 +238,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-          .to.deep.equal({ view: 'creator', lambdaId: 'lambda0', revision: '1' });
+          .to.deep.equal({ view: 'creator', lambdaId: 'lambda1', revision: '1' });
         done();
       });
   });

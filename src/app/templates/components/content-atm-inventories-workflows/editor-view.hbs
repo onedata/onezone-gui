@@ -4,7 +4,12 @@
       {{record-icon modelName="atmWorkflowSchema" class="content-back-resource-icon"}}
       {{one-icon icon="arrow-left" class="content-back-arrow-icon"}}
     </a>
-    <span class="resource-name">{{atmWorkflowSchema.name}}</span>
+    <div class="resource-name">
+      {{atmWorkflowSchema.name}}
+      <small class="revision-number">
+        {{tt this "header.revisionNumber" revisionNumber=revisionNumber}}
+      </small>
+    </div>
     <div class="btn-toolbar">
       <span>
         {{#bs-button

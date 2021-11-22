@@ -179,7 +179,7 @@ describe(
         await render(this);
 
         expect(this.$('.header-row h1').text().trim())
-          .to.equal('Modify lambda revision');
+          .to.contain('Modify lambda revision');
         done();
       });
 
