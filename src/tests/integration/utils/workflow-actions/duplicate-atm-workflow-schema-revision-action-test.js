@@ -9,11 +9,10 @@ import wait from 'ember-test-helpers/wait';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, reject } from 'rsvp';
-import { click, fillIn, triggerEvent } from 'ember-native-dom-helpers';
+import { click, fillIn } from 'ember-native-dom-helpers';
 import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-atm-workflow-schema-dump';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
-import $ from 'jquery';
 
 const atmInventoryId = 'invid';
 
@@ -218,15 +217,3 @@ describe(
     );
   }
 );
-
-export async function triggerUploadInputChange(filename, fileContent) {
-  const uploadInputElement = $('.upload-atm-workflow-schema-action-input')[0];
-  const fileContentBlob = new Blob([fileContent], {
-    type: 'application/json',
-  });
-  const file = new File([fileContentBlob], filename, { type: 'application/json' });
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(file);
-  uploadInputElement.files = dataTransfer.files;
-  await triggerEvent(uploadInputElement, 'change');
-}

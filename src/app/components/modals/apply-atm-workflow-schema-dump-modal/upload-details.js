@@ -1,3 +1,12 @@
+/**
+ * Shows information about uploaded dump file.
+ *
+ * @module components/modals/apply-atm-workflow-schema-dump/upload-details
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

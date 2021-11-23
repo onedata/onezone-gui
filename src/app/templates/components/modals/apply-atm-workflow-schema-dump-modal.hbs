@@ -9,44 +9,44 @@
   {{/modal.header}}
 
   {{#modal.body}}
-      {{#if (eq dumpSourceType "upload")}}
-        {{modals/apply-atm-workflow-schema-dump-modal/upload-details
-          class="modal-section"
-          dumpSource=dumpSource
-          onReupload=onReupload
-          isDisabled=isSubmitting
-        }}
-      {{/if}}
-      {{modals/apply-atm-workflow-schema-dump-modal/dump-details
+    {{#if (eq dumpSourceType "upload")}}
+      {{modals/apply-atm-workflow-schema-dump-modal/upload-details
         class="modal-section"
-        dump=dump
+        dumpSource=dumpSource
+        onReupload=onReupload
+        isDisabled=isSubmitting
       }}
-      {{#if dump}}
-        {{#promise-proxy-container proxy=targetAtmInventoriesProxy}}
-          {{#if (eq dumpSourceType "duplication")}}
-            {{modals/apply-atm-workflow-schema-dump-modal/inventory-selector
-              class="modal-section"
-              atmInventories=targetAtmInventoriesProxy
-              selectedAtmInventory=selectedTargetAtmInventory
-              onChange=(action "targetAtmInventoryChanged")
-              isDisabled=isSubmitting
-            }}
-          {{/if}}
-          {{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
-            {{modals/apply-atm-workflow-schema-dump-modal/operation-form
-              class="modal-section"
-              dump=dump
-              dumpSourceType=dumpSourceType
-              targetWorkflows=targetWorkflows
-              selectedOperation=selectedOperation
-              selectedTargetWorkflow=selectedTargetWorkflow
-              newWorkflowName=newWorkflowName
-              onValueChange=(action "operationValueChanged")
-              isDisabled=isSubmitting
-            }}
-          {{/promise-proxy-container}}
+    {{/if}}
+    {{modals/apply-atm-workflow-schema-dump-modal/dump-details
+      class="modal-section"
+      dump=dump
+    }}
+    {{#if dump}}
+      {{#promise-proxy-container proxy=targetAtmInventoriesProxy}}
+        {{#if (eq dumpSourceType "duplication")}}
+          {{modals/apply-atm-workflow-schema-dump-modal/inventory-selector
+            class="modal-section"
+            atmInventories=targetAtmInventoriesProxy
+            selectedAtmInventory=selectedTargetAtmInventory
+            onChange=(action "targetAtmInventoryChanged")
+            isDisabled=isSubmitting
+          }}
+        {{/if}}
+        {{#promise-proxy-container proxy=atmWorkflowSchemasProxy}}
+          {{modals/apply-atm-workflow-schema-dump-modal/operation-form
+            class="modal-section"
+            dump=dump
+            dumpSourceType=dumpSourceType
+            targetWorkflows=targetWorkflows
+            selectedOperation=selectedOperation
+            selectedTargetWorkflow=selectedTargetWorkflow
+            newWorkflowName=newWorkflowName
+            onValueChange=(action "operationValueChanged")
+            isDisabled=isSubmitting
+          }}
         {{/promise-proxy-container}}
-      {{/if}}
+      {{/promise-proxy-container}}
+    {{/if}}
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}

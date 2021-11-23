@@ -150,14 +150,12 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
 
 const DumpLoader = EmberObject.extend({
   /**
-   * @private
    * @virtual
    * @type {() => void}
    */
   onExternalUpload: undefined,
 
   /**
-   * @private
    * @virtual
    * @type {Window}
    */

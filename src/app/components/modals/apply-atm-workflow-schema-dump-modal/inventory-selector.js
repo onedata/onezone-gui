@@ -1,3 +1,12 @@
+/**
+ * Allows to choose dump application target automation inventory.
+ *
+ * @module components/modals/apply-atm-workflow-schema-dump/inventory-selector
+ * @author Michał Borzęcki
+ * @copyright (C) 2021 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import { computed, get } from '@ember/object';

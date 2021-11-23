@@ -94,13 +94,13 @@ export default Component.extend(I18n, {
 
   /**
    * The same as `visualiserData`, but without modifications.
-   * @type {Object}-flex
+   * @type {Object}
    */
   unchangedVisualiserData: undefined,
 
   /**
    * The same as `detailsData`, but without modifications.
-   * @type {Object}-flex
+   * @type {Object}
    */
   unchangedDetailsData: undefined,
 
