@@ -76,6 +76,14 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    */
   selected: computedAspectOptionsArray('selected'),
 
+  /**
+   * List of archive or file entity ids that are selected
+   *
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selectedSecondary: computedAspectOptionsArray('selectedSecondary'),
+
   datasetDeferred: computed('datasetId', function datasetDeferred() {
     return defer();
   }),

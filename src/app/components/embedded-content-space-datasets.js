@@ -1,6 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-space-datasets`.
- * 
+ *
  * @module components/embedded-content-space-datasets
  * @author Jakub Liput
  * @copyright (C) 2021 ACK CYFRONET AGH
@@ -22,7 +22,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   /**
    * Entity ID of space for which datasets browser is displayed.
-   * 
+   *
    * **Injected to embedded iframe.**
    * @virtual
    * @type {string}
@@ -69,6 +69,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   dirId: undefined,
 
   /**
+   * Seletected item IDs (datasets) for "upper" browser.
    * **Injected to embedded iframe.**
    * @virtual
    * @type {Array<String>}
@@ -76,8 +77,16 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   selected: undefined,
 
   /**
+   * Seletected item IDs (archives or files) for "bottom" browser.
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {Array<String>}
+   */
+  selectedSecondary: undefined,
+
+  /**
    * Dataset state tree to show. One of: attached, detached.
-   * 
+   *
    * **Injected to embedded iframe.**
    * @type {String}
    */
@@ -103,7 +112,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'archiveId',
     'dirId',
     'selected',
+    'selectedSecondary',
     'attachmentState',
+    // FIXME: deprecated
     'viewMode',
   ]),
 
@@ -115,8 +126,12 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateArchiveId',
     'updateDirId',
     'updateSelected',
+    'updateSecondarySelected',
+    // FIXME: deprecated
     'updateViewMode',
+    // FIXME: deprecated
     'updateDatasetData',
+    // FIXME: deprecated
     'updateArchiveData',
     'getDataUrl',
     'getDatasetsUrl',
@@ -150,6 +165,12 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         selected: Array.isArray(selected) ? selected.join(',') : selected || null,
       });
     },
+    updateSecondarySelected(selectedSecondary) {
+      this.get('navigationState').changeRouteAspectOptions({
+        selectedSecondary: Array.isArray(selectedSecondary) ?
+          selectedSecondary.join(',') : selectedSecondary || null,
+      });
+    },
     updateViewMode(viewMode) {
       this.get('navigationState').changeRouteAspectOptions({
         viewMode,
@@ -160,7 +181,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * Sets value of dataset property.
      * Due to lack of dataset model in Onezone it is provided by Oneprovider
      * in an iframe.
-     * @param {Object} dataset 
+     * @param {Object} dataset
      */
     updateDatasetData(dataset) {
       this.get('onUpdateDatasetData')(dataset);
@@ -170,7 +191,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
      * Sets value of archive property.
      * Due to lack of archive model in Onezone it is provided by Oneprovider
      * in an iframe.
-     * @param {Object} archive 
+     * @param {Object} archive
      */
     updateArchiveData(archive) {
       this.get('onUpdateArchiveData')(archive);
