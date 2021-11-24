@@ -28,6 +28,7 @@ describe('Integration | Component | content atm inventories workflows', function
           1: {
             name: 'f1',
             summary: 'f1 summary',
+            preferredBatchSize: 100,
             operationSpec: {
               engine: 'openfaas',
               dockerImage: 'f1Image',
@@ -43,7 +44,6 @@ describe('Integration | Component | content atm inventories workflows', function
                 valueConstraints: {},
               },
               isOptional: true,
-              isBatch: false,
             }],
             resultSpecs: [],
           },

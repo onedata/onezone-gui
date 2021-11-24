@@ -22,6 +22,7 @@ export default function formDataToRecord(formData) {
     summary,
     engine,
     openfaasOptions,
+    preferredBatchSize,
     arguments: formArguments,
     results: formResults,
     resources,
@@ -32,6 +33,7 @@ export default function formDataToRecord(formData) {
     'summary',
     'engine',
     'openfaasOptions',
+    'preferredBatchSize',
     'arguments',
     'results',
     'resources'
@@ -86,6 +88,7 @@ export default function formDataToRecord(formData) {
     summary,
     description: '',
     operationSpec,
+    preferredBatchSize: Number.parseInt(preferredBatchSize) || 1,
     argumentSpecs: lambdaArguments,
     resultSpecs: lambdaResults,
     resourceSpec,
@@ -103,14 +106,12 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     const {
       entryName,
       entryType,
-      entryBatch,
       entryOptional,
       entryDefaultValue,
     } = getProperties(
       get(formArgRes, valueName) || {},
       'entryName',
       'entryType',
-      'entryBatch',
       'entryOptional',
       'entryDefaultValue'
     );
@@ -119,7 +120,6 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     const lambdaData = {
       name: entryName,
       dataSpec,
-      isBatch: entryBatch,
     };
     if (dataType === 'argument') {
       if (dataSpec &&

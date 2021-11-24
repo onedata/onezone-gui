@@ -41,6 +41,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
             engine: 'onedataFunction',
             functionId: 'f0Function',
           },
+          preferredBatchSize: 100,
           argumentSpecs: [],
           resultSpecs: [],
           resourceSpec: {
@@ -68,6 +69,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
               mountOneclient: false,
             },
           },
+          preferredBatchSize: 100,
           argumentSpecs: [],
           resultSpecs: [],
           resourceSpec: {

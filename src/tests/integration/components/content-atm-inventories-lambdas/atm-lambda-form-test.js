@@ -170,21 +170,23 @@ describe(
       });
     });
 
-    it('has class "atm-lambda-form"', async function () {
+    it('has class "atm-lambda-form"', async function (done) {
       this.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
 
       expect(this.$().children()).to.have.class('atm-lambda-form')
         .and.to.have.length(1);
+      done();
     });
 
     context('in "create" mode', function () {
-      it('has class "mode-create"', async function () {
+      it('has class "mode-create"', async function (done) {
         await renderCreate(this);
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-create');
+        done();
       });
 
-      it('renders empty "name" field', async function () {
+      it('renders empty "name" field', async function (done) {
         await renderCreate(this);
 
         const $label = this.$('.name-field .control-label');
@@ -192,35 +194,39 @@ describe(
         expect($label.text().trim()).to.equal('Name:');
         expect($field).to.have.attr('type', 'text');
         expect($field).to.have.value('');
+        done();
       });
 
-      it('marks "name" field as invalid when it is empty', async function () {
+      it('marks "name" field as invalid when it is empty', async function (done) {
         await renderCreate(this);
 
         await focus('.name-field .form-control');
         await blur('.name-field .form-control');
 
         expect(this.$('.name-field')).to.have.class('has-error');
+        done();
       });
 
-      it('marks "name" field as valid when it is not empty', async function () {
+      it('marks "name" field as valid when it is not empty', async function (done) {
         await renderCreate(this);
 
         await fillIn('.name-field .form-control', 'somename');
 
         expect(this.$('.name-field')).to.have.class('has-success');
+        done();
       });
 
-      it('renders "state" field with preselected "draft" option', async function () {
+      it('renders "state" field with preselected "draft" option', async function (done) {
         await renderCreate(this);
 
         const $label = this.$('.state-field .control-label');
         const $field = this.$('.state-field .dropdown-field-trigger');
         expect($label.text().trim()).to.equal('State:');
         expect($field.text().trim()).to.equal('Draft');
+        done();
       });
 
-      it('allows to choose different state for "state" field', async function () {
+      it('allows to choose different state for "state" field', async function (done) {
         await renderCreate(this);
 
         await clickTrigger('.state-field');
@@ -230,9 +236,10 @@ describe(
         states.forEach(({ label }, idx) =>
           expect($options.eq(idx).text().trim()).to.equal(label)
         );
+        done();
       });
 
-      it('renders empty "summary" field', async function () {
+      it('renders empty "summary" field', async function (done) {
         await renderCreate(this);
 
         const $label = this.$('.summary-field .control-label');
@@ -240,27 +247,31 @@ describe(
         expect($label.text().trim()).to.equal('Summary (optional):');
         expect($field).to.have.attr('type', 'text');
         expect($field).to.have.value('');
+        done();
       });
 
-      it('marks "summary" field as valid when it is empty', async function () {
+      it('marks "summary" field as valid when it is empty', async function (done) {
         await renderCreate(this);
 
         await focus('.summary-field .form-control');
         await blur('.summary-field .form-control');
 
         expect(this.$('.summary-field')).to.have.class('has-success');
+        done();
       });
 
-      it('renders "engine" field with preselected "openfaas" option', async function () {
-        await renderCreate(this);
+      it('renders "engine" field with preselected "openfaas" option',
+        async function (done) {
+          await renderCreate(this);
 
-        const $label = this.$('.engine-field .control-label');
-        const $field = this.$('.engine-field .dropdown-field-trigger');
-        expect($label.text().trim()).to.equal('Engine:');
-        expect($field.text().trim()).to.equal('OpenFaaS');
-      });
+          const $label = this.$('.engine-field .control-label');
+          const $field = this.$('.engine-field .dropdown-field-trigger');
+          expect($label.text().trim()).to.equal('Engine:');
+          expect($field.text().trim()).to.equal('OpenFaaS');
+          done();
+        });
 
-      it('provides only "openfass" option for "engine" field', async function () {
+      it('provides only "openfass" option for "engine" field', async function (done) {
         await renderCreate(this);
 
         await clickTrigger('.engine-field');
@@ -268,17 +279,19 @@ describe(
         const $options = $('.ember-power-select-option');
         expect($options).to.have.length(1);
         expect($options.eq(0).text().trim()).to.equal('OpenFaaS');
+        done();
       });
 
       context('when selected engine is "openfaas"', function () {
-        it('shows only openfaas-related fields', async function () {
+        it('shows only openfaas-related fields', async function (done) {
           await renderCreate(this);
 
           expect(this.$('.openfaasOptions-collapse')).to.have.class('in');
           expect(this.$('.onedataFunctionOptions-collapse')).to.not.have.class('in');
+          done();
         });
 
-        it('renders empty "docker image" field', async function () {
+        it('renders empty "docker image" field', async function (done) {
           await renderCreate(this);
 
           const $label = this.$('.dockerImage-field .control-label');
@@ -286,55 +299,63 @@ describe(
           expect($label.text().trim()).to.equal('Docker image:');
           expect($field).to.have.attr('type', 'text');
           expect($field).to.have.value('');
+          done();
         });
 
-        it('marks "docker image" field as invalid when it is empty', async function () {
-          await renderCreate(this);
+        it('marks "docker image" field as invalid when it is empty',
+          async function (done) {
+            await renderCreate(this);
 
-          await focus('.dockerImage-field .form-control');
-          await blur('.dockerImage-field .form-control');
+            await focus('.dockerImage-field .form-control');
+            await blur('.dockerImage-field .form-control');
 
-          expect(this.$('.dockerImage-field')).to.have.class('has-error');
-        });
+            expect(this.$('.dockerImage-field')).to.have.class('has-error');
+            done();
+          });
 
-        it('marks "docker image" field as valid when it is not empty', async function () {
-          await renderCreate(this);
+        it('marks "docker image" field as valid when it is not empty',
+          async function (done) {
+            await renderCreate(this);
 
-          await fillIn('.dockerImage-field .form-control', 'somename');
+            await fillIn('.dockerImage-field .form-control', 'somename');
 
-          expect(this.$('.dockerImage-field')).to.have.class('has-success');
-        });
+            expect(this.$('.dockerImage-field')).to.have.class('has-success');
+            done();
+          });
 
-        it('renders checked "readonly" toggle', async function () {
+        it('renders checked "readonly" toggle', async function (done) {
           await renderCreate(this);
 
           const $label = this.$('.readonly-field .control-label');
           const $field = this.$('.readonly-field .form-control');
           expect($label.text().trim()).to.equal('Read-only:');
           expect($field).to.have.class('checked');
+          done();
         });
 
-        it('renders checked "mount space" toggle', async function () {
+        it('renders checked "mount space" toggle', async function (done) {
           await renderCreate(this);
 
           const $label = this.$('.mountSpace-field .control-label');
           const $field = this.$('.mountSpace-field .form-control');
           expect($label.text().trim()).to.equal('Mount space:');
           expect($field).to.have.class('checked');
+          done();
         });
 
         context('when "mount space" is checked', function () {
           it('renders expanded mount space options',
-            async function () {
+            async function (done) {
               await renderCreate(this);
 
               await toggleMountSpace(this, true);
 
               expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
+              done();
             });
 
           it('renders "mount point" field with "/mnt/onedata" as a default value',
-            async function () {
+            async function (done) {
               await renderCreate(this);
               await toggleMountSpace(this, true);
 
@@ -344,18 +365,21 @@ describe(
               expect($label.text().trim()).to.equal('Mount point:');
               expect($field).to.have.attr('type', 'text');
               expect($field).to.have.value('/mnt/onedata');
+              done();
             });
 
-          it('marks "mount point" field as invalid when it is empty', async function () {
-            await renderCreate(this);
-            await toggleMountSpace(this, true);
+          it('marks "mount point" field as invalid when it is empty',
+            async function (done) {
+              await renderCreate(this);
+              await toggleMountSpace(this, true);
 
-            await fillIn('.mountPoint-field .form-control', '');
+              await fillIn('.mountPoint-field .form-control', '');
 
-            expect(this.$('.mountPoint-field')).to.have.class('has-error');
-          });
+              expect(this.$('.mountPoint-field')).to.have.class('has-error');
+              done();
+            });
 
-          it('renders empty "oneclient options" field', async function () {
+          it('renders empty "oneclient options" field', async function (done) {
             await renderCreate(this);
             await toggleMountSpace(this, true);
 
@@ -365,32 +389,35 @@ describe(
             expect($label.text().trim()).to.equal('Oneclient options:');
             expect($field).to.have.attr('type', 'text');
             expect($field).to.have.value('');
+            done();
           });
 
           it('marks "oneclient options" field as valid when it is empty',
-            async function () {
+            async function (done) {
               await renderCreate(this);
 
               await focus('.oneclientOptions-field .form-control');
               await blur('.oneclientOptions-field .form-control');
 
               expect(this.$('.oneclientOptions-field')).to.have.class('has-success');
+              done();
             });
         });
 
         context('when "mount space" is unchecked', function () {
           it('renders collapsed mount space options',
-            async function () {
+            async function (done) {
               await renderCreate(this);
 
               await toggleMountSpace(this, false);
 
               expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+              done();
             });
         });
       });
 
-      it('renders "arguments" field with no argument defined', async function () {
+      it('renders "arguments" field with no argument defined', async function (done) {
         await renderCreate(this);
 
         const $label = this.$('.arguments-field .control-label');
@@ -399,9 +426,10 @@ describe(
         expect($label.text().trim()).to.equal('Arguments:');
         expect($entries).to.have.length(0);
         expect($addBtn.text().trim()).to.equal('Add argument');
+        done();
       });
 
-      it('allows to add new, empty argument', async function () {
+      it('allows to add new, empty argument', async function (done) {
         await renderCreate(this);
 
         await addArgument();
@@ -422,11 +450,6 @@ describe(
         expect($entryTypeLabel.text().trim()).to.equal('Type:');
         expect($entryTypeField.text().trim()).to.equal('Integer');
 
-        const $entryBatchLabel = $entry.find('.entryBatch-field .control-label');
-        const $entryBatchField = $entry.find('.entryBatch-field .form-control');
-        expect($entryBatchLabel.text().trim()).to.equal('Batch');
-        expect($entryBatchField).to.not.have.class('checked');
-
         const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
         const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
         expect($entryOptionalLabel.text().trim()).to.equal('Optional');
@@ -437,30 +460,35 @@ describe(
         expect($entryDefaultValueLabel.text().trim()).to.equal('Default value:');
         expect($entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
         expect($entryDefaultValueField).to.have.value('');
+        done();
       });
 
-      it('marks "argument name" field as invalid when it is empty', async function () {
-        await renderCreate(this);
-        await addArgument();
+      it('marks "argument name" field as invalid when it is empty',
+        async function (done) {
+          await renderCreate(this);
+          await addArgument();
 
-        await focus('.entryName-field .form-control');
-        await blur('.entryName-field .form-control');
+          await focus('.entryName-field .form-control');
+          await blur('.entryName-field .form-control');
 
-        expect(this.$('.entryName-field')).to.have.class('has-error');
-      });
+          expect(this.$('.entryName-field')).to.have.class('has-error');
+          done();
+        });
 
-      it('marks "argument name" field as valid when it is not empty', async function () {
-        await renderCreate(this);
-        await addArgument();
+      it('marks "argument name" field as valid when it is not empty',
+        async function (done) {
+          await renderCreate(this);
+          await addArgument();
 
-        await fillIn('.entryName-field .form-control', 'somename');
-        await wait();
+          await fillIn('.entryName-field .form-control', 'somename');
+          await wait();
 
-        expect(this.$('.entryName-field')).to.have.class('has-success');
-      });
+          expect(this.$('.entryName-field')).to.have.class('has-success');
+          done();
+        });
 
       it('marks "argument name" field as invalid when there are two arguments with the same name',
-        async function () {
+        async function (done) {
           await renderCreate(this);
           await addArgument();
           await addArgument();
@@ -476,23 +504,26 @@ describe(
             .to.equal('This field must have a unique value')
           );
           expect(this.$('.entryName-field.has-error')).to.have.length(2);
+          done();
         });
 
-      it('provides argument types options for "argument type" field', async function () {
-        await renderCreate(this);
-        await addArgument();
+      it('provides argument types options for "argument type" field',
+        async function (done) {
+          await renderCreate(this);
+          await addArgument();
 
-        await clickTrigger('.entryType-field');
+          await clickTrigger('.entryType-field');
 
-        const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(argumentAndResultTypes.length);
-        argumentAndResultTypes.forEach(({ label }, i) =>
-          expect($options.eq(i).text().trim()).to.equal(label)
-        );
-      });
+          const $options = $('.ember-power-select-option');
+          expect($options).to.have.length(argumentAndResultTypes.length);
+          argumentAndResultTypes.forEach(({ label }, i) =>
+            expect($options.eq(i).text().trim()).to.equal(label)
+          );
+          done();
+        });
 
       it('marks "argument default value" field as valid when it is empty',
-        async function () {
+        async function (done) {
           await renderCreate(this);
           await addArgument();
 
@@ -500,9 +531,10 @@ describe(
           await blur('.entryDefaultValue-field .form-control');
 
           expect(this.$('.entryDefaultValue-field')).to.have.class('has-success');
+          done();
         });
 
-      it('renders "results" field with no result defined', async function () {
+      it('renders "results" field with no result defined', async function (done) {
         await renderCreate(this);
 
         const $label = this.$('.results-field .control-label');
@@ -511,9 +543,10 @@ describe(
         expect($label.text().trim()).to.equal('Results:');
         expect($entries).to.have.length(0);
         expect($addBtn.text().trim()).to.equal('Add result');
+        done();
       });
 
-      it('allows to add new, empty result', async function () {
+      it('allows to add new, empty result', async function (done) {
         await renderCreate(this);
 
         await addResult();
@@ -533,14 +566,10 @@ describe(
         const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
         expect($entryTypeLabel.text().trim()).to.equal('Type:');
         expect($entryTypeField.text().trim()).to.equal('Integer');
-
-        const $entryBatchLabel = $entry.find('.entryBatch-field .control-label');
-        const $entryBatchField = $entry.find('.entryBatch-field .form-control');
-        expect($entryBatchLabel.text().trim()).to.equal('Batch');
-        expect($entryBatchField).to.not.have.class('checked');
+        done();
       });
 
-      it('marks "result name" field as invalid when it is empty', async function () {
+      it('marks "result name" field as invalid when it is empty', async function (done) {
         await renderCreate(this);
         await addResult();
 
@@ -548,30 +577,34 @@ describe(
         await blur('.entryName-field .form-control');
 
         expect(this.$('.entryName-field')).to.have.class('has-error');
+        done();
       });
 
       it('marks "result name" field as invalid when it contains reserved name "exception"',
-        async function () {
+        async function (done) {
           await renderCreate(this);
           await addResult();
 
           await fillIn('.entryName-field .form-control', 'exception');
 
           expect(this.$('.entryName-field')).to.have.class('has-error');
+          done();
         }
       );
 
-      it('marks "result name" field as valid when it is not empty', async function () {
-        await renderCreate(this);
-        await addResult();
+      it('marks "result name" field as valid when it is not empty',
+        async function (done) {
+          await renderCreate(this);
+          await addResult();
 
-        await fillIn('.entryName-field .form-control', 'somename');
+          await fillIn('.entryName-field .form-control', 'somename');
 
-        expect(this.$('.entryName-field')).to.have.class('has-success');
-      });
+          expect(this.$('.entryName-field')).to.have.class('has-success');
+          done();
+        });
 
       it('marks "result name" field as invalid when there are two results with the same name',
-        async function () {
+        async function (done) {
           await renderCreate(this);
           await addResult();
           await addResult();
@@ -587,9 +620,10 @@ describe(
             .to.equal('This field must have a unique value')
           );
           expect(this.$('.entryName-field.has-error')).to.have.length(2);
+          done();
         });
 
-      it('provides result types options for "result type" field', async function () {
+      it('provides result types options for "result type" field', async function (done) {
         await renderCreate(this);
         await addResult();
 
@@ -600,10 +634,11 @@ describe(
         argumentAndResultTypes.forEach(({ label }, i) =>
           expect($options.eq(i).text().trim()).to.equal(label)
         );
+        done();
       });
 
       it('renders "resources" section with cpu, memory and storage fields groups',
-        async function () {
+        async function (done) {
           await renderCreate(this);
 
           const $resourcesSection = this.$('.resources-field');
@@ -634,9 +669,10 @@ describe(
             expect($limit.find('.ember-power-select-trigger').text())
               .to.contain(limit[1]);
           });
+          done();
         });
 
-      it('creates simple lambda on submit button click', async function () {
+      it('creates simple lambda on submit button click', async function (done) {
         await renderCreate(this);
 
         const revision = await fillWithMinimumData(this);
@@ -644,18 +680,20 @@ describe(
 
         expect(this.get('submitStub')).to.be.calledOnce
           .and.to.be.calledWith(revision);
+        done();
       });
 
-      it('resets form on successfull submission', async function () {
+      it('resets form on successfull submission', async function (done) {
         await renderCreate(this);
 
         await fillWithMinimumData(this);
         await click('.btn-submit');
 
         expect(this.$('.name-field .form-control')).to.have.value('');
+        done();
       });
 
-      it('does not reset form on failed submission', async function () {
+      it('does not reset form on failed submission', async function (done) {
         await renderCreate(this);
         let rejectSubmit;
         this.get('submitStub').returns(
@@ -668,15 +706,17 @@ describe(
         await wait();
 
         expect(this.$('.name-field .form-control')).to.not.have.value('');
+        done();
       });
 
-      it('creates complex lambda on submit button click', async function () {
+      it('creates complex lambda on submit button click', async function (done) {
         await renderCreate(this);
 
         await fillIn('.name-field .form-control', 'myname');
         await selectChoose('.state-field', 'Stable');
         await fillIn('.summary-field .form-control', 'mysummary');
         await fillIn('.dockerImage-field .form-control', 'myimage');
+        await fillIn('.preferredBatchSize-field .form-control', '250');
 
         for (let i = 0; i < 2; i++) {
           await addArgument();
@@ -687,7 +727,6 @@ describe(
             argumentAndResultTypes[i].label
           );
           if (i === 0) {
-            await click(`${nthArgSelector} .entryBatch-field .form-control`);
             await click(`${nthArgSelector} .entryOptional-field .form-control`);
             await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '"val0"');
           }
@@ -699,9 +738,6 @@ describe(
             `${nthResSelector} .entryType-field`,
             argumentAndResultTypes[i].label
           );
-          if (i === 1) {
-            await click(`${nthResSelector} .entryBatch-field .form-control`);
-          }
         }
 
         await fillIn('.mountPoint-field .form-control', '/mount/point');
@@ -729,12 +765,12 @@ describe(
               oneclientOptions: 'oc-options',
             },
           },
+          preferredBatchSize: 250,
           argumentSpecs: argumentAndResultTypes.slice(0, 2)
             .map(({ dataSpec }, idx) => {
               const arg = {
                 name: `arg${idx}`,
                 dataSpec,
-                isBatch: idx === 0,
                 isOptional: idx === 0,
               };
               if (idx === 0) {
@@ -745,7 +781,6 @@ describe(
           resultSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `res${idx}`,
             dataSpec,
-            isBatch: idx === 1,
           })),
           resourceSpec: {
             cpuRequested: 2,
@@ -756,11 +791,12 @@ describe(
             ephemeralStorageLimit: 10 * 1024 * 1024,
           },
         });
+        done();
       });
 
       states.forEach(({ value, label }) => {
         it(`creates lambda in "${label}" state on submit button click`,
-          async function () {
+          async function (done) {
             await renderCreate(this);
 
             const revision = await fillWithMinimumData(this);
@@ -771,12 +807,13 @@ describe(
               .and.to.be.calledWith(Object.assign(revision, {
                 state: value,
               }));
+            done();
           });
       });
 
       argumentAndResultTypes.forEach(({ dataSpec, label }) => {
         it(`creates lambda with "${label}"-typed argument on submit button click`,
-          async function () {
+          async function (done) {
             await renderCreate(this);
 
             const revision = await fillWithMinimumData(this);
@@ -791,16 +828,16 @@ describe(
                 argumentSpecs: [{
                   name: 'entry',
                   dataSpec,
-                  isBatch: false,
                   isOptional: false,
                 }],
               }));
+            done();
           });
       });
 
       argumentAndResultTypes.forEach(({ dataSpec, label }) => {
         it(`creates lambda with "${label}"-typed result on submit button click`,
-          async function () {
+          async function (done) {
             await renderCreate(this);
 
             const revision = await fillWithMinimumData(this);
@@ -815,22 +852,23 @@ describe(
                 resultSpecs: [{
                   name: 'entry',
                   dataSpec,
-                  isBatch: false,
                 }],
               }));
+            done();
           });
       });
 
-      it('disables sumbit button when one of fields is invalid', async function () {
+      it('disables sumbit button when one of fields is invalid', async function (done) {
         await renderCreate(this);
 
         await fillWithMinimumData(this);
         await fillIn('.name-field .form-control', '');
 
         expect(this.$('.btn-submit')).to.have.attr('disabled');
+        done();
       });
 
-      it('disables sumbit button when submission is pending', async function () {
+      it('disables sumbit button when submission is pending', async function (done) {
         await renderCreate(this);
         this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
 
@@ -838,10 +876,11 @@ describe(
         await click('.btn-submit');
 
         expect(this.$('.btn-submit')).to.have.attr('disabled');
+        done();
       });
 
       it('fills form fields with initial data taken from "revision"',
-        async function () {
+        async function (done) {
           this.set('revision', {
             name: 'myname',
             state: 'stable',
@@ -857,17 +896,16 @@ describe(
                 oneclientOptions: 'oc-options',
               },
             },
+            preferredBatchSize: 150,
             argumentSpecs: [{
               name: 'arg',
               dataSpec: { type: 'string' },
-              isBatch: true,
               isOptional: true,
               defaultValue: 'default',
             }],
             resultSpecs: [{
               name: 'res',
               dataSpec: { type: 'integer' },
-              isBatch: true,
             }],
           });
 
@@ -880,12 +918,11 @@ describe(
           expect(this.$('.summary-field .form-control')).to.have.value('summary');
           expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
           expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
           expect($argument.find('.entryType-field .field-component').text().trim())
             .to.equal('String');
-          expect($argument.find('.entryBatch-field .form-control'))
-            .to.have.class('checked');
           expect($argument.find('.entryOptional-field .form-control'))
             .to.have.class('checked');
           expect($argument.find('.entryDefaultValue-field .form-control'))
@@ -894,82 +931,85 @@ describe(
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
           expect($result.find('.entryType-field .field-component').text().trim())
             .to.equal('Integer');
-          expect($result.find('.entryBatch-field .form-control'))
-            .to.have.class('checked');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
           expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          done();
         });
     });
 
     context('in "view" mode', function () {
-      it('has class "mode-view"', async function () {
+      it('has class "mode-view"', async function (done) {
         await renderView(this);
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-view');
+        done();
       });
 
-      it('does not show submit button', async function () {
+      it('does not show submit button', async function (done) {
         await renderView(this);
 
         expect(this.$('.btn-submit')).to.not.exist;
+        done();
       });
 
-      it('shows simple openfaas lambda with minimal resources spec', async function () {
-        this.set('revision', {
-          name: 'myname',
-          state: 'draft',
-          summary: 'summary',
-          description: '',
-          operationSpec: {
-            engine: 'openfaas',
-            dockerImage: 'myimage',
-            dockerExecutionOptions: {
-              readonly: true,
-              mountOneclient: false,
+      it('shows simple openfaas lambda with minimal resources spec',
+        async function (done) {
+          this.set('revision', {
+            name: 'myname',
+            state: 'draft',
+            summary: 'summary',
+            description: '',
+            operationSpec: {
+              engine: 'openfaas',
+              dockerImage: 'myimage',
+              dockerExecutionOptions: {
+                readonly: true,
+                mountOneclient: false,
+              },
             },
-          },
-          argumentSpecs: [],
-          resultSpecs: [],
-          resourceSpec: {
-            cpuRequested: 0.1,
-            cpuLimit: null,
-            memoryRequested: 128 * 1024 * 1024,
-            memoryLimit: null,
-            ephemeralStorageRequested: 0,
-            ephemeralStorageLimit: null,
-          },
+            argumentSpecs: [],
+            resultSpecs: [],
+            resourceSpec: {
+              cpuRequested: 0.1,
+              cpuLimit: null,
+              memoryRequested: 128 * 1024 * 1024,
+              memoryLimit: null,
+              ephemeralStorageRequested: 0,
+              ephemeralStorageLimit: null,
+            },
+          });
+
+          await renderView(this);
+
+          expect(this.$('.field-enabled')).to.not.exist;
+          expect(this.$('.name-field .form-control')).to.have.value('myname');
+          expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
+          expect(this.$('.summary-field .form-control')).to.have.value('summary');
+          expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
+          expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(this.$('.onedataFunctionOptions-field')).to.not.exist;
+          expect(this.$('.readonly-field .form-control')).to.have.class('checked');
+          expect(this.$('.mountSpace-field .form-control')).to.exist
+            .and.to.not.have.class('checked');
+          expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+          expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
+          expect(this.$('.cpuLimitUnlimitedDesc-field .form-control'))
+            .to.have.value(undefined);
+          expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
+          expect(this.$('.memoryLimitUnlimitedDesc-field .form-control'))
+            .to.have.value(undefined);
+          expect(this.$('.ephemeralStorageRequested-field .form-control'))
+            .to.have.value('0');
+          expect(
+            this.$('.ephemeralStorageLimitUnlimitedDesc-field .form-control')
+          ).to.have.value(undefined);
+          done();
         });
 
-        await renderView(this);
-
-        expect(this.$('.field-enabled')).to.not.exist;
-        expect(this.$('.name-field .form-control')).to.have.value('myname');
-        expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-        expect(this.$('.summary-field .form-control')).to.have.value('summary');
-        expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
-        expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
-        expect(this.$('.onedataFunctionOptions-field')).to.not.exist;
-        expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-        expect(this.$('.mountSpace-field .form-control')).to.exist
-          .and.to.not.have.class('checked');
-        expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
-        expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
-        expect(this.$('.cpuLimitUnlimitedDesc-field .form-control'))
-          .to.have.value(undefined);
-        expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
-        expect(this.$('.memoryLimitUnlimitedDesc-field .form-control'))
-          .to.have.value(undefined);
-        expect(this.$('.ephemeralStorageRequested-field .form-control'))
-          .to.have.value('0');
-        expect(
-          this.$('.ephemeralStorageLimitUnlimitedDesc-field .form-control')
-        ).to.have.value(undefined);
-      });
-
       it('shows simple onedata function lambda with full resources spec',
-        async function () {
+        async function (done) {
           this.set('revision', {
             name: 'myname',
             state: 'draft',
@@ -1006,10 +1046,11 @@ describe(
           expect(this.$('.memoryLimit-field .form-control')).to.have.value('256');
           expect(this.$('.ephemeralStorageRequested-field .form-control')).to.have.value('1');
           expect(this.$('.ephemeralStorageLimit-field .form-control')).to.have.value('10');
+          done();
         });
 
       it('shows mount space options when passed lambda has "mount space" enabled',
-        async function () {
+        async function (done) {
           this.set('revision', {
             operationSpec: {
               engine: 'openfaas',
@@ -1027,9 +1068,10 @@ describe(
           expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
           expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          done();
         });
 
-      it('shows arguments of passed lambda', async function () {
+      it('shows arguments of passed lambda', async function (done) {
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
@@ -1037,7 +1079,6 @@ describe(
           argumentSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
-            isBatch: idx === 0,
             isOptional: idx === 0,
             defaultValue: idx === 0 ? 'val0' : null,
           })),
@@ -1053,24 +1094,22 @@ describe(
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
-          const $batchToggle = $entry.find('.entryBatch-field .form-control');
           const $optionalToggle = $entry.find('.entryOptional-field .form-control');
           const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
           if (idx === 0) {
-            expect($batchToggle).to.have.class('checked');
             expect($optionalToggle).to.have.class('checked');
             expect($defaultValueField).to.have.value('"val0"');
           } else {
-            expect($batchToggle).to.not.have.class('checked');
             expect($optionalToggle).to.not.have.class('checked');
             if ($defaultValueField.length) {
               expect($defaultValueField).to.have.value('');
             }
           }
         });
+        done();
       });
 
-      it('shows results of passed lambda', async function () {
+      it('shows results of passed lambda', async function (done) {
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
@@ -1078,7 +1117,6 @@ describe(
           resultSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
-            isBatch: idx === 1,
           })),
         });
 
@@ -1094,13 +1132,8 @@ describe(
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
-          const $batchToggle = $entry.find('.entryBatch-field .form-control');
-          if (idx === 1) {
-            expect($batchToggle).to.have.class('checked');
-          } else {
-            expect($batchToggle).to.not.have.class('checked');
-          }
         });
+        done();
       });
     });
 
@@ -1113,13 +1146,14 @@ describe(
         });
       });
 
-      it('has class "mode-edit"', async function () {
+      it('has class "mode-edit"', async function (done) {
         await renderEdit(this);
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-edit');
+        done();
       });
 
-      it('renders two buttons - save and cancel', async function () {
+      it('renders two buttons - save and cancel', async function (done) {
         await renderEdit(this);
 
         const $saveBtn = this.$('.btn-submit');
@@ -1128,10 +1162,11 @@ describe(
         expect($saveBtn.text().trim()).to.equal('Save');
         expect($cancelBtn).to.exist;
         expect($cancelBtn.text().trim()).to.equal('Cancel');
+        done();
       });
 
       it('shows lambda values and only one field enabled - state',
-        async function () {
+        async function (done) {
           this.set('revision', {
             name: 'myname',
             state: 'stable',
@@ -1147,17 +1182,16 @@ describe(
                 oneclientOptions: 'oc-options',
               },
             },
+            preferredBatchSize: 150,
             argumentSpecs: [{
               name: 'arg',
               dataSpec: { type: 'string' },
-              isBatch: true,
               isOptional: true,
               defaultValue: 'default',
             }],
             resultSpecs: [{
               name: 'res',
               dataSpec: { type: 'integer' },
-              isBatch: true,
             }],
           });
 
@@ -1173,12 +1207,11 @@ describe(
           expect(this.$('.summary-field .form-control')).to.have.value('summary');
           expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
           expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
           expect($argument.find('.entryType-field .field-component').text().trim())
             .to.equal('String');
-          expect($argument.find('.entryBatch-field .form-control'))
-            .to.have.class('checked');
           expect($argument.find('.entryOptional-field .form-control'))
             .to.have.class('checked');
           expect($argument.find('.entryDefaultValue-field .form-control'))
@@ -1187,16 +1220,15 @@ describe(
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
           expect($result.find('.entryType-field .field-component').text().trim())
             .to.equal('Integer');
-          expect($result.find('.entryBatch-field .form-control'))
-            .to.have.class('checked');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
           expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
           expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          done();
         });
 
       it('modifies lambda on submit button click (all enabled fields modified)',
-        async function () {
+        async function (done) {
           await renderEdit(this);
 
           await selectChoose('.state-field', 'Stable');
@@ -1204,28 +1236,31 @@ describe(
 
           expect(this.get('submitStub')).to.be.calledOnce
             .and.to.be.calledWith({ state: 'stable' });
+          done();
         });
 
       it('modifies lambda on submit button click (no fields modified)',
-        async function () {
+        async function (done) {
           await renderEdit(this);
 
           await click('.btn-submit');
 
           expect(this.get('submitStub')).to.be.calledOnce
             .and.to.be.calledWith({});
+          done();
         });
 
-      it('calls onCancel on "cancel" click', async function () {
+      it('calls onCancel on "cancel" click', async function (done) {
         await renderEdit(this);
 
         await click('.btn-cancel');
 
         expect(this.get('cancelSpy')).to.be.calledOnce;
+        done();
       });
 
       it('disables sumbit and cancel buttons when submission is pending',
-        async function () {
+        async function (done) {
           await renderEdit(this);
           this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
 
@@ -1233,6 +1268,7 @@ describe(
 
           expect(this.$('.btn-submit')).to.have.attr('disabled');
           expect(this.$('.btn-cancel')).to.have.attr('disabled');
+          done();
         });
     });
   }
@@ -1304,6 +1340,7 @@ async function fillWithMinimumData(testCase) {
         mountOneclient: false,
       },
     },
+    preferredBatchSize: 100,
     argumentSpecs: [],
     resultSpecs: [],
     resourceSpec: {
