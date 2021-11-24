@@ -993,11 +993,10 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
             lanes: [{
               id: 'lane1',
               name: 'lane 1',
+              maxRetries: 1,
               storeIteratorSpec: {
-                strategy: {
-                  type: 'serial',
-                },
                 storeSchemaId: 'store1',
+                maxBatchSize: 50,
               },
               parallelBoxes: [{
                 id: 'pbox1-1',

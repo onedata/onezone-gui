@@ -46,18 +46,8 @@ export const entityType = 'atm_workflow_schema';
 
 /**
  * @typedef {Object} AtmLaneStoreIteratorSpec
- * @property {StoreIteratorSingleStrategy|StoreIteratorBatchStrategy} strategy
- */
-
-/**
- * @typedef {Object} StoreIteratorSingleStrategy
- * @property {'single'} type
- */
-
-/**
- * @typedef {Object} StoreIteratorBatchStrategy
- * @property {'batch'} type
- * @property {Number} batchSize
+ * @property {String} storeSchemaId
+ * @property {Number} maxBatchSize
  */
 
 /**
