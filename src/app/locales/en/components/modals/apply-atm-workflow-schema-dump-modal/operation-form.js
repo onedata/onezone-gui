@@ -10,8 +10,8 @@ export default {
         duplication: `This operation is available if there already is a duplicate of the source workflow in this inventory. ${dumpCanBeUsedToUpdate}`,
       },
       revisionConflictWarning: {
-        upload: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the uploaded file.',
-        duplication: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the source workflow.',
+        upload: 'Selected workflow already has revision #{{revisionNumber}}. It will be irreversibly replaced by the revision from the uploaded file.',
+        duplication: 'Selected workflow already has revision #{{revisionNumber}}. It will be irreversibly replaced by the revision from the source workflow.',
       },
     },
     create: {

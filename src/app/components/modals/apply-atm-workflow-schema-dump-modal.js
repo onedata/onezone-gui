@@ -119,7 +119,8 @@ export default Component.extend(I18n, {
         initialAtmInventory,
       } = this.getProperties('dumpSourceType', 'initialAtmInventory');
       if (dumpSourceType === 'upload') {
-        // In "upload" mode only one inventory is allowed
+        // In "upload" mode only one inventory is allowed, because you upload
+        // dump always in some concrete inventory, not globally
         return [initialAtmInventory];
       }
 

@@ -30,7 +30,6 @@
 
   .revisions-table {
     grid-area: revisions;
-    margin-top: 1em;
   }
 
   .atm-lambda-actions-trigger {
@@ -42,6 +41,10 @@
   .lambda-name {
     @include font-semibold();
     margin-bottom: $padding-small-vertical;
+  }
+
+  .lambda-summary {
+    margin-bottom: $padding-base-vertical;
   }
 
   .lambda-name,

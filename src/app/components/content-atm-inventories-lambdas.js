@@ -184,7 +184,6 @@ export default Component.extend(GlobalActions, {
 
   atmInventoryObserver: observer('atmInventory', function atmInventoryObserver() {
     // rerender carousel from scratch to avoid animations of slide change
-    console.log('inventory');
     this.set('isCarouselVisible', false);
     scheduleOnce('afterRender', this, 'set', 'isCarouselVisible', true);
   }),
@@ -210,8 +209,7 @@ export default Component.extend(GlobalActions, {
       actionsPerSlide: {},
     });
     this.urlParamsObserver();
-    console.log('init');
-    // scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
+    scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
   },
 
   synchronizeStateWithUrl() {

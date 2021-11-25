@@ -53,9 +53,9 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       await render(this);
 
       expectDetails(this, {
-        name: 'unknown',
-        summary: 'unknown',
-        revisionNumber: 'unknown',
+        name: 'none',
+        summary: 'none',
+        revisionNumber: 'none',
       });
     });
 

@@ -174,11 +174,11 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     [{
       dumpSourceType: 'upload',
       noTargetWarning: 'This operation is available if there already is a duplicate of the uploaded workflow in this inventory. It can be used to update the existing duplicate with a newer version of the original.',
-      overrideWarning: 'Selected workflow already has revision 2. It will be irreversibly replaced by the revision from the uploaded file.',
+      overrideWarning: 'Selected workflow already has revision #2. It will be irreversibly replaced by the revision from the uploaded file.',
     }, {
       dumpSourceType: 'duplication',
       noTargetWarning: 'This operation is available if there already is a duplicate of the source workflow in this inventory. It can be used to update the existing duplicate with a newer version of the original.',
-      overrideWarning: 'Selected workflow already has revision 2. It will be irreversibly replaced by the revision from the source workflow.',
+      overrideWarning: 'Selected workflow already has revision #2. It will be irreversibly replaced by the revision from the source workflow.',
     }].forEach(({ dumpSourceType, noTargetWarning, overrideWarning }) => {
       it(`makes option "merge" disabled when there is no target workflow available - ${dumpSourceType} scanario`,
         async function () {

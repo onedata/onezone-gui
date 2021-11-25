@@ -198,7 +198,7 @@ export default Component.extend(GlobalActions, I18n, {
   activeAtmWorkflowSchemaRevisionProxy: promise.object(computed(
     'activeAtmWorkflowSchemaProxy',
     'activeRevisionNumber',
-    async function activeAtmWorkflowSchemaRevision() {
+    async function activeAtmWorkflowSchemaRevisionProxy() {
       const {
         activeAtmWorkflowSchemaProxy,
         activeRevisionNumber,
