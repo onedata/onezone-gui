@@ -57,6 +57,7 @@ export default Component.extend(I18n, {
   selectedOperation: undefined,
 
   /**
+   * Set by `reinitializeTargetWorkflows`
    * @type {Array<Models.AtmWorkflowSchema>}
    */
   targetWorkflows: undefined,
@@ -118,7 +119,8 @@ export default Component.extend(I18n, {
         initialAtmInventory,
       } = this.getProperties('dumpSourceType', 'initialAtmInventory');
       if (dumpSourceType === 'upload') {
-        // In "upload" mode only one inventory is allowed
+        // In "upload" mode only one inventory is allowed, because you upload
+        // dump always in some concrete inventory, not globally
         return [initialAtmInventory];
       }
 
@@ -259,7 +261,12 @@ export default Component.extend(I18n, {
       this.set('selectedTargetAtmInventory', atmInventory);
     },
     operationValueChanged(fieldName, value) {
-      this.set(fieldName, value);
+      if (
+        ['selectedOperation', 'newWorkflowName', 'selectedTargetWorkflow']
+        .includes(fieldName)
+      ) {
+        this.set(fieldName, value);
+      }
     },
     async submit(submitCallback) {
       const dataToSubmit = this.get('dataToSubmit');

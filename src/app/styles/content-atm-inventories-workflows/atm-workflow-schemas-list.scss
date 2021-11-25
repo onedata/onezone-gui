@@ -53,13 +53,10 @@
     @include font-semibold();
   }
 
-  .fields-group-children.-children > .form-group.field-view-mode:last-child {
-    margin-bottom: 0;
-  }
-
   .footer-buttons {
     float: none;
     text-align: left;
+    margin-bottom: $form-group-margin-bottom;
     .btn {
       margin-left: $padding-small-horizontal;
     }

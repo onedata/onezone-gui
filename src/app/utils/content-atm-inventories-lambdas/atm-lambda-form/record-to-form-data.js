@@ -22,10 +22,10 @@ const fallbackDefaultAtmResourceSpec = {
 /**
  * @param {AtmLambdaRevision|null} revision
  * @param {AtmResourceSpec} defaultAtmResourceSpec
- * @param {string} mode
+ * @param {string} formMode
  * @returns {Object}
  */
-export default function recordToFormData(revision, defaultAtmResourceSpec, mode) {
+export default function recordToFormData(revision, defaultAtmResourceSpec, formMode) {
   if (!revision) {
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
@@ -122,7 +122,7 @@ export default function recordToFormData(revision, defaultAtmResourceSpec, mode)
       ),
     },
   };
-  const formState = mode === 'create' ? 'draft' : state;
+  const formState = formMode === 'create' ? 'draft' : state;
 
   return Object.assign({
     name,

@@ -29,6 +29,7 @@ export default Component.extend(I18n, {
   dumpSource: undefined,
 
   /**
+   * @virtual
    * @type {() => void}
    */
   onReupload: undefined,

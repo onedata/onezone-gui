@@ -78,7 +78,7 @@ describe(
       } = getProperties(this.get('action'), 'className', 'icon', 'title');
       expect(className).to.equal('duplicate-atm-workflow-schema-revision-action-trigger');
       expect(icon).to.equal('browser-copy');
-      expect(String(title)).to.equal('Duplicate');
+      expect(String(title)).to.equal('Duplicate to...');
     });
 
     it('shows modal on execute', async function () {

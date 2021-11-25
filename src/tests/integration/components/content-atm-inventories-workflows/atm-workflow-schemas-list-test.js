@@ -35,7 +35,7 @@ const revisionActionsSpec = [{
   icon: 'plus',
 }, {
   className: 'duplicate-atm-workflow-schema-revision-action-trigger',
-  label: 'Duplicate',
+  label: 'Duplicate to...',
   icon: 'browser-copy',
 }, {
   className: 'dump-atm-workflow-schema-revision-action-trigger',

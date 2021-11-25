@@ -3,6 +3,6 @@ export default {
   name: 'Name',
   summary: 'Summary',
   revisionNumber: 'Revision',
-  unknownValue: 'unknown',
+  unknownValue: 'none',
   error: 'Uploaded file is not a valid workflow dump.',
 };

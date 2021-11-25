@@ -27,6 +27,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   atmLambda: undefined,
 
   /**
+   * @virtual
    * @type {(originRevisionNumber: number) => void}
    */
   onRevisionCreate: undefined,
@@ -49,7 +50,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       onRevisionCreate,
     } = this.getProperties('atmLambda', 'onRevisionCreate');
 
-    return CreateRevisionAction.create({
+    return StartRevisionCreationAction.create({
       ownerSource: this,
       atmLambda,
       onRevisionCreate,
@@ -67,7 +68,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
       onRevisionCreate,
     } = this.getProperties('atmLambda', 'onRevisionCreate');
 
-    return CreateRevisionAction.create({
+    return StartRevisionCreationAction.create({
       ownerSource: this,
       atmLambda,
       originRevisionNumber: revisionNumber,
@@ -76,11 +77,11 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
   },
 });
 
-const CreateRevisionAction = Action.extend({
+const StartRevisionCreationAction = Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.atmWorkflow.atmLambda.revisionActionsFactory.createRevisionAction',
+  i18nPrefix: 'utils.atmWorkflow.atmLambda.revisionActionsFactory.startRevisionCreationAction',
 
   /**
    * @override

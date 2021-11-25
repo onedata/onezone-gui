@@ -360,7 +360,7 @@ const DumpLoader = EmberObject.extend({
 
   logParsingError(error) {
     if (config.environment !== 'test') {
-      console.error(error);
+      console.error('util:workflow-actions/upload-atm-workflow-schema-action', error);
     }
   },
 

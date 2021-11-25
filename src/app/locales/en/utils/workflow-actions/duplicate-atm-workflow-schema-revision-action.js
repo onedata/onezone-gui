@@ -1,5 +1,5 @@
 export default {
-  title: 'Duplicate',
+  title: 'Duplicate to...',
   successNotificationText: {
     merge: 'The workflow has been merged successfully.',
     create: 'The workflow has been created successfully.',
