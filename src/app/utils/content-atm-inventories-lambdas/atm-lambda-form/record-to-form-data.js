@@ -22,10 +22,10 @@ const fallbackDefaultAtmResourceSpec = {
 /**
  * @param {Models.AtmLambda|null} record
  * @param {AtmResourceSpec} defaultAtmResourceSpec
- * @param {string} mode
+ * @param {string} formMode
  * @returns {Object}
  */
-export default function recordToFormData(record, defaultAtmResourceSpec, mode) {
+export default function recordToFormData(record, defaultAtmResourceSpec, formMode) {
   if (!record) {
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
@@ -120,7 +120,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec, mode) {
       ),
     },
   };
-  const formState = mode === 'create' ? 'draft' : state;
+  const formState = formMode === 'create' ? 'draft' : state;
 
   return Object.assign({
     name,

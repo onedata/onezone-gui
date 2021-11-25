@@ -57,6 +57,7 @@ export default Component.extend(I18n, {
   selectedOperation: undefined,
 
   /**
+   * Set by `reinitializeTargetWorkflows`
    * @type {Array<Models.AtmWorkflowSchema>}
    */
   targetWorkflows: undefined,
@@ -259,7 +260,12 @@ export default Component.extend(I18n, {
       this.set('selectedTargetAtmInventory', atmInventory);
     },
     operationValueChanged(fieldName, value) {
-      this.set(fieldName, value);
+      if (
+        ['selectedOperation', 'newWorkflowName', 'selectedTargetWorkflow']
+        .includes(fieldName)
+      ) {
+        this.set(fieldName, value);
+      }
     },
     async submit(submitCallback) {
       const dataToSubmit = this.get('dataToSubmit');

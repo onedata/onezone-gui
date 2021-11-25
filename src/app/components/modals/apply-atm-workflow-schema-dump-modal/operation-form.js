@@ -35,6 +35,7 @@ export default Component.extend(I18n, {
   dump: undefined,
 
   /**
+   * @virtual
    * @type {'upload'|'duplication'}
    */
   dumpSourceType: undefined,

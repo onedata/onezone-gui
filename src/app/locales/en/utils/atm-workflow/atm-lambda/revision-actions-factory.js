@@ -1,5 +1,5 @@
 export default {
-  createRevisionAction: {
+  startRevisionCreationAction: {
     title: {
       new: 'Create new revision',
       redesign: 'Redesign as new revision',

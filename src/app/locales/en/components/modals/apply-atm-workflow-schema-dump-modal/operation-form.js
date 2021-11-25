@@ -1,11 +1,13 @@
+const dumpCanBeUsedToUpdate = 'It can be used to update the existing duplicate with a newer version of the original.';
+
 export default {
-  header: 'Persistence strategy',
+  header: 'Operation',
   operations: {
     merge: {
       label: 'Merge into existing workflow',
       noTargetWorkflowWarning: {
-        upload: 'There are no workflows, which were created based on the workflow from the uploaded file.',
-        duplication: 'There are no workflows, which were created based on the source workflow.',
+        upload: `This operation is available if there already is a duplicate of the uploaded workflow in this inventory. ${dumpCanBeUsedToUpdate}`,
+        duplication: `This operation is available if there already is a duplicate of the source workflow in this inventory. ${dumpCanBeUsedToUpdate}`,
       },
       revisionConflictWarning: {
         upload: 'Selected workflow already has revision {{revisionNumber}}. It will be irreversibly replaced by the revision from the uploaded file.',

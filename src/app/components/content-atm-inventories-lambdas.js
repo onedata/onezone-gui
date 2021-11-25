@@ -57,7 +57,7 @@ export default Component.extend(GlobalActions, {
   /**
    * @type {Boolean}
    */
-  isCarouselVisible: false,
+  isCarouselVisible: true,
 
   /**
    * @type {String}
@@ -184,6 +184,7 @@ export default Component.extend(GlobalActions, {
 
   atmInventoryObserver: observer('atmInventory', function atmInventoryObserver() {
     // rerender carousel from scratch to avoid animations of slide change
+    console.log('inventory');
     this.set('isCarouselVisible', false);
     scheduleOnce('afterRender', this, 'set', 'isCarouselVisible', true);
   }),
@@ -209,7 +210,8 @@ export default Component.extend(GlobalActions, {
       actionsPerSlide: {},
     });
     this.urlParamsObserver();
-    scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
+    console.log('init');
+    // scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
   },
 
   synchronizeStateWithUrl() {
@@ -266,26 +268,6 @@ export default Component.extend(GlobalActions, {
       nextActiveSlide = defaultSlideId;
     }
 
-    // Perform update of component properties
-    const propsToUpdate = {};
-    if (isActiveSlideChanged()) {
-      propsToUpdate.activeSlide = nextActiveSlide;
-    }
-    if (isActiveAtmLambdaIdChanged()) {
-      propsToUpdate.activeAtmLambdaId = nextActiveAtmLambdaId;
-    }
-    if (isActiveRevisionNumberChanged()) {
-      propsToUpdate.activeRevisionNumber = nextRevisionNumber;
-    }
-    if (Object.keys(propsToUpdate).length) {
-      this.setProperties(propsToUpdate);
-    }
-
-    // Introduce some post-update adjustments related to changes.
-    if (isActiveSlideChanged()) {
-      this.scrollTop();
-    }
-
     // If url params values are different than used by the component,
     // then url params should be redefined to ensure values consistency.
     if (
@@ -299,6 +281,26 @@ export default Component.extend(GlobalActions, {
         revision: nextRevisionNumber === null ?
           nextRevisionNumber : String(nextRevisionNumber),
       }, true);
+    } else {
+      // Perform update of component properties
+      const propsToUpdate = {};
+      if (isActiveSlideChanged()) {
+        propsToUpdate.activeSlide = nextActiveSlide;
+      }
+      if (isActiveAtmLambdaIdChanged()) {
+        propsToUpdate.activeAtmLambdaId = nextActiveAtmLambdaId;
+      }
+      if (isActiveRevisionNumberChanged()) {
+        propsToUpdate.activeRevisionNumber = nextRevisionNumber;
+      }
+      if (Object.keys(propsToUpdate).length) {
+        this.setProperties(propsToUpdate);
+      }
+
+      // Introduce some post-update adjustments related to changes.
+      if (isActiveSlideChanged()) {
+        this.scrollTop();
+      }
     }
   },
 

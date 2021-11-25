@@ -610,65 +610,69 @@ export default Component.extend(GlobalActions, I18n, {
     }
   },
 
+  async showEditorView(atmWorkflowSchema, revisionNumber) {
+    const {
+      atmInventory,
+      activeAtmWorkflowSchemaId,
+      router,
+    } = this.getProperties('atmInventory', 'activeAtmWorkflowSchemaId', 'router');
+    const atmInventoryOfWorkflowSchema = await get(atmWorkflowSchema || {}, 'atmInventory');
+    const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
+    if (
+      atmInventoryOfWorkflowSchema &&
+      atmInventoryOfWorkflowSchema !== atmInventory &&
+      workflowId &&
+      revisionNumber
+    ) {
+      // Some event from inside of this component triggered a change in model,
+      // that needs showing editor for a workflow in another inventory.
+      // Example of such an event is duplicating revision to a workflow in
+      // other inventory.
+      await router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        'atm-inventories',
+        get(atmInventoryOfWorkflowSchema, 'entityId'),
+        'workflows', {
+          queryParams: {
+            options: serializeAspectOptions({
+              view: 'editor',
+              workflowId,
+              revision: revisionNumber,
+            }),
+          },
+        }
+      );
+      return;
+    }
+
+    const schemaTheSameAsPrevOne = workflowId === activeAtmWorkflowSchemaId;
+    this.changeSlideViaUrl('editor', {
+      workflowId,
+      revision: String(revisionNumber),
+    });
+
+    if (schemaTheSameAsPrevOne) {
+      // Notify about change in case when selected workflow schema is the same
+      // as previously selected. It should reset editor state by treating selected
+      // schema as different one.
+      scheduleOnce(
+        'afterRender',
+        this,
+        'notifyPropertyChange',
+        'activeAtmWorkflowSchemaProxy'
+      );
+    }
+  },
+
   actions: {
     showCreatorView() {
       this.changeSlideViaUrl('editor', { workflowId: null });
     },
     atmWorkflowSchemaAdded(atmWorkflowSchema) {
-      this.send('showEditorView', atmWorkflowSchema, 1);
+      this.showEditorView(atmWorkflowSchema, 1);
     },
     async showEditorView(atmWorkflowSchema, revisionNumber) {
-      const {
-        atmInventory,
-        activeAtmWorkflowSchemaId,
-        router,
-      } = this.getProperties('atmInventory', 'activeAtmWorkflowSchemaId', 'router');
-      const atmInventoryOfWorkflowSchema = await get(atmWorkflowSchema || {}, 'atmInventory');
-      const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
-      if (
-        atmInventoryOfWorkflowSchema &&
-        atmInventoryOfWorkflowSchema !== atmInventory &&
-        workflowId &&
-        revisionNumber
-      ) {
-        // Some event from inside of this component triggered a change in model,
-        // that needs showing editor for a workflow in another inventory.
-        // Example of such an event is duplicating revision to a workflow in
-        // other inventory.
-        router.transitionTo(
-          'onedata.sidebar.content.aspect',
-          'atm-inventories',
-          get(atmInventoryOfWorkflowSchema, 'entityId'),
-          'workflows', {
-            queryParams: {
-              options: serializeAspectOptions({
-                view: 'editor',
-                workflowId,
-                revision: revisionNumber,
-              }),
-            },
-          }
-        );
-        return;
-      }
-
-      const schemaTheSameAsPrevOne = workflowId === activeAtmWorkflowSchemaId;
-      this.changeSlideViaUrl('editor', {
-        workflowId,
-        revision: String(revisionNumber),
-      });
-
-      if (schemaTheSameAsPrevOne) {
-        // Notify about change in case when selected workflow schema is the same
-        // as previously selected. It should reset editor state by treating selected
-        // schema as different one.
-        scheduleOnce(
-          'afterRender',
-          this,
-          'notifyPropertyChange',
-          'activeAtmWorkflowSchemaProxy'
-        );
-      }
+      await this.showEditorView(atmWorkflowSchema, revisionNumber);
     },
     showLambdaCreatorView(atmLambda, originRevisionNumber) {
       let lambdaCreatorData = null;
