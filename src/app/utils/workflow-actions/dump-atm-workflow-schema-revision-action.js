@@ -1,7 +1,8 @@
 /**
- * Dumps workflow schema to JSON file. Needs `atmWorkflowSchema` passed in context.
+ * Dumps workflow schema revision to JSON file. Needs `atmWorkflowSchema` and
+ * `revisionNumber` passed in context.
  *
- * @module utils/workflow-actions/dump-atm-workflow-schema-action
+ * @module utils/workflow-actions/dump-atm-workflow-schema-revision-action
  * @author Michał Borzęcki
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -20,12 +21,12 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.workflowActions.dumpAtmWorkflowSchemaAction',
+  i18nPrefix: 'utils.workflowActions.dumpAtmWorkflowSchemaRevisionAction',
 
   /**
    * @override
    */
-  className: 'dump-atm-workflow-schema-action-trigger',
+  className: 'dump-atm-workflow-schema-revision-action-trigger',
 
   /**
    * @override
@@ -38,6 +39,16 @@ export default Action.extend({
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
 
   /**
+   * @type {ComputedProperty<Number>}
+   */
+  revisionNumber: reads('context.revisionNumber'),
+
+  /**
+   * @type {Function}
+   */
+  _downloadData: downloadData,
+
+  /**
    * @type {Window}
    */
   _window: window,
@@ -47,37 +58,40 @@ export default Action.extend({
    */
   onExecute() {
     const result = ActionResult.create();
-    const getSchemaDumpPromise = this.getAtmWorkflowSchemaDump();
+    const getSchemaDumpPromise = this.getAtmWorkflowSchemaRevisionDump();
 
     getSchemaDumpPromise.then(atmWorkflowSchemaDump =>
-      this.downloadAtmWorkflowSchemaDump(atmWorkflowSchemaDump)
+      this.downloadAtmWorkflowSchemaRevisionDump(atmWorkflowSchemaDump)
     );
 
     return result.interceptPromise(getSchemaDumpPromise)
       .then(() => result, () => result);
   },
 
-  async getAtmWorkflowSchemaDump() {
+  async getAtmWorkflowSchemaRevisionDump() {
     const {
       atmWorkflowSchema,
+      revisionNumber,
       workflowManager,
     } = this.getProperties(
       'atmWorkflowSchema',
+      'revisionNumber',
       'workflowManager',
     );
 
     return await workflowManager
-      .getAtmWorkflowSchemaDump(get(atmWorkflowSchema, 'entityId'));
+      .getAtmWorkflowSchemaDump(get(atmWorkflowSchema, 'entityId'), revisionNumber);
   },
 
-  downloadAtmWorkflowSchemaDump(atmWorkflowSchemaDump) {
+  downloadAtmWorkflowSchemaRevisionDump(atmWorkflowSchemaRevisionDump) {
     const {
       atmWorkflowSchema,
+      _downloadData,
       _window,
-    } = this.getProperties('atmWorkflowSchema', '_window');
+    } = this.getProperties('atmWorkflowSchema', '_downloadData', '_window');
 
-    downloadData({
-      dataString: JSON.stringify(atmWorkflowSchemaDump, null, 2),
+    _downloadData({
+      dataString: JSON.stringify(atmWorkflowSchemaRevisionDump, null, 2),
       fileName: `${get(atmWorkflowSchema, 'name')}.json`,
       mimeType: 'application/json',
       _window,

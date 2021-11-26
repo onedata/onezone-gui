@@ -17,9 +17,9 @@
       padding-right: 1em;
     }
 
-    .one-inline-editor {
-      margin-top: -1px;
-      max-width: 100%;
+    .revision-number {
+      display: block;
+      text-transform: uppercase;
     }
 
     .btn-toolbar {
@@ -29,9 +29,29 @@
     }
   }
 
+  .tab-content {
+    @include fill-flex-using-column();
+  }
+
   .workflow-visualiser {
     min-height: 0;
     height: initial;
     flex-grow: 1;
+    border-top: 1px solid $main-border-color;
+  }
+
+  .revision-details-form {
+    max-width: 50em;
+    margin: 0 auto;
+  }
+
+  .tab-content > #editor.active {
+    display: flex;
+  }
+
+  &.editor-tab-active {
+    .tab-content {
+      padding-bottom: 0;
+    }
   }
 }

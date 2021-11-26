@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, before, beforeEach, afterEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -8,11 +8,19 @@ import { resolve } from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
+import $ from 'jquery';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
 describe('Integration | Component | content atm inventories workflows/list view',
   function () {
     setupComponentTest('content-atm-inventories-workflows/list-view', {
       integration: true,
+    });
+
+    before(function () {
+      // Instatiate Action class to make its `prototype.execute` available for
+      // mocking.
+      CreateAtmWorkflowSchemaRevisionAction.create();
     });
 
     beforeEach(function () {
@@ -26,6 +34,9 @@ describe('Integration | Component | content atm inventories workflows/list view'
             }, {
               name: 'w0',
               description: 'w0 description',
+              revisionRegistry: {
+                2: {},
+              },
               isLoaded: true,
             }])),
           })),
@@ -35,6 +46,19 @@ describe('Integration | Component | content atm inventories workflows/list view'
           },
         },
         addFunctionSpy: sinon.spy(),
+        openAtmWorkflowSchemaRevisionSpy: sinon.spy(),
+        createdAtmWorkflowSchemaRevisionSpy: sinon.spy(),
+      });
+    });
+
+    afterEach(function () {
+      // Reset stubbed actions
+      [
+        CreateAtmWorkflowSchemaRevisionAction,
+      ].forEach(action => {
+        if (action.prototype.onExecute.restore) {
+          action.prototype.onExecute.restore();
+        }
       });
     });
 
@@ -74,12 +98,55 @@ describe('Integration | Component | content atm inventories workflows/list view'
 
         expect(addFunctionSpy).to.be.calledOnce;
       });
+
+    it('calls "onOpenAtmWorkflowSchemaRevision" when workflow revision has been clicked',
+      async function () {
+        await render(this);
+
+        await click('.revisions-table-revision-entry');
+
+        expect(this.get('openAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
+          .and.to.be.calledWith(sinon.match({ name: 'w0' }), 2);
+      });
+
+    it('calls "onCreatedAtmWorkflowSchemaRevision" when "create revision" has been clicked',
+      async function () {
+        sinon.stub(
+          CreateAtmWorkflowSchemaRevisionAction.prototype,
+          'onExecute'
+        ).resolves(4);
+        await render(this);
+
+        await click('.revisions-table-create-revision-entry');
+
+        expect(this.get('createdAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
+          .and.to.be.calledWith(sinon.match({ name: 'w0' }), 4);
+      });
+
+    it('calls "onCreatedAtmWorkflowSchemaRevision" when "redesign revision" has been clicked',
+      async function () {
+        sinon.stub(
+          CreateAtmWorkflowSchemaRevisionAction.prototype,
+          'onExecute'
+        ).resolves(4);
+        await render(this);
+
+        await click('.revision-actions-trigger');
+        await click($(
+          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        )[0]);
+
+        expect(this.get('createdAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
+          .and.to.be.calledWith(sinon.match({ name: 'w0' }), 4);
+      });
   });
 
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/list-view
     atmInventory=atmInventory
     onAddAtmWorkflowSchema=addFunctionSpy
+    onOpenAtmWorkflowSchemaRevision=openAtmWorkflowSchemaRevisionSpy
+    onCreatedAtmWorkflowSchemaRevision=createdAtmWorkflowSchemaRevisionSpy
   }}`);
   await wait();
 }

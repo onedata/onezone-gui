@@ -25,7 +25,7 @@ describe(
         atmInventory: {
           entityId: 'someid',
         },
-        rawAtmLambda: {
+        initialRevision: {
           name: 'someName',
         },
       });
@@ -36,22 +36,27 @@ describe(
         createAtmLambdaStub,
         successNotifySpy,
         atmInventory,
-        rawAtmLambda,
+        initialRevision,
       } = this.getProperties(
         'createAtmLambdaStub',
         'successNotifySpy',
         'atmInventory',
-        'rawAtmLambda'
+        'initialRevision'
       );
       const atmLambdaRecord = {};
       createAtmLambdaStub
-        .withArgs(atmInventory.entityId, rawAtmLambda)
+        .withArgs(atmInventory.entityId, {
+          revision: {
+            originalRevisionNumber: 1,
+            atmLambdaRevision: initialRevision,
+          },
+        })
         .resolves(atmLambdaRecord);
       const action = CreateAtmLambdaAction.create({
         ownerSource: this,
         context: {
           atmInventory,
-          rawAtmLambda,
+          initialRevision,
         },
       });
 
@@ -68,18 +73,18 @@ describe(
         createAtmLambdaStub,
         failureNotifySpy,
         atmInventory,
-        rawAtmLambda,
+        initialRevision,
       } = this.getProperties(
         'createAtmLambdaStub',
         'failureNotifySpy',
         'atmInventory',
-        'rawAtmLambda'
+        'initialRevision'
       );
       const action = CreateAtmLambdaAction.create({
         ownerSource: this,
         context: {
           atmInventory,
-          rawAtmLambda,
+          initialRevision,
         },
       });
       let rejectCreate;

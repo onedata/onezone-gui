@@ -8,10 +8,11 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { set, get } from '@ember/object';
+import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
+import $ from 'jquery';
 
 describe('Integration | Component | content atm inventories workflows', function () {
   setupComponentTest('content-atm-inventories-workflows', {
@@ -19,93 +20,111 @@ describe('Integration | Component | content atm inventories workflows', function
   });
 
   beforeEach(function () {
-    const atmLambdas = [{
-      entityId: 'lambda1',
-      name: 'f1',
-      summary: 'f1 summary',
-      operationSpec: {
-        engine: 'openfaas',
-        dockerImage: 'f1Image',
-        dockerExecutionOptions: {
-          readonly: false,
-          mountOneclient: false,
-        },
-      },
-      argumentSpecs: [{
-        name: 'argobject',
-        dataSpec: {
-          type: 'object',
-          valueConstraints: {},
-        },
-        isOptional: true,
-        isBatch: false,
-      }],
-      resultSpecs: [],
-      isLoaded: true,
-    }, {
-      entityId: 'lambda0',
-      name: 'f0',
-      summary: 'f0 summary',
-      operationSpec: {
-        engine: 'onedataFunction',
-        functionId: 'f0Function',
-      },
-      argumentSpecs: [],
-      resultSpecs: [],
-      isLoaded: true,
-    }];
-    const allInventoriesLambdas = [
-      ...atmLambdas, {
-        entityId: 'lambda2',
-        name: 'f2',
-        summary: 'f2 summary',
-        operationSpec: {
-          engine: 'openfaas',
-          dockerImage: 'f1Image',
-          dockerExecutionOptions: {
-            readonly: false,
-            mountOneclient: false,
+    const store = lookupService(this, 'store');
+    const atmLambdas = [
+      store.createRecord('atm-lambda', {
+        id: 'atm_lambda.lambda1.instance:private',
+        revisionRegistry: {
+          1: {
+            name: 'f1',
+            summary: 'f1 summary',
+            operationSpec: {
+              engine: 'openfaas',
+              dockerImage: 'f1Image',
+              dockerExecutionOptions: {
+                readonly: false,
+                mountOneclient: false,
+              },
+            },
+            argumentSpecs: [{
+              name: 'argobject',
+              dataSpec: {
+                type: 'object',
+                valueConstraints: {},
+              },
+              isOptional: true,
+              isBatch: false,
+            }],
+            resultSpecs: [],
           },
         },
-        argumentSpecs: [],
-        resultSpecs: [],
-        isLoaded: true,
-      },
+      }),
+      store.createRecord('atm-lambda', {
+        id: 'atm_lambda.lambda0.instance:private',
+        revisionRegistry: {
+          1: {
+            name: 'f0',
+            summary: 'f0 summary',
+            operationSpec: {
+              engine: 'onedataFunction',
+              functionId: 'f0Function',
+            },
+            argumentSpecs: [],
+            resultSpecs: [],
+          },
+        },
+      }),
+    ];
+    const allInventoriesLambdas = [
+      ...atmLambdas, store.createRecord('atm-lambda', {
+        id: 'atm_lambda.lambda2.instance:private',
+        revisionRegistry: {
+          1: {
+            name: 'f2',
+            summary: 'f2 summary',
+            operationSpec: {
+              engine: 'openfaas',
+              dockerImage: 'f1Image',
+              dockerExecutionOptions: {
+                readonly: false,
+                mountOneclient: false,
+              },
+            },
+            argumentSpecs: [],
+            resultSpecs: [],
+          },
+        },
+      }),
     ];
     const atmWorkflowSchemas = [{
       entityId: 'w1id',
       name: 'w1',
-      description: 'w1 description',
-      lanes: [{
-        id: 'l1',
-        name: 'lane1',
-        storeIteratorSpec: {
-          strategy: {
-            type: 'serial',
-          },
-          storeSchemaId: 's1',
-        },
-        parallelBoxes: [{
-          id: 'pbox1',
-          name: 'pbox1',
-          tasks: [{
-            id: 't1',
-            lambdaId: 'lambda1',
-            name: 'task1',
-            argumentMappings: [],
-            resultMappings: [],
+      summary: 'w1 summary',
+      revisionRegistry: {
+        2: {
+          lanes: [{
+            id: 'l1',
+            name: 'lane1',
+            storeIteratorSpec: {
+              strategy: {
+                type: 'serial',
+              },
+              storeSchemaId: 's1',
+            },
+            parallelBoxes: [{
+              id: 'pbox1',
+              name: 'pbox1',
+              tasks: [{
+                id: 't1',
+                lambdaId: 'lambda1',
+                lambdaRevisionNumber: 1,
+                name: 'task1',
+                argumentMappings: [],
+                resultMappings: [],
+              }],
+            }],
           }],
-        }],
-      }],
-      stores: [{
-        id: 's1',
-        name: 'store1',
-        type: 'singleValue',
-        dataSpec: {
-          type: 'string',
-          valueConstraints: {},
+          stores: [{
+            id: 's1',
+            name: 'store1',
+            type: 'singleValue',
+            dataSpec: {
+              type: 'string',
+              valueConstraints: {},
+            },
+          }],
         },
-      }],
+      },
       atmLambdaList: promiseObject(resolve({
         list: promiseArray(resolve(atmLambdas)),
       })),
@@ -114,7 +133,8 @@ describe('Integration | Component | content atm inventories workflows', function
     }, {
       entityId: 'w0id',
       name: 'w0',
-      description: 'w0 description',
+      summary: 'w0 summary',
+      revisionRegistry: {},
       atmLambdaList: promiseObject(resolve({
         list: promiseArray(resolve(atmLambdas)),
       })),
@@ -151,6 +171,12 @@ describe('Integration | Component | content atm inventories workflows', function
       workflowManager,
       'attachAtmLambdaToAtmInventory'
     ).resolves();
+    sinon.stub(workflowManager, 'saveAtmWorkflowSchemaRevision')
+      .callsFake((atmWorkflowSchemaId, revisionNumber, revisionData) => {
+        const wf = atmWorkflowSchemas.findBy('entityId', atmWorkflowSchemaId);
+        set(wf.revisionRegistry, String(revisionNumber), revisionData);
+        return resolve();
+      });
     const getRecordByIdStub = sinon.stub(recordManager, 'getRecordById')
       .callsFake((modelName, id) => {
         if (modelName === 'atmWorkflowSchema') {
@@ -222,17 +248,16 @@ describe('Integration | Component | content atm inventories workflows', function
       await render(this);
 
       expect(isSlideActive('list')).to.be.true;
-      expect(getSlide('list').innerText).to.contain('w0 description');
+      expect(getSlide('list').innerText).to.contain('w0 summary');
       done();
     });
 
-    it('shows workflow schemas list when "workflowId" is not empty',
+    it('shows workflow schemas list when "workflowId" and "revision" are not empty',
       async function (done) {
-        set(
-          lookupService(this, 'navigation-state'),
-          'aspectOptions.workflowId',
-          'someId'
-        );
+        setProperties(get(lookupService(this, 'navigation-state'), 'aspectOptions'), {
+          workflowId: 'w1id',
+          revision: '2',
+        });
 
         await render(this);
 
@@ -250,21 +275,54 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('editor')).to.be.true;
       expectSlideContainsView('editor', 'creator');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-        .to.deep.equal({ view: 'editor', workflowId: null });
+        .to.deep.equal({ view: 'editor', workflowId: null, revision: null });
       done();
     });
 
     it('allows to open editor view for specific workflow schema', async function (done) {
       await render(this);
 
-      await click(getSlide('list').querySelector('.atm-workflow-schemas-list-entry'));
+      await click(getSlide('list').querySelector('.revisions-table-revision-entry'));
 
       expect(isSlideActive('editor')).to.be.true;
       expectSlideContainsView('editor', 'editor');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-        .to.deep.equal({ view: 'editor', workflowId: 'w0id' });
+        .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
       done();
     });
+
+    it('allows to create new revision and opens it in editor after creation',
+      async function (done) {
+        await render(this);
+
+        await click(
+          getSlide('list').querySelector('.revisions-table-create-revision-entry')
+        );
+
+        expect(isSlideActive('editor')).to.be.true;
+        expectSlideContainsView('editor', 'editor');
+        expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
+          .to.deep.equal({ view: 'editor', workflowId: 'w0id', revision: '1' });
+        done();
+      });
+
+    it('allows to redesign existing revision and opens it in editor after creation',
+      async function (done) {
+        await render(this);
+
+        await click(
+          getSlide('list').querySelector('.revision-actions-trigger')
+        );
+        await click($(
+          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        )[0]);
+
+        expect(isSlideActive('editor')).to.be.true;
+        expectSlideContainsView('editor', 'editor');
+        expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
+          .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '3' });
+        done();
+      });
   });
 
   context('when "view" query param is "editor"', function () {
@@ -285,9 +343,11 @@ describe('Integration | Component | content atm inventories workflows', function
         done();
       });
 
-    it('shows loading page when workflowId is not empty and workflow is being loaded',
+    it('shows loading page when all query params are provided and workflow is being loaded',
       async function (done) {
-        set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', 'abc');
+        const navigationState = lookupService(this, 'navigation-state');
+        set(navigationState, 'aspectOptions.workflowId', 'abc');
+        set(navigationState, 'aspectOptions.revision', '2');
         this.get('getRecordByIdStub')
           .withArgs('atmWorkflowSchema', 'abc')
           .returns(new Promise(() => {}));
@@ -301,10 +361,12 @@ describe('Integration | Component | content atm inventories workflows', function
         done();
       });
 
-    it('shows error page when workflowId is not empty and workflow loading failed',
+    it('shows error page when all query params are provided and workflow loading failed',
       async function (done) {
-        set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', 'abc');
+        const navigationState = lookupService(this, 'navigation-state');
         let rejectCallback;
+        set(navigationState, 'aspectOptions.workflowId', 'abc');
+        set(navigationState, 'aspectOptions.revision', '2');
         this.get('getRecordByIdStub')
           .withArgs('atmWorkflowSchema', 'abc')
           .returns(new Promise((resolve, reject) => { rejectCallback = reject; }));
@@ -320,9 +382,11 @@ describe('Integration | Component | content atm inventories workflows', function
         done();
       });
 
-    it('shows editor page when workflowId is not empty and workflow is loaded',
+    it('shows editor page when all query params are provided and workflow is loaded',
       async function (done) {
-        set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', 'w1id');
+        const navigationState = lookupService(this, 'navigation-state');
+        set(navigationState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationState, 'aspectOptions.revision', '2');
         await render(this);
 
         expect(isSlideActive('editor')).to.be.true;
@@ -334,7 +398,8 @@ describe('Integration | Component | content atm inventories workflows', function
 
     it('allows to go back from editor page', async function (done) {
       const navigationState = lookupService(this, 'navigation-state');
-      set(navigationState, 'aspectOptions.workflowId', 'abc');
+      set(navigationState, 'aspectOptions.workflowId', 'w1id');
+      set(navigationState, 'aspectOptions.revision', '2');
       await render(this);
 
       await click(getSlide('editor').querySelector('.content-back-link'));
@@ -342,7 +407,8 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('list')).to.be.true;
       expect(get(navigationState, 'aspectOptions')).to.deep.equal({
         view: 'list',
-        workflowId: 'abc',
+        workflowId: 'w1id',
+        revision: '2',
       });
       done();
     });
@@ -358,6 +424,7 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(get(navigationState, 'aspectOptions')).to.deep.equal({
         view: 'list',
         workflowId: null,
+        revision: null,
       });
       done();
     });
@@ -365,6 +432,7 @@ describe('Integration | Component | content atm inventories workflows', function
     it('allows to go back from loader page', async function (done) {
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', 'abc');
+      set(navigationState, 'aspectOptions.revision', '2');
       this.get('getRecordByIdStub')
         .withArgs('atmWorkflowSchema', 'abc')
         .returns(new Promise(() => {}));
@@ -376,6 +444,7 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(get(navigationState, 'aspectOptions')).to.deep.equal({
         view: 'list',
         workflowId: 'abc',
+        revision: '2',
       });
       done();
     });
@@ -388,6 +457,9 @@ describe('Integration | Component | content atm inventories workflows', function
       } = this.getProperties('atmWorkflowSchemas', 'atmInventory');
       const createdRecord = {
         entityId: 'someId',
+        revisionRegistry: {
+          1: {},
+        },
         atmInventory: promiseObject(resolve(atmInventory)),
         atmLambdaList: promiseObject(resolve({
           list: promiseArray(resolve([])),
@@ -412,13 +484,14 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('editor')).to.be.true;
       expectSlideContainsView('editor', 'editor');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
-        .to.deep.equal({ view: 'editor', workflowId: 'someId' });
+        .to.deep.equal({ view: 'editor', workflowId: 'someId', revision: '1' });
       done();
     });
 
     it('allows to add new task', async function (done) {
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+      set(navigationsState, 'aspectOptions.revision', '2');
       await render(this);
       const editorSlide = getSlide('editor');
       const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -442,17 +515,19 @@ describe('Integration | Component | content atm inventories workflows', function
       await click(editorSlide.querySelector('.btn-save'));
 
       const atmWorkflowSchema = this.get('atmWorkflowSchemas').findBy('entityId', 'w1id');
-      expect(atmWorkflowSchema.lanes[0].parallelBoxes[0].tasks[1]).to.deep.include({
-        name: 'f1',
-        lambdaId: 'lambda1',
-        argumentMappings: [{
-          argumentName: 'argobject',
-          valueBuilder: {
-            valueBuilderType: 'iteratedItem',
-          },
-        }],
-        resultMappings: [],
-      });
+      expect(atmWorkflowSchema.revisionRegistry[2].lanes[0].parallelBoxes[0].tasks[1])
+        .to.deep.include({
+          name: 'f1',
+          lambdaId: 'lambda1',
+          lambdaRevisionNumber: 1,
+          argumentMappings: [{
+            argumentName: 'argobject',
+            valueBuilder: {
+              valueBuilderType: 'iteratedItem',
+            },
+          }],
+          resultMappings: [],
+        });
       done();
     });
 
@@ -462,6 +537,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const attachAtmLambdaToAtmInventoryStub =
           this.get('attachAtmLambdaToAtmInventoryStub');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -485,12 +561,14 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(editorSlide.querySelector('.btn-save'));
 
         const atmWorkflowSchema = this.get('atmWorkflowSchemas').findBy('entityId', 'w1id');
-        expect(atmWorkflowSchema.lanes[0].parallelBoxes[0].tasks[1]).to.deep.include({
-          name: 'f2',
-          lambdaId: 'lambda2',
-          argumentMappings: [],
-          resultMappings: [],
-        });
+        expect(atmWorkflowSchema.revisionRegistry[2].lanes[0].parallelBoxes[0].tasks[1])
+          .to.deep.include({
+            name: 'f2',
+            lambdaId: 'lambda2',
+            lambdaRevisionNumber: 1,
+            argumentMappings: [],
+            resultMappings: [],
+          });
         done();
       });
 
@@ -498,6 +576,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -515,6 +594,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -532,6 +612,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -550,6 +631,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
@@ -566,6 +648,7 @@ describe('Integration | Component | content atm inventories workflows', function
     it('allows to modify existing task', async function (done) {
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+      set(navigationsState, 'aspectOptions.revision', '2');
       await render(this);
       const editorSlide = getSlide('editor');
       const taskDetailsSlide = getSlide('taskDetails');
@@ -586,16 +669,17 @@ describe('Integration | Component | content atm inventories workflows', function
       await click(editorSlide.querySelector('.btn-save'));
 
       const atmWorkflowSchema = this.get('atmWorkflowSchemas').findBy('entityId', 'w1id');
-      expect(atmWorkflowSchema.lanes[0].parallelBoxes[0].tasks[0]).to.deep.include({
-        name: 'newName',
-        argumentMappings: [{
-          argumentName: 'argobject',
-          valueBuilder: {
-            valueBuilderType: 'const',
-            valueBuilderRecipe: {},
-          },
-        }],
-      });
+      expect(atmWorkflowSchema.revisionRegistry[2].lanes[0].parallelBoxes[0].tasks[0])
+        .to.deep.include({
+          name: 'newName',
+          argumentMappings: [{
+            argumentName: 'argobject',
+            valueBuilder: {
+              valueBuilderType: 'const',
+              valueBuilderRecipe: {},
+            },
+          }],
+        });
       done();
     });
 
@@ -603,6 +687,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -619,6 +704,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
+        set(navigationsState, 'aspectOptions.revision', '2');
         await render(this);
         const editorSlide = getSlide('editor');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -639,12 +725,13 @@ describe('Integration | Component | content atm inventories workflows', function
         set(navigationsState, 'aspectOptions', {
           view: 'lambdaSelector',
           workflowId: 'w1id',
+          revision: '2',
         });
 
         await render(this);
 
         expect(get(navigationsState, 'aspectOptions'))
-          .to.deep.equal({ view: 'editor', workflowId: 'w1id' });
+          .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
         done();
       });
   });
@@ -656,12 +743,13 @@ describe('Integration | Component | content atm inventories workflows', function
         set(navigationsState, 'aspectOptions', {
           view: 'taskDetails',
           workflowId: 'w1id',
+          revision: '2',
         });
 
         await render(this);
 
         expect(get(navigationsState, 'aspectOptions'))
-          .to.deep.equal({ view: 'editor', workflowId: 'w1id' });
+          .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
         done();
       });
   });

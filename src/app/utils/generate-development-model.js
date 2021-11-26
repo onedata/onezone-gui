@@ -903,45 +903,53 @@ function attachProgressToHarvesterIndices(
   }));
 }
 
-function attachAtmLambdasToAtmInventory(store, atmInventory) {
+async function attachAtmLambdasToAtmInventory(store, atmInventory) {
+  const atmInventoryList = await createListRecord(store, 'atmInventory', [atmInventory]);
   return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
     return store.createRecord('atmLambda', {
-      name: `Function ${index}`,
-      summary: `Some very complicated function #${index}`,
-      operationSpec: {
-        engine: 'openfaas',
-        dockerImage: `some-super-docker-image:${index}`,
-        dockerExecutionOptions: {
-          readonly: true,
-          mountOneclient: true,
-          oneclientMountPoint: '/mnt/oneclient',
-          oneclientOptions: '-k',
-        },
-      },
-      argumentSpecs: [{
-        name: 'arg1',
-        dataSpec: { type: 'string' },
-        isBatch: true,
-        isOptional: true,
-        defaultValue: '"some value"',
-      }, {
-        name: 'arg2',
-        dataSpec: { type: 'onedatafsCredentials' },
-        isBatch: true,
-      }],
-      resultSpecs: [{
-        name: 'res1',
-        dataSpec: { type: 'string' },
-        isBatch: false,
-      }],
-      resourceSpec: {
-        cpuRequested: 2,
-        cpuLimit: 10,
-        memoryRequested: 100 * 1024 * 1024,
-        memoryLimit: 200 * 1024 * 1024,
-        ephemeralStorageRequested: 300 * 1024 * 1024,
-        ephemeralStorageLimit: null,
-      },
+      atmInventoryList,
+      revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
+        registry[revisionNumber] = {
+          name: `Function ${index}`,
+          state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
+          summary: `Some very complicated function #${index}.${revisionNumber}`,
+          operationSpec: {
+            engine: 'openfaas',
+            dockerImage: `some-super-docker-image:${index}.${revisionNumber}`,
+            dockerExecutionOptions: {
+              readonly: true,
+              mountOneclient: true,
+              oneclientMountPoint: '/mnt/oneclient',
+              oneclientOptions: '-k',
+            },
+          },
+          argumentSpecs: [{
+            name: 'arg1',
+            dataSpec: { type: 'string' },
+            isBatch: true,
+            isOptional: true,
+            defaultValue: '"some value"',
+          }, {
+            name: 'arg2',
+            dataSpec: { type: 'onedatafsCredentials' },
+            isBatch: true,
+          }],
+          resultSpecs: [{
+            name: 'res1',
+            dataSpec: { type: 'string' },
+            isBatch: false,
+          }],
+          resourceSpec: {
+            cpuRequested: 2,
+            cpuLimit: 10,
+            memoryRequested: 100 * 1024 * 1024,
+            memoryLimit: 200 * 1024 * 1024,
+            ephemeralStorageRequested: 300 * 1024 * 1024,
+            ephemeralStorageLimit: null,
+          },
+        };
+        return registry;
+      }, {}),
     }).save();
   })).then(atmLambdas =>
     createListRecord(store, 'atmLambda', atmLambdas)
@@ -959,33 +967,75 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
         await createListRecord(store, 'atmLambda', inventoryAtmLambdas);
       return await store.createRecord('atmWorkflowSchema', {
         name: `Workflow ${index}`,
-        description: `Some very complicated workflow #${index}`,
+        summary: `Some very complicated workflow #${index}`,
         atmLambdaList: workflowAtmLambdas,
         atmInventory,
-        lanes: [{
-          id: 'lane1',
-          name: 'lane 1',
-          storeIteratorSpec: {
-            strategy: {
-              type: 'serial',
-            },
-            storeSchemaId: 'store1',
+        revisionRegistry: {
+          1: {
+            description: 'My 1st revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
           },
-          parallelBoxes: [{
-            id: 'pbox1-1',
-            name: 'Parallel box',
-            tasks: [],
-          }],
-        }],
-        stores: [{
-          id: 'store1',
-          name: 'store 1',
-          type: 'list',
-          dataSpec: {
-            type: 'string',
-            valueConstraints: {},
+          2: {
+            description: 'My 2nd revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
           },
-        }],
+          3: {
+            description: 'My 3rd revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          4: {
+            description: 'My 4th revision',
+            state: 'stable',
+            lanes: [{
+              id: 'lane1',
+              name: 'lane 1',
+              storeIteratorSpec: {
+                strategy: {
+                  type: 'serial',
+                },
+                storeSchemaId: 'store1',
+              },
+              parallelBoxes: [{
+                id: 'pbox1-1',
+                name: 'Parallel box',
+                tasks: [],
+              }],
+            }],
+            stores: [{
+              id: 'store1',
+              name: 'store 1',
+              type: 'list',
+              dataSpec: {
+                type: 'string',
+                valueConstraints: {},
+              },
+            }],
+          },
+          5: {
+            description: 'My 5th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          6: {
+            description: 'My 6th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+          7: {
+            description: 'My 7th revision',
+            state: 'draft',
+            lanes: [],
+            stores: [],
+          },
+        },
       }).save();
     })
   );

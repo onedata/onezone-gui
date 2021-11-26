@@ -118,6 +118,20 @@ export default Service.extend({
   },
 
   /**
+   * Reloads specified record if it has been already loaded.
+   * @param {String} modelName
+   * @param {String} recordId
+   * @returns {Promise<GraphSingleModel|null>}
+   */
+  async reloadRecordById(modelName, recordId) {
+    const loadedRecord = this.getLoadedRecordById(modelName, recordId);
+    if (!loadedRecord) {
+      return null;
+    }
+    return await loadedRecord.reload();
+  },
+
+  /**
    * Returns current user record
    * @returns {Models.User}
    */
@@ -161,10 +175,10 @@ export default Service.extend({
    * loaded earlier.
    * @param {String} modelName
    * @param {String} recordId
-   * @returns {Models.User}
+   * @returns {Promise<GraphSingleModel|null>}
    */
   getLoadedRecordById(modelName, recordId) {
-    return this.getAllLoadedRecords(modelName).findBy('entityId', recordId);
+    return this.getAllLoadedRecords(modelName).findBy('entityId', recordId) || null;
   },
 
   /**

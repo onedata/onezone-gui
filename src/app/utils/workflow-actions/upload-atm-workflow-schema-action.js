@@ -1,17 +1,6 @@
 /**
- * Uploads workflow schema from JSON file. Needs `atmInventory` passed in context.
- *
- * Can be triggered in two ways:
- * - like all other actions - via execute() method. In that case "open file" dialog
- *   is programatically triggered and state of that dialog is available via
- *   `uploadFileDefer`. It provides promise, which resolves after choosing file or
- *   rejects when dialog is closed without file selection.
- * - by changing value of hidden input rendered in document body. Typically this input
- *   is used only to trigger "open file" dialog by execute(), but in some circumstances
- *   it might be changed directly by e.g. Selenium. In that case the full execution flow
- *   is triggered (like during execute()), except that "open file" dialog is not being
- *   triggered (so `uploadFileDefer` is not set). Instead of that, value provided
- *   to the input is passed via `fileToUseForNextExecution` to the action algorithm.
+ * Uploads workflow schema from JSON file. Needs `atmInventory` passed
+ * in context.
  *
  * @module utils/workflow-actions/upload-atm-workflow-schema-action
  * @author Michał Borzęcki
@@ -20,26 +9,19 @@
  */
 
 import { reads } from '@ember/object/computed';
-import { get, setProperties } from '@ember/object';
-import Action from 'onedata-gui-common/utils/action';
-import ActionResult from 'onedata-gui-common/utils/action-result';
 import { inject as service } from '@ember/service';
-import { Promise } from 'rsvp';
-import { defer } from 'rsvp';
+import ActionResult from 'onedata-gui-common/utils/action-result';
+import EmberObject, { computed, get, set } from '@ember/object';
+import { bool, not } from 'ember-awesome-macros';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import { defer, Promise } from 'rsvp';
+import config from 'ember-get-config';
+import ObjectProxy from '@ember/object/proxy';
+import ApplyAtmWorkflowSchemaDumpActionBase from 'onezone-gui/utils/workflow-actions/apply-atm-workflow-schema-dump-action-base';
 
-const allowedAtmWorkflowSchemaJsonKeys = [
-  'supplementaryAtmLambdas',
-  'stores',
-  'state',
-  'schemaFormatVersion',
-  'name',
-  'lanes',
-  'description',
-  'atmWorkflowSchemaId',
-];
-
-export default Action.extend({
+export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   workflowManager: service(),
+  modalManager: service(),
 
   /**
    * @override
@@ -57,32 +39,145 @@ export default Action.extend({
   icon: 'browser-upload',
 
   /**
-   * @type {ComputedProperty<Models.AtmInventory>}
+   * @type {DumpLoader}
    */
-  atmInventory: reads('context.atmInventory'),
-
-  /**
-   * @type {HTMLInputElement|null}
-   */
-  uploadInputElement: null,
-
-  /**
-   * @type {RSVP.Defer}
-   */
-  uploadFileDefer: null,
-
-  /**
-   * Contains file, which should be processed by next action execution. When present,
-   * file input will not be used.
-   * Is needed to handle action executions triggered by external file input change.
-   * @type {File|null}
-   */
-  fileToUseForNextExecution: null,
+  dumpLoader: undefined,
 
   /**
    * @type {Window}
    */
   _window: window,
+
+  /**
+   * @override
+   */
+  disabled: not('hasManageWorkflowSchemasPrivilege'),
+
+  /**
+   * @override
+   */
+  tip: computed(
+    'hasManageWorkflowSchemasPrivilege',
+    function tip() {
+      const {
+        i18n,
+        hasManageWorkflowSchemasPrivilege,
+      } = this.getProperties(
+        'i18n',
+        'hasManageWorkflowSchemasPrivilege'
+      );
+
+      return hasManageWorkflowSchemasPrivilege ? '' : insufficientPrivilegesMessage({
+        i18n,
+        modelName: 'atmInventory',
+        privilegeFlag: 'atm_inventory_manage_workflow_schemas',
+      });
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<Models.AtmInventory>}
+   */
+  atmInventory: reads('context.atmInventory'),
+
+  /**
+   * @type {ComputedProperty<Boolean>}
+   */
+  hasManageWorkflowSchemasPrivilege: bool('atmInventory.privileges.manageWorkflowSchemas'),
+
+  /**
+   * @override
+   */
+  init() {
+    this._super(...arguments);
+    this.set('dumpLoader', DumpLoader.create({
+      onExternalUpload: () => this.execute(),
+      _window: this.get('_window'),
+    }));
+  },
+
+  /**
+   * @override
+   */
+  willDestroy() {
+    try {
+      this.get('dumpLoader').destroy();
+    } finally {
+      this._super(...arguments);
+    }
+  },
+
+  /**
+   * @override
+   */
+  async onExecute() {
+    const {
+      atmInventory,
+      modalManager,
+      dumpLoader,
+    } = this.getProperties(
+      'atmInventory',
+      'modalManager',
+      'dumpLoader',
+    );
+    const uploadedFileProxy = get(dumpLoader, 'uploadedFileProxy');
+    const result = ActionResult.create();
+    const finalizeExecution = () => {
+      dumpLoader.clearState();
+      result.cancelIfPending();
+      return result;
+    };
+
+    if (!get(uploadedFileProxy, 'content')) {
+      try {
+        await dumpLoader.loadJsonFile();
+      } catch (e) {
+        return finalizeExecution();
+      }
+    }
+
+    await modalManager.show('apply-atm-workflow-schema-dump-modal', {
+      initialAtmInventory: atmInventory,
+      dumpSourceType: 'upload',
+      dumpSourceProxy: uploadedFileProxy,
+      onReupload: () => dumpLoader.loadJsonFile(),
+      onSubmit: (data) => this.handleModalSubmit(data, result),
+    }).hiddenPromise;
+
+    return finalizeExecution();
+  },
+});
+
+const DumpLoader = EmberObject.extend({
+  /**
+   * @virtual
+   * @type {() => void}
+   */
+  onExternalUpload: undefined,
+
+  /**
+   * @virtual
+   * @type {Window}
+   */
+  _window: undefined,
+
+  /**
+   * @private
+   * @type {HTMLInputElement|null}
+   */
+  uploadInputElement: null,
+
+  /**
+   * @private
+   * @type {RSVP.Defer}
+   */
+  loadJsonFileDefer: null,
+
+  /**
+   * @public
+   * @type {ComputedProperty<ObjectProxy<AtmWorkflowSchemaDumpSource>>}
+   */
+  uploadedFileProxy: computed(() => ObjectProxy.create()),
 
   /**
    * @override
@@ -97,9 +192,7 @@ export default Action.extend({
    */
   willDestroy() {
     try {
-      if (this.get('uploadFileDefer')) {
-        this.fileSelectionCancelled();
-      }
+      this.clearState();
       this.unmountUploadInput();
     } finally {
       this._super(...arguments);
@@ -107,40 +200,42 @@ export default Action.extend({
   },
 
   /**
-   * @override
+   * @public
+   * @returns {Promise}
    */
-  async onExecute() {
-    const result = ActionResult.create();
-    const fileToUseForNextExecution = this.get('fileToUseForNextExecution');
-
-    let file;
-    if (fileToUseForNextExecution) {
-      file = fileToUseForNextExecution;
-      this.set('fileToUseForNextExecution', null);
-    } else {
-      try {
-        file = await this.getJsonFile();
-      } catch (e) {
-        result.cancelIfPending();
-        return result;
-      }
+  async loadJsonFile() {
+    const {
+      loadJsonFileDefer: existingLoadJsonFileDefer,
+      _window,
+    } = this.getProperties('loadJsonFileDefer', '_window');
+    if (existingLoadJsonFileDefer) {
+      this.fileSelectionCancelled();
     }
+    const newLoadJsonFileDefer = this.set('loadJsonFileDefer', defer());
+    _window.addEventListener('focus', () => {
+      // Based on https://stackoverflow.com/a/63773257. It does not detect
+      // "open file" dialog canellation on iOS and it is hard to find any working
+      // solution for that issue. :(
+      // Wait for input change event to be processed (especially in mobile
+      // browsers and macOS).
+      setTimeout(() => {
+        if (this.get('loadJsonFileDefer') === newLoadJsonFileDefer) {
+          this.fileSelectionCancelled();
+        }
+      }, 2000);
+    }, { once: true });
+    this.triggerFileSelection();
+    return await newLoadJsonFileDefer.promise;
+  },
 
-    let atmWorkflowSchemaPrototype;
-    try {
-      const fileContent = await this.getFileContent(file);
-      atmWorkflowSchemaPrototype = this.generateAtmWorkflowPrototype(fileContent);
-    } catch (e) {
-      setProperties(result, {
-        status: 'failed',
-        error: String(this.t('cannotParseFile')),
-      });
-      return result;
+  /**
+   * @public
+   */
+  clearState() {
+    if (this.get('loadJsonFileDefer')) {
+      this.fileSelectionCancelled();
     }
-
-    return await result.interceptPromise(
-      this.createAtmWorkflowSchema(atmWorkflowSchemaPrototype)
-    ).then(() => result, () => result);
+    this.set('uploadedFileProxy.content', null);
   },
 
   /**
@@ -193,48 +288,79 @@ export default Action.extend({
 
   /**
    * @private
-   * @returns {Promise<File>}
    */
-  async getJsonFile() {
-    const {
-      uploadInputElement,
-      uploadFileDefer: existingUploadFileDefer,
-      _window,
-    } = this.getProperties('uploadInputElement', 'uploadFileDefer', '_window');
-    if (existingUploadFileDefer) {
-      this.fileSelectionCancelled();
-    }
-    const newUploadFileDefer = this.set('uploadFileDefer', defer());
-    _window.addEventListener('focus', () => {
-      // Based on https://stackoverflow.com/a/63773257. It does not detect
-      // "open file" dialog canellation on iOS and it is hard to find any working
-      // solution for that issue. :(
-      // Wait for input change event to be processed (especially in mobile
-      // browsers and macOS).
-      setTimeout(() => {
-        if (this.get('uploadFileDefer') === newUploadFileDefer) {
-          this.fileSelectionCancelled();
-        }
-      }, 2000);
-    }, { once: true });
-    uploadInputElement.click();
-    return await newUploadFileDefer.promise;
+  triggerFileSelection() {
+    this.get('uploadInputElement').click();
   },
 
   /**
    * @private
    * @param {File} file
    */
-  fileSelected(file) {
-    const uploadFileDefer = this.get('uploadFileDefer');
-    if (uploadFileDefer) {
-      uploadFileDefer.resolve(file);
-      this.set('uploadFileDefer', null);
-    } else {
+  async fileSelected(file) {
+    const {
+      loadJsonFileDefer,
+      uploadedFileProxy,
+      onExternalUpload,
+    } = this.getProperties('loadJsonFileDefer', 'uploadedFileProxy', 'onExternalUpload');
+    const uploadedFile = await this.parseUploadedFile(file);
+    const wasProxyEmpty = !get(uploadedFileProxy, 'content');
+    set(uploadedFileProxy, 'content', uploadedFile);
+    if (loadJsonFileDefer) {
+      // Upload was triggered by action execution. It will create uploadedFileProxy
+      // on its own.
+      loadJsonFileDefer.resolve();
+      this.set('uploadedFileDefer', null);
+    } else if (wasProxyEmpty && onExternalUpload) {
       // File selection was triggered from the outside (e.g. by Selenium).
       // We need to perform full action handling from this place.
-      this.set('fileToUseForNextExecution', file);
-      this.execute();
+      onExternalUpload();
+    }
+  },
+
+  async parseUploadedFile(file) {
+    let content;
+    try {
+      content = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file);
+      });
+    } catch (error) {
+      this.logParsingError(error);
+      content = null;
+    }
+    const parsedContent = content ? this.parseFileRawContent(content) : null;
+    return {
+      name: file.name,
+      dump: parsedContent,
+    };
+  },
+
+  parseFileRawContent(fileRawContent) {
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(fileRawContent);
+    } catch (error) {
+      this.logParsingError(error);
+      return null;
+    }
+    if (
+      typeof parsedContent !== 'object' || !parsedContent ||
+      typeof parsedContent.name !== 'string' ||
+      typeof parsedContent.revision !== 'object' || !parsedContent.revision
+    ) {
+      return null;
+    }
+    return parsedContent;
+  },
+
+  logParsingError(error) {
+    if (config.environment !== 'test') {
+      console.error('util:workflow-actions/upload-atm-workflow-schema-action', error);
     }
   },
 
@@ -242,65 +368,10 @@ export default Action.extend({
    * @private
    */
   fileSelectionCancelled() {
-    const uploadFileDefer = this.get('uploadFileDefer');
-    if (uploadFileDefer) {
-      uploadFileDefer.reject();
-      this.set('uploadFileDefer', null);
+    const loadJsonFileDefer = this.get('loadJsonFileDefer');
+    if (loadJsonFileDefer) {
+      loadJsonFileDefer.reject();
+      this.set('loadJsonFileDefer', null);
     }
-  },
-
-  /**
-   * @private
-   * @param {File} file
-   * @returns {Promise<String>}
-   */
-  async getFileContent(file) {
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        resolve(reader.result);
-      };
-      reader.onerror = () => reject(reader.error);
-      reader.readAsText(file);
-    });
-  },
-
-  /**
-   * @private
-   * @param {String} fileContent
-   * @returns {Object}
-   */
-  generateAtmWorkflowPrototype(fileContent) {
-    const spec = JSON.parse(fileContent);
-
-    if (!spec || typeof spec !== 'object') {
-      throw new Error('Passed data is not a JSON object.');
-    }
-
-    const validatedSpec = allowedAtmWorkflowSchemaJsonKeys.reduce((vs, allowedKey) => {
-      if (allowedKey in spec) {
-        vs[allowedKey] = spec[allowedKey];
-      }
-      return vs;
-    }, {});
-
-    return validatedSpec;
-  },
-
-  /**
-   * @private
-   * @param {Object} atmWorkflowSchemaPrototype
-   * @returns {Promise<Models.AtmWorkflowSchema>}
-   */
-  async createAtmWorkflowSchema(atmWorkflowSchemaPrototype) {
-    const {
-      workflowManager,
-      atmInventory,
-    } = this.getProperties('workflowManager', 'atmInventory');
-
-    return await workflowManager.createAtmWorkflowSchema(
-      get(atmInventory, 'entityId'),
-      atmWorkflowSchemaPrototype
-    );
   },
 });

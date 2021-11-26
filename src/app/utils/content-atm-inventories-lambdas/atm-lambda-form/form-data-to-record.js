@@ -18,6 +18,7 @@ import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/wor
 export default function formDataToRecord(formData) {
   const {
     name,
+    state,
     summary,
     engine,
     openfaasOptions,
@@ -27,6 +28,7 @@ export default function formDataToRecord(formData) {
   } = getProperties(
     formData,
     'name',
+    'state',
     'summary',
     'engine',
     'openfaasOptions',
@@ -80,6 +82,7 @@ export default function formDataToRecord(formData) {
   const resourceSpec = serializeTaskResourcesFieldsValues(resources);
   return {
     name,
+    state,
     summary,
     description: '',
     operationSpec,

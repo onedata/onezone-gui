@@ -13,7 +13,7 @@ import { reads } from '@ember/object/computed';
 import { get } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
-import ActionResult from 'onedata-gui-common/utils/action-result';
+import createEmptyRevision from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/create-empty-revision';
 
 export default Action.extend({
   workflowManager: service(),
@@ -36,7 +36,7 @@ export default Action.extend({
   /**
    * @override
    */
-  onExecute() {
+  async onExecute() {
     const {
       rawAtmWorkflowSchema,
       atmInventory,
@@ -47,10 +47,16 @@ export default Action.extend({
       'workflowManager',
     );
     const atmInventoryId = get(atmInventory, 'entityId');
+    const rawAtmWorkflowSchemaToSave = Object.assign({
+      revision: {
+        originalRevisionNumber: 1,
+        atmWorkflowSchemaRevision: createEmptyRevision(),
+      },
+    }, rawAtmWorkflowSchema);
 
-    const result = ActionResult.create();
-    return result.interceptPromise(
-      workflowManager.createAtmWorkflowSchema(atmInventoryId, rawAtmWorkflowSchema)
-    ).then(() => result, () => result);
+    return await workflowManager.createAtmWorkflowSchema(
+      atmInventoryId,
+      rawAtmWorkflowSchemaToSave
+    );
   },
 });

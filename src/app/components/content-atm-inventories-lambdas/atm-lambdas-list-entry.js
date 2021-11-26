@@ -9,14 +9,12 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { conditional, tag } from 'ember-awesome-macros';
-import computedT from 'onedata-gui-common/utils/computed-t';
 import { inject as service } from '@ember/service';
-import { computed, get } from '@ember/object';
-import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { collect } from '@ember/object/computed';
+import { computed } from '@ember/object';
+import { collect, reads } from '@ember/object/computed';
+import { conditional, raw, eq } from 'ember-awesome-macros';
 import { scheduleOnce } from '@ember/runloop';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-lambda/revision-actions-factory';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -39,13 +37,6 @@ export default Component.extend(I18n, {
   atmLambda: undefined,
 
   /**
-   * Needed when `mode` is `'presentation'`.
-   * @virtual optional
-   * @type {Models.AtmInventory}
-   */
-  atmInventory: undefined,
-
-  /**
    * One of: `'presentation'`, `'selection'`
    * @virtual optional
    * @type {String}
@@ -53,12 +44,30 @@ export default Component.extend(I18n, {
   mode: 'presentation',
 
   /**
-   * Needed when `mode` is `'selection'`
+   * Needed when `mode` is `'presentation'`.
    * @virtual optional
-   * @type {Function}
-   * @returns {any}
+   * @type {Models.AtmInventory}
    */
-  onAddToAtmWorkflowSchema: notImplementedIgnore,
+  atmInventory: undefined,
+
+  /**
+   * Needed when `mode` is `'selection'`
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
+   */
+  onAddToAtmWorkflowSchema: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: Number) => void}
+   */
+  onRevisionClick: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: Number) => void}
+   */
+  onRevisionCreate: undefined,
 
   /**
    * @type {Boolean}
@@ -66,41 +75,71 @@ export default Component.extend(I18n, {
   areActionsOpened: false,
 
   /**
-   * @type {Boolean}
+   * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
    */
-  isExpanded: false,
-
-  /**
-   * @type {Boolean}
-   */
-  isEditing: false,
+  revisionCustomColumnSpecs: computed('mode', function revisionCustomColumnSpecs() {
+    const cols = [{
+      name: 'name',
+      title: this.t('columns.name.title'),
+      className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'name',
+        fallbackValue: this.t('columns.name.fallback'),
+      },
+    }, {
+      name: 'summary',
+      title: this.t('columns.summary.title'),
+      className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'summary',
+        fallbackValue: this.t('columns.summary.fallback'),
+      },
+    }];
+    if (this.get('mode') === 'selection') {
+      cols.push({
+        name: 'addToWorkflow',
+        title: '',
+        content: {
+          type: 'button',
+          buttonLabel: this.t('columns.addToWorkflow.buttonLabel'),
+          buttonIcon: 'plus',
+        },
+      });
+    }
+    return cols;
+  }),
 
   /**
    * @type {ComputedProperty<String>}
    */
-  modeClass: tag `mode-${'mode'}`,
+  latestRevisionName: reads('atmLambda.latestRevision.name'),
 
   /**
-   * @type {ComputedProperty<SafeString>}
+   * @type {ComputedProperty<String>}
    */
-  toggleDetailsText: conditional(
-    'isExpanded',
-    computedT('hideDetails'),
-    computedT('showDetails'),
+  latestRevisionSummary: reads('atmLambda.latestRevision.summary'),
+
+  /**
+   * @type {ComputedProperty<Utils.AtmWorkflow.AtmLambda.RevisionActionsFactory>}
+   */
+  revisionActionsFactory: computed(
+    'atmLambda',
+    'onRevisionCreate',
+    function revisionActionsFactory() {
+      const {
+        atmLambda,
+        onRevisionCreate,
+      } = this.getProperties('atmLambda', 'onRevisionCreate');
+      return RevisionActionsFactory.create({
+        ownerSource: this,
+        atmLambda,
+        onRevisionCreate: onRevisionCreate ?
+          (...args) => onRevisionCreate(atmLambda, ...args) : undefined,
+      });
+    }
   ),
-
-  /**
-   * @type {ComputedProperty<Utils.Action>}
-   */
-  modifyAction: computed('isEditing', function modifyAction() {
-    return {
-      action: () => this.startEdition(),
-      title: this.t('modifyAction'),
-      class: 'modify-action-trigger',
-      icon: 'rename',
-      disabled: this.get('isEditing'),
-    };
-  }),
 
   /**
    * @type {ComputedProperty<Utils.Action>}
@@ -133,43 +172,32 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  atmLambdaActionsArray: collect('modifyAction', 'unlinkAction', 'copyIdAction'),
-
-  startEdition() {
-    this.set('isEditing', true);
-  },
-
-  stopEdition() {
-    this.set('isEditing', false);
-  },
+  atmLambdaActionsArray: conditional(
+    eq('mode', raw('selection')),
+    collect('copyIdAction'),
+    collect('unlinkAction', 'copyIdAction')
+  ),
 
   actions: {
+    clickRevision(revisionNumber) {
+      const {
+        onRevisionClick,
+        atmLambda,
+      } = this.getProperties('onRevisionClick', 'atmLambda');
+
+      onRevisionClick && onRevisionClick(atmLambda, revisionNumber);
+    },
     toggleActionsOpen(state) {
       scheduleOnce('afterRender', this, 'set', 'areActionsOpened', state);
     },
-    toggleDetails() {
-      this.toggleProperty('isExpanded');
-    },
-    async saveChanges(atmLambdaDiff) {
+    addToWorkflowSchema(revisionNumber) {
       const {
-        workflowActions,
+        onAddToAtmWorkflowSchema,
         atmLambda,
-      } = this.getProperties('workflowActions', 'atmLambda');
-
-      if (Object.keys(atmLambdaDiff).length) {
-        const result = await workflowActions.createModifyAtmLambdaAction({
-          atmLambda,
-          atmLambdaDiff,
-        }).execute();
-        if (get(result, 'status') === 'done') {
-          safeExec(this, 'stopEdition');
-        }
-      } else {
-        this.stopEdition();
+      } = this.getProperties('onAddToAtmWorkflowSchema', 'atmLambda');
+      if (onAddToAtmWorkflowSchema) {
+        onAddToAtmWorkflowSchema(atmLambda, revisionNumber);
       }
-    },
-    cancelChanges() {
-      this.stopEdition();
     },
   },
 });

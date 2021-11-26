@@ -11,37 +11,15 @@
   .arguments-field,
   .results-field {
     .collection-item + .collection-item {
+      padding-top: $form-group-margin-bottom;
       border-top: 1px solid $main-border-color;
     }
 
-    &.field-edit-mode {
-      .collection-item + .collection-item {
-        padding-top: $form-group-margin-bottom;
-      }
-
-      .entryName-field,
-      .entryType-field,
-      .entryDefaultValue-field {
-        .control-label {
-          display: none;
-        }
-      }
-    }
-
-    &.field-view-mode {
-      flex-wrap: wrap;
-
-      .form-fields-collection-group {
-        flex: 0 1 100%;
-        margin-left: $nested-fields-indent;
-      }
-
-      .entry-field {
-        min-width: 0;
-      }
-
-      .collection-item {
-        padding-top: $form-component-view-margin;
+    .entryName-field,
+    .entryType-field,
+    .entryDefaultValue-field {
+      .control-label {
+        display: none;
       }
     }
   }
@@ -75,13 +53,11 @@
   @media (max-width: $screen-xs-max) {
     .arguments-field,
     .results-field {
-      &.field-edit-mode {
-        .form-fields-collection-group {
-          margin-left: $nested-fields-indent;
-        }
-        > .control-label {
-          margin-bottom: $form-group-margin-bottom / 2;
-        }
+      .form-fields-collection-group {
+        margin-left: $nested-fields-indent;
+      }
+      > .control-label {
+        margin-bottom: $form-group-margin-bottom / 2;
       }
     }
   }
@@ -94,14 +70,12 @@
 
     .arguments-field,
     .results-field {
-      &.field-edit-mode {
-        flex-wrap: nowrap;
+      flex-wrap: nowrap;
 
-        .entry-children {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: flex-start;
-        }
+      .entry-children {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
       }
     }
 
@@ -114,11 +88,9 @@
 
       .entryBatch-field,
       .entryOptional-field {
-        &.field-edit-mode {
-          .control-label {
-            width: initial;
-            min-width: initial;
-          }
+        .control-label {
+          width: initial;
+          min-width: initial;
         }
       }
     }
@@ -144,62 +116,60 @@
 
     .arguments-field,
     .results-field {
-      &.field-edit-mode {
-        .entryName-field {
-          flex: 0 1 calc(50% - #{$padding-right / 2});
-        }
+      .entryName-field {
+        flex: 0 1 calc(50% - #{$padding-right / 2});
+      }
 
-        .entryType-field {
-          flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
-          min-width: 15em;
-          margin-left: $padding-base-vertical;
-        }
+      .entryType-field {
+        flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
+        min-width: 15em;
+        margin-left: $padding-base-vertical;
+      }
 
-        .entryBatch-field,
-        .entryOptional-field {
-          flex: 0 1 $entry-toggle-container-width;
-          height: $input-height-base;
+      .entryBatch-field,
+      .entryOptional-field {
+        flex: 0 1 $entry-toggle-container-width;
+        height: $input-height-base;
 
-          .control-label {
-            position: absolute;
-            min-width: initial;
-            width: initial;
-            max-width: initial;
-            padding: 0;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-          }
-
-          .field-component {
-            text-align: center;
-          }
-        }
-
-        .entryBatch-field {
-          transform: translateX(#{$x-offset-to-center-toggles});
-        }
-
-        .entryOptional-field {
-          transform: translateX(-#{$x-offset-to-center-toggles});
-        }
-
-        .entryDefaultValue-field {
-          margin-right: $padding-right;
-        }
-
-        .remove-field-button-container {
+        .control-label {
           position: absolute;
-          right: 0;
+          min-width: initial;
+          width: initial;
+          max-width: initial;
+          padding: 0;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
         }
 
-        .remove-icon {
-          margin-top: initial;
+        .field-component {
+          text-align: center;
         }
+      }
+
+      .entryBatch-field {
+        transform: translateX(#{$x-offset-to-center-toggles});
+      }
+
+      .entryOptional-field {
+        transform: translateX(-#{$x-offset-to-center-toggles});
+      }
+
+      .entryDefaultValue-field {
+        margin-right: $padding-right;
+      }
+
+      .remove-field-button-container {
+        position: absolute;
+        right: 0;
+      }
+
+      .remove-icon {
+        margin-top: initial;
       }
     }
 
-    .results-field.field-edit-mode {
+    .results-field {
       .remove-field-button-container {
         right: $entry-toggle-container-width - $x-offset-to-center-toggles * 2;
       }

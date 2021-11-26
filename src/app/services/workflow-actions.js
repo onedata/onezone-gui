@@ -15,13 +15,18 @@ import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
-import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
+import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
+import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
-import DumpAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-action';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
+import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';
+import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
+import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import { classify } from '@ember/string';
 
 export default Service.extend(I18n, {
@@ -101,13 +106,28 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmLambda: Models.AtmLambda,
-   *     atmLambdaDiff: Object,
+   *     revisionContent: AtmLambdaRevision,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.ModifyAtmLambdaAction}
+   * @returns {Utils.WorkflowActions.CreateAtmLambdaRevisionAction}
    */
-  createModifyAtmLambdaAction(context) {
-    return ModifyAtmLambdaAction.create({ ownerSource: this, context });
+  createCreateAtmLambdaRevisionAction(context) {
+    return CreateAtmLambdaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmLambda: Models.AtmLambda,
+   *     revisionNumber: number,
+   *     revisionDiff: Object,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.ModifyAtmLambdaRevisionAction}
+   */
+  createModifyAtmLambdaRevisionAction(context) {
+    return ModifyAtmLambdaRevisionAction.create({ ownerSource: this, context });
   },
 
   /**
@@ -169,26 +189,87 @@ export default Service.extend(I18n, {
    * @param {Object} context context specification:
    *   ```
    *   {
-   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     atmInventory: Models.AtmInventory,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaAction}
+   * @returns {Utils.WorkflowActions.UploadAtmWorkflowSchemaAction}
    */
-  createDumpAtmWorkflowSchemaAction(context) {
-    return DumpAtmWorkflowSchemaAction.create({ ownerSource: this, context });
+  createUploadAtmWorkflowSchemaAction(context) {
+    return UploadAtmWorkflowSchemaAction.create({ ownerSource: this, context });
   },
 
   /**
    * @param {Object} context context specification:
    *   ```
    *   {
-   *     atmInventory: Models.AtmInventory,
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     revisionNumber: Number,
    *   }
    *   ```
-   * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaAction}
+   * @returns {Utils.WorkflowActions.RemoveAtmWorkflowSchemaRevisionAction}
    */
-  createUploadAtmWorkflowSchemaAction(context) {
-    return UploadAtmWorkflowSchemaAction.create({ ownerSource: this, context });
+  createRemoveAtmWorkflowSchemaRevisionAction(context) {
+    return RemoveAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     revisionNumber: Number,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaRevisionAction}
+   */
+  createDumpAtmWorkflowSchemaRevisionAction(context) {
+    return DumpAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     originRevisionNumber: Number|undefined,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.CreateAtmWorkflowSchemaRevisionAction}
+   */
+  createCreateAtmWorkflowSchemaRevisionAction(context) {
+    return CreateAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     revisionNumber: Number,
+   *     revisionDiff: Object,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.ModifyAtmWorkflowSchemaRevisionAction}
+   */
+  createModifyAtmWorkflowSchemaRevisionAction(context) {
+    return ModifyAtmWorkflowSchemaRevisionAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {Object} context context specification:
+   *   ```
+   *   {
+   *     atmWorkflowSchema: Models.AtmWorkflowSchema,
+   *     revisionNumber: Number,
+   *   }
+   *   ```
+   * @returns {Utils.WorkflowActions.DuplicateAtmWorkflowSchemaRevisionAction}
+   */
+  createDuplicateAtmWorkflowSchemaRevisionAction(context) {
+    return DuplicateAtmWorkflowSchemaRevisionAction.create({
+      ownerSource: this,
+      context,
+    });
   },
 
   createGlobalActions() {

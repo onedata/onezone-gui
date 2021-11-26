@@ -10,15 +10,15 @@ import { resolve } from 'rsvp';
 import ModifyAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-action';
 import RemoveAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
+import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
+import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
+import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 
 const workflowActionsSpec = [{
   className: 'change-details-action-trigger',
   label: 'Change details',
   icon: 'rename',
-}, {
-  className: 'dump-atm-workflow-schema-action-trigger',
-  label: 'Download (json)',
-  icon: 'browser-download',
 }, {
   className: 'remove-atm-workflow-schema-action-trigger',
   label: 'Remove',
@@ -29,13 +29,37 @@ const workflowActionsSpec = [{
   icon: 'copy',
 }];
 
+const revisionActionsSpec = [{
+  className: 'create-atm-workflow-schema-revision-action-trigger',
+  label: 'Redesign as new revision',
+  icon: 'plus',
+}, {
+  className: 'duplicate-atm-workflow-schema-revision-action-trigger',
+  label: 'Duplicate to...',
+  icon: 'browser-copy',
+}, {
+  className: 'dump-atm-workflow-schema-revision-action-trigger',
+  label: 'Download (json)',
+  icon: 'browser-download',
+}, {
+  className: 'remove-atm-workflow-schema-revision-action-trigger',
+  label: 'Remove',
+  icon: 'x',
+}];
+
 function generateAtmWorkflowSchema(name) {
   return {
     constructor: {
       modelName: 'atmWorkflowSchema',
     },
     name,
-    description: `${name} description`,
+    summary: `${name} summary`,
+    revisionRegistry: {
+      1: {
+        state: 'draft',
+        description: `${name} first revision`,
+      },
+    },
     isLoaded: true,
   };
 }
@@ -52,6 +76,10 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       ModifyAtmWorkflowSchemaAction.create();
       RemoveAtmWorkflowSchemaAction.create();
       CopyRecordIdAction.create();
+      CreateAtmWorkflowSchemaRevisionAction.create();
+      DuplicateAtmWorkflowSchemaRevisionAction.create();
+      DumpAtmWorkflowSchemaRevisionAction.create();
+      RemoveAtmWorkflowSchemaRevisionAction.create();
     });
 
     beforeEach(function () {
@@ -60,7 +88,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
           generateAtmWorkflowSchema('w1'),
           generateAtmWorkflowSchema('w0'),
         ],
-        workflowClickedSpy: sinon.spy(),
+        workflowRevisionClickedSpy: sinon.spy(),
+        revisionCreatedSpy: sinon.spy(),
       });
     });
 
@@ -70,9 +99,13 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         ModifyAtmWorkflowSchemaAction,
         RemoveAtmWorkflowSchemaAction,
         CopyRecordIdAction,
+        CreateAtmWorkflowSchemaRevisionAction,
+        DuplicateAtmWorkflowSchemaRevisionAction,
+        DumpAtmWorkflowSchemaRevisionAction,
+        RemoveAtmWorkflowSchemaRevisionAction,
       ].forEach(action => {
-        if (action.prototype.execute.restore) {
-          action.prototype.execute.restore();
+        if (action.prototype.onExecute.restore) {
+          action.prototype.onExecute.restore();
         }
       });
     });
@@ -90,9 +123,12 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       expect($workflows).to.have.length(2);
       [0, 1].forEach(idx => {
-        expect($workflows.eq(idx).find('.name-field').text()).to.contain(`w${idx}`);
-        expect($workflows.eq(idx).find('.description-field').text())
-          .to.contain(`w${idx} description`);
+        const $workflow = $workflows.eq(idx);
+        expect($workflow.find('.name-field').text()).to.contain(`w${idx}`);
+        expect($workflow.find('.summary-field').text())
+          .to.contain(`w${idx} summary`);
+        expect($workflow.find('.revisions-table').text())
+          .to.contain(`w${idx} first revision`);
       });
     });
 
@@ -141,12 +177,12 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
     it('allows to modify workflow', async function () {
       const firstWorkflow = this.get('collection.1');
-      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
+      const executeStub = sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'onExecute')
         .callsFake(function () {
           expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
           expect(this.get('context.atmWorkflowSchemaDiff')).to.deep.include({
             name: 'newName',
-            description: 'newDescription',
+            summary: 'newSummary',
           });
           return resolve({ status: 'done' });
         });
@@ -157,7 +193,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
       await click($('body .webui-popover.in .change-details-action-trigger')[0]);
       await fillIn('.name-field .form-control', 'newName');
-      await fillIn('.description-field .form-control', 'newDescription');
+      await fillIn('.summary-field .form-control', 'newSummary');
       await click('.btn-save');
 
       expect(executeStub).to.be.calledOnce;
@@ -165,8 +201,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('stays in edition mode when workflow modification failed', async function () {
-      sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'execute')
-        .callsFake(() => resolve({ status: 'failed' }));
+      sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'onExecute').rejects();
       await render(this);
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
@@ -186,12 +221,12 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
       await click($('body .webui-popover.in .change-details-action-trigger')[0]);
       await fillIn('.name-field .form-control', 'newName');
-      await fillIn('.description-field .form-control', 'newDescription');
+      await fillIn('.summary-field .form-control', 'newSummary');
       await click('.btn-cancel');
 
       expect($firstWorkflow.find('.name-field').text()).to.contain('w0');
-      expect($firstWorkflow.find('.description-field').text())
-        .to.contain('w0 description');
+      expect($firstWorkflow.find('.summary-field').text())
+        .to.contain('w0 summary');
     });
 
     it('blocks saving modifications when form is invalid', async function () {
@@ -213,10 +248,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         RemoveAtmWorkflowSchemaAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
-        return resolve({ status: 'done' });
       });
 
       await render(this);
@@ -235,10 +269,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       const firstWorkflow = this.get('collection.1');
       const executeStub = sinon.stub(
         CopyRecordIdAction.prototype,
-        'execute'
+        'onExecute'
       ).callsFake(function () {
         expect(this.get('context.record')).to.equal(firstWorkflow);
-        return resolve({ status: 'done' });
       });
 
       await render(this);
@@ -269,40 +302,138 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       expect($workflows.text()).to.contain('w1');
     });
 
-    it('notifies about workflow click', async function () {
+    it('allows creating new revision', async function () {
+      const revisionCreatedSpy = this.get('revisionCreatedSpy');
+      sinon.stub(
+        CreateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).resolves(4);
       await render(this);
+      expect(revisionCreatedSpy).to.not.be.called;
 
-      await click('.atm-workflow-schemas-list-entry');
+      await click('.atm-workflow-schemas-list-entry .revisions-table-create-revision-entry');
 
-      expect(this.get('workflowClickedSpy')).to.be.calledOnce
-        .and.to.be.calledWith(this.get('collection.1'));
+      expect(revisionCreatedSpy).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'), 4);
     });
 
-    it('does not notify about workflow click, when workflow actions were clicked',
-      async function () {
-        await render(this);
+    it('notifies about workflow revision click', async function () {
+      await render(this);
 
-        await click('.workflow-actions-trigger');
+      await click('.atm-workflow-schemas-list-entry .revisions-table-revision-entry');
 
-        expect(this.get('workflowClickedSpy')).to.not.be.called;
+      expect(this.get('workflowRevisionClickedSpy')).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'), 1);
+    });
+
+    it('allows choosing from workflow revision actions', async function () {
+      await render(this);
+
+      const $actionsTrigger = this.$('.revision-actions-trigger');
+      expect($actionsTrigger).to.exist;
+
+      await click($actionsTrigger[0]);
+
+      const $actions = $('body .webui-popover.in .actions-popover-content a');
+      expect($actions).to.have.length(revisionActionsSpec.length);
+      revisionActionsSpec.forEach(({ className, label, icon }, index) => {
+        const $action = $actions.eq(index);
+        expect($action).to.have.class(className);
+        expect($action.text().trim()).to.equal(label);
+        expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
       });
+    });
 
-    it('does not notify about workflow click, when workflow is being edited',
-      async function () {
-        await render(this);
-
-        await click('.workflow-actions-trigger');
-        await click($('body .webui-popover.in .change-details-action-trigger')[0]);
-        await click('.atm-workflow-schemas-list-entry');
-
-        expect(this.get('workflowClickedSpy')).to.not.be.called;
+    it('allows redesigning workflow revision as new revision', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        CreateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.originRevisionNumber')).to.equal(1);
       });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows duplicating workflow revision', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        DuplicateAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.revisionNumber')).to.equal(1);
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click($(
+        'body .webui-popover.in .duplicate-atm-workflow-schema-revision-action-trigger'
+      )[0]);
+
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows downloading workflow revision dump', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        DumpAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.revisionNumber')).to.equal(1);
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .dump-atm-workflow-schema-revision-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
+    });
+
+    it('allows removing workflow revision', async function () {
+      const firstWorkflow = this.get('collection.1');
+      const executeStub = sinon.stub(
+        RemoveAtmWorkflowSchemaRevisionAction.prototype,
+        'onExecute'
+      ).callsFake(function () {
+        expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
+        expect(this.get('context.revisionNumber')).to.equal(1);
+      });
+      await render(this);
+      const $workflows = this.$('.atm-workflow-schemas-list-entry');
+      const $firstWorkflow = $workflows.eq(0);
+
+      await click($firstWorkflow.find('.revision-actions-trigger')[0]);
+      await click(
+        $('body .webui-popover.in .remove-atm-workflow-schema-revision-action-trigger')[0]
+      );
+
+      expect(executeStub).to.be.calledOnce;
+    });
   });
 
 async function render(testCase) {
   testCase.render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
     collection=collection
-    onAtmWorkflowSchemaClick=workflowClickedSpy
+    onRevisionCreated=revisionCreatedSpy
+    onRevisionClick=workflowRevisionClickedSpy
   }}`);
   await wait();
 }

@@ -96,6 +96,7 @@ import oneproviderAuthenticationError from './components/alerts/oneprovider-auth
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
 import generateInviteTokenModal from './components/modals/generate-invite-token-modal';
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
+import applyAtmWorkflowSchemaDumpModal from './components/modals/apply-atm-workflow-schema-dump-modal';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
@@ -112,6 +113,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import uploadObject from './utils/upload-object';
+import atmWorkflow from './utils/atm-workflow';
 import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
@@ -129,13 +131,18 @@ import createAtmInventoryAction from './utils/workflow-actions/create-atm-invent
 import modifyAtmInventoryAction from './utils/workflow-actions/modify-atm-inventory-action';
 import removeAtmInventoryAction from './utils/workflow-actions/remove-atm-inventory-action';
 import createAtmLambdaAction from './utils/workflow-actions/create-atm-lambda-action';
-import modifyAtmLambdaAction from './utils/workflow-actions/modify-atm-lambda-action';
+import createAtmLambdaRevisionAction from './utils/workflow-actions/create-atm-lambda-revision-action';
+import modifyAtmLambdaRevisionAction from './utils/workflow-actions/modify-atm-lambda-revision-action';
 import unlinkAtmLambdaAction from './utils/workflow-actions/unlink-atm-lambda-action';
 import modifyAtmWorkflowSchemaAction from './utils/workflow-actions/modify-atm-workflow-schema-action';
 import removeAtmWorkflowSchemaAction from './utils/workflow-actions/remove-atm-workflow-schema-action';
 import createAtmWorkflowSchemaAction from './utils/workflow-actions/create-atm-workflow-schema-action';
-import dumpAtmWorkflowSchemaAction from './utils/workflow-actions/dump-atm-workflow-schema-action';
 import uploadAtmWorkflowSchemaAction from './utils/workflow-actions/upload-atm-workflow-schema-action';
+import dumpAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/dump-atm-workflow-schema-revision-action';
+import modifyAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/modify-atm-workflow-schema-revision-action';
+import createAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/create-atm-workflow-schema-revision-action';
+import removeAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/remove-atm-workflow-schema-revision-action';
+import duplicateAtmWorkflowSchemaRevisionAction from './utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 
 const translations = {
   tabs: {
@@ -161,6 +168,7 @@ const translations = {
       cleanObsoleteTokensModal,
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
+      applyAtmWorkflowSchemaDumpModal,
     },
     errors: {
       shareNotFound,
@@ -261,6 +269,7 @@ const translations = {
   },
   utils: {
     uploadObject,
+    atmWorkflow,
     harvesterActions: {
       removeSpaceFromHarvesterAction,
     },
@@ -287,13 +296,18 @@ const translations = {
       modifyAtmInventoryAction,
       removeAtmInventoryAction,
       createAtmLambdaAction,
-      modifyAtmLambdaAction,
+      createAtmLambdaRevisionAction,
+      modifyAtmLambdaRevisionAction,
       unlinkAtmLambdaAction,
       modifyAtmWorkflowSchemaAction,
       removeAtmWorkflowSchemaAction,
       createAtmWorkflowSchemaAction,
-      dumpAtmWorkflowSchemaAction,
       uploadAtmWorkflowSchemaAction,
+      dumpAtmWorkflowSchemaRevisionAction,
+      modifyAtmWorkflowSchemaRevisionAction,
+      createAtmWorkflowSchemaRevisionAction,
+      removeAtmWorkflowSchemaRevisionAction,
+      duplicateAtmWorkflowSchemaRevisionAction,
     },
   },
 };

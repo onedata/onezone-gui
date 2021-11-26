@@ -1,6 +1,5 @@
 /**
- * Shows loading state (including loading errors). It is a whole view
- * component - may be used for a full page carousel.
+ * Shows loading state of workflow.
  *
  * @module components/content-atm-inventories-workflows/loading-view
  * @author Michał Borzęcki
@@ -9,13 +8,13 @@
  */
 
 import Component from '@ember/component';
-import { computed, getProperties, get } from '@ember/object';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import { computed } from '@ember/object';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, {
-  classNames: ['content-atm-inventories-workflows-loading-view'],
+  tagName: '',
 
   i18n: service(),
 
@@ -25,54 +24,31 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentAtmInventoriesWorkflows.loadingView',
 
   /**
+   * @virtual
    * @type {PromiseProxy}
    */
   loadingProxy: undefined,
 
   /**
    * @virtual
-   * @type {Function}
+   * @type {() => void}
    */
-  onBackSlide: notImplementedIgnore,
+  onBackSlide: undefined,
 
   /**
-   * One of: `'loading'`, `'notFound'`, `'forbidden'`, `'otherError'`, `'loaded'`
-   * @type {ComputedProperty<String>}
+   * @type {string}
    */
-  state: computed('loadingProxy.isPending', function state() {
-    const {
-      isPending,
-      isRejected,
-      reason,
-    } = getProperties(
-      this.get('loadingProxy') || {},
-      'isPending',
-      'isRejected',
-      'reason'
-    );
-
-    if (isPending) {
-      return 'loading';
-    } else if (isRejected) {
-      const errorId = reason && get(reason, 'id');
-      if (['notFound', 'forbidden'].includes(errorId)) {
-        return errorId;
-      }
-      return 'otherError';
-    }
-    return 'loaded';
-  }),
+  backResourceIcon: recordIcon('atmWorkflowSchema'),
 
   /**
-   * @type {ComputedProperty<SafeString>}
+   * @type {ComputedProperty<LoadingCarouselViewHeaderTexts>}
    */
-  headerText: computed('state', function headerText() {
-    return this.t(`header.${this.get('state')}`, {}, { defaultValue: '' });
+  headerTexts: computed(function headerText() {
+    return {
+      loading: this.t('header.loading'),
+      notFound: this.t('header.notFound'),
+      forbidden: this.t('header.forbidden'),
+      otherError: this.t('header.otherError'),
+    };
   }),
-
-  actions: {
-    backSlide() {
-      this.get('onBackSlide')();
-    },
-  },
 });

@@ -14,12 +14,11 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, getProperties } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import { tag, conditional, eq, raw } from 'ember-awesome-macros';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
@@ -70,11 +69,21 @@ export default Component.extend(I18n, {
   /**
    * Needed when `mode` is `'selection'`
    * @virtual optional
-   * @type {Function}
-   * @param {Model.AtmLambda}
-   * @returns {any}
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
    */
-  onAddToAtmWorkflowSchema: notImplementedIgnore,
+  onAddToAtmWorkflowSchema: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: Number) => void}
+   */
+  onRevisionClick: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: Number) => void}
+   */
+  onRevisionCreate: undefined,
 
   /**
    * One of: `'thisInventory'`, `'all'`
@@ -90,7 +99,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Array<String>}
    */
-  collectionOrder: Object.freeze(['name']),
+  collectionOrder: Object.freeze(['latestRevision.name']),
 
   /**
    * @type {ComputedProperty<String>}
@@ -111,7 +120,7 @@ export default Component.extend(I18n, {
    */
   filteredCollection: computed(
     'searchValue',
-    'activeCollection.@each.{name,isLoaded}',
+    'activeCollection.@each.{latestRevision,isLoaded}',
     function filteredCollection() {
       const {
         activeCollection,
@@ -120,13 +129,11 @@ export default Component.extend(I18n, {
       const normalizedSearchValue = searchValue.trim().toLowerCase();
 
       return (activeCollection || []).filter(atmLambda => {
-        const {
-          isLoaded,
-          name,
-        } = getProperties(atmLambda, 'isLoaded', 'name');
+        const isLoaded = get(atmLambda, 'isLoaded');
         if (!isLoaded) {
           return false;
         }
+        const name = get(atmLambda, 'latestRevision.name');
         const normalizedName = (name || '').trim().toLowerCase();
         return normalizedName.includes(normalizedSearchValue);
       });
@@ -141,9 +148,6 @@ export default Component.extend(I18n, {
   actions: {
     changeSearchValue(newValue) {
       debounce(this, 'set', 'searchValue', newValue, typingActionDebouce);
-    },
-    addToAtmWorkflowSchema(atmLambda) {
-      this.get('onAddToAtmWorkflowSchema')(atmLambda);
     },
   },
 });

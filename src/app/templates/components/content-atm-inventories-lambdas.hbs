@@ -1,17 +1,37 @@
-{{#one-carousel activeSlideId=activeSlide as |carousel|}}
-  {{#carousel.slide slideId="list"}}
-    {{content-atm-inventories-lambdas/list-view
-      atmInventory=atmInventory
-      onAddAtmLambda=(action "showCreatorView")
-      onRegisterViewActions=(action "registerViewActions" "list")
-    }}
-  {{/carousel.slide}}
-  {{#carousel.slide slideId="creator"}}
-    {{content-atm-inventories-lambdas/creator-view
-      atmInventory=atmInventory
-      onBackSlide=(action "showListView")
-      onAtmLambdaAdded=(action "showListView")
-    }}
-  {{/carousel.slide}}
-{{/one-carousel}}
+{{#if isCarouselVisible}}
+  {{#one-carousel activeSlideId=effectiveActiveSlide as |carousel|}}
+    {{#carousel.slide slideId="list"}}
+      {{content-atm-inventories-lambdas/list-view
+        atmInventory=atmInventory
+        onAddAtmLambda=(action "showCreatorView")
+        onRevisionClick=(action "showEditorView")
+        onRevisionCreate=(action "showRevisionCreatorView")
+        onRegisterViewActions=(action "registerViewActions" "list")
+      }}
+    {{/carousel.slide}}
+    {{#carousel.slide slideId="editor"}}
+      {{#render-later triggerRender=(eq effectiveActiveSlide "editor")}}
+        {{#if (or
+          (and (eq activeEditorType "creator") (not activeAtmLambdaId))
+          activeAtmLambdaRevisionProxy.isFulfilled
+        )}}
+          {{content-atm-inventories-lambdas/editor-view
+            atmInventory=atmInventory
+            atmLambda=activeAtmLambdaProxy.content
+            atmLambdaRevisionNumber=activeRevisionNumber
+            viewType=activeEditorType
+            visible=(eq effectiveActiveSlide "editor")
+            onBackSlide=(action "showListView")
+            onAtmLambdaRevisionSaved=(action "showListView")
+          }}
+        {{else}}
+          {{content-atm-inventories-lambdas/loading-view
+            loadingProxy=activeAtmLambdaRevisionProxy
+            onBackSlide=(action "showListView")
+          }}
+        {{/if}}
+      {{/render-later}}
+    {{/carousel.slide}}
+  {{/one-carousel}}
+{{/if}}
 {{yield}}

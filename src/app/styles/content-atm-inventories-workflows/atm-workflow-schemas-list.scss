@@ -16,14 +16,15 @@
   }
 
   .content-section {
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-template-areas:
+        "details actions"
+        "revisions revisions";
 
     .form {
       margin: 0;
       padding: 0;
-      flex-grow: 1;
-      min-width: 0;
     }
 
     .field-view-mode {
@@ -38,23 +39,32 @@
     }
   }
 
-  .name-field.field-view-mode {
-    @include font-semibold();
+  .atm-workflow-schema-details-form {
+    grid-area: details;
+    min-width: 0;
+    padding-bottom: 1em;
   }
 
-  .fields-group-children.-children > .form-group.field-view-mode:last-child {
-    margin-bottom: 0;
+  .revisions-table {
+    grid-area: revisions;
+  }
+
+  .name-field.field-view-mode {
+    @include font-semibold();
   }
 
   .footer-buttons {
     float: none;
     text-align: left;
+    margin-bottom: $form-group-margin-bottom;
     .btn {
       margin-left: $padding-small-horizontal;
     }
   }
 
-  .one-menu-toggle {
+  .workflow-actions-trigger {
+    grid-area: actions;
+    align-self: start;
     margin-right: -$iconified-block-padding;
   }
 }

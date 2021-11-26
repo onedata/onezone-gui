@@ -171,6 +171,9 @@ export default Service.extend({
         _meta: {
           additionalData: {
             atmInventoryId,
+            originalAtmLambdaId: atmLambdaPrototype.originalAtmLambdaId,
+            revision: atmLambdaPrototype.revision,
+            schemaFormatVersion: atmLambdaPrototype.schemaFormatVersion,
           },
         },
       })
@@ -179,6 +182,58 @@ export default Service.extend({
       .reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
       .catch(ignoreForbiddenError);
     return atmLambda;
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {Number} revisionNumber
+   * @param {Object} revisionData
+   */
+  async createAtmLambdaRevision(atmLambdaId, revisionNumber, revisionData) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'create',
+      subscribe: false,
+      data: {
+        atmLambdaRevision: revisionData,
+      },
+    });
+    await recordManager.reloadRecordById('atmLambda', atmLambdaId);
+  },
+
+  /**
+   * @param {String} atmLambdaId
+   * @param {Number} revisionNumber
+   * @param {Object} revisionDataUpdate
+   */
+  async updateAtmLambdaRevision(atmLambdaId, revisionNumber, revisionDataUpdate) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmLambdaEntityType,
+        entityId: atmLambdaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'update',
+      subscribe: false,
+      data: revisionDataUpdate,
+    });
+    await recordManager.reloadRecordById('atmLambda', atmLambdaId);
   },
 
   /**
@@ -198,15 +253,16 @@ export default Service.extend({
         _meta: {
           additionalData: {
             atmInventoryId,
-            atmWorkflowSchemaId: atmWorkflowSchemaPrototype.atmWorkflowSchemaId,
-            supplementaryAtmLambdas: atmWorkflowSchemaPrototype.supplementaryAtmLambdas,
+            originalAtmWorkflowSchemaId: atmWorkflowSchemaPrototype
+              .originalAtmWorkflowSchemaId,
+            revision: atmWorkflowSchemaPrototype.revision,
             schemaFormatVersion: atmWorkflowSchemaPrototype.schemaFormatVersion,
           },
         },
       })
     ).save();
     // If workflow is created from workflow dump, then we need to reload lambdas
-    const reloadLambdasPromise = atmWorkflowSchemaPrototype.supplementaryAtmLambdas ?
+    const reloadLambdasPromise = atmWorkflowSchemaPrototype.originalAtmWorkflowSchemaId ?
       recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda')
       .catch(ignoreForbiddenError) : resolve();
     await allFulfilled([
@@ -220,9 +276,10 @@ export default Service.extend({
 
   /**
    * @param {String} atmWorkflowSchemaId
+   * @param {Number} revisionNumber
    * @returns {Promise<Object>} workflow schema dump
    */
-  async getAtmWorkflowSchemaDump(atmWorkflowSchemaId) {
+  async getAtmWorkflowSchemaDump(atmWorkflowSchemaId, revisionNumber) {
     return await this.get('onedataGraph').request({
       gri: gri({
         entityType: atmWorkflowSchemaEntityType,
@@ -232,7 +289,100 @@ export default Service.extend({
       }),
       operation: 'create',
       subscribe: false,
+      data: {
+        includeRevision: revisionNumber,
+      },
     });
+  },
+
+  /**
+   * @param {String} atmWorkflowSchemaId
+   * @param {Object} atmWorkflowSchemaDump
+   * @returns {Promise<Models.AtmWorkflowSchema>}
+   */
+  async mergeAtmWorkflowSchemaDumpToExistingSchema(
+    atmWorkflowSchemaId,
+    atmWorkflowSchemaDump
+  ) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmWorkflowSchemaEntityType,
+        entityId: atmWorkflowSchemaId,
+        aspect: 'instance',
+        scope: 'private',
+      }),
+      operation: 'update',
+      subscribe: false,
+      data: atmWorkflowSchemaDump,
+    });
+    let atmWorkflowSchema = await recordManager
+      .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
+    if (!atmWorkflowSchema) {
+      atmWorkflowSchema = await recordManager
+        .getRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
+    }
+    return atmWorkflowSchema;
+  },
+
+  /**
+   * @param {String} atmWorkflowSchemaId
+   * @param {Number} revisionNumber
+   * @param {Object} revisionData
+   */
+  async saveAtmWorkflowSchemaRevision(
+    atmWorkflowSchemaId,
+    revisionNumber,
+    revisionData
+  ) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmWorkflowSchemaEntityType,
+        entityId: atmWorkflowSchemaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'create',
+      subscribe: false,
+      data: {
+        atmWorkflowSchemaRevision: revisionData,
+      },
+    });
+    await recordManager
+      .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
+  },
+
+  /**
+   * @param {String} atmWorkflowSchemaId
+   * @param {String} revisionNumber
+   */
+  async removeAtmWorkflowSchemaRevision(atmWorkflowSchemaId, revisionNumber) {
+    const {
+      recordManager,
+      onedataGraph,
+    } = this.getProperties('recordManager', 'onedataGraph');
+
+    await onedataGraph.request({
+      gri: gri({
+        entityType: atmWorkflowSchemaEntityType,
+        entityId: atmWorkflowSchemaId,
+        aspect: `revision,${revisionNumber}`,
+        scope: 'private',
+      }),
+      operation: 'delete',
+      subscribe: false,
+    });
+    await recordManager
+      .reloadRecordById('atmWorkflowSchema', atmWorkflowSchemaId);
   },
 
   /**

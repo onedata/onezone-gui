@@ -44,7 +44,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   /**
    * List of file entity ids that are selected
-   * 
+   *
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
@@ -86,7 +86,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     updateSelected(selected) {
       this.set('selected', selected);
     },
-    getExecuteWorkflowUrl({ workflowSchemaId, fillInputStores }) {
+    getExecuteWorkflowUrl({ workflowSchemaId, workflowSchemaRevision, fillInputStores }) {
       const {
         _location,
         router,
@@ -99,6 +99,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       const aspectOptions = {
         tab: 'create',
         workflowSchemaId,
+        workflowSchemaRevision,
       };
       const oneproviderId = get(navigationState, 'aspectOptions.oneproviderId');
       if (oneproviderId) {

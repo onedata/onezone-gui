@@ -13,11 +13,11 @@ import { collect } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
+import RevisionActionsFactory from 'onezone-gui/utils/atm-workflow/atm-workflow-schema/revision-actions-factory';
 
 export default Component.extend(I18n, {
   classNames: ['atm-workflow-schemas-list-entry', 'iconified-block'],
-  classNameBindings: ['isEditing:is-editing:hoverable'],
+  classNameBindings: ['isEditing:is-editing'],
 
   i18n: service(),
   workflowActions: service(),
@@ -36,10 +36,15 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Function}
-   * @returns {any}
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, revisionNumber: Number) => void}
    */
-  onAtmWorkflowSchemaClick: notImplementedIgnore,
+  onRevisionClick: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: Number) => void}
+   */
+  onRevisionCreated: undefined,
 
   /**
    * @type {Boolean}
@@ -70,6 +75,22 @@ export default Component.extend(I18n, {
   isEditing: false,
 
   /**
+   * @type {ComputedProperty<Array<RevisionsTableColumnSpec>>}
+   */
+  revisionCustomColumnSpecs: computed(function revisionCustomColumnSpecs() {
+    return [{
+      name: 'description',
+      title: this.t('columns.description.title'),
+      className: 'filling-column',
+      content: {
+        type: 'text',
+        sourceFieldName: 'description',
+        fallbackValue: this.t('columns.description.fallback'),
+      },
+    }];
+  }),
+
+  /**
    * @type {ComputedProperty<Utils.Action>}
    */
   changeDetailsAction: computed('isEditing', function changeDetailsAction() {
@@ -80,19 +101,6 @@ export default Component.extend(I18n, {
       icon: 'rename',
       disabled: this.get('isEditing'),
     };
-  }),
-
-  /**
-   * @type {ComputedProperty<Utils.Action>}
-   */
-  dumpAction: computed('atmWorkflowSchema', function dumpAction() {
-    const {
-      workflowActions,
-      atmWorkflowSchema,
-    } = this.getProperties('workflowActions', 'atmWorkflowSchema');
-    return workflowActions.createDumpAtmWorkflowSchemaAction({
-      atmWorkflowSchema,
-    });
   }),
 
   /**
@@ -125,30 +133,28 @@ export default Component.extend(I18n, {
    */
   workflowActionsArray: collect(
     'changeDetailsAction',
-    'dumpAction',
     'removeAction',
     'copyIdAction'
   ),
 
-  click(event) {
-    const {
-      isEditing,
-      onAtmWorkflowSchemaClick,
-      element,
-    } = this.getProperties('isEditing', 'onAtmWorkflowSchemaClick', 'element');
-    const clickableElements = [...element.querySelectorAll('.clickable')];
-
-    if (
-      isEditing ||
-      clickableElements.includes(event.target) ||
-      clickableElements.some(clkElement => clkElement.contains(event.target)) ||
-      !element.contains(event.target)
-    ) {
-      // Should be handled by another clickable element.
-      return;
+  /**
+   * @type {ComputedProperty<Utils.AtmWorkflow.AtmWorkflowSchema.RevisionActionsFactory>}
+   */
+  revisionActionsFactory: computed(
+    'atmWorkflowSchema',
+    'onRevisionCreated',
+    function revisionActionsFactory() {
+      const {
+        atmWorkflowSchema,
+        onRevisionCreated,
+      } = this.getProperties('atmWorkflowSchema', 'onRevisionCreated');
+      return RevisionActionsFactory.create({
+        ownerSource: this,
+        atmWorkflowSchema,
+        onRevisionCreated,
+      });
     }
-    onAtmWorkflowSchemaClick();
-  },
+  ),
 
   actions: {
     toggleActionsOpen(state) {
@@ -180,6 +186,14 @@ export default Component.extend(I18n, {
     },
     cancelChanges() {
       this.set('isEditing', false);
+    },
+    clickRevision(revisionNumber) {
+      const {
+        onRevisionClick,
+        atmWorkflowSchema,
+      } = this.getProperties('onRevisionClick', 'atmWorkflowSchema');
+
+      onRevisionClick && onRevisionClick(atmWorkflowSchema, revisionNumber);
     },
   },
 });

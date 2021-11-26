@@ -7,18 +7,15 @@ import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
-import ModifyAtmLambdaAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-action';
+import { set } from '@ember/object';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import OneTooltipHelper from '../../../helpers/one-tooltip';
 
-const lambdaActionsSpec = [{
-  className: 'modify-action-trigger',
-  label: 'Modify',
-  icon: 'rename',
-}, {
+const lambdaPresentationActionsSpec = [{
   className: 'unlink-atm-lambda-action-trigger',
   label: 'Unlink',
   icon: 'x',
@@ -28,17 +25,27 @@ const lambdaActionsSpec = [{
   icon: 'copy',
 }];
 
-function generateLambda(name, content) {
-  return Object.assign({
-    constructor: {
-      modelName: 'atm-lambda',
+const revisionActionsSpec = [{
+  className: 'create-atm-lambda-revision-action-trigger',
+  label: 'Redesign as new revision',
+  icon: 'plus',
+}];
+
+const lambdaSelectionActionsSpec = [lambdaPresentationActionsSpec[1]];
+
+function generateLambda(testCase, name, content) {
+  const store = lookupService(testCase, 'store');
+  return store.createRecord('atm-lambda', {
+    revisionRegistry: {
+      1: Object.assign({
+        name,
+        state: 'stable',
+        summary: `${name} summary`,
+        argumentSpecs: [],
+        resultSpecs: [],
+      }, content),
     },
-    name,
-    summary: `${name} summary`,
-    isLoaded: true,
-    argumentSpecs: [],
-    resultSpecs: [],
-  }, content);
+  });
 }
 
 describe(
@@ -51,13 +58,13 @@ describe(
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
       // mocking.
-      ModifyAtmLambdaAction.create();
       CopyRecordIdAction.create();
+      UnlinkAtmLambdaAction.create();
     });
 
     beforeEach(function () {
       const collection = [
-        generateLambda('f1', {
+        generateLambda(this, 'f1', {
           operationSpec: {
             engine: 'openfaas',
             dockerImage: 'f1Image',
@@ -67,7 +74,7 @@ describe(
             },
           },
         }),
-        generateLambda('f0', {
+        generateLambda(this, 'f0', {
           operationSpec: {
             engine: 'onedataFunction',
             functionId: 'f0Function',
@@ -76,7 +83,7 @@ describe(
       ];
       const allCollection = [
         ...collection,
-        generateLambda('f2', {
+        generateLambda(this, 'f2', {
           operationSpec: {
             engine: 'openfaas',
             dockerImage: 'f2Image',
@@ -90,6 +97,8 @@ describe(
       this.setProperties({
         collection,
         allCollection,
+        lambdaRevisionClickedSpy: sinon.spy(),
+        onRevisionCreate: sinon.spy(),
         atmInventory: {
           name: 'inv1',
           atmWorkflowSchemaList: promiseObject(resolve({
@@ -105,11 +114,11 @@ describe(
     afterEach(function () {
       // Reset stubbed actions
       [
-        ModifyAtmLambdaAction,
         CopyRecordIdAction,
+        UnlinkAtmLambdaAction,
       ].forEach(action => {
-        if (action.prototype.execute.restore) {
-          action.prototype.execute.restore();
+        if (action.prototype.onExecute.restore) {
+          action.prototype.onExecute.restore();
         }
       });
     });
@@ -121,59 +130,40 @@ describe(
         .and.to.have.length(1);
     });
 
-    it('shows list of collapsed lambda entries', async function () {
+    it('shows list of lambda entries', async function () {
       await render(this);
 
       const $lambdas = this.$('.atm-lambdas-list-entry');
       expect($lambdas).to.have.length(2);
+
       [0, 1].forEach(idx => {
         const $lambda = $lambdas.eq(idx);
-        expect($lambda.find('.view-data-collapse')).to.have.class('in');
-        expect($lambda.find('.name').text().trim()).to.equal(`f${idx}`);
-        expect($lambda.find('.summary').text().trim())
+        expect($lambda.find('.lambda-name').text().trim()).to.equal(`f${idx}`);
+        expect($lambda.find('.lambda-summary').text().trim())
           .to.equal(`f${idx} summary`);
-        expect($lambda.find('.details-collapse')).to.not.have.class('in');
-        expect($lambda.find('.atm-lambda-form')).to.not.exist;
       });
     });
 
     it('does not show summary when lambda does not have any', async function () {
-      this.get('collection').setEach('summary', '');
+      this.get('collection').forEach((atmLambda) =>
+        set(atmLambda, 'revisionRegistry.1.summary', undefined)
+      );
 
       await render(this);
 
-      expect(this.$('.summary')).to.not.exist;
+      expect(this.$('.lambda-summary')).to.not.exist;
     });
 
-    it('allows to expand lambda details', async function () {
+    it('shows table with lambda revisions', async function () {
       await render(this);
 
-      await toggleLambdaDetails(0);
-
-      expect(this.$('.details-collapse').eq(0)).to.have.class('in');
-      expect(this.$('.details-toggle').eq(0).text().trim()).to.equal('Hide details');
-    });
-
-    it('allows to collapse lambda details', async function () {
-      await render(this);
-
-      await toggleLambdaDetails(0);
-      await toggleLambdaDetails(0);
-
-      expect(this.$('.details-collapse').eq(0)).to.not.have.class('in');
-      expect(this.$('.details-toggle').eq(0).text().trim()).to.equal('Show details...');
-    });
-
-    it('shows lambda details when lambda is expanded', async function () {
-      await render(this);
-
-      await toggleLambdaDetails(0);
-      await toggleLambdaDetails(1);
-
-      const $detailsForms = this.$('.atm-lambdas-list-entry .atm-lambda-form');
-      expect($detailsForms).to.have.length(2).and.to.have.class('mode-view');
-      expect($detailsForms.eq(0).text()).to.contain('f0Function');
-      expect($detailsForms.eq(1).text()).to.contain('f1Image');
+      const $table = this.$('.atm-lambdas-list-entry').eq(0).find('.revisions-table');
+      expect($table.find('.name-column').text().trim()).to.equal('Name');
+      expect($table.find('.summary-column').text().trim()).to.equal('Summary');
+      expect($table.find('.revision-number').text().trim()).to.equal('1');
+      expect($table.find('.state').text().trim()).to.equal('Stable');
+      expect($table.find('.name').text().trim()).to.equal('f0');
+      expect($table.find('.summary').text().trim()).to.equal('f0 summary');
     });
 
     it('has empty search input on init', async function () {
@@ -192,6 +182,15 @@ describe(
       expect($lambdas.text()).to.contain('f1');
     });
 
+    it('notifies about lambda revision click', async function () {
+      await render(this);
+
+      await click('.atm-lambdas-list-entry .revisions-table-revision-entry');
+
+      expect(this.get('lambdaRevisionClickedSpy')).to.be.calledOnce
+        .and.to.be.calledWith(this.get('collection.1'), 1);
+    });
+
     context('in "presentation" mode', function () {
       beforeEach(function () {
         this.set('mode', 'presentation');
@@ -203,82 +202,20 @@ describe(
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-presentation');
       });
 
-      it('allows to choose from lambda actions', async function () {
-        await render(this);
-
-        const $actionsTrigger = this.$('.atm-lambda-actions-trigger');
-        expect($actionsTrigger).to.exist;
-
-        await click($actionsTrigger[0]);
-
-        const $actions = $('body .webui-popover.in .actions-popover-content a');
-        expect($actions).to.have.length(lambdaActionsSpec.length);
-        lambdaActionsSpec.forEach(({ className, label, icon }, index) => {
-          const $action = $actions.eq(index);
-          expect($action).to.have.class(className);
-          expect($action.text().trim()).to.equal(label);
-          expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
-        });
-      });
-
-      it('allows to turn on edition mode for lambda', async function () {
-        await render(this);
-
-        await click('.atm-lambda-actions-trigger');
-        await click($('body .webui-popover.in .modify-action-trigger')[0]);
-
-        expect(this.$('.view-data-collapse').eq(0)).to.not.have.class('in');
-        expect(this.$('.details-collapse').eq(0)).to.have.class('in');
-        expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-edit');
-      });
-
-      it('saves modified lambda and closes edition mode', async function () {
-        const firstLambda = this.get('collection.1');
-        const executeStub = sinon.stub(ModifyAtmLambdaAction.prototype, 'execute')
-          .callsFake(function () {
-            expect(this.get('context.atmLambda')).to.equal(firstLambda);
-            expect(this.get('context.atmLambdaDiff')).to.deep.include({
-              name: 'randomname',
-              summary: 'randomsummary',
-            });
-            return resolve({ status: 'done' });
-          });
-        await render(this);
-
-        await click('.atm-lambda-actions-trigger');
-        await click($('body .webui-popover.in .modify-action-trigger')[0]);
-        await fillIn('.name-field .form-control', 'randomname');
-        await fillIn('.summary-field .form-control', 'randomsummary');
-        await click('.btn-submit');
-
-        expect(executeStub).to.be.calledOnce;
-        expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
-      });
-
-      it('cancels lambda modification', async function () {
-        await render(this);
-
-        await click('.atm-lambda-actions-trigger');
-        await click($('body .webui-popover.in .modify-action-trigger')[0]);
-        await click('.btn-cancel');
-
-        expect(this.$('.atm-lambda-form').eq(0)).to.have.class('mode-view');
-      });
+      itAllowsToChooseLambdaActions(lambdaPresentationActionsSpec);
 
       it('allows to remove lambda', async function () {
-        const workflowActions = lookupService(this, 'workflow-actions');
-        let removeCalled = false;
-        const createUnlinkAtmLambdaActionStub =
-          sinon.stub(workflowActions, 'createUnlinkAtmLambdaAction')
-          .callsFake((context) => UnlinkAtmLambdaAction.create(context, {
-            ownerSource: this,
-            onExecute() {
-              removeCalled = true;
-              return resolve({
-                status: 'done',
-              });
-            },
-          }));
+        // const workflowActions = lookup
+        const {
+          collection,
+          atmInventory,
+        } = this.getProperties('collection', 'atmInventory');
+        const firstLambda = collection.findBy('latestRevision.name', 'f0');
+        const unlinkStub = sinon.stub(UnlinkAtmLambdaAction.prototype, 'onExecute')
+          .callsFake(function () {
+            expect(this.get('context.atmLambda')).to.equal(firstLambda);
+            expect(this.get('context.atmInventory')).to.equal(atmInventory);
+          });
 
         await render(this);
         const $atmLambdas = this.$('.atm-lambdas-list-entry');
@@ -289,18 +226,14 @@ describe(
           $('body .webui-popover.in .unlink-atm-lambda-action-trigger')[0]
         );
 
-        expect(createUnlinkAtmLambdaActionStub).to.be.calledWith({
-          atmLambda: this.get('collection').findBy('name', 'f0'),
-          atmInventory: this.get('atmInventory'),
-        });
-        expect(removeCalled).to.be.true;
+        expect(unlinkStub).to.be.calledOnce;
       });
 
       it('allows to copy lambda ID', async function () {
         const firstLambda = this.get('collection.1');
         const executeStub = sinon.stub(
           CopyRecordIdAction.prototype,
-          'execute'
+          'onExecute'
         ).callsFake(function () {
           expect(this.get('context.record')).to.equal(firstLambda);
           return resolve({ status: 'done' });
@@ -314,6 +247,88 @@ describe(
 
         expect(executeStub).to.be.calledOnce;
       });
+
+      it('allows creating new revision', async function () {
+        const onRevisionCreate = this.get('onRevisionCreate');
+        await render(this);
+        expect(onRevisionCreate).to.not.be.called;
+
+        await click(this.$(
+          '.atm-lambdas-list-entry .revisions-table-create-revision-entry'
+        )[1]);
+
+        expect(onRevisionCreate).to.be.calledOnce
+          .and.to.be.calledWith(this.get('collection.0'), 1);
+      });
+
+      it('blocks creating new revision when lambda is onedataFunction',
+        async function () {
+          const onRevisionCreate = this.get('onRevisionCreate');
+          await render(this);
+          const actionTrigger = this.$(
+            '.atm-lambdas-list-entry .revisions-table-create-revision-entry'
+          )[0];
+
+          await click(actionTrigger);
+          expect(onRevisionCreate).to.be.not.called;
+
+          const tooltipHelper =
+            new OneTooltipHelper(actionTrigger.querySelector('.action-title'));
+          expect(await tooltipHelper.getText()).to.equal(
+            'Creating new revision of a lambda with engine "Onedata function" is not allowed.'
+          );
+        });
+
+      it('allows choosing from lambda revision actions', async function () {
+        await render(this);
+
+        const $actionsTrigger = this.$('.revision-actions-trigger');
+        expect($actionsTrigger).to.exist;
+
+        await click($actionsTrigger[0]);
+
+        const $actions = $('body .webui-popover.in .actions-popover-content a');
+        expect($actions).to.have.length(revisionActionsSpec.length);
+        revisionActionsSpec.forEach(({ className, label, icon }, index) => {
+          const $action = $actions.eq(index);
+          expect($action).to.have.class(className);
+          expect($action.text().trim()).to.equal(label);
+          expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+        });
+      });
+
+      it('allows redesigning lambda revision as new revision', async function () {
+        const secondLambda = this.get('collection.0');
+        const onRevisionCreate = this.get('onRevisionCreate');
+        await render(this);
+        const $lambdas = this.$('.atm-lambdas-list-entry');
+        const $secondLambda = $lambdas.eq(1);
+
+        await click($secondLambda.find('.revision-actions-trigger')[0]);
+        await click(
+          $('body .webui-popover.in .create-atm-lambda-revision-action-trigger')[0]
+        );
+
+        expect(onRevisionCreate).to.be.calledOnce
+          .and.to.be.calledWith(secondLambda, 1);
+      });
+
+      it('blocks redesigning lambda revision as new revision when lambda is onedataFunction',
+        async function () {
+          await render(this);
+          const $lambdas = this.$('.atm-lambdas-list-entry');
+          const $firstLambda = $lambdas.eq(0);
+
+          await click($firstLambda.find('.revision-actions-trigger')[0]);
+          const $actionTrigger = $(
+            'body .webui-popover.in .create-atm-lambda-revision-action-trigger'
+          );
+          expect($actionTrigger.parent()).to.have.class('disabled');
+          const tooltipHelper = new OneTooltipHelper($actionTrigger[0]);
+          expect(await tooltipHelper.getText()).to.equal(
+            'Creating new revision of a lambda with engine "Onedata function" is not allowed.'
+          );
+        });
 
       it('does not have "add to workflow" button', async function () {
         await render(this);
@@ -342,11 +357,7 @@ describe(
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
       });
 
-      it('does not show lambda actions trigger', async function () {
-        await render(this);
-
-        expect(this.$('.atm-lambda-actions-trigger')).to.not.exist;
-      });
+      itAllowsToChooseLambdaActions(lambdaSelectionActionsSpec);
 
       it('notifies about "add to workflow" button click', async function () {
         const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
@@ -359,7 +370,7 @@ describe(
 
         expect($addBtn.text().trim()).to.equal('Add to workflow');
         expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
-          .and.to.be.calledWith(this.get('collection.1'));
+          .and.to.be.calledWith(this.get('collection.1'), 1);
       });
 
       it('has collection type selector with preselected "this inventory"',
@@ -430,10 +441,28 @@ async function render(testCase) {
     atmInventory=atmInventory
     mode=mode
     onAddToAtmWorkflowSchema=addToAtmWorkflowSchemaSpy
+    onRevisionClick=lambdaRevisionClickedSpy
+    onRevisionCreate=onRevisionCreate
   }}`);
   await wait();
 }
 
-async function toggleLambdaDetails(lambdaIdx) {
-  await click(`.atm-lambdas-list-entry:nth-child(${lambdaIdx + 1}) .details-toggle`);
+function itAllowsToChooseLambdaActions(actions) {
+  it('allows to choose from lambda actions', async function () {
+    await render(this);
+
+    const $actionsTrigger = this.$('.atm-lambda-actions-trigger');
+    expect($actionsTrigger).to.exist;
+
+    await click($actionsTrigger[0]);
+
+    const $actions = $('body .webui-popover.in .actions-popover-content a');
+    expect($actions).to.have.length(actions.length);
+    actions.forEach(({ className, label, icon }, index) => {
+      const $action = $actions.eq(index);
+      expect($action).to.have.class(className);
+      expect($action.text().trim()).to.equal(label);
+      expect($action.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+    });
+  });
 }

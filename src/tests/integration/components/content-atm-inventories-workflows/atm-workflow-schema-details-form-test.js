@@ -17,7 +17,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     beforeEach(function () {
       this.set('atmWorkflowSchema', EmberObject.create({
         name: 'workflow1',
-        description: 'workflowDescription',
+        summary: 'workflowSummary',
       }));
     });
 
@@ -40,16 +40,16 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
         expect(this.$('.name-field .text-like-field').text().trim())
           .to.equal('workflow1');
-        expect(this.$('.description-field .textarea-field').text().trim())
-          .to.equal('workflowDescription');
+        expect(this.$('.summary-field .textarea-field').text().trim())
+          .to.equal('workflowSummary');
       });
 
-      it('does not show description field when it is empty', async function () {
-        this.set('atmWorkflowSchema.description', '');
+      it('does not show summary field when it is empty', async function () {
+        this.set('atmWorkflowSchema.summary', '');
 
         await render(this);
 
-        expect(this.$('.description-field')).to.not.exist;
+        expect(this.$('.summary-field')).to.not.exist;
       });
 
       it('updates form values on workflow change', async function () {
@@ -78,8 +78,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         await render(this);
 
         expect(this.$('.name-field .form-control')).to.have.value('workflow1');
-        expect(this.$('.description-field .form-control'))
-          .to.have.value('workflowDescription');
+        expect(this.$('.summary-field .form-control'))
+          .to.have.value('workflowSummary');
       });
 
       it('validates user input and notifies about changes', async function () {
@@ -91,7 +91,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(changeSpy).to.be.calledWith({
           data: {
             name: 'workflow1',
-            description: 'workflowDescription',
+            summary: 'workflowSummary',
           },
           isValid: true,
         });
@@ -102,19 +102,19 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(changeSpy).to.be.to.be.calledWith({
           data: {
             name: '',
-            description: 'workflowDescription',
+            summary: 'workflowSummary',
           },
           isValid: false,
         });
         changeSpy.reset();
 
         await fillIn('.name-field .form-control', 'someName');
-        await fillIn('.description-field .form-control', '');
+        await fillIn('.summary-field .form-control', '');
         expect(this.$('.has-error')).to.not.exist;
         expect(changeSpy).to.be.calledWith({
           data: {
             name: 'someName',
-            description: '',
+            summary: '',
           },
           isValid: true,
         });
@@ -165,7 +165,7 @@ async function render(testCase) {
 }
 
 function itShowsFields(mode) {
-  it('has two fields - name and description', async function () {
+  it('has two fields - name and summary', async function () {
     await render(this);
 
     const $nameField = this.$('.name-field');
@@ -173,9 +173,9 @@ function itShowsFields(mode) {
     expect($nameField).to.exist.and.to.have.class(`field-${mode}-mode`);
     expect($nameLabel.text().trim()).to.equal('Name:');
 
-    const $descriptionField = this.$('.description-field');
-    const $descriptionLabel = $descriptionField.find('.control-label');
-    expect($descriptionField).to.exist.and.to.have.class(`field-${mode}-mode`);
-    expect($descriptionLabel.text().trim()).to.equal('Description:');
+    const $summaryField = this.$('.summary-field');
+    const $summaryLabel = $summaryField.find('.control-label');
+    expect($summaryField).to.exist.and.to.have.class(`field-${mode}-mode`);
+    expect($summaryLabel.text().trim()).to.equal('Summary:');
   });
 }

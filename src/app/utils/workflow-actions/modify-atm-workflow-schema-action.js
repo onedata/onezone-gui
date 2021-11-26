@@ -43,7 +43,7 @@ export default Action.extend({
       'atmWorkflowSchemaDiff',
     );
 
-    const changedProperties = Object.keys(atmWorkflowSchemaDiff).filter(key =>
+    const changedProperties = Object.keys(atmWorkflowSchemaDiff || {}).filter(key =>
       !_.isEqual(get(atmWorkflowSchema, key), get(atmWorkflowSchemaDiff, key))
     );
 

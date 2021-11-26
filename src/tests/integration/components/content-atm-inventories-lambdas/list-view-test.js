@@ -17,47 +17,60 @@ describe('Integration | Component | content atm inventories lambdas/list view',
     });
 
     beforeEach(function () {
-      const atmLambdas = [{
-        name: 'f1',
-        summary: 'f1 summary',
-        operationSpec: {
-          engine: 'openfaas',
-          dockerImage: 'f1Image',
-          dockerExecutionOptions: {
-            readonly: false,
-            mountOneclient: false,
-          },
-        },
-        argumentSpecs: [],
-        resultSpecs: [],
-        isLoaded: true,
-      }, {
-        name: 'f0',
-        summary: 'f0 summary',
-        operationSpec: {
-          engine: 'onedataFunction',
-          functionId: 'f0Function',
-        },
-        argumentSpecs: [],
-        resultSpecs: [],
-        isLoaded: true,
-      }];
-      const allAtmLambdas = [
-        ...atmLambdas, {
-          name: 'f2',
-          summary: 'f2 summary',
-          operationSpec: {
-            engine: 'openfaas',
-            dockerImage: 'f2Image',
-            dockerExecutionOptions: {
-              readonly: false,
-              mountOneclient: false,
+      const store = lookupService(this, 'store');
+      const atmLambdas = [
+        store.createRecord('atm-lambda', {
+          revisionRegistry: {
+            1: {
+              name: 'f1',
+              summary: 'f1 summary',
+              operationSpec: {
+                engine: 'openfaas',
+                dockerImage: 'f1Image',
+                dockerExecutionOptions: {
+                  readonly: false,
+                  mountOneclient: false,
+                },
+              },
+              argumentSpecs: [],
+              resultSpecs: [],
             },
           },
-          argumentSpecs: [],
-          resultSpecs: [],
-          isLoaded: true,
-        },
+        }),
+        store.createRecord('atm-lambda', {
+          revisionRegistry: {
+            1: {
+              name: 'f0',
+              summary: 'f0 summary',
+              operationSpec: {
+                engine: 'onedataFunction',
+                functionId: 'f0Function',
+              },
+              argumentSpecs: [],
+              resultSpecs: [],
+            },
+          },
+        }),
+      ];
+      const allAtmLambdas = [
+        ...atmLambdas, store.createRecord('atm-lambda', {
+          revisionRegistry: {
+            1: {
+              name: 'f2',
+              summary: 'f2 summary',
+              operationSpec: {
+                engine: 'openfaas',
+                dockerImage: 'f2Image',
+                dockerExecutionOptions: {
+                  readonly: false,
+                  mountOneclient: false,
+                },
+              },
+              argumentSpecs: [],
+              resultSpecs: [],
+            },
+          },
+        }),
       ];
       sinon.stub(lookupService(this, 'workflow-manager'), 'getAllKnownAtmLambdas')
         .returns(promiseArray(resolve(allAtmLambdas)));
@@ -162,7 +175,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
           await click('.add-to-workflow-action-trigger');
 
           expect(addToAtmWorkflowSchemaSpy).to.be.calledOnce
-            .and.to.be.calledWith(this.get('atmLambdas.1'));
+            .and.to.be.calledWith(this.get('atmLambdas.1'), 1);
         });
 
       it('calls "onBackSlide" callback on back link click', async function () {

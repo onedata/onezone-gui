@@ -2,78 +2,75 @@
   {{record-icon record=atmLambda}}
 </div>
 <div class="content-section">
-  <div class="lambda-content">
-    {{#one-collapse
-      class="view-data-collapse"
-      collapsed=isEditing
-    }}
-      <div class="lambda-generics">
-        <div class="name">{{atmLambda.name}}</div>
-        <div class="summary-container">
-          {{#if atmLambda.summary}}
-            <span class="summary">{{atmLambda.summary}}</span>
-          {{/if}}
-          <a class="details-toggle" {{action "toggleDetails"}}>
-            {{toggleDetailsText}}
-          </a>
-        </div>
-      </div>
-      {{#if (eq mode "selection")}}
-        {{#bs-button
-          class="add-to-workflow-action-trigger pull-right"
-          size="sm"
-          onClick=onAddToAtmWorkflowSchema
-        }}
-          {{one-icon icon="plus"}}
-          <span class="text">{{tt this "addToAtmWorkflowSchemaAction"}}</span>
-        {{/bs-button}}
-      {{/if}}
-    {{/one-collapse}}
-    {{#one-collapse
-      class="details-collapse"
-      collapsed=(not (or isExpanded isEditing))
-    }}
-      {{#render-later triggerRender=(or isExpanded isEditing)}}
-        {{content-atm-inventories-lambdas/atm-lambda-form
-          mode=(if isEditing "edit" "view")
-          atmLambda=atmLambda
-          btnSize="sm"
-          onSubmit=(action "saveChanges")
-          onCancel=(action "cancelChanges")
-        }}
-      {{/render-later}}
-    {{/one-collapse}}
+  <div class="details">
+    {{#truncated-string class="lambda-name"}}{{latestRevisionName}}{{/truncated-string}}
+    {{#if latestRevisionSummary}}
+      <div class="lambda-summary">{{latestRevisionSummary}}</div>
+    {{/if}}
   </div>
-  {{#if (eq mode "presentation")}}
-    {{one-menu-toggle
-      class=(concat-classes
-        "atm-lambda-actions-trigger clickable"
-        (concat "actions-trigger-" elementId)
-        (if areActionsOpened "active")
-      )
-      click=(action "toggleActionsOpen" (not areActionsOpened))
-    }}
-    {{#render-later triggerRender=areActionsOpened}}
-      {{#one-webui-popover
-        class="atm-lambda-actions"
-        padding=false
-        popoverStyle="with-dropdown"
-        triggerSelector=(concat ".actions-trigger-" elementId)
-        open=areActionsOpened
-        onToggle=(action "toggleActionsOpen")
-        as |popover|
-      }}
-        {{#click-outside
-          action=(action "toggleActionsOpen" false)
-          except-selector=(concat ".actions-trigger-" elementId)
-        }}
-          {{actions-popover-content
-            actionsArray=atmLambdaActionsArray
-            actionClicked=(action "toggleActionsOpen" false)
+  {{#revisions-table
+    revisionRegistry=atmLambda.revisionRegistry
+    revisionActionsFactory=revisionActionsFactory
+    customColumnsCount=(if (eq mode "selection") 3 2)
+    onRevisionClick=(unless (eq mode "selection") (action "clickRevision"))
+    as |section data|
+  }}
+    {{#if (eq section "header")}}
+      <th class="name-column filling-column">{{tt this "columns.name.title"}}</th>
+      <th class="summary-column filling-column">{{tt this "columns.summary.title"}}</th>
+      {{#if (eq mode "selection")}}
+        <th></th>
+      {{/if}}
+    {{else}}
+      <td class="name filling-column {{unless data.revision.name "no-value"}}">
+        {{or data.revision.name (tt this "columns.name.fallback")}}
+      </td>
+      <td class="summary filling-column {{unless data.revision.summary "no-value"}}">
+        {{or data.revision.summary (tt this "columns.summary.fallback")}}
+      </td>
+      {{#if (eq mode "selection")}}
+        <td class="buttons">
+          {{#bs-button
+            type="default"
+            size="sm"
+            class="clickable add-to-workflow-action-trigger"
+            onClick=(action "addToWorkflowSchema" data.revisionNumber)
           }}
-        {{/click-outside}}
-      {{/one-webui-popover}}
-    {{/render-later}}
-  {{/if}}
+            {{one-icon icon="plus"}}
+            <span class="text">{{tt this "columns.buttons.addToWorkflow"}}</span>
+          {{/bs-button}}
+        </td>
+      {{/if}}
+    {{/if}}
+  {{/revisions-table}}
+  {{one-menu-toggle
+    class=(concat-classes
+      "atm-lambda-actions-trigger clickable"
+      (concat "actions-trigger-" elementId)
+      (if areActionsOpened "active")
+    )
+    click=(action "toggleActionsOpen" (not areActionsOpened))
+  }}
+  {{#render-later triggerRender=areActionsOpened}}
+    {{#one-webui-popover
+      class="atm-lambda-actions"
+      padding=false
+      popoverStyle="with-dropdown"
+      triggerSelector=(concat ".actions-trigger-" elementId)
+      open=areActionsOpened
+      onToggle=(action "toggleActionsOpen")
+      as |popover|
+    }}
+      {{#click-outside
+        action=(action "toggleActionsOpen" false)
+        except-selector=(concat ".actions-trigger-" elementId)
+      }}
+        {{actions-popover-content
+          actionsArray=atmLambdaActionsArray
+          actionClicked=(action "toggleActionsOpen" false)
+        }}
+      {{/click-outside}}
+    {{/one-webui-popover}}
+  {{/render-later}}
 </div>
 {{yield}}

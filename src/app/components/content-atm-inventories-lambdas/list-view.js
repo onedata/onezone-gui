@@ -46,11 +46,21 @@ export default Component.extend(I18n, {
   /**
    * Needed when `mode` is `'selection'`
    * @virtual optional
-   * @type {Function}
-   * @param {Model.AtmLambda}
-   * @returns {any}
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
    */
-  onAddToAtmWorkflowSchema: notImplementedIgnore,
+  onAddToAtmWorkflowSchema: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: Number) => void}
+   */
+  onRevisionClick: undefined,
+
+  /**
+   * @virtual
+   * @type {(atmLambda: Models.AtmLambda, originRevisionNumber: Number) => void}
+   */
+  onRevisionCreate: undefined,
 
   /**
    * Needed when `mode` is `'selection'`

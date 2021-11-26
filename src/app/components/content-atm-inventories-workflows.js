@@ -9,9 +9,8 @@
 
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
-import { promise } from 'ember-awesome-macros';
-import EmberObject, { computed, observer, get } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { promise, or, raw } from 'ember-awesome-macros';
+import EmberObject, { computed, observer, get, getProperties, setProperties } from '@ember/object';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
 import { Promise } from 'rsvp';
@@ -19,6 +18,7 @@ import { scheduleOnce } from '@ember/runloop';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Component.extend(GlobalActions, I18n, {
   classNames: ['content-atm-inventories-workflows'],
@@ -48,9 +48,14 @@ export default Component.extend(GlobalActions, I18n, {
   actionsPerSlide: undefined,
 
   /**
-   * @type {String|undefined}
+   * @type {String|null}
    */
-  activeAtmWorkflowSchemaId: undefined,
+  activeAtmWorkflowSchemaId: null,
+
+  /**
+   * @type {Number|null}
+   */
+  activeRevisionNumber: null,
 
   /**
    * One of: `'create'`, `'edit'`
@@ -62,6 +67,7 @@ export default Component.extend(GlobalActions, I18n, {
    * ```
    * {
    *   atmLambda: Models.AtmLambda,
+   *   revisionNumber: number,
    *   definedStores: Array<Object>
    *   task: Object,
    *   onSuccess: Function,
@@ -71,6 +77,14 @@ export default Component.extend(GlobalActions, I18n, {
    * @type {Object|undefined}
    */
   taskDetailsProviderData: undefined,
+
+  /**
+   * Data passed to editor in `lambdaCreator` slide. If `null`, then new lambda
+   * will be created. Otherwise a new revision based on the specs from this object
+   * will be added to the lambda.
+   * @type {{ atmLambda: Model.AtmLambda, originRevisionNumber: number }}
+   */
+  lambdaCreatorData: null,
 
   /**
    * Set on init
@@ -90,14 +104,14 @@ export default Component.extend(GlobalActions, I18n, {
   ]),
 
   /**
-   * @type {String}
+   * @type {String|null}
    */
-  activeSlide: undefined,
+  activeSlide: null,
 
   /**
    * @type {Boolean}
    */
-  isCarouselVisible: true,
+  isCarouselVisible: false,
 
   /**
    * @type {WorkflowEditorViewModificationState}
@@ -128,14 +142,22 @@ export default Component.extend(GlobalActions, I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String|null>}
    */
-  activeSlideFromUrl: reads('navigationState.aspectOptions.view'),
+  activeSlideFromUrl: or('navigationState.aspectOptions.view', raw(null)),
 
   /**
-   * @type {ComputedProperty<String|undefined>}
+   * @type {ComputedProperty<String|null>}
    */
-  activeAtmWorkflowSchemaIdFromUrl: reads('navigationState.aspectOptions.workflowId'),
+  activeAtmWorkflowSchemaIdFromUrl: or(
+    'navigationState.aspectOptions.workflowId',
+    raw(null)
+  ),
+
+  /**
+   * @type {ComputedProperty<String|null>}
+   */
+  activeRevisionNumberFromUrl: or('navigationState.aspectOptions.revision', raw(null)),
 
   /**
    * @type {ComputedProperty<PromiseObject<Model.AtmWorkflowSchema>>}
@@ -171,6 +193,28 @@ export default Component.extend(GlobalActions, I18n, {
   )),
 
   /**
+   * @type {ComputedProperty<PromiseObject<AtmWorkflowSchemaRevision>>}
+   */
+  activeAtmWorkflowSchemaRevisionProxy: promise.object(computed(
+    'activeAtmWorkflowSchemaProxy',
+    'activeRevisionNumber',
+    async function activeAtmWorkflowSchemaRevisionProxy() {
+      const {
+        activeAtmWorkflowSchemaProxy,
+        activeRevisionNumber,
+      } = this.getProperties('activeAtmWorkflowSchemaProxy', 'activeRevisionNumber');
+
+      const activeAtmWorkflowSchema = await activeAtmWorkflowSchemaProxy;
+      const activeRevision = activeRevisionNumber &&
+        get(activeAtmWorkflowSchema, `revisionRegistry.${activeRevisionNumber}`);
+      if (!activeRevision) {
+        throw { id: 'notFound' };
+      }
+      return activeRevision;
+    }
+  )),
+
+  /**
    * @type {ComputedProperty<Function>}
    */
   routeChangeHandler: computed(function routeChangeHandler() {
@@ -186,6 +230,7 @@ export default Component.extend(GlobalActions, I18n, {
 
   urlParamsObserver: observer(
     'activeAtmWorkflowSchemaIdFromUrl',
+    'activeRevisionNumberFromUrl',
     'activeSlideFromUrl',
     function urlParamsObserver() {
       scheduleOnce('actions', this, 'synchronizeStateWithUrl');
@@ -215,6 +260,7 @@ export default Component.extend(GlobalActions, I18n, {
     this.urlParamsObserver();
     this.registerRouteChangeHandler();
     this.registerPageUnloadHandler();
+    scheduleOnce('afterRender', this, () => this.set('isCarouselVisible', true));
   },
 
   willDestroyElement() {
@@ -276,17 +322,24 @@ export default Component.extend(GlobalActions, I18n, {
       activeSlideFromUrl,
       activeAtmWorkflowSchemaId,
       activeAtmWorkflowSchemaIdFromUrl,
+      activeRevisionNumber,
+      activeRevisionNumberFromUrl,
     } = this.getProperties(
       'activeSlide',
       'activeSlideFromUrl',
       'activeAtmWorkflowSchemaId',
       'activeAtmWorkflowSchemaIdFromUrl',
+      'activeRevisionNumber',
+      'activeRevisionNumberFromUrl'
     );
 
     let nextActiveSlide = activeSlide;
-    let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId || null;
+    let nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaId;
+    let nextRevisionNumber = activeRevisionNumberFromUrl;
     const isActiveAtmWorkflowSchemaIdChanged =
       () => nextActiveAtmWorkflowSchemaId !== activeAtmWorkflowSchemaId;
+    const isActiveRevisionNumberChanged =
+      () => nextRevisionNumber !== activeRevisionNumber;
     const isActiveSlideChanged = () => nextActiveSlide !== activeSlide;
 
     // Detect change of `activeAtmWorkflowSchemaId`. `||` condition
@@ -294,7 +347,12 @@ export default Component.extend(GlobalActions, I18n, {
     if (activeAtmWorkflowSchemaIdFromUrl !== activeAtmWorkflowSchemaId && (
         activeAtmWorkflowSchemaIdFromUrl || activeAtmWorkflowSchemaId
       )) {
-      nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl || null;
+      nextActiveAtmWorkflowSchemaId = activeAtmWorkflowSchemaIdFromUrl;
+    }
+
+    // Convert revision number to integer
+    if (typeof nextRevisionNumber === 'string') {
+      nextRevisionNumber = Number.parseInt(nextRevisionNumber) || null;
     }
 
     // Detect change of `activeSlide`
@@ -349,6 +407,9 @@ export default Component.extend(GlobalActions, I18n, {
     if (isActiveAtmWorkflowSchemaIdChanged()) {
       propsToUpdate.activeAtmWorkflowSchemaId = nextActiveAtmWorkflowSchemaId;
     }
+    if (isActiveRevisionNumberChanged()) {
+      propsToUpdate.activeRevisionNumber = nextRevisionNumber;
+    }
     if (Object.keys(propsToUpdate).length) {
       this.setProperties(propsToUpdate);
     }
@@ -367,11 +428,14 @@ export default Component.extend(GlobalActions, I18n, {
     // while asking user what to do with changes.
     if (
       nextActiveSlide !== this.get('activeSlideFromUrl') ||
-      nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl')
+      nextActiveAtmWorkflowSchemaId !== this.get('activeAtmWorkflowSchemaIdFromUrl') ||
+      String(nextRevisionNumber) !== String(this.get('activeRevisionNumberFromUrl'))
     ) {
       this.setUrlParams({
         view: nextActiveSlide,
         workflowId: nextActiveAtmWorkflowSchemaId,
+        revision: nextRevisionNumber === null ?
+          nextRevisionNumber : String(nextRevisionNumber),
       }, true);
     }
   },
@@ -454,13 +518,17 @@ export default Component.extend(GlobalActions, I18n, {
 
   changeSlideViaUrl(newSlide, slideParams = {}) {
     const workflowId = this.get('activeAtmWorkflowSchemaIdFromUrl') || null;
-    this.setUrlParams(Object.assign({ workflowId }, slideParams, {
+    const revision = this.get('activeRevisionNumberFromUrl') || null;
+    this.setUrlParams(Object.assign({ workflowId, revision }, slideParams, {
       view: newSlide,
     }));
   },
 
   runTaskDetailsProvider(mode, { definedStores, task }) {
-    const atmLambdaId = task && get(task, 'lambdaId');
+    const {
+      lambdaId: atmLambdaId,
+      lambdaRevisionNumber: revisionNumber,
+    } = getProperties(task || {}, 'lambdaId', 'lambdaRevisionNumber');
     const atmLambda = atmLambdaId ?
       this.get('recordManager').getLoadedRecordById('atmLambda', atmLambdaId) :
       undefined;
@@ -483,6 +551,7 @@ export default Component.extend(GlobalActions, I18n, {
       taskDetailsProviderMode: mode,
       taskDetailsProviderData: EmberObject.create({
         atmLambda,
+        revisionNumber,
         definedStores,
         task,
         onSuccess: resolvePromise,
@@ -541,28 +610,79 @@ export default Component.extend(GlobalActions, I18n, {
     }
   },
 
+  async showEditorView(atmWorkflowSchema, revisionNumber) {
+    const {
+      atmInventory,
+      activeAtmWorkflowSchemaId,
+      router,
+    } = this.getProperties('atmInventory', 'activeAtmWorkflowSchemaId', 'router');
+    const atmInventoryOfWorkflowSchema = await get(atmWorkflowSchema || {}, 'atmInventory');
+    const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
+    if (
+      atmInventoryOfWorkflowSchema &&
+      atmInventoryOfWorkflowSchema !== atmInventory &&
+      workflowId &&
+      revisionNumber
+    ) {
+      // Some event from inside of this component triggered a change in model,
+      // that needs showing editor for a workflow in another inventory.
+      // Example of such an event is duplicating revision to a workflow in
+      // other inventory.
+      await router.transitionTo(
+        'onedata.sidebar.content.aspect',
+        'atm-inventories',
+        get(atmInventoryOfWorkflowSchema, 'entityId'),
+        'workflows', {
+          queryParams: {
+            options: serializeAspectOptions({
+              view: 'editor',
+              workflowId,
+              revision: revisionNumber,
+            }),
+          },
+        }
+      );
+      return;
+    }
+
+    const schemaTheSameAsPrevOne = workflowId === activeAtmWorkflowSchemaId;
+    this.changeSlideViaUrl('editor', {
+      workflowId,
+      revision: String(revisionNumber),
+    });
+
+    if (schemaTheSameAsPrevOne) {
+      // Notify about change in case when selected workflow schema is the same
+      // as previously selected. It should reset editor state by treating selected
+      // schema as different one.
+      scheduleOnce(
+        'afterRender',
+        this,
+        'notifyPropertyChange',
+        'activeAtmWorkflowSchemaProxy'
+      );
+    }
+  },
+
   actions: {
     showCreatorView() {
       this.changeSlideViaUrl('editor', { workflowId: null });
     },
-    showEditorView(atmWorkflowSchema) {
-      const workflowId = get(atmWorkflowSchema || {}, 'entityId') || null;
-      const schemaTheSameAsPrevOne = workflowId === this.get('activeAtmWorkflowSchemaId');
-      this.changeSlideViaUrl('editor', { workflowId });
-
-      if (schemaTheSameAsPrevOne) {
-        // Notify about change in case when selected workflow schema is the same
-        // as previously selected. It should reset editor state by treating selected
-        // schema as different one.
-        scheduleOnce(
-          'afterRender',
-          this,
-          'notifyPropertyChange',
-          'activeAtmWorkflowSchemaProxy'
-        );
-      }
+    atmWorkflowSchemaAdded(atmWorkflowSchema) {
+      this.showEditorView(atmWorkflowSchema, 1);
     },
-    showLambdaCreatorView() {
+    async showEditorView(atmWorkflowSchema, revisionNumber) {
+      await this.showEditorView(atmWorkflowSchema, revisionNumber);
+    },
+    showLambdaCreatorView(atmLambda, originRevisionNumber) {
+      let lambdaCreatorData = null;
+      if (atmLambda && originRevisionNumber) {
+        lambdaCreatorData = {
+          atmLambda,
+          originRevisionNumber,
+        };
+        this.set('lambdaCreatorData', lambdaCreatorData);
+      }
       this.changeSlideViaUrl('lambdaCreator');
     },
     backSlide() {
@@ -598,13 +718,17 @@ export default Component.extend(GlobalActions, I18n, {
         }));
       });
     },
-    taskProviderLambdaSelected(atmLambda) {
-      this.set('taskDetailsProviderData.atmLambda', atmLambda);
+    taskProviderLambdaSelected(atmLambda, revisionNumber) {
+      setProperties(this.get('taskDetailsProviderData'), {
+        atmLambda,
+        revisionNumber,
+      });
       this.changeSlideViaUrl('taskDetails');
     },
     async taskProviderDataAccepted(taskData) {
       try {
         const atmLambda = this.get('taskDetailsProviderData.atmLambda');
+        const revisionNumber = this.get('taskDetailsProviderData.revisionNumber');
         const atmLambdaId = get(atmLambda, 'entityId');
         const atmInventory = this.get('atmInventory');
         const atmLambdasInInventory = await get(
@@ -618,7 +742,10 @@ export default Component.extend(GlobalActions, I18n, {
           );
         }
         this.finishTaskDetailsProvider(
-          Object.assign({ lambdaId: atmLambdaId }, taskData)
+          Object.assign({
+            lambdaId: atmLambdaId,
+            lambdaRevisionNumber: revisionNumber,
+          }, taskData)
         );
       } catch (e) {
         this.cancelTaskDetailsProvider();

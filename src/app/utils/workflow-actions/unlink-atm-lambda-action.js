@@ -40,7 +40,7 @@ export default Action.extend({
    * @override
    */
   disabled: or(
-    not('atmInventory.privileges.manageLambdas'),
+    not('hasManageLambdasPrivilege'),
     'isAtmLambdaUsedInAtmInventory'
   ),
 

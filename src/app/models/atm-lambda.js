@@ -9,9 +9,24 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
+import { computed } from '@ember/object';
 import { belongsTo } from 'onedata-gui-websocket-client/utils/relationships';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
+import sortRevisionNumbers from 'onedata-gui-common/utils/revisions/sort-revision-numbers';
+import { getBy } from 'ember-awesome-macros';
+
+/**
+ * @typedef {Object} AtmLambdaRevision
+ * @property {String} name
+ * @property {'draft'|'stable'|'deprecated'} state
+ * @property {String} summary
+ * @property {String} description
+ * @property {AtmLambdaOperationSpec} operationSpec
+ * @property {Array<AtmLambdaArgumentSpec>} argumentSpecs
+ * @property {Array<AtmLambdaResultSpec>} resultSpecs
+ * @property {AtmResourceSpec} resourceSpec
+ */
 
 /**
  * @typedef {Object} AtmLambdaOperationSpec
@@ -107,43 +122,52 @@ export const entityType = 'atm_lambda';
 
 export default Model.extend(GraphSingleModelMixin, {
   /**
-   * @type {ComputedProperty<String>}
+   * Keys are revision numbers.
+   * @type {ComputedProperty<Object<String,AtmLambdaRevision>>}
    */
-  name: attr('string'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  summary: attr('string'),
-
-  /**
-   * Is in markdown format
-   * @type {ComputedProperty<String>}
-   */
-  description: attr('string'),
-
-  /**
-   * @type {ComputedProperty<AtmLambdaOperationSpec>}
-   */
-  operationSpec: attr('object'),
-
-  /**
-   * @type {ComputedProperty<Array<AtmLambdaArgumentSpec>>}
-   */
-  argumentSpecs: attr('array'),
-
-  /**
-   * @type {ComputedProperty<Array<AtmLambdaResultSpec>>}
-   */
-  resultSpecs: attr('array'),
-
-  /**
-   * @type {ComputedProperty<AtmResourceSpec>}
-   */
-  resourceSpec: attr('object'),
+  revisionRegistry: attr('object'),
 
   /**
    * @type {ComputedProperty<Models.AtmInventoryList>}
    */
   atmInventoryList: belongsTo('atm-inventory-list'),
+
+  /**
+   * In case if this lambda is a dumped another lambda, then that
+   * 'another' lambda is referenced here (if available).
+   * @type {ComputedProperty<Models.AtmLambda|null>}
+   */
+  originalAtmLambda: belongsTo('atm-lambda'),
+
+  /**
+   * ID taken from `originalAtmLambda` relation. Set in `didLoad`.
+   * @type {String}
+   */
+  originalAtmLambdaId: undefined,
+
+  /**
+   * @type {ComputedProperty<Number>}
+   */
+  latestRevisionNumber: computed(
+    'revisionRegistry',
+    function latestRevisionNumber() {
+      const revisionRegistry = this.get('revisionRegistry') || {};
+      const sortedRevisionNumbers =
+        sortRevisionNumbers(Object.keys(revisionRegistry));
+      return sortedRevisionNumbers[sortedRevisionNumbers.length - 1];
+    }
+  ),
+
+  /**
+   * @type {ComputedProperty<AtmLambdaRevision>}
+   */
+  latestRevision: getBy('revisionRegistry', 'latestRevisionNumber'),
+
+  didLoad() {
+    this._super(...arguments);
+    this.set(
+      'originalAtmLambdaId',
+      this.relationEntityId('originalAtmLambda')
+    );
+  },
 }).reopenClass(StaticGraphModelMixin);

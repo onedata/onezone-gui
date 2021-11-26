@@ -14,10 +14,9 @@ import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignor
 import { inject as service } from '@ember/service';
 import { get, getProperties, observer, computed, setProperties } from '@ember/object';
 import { collect } from '@ember/object/computed';
-import { reject } from 'rsvp';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import areWorkflowSchemasEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schemas-equal';
-import { not } from 'ember-awesome-macros';
+import areWorkflowSchemaRevisionsEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schema-revisions-equal';
+import { not, tag } from 'ember-awesome-macros';
 
 /**
  * @typedef {Object} WorkflowEditorViewModificationState
@@ -27,6 +26,7 @@ import { not } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   classNames: ['content-atm-inventories-workflows-editor-view'],
+  classNameBindings: ['activeTabClass'],
 
   i18n: service(),
   workflowActions: service(),
@@ -41,6 +41,12 @@ export default Component.extend(I18n, {
    * @type {Models.AtmWorkflowSchema}
    */
   atmWorkflowSchema: undefined,
+
+  /**
+   * @virtual
+   * @type {Number}
+   */
+  revisionNumber: undefined,
 
   /**
    * @virtual
@@ -68,11 +74,23 @@ export default Component.extend(I18n, {
   onModificationStateChange: notImplementedIgnore,
 
   /**
+   * @type {'editor'|'details'}
+   */
+  activeTab: 'editor',
+
+  /**
    * Data injected into the visualiser. Initialized by
-   * `atmWorkflowSchemaObserver`, updated by modifications.
+   * `atmWorkflowSchemaRevisionObserver`, updated by modifications.
    * @type {Object}
    */
   visualiserData: undefined,
+
+  /**
+   * Contains data showed by details form. Initialized by
+   * `atmWorkflowSchemaRevisionObserver`, updated by modifications.
+   * @type {Object}
+   */
+  detailsData: undefined,
 
   /**
    * The same as `visualiserData`, but without modifications.
@@ -81,22 +99,45 @@ export default Component.extend(I18n, {
   unchangedVisualiserData: undefined,
 
   /**
+   * The same as `detailsData`, but without modifications.
+   * @type {Object}
+   */
+  unchangedDetailsData: undefined,
+
+  /**
    * @override
    */
   globalActions: collect('dumpAction'),
 
   /**
+   * @type {ComputedProperty<String>}
+   */
+  activeTabClass: tag `${'activeTab'}-tab-active`,
+
+  /**
    * @type {ComputedProperty<Boolean>}
    */
-  isVisualiserDataModified: computed(
+  isRevisionModified: computed(
     'visualiserData',
+    'detailsData',
     'unchangedVisualiserData',
-    function isVisualiserDataModified() {
+    'unchangedDetailsData',
+    function isRevisionModified() {
       const {
         visualiserData,
+        detailsData,
         unchangedVisualiserData,
-      } = this.getProperties('visualiserData', 'unchangedVisualiserData');
-      return !areWorkflowSchemasEqual(visualiserData, unchangedVisualiserData);
+        unchangedDetailsData,
+      } = this.getProperties(
+        'visualiserData',
+        'detailsData',
+        'unchangedVisualiserData',
+        'unchangedDetailsData'
+      );
+      return !areWorkflowSchemaRevisionsEqual(
+        Object.assign({}, visualiserData, detailsData),
+        Object.assign({}, unchangedVisualiserData, unchangedDetailsData)
+      );
     }
   ),
 
@@ -104,13 +145,13 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<WorkflowEditorViewModificationState>}
    */
   modificationState: computed(
-    'isVisualiserDataModified',
+    'isRevisionModified',
     function modificationState() {
-      const isVisualiserDataModified = this.get('isVisualiserDataModified');
+      const isRevisionModified = this.get('isRevisionModified');
       const state = {
-        isModified: isVisualiserDataModified,
+        isModified: isRevisionModified,
       };
-      if (isVisualiserDataModified) {
+      if (isRevisionModified) {
         state.executeSaveAction = async () => await this.save();
       }
       return state;
@@ -120,13 +161,13 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Boolean>}
    */
-  isSaveBtnDisabled: not('isVisualiserDataModified'),
+  isSaveBtnDisabled: not('isRevisionModified'),
 
   /**
    * @type {ComputedProperty<String|undefined>}
    */
-  saveBtnTip: computed('isVisualiserDataModified', function isSaveBtnDisabled() {
-    if (!this.get('isVisualiserDataModified')) {
+  saveBtnTip: computed('isRevisionModified', function isSaveBtnDisabled() {
+    if (!this.get('isRevisionModified')) {
       return this.t('noChangesToSave');
     }
   }),
@@ -136,47 +177,63 @@ export default Component.extend(I18n, {
    */
   dumpAction: computed(
     'atmWorkflowSchema',
-    'isVisualiserDataModified',
+    'isRevisionModified',
     function dumpAction() {
       const {
         workflowActions,
         atmWorkflowSchema,
-        isVisualiserDataModified,
+        revisionNumber,
+        isRevisionModified,
       } = this.getProperties(
         'workflowActions',
         'atmWorkflowSchema',
-        'isVisualiserDataModified'
+        'revisionNumber',
+        'isRevisionModified'
       );
-      const action = workflowActions.createDumpAtmWorkflowSchemaAction({
+      const action = workflowActions.createDumpAtmWorkflowSchemaRevisionAction({
         atmWorkflowSchema,
+        revisionNumber,
       });
       setProperties(action, {
-        disabled: isVisualiserDataModified,
-        tip: isVisualiserDataModified ? this.t('cannotDumpModified') : undefined,
+        disabled: isRevisionModified,
+        tip: isRevisionModified ? this.t('cannotDumpModified') : undefined,
       });
       return action;
     }
   ),
 
-  atmWorkflowSchemaObserver: observer(
+  atmWorkflowSchemaRevisionObserver: observer(
     'atmWorkflowSchema',
-    function atmWorkflowSchemaObserver() {
-      const atmWorkflowSchema = this.get('atmWorkflowSchema');
-      if (!atmWorkflowSchema) {
+    'revisionNumber',
+    function atmWorkflowSchemaRevisionObserver() {
+      const {
+        atmWorkflowSchema,
+        revisionNumber,
+      } = this.getProperties('atmWorkflowSchema', 'revisionNumber');
+      if (!atmWorkflowSchema || typeof revisionNumber !== 'number') {
         return;
       }
 
+      const revision = get(atmWorkflowSchema, `revisionRegistry.${revisionNumber}`);
       const {
-        lanes = [],
+        state = 'draft',
+          description = '',
+          lanes = [],
           stores = [],
-      } = getProperties(atmWorkflowSchema, 'lanes', 'stores');
-      const data = {
+      } = getProperties(revision || {}, 'state', 'description', 'lanes', 'stores');
+      const visualiserData = {
         lanes,
         stores,
       };
+      const detailsData = {
+        state,
+        description,
+      };
       this.setProperties({
-        visualiserData: data,
-        unchangedVisualiserData: data,
+        visualiserData,
+        detailsData,
+        unchangedVisualiserData: visualiserData,
+        unchangedDetailsData: detailsData,
       });
     }
   ),
@@ -200,7 +257,7 @@ export default Component.extend(I18n, {
 
   init() {
     this._super(...arguments);
-    this.atmWorkflowSchemaObserver();
+    this.atmWorkflowSchemaRevisionObserver();
     this.globalActionsObserver();
     this.modificationStateNotifier();
   },
@@ -226,25 +283,31 @@ export default Component.extend(I18n, {
     const {
       workflowActions,
       atmWorkflowSchema,
+      revisionNumber,
       visualiserData,
+      detailsData,
     } = this.getProperties(
       'workflowActions',
       'atmWorkflowSchema',
-      'visualiserData'
+      'revisionNumber',
+      'visualiserData',
+      'detailsData'
     );
 
-    const action = workflowActions.createModifyAtmWorkflowSchemaAction({
+    const action = workflowActions.createModifyAtmWorkflowSchemaRevisionAction({
       atmWorkflowSchema,
-      atmWorkflowSchemaDiff: visualiserData,
+      revisionNumber,
+      revisionDiff: Object.assign({}, visualiserData, detailsData),
     });
     action.addExecuteHook(result => {
       if (
         result &&
         get(result, 'status') === 'done' &&
-        atmWorkflowSchema === this.get('atmWorkflowSchema')
+        atmWorkflowSchema === this.get('atmWorkflowSchema') &&
+        revisionNumber === this.get('revisionNumber')
       ) {
         // reload modification state
-        safeExec(this, 'atmWorkflowSchemaObserver');
+        safeExec(this, 'atmWorkflowSchemaRevisionObserver');
       }
     });
 
@@ -255,36 +318,14 @@ export default Component.extend(I18n, {
     backSlide() {
       this.get('onBackSlide')();
     },
-    async changeName(newName) {
-      const {
-        workflowActions,
-        atmWorkflowSchema,
-      } = this.getProperties('workflowActions', 'atmWorkflowSchema');
-
-      if (!newName) {
-        return reject();
-      }
-      if (!get(atmWorkflowSchema, 'name') === newName) {
-        return;
-      }
-
-      const action = workflowActions.createModifyAtmWorkflowSchemaAction({
-        atmWorkflowSchema,
-        atmWorkflowSchemaDiff: {
-          name: newName,
-        },
-      });
-      const result = await action.execute();
-      const {
-        status,
-        error,
-      } = getProperties(result, 'status', 'error');
-      if (status == 'failed') {
-        throw error;
-      }
-    },
     visualiserDataChange(newVisualiserData) {
       this.set('visualiserData', newVisualiserData);
+    },
+    detailsDataChange({ data }) {
+      this.set('detailsData', data);
+    },
+    onTabChange(tabId) {
+      this.set('activeTab', tabId);
     },
     async save() {
       return await this.save();

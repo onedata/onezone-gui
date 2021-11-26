@@ -22,15 +22,17 @@ const fallbackDefaultAtmResourceSpec = {
 /**
  * @param {Models.AtmLambda|null} record
  * @param {AtmResourceSpec} defaultAtmResourceSpec
+ * @param {string} formMode
  * @returns {Object}
  */
-export default function recordToFormData(record, defaultAtmResourceSpec) {
+export default function recordToFormData(record, defaultAtmResourceSpec, formMode) {
   if (!record) {
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
 
   const {
     name,
+    state,
     summary,
     operationSpec,
     argumentSpecs,
@@ -39,6 +41,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
   } = getProperties(
     record || {},
     'name',
+    'state',
     'summary',
     'operationSpec',
     'argumentSpecs',
@@ -99,21 +102,29 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 
   const resources = {
     cpu: {
-      cpuRequested: (resourceSpec || {}).cpuRequested,
-      cpuLimit: (resourceSpec || {}).cpuLimit,
+      cpuRequested: atmResourceValueAsInputString((resourceSpec || {}).cpuRequested),
+      cpuLimit: atmResourceValueAsInputString((resourceSpec || {}).cpuLimit),
     },
     memory: {
-      memoryRequested: (resourceSpec || {}).memoryRequested,
-      memoryLimit: (resourceSpec || {}).memoryLimit,
+      memoryRequested: atmResourceValueAsInputString(
+        (resourceSpec || {}).memoryRequested
+      ),
+      memoryLimit: atmResourceValueAsInputString((resourceSpec || {}).memoryLimit),
     },
     ephemeralStorage: {
-      ephemeralStorageRequested: (resourceSpec || {}).ephemeralStorageRequested,
-      ephemeralStorageLimit: (resourceSpec || {}).ephemeralStorageLimit,
+      ephemeralStorageRequested: atmResourceValueAsInputString(
+        (resourceSpec || {}).ephemeralStorageRequested
+      ),
+      ephemeralStorageLimit: atmResourceValueAsInputString(
+        (resourceSpec || {}).ephemeralStorageLimit
+      ),
     },
   };
+  const formState = formMode === 'create' ? 'draft' : state;
 
   return Object.assign({
     name,
+    state: formState,
     summary,
     engine,
     arguments: formArguments,
@@ -125,6 +136,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec) {
 function generateDefaultFormData(defaultAtmResourceSpec) {
   return {
     name: '',
+    state: 'draft',
     summary: '',
     engine: 'openfaas',
     openfaasOptions: {
@@ -193,6 +205,10 @@ function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
   }
 }
 
+function atmResourceValueAsInputString(value) {
+  return typeof value === 'number' ? String(value) : '';
+}
+
 /**
  * Converts record arguments/results to form arguments/results
  * @param {String} dataType one of: `argument`, `result`
@@ -233,7 +249,7 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       formData[valueName].entryDefaultValue =
         defaultValue === null || defaultValue === undefined ?
         undefined : JSON.stringify(defaultValue);
-      formData[valueName].entryOptional = isOptional;
+      formData[valueName].entryOptional = isOptional === true;
     }
   });
   return formData;
