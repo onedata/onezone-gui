@@ -923,21 +923,19 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
               oneclientOptions: '-k',
             },
           },
+          preferredBatchSize: 100,
           argumentSpecs: [{
             name: 'arg1',
             dataSpec: { type: 'string' },
-            isBatch: true,
             isOptional: true,
             defaultValue: '"some value"',
           }, {
             name: 'arg2',
             dataSpec: { type: 'onedatafsCredentials' },
-            isBatch: true,
           }],
           resultSpecs: [{
             name: 'res1',
             dataSpec: { type: 'string' },
-            isBatch: false,
           }],
           resourceSpec: {
             cpuRequested: 2,
@@ -995,11 +993,10 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
             lanes: [{
               id: 'lane1',
               name: 'lane 1',
+              maxRetries: 1,
               storeIteratorSpec: {
-                strategy: {
-                  type: 'serial',
-                },
                 storeSchemaId: 'store1',
+                maxBatchSize: 50,
               },
               parallelBoxes: [{
                 id: 'pbox1-1',

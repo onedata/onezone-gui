@@ -113,6 +113,9 @@ export default {
         label: 'Onedata function name',
       },
     },
+    preferredBatchSize: {
+      label: 'Preferred batch size',
+    },
     arguments: {
       label: 'Arguments',
       addButtonText: 'Add argument',
@@ -127,9 +130,6 @@ export default {
         entryType: {
           label: 'Type',
           options: argumentAndResultTypes,
-        },
-        entryBatch: {
-          label: 'Batch',
         },
         entryOptional: {
           label: 'Optional',
@@ -154,9 +154,6 @@ export default {
         entryType: {
           label: 'Type',
           options: argumentAndResultTypes,
-        },
-        entryBatch: {
-          label: 'Batch',
         },
       },
     },

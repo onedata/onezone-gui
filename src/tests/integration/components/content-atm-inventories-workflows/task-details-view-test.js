@@ -13,6 +13,7 @@ import { Promise } from 'rsvp';
 const exampleAtmLambdaRevision = {
   name: 'function1',
   summary: 'function1 summary',
+  preferredBatchSize: 1,
   argumentSpecs: [{
     name: 'argint',
     dataSpec: {
@@ -20,7 +21,6 @@ const exampleAtmLambdaRevision = {
       valueConstraints: {},
     },
     isOptional: true,
-    isBatch: false,
     // TODO: VFS-7816 uncomment or remove future code
     // }, {
     //   name: 'argstore',
@@ -31,7 +31,6 @@ const exampleAtmLambdaRevision = {
     //     },
     //   },
     //   isOptional: true,
-    //   isBatch: false,
   }],
   resultSpecs: [{
     name: 'resstring',
@@ -39,7 +38,6 @@ const exampleAtmLambdaRevision = {
       type: 'string',
       valueConstraints: {},
     },
-    isBatch: false,
   }],
 };
 

@@ -18,6 +18,7 @@ import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fi
 import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields-group';
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
+import NumberField from 'onedata-gui-common/utils/form-component/number-field';
 import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
@@ -127,6 +128,7 @@ export default Component.extend(I18n, {
       engineField,
       openfaasOptionsFieldsGroup,
       onedataFunctionOptionsFieldsGroup,
+      preferredBatchSizeField,
       argumentsFieldsCollectionGroup,
       resultsFieldsCollectionGroup,
       resourcesFieldsGroup,
@@ -137,6 +139,7 @@ export default Component.extend(I18n, {
       'engineField',
       'openfaasOptionsFieldsGroup',
       'onedataFunctionOptionsFieldsGroup',
+      'preferredBatchSizeField',
       'argumentsFieldsCollectionGroup',
       'resultsFieldsCollectionGroup',
       'resourcesFieldsGroup'
@@ -157,6 +160,7 @@ export default Component.extend(I18n, {
         engineField,
         openfaasOptionsFieldsGroup,
         onedataFunctionOptionsFieldsGroup,
+        preferredBatchSizeField,
         argumentsFieldsCollectionGroup,
         resultsFieldsCollectionGroup,
         resourcesFieldsGroup,
@@ -284,6 +288,20 @@ export default Component.extend(I18n, {
       });
     }
   ),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.NumberField>}
+   */
+  preferredBatchSizeField: computed(function preferredBatchSizeField() {
+    return NumberField.extend(
+      defaultValueGenerator(this),
+      disableFieldInEditMode(this)
+    ).create({
+      gte: 1,
+      integer: true,
+      name: 'preferredBatchSize',
+    });
+  }),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
@@ -457,14 +475,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       // { value: 'histogramStore' },
     ],
   });
-  const generateEntryBatchField = mode => ToggleField.extend({
-    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-  }).create({
-    mode,
-    name: 'entryBatch',
-    defaultValue: false,
-    component,
-  });
   const generateEntryOptionalField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
@@ -528,7 +538,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
         fields: [
           generateEntryNameField(mode),
           generateEntryTypeField(mode),
-          generateEntryBatchField(mode),
           ...(isForArguments ? [
             generateEntryOptionalField(mode),
             generateEntryDefaultValueField(mode),

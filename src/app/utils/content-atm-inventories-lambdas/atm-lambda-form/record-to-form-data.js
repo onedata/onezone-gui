@@ -20,13 +20,13 @@ const fallbackDefaultAtmResourceSpec = {
 };
 
 /**
- * @param {Models.AtmLambda|null} record
+ * @param {AtmLambdaRevision|null} revision
  * @param {AtmResourceSpec} defaultAtmResourceSpec
  * @param {string} formMode
  * @returns {Object}
  */
-export default function recordToFormData(record, defaultAtmResourceSpec, formMode) {
-  if (!record) {
+export default function recordToFormData(revision, defaultAtmResourceSpec, formMode) {
+  if (!revision) {
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
 
@@ -35,15 +35,17 @@ export default function recordToFormData(record, defaultAtmResourceSpec, formMod
     state,
     summary,
     operationSpec,
+    preferredBatchSize,
     argumentSpecs,
     resultSpecs,
     resourceSpec,
   } = getProperties(
-    record || {},
+    revision || {},
     'name',
     'state',
     'summary',
     'operationSpec',
+    'preferredBatchSize',
     'argumentSpecs',
     'resultSpecs',
     'resourceSpec'
@@ -127,6 +129,7 @@ export default function recordToFormData(record, defaultAtmResourceSpec, formMod
     state: formState,
     summary,
     engine,
+    preferredBatchSize,
     arguments: formArguments,
     results: formResults,
     resources,
@@ -151,6 +154,7 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
     onedataFunctionOptions: {
       onedataFunctionName: '',
     },
+    preferredBatchSize: 100,
     arguments: {
       __fieldsValueNames: [],
     },
@@ -223,14 +227,12 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     const {
       name,
       dataSpec,
-      isBatch,
       isOptional,
       defaultValue,
     } = getProperties(
       entry || {},
       'name',
       'dataSpec',
-      'isBatch',
       'isOptional',
       'defaultValue'
     );
@@ -243,7 +245,6 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     formData[valueName] = {
       entryName: name,
       entryType: dataSpecToType(dataSpec),
-      entryBatch: Boolean(isBatch),
     };
     if (dataType === 'argument') {
       formData[valueName].entryDefaultValue =

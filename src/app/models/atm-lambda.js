@@ -23,6 +23,7 @@ import { getBy } from 'ember-awesome-macros';
  * @property {String} summary
  * @property {String} description
  * @property {AtmLambdaOperationSpec} operationSpec
+ * @property {Number} preferredBatchSize
  * @property {Array<AtmLambdaArgumentSpec>} argumentSpecs
  * @property {Array<AtmLambdaResultSpec>} resultSpecs
  * @property {AtmResourceSpec} resourceSpec
@@ -52,7 +53,6 @@ import { getBy } from 'ember-awesome-macros';
  * @typedef {Object} AtmLambdaArgumentSpec
  * @property {String} name
  * @property {AtmDataSpec} dataSpec
- * @property {Boolean} isBatch
  * @property {Boolean} isOptional
  * @property {String} defaultValue
  */
@@ -61,7 +61,6 @@ import { getBy } from 'ember-awesome-macros';
  * @typedef {Object} AtmLambdaResultSpec
  * @property {String} name
  * @property {AtmDataSpec} dataSpec
- * @property {Boolean} isBatch
  */
 
 /**
