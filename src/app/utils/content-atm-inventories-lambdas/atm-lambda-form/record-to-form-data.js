@@ -240,11 +240,16 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       return;
     }
 
+    const {
+      type,
+      isArray,
+    } = dataSpecToType(dataSpec);
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
     formData[valueName] = {
       entryName: name,
-      entryType: dataSpecToType(dataSpec),
+      entryType: type,
+      entryArray: isArray,
     };
     if (dataType === 'argument') {
       formData[valueName].entryDefaultValue =

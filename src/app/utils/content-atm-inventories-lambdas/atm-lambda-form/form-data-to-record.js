@@ -106,17 +106,19 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     const {
       entryName,
       entryType,
+      entryArray,
       entryOptional,
       entryDefaultValue,
     } = getProperties(
       get(formArgRes, valueName) || {},
       'entryName',
       'entryType',
+      'entryArray',
       'entryOptional',
       'entryDefaultValue'
     );
 
-    const dataSpec = typeToDataSpec(entryType);
+    const dataSpec = typeToDataSpec({ type: entryType, isArray: entryArray });
     const lambdaData = {
       name: entryName,
       dataSpec,

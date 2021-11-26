@@ -131,6 +131,9 @@ export default {
           label: 'Type',
           options: argumentAndResultTypes,
         },
+        entryArray: {
+          label: 'Array',
+        },
         entryOptional: {
           label: 'Optional',
         },
@@ -154,6 +157,9 @@ export default {
         entryType: {
           label: 'Type',
           options: argumentAndResultTypes,
+        },
+        entryArray: {
+          label: 'Array',
         },
       },
     },

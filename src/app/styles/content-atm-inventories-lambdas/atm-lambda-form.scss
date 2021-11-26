@@ -1,7 +1,7 @@
 .atm-lambda-form {
   $padding-right: 15em;
   $space-for-remove-entry: 1em;
-  $entry-toggle-container-width: 6em;
+  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) / 2;
   $nested-fields-indent: 2em;
 
   .form .one-way-toggle {
@@ -86,6 +86,7 @@
         flex: 1 1 100%;
       }
 
+      .entryArray-field,
       .entryOptional-field {
         .control-label {
           width: initial;
@@ -125,8 +126,8 @@
         margin-left: $padding-base-vertical;
       }
 
+      .entryArray-field,
       .entryOptional-field {
-        transform: translateX(#{$x-offset-to-center-toggles});
         flex: 0 1 $entry-toggle-container-width;
         height: $input-height-base;
 
@@ -146,29 +147,31 @@
         }
       }
 
+      .entryArray-field {
+        transform: translateX(#{$x-offset-to-center-toggles});
+      }
+
+      .entryOptional-field {
+        transform: translateX(-#{$x-offset-to-center-toggles});
+      }
+
       .entryDefaultValue-field {
         margin-right: $padding-right;
       }
 
       .remove-field-button-container {
         position: absolute;
-        right: $padding-right - $entry-toggle-container-width - $space-for-remove-entry * 2;
+        right: 0;
       }
 
       .remove-icon {
         margin-top: initial;
       }
-
-      &.field-disabled {
-        .remove-icon {
-          display: none;
-        }
-      }
     }
 
     .results-field {
       .remove-field-button-container {
-        right: $padding-right - $space-for-remove-entry * 2 - ($entry-toggle-container-width - $toggle-width) / 2;
+        right: $entry-toggle-container-width - $x-offset-to-center-toggles * 2;
       }
     }
   }
