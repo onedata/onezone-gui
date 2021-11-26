@@ -131,9 +131,6 @@ export default {
           label: 'Type',
           options: argumentAndResultTypes,
         },
-        entryBatch: {
-          label: 'Batch',
-        },
         entryOptional: {
           label: 'Optional',
         },

@@ -1,7 +1,7 @@
 .atm-lambda-form {
   $padding-right: 15em;
   $space-for-remove-entry: 1em;
-  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) / 2;
+  $entry-toggle-container-width: 6em;
   $nested-fields-indent: 2em;
 
   .form .one-way-toggle {
@@ -86,7 +86,6 @@
         flex: 1 1 100%;
       }
 
-      .entryBatch-field,
       .entryOptional-field {
         .control-label {
           width: initial;
@@ -100,7 +99,7 @@
     $x-offset-to-center-toggles: ($entry-toggle-container-width - $toggle-width) / 6;
 
     .control-label {
-      width: 11em;
+      width: 12em;
     }
 
     .fields-group-children.-children {
@@ -126,8 +125,8 @@
         margin-left: $padding-base-vertical;
       }
 
-      .entryBatch-field,
       .entryOptional-field {
+        transform: translateX(#{$x-offset-to-center-toggles});
         flex: 0 1 $entry-toggle-container-width;
         height: $input-height-base;
 
@@ -137,7 +136,7 @@
           width: initial;
           max-width: initial;
           padding: 0;
-          bottom: 100%;
+          bottom: 90%;
           left: 50%;
           transform: translateX(-50%);
         }
@@ -147,31 +146,29 @@
         }
       }
 
-      .entryBatch-field {
-        transform: translateX(#{$x-offset-to-center-toggles});
-      }
-
-      .entryOptional-field {
-        transform: translateX(-#{$x-offset-to-center-toggles});
-      }
-
       .entryDefaultValue-field {
         margin-right: $padding-right;
       }
 
       .remove-field-button-container {
         position: absolute;
-        right: 0;
+        right: $padding-right - $entry-toggle-container-width - $space-for-remove-entry * 2;
       }
 
       .remove-icon {
         margin-top: initial;
       }
+
+      &.field-disabled {
+        .remove-icon {
+          display: none;
+        }
+      }
     }
 
     .results-field {
       .remove-field-button-container {
-        right: $entry-toggle-container-width - $x-offset-to-center-toggles * 2;
+        right: $padding-right - $space-for-remove-entry * 2 - ($entry-toggle-container-width - $toggle-width) / 2;
       }
     }
   }
