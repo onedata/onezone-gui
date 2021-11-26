@@ -53,7 +53,7 @@ export default Component.extend(GlobalActions, I18n, {
   activeAtmWorkflowSchemaId: null,
 
   /**
-   * @type {Number|null}
+   * @type {RevisionNumber|null}
    */
   activeRevisionNumber: null,
 
@@ -67,7 +67,7 @@ export default Component.extend(GlobalActions, I18n, {
    * ```
    * {
    *   atmLambda: Models.AtmLambda,
-   *   revisionNumber: number,
+   *   revisionNumber: RevisionNumber,
    *   definedStores: Array<Object>
    *   task: Object,
    *   onSuccess: Function,
@@ -82,7 +82,7 @@ export default Component.extend(GlobalActions, I18n, {
    * Data passed to editor in `lambdaCreator` slide. If `null`, then new lambda
    * will be created. Otherwise a new revision based on the specs from this object
    * will be added to the lambda.
-   * @type {{ atmLambda: Model.AtmLambda, originRevisionNumber: number }}
+   * @type {{ atmLambda: Model.AtmLambda, originRevisionNumber: RevisionNumber }}
    */
   lambdaCreatorData: null,
 

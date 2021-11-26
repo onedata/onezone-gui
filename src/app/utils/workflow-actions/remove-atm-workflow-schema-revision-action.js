@@ -38,7 +38,7 @@ export default Action.extend({
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
 
   /**
-   * @type {ComputedProperty<Number>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   revisionNumber: reads('context.revisionNumber'),
 

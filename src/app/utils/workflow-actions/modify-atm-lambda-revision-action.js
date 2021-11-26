@@ -28,7 +28,7 @@ export default Action.extend({
   atmLambda: reads('context.atmLambda'),
 
   /**
-   * @type {ComputedProperty<Number>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   revisionNumber: reads('context.revisionNumber'),
 

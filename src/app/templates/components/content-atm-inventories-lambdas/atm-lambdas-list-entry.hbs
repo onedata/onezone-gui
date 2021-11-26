@@ -16,20 +16,24 @@
     as |section data|
   }}
     {{#if (eq section "header")}}
-      <th class="name-column filling-column">{{tt this "columns.name.title"}}</th>
-      <th class="summary-column filling-column">{{tt this "columns.summary.title"}}</th>
+      <th class="revisions-table-header-cell name-column filling-column">
+        {{tt this "columns.name.title"}}
+      </th>
+      <th class="revisions-table-header-cell summary-column filling-column">
+        {{tt this "columns.summary.title"}}
+      </th>
       {{#if (eq mode "selection")}}
-        <th></th>
+        <th class="revisions-table-header-cell"></th>
       {{/if}}
     {{else}}
-      <td class="name filling-column {{unless data.revision.name "no-value"}}">
+      <td class="revisions-table-data-cell name filling-column {{unless data.revision.name "no-value"}}">
         {{or data.revision.name (tt this "columns.name.fallback")}}
       </td>
-      <td class="summary filling-column {{unless data.revision.summary "no-value"}}">
+      <td class="revisions-table-data-cell summary filling-column {{unless data.revision.summary "no-value"}}">
         {{or data.revision.summary (tt this "columns.summary.fallback")}}
       </td>
       {{#if (eq mode "selection")}}
-        <td class="buttons">
+        <td class="revisions-table-data-cell buttons">
           {{#bs-button
             type="default"
             size="sm"

@@ -48,7 +48,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Number}
+   * @type {RevisionNumber}
    */
   atmLambdaRevisionNumber: undefined,
 
@@ -72,7 +72,7 @@ export default Component.extend(I18n, {
   onBackSlide: notImplementedIgnore,
 
   /**
-   * @type {(atmLambda: Models.AtmLambda, revisionNumber: number) => void}
+   * @type {(atmLambda: Models.AtmLambda, revisionNumber: RevisionNumber) => void}
    */
   onAtmLambdaRevisionSaved: notImplementedIgnore,
 
@@ -92,7 +92,7 @@ export default Component.extend(I18n, {
   activeAtmLambda: undefined,
 
   /**
-   * @type {Number|undefined}
+   * @type {RevisionNumber|undefined}
    */
   activeRevisionNumber: undefined,
 

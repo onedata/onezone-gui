@@ -38,7 +38,7 @@ export default ApplyAtmWorkflowSchemaDumpActionBase.extend({
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
 
   /**
-   * @type {ComputedProperty<number>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   revisionNumber: reads('context.revisionNumber'),
 

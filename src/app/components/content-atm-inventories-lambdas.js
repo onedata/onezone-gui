@@ -40,7 +40,7 @@ export default Component.extend(GlobalActions, {
   activeAtmLambdaId: null,
 
   /**
-   * @type {Number|null}
+   * @type {RevisionNumber|null}
    */
   activeRevisionNumber: null,
 

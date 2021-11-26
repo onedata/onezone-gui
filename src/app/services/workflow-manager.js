@@ -186,7 +186,7 @@ export default Service.extend({
 
   /**
    * @param {String} atmLambdaId
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @param {Object} revisionData
    */
   async createAtmLambdaRevision(atmLambdaId, revisionNumber, revisionData) {
@@ -213,7 +213,7 @@ export default Service.extend({
 
   /**
    * @param {String} atmLambdaId
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @param {Object} revisionDataUpdate
    */
   async updateAtmLambdaRevision(atmLambdaId, revisionNumber, revisionDataUpdate) {
@@ -276,7 +276,7 @@ export default Service.extend({
 
   /**
    * @param {String} atmWorkflowSchemaId
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Promise<Object>} workflow schema dump
    */
   async getAtmWorkflowSchemaDump(atmWorkflowSchemaId, revisionNumber) {
@@ -331,7 +331,7 @@ export default Service.extend({
 
   /**
    * @param {String} atmWorkflowSchemaId
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @param {Object} revisionData
    */
   async saveAtmWorkflowSchemaRevision(
@@ -363,7 +363,7 @@ export default Service.extend({
 
   /**
    * @param {String} atmWorkflowSchemaId
-   * @param {String} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    */
   async removeAtmWorkflowSchemaRevision(atmWorkflowSchemaId, revisionNumber) {
     const {

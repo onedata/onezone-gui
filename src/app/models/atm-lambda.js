@@ -145,7 +145,7 @@ export default Model.extend(GraphSingleModelMixin, {
   originalAtmLambdaId: undefined,
 
   /**
-   * @type {ComputedProperty<Number>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   latestRevisionNumber: computed(
     'revisionRegistry',

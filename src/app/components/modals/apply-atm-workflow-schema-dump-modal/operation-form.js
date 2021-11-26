@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
   isDisabled: false,
 
   /**
-   * @type {ComputedProperty<Number>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   revisionNumber: reads('dump.revision.originalRevisionNumber'),
 

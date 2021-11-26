@@ -44,7 +44,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Number}
+   * @type {RevisionNumber}
    */
   revisionNumber: undefined,
 

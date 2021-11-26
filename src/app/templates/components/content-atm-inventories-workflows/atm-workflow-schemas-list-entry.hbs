@@ -36,9 +36,11 @@
     as |section data|
   }}
     {{#if (eq section "header")}}
-      <th class="description-column filling-column">{{tt this "columns.description.title"}}</th>
+      <th class="revisions-table-header-cell description-column filling-column">
+        {{tt this "columns.description.title"}}
+      </th>
     {{else}}
-      <td class="description filling-column {{unless data.revision.description "no-value"}}">
+      <td class="revisions-table-data-cell description filling-column {{unless data.revision.description "no-value"}}">
         {{or data.revision.description (tt this "columns.description.fallback")}}
       </td>
     {{/if}}

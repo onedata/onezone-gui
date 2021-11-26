@@ -23,7 +23,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @virtual optional
-   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: Number) => void)}
+   * @type {(atmWorkflowSchema: Models.AtmWorkflowSchema, createdRevisionNumber: RevisionNumber) => void)}
    */
   onRevisionCreated: undefined,
 
@@ -64,7 +64,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @private
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
   createRedesignAsNewAtmWorkflowSchemaRevisionAction(revisionNumber) {
@@ -90,7 +90,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @private
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
   createDuplicateAtmWorkflowSchemaRevisionAction(revisionNumber) {
@@ -124,7 +124,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @private
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
   createDumpAtmWorkflowSchemaRevisionAction(revisionNumber) {
@@ -141,7 +141,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @private
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
   createRemoveAtmWorkflowSchemaRevisionAction(revisionNumber) {

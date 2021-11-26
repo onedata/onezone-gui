@@ -53,12 +53,12 @@ export default Action.extend({
   atmWorkflowSchema: reads('context.atmWorkflowSchema'),
 
   /**
-   * @type {ComputedProperty<Number|undefined>}
+   * @type {ComputedProperty<RevisionNumber|undefined>}
    */
   originRevisionNumber: reads('context.originRevisionNumber'),
 
   /**
-   * @type {ComputedProperty<Number|undefined>}
+   * @type {ComputedProperty<RevisionNumber|undefined>}
    */
   normalizedOriginRevisionNumber: computed(
     'originRevisionNumber',
@@ -103,7 +103,7 @@ export default Action.extend({
 
   /**
    * @param {Object} revision
-   * @returns {Promise<Number>} revision number
+   * @returns {Promise<RevisionNumber>} revision number
    */
   async persistNewRevision(revision) {
     const {

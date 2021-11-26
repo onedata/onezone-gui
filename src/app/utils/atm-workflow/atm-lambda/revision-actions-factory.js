@@ -28,7 +28,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @virtual
-   * @type {(originRevisionNumber: number) => void}
+   * @type {(originRevisionNumber: RevisionNumber) => void}
    */
   onRevisionCreate: undefined,
 
@@ -59,7 +59,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
 
   /**
    * @private
-   * @param {Number} revisionNumber
+   * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
   createRedesignAsNewAtmLambdaRevisionAction(revisionNumber) {
@@ -122,17 +122,17 @@ const StartRevisionCreationAction = Action.extend({
   atmLambda: reads('context.atmLambda'),
 
   /**
-   * @type {ComputedProperty<Number|undefined>}
+   * @type {ComputedProperty<RevisionNumber|undefined>}
    */
   originRevisionNumber: reads('context.originRevisionNumber'),
 
   /**
-   * @type {ComputedProperty<(originRevisionNumber: number) => void>}
+   * @type {ComputedProperty<(originRevisionNumber: RevisionNumber) => void>}
    */
   onRevisionCreate: reads('context.onRevisionCreate'),
 
   /**
-   * @type {ComputedProperty<Number|undefined>}
+   * @type {ComputedProperty<RevisionNumber|undefined>}
    */
   normalizedOriginRevisionNumber: computed(
     'originRevisionNumber',
