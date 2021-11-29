@@ -32,10 +32,10 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    */
   createActionsForRevisionNumber(revisionNumber) {
     return [
-      this.createRedesignAsNewAtmWorkflowSchemaRevisionAction(revisionNumber),
-      this.createDuplicateAtmWorkflowSchemaRevisionAction(revisionNumber),
-      this.createDumpAtmWorkflowSchemaRevisionAction(revisionNumber),
-      this.createRemoveAtmWorkflowSchemaRevisionAction(revisionNumber),
+      this.createRedesignAsNewRevisionAction(revisionNumber),
+      this.createDuplicateRevisionAction(revisionNumber),
+      this.createDumpRevisionAction(revisionNumber),
+      this.createRemoveRevisionAction(revisionNumber),
     ];
   },
 
@@ -67,7 +67,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
-  createRedesignAsNewAtmWorkflowSchemaRevisionAction(revisionNumber) {
+  createRedesignAsNewRevisionAction(revisionNumber) {
     const {
       workflowActions,
       atmWorkflowSchema,
@@ -93,7 +93,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
-  createDuplicateAtmWorkflowSchemaRevisionAction(revisionNumber) {
+  createDuplicateRevisionAction(revisionNumber) {
     const {
       workflowActions,
       atmWorkflowSchema,
@@ -127,7 +127,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
-  createDumpAtmWorkflowSchemaRevisionAction(revisionNumber) {
+  createDumpRevisionAction(revisionNumber) {
     const {
       workflowActions,
       atmWorkflowSchema,
@@ -144,7 +144,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
-  createRemoveAtmWorkflowSchemaRevisionAction(revisionNumber) {
+  createRemoveRevisionAction(revisionNumber) {
     const {
       workflowActions,
       atmWorkflowSchema,

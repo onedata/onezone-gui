@@ -37,7 +37,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    */
   createActionsForRevisionNumber(revisionNumber) {
     return [
-      this.createRedesignAsNewAtmLambdaRevisionAction(revisionNumber),
+      this.createRedesignAsNewRevisionAction(revisionNumber),
     ];
   },
 
@@ -62,7 +62,7 @@ export default RevisionActionsFactory.extend(OwnerInjector, {
    * @param {RevisionNumber} revisionNumber
    * @returns {Utils.Action}
    */
-  createRedesignAsNewAtmLambdaRevisionAction(revisionNumber) {
+  createRedesignAsNewRevisionAction(revisionNumber) {
     const {
       atmLambda,
       onRevisionCreate,
