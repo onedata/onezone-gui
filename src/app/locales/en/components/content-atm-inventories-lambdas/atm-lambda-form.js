@@ -131,10 +131,10 @@ export default {
           label: 'Type',
           options: argumentAndResultTypes,
         },
-        entryArray: {
+        entryIsArray: {
           label: 'Array',
         },
-        entryOptional: {
+        entryIsOptional: {
           label: 'Optional',
         },
         entryDefaultValue: {
@@ -158,7 +158,7 @@ export default {
           label: 'Type',
           options: argumentAndResultTypes,
         },
-        entryArray: {
+        entryIsArray: {
           label: 'Array',
         },
       },

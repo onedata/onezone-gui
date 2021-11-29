@@ -249,13 +249,13 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     formData[valueName] = {
       entryName: name,
       entryType: type,
-      entryArray: isArray,
+      entryIsArray: isArray,
     };
     if (dataType === 'argument') {
       formData[valueName].entryDefaultValue =
         defaultValue === null || defaultValue === undefined ?
         undefined : JSON.stringify(defaultValue);
-      formData[valueName].entryOptional = isOptional === true;
+      formData[valueName].entryIsOptional = isOptional === true;
     }
   });
   return formData;

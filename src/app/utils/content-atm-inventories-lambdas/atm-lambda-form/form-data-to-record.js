@@ -106,19 +106,19 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     const {
       entryName,
       entryType,
-      entryArray,
-      entryOptional,
+      entryIsArray,
+      entryIsOptional,
       entryDefaultValue,
     } = getProperties(
       get(formArgRes, valueName) || {},
       'entryName',
       'entryType',
-      'entryArray',
-      'entryOptional',
+      'entryIsArray',
+      'entryIsOptional',
       'entryDefaultValue'
     );
 
-    const dataSpec = typeToDataSpec({ type: entryType, isArray: entryArray });
+    const dataSpec = typeToDataSpec({ type: entryType, isArray: entryIsArray });
     const lambdaData = {
       name: entryName,
       dataSpec,
@@ -134,7 +134,7 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
           lambdaData.defaultValue = null;
         }
       }
-      lambdaData.isOptional = entryOptional;
+      lambdaData.isOptional = entryIsOptional;
     }
     return lambdaData;
   });

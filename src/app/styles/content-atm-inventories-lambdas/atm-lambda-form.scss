@@ -86,8 +86,8 @@
         flex: 1 1 100%;
       }
 
-      .entryArray-field,
-      .entryOptional-field {
+      .entryIsArray-field,
+      .entryIsOptional-field {
         .control-label {
           width: initial;
           min-width: initial;
@@ -126,8 +126,8 @@
         margin-left: $padding-base-vertical;
       }
 
-      .entryArray-field,
-      .entryOptional-field {
+      .entryIsArray-field,
+      .entryIsOptional-field {
         flex: 0 1 $entry-toggle-container-width;
         height: $input-height-base;
 
@@ -147,11 +147,11 @@
         }
       }
 
-      .entryArray-field {
+      .entryIsArray-field {
         transform: translateX(#{$x-offset-to-center-toggles});
       }
 
-      .entryOptional-field {
+      .entryIsOptional-field {
         transform: translateX(-#{$x-offset-to-center-toggles});
       }
 
