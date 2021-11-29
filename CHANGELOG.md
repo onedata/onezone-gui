@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8682 Added array dataSpec type to workflows
 * VFS-8639 Removed iterator strategy from workflows
 * VFS-8255 Added workflow and lambda revisions
 * VFS-8348 Added support for generating file URLs on transfers view

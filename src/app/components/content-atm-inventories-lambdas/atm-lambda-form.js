@@ -475,11 +475,19 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       // { value: 'histogramStore' },
     ],
   });
-  const generateEntryOptionalField = mode => ToggleField.extend({
+  const generateEntryIsArrayField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
     mode,
-    name: 'entryOptional',
+    name: 'entryIsArray',
+    defaultValue: false,
+    component,
+  });
+  const generateEntryIsOptionalField = mode => ToggleField.extend({
+    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
+  }).create({
+    mode,
+    name: 'entryIsOptional',
     defaultValue: false,
     component,
   });
@@ -538,8 +546,9 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
         fields: [
           generateEntryNameField(mode),
           generateEntryTypeField(mode),
+          generateEntryIsArrayField(mode),
           ...(isForArguments ? [
-            generateEntryOptionalField(mode),
+            generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),
           ] : []),
         ],
