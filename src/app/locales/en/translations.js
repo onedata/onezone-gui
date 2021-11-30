@@ -73,6 +73,7 @@ import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
 import contentPrivacyPolicy from './components/content-privacy-policy';
 import contentAcceptableUsePolicy from './components/content-acceptable-use-policy';
+import publicPage from './components/public-page';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
@@ -202,6 +203,7 @@ const translations = {
     cookiesConsent,
     contentPrivacyPolicy,
     contentAcceptableUsePolicy,
+    publicPage,
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,

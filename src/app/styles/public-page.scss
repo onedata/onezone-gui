@@ -1,4 +1,4 @@
-.content-privacy-policy {
+.public-page {
   display: flex; 
   flex-direction: column;
 
@@ -12,7 +12,7 @@
     flex-direction: column;
   }
 
-  .privacy-policy-content {
+  .public-content {
     overflow: auto;
     text-align: justify;
     padding: 10px;
@@ -24,7 +24,7 @@
       padding-right: 30px;
     }
 
-    .privacy-policy-title {
+    .public-title {
       @include font-semibold;
       font-size: 32px;
       padding-bottom: 80px;

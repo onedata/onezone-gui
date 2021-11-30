@@ -11,12 +11,10 @@ import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
-  classNames: ['content-privacy-policy'],
-  
   privacyPolicyManager: service(),
-  router: service(),
 
   /**
    * @override
@@ -26,12 +24,10 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  content: reads('privacyPolicyManager.privacyPolicy'),
+  header: computedT('privacyPolicy'),
 
-  init() {
-    this._super(...arguments);
-    if (!this.get('content')) {
-      this.get('router').replaceWith('index');
-    }
-  },
+  /**
+   * @type {Ember.ComputedProperty<string>}
+   */
+  content: reads('privacyPolicyManager.privacyPolicy'),
 });
