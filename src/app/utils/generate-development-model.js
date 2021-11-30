@@ -294,7 +294,7 @@ function createGuiMessages(store) {
     body: '<p>Privacy policy</p>',
   }, {
     name: 'cookie_consent_notification',
-    body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy].',
+    body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy] and [acceptable-use-policy]acceptable use policy[/acceptable-use-policy].',
   }, {
     name: 'signin_notification',
     body: 'Onezone will be down for two months. You have 20 seconds to migrate your data. 19... 18...',

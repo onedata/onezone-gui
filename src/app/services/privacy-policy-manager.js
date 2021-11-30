@@ -18,6 +18,7 @@ const cookiesAcceptedCookieName = 'cookies-accepted';
 
 export default Service.extend(
   createDataProxyMixin('privacyPolicy'),
+  createDataProxyMixin('acceptableUsePolicy'),
   createDataProxyMixin('cookieConsentNotification'), {
     cookies: service(),
     guiMessageManager: service(),
@@ -38,7 +39,19 @@ export default Service.extend(
           return this.get('router').urlFor('public.privacy-policy');
         }
         return null;
-    }),
+      }),
+    
+    /**
+    * @type {Ember.ComputedProperty<string|null>}
+    */
+    acceptableUsePolicyUrl: computed(
+      'acceptableUsePolicy',
+      function acceptableUsePolicyUrl() {
+        if (this.get('acceptableUsePolicy')) {
+          return this.get('router').urlFor('public.acceptable-use-policy');
+        }
+        return null;
+      }),
 
     init() {
       this._super(...arguments);
@@ -60,15 +73,28 @@ export default Service.extend(
     /**
      * @override
      */
+    fetchAcceptableUsePolicy() {
+      return this.get('guiMessageManager').getMessage('acceptable_use_policy')
+        .then(message => DOMPurify.sanitize(message).toString());
+    },
+
+    /**
+     * @override
+     */
     fetchCookieConsentNotification() {
       return Promise.all([
         this.get('privacyPolicyProxy').then(() => this.get('privacyPolicyUrl')),
+        this.get('acceptableUsePolicyProxy').then(() => this.get('acceptableUsePolicyUrl')),
         this.get('guiMessageManager').getMessage('cookie_consent_notification'),
-      ]).then(([privacyPolicyUrl, message]) =>
+      ]).then(([privacyPolicyUrl, acceptableUsePolicyUrl, message]) =>
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
             `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
+        )
+        .replace(
+            /\[acceptable-use-policy\](.*?)\[\/acceptable-use-policy\]/gi,
+            `<a href="${acceptableUsePolicyUrl || ''}" class="clickable acceptable-use-policy-link">$1</a>`
           )
         );
     },

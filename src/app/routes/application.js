@@ -17,6 +17,7 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
   privacyPolicyManager: service(),
+  acceptableUsePolicyManager: service(),
 
   /**
    * @override
@@ -32,8 +33,13 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
     const superResult = this._super(...arguments);
     const {
       privacyPolicyManager,
+      acceptableUsePolicyManager,
       onedataWebsocket,
-    } = this.getProperties('privacyPolicyManager', 'onedataWebsocket');
+    } = this.getProperties(
+      'privacyPolicyManager',
+      'acceptableUsePolicyManager',
+      'onedataWebsocket'
+    );
     return get(onedataWebsocket, 'webSocketInitializedProxy')
       .catch(() => {
         throw {
@@ -44,6 +50,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
       .then(() =>
         allFulfilled([
           get(privacyPolicyManager, 'privacyPolicyProxy'),
+          get(acceptableUsePolicyManager, 'acceptableUsePolicyProxy'),
           get(privacyPolicyManager, 'cookieConsentNotificationProxy'),
         ]).catch(error => {
           console.error(error);

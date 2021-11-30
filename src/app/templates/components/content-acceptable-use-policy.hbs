@@ -1,0 +1,18 @@
+<div class="world-map light">
+  <div class="acceptable-use-policy-content">
+    <div class="container">
+      <h1 class="acceptable-use-policy-title">{{tt this "acceptableUsePolicy"}}</h1>
+      {{wysiwyg-editor mode="show" content=content}}
+    </div>
+  </div>
+  {{#public-footer}}
+    <div class="back-to-main-page">
+      {{#link-to "index"}}
+        {{one-icon icon="home"}}
+        {{#unless media.isMobile}}
+          <span>{{tt this "backToMainPage"}}</span>
+        {{/unless}}
+      {{/link-to}}
+    </div>
+  {{/public-footer}}
+</div>

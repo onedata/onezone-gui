@@ -1,0 +1,58 @@
+.content-acceptable-use-policy {
+  display: flex; 
+  flex-direction: column;
+
+  .world-map {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-attachment: fixed;
+    height: 100vh;
+    display: flex; 
+    flex-direction: column;
+  }
+
+  .acceptable-use-policy-content {
+    overflow: auto;
+    text-align: justify;
+    padding: 10px;
+    padding-bottom: 30px;
+    flex-grow: 1;
+
+    @media (max-width: $screen-xs-max) {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+
+    .acceptable-use-policy-title {
+      @include font-semibold;
+      font-size: 32px;
+      padding-bottom: 80px;
+      padding-top: 80px;
+      text-transform: uppercase;
+    }
+  }
+  .public-footer {
+    .back-to-main-page {
+      font-size: 16px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  
+    .oneicon-home {
+      position: relative;
+      top: 5px;
+      font-size: 22px;
+    }
+  
+    @media (max-width: $screen-xs-max) {
+      .oneicon-home {
+        top: 14px;
+        font-size: 44px;
+      }
+    }
+  }
+}
+
+
