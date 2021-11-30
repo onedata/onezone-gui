@@ -24,6 +24,10 @@ const PrivacyPolicyManagerStub = Service.extend({
   showPrivacyPolicyAction: undefined,
 });
 
+const AcceptableUsePolicyManagerStub = Service.extend({
+  showPrivacyPolicyAction: undefined,
+});
+
 describe('Integration | Component | user account button', function () {
   setupComponentTest('user-account-button', {
     integration: true,
@@ -33,6 +37,7 @@ describe('Integration | Component | user account button', function () {
     registerService(this, 'currentUser', CurrentUser);
     registerService(this, 'session', SessionStub);
     registerService(this, 'privacyPolicyManager', PrivacyPolicyManagerStub);
+    registerService(this, 'acceptableUsePolicyManager', AcceptableUsePolicyManagerStub);
 
     const session = this.container.lookup('service:session');
     session.get('data.authenticated').identity.user = userId;
