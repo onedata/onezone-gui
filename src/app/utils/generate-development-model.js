@@ -926,7 +926,14 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
           preferredBatchSize: 100,
           argumentSpecs: [{
             name: 'arg1',
-            dataSpec: { type: 'string' },
+            dataSpec: {
+              type: 'array',
+              valueConstraints: {
+                itemDataSpec: {
+                  type: 'string',
+                },
+              },
+            },
             isOptional: true,
             defaultValue: '"some value"',
           }, {
@@ -935,7 +942,14 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
           }],
           resultSpecs: [{
             name: 'res1',
-            dataSpec: { type: 'string' },
+            dataSpec: {
+              type: 'array',
+              valueConstraints: {
+                itemDataSpec: {
+                  type: 'string',
+                },
+              },
+            },
           }],
           resourceSpec: {
             cpuRequested: 2,

@@ -86,7 +86,7 @@ export const entityType = 'atm_workflow_schema';
  * @typedef {Object} AtmTaskResultMapping
  * @property {String} resultName
  * @property {String} storeSchemaId
- * @property {'set'|'append'} dispatchFunction
+ * @property {'set'|'append'|'extend'} dispatchFunction
  */
 
 export default Model.extend(GraphSingleModelMixin, {

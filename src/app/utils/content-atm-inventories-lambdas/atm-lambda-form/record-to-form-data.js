@@ -240,17 +240,22 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       return;
     }
 
+    const {
+      type,
+      isArray,
+    } = dataSpecToType(dataSpec);
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
     formData[valueName] = {
       entryName: name,
-      entryType: dataSpecToType(dataSpec),
+      entryType: type,
+      entryIsArray: isArray,
     };
     if (dataType === 'argument') {
       formData[valueName].entryDefaultValue =
         defaultValue === null || defaultValue === undefined ?
         undefined : JSON.stringify(defaultValue);
-      formData[valueName].entryOptional = isOptional === true;
+      formData[valueName].entryIsOptional = isOptional === true;
     }
   });
   return formData;

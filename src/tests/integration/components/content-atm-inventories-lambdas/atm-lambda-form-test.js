@@ -450,10 +450,10 @@ describe(
         expect($entryTypeLabel.text().trim()).to.equal('Type:');
         expect($entryTypeField.text().trim()).to.equal('Integer');
 
-        const $entryOptionalLabel = $entry.find('.entryOptional-field .control-label');
-        const $entryOptionalField = $entry.find('.entryOptional-field .form-control');
-        expect($entryOptionalLabel.text().trim()).to.equal('Optional');
-        expect($entryOptionalField).to.not.have.class('checked');
+        const $entryIsOptionalLabel = $entry.find('.entryIsOptional-field .control-label');
+        const $entryIsOptionalField = $entry.find('.entryIsOptional-field .form-control');
+        expect($entryIsOptionalLabel.text().trim()).to.equal('Optional');
+        expect($entryIsOptionalField).to.not.have.class('checked');
 
         const $entryDefaultValueLabel = $entry.find('.entryDefaultValue-field .control-label');
         const $entryDefaultValueField = $entry.find('.entryDefaultValue-field .form-control');
@@ -727,7 +727,7 @@ describe(
             argumentAndResultTypes[i].label
           );
           if (i === 0) {
-            await click(`${nthArgSelector} .entryOptional-field .form-control`);
+            await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
             await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '"val0"');
           }
 
@@ -923,7 +923,7 @@ describe(
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
           expect($argument.find('.entryType-field .field-component').text().trim())
             .to.equal('String');
-          expect($argument.find('.entryOptional-field .form-control'))
+          expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect($argument.find('.entryDefaultValue-field .form-control'))
             .to.have.value('"default"');
@@ -1094,7 +1094,7 @@ describe(
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
-          const $optionalToggle = $entry.find('.entryOptional-field .form-control');
+          const $optionalToggle = $entry.find('.entryIsOptional-field .form-control');
           const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
           if (idx === 0) {
             expect($optionalToggle).to.have.class('checked');
@@ -1212,7 +1212,7 @@ describe(
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
           expect($argument.find('.entryType-field .field-component').text().trim())
             .to.equal('String');
-          expect($argument.find('.entryOptional-field .form-control'))
+          expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect($argument.find('.entryDefaultValue-field .form-control'))
             .to.have.value('"default"');
