@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 import { htmlSafe } from '@ember/template';
 
 export default Component.extend(I18n, {
-  privacyPolicyManager: service(),
+  cookiesConsentManager: service(),
 
   /**
    * @override
@@ -26,10 +26,10 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<HtmlSafe|undefined>}
    */
   content: computed(
-    'privacyPolicyManager.cookieConsentNotification',
+    'cookiesConsentManager.cookieConsentNotification',
     function content() {
       const consentContent =
-        this.get('privacyPolicyManager.cookieConsentNotification');
+        this.get('cookiesConsentManager.cookieConsentNotification');
       return consentContent ? htmlSafe(consentContent) : undefined;
     }
   ),
@@ -37,11 +37,11 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  areCookiesAccepted: reads('privacyPolicyManager.areCookiesAccepted'),
+  areCookiesAccepted: reads('cookiesConsentManager.areCookiesAccepted'),
 
   actions: {
     acceptCookies() {
-      this.get('privacyPolicyManager').acceptCookies();
+      this.get('cookiesConsentManager').acceptCookies();
     },
   },
 });

@@ -1,6 +1,5 @@
 /**
- * A service that contain functionality related to privacy policy and cookies
- * consent.
+ * A service that contain functionality related to privacy policy.
  *
  * @module services/privacy-policy-manager
  * @author Michał Borzęcki
@@ -12,22 +11,11 @@ import Service, { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import DOMPurify from 'npm:dompurify';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import { Promise } from 'rsvp';
-
-const cookiesAcceptedCookieName = 'cookies-accepted';
 
 export default Service.extend(
-  createDataProxyMixin('privacyPolicy'),
-  createDataProxyMixin('acceptableUsePolicy'),
-  createDataProxyMixin('cookieConsentNotification'), {
-    cookies: service(),
-    guiMessageManager: service(),
+  createDataProxyMixin('privacyPolicy'), {
     router: service(),
-
-    /**
-     * @type {boolean}
-     */
-    areCookiesAccepted: false,
+    guiMessageManager: service(),
 
     /**
      * @type {Ember.ComputedProperty<string|null>}
@@ -42,69 +30,11 @@ export default Service.extend(
       }),
     
     /**
-    * @type {Ember.ComputedProperty<string|null>}
-    */
-    acceptableUsePolicyUrl: computed(
-      'acceptableUsePolicy',
-      function acceptableUsePolicyUrl() {
-        if (this.get('acceptableUsePolicy')) {
-          return this.get('router').urlFor('public.acceptable-use-policy');
-        }
-        return null;
-      }),
-
-    init() {
-      this._super(...arguments);
-
-      this.set(
-        'areCookiesAccepted',
-        this.get('cookies').read(cookiesAcceptedCookieName)
-      );
-    },
-
-    /**
      * @override
      */
     fetchPrivacyPolicy() {
       return this.get('guiMessageManager').getMessage('privacy_policy')
         .then(message => DOMPurify.sanitize(message).toString());
-    },
-
-    /**
-     * @override
-     */
-    fetchAcceptableUsePolicy() {
-      return this.get('guiMessageManager').getMessage('acceptable_use_policy')
-        .then(message => DOMPurify.sanitize(message).toString());
-    },
-
-    /**
-     * @override
-     */
-    fetchCookieConsentNotification() {
-      return Promise.all([
-        this.get('privacyPolicyProxy').then(() => this.get('privacyPolicyUrl')),
-        this.get('acceptableUsePolicyProxy').then(() => this.get('acceptableUsePolicyUrl')),
-        this.get('guiMessageManager').getMessage('cookie_consent_notification'),
-      ]).then(([privacyPolicyUrl, acceptableUsePolicyUrl, message]) =>
-        DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
-          .replace(
-            /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
-        )
-        .replace(
-            /\[acceptable-use-policy\](.*?)\[\/acceptable-use-policy\]/gi,
-            `<a href="${acceptableUsePolicyUrl || ''}" class="clickable acceptable-use-policy-link">$1</a>`
-          )
-        );
-    },
-
-    /**
-     * @returns {undefined}
-     */
-    acceptCookies() {
-      this.get('cookies').write(cookiesAcceptedCookieName, true, { path: '/' });
-      this.set('areCookiesAccepted', true);
     },
   }
 );

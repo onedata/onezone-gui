@@ -18,6 +18,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
   privacyPolicyManager: service(),
   acceptableUsePolicyManager: service(),
+  cookiesConsentManager: service(),
 
   /**
    * @override
@@ -34,10 +35,12 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
     const {
       privacyPolicyManager,
       acceptableUsePolicyManager,
+      cookiesConsentManager,
       onedataWebsocket,
     } = this.getProperties(
       'privacyPolicyManager',
       'acceptableUsePolicyManager',
+      'cookiesConsentManager',
       'onedataWebsocket'
     );
     return get(onedataWebsocket, 'webSocketInitializedProxy')
@@ -51,7 +54,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
         allFulfilled([
           get(privacyPolicyManager, 'privacyPolicyProxy'),
           get(acceptableUsePolicyManager, 'acceptableUsePolicyProxy'),
-          get(privacyPolicyManager, 'cookieConsentNotificationProxy'),
+          get(cookiesConsentManager, 'cookieConsentNotificationProxy'),
         ]).catch(error => {
           console.error(error);
           // Error while loading gui messages is not critical, so it should not
