@@ -120,7 +120,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmLambda: Models.AtmLambda,
-   *     revisionNumber: number,
+   *     revisionNumber: RevisionNumber,
    *     revisionDiff: Object,
    *   }
    *   ```
@@ -203,7 +203,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmWorkflowSchema: Models.AtmWorkflowSchema,
-   *     revisionNumber: Number,
+   *     revisionNumber: RevisionNumber,
    *   }
    *   ```
    * @returns {Utils.WorkflowActions.RemoveAtmWorkflowSchemaRevisionAction}
@@ -217,7 +217,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmWorkflowSchema: Models.AtmWorkflowSchema,
-   *     revisionNumber: Number,
+   *     revisionNumber: RevisionNumber,
    *   }
    *   ```
    * @returns {Utils.WorkflowActions.DumpAtmWorkflowSchemaRevisionAction}
@@ -231,7 +231,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmWorkflowSchema: Models.AtmWorkflowSchema,
-   *     originRevisionNumber: Number|undefined,
+   *     originRevisionNumber: RevisionNumber|undefined,
    *   }
    *   ```
    * @returns {Utils.WorkflowActions.CreateAtmWorkflowSchemaRevisionAction}
@@ -245,7 +245,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmWorkflowSchema: Models.AtmWorkflowSchema,
-   *     revisionNumber: Number,
+   *     revisionNumber: RevisionNumber,
    *     revisionDiff: Object,
    *   }
    *   ```
@@ -260,7 +260,7 @@ export default Service.extend(I18n, {
    *   ```
    *   {
    *     atmWorkflowSchema: Models.AtmWorkflowSchema,
-   *     revisionNumber: Number,
+   *     revisionNumber: RevisionNumber,
    *   }
    *   ```
    * @returns {Utils.WorkflowActions.DuplicateAtmWorkflowSchemaRevisionAction}

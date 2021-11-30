@@ -39,7 +39,7 @@ export default Component.extend(I18n, {
   summary: reads('dump.summary'),
 
   /**
-   * @type {ComputedProperty<String>}
+   * @type {ComputedProperty<RevisionNumber>}
    */
   revisionNumber: reads('dump.revision.originalRevisionNumber'),
 
