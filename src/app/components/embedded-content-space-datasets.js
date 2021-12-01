@@ -126,7 +126,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateArchiveId',
     'updateDirId',
     'updateSelected',
-    'updateSecondarySelected',
+    'updateSelectedSecondary',
     // FIXME: deprecated
     'updateViewMode',
     // FIXME: deprecated
@@ -149,15 +149,17 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       });
     },
     updateArchiveId(archiveId) {
+      // FIXME: breaks backward compat. - seleced not cleared for < a24
       this.get('navigationState').changeRouteAspectOptions({
         archive: archiveId,
-        selected: null,
+        selectedSecondary: null,
       });
     },
     updateDirId(dirId) {
+      // FIXME: breaks backward compat. - seleced not cleared for < a24
       this.get('navigationState').changeRouteAspectOptions({
         dir: dirId,
-        selected: null,
+        selectedSecondary: null,
       });
     },
     updateSelected(selected) {
@@ -165,7 +167,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
         selected: Array.isArray(selected) ? selected.join(',') : selected || null,
       });
     },
-    updateSecondarySelected(selectedSecondary) {
+    updateSelectedSecondary(selectedSecondary) {
       this.get('navigationState').changeRouteAspectOptions({
         selectedSecondary: Array.isArray(selectedSecondary) ?
           selectedSecondary.join(',') : selectedSecondary || null,
