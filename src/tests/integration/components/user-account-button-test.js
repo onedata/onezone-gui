@@ -20,12 +20,9 @@ const CurrentUser = Service.extend({
   getCurrentUserRecord() {},
 });
 
-const PrivacyPolicyManagerStub = Service.extend({
-  showPrivacyPolicyAction: undefined,
-});
-
-const AcceptableUsePolicyManagerStub = Service.extend({
-  showPrivacyPolicyAction: undefined,
+const GuiMessageManagerStub = Service.extend({
+  privacyPolicyUrl: undefined,
+  acceptableUsePolicyUrl: undefined,
 });
 
 describe('Integration | Component | user account button', function () {
@@ -36,8 +33,7 @@ describe('Integration | Component | user account button', function () {
   beforeEach(function () {
     registerService(this, 'currentUser', CurrentUser);
     registerService(this, 'session', SessionStub);
-    registerService(this, 'privacyPolicyManager', PrivacyPolicyManagerStub);
-    registerService(this, 'acceptableUsePolicyManager', AcceptableUsePolicyManagerStub);
+    registerService(this, 'guiMessageManager', GuiMessageManagerStub);
 
     const session = this.container.lookup('service:session');
     session.get('data.authenticated').identity.user = userId;

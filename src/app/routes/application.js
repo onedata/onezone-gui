@@ -16,9 +16,7 @@ import generateDevelopmentModel from 'onezone-gui/utils/generate-development-mod
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
-  privacyPolicyManager: service(),
-  acceptableUsePolicyManager: service(),
-  cookiesConsentManager: service(),
+  guiMessageManager: service(),
 
   /**
    * @override
@@ -33,14 +31,10 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   beforeModel() {
     const superResult = this._super(...arguments);
     const {
-      privacyPolicyManager,
-      acceptableUsePolicyManager,
-      cookiesConsentManager,
+      guiMessageManager,
       onedataWebsocket,
     } = this.getProperties(
-      'privacyPolicyManager',
-      'acceptableUsePolicyManager',
-      'cookiesConsentManager',
+      'guiMessageManager',
       'onedataWebsocket'
     );
     return get(onedataWebsocket, 'webSocketInitializedProxy')
@@ -52,9 +46,8 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
       })
       .then(() =>
         allFulfilled([
-          get(privacyPolicyManager, 'privacyPolicyProxy'),
-          get(acceptableUsePolicyManager, 'acceptableUsePolicyProxy'),
-          get(cookiesConsentManager, 'cookieConsentNotificationProxy'),
+          get(guiMessageManager, 'guiMessageManagerProxy'),
+          get(guiMessageManager, 'cookieConsentNotificationProxy'),
         ]).catch(error => {
           console.error(error);
           // Error while loading gui messages is not critical, so it should not

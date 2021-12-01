@@ -15,7 +15,7 @@ import { inject as service } from '@ember/service';
 import { htmlSafe } from '@ember/template';
 
 export default Component.extend(I18n, {
-  cookiesConsentManager: service(),
+  guiMessageManager: service(),
 
   /**
    * @override
@@ -26,10 +26,10 @@ export default Component.extend(I18n, {
    * @type {Ember.ComputedProperty<HtmlSafe|undefined>}
    */
   content: computed(
-    'cookiesConsentManager.cookieConsentNotification',
+    'guiMessageManager.cookieConsentNotification',
     function content() {
       const consentContent =
-        this.get('cookiesConsentManager.cookieConsentNotification');
+        this.get('guiMessageManager.cookieConsentNotification');
       return consentContent ? htmlSafe(consentContent) : undefined;
     }
   ),
@@ -37,11 +37,11 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<boolean>}
    */
-  areCookiesAccepted: reads('cookiesConsentManager.areCookiesAccepted'),
+  areCookiesAccepted: reads('guiMessageManager.areCookiesAccepted'),
 
   actions: {
     acceptCookies() {
-      this.get('cookiesConsentManager').acceptCookies();
+      this.get('guiMessageManager').acceptCookies();
     },
   },
 });

@@ -14,7 +14,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
-  privacyPolicyManager: service(),
+  guiMessageManager: service(),
 
   /**
    * @override
@@ -29,5 +29,5 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  content: reads('privacyPolicyManager.privacyPolicy'),
+  content: reads('guiMessageManager.privacyPolicy'),
 });
