@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8631 Added acceptable use policy page
 * VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
 * VFS-8038 Refactored build process to support faster builds on CI
