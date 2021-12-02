@@ -72,7 +72,7 @@ import fatalConnectionErrorModal from './components/fatal-connection-error-modal
 import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
 import contentPrivacyPolicy from './components/content-privacy-policy';
-import contentAcceptableUsePolicy from './components/content-acceptable-use-policy';
+import contentTermsOfUse from './components/content-terms-of-use';
 import publicPage from './components/public-page';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
@@ -202,7 +202,7 @@ const translations = {
     uploadPresenter,
     cookiesConsent,
     contentPrivacyPolicy,
-    contentAcceptableUsePolicy,
+    contentTermsOfUse,
     publicPage,
     sidebarTokens,
     removeTokenModal,

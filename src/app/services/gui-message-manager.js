@@ -17,7 +17,7 @@ const cookiesAcceptedCookieName = 'cookies-accepted';
 
 export default Service.extend(
   createDataProxyMixin('privacyPolicy'),
-  createDataProxyMixin('acceptableUsePolicy'),
+  createDataProxyMixin('termsOfUse'),
   createDataProxyMixin('cookieConsentNotification'), {
     store: service(),
     router: service(),
@@ -39,11 +39,11 @@ export default Service.extend(
     /**
      * @type {Ember.ComputedProperty<string|null>}
      */
-    acceptableUsePolicyUrl: computed(
-      'acceptableUsePolicy',
-      function acceptableUsePolicyUrl() {
-        if (this.get('acceptableUsePolicy')) {
-          return this.get('router').urlFor('public.acceptable-use-policy');
+    termsOfUseUrl: computed(
+      'termsOfUse',
+      function termsOfUseUrl() {
+        if (this.get('termsOfUse')) {
+          return this.get('router').urlFor('public.terms-of-use');
         }
         return null;
       }
@@ -74,7 +74,7 @@ export default Service.extend(
     /**
      * @override
      */
-    fetchAcceptableUsePolicy() {
+    fetchTermsOfUse() {
       return this.getMessage('acceptable_use_policy')
         .then(message => DOMPurify.sanitize(message).toString());
     },
@@ -85,17 +85,17 @@ export default Service.extend(
     fetchCookieConsentNotification() {
       return Promise.all([
         this.get('privacyPolicyProxy').then(() => this.get('privacyPolicyUrl')),
-        this.get('acceptableUsePolicyProxy').then(() => this.get('acceptableUsePolicyUrl')),
+        this.get('termsOfUseProxy').then(() => this.get('termsOfUseUrl')),
         this.getMessage('cookie_consent_notification'),
-      ]).then(([privacyPolicyUrl, acceptableUsePolicyUrl, message]) =>
+      ]).then(([privacyPolicyUrl, termsOfUseUrl, message]) =>
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
           .replace(
             /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
             `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
         )
         .replace(
-            /\[acceptable-use-policy\](.*?)\[\/acceptable-use-policy\]/gi,
-            `<a href="${acceptableUsePolicyUrl || ''}" class="clickable acceptable-use-policy-link">$1</a>`
+            /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
+            `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
           )
         );
     },

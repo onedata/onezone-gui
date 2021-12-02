@@ -22,7 +22,7 @@ const CurrentUser = Service.extend({
 
 const GuiMessageManagerStub = Service.extend({
   privacyPolicyUrl: undefined,
-  acceptableUsePolicyUrl: undefined,
+  termsOfUseUrl: undefined,
 });
 
 describe('Integration | Component | user account button', function () {
