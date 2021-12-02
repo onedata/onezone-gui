@@ -24,6 +24,11 @@ export default Service.extend(
     cookies: service(),
 
     /**
+     * @type {boolean}
+     */
+    areCookiesAccepted: false,
+
+    /**
      * @type {Ember.ComputedProperty<string|null>}
      */
     privacyPolicyUrl: computed(
@@ -49,11 +54,6 @@ export default Service.extend(
       }
     ),
 
-    /**
-     * @type {boolean}
-     */
-    areCookiesAccepted: false,
-
     init() {
       this._super(...arguments);
 
@@ -75,7 +75,7 @@ export default Service.extend(
      * @override
      */
     fetchTermsOfUse() {
-      return this.getMessage('acceptable_use_policy')
+      return this.getMessage('terms_of_use')
         .then(message => DOMPurify.sanitize(message).toString());
     },
 

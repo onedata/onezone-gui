@@ -293,6 +293,9 @@ function createGuiMessages(store) {
     name: 'privacy_policy',
     body: '<p>Privacy policy</p>',
   }, {
+    name: 'terms_of_use',
+    body: '<p>Terms of use</p>',
+  }, {
     name: 'cookie_consent_notification',
     body: 'We use cookies for navigation purposes and holding user session state. For more details see our [privacy-policy]privacy policy[/privacy-policy] and [terms-of-use]terms of use[/terms-of-use].',
   }, {

@@ -47,6 +47,8 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
       .then(() =>
         allFulfilled([
           get(guiMessageManager, 'guiMessageManagerProxy'),
+          get(guiMessageManager, 'privacyPolicyProxy'),
+          get(guiMessageManager, 'termsOfUseProxy'),
           get(guiMessageManager, 'cookieConsentNotificationProxy'),
         ]).catch(error => {
           console.error(error);
