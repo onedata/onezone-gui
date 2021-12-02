@@ -1,7 +1,7 @@
 /**
- * A component that shows privacy policy content.
+ * A component that shows terms of use content.
  * 
- * @module components/content-privacy-policy
+ * @module components/content-terms-of-use
  * @author Agnieszka Warchoł
  * @copyright (C) 2021 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -19,15 +19,15 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.contentPrivacyPolicy',
+  i18nPrefix: 'components.contentTermsOfUse',
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  header: computedT('privacyPolicy'),
+  header: computedT('termsOfUse'),
 
   /**
    * @type {Ember.ComputedProperty<string>}
    */
-  content: reads('guiMessageManager.privacyPolicy'),
+  content: reads('guiMessageManager.termsOfUse'),
 });

@@ -72,6 +72,8 @@ import fatalConnectionErrorModal from './components/fatal-connection-error-modal
 import uploadPresenter from './components/upload-presenter';
 import cookiesConsent from './components/cookies-consent';
 import contentPrivacyPolicy from './components/content-privacy-policy';
+import contentTermsOfUse from './components/content-terms-of-use';
+import publicPage from './components/public-page';
 import sidebarTokens from './components/sidebar-tokens';
 import removeTokenModal from './components/remove-token-modal';
 import contentTokensNew from './components/content-tokens-new';
@@ -200,6 +202,8 @@ const translations = {
     uploadPresenter,
     cookiesConsent,
     contentPrivacyPolicy,
+    contentTermsOfUse,
+    publicPage,
     sidebarTokens,
     removeTokenModal,
     contentTokensNew,
