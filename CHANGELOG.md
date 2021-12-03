@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8650 Changed default temporary invite token TTL to 2 weeks
 * VFS-8631 Added terms of use page
 * VFS-8326 Updated commons
 * VFS-8482 Added dedicated page for privacy policy content
