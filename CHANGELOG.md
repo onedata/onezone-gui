@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8650 Changed default temporary invite token TTL to 2 weeks
+* VFS-8631 Added terms of use page
 * VFS-8682 Added array dataSpec type to workflows
 * VFS-8639 Removed iterator strategy from workflows
 * VFS-8255 Added workflow and lambda revisions

@@ -130,7 +130,7 @@ describe('Integration | Component | invite token generator', function () {
         },
         caveats: [{
           type: 'time',
-          validUntil: timestamp + 24 * 60 * 60,
+          validUntil: timestamp + 14 * 24 * 60 * 60,
         }],
       })),
     };
@@ -178,8 +178,8 @@ describe('Integration | Component | invite token generator', function () {
     }
   );
 
-  const standardLimitations = 'This token will expire in 24 hours and has no usage count limit.';
-  const onedatifyLimitations = 'Tokens used below will expire in 24 hours and have no usage count limit.';
+  const standardLimitations = 'This token will expire in 2 weeks and has no usage count limit.';
+  const onedatifyLimitations = 'Tokens used below will expire in 2 weeks and have no usage count limit.';
   const passToUserDescription = 'Copy below token and pass it to the user you would like to invite.';
   const passToGroupDescription = 'Copy below token and pass it to the owner of group you would like to invite.';
 

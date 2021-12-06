@@ -143,7 +143,7 @@ const TokenManager = Service.extend({
         },
         caveats: [{
           type: 'time',
-          validUntil: serverTimestamp + Math.min(maxTtl, 24 * 60 * 60),
+          validUntil: serverTimestamp + Math.min(maxTtl, 14 * 24 * 60 * 60),
         }],
       }));
   },

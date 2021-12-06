@@ -20,7 +20,7 @@ export default OnedataConnection.extend({
   serviceVersion: '19.02.9',
   serviceBuildVersion: 'm-23493894y7238',
   brandSubtitle: 'Isolated zone',
-  maxTemporaryTokenTtl: 7 * 24 * 60 * 60,
+  maxTemporaryTokenTtl: 14 * 24 * 60 * 60,
   defaultHarvestingBackendType: 'elasticsearch_harvesting_backend',
   defaultHarvestingBackendEndpoint: '172.17.0.8:9200',
   defaultAtmResourceSpec: computed(() => ({
