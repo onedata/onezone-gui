@@ -114,7 +114,8 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'selected',
     'selectedSecondary',
     'attachmentState',
-    // FIXME: deprecated
+    // TODO: VFS-8723 decide if viewMode should be supported for backward compatibility or
+    // completely removed
     'viewMode',
   ]),
 
@@ -127,11 +128,14 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateDirId',
     'updateSelected',
     'updateSelectedSecondary',
-    // FIXME: deprecated
+    // TODO: VFS-8723 decide if viewMode should be supported for backward compatibility or
+    // completely removed
     'updateViewMode',
-    // FIXME: deprecated
+    // TODO: VFS-8723 decide if showing dataset info in onezone-gui header should be
+    // supported for backward compatibility or completely removed
     'updateDatasetData',
-    // FIXME: deprecated
+    // TODO: VFS-8723 decide if storing archive info in onezone-gui header should be
+    // supported for backward compatibility or completely removed
     'updateArchiveData',
     'getDataUrl',
     'getDatasetsUrl',
@@ -149,14 +153,14 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
       });
     },
     updateArchiveId(archiveId) {
-      // FIXME: breaks backward compat. - seleced not cleared for < a24
+      // FIXME: breaks backward compat. - selected not cleared for < a24, to decide
       this.get('navigationState').changeRouteAspectOptions({
         archive: archiveId,
         selectedSecondary: null,
       });
     },
     updateDirId(dirId) {
-      // FIXME: breaks backward compat. - seleced not cleared for < a24
+      // FIXME: breaks backward compat. - selected not cleared for < a24, to decide
       this.get('navigationState').changeRouteAspectOptions({
         dir: dirId,
         selectedSecondary: null,
