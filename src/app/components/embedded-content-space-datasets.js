@@ -12,6 +12,7 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
+import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -69,12 +70,28 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   dirId: undefined,
 
   /**
-   * Seletected item IDs (datasets) for "upper" browser.
+   * List of datasets entity ids that are selected.
+   *
    * **Injected to embedded iframe.**
-   * @virtual
    * @type {Array<String>}
    */
-  selected: undefined,
+  selectedDatasets: computedAspectOptionsArray('selectedDatasets'),
+
+  /**
+   * List of archives entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selectedArchives: computedAspectOptionsArray('selectedArchives'),
+
+  /**
+   * List of files entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selectedFiles: computedAspectOptionsArray('selectedFiles'),
 
   /**
    * Seletected item IDs (archives or files) for "bottom" browser.
@@ -111,12 +128,10 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'datasetId',
     'archiveId',
     'dirId',
-    'selected',
-    'selectedSecondary',
+    'selectedDatasets',
+    'selectedArchives',
+    'selectedFiles',
     'attachmentState',
-    // TODO: VFS-8723 decide if viewMode should be supported for backward compatibility or
-    // completely removed
-    'viewMode',
   ]),
 
   /**
@@ -126,17 +141,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateDatasetId',
     'updateArchiveId',
     'updateDirId',
-    'updateSelected',
-    'updateSelectedSecondary',
-    // TODO: VFS-8723 decide if viewMode should be supported for backward compatibility or
-    // completely removed
-    'updateViewMode',
-    // TODO: VFS-8723 decide if showing dataset info in onezone-gui header should be
-    // supported for backward compatibility or completely removed
-    'updateDatasetData',
-    // TODO: VFS-8723 decide if storing archive info in onezone-gui header should be
-    // supported for backward compatibility or completely removed
-    'updateArchiveData',
+    'updateSelectedDatasets',
+    'updateSelectedArchives',
+    'updateSelectedFiles',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
@@ -149,58 +156,30 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     updateDatasetId(datasetId) {
       this.get('navigationState').changeRouteAspectOptions({
         dataset: datasetId,
-        selected: null,
+        selectedDatasets: null,
       });
     },
     updateArchiveId(archiveId) {
-      // FIXME: breaks backward compat. - selected not cleared for < a24, to decide
       this.get('navigationState').changeRouteAspectOptions({
         archive: archiveId,
-        selectedSecondary: null,
+        selectedArchives: null,
+        selectedFiles: null,
       });
     },
     updateDirId(dirId) {
-      // FIXME: breaks backward compat. - selected not cleared for < a24, to decide
       this.get('navigationState').changeRouteAspectOptions({
         dir: dirId,
-        selectedSecondary: null,
+        selectedFiles: null,
       });
     },
-    updateSelected(selected) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selected: Array.isArray(selected) ? selected.join(',') : selected || null,
-      });
+    updateSelectedDatasets(selected) {
+      this.set('selectedDatasets', selected);
     },
-    updateSelectedSecondary(selectedSecondary) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selectedSecondary: Array.isArray(selectedSecondary) ?
-          selectedSecondary.join(',') : selectedSecondary || null,
-      });
+    updateSelectedArchives(selected) {
+      this.set('selectedArchives', selected);
     },
-    updateViewMode(viewMode) {
-      this.get('navigationState').changeRouteAspectOptions({
-        viewMode,
-      });
-    },
-
-    /**
-     * Sets value of dataset property.
-     * Due to lack of dataset model in Onezone it is provided by Oneprovider
-     * in an iframe.
-     * @param {Object} dataset
-     */
-    updateDatasetData(dataset) {
-      this.get('onUpdateDatasetData')(dataset);
-    },
-
-    /**
-     * Sets value of archive property.
-     * Due to lack of archive model in Onezone it is provided by Oneprovider
-     * in an iframe.
-     * @param {Object} archive
-     */
-    updateArchiveData(archive) {
-      this.get('onUpdateArchiveData')(archive);
+    updateSelectedFiles(selected) {
+      this.set('selectedFiles', selected);
     },
   },
 });

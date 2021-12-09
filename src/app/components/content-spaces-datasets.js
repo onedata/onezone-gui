@@ -69,14 +69,6 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   dirId: reads('navigationState.aspectOptions.dir'),
 
   /**
-   * List of dataset entity ids that are selected
-   *
-   * **Injected to embedded iframe.**
-   * @type {Array<String>}
-   */
-  selected: computedAspectOptionsArray('selected'),
-
-  /**
    * List of archive or file entity ids that are selected
    *
    * **Injected to embedded iframe.**
