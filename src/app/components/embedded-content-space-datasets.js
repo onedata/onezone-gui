@@ -12,7 +12,6 @@ import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
 import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
-import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
 
 export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
@@ -57,12 +56,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   archiveId: undefined,
 
   /**
-   * @virtual
-   * @type {String}
-   */
-  viewMode: undefined,
-
-  /**
    * **Injected to embedded iframe.**
    * @virtual
    * @type {String}
@@ -73,33 +66,28 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
    * List of datasets entity ids that are selected.
    *
    * **Injected to embedded iframe.**
+   * @virtual
    * @type {Array<String>}
    */
-  selectedDatasets: computedAspectOptionsArray('selectedDatasets'),
+  selectedDatasets: undefined,
 
   /**
    * List of archives entity ids that are selected.
    *
    * **Injected to embedded iframe.**
+   * @virtual
    * @type {Array<String>}
    */
-  selectedArchives: computedAspectOptionsArray('selectedArchives'),
+  selectedArchives: undefined,
 
   /**
    * List of files entity ids that are selected.
    *
    * **Injected to embedded iframe.**
-   * @type {Array<String>}
-   */
-  selectedFiles: computedAspectOptionsArray('selectedFiles'),
-
-  /**
-   * Seletected item IDs (archives or files) for "bottom" browser.
-   * **Injected to embedded iframe.**
    * @virtual
    * @type {Array<String>}
    */
-  selectedSecondary: undefined,
+  selectedFiles: undefined,
 
   /**
    * Dataset state tree to show. One of: attached, detached.

@@ -8,12 +8,10 @@
  */
 
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed, get, observer } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import { or, raw, promise, notEqual, and, bool } from 'ember-awesome-macros';
-import { defer } from 'rsvp';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import { promise, and, bool } from 'ember-awesome-macros';
 import ContentOneproviderContainerBase from './content-oneprovider-container-base';
 import { camelize } from '@ember/string';
 import computedAspectOptionsArray from 'onedata-gui-common/utils/computed-aspect-options-array';
@@ -27,10 +25,6 @@ export default ContentOneproviderContainerBase.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.contentSpacesDatasets',
-
-  datasetDataMapping: Object.freeze({}),
-
-  archiveDataMapping: Object.freeze({}),
 
   /**
    * Entity ID of dataset currently opened in datasets browser.
@@ -53,41 +47,34 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   attachmentState: reads('navigationState.aspectOptions.attachmentState'),
 
   /**
-   * View mode:
-   * - datasets: default, browse datasets; if `datasetId` is provided, open dataset
-   *     children listing of this dataset if available
-   * - archives: browse list of archives of a single dataset; `datasetId` is required
-   * - files: browse filesystem of archive
-   * @type {ComputedProperty<String>}
-   */
-  viewMode: or('navigationState.aspectOptions.viewMode', raw('datasets')),
-
-  /**
    * **Injected to embedded iframe.**
    * @type {string}
    */
   dirId: reads('navigationState.aspectOptions.dir'),
 
   /**
-   * List of archive or file entity ids that are selected
+   * List of datasets entity ids that are selected.
    *
    * **Injected to embedded iframe.**
    * @type {Array<String>}
    */
-  selectedSecondary: computedAspectOptionsArray('selectedSecondary'),
+  selectedDatasets: computedAspectOptionsArray('selectedDatasets'),
 
-  datasetDeferred: computed('datasetId', function datasetDeferred() {
-    return defer();
-  }),
+  /**
+   * List of archives entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selectedArchives: computedAspectOptionsArray('selectedArchives'),
 
-  archiveDeferred: computed('archiveId', function archiveDeferred() {
-    if (!this.get('archiveId')) {
-      const deferred = defer();
-      deferred.resolve(null);
-      return deferred;
-    }
-    return defer();
-  }),
+  /**
+   * List of files entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @type {Array<String>}
+   */
+  selectedFiles: computedAspectOptionsArray('selectedFiles'),
 
   datasetProxy: promise.object('datasetDeferred.promise'),
 
@@ -96,26 +83,6 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   dataset: reads('datasetProxy.content'),
 
   archive: reads('archiveProxy.content'),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
-  backToDatasetsOptions: computed(
-    'navigationState.aspectOptions',
-    'dataset.{entityId,rootDir,rootFileType}',
-    function backToDatasetsOptions() {
-      const dataset = this.get('dataset');
-      const options = {
-        viewMode: 'datasets',
-        archive: null,
-        dir: null,
-        selected: dataset && get(dataset, 'entityId') || null,
-        dataset: dataset && get(dataset, 'parentId') || null,
-      };
-      const mergedOptions = this.get('navigationState').mergedAspectOptions(options);
-      return serializeAspectOptions(mergedOptions);
-    }
-  ),
 
   effAttachmentState: computed('attachmentState', function effAttachmentState() {
     const attachmentState = this.get('attachmentState');
@@ -155,40 +122,6 @@ export default ContentOneproviderContainerBase.extend(I18n, {
   archiveDipModeSwitchEnabled: and('archive', 'isArchiveDipAvailable'),
 
   isArchiveDipAvailable: bool('archive.config.includeDip'),
-
-  showOpenedDatasetHeader: notEqual('viewMode', raw('datasets')),
-
-  tryToResolveDataset: observer(
-    'datasetDeferred',
-    'datasetDataMapping',
-    function tryToResolveDataset() {
-      const {
-        datasetId,
-        datasetDeferred,
-        datasetDataMapping,
-      } = this.getProperties('datasetId', 'datasetDeferred', 'datasetDataMapping');
-      const datasetData = datasetDataMapping[datasetId];
-      if (datasetData) {
-        datasetDeferred.resolve(datasetData);
-      }
-    }
-  ),
-
-  tryToResolveArchive: observer(
-    'archiveDeferred',
-    'archiveDataMapping',
-    function tryToResolveArchive() {
-      const {
-        archiveId,
-        archiveDeferred,
-        archiveDataMapping,
-      } = this.getProperties('archiveId', 'archiveDeferred', 'archiveDataMapping');
-      const archiveData = archiveDataMapping[archiveId];
-      if (archiveData) {
-        archiveDeferred.resolve(archiveData);
-      }
-    }
-  ),
 
   isValidAttachmentState(state) {
     return ['attached', 'detached'].includes(state);
@@ -241,28 +174,6 @@ export default ContentOneproviderContainerBase.extend(I18n, {
     },
     archiveDipModeChanged(archiveDipMode) {
       this.archiveDipModeChanged(archiveDipMode);
-    },
-    updateDatasetData(dataset) {
-      const receivedDatasetId = dataset && get(dataset, 'entityId');
-      this.set(
-        'datasetDataMapping',
-        Object.assign({},
-          this.get('datasetDataMapping'), {
-            [receivedDatasetId]: dataset,
-          },
-        )
-      );
-    },
-    updateArchiveData(archive) {
-      const receivedArchiveId = archive && get(archive, 'entityId');
-      this.set(
-        'archiveDataMapping',
-        Object.assign({},
-          this.get('archiveDataMapping'), {
-            [receivedArchiveId]: archive,
-          },
-        )
-      );
     },
   },
 });
