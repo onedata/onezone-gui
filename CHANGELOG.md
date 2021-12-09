@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8574 Updated backend errors translations
 * VFS-8650 Changed default temporary invite token TTL to 2 weeks
 * VFS-8631 Added terms of use page
 * VFS-8682 Added array dataSpec type to workflows
