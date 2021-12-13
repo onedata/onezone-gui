@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7724 Breaking change: added support for splitted datasets/archives browser and removed support for single-view datasets/archives browser
 * VFS-8650 Changed default temporary invite token TTL to 2 weeks
 * VFS-8631 Added terms of use page
 * VFS-8682 Added array dataSpec type to workflows

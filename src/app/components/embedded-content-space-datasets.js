@@ -1,6 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-space-datasets`.
- * 
+ *
  * @module components/embedded-content-space-datasets
  * @author Jakub Liput
  * @copyright (C) 2021 ACK CYFRONET AGH
@@ -22,7 +22,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
 
   /**
    * Entity ID of space for which datasets browser is displayed.
-   * 
+   *
    * **Injected to embedded iframe.**
    * @virtual
    * @type {string}
@@ -56,12 +56,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   archiveId: undefined,
 
   /**
-   * @virtual
-   * @type {String}
-   */
-  viewMode: undefined,
-
-  /**
    * **Injected to embedded iframe.**
    * @virtual
    * @type {String}
@@ -69,15 +63,35 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   dirId: undefined,
 
   /**
+   * List of datasets entity ids that are selected.
+   *
    * **Injected to embedded iframe.**
    * @virtual
    * @type {Array<String>}
    */
-  selected: undefined,
+  selectedDatasets: undefined,
+
+  /**
+   * List of archives entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {Array<String>}
+   */
+  selectedArchives: undefined,
+
+  /**
+   * List of files entity ids that are selected.
+   *
+   * **Injected to embedded iframe.**
+   * @virtual
+   * @type {Array<String>}
+   */
+  selectedFiles: undefined,
 
   /**
    * Dataset state tree to show. One of: attached, detached.
-   * 
+   *
    * **Injected to embedded iframe.**
    * @type {String}
    */
@@ -102,9 +116,10 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'datasetId',
     'archiveId',
     'dirId',
-    'selected',
+    'selectedDatasets',
+    'selectedArchives',
+    'selectedFiles',
     'attachmentState',
-    'viewMode',
   ]),
 
   /**
@@ -114,10 +129,9 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'updateDatasetId',
     'updateArchiveId',
     'updateDirId',
-    'updateSelected',
-    'updateViewMode',
-    'updateDatasetData',
-    'updateArchiveData',
+    'updateSelectedDatasets',
+    'updateSelectedArchives',
+    'updateSelectedFiles',
     'getDataUrl',
     'getDatasetsUrl',
     'getTransfersUrl',
@@ -130,50 +144,30 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     updateDatasetId(datasetId) {
       this.get('navigationState').changeRouteAspectOptions({
         dataset: datasetId,
-        selected: null,
+        selectedDatasets: null,
       });
     },
     updateArchiveId(archiveId) {
       this.get('navigationState').changeRouteAspectOptions({
         archive: archiveId,
-        selected: null,
+        selectedArchives: null,
+        selectedFiles: null,
       });
     },
     updateDirId(dirId) {
       this.get('navigationState').changeRouteAspectOptions({
         dir: dirId,
-        selected: null,
+        selectedFiles: null,
       });
     },
-    updateSelected(selected) {
-      this.get('navigationState').changeRouteAspectOptions({
-        selected: Array.isArray(selected) ? selected.join(',') : selected || null,
-      });
+    updateSelectedDatasets(selected) {
+      this.set('selectedDatasets', selected);
     },
-    updateViewMode(viewMode) {
-      this.get('navigationState').changeRouteAspectOptions({
-        viewMode,
-      });
+    updateSelectedArchives(selected) {
+      this.set('selectedArchives', selected);
     },
-
-    /**
-     * Sets value of dataset property.
-     * Due to lack of dataset model in Onezone it is provided by Oneprovider
-     * in an iframe.
-     * @param {Object} dataset 
-     */
-    updateDatasetData(dataset) {
-      this.get('onUpdateDatasetData')(dataset);
-    },
-
-    /**
-     * Sets value of archive property.
-     * Due to lack of archive model in Onezone it is provided by Oneprovider
-     * in an iframe.
-     * @param {Object} archive 
-     */
-    updateArchiveData(archive) {
-      this.get('onUpdateArchiveData')(archive);
+    updateSelectedFiles(selected) {
+      this.set('selectedFiles', selected);
     },
   },
 });
