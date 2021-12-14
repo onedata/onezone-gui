@@ -8,7 +8,7 @@ import { set, get } from '@ember/object';
 import { click } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
 
-const PrivacyPolicyManagerStub = Service.extend({
+const GuiMessageManagerStub = Service.extend({
   cookieConsentNotification: 'Cookie consent content <a class="clickable privacy-policy-link">privacy policy</a>.',
   areCookiesAccepted: false,
   cookieConsentNotificationProxy: resolve(),
@@ -25,7 +25,7 @@ describe('Integration | Component | cookies consent', function () {
   });
 
   beforeEach(function () {
-    registerService(this, 'privacyPolicyManager', PrivacyPolicyManagerStub);
+    registerService(this, 'guiMessageManager', GuiMessageManagerStub);
   });
 
   it('renders cookie consent notification', function () {
@@ -37,7 +37,7 @@ describe('Integration | Component | cookies consent', function () {
   it(
     'does not render cookie consent notification when cookies are accepted',
     function () {
-      set(lookupService(this, 'privacyPolicyManager'), 'areCookiesAccepted', true);
+      set(lookupService(this, 'guiMessageManager'), 'areCookiesAccepted', true);
       this.render(hbs `{{cookies-consent}}`);
 
       expect(this.$('.cookies-consent')).to.not.exist;
@@ -50,7 +50,7 @@ describe('Integration | Component | cookies consent', function () {
     return click('.accept-cookies').then(() => {
       expect(this.$('.cookies-consent')).to.not.exist;
       expect(
-        get(lookupService(this, 'privacyPolicyManager'),
+        get(lookupService(this, 'guiMessageManager'),
           'areCookiesAccepted')
       ).to.be.true;
     });

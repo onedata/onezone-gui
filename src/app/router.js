@@ -26,6 +26,7 @@ Router.map(function () {
       this.route('harvesters', { path: 'harvesters/:harvester_id' });
       this.route('shares', { path: 'shares/:share_id' });
       this.route('privacy-policy');
+      this.route('terms-of-use');
     },
   });
 });
