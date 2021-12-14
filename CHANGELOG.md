@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8617 Removed usages of ember-invoke-action
 * VFS-8574 Updated backend errors translations
 * VFS-7724 Breaking change: added support for splitted datasets/archives browser and removed support for single-view datasets/archives browser
 * VFS-8650 Changed default temporary invite token TTL to 2 weeks
