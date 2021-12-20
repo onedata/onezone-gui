@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8640 Updated commons
 * VFS-8617 Removed usages of ember-invoke-action
 * VFS-8574 Updated backend errors translations
 * VFS-7724 Breaking change: added support for splitted datasets/archives browser and removed support for single-view datasets/archives browser
