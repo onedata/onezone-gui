@@ -98,9 +98,6 @@ module.exports = function (defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
-
-  const BOWER_ASSETS = [];
-
   const NODE_ASSETS = [
     'input-tokenizer/tokenizer.min.js',
     'perfect-scrollbar/css/perfect-scrollbar.css',
@@ -113,7 +110,6 @@ module.exports = function (defaults) {
     'perfect-scrollbar/css/perfect-scrollbar.css',
   ];
 
-  BOWER_ASSETS.forEach(path => app.import(app.bowerDirectory + '/' + path));
   NODE_ASSETS.forEach(path => app.import(`node_modules/${path}`));
   VENDOR_ASSETS.forEach(path => app.import('vendor/' + path));
 
