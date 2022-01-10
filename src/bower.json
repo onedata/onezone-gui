@@ -1,7 +1,6 @@
 {
-  "name": "onezone-gui", 
+  "name": "onezone-gui",
   "dependencies": {
-    "animate.css": "3.5.2",
     "spin.js": "2.3.2"
   }
 }

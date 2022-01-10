@@ -73,14 +73,6 @@ module.exports = function (defaults) {
     'ember-cli-chartist': {
       useCustomCSS: true,
     },
-    'nodeAssets': {
-      'chartist-plugin-legend': {
-        vendor: {
-          include: ['chartist-plugin-legend.js'],
-        },
-        public: {},
-      },
-    },
   });
 
   defineSassColors(app, colors);
@@ -98,24 +90,15 @@ module.exports = function (defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
-
-  const BOWER_ASSETS = [];
-
   const NODE_ASSETS = [
+    'chartist-plugin-legend/chartist-plugin-legend.js',
     'input-tokenizer/tokenizer.min.js',
     'perfect-scrollbar/css/perfect-scrollbar.css',
     'webui-popover/dist/jquery.webui-popover.css',
     'webui-popover/dist/jquery.webui-popover.js',
   ];
 
-  const VENDOR_ASSETS = [
-    'chartist-plugin-legend/chartist-plugin-legend.js',
-    'perfect-scrollbar/css/perfect-scrollbar.css',
-  ];
-
-  BOWER_ASSETS.forEach(path => app.import(app.bowerDirectory + '/' + path));
   NODE_ASSETS.forEach(path => app.import(`node_modules/${path}`));
-  VENDOR_ASSETS.forEach(path => app.import('vendor/' + path));
 
   if (app.env === 'test') {
     app.import('vendor/fixtures/empty.html', {
