@@ -13,6 +13,11 @@ export default Component.extend(I18n, {
   tagName: 'span',
 
   /**
+   * @type {string}
+   */
+  iconColor: undefined,
+
+  /**
    * If true, block icon is hovered
    * @type {boolean}
    */
