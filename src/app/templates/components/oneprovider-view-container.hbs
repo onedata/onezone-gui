@@ -18,12 +18,10 @@
               <span class="current-oneprovider-bar-info">
                 {{tt this "currentOneproviderInfo"}}
               </span>
-              <div class="inline-icon-container inline-icon-container-provider">
-                {{one-icon icon="provider"}}
-              </div>
-              {{#truncated-string class="current-oneprovider-name"}}
-                {{selectedProviderItem.name}}
-              {{/truncated-string}}{{#if multiOneproviders}}.{{/if}}
+              {{provider-info
+                provider=selectedProviderItem
+                multiOneproviders=multiOneproviders 
+              }}
               {{#if multiOneproviders}}
                 <a {{action (mut isTabBarCollapsed) false}}
                   class="choose-oneprovider-link black clickable"

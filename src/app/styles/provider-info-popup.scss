@@ -1,0 +1,27 @@
+.provider-info {
+  .popup-title {
+    margin-bottom: 20px;
+  }
+  .table {
+    table-layout: fixed;
+    margin-bottom: 0;
+    tr {
+      .property-name {
+        padding-left: 0;
+      }
+      td {
+        padding-top: 2 * $table-condensed-cell-padding;
+        padding-bottom: 2 * $table-condensed-cell-padding;
+        border-top: 0;
+        word-break: break-all;
+      }
+    }
+  }
+  .property-name {
+    width: 85px;
+    @include font-semibold();
+  }
+  .clipboard-line {
+    margin-top: -5px;
+  }
+}
