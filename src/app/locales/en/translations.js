@@ -100,6 +100,7 @@ import generateInviteTokenModal from './components/modals/generate-invite-token-
 import unlinkAtmLambdaModal from './components/modals/unlink-atm-lambda-modal';
 import applyAtmWorkflowSchemaDumpModal from './components/modals/apply-atm-workflow-schema-dump-modal';
 import providerInfoPopup from './components/provider-info-popup';
+import providersList from './components/providers-list';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
@@ -260,6 +261,7 @@ const translations = {
     contentAtmInventoriesWorkflows,
     emptyCollectionSidebar,
     providerInfoPopup,
+    providersList,
   },
   services: {
     tokenActions,
