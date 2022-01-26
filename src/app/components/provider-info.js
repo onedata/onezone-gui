@@ -1,5 +1,5 @@
 /**
- * Information about provider
+ * Provider name, icon and popup with more details
  * 
  * @module components/provider-info
  * @author Agnieszka Warchoł
