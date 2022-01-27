@@ -147,13 +147,15 @@
       }}
         {{tt this "cancelBtn"}}
       {{/bs-button}}
-      {{#one-spin-button
-        class="confirm-btn btn btn-lg btn-primary"
+      {{#one-button
+        type="primary"
+        size="lg"
+        class="confirm-btn"
         disabled=isConfirmBtnDisabled
-        action=(action "confirm")
+        onClick=(action "confirm")
       }}
         {{tt this "confirmBtn"}}
-      {{/one-spin-button}}
+      {{/one-button}}
     </div>
   {{/if}}
 {{/one-collapse}}

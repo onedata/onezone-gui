@@ -99,7 +99,7 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
 
     expect(getModalBody().find('.one-way-radio-group')).to.have.class('disabled');
     expect($submitBtn).to.have.attr('disabled');
-    expect($submitBtn).to.have.class('in-flight');
+    expect($submitBtn).to.have.class('pending');
     expect(getModalFooter().find('.cancel-btn')).to.have.attr('disabled');
   });
 

@@ -36,12 +36,13 @@
     }}
       {{tt this "cancel"}}
     {{/bs-button}}
-    {{#one-spin-button
-      class="btn submit-btn btn-danger"
-      action=(action "submit" modal.submit)
-      disabled=isSubmitting
+    {{#one-button
+      type="danger"
+      buttonType="submit"
+      class="submit-btn"
+      onClick=(action "submit" modal.submit)
     }}
       {{tt this "submit"}}
-    {{/one-spin-button}}
+    {{/one-button}}
   {{/modal.footer}}
 {{/global-modal}}
