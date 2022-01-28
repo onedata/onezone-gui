@@ -22,7 +22,7 @@ make submodules
 To build a development release of GUI:
 
 ```
-make             # run natively (requires npm, bower, ember)
+make             # run natively (requires npm, ember)
 ./make.py        # run in docker (onedata/gui_builder) that has all deps
 ```
 <br />
@@ -30,7 +30,7 @@ make             # run natively (requires npm, bower, ember)
 To build a production release of GUI:
 
 ```
-make rel         # run natively (requires npm, bower, ember)
+make rel         # run natively (requires npm, ember)
 ./make.py rel    # run in docker (onedata/gui_builder) that has all deps
 ```
 <br />
