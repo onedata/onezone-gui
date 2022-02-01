@@ -9,14 +9,14 @@
       }}
         {{tt this "cancelBtnText"}}
       {{/bs-button}}
-      {{#one-spin-button
-        class="btn btn-primary create-btn"
+      {{#one-button
+        type="primary"
+        class="create-btn"
         disabled=(not fields.isValid)
-        type="button"
-        action=(action "create")
+        onClick=(action "create")
       }}
         {{tt this "createBtnText"}}
-      {{/one-spin-button}}
+      {{/one-button}}
     </div>
   {{/if}}
 </form>

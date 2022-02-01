@@ -27,13 +27,16 @@
         {{/if}}
       </span>
       <span>
-        {{#one-spin-button
-          class="btn btn-save btn-sm btn-primary"
+        {{#one-button
+          type="primary"
+          buttonType="submit"
+          size="sm"
+          class="btn-save"
           disabled=isSaveBtnDisabled
-          action=(action "save")
+          onClick=(action "save")
         }}
           {{tt this "saveBtn"}}
-        {{/one-spin-button}}
+        {{/one-button}}
         {{#if saveBtnTip}}
           {{one-tooltip title=saveBtnTip}}
         {{/if}}

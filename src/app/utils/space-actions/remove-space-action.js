@@ -74,7 +74,7 @@ export default Action.extend({
         }],
         checkboxMessage: this.t('modalCheckboxMessage'),
         yesButtonText: this.t('modalYes'),
-        yesButtonClassName: 'btn-danger',
+        yesButtonType: 'danger',
         onSubmit: () =>
           result.interceptPromise(this.removeSpace()),
       }).hiddenPromise

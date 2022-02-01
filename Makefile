@@ -18,7 +18,6 @@ test_xunit_output: deps run_tests_xunit_output
 
 deps:
 	cd $(SRC_DIR) && npm install
-	cd $(SRC_DIR) && bower install --allow-root
 
 build_mock:
 	cd $(SRC_DIR) && ember build --environment=development --output-path=../$(REL_DIR)
@@ -30,7 +29,7 @@ build_prod:
 	cd $(SRC_DIR) && ember build --environment=production --output-path=../$(REL_DIR)
 
 clean:
-	cd $(SRC_DIR) && rm -rf node_modules bower_components dist tmp ../$(REL_DIR)/*
+	cd $(SRC_DIR) && rm -rf node_modules dist tmp ../$(REL_DIR)/*
 
 run_tests:
 	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test

@@ -44,20 +44,19 @@
     {{/if}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}
-    {{#one-spin-button
-      action=(action "connectNow")
-      disabled=(eq state "connecting")
-      inFlight=(eq state "connecting")
-      class="btn btn-primary"
+    {{#one-button
+      type="primary"
+      buttonType="submit"
+      onClick=(action "connectNow")
+      isPending=(eq state "connecting")
     }}
       {{tt this (if (eq state "connecting") "reconnecting" "tryToConnectNow")}}
-    {{/one-spin-button}}
-    {{#one-spin-button
-      action=(action "reload")
+    {{/one-button}}
+    {{#one-button
+      onClick=(action "reload")
       disabled=(eq state "connecting")
-      class="btn btn-default"
     }}
       {{tt this "reload"}}
-    {{/one-spin-button}}
+    {{/one-button}}
   {{/modal.footer}}
 {{/one-modal}}
