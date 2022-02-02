@@ -13,9 +13,15 @@
           {{tt this "useDefaults"}}
         {{/bs-button}}
         {{#bs-button type="default" size="sm" onClick=(action "cancel") disabled=isSaving}}{{tt this "cancel"}}{{/bs-button}}
-        {{#one-spin-button class="btn btn-primary btn-sm" disabled=(not isValid) action=(action "save")}}
-          {{tt this "save"}}  
-        {{/one-spin-button}}
+        {{#one-button
+          type="primary"
+          buttonType="submit"
+          size="sm"
+          disabled=(not isValid)
+          onClick=(action "save")
+        }}
+          {{tt this "save"}}
+        {{/one-button}}
       {{/if}}
     </div>
   {{/if}}

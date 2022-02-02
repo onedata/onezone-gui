@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-8640 Updated commons
+* VFS-8874 Removed bower and ember-spin-button
 * VFS-6397 Removed redundant bower dependencies
 * VFS-8617 Removed usages of ember-invoke-action
 * VFS-8574 Updated backend errors translations

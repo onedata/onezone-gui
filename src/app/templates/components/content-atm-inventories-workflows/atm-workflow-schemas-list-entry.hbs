@@ -10,13 +10,16 @@
   }}
     {{#if isEditing}}
       <div class="btn-toolbar footer-buttons">
-        {{#one-spin-button
-          class="btn btn-sm btn-success btn-save clickable"
-          action=(action "saveChanges")
+        {{#one-button
+          type="primary"
+          buttonType="submit"
+          size="sm"
+          class="btn-save clickable"
+          onClick=(action "saveChanges")
           disabled=(not areChangesValid)
         }}
           {{tt this "saveBtn"}}
-        {{/one-spin-button}}
+        {{/one-button}}
         {{#bs-button
           size="sm"
           type="default"

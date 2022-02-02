@@ -48,12 +48,15 @@
           <div class="right-container">
             {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
               <span class="hidden-xs">
-                {{#one-spin-button
-                  action=(action "savePrivileges" memberProxy)
-                  class="btn btn-sm btn-primary save-btn"
+                {{#one-button
+                  type="primary"
+                  buttonType="submit"
+                  size="sm"
+                  onClick=(action "savePrivileges" memberProxy)
+                  class="save-btn"
                 }}
                   {{tt this "save"}}
-                {{/one-spin-button}}
+                {{/one-button}}
                 <span class="space"></span>
                 {{#bs-button
                   size="sm"

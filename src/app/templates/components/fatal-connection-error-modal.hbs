@@ -16,11 +16,8 @@
     {{tt this "textTryToReload"}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}
-    {{#one-spin-button
-      action=(action "reload")
-      class="btn btn-default"
-    }}
+    {{#one-button buttonType="submit" onClick=(action "reload")}}
       {{tt this "reload"}}
-    {{/one-spin-button}}
+    {{/one-button}}
   {{/modal.footer}}
 {{/one-modal}}
