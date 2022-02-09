@@ -9,6 +9,7 @@ import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-oneprovider';
+import { lookupService } from '../../helpers/stub-service';
 
 describe('Integration | Component | oneprovider view container', function () {
   setupComponentTest('oneprovider-view-container', {
@@ -36,11 +37,16 @@ describe('Integration | Component | oneprovider view container', function () {
           }
         },
       };
+      const providerManager = lookupService(this, 'provider-manager');
+      const getRecordByIdStub = sinon.stub(providerManager, 'getRecordById')
+        .withArgs(oneproviderId)
+        .resolves(provider);
       this.setProperties({
         provider,
         space,
         oneproviderId,
         oneproviderName,
+        getRecordByIdStub,
       });
     });
 
@@ -178,12 +184,17 @@ describe('Integration | Component | oneprovider view container', function () {
         return this.set('oneproviderId', id);
       });
       this.on('changeOneproviderId', changeOneproviderId);
+      const providerManager = lookupService(this, 'provider-manager');
+      const getRecordByIdStub = sinon.stub(providerManager, 'getRecordById')
+        .withArgs(oneproviderId1)
+        .resolves(provider1);
       this.setProperties({
         provider1,
         provider2,
         changeOneproviderId,
         space,
         oneproviderId: oneproviderId1,
+        getRecordByIdStub,
       });
     });
 

@@ -82,7 +82,7 @@ export default Component.extend({
   init() {
     this._super(...arguments);
 
-    let {
+    const {
       title,
       i18n,
     } = this.getProperties('title', 'i18n');

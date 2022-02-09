@@ -1,7 +1,7 @@
 /**
  * Provider name, icon and popup with more details
  * 
- * @module components/provider-info
+ * @module components/provider-info-name
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -10,9 +10,17 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { computed } from '@ember/object';
 export default Component.extend(I18n, {
-  tagName: 'span',
+  tagName:'span',
+  classNames: ['provider-info-name'],
 
   /**
+   * @virtual
+   * @type {string}
+   */
+  provider: undefined,
+
+  /**
+   * @vitual optional
    * @type {string}
    */
   iconColor: undefined,
@@ -32,10 +40,15 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string>}
    */
   icon: computed('isIconHovered', 'providerInfoOpened', function icon() {
-    if (this.get('isIconHovered') || this.get('providerInfoOpened')) {
+    const {
+      isIconHovered,
+      providerInfoOpened,
+    } = this.getProperties('isIconHovered', 'providerInfoOpened');
+    if (isIconHovered || providerInfoOpened) {
       return 'browser-info';
+    } else {
+      return 'provider';
     }
-    return 'provider';
   }),
 
   actions: {

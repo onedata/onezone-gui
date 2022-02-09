@@ -18,10 +18,10 @@
               <span class="current-oneprovider-bar-info">
                 {{tt this "currentOneproviderInfo"}}
               </span>
-              {{provider-info
+              {{#provider-info-name
                 provider=selectedProviderItem
-                multiOneproviders=multiOneproviders 
-              }}
+              }}{{#if multiOneproviders}}.{{/if}}
+              {{/provider-info-name}}
               {{#if multiOneproviders}}
                 <a {{action (mut isTabBarCollapsed) false}}
                   class="choose-oneprovider-link black clickable"

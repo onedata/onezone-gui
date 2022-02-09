@@ -1,4 +1,6 @@
-.provider-info {
+.webui-popover-provider-info {
+  max-width: 500px;
+
   .popup-title {
     margin-bottom: 20px;
   }
@@ -24,7 +26,4 @@
   .clipboard-line {
     margin-top: -5px;
   }
-}
-.webui-popover-provider-info {
-  max-width: 500px;
 }

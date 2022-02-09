@@ -19,17 +19,10 @@ export default TabBarLi.extend({
   providerManager: service(),
 
   /**
-   * @virtual
-   * @type {string}
-   */
-  id: undefined,
-
-  /**
    * @type {ComputedProperty<PromiseObject<Model.Provider>>}
    */
-  provider: computed('id', function provider() {
-    const { id, providerManager } = this.getProperties('id', 'providerManager');
-    console.log(id);
-    return providerManager.getRecordById(id);
+  provider: computed('itemId', function provider() {
+    const { itemId, providerManager } = this.getProperties('itemId', 'providerManager');
+    return providerManager.getRecordById(itemId);
   }),
 });

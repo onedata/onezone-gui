@@ -11,8 +11,8 @@ import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import layout from '../../templates/components/providers-list/provider-item';
-
 import bytesToString from 'onedata-gui-common/utils/bytes-to-string';
+
 export default Component.extend({
   layout,
   classNames: ['providers-list-provider-item', 'provider-item'],

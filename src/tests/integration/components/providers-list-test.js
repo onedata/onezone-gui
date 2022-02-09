@@ -70,9 +70,9 @@ describe('Integration | Component | providers list', function () {
   it('renders list of providers', function () {
     this.render(hbs `{{providers-list providersData=providersData}}`);
 
-    let list = this.$('.one-collapsible-list');
+    const list = this.$('.one-collapsible-list');
     expect(list.children()).to.have.length(4);
-    let firstItem = $(list.children()[1]);
+    const firstItem = $(list.children()[1]);
     expect(firstItem).to.be.visible;
     expect(firstItem).to.contain('provider1');
   });
@@ -80,14 +80,14 @@ describe('Integration | Component | providers list', function () {
   it('sets icon colors according to provider object setting', function () {
     this.render(hbs `{{providers-list providersData=providersData}}`);
 
-    let firstItemIcon =
+    const firstItemIcon =
       this.$('.one-collapsible-list-item:nth-child(2) .one-icon');
     expect(firstItemIcon.attr('style'))
       .to.contain(this.get('providersData')[0].color);
   });
 
   it('triggers providers filter state changed action on init', function () {
-    let providersFilterSpy = sinon.spy();
+    const providersFilterSpy = sinon.spy();
     this.on('providersFilter', providersFilterSpy);
 
     this.render(hbs `
@@ -107,7 +107,7 @@ describe('Integration | Component | providers list', function () {
 
   it('triggers providers filter state changed action after query input',
     function (done) {
-      let providersFilterSpy = sinon.spy();
+      const providersFilterSpy = sinon.spy();
       this.on('providersFilter', providersFilterSpy);
 
       this.render(hbs `
@@ -128,7 +128,7 @@ describe('Integration | Component | providers list', function () {
   );
 
   it('handles with custom provider actions', function (done) {
-    let actionSpy = sinon.spy();
+    const actionSpy = sinon.spy();
     this.set('actions', [{
       text: 'Action',
       action: actionSpy,
