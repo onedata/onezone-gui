@@ -1,13 +1,9 @@
 /* eslint-env node */
 module.exports = {
   browsers: [
-    'ie 11',
-    'last 3 Chrome versions',
-    'last 3 Firefox versions',
-    'last 3 Safari versions',
-    'last 3 Edge versions',
-    'last 3 FirefoxAndroid versions',
-    'last 3 ChromeAndroid versions',
-    'last 3 iOS versions',
+    'since 2017',
+    // must be specified, due to potential bug in build chain: only old versions
+    // of android are listed in Babel's data, so it will always add plugins for Android 4
+    'not android > 4',
   ],
 };

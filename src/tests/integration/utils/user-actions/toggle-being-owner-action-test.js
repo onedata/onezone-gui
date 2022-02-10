@@ -185,6 +185,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   });
 
   it('notifies failure on adding owner action failure', function () {
+    const error = { id: 'err' };
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
@@ -196,7 +197,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     ).callsFake((recordBeingOwned, ownerRecord) => {
       if (recordBeingOwned === context.recordBeingOwned &&
         ownerRecord === context.ownerRecord) {
-        return reject('err');
+        return reject(error);
       }
     });
     const failureNotifySpy = sinon.spy(
@@ -209,13 +210,14 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'granting ownership'),
-          'err'
+          error
         );
         expect(get(actionResult, 'status')).to.equal('failed');
       });
   });
 
   it('notifies failure on removing owner action failure', function () {
+    const error = { id: 'err' };
     const context = this.get('context');
 
     const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
@@ -226,7 +228,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     ).callsFake((recordBeingOwned, ownerRecord) => {
       if (recordBeingOwned === context.recordBeingOwned &&
         ownerRecord === context.ownerRecord) {
-        return reject('err');
+        return reject(error);
       }
     });
     const failureNotifySpy = sinon.spy(
@@ -239,7 +241,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
         expect(addOwnerStub).to.be.calledOnce;
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'revoking ownership'),
-          'err'
+          error
         );
         expect(get(actionResult, 'status')).to.equal('failed');
       });
