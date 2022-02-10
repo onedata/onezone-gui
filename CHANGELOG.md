@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-7717 Upgraded Babel to version 7.3, using EcmaScript 2019 for development
 * VFS-8640 Updated commons
 * VFS-8874 Removed bower and ember-spin-button
 * VFS-6397 Removed redundant bower dependencies
