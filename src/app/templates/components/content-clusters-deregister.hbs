@@ -37,14 +37,14 @@
                 </span>
               </li>
             </ul>
-          </div>          
+          </div>
         </div>
       </div>
     </div>
   {{/if}}
   <div class="row content-row no-border row-understand-notice">
     <div class="col-xs-9 col-centered">
-      {{one-checkbox 
+      {{one-checkbox
         class="danger one-checkbox-danger one-checkbox-understand"
         checked=understandChecked
         update=(action (mut understandChecked))
@@ -58,12 +58,14 @@
     {{#bs-button class="btn" type="info" onClick=(action "cancel")}}
       {{tt this "cancel"}}
     {{/bs-button}}
-    {{#one-spin-button
-      class="btn btn-danger btn-deregister"
-      action=(action "deregister")
+    {{#one-button
+      type="danger"
+      buttonType="submit"
+      class="btn-deregister"
+      onClick=(action "deregister")
       disabled=(not understandChecked)
     }}
       {{tt this "confirm"}}
-    {{/one-spin-button}}
+    {{/one-button}}
   </div>
 {{/content-info}}

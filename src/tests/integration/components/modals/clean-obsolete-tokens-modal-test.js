@@ -209,7 +209,7 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => $submitButton = getModalFooter().find('.remove-tokens-submit'))
       .then(() => click($submitButton[0]))
       .then(() => {
-        expect($submitButton).to.have.class('in-flight');
+        expect($submitButton).to.have.class('pending');
         expect(submitStub.lastCall.args[0]).to.have.same.members(this.get('tokens'));
       });
   });
@@ -225,7 +225,7 @@ describe('Integration | Component | modals/clean obsolete tokens modal', functio
       .then(() => $submitButton = getModalFooter().find('.remove-tokens-submit'))
       .then(() => click($submitButton[0]))
       .then(() => {
-        expect($submitButton).to.have.class('in-flight');
+        expect($submitButton).to.have.class('pending');
         expect(submitStub.lastCall.args[0])
           .to.have.same.members(tokens.without(tokens[3]));
       });

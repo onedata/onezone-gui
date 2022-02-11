@@ -71,14 +71,14 @@
     {{/if}}
     <div class="btn-toolbar footer-buttons">
       {{#if (not-eq mode "view")}}
-        {{#one-spin-button
-          class="btn btn-primary submit-token"
+        {{#one-button
+          type="primary"
+          class="submit-token"
           disabled=(not fields.isValid)
-          type="button"
-          action=(action "submit")
+          onClick=(action "submit")
         }}
           {{submitBtnText}}
-        {{/one-spin-button}}
+        {{/one-button}}
       {{/if}}
       {{#if (eq mode "edit")}}
         {{#bs-button

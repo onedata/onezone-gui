@@ -29,8 +29,10 @@
     }
   }
 
+  .bs-tab-onedata,
   .tab-content {
     @include fill-flex-using-column();
+    min-height: 0;
   }
 
   .workflow-visualiser {
@@ -47,6 +49,11 @@
 
   .tab-content > #editor.active {
     display: flex;
+    min-height: 0;
+  }
+
+  .tab-content > *:not(#editor) {
+    overflow-y: auto;
   }
 
   &.editor-tab-active {

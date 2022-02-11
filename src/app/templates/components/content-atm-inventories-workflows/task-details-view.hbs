@@ -23,13 +23,15 @@
     onChange=(action "formDataChanged")
   }}
   <div class="btn-toolbar">
-    {{#one-spin-button
-      class="btn btn-primary btn-submit clickable"
-      action=(action "submit")
+    {{#one-button
+      type="primary"
+      buttonType="submit"
+      class="btn-submit clickable"
+      onClick=(action "submit")
       disabled=(not isDataValid)
     }}
       {{submitBtnText}}
-    {{/one-spin-button}}
+    {{/one-button}}
     {{#bs-button
       type="default"
       class="btn-cancel clickable"

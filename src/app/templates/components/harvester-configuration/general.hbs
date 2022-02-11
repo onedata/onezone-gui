@@ -14,14 +14,15 @@
         {{/bs-button}}
       </div>
     {{else}}
-      {{#one-spin-button
-        type="submit"
-        class="btn btn-primary submit-btn"
+      {{#one-button
+        type="primary"
+        buttonType="submit"
+        class="submit-btn"
         disabled=(not fields.isValid)
-        action=(action "submit")
+        onClick=(action "submit")
       }}
-        {{tt this (if (eq mode "create") "create" "save")}}  
-      {{/one-spin-button}}
+        {{tt this (if (eq mode "create") "create" "save")}}
+      {{/one-button}}
 
       {{#if (eq mode "edit")}}
         {{#bs-button

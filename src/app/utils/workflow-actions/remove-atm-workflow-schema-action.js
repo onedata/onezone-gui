@@ -60,7 +60,7 @@ export default Action.extend({
           }),
         }],
         yesButtonText: this.t('modalYes'),
-        yesButtonClassName: 'btn-danger',
+        yesButtonType: 'danger',
         onSubmit: () =>
           result.interceptPromise(this.removeAtmWorkflowSchema()),
       }).hiddenPromise
