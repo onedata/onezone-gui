@@ -84,13 +84,6 @@
         top: $-one-tab-bar-height + $padding-base-vertical - $content-col-padding;
       }
     }
-
-    .tab-bar-li .inline-icon-container {
-      // a hack to make provider icon to be more to the left and everything
-      // to be more centered - because the icon has internal padding
-      margin-left: -4px;
-      width: 25px;
-    }
   }
   
   .tab-bar-selector {
@@ -120,10 +113,6 @@
           max-width: calc(100% - 270px);
         }
       }
-    }
-    .inline-icon-container-provider {
-      width: 25px;
-      margin-left: -4px;
     }
     .current-oneprovider-name {
       display: inline-block;

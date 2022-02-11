@@ -1,21 +1,43 @@
+.provider-info-name {
+  perspective: 1000px;
+  background-color: transparent;
+  .inline-icon-container {
+    width: 25px;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+  .oneicon-browser-info.one-icon {
+    transform: rotateY(180deg) translateY(-50%) translateY(1px);
+    color: $main-text-color;
+  }
+  .one-icon {
+    backface-visibility: hidden;
+  }
+}
+.provider-info-name:hover .inline-icon-container.animation{
+    transform: rotateY(180deg);
+}
+.provider-info-name .inline-icon-container.not-animation{
+    transform: rotateY(180deg);
+}
+
 .webui-popover-provider-info {
   max-width: 500px;
 
   .popup-title {
     margin-bottom: 20px;
+    .one-label {
+      font-size: $font-size-h4;
+    }
   }
   .table {
-    table-layout: fixed;
     margin-bottom: 0;
     tr {
       .property-name {
         padding-left: 0;
       }
       td {
-        padding-top: 2 * $table-condensed-cell-padding;
-        padding-bottom: 2 * $table-condensed-cell-padding;
-        border-top: 0;
-        word-break: break-all;
+        overflow-wrap: break-word;
       }
     }
   }
@@ -25,5 +47,13 @@
   }
   .clipboard-line {
     margin-top: -5px;
+  }
+  .webui-popover-content {
+    padding: $padding-large-horizontal;
+  }
+  &.bottom, &.bottom-right {
+    .webui-arrow {
+      margin-left: -12px;
+    }
   }
 }

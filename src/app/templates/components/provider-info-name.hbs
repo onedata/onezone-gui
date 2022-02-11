@@ -4,14 +4,18 @@
   mouseLeave=(action "changeIconHover" false)
 }}
   <div 
-    class="inline-icon-container inline-icon-container-provider provider-info-trigger"
+    class={{concat-classes 
+      "inline-icon-container provider-info-trigger" 
+      (if providerInfoOpened "not-animation" "animation")
+    }}
     {{action
       (mut providerInfoOpened)
       (not providerInfoOpened)
       bubbles=false
     }}
   >
-    {{one-icon icon=icon color=iconColor}}
+    {{one-icon icon="provider" color=iconColor}}
+    {{one-icon icon="browser-info" color=iconColor}}
   </div>
   <span class="tab-name one-label">{{provider.name}}</span>
 {{/truncated-string}}{{yield}}
