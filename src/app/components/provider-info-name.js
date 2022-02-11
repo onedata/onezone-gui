@@ -8,7 +8,6 @@
  */
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { computed } from '@ember/object';
 export default Component.extend(I18n, {
   tagName:'span',
   classNames: ['provider-info-name'],
@@ -35,21 +34,6 @@ export default Component.extend(I18n, {
    * @type {boolean}
    */
   providerInfoOpened: false,
-
-  /**
-   * @type {ComputedProperty<string>}
-   */
-  icon: computed('isIconHovered', 'providerInfoOpened', function icon() {
-    const {
-      isIconHovered,
-      providerInfoOpened,
-    } = this.getProperties('isIconHovered', 'providerInfoOpened');
-    if (isIconHovered || providerInfoOpened) {
-      return 'browser-info';
-    } else {
-      return 'provider';
-    }
-  }),
 
   actions: {
     changeIconHover(isIconHovered) {
