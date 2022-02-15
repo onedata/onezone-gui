@@ -87,7 +87,7 @@ describe('Integration | Component | oneprovider view container', function () {
       `);
 
       return wait().then(() => {
-        expect(this.$('.current-oneprovider-name'), 'current oneprovider name')
+        expect(this.$('.oneprovider-name'), 'current oneprovider name')
           .to.contain(this.get('oneproviderName'));
       });
     });

@@ -1,24 +1,27 @@
 .provider-info-name {
-  perspective: 1000px;
   background-color: transparent;
   .inline-icon-container {
     width: 25px;
     transition: transform 0.5s;
     transform-style: preserve-3d;
+    &.not-animation {
+      transform: rotateY(180deg);
+    }
+  }
+  &:hover {
+    .inline-icon-container {
+      &.animation {
+        transform: rotateY(180deg);
+      }
+    }
   }
   .oneicon-browser-info.one-icon {
     transform: rotateY(180deg) translateY(-50%) translateY(1px);
-    color: $main-text-color;
+    color: inherit;
   }
   .one-icon {
     backface-visibility: hidden;
   }
-}
-.provider-info-name:hover .inline-icon-container.animation{
-    transform: rotateY(180deg);
-}
-.provider-info-name .inline-icon-container.not-animation{
-    transform: rotateY(180deg);
 }
 
 .webui-popover-provider-info {
@@ -43,7 +46,6 @@
   }
   .property-name {
     width: 85px;
-    @include font-semibold();
   }
   .clipboard-line {
     margin-top: -5px;
@@ -53,7 +55,7 @@
   }
   &.bottom, &.bottom-right {
     .webui-arrow {
-      margin-left: -12px;
+      margin-left: -$padding-base-vertical;
     }
   }
 }

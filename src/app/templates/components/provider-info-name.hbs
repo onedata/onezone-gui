@@ -1,5 +1,5 @@
 {{#truncated-string 
-  class="current-oneprovider-name"
+  class="oneprovider-name"
   mouseEnter=(action "changeIconHover" true)
   mouseLeave=(action "changeIconHover" false)
 }}
@@ -15,7 +15,7 @@
     }}
   >
     {{one-icon icon="provider" color=iconColor}}
-    {{one-icon icon="browser-info" color=iconColor}}
+    {{one-icon icon="browser-info"}}
   </div>
   <span class="tab-name one-label">{{provider.name}}</span>
 {{/truncated-string}}{{yield}}
@@ -30,7 +30,7 @@
       action=(action (mut providerInfoOpened) false)
       except-selector=".provider-info-trigger, .webui-popover-provider-info"
     }}
-      {{content-provider-info
+      {{provider-info-content
         class="form-group without-margin"
         provider=provider
       }}
