@@ -15,7 +15,7 @@ import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-s
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ProvidersColors from 'onedata-gui-common/mixins/components/providers-colors';
-import { collect } from 'ember-awesome-macros';
+import { collect, conditional } from 'ember-awesome-macros';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 export default Component.extend(I18n, GlobalActions, ProvidersColors, {
@@ -26,6 +26,7 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   guiUtils: service(),
   spaceActions: service(),
   globalClipboard: service(),
+  media: service(),
 
   i18nPrefix: 'components.contentSpacesProviders',
 
@@ -188,12 +189,19 @@ export default Component.extend(I18n, GlobalActions, ProvidersColors, {
   /**
    * @type {ComputedProperty<Array<Action>>}
    */
-  providerActions: collect(
+  providerActions: conditional(
+    'media.isMobile',
+    collect(
     'browseFilesAction',
     'showDetailsAction',
     'copyProviderIdAction',
     'copyProviderDomainAction',
     'ceaseOneproviderSupportAction'
+    ), collect(
+    'browseFilesAction',
+    'showDetailsAction',
+    'ceaseOneproviderSupportAction'
+    )
   ),
 
   browseFiles(provider) {
