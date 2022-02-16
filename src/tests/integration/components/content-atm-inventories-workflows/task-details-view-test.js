@@ -9,6 +9,7 @@ import _ from 'lodash';
 import { clickTrigger } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
 import { Promise } from 'rsvp';
+import Store from 'onedata-gui-common/utils/workflow-visualiser/store';
 
 const exampleAtmLambdaRevision = {
   name: 'function1',
@@ -56,25 +57,29 @@ const exampleStores = [{
   //     type: 'integer',
   //     valueConstraints: {},
   //   },
-  //   requiresInitialValue: false,
+  //   requiresInitialContent: false,
   // }, {
   id: 'listStringStoreId',
   name: 'listStringStore',
   type: 'list',
-  dataSpec: {
-    type: 'string',
-    valueConstraints: {},
+  config: {
+    itemDataSpec: {
+      type: 'string',
+      valueConstraints: {},
+    },
   },
-  requiresInitialValue: false,
+  requiresInitialContent: false,
 }, {
   id: 'singleValueStringId',
   name: 'singleValueStringStore',
   type: 'singleValue',
-  dataSpec: {
-    type: 'string',
-    valueConstraints: {},
+  config: {
+    itemDataSpec: {
+      type: 'string',
+      valueConstraints: {},
+    },
   },
-  requiresInitialValue: false,
+  requiresInitialContent: false,
 }];
 
 const exampleTask = {
@@ -112,7 +117,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
         applyChangesSpy: sinon.stub().resolves(),
         atmLambda: _.cloneDeep(exampleAtmLambda),
         revisionNumber: 1,
-        definedStores: _.cloneDeep(exampleStores),
+        definedStores: _.cloneDeep(exampleStores).map(rawStore => Store.create(rawStore)),
       });
     });
 
