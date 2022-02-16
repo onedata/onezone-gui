@@ -1,4 +1,6 @@
 .provider-info-name {
+  // a hack to set a stacking context to fix issues in Safari/WebKit
+  perspective: 1px;
   background-color: transparent;
   .inline-icon-container {
     width: 25px;
@@ -20,6 +22,8 @@
     color: inherit;
   }
   .one-icon {
+    // for Safari <= 15.3
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
 }
