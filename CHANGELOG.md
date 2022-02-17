@@ -6,7 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-8997 Understanding new data specs format in automation stores
+* VFS-8997 Added support for new data specs format in automation stores
 * VFS-8640 Updated commons
 * VFS-8874 Removed bower and ember-spin-button
 * VFS-6397 Removed redundant bower dependencies
