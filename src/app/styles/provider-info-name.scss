@@ -1,0 +1,65 @@
+.provider-info-name {
+  // a hack to set a stacking context to fix issues in Safari/WebKit
+  perspective: 1px;
+  background-color: transparent;
+  .inline-icon-container {
+    width: 25px;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+    &.not-animation {
+      transform: rotateY(180deg);
+    }
+  }
+  &:hover {
+    .inline-icon-container {
+      &.animation {
+        transform: rotateY(180deg);
+      }
+    }
+  }
+  .oneicon-browser-info.one-icon {
+    transform: rotateY(180deg) translateY(-50%) translateY(1px);
+    color: inherit;
+  }
+  .one-icon {
+    // for Safari <= 15.3
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
+
+.webui-popover-provider-info {
+  max-width: 500px;
+
+  .popup-title {
+    margin-bottom: 20px;
+    .one-label {
+      font-size: $font-size-h4;
+    }
+  }
+  .table {
+    margin-bottom: 0;
+    tr {
+      .property-name {
+        padding-left: 0;
+      }
+      td {
+        overflow-wrap: break-word;
+      }
+    }
+  }
+  .property-name {
+    width: 85px;
+  }
+  .clipboard-line {
+    margin-top: -5px;
+  }
+  .webui-popover-content {
+    padding: $padding-large-horizontal;
+  }
+  &.bottom, &.bottom-right {
+    .webui-arrow {
+      margin-left: -$padding-base-vertical;
+    }
+  }
+}

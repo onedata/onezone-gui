@@ -39,6 +39,9 @@ const OneproviderTabItem = EmberObject.extend({
   icon: 'provider',
   id: reads('provider.entityId'),
   name: reads('provider.name'),
+  version: reads('provider.version'),
+  domain: reads('provider.domain'),
+  entityId: reads('provider.entityId'),
   disabled: not('provider.online'),
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
