@@ -84,12 +84,6 @@
         top: $-one-tab-bar-height + $padding-base-vertical - $content-col-padding;
       }
     }
-
-    .tab-bar-li .inline-icon-container {
-      // a hack to make provider icon to be more to the left and everything
-      // to be more centered - because the icon has internal padding
-      margin-left: -10px;
-    }
   }
   
   .tab-bar-selector {
@@ -108,23 +102,19 @@
     height: 44px;
     line-height: 44px;
     &.current-oneprovider-bar-multi {
-      .current-oneprovider-name {
+      .oneprovider-name.truncated-string {
         max-width: calc(100% - 380px);
       }
       @media (max-width: 900px) {
         .current-oneprovider-bar-info {
           display: none;
         }
-        .current-oneprovider-name {
+        .oneprovider-name.truncated-string {
           max-width: calc(100% - 270px);
         }
       }
     }
-    .inline-icon-container-provider {
-      width: 22px;
-      margin-left: -2px;
-    }
-    .current-oneprovider-name {
+    .oneprovider-name.truncated-string {
       display: inline-block;
       font-weight: bold;
       max-width: calc(100% - 180px);
@@ -140,7 +130,7 @@
       .current-oneprovider-bar-info {
         display: inline;
       }
-      .current-oneprovider-name {
+      .oneprovider-name.truncated-string {
         max-width: calc(100% - 200px);
       }
     }

@@ -1,0 +1,40 @@
+{{#truncated-string 
+  class="oneprovider-name"
+  mouseEnter=(action "changeIconHover" true)
+  mouseLeave=(action "changeIconHover" false)
+}}
+  <div 
+    class={{concat-classes 
+      "inline-icon-container provider-info-trigger" 
+      (if providerInfoOpened "not-animation" "animation")
+    }}
+    {{action
+      (mut providerInfoOpened)
+      (not providerInfoOpened)
+      bubbles=false
+    }}
+  >
+    {{one-icon icon="provider" color=iconColor}}
+    {{one-icon icon="browser-info"}}
+  </div>
+  <span class="tab-name one-label">{{provider.name}}</span>
+{{/truncated-string}}{{yield}}
+{{#render-later triggerRender=providerInfoOpened}}
+  {{#one-webui-popover
+    popoverStyle="provider-info"
+    open=providerInfoOpened
+    triggerSelector=(concat "#" elementId " .provider-info-trigger")
+    as |popover|
+  }}
+    {{#click-outside
+      action=(action (mut providerInfoOpened) false)
+      except-selector=".provider-info-trigger, .webui-popover-provider-info"
+    }}
+      {{provider-info-content
+        class="form-group without-margin"
+        provider=provider
+      }}
+    {{/click-outside}}
+  {{/one-webui-popover}}
+{{/render-later}}
+
