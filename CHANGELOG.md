@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-8997 Added support for new data specs format in automation stores
 * VFS-6803 Added Oneprovider info popup
 * VFS-8640 Updated commons
 * VFS-8874 Removed bower and ember-spin-button
