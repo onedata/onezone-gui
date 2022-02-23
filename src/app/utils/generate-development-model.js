@@ -1025,9 +1025,11 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
               id: 'store1',
               name: 'store 1',
               type: 'list',
-              dataSpec: {
-                type: 'string',
-                valueConstraints: {},
+              config: {
+                itemDataSpec: {
+                  type: 'string',
+                  valueConstraints: {},
+                },
               },
             }],
           },
