@@ -57,9 +57,10 @@ describe(
     });
 
     it('executes modifying lambda (failure scenario)', async function () {
+      const error = { id: 'error' };
       sinon
         .stub(lookupService(this, 'workflow-manager'), 'updateAtmLambdaRevision')
-        .returns(reject('err'));
+        .returns(reject(error));
       const revisionDiff = {
         state: 'stable',
       };
@@ -90,10 +91,10 @@ describe(
       const actionResult = await action.execute();
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'modifying lambda revision'),
-        'err'
+        error
       );
       expect(get(actionResult, 'status')).to.equal('failed');
-      expect(get(actionResult, 'error')).to.equal('err');
+      expect(get(actionResult, 'error')).to.equal(error);
     });
   }
 );

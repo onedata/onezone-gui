@@ -77,11 +77,12 @@ describe(
     });
 
     it('executes modifying workflow revision (failure scenario)', async function () {
+      const error = { id: 'err' };
       const action = this.get('action');
       set(action, 'revisionDiff', { description: 'def' });
       sinon
         .stub(lookupService(this, 'workflow-manager'), 'saveAtmWorkflowSchemaRevision')
-        .returns(reject('err'));
+        .returns(reject(error));
       const failureNotifySpy = sinon.spy(
         lookupService(this, 'global-notify'),
         'backendError'
@@ -91,10 +92,10 @@ describe(
 
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'modifying workflow revision'),
-        'err'
+        error
       );
       expect(get(actionResult, 'status')).to.equal('failed');
-      expect(get(actionResult, 'error')).to.equal('err');
+      expect(get(actionResult, 'error')).to.equal(error);
     });
   }
 );
