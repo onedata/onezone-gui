@@ -22,18 +22,46 @@ export const entityType = 'atm_workflow_schema';
  */
 
 /**
- * @typedef {Object} AtmStoreSchema
- * @property {String} id
- * @property {String} name
- * @property {String} description
- * @property {AtmStoreType} type
- * @property {AtmDataSpec} dataSpec
- * @property {any} defaultInitialValue
- * @property {Boolean} requiresInitialValue
+ * @typedef {AtmAuditLogStoreSchema|AtmListStoreSchema|AtmSingleValueStoreSchema|AtmTreeForestStoreSchema|AtmRangeStoreSchema} AtmStoreSchema
  */
 
 /**
- * @typedef {'list'|'treeForest'|'singleValue'|'range'|'auditLog'} AtmStoreType
+ * @typedef {Object} AtmStoreSchemaBase
+ * @property {String} id
+ * @property {String} name
+ * @property {String} description
+ * @property {any} defaultInitialContent
+ * @property {Boolean} requiresInitialContent
+ */
+
+/**
+ * @typedef {AtmStoreSchemaBase} AtmAuditLogStoreSchema
+ * @property {'auditLog'} type
+ * @property {{ logContentDataSpec: AtmDataSpec }} config
+ */
+
+/**
+ * @typedef {AtmStoreSchemaBase} AtmListStoreSchema
+ * @property {'list'} type
+ * @property {{ itemDataSpec: AtmDataSpec }} config
+ */
+
+/**
+ * @typedef {AtmStoreSchemaBase} AtmSingleValueStoreSchema
+ * @property {'singleValue'} type
+ * @property {{ itemDataSpec: AtmDataSpec }} config
+ */
+
+/**
+ * @typedef {AtmStoreSchemaBase} AtmTreeForestStoreSchema
+ * @property {'treeForest'} type
+ * @property {{ itemDataSpec: AtmDataSpec }} config
+ */
+
+/**
+ * @typedef {AtmStoreSchemaBase} AtmRangeStoreSchema
+ * @property {'range'} type
+ * @property {Object} [config] if present, it is always an empty object
  */
 
 /**
