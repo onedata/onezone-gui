@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9013 Updated commons
 * VFS-8988 Fixed carousel animation in Safari
 * VFS-7717 Upgraded Babel to version 7.3, using EcmaScript 2019 for development
 * VFS-8997 Added support for new data specs format in automation stores
