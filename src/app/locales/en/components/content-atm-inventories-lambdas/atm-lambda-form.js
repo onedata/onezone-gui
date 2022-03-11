@@ -51,6 +51,9 @@ const argumentAndResultTypes = {
   // histogramStore: {
   //   label: 'Histogram store',
   // },
+  range: {
+    label: 'Range',
+  },
   onedatafsCredentials: {
     label: 'OnedataFS credentials',
   },

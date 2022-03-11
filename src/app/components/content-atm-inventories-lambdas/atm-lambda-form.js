@@ -463,6 +463,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       { value: 'directory' },
       { value: 'symlink' },
       { value: 'dataset' },
+      { value: 'range' },
       { value: 'onedatafsCredentials' },
       // TODO: VFS-7816 uncomment or remove future code
       // { value: 'histogram' },

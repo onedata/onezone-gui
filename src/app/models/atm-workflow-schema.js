@@ -114,7 +114,41 @@ export const entityType = 'atm_workflow_schema';
  * @typedef {Object} AtmTaskResultMapping
  * @property {String} resultName
  * @property {String} storeSchemaId
- * @property {'set'|'append'|'extend'} dispatchFunction
+ * @property {AtmStoreContentUpdateOptions} storeContentUpdateOptions
+ */
+
+/**
+ * @typedef {AtmAuditLogStoreContentUpdateOptions|AtmListStoreContentUpdateOptions|AtmRangeStoreContentUpdateOptions|AtmSingleValueStoreContentUpdateOptions|AtmTreeForestStoreContentUpdateOptions} AtmStoreContentUpdateOptions
+ */
+
+/**
+ * @typedef {Object} AtmListLikeStoreContentUpdateOptions
+ * @property {'append'|'extend'} function
+ */
+
+/**
+ * @typedef {AtmListLikeStoreContentUpdateOptions} AtmAuditLogStoreContentUpdateOptions
+ * @property {'auditLogStoreContentUpdateOptions'} type
+ */
+
+/**
+ * @typedef {AtmListLikeStoreContentUpdateOptions} AtmListStoreContentUpdateOptions
+ * @property {'listStoreContentUpdateOptions'} type
+ */
+
+/**
+ * @typedef {Object} AtmRangeStoreContentUpdateOptions
+ * @property {'singleValueStoreContentUpdateOptions'} type
+ */
+
+/**
+ * @typedef {Object} AtmSingleValueStoreContentUpdateOptions
+ * @property {'singleValueStoreContentUpdateOptions'} type
+ */
+
+/**
+ * @typedef {AtmListLikeStoreContentUpdateOptions} AtmTreeForestStoreContentUpdateOptions
+ * @property {'treeForestStoreContentUpdateOptions'} type
  */
 
 export default Model.extend(GraphSingleModelMixin, {
