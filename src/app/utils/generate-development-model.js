@@ -953,6 +953,22 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
                 },
               },
             },
+          }, {
+            name: 'res2',
+            dataSpec: {
+              type: 'timeSeriesMeasurements',
+              valueConstraints: {
+                specs: [{
+                  nameMatcherType: 'exact',
+                  nameMatcher: 'total_size',
+                  unit: 'bytes',
+                }, {
+                  nameMatcherType: 'hasPrefix',
+                  nameMatcher: 'volume_',
+                  unit: 'custom:liters',
+                }],
+              },
+            },
           }],
           resourceSpec: {
             cpuRequested: 2,

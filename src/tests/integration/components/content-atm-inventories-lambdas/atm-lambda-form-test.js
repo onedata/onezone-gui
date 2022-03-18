@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import { fillIn, focus, blur, click } from 'ember-native-dom-helpers';
+import { fillIn, focus, blur, click, find } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
@@ -22,7 +22,7 @@ const states = [{
   label: 'Deprecated',
 }];
 
-const argumentAndResultTypes = [{
+const simpleArgumentAndResultTypes = [{
   dataSpec: {
     type: 'integer',
     valueConstraints: {},
@@ -152,6 +152,11 @@ const argumentAndResultTypes = [{
     valueConstraints: {},
   },
   label: 'OnedataFS credentials',
+}];
+
+const argumentTypes = simpleArgumentAndResultTypes;
+const resultTypes = [...simpleArgumentAndResultTypes, {
+  label: 'Time series measurements',
 }];
 
 describe(
@@ -521,8 +526,8 @@ describe(
           await clickTrigger('.entryType-field');
 
           const $options = $('.ember-power-select-option');
-          expect($options).to.have.length(argumentAndResultTypes.length);
-          argumentAndResultTypes.forEach(({ label }, i) =>
+          expect($options).to.have.length(argumentTypes.length);
+          argumentTypes.forEach(({ label }, i) =>
             expect($options.eq(i).text().trim()).to.equal(label)
           );
           done();
@@ -636,8 +641,8 @@ describe(
         await clickTrigger('.entryType-field');
 
         const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(argumentAndResultTypes.length);
-        argumentAndResultTypes.forEach(({ label }, i) =>
+        expect($options).to.have.length(resultTypes.length);
+        resultTypes.forEach(({ label }, i) =>
           expect($options.eq(i).text().trim()).to.equal(label)
         );
         done();
@@ -730,7 +735,7 @@ describe(
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
           await selectChoose(
             `${nthArgSelector} .entryType-field`,
-            argumentAndResultTypes[i].label
+            argumentTypes[i].label
           );
           if (i === 0) {
             await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
@@ -742,7 +747,7 @@ describe(
           await fillIn(`${nthResSelector} .entryName-field .form-control`, `res${i}`);
           await selectChoose(
             `${nthResSelector} .entryType-field`,
-            argumentAndResultTypes[i].label
+            argumentTypes[i].label
           );
         }
 
@@ -772,7 +777,7 @@ describe(
             },
           },
           preferredBatchSize: 250,
-          argumentSpecs: argumentAndResultTypes.slice(0, 2)
+          argumentSpecs: argumentTypes.slice(0, 2)
             .map(({ dataSpec }, idx) => {
               const arg = {
                 name: `arg${idx}`,
@@ -784,7 +789,7 @@ describe(
               }
               return arg;
             }),
-          resultSpecs: argumentAndResultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
+          resultSpecs: resultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `res${idx}`,
             dataSpec,
           })),
@@ -817,7 +822,7 @@ describe(
           });
       });
 
-      argumentAndResultTypes.forEach(({ dataSpec, label }) => {
+      argumentTypes.forEach(({ dataSpec, label }) => {
         it(`creates lambda with "${label}"-typed argument on submit button click`,
           async function (done) {
             await renderCreate(this);
@@ -841,28 +846,64 @@ describe(
           });
       });
 
-      argumentAndResultTypes.forEach(({ dataSpec, label }) => {
-        it(`creates lambda with "${label}"-typed result on submit button click`,
-          async function (done) {
-            await renderCreate(this);
+      resultTypes.rejectBy('label', 'Time series measurements')
+        .forEach(({ dataSpec, label }) => {
+          it(`creates lambda with "${label}"-typed result on submit button click`,
+            async function (done) {
+              await renderCreate(this);
 
-            const revision = await fillWithMinimumData(this);
-            await addResult();
-            const resSelector = '.results-field .collection-item:first-child';
-            await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-            await selectChoose(`${resSelector} .entryType-field`, label);
-            await click('.btn-submit');
+              const revision = await fillWithMinimumData(this);
+              await addResult();
+              const resSelector = '.results-field .collection-item:first-child';
+              await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
+              await selectChoose(`${resSelector} .entryType-field`, label);
+              await click('.btn-submit');
 
-            expect(this.get('submitStub')).to.be.calledOnce
-              .and.to.be.calledWith(Object.assign(revision, {
-                resultSpecs: [{
-                  name: 'entry',
-                  dataSpec,
-                }],
-              }));
-            done();
-          });
-      });
+              expect(this.get('submitStub')).to.be.calledOnce
+                .and.to.be.calledWith(Object.assign(revision, {
+                  resultSpecs: [{
+                    name: 'entry',
+                    dataSpec,
+                  }],
+                }));
+              done();
+            });
+        });
+
+      it('creates lambda with "Time series measurements"-typed result on submit button click',
+        async function (done) {
+          await renderCreate(this);
+
+          const revision = await fillWithMinimumData(this);
+          await addResult();
+          const resSelector = '.results-field .collection-item:first-child';
+          await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
+          await selectChoose(`${resSelector} .entryType-field`, 'Time series measurements');
+          await click(`${resSelector} .timeSeriesMeasurementsEditor-field .add-field-button`);
+          await selectChoose(`${resSelector} .nameMatcherType-field`, 'Has prefix');
+          await fillIn(`${resSelector} .nameMatcher-field .form-control`, 'file_');
+          await selectChoose(`${resSelector} .unit-field`, 'Custom');
+          await fillIn(`${resSelector} .customUnit-field .form-control`, 'liters');
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith(Object.assign(revision, {
+              resultSpecs: [{
+                name: 'entry',
+                dataSpec: {
+                  type: 'timeSeriesMeasurements',
+                  valueConstraints: {
+                    specs: [{
+                      nameMatcherType: 'hasPrefix',
+                      nameMatcher: 'file_',
+                      unit: 'custom:liters',
+                    }],
+                  },
+                },
+              }],
+            }));
+          done();
+        });
 
       it('disables sumbit button when one of fields is invalid', async function (done) {
         await renderCreate(this);
@@ -1082,7 +1123,7 @@ describe(
           operationSpec: {
             engine: 'openfaas',
           },
-          argumentSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
+          argumentSpecs: argumentTypes.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
             isOptional: idx === 0,
@@ -1094,8 +1135,8 @@ describe(
 
         expect(this.$('.field-enabled')).to.not.exist;
         const $entries = this.$('.arguments-field .entry-field');
-        expect($entries).to.have.length(argumentAndResultTypes.length);
-        argumentAndResultTypes.forEach(({ label: type }, idx) => {
+        expect($entries).to.have.length(argumentTypes.length);
+        argumentTypes.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
@@ -1116,11 +1157,12 @@ describe(
       });
 
       it('shows results of passed lambda', async function (done) {
+        const resultTypesToCheck = resultTypes.rejectBy('label', 'Time series measurements');
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
           },
-          resultSpecs: argumentAndResultTypes.map(({ dataSpec }, idx) => ({
+          resultSpecs: resultTypesToCheck.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
           })),
@@ -1131,14 +1173,43 @@ describe(
         expect(this.$('.field-enabled')).to.not.exist;
         expect(this.$('.results-field')).to.exist;
         const $entries = this.$('.results-field .entry-field');
-        expect($entries).to.have.length(argumentAndResultTypes.length);
+        expect($entries).to.have.length(resultTypesToCheck.length);
 
-        argumentAndResultTypes.forEach(({ label: type }, idx) => {
+        resultTypesToCheck.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.entryType-field .field-component').text().trim())
             .to.equal(type);
         });
+        done();
+      });
+
+      it('shows time series measurements result of passed lambda', async function (done) {
+        this.set('revision', {
+          operationSpec: {
+            engine: 'openfaas',
+          },
+          resultSpecs: [{
+            name: 'entry1',
+            dataSpec: {
+              type: 'timeSeriesMeasurements',
+              valueConstraints: {
+                specs: [{
+                  nameMatcherType: 'hasPrefix',
+                  nameMatcher: 'file_',
+                  unit: 'custom:liters',
+                }],
+              },
+            },
+          }],
+        });
+
+        await renderView(this);
+
+        expect(find('.results-field .nameMatcherType-field').textContent).to.contain('Has prefix');
+        expect(find('.results-field .nameMatcher-field input').value).to.equal('file_');
+        expect(find('.results-field .unit-field').textContent).to.contain('Custom');
+        expect(find('.results-field .customUnit-field input').value).to.equal('liters');
         done();
       });
     });

@@ -10,9 +10,23 @@
 
   .arguments-field,
   .results-field {
-    .collection-item + .collection-item {
-      padding-top: $form-group-margin-bottom;
-      border-top: 1px solid $main-border-color;
+    .arguments-collapse, .results-collapse {
+      > .collection-item {
+        position: relative;
+        border: 1px solid $main-border-color;
+        border-radius: $border-radius-base;
+        padding: $form-group-margin-bottom;
+        padding-bottom: 0;
+        background-color: rgba($color-one-semiwhite, 0.2);
+
+        + .collection-item, + .add-field-button {
+          margin-top: $form-group-margin-bottom;
+        }
+      }
+
+      > .collection-item + .collection-item {
+        margin-top: $form-group-margin-bottom;
+      }
     }
 
     .entryName-field,
@@ -47,6 +61,15 @@
     text-align: left;
     .btn {
       margin-left: $padding-small-horizontal;
+    }
+  }
+
+  .time-series-measurements-dataspec-editor {
+    margin-bottom: 0;
+
+    .add-field-button:first-child {
+      margin-top: 0;
+      margin-bottom: $form-group-margin-bottom;
     }
   }
 
@@ -159,19 +182,11 @@
         margin-right: $padding-right;
       }
 
-      .remove-field-button-container {
+      .entry-field + .remove-field-button-container {
         position: absolute;
-        right: 0;
-      }
-
-      .remove-icon {
-        margin-top: initial;
-      }
-    }
-
-    .results-field {
-      .remove-field-button-container {
-        right: $entry-toggle-container-width - $x-offset-to-center-toggles * 2;
+        right: 0.1em;
+        top: 0.4em;
+        display: initial;
       }
     }
   }

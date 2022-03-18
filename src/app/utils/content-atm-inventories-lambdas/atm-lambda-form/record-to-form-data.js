@@ -7,8 +7,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { getProperties } from '@ember/object';
+import { set, setProperties, getProperties } from '@ember/object';
 import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
+import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
+import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -80,51 +82,53 @@ export default function recordToFormData(revision, defaultAtmResourceSpec, formM
   const formArguments = recordArgResToFormArgRes('argument', argumentSpecs);
   const formResults = recordArgResToFormArgRes('result', resultSpecs);
 
-  const engineOptions = {};
+  const engineOptions = createValuesContainer();
   switch (engine) {
-    case 'openfaas':
-      engineOptions.openfaasOptions = {
-        dockerImage,
-        readonly: Boolean(readonly),
-        mountSpace: Boolean(mountOneclient),
-      };
+    case 'openfaas': {
+      const openfaasOptions =
+        set(engineOptions, 'openfaasOptions', createValuesContainer({
+          dockerImage,
+          readonly: Boolean(readonly),
+          mountSpace: Boolean(mountOneclient),
+        }));
       if (mountOneclient) {
-        engineOptions.openfaasOptions.mountSpaceOptions = {
+        set(openfaasOptions, 'mountSpaceOptions', createValuesContainer({
           mountPoint: oneclientMountPoint,
           oneclientOptions,
-        };
+        }));
       }
       break;
+    }
     case 'onedataFunction':
-      engineOptions.onedataFunctionOptions = {
+      set(engineOptions, 'onedataFunctionOptions', createValuesContainer({
         onedataFunctionName: functionId,
-      };
+      }));
       break;
   }
 
-  const resources = {
-    cpu: {
+  const resources = createValuesContainer({
+    cpu: createValuesContainer({
       cpuRequested: atmResourceValueAsInputString((resourceSpec || {}).cpuRequested),
       cpuLimit: atmResourceValueAsInputString((resourceSpec || {}).cpuLimit),
-    },
-    memory: {
+    }),
+    memory: createValuesContainer({
       memoryRequested: atmResourceValueAsInputString(
         (resourceSpec || {}).memoryRequested
       ),
       memoryLimit: atmResourceValueAsInputString((resourceSpec || {}).memoryLimit),
-    },
-    ephemeralStorage: {
+    }),
+    ephemeralStorage: createValuesContainer({
       ephemeralStorageRequested: atmResourceValueAsInputString(
         (resourceSpec || {}).ephemeralStorageRequested
       ),
       ephemeralStorageLimit: atmResourceValueAsInputString(
         (resourceSpec || {}).ephemeralStorageLimit
       ),
-    },
-  };
+    }),
+  });
   const formState = formMode === 'create' ? 'draft' : state;
 
-  return Object.assign({
+  return createValuesContainer(Object.assign({
     name,
     state: formState,
     summary,
@@ -133,36 +137,36 @@ export default function recordToFormData(revision, defaultAtmResourceSpec, formM
     arguments: formArguments,
     results: formResults,
     resources,
-  }, engineOptions);
+  }, engineOptions));
 }
 
 function generateDefaultFormData(defaultAtmResourceSpec) {
-  return {
+  return createValuesContainer({
     name: '',
     state: 'draft',
     summary: '',
     engine: 'openfaas',
-    openfaasOptions: {
+    openfaasOptions: createValuesContainer({
       dockerImage: '',
       readonly: true,
       mountSpace: true,
-      mountSpaceOptions: {
+      mountSpaceOptions: createValuesContainer({
         mountPoint: '/mnt/onedata',
         oneclientOptions: '',
-      },
-    },
-    onedataFunctionOptions: {
+      }),
+    }),
+    onedataFunctionOptions: createValuesContainer({
       onedataFunctionName: '',
-    },
+    }),
     preferredBatchSize: 100,
-    arguments: {
+    arguments: createValuesContainer({
       __fieldsValueNames: [],
-    },
-    results: {
+    }),
+    results: createValuesContainer({
       __fieldsValueNames: [],
-    },
-    resources: {
-      cpu: {
+    }),
+    resources: createValuesContainer({
+      cpu: createValuesContainer({
         cpuRequested: getDefaultAtmResourceValue(
           defaultAtmResourceSpec,
           'cpuRequested'
@@ -171,8 +175,8 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
           defaultAtmResourceSpec,
           'cpuLimit'
         ),
-      },
-      memory: {
+      }),
+      memory: createValuesContainer({
         memoryRequested: getDefaultAtmResourceValue(
           defaultAtmResourceSpec,
           'memoryRequested'
@@ -181,8 +185,8 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
           defaultAtmResourceSpec,
           'memoryLimit'
         ),
-      },
-      ephemeralStorage: {
+      }),
+      ephemeralStorage: createValuesContainer({
         ephemeralStorageRequested: getDefaultAtmResourceValue(
           defaultAtmResourceSpec,
           'ephemeralStorageRequested'
@@ -191,9 +195,9 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
           defaultAtmResourceSpec,
           'ephemeralStorageLimit'
         ),
-      },
-    },
-  };
+      }),
+    }),
+  });
 }
 
 function getDefaultAtmResourceValue(defaultAtmResourceSpec, propName) {
@@ -220,9 +224,9 @@ function atmResourceValueAsInputString(value) {
  * @returns {Object} form field data
  */
 function recordArgResToFormArgRes(dataType, recordArgRes) {
-  const formData = {
+  const formData = createValuesContainer({
     __fieldsValueNames: [],
-  };
+  });
   (recordArgRes || []).forEach((entry, idx) => {
     const {
       name,
@@ -246,16 +250,23 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     } = dataSpecToType(dataSpec);
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
-    formData[valueName] = {
+    const formEntry = set(formData, valueName, createValuesContainer({
       entryName: name,
       entryType: type,
       entryIsArray: isArray,
-    };
+    }));
     if (dataType === 'argument') {
-      formData[valueName].entryDefaultValue =
-        defaultValue === null || defaultValue === undefined ?
-        undefined : JSON.stringify(defaultValue);
-      formData[valueName].entryIsOptional = isOptional === true;
+      setProperties(formEntry, {
+        entryDefaultValue: defaultValue === null || defaultValue === undefined ?
+          undefined : JSON.stringify(defaultValue),
+        entryIsOptional: isOptional === true,
+      });
+    }
+
+    if (type in dataSpecEditors) {
+      const dataSpecEditorValues =
+        dataSpecEditors[type].valueConstraintsToFormValues(dataSpec.valueConstraints);
+      set(formEntry, `${type}Editor`, dataSpecEditorValues);
     }
   });
   return formData;
