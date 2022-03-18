@@ -66,7 +66,7 @@ import { getBy } from 'ember-awesome-macros';
 /**
  * @typedef {Object} AtmDataSpec
  * @property {String} type one of: `'integer'`, `'string'`, `'object'`, `'file'`, `'array'`,
- *   `'histogram'`, `'dataset'`, `'archive'`, `'storeCredentials'`, `'onedatafsCredentials'`
+ *   `'histogram'`, `'dataset'`, `'archive'`, `'range'`, `'storeCredentials'`, `'onedatafsCredentials'`
  * @property {AtmDataTypeValueConstraints} valueConstraints its structure depends
  *   on `type` value and its corresponding Atm*TypeValueConstraints
  */
@@ -81,6 +81,10 @@ import { getBy } from 'ember-awesome-macros';
 
 /**
  * @typedef {AtmDataTypeValueConstraints} AtmDatasetTypeValueConstraints
+ */
+
+/**
+ * @typedef {AtmDataTypeValueConstraints} AtmRangeTypeValueConstraints
  */
 
 /**

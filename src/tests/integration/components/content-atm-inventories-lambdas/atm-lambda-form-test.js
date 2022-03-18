@@ -142,6 +142,12 @@ const argumentAndResultTypes = [{
   //   label: 'Histogram store',
   // }, {
   dataSpec: {
+    type: 'range',
+    valueConstraints: {},
+  },
+  label: 'Range',
+}, {
+  dataSpec: {
     type: 'onedatafsCredentials',
     valueConstraints: {},
   },

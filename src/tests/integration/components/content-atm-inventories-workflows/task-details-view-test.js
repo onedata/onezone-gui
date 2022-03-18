@@ -100,7 +100,9 @@ const exampleTask = {
   resultMappings: [{
     resultName: 'resstring',
     storeSchemaId: 'singleValueStringId',
-    dispatchFunction: 'set',
+    storeContentUpdateOptions: {
+      type: 'singleValueStoreContentUpdateOptions',
+    },
   }],
 };
 
