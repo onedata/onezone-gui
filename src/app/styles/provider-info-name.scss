@@ -13,15 +13,22 @@
   &:hover {
     .inline-icon-container {
       &.animation {
-        transform: rotateY(180deg);
+        // translateZ is added because of bug in Safari
+        transform: rotateY(180deg) translateZ(1px);
+        .oneicon-browser-info.one-icon {
+          opacity: 1;
+        }
       }
     }
   }
   .oneicon-browser-info.one-icon {
-    transform: rotateY(180deg) translateY(-50%) translateY(1px);
+    // translateZ is added for fix bug with animation in Safari
+    transform: rotateY(180deg) translateY(-50%) translateY(1px) translateZ(1px);
     color: inherit;
+    opacity: 0;
+    transition: opacity 0.5s;
   }
-  .one-icon {
+  .oneicon-provider.one-icon {
     // for Safari <= 15.3
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
