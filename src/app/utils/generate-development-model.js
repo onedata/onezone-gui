@@ -1047,6 +1047,17 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                   valueConstraints: {},
                 },
               },
+            }, {
+              id: 'store2',
+              name: 'store 2',
+              type: 'timeSeries',
+              config: {
+                schemas: [{
+                  nameGeneratorType: 'exact',
+                  nameGenerator: 'exactGeneratorName',
+                  unit: 'bytes',
+                }],
+              },
             }],
           },
           5: {

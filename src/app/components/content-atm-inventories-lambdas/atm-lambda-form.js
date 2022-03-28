@@ -489,7 +489,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   });
   const generateDataSpecEditorFields = mode => {
     const editors = Object.keys(dataSpecEditors).map((dataSpecName) =>
-      dataSpecEditors[dataSpecName].fieldsGroup.extend({
+      dataSpecEditors[dataSpecName].formElement.extend({
         isVisible: eq('parent.value.entryType', raw(dataSpecName)),
       }).create({
         name: `${dataSpecName}Editor`,
