@@ -1,13 +1,17 @@
 .provider-info-name {
+  $transition-time: 0.5s;
   // a hack to set a stacking context to fix issues in Safari/WebKit
   perspective: 1px;
   background-color: transparent;
   .inline-icon-container {
     width: 25px;
-    transition: transform 0.5s;
+    transition: transform $transition-time;
     transform-style: preserve-3d;
     &.not-animation {
       transform: rotateY(180deg);
+      .oneicon-browser-info.one-icon {
+        opacity: 1;
+      }
     }
   }
   &:hover {
@@ -26,7 +30,7 @@
     transform: rotateY(180deg) translateY(-50%) translateY(1px) translateZ(1px);
     color: inherit;
     opacity: 0;
-    transition: opacity 0.5s;
+    transition: opacity $transition-time;
   }
   .oneicon-provider.one-icon {
     // for Safari <= 15.3
