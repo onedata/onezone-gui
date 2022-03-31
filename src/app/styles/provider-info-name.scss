@@ -8,17 +8,20 @@
     transition: transform $transition-time;
     transform-style: preserve-3d;
     &.not-animation {
-      transform: rotateY(180deg) translateZ(1px);
+      transform: rotateY(180deg);
+      vertical-align: top;
       .oneicon-browser-info.one-icon {
         opacity: 1;
       }
+    }
+    &.animation {
+      vertical-align: top;
     }
   }
   &:hover {
     .inline-icon-container {
       &.animation {
-        // translateZ is added because of bug in Safari
-        transform: rotateY(180deg) translateZ(1px);
+        transform: rotateY(180deg);
         .oneicon-browser-info.one-icon {
           opacity: 1;
         }
@@ -26,8 +29,7 @@
     }
   }
   .oneicon-browser-info.one-icon {
-    // translateZ is added for fix bug with animation in Safari
-    transform: rotateY(180deg) translateY(-50%) translateY(1px) translateZ(1px);
+    transform: rotateY(180deg) translateY(-50%) translateY(1px);
     color: inherit;
     opacity: 0;
     transition: opacity $transition-time;
@@ -73,4 +75,8 @@
       margin-left: -$padding-base-vertical;
     }
   }
+}
+.provider-info-trigger {
+  height: 18px;
+  vertical-align: middle;
 }
