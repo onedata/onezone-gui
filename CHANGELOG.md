@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9138 Fixed glitch during provider info icon animation
 * VFS-9034 Added support for changed format of automation task results and new range data type
 * VFS-9013 Updated commons
 * VFS-8988 Fixed carousel animation in Safari
