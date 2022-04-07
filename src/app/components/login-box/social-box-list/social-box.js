@@ -25,7 +25,7 @@ export default Component.extend({
   classNames: ['social-box'],
 
   /**
-   * @virtual 
+   * @virtual
    * Id of authorizer, e.g. google, plgrid, dropbox, google, facebook, ...
    * @type {string}
    */
@@ -67,7 +67,7 @@ export default Component.extend({
    * Action called on click
    * @type {function}
    * @param {Ember.Component} thisComponent this component instance
-   * @return {undefined}
+   * @returns {undefined}
    */
   action: notImplementedIgnore,
 

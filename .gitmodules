@@ -7,3 +7,6 @@
 [submodule "src/lib/onedata-gui-common"]
 	path = src/lib/onedata-gui-common
 	url = ../onedata-gui-common.git
+[submodule "onedata-gui-utils"]
+	path = onedata-gui-utils
+	url = ../onedata-gui-utils.git

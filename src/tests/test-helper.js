@@ -1,9 +1,13 @@
 import resolver from './helpers/resolver';
+import './helpers/responsive';
+import { mocha, afterEach } from 'mocha';
 import { setResolver } from 'ember-mocha';
-import { mocha } from 'mocha';
+import handleHidepassed from './handle-hidepassed';
 
 setResolver(resolver);
 
 mocha.setup({
-  timeout: 15000,
+  timeout: 5000,
 });
+
+handleHidepassed(afterEach);

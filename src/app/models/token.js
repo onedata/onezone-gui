@@ -257,7 +257,7 @@ export default Model.extend(
 
     /**
      * @override
-     * @return {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester>}
+     * @returns {Promise<Models.User|Models.Group|Models.Cluster|Models.Space|Models.Harvester>}
      */
     fetchTokenTarget() {
       const {

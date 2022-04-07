@@ -19,8 +19,8 @@ export default Service.extend({
 
   /**
    * Fetches collection of all providers
-   * 
-   * @return {Promise<DS.RecordArray<Provider>>} resolves to an array of providers
+   *
+   * @returns {Promise<DS.RecordArray<Provider>>} resolves to an array of providers
    */
   getProviders() {
     return this.get('currentUser')
@@ -44,7 +44,7 @@ export default Service.extend({
   /**
    * Returns provider with specified id
    * @param {string} id
-   * @return {Promise<Provider>} provider promise
+   * @returns {Promise<Provider>} provider promise
    */
   getRecord(id) {
     return this.get('store').findRecord('provider', id);
