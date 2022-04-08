@@ -7,7 +7,7 @@ import handleHidepassed from './handle-hidepassed';
 setResolver(resolver);
 
 mocha.setup({
-  timeout: 5000,
+  timeout: 15000,
 });
 
 handleHidepassed(afterEach);
