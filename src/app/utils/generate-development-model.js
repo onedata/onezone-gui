@@ -1056,6 +1056,34 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                   nameGeneratorType: 'exact',
                   nameGenerator: 'exactGeneratorName',
                   unit: 'bytes',
+                  metrics: {
+                    sum5s: {
+                      aggregator: 'sum',
+                      resolution: 5,
+                      retention: 1440,
+                    },
+                    max1h: {
+                      aggregator: 'max',
+                      resolution: 60 * 60,
+                      retention: 1000,
+                    },
+                  },
+                }, {
+                  nameGeneratorType: 'addPrefix',
+                  nameGenerator: 'file_',
+                  unit: 'bytes',
+                  metrics: {
+                    sum5s: {
+                      aggregator: 'sum',
+                      resolution: 5,
+                      retention: 1440,
+                    },
+                    max1h: {
+                      aggregator: 'max',
+                      resolution: 60 * 60,
+                      retention: 1000,
+                    },
+                  },
                 }],
               },
             }],

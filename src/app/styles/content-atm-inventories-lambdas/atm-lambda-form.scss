@@ -65,9 +65,16 @@
   }
 
   .time-series-measurements-dataspec-editor {
+    flex-basis: 100%;
     margin-bottom: 0;
 
-    .add-field-button:first-child {
+    > .control-label {
+      width: 100%;
+      padding: 0;
+      margin-bottom: 5px;
+    }
+
+    .add-field-button {
       margin-top: 0;
       margin-bottom: $form-group-margin-bottom;
     }
