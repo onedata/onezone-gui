@@ -10,10 +10,6 @@ const argumentAndResultTypes = {
   object: {
     label: 'Object',
   },
-  // TODO: VFS-7816 uncomment or remove future code
-  // histogram: {
-  //   label: 'Histogram',
-  // },
   anyFile: {
     label: 'Any file',
   },
