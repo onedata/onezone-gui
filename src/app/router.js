@@ -16,6 +16,7 @@ const Router = OnedataRouter.extend({
   rootURL: config.rootURL,
 });
 
+// eslint-disable-next-line array-callback-return
 Router.map(function () {
   this.route('provider-redirect', { path: 'provider-redirect/:provider_id' });
   this.route('test', function () {

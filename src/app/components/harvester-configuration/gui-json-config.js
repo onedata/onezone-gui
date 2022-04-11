@@ -1,3 +1,6 @@
+// TODO: VFS-9257 fix eslint issues in this file
+/* eslint-disable no-param-reassign */
+
 /**
  * Harvester configuration section responsible for gui plugin JSON config setup.
  *

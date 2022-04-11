@@ -323,7 +323,7 @@ export default Service.extend(I18n, {
    * Creates member group for specified automation inventory
    * @param {Model.AtmInventory} atmInventory
    * @param {Object} groupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroupForAtmInventory(atmInventory, groupRepresentation) {
     const {
@@ -348,7 +348,7 @@ export default Service.extend(I18n, {
    * Adds existing group to a automation inventory
    * @param {Model.AtmInventory} atmInventory
    * @param {Model.Group} group
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroupToAtmInventory(atmInventory, group) {
     const {

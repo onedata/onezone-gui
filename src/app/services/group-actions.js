@@ -153,7 +153,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes subgroup from group
-   * @param {Group} parent 
+   * @param {Group} parent
    * @param {Group} child
    * @returns {Promise}
    */
@@ -180,7 +180,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes user from group
-   * @param {Group} group 
+   * @param {Group} group
    * @param {User} user
    * @returns {Promise}
    */
@@ -219,7 +219,7 @@ export default Service.extend(I18n, {
 
   /**
    * Leaves from parent group
-   * @param {Group} parent 
+   * @param {Group} parent
    * @param {Group} child
    * @returns {Promise}
    */
@@ -243,9 +243,9 @@ export default Service.extend(I18n, {
 
   /**
    * Creates parent for specified child group
-   * @param {Group} child 
+   * @param {Group} child
    * @param {Object} parentRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createParent(child, parentRepresentation) {
     const {
@@ -265,9 +265,9 @@ export default Service.extend(I18n, {
 
   /**
    * Creates child for specified parent group
-   * @param {Group} parent 
+   * @param {Group} parent
    * @param {Object} childRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createChild(parent, childRepresentation) {
     const {
@@ -287,9 +287,9 @@ export default Service.extend(I18n, {
 
   /**
    * Adds parent to specified child group
-   * @param {Group} group 
+   * @param {Group} group
    * @param {Object} futureParent
-   * @return {Promise}
+   * @returns {Promise}
    */
   addParent(group, futureParent) {
     const {
@@ -311,9 +311,9 @@ export default Service.extend(I18n, {
 
   /**
    * Adds child to specified parent group
-   * @param {Group} group 
+   * @param {Group} group
    * @param {Group} futureChild
-   * @return {Promise}
+   * @returns {Promise}
    */
   addChild(group, futureChild) {
     const {
@@ -335,9 +335,9 @@ export default Service.extend(I18n, {
 
   /**
    * Removes relation by combining leaving parent or (if needed) removing child
-   * @param {Group} parentGroup 
-   * @param {Group} childGroup 
-   * @return {Promise}
+   * @param {Group} parentGroup
+   * @param {Group} childGroup
+   * @returns {Promise}
    */
   removeRelation(parentGroup, childGroup) {
     const {

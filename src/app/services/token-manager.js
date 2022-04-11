@@ -30,8 +30,8 @@ const TokenManager = Service.extend({
 
   /**
    * Fetches collection of all tokens
-   * 
-   * @return {Promise<DS.RecordArray<Models.Token>>} resolves to an array of tokens
+   *
+   * @returns {Promise<DS.RecordArray<Models.Token>>} resolves to an array of tokens
    */
   getTokens() {
     return this.get('recordManager').getUserRecordList('token');
@@ -40,7 +40,7 @@ const TokenManager = Service.extend({
   /**
    * Returns token with specified gri
    * @param {String} gri
-   * @return {Promise<Models.Token>} token promise
+   * @returns {Promise<Models.Token>} token promise
    */
   getRecord(gri) {
     return this.get('recordManager').getRecord('token', gri);
@@ -79,7 +79,7 @@ const TokenManager = Service.extend({
   },
 
   /**
-   * @param {String} inviteType 
+   * @param {String} inviteType
    * @param {String} targetRecordId
    * @returns {Promise<String>}
    */
@@ -112,7 +112,7 @@ const TokenManager = Service.extend({
   /**
    * Resolves to temporary token template (a plain object, which can be used to create
    * token record).
-   * @param {String} inviteType 
+   * @param {String} inviteType
    * @param {String} targetRecordId
    * @returns {Promise<Object>}
    */
@@ -163,7 +163,7 @@ const TokenManager = Service.extend({
 
   /**
    * Gets information about given token
-   * @param {String} token 
+   * @param {String} token
    * @returns {Promise}
    */
   examineToken(token) {
@@ -182,7 +182,7 @@ const TokenManager = Service.extend({
 
   /**
    * Verify given invite token
-   * @param {String} token 
+   * @param {String} token
    * @returns {Promise}
    */
   verifyInviteToken(token) {

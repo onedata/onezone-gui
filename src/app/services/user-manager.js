@@ -49,7 +49,7 @@ export default Service.extend({
   /**
    * Returns user with specified GRI
    * @param {String} gri
-   * @return {Promise<Models.User>} user promise
+   * @returns {Promise<Models.User>} user promise
    */
   getRecord(gri) {
     return this.get('store').findRecord('user', gri);
@@ -58,7 +58,7 @@ export default Service.extend({
   /**
    * Returns user with specified entityId
    * @param {String} entityId
-   * @return {Promise<Models.User>} user promise
+   * @returns {Promise<Models.User>} user promise
    */
   getRecordById(entityId) {
     const recordGri = gri({

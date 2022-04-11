@@ -1,6 +1,6 @@
 /**
  * Defines oprations related to harvester management.
- * 
+ *
  * @module services/harvester-manager
  * @author Michał Borzęcki
  * @copyright (C) 20190-2020 ACK CYFRONET AGH
@@ -45,7 +45,7 @@ export default Service.extend(
      * Returns harvester with specified id
      * @param {string} id
      * @param {boolean} [backgroundReload=false]
-     * @return {Promise<Harvester>}
+     * @returns {Promise<Harvester>}
      */
     getRecord(id, backgroundReload = false) {
       return this.get('store').findRecord('harvester', id, { backgroundReload });
@@ -130,7 +130,7 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterId 
+     * @param {string} harvesterId
      * @param {string} spaceId
      * @returns {Promise}
      */
@@ -163,7 +163,7 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterId 
+     * @param {string} harvesterId
      * @param {string} spaceId
      * @returns {Promise}
      */
@@ -194,7 +194,7 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterEntityId 
+     * @param {string} harvesterEntityId
      * @param {string} groupEntityId
      * @returns {Promise}
      */
@@ -246,7 +246,7 @@ export default Service.extend(
     },
 
     /**
-     * @param {string} harvesterEntityId 
+     * @param {string} harvesterEntityId
      * @param {string} userEntityId
      * @returns {Promise}
      */
@@ -272,9 +272,9 @@ export default Service.extend(
 
     /**
      * Creates member group for specified harvester
-     * @param {string} harvesterEntityId 
+     * @param {string} harvesterEntityId
      * @param {Object} childGroupRepresentation
-     * @return {Promise}
+     * @returns {Promise}
      */
     createMemberGroupForHarvester(harvesterEntityId, childGroupRepresentation) {
       const {
@@ -304,9 +304,9 @@ export default Service.extend(
 
     /**
      * Adds group to the members of a harvester
-     * @param {string} harvesterEntityId 
+     * @param {string} harvesterEntityId
      * @param {string} groupEntityId
-     * @return {Promise}
+     * @returns {Promise}
      */
     addMemberGroupToHarvester(harvesterEntityId, groupEntityId) {
       return this.get('onedataGraph').request({
@@ -511,10 +511,10 @@ export default Service.extend(
 
     /**
      * Creates index for specified harvester
-     * @param {string} harvesterEntityId 
+     * @param {string} harvesterEntityId
      * @param {Object} indexRepresentation
      * @param {boolean} [reloadList=true]
-     * @return {Promise}
+     * @returns {Promise}
      */
     createIndex(harvesterEntityId, indexRepresentation, reloadList = true) {
       return this.get('onedataGraph').request({
@@ -533,7 +533,7 @@ export default Service.extend(
      * Removes index
      * @param {string} indexGri
      * @param {boolean} removeData
-     * @return {Promise}
+     * @returns {Promise}
      */
     removeIndex(indexGri, removeData) {
       const onedataGraph = this.get('onedataGraph');

@@ -34,7 +34,7 @@ export default Service.extend({
   /**
    * Fetches collection of all groups
    *
-   * @return {Promise<DS.RecordArray<GroupList>>} resolves to an array of groups
+   * @returns {Promise<DS.RecordArray<GroupList>>} resolves to an array of groups
    */
   getGroups() {
     return this.get('currentUser')
@@ -49,7 +49,7 @@ export default Service.extend({
    * Returns group with specified id
    * @param {string} id
    * @param {boolean} backgroundReload
-   * @return {Promise<Group>} group promise
+   * @returns {Promise<Group>} group promise
    */
   getRecord(id, backgroundReload = true) {
     return this.get('store').findRecord('group', id, { backgroundReload });
@@ -252,7 +252,7 @@ export default Service.extend({
    * Creates parent for specified child group
    * @param {string} childEntityId
    * @param {Object} parentGroupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createParent(childEntityId, parentGroupRepresentation) {
     return this.get('onedataGraph').request({
@@ -275,7 +275,7 @@ export default Service.extend({
    * Creates child for specified parent group
    * @param {string} parentEntityId
    * @param {Object} childGroupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createChild(parentEntityId, childGroupRepresentation) {
     return this.get('currentUser').getCurrentUserRecord()
@@ -302,7 +302,7 @@ export default Service.extend({
    * Adds group to the children of another group
    * @param {string} groupEntityId
    * @param {string} futureChildEntityId
-   * @return {Promise}
+   * @returns {Promise}
    */
   addChild(groupEntityId, futureChildEntityId) {
     return this.get('onedataGraph').request({

@@ -38,9 +38,9 @@ export default ClusterActions.extend({
 
   /**
    * Creates member group for specified cluster
-   * @param {Models.Cluster} cluster 
+   * @param {Models.Cluster} cluster
    * @param {Object} groupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroupForCluster(cluster, groupRepresentation) {
     const {
@@ -61,9 +61,9 @@ export default ClusterActions.extend({
 
   /**
    * Adds existing group to cluster
-   * @param {Models.Cluster} cluster 
+   * @param {Models.Cluster} cluster
    * @param {Models.Group} group
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroupToCluster(cluster, group) {
     const {
@@ -85,7 +85,7 @@ export default ClusterActions.extend({
 
   /**
    * Removes group from cluster
-   * @param {Models.Cluster} cluster 
+   * @param {Models.Cluster} cluster
    * @param {Models.Group} group
    * @returns {Promise}
    */
@@ -122,7 +122,7 @@ export default ClusterActions.extend({
 
   /**
    * Removes user from cluster
-   * @param {Models.Cluster} cluster 
+   * @param {Models.Cluster} cluster
    * @param {Models.User} user
    * @returns {Promise}
    */

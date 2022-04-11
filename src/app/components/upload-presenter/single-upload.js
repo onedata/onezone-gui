@@ -1,3 +1,6 @@
+// TODO: VFS-9257 fix eslint issues in this file
+/* eslint-disable no-param-reassign */
+
 /**
  * Presents a single upload triggered by user (groups possible many files, that
  * were marked to upload in the same operation). May be floating over the content
