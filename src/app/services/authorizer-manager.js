@@ -27,7 +27,7 @@ export default Service.extend({
   /**
    * Returns array of authorizers info objects supported by backend
    * @param {boolean} testMode
-   * @return {Array<AuthorizerInfo>}
+   * @returns {Array<AuthorizerInfo>}
    */
   getAvailableAuthorizers(testMode = false) {
     const proxyName = testMode ? 'testAuthorizersProxy' : 'authorizersProxy';

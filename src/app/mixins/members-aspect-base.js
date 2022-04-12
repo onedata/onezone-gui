@@ -561,7 +561,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * Fetches list of record owners
    * @virtual
-   * @return {Promise<Array<User>>}
+   * @returns {Promise<Array<User>>}
    */
   fetchOwners() {
     return resolve([]);
@@ -572,7 +572,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * @virtual
    * @param {string} type type of member model
    * @param {GraphSingleModel} member member record
-   * @return {Promise}
+   * @returns {Promise}
    */
   removeMember( /* type, member */ ) {
     return notImplementedReject();
@@ -582,7 +582,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * Removes members. Should be implemented in component.
    * @virtual
    * @param {Array<GraphSingleModel>} members
-   * @return {Promise}
+   * @returns {Promise}
    */
   removeMembers( /* members */ ) {
     return notImplementedReject();
@@ -592,7 +592,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * Creates child group. Should be implemented in component.
    * @virtual
    * @param {string} name group name
-   * @return {Promise}
+   * @returns {Promise}
    */
   createChildGroup( /* name */ ) {
     return notImplementedReject();
@@ -602,7 +602,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
    * Adds child group. Should be implemented in component.
    * @virtual
    * @param {Group} group
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroup( /* group */ ) {
     return notImplementedReject();
@@ -611,7 +611,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   /**
    * Joins user directly to the record. Should be implemented in component.
    * @virtual
-   * @return {Promise}
+   * @returns {Promise}
    */
   join() {
     return notImplementedReject();

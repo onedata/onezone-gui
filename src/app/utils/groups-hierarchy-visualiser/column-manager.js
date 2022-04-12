@@ -86,7 +86,7 @@ export default EmberObject.extend({
 
   /**
    * Inserts column before startColumn
-   * @param {Utils/GroupHierarchyVisualiser/Column} column 
+   * @param {Utils/GroupHierarchyVisualiser/Column} column
    * @param {Utils/GroupHierarchyVisualiser/Column} startColumn
    * @returns {undefined}
    */
@@ -110,7 +110,7 @@ export default EmberObject.extend({
 
   /**
    * Inserts column after startColumn
-   * @param {Utils/GroupHierarchyVisualiser/Column} column 
+   * @param {Utils/GroupHierarchyVisualiser/Column} column
    * @param {Utils/GroupHierarchyVisualiser/Column} startColumn
    * @returns {undefined}
    */
@@ -133,7 +133,7 @@ export default EmberObject.extend({
 
   /**
    * Replaces oldColumn with newColumn
-   * @param {Utils/GroupHierarchyVisualiser/Column} oldColumn 
+   * @param {Utils/GroupHierarchyVisualiser/Column} oldColumn
    * @param {Utils/GroupHierarchyVisualiser/Column} newColumn
    * @returns {undefined}
    */
@@ -164,7 +164,7 @@ export default EmberObject.extend({
 
   /**
    * Moves all columns by `byNColumns` columns
-   * @param {number} byNColumns 
+   * @param {number} byNColumns
    * @returns {undefined}
    */
   moveColumns(byNColumns) {
@@ -205,7 +205,7 @@ export default EmberObject.extend({
 
   /**
    * Removes columns, that are outside screen after window resize
-   * @return {undefined}
+   * @returns {undefined}
    */
   removeColumnsAfterResize() {
     this.removeUnnecessaryColumns('emptyFirst');

@@ -1,3 +1,6 @@
+// TODO: VFS-9257 fix eslint issues in this file
+/* eslint-disable no-param-reassign */
+
 /**
  * A component that shows membership path from `contextRecord` to `targetRecord`.
  * Rendering options can be changed using fields `visibleBlocks`, `isCondensed` and

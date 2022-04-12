@@ -173,7 +173,7 @@ export default Service.extend(I18n, {
    * Adds space to harvester
    * @param {Model.Harvester} harvester
    * @param {Model.Space} space
-   * @return {Promise}
+   * @returns {Promise}
    */
   addSpaceToHarvester(harvester, space) {
     const {
@@ -265,7 +265,7 @@ export default Service.extend(I18n, {
    * Creates member group for specified harvester
    * @param {Model.Harvester} harvester
    * @param {Object} groupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroupForHarvester(harvester, groupRepresentation) {
     const {
@@ -290,7 +290,7 @@ export default Service.extend(I18n, {
    * Adds existing group to harvetser
    * @param {Model.Harvester} harvester
    * @param {Model.Group} group
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroupToHarvester(harvester, group) {
     const {
