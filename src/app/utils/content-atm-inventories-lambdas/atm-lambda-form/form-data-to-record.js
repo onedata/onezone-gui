@@ -122,7 +122,17 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         'entryDefaultValue'
       );
 
-      const dataSpec = typeToDataSpec({ type: entryType, isArray: entryIsArray });
+      let customValueConstraints = null;
+      if (entryType in dataSpecEditors) {
+        const dataSpecFormData = get(entry, `${entryType}Editor`);
+        customValueConstraints =
+          dataSpecEditors[entryType].formValuesToValueConstraints(dataSpecFormData);
+      }
+      const dataSpec = typeToDataSpec({
+        type: entryType,
+        isArray: entryIsArray,
+        customValueConstraints,
+      });
       const lambdaData = {
         name: entryName,
         dataSpec,
@@ -139,12 +149,8 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
           }
         }
         lambdaData.isOptional = entryIsOptional;
-      }
-      if (entryType in dataSpecEditors) {
-        const dataSpecFormData = get(entry, `${entryType}Editor`);
-        const valueConstraints =
-          dataSpecEditors[entryType].formValuesToValueConstraints(dataSpecFormData);
-        dataSpec.valueConstraints = valueConstraints;
+      } else {
+        lambdaData.relayMethod = 'returnValue';
       }
       return lambdaData;
     });

@@ -264,8 +264,11 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     }
 
     if (type in dataSpecEditors) {
+      const valueConstraintsForEditor = isArray ?
+        dataSpec.valueConstraints.itemDataSpec.valueConstraints :
+        dataSpec.valueConstraints;
       const dataSpecEditorValues =
-        dataSpecEditors[type].valueConstraintsToFormValues(dataSpec.valueConstraints);
+        dataSpecEditors[type].valueConstraintsToFormValues(valueConstraintsForEditor);
       set(formEntry, `${type}Editor`, dataSpecEditorValues);
     }
   });

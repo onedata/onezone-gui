@@ -443,7 +443,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     { value: 'onedatafsCredentials' },
   ];
   if (!isForArguments) {
-    entryTypeOptions.push({ value: 'timeSeriesMeasurements' });
+    entryTypeOptions.push({ value: 'timeSeriesMeasurement' });
   }
   const generateEntryTypeField = mode => DropdownField.extend({
     defaultValue: reads('options.firstObject.value'),
@@ -489,7 +489,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   });
   const generateDataSpecEditorFields = mode => {
     const editors = Object.keys(dataSpecEditors).map((dataSpecName) =>
-      dataSpecEditors[dataSpecName].formElement.extend({
+      dataSpecEditors[dataSpecName].FormElement.extend({
         isVisible: eq('parent.value.entryType', raw(dataSpecName)),
       }).create({
         name: `${dataSpecName}Editor`,

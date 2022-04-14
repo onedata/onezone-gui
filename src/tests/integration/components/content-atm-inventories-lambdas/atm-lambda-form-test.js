@@ -22,7 +22,7 @@ const states = [{
   label: 'Deprecated',
 }];
 
-const simpleArgumentAndResultTypes = [{
+const argumentAndResultCommonTypes = [{
   dataSpec: {
     type: 'integer',
     valueConstraints: {},
@@ -154,9 +154,9 @@ const simpleArgumentAndResultTypes = [{
   label: 'OnedataFS credentials',
 }];
 
-const argumentTypes = simpleArgumentAndResultTypes;
-const resultTypes = [...simpleArgumentAndResultTypes, {
-  label: 'Time series measurements',
+const argumentTypes = argumentAndResultCommonTypes;
+const resultTypes = [...argumentAndResultCommonTypes, {
+  label: 'Time series measurement',
 }];
 
 describe(
@@ -792,6 +792,7 @@ describe(
           resultSpecs: resultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
             name: `res${idx}`,
             dataSpec,
+            relayMethod: 'returnValue',
           })),
           resourceSpec: {
             cpuRequested: 2,
@@ -846,7 +847,7 @@ describe(
           });
       });
 
-      resultTypes.rejectBy('label', 'Time series measurements')
+      resultTypes.rejectBy('label', 'Time series measurement')
         .forEach(({ dataSpec, label }) => {
           it(`creates lambda with "${label}"-typed result on submit button click`,
             async function (done) {
@@ -864,13 +865,14 @@ describe(
                   resultSpecs: [{
                     name: 'entry',
                     dataSpec,
+                    relayMethod: 'returnValue',
                   }],
                 }));
               done();
             });
         });
 
-      it('creates lambda with "Time series measurements"-typed result on submit button click',
+      it('creates lambda with "Time series measurement"-typed result on submit button click',
         async function (done) {
           await renderCreate(this);
 
@@ -878,8 +880,8 @@ describe(
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .entryType-field`, 'Time series measurements');
-          await click(`${resSelector} .timeSeriesMeasurementsEditor-field .add-field-button`);
+          await selectChoose(`${resSelector} .entryType-field`, 'Time series measurement');
+          await click(`${resSelector} .timeSeriesMeasurementEditor-field .add-field-button`);
           await selectChoose(`${resSelector} .nameMatcherType-field`, 'Has prefix');
           await fillIn(`${resSelector} .nameMatcher-field .form-control`, 'file_');
           await selectChoose(`${resSelector} .unit-field`, 'Custom');
@@ -891,7 +893,7 @@ describe(
               resultSpecs: [{
                 name: 'entry',
                 dataSpec: {
-                  type: 'timeSeriesMeasurements',
+                  type: 'timeSeriesMeasurement',
                   valueConstraints: {
                     specs: [{
                       nameMatcherType: 'hasPrefix',
@@ -900,6 +902,7 @@ describe(
                     }],
                   },
                 },
+                relayMethod: 'returnValue',
               }],
             }));
           done();
@@ -1157,7 +1160,7 @@ describe(
       });
 
       it('shows results of passed lambda', async function (done) {
-        const resultTypesToCheck = resultTypes.rejectBy('label', 'Time series measurements');
+        const resultTypesToCheck = resultTypes.rejectBy('label', 'Time series measurement');
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
@@ -1184,7 +1187,7 @@ describe(
         done();
       });
 
-      it('shows time series measurements result of passed lambda', async function (done) {
+      it('shows time series measurement result of passed lambda', async function (done) {
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
@@ -1192,7 +1195,7 @@ describe(
           resultSpecs: [{
             name: 'entry1',
             dataSpec: {
-              type: 'timeSeriesMeasurements',
+              type: 'timeSeriesMeasurement',
               valueConstraints: {
                 specs: [{
                   nameMatcherType: 'hasPrefix',

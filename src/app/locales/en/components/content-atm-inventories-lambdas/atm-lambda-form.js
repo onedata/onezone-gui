@@ -53,8 +53,8 @@ const argumentAndResultTypes = {
   onedatafsCredentials: {
     label: 'OnedataFS credentials',
   },
-  timeSeriesMeasurements: {
-    label: 'Time series measurements',
+  timeSeriesMeasurement: {
+    label: 'Time series measurement',
   },
 };
 

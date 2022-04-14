@@ -956,7 +956,7 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
           }, {
             name: 'res2',
             dataSpec: {
-              type: 'timeSeriesMeasurements',
+              type: 'timeSeriesMeasurement',
               valueConstraints: {
                 specs: [{
                   nameMatcherType: 'exact',

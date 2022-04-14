@@ -10,7 +10,7 @@
 
   .arguments-field,
   .results-field {
-    .arguments-collapse, .results-collapse {
+    > .field-component > .collapse {
       > .collection-item {
         position: relative;
         border: 1px solid $main-border-color;
@@ -19,13 +19,9 @@
         padding-bottom: 0;
         background-color: rgba($color-one-semiwhite, 0.2);
 
-        + .collection-item, + .add-field-button {
+        ~ * {
           margin-top: $form-group-margin-bottom;
         }
-      }
-
-      > .collection-item + .collection-item {
-        margin-top: $form-group-margin-bottom;
       }
     }
 
@@ -64,9 +60,8 @@
     }
   }
 
-  .time-series-measurements-dataspec-editor {
+  .time-series-measurement-dataspec-editor {
     flex-basis: 100%;
-    margin-bottom: 0;
 
     > .control-label {
       width: 100%;
@@ -192,7 +187,7 @@
       .entry-field + .remove-field-button-container {
         position: absolute;
         right: 0.1em;
-        top: 0.4em;
+        top: 0.35em;
         display: initial;
       }
     }
