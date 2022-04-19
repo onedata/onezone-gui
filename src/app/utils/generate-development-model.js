@@ -953,6 +953,22 @@ async function attachAtmLambdasToAtmInventory(store, atmInventory) {
                 },
               },
             },
+          }, {
+            name: 'res2',
+            dataSpec: {
+              type: 'timeSeriesMeasurement',
+              valueConstraints: {
+                specs: [{
+                  nameMatcherType: 'exact',
+                  nameMatcher: 'total_size',
+                  unit: 'bytes',
+                }, {
+                  nameMatcherType: 'hasPrefix',
+                  nameMatcher: 'volume_',
+                  unit: 'custom:liters',
+                }],
+              },
+            },
           }],
           resourceSpec: {
             cpuRequested: 2,
@@ -1030,6 +1046,45 @@ async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
                   type: 'string',
                   valueConstraints: {},
                 },
+              },
+            }, {
+              id: 'store2',
+              name: 'store 2',
+              type: 'timeSeries',
+              config: {
+                schemas: [{
+                  nameGeneratorType: 'exact',
+                  nameGenerator: 'exactGeneratorName',
+                  unit: 'bytes',
+                  metrics: {
+                    sum5s: {
+                      aggregator: 'sum',
+                      resolution: 5,
+                      retention: 1440,
+                    },
+                    max1h: {
+                      aggregator: 'max',
+                      resolution: 60 * 60,
+                      retention: 1000,
+                    },
+                  },
+                }, {
+                  nameGeneratorType: 'addPrefix',
+                  nameGenerator: 'file_',
+                  unit: 'bytes',
+                  metrics: {
+                    sum5s: {
+                      aggregator: 'sum',
+                      resolution: 5,
+                      retention: 1440,
+                    },
+                    max1h: {
+                      aggregator: 'max',
+                      resolution: 60 * 60,
+                      retention: 1000,
+                    },
+                  },
+                }],
               },
             }],
           },

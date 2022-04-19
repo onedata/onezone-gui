@@ -10,7 +10,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, trySet, defineProperty } from '@ember/object';
+import { computed, observer, get, set, trySet, defineProperty } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -22,7 +22,7 @@ import NumberField from 'onedata-gui-common/utils/form-component/number-field';
 import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, getBy, array } from 'ember-awesome-macros';
+import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, array } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import {
@@ -31,6 +31,7 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
+import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -172,10 +173,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   nameField: computed(function nameField() {
-    return TextField.extend(
-      defaultValueGenerator(this),
-      disableFieldInEditMode(this)
-    ).create({
+    return TextField.extend(disableFieldInEditMode(this)).create({
       name: 'name',
     });
   }),
@@ -184,7 +182,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.DropdownField>}
    */
   stateField: computed(function stateField() {
-    return DropdownField.extend(defaultValueGenerator(this)).create({
+    return DropdownField.create({
       name: 'state',
       showSearch: false,
       options: [{ value: 'draft' }, { value: 'stable' }, { value: 'deprecated' }],
@@ -195,10 +193,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.TextField>}
    */
   summaryField: computed(function summaryField() {
-    return TextField.extend(
-      defaultValueGenerator(this),
-      disableFieldInEditMode(this)
-    ).create({
+    return TextField.extend(disableFieldInEditMode(this)).create({
       name: 'summary',
       isOptional: true,
     });
@@ -215,7 +210,6 @@ export default Component.extend(I18n, {
     const editOptions = viewOptions.rejectBy('value', 'onedataFunction');
 
     return DropdownField.extend(
-      defaultValueGenerator(this),
       disableFieldInEditMode(this), {
         options: conditional('isInViewMode', raw(viewOptions), raw(editOptions)),
       }).create({
@@ -234,13 +228,13 @@ export default Component.extend(I18n, {
     }).create({
       name: 'openfaasOptions',
       fields: [
-        TextField.extend(defaultValueGenerator(this)).create({
+        TextField.create({
           name: 'dockerImage',
         }),
-        ToggleField.extend(defaultValueGenerator(this)).create({
+        ToggleField.create({
           name: 'readonly',
         }),
-        ToggleField.extend(defaultValueGenerator(this)).create({
+        ToggleField.create({
           name: 'mountSpace',
         }),
         mountSpaceOptionsFieldsGroup,
@@ -258,10 +252,10 @@ export default Component.extend(I18n, {
     }).create({
       name: 'mountSpaceOptions',
       fields: [
-        TextField.extend(defaultValueGenerator(this)).create({
+        TextField.create({
           name: 'mountPoint',
         }),
-        TextField.extend(defaultValueGenerator(this), {
+        TextField.extend({
           isVisible: not(and('isInViewMode', isEmpty('value'))),
         }).create({
           name: 'oneclientOptions',
@@ -281,7 +275,7 @@ export default Component.extend(I18n, {
       }).create({
         name: 'onedataFunctionOptions',
         fields: [
-          TextField.extend(defaultValueGenerator(this)).create({
+          TextField.create({
             name: 'onedataFunctionName',
           }),
         ],
@@ -293,10 +287,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.NumberField>}
    */
   preferredBatchSizeField: computed(function preferredBatchSizeField() {
-    return NumberField.extend(
-      defaultValueGenerator(this),
-      disableFieldInEditMode(this)
-    ).create({
+    return NumberField.extend(disableFieldInEditMode(this)).create({
       gte: 1,
       integer: true,
       name: 'preferredBatchSize',
@@ -332,18 +323,24 @@ export default Component.extend(I18n, {
       classes: 'task-resources-fields',
       fields: createTaskResourcesFields({
         pathToGroup: name,
-        cpuRequestedDefaultValueMixin: defaultValueGenerator(this),
-        cpuLimitDefaultValueMixin: defaultValueGenerator(this),
-        memoryRequestedDefaultValueMixin: defaultValueGenerator(this),
-        memoryLimitDefaultValueMixin: defaultValueGenerator(this),
-        ephemeralStorageRequestedDefaultValueMixin: defaultValueGenerator(this),
-        ephemeralStorageLimitDefaultValueMixin: defaultValueGenerator(this),
+        cpuRequestedDefaultValueMixin: {},
+        cpuLimitDefaultValueMixin: {},
+        memoryRequestedDefaultValueMixin: {},
+        memoryLimitDefaultValueMixin: {},
+        ephemeralStorageRequestedDefaultValueMixin: {},
+        ephemeralStorageLimitDefaultValueMixin: {},
       }),
     });
   }),
 
   fieldsResetter: observer('mode', 'revision', function fieldsResetter() {
-    this.get('fields').reset();
+    const {
+      fields,
+      fieldsValuesFromRecord,
+    } = this.getProperties('fields', 'fieldsValuesFromRecord');
+    set(fields, 'valuesSource', fieldsValuesFromRecord);
+    fields.useCurrentValueAsDefault();
+    fields.reset();
   }),
 
   init() {
@@ -386,22 +383,6 @@ export default Component.extend(I18n, {
     },
   },
 });
-
-/**
- * Generates mixin-like object, that specifies default value for field.
- * It's result should be passed to *Field.extend.
- * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
- * @returns {Object}
- */
-function defaultValueGenerator(component) {
-  return {
-    defaultValueSource: component,
-    defaultValue: getBy(
-      'defaultValueSource',
-      tag `fieldsValuesFromRecord.${'path'}`
-    ),
-  };
-}
 
 /**
  * Generates mixin-like object, that blocks field when component is in `edit` mode.
@@ -449,32 +430,27 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       validator('exclusion', { in: reservedNames }),
     ],
   });
+  const entryTypeOptions = [
+    { value: 'integer' },
+    { value: 'string' },
+    { value: 'object' },
+    { value: 'anyFile' },
+    { value: 'regularFile' },
+    { value: 'directory' },
+    { value: 'symlink' },
+    { value: 'dataset' },
+    { value: 'range' },
+    { value: 'onedatafsCredentials' },
+  ];
+  if (!isForArguments) {
+    entryTypeOptions.push({ value: 'timeSeriesMeasurement' });
+  }
   const generateEntryTypeField = mode => DropdownField.extend({
     defaultValue: reads('options.firstObject.value'),
   }).create({
     mode,
     name: 'entryType',
-    options: [
-      { value: 'integer' },
-      { value: 'string' },
-      { value: 'object' },
-      { value: 'anyFile' },
-      { value: 'regularFile' },
-      { value: 'directory' },
-      { value: 'symlink' },
-      { value: 'dataset' },
-      { value: 'range' },
-      { value: 'onedatafsCredentials' },
-      // TODO: VFS-7816 uncomment or remove future code
-      // { value: 'histogram' },
-      // { value: 'archive' },
-      // { value: 'singleValueStore' },
-      // { value: 'listStore' },
-      // { value: 'mapStore' },
-      // { value: 'treeForestStore' },
-      // { value: 'rangeStore' },
-      // { value: 'histogramStore' },
-    ],
+    options: entryTypeOptions,
   });
   const generateEntryIsArrayField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
@@ -511,6 +487,17 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     defaultValue: '',
     isOptional: true,
   });
+  const generateDataSpecEditorFields = mode => {
+    const editors = Object.keys(dataSpecEditors).map((dataSpecName) =>
+      dataSpecEditors[dataSpecName].FormElement.extend({
+        isVisible: eq('parent.value.entryType', raw(dataSpecName)),
+      }).create({
+        name: `${dataSpecName}Editor`,
+      })
+    );
+    editors.forEach(editor => editor.changeMode(mode));
+    return editors;
+  };
 
   const fieldsCollectionExtension = {
     isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
@@ -552,6 +539,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
             generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),
           ] : []),
+          ...generateDataSpecEditorFields(mode),
         ],
       });
     },
@@ -560,7 +548,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     },
   };
   return FormFieldsCollectionGroup.extend(
-    defaultValueGenerator(component),
     disableFieldInEditMode(component),
     fieldsCollectionExtension
   ).create({

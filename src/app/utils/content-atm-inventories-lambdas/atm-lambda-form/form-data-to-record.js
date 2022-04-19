@@ -10,6 +10,7 @@
 import { get, getProperties } from '@ember/object';
 import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
+import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 /**
  * @param {Object} formData
@@ -102,40 +103,55 @@ export default function formDataToRecord(formData) {
  * @returns {Array<Object>} record data
  */
 function formArgResToRecordArgRes(dataType, formArgRes) {
-  return get(formArgRes, '__fieldsValueNames').map(valueName => {
-    const {
-      entryName,
-      entryType,
-      entryIsArray,
-      entryIsOptional,
-      entryDefaultValue,
-    } = getProperties(
-      get(formArgRes, valueName) || {},
-      'entryName',
-      'entryType',
-      'entryIsArray',
-      'entryIsOptional',
-      'entryDefaultValue'
-    );
+  return get(formArgRes, '__fieldsValueNames')
+    .map((valueName) => get(formArgRes, valueName))
+    .filter(Boolean)
+    .map((entry) => {
+      const {
+        entryName,
+        entryType,
+        entryIsArray,
+        entryIsOptional,
+        entryDefaultValue,
+      } = getProperties(
+        entry,
+        'entryName',
+        'entryType',
+        'entryIsArray',
+        'entryIsOptional',
+        'entryDefaultValue'
+      );
 
-    const dataSpec = typeToDataSpec({ type: entryType, isArray: entryIsArray });
-    const lambdaData = {
-      name: entryName,
-      dataSpec,
-    };
-    if (dataType === 'argument') {
-      if (dataSpec &&
-        !['storeCredentials', 'onedatafsCredentials'].includes(dataSpec.type) &&
-        entryDefaultValue
-      ) {
-        try {
-          lambdaData.defaultValue = JSON.parse(entryDefaultValue);
-        } catch (e) {
-          lambdaData.defaultValue = null;
-        }
+      let customValueConstraints = null;
+      if (entryType in dataSpecEditors) {
+        const dataSpecFormData = get(entry, `${entryType}Editor`);
+        customValueConstraints =
+          dataSpecEditors[entryType].formValuesToValueConstraints(dataSpecFormData);
       }
-      lambdaData.isOptional = entryIsOptional;
-    }
-    return lambdaData;
-  });
+      const dataSpec = typeToDataSpec({
+        type: entryType,
+        isArray: entryIsArray,
+        customValueConstraints,
+      });
+      const lambdaData = {
+        name: entryName,
+        dataSpec,
+      };
+      if (dataType === 'argument') {
+        if (dataSpec &&
+          !['storeCredentials', 'onedatafsCredentials'].includes(dataSpec.type) &&
+          entryDefaultValue
+        ) {
+          try {
+            lambdaData.defaultValue = JSON.parse(entryDefaultValue);
+          } catch (e) {
+            lambdaData.defaultValue = null;
+          }
+        }
+        lambdaData.isOptional = entryIsOptional;
+      } else {
+        lambdaData.relayMethod = 'returnValue';
+      }
+      return lambdaData;
+    });
 }

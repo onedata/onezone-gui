@@ -10,9 +10,19 @@
 
   .arguments-field,
   .results-field {
-    .collection-item + .collection-item {
-      padding-top: $form-group-margin-bottom;
-      border-top: 1px solid $main-border-color;
+    > .field-component > .collapse {
+      > .collection-item {
+        position: relative;
+        border: 1px solid $main-border-color;
+        border-radius: $border-radius-base;
+        padding: $form-group-margin-bottom;
+        padding-bottom: 0;
+        background-color: rgba($color-one-semiwhite, 0.2);
+
+        ~ * {
+          margin-top: $form-group-margin-bottom;
+        }
+      }
     }
 
     .entryName-field,
@@ -47,6 +57,21 @@
     text-align: left;
     .btn {
       margin-left: $padding-small-horizontal;
+    }
+  }
+
+  .time-series-measurement-dataspec-editor {
+    flex-basis: 100%;
+
+    > .control-label {
+      width: 100%;
+      padding: 0;
+      margin-bottom: 5px;
+    }
+
+    .add-field-button {
+      margin-top: 0;
+      margin-bottom: $form-group-margin-bottom;
     }
   }
 
@@ -159,19 +184,11 @@
         margin-right: $padding-right;
       }
 
-      .remove-field-button-container {
+      .entry-field + .remove-field-button-container {
         position: absolute;
-        right: 0;
-      }
-
-      .remove-icon {
-        margin-top: initial;
-      }
-    }
-
-    .results-field {
-      .remove-field-button-container {
-        right: $entry-toggle-container-width - $x-offset-to-center-toggles * 2;
+        right: 0.1em;
+        top: 0.35em;
+        display: initial;
       }
     }
   }

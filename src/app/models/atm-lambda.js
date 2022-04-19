@@ -61,6 +61,7 @@ import { getBy } from 'ember-awesome-macros';
  * @typedef {Object} AtmLambdaResultSpec
  * @property {String} name
  * @property {AtmDataSpec} dataSpec
+ * @property {'returnValue'|'filePipe'} relayMethod
  */
 
 /**

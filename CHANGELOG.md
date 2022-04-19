@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9036 Added time series features to automation GUI
 * VFS-9207 Removed usage of local OpenSans fonts
 * VFS-9138 Fixed glitch during provider info icon animation
 * VFS-9034 Added support for changed format of automation task results and new range data type
