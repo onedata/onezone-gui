@@ -14,8 +14,8 @@ export default Service.extend({
 
   /**
    * Fetches collection of all linked accounts
-   * 
-   * @return {Promise<DS.RecordArray<models/LinkedAccountList>>} resolves to
+   *
+   * @returns {Promise<DS.RecordArray<models/LinkedAccountList>>} resolves to
    * an array of linked accounts
    */
   getLinkedAccounts() {

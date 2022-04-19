@@ -26,8 +26,8 @@ export default Service.extend({
 
   /**
    * Fetches collection of all spaces
-   * 
-   * @return {Promise<DS.RecordArray<Space>>} resolves to an array of providers
+   *
+   * @returns {Promise<DS.RecordArray<Space>>} resolves to an array of providers
    */
   getSpaces() {
     return this.get('currentUser')
@@ -41,7 +41,7 @@ export default Service.extend({
   /**
    * Returns provider with specified id
    * @param {string} id
-   * @return {Promise<Provider>} space promise
+   * @returns {Promise<Provider>} space promise
    */
   getRecord(id) {
     return this.get('store').findRecord('space', id);
@@ -77,7 +77,7 @@ export default Service.extend({
 
   /**
    * Removes space
-   * @param {String} spaceId 
+   * @param {String} spaceId
    * @returns {Promise}
    */
   removeSpace(spaceId) {
@@ -159,9 +159,9 @@ export default Service.extend({
 
   /**
    * Creates member group for specified space
-   * @param {string} spaceEntityId 
+   * @param {string} spaceEntityId
    * @param {Object} childGroupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroup(spaceEntityId, childGroupRepresentation) {
     return this.get('currentUser').getCurrentUserRecord()
@@ -186,9 +186,9 @@ export default Service.extend({
 
   /**
    * Adds group to the members of a space
-   * @param {string} spaceEntityId 
+   * @param {string} spaceEntityId
    * @param {string} groupEntityId
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroup(spaceEntityId, groupEntityId) {
     return this.get('onedataGraph').request({
@@ -211,7 +211,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} spaceEntityId 
+   * @param {string} spaceEntityId
    * @param {string} userEntityId
    * @returns {Promise}
    */
@@ -237,7 +237,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} spaceEntityId 
+   * @param {string} spaceEntityId
    * @param {string} groupEntityId
    * @returns {Promise}
    */
@@ -259,7 +259,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} spaceEntityId 
+   * @param {string} spaceEntityId
    * @param {string} groupEntityId
    * @returns {Promise}
    */

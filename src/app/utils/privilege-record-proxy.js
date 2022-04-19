@@ -2,11 +2,11 @@
  * Container for one or many privilege records (depends on griArray and
  * sumPrivileges properties). Allows to automatically fetch/save data and manage
  * modification state of the privileges to deal with privilege editors.
- * 
+ *
  * Modification detection does not depend on real record values. Snapshot of record
  * is used to compare and detect changes to prevent from unpredictable behavior
  * during some record dynamic update.
- * 
+ *
  * Internally (and also through setNewPrivileges method) privileges are stored using
  * object representation. All privileges are grouped under corresponding keys according
  * to the groupedPrivilegesFlags property:
@@ -22,7 +22,7 @@
  *   //...
  * }
  * ```
- * 
+ *
  * Important methods:
  * * reloadRecords() - loads/reloads privilege records from server (also updates
  *     snapshot),
@@ -258,7 +258,7 @@ export default EmberObject.extend({
 
   /**
    * Sets privilegesSnapshot to persisted privileges
-   * @return {undefined}
+   * @returns {undefined}
    */
   updateSnapshot() {
     const copy = this.get('persistedPrivileges')
@@ -268,7 +268,7 @@ export default EmberObject.extend({
 
   /**
    * Sets modifiedPrivileges to actual privileges snapshot
-   * @return {undefined}
+   * @returns {undefined}
    */
   resetModifications() {
     this.updateSnapshot();
@@ -381,8 +381,8 @@ export default EmberObject.extend({
   /**
    * Calculates privileges diff between passed prevPrivileges and
    * modifiedPrivileges
-   * @param {Object} prevPrivileges 
-   * @return {PrivilegeDiff}
+   * @param {Object} prevPrivileges
+   * @returns {PrivilegeDiff}
    */
   getPrivilegesModificationDiff(prevPrivileges) {
     const modifiedPrivileges = this.get('modifiedPrivileges');

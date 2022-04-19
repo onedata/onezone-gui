@@ -86,9 +86,9 @@ export default Service.extend({
 
   /**
    * Creates member group for specified cluster
-   * @param {string} clusterEntityId 
+   * @param {string} clusterEntityId
    * @param {Object} groupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroupForCluster(clusterEntityId, groupRepresentation) {
     return this.get('currentUser').getCurrentUserRecord()
@@ -110,9 +110,9 @@ export default Service.extend({
 
   /**
    * Adds group to the members of a cluster
-   * @param {string} clusterEntityId 
+   * @param {string} clusterEntityId
    * @param {string} groupEntityId
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroupToCluster(clusterEntityId, groupEntityId) {
     return this.get('onedataGraph').request({
@@ -178,7 +178,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} clusterEntityId 
+   * @param {string} clusterEntityId
    * @param {string} userEntityId
    * @returns {Promise}
    */
@@ -203,7 +203,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} clusterEntityId 
+   * @param {string} clusterEntityId
    * @param {string} groupEntityId
    * @returns {Promise}
    */
@@ -225,7 +225,7 @@ export default Service.extend({
   },
 
   /**
-   * @param {string} clusterEntityId 
+   * @param {string} clusterEntityId
    * @param {string} groupEntityId
    * @returns {Promise}
    */

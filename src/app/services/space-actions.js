@@ -1,5 +1,5 @@
 /**
- * A service which provides spaces manipulation functions ready to use for GUI 
+ * A service which provides spaces manipulation functions ready to use for GUI
  *
  * @module services/space-actions
  * @author Jakub Liput, Michał Borzęcki
@@ -128,9 +128,9 @@ export default Service.extend(I18n, {
 
   /**
    * Creates member group for specified space
-   * @param {Space} space 
+   * @param {Space} space
    * @param {Object} groupRepresentation
-   * @return {Promise}
+   * @returns {Promise}
    */
   createMemberGroup(space, groupRepresentation) {
     const {
@@ -151,9 +151,9 @@ export default Service.extend(I18n, {
 
   /**
    * Adds existing group to space
-   * @param {Space} space 
+   * @param {Space} space
    * @param {Group} group
-   * @return {Promise}
+   * @returns {Promise}
    */
   addMemberGroup(space, group) {
     const {
@@ -175,7 +175,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes group from space
-   * @param {Space} space 
+   * @param {Space} space
    * @param {Group} group
    * @returns {Promise}
    */
@@ -212,7 +212,7 @@ export default Service.extend(I18n, {
 
   /**
    * Removes user from space
-   * @param {Space} space 
+   * @param {Space} space
    * @param {User} user
    * @returns {Promise}
    */

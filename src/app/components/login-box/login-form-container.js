@@ -163,7 +163,7 @@ export default LoginFormContainer.extend(
 
     /**
      * Powerselect item matcher used by its search engine.
-     * @param {AuthorizerInfo} authorizer 
+     * @param {AuthorizerInfo} authorizer
      * @param {string} term Query string.
      * @returns {boolean} True, if authorizer matches given term.
      */
@@ -208,7 +208,7 @@ export default LoginFormContainer.extend(
       /**
        * Action called on auth provider select.
        * @param {AuthorizerInfo} authorizer
-       * @return {undefined}
+       * @returns {undefined}
        */
       authorizerSelected(authorizer) {
         this.set('selectedAuthorizer', authorizer);

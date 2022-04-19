@@ -1,3 +1,6 @@
+// TODO: VFS-9257 fix eslint issues in this file
+/* eslint-disable no-param-reassign */
+
 /**
  * Renders scalable map with Oneproviders, that allows selection.
  *
@@ -103,7 +106,7 @@ export default Component.extend({
       mapInitialState,
     } = this.getProperties('oneproviders', 'mapInitialState');
     if (!mapInitialState) {
-      const points = 
+      const points =
         oneproviders.map(p => getProperties(p, 'latitude', 'longitude'));
       const mapPosition = mapPositionForCoordinates(points);
       this.set('mapInitialState', {
