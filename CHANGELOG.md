@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9354 Fixed loading echarts library
 * VFS-9036 Added time series features to automation GUI
 * VFS-9207 Removed usage of local OpenSans fonts
 * VFS-9138 Fixed glitch during provider info icon animation
