@@ -31,7 +31,7 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { valueConstraintsEditor } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -488,8 +488,8 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     isOptional: true,
   });
   const generateDataSpecEditorFields = mode => {
-    const editors = Object.keys(dataSpecEditors).map((dataSpecName) =>
-      dataSpecEditors[dataSpecName].FormElement.extend({
+    const editors = Object.keys(valueConstraintsEditor).map((dataSpecName) =>
+      valueConstraintsEditor[dataSpecName].FormElement.extend({
         isVisible: eq('parent.value.entryType', raw(dataSpecName)),
       }).create({
         name: `${dataSpecName}Editor`,
