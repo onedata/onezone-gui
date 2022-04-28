@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9332 Added handling time series measurements in all types of stores
 * VFS-9270 Added task time series store
 * VFS-9036 Added time series features to automation GUI
 * VFS-9207 Removed usage of local OpenSans fonts

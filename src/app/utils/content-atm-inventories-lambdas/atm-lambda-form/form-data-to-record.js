@@ -10,7 +10,7 @@
 import { get, getProperties } from '@ember/object';
 import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import { valueConstraintsEditor } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { valueConstraintsEditors } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 /**
  * @param {Object} formData
@@ -123,10 +123,10 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
       );
 
       let customValueConstraints = null;
-      if (entryType in valueConstraintsEditor) {
+      if (entryType in valueConstraintsEditors) {
         const dataSpecFormData = get(entry, `${entryType}Editor`);
-        customValueConstraints =
-          valueConstraintsEditor[entryType].formValuesToValueConstraints(dataSpecFormData);
+        customValueConstraints = valueConstraintsEditors[entryType]
+          .formValuesToValueConstraints(dataSpecFormData);
       }
       const dataSpec = typeToDataSpec({
         type: entryType,

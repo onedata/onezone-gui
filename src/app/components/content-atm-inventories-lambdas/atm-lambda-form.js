@@ -31,7 +31,7 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import { valueConstraintsEditor } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { valueConstraintsEditors } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -440,9 +440,10 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     { value: 'symlink' },
     { value: 'dataset' },
     { value: 'range' },
-    { value: 'onedatafsCredentials' },
   ];
-  if (!isForArguments) {
+  if (isForArguments) {
+    entryTypeOptions.push({ value: 'onedatafsCredentials' });
+  } else {
     entryTypeOptions.push({ value: 'timeSeriesMeasurement' });
   }
   const generateEntryTypeField = mode => DropdownField.extend({
@@ -488,8 +489,8 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     isOptional: true,
   });
   const generateDataSpecEditorFields = mode => {
-    const editors = Object.keys(valueConstraintsEditor).map((dataSpecName) =>
-      valueConstraintsEditor[dataSpecName].FormElement.extend({
+    const editors = Object.keys(valueConstraintsEditors).map((dataSpecName) =>
+      valueConstraintsEditors[dataSpecName].FormElement.extend({
         isVisible: eq('parent.value.entryType', raw(dataSpecName)),
       }).create({
         name: `${dataSpecName}Editor`,

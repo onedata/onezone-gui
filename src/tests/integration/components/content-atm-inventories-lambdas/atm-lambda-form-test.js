@@ -146,15 +146,15 @@ const argumentAndResultCommonTypes = [{
     valueConstraints: {},
   },
   label: 'Range',
-}, {
+}];
+
+const argumentTypes = [...argumentAndResultCommonTypes, {
   dataSpec: {
     type: 'onedatafsCredentials',
     valueConstraints: {},
   },
   label: 'OnedataFS credentials',
 }];
-
-const argumentTypes = argumentAndResultCommonTypes;
 const resultTypes = [...argumentAndResultCommonTypes, {
   label: 'Time series measurement',
 }];
