@@ -10,7 +10,7 @@
 import { set, setProperties, getProperties } from '@ember/object';
 import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
-import { valueConstraintsEditors } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { dataSpecToFormValues } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -244,15 +244,12 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       return;
     }
 
-    const {
-      type,
-      isArray,
-    } = dataSpecToType(dataSpec);
+    const { isArray } = dataSpecToType(dataSpec);
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
     const formEntry = set(formData, valueName, createValuesContainer({
       entryName: name,
-      entryType: type,
+      entryDataSpec: dataSpecToFormValues(dataSpec),
       entryIsArray: isArray,
     }));
     if (dataType === 'argument') {
@@ -261,15 +258,6 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
           undefined : JSON.stringify(defaultValue),
         entryIsOptional: isOptional === true,
       });
-    }
-
-    if (type in valueConstraintsEditors) {
-      const valueConstraintsForEditor = isArray ?
-        dataSpec.valueConstraints.itemDataSpec.valueConstraints :
-        dataSpec.valueConstraints;
-      const valueConstraintsValues = valueConstraintsEditors[type]
-        .valueConstraintsToFormValues(valueConstraintsForEditor);
-      set(formEntry, `${type}Editor`, valueConstraintsValues);
     }
   });
   return formData;

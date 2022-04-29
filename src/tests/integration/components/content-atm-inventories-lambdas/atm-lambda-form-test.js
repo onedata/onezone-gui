@@ -146,6 +146,8 @@ const argumentAndResultCommonTypes = [{
     valueConstraints: {},
   },
   label: 'Range',
+}, {
+  label: 'Time series measurement',
 }];
 
 const argumentTypes = [...argumentAndResultCommonTypes, {
@@ -155,9 +157,7 @@ const argumentTypes = [...argumentAndResultCommonTypes, {
   },
   label: 'OnedataFS credentials',
 }];
-const resultTypes = [...argumentAndResultCommonTypes, {
-  label: 'Time series measurement',
-}];
+const resultTypes = argumentAndResultCommonTypes;
 
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambda form',
@@ -449,16 +449,12 @@ describe(
         expect($entries).to.have.length(1);
         const $entry = $entries.eq(0);
 
-        const $entryNameLabel = $entry.find('.entryName-field .control-label');
         const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameLabel.text().trim()).to.equal('Name:');
         expect($entryNameField).to.have.attr('type', 'text');
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
-        const $entryTypeLabel = $entry.find('.entryType-field .control-label');
-        const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
-        expect($entryTypeLabel.text().trim()).to.equal('Type:');
+        const $entryTypeField = $entry.find('.type-field .dropdown-field-trigger');
         expect($entryTypeField.text().trim()).to.equal('Integer');
 
         const $entryIsOptionalLabel = $entry.find('.entryIsOptional-field .control-label');
@@ -523,7 +519,7 @@ describe(
           await renderCreate(this);
           await addArgument();
 
-          await clickTrigger('.entryType-field');
+          await clickTrigger('.type-field');
 
           const $options = $('.ember-power-select-option');
           expect($options).to.have.length(argumentTypes.length);
@@ -566,16 +562,12 @@ describe(
         expect($entries).to.have.length(1);
         const $entry = $entries.eq(0);
 
-        const $entryNameLabel = $entry.find('.entryName-field .control-label');
         const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameLabel.text().trim()).to.equal('Name:');
         expect($entryNameField).to.have.attr('type', 'text');
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
-        const $entryTypeLabel = $entry.find('.entryType-field .control-label');
-        const $entryTypeField = $entry.find('.entryType-field .dropdown-field-trigger');
-        expect($entryTypeLabel.text().trim()).to.equal('Type:');
+        const $entryTypeField = $entry.find('.type-field .dropdown-field-trigger');
         expect($entryTypeField.text().trim()).to.equal('Integer');
         done();
       });
@@ -638,7 +630,7 @@ describe(
         await renderCreate(this);
         await addResult();
 
-        await clickTrigger('.entryType-field');
+        await clickTrigger('.type-field');
 
         const $options = $('.ember-power-select-option');
         expect($options).to.have.length(resultTypes.length);
@@ -734,7 +726,7 @@ describe(
           const nthArgSelector = `.arguments-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
           await selectChoose(
-            `${nthArgSelector} .entryType-field`,
+            `${nthArgSelector} .type-field`,
             argumentTypes[i].label
           );
           if (i === 0) {
@@ -746,7 +738,7 @@ describe(
           const nthResSelector = `.results-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthResSelector} .entryName-field .form-control`, `res${i}`);
           await selectChoose(
-            `${nthResSelector} .entryType-field`,
+            `${nthResSelector} .type-field`,
             argumentTypes[i].label
           );
         }
@@ -823,29 +815,68 @@ describe(
           });
       });
 
-      argumentTypes.forEach(({ dataSpec, label }) => {
-        it(`creates lambda with "${label}"-typed argument on submit button click`,
-          async function (done) {
-            await renderCreate(this);
+      argumentTypes.rejectBy('label', 'Time series measurement')
+        .forEach(({ dataSpec, label }) => {
+          it(`creates lambda with "${label}"-typed argument on submit button click`,
+            async function (done) {
+              await renderCreate(this);
 
-            const revision = await fillWithMinimumData(this);
-            await addArgument();
-            const argSelector = '.arguments-field .collection-item:first-child';
-            await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
-            await selectChoose(`${argSelector} .entryType-field`, label);
-            await click('.btn-submit');
+              const revision = await fillWithMinimumData(this);
+              await addArgument();
+              const argSelector = '.arguments-field .collection-item:first-child';
+              await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
+              await selectChoose(`${argSelector} .type-field`, label);
+              await click('.btn-submit');
 
-            expect(this.get('submitStub')).to.be.calledOnce
-              .and.to.be.calledWith(Object.assign(revision, {
-                argumentSpecs: [{
-                  name: 'entry',
-                  dataSpec,
-                  isOptional: false,
-                }],
-              }));
-            done();
-          });
-      });
+              expect(this.get('submitStub')).to.be.calledOnce
+                .and.to.be.calledWith(Object.assign(revision, {
+                  argumentSpecs: [{
+                    name: 'entry',
+                    dataSpec,
+                    isOptional: false,
+                  }],
+                }));
+              done();
+            });
+        });
+
+      it('creates lambda with "Time series measurement"-typed argument on submit button click',
+        async function (done) {
+          await renderCreate(this);
+
+          const revision = await fillWithMinimumData(this);
+          await addArgument();
+          const argSelector = '.arguments-field .collection-item:first-child';
+          await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
+          await selectChoose(`${argSelector} .type-field`, 'Time series measurement');
+          await click(
+            `${argSelector} .timeSeriesMeasurementValueConstraints-field .add-field-button`
+          );
+          await selectChoose(`${argSelector} .nameMatcherType-field`, 'Has prefix');
+          await fillIn(`${argSelector} .nameMatcher-field .form-control`, 'file_');
+          await selectChoose(`${argSelector} .unit-field`, 'Custom');
+          await fillIn(`${argSelector} .customUnit-field .form-control`, 'liters');
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith(Object.assign(revision, {
+              argumentSpecs: [{
+                name: 'entry',
+                dataSpec: {
+                  type: 'timeSeriesMeasurement',
+                  valueConstraints: {
+                    specs: [{
+                      nameMatcherType: 'hasPrefix',
+                      nameMatcher: 'file_',
+                      unit: 'custom:liters',
+                    }],
+                  },
+                },
+                isOptional: false,
+              }],
+            }));
+          done();
+        });
 
       resultTypes.rejectBy('label', 'Time series measurement')
         .forEach(({ dataSpec, label }) => {
@@ -857,7 +888,7 @@ describe(
               await addResult();
               const resSelector = '.results-field .collection-item:first-child';
               await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-              await selectChoose(`${resSelector} .entryType-field`, label);
+              await selectChoose(`${resSelector} .type-field`, label);
               await click('.btn-submit');
 
               expect(this.get('submitStub')).to.be.calledOnce
@@ -880,8 +911,10 @@ describe(
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .entryType-field`, 'Time series measurement');
-          await click(`${resSelector} .timeSeriesMeasurementEditor-field .add-field-button`);
+          await selectChoose(`${resSelector} .type-field`, 'Time series measurement');
+          await click(
+            `${resSelector} .timeSeriesMeasurementValueConstraints-field .add-field-button`
+          );
           await selectChoose(`${resSelector} .nameMatcherType-field`, 'Has prefix');
           await fillIn(`${resSelector} .nameMatcher-field .form-control`, 'file_');
           await selectChoose(`${resSelector} .unit-field`, 'Custom');
@@ -971,7 +1004,7 @@ describe(
           expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.entryType-field .field-component').text().trim())
+          expect($argument.find('.type-field .field-component').text().trim())
             .to.equal('String');
           expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
@@ -979,7 +1012,7 @@ describe(
             .to.have.value('"default"');
           const $result = this.$('.results-field .entry-field');
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.entryType-field .field-component').text().trim())
+          expect($result.find('.type-field .field-component').text().trim())
             .to.equal('Integer');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
@@ -1122,11 +1155,13 @@ describe(
         });
 
       it('shows arguments of passed lambda', async function (done) {
+        const argumentTypesToCheck =
+          argumentTypes.rejectBy('label', 'Time series measurement');
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
           },
-          argumentSpecs: argumentTypes.map(({ dataSpec }, idx) => ({
+          argumentSpecs: argumentTypesToCheck.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
             isOptional: idx === 0,
@@ -1138,11 +1173,11 @@ describe(
 
         expect(this.$('.field-enabled')).to.not.exist;
         const $entries = this.$('.arguments-field .entry-field');
-        expect($entries).to.have.length(argumentTypes.length);
-        argumentTypes.forEach(({ label: type }, idx) => {
+        expect($entries).to.have.length(argumentTypesToCheck.length);
+        argumentTypesToCheck.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.entryType-field .field-component').text().trim())
+          expect($entry.find('.type-field .field-component').text().trim())
             .to.equal(type);
           const $optionalToggle = $entry.find('.entryIsOptional-field .form-control');
           const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
@@ -1156,6 +1191,37 @@ describe(
             }
           }
         });
+        done();
+      });
+
+      it('shows time series measurement argument of passed lambda', async function (done) {
+        this.set('revision', {
+          operationSpec: {
+            engine: 'openfaas',
+          },
+          argumentSpecs: [{
+            name: 'entry1',
+            dataSpec: {
+              type: 'timeSeriesMeasurement',
+              valueConstraints: {
+                specs: [{
+                  nameMatcherType: 'hasPrefix',
+                  nameMatcher: 'file_',
+                  unit: 'custom:liters',
+                }],
+              },
+            },
+            isOptional: false,
+            defaultValue: null,
+          }],
+        });
+
+        await renderView(this);
+
+        expect(find('.arguments-field .nameMatcherType-field').textContent).to.contain('Has prefix');
+        expect(find('.arguments-field .nameMatcher-field input').value).to.equal('file_');
+        expect(find('.arguments-field .unit-field').textContent).to.contain('Custom');
+        expect(find('.arguments-field .customUnit-field input').value).to.equal('liters');
         done();
       });
 
@@ -1181,7 +1247,7 @@ describe(
         resultTypesToCheck.forEach(({ label: type }, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.entryType-field .field-component').text().trim())
+          expect($entry.find('.type-field .field-component').text().trim())
             .to.equal(type);
         });
         done();
@@ -1290,7 +1356,7 @@ describe(
           expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.entryType-field .field-component').text().trim())
+          expect($argument.find('.type-field .field-component').text().trim())
             .to.equal('String');
           expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
@@ -1298,7 +1364,7 @@ describe(
             .to.have.value('"default"');
           const $result = this.$('.results-field .entry-field');
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.entryType-field .field-component').text().trim())
+          expect($result.find('.type-field .field-component').text().trim())
             .to.equal('Integer');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
