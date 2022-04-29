@@ -93,6 +93,7 @@ export const entityType = 'atm_workflow_schema';
  * @property {RevisionNumber} lambdaRevisionNumber
  * @property {AtmTaskArgumentMapping} argumentMappings
  * @property {AtmTaskResultMapping} resultMappings
+ * @property {AtmTimeSeriesStoreConfig|null} timeSeriesStoreConfig
  * @property {AtmResourceSpec|null} resourceSpecOverride
  */
 
