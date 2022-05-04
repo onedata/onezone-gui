@@ -112,13 +112,15 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         entryIsArray,
         entryIsOptional,
         entryDefaultValue,
+        entryIsFromFile,
       } = getProperties(
         entry,
         'entryName',
         'entryDataSpec',
         'entryIsArray',
         'entryIsOptional',
-        'entryDefaultValue'
+        'entryDefaultValue',
+        'entryIsFromFile',
       );
 
       const dataSpec = formValuesToDataSpec(entryDataSpec, entryIsArray);
@@ -139,7 +141,7 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         }
         lambdaData.isOptional = entryIsOptional;
       } else {
-        lambdaData.relayMethod = 'returnValue';
+        lambdaData.relayMethod = entryIsFromFile ? 'filePipe' : 'returnValue';
       }
       return lambdaData;
     });
