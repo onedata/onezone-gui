@@ -476,12 +476,12 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     defaultValue: false,
     component,
   });
-  const generateEntryIsFromFileField = mode => ToggleField.extend({
+  const generateEntryIsViaFileField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
     classes: 'right-floating-toggle',
     mode,
-    name: 'entryIsFromFile',
+    name: 'entryIsViaFile',
     defaultValue: false,
     component,
   });
@@ -545,7 +545,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
             generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),
           ] : [
-            generateEntryIsFromFileField(mode),
+            generateEntryIsViaFileField(mode),
           ]),
         ],
       });

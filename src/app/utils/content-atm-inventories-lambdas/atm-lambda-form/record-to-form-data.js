@@ -261,7 +261,7 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
         entryIsOptional: isOptional === true,
       });
     } else {
-      set(formEntry, 'entryIsFromFile', relayMethod === 'filePipe');
+      set(formEntry, 'entryIsViaFile', relayMethod === 'filePipe');
     }
   });
   return formData;

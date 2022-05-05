@@ -65,7 +65,7 @@
   }
 
   .entryIsOptional-field,
-  .entryIsFromFile-field {
+  .entryIsViaFile-field {
     order: 3;
   }
 
@@ -208,7 +208,7 @@
       }
 
       .entryIsOptional-field,
-      .entryIsFromFile-field {
+      .entryIsViaFile-field {
         transform: translateX(-#{$x-offset-to-center-toggles});
       }
 

@@ -941,7 +941,7 @@ describe(
           done();
         });
 
-      it('creates lambda result "from file" on submit button click',
+      it('creates lambda result "via file" on submit button click',
         async function (done) {
           await renderCreate(this);
 
@@ -950,7 +950,7 @@ describe(
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
           await selectChoose(`${resSelector} .type-field`, 'Integer');
-          await click(`${resSelector} .entryIsFromFile-field .one-way-toggle`);
+          await click(`${resSelector} .entryIsViaFile-field .one-way-toggle`);
           await click('.btn-submit');
 
           expect(this.get('submitStub')).to.be.calledOnce
@@ -1276,11 +1276,11 @@ describe(
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.type-field .field-component').text().trim())
             .to.equal(type);
-          const $isFromFileToggle = $entry.find('.entryIsFromFile-field .form-control');
+          const $isViaFileToggle = $entry.find('.entryIsViaFile-field .form-control');
           if (idx === 0) {
-            expect($isFromFileToggle).to.have.class('checked');
+            expect($isViaFileToggle).to.have.class('checked');
           } else {
-            expect($isFromFileToggle).to.not.have.class('checked');
+            expect($isViaFileToggle).to.not.have.class('checked');
           }
         });
         done();

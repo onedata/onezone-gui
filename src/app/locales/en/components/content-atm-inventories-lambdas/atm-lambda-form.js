@@ -163,8 +163,8 @@ export default {
         entryIsArray: {
           label: 'Array',
         },
-        entryIsFromFile: {
-          label: 'From file',
+        entryIsViaFile: {
+          label: 'Via file',
         },
       },
     },
