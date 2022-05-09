@@ -26,7 +26,7 @@
     }
 
     .entryName-field,
-    .entryType-field,
+    .entryDataSpec-field .type-field,
     .entryDefaultValue-field {
       .control-label {
         display: none;
@@ -36,6 +36,40 @@
 
   .mountSpaceOptions-field {
     margin-left: $nested-fields-indent;
+  }
+
+  .entry-name {
+    order: 0;
+  }
+
+  .entryDataSpec-field {
+    .type-field {
+      order: 1;
+    }
+
+    .valueConstraints-field {
+      order: 4;
+      flex-basis: 100%;
+    }
+
+    &,
+    > .field-component,
+    .entryDataSpec-collapse,
+    .entryDataSpec-children {
+      display: contents;
+    }
+  }
+
+  .entryIsArray-field {
+    order: 2;
+  }
+
+  .entryIsOptional-field {
+    order: 3;
+  }
+
+  .entryDefaultValue-field {
+    order: 5;
   }
 
   .resources-field {
@@ -78,9 +112,6 @@
   @media (max-width: $screen-xs-max) {
     .arguments-field,
     .results-field {
-      .form-fields-collection-group {
-        margin-left: $nested-fields-indent;
-      }
       > .control-label {
         margin-bottom: $form-group-margin-bottom / 2;
       }
@@ -106,7 +137,7 @@
 
     @media (max-width: $screen-sm-max) {
       .entryName-field,
-      .entryType-field,
+      .entryDataSpec-field .type-field,
       .entryDefaultValue-field {
         flex: 1 1 100%;
       }
@@ -145,9 +176,9 @@
         flex: 0 1 calc(50% - #{$padding-right / 2});
       }
 
-      .entryType-field {
+      .entryDataSpec-field .type-field {
         flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
-        min-width: 15em;
+        min-width: 13em;
         margin-left: $padding-base-vertical;
       }
 
