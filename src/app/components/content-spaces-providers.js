@@ -183,12 +183,12 @@ export default ContentOneproviderContainerBase.extend(
     /**
      * @type {Ember.ComputedProperty<Action>}
      */
-    showDetailsAction: computed(function showDetailsAction() {
+    showConfigurationAction: computed(function showConfigurationAction() {
       return {
         icon: 'provider',
-        text: this.t('showDetailsAction'),
+        text: this.t('showConfigurationAction'),
         class: 'show-provider-details-action-trigger',
-        action: (provider) => this.showDetails(provider),
+        action: (provider) => this.showConfiguration(provider),
       };
     }),
 
@@ -199,13 +199,13 @@ export default ContentOneproviderContainerBase.extend(
       'media.isMobile',
       collect(
         'browseFilesAction',
-        'showDetailsAction',
+        'showConfigurationAction',
         'copyProviderIdAction',
         'copyProviderDomainAction',
         'ceaseOneproviderSupportAction'
       ), collect(
         'browseFilesAction',
-        'showDetailsAction',
+        'showConfigurationAction',
         'ceaseOneproviderSupportAction'
       )
     ),
@@ -230,16 +230,12 @@ export default ContentOneproviderContainerBase.extend(
       );
     },
 
-    showDetails(provider) {
-      const {
-        guiUtils,
-        router,
-      } = this.getProperties('guiUtils', 'router');
-      return router.transitionTo(
-        'onedata.sidebar.content',
-        'providers',
-        guiUtils.getRoutableIdFor(provider),
-      );
+    showConfiguration(provider) {
+      const guiUtils = this.get('guiUtils');
+      const providerId = guiUtils.getRoutableIdFor(provider);
+      let oneproviderIdChanged = this.actions['oneproviderIdChanged'];
+      oneproviderIdChanged = oneproviderIdChanged.bind(this);
+      oneproviderIdChanged(providerId);
     },
 
     openCeaseModal(provider) {

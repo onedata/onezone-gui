@@ -1,7 +1,6 @@
 /**
  * Proxy component for Oneprovider's `content-space-config`.
  *
- * @module components/embedded-content-space-config
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -20,8 +19,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   layout,
 
   navigationState: service(),
-  globalNotify: service(),
-  router: service(),
 
   /**
    * Entity ID of `space` record that is a space, where configuration 
