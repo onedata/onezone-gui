@@ -9,10 +9,9 @@
   {{#truncated-string 
     class=(concat "nav-link truncate " (if isActive "active"))
     click=(action "anchorClicked")
+    ignoreTouchAction=true
   }}
-    <div 
-      class="inline-icon-container not-animation"
-    >
+    <div class="inline-icon-container not-animation">
       {{one-icon icon="overview"}}
     </div>
     <span class="tab-name one-label">{{item.name}}</span>

@@ -10,5 +10,5 @@ export default {
   providerDomain: 'provider domain',
   copyProviderDomainAction: 'Copy provider domain',
   browseFilesAction: 'Browse files',
-  showConfigurationAction: 'Configuration',
+  showSettingsAction: 'Settings',
 };

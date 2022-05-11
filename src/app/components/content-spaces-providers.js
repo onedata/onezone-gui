@@ -183,10 +183,10 @@ export default ContentOneproviderContainerBase.extend(
     /**
      * @type {Ember.ComputedProperty<Action>}
      */
-    showConfigurationAction: computed(function showConfigurationAction() {
+    showSettingsAction: computed(function showSettingsAction() {
       return {
-        icon: 'provider',
-        text: this.t('showConfigurationAction'),
+        icon: 'settings',
+        text: this.t('showSettingsAction'),
         class: 'show-provider-details-action-trigger',
         action: (provider) => this.showConfiguration(provider),
       };
@@ -199,13 +199,13 @@ export default ContentOneproviderContainerBase.extend(
       'media.isMobile',
       collect(
         'browseFilesAction',
-        'showConfigurationAction',
+        'showSettingsAction',
         'copyProviderIdAction',
         'copyProviderDomainAction',
         'ceaseOneproviderSupportAction'
       ), collect(
         'browseFilesAction',
-        'showConfigurationAction',
+        'showSettingsAction',
         'ceaseOneproviderSupportAction'
       )
     ),
