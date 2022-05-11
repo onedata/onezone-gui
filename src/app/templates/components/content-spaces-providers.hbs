@@ -1,6 +1,6 @@
 {{#if providersProxy.content.length}}
   {{#overview-oneprovider-view-container
-    contentContainerClass="content-spaces-data-content"
+    contentContainerClass="content-spaces-providers-content"
     space=space
     oneproviderId=oneproviderId
     resourceType="data"
@@ -8,7 +8,7 @@
     isTabBarCollapsed=false
     as |container|
   }}
-    {{#container.header class="content-spaces-data-header"}}
+    {{#container.header class="content-spaces-providers-header"}}
       <div class="row content-row header-row hidden-xs">
         <h1 class="with-menu">
           <span class="one-label">
@@ -75,6 +75,7 @@
                   </div>
                 </div>
               {{/unless}}
+
               <div class="row content-row row-space-providers-support-chart">
                 <h1>{{tt this "supportByProviders"}}</h1>
                 <div class="inner-row-content">

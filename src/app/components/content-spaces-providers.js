@@ -61,6 +61,9 @@ export default ContentOneproviderContainerBase.extend(
     // TODO: undefined possible?
     providersProxy: reads('space.providerList.list'),
 
+    /**
+     * @type {ComputedProperty<String>}
+     */
     oneproviderId: or('navigationState.aspectOptions.oneproviderId', raw('overview')),
 
     // TODO: it will recompute everything if color changes
