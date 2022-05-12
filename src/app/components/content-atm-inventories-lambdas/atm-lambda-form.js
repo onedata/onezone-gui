@@ -31,7 +31,10 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import {
+  FormElement as DataSpecEditor,
+  dataSpecTypes,
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -440,18 +443,21 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     { value: 'symlink' },
     { value: 'dataset' },
     { value: 'range' },
-    { value: 'onedatafsCredentials' },
   ];
-  if (!isForArguments) {
+  if (isForArguments) {
+    entryTypeOptions.push({ value: 'onedatafsCredentials' });
+  } else {
     entryTypeOptions.push({ value: 'timeSeriesMeasurement' });
   }
-  const generateEntryTypeField = mode => DropdownField.extend({
-    defaultValue: reads('options.firstObject.value'),
-  }).create({
-    mode,
-    name: 'entryType',
-    options: entryTypeOptions,
-  });
+  const generateEntryDataSpecField = mode => {
+    const field = DataSpecEditor.create({
+      name: 'entryDataSpec',
+      allowedTypes: isForArguments ?
+        dataSpecTypes : dataSpecTypes.without('onedatafsCredentials'),
+    });
+    field.changeMode(mode);
+    return field;
+  };
   const generateEntryIsArrayField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
@@ -487,17 +493,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     defaultValue: '',
     isOptional: true,
   });
-  const generateDataSpecEditorFields = mode => {
-    const editors = Object.keys(dataSpecEditors).map((dataSpecName) =>
-      dataSpecEditors[dataSpecName].FormElement.extend({
-        isVisible: eq('parent.value.entryType', raw(dataSpecName)),
-      }).create({
-        name: `${dataSpecName}Editor`,
-      })
-    );
-    editors.forEach(editor => editor.changeMode(mode));
-    return editors;
-  };
 
   const fieldsCollectionExtension = {
     isVisible: not(and('isInViewMode', isEmpty('value.__fieldsValueNames'))),
@@ -533,13 +528,12 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
         valueName: uniqueFieldValueName,
         fields: [
           generateEntryNameField(mode),
-          generateEntryTypeField(mode),
+          generateEntryDataSpecField(mode),
           generateEntryIsArrayField(mode),
           ...(isForArguments ? [
             generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),
           ] : []),
-          ...generateDataSpecEditorFields(mode),
         ],
       });
     },

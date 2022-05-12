@@ -8,9 +8,8 @@
  */
 
 import { get, getProperties } from '@ember/object';
-import { typeToDataSpec } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import dataSpecEditors from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { formValuesToDataSpec } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 /**
  * @param {Object} formData
@@ -109,30 +108,20 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
     .map((entry) => {
       const {
         entryName,
-        entryType,
+        entryDataSpec,
         entryIsArray,
         entryIsOptional,
         entryDefaultValue,
       } = getProperties(
         entry,
         'entryName',
-        'entryType',
+        'entryDataSpec',
         'entryIsArray',
         'entryIsOptional',
         'entryDefaultValue'
       );
 
-      let customValueConstraints = null;
-      if (entryType in dataSpecEditors) {
-        const dataSpecFormData = get(entry, `${entryType}Editor`);
-        customValueConstraints =
-          dataSpecEditors[entryType].formValuesToValueConstraints(dataSpecFormData);
-      }
-      const dataSpec = typeToDataSpec({
-        type: entryType,
-        isArray: entryIsArray,
-        customValueConstraints,
-      });
+      const dataSpec = formValuesToDataSpec(entryDataSpec, entryIsArray);
       const lambdaData = {
         name: entryName,
         dataSpec,

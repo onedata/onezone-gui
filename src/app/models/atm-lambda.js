@@ -65,66 +65,6 @@ import { getBy } from 'ember-awesome-macros';
  */
 
 /**
- * @typedef {Object} AtmDataSpec
- * @property {String} type one of: `'integer'`, `'string'`, `'object'`, `'file'`, `'array'`,
- *   `'histogram'`, `'dataset'`, `'archive'`, `'range'`, `'storeCredentials'`, `'onedatafsCredentials'`
- * @property {AtmDataTypeValueConstraints} valueConstraints its structure depends
- *   on `type` value and its corresponding Atm*TypeValueConstraints
- */
-
-/**
- * @typedef {Object} AtmDataTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmArchiveTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmDatasetTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmRangeTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmFileTypeValueConstraints
- * @param {String} fileType one of: `'REG'`, `'DIR'`, `'SYMLNK'`, `'ANY'`
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmHistogramTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmIntegerTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmObjectTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmOnedatafsCredentialsTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmStoreCredentialsTypeValueConstraints
- * @param {String} storeType one of: `'singleValue'`, `'list'`, `'map'`, `'treeForest'`,
- *   `'range'`, `'histogram'`
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmStringTypeValueConstraints
- */
-
-/**
- * @typedef {AtmDataTypeValueConstraints} AtmArrayTypeValueConstraints
- * @param {AtmDataSpec} itemDataSpec
- */
-
-/**
  * @type {String}
  */
 export const entityType = 'atm_lambda';

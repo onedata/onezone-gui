@@ -104,6 +104,7 @@ const exampleTask = {
       type: 'singleValueStoreContentUpdateOptions',
     },
   }],
+  timeSeriesStoreConfig: null,
 };
 
 describe('Integration | Component | content atm inventories workflows/task details view',
@@ -150,6 +151,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itSubmitsFormDataOnSubmitClick({
         argumentMappings: [],
         resultMappings: [],
+        timeSeriesStoreConfig: null,
       });
     });
 
@@ -174,6 +176,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itSubmitsFormDataOnSubmitClick({
         argumentMappings: exampleTask.argumentMappings,
         resultMappings: exampleTask.resultMappings,
+        timeSeriesStoreConfig: null,
       });
 
       it('fills task form with task data', async function () {
