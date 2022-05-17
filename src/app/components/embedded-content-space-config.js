@@ -39,5 +39,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
    */
   iframeInjectedProperties: Object.freeze([
     'spaceEntityId',
+    'oneprovider',
   ]),
 });
