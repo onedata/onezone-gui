@@ -27,6 +27,7 @@ import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import spacesProvidersOverview from './components/spaces-providers-overview';
 import contentSpacesData from './components/content-spaces-data';
 import contentSpacesDatasets from './components/content-spaces-datasets';
 import contentSpacesShares from './components/content-spaces-shares';
@@ -194,6 +195,7 @@ const translations = {
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    spacesProvidersOverview,
     contentSpacesData,
     contentSpacesDatasets,
     contentSpacesShares,

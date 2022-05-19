@@ -1,0 +1,72 @@
+<div class="row">
+  <div class="col-xs-12 col-md-5 col-lg-4 col-space-provider-list">
+    <div class="row content-row loadable-row">
+      {{providers-list
+        class="space-providers-list"
+        providersData=providersData
+        selectedSpace=space
+        showSelectedSpaceSupportSize=true
+        showSupportedSpacesCount=false
+        providerActions=providerActions
+      }}
+    </div>
+  </div>
+  <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
+    {{#unless media.isMobile}}
+      <div class="row row-space-providers-map">
+        <div class="row content-row loadable-row">
+          <h1>{{tt this "providersMap"}}</h1>
+          <div class="row" style="height: 500px;">
+            {{#one-atlas class="space-providers-atlas" as |atlas|}}
+              {{#each providers as |provider|}}
+                {{#atlas.position
+                  latitude=provider.latitude
+                  longitude=provider.longitude
+                  as |position|
+                }}
+                  {{#position.point}}
+                    {{#link-to
+                      "onedata.sidebar.content.aspect"
+                      "spaces"
+                      (model-routable-id space)
+                      "data"
+                      (query-params
+                        options=(concat "oneproviderId." provider.entityId)
+                      )
+                    }}
+                      {{provider-place
+                        provider=provider
+                        atlasWidth=atlas.width
+                        circleSizeScale=4
+                        active=(eq provider selectedProvider)
+                        renderDrop=(eq provider selectedProvider)
+                        circleColor=(get providersColors provider.entityId)
+                      }}
+                    {{/link-to}}
+                  {{/position.point}}
+                {{/atlas.position}}
+              {{/each}}
+            {{/one-atlas}}
+          </div>
+        </div>
+      </div>
+    {{/unless}}
+
+    <div class="row content-row row-space-providers-support-chart">
+      <h1>{{tt this "supportByProviders"}}</h1>
+      <div class="inner-row-content">
+        {{space-providers-support-chart
+          class="space-providers-support-chart"
+          space=space
+          providersColors=providersColors
+        }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{cease-oneprovider-support-modal
+  opened=ceaseModalOpened
+  removeSpaceClick=(action "openRemoveSpace")
+  close=(action (mut ceaseModalOpened) false)
+}}
