@@ -38,7 +38,7 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
 
   /**
    * @virtual
-   * @type {Space}
+   * @type {Models.Space}
    */
   space: undefined,
 

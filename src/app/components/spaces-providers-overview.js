@@ -59,7 +59,7 @@ export default Component.extend(...mixins, {
   ceaseModalOpened: false,
 
   /**
-   * @type {ComputedProperty<Array<Models.Providers>>}
+   * @type {ComputedProperty<Array<Models.Provider>>}
    */
   providers: reads('providersProxy.content'),
 
@@ -67,7 +67,7 @@ export default Component.extend(...mixins, {
   providersData: computed(
     'providers',
     'providersColors',
-    function getProvidersData() {
+    function providersData() {
       const providers = this.get('providers');
       if (providers) {
         const providerColors = this.get('providersColors');

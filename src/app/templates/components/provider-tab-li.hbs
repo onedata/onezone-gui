@@ -3,11 +3,10 @@
     provider=provider 
     class=(concat "nav-link truncate " (if isActive "active"))
     click=(action "anchorClicked")
-    ignoreTouchAction=true
   }}
 {{else}}
   {{#truncated-string 
-    class=(concat "nav-link truncate " (if isActive "active"))
+    class=(concat "nav-link" (if isActive "active"))
     click=(action "anchorClicked")
     ignoreTouchAction=true
   }}
