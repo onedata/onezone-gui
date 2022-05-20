@@ -6,7 +6,7 @@
   }}
 {{else}}
   {{#truncated-string 
-    class=(concat "nav-link" (if isActive "active"))
+    class=(concat-classes "nav-link" (if isActive "active"))
     click=(action "anchorClicked")
     ignoreTouchAction=true
   }}

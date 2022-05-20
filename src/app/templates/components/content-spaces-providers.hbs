@@ -1,39 +1,36 @@
-{{#if providersProxy.content.length}}
-  {{#overview-oneprovider-view-container
-    contentContainerClass="content-spaces-providers-content"
-    space=space
-    oneproviderId=oneproviderId
-    resourceType="data"
-    oneproviderIdChanged=(action "oneproviderIdChanged")
-    isTabBarCollapsed=false
-    as |container|
-  }}
-    {{#container.header class="content-spaces-providers-header"}}
-      <div class="row content-row header-row hidden-xs">
-        <h1 class="with-menu">
-          <span class="one-label">
-            {{tt this "header"}}
-          </span>
-          {{actions-toolbar actionsArray=globalActions}}
-        </h1>
-      </div>
-    {{/container.header}}
-    {{#container.body}}
-      {{#if (eq container.selectedProvider "overview")}}
-        {{spaces-providers-overview
-          space=space
-          oneproviderIdChanged=(action "oneproviderIdChanged")
-          providersProxy=providersProxy
-        }}
-      {{else}}
-        {{embedded-content-space-config
-          oneprovider=container.selectedProvider
-          baseUrl=container.contentIframeBaseUrl
-          spaceEntityId=space.entityId
-        }}
-      {{/if}}
-    {{/container.body}}
-  {{/overview-oneprovider-view-container}}
-{{else}}
-  {{content-spaces-no-support}}
-{{/if}}
+{{#oneprovider-view-container
+  contentContainerClass="content-spaces-providers-content"
+  space=space
+  oneproviderId=oneproviderId
+  resourceType="data"
+  oneproviderIdChanged=(action "oneproviderIdChanged")
+  isTabBarCollapsed=false
+  isShowOverview=true
+  mapSelectorEnabled=false
+  as |container|
+}}
+  {{#container.header class="content-spaces-providers-header"}}
+    <div class="row content-row header-row hidden-xs">
+      <h1 class="with-menu">
+        <span class="one-label">
+          {{tt this "header"}}
+        </span>
+        {{actions-toolbar actionsArray=globalActions}}
+      </h1>
+    </div>
+  {{/container.header}}
+  {{#container.body}}
+    {{#if (eq container.selectedProvider "overview")}}
+      {{spaces-providers-overview
+        space=space
+        oneproviderIdChanged=(action "oneproviderIdChanged")
+        providersProxy=providersProxy
+      }}
+    {{else}}
+      {{embedded-content-space-config
+        baseUrl=container.contentIframeBaseUrl
+        spaceEntityId=space.entityId
+      }}
+    {{/if}}
+  {{/container.body}}
+{{/oneprovider-view-container}}
