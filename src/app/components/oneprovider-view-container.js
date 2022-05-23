@@ -49,7 +49,7 @@ const OneproviderTabItem = EmberObject.extend({
   }),
 });
 
-const OverviewTabItem = EmberObject.extend({
+const OverviewTabItem = EmberObject.create({
   id: 'overview',
   type: 'overview',
   entityId: 'overview',
@@ -103,16 +103,17 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tabBarClass: '',
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isOverviewEnabled: false,
+
+  /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
    * an option to show full options selector
    * @type {boolean}
    */
   isTabBarCollapsed: true,
-
-  /**
-   * @type {boolean}
-   */
-  isShowOverview: false,
 
   /**
    * @type {boolean}
@@ -138,7 +139,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       } = this.getProperties('providers', 'validatedOneproviderIdProxy');
       return validatedOneproviderIdProxy.then(validatedOneproviderId => {
         if (validatedOneproviderId === 'overview') {
-          return resolve(this.get('overviewProviderItems')[0]);
+          return null;
         }
         return providers.findBy('entityId', validatedOneproviderId);
       });
@@ -218,29 +219,29 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
     'selectedProvider',
-    'overviewProviderItems',
+    'tabBarItems',
     function selectedProviderItem() {
       const {
         selectedProvider,
-        overviewProviderItems,
-      } = this.getProperties('selectedProvider', 'overviewProviderItems');
+        tabBarItems,
+      } = this.getProperties('selectedProvider', 'tabBarItems');
       if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
-        return overviewProviderItems.findBy('id', providerEntityId);
+        return tabBarItems.findBy('id', providerEntityId);
       }
     }
   ),
 
-  overviewProviderItems: computed(
-    'isShowOverview',
+  tabBarItems: computed(
+    'isOverviewEnabled',
     'providerItems',
-    function overviewProviderItems() {
+    function tabBarItems() {
       const {
-        isShowOverview,
+        isOverviewEnabled,
         providerItems,
-      } = this.getProperties('isShowOverview', 'providerItems');
-      if (isShowOverview) {
-        return [OverviewTabItem.create()].concat(providerItems);
+      } = this.getProperties('isOverviewEnabled', 'providerItems');
+      if (isOverviewEnabled) {
+        return [OverviewTabItem, ...providerItems];
       } else {
         return providerItems;
       }
@@ -284,7 +285,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         return this.get('initialProvidersListProxy').then(() => {
           const selectedProvider = this.get('selectedProvider');
           if (selectedProvider) {
-            if (selectedProvider.id === 'overview') {
+            if (get(selectedProvider, 'id') === 'overview') {
               return selectedProvider;
             }
             return get(selectedProvider, 'versionProxy').then(version => {

@@ -7,7 +7,7 @@
 {{else if (eq item.type "overview")}}
   <div
     class={{concat-classes "nav-link truncate" (if isActive "active")}}
-    onClick={{action "anchorClicked"}}
+    onclick={{action "anchorClicked"}}
     ignoreTouchAction=true
   >
     <div class="inline-icon-container not-animation">
