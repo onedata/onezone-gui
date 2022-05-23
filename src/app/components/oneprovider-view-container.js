@@ -53,7 +53,6 @@ const OverviewTabItem = EmberObject.extend({
   id: 'overview',
   type: 'overview',
   entityId: 'overview',
-  name: 'Overview',
   icon: 'overview',
 });
 

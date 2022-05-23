@@ -1,18 +1,18 @@
-{{#if (eq item.icon "provider")}}
+{{#if (eq item.type "provider")}}
   {{provider-info-name
     provider=provider 
     class=(concat "nav-link truncate " (if isActive "active"))
     click=(action "anchorClicked")
   }}
-{{else}}
-  {{#truncated-string 
-    class=(concat-classes "nav-link" (if isActive "active"))
-    click=(action "anchorClicked")
+{{else if (eq item.type "overview")}}
+  <div
+    class={{concat-classes "nav-link truncate" (if isActive "active")}}
+    onClick={{action "anchorClicked"}}
     ignoreTouchAction=true
-  }}
+  >
     <div class="inline-icon-container not-animation">
-      {{one-icon icon="overview"}}
+      {{one-icon icon=item.icon}}
     </div>
-    <span class="tab-name one-label">{{item.name}}</span>
-  {{/truncated-string}}
+    <span class="tab-name one-label">{{tt this "overviewName"}}</span>
+  </div>
 {{/if}}
