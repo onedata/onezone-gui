@@ -9,7 +9,7 @@
     <div class="back-to-main-page">
       {{#link-to "index"}}
         {{one-icon icon="home"}}
-        {{#unless media.isMobile}}
+        {{#unless (media "isMobile")}}
           <span>{{tt this "backToMainPage"}}</span>
         {{/unless}}
       {{/link-to}}

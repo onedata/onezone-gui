@@ -65,7 +65,10 @@
       open=actionsOpened
       placement="context-menu"
       onToggle=(action "toggleActions") as |popover|}}
-      {{#click-outside action=(action "toggleActions" false) except-selector=(concat ".actions-group-" elementId)}}
+      {{#click-outside
+        onClickOutside=(action "toggleActions" false)
+        exceptSelector=(concat ".actions-group-" elementId)
+      }}
         {{actions-popover-content
           class="groups-hierarchy-visualiser-actions"
           actionsArray=groupActions

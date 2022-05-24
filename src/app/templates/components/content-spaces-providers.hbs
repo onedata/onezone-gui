@@ -26,9 +26,9 @@
           }}
         </div>
       </div>
-      
+
       <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
-        {{#unless media.isMobile}}
+        {{#unless (media "isMobile")}}
           <div class="row row-space-providers-map">
             <div class="row content-row loadable-row">
               <h1>{{tt this "providersMap"}}</h1>
@@ -67,7 +67,7 @@
             </div>
         </div>
         {{/unless}}
-        
+
         <div class="row content-row row-space-providers-support-chart">
           <h1>{{tt this "supportByProviders"}}</h1>
           <div class="inner-row-content">
@@ -80,7 +80,7 @@
         </div>
       </div>
     </div>
-    
+
     {{cease-oneprovider-support-modal
       opened=ceaseModalOpened
       removeSpaceClick=(action "openRemoveSpace")
