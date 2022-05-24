@@ -27,6 +27,7 @@ import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
 import contentSpacesProviders from './components/content-spaces-providers';
+import spacesProvidersOverview from './components/spaces-providers-overview';
 import contentSpacesData from './components/content-spaces-data';
 import contentSpacesDatasets from './components/content-spaces-datasets';
 import contentSpacesShares from './components/content-spaces-shares';
@@ -93,6 +94,7 @@ import contentAtmInventoriesMembers from './components/content-atm-inventories-m
 import contentAtmInventoriesLambdas from './components/content-atm-inventories-lambdas';
 import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
+import providerTabLi from './components/provider-tab-li';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -194,6 +196,7 @@ const translations = {
     contentSpacesNoSupport,
     contentSpacesSupport,
     contentSpacesProviders,
+    spacesProvidersOverview,
     contentSpacesData,
     contentSpacesDatasets,
     contentSpacesShares,
@@ -262,6 +265,7 @@ const translations = {
     emptyCollectionSidebar,
     providerInfoContent,
     providersList,
+    providerTabLi,
   },
   services: {
     tokenActions,

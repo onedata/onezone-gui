@@ -38,6 +38,7 @@ const OneproviderTabItem = EmberObject.extend({
 
   icon: 'provider',
   id: reads('provider.entityId'),
+  type: 'provider',
   name: reads('provider.name'),
   version: reads('provider.version'),
   domain: reads('provider.domain'),
@@ -46,6 +47,13 @@ const OneproviderTabItem = EmberObject.extend({
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
+});
+
+const OverviewTabItem = EmberObject.create({
+  id: 'overview',
+  type: 'overview',
+  entityId: 'overview',
+  icon: 'overview',
 });
 
 export default Component.extend(I18n, ChooseDefaultOneprovider, {
@@ -95,6 +103,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tabBarClass: '',
 
   /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  isOverviewEnabled: false,
+
+  /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
    * an option to show full options selector
    * @type {boolean}
@@ -124,6 +138,9 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         validatedOneproviderIdProxy,
       } = this.getProperties('providers', 'validatedOneproviderIdProxy');
       return validatedOneproviderIdProxy.then(validatedOneproviderId => {
+        if (validatedOneproviderId === 'overview') {
+          return null;
+        }
         return providers.findBy('entityId', validatedOneproviderId);
       });
     }
@@ -202,15 +219,31 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
     'selectedProvider',
-    'providerItems',
+    'tabBarItems',
     function selectedProviderItem() {
       const {
-        providerItems,
         selectedProvider,
-      } = this.getProperties('providerItems', 'selectedProvider');
+        tabBarItems,
+      } = this.getProperties('selectedProvider', 'tabBarItems');
       if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
-        return providerItems.findBy('id', providerEntityId);
+        return tabBarItems.findBy('id', providerEntityId);
+      }
+    }
+  ),
+
+  tabBarItems: computed(
+    'isOverviewEnabled',
+    'providerItems',
+    function tabBarItems() {
+      const {
+        isOverviewEnabled,
+        providerItems,
+      } = this.getProperties('isOverviewEnabled', 'providerItems');
+      if (isOverviewEnabled) {
+        return [OverviewTabItem, ...providerItems];
+      } else {
+        return providerItems;
       }
     }
   ),
@@ -252,6 +285,9 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         return this.get('initialProvidersListProxy').then(() => {
           const selectedProvider = this.get('selectedProvider');
           if (selectedProvider) {
+            if (get(selectedProvider, 'id') === 'overview') {
+              return selectedProvider;
+            }
             return get(selectedProvider, 'versionProxy').then(version => {
               return !isStandaloneGuiOneprovider(version);
             });
@@ -314,13 +350,18 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   actions: {
     selectedProviderChanged(providerItem) {
       this.send('onToggleExpandMap', false);
-      const providerEntityId =
+      const entityId =
         get(providerItem, 'entityId') || get(providerItem, 'id');
-      const provider = this.get('providers').findBy('entityId', providerEntityId);
+      if (entityId === 'overview') {
+        this.get('oneproviderIdChanged')(entityId);
+        return true;
+      }
+      const provider = this.get('providers').findBy('entityId', entityId);
       if (provider) {
-        this.setBrowserDefaultOneproviderId(providerEntityId);
-        this.get('oneproviderIdChanged')(providerEntityId);
+        this.setBrowserDefaultOneproviderId(entityId);
+        this.get('oneproviderIdChanged')(entityId);
       } else {
+        this.set('selectedItem', entityId);
         // TODO: show error if cannot find the selected provider on list
         return false;
       }

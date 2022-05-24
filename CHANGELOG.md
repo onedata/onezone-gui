@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9163 Added config for space with directory size statistics setting
 * VFS-9333 Added handling time series measurements in lambda arguments
 * VFS-9332 Added handling time series measurements in all types of stores
 * VFS-9270 Added task time series store
