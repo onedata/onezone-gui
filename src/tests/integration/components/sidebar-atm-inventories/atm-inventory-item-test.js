@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
@@ -13,9 +14,7 @@ import { resolve } from 'rsvp';
 describe(
   'Integration | Component | sidebar atm inventories/atm inventory item',
   function () {
-    setupComponentTest('sidebar-atm-inventories/atm-inventory-item', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
@@ -47,8 +46,8 @@ describe(
       });
     });
 
-    it('renders automation inventory name, icon and menu trigger', function () {
-      render(this);
+    it('renders automation inventory name, icon and menu trigger', async function () {
+      await renderComponent();
 
       expect(this.$()).to.contain(this.get('atmInventory.name'));
       // TODO VFS-7455 change icon
@@ -57,7 +56,7 @@ describe(
     });
 
     it('renders actions in dots menu', async function () {
-      render(this);
+      await renderComponent();
 
       await click('.atm-inventory-menu-trigger');
 
@@ -100,7 +99,7 @@ describe(
           return resolve({ status: 'done' });
         });
 
-        render(this);
+        await renderComponent();
         await click('.atm-inventory-menu-trigger');
         const renameTrigger =
           $('body .webui-popover.in .rename-atm-inventory-action-trigger')[0];
@@ -124,7 +123,7 @@ describe(
             .to.equal(atmInventory);
         });
 
-        render(this);
+        await renderComponent();
         await click('.atm-inventory-menu-trigger');
         const removeTrigger =
           $('body .webui-popover.in .remove-atm-inventory-action-trigger')[0];
@@ -143,7 +142,7 @@ describe(
           expect(this.get('context.record')).to.equal(atmInventory);
         });
 
-        render(this);
+        await renderComponent();
         await click('.atm-inventory-menu-trigger');
         const removeTrigger =
           $('body .webui-popover.in .copy-record-id-action-trigger')[0];
@@ -154,8 +153,8 @@ describe(
   }
 );
 
-function render(testCase) {
-  testCase.render(hbs `
+async function renderComponent() {
+  await render(hbs `
     {{sidebar-atm-inventories/atm-inventory-item item=atmInventory}}
   `);
 }

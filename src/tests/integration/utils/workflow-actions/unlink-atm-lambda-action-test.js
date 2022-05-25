@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import sinon from 'sinon';
@@ -12,12 +13,11 @@ import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import $ from 'jquery';
 
 describe('Integration | Utility | workflow actions/unlink atm lambda action',
   function () {
-    setupComponentTest('global-modal-mounter', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const atmInventory = {
@@ -66,7 +66,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
       };
       this.setProperties(Object.assign({
         action: UnlinkAtmLambdaAction.create({
-          ownerSource: this,
+          ownerSource: this.owner,
           context,
         }),
         usedAtmLambdasDefer,
@@ -144,22 +144,22 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
     });
 
     it('shows modal on execute', async function () {
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
       await wait();
 
-      expect(getModal()).to.have.class('unlink-atm-lambda-modal');
-      expect(getModalBody().text()).to.contain('inventory1');
-      expect(getModalBody().text()).to.contain('lambda1');
+      expect($(getModal())).to.have.class('unlink-atm-lambda-modal');
+      expect($(getModalBody()).text()).to.contain('inventory1');
+      expect($(getModalBody()).text()).to.contain('lambda1');
     });
 
     it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
         await wait();
-        await click(getModalFooter().find('.cancel-btn')[0]);
+        await click($(getModalFooter()).find('.cancel-btn')[0]);
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
@@ -184,11 +184,11 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
           lookupService(this, 'global-notify'),
           'success'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalFooter().find('.submit-btn')[0]);
+        await click($(getModalFooter()).find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledOnce;
@@ -222,12 +222,12 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
           lookupService(this, 'global-notify'),
           'success'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalBody().find('input[value="allInventories"]')[0]);
-        await click(getModalFooter().find('.submit-btn')[0]);
+        await click($(getModalBody()).find('input[value="allInventories"]')[0]);
+        await click($(getModalFooter()).find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledThrice;
@@ -257,11 +257,11 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalFooter().find('.submit-btn')[0]);
+        await click($(getModalFooter()).find('.submit-btn')[0]);
         await wait();
         const actionResult = await actionResultPromise;
 
@@ -298,12 +298,12 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
-        await click(getModalBody().find('input[value="allInventories"]')[0]);
-        await click(getModalFooter().find('.submit-btn')[0]);
+        await click($(getModalBody()).find('input[value="allInventories"]')[0]);
+        await click($(getModalFooter()).find('.submit-btn')[0]);
         await wait();
         const actionResult = await actionResultPromise;
 

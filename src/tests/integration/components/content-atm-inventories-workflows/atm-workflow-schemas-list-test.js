@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import sinon from 'sinon';
@@ -66,9 +66,7 @@ function generateAtmWorkflowSchema(name) {
 
 describe('Integration | Component | content atm inventories workflows/atm workflow schemas list',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/atm-workflow-schemas-list', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
@@ -110,15 +108,15 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       });
     });
 
-    it('has class "atm-workflow-schemas-list"', function () {
-      this.render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list}}`);
+    it('has class "atm-workflow-schemas-list"', async function () {
+      await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list}}`);
 
       expect(this.$().children()).to.have.class('atm-workflow-schemas-list')
         .and.to.have.length(1);
     });
 
     it('shows list of workflows entries', async function () {
-      await render(this);
+      await renderComponent();
 
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       expect($workflows).to.have.length(2);
@@ -133,13 +131,13 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('shows workflows in view mode on init', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.field-edit-mode')).to.not.exist;
     });
 
     it('allows to choose from workflow actions', async function () {
-      await render(this);
+      await renderComponent();
 
       const $actionsTrigger = this.$('.workflow-actions-trigger');
       expect($actionsTrigger).to.exist;
@@ -157,7 +155,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('allows to trigger workflow details editor', async function () {
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
       const $secondWorkflow = $workflows.eq(1);
@@ -186,7 +184,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
           });
           return resolve({ status: 'done' });
         });
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -202,7 +200,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
     it('stays in edition mode when workflow modification failed', async function () {
       sinon.stub(ModifyAtmWorkflowSchemaAction.prototype, 'onExecute').rejects();
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -214,7 +212,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('allows to cancel workflow modification', async function () {
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -230,7 +228,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('blocks saving modifications when form is invalid', async function () {
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
       await click($firstWorkflow.find('.workflow-actions-trigger')[0]);
@@ -253,7 +251,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
       });
 
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -274,7 +272,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.record')).to.equal(firstWorkflow);
       });
 
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -287,13 +285,13 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('has empty search input on init', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.search-bar')).to.have.value('');
     });
 
     it('filters workflows by name when search input is not empty', async function () {
-      await render(this);
+      await renderComponent();
 
       await fillIn('.search-bar', 'w1');
 
@@ -308,7 +306,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         CreateAtmWorkflowSchemaRevisionAction.prototype,
         'onExecute'
       ).resolves(4);
-      await render(this);
+      await renderComponent();
       expect(revisionCreatedSpy).to.not.be.called;
 
       await click('.atm-workflow-schemas-list-entry .revisions-table-create-revision-entry');
@@ -318,7 +316,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('notifies about workflow revision click', async function () {
-      await render(this);
+      await renderComponent();
 
       await click('.atm-workflow-schemas-list-entry .revisions-table-revision-entry');
 
@@ -327,7 +325,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
 
     it('allows choosing from workflow revision actions', async function () {
-      await render(this);
+      await renderComponent();
 
       const $actionsTrigger = this.$('.revision-actions-trigger');
       expect($actionsTrigger).to.exist;
@@ -353,7 +351,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.originRevisionNumber')).to.equal(1);
       });
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -374,7 +372,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.revisionNumber')).to.equal(1);
       });
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -395,7 +393,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.revisionNumber')).to.equal(1);
       });
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -416,7 +414,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         expect(this.get('context.atmWorkflowSchema')).to.equal(firstWorkflow);
         expect(this.get('context.revisionNumber')).to.equal(1);
       });
-      await render(this);
+      await renderComponent();
       const $workflows = this.$('.atm-workflow-schemas-list-entry');
       const $firstWorkflow = $workflows.eq(0);
 
@@ -429,11 +427,10 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schemas-list
     collection=collection
     onRevisionCreated=revisionCreatedSpy
     onRevisionClick=workflowRevisionClickedSpy
   }}`);
-  await wait();
 }

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../../helpers/ember-power-select';
 import EmberObject, { get } from '@ember/object';
@@ -12,9 +12,7 @@ import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 
 describe('Integration | Component | content atm inventories workflows/editor view',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/editor-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action classes to make its `prototype.execute` available for
@@ -78,15 +76,15 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       });
     });
 
-    it('has class "content-atm-inventories-workflows-editor-view"', function () {
-      this.render(hbs `{{content-atm-inventories-workflows/editor-view}}`);
+    it('has class "content-atm-inventories-workflows-editor-view"', async function () {
+      await render(hbs `{{content-atm-inventories-workflows/editor-view}}`);
 
       expect(this.$().children()).to.have.class('content-atm-inventories-workflows-editor-view')
         .and.to.have.length(1);
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {
-      await render(this);
+      await renderComponent();
 
       const backSlideSpy = this.get('backSlideSpy');
       expect(backSlideSpy).to.be.not.called;
@@ -97,13 +95,13 @@ describe('Integration | Component | content atm inventories workflows/editor vie
     });
 
     it('shows workflow schema name in header', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.header-row').text()).to.contain('workflow1');
     });
 
     it('shows workflow schema elements', async function () {
-      await render(this);
+      await renderComponent();
 
       const $workflowVisualiser = this.$('.workflow-visualiser');
       expect($workflowVisualiser).to.have.class('mode-edit');
@@ -128,7 +126,7 @@ describe('Integration | Component | content atm inventories workflows/editor vie
               lanes: newLanes,
             });
           });
-        await render(this);
+        await renderComponent();
 
         await click('.lane-name .one-label');
         await fillIn('.lane-name .form-control', 'newName');
@@ -139,7 +137,7 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       });
 
     it('has two tabs - "editor" (default) and "details"', async function () {
-      await render(this);
+      await renderComponent();
 
       const $tabs = this.$('.nav-tabs .nav-link');
       expect($tabs.eq(0).text().trim()).to.equal('Editor');
@@ -149,7 +147,7 @@ describe('Integration | Component | content atm inventories workflows/editor vie
     });
 
     it('shows revision details in "details" tab', async function () {
-      await render(this);
+      await renderComponent();
       const $detailsTabLink = this.$('.nav-link:contains("Details")');
       const $form = this.$('.revision-details-form');
 
@@ -177,7 +175,7 @@ describe('Integration | Component | content atm inventories workflows/editor vie
               description: 'abcd',
             });
           });
-        await render(this);
+        await renderComponent();
 
         await click(this.$('.nav-link:contains("Details")')[0]);
         await selectChoose('.state-field', 'Deprecated');
@@ -188,11 +186,10 @@ describe('Integration | Component | content atm inventories workflows/editor vie
       });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/editor-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/editor-view
     atmWorkflowSchema=atmWorkflowSchema
     revisionNumber=revisionNumber
     onBackSlide=backSlideSpy
   }}`);
-  await wait();
 }

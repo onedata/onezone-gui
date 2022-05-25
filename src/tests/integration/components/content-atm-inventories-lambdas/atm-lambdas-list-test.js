@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach, context } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import sinon from 'sinon';
@@ -51,9 +51,7 @@ function generateLambda(testCase, name, content) {
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambdas list',
   function () {
-    setupComponentTest('content-atm-inventories-lambdas/atm-lambdas-list', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
@@ -123,15 +121,15 @@ describe(
       });
     });
 
-    it('has class "atm-lambdas-list"', function () {
-      this.render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list}}`);
+    it('has class "atm-lambdas-list"', async function () {
+      await render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list}}`);
 
       expect(this.$().children()).to.have.class('atm-lambdas-list')
         .and.to.have.length(1);
     });
 
     it('shows list of lambda entries', async function () {
-      await render(this);
+      await renderComponent();
 
       const $lambdas = this.$('.atm-lambdas-list-entry');
       expect($lambdas).to.have.length(2);
@@ -149,13 +147,13 @@ describe(
         set(atmLambda, 'revisionRegistry.1.summary', undefined)
       );
 
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.lambda-summary')).to.not.exist;
     });
 
     it('shows table with lambda revisions', async function () {
-      await render(this);
+      await renderComponent();
 
       const $table = this.$('.atm-lambdas-list-entry').eq(0).find('.revisions-table');
       expect($table.find('.name-column').text().trim()).to.equal('Name');
@@ -167,13 +165,13 @@ describe(
     });
 
     it('has empty search input on init', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.search-bar')).to.have.value('');
     });
 
     it('filters lambdas by name when search input is not empty', async function () {
-      await render(this);
+      await renderComponent();
 
       await fillIn('.search-bar', 'f1');
 
@@ -183,7 +181,7 @@ describe(
     });
 
     it('notifies about lambda revision click', async function () {
-      await render(this);
+      await renderComponent();
 
       await click('.atm-lambdas-list-entry .revisions-table-revision-entry');
 
@@ -197,7 +195,7 @@ describe(
       });
 
       it('has class "mode-presentation"', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-presentation');
       });
@@ -217,7 +215,7 @@ describe(
             expect(this.get('context.atmInventory')).to.equal(atmInventory);
           });
 
-        await render(this);
+        await renderComponent();
         const $atmLambdas = this.$('.atm-lambdas-list-entry');
         const $firstAtmLambda = $atmLambdas.eq(0);
 
@@ -239,7 +237,7 @@ describe(
           return resolve({ status: 'done' });
         });
 
-        await render(this);
+        await renderComponent();
         await click('.atm-lambda-actions-trigger');
         await click(
           $('body .webui-popover.in .copy-record-id-action-trigger')[0]
@@ -250,7 +248,7 @@ describe(
 
       it('allows creating new revision', async function () {
         const onRevisionCreate = this.get('onRevisionCreate');
-        await render(this);
+        await renderComponent();
         expect(onRevisionCreate).to.not.be.called;
 
         await click(this.$(
@@ -264,7 +262,7 @@ describe(
       it('blocks creating new revision when lambda is onedataFunction',
         async function () {
           const onRevisionCreate = this.get('onRevisionCreate');
-          await render(this);
+          await renderComponent();
           const actionTrigger = this.$(
             '.atm-lambdas-list-entry .revisions-table-create-revision-entry'
           )[0];
@@ -280,7 +278,7 @@ describe(
         });
 
       it('allows choosing from lambda revision actions', async function () {
-        await render(this);
+        await renderComponent();
 
         const $actionsTrigger = this.$('.revision-actions-trigger');
         expect($actionsTrigger).to.exist;
@@ -300,7 +298,7 @@ describe(
       it('allows redesigning lambda revision as new revision', async function () {
         const secondLambda = this.get('collection.0');
         const onRevisionCreate = this.get('onRevisionCreate');
-        await render(this);
+        await renderComponent();
         const $lambdas = this.$('.atm-lambdas-list-entry');
         const $secondLambda = $lambdas.eq(1);
 
@@ -315,7 +313,7 @@ describe(
 
       it('blocks redesigning lambda revision as new revision when lambda is onedataFunction',
         async function () {
-          await render(this);
+          await renderComponent();
           const $lambdas = this.$('.atm-lambdas-list-entry');
           const $firstLambda = $lambdas.eq(0);
 
@@ -331,13 +329,13 @@ describe(
         });
 
       it('does not have "add to workflow" button', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.add-to-workflow-action-trigger')).to.not.exist;
       });
 
       it('does not have collection type selector', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.collection-type-selector')).to.not.exist;
       });
@@ -352,7 +350,7 @@ describe(
       });
 
       it('has class "mode-selection"', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
       });
@@ -361,7 +359,7 @@ describe(
 
       it('notifies about "add to workflow" button click', async function () {
         const addToAtmWorkflowSchemaSpy = this.get('addToAtmWorkflowSchemaSpy');
-        await render(this);
+        await renderComponent();
 
         expect(addToAtmWorkflowSchemaSpy).to.be.not.called;
         const $addBtn =
@@ -375,7 +373,7 @@ describe(
 
       it('has collection type selector with preselected "this inventory"',
         async function () {
-          await render(this);
+          await renderComponent();
 
           const $selector = this.$('.collection-type-selector');
           expect($selector).to.exist.and.to.have.class('btn-group');
@@ -386,7 +384,7 @@ describe(
         });
 
       it('allows to toggle between collection types', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.atm-lambdas-list-entry')).to.have.length(2);
         await click('.btn-all');
@@ -398,7 +396,7 @@ describe(
       });
 
       it('does not reset filtering during collection type change', async function () {
-        await render(this);
+        await renderComponent();
 
         await fillIn('.search-bar', 'f2');
 
@@ -412,7 +410,7 @@ describe(
         async function () {
           this.set('collection', []);
 
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.empty-message').text().trim()).to.equal(
             'This automation inventory does not have any lambdas yet. To see lambdas from other inventories, change the listing mode to "All".'
@@ -423,7 +421,7 @@ describe(
         async function () {
           this.set('allCollection', []);
 
-          await render(this);
+          await renderComponent();
           await click('.btn-all');
 
           expect(this.$('.empty-message').text().trim()).to.equal(
@@ -434,8 +432,8 @@ describe(
   }
 );
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambdas-list
     collection=collection
     allCollection=allCollection
     atmInventory=atmInventory
@@ -444,12 +442,11 @@ async function render(testCase) {
     onRevisionClick=lambdaRevisionClickedSpy
     onRevisionCreate=onRevisionCreate
   }}`);
-  await wait();
 }
 
 function itAllowsToChooseLambdaActions(actions) {
   it('allows to choose from lambda actions', async function () {
-    await render(this);
+    await renderComponent();
 
     const $actionsTrigger = this.$('.atm-lambda-actions-trigger');
     expect($actionsTrigger).to.exist;

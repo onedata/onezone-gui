@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { lookupService } from '../../helpers/stub-service';
@@ -9,9 +10,7 @@ import wait from 'ember-test-helpers/wait';
 import { Promise } from 'rsvp';
 
 describe('Integration | Component | content tokens', function () {
-  setupComponentTest('content-tokens', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.set('token', {
@@ -20,21 +19,21 @@ describe('Integration | Component | content tokens', function () {
     });
   });
 
-  it('has class content-tokens', function () {
-    this.render(hbs `{{content-tokens}}`);
+  it('has class content-tokens', async function () {
+    await render(hbs `{{content-tokens}}`);
 
     expect(this.$('.content-tokens')).to.exist;
   });
 
-  it('shows token name in header', function () {
-    this.render(hbs `{{content-tokens token=token}}`);
+  it('shows token name in header', async function () {
+    await render(hbs `{{content-tokens token=token}}`);
 
     expect(this.$('h1 .token-name').text().trim())
       .to.equal(this.get('token.name'));
   });
 
-  it('shows modify action trigger', function () {
-    this.render(hbs `{{content-tokens token=token}}`);
+  it('shows modify action trigger', async function () {
+    await render(hbs `{{content-tokens token=token}}`);
 
     const $trigger = this.$('.edit-token-action-btn').eq(0);
     expect($trigger).to.exist;
@@ -43,8 +42,8 @@ describe('Integration | Component | content tokens', function () {
     expect($trigger.parents('.one-collapsible-toolbar-item.disabled')).to.not.exist;
   });
 
-  it('shows token editor component in view mode with token data', function () {
-    this.render(hbs `{{content-tokens token=token}}`);
+  it('shows token editor component in view mode with token data', async function () {
+    await render(hbs `{{content-tokens token=token}}`);
 
     return wait()
       .then(() => {
@@ -55,8 +54,8 @@ describe('Integration | Component | content tokens', function () {
       });
   });
 
-  it('changes mode to "edit" after clicking "Modify" button', function () {
-    this.render(hbs `{{content-tokens token=token}}`);
+  it('changes mode to "edit" after clicking "Modify" button', async function () {
+    await render(hbs `{{content-tokens token=token}}`);
 
     return click('.edit-token-action-btn')
       .then(() => {
@@ -68,7 +67,7 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'passess token and diff object to ModifyTokenAction instance and executes it',
-    function () {
+    async function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'done' }),
@@ -77,7 +76,7 @@ describe('Integration | Component | content tokens', function () {
         sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      this.render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => fillIn('.name-field input', 'token2'))
@@ -99,7 +98,7 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'token editor form is blocked until ModifyTokenAction execution is done',
-    function () {
+    async function () {
       let resolveSubmit;
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
@@ -109,7 +108,7 @@ describe('Integration | Component | content tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      this.render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => click('.submit-token'))
@@ -126,7 +125,7 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'comes back to view mode after successful token modification',
-    function () {
+    async function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'done' }),
@@ -134,7 +133,7 @@ describe('Integration | Component | content tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      this.render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => click('.submit-token'))
@@ -146,7 +145,7 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'stays in edit mode after failed token modification',
-    function () {
+    async function () {
       const tokenActions = lookupService(this, 'token-actions');
       const modifyTokenAction = {
         execute: sinon.stub().resolves({ status: 'failed' }),
@@ -154,7 +153,7 @@ describe('Integration | Component | content tokens', function () {
       sinon.stub(tokenActions, 'createModifyTokenAction')
         .returns(modifyTokenAction);
 
-      this.render(hbs `{{content-tokens token=token}}`);
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => click('.submit-token'))
@@ -166,8 +165,8 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'comes back to view mode after clicking "cancel" and rollbacks all changes',
-    function () {
-      this.render(hbs `{{content-tokens token=token}}`);
+    async function () {
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => fillIn('.name-field input', 'test'))
@@ -183,8 +182,8 @@ describe('Integration | Component | content tokens', function () {
 
   it(
     'comes back to view mode when is in edit mode and token instance has changed',
-    function () {
-      this.render(hbs `{{content-tokens token=token}}`);
+    async function () {
+      await render(hbs `{{content-tokens token=token}}`);
 
       return click('.edit-token-action-btn')
         .then(() => {

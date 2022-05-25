@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
@@ -23,9 +24,7 @@ const states = [{
 
 describe('Integration | Component | content atm inventories workflows/revision details form',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/revision-details-form', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const revision = {
@@ -45,13 +44,13 @@ describe('Integration | Component | content atm inventories workflows/revision d
     });
 
     it('has class "revision-details-form"', async function () {
-      await render(this);
+      await renderComponent();
       expect(this.$().children()).to.have.class(componentClass)
         .and.to.have.length(1);
     });
 
     it('has dropdown field "state" with revision states as options', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.state-field .control-label').text().trim()).to.equal('State:');
       await clickTrigger('.state-field');
@@ -63,7 +62,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
     });
 
     it('has textarea field "description"', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.description-field .control-label').text().trim())
         .to.equal('Description:');
@@ -73,7 +72,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
     it('shows revision data', async function () {
       const revision = this.get('revision');
 
-      await render(this);
+      await renderComponent();
 
       expectValues(this, revision);
     });
@@ -88,16 +87,16 @@ describe('Integration | Component | content atm inventories workflows/revision d
           revision.state = states.rejectBy('value', value)[0].state;
         }
 
-        await render(this);
-        changeSpy.reset();
+        await renderComponent();
+        changeSpy.resetHistory();
 
         await selectChoose('.state-field', label);
 
         expect(changeSpy).to.be.calledWith({
-          data: {
+          data: sinon.match({
             state: value,
             description: revision.description,
-          },
+          }),
           isValid: true,
         });
       });
@@ -109,16 +108,16 @@ describe('Integration | Component | content atm inventories workflows/revision d
         revision,
       } = this.getProperties('changeSpy', 'revision');
 
-      await render(this);
-      changeSpy.reset();
+      await renderComponent();
+      changeSpy.resetHistory();
 
       await fillIn('.description-field .form-control', 'test');
 
       expect(changeSpy).to.be.calledWith({
-        data: {
+        data: sinon.match({
           state: revision.state,
           description: 'test',
-        },
+        }),
         isValid: true,
       });
     });
@@ -129,16 +128,16 @@ describe('Integration | Component | content atm inventories workflows/revision d
         revision,
       } = this.getProperties('changeSpy', 'revision');
 
-      await render(this);
-      changeSpy.reset();
+      await renderComponent();
+      changeSpy.resetHistory();
 
       await fillIn('.description-field .form-control', '');
 
       expect(changeSpy).to.be.calledWith({
-        data: {
+        data: sinon.match({
           state: revision.state,
           description: '',
-        },
+        }),
         isValid: true,
       });
     });
@@ -148,7 +147,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
         revision: oldRevision,
         revisionNumber,
       } = this.getProperties('revision', 'revisionNumber');
-      await render(this);
+      await renderComponent();
 
       this.set('atmWorkflowSchema.revisionRegistry', {
         [revisionNumber]: {
@@ -166,7 +165,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
         state: 'deprecated',
         description: '',
       });
-      await render(this);
+      await renderComponent();
 
       this.set('revisionNumber', 10);
       await wait();
@@ -180,7 +179,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
         state: 'deprecated',
         description: '',
       };
-      await render(this);
+      await renderComponent();
 
       this.set('atmWorkflowSchema', EmberObject.create({
         revisionRegistry: {
@@ -193,13 +192,12 @@ describe('Integration | Component | content atm inventories workflows/revision d
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/revision-details-form
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/revision-details-form
     atmWorkflowSchema=atmWorkflowSchema
     revisionNumber=revisionNumber
     onChange=changeSpy
   }}`);
-  await wait();
 }
 
 function expectValues(testCase, { state, description }) {

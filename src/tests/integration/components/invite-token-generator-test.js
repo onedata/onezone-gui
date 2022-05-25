@@ -1,28 +1,21 @@
 import wait from 'ember-test-helpers/wait';
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { describe, it, beforeEach } from 'mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve, reject, Promise } from 'rsvp';
-import TestAdapter from '@ember/test/adapter';
-import Ember from 'ember';
 import { click } from 'ember-native-dom-helpers';
 import { parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';
+import { suppressRejections } from '../../helpers/suppress-rejections';
 
 describe('Integration | Component | invite token generator', function () {
-  setupComponentTest('invite-token-generator', {
-    integration: true,
-  });
+  const { afterEach } = setupRenderingTest();
 
   beforeEach(function () {
-    this.originalLoggerError = Ember.Logger.error;
-    this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function () {};
-    Ember.Test.adapter.exception = function () {};
-
     const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
     this.setProperties({
       targetRecord: {
@@ -38,23 +31,21 @@ describe('Integration | Component | invite token generator', function () {
     if (fakeClock) {
       fakeClock.restore();
     }
-    Ember.Logger.error = this.originalLoggerError;
-    Ember.Test.adapter.exception = this.originalTestAdapterException;
   });
 
-  it('has class invite-token-generator', function () {
+  it('has class invite-token-generator', async function () {
     stubCreateToken(this, [undefined, undefined], resolve());
 
-    this.render(hbs `{{invite-token-generator}}`);
+    await render(hbs `{{invite-token-generator}}`);
 
     expect(this.$('.invite-token-generator')).to.exist;
   });
 
-  it('shows token in textarea', function () {
+  it('shows token in textarea', async function () {
     const correctToken = 'userJoinGroup-token';
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve(correctToken));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
@@ -72,10 +63,10 @@ describe('Integration | Component | invite token generator', function () {
       });
   });
 
-  it('shows spinner while token is being generated', function () {
+  it('shows spinner while token is being generated', async function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], new Promise(() => {}));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
@@ -91,10 +82,11 @@ describe('Integration | Component | invite token generator', function () {
       });
   });
 
-  it('shows error when token generation has failed', function () {
+  it('shows error when token generation has failed', async function () {
+    suppressRejections();
     stubCreateToken(this, ['userJoinGroup', 'group0'], reject('tokenError'));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
@@ -112,7 +104,7 @@ describe('Integration | Component | invite token generator', function () {
       });
   });
 
-  it('sets correct url for "custom token" action', function () {
+  it('sets correct url for "custom token" action', async function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve());
     const timestamp = 1584525600;
     this.set('fakeClock', sinon.useFakeTimers({
@@ -144,7 +136,7 @@ describe('Integration | Component | invite token generator', function () {
       }
     });
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
@@ -159,16 +151,16 @@ describe('Integration | Component | invite token generator', function () {
 
   it(
     'calls passed onCustomTokenClick when "custom token" action has been clicked',
-    function () {
+    async function () {
       stubCreateToken(this, ['userJoinGroup', 'group0'], resolve());
       const clickSpy = sinon.spy();
-      this.on('clickHandler', clickSpy);
+      this.set('clickHandler', clickSpy);
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="userJoinGroup"
           targetRecord=targetRecord
-          onCustomTokenClick=(action "clickHandler")
+          onCustomTokenClick=(action clickHandler)
         }}
       `);
 
@@ -251,11 +243,11 @@ describe('Integration | Component | invite token generator', function () {
     limitationsDescription,
     dontShowCustomToken,
   }) => {
-    it(`shows correct subject description for ${inviteType} invite token`, function () {
+    it(`shows correct subject description for ${inviteType} invite token`, async function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
 
-      this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+      await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
       if (subjectDescription) {
         expect(this.$('.subject-description').text().trim()).to.equal(subjectDescription);
@@ -266,11 +258,11 @@ describe('Integration | Component | invite token generator', function () {
 
     it(
       `shows correct limitations description for ${inviteType} invite token`,
-      function () {
+      async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
         return wait()
           .then(() =>
@@ -281,21 +273,21 @@ describe('Integration | Component | invite token generator', function () {
     );
 
     if (dontShowCustomToken) {
-      it(`does not show "custom token" link for ${inviteType} invite token`, function () {
+      it(`does not show "custom token" link for ${inviteType} invite token`, async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
         return wait()
           .then(() => expect(this.$('.custom-token-action')).to.not.exist);
       });
     } else {
-      it(`shows "custom token" link for ${inviteType} invite token`, function () {
+      it(`shows "custom token" link for ${inviteType} invite token`, async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
         return wait()
           .then(() => expect(this.$('.custom-token-action')).to.exist);
@@ -303,7 +295,7 @@ describe('Integration | Component | invite token generator', function () {
     }
   });
 
-  it('allows to generate onedatify command', function () {
+  it('allows to generate onedatify command', async function () {
     const space = { entityId: 'space0' };
     this.set('targetRecord', space);
     stubCreateToken(this,
@@ -315,7 +307,7 @@ describe('Integration | Component | invite token generator', function () {
       resolve('registertoken')
     );
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="onedatify"
         targetRecord=targetRecord
@@ -328,13 +320,13 @@ describe('Integration | Component | invite token generator', function () {
       ));
   });
 
-  it('allows to generate onedatify with import command', function () {
+  it('allows to generate onedatify with import command', async function () {
     const space = { entityId: 'space0' };
     this.set('targetRecord', space);
     stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
     stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="onedatifyWithImport"
         targetRecord=targetRecord

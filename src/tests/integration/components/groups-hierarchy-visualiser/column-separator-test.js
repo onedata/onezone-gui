@@ -1,17 +1,16 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject from '@ember/object';
 
 describe(
   'Integration | Component | groups hierarchy visualiser/column separator',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/column-separator', {
-      integration: true,
-    });
+    setupRenderingTest();
 
-    it('renders separator without central line', function () {
+    it('renders separator without central line', async function () {
       const columnSeparator = EmberObject.create({
         hasCentralLine: false,
         lineX: 100,
@@ -22,7 +21,7 @@ describe(
       });
 
       this.set('columnSeparator', columnSeparator);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/column-separator
           separator=columnSeparator}}
       `);
@@ -41,7 +40,7 @@ describe(
       expect($placeholders.eq(1).css('height')).to.be.equal('50px');
     });
 
-    it('renders separator with hovered line', function () {
+    it('renders separator with hovered line', async function () {
       const columnSeparator = EmberObject.create({
         hasCentralLine: true,
         lineX: 100,
@@ -58,7 +57,7 @@ describe(
       });
 
       this.set('columnSeparator', columnSeparator);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/column-separator
           separator=columnSeparator}}
       `);

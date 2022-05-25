@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { get, set } from '@ember/object';
 import { triggerEvent } from 'ember-native-dom-helpers';
@@ -19,9 +20,7 @@ const GlobalNotifyStub = Service.extend({
 describe(
   'Integration | Component | groups hierarchy visualiser/group box relation',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/group-box-relation', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function beforeEach() {
       registerService(this, 'i18n', I18nStub);
@@ -29,13 +28,13 @@ describe(
       set(lookupService(this, 'global-notify'), 'spy', sinon.spy());
     });
 
-    it('renders information about insufficient privileges', function () {
+    it('renders information about insufficient privileges', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: false,
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           group=group}}
       `);
@@ -44,7 +43,7 @@ describe(
       expect($relation.find('.oneicon-no-view')).to.exist;
     });
 
-    it('shows spinner when loading relation', function () {
+    it('shows spinner when loading relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -53,7 +52,7 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
@@ -63,7 +62,7 @@ describe(
       expect($relation.find('.spinner')).to.exist;
     });
 
-    it('shows error icon on error', function () {
+    it('shows error icon on error', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -72,7 +71,7 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
@@ -82,7 +81,7 @@ describe(
       expect($relation.find('.oneicon-ban-left')).to.exist;
     });
 
-    it('shows error details on double click', function () {
+    it('shows error details on double click', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -92,7 +91,7 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
@@ -104,7 +103,7 @@ describe(
       });
     });
 
-    it('shows children relation', function () {
+    it('shows children relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -114,7 +113,7 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
@@ -125,7 +124,7 @@ describe(
       expect($relation.find('.relations-number').text()).to.equal('5');
     });
 
-    it('shows parents relation', function () {
+    it('shows parents relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         parentList: EmberObject.create({
@@ -135,7 +134,7 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="parents"
           group=group}}

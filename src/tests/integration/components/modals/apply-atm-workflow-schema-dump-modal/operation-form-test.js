@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
 import $ from 'jquery';
 import sinon from 'sinon';
@@ -12,9 +12,7 @@ const componentClass = 'operation-form';
 
 describe('Integration | Component | modals/apply atm workflow schema dump modal/operation form',
   function () {
-    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal/operation-form', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       this.setProperties({
@@ -30,7 +28,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     });
 
     it(`has class "${componentClass}"`, async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$().children()).to.have.class(componentClass)
         .and.to.have.length(1);
@@ -38,7 +36,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
     it('shows "merge" operation with workflows dropdown and "create" operation with name input',
       async function () {
-        await render(this);
+        await renderComponent();
 
         const $options = this.$('.radio-inline');
         expect($options.eq(0)).to.have.class('option-merge');
@@ -64,7 +62,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       async function () {
         this.set('selectedOperation', 'merge');
 
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.option-merge input').prop('checked')).to.equal(true);
         expect(this.$('.option-create input').prop('checked')).to.equal(false);
@@ -78,7 +76,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       async function () {
         this.set('selectedOperation', 'create');
 
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.option-merge input').prop('checked')).to.equal(false);
         expect(this.$('.option-create input').prop('checked')).to.equal(true);
@@ -90,7 +88,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
     it('allows changing operation', async function () {
       this.set('selectedOperation', 'create');
-      await render(this);
+      await renderComponent();
 
       await click('.option-merge');
 
@@ -105,7 +103,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'merge',
         targetWorkflows,
       });
-      await render(this);
+      await renderComponent();
 
       await clickTrigger('.targetWorkflow-field');
 
@@ -123,7 +121,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         targetWorkflows,
         selectedTargetWorkflow: targetWorkflows[0],
       });
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.targetWorkflow-field .dropdown-field-trigger').text().trim())
         .to.equal(targetWorkflows[0].name);
@@ -136,7 +134,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         targetWorkflows,
         selectedTargetWorkflow: targetWorkflows[0],
       });
-      await render(this);
+      await renderComponent();
 
       await selectChoose('.targetWorkflow-field', targetWorkflows[1].name);
 
@@ -151,7 +149,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'create',
         newWorkflowName: 'abc',
       });
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.newWorkflowName-field .form-control')).to.have.value('abc');
     });
@@ -161,7 +159,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'create',
         newWorkflowName: 'xyz',
       });
-      await render(this);
+      await renderComponent();
 
       await fillIn('.newWorkflowName-field .form-control', 'abc');
 
@@ -187,7 +185,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
             targetWorkflows: [],
           });
 
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.option-merge')).to.have.class('disabled');
           expect(this.$('.targetWorkflow-field')).to.not.exist;
@@ -207,7 +205,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
             selectedTargetWorkflow: targetWorkflows[0],
           });
 
-          await render(this);
+          await renderComponent();
 
           const $warning = this.$('.revision-conflict-warning');
           expect($warning).to.exist;
@@ -224,7 +222,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
           selectedTargetWorkflow: targetWorkflows[0],
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.revision-conflict-warning')).to.not.exist;
       });
@@ -239,7 +237,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
           selectedTargetWorkflow: targetWorkflows[0],
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.revision-conflict-warning')).to.not.exist;
       });
@@ -247,7 +245,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     it('disables controls when isDisabled is true', async function () {
       this.set('isDisabled', true);
 
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.one-way-radio-group')).to.have.class('disabled');
       expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
@@ -256,8 +254,8 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
+async function renderComponent() {
+  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
     dumpSourceType=dumpSourceType
     selectedOperation=selectedOperation
     targetWorkflows=targetWorkflows
@@ -267,7 +265,6 @@ async function render(testCase) {
     onValueChange=onValueChange
     isDisabled=isDisabled
   }}`);
-  await wait();
 }
 
 function generateTargetWorkflows(count, reversedOrder) {

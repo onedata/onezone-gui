@@ -1,14 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import $ from 'jquery';
 import { click } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | sidebar harvesters/harvester item', function () {
-  setupComponentTest('sidebar-harvesters/harvester-item', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.set('harvester', {
@@ -19,23 +18,22 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
     });
   });
 
-  it('renders harvester name, icon and menu trigger', function () {
-    this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+  it('renders harvester name, icon and menu trigger', async function () {
+    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     expect(this.$()).to.contain(this.get('harvester.name'));
     expect(this.$('.oneicon-light-bulb')).to.exist;
     expect(this.$('.collapsible-toolbar-toggle')).to.exist;
   });
 
-  it('does not render actions menu if inSidenav is true', function () {
-    this.render(
-      hbs `{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
+  it('does not render actions menu if inSidenav is true', async function () {
+    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester inSidenav=true}}`);
 
     expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
-  it('allows to access name editor', function () {
-    this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+  it('allows to access name editor', async function () {
+    await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
     return click('.collapsible-toolbar-toggle')
       .then(() => click($('.webui-popover.in .rename-harvester-action')[0]))
@@ -49,8 +47,8 @@ describe('Integration | Component | sidebar harvesters/harvester item', function
     operation: 'remove',
     modalClass: 'harvester-remove-modal',
   }].forEach(({ operation, modalClass }) => {
-    it(`shows ${operation} acknowledgment modal`, function () {
-      this.render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
+    it(`shows ${operation} acknowledgment modal`, async function () {
+      await render(hbs `{{sidebar-harvesters/harvester-item item=harvester}}`);
 
       return click('.collapsible-toolbar-toggle')
         .then(() =>

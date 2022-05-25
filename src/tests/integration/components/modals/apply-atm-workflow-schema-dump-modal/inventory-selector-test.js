@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
 import sinon from 'sinon';
 import $ from 'jquery';
@@ -11,9 +11,7 @@ const componentClass = 'inventory-selector';
 
 describe('Integration | Component | modals/apply atm workflow schema dump modal/inventory selector',
   function () {
-    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal/inventory-selector', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const atmInventories = [{
@@ -32,14 +30,14 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     });
 
     it(`has class "${componentClass}"`, async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$().children()).to.have.class(componentClass)
         .and.to.have.length(1);
     });
 
     it('has correct placeholder in dropdown', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.targetAtmInventory-field .dropdown-field-trigger').text().trim())
         .to.equal('Select target inventory...');
@@ -47,7 +45,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
     it('shows passed inventories as dropdown options', async function () {
       const atmInventories = this.get('atmInventories');
-      await render(this);
+      await renderComponent();
 
       await clickTrigger('.targetAtmInventory-field');
 
@@ -61,7 +59,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     it('shows selected inventory', async function () {
       const selectedAtmInventory =
         this.set('selectedAtmInventory', this.get('atmInventories.0'));
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.targetAtmInventory-field .dropdown-field-trigger').text().trim())
         .to.equal(selectedAtmInventory.name);
@@ -73,7 +71,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         onChange,
       } = this.getProperties('atmInventories', 'onChange');
       this.set('selectedAtmInventory', atmInventories[0]);
-      await render(this);
+      await renderComponent();
       expect(onChange).to.be.not.called;
 
       await selectChoose('.targetAtmInventory-field', atmInventories[1].name);
@@ -87,19 +85,18 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     it('disables controls when isDisabled is true', async function () {
       this.set('isDisabled', true);
 
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.targetAtmInventory-field .dropdown-field-trigger'))
         .to.have.attr('aria-disabled');
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/inventory-selector
+async function renderComponent() {
+  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/inventory-selector
     atmInventories=atmInventories
     selectedAtmInventory=selectedAtmInventory
     onChange=onChange
     isDisabled=isDisabled
   }}`);
-  await wait();
 }

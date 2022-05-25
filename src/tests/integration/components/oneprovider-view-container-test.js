@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -12,9 +13,7 @@ import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-onep
 import { lookupService } from '../../helpers/stub-service';
 
 describe('Integration | Component | oneprovider view container', function () {
-  setupComponentTest('oneprovider-view-container', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   context('with single modern Oneprovider', function () {
     beforeEach(function () {
@@ -50,8 +49,8 @@ describe('Integration | Component | oneprovider view container', function () {
       });
     });
 
-    it('renders container header and body content', function () {
-      this.render(hbs `
+    it('renders container header and body content', async function () {
+      await render(hbs `
         {{#oneprovider-view-container
           space=space
           oneproviderId=oneproviderId
@@ -74,8 +73,8 @@ describe('Integration | Component | oneprovider view container', function () {
       });
     });
 
-    it('renders name of selected Oneprovider in tab bar mode', function () {
-      this.render(hbs `
+    it('renders name of selected Oneprovider in tab bar mode', async function () {
+      await render(hbs `
         {{#oneprovider-view-container
           space=space
           oneproviderId=oneproviderId
@@ -93,10 +92,10 @@ describe('Integration | Component | oneprovider view container', function () {
     });
 
     it('renders container header and no body if all Oneproviders are offline',
-      function () {
+      async function () {
         this.set('provider.online', false);
 
-        this.render(hbs `
+        await render(hbs `
           {{#oneprovider-view-container
             space=space
             oneproviderId=undefined
@@ -122,10 +121,10 @@ describe('Integration | Component | oneprovider view container', function () {
       }
     );
 
-    it('renders space providers tab bar if all Oneproviders are offline', function () {
+    it('renders space providers tab bar if all Oneproviders are offline', async function () {
       this.set('provider.online', false);
 
-      this.render(hbs `
+      await render(hbs `
         {{#oneprovider-view-container
           space=space
           oneproviderId=undefined
@@ -183,7 +182,7 @@ describe('Integration | Component | oneprovider view container', function () {
       const changeOneproviderId = sinon.stub().callsFake((id) => {
         return this.set('oneproviderId', id);
       });
-      this.on('changeOneproviderId', changeOneproviderId);
+      this.set('changeOneproviderId', changeOneproviderId);
       const providerManager = lookupService(this, 'provider-manager');
       const getRecordByIdStub = sinon.stub(providerManager, 'getRecordById')
         .withArgs(oneproviderId1)
@@ -198,20 +197,20 @@ describe('Integration | Component | oneprovider view container', function () {
       });
     });
 
-    it('changes yielded Oneprovider data when tab bar item selected', function () {
+    it('changes yielded Oneprovider data when tab bar item selected', async function () {
       const {
         provider1,
         provider2,
         changeOneproviderId,
       } = this.getProperties('provider1', 'provider2', 'changeOneproviderId');
 
-      this.render(hbs `
+      await render(hbs `
         {{#oneprovider-view-container
           space=space
           oneproviderId=oneproviderId
           mapSelectorEnabled=false
           isTabBarCollapsed=false
-          oneproviderIdChanged=(action "changeOneproviderId")
+          oneproviderIdChanged=(action changeOneproviderId)
           as |container|
         }}
           {{#container.body}}
@@ -245,7 +244,7 @@ describe('Integration | Component | oneprovider view container', function () {
         });
     });
 
-    it('gets and sets default space Oneprovider using localStorage', function () {
+    it('gets and sets default space Oneprovider using localStorage', async function () {
       const {
         space,
         provider1,
@@ -266,7 +265,7 @@ describe('Integration | Component | oneprovider view container', function () {
         space,
         _localStorage,
       });
-      this.render(hbs `
+      await render(hbs `
         {{#oneprovider-view-container
           _localStorage=_localStorage
           space=space

@@ -1,7 +1,8 @@
 import { A } from '@ember/array';
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import wait from 'ember-test-helpers/wait';
 import hbs from 'htmlbars-inline-precompile';
 import { click, fillIn } from 'ember-native-dom-helpers';
@@ -12,9 +13,7 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
 
 describe('Integration | Component | providers list', function () {
-  setupComponentTest('providers-list', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const spaces = A([{
@@ -67,8 +66,8 @@ describe('Integration | Component | providers list', function () {
     });
   });
 
-  it('renders list of providers', function () {
-    this.render(hbs `{{providers-list providersData=providersData}}`);
+  it('renders list of providers', async function () {
+    await render(hbs `{{providers-list providersData=providersData}}`);
 
     const list = this.$('.one-collapsible-list');
     expect(list.children()).to.have.length(4);
@@ -77,8 +76,8 @@ describe('Integration | Component | providers list', function () {
     expect(firstItem).to.contain('provider1');
   });
 
-  it('sets icon colors according to provider object setting', function () {
-    this.render(hbs `{{providers-list providersData=providersData}}`);
+  it('sets icon colors according to provider object setting', async function () {
+    await render(hbs `{{providers-list providersData=providersData}}`);
 
     const firstItemIcon =
       this.$('.one-collapsible-list-item:nth-child(2) .one-icon');
@@ -86,14 +85,14 @@ describe('Integration | Component | providers list', function () {
       .to.contain(this.get('providersData')[0].color);
   });
 
-  it('triggers providers filter state changed action on init', function () {
+  it('triggers providers filter state changed action on init', async function () {
     const providersFilterSpy = sinon.spy();
-    this.on('providersFilter', providersFilterSpy);
+    this.set('providersFilter', providersFilterSpy);
 
-    this.render(hbs `
-        {{providers-list 
+    await render(hbs `
+        {{providers-list
           providersData=providersData
-          providersFilterAction=(action "providersFilter")}}
+          providersFilterAction=(action providersFilter)}}
       `);
     return wait().then(() => {
       expect(providersFilterSpy).to.be.calledOnce;
@@ -106,14 +105,14 @@ describe('Integration | Component | providers list', function () {
   });
 
   it('triggers providers filter state changed action after query input',
-    function (done) {
+    async function (done) {
       const providersFilterSpy = sinon.spy();
-      this.on('providersFilter', providersFilterSpy);
+      this.set('providersFilter', providersFilterSpy);
 
-      this.render(hbs `
-            {{providers-list 
+      await render(hbs `
+            {{providers-list
               providersData=providersData
-              providersFilterAction=(action "providersFilter")}}
+              providersFilterAction=(action providersFilter)}}
           `);
       wait().then(() => {
         fillIn('.search-bar', '1').then(() => {
@@ -127,7 +126,7 @@ describe('Integration | Component | providers list', function () {
     }
   );
 
-  it('handles with custom provider actions', function (done) {
+  it('handles with custom provider actions', async function (done) {
     const actionSpy = sinon.spy();
     this.set('actions', [{
       text: 'Action',
@@ -135,8 +134,8 @@ describe('Integration | Component | providers list', function () {
       class: 'action-trigger',
     }]);
 
-    this.render(hbs `
-            {{providers-list 
+    await render(hbs `
+            {{providers-list
               providersData=providersData
               providerActions=actions}}
           `);
@@ -149,9 +148,9 @@ describe('Integration | Component | providers list', function () {
     });
   });
 
-  it('shows information about supported spaces', function () {
-    this.render(hbs `
-              {{providers-list 
+  it('shows information about supported spaces', async function () {
+    await render(hbs `
+              {{providers-list
                 providersData=providersData
                 selectedSpace=selectedSpace
               }}

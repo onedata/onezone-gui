@@ -1,14 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { click } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 
 describe('Integration | Component | sidebar groups/group item', function () {
-  setupComponentTest('sidebar-groups/group-item', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.set('group', {
@@ -20,22 +19,22 @@ describe('Integration | Component | sidebar groups/group item', function () {
     });
   });
 
-  it('renders group name, icon and menu trigger', function () {
-    this.render(hbs `{{sidebar-groups/group-item item=group}}`);
+  it('renders group name, icon and menu trigger', async function () {
+    await render(hbs `{{sidebar-groups/group-item item=group}}`);
 
     expect(this.$()).to.contain(this.get('group.name'));
     expect(this.$('.oneicon-group')).to.exist;
     expect(this.$('.collapsible-toolbar-toggle')).to.exist;
   });
 
-  it('does not render actions menu if inSidenav is true', function () {
-    this.render(hbs `{{sidebar-groups/group-item item=group inSidenav=true}}`);
+  it('does not render actions menu if inSidenav is true', async function () {
+    await render(hbs `{{sidebar-groups/group-item item=group inSidenav=true}}`);
 
     expect(this.$('.collapsible-toolbar-toggle')).to.not.exist;
   });
 
-  it('allows to access name editor', function () {
-    this.render(hbs `{{sidebar-groups/group-item item=group}}`);
+  it('allows to access name editor', async function () {
+    await render(hbs `{{sidebar-groups/group-item item=group}}`);
 
     return click('.collapsible-toolbar-toggle')
       .then(() => click($('.webui-popover.in .rename-group-action')[0]))
@@ -49,8 +48,8 @@ describe('Integration | Component | sidebar groups/group item', function () {
     operation: 'remove',
     modalClass: 'group-remove-modal',
   }].forEach(({ operation, modalClass }) => {
-    it(`shows ${operation} acknowledgment modal`, function () {
-      this.render(hbs `{{sidebar-groups/group-item item=group}}`);
+    it(`shows ${operation} acknowledgment modal`, async function () {
+      await render(hbs `{{sidebar-groups/group-item item=group}}`);
 
       return click('.collapsible-toolbar-toggle')
         .then(() => click($(`.webui-popover.in .${operation}-group-action`)[0]))

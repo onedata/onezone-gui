@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
@@ -8,14 +9,12 @@ import sinon from 'sinon';
 describe(
   'Integration | Component | token template selector/readonly data template',
   function () {
-    setupComponentTest('token-template-selector/readonly-data-template', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     it(
       'renders tile with "template-readonlyData" class, correct title and image',
-      function () {
-        this.render(hbs `{{token-template-selector/readonly-data-template}}`);
+      async function () {
+        await render(hbs `{{token-template-selector/readonly-data-template}}`);
 
         const $tile = this.$('.one-tile');
         expect($tile).to.have.class('template-readonlyData');
@@ -28,7 +27,7 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      this.render(hbs `{{token-template-selector/readonly-data-template
+      await render(hbs `{{token-template-selector/readonly-data-template
         onSelected=selectedSpy
       }}`);
 

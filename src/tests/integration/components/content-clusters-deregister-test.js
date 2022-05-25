@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
@@ -16,9 +17,7 @@ const OnedataGraph = Service.extend({
 });
 
 describe('Integration | Component | content clusters deregister', function () {
-  setupComponentTest('content-clusters-deregister', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'onedataGraph', OnedataGraph);
@@ -26,12 +25,12 @@ describe('Integration | Component | content clusters deregister', function () {
 
   it(
     'does not allow to click the deregister button when warning checkbox is not checked',
-    function () {
+    async function () {
       this.set('cluster', {});
       const deregister = sinon.spy();
       this.set('deregister', deregister);
 
-      this.render(hbs `{{content-clusters-deregister
+      await render(hbs `{{content-clusters-deregister
         cluster=cluster
         deregister=deregister
       }}`);
@@ -49,14 +48,14 @@ describe('Integration | Component | content clusters deregister', function () {
 
   it(
     'invokes deregister procedure when clicking deregister button',
-    function () {
+    async function () {
       this.set('cluster', {});
       const deregister = sinon.stub().resolves();
       const afterDeregister = sinon.spy();
       this.set('deregister', deregister);
       this.set('afterDeregister', afterDeregister);
 
-      this.render(hbs `{{content-clusters-deregister
+      await render(hbs `{{content-clusters-deregister
         cluster=cluster
         deregister=deregister
         afterDeregister=afterDeregister
@@ -78,7 +77,7 @@ describe('Integration | Component | content clusters deregister', function () {
 
   it(
     'shows statistics info when cluster has hasViewPrivilege',
-    function () {
+    async function () {
       this.set('cluster', {
         creationTime: moment('2019-03-13 12:00').unix(),
         hasViewPrivilege: true,
@@ -97,7 +96,7 @@ describe('Integration | Component | content clusters deregister', function () {
         getOneproviderClusterResourceStats
       );
 
-      this.render(hbs `{{content-clusters-deregister
+      await render(hbs `{{content-clusters-deregister
         cluster=cluster
         deregister=deregister
         afterDeregister=afterDeregister

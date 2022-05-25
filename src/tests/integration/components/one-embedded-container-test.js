@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
@@ -14,11 +15,9 @@ import {
 } from 'onedata-gui-common/utils/one-embedded-common';
 
 describe('Integration | Component | one embedded container', function () {
-  setupComponentTest('one-embedded-container', {
-    integration: true,
-  });
+  setupRenderingTest();
 
-  it('passes the property and action which can be invoked by iframe', function () {
+  it('passes the property and action which can be invoked by iframe', async function () {
     const hello = sinon.spy();
     const SomeEmbeddedContainer = OneEmbeddedContainer.extend({
       layout: oneEmbeddedContainerLayout,
@@ -28,7 +27,7 @@ describe('Integration | Component | one embedded container', function () {
         hello,
       },
     });
-    this.register('component:some-embedded-container', SomeEmbeddedContainer);
+    this.owner.register('component:some-embedded-container', SomeEmbeddedContainer);
     this.set('iframeElement', {});
     const s = document.createElement('script');
     s.type = 'text/javascript';
@@ -36,7 +35,7 @@ describe('Integration | Component | one embedded container', function () {
       `frameElement.${sharedObjectName}.callParent('hello', frameElement.${sharedObjectName}.${sharedDataPropertyName}.iprop);`;
     s.appendChild(document.createTextNode(code));
 
-    this.render(hbs `
+    await render(hbs `
       <div class="embedded-iframes-container"></div>
       {{some-embedded-container
         iframeId="testId"

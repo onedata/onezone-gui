@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
@@ -39,18 +40,16 @@ const templates = [{
 }];
 
 describe('Integration | Component | token template selector', function () {
-  setupComponentTest('token-template-selector', {
-    integration: true,
-  });
+  setupRenderingTest();
 
-  it('has class "token-template-selector"', function () {
-    this.render(hbs `{{token-template-selector}}`);
+  it('has class "token-template-selector"', async function () {
+    await render(hbs `{{token-template-selector}}`);
 
     expect(this.$('.token-template-selector')).to.have.length(1);
   });
 
-  it('shows list of templates in correct categories', function () {
-    this.render(hbs `{{token-template-selector}}`);
+  it('shows list of templates in correct categories', async function () {
+    await render(hbs `{{token-template-selector}}`);
 
     const tiles = this.$()[0].querySelectorAll('.one-tile');
     templates.forEach(({ name, category }, index) => {
@@ -61,8 +60,8 @@ describe('Integration | Component | token template selector', function () {
     });
   });
 
-  it('has only first category expanded', function () {
-    this.render(hbs `{{token-template-selector}}`);
+  it('has only first category expanded', async function () {
+    await render(hbs `{{token-template-selector}}`);
 
     return wait()
       .then(() => {
@@ -76,7 +75,7 @@ describe('Integration | Component | token template selector', function () {
   it('notifies about selected template', async function () {
     const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-    this.render(hbs `{{token-template-selector onTemplateSelected=selectedSpy}}`);
+    await render(hbs `{{token-template-selector onTemplateSelected=selectedSpy}}`);
     await click('.template-custom');
 
     expect(selectedSpy).to.be.calledOnce.and.to.be.calledWith('custom', sinon.match({}));

@@ -1,19 +1,17 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 
 const componentClass = 'dump-details';
 
 describe('Integration | Component | modals/apply atm workflow schema dump modal/dump details',
   function () {
-    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal/dump-details', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     it(`has class "${componentClass}"`, async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$().children()).to.have.class(componentClass)
         .and.to.have.length(1);
@@ -32,7 +30,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         },
       });
 
-      await render(this);
+      await renderComponent();
 
       expectDetails(this, { name: 'w1', summary: 'summary', revisionNumber: '3' });
     });
@@ -50,7 +48,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         },
       });
 
-      await render(this);
+      await renderComponent();
 
       expectDetails(this, {
         name: 'none',
@@ -63,7 +61,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       async function () {
         this.set('dump', null);
 
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.name')).to.not.exist;
         expect(this.$('.summary')).to.not.exist;
@@ -73,11 +71,10 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/dump-details
+async function renderComponent() {
+  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/dump-details
     dump=dump
   }}`);
-  await wait();
 }
 
 function expectDetails(testCase, { name, summary, revisionNumber }) {

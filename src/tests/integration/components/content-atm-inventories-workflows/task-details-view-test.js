@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import _ from 'lodash';
@@ -109,9 +109,7 @@ const exampleTask = {
 
 describe('Integration | Component | content atm inventories workflows/task details view',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/task-details-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       this.setProperties({
@@ -126,7 +124,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
 
     it('has class "content-atm-inventories-workflows-task-details-view"',
       async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$().children())
           .to.have.class('content-atm-inventories-workflows-task-details-view')
@@ -180,7 +178,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
       });
 
       it('fills task form with task data', async function () {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.name-field .form-control')).to.have.value(exampleTask.name);
         // TODO: VFS-7816 uncomment or remove future code
@@ -192,8 +190,8 @@ describe('Integration | Component | content atm inventories workflows/task detai
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/task-details-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/task-details-view
     mode=mode
     atmLambda=atmLambda
     revisionNumber=revisionNumber
@@ -203,12 +201,11 @@ async function render(testCase) {
     onCancel=cancelSpy
     onApplyChanges=applyChangesSpy
   }}`);
-  await wait();
 }
 
 function itHasHeader(headerText) {
   it(`has header "${headerText}"`, async function () {
-    await render(this);
+    await renderComponent();
 
     expect(this.$('.header-row h1').text().trim()).to.equal(headerText);
   });
@@ -216,7 +213,7 @@ function itHasHeader(headerText) {
 
 function itCallsOnBackSlideOnBackLinkClick() {
   it('calls "onBackSlide" callback on back link click', async function () {
-    await render(this);
+    await renderComponent();
 
     const backSlideSpy = this.get('backSlideSpy');
     expect(backSlideSpy).to.be.not.called;
@@ -229,7 +226,7 @@ function itCallsOnBackSlideOnBackLinkClick() {
 
 function itShowsTaskFormInMode(mode) {
   it(`shows task form in "${mode}" mode`, async function () {
-    await render(this);
+    await renderComponent();
 
     expect(this.$('.task-form')).to.exist.and.to.have.class(`mode-${mode}`);
   });
@@ -237,7 +234,7 @@ function itShowsTaskFormInMode(mode) {
 
 function itShowsAtmLambdaDetailsToTaskForm() {
   it('passes lambda details to task form', async function () {
-    await render(this);
+    await renderComponent();
 
     expect(this.$('.task-form .atm-lambda-name').text())
       .to.contain(exampleAtmLambdaRevision.name);
@@ -248,7 +245,7 @@ function itShowsAtmLambdaDetailsToTaskForm() {
 
 function itProvidesStoresInTaskForm() {
   it('provides stores in task form', async function () {
-    await render(this);
+    await renderComponent();
 
     await clickTrigger('.targetStore-field');
 
@@ -260,7 +257,7 @@ function itProvidesStoresInTaskForm() {
 
 function itCallsOnCancelOnCancelClick() {
   it('calls "onCancel" callback on "Cancel" button click', async function () {
-    await render(this);
+    await renderComponent();
 
     const cancelSpy = this.get('cancelSpy');
     expect(cancelSpy).to.be.not.called;
@@ -273,7 +270,7 @@ function itCallsOnCancelOnCancelClick() {
 
 function itShowsButtons({ cancelBtnText, submitBtnText }) {
   it(`shows "${cancelBtnText}" and "${submitBtnText}" buttons`, async function () {
-    await render(this);
+    await renderComponent();
 
     const $cancelBtn = this.$('.btn-cancel');
     expect($cancelBtn.text().trim()).to.equal(cancelBtnText);
@@ -286,7 +283,7 @@ function itShowsButtons({ cancelBtnText, submitBtnText }) {
 
 function itHasEnabledSubmitWhenFormIsValid() {
   it('has enabled submitting button when form is valid', async function () {
-    await render(this);
+    await renderComponent();
 
     expect(this.$('.btn-submit')).to.be.not.disabled;
   });
@@ -294,7 +291,7 @@ function itHasEnabledSubmitWhenFormIsValid() {
 
 function itHasDisabledSubmitWhenFormIsInvalid() {
   it('has enabled submitting button when form is invalid', async function () {
-    await render(this);
+    await renderComponent();
 
     await fillIn('.name-field .form-control', '');
 
@@ -305,7 +302,7 @@ function itHasDisabledSubmitWhenFormIsInvalid() {
 function itBlocksButtonsAndFormDuringSubmission() {
   it('blocks buttons and form during the submission', async function () {
     this.set('applyChangesSpy', sinon.stub().returns(new Promise(() => {})));
-    await render(this);
+    await renderComponent();
 
     await click('.btn-submit');
 
@@ -318,7 +315,7 @@ function itBlocksButtonsAndFormDuringSubmission() {
 function itSubmitsFormDataOnSubmitClick(formDataMatcher) {
   it('submits form data on submit click', async function () {
     const applyChangesSpy = this.get('applyChangesSpy');
-    await render(this);
+    await renderComponent();
 
     expect(applyChangesSpy).to.be.not.called;
     await fillIn('.name-field .form-control', 'newName');

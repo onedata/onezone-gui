@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, before, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
 import $ from 'jquery';
@@ -13,9 +13,7 @@ import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 
 describe('Integration | Component | content atm inventories workflows/list view',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/list-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
@@ -62,21 +60,21 @@ describe('Integration | Component | content atm inventories workflows/list view'
       });
     });
 
-    it('has class "content-atm-inventories-workflows-list-view"', function () {
-      this.render(hbs `{{content-atm-inventories-workflows/list-view}}`);
+    it('has class "content-atm-inventories-workflows-list-view"', async function () {
+      await render(hbs `{{content-atm-inventories-workflows/list-view}}`);
 
       expect(this.$().children()).to.have.class('content-atm-inventories-workflows-list-view')
         .and.to.have.length(1);
     });
 
     it('has header "Workflows"', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.header-row h1 .one-label').text().trim()).to.equal('Workflows');
     });
 
     it('shows list of workflow schemas of given automation inventory', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.atm-workflow-schemas-list')).to.exist;
       const $entries = this.$('.atm-workflow-schemas-list-entry');
@@ -87,7 +85,7 @@ describe('Integration | Component | content atm inventories workflows/list view'
 
     it('has "add new workflow" button, which calls "onAddAtmWorkflowSchema" callback on click',
       async function () {
-        await render(this);
+        await renderComponent();
 
         const $addFunctionBtn = this.$('.header-row .open-add-atm-workflow-schema-trigger');
         expect($addFunctionBtn.text().trim()).to.equal('Add new workflow');
@@ -101,7 +99,7 @@ describe('Integration | Component | content atm inventories workflows/list view'
 
     it('calls "onOpenAtmWorkflowSchemaRevision" when workflow revision has been clicked',
       async function () {
-        await render(this);
+        await renderComponent();
 
         await click('.revisions-table-revision-entry');
 
@@ -115,7 +113,7 @@ describe('Integration | Component | content atm inventories workflows/list view'
           CreateAtmWorkflowSchemaRevisionAction.prototype,
           'onExecute'
         ).resolves(4);
-        await render(this);
+        await renderComponent();
 
         await click('.revisions-table-create-revision-entry');
 
@@ -129,7 +127,7 @@ describe('Integration | Component | content atm inventories workflows/list view'
           CreateAtmWorkflowSchemaRevisionAction.prototype,
           'onExecute'
         ).resolves(4);
-        await render(this);
+        await renderComponent();
 
         await click('.revision-actions-trigger');
         await click($(
@@ -141,12 +139,11 @@ describe('Integration | Component | content atm inventories workflows/list view'
       });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/list-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/list-view
     atmInventory=atmInventory
     onAddAtmWorkflowSchema=addFunctionSpy
     onOpenAtmWorkflowSchemaRevision=openAtmWorkflowSchemaRevisionSpy
     onCreatedAtmWorkflowSchemaRevision=createdAtmWorkflowSchemaRevisionSpy
   }}`);
-  await wait();
 }

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import CreateAtmInventoryAction from 'onezone-gui/utils/workflow-actions/create-atm-inventory-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
@@ -10,9 +10,7 @@ import { next } from '@ember/runloop';
 
 describe('Integration | Utility | workflow actions/create atm inventory action',
   function () {
-    setupComponentTest('global-modal-mounter', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       this.set('context', {
@@ -22,7 +20,7 @@ describe('Integration | Utility | workflow actions/create atm inventory action',
 
     it('executes creating automation inventory (success scenario)', function () {
       const action = CreateAtmInventoryAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: this.get('context'),
       });
       const workflowManager = lookupService(this, 'workflow-manager');
@@ -62,7 +60,7 @@ describe('Integration | Utility | workflow actions/create atm inventory action',
 
     it('executes creating automation inventory (failure scenario)', function () {
       const action = CreateAtmInventoryAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: this.get('context'),
       });
       const workflowManager = lookupService(this, 'workflow-manager');

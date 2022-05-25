@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, before, afterEach, context } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
@@ -16,9 +17,7 @@ import { set, setProperties, get } from '@ember/object';
 import $ from 'jquery';
 
 describe('Integration | Component | content atm inventories lambdas', function () {
-  setupComponentTest('content-atm-inventories-lambdas', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   before(function () {
     // Instatiate Action class to make its `prototype.execute` available for
@@ -136,15 +135,15 @@ describe('Integration | Component | content atm inventories lambdas', function (
     });
   });
 
-  it('has class "content-atm-inventories-lambdas"', function () {
-    this.render(hbs `{{content-atm-inventories-lambdas}}`);
+  it('has class "content-atm-inventories-lambdas"', async function () {
+    await render(hbs `{{content-atm-inventories-lambdas}}`);
 
     expect(this.$().children()).to.have.class('content-atm-inventories-lambdas')
       .and.to.have.length(1);
   });
 
   it('contains carousel with two slides', async function () {
-    await render(this);
+    await renderComponent();
 
     const $slides = this.$('.one-carousel-slide');
     expect($slides).to.have.length(2);
@@ -161,7 +160,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
     });
 
     it('shows lambdas list in "list" slide', async function (done) {
-      await render(this);
+      await renderComponent();
 
       const listSlide = getSlide('list');
       const listView = listSlide.querySelector('.content-atm-inventories-lambdas-list-view');
@@ -178,14 +177,14 @@ describe('Integration | Component | content atm inventories lambdas', function (
           revision: '2',
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
         done();
       });
 
     it('allows to open editor in creation mode', async function (done) {
-      await render(this);
+      await renderComponent();
 
       await click(
         getSlide('list').querySelector('.open-add-atm-lambda-trigger')
@@ -199,7 +198,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
     });
 
     it('allows to open editor for specific lambda', async function (done) {
-      await render(this);
+      await renderComponent();
 
       await click(getSlide('list').querySelector('.revisions-table-revision-entry'));
 
@@ -213,7 +212,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
     });
 
     it('allows to open new lambda revision creator', async function (done) {
-      await render(this);
+      await renderComponent();
 
       await click(
         getSlide('list').querySelectorAll('.revisions-table-create-revision-entry')[1]
@@ -228,7 +227,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
     it('allows to open new lambda revision creator based on old revision',
       async function (done) {
-        await render(this);
+        await renderComponent();
 
         await click(
           getSlide('list').querySelectorAll('.revision-actions-trigger')[1]
@@ -260,7 +259,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
     context('when "lambdaId" and "revision" query params are empty', function () {
       it('shows lambda creator', async function (done) {
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda');
@@ -277,7 +276,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
             // in nested components.
             expect(this.get('context.atmInventory')).to.equal(atmInventory);
           });
-        await render(this);
+        await renderComponent();
 
         await fillIn('.name-field .form-control', 'someName');
         await fillIn('.dockerImage-field .form-control', 'someImage');
@@ -301,7 +300,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
       itShowsLoader();
 
       it('shows lambda revision creator', async function (done) {
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
@@ -312,7 +311,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
       it('allows to add new lambda revision', async function (done) {
         const createStub = sinon.stub(CreateAtmLambdaRevisionAction.prototype, 'onExecute');
-        await render(this);
+        await renderComponent();
 
         await fillIn('.name-field .form-control', 'someName');
         await click('.btn-submit');
@@ -334,7 +333,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
     context('when "lambdaId" and "revision" query params are empty', function () {
       it('redirects to "list" view', async function (done) {
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
         done();
@@ -356,7 +355,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
       });
 
       it('shows lambda revision editor', async function (done) {
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Modify lambda revision');
@@ -367,7 +366,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
       it('allows to modify lambda revision', async function (done) {
         const modifyStub = sinon.stub(ModifyAtmLambdaRevisionAction.prototype, 'onExecute');
-        await render(this);
+        await renderComponent();
 
         await selectChoose('.state-field', 'Stable');
         await click('.btn-submit');
@@ -381,18 +380,17 @@ describe('Integration | Component | content atm inventories lambdas', function (
   });
 });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-lambdas
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-lambdas
     atmInventory=atmInventory
   }}`);
-  await wait();
 }
 
 function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {
   const expectedQueryParams =
     Object.assign({ view: 'list' }, expectedListQueryParams);
   it('allows to get back to "list" slide using back link', async function (done) {
-    await render(this);
+    await renderComponent();
 
     await enterEditorCallback(this);
     expect(isSlideActive('editor')).to.be.true;
@@ -405,7 +403,7 @@ function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {
   });
 
   it('allows to get back to "list" slide using cancel button', async function (done) {
-    await render(this);
+    await renderComponent();
 
     await enterEditorCallback(this);
     expect(isSlideActive('editor')).to.be.true;
@@ -424,7 +422,7 @@ function itShowsLoader() {
       .withArgs('atmLambda', 'lambda0')
       .returns(new Promise(() => {}));
 
-    await render(this);
+    await renderComponent();
 
     expect(isSlideActive('editor')).to.be.true;
     expect(getSlide('editor').querySelector('.spin-spinner')).to.exist;
@@ -437,7 +435,7 @@ function itShowsLoader() {
       .withArgs('atmLambda', 'lambda0')
       .returns(new Promise((resolve, reject) => { rejectCallback = reject; }));
 
-    await render(this);
+    await renderComponent();
     rejectCallback();
     await wait();
 
@@ -450,7 +448,7 @@ function itShowsLoader() {
     this.get('getRecordByIdStub')
       .withArgs('atmLambda', 'lambda0')
       .returns(new Promise(() => {}));
-    await render(this);
+    await renderComponent();
 
     await click(getSlide('editor').querySelector('.content-back-link'));
 
