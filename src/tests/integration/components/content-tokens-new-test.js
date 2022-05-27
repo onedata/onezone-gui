@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { lookupService } from '../../helpers/stub-service';
@@ -13,9 +14,7 @@ import { set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Component | content tokens new', function () {
-  setupComponentTest('content-tokens-new', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const spaces = [{
@@ -94,14 +93,14 @@ describe('Integration | Component | content tokens new', function () {
       });
   });
 
-  it('has class "content-tokens-new', function () {
-    this.render(hbs `{{content-tokens-new}}`);
+  it('has class "content-tokens-new', async function () {
+    await render(hbs `{{content-tokens-new}}`);
 
     expect(this.$('.content-tokens-new')).to.exist;
   });
 
   it('shows list of token templates at the beginning', async function () {
-    this.render(hbs `{{content-tokens-new}}`);
+    await render(hbs `{{content-tokens-new}}`);
 
     expect(isSlideActive('templates')).to.be.true;
   });
@@ -117,7 +116,7 @@ describe('Integration | Component | content tokens new', function () {
         sinon.stub(tokenActions, 'createCreateTokenAction')
         .returns(createTokenAction);
 
-      await renderAndSelectTemplate(this, 'custom');
+      await renderAndSelectTemplate('custom');
       await fillIn('.name-field input', 'abc');
       await click('.submit-token');
 
@@ -146,7 +145,7 @@ describe('Integration | Component | content tokens new', function () {
       sinon.stub(tokenActions, 'createCreateTokenAction')
         .returns(createTokenAction);
 
-      await renderAndSelectTemplate(this, 'custom');
+      await renderAndSelectTemplate('custom');
       await fillIn('.name-field input', 'abc');
       await click('.submit-token');
 
@@ -176,7 +175,7 @@ describe('Integration | Component | content tokens new', function () {
         })),
       });
 
-      this.render(hbs `{{content-tokens-new}}`);
+      await render(hbs `{{content-tokens-new}}`);
       await wait();
 
       checkShowsTemplate('Custom');
@@ -189,8 +188,8 @@ describe('Integration | Component | content tokens new', function () {
 
   it(
     'does not show selected template name on token template selector slide',
-    function () {
-      this.render(hbs `{{content-tokens-new}}`);
+    async function () {
+      await render(hbs `{{content-tokens-new}}`);
 
       expect(getSlide('templates').querySelector('.header-row .template-name'))
         .to.not.exist;
@@ -198,7 +197,7 @@ describe('Integration | Component | content tokens new', function () {
   );
 
   it('allows to select "Onezone REST" template', async function () {
-    await renderAndSelectTemplate(this, 'onezoneRest');
+    await renderAndSelectTemplate('onezoneRest');
 
     checkShowsTemplate('Onezone REST');
     checkTokenEditorHasName(this, /Onezone REST .+/);
@@ -209,7 +208,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Oneprovider REST" template', async function () {
-    await renderAndSelectTemplate(this, 'oneproviderRest');
+    await renderAndSelectTemplate('oneproviderRest');
 
     checkShowsTemplate('Oneprovider REST/CDMI');
     checkTokenEditorHasName(this, /Oneprovider REST .+/);
@@ -220,7 +219,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Oneclient" template', async function () {
-    await renderAndSelectTemplate(this, 'oneclient');
+    await renderAndSelectTemplate('oneclient');
 
     checkShowsTemplate('Oneclient access');
     checkTokenEditorHasName(this, /Oneclient .+/);
@@ -228,7 +227,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Oneclient in Oneprovider" template', async function () {
-    await renderAndSelectTemplate(this, 'oneclientInOneprovider');
+    await renderAndSelectTemplate('oneclientInOneprovider');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Oneclient access in specific Oneprovider');
@@ -240,7 +239,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Read-only data" template', async function () {
-    await renderAndSelectTemplate(this, 'readonlyData');
+    await renderAndSelectTemplate('readonlyData');
 
     checkShowsTemplate('Read‐only data access');
     checkTokenEditorHasName(this, /Read-only data .+/);
@@ -248,7 +247,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Read-only data for user" template', async function () {
-    await renderAndSelectTemplate(this, 'readonlyDataForUser');
+    await renderAndSelectTemplate('readonlyDataForUser');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Read‐only data access for specific user');
@@ -260,7 +259,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Restricted data" template', async function () {
-    await renderAndSelectTemplate(this, 'restrictedData');
+    await renderAndSelectTemplate('restrictedData');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Restricted data access');
@@ -272,7 +271,7 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Identity" template', async function () {
-    await renderAndSelectTemplate(this, 'identity');
+    await renderAndSelectTemplate('identity');
 
     checkShowsTemplate('Identity proof');
     checkTokenEditorHasName(this, /Identity .+/);
@@ -280,14 +279,14 @@ describe('Integration | Component | content tokens new', function () {
   });
 
   it('allows to select "Custom" template', async function () {
-    await renderAndSelectTemplate(this, 'custom');
+    await renderAndSelectTemplate('custom');
 
     checkShowsTemplate('Custom');
     checkTokenEditorHasName(this, /Access .+/);
   });
 
   it('allows to come back from the form to templates list', async function () {
-    await renderAndSelectTemplate(this, 'onezoneRest');
+    await renderAndSelectTemplate('onezoneRest');
     await click('.content-back-link');
 
     expect(isSlideActive('templates')).to.be.true;
@@ -296,7 +295,7 @@ describe('Integration | Component | content tokens new', function () {
   it(
     'resets form back to the templates default after user chose template, modified form, came back to templates list and selected the same template again',
     async function () {
-      await renderAndSelectTemplate(this, 'onezoneRest');
+      await renderAndSelectTemplate('onezoneRest');
       await click('.interface-field .option-oneclient');
       await click('.content-back-link');
       await selectTemplate('onezoneRest');
@@ -307,8 +306,8 @@ describe('Integration | Component | content tokens new', function () {
   );
 });
 
-async function renderAndSelectTemplate(testCase, templateName) {
-  testCase.render(hbs `{{content-tokens-new}}`);
+async function renderAndSelectTemplate(templateName) {
+  await render(hbs `{{content-tokens-new}}`);
   await selectTemplate(templateName);
 }
 

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -16,9 +17,7 @@ import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
 
 describe('Integration | Component | token consumer', function () {
-  setupComponentTest('token-consumer', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.originalLoggerError = Ember.Logger.error;
@@ -67,29 +66,29 @@ describe('Integration | Component | token consumer', function () {
     Ember.Test.adapter.exception = this.originalTestAdapterException;
   });
 
-  it('has class "token-consumer"', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('has class "token-consumer"', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     expect(this.$('.token-consumer')).to.exist;
   });
 
-  it('has token input', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('has token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     const $input = this.$('input[type="text"].token-string');
     expect($input).to.exist;
     expect($input).to.have.attr('placeholder', 'Enter token...');
   });
 
-  it('does not invoke examine on init', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('does not invoke examine on init', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     return wait()
       .then(() => expect(this.get('examineStub')).to.not.be.called);
   });
 
-  it('invokes examine on token input', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('invokes examine on token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     return fillIn('.token-string', 'token')
       .then(() => {
@@ -99,8 +98,8 @@ describe('Integration | Component | token consumer', function () {
       });
   });
 
-  it('invokes examine many times on subsequent token input', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('invokes examine many times on subsequent token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     return fillIn('.token-string', 'token')
       .then(() => fillIn('.token-string', 'token1'))
@@ -123,19 +122,19 @@ describe('Integration | Component | token consumer', function () {
     typeText: 'Identity token',
     name: 'identity',
   }].forEach(({ type, typeText, name }) => {
-    it(`shows type information for ${name} token`, function () {
+    it(`shows type information for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
         .then(() => expect(this.$('.token-type').text().trim()).to.equal(typeText));
     });
 
-    it(`does not show "Join" button for ${name} token`, function () {
+    it(`does not show "Join" button for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
         .then(() => {
@@ -283,14 +282,14 @@ describe('Integration | Component | token consumer', function () {
     const inviteType = inviteSpec.inviteType;
 
     if (noJoinMessage) {
-      it(`does not show "Confirm" button for invite ${inviteType} token`, function () {
+      it(`does not show "Confirm" button for invite ${inviteType} token`, async function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
           },
         }));
 
-        this.render(hbs `{{token-consumer}}`);
+        await render(hbs `{{token-consumer}}`);
 
         return fillIn('.token-string', 'token')
           .then(() => {
@@ -299,14 +298,14 @@ describe('Integration | Component | token consumer', function () {
           });
       });
     } else {
-      it(`shows "Confirm" button for invite ${inviteType} token`, function () {
+      it(`shows "Confirm" button for invite ${inviteType} token`, async function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
           },
         }));
 
-        this.render(hbs `{{token-consumer}}`);
+        await render(hbs `{{token-consumer}}`);
 
         return fillIn('.token-string', 'token')
           .then(() => {
@@ -316,14 +315,14 @@ describe('Integration | Component | token consumer', function () {
       });
     }
 
-    it(`shows type information for invite ${inviteType} token`, function () {
+    it(`shows type information for invite ${inviteType} token`, async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: inviteSpec,
         },
       }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
         .then(() => {
@@ -335,7 +334,7 @@ describe('Integration | Component | token consumer', function () {
     if (modelToSelect) {
       it(
         `shows joining record selector for invite ${inviteType} token`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
@@ -343,7 +342,7 @@ describe('Integration | Component | token consumer', function () {
             targetName: 'someRecord',
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
           const joiningRecordHelper = new JoiningRecordHelper();
           return fillIn('.token-string', 'token')
@@ -369,14 +368,14 @@ describe('Integration | Component | token consumer', function () {
 
       it(
         `has disabled "Confirm" button for invite ${inviteType} token when no target record is selected`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
             },
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
             .then(() => expect(this.$('.confirm-btn')).to.have.attr('disabled'));
@@ -385,14 +384,14 @@ describe('Integration | Component | token consumer', function () {
 
       it(
         `has enabled "Confirm" button for invite ${inviteType} token when target record is selected`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
             },
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
             .then(() => new JoiningRecordHelper().selectOption(1))
@@ -402,7 +401,7 @@ describe('Integration | Component | token consumer', function () {
     } else {
       it(
         `does not show joining record selector for invite ${inviteType} token`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
@@ -410,7 +409,7 @@ describe('Integration | Component | token consumer', function () {
             targetName: 'someRecord',
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
             .then(() => expect(this.$('.joining-record-selector')).to.not.exist);
@@ -419,14 +418,14 @@ describe('Integration | Component | token consumer', function () {
 
       it(
         `has enabled "Confirm" button for invite ${inviteType} token`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
             },
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
           return fillIn('.token-string', 'token')
             .then(() => expect(this.$('.confirm-btn')).to.not.have.attr('disabled'));
@@ -437,7 +436,7 @@ describe('Integration | Component | token consumer', function () {
 
   it(
     'shows "unknown" target name and warning for invite token when target name is null',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -447,7 +446,7 @@ describe('Integration | Component | token consumer', function () {
         },
       }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
         .then(() => {
@@ -463,10 +462,10 @@ describe('Integration | Component | token consumer', function () {
     }
   );
 
-  it('informs about incorrect token', function () {
+  it('informs about incorrect token', async function () {
     stubExamine(this, 'token', reject({ id: 'badValueToken' }));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
     return fillIn('.token-string', 'token')
       .then(() =>
@@ -475,10 +474,10 @@ describe('Integration | Component | token consumer', function () {
       );
   });
 
-  it('informs about other examine errors', function () {
+  it('informs about other examine errors', async function () {
     stubExamine(this, 'token', reject({ id: 'someOtherError' }));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
     return fillIn('.token-string', 'token')
       .then(() =>
@@ -486,8 +485,8 @@ describe('Integration | Component | token consumer', function () {
       );
   });
 
-  it('interprets whitespaces in token input as an empty value', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('interprets whitespaces in token input as an empty value', async function () {
+    await render(hbs `{{token-consumer}}`);
 
     return fillIn('.token-string', '   ')
       .then(() => {
@@ -499,8 +498,8 @@ describe('Integration | Component | token consumer', function () {
 
   it(
     'interprets forbidden-only characters in token input as an incorrect token',
-    function () {
-      this.render(hbs `{{token-consumer}}`);
+    async function () {
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', '!@#$%^&*()')
         .then(() => {
@@ -511,11 +510,11 @@ describe('Integration | Component | token consumer', function () {
     }
   );
 
-  it('shows spinner while examining token', function () {
+  it('shows spinner while examining token', async function () {
     let resolveRequest;
     stubExamine(this, 'token', new Promise(resolve => resolveRequest = resolve));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
     expect(this.$('.spinner')).to.not.exist;
     return fillIn('.token-string', 'token')
@@ -529,7 +528,7 @@ describe('Integration | Component | token consumer', function () {
 
   it(
     'passess data to ConsumeInviteTokenAction instance and executes it',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -545,7 +544,7 @@ describe('Integration | Component | token consumer', function () {
         sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       const joiningRecordHelper = new JoiningRecordHelper();
       return fillIn('.token-string', 'token')
@@ -565,7 +564,7 @@ describe('Integration | Component | token consumer', function () {
 
   it(
     'has confirm button blocked until ConsumeInviteTokenAction execution is done',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -582,7 +581,7 @@ describe('Integration | Component | token consumer', function () {
       sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
       return fillIn('.token-string', 'token')
         .then(() => click('.confirm-btn'))

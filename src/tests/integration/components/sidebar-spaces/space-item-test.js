@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import $ from 'jquery';
@@ -8,9 +9,7 @@ import { resolve } from 'rsvp';
 import { click, fillIn } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | sidebar spaces/space item', function () {
-  setupComponentTest('sidebar-spaces/space-item', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.set('space', {
@@ -18,18 +17,18 @@ describe('Integration | Component | sidebar spaces/space item', function () {
     });
   });
 
-  it('renders space name and icon', function () {
-    this.render(hbs `{{sidebar-spaces/space-item item=space}}`);
+  it('renders space name and icon', async function () {
+    await render(hbs `{{sidebar-spaces/space-item item=space}}`);
 
     expect(this.$()).to.contain(this.get('space.name'));
     expect(this.$('.oneicon-space')).to.exist;
   });
 
-  it('allows to rename space through "Rename" action', function () {
+  it('allows to rename space through "Rename" action', async function () {
     const saveSpy = sinon.spy(resolve);
     this.set('space.save', saveSpy);
 
-    this.render(hbs `{{sidebar-spaces/space-item item=space}}`);
+    await render(hbs `{{sidebar-spaces/space-item item=space}}`);
 
     return click('.collapsible-toolbar-toggle')
       .then(() => {

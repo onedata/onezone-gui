@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { registerService } from '../../helpers/stub-service';
@@ -45,9 +46,7 @@ const authorizerManagerStub = Service.extend({
 });
 
 describe('Integration | Component | content users', function () {
-  setupComponentTest('content-users', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'linkedAccountManager', linkedAccountManagerStub);
@@ -62,8 +61,8 @@ describe('Integration | Component | content users', function () {
     this.set('user', MOCKED_USER);
   });
 
-  it('renders full name', function (done) {
-    this.render(hbs `{{content-users user=user}}`);
+  it('renders full name', async function (done) {
+    await render(hbs `{{content-users user=user}}`);
     wait().then(() => {
       expect(this.$('.full-name-editor').text().trim())
         .to.equal(this.get('user.fullName'));
@@ -71,8 +70,8 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders username', function (done) {
-    this.render(hbs `{{content-users user=user}}`);
+  it('renders username', async function (done) {
+    await render(hbs `{{content-users user=user}}`);
     wait().then(() => {
       expect(this.$('.username-editor').text().trim())
         .to.equal(this.get('user.username'));
@@ -81,15 +80,15 @@ describe('Integration | Component | content users', function () {
   });
 
   it('renders copiable user id', async function () {
-    this.render(hbs `{{content-users user=user}}`);
+    await render(hbs `{{content-users user=user}}`);
     await wait();
 
     expect(this.$('.user-id-clipboard-line input').val())
       .to.equal(this.get('user.entityId'));
   });
 
-  it('renders linked account', function () {
-    this.render(hbs `{{content-users user=user}}`);
+  it('renders linked account', async function () {
+    await render(hbs `{{content-users user=user}}`);
     return wait().then(() => {
       expect(this.$('.google-account'), 'google-account').to.exist;
       expect(
@@ -101,8 +100,8 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change display name', function (done) {
-    this.render(hbs `{{content-users user=user}}`);
+  it('allows to change display name', async function (done) {
+    await render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newName = 'testName';
     const saveSpy = sinon.spy(() => resolve());
@@ -122,8 +121,8 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('allows to change username', function (done) {
-    this.render(hbs `{{content-users user=user}}`);
+  it('allows to change username', async function (done) {
+    await render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newUsername = 'testUsername';
     const saveSpy = sinon.spy(() => resolve());
@@ -143,8 +142,8 @@ describe('Integration | Component | content users', function () {
     });
   });
 
-  it('renders password section for user with basicAuth enabled', function () {
-    this.render(hbs `{{content-users user=user}}`);
+  it('renders password section for user with basicAuth enabled', async function () {
+    await render(hbs `{{content-users user=user}}`);
     return wait().then(() => {
       expect(this.$('.change-password-row .one-inline-editor')).to.exist;
     });
@@ -152,9 +151,9 @@ describe('Integration | Component | content users', function () {
 
   it(
     'does not render password section for user with basicAuth disabled',
-    function () {
+    async function () {
       this.set('user.basicAuthEnabled', false);
-      this.render(hbs `{{content-users user=user}}`);
+      await render(hbs `{{content-users user=user}}`);
       return wait().then(() => {
         expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
       });

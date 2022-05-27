@@ -1,6 +1,7 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { describe, it, beforeEach } from 'mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { get, setProperties } from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
@@ -9,8 +10,7 @@ import { resolve, reject } from 'rsvp';
 import Service from '@ember/service';
 import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
-import TestAdapter from '@ember/test/adapter';
-import Ember from 'ember';
+import { suppressRejections } from '../../helpers/suppress-rejections';
 
 const userEntityId = 'userEntityId';
 
@@ -78,9 +78,7 @@ function generateNGroups(context, n) {
 }
 
 describe('Integration | Component | membership visualiser', function () {
-  setupComponentTest('membership-visualiser', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'store', StoreStub);
@@ -95,24 +93,11 @@ describe('Integration | Component | membership visualiser', function () {
     });
     generateNGroups(this, 3);
     this.set('user', user);
-
-    // Hack: changing default error handling in tests, due to the Ember bug:
-    // rejected, not caught promises with some error inside (not empty) marks
-    // tests as failed. So e.g. `reject({ id: 'forbidden' })` in store.findRecord,
-    // crashes tests even if it's a correct behaviour of findRecord.
-    this.originalLoggerError = Ember.Logger.error;
-    this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function () {};
-    Ember.Test.adapter.exception = function () {};
+    suppressRejections();
   });
 
-  afterEach(function () {
-    Ember.Logger.error = this.originalLoggerError;
-    Ember.Test.adapter.exception = this.originalTestAdapterException;
-  });
-
-  it('renders all possible paths', function () {
-    this.render(hbs `{{membership-visualiser
+  it('renders all possible paths', async function () {
+    await render(hbs `{{membership-visualiser
       contextRecord=user
       targetRecord=groups.[0]}}`);
     return wait().then(() => {
@@ -120,8 +105,8 @@ describe('Integration | Component | membership visualiser', function () {
     });
   });
 
-  it('renders limited number of possible paths and limit info message', function () {
-    this.render(hbs `{{membership-visualiser
+  it('renders limited number of possible paths and limit info message', async function () {
+    await render(hbs `{{membership-visualiser
       maxPathsNumber=3
       contextRecord=user
       targetRecord=groups.[0]}}`);
@@ -131,8 +116,8 @@ describe('Integration | Component | membership visualiser', function () {
     });
   });
 
-  it('renders paths in growing-length order', function () {
-    this.render(hbs `{{membership-visualiser
+  it('renders paths in growing-length order', async function () {
+    await render(hbs `{{membership-visualiser
       contextRecord=user
       targetRecord=groups.[0]}}`);
     return wait().then(() => {
@@ -145,8 +130,8 @@ describe('Integration | Component | membership visualiser', function () {
     });
   });
 
-  it('renders all possible paths when visibleBlocks equals 2', function () {
-    this.render(hbs `{{membership-visualiser
+  it('renders all possible paths when visibleBlocks equals 2', async function () {
+    await render(hbs `{{membership-visualiser
       contextRecord=user
       visibleBlocks=2
       targetRecord=groups.[0]}}`);

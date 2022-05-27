@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import CreateAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-action';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
@@ -11,9 +11,7 @@ import wait from 'ember-test-helpers/wait';
 describe(
   'Integration | Utility | workflow actions/create atm workflow schema action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const workflowManager = lookupService(this, 'workflow-manager');
@@ -62,7 +60,7 @@ describe(
         .withArgs(atmInventory.entityId, sinon.match(completeRawAtmWorkflowSchema))
         .resolves(atmWorkflowSchemaRecord);
       const action = CreateAtmWorkflowSchemaAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmInventory,
           rawAtmWorkflowSchema,
@@ -90,7 +88,7 @@ describe(
         'rawAtmWorkflowSchema'
       );
       const action = CreateAtmWorkflowSchemaAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmInventory,
           rawAtmWorkflowSchema,

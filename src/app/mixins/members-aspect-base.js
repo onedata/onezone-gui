@@ -31,7 +31,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeActions: service(),
   tokenActions: service(),
   userActions: service(),
-  media: service(),
   navigationState: service(),
   recordManager: service(),
 

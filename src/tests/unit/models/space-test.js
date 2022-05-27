@@ -1,17 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupModelTest } from 'ember-mocha';
+import { setupTest } from 'ember-mocha';
 import Service from '@ember/service';
 import { get } from '@ember/object';
 import { registerService } from '../../helpers/stub-service';
 import OnedataGraphStub from '../../helpers/stubs/services/onedata-graph';
 
 describe('Unit | Model | space', function () {
-  setupModelTest('space', {
-    needs: [
-      'service:onedata-token-api',
-    ],
-  });
+  setupTest();
 
   beforeEach(function () {
     registerService(this, 'onedata-graph', OnedataGraphStub);
@@ -22,12 +18,12 @@ describe('Unit | Model | space', function () {
   });
 
   it('has getInviteToken method', function () {
-    const record = this.subject();
+    const record = this.owner.lookup('service:store').createRecord('space', {});
     expect(record.getInviteToken).to.be.instanceOf(Function);
   });
 
   it('computes current user privileges without owner flag', function () {
-    const model = this.subject({
+    const model = this.owner.lookup('service:store').createRecord('space', {
       currentUserEffPrivileges: ['space_view_qos'],
       currentUserIsOwner: false,
     });
@@ -39,7 +35,7 @@ describe('Unit | Model | space', function () {
   });
 
   it('computes current user privileges with owner flag', function () {
-    const model = this.subject({
+    const model = this.owner.lookup('service:store').createRecord('space', {
       currentUserEffPrivileges: [],
       currentUserIsOwner: true,
     });

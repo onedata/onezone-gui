@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
@@ -12,9 +13,7 @@ import { click } from 'ember-native-dom-helpers';
 describe(
   'Integration | Component | token template selector/onepanel rest template',
   function () {
-    setupComponentTest('token-template-selector/onepanel-rest-template', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const clusters = [{
@@ -42,8 +41,8 @@ describe(
 
     it(
       'renders tile with "template-onepanelRest" class, correct title and image',
-      function () {
-        this.render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+      async function () {
+        await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
 
         const $tile = this.$('.one-tile');
         expect($tile).to.have.class('template-onepanelRest');
@@ -55,7 +54,7 @@ describe(
     );
 
     it('shows list of clusters', async function () {
-      this.render(hbs `{{token-template-selector/onepanel-rest-template}}`);
+      await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
 
       await click('.one-tile');
       const $records = this.$('.record-item');
@@ -70,7 +69,7 @@ describe(
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-        this.render(hbs `{{token-template-selector/onepanel-rest-template
+        await render(hbs `{{token-template-selector/onepanel-rest-template
           onSelected=selectedSpy
         }}`);
 
@@ -96,7 +95,7 @@ describe(
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-        this.render(hbs `{{token-template-selector/onepanel-rest-template
+        await render(hbs `{{token-template-selector/onepanel-rest-template
           onSelected=selectedSpy
         }}`);
 

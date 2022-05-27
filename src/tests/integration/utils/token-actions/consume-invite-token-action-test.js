@@ -3,7 +3,7 @@
 
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import ConsumeInviteTokenAction from 'onezone-gui/utils/token-actions/consume-invite-token-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
@@ -13,9 +13,7 @@ import { next } from '@ember/runloop';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Util | token actions/consume invite token action', function () {
-  setupComponentTest('global-modal-mounter', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const token = 'abcd';
@@ -125,7 +123,7 @@ describe('Integration | Util | token actions/consume invite token action', funct
             scope: 'auto',
           }));
           const action = ConsumeInviteTokenAction.create({
-            ownerSource: this,
+            ownerSource: this.owner,
             context,
           });
           const tokenManager = lookupService(this, 'token-manager');
@@ -171,7 +169,7 @@ describe('Integration | Util | token actions/consume invite token action', funct
       this.set('context.targetModelName', 'group');
       this.set('context.joiningRecord.constructor.modelName', 'group');
       const action = ConsumeInviteTokenAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: Object.assign(this.get('context'), { dontRedirect: true }),
       });
       const tokenManager = lookupService(this, 'token-manager');
@@ -193,7 +191,7 @@ describe('Integration | Util | token actions/consume invite token action', funct
     this.set('context.targetModelName', 'group');
     this.set('context.joiningRecord.constructor.modelName', 'group');
     const action = ConsumeInviteTokenAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
     const tokenManager = lookupService(this, 'token-manager');

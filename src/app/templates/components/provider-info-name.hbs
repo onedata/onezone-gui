@@ -1,9 +1,9 @@
-{{#truncated-string 
+{{#truncated-string
   class="oneprovider-name"
   mouseEnter=(action "changeIconHover" true)
   mouseLeave=(action "changeIconHover" false)
 }}
-  <div 
+  <div
     class="inline-icon-container provider-info-trigger"
     {{action
       (mut providerInfoOpened)
@@ -11,9 +11,9 @@
       bubbles=false
     }}
   >
-    <div 
-      class={{concat-classes 
-        "inline-icon-container" 
+    <div
+      class={{concat-classes
+        "inline-icon-container"
         (if providerInfoOpened "not-animation" "animation")
       }}
 
@@ -32,8 +32,8 @@
     as |popover|
   }}
     {{#click-outside
-      action=(action (mut providerInfoOpened) false)
-      except-selector=".provider-info-trigger, .webui-popover-provider-info"
+      onClickOutside=(action (mut providerInfoOpened) false)
+      exceptSelector=".provider-info-trigger, .webui-popover-provider-info"
     }}
       {{provider-info-content
         class="form-group without-margin"

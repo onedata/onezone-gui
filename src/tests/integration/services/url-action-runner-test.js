@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import { lookupService } from '../../helpers/stub-service';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import sinon from 'sinon';
@@ -8,9 +8,7 @@ import wait from 'ember-test-helpers/wait';
 import { get } from '@ember/object';
 
 describe('Integration | Service | url action runner', function () {
-  setupComponentTest('test-component', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   afterEach(function () {
     if (get(RemoveSpaceAction.prototype, 'execute.restore')) {

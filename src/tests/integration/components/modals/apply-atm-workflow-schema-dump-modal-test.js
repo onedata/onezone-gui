@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import { lookupService } from '../../../helpers/stub-service';
 import hbs from 'htmlbars-inline-precompile';
 import {
@@ -23,9 +24,7 @@ import ObjectProxy from '@ember/object/proxy';
 
 describe('Integration | Component | modals/apply atm workflow schema dump modal',
   function () {
-    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const atmWorkflowSchemas = A([{
@@ -102,7 +101,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
 
       it('allows changing uploaded file to another one', async function (done) {
         await showModal(this);
-        const $modalBody = getModalBody();
+        const $modalBody = $(getModalBody());
 
         const dump2 = generateAtmWorkflowSchemaDump();
         dump2.name = 'w2';
@@ -151,7 +150,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
 
       it('allows changing target inventory', async function (done) {
         await showModal(this);
-        const $modalBody = getModalBody();
+        const $modalBody = $(getModalBody());
 
         await clickTrigger('.targetAtmInventory-field');
         const $options = $('.ember-power-select-option');
@@ -187,7 +186,7 @@ async function showModal(testCase) {
     modalOptions,
   } = testCase.getProperties('modalManager', 'modalOptions');
 
-  testCase.render(hbs `{{global-modal-mounter}}`);
+  await render(hbs `{{global-modal-mounter}}`);
 
   await modalManager.show('apply-atm-workflow-schema-dump-modal', modalOptions)
     .shownPromise;
@@ -201,10 +200,10 @@ function itShowsModalWithContent() {
       const dump = this.get('dump');
       await showModal(this);
 
-      const $modal = getModal();
-      const $modalHeader = getModalHeader();
-      const $modalBody = getModalBody();
-      const $modalFooter = getModalFooter();
+      const $modal = $(getModal());
+      const $modalHeader = $(getModalHeader());
+      const $modalBody = $(getModalBody());
+      const $modalFooter = $(getModalFooter());
 
       expect($modal).to.have.class('apply-atm-workflow-schema-dump-modal');
       expect($modalHeader.find('h1').text().trim()).to.equal(expectedTitle);
@@ -250,7 +249,7 @@ function itShowsWorkflowDumpError() {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
       this.set('dumpSourceProxy.content.dump', null);
       await showModal(this);
-      const $modalBody = getModalBody();
+      const $modalBody = $(getModalBody());
 
       if (isUploadMode) {
         expect($modalBody.find('.upload-details .filename').text().trim())
@@ -266,7 +265,7 @@ function itShowsWorkflowDumpError() {
 function itAllowsChangingTargetWorkflow() {
   it('allows changing target workflow', async function (done) {
     await showModal(this);
-    const $modalBody = getModalBody();
+    const $modalBody = $(getModalBody());
 
     await clickTrigger('.targetWorkflow-field');
     const $options = $('.ember-power-select-option');
@@ -287,7 +286,7 @@ function itAllowsChangingTargetWorkflow() {
 function itAllowsChangingOperationAndNewWorkflowName() {
   it('allows changing operation and new workflow name', async function (done) {
     await showModal(this);
-    const $modalBody = getModalBody();
+    const $modalBody = $(getModalBody());
 
     await click('.option-create');
     await fillIn('.newWorkflowName-field .form-control', 'xyz');
@@ -302,7 +301,7 @@ function itChangesOperationToCreateOnEmptyTargetWorkflows() {
   it('changes operation from "merge" to "create" when there are no target workflows available',
     async function (done) {
       await showModal(this);
-      const $modalBody = getModalBody();
+      const $modalBody = $(getModalBody());
 
       this.get('atmWorkflowSchemas').clear();
       await wait();
@@ -387,7 +386,7 @@ function itClosesModal() {
     const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
     await showModal(this);
 
-    await click(getModal()[0]);
+    await click(getModal());
     expect(onHideSpy).to.be.calledOnce;
     done();
   });
@@ -402,7 +401,7 @@ function itBlocksControlsAndCloseWhenSubmitting() {
       await showModal(this);
 
       await click('.submit-btn');
-      await click(getModal()[0]);
+      await click(getModal());
 
       expect(onHideSpy).to.not.be.called;
       if (isUploadMode) {
@@ -415,7 +414,7 @@ function itBlocksControlsAndCloseWhenSubmitting() {
         .to.have.attr('aria-disabled');
       expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
       expect(this.$('.one-way-radio-group')).to.have.class('disabled');
-      expect(getModalFooter().find('.cancel-btn')).to.be.disabled;
+      expect($(getModalFooter()).find('.cancel-btn')).to.be.disabled;
       done();
     });
 }

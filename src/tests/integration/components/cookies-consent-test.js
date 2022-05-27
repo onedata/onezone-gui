@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
@@ -20,32 +21,30 @@ const GuiMessageManagerStub = Service.extend({
 });
 
 describe('Integration | Component | cookies consent', function () {
-  setupComponentTest('cookies-consent', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'guiMessageManager', GuiMessageManagerStub);
   });
 
-  it('renders cookie consent notification', function () {
-    this.render(hbs `{{cookies-consent}}`);
+  it('renders cookie consent notification', async function () {
+    await render(hbs `{{cookies-consent}}`);
 
     expect(this.$('.cookies-consent').text()).to.contain('consent content');
   });
 
   it(
     'does not render cookie consent notification when cookies are accepted',
-    function () {
+    async function () {
       set(lookupService(this, 'guiMessageManager'), 'areCookiesAccepted', true);
-      this.render(hbs `{{cookies-consent}}`);
+      await render(hbs `{{cookies-consent}}`);
 
       expect(this.$('.cookies-consent')).to.not.exist;
     }
   );
 
-  it('allows to accepts cookies', function () {
-    this.render(hbs `{{cookies-consent}}`);
+  it('allows to accepts cookies', async function () {
+    await render(hbs `{{cookies-consent}}`);
 
     return click('.accept-cookies').then(() => {
       expect(this.$('.cookies-consent')).to.not.exist;

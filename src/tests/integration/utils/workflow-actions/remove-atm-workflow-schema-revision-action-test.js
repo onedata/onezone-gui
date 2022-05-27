@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import { get, getProperties } from '@ember/object';
@@ -10,13 +11,12 @@ import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
 import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
+import $ from 'jquery';
 
 describe(
   'Integration | Utility | workflow actions/remove atm workflow schema revision action',
   function () {
-    setupComponentTest('global-modal-mounter', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const context = {
@@ -28,7 +28,7 @@ describe(
       };
       this.setProperties({
         action: RemoveAtmWorkflowSchemaRevisionAction.create({
-          ownerSource: this,
+          ownerSource: this.owner,
           context,
         }),
         atmWorkflowSchema: context.atmWorkflowSchema,
@@ -47,17 +47,17 @@ describe(
     });
 
     it('shows modal on execute', async function () {
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
       await wait();
 
-      expect(getModal()).to.have.class('question-modal');
-      expect(getModalHeader().find('.oneicon-sign-warning-rounded')).to.exist;
-      expect(getModalHeader().find('h1').text().trim()).to.equal('Remove workflow revision');
-      expect(getModalBody().text().trim()).to.contain(
+      expect($(getModal())).to.have.class('question-modal');
+      expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
+      expect($(getModalHeader()).find('h1').text().trim()).to.equal('Remove workflow revision');
+      expect($(getModalBody()).text().trim()).to.contain(
         'You are about to delete revision 3 of the workflow workflow1.'
       );
-      const $yesButton = getModalFooter().find('.question-yes');
+      const $yesButton = $(getModalFooter()).find('.question-yes');
       expect($yesButton.text().trim()).to.equal('Remove');
       expect($yesButton).to.have.class('btn-danger');
     });
@@ -65,11 +65,11 @@ describe(
     it(
       'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
       async function () {
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
         await wait();
-        await click(getModalFooter().find('.question-no')[0]);
+        await click($(getModalFooter()).find('.question-no')[0]);
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
@@ -86,11 +86,11 @@ describe(
           lookupService(this, 'global-notify'),
           'success'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
         await wait();
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click($(getModalFooter()).find('.question-yes')[0]);
         const actionResult = await actionResultPromise;
 
         expect(removeRevisionStub).to.be.calledOnce
@@ -113,11 +113,11 @@ describe(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
         await wait();
-        await click(getModalFooter().find('.question-yes')[0]);
+        await click($(getModalFooter()).find('.question-yes')[0]);
         rejectRemove('someError');
         await wait();
         const actionResult = await actionResultPromise;

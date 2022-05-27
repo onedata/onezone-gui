@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, before, afterEach, context } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { lookupService } from '../../../helpers/stub-service';
@@ -14,9 +14,7 @@ import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/mo
 describe(
   'Integration | Component | content atm inventories lambdas/editor view',
   function () {
-    setupComponentTest('content-atm-inventories-lambdas/editor-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     before(function () {
       // Instatiate Action class to make its `prototype.execute` available for
@@ -49,15 +47,15 @@ describe(
       });
     });
 
-    it('has class "content-atm-inventories-lambdas-editor-view"', function () {
-      this.render(hbs `{{content-atm-inventories-lambdas/editor-view}}`);
+    it('has class "content-atm-inventories-lambdas-editor-view"', async function () {
+      await render(hbs `{{content-atm-inventories-lambdas/editor-view}}`);
 
       expect(this.$().children()).to.have.class('content-atm-inventories-lambdas-editor-view')
         .and.to.have.length(1);
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {
-      await render(this);
+      await renderComponent();
 
       const onBackSlide = this.get('onBackSlide');
       expect(onBackSlide).to.be.not.called;
@@ -74,7 +72,7 @@ describe(
 
       context('when "atmLambda" and "atmLambdaRevisionNumber" are empty', function () {
         it('has header "Add new lambda"', async function (done) {
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.header-row h1').text().trim())
             .to.equal('Add new lambda');
@@ -84,7 +82,7 @@ describe(
         itShowsFormInMode('create');
 
         it('renders empty form', async function (done) {
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.name-field .form-control')).to.have.value('');
           done();
@@ -103,7 +101,7 @@ describe(
                 state: 'draft',
               });
             });
-          await render(this);
+          await renderComponent();
 
           await fillIn('.name-field .form-control', 'someName');
           await fillIn('.dockerImage-field .form-control', 'someImage');
@@ -124,7 +122,7 @@ describe(
         });
 
         it('has header "Add new lambda revision"', async function (done) {
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.header-row h1').text().trim())
             .to.equal('Add new lambda revision');
@@ -135,7 +133,7 @@ describe(
 
         it('renders form with fields prefilled with data from lambda revision',
           async function (done) {
-            await render(this);
+            await renderComponent();
 
             expect(this.$('.name-field .form-control')).to.have.value('f1');
             done();
@@ -154,7 +152,7 @@ describe(
                 state: 'draft',
               });
             });
-          await render(this);
+          await renderComponent();
 
           await fillIn('.name-field .form-control', 'someName');
           await click('.btn-submit');
@@ -176,7 +174,7 @@ describe(
       });
 
       it('has header "Modify lambda revision"', async function (done) {
-        await render(this);
+        await renderComponent();
 
         expect(this.$('.header-row h1').text().trim())
           .to.contain('Modify lambda revision');
@@ -187,7 +185,7 @@ describe(
 
       it('renders form with fields prefilled with data from lambda revision',
         async function (done) {
-          await render(this);
+          await renderComponent();
 
           expect(this.$('.name-field .form-control')).to.have.value('f1');
           done();
@@ -205,7 +203,7 @@ describe(
               state: 'deprecated',
             });
           });
-        await render(this);
+        await renderComponent();
 
         await selectChoose('.state-field', 'Deprecated');
         await click('.btn-submit');
@@ -218,8 +216,8 @@ describe(
   }
 );
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-lambdas/editor-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-lambdas/editor-view
     viewType=viewType
     atmInventory=atmInventory
     atmLambda=atmLambda
@@ -227,12 +225,11 @@ async function render(testCase) {
     onBackSlide=onBackSlide
     onAtmLambdaRevisionSaved=onAtmLambdaRevisionSaved
   }}`);
-  await wait();
 }
 
 function itShowsFormInMode(mode) {
   it(`shows form in "${mode}" mode`, async function (done) {
-    await render(this);
+    await renderComponent();
 
     const $form = this.$('.atm-lambda-form');
     expect($form).to.have.class(`mode-${mode}`);

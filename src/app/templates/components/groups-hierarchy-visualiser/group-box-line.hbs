@@ -15,7 +15,10 @@
     triggerSelector=(concat ".actions-relation-" elementId)
     open=actionsOpened
     onToggle=(action "toggleActions")}}
-    {{#click-outside action=(action "toggleActions" false) except-selector=(concat ".actions-relation-" elementId)}}
+    {{#click-outside
+      onClickOutside=(action "toggleActions" false)
+      exceptSelector=(concat ".actions-relation-" elementId)
+    }}
       {{actions-popover-content
         actionsArray=relationActions
         actionClicked=(action "toggleActions" false)

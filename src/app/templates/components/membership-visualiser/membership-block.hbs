@@ -16,7 +16,10 @@
     triggerSelector=(concat ".actions-block-" elementId)
     open=actionsOpened
     onToggle=(action "toggleActions")}}
-    {{#click-outside action=(action "toggleActions" false) except-selector=(concat ".actions-block-" elementId)}}
+    {{#click-outside
+      onClickOutside=(action "toggleActions" false)
+      exceptSelector=(concat ".actions-block-" elementId)
+    }}
       {{actions-popover-content
         actionsArray=blockActions
         actionClicked=(action "toggleActions" false)

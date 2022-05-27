@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
@@ -12,9 +13,7 @@ import { click } from 'ember-native-dom-helpers';
 describe(
   'Integration | Component | token template selector/oneclient in oneprovider template',
   function () {
-    setupComponentTest('token-template-selector/oneclient-in-oneprovider-template', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const oneproviders = [{
@@ -41,8 +40,8 @@ describe(
 
     it(
       'renders tile with "template-oneclientInOneprovider" class, correct title and image',
-      function () {
-        this.render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+      async function () {
+        await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
 
         const $tile = this.$('.one-tile');
         expect($tile).to.have.class('template-oneclientInOneprovider');
@@ -54,7 +53,7 @@ describe(
     );
 
     it('shows list of oneproviders', async function () {
-      this.render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
 
       await click('.one-tile');
       const $records = this.$('.record-item');
@@ -67,7 +66,7 @@ describe(
     it('shows information about no oneproviders to choose', async function () {
       this.get('oneproviders').clear();
 
-      this.render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
+      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template}}`);
 
       await click('.one-tile');
       expect(this.$('.no-records-info').text().trim()).to.equal('You have no providers.');
@@ -76,7 +75,7 @@ describe(
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      this.render(hbs `{{token-template-selector/oneclient-in-oneprovider-template
+      await render(hbs `{{token-template-selector/oneclient-in-oneprovider-template
         onSelected=selectedSpy
       }}`);
 

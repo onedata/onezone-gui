@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import CreateTokenAction from 'onezone-gui/utils/token-actions/create-token-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
@@ -9,9 +9,7 @@ import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 
 describe('Integration | Util | token actions/create token action', function () {
-  setupComponentTest('global-modal-mounter', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.set('context', {
@@ -21,7 +19,7 @@ describe('Integration | Util | token actions/create token action', function () {
 
   it('executes creating token (success scenario)', function () {
     const action = CreateTokenAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
     const tokenManager = lookupService(this, 'token-manager');
@@ -61,7 +59,7 @@ describe('Integration | Util | token actions/create token action', function () {
 
   it('executes creating token (failure scenario)', function () {
     const action = CreateTokenAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
     const tokenManager = lookupService(this, 'token-manager');

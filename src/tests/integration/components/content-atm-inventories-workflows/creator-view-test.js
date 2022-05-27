@@ -1,18 +1,16 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { click, fillIn } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
 
 describe('Integration | Component | content atm inventories workflows/creator view',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/creator-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const workflowActions = lookupService(this, 'workflow-actions');
@@ -27,21 +25,21 @@ describe('Integration | Component | content atm inventories workflows/creator vi
       });
     });
 
-    it('has class "content-atm-inventories-workflows-creator-view"', function () {
-      this.render(hbs `{{content-atm-inventories-workflows/creator-view}}`);
+    it('has class "content-atm-inventories-workflows-creator-view"', async function () {
+      await render(hbs `{{content-atm-inventories-workflows/creator-view}}`);
 
       expect(this.$().children()).to.have.class('content-atm-inventories-workflows-creator-view')
         .and.to.have.length(1);
     });
 
     it('has header "Add new workflow"', async function () {
-      await render(this);
+      await renderComponent();
 
       expect(this.$('.header-row h1').text().trim()).to.equal('Add new workflow');
     });
 
     it('shows empty workflow schema details form in edit mode', async function () {
-      await render(this);
+      await renderComponent();
 
       const $form = this.$('.atm-workflow-schema-details-form');
       expect($form).to.exist;
@@ -51,7 +49,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {
-      await render(this);
+      await renderComponent();
 
       const backSlideSpy = this.get('backSlideSpy');
       expect(backSlideSpy).to.be.not.called;
@@ -79,7 +77,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
             result: createdRecord,
           }),
         });
-        await render(this);
+        await renderComponent();
 
         expect(atmWorkflowSchemaAddedSpy).to.be.not.called;
 
@@ -104,7 +102,7 @@ describe('Integration | Component | content atm inventories workflows/creator vi
         this.get('createCreateAtmWorkflowSchemaActionStub').returns({
           execute: () => resolve({ status: 'failed' }),
         });
-        await render(this);
+        await renderComponent();
 
         await fillIn('.name-field .form-control', 'someName');
         await click('.btn-content-info');
@@ -113,11 +111,10 @@ describe('Integration | Component | content atm inventories workflows/creator vi
       });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/creator-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/creator-view
     atmInventory=atmInventory
     onBackSlide=backSlideSpy
     onAtmWorkflowSchemaAdded=atmWorkflowSchemaAddedSpy
   }}`);
-  await wait();
 }

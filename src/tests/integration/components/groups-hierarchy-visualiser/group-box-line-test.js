@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { set } from '@ember/object';
 import wait from 'ember-test-helpers/wait';
@@ -12,15 +13,13 @@ import { registerService } from '../../../helpers/stub-service';
 describe(
   'Integration | Component | groups hierarchy visualiser/group box line',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/group-box-line', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function beforeEach() {
       registerService(this, 'i18n', I18nStub);
     });
 
-    it('renders line in proper position', function () {
+    it('renders line in proper position', async function () {
       const line = EmberObject.create({
         x: 100,
         y: 200,
@@ -28,7 +27,7 @@ describe(
       });
 
       this.set('line', line);
-      this.render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
 
       const $line = this.$('.group-box-line');
       expect($line.css('top')).to.be.equal('200px');
@@ -36,7 +35,7 @@ describe(
       expect($line.css('width')).to.be.equal('50px');
     });
 
-    it('renders actions on demand', function (done) {
+    it('renders actions on demand', async function (done) {
       const line = EmberObject.create({
         x: 100,
         y: 100,
@@ -51,7 +50,7 @@ describe(
       });
 
       this.set('line', line);
-      this.render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
       const $line = this.$('.group-box-line');
       expect($line.find('.actions-trigger')).to.not.exist;
       set(line, 'hovered', true);
@@ -66,7 +65,7 @@ describe(
       });
     });
 
-    it('does not render actions if actionsEnabled is false', function () {
+    it('does not render actions if actionsEnabled is false', async function () {
       const line = EmberObject.create({
         x: 100,
         y: 100,
@@ -76,13 +75,13 @@ describe(
       });
 
       this.set('line', line);
-      this.render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+      await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
       expect(this.$('.group-box-line .actions-trigger')).to.not.exist;
     });
 
     it(
       'disables "modify privileges" action if canViewPrivileges is false',
-      function () {
+      async function () {
         const line = EmberObject.create({
           x: 100,
           y: 100,
@@ -97,7 +96,7 @@ describe(
         });
 
         this.set('line', line);
-        this.render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
+        await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
         return click(this.$('.group-box-line .actions-trigger')[0]).then(() => {
           const $popover = $('body .webui-popover.in');
           expect($popover.find('.disabled > .modify-privileges-action')).to.exist;
@@ -105,7 +104,7 @@ describe(
       }
     );
 
-    it('closes actions popover after action click', function (done) {
+    it('closes actions popover after action click', async function (done) {
       const line = EmberObject.create({
         x: 100,
         y: 100,
@@ -121,7 +120,7 @@ describe(
 
       this.set('line', line);
       this.set('dummyCallback', () => {});
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-line
           line=line
           modifyPrivileges=dummyCallback}}

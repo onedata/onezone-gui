@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { get } from '@ember/object';
 import $ from 'jquery';
@@ -20,9 +21,7 @@ class TargetRecordHelper extends EmberPowerSelectHelper {
 }
 
 describe('Integration | Component | sidebar tokens', function () {
-  setupComponentTest('sidebar-tokens', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.setProperties({
@@ -64,20 +63,20 @@ describe('Integration | Component | sidebar tokens', function () {
     });
   });
 
-  it('renders all tokens', function () {
+  it('renders all tokens', async function () {
     const tokens = this.get('model.collection.list');
 
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
     const renderedTokens = this.$('.token-item');
     expect(renderedTokens).to.have.length(tokens.length);
   });
 
-  it('renders tokens in correct order', function () {
+  it('renders tokens in correct order', async function () {
     const tokens = this.get('model.collection.list');
     const tokensOrder = this.get('tokensOrder');
 
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
     this.$('.token-item').each((index, element) => {
       const originIndex = tokensOrder[index];
@@ -86,8 +85,8 @@ describe('Integration | Component | sidebar tokens', function () {
     });
   });
 
-  it('shows advanced token filters by default', function () {
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+  it('shows advanced token filters by default', async function () {
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
     expect(this.$('.advanced-filters-collapse.in .advanced-token-filters'))
       .to.exist;
@@ -103,8 +102,8 @@ describe('Integration | Component | sidebar tokens', function () {
     type: 'invite',
     count: 3,
   }].forEach(({ type, count }) => {
-    it(`shows only ${type} tokens, when type filter is "${type}"`, function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    it(`shows only ${type} tokens, when type filter is "${type}"`, async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
       return click(`.btn-${type}`)
         .then(() => {
@@ -119,8 +118,8 @@ describe('Integration | Component | sidebar tokens', function () {
 
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
       const targetModelHelper = new TargetModelHelper();
       return click('.btn-invite')
@@ -138,8 +137,8 @@ describe('Integration | Component | sidebar tokens', function () {
 
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
@@ -157,8 +156,8 @@ describe('Integration | Component | sidebar tokens', function () {
 
   it(
     'does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();

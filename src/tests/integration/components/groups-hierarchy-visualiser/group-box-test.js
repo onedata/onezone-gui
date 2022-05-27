@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { set } from '@ember/object';
 import I18nStub from '../../../helpers/i18n-stub';
@@ -12,15 +13,13 @@ import $ from 'jquery';
 describe(
   'Integration | Component | groups hierarchy visualiser/group box',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/group-box', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function beforeEach() {
       registerService(this, 'i18n', I18nStub);
     });
 
-    it('shows group name', function () {
+    it('shows group name', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -28,13 +27,13 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.group-box .group-name').text().trim()).to.equal('testname');
     });
 
-    it('allows to edit group name', function (done) {
+    it('allows to edit group name', async function (done) {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -43,14 +42,14 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.on('renameGroup', (newName) => {
+      this.set('renameGroup', (newName) => {
         set(groupBox, 'group.name', newName);
         return resolve();
       });
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box
           groupBox=groupBox
-          renameGroup=(action "renameGroup")}}
+          renameGroup=(action renameGroup)}}
       `);
 
       const $groupBox = this.$('.group-box');
@@ -69,7 +68,7 @@ describe(
       });
     });
 
-    it('shows lines', function () {
+    it('shows lines', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -83,13 +82,13 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.group-box-line')).to.have.length(2);
     });
 
-    it('hides lines', function () {
+    it('hides lines', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -103,13 +102,13 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.group-box-line')).to.not.exist;
     });
 
-    it('shows relations', function () {
+    it('shows relations', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -126,7 +125,7 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.group-box-relation.children .relations-number').text().trim())
@@ -135,7 +134,7 @@ describe(
         .to.equal('3');
     });
 
-    it('shows direct membership icon', function () {
+    it('shows direct membership icon', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -144,13 +143,13 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.direct-membership-icon')).to.exist;
     });
 
-    it('hides direct membership icon', function () {
+    it('hides direct membership icon', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -159,7 +158,7 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
       expect(this.$('.direct-membership-icon')).to.not.exist;
@@ -167,7 +166,7 @@ describe(
 
     it(
       'shows "join" instead of "leave" action if directMembership is false',
-      function () {
+      async function () {
         const groupBox = EmberObject.create({
           group: EmberObject.create({
             name: 'testname',
@@ -177,7 +176,7 @@ describe(
         });
 
         this.set('groupBox', groupBox);
-        this.render(hbs `
+        await render(hbs `
           {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
         `);
 
@@ -191,7 +190,7 @@ describe(
 
     it(
       'shows "leave" instead of "join" action if directMembership is true',
-      function () {
+      async function () {
         const groupBox = EmberObject.create({
           group: EmberObject.create({
             name: 'testname',
@@ -201,7 +200,7 @@ describe(
         });
 
         this.set('groupBox', groupBox);
-        this.render(hbs `
+        await render(hbs `
           {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
         `);
 
@@ -215,7 +214,7 @@ describe(
 
     it(
       'does not show actions trigger for groups with membership == false',
-      function () {
+      async function () {
         const groupBox = EmberObject.create({
           group: EmberObject.create({
             name: 'testname',
@@ -224,14 +223,14 @@ describe(
         });
 
         this.set('groupBox', groupBox);
-        this.render(hbs `
+        await render(hbs `
           {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
         `);
         expect(this.$('.group-box .group-actions-trigger')).to.not.exist;
       }
     );
 
-    it('closes actions popover after action click', function (done) {
+    it('closes actions popover after action click', async function (done) {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -241,11 +240,11 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.on('leaveGroup', () => {});
-      this.render(hbs `
+      this.set('leaveGroup', () => {});
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box
           groupBox=groupBox
-          leaveGroup=(action "leaveGroup")}}
+          leaveGroup=(action leaveGroup)}}
       `);
       click(this.$('.group-box .group-actions-trigger')[0]).then(() => {
         const $popover = $('body .webui-popover.in');
@@ -256,7 +255,7 @@ describe(
       });
     });
 
-    it('renders box in proper position', function () {
+    it('renders box in proper position', async function () {
       const groupBox = EmberObject.create({
         group: EmberObject.create({
           name: 'testname',
@@ -268,7 +267,7 @@ describe(
       });
 
       this.set('groupBox', groupBox);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box groupBox=groupBox}}
       `);
 

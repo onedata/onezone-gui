@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import { getProperties, get } from '@ember/object';
@@ -13,15 +14,15 @@ import { click, fillIn } from 'ember-native-dom-helpers';
 import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-atm-workflow-schema-dump';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
+import $ from 'jquery';
+import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 const atmInventoryId = 'invid';
 
 describe(
   'Integration | Utility | workflow actions/duplicate atm workflow schema revision action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const atmWorkflowSchema = {
@@ -57,7 +58,7 @@ describe(
       const createStub = sinon.stub(workflowManager, 'createAtmWorkflowSchema');
       this.setProperties({
         action: DuplicateAtmWorkflowSchemaRevisionAction.create({
-          ownerSource: this,
+          ownerSource: this.owner,
           context: {
             atmWorkflowSchema,
             revisionNumber: 1,
@@ -82,12 +83,12 @@ describe(
     });
 
     it('shows modal on execute', async function () {
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
       await wait();
 
-      expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
-      expect(getModal().find('.dump-details').text())
+      expect($(getModal())).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect($(getModal()).find('.dump-details').text())
         .to.contain(this.get('atmWorkflowSchemaDump.name'));
     });
 
@@ -104,7 +105,7 @@ describe(
           lookupService(this, 'global-notify'),
           'success'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
@@ -137,7 +138,7 @@ describe(
           lookupService(this, 'global-notify'),
           'success'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
@@ -163,6 +164,7 @@ describe(
 
     it('executes merging workflow dump on submit - notification on failure',
       async function () {
+        suppressRejections();
         const {
           mergeStub,
           action,
@@ -172,7 +174,7 @@ describe(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();
@@ -190,6 +192,7 @@ describe(
 
     it('executes creating new workflow on submit - notification on failure',
       async function () {
+        suppressRejections();
         const {
           createStub,
           action,
@@ -199,7 +202,7 @@ describe(
           lookupService(this, 'global-notify'),
           'backendError'
         );
-        this.render(hbs `{{global-modal-mounter}}`);
+        await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
         await wait();

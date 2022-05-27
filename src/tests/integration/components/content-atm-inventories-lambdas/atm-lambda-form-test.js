@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { fillIn, focus, blur, click, find } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
@@ -162,9 +163,7 @@ const resultTypes = argumentAndResultCommonTypes;
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambda form',
   function () {
-    setupComponentTest('content-atm-inventories-lambdas/atm-lambda-form', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       registerService(this, 'media', Service.extend({
@@ -182,7 +181,7 @@ describe(
     });
 
     it('has class "atm-lambda-form"', async function (done) {
-      this.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
+      await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
 
       expect(this.$().children()).to.have.class('atm-lambda-form')
         .and.to.have.length(1);
@@ -1024,14 +1023,14 @@ describe(
 
     context('in "view" mode', function () {
       it('has class "mode-view"', async function (done) {
-        await renderView(this);
+        await renderView();
 
         expect(this.$('.atm-lambda-form')).to.have.class('mode-view');
         done();
       });
 
       it('does not show submit button', async function (done) {
-        await renderView(this);
+        await renderView();
 
         expect(this.$('.btn-submit')).to.not.exist;
         done();
@@ -1064,7 +1063,7 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
           expect(this.$('.field-enabled')).to.not.exist;
           expect(this.$('.name-field .form-control')).to.have.value('myname');
@@ -1114,7 +1113,7 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
           expect(this.$('.field-enabled')).to.not.exist;
           expect(this.$('.name-field .form-control')).to.have.value('myname');
@@ -1145,7 +1144,7 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
           expect(this.$('.field-enabled')).to.not.exist;
           expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
@@ -1169,7 +1168,7 @@ describe(
           })),
         });
 
-        await renderView(this);
+        await renderView();
 
         expect(this.$('.field-enabled')).to.not.exist;
         const $entries = this.$('.arguments-field .entry-field');
@@ -1216,7 +1215,7 @@ describe(
           }],
         });
 
-        await renderView(this);
+        await renderView();
 
         expect(find('.arguments-field .nameMatcherType-field').textContent).to.contain('Has prefix');
         expect(find('.arguments-field .nameMatcher-field input').value).to.equal('file_');
@@ -1237,7 +1236,7 @@ describe(
           })),
         });
 
-        await renderView(this);
+        await renderView();
 
         expect(this.$('.field-enabled')).to.not.exist;
         expect(this.$('.results-field')).to.exist;
@@ -1273,7 +1272,7 @@ describe(
           }],
         });
 
-        await renderView(this);
+        await renderView();
 
         expect(find('.results-field .nameMatcherType-field').textContent).to.contain('Has prefix');
         expect(find('.results-field .nameMatcher-field input').value).to.equal('file_');
@@ -1422,21 +1421,19 @@ describe(
 
 async function renderCreate(testCase) {
   testCase.set('submitStub', sinon.stub().resolves());
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="create"
     revision=revision
     onSubmit=submitStub
     defaultAtmResourceSpec=defaultAtmResourceSpec
   }}`);
-  await wait();
 }
 
-async function renderView(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+async function renderView() {
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="view"
     revision=revision
   }}`);
-  await wait();
 }
 
 async function renderEdit(testCase) {
@@ -1444,13 +1441,12 @@ async function renderEdit(testCase) {
     submitStub: sinon.stub().resolves(),
     cancelSpy: sinon.spy(),
   });
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="edit"
     revision=revision
     onSubmit=submitStub
     onCancel=cancelSpy
   }}`);
-  await wait();
 }
 
 async function toggleMountSpace(testCase, toggleChecked) {

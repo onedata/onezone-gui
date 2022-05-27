@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { htmlSafe } from '@ember/template';
@@ -10,9 +11,7 @@ import { click } from 'ember-native-dom-helpers';
 describe(
   'Integration | Component | token template selector/single step template',
   function () {
-    setupComponentTest('token-template-selector/single-step-template', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const tStub = sinon.stub(lookupService(this, 'i18n'), 't');
@@ -25,8 +24,8 @@ describe(
       });
     });
 
-    it('renders template-tile dedicated for specified template', function () {
-      this.render(hbs `{{token-template-selector/single-step-template
+    it('renders template-tile dedicated for specified template', async function () {
+      await render(hbs `{{token-template-selector/single-step-template
         templateName="custom"
       }}`);
 
@@ -34,8 +33,8 @@ describe(
       expect(this.$('.tile-title').text().trim()).to.equal('Custom');
     });
 
-    it('renders template image', function () {
-      this.render(hbs `{{token-template-selector/single-step-template
+    it('renders template image', async function () {
+      await render(hbs `{{token-template-selector/single-step-template
         templateName="custom"
         imagePath="some-path.svg"
       }}`);
@@ -46,7 +45,7 @@ describe(
     it('notifies about selection', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      this.render(hbs `{{token-template-selector/single-step-template
+      await render(hbs `{{token-template-selector/single-step-template
         templateName="custom"
         onSelected=selectedSpy
       }}`);

@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
@@ -20,9 +21,7 @@ const Router = Service.extend({
 });
 
 describe('Integration | Component | content providers', function () {
-  setupComponentTest('content-providers', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'router', Router);
@@ -30,7 +29,7 @@ describe('Integration | Component | content providers', function () {
 
   it(
     'invokes transition to provider-redirect on double click if provider status is online',
-    function () {
+    async function () {
       const router = lookupService(this, 'router');
       const exampleUrl = 'https://example.com';
       sinon.stub(router, 'urlFor').returns(exampleUrl);
@@ -66,7 +65,7 @@ describe('Integration | Component | content providers', function () {
         transitionToProviderRedirect,
       });
 
-      this.render(hbs `{{content-providers
+      await render(hbs `{{content-providers
         _window=_window
         providerList=providerList
         transitionToProviderRedirect=transitionToProviderRedirect

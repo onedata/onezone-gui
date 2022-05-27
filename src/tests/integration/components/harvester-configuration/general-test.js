@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -20,9 +21,7 @@ const exampleHarvester = {
 };
 
 describe('Integration | Component | harvester configuration/general', function () {
-  setupComponentTest('harvester-configuration/general', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const plugins = [{
@@ -43,15 +42,15 @@ describe('Integration | Component | harvester configuration/general', function (
     });
   });
 
-  it('has class "harvester-configuration-general"', function () {
-    this.render(hbs `{{harvester-configuration/general}}`);
+  it('has class "harvester-configuration-general"', async function () {
+    await render(hbs `{{harvester-configuration/general}}`);
 
     expect(this.$('.harvester-configuration-general')).to.have.length(1);
   });
 
   context('in create mode', function () {
-    it('shows empty text field with "Name" label and no placeholder', function () {
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+    it('shows empty text field with "Name" label and no placeholder', async function () {
+      await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       const $formGroup = this.$('.name-field');
       const $input = $formGroup.find('input');
@@ -64,8 +63,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'shows preselected toggle field with "Use default backend" label and tip',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const tooltip = new OneTooltipHelper(
           '.useDefaultHarvestingBackend-field .one-label-tip .oneicon'
@@ -85,8 +84,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'shows preselected toggle field with "auto setup" label and tip',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const tooltip = new OneTooltipHelper(
           '.autoSetup-field .one-label-tip .oneicon'
@@ -106,7 +105,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'shows dropdown field with "Backend type" label, tip, preselected option and types list',
-      function () {
+      async function () {
         // reset default backend type to unlock the field and not set default value
         set(
           lookupService(this, 'onedata-connection'),
@@ -114,7 +113,7 @@ describe('Integration | Component | harvester configuration/general', function (
           ''
         );
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const typeDropdown = new TypeHelper();
         const tooltip =
@@ -143,7 +142,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'shows empty text field with "Backend endpoint" label, tip and no placeholder',
-      function () {
+      async function () {
         // reset default backend endpoint to unlock the field and not set default value
         set(
           lookupService(this, 'onedata-connection'),
@@ -151,7 +150,7 @@ describe('Integration | Component | harvester configuration/general', function (
           ''
         );
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const tooltip = new OneTooltipHelper(
           '.endpoint-field .one-label-tip .oneicon'
@@ -176,8 +175,8 @@ describe('Integration | Component | harvester configuration/general', function (
       selector: '.publicUrl-field',
       name: 'public url',
     }].forEach(({ selector, name }) => {
-      it(`does not show ${name} field`, function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      it(`does not show ${name} field`, async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$(selector)).to.not.exist;
       });
@@ -185,8 +184,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'shows enabled "Use default backend" toggle and disabled backend-related fields with default values',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const $defaultBackendToggle =
           this.$('.useDefaultHarvestingBackend-field .one-way-toggle');
@@ -198,8 +197,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'enables backend-related fields with default values when toggle "Use default backend" becomes unchecked',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return click('.useDefaultHarvestingBackend-field .one-way-toggle')
           .then(() => {
@@ -211,8 +210,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'resets backend-related fields to default values when toggle "Use default backend" becomes unchecked, fields are modified and then toggle again becomes checked',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return click('.useDefaultHarvestingBackend-field .one-way-toggle')
           .then(() => {
@@ -230,14 +229,14 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'does not show "Use default backend" toggle and has enabled and empty backend-related fields when there is no default backend type',
-      function () {
+      async function () {
         set(
           lookupService(this, 'onedata-connection'),
           'defaultHarvestingBackendType',
           ''
         );
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
         expectBackendTypeState(this, true, 'Postgre');
@@ -247,14 +246,14 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'does not show "Use default backend" toggle and has enabled and empty backend-related fields when there is no default backend endpoint',
-      function () {
+      async function () {
         set(
           lookupService(this, 'onedata-connection'),
           'defaultHarvestingBackendEndpoint',
           ''
         );
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         expect(this.$('.useDefaultHarvestingBackend-field')).to.not.exist;
         expectBackendTypeState(this, true, 'Postgre');
@@ -262,16 +261,16 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('shows validation error when name field is empty', function () {
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+    it('shows validation error when name field is empty', async function () {
+      await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       return focus('.name-field input')
         .then(() => blur('.name-field input'))
         .then(() => expect(this.$('.name-field')).to.have.class('has-error'));
     });
 
-    it('shows validation error when endpoint field is empty', function () {
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+    it('shows validation error when endpoint field is empty', async function () {
+      await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       return click('.useDefaultHarvestingBackend-field .one-way-toggle')
         .then(() => fillIn('.endpoint-field input', ''))
@@ -280,8 +279,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'has disabled "Create" button on init and no "Cancel" button',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         const $cancel = this.$('button.cancel-btn');
         const $create = this.$('button.submit-btn');
@@ -294,8 +293,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'has enabled "Create" button when name has been provided',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => expect(this.$('.submit-btn')).to.not.have.attr('disabled'));
@@ -304,8 +303,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'has disabled "Create" button when form is filled in but endpoint is empty',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
@@ -316,8 +315,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'has enabled "Create" button when form if filled in and endpoint is provided',
-      function () {
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      async function () {
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
@@ -326,11 +325,11 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('tries to create harvester on "Create" click using default endpoint', function () {
+    it('tries to create harvester on "Create" click using default endpoint', async function () {
       const harvesterActions = lookupService(this, 'harvester-actions');
       const createStub = sinon.stub(harvesterActions, 'createHarvester').resolves();
 
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+      await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       return fillIn('.name-field input', 'abc')
         .then(() => click('.submit-btn'))
@@ -345,11 +344,11 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'tries to create harvester on "Create" click using custom backend type, endpoint and no auto setup',
-      function () {
+      async function () {
         const harvesterActions = lookupService(this, 'harvester-actions');
         const createStub = sinon.stub(harvesterActions, 'createHarvester').resolves();
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.useDefaultHarvestingBackend-field .one-way-toggle'))
@@ -372,11 +371,11 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'disables buttons and fields after "Create" button click when creating promise is pending',
-      function () {
+      async function () {
         const harvesterActions = lookupService(this, 'harvester-actions');
         sinon.stub(harvesterActions, 'createHarvester').returns(new Promise(() => {}));
 
-        this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+        await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         return fillIn('.name-field input', 'abc')
           .then(() => click('.submit-btn'))
@@ -388,8 +387,8 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('does not have any field in "view" mode', function () {
-      this.render(hbs `{{harvester-configuration/general mode="create"}}`);
+    it('does not have any field in "view" mode', async function () {
+      await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
       expect(this.$('.field-view-mode')).to.not.exist;
     });
@@ -404,8 +403,8 @@ describe('Integration | Component | harvester configuration/general', function (
         .returns('internalPath');
     });
 
-    it('does not have any field in "edit" mode', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('does not have any field in "edit" mode', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -413,8 +412,8 @@ describe('Integration | Component | harvester configuration/general', function (
       expect(this.$('.field-edit-mode')).to.not.exist;
     });
 
-    it('shows harvester data and public URL field', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('shows harvester data and public URL field', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -434,10 +433,10 @@ describe('Integration | Component | harvester configuration/general', function (
       expect(urlFormGroup.find('input')).to.have.value(correctUrl);
     });
 
-    it('does not show "Public URL" field when harvester is not public', function () {
+    it('does not show "Public URL" field when harvester is not public', async function () {
       this.get('harvester').public = false;
 
-      this.render(hbs `{{harvester-configuration/general
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -448,8 +447,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'does not show fields "Use default harvesting backend" and "Auto setup"',
-      function () {
-        this.render(hbs `{{harvester-configuration/general
+      async function () {
+        await render(hbs `{{harvester-configuration/general
           mode="view"
           harvester=harvester
         }}`);
@@ -459,8 +458,8 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('shows enabled "Edit" button and no "Cancel" button', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('shows enabled "Edit" button and no "Cancel" button', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -471,8 +470,8 @@ describe('Integration | Component | harvester configuration/general', function (
       expect(this.$('button:not(.copy-btn)')).to.have.length(1);
     });
 
-    it('changes mode to "edit" on "Edit" button click', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('changes mode to "edit" on "Edit" button click', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -491,8 +490,8 @@ describe('Integration | Component | harvester configuration/general', function (
         .returns('internalPath');
     });
 
-    it('does not have any field in "view" mode', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('does not have any field in "view" mode', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -501,8 +500,8 @@ describe('Integration | Component | harvester configuration/general', function (
         .then(() => expect(this.$('.field-view-mode')).to.not.exist);
     });
 
-    it('sets form values to data taken from harvester record', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('sets form values to data taken from harvester record', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -524,8 +523,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'collapses "Public URL" field when "Public" toggle becomes unchecked',
-      function () {
-        this.render(hbs `{{harvester-configuration/general
+      async function () {
+        await render(hbs `{{harvester-configuration/general
           mode="view"
           harvester=harvester
         }}`);
@@ -541,8 +540,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'does not show fields "Use default harvesting backend" and "Auto setup"',
-      function () {
-        this.render(hbs `{{harvester-configuration/general
+      async function () {
+        await render(hbs `{{harvester-configuration/general
           mode="view"
           harvester=harvester
         }}`);
@@ -555,8 +554,8 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('shows "Cancel" and "Save" enabled buttons', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('shows "Cancel" and "Save" enabled buttons', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -575,8 +574,8 @@ describe('Integration | Component | harvester configuration/general', function (
         });
     });
 
-    it('stops edition and resets changes on "Cancel" button click', function () {
-      this.render(hbs `{{harvester-configuration/general
+    it('stops edition and resets changes on "Cancel" button click', async function () {
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -593,8 +592,8 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'disables "Save" button and does not disable "Cancel" button when form is invalid',
-      function () {
-        this.render(hbs `{{harvester-configuration/general
+      async function () {
+        await render(hbs `{{harvester-configuration/general
           mode="view"
           harvester=harvester
         }}`);
@@ -608,11 +607,11 @@ describe('Integration | Component | harvester configuration/general', function (
       }
     );
 
-    it('does not save harvester if there are no changes', function () {
+    it('does not save harvester if there are no changes', async function () {
       const harvesterActions = lookupService(this, 'harvester-actions');
       const updateStub = sinon.stub(harvesterActions, 'updateHarvester').resolves();
 
-      this.render(hbs `{{harvester-configuration/general
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -625,11 +624,11 @@ describe('Integration | Component | harvester configuration/general', function (
         });
     });
 
-    it('saves harvester changes', function () {
+    it('saves harvester changes', async function () {
       const harvesterActions = lookupService(this, 'harvester-actions');
       const updateStub = sinon.stub(harvesterActions, 'updateHarvester').resolves();
 
-      this.render(hbs `{{harvester-configuration/general
+      await render(hbs `{{harvester-configuration/general
         mode="view"
         harvester=harvester
       }}`);
@@ -658,11 +657,11 @@ describe('Integration | Component | harvester configuration/general', function (
 
     it(
       'disables buttons and fields after "Save" button click when saving promise is pending',
-      function () {
+      async function () {
         const harvesterActions = lookupService(this, 'harvester-actions');
         sinon.stub(harvesterActions, 'updateHarvester').returns(new Promise(() => {}));
 
-        this.render(hbs `{{harvester-configuration/general
+        await render(hbs `{{harvester-configuration/general
           mode="view"
           harvester=harvester
         }}`);

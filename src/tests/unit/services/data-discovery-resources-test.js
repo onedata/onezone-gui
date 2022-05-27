@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { describe, context, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
@@ -7,7 +7,7 @@ import { set, setProperties } from '@ember/object';
 import { resolve, reject } from 'rsvp';
 import sinon from 'sinon';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import suppressRejections from '../../helpers/suppress-rejections';
+import { suppressRejections } from '../../helpers/suppress-rejections';
 
 const HarvesterManager = Service.extend({
   getGuiPluginConfig() {},
@@ -23,7 +23,7 @@ const CurrentUserService = Service.extend({
 });
 
 describe('Unit | Service | data discovery resources', function () {
-  setupTest('service:data-discovery-resources', {});
+  setupTest();
 
   beforeEach(function () {
     registerService(this, 'router', RouterService);
@@ -33,7 +33,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('constructs properly structured appProxy object', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
 
     const appProxy = service.createAppProxyObject();
 
@@ -52,7 +52,7 @@ describe('Unit | Service | data discovery resources', function () {
   it(
     'injects rejected gui configuration response when harvester is not defined',
     function () {
-      const service = this.subject();
+      const service = this.owner.lookup('service:data-discovery-resources');
 
       const appProxy = service.createAppProxyObject();
 
@@ -64,7 +64,7 @@ describe('Unit | Service | data discovery resources', function () {
   );
 
   it('injects gui configuration when harvester is defined', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const navigationState = lookupService(this, 'navigation-state');
     const harvesterManager = lookupService(this, 'harvester-manager');
     setProperties(navigationState, {
@@ -89,7 +89,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects info about no signed in user into appProxy', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const currentUser = lookupService(this, 'current-user');
     sinon.stub(currentUser, 'getCurrentUserRecord')
       .returns(reject());
@@ -100,7 +100,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects info about signed in user into appProxy', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const currentUser = lookupService(this, 'current-user');
     const user = Object.freeze({
       entityId: '123',
@@ -120,7 +120,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects info about viewMode (public) into appProxy', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const router = lookupService(this, 'router');
     sinon.stub(router, 'isActive')
       .withArgs('public.harvesters')
@@ -133,7 +133,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects info about viewMode (internal) into appProxy', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const router = lookupService(this, 'router');
     sinon.stub(router, 'isActive')
       .withArgs('public.harvesters')
@@ -146,7 +146,7 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects info about onezone url into appProxy', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     set(service, '_location', {
       origin: 'https://abcdef.com',
       pathname: '/ghi',
@@ -179,7 +179,7 @@ describe('Unit | Service | data discovery resources', function () {
         )
         .returns('#browser');
 
-      const service = this.subject();
+      const service = this.owner.lookup('service:data-discovery-resources');
       set(service, '_location', {
         origin: 'https://abcdef.com',
         pathname: '/ghi',
@@ -197,7 +197,7 @@ describe('Unit | Service | data discovery resources', function () {
     function () {
       const cdmiObjectId = null;
 
-      const service = this.subject();
+      const service = this.owner.lookup('service:data-discovery-resources');
       const appProxy = service.createAppProxyObject();
 
       return appProxy.fileBrowserUrlRequest(cdmiObjectId)
@@ -206,7 +206,7 @@ describe('Unit | Service | data discovery resources', function () {
   );
 
   it('injects info about harvester spaces', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
     const navigationState = lookupService(this, 'navigation-state');
     setProperties(navigationState, {
       activeResourceType: 'harvesters',
@@ -241,33 +241,30 @@ describe('Unit | Service | data discovery resources', function () {
   });
 
   it('injects no info about harvester spaces (no harvester specified)', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:data-discovery-resources');
 
     const appProxy = service.createAppProxyObject();
 
     return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
   });
 
-  context('handles errors', function () {
+  it('injects no info about harvester spaces (no view privilege)', function () {
     suppressRejections();
-
-    it('injects no info about harvester spaces (no view privilege)', function () {
-      const service = this.subject();
-      const navigationState = lookupService(this, 'navigation-state');
-      setProperties(navigationState, {
-        activeResourceType: 'harvesters',
-        activeResource: {
-          entityId: 'someId',
-          hasViewPrivilege: false,
-          getRelation() {
-            return reject({ id: 'forbidden ' });
-          },
+    const service = this.owner.lookup('service:data-discovery-resources');
+    const navigationState = lookupService(this, 'navigation-state');
+    setProperties(navigationState, {
+      activeResourceType: 'harvesters',
+      activeResource: {
+        entityId: 'someId',
+        hasViewPrivilege: false,
+        getRelation() {
+          return reject({ id: 'forbidden ' });
         },
-      });
-
-      const appProxy = service.createAppProxyObject();
-
-      return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
+      },
     });
+
+    const appProxy = service.createAppProxyObject();
+
+    return appProxy.spacesRequest().then(spaces => expect(spaces).to.have.length(0));
   });
 });

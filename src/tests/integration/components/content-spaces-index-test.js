@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -18,9 +19,7 @@ const TestCurrentUser = CurrentUser.extend({
 });
 
 describe('Integration | Component | content spaces index', function () {
-  setupComponentTest('content-spaces-index', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'currentUser', TestCurrentUser);
@@ -30,7 +29,7 @@ describe('Integration | Component | content spaces index', function () {
     };
   });
 
-  it('renders a tile with resolved default Oneprovider', function () {
+  it('renders a tile with resolved default Oneprovider', async function () {
     const provider1 = {
       id: 'provider.p1.instance:private',
       entityId: 'op1',
@@ -88,7 +87,7 @@ describe('Integration | Component | content spaces index', function () {
       _localStorage,
     });
 
-    this.render(hbs `{{content-spaces-index
+    await render(hbs `{{content-spaces-index
       _localStorage=_localStorage
       space=space
       showResourceMembershipTile=false

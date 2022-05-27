@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { click } from 'ember-native-dom-helpers';
@@ -41,9 +42,7 @@ const possibleTargetModels = [{
 }];
 
 describe('Integration | Component | sidebar tokens/advanced filters', function () {
-  setupComponentTest('sidebar-tokens/advanced-filters', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const tokensCollection = possibleTargetModels
@@ -56,14 +55,14 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     this.set('tokensCollection', tokensCollection);
   });
 
-  it('has class "advanced-token-filters"', function () {
-    this.render(hbs `{{sidebar-tokens/advanced-filters}}`);
+  it('has class "advanced-token-filters"', async function () {
+    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
     expect(this.$('.advanced-token-filters')).to.exist;
   });
 
-  it('shows "type" filter', function () {
-    this.render(hbs `{{sidebar-tokens/advanced-filters}}`);
+  it('shows "type" filter', async function () {
+    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
     const $typeFilterRow = this.$('.type-filter-row');
     expect($typeFilterRow).to.exist;
@@ -74,8 +73,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     expect($typeFilterRow.find('.btn-invite').text().trim()).to.equal('Invite');
   });
 
-  it('uses "All" as a default value of "type" filter', function () {
-    this.render(hbs `{{sidebar-tokens/advanced-filters}}`);
+  it('uses "All" as a default value of "type" filter', async function () {
+    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
     const $typeFilterRow = this.$('.type-filter-row');
     expect($typeFilterRow.find('.btn-all')).to.have.class('active');
@@ -84,12 +83,12 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     expect($typeFilterRow.find('.btn-invite')).to.not.have.class('active');
   });
 
-  it('notifies about filters state on initial render', function () {
+  it('notifies about filters state on initial render', async function () {
     const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
+    this.set('change', changeSpy);
 
-    this.render(hbs `
-      {{sidebar-tokens/advanced-filters onChange=(action "change")}}
+    await render(hbs `
+      {{sidebar-tokens/advanced-filters onChange=(action change)}}
     `);
 
     expect(changeSpy).to.be.calledOnce;
@@ -100,12 +99,12 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     });
   });
 
-  it('notifies about filters state after type filter change', function () {
+  it('notifies about filters state after type filter change', async function () {
     const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
+    this.set('change', changeSpy);
 
-    this.render(hbs `
-      {{sidebar-tokens/advanced-filters onChange=(action "change")}}
+    await render(hbs `
+      {{sidebar-tokens/advanced-filters onChange=(action change)}}
     `);
 
     let checkPromise = resolve();
@@ -121,8 +120,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     return checkPromise;
   });
 
-  it('shows target filter when type filter equals "invite"', function () {
-    this.render(hbs `{{sidebar-tokens/advanced-filters}}`);
+  it('shows target filter when type filter equals "invite"', async function () {
+    await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
     return selectType('invite')
       .then(() => {
@@ -143,8 +142,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
   ].forEach(type => {
     it(
       `does not show target filter when type filter equals "${type}"`,
-      function () {
-        this.render(hbs `{{sidebar-tokens/advanced-filters}}`);
+      async function () {
+        await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
         return selectType(type)
           .then(() =>
@@ -154,8 +153,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     );
   });
 
-  it('shows possible target models according to passed tokens', function () {
-    this.render(hbs `
+  it('shows possible target models according to passed tokens', async function () {
+    await render(hbs `
       {{sidebar-tokens/advanced-filters collection=tokensCollection}}
     `);
 
@@ -175,9 +174,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       });
   });
 
-  it('notifies about filters state after target model filter change', function () {
+  it('notifies about filters state after target model filter change', async function () {
     const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
+    this.set('change', changeSpy);
     let optionsToCheck = possibleTargetModels
       .map((option, i) => Object.assign({ optionIndex: i + 1 }, option));
     // Need to move "All" model to the end, because it is a preselected option and
@@ -185,10 +184,10 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     optionsToCheck =
       optionsToCheck.without(optionsToCheck[0]).concat([optionsToCheck[0]]);
 
-    this.render(hbs `
+    await render(hbs `
       {{sidebar-tokens/advanced-filters
         collection=tokensCollection
-        onChange=(action "change")}}
+        onChange=(action change)}}
     `);
 
     const targetModelHelper = new TargetModelHelper();
@@ -205,8 +204,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     return checkPromise;
   });
 
-  it('disables target record filter when target model is set to "All"', function () {
-    this.render(hbs `
+  it('disables target record filter when target model is set to "All"', async function () {
+    await render(hbs `
       {{sidebar-tokens/advanced-filters collection=tokensCollection}}
     `);
 
@@ -219,8 +218,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
 
   it(
     'enables target record filter when target model is set to item different than "All"',
-    function () {
-      this.render(hbs `
+    async function () {
+      await render(hbs `
         {{sidebar-tokens/advanced-filters collection=tokensCollection}}
       `);
 
@@ -237,8 +236,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
   possibleTargetModels.slice(1).forEach(({ name, modelName }, index) => {
     it(
       `renders "All" and two records in target record filter when target model is set to "${name}"`,
-      function () {
-        this.render(hbs `
+      async function () {
+        await render(hbs `
           {{sidebar-tokens/advanced-filters collection=tokensCollection}}
         `);
 
@@ -260,17 +259,17 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     );
   });
 
-  it('notifies about filters state after target record filter change', function () {
+  it('notifies about filters state after target record filter change', async function () {
     const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
+    this.set('change', changeSpy);
     const clusterRecords = this.get('tokensCollection')
       .filterBy('targetModelName', 'cluster')
       .mapBy('tokenTarget');
 
-    this.render(hbs `
+    await render(hbs `
       {{sidebar-tokens/advanced-filters
         collection=tokensCollection
-        onChange=(action "change")}}
+        onChange=(action change)}}
     `);
 
     const targetModelHelper = new TargetModelHelper();
@@ -295,7 +294,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       });
   });
 
-  it('removes duplicated records from target record filter dropdown', function () {
+  it('removes duplicated records from target record filter dropdown', async function () {
     const tokenTarget = {
       name: 'cluster1',
     };
@@ -304,7 +303,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       Object.assign(createTokenStub('cluster', 1), { tokenTarget }),
     ]);
 
-    this.render(hbs `
+    await render(hbs `
       {{sidebar-tokens/advanced-filters collection=tokensCollection}}
     `);
 
@@ -324,14 +323,14 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       });
   });
 
-  it('resets target record filter to "All" on target model filter change', function () {
+  it('resets target record filter to "All" on target model filter change', async function () {
     const changeSpy = sinon.spy();
-    this.on('change', changeSpy);
+    this.set('change', changeSpy);
 
-    this.render(hbs `
+    await render(hbs `
       {{sidebar-tokens/advanced-filters
         collection=tokensCollection
-        onChange=(action "change")}}
+        onChange=(action change)}}
     `);
 
     const targetModelHelper = new TargetModelHelper();
@@ -351,15 +350,15 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
 
   it(
     'does not change selected target record if refreshed list of tokens still has selected record',
-    function () {
+    async function () {
       const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
+      this.set('change', changeSpy);
       let changesCount;
 
-      this.render(hbs `
+      await render(hbs `
         {{sidebar-tokens/advanced-filters
           collection=tokensCollection
-          onChange=(action "change")}}
+          onChange=(action change)}}
       `);
 
       const targetModelHelper = new TargetModelHelper();
@@ -388,15 +387,15 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
 
   it(
     'changes selected target record to "All" if refreshed list of tokens does not have selected record',
-    function () {
+    async function () {
       const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
+      this.set('change', changeSpy);
       let changesCount;
 
-      this.render(hbs `
+      await render(hbs `
         {{sidebar-tokens/advanced-filters
           collection=tokensCollection
-          onChange=(action "change")}}
+          onChange=(action change)}}
       `);
 
       const targetModelHelper = new TargetModelHelper();
@@ -430,15 +429,15 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
 
   it(
     'changes selected target model and record to "All" if refreshed list of tokens does not have selected model',
-    function () {
+    async function () {
       const changeSpy = sinon.spy();
-      this.on('change', changeSpy);
+      this.set('change', changeSpy);
       let changesCount;
 
-      this.render(hbs `
+      await render(hbs `
         {{sidebar-tokens/advanced-filters
           collection=tokensCollection
-          onChange=(action "change")}}
+          onChange=(action change)}}
       `);
 
       const targetModelHelper = new TargetModelHelper();
