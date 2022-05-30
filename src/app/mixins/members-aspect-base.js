@@ -675,12 +675,15 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     },
     recordsLoaded() {
       next(() => safeExec(this, () => {
-        const memberIdToExpand = this.get('memberIdToExpand');
-        if (memberIdToExpand) {
-          const memberItemHeader = this.$(
+        const {
+          memberIdToExpand,
+          element,
+        } = this.getProperties('memberIdToExpand', 'element');
+        if (memberIdToExpand && element) {
+          const memberItemHeader = element.querySelector(
             `.member-${memberIdToExpand} .one-collapsible-list-item-header`
           );
-          if (get(memberItemHeader, 'length')) {
+          if (memberItemHeader) {
             memberItemHeader.click();
             this.set('memberIdToExpand', null);
           }

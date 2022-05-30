@@ -607,7 +607,8 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   scrollTop() {
-    const scrollableParent = this.$() && this.$().parents('.ps')[0];
+    const element = this.get('element');
+    const scrollableParent = element && element.closest('.ps');
     if (scrollableParent) {
       scrollableParent.scroll({
         top: 0,

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import { getProperties } from '@ember/object';
@@ -98,6 +98,7 @@ describe(
       await render(hbs `{{global-modal-mounter}}`);
       const dump = generateAtmWorkflowSchemaDump();
       await triggerUploadInputChange(filename, JSON.stringify(dump));
+      await settled();
 
       expect($(getModal())).to.have.class('apply-atm-workflow-schema-dump-modal');
       expect($(getModal()).find('.upload-details').text()).to.contain(filename);
@@ -108,7 +109,9 @@ describe(
       await render(hbs `{{global-modal-mounter}}`);
       const dump = generateAtmWorkflowSchemaDump();
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
+      await settled();
       await triggerUploadInputChange('file2.json', JSON.stringify(dump));
+      await settled();
 
       expect($(getModal()).find('.upload-details').text()).to.contain('file2.json');
     });
@@ -122,6 +125,7 @@ describe(
           const dump = generateAtmWorkflowSchemaDump();
           delete dump[fieldName];
           await triggerUploadInputChange(filename, JSON.stringify(dump));
+          await settled();
 
           expect($(getModal()).find('.upload-details').text()).to.contain(filename);
           expect($(getModal()).find('.dump-details .error')).to.exist;
@@ -134,6 +138,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         await triggerUploadInputChange(filename, 'random content');
+        await settled();
 
         expect($(getModal()).find('.upload-details').text()).to.contain(filename);
         expect($(getModal()).find('.dump-details .error')).to.exist;
@@ -151,6 +156,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        await settled();
         await click('.submit-btn');
 
         expect(mergeStub).to.be.calledOnce.and.to.be.calledWith('wf1id', dump);
@@ -172,6 +178,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        await settled();
         await click('.option-create');
         await fillIn('.newWorkflowName-field .form-control', 'abcd');
         await click('.submit-btn');
@@ -198,6 +205,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        await settled();
         await click('.submit-btn');
 
         expect(failureNotifySpy).to.be.calledWith(
@@ -220,6 +228,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
+        await settled();
         await click('.option-create');
         await click('.submit-btn');
 

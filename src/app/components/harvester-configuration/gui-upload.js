@@ -64,7 +64,11 @@ export default Component.extend(I18n, {
 
   actions: {
     browse() {
-      this.$('.upload-gui-input').click();
+      const element = this.get('element');
+      const uploadInput = element && element.querySelector('.upload-gui-input');
+      if (uploadInput) {
+        uploadInput.click();
+      }
     },
     fileChange(event) {
       const files = get(event, 'target.files');

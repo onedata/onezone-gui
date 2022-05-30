@@ -110,7 +110,7 @@ export default Component.extend(I18n, {
     pluginLoaded() {
       if (!this.get('checkingGuiAvailability')) {
         this.set('isGuiLoading', false);
-        const iframe = this.$('.plugin-frame')[0];
+        const iframe = this.get('element').querySelector('.plugin-frame');
 
         // attaching handler to intercept click events
         const pluginBody = iframe.contentDocument.body;

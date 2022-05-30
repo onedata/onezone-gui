@@ -406,7 +406,8 @@ export default Component.extend(I18n, WindowResizeHandler, {
     const {
       progressData,
       currentSeqSum,
-    } = this.getProperties('progressData', 'currentSeqSum');
+      element,
+    } = this.getProperties('progressData', 'currentSeqSum', 'element');
     let sum = 0;
     progressData.forEach(({ progress }) =>
       progress
@@ -421,9 +422,10 @@ export default Component.extend(I18n, WindowResizeHandler, {
       previousSeqSum: currentSeqSum,
     });
     if (this.get('element')) {
-      this.$('.activity-indicator').removeClass('pulse-mint');
+      const $element = $(element);
+      $element.find('.activity-indicator').removeClass('pulse-mint');
       next(() => {
-        safeExec(this, () => this.$('.activity-indicator').addClass('pulse-mint'));
+        safeExec(this, () => $element.find('.activity-indicator').addClass('pulse-mint'));
       });
     }
   },
@@ -438,16 +440,17 @@ export default Component.extend(I18n, WindowResizeHandler, {
       this.set('edgeScrollState', initialEdgeScrollState);
       return;
     }
+    const $element = $(element);
 
-    const $ps = this.$('.ps');
+    const $ps = $element.find('.ps');
     const scrollLeftOffset = $ps.scrollLeft();
     const scrollTopOffset = $ps.scrollTop();
-    const $constantRowLabels = this.$('.row-label.constant-row-label');
-    const $floatingRowLabels = this.$('.row-label.floating-row-label');
-    const $constantColumnLabels = this.$('.constant-column-labels .table-cell');
-    const $floatingColumnLabelsRow = this.$('.floating-column-labels');
+    const $constantRowLabels = $element.find('.row-label.constant-row-label');
+    const $floatingRowLabels = $element.find('.row-label.floating-row-label');
+    const $constantColumnLabels = $element.find('.constant-column-labels .table-cell');
+    const $floatingColumnLabelsRow = $element.find('.floating-column-labels');
     const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
-    const $rightShadowOverlay = this.$('.right-shadow-overlay');
+    const $rightShadowOverlay = $element.find('.right-shadow-overlay');
 
     $constantRowLabels.each(function each(index) {
       $floatingRowLabels.eq(index).css({

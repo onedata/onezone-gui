@@ -183,7 +183,8 @@ export default Component.extend(I18n, {
   }),
 
   scrollTopObserver: observer('column.scrollTop', function scrollTopObserver() {
-    this.$('.group-boxes-container').scrollTop(this.get('column.scrollTop'));
+    const element = this.get('element');
+    $(element).find('.group-boxes-container').scrollTop(this.get('column.scrollTop'));
   }),
 
   actions: {
