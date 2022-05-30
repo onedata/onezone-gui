@@ -8,14 +8,12 @@ import {
   context,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { resolve, Promise } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
@@ -444,7 +442,7 @@ function itShowsLoader() {
 
     await renderComponent();
     rejectCallback();
-    await wait();
+    await settled();
 
     expect(isSlideActive('editor')).to.be.true;
     expect(getSlide('editor').querySelector('.resource-load-error')).to.exist;

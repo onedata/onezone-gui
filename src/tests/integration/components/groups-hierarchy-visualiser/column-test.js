@@ -10,7 +10,6 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { A } from '@ember/array';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import { createEmptyColumnModel } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
 describe(
@@ -62,9 +61,7 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      return wait(() => {
-        expect(this.$('.column-header').text()).to.contain('testname');
-      });
+      expect(this.$('.column-header').text()).to.contain('testname');
     });
 
     it('shows group name in header for children type', async function () {

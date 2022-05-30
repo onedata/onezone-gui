@@ -1,12 +1,10 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
-import { fillIn } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | content atm inventories workflows/atm workflow schema details form',
   function () {
@@ -54,7 +52,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         await renderComponent();
 
         this.set('atmWorkflowSchema.name', 'anotherName');
-        await wait();
+        await settled();
 
         expect(this.$('.name-field .text-like-field').text().trim())
           .to.equal('anotherName');
@@ -122,7 +120,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         await renderComponent();
 
         this.set('atmWorkflowSchema.name', 'anotherName');
-        await wait();
+        await settled();
 
         expect(this.$('.name-field .form-control')).to.have.value('workflow1');
       });
@@ -131,9 +129,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         await renderComponent();
 
         this.set('atmWorkflowSchema.name', 'anotherName');
-        await wait();
+        await settled();
         this.set('mode', 'view');
-        await wait();
+        await settled();
 
         expect(this.$('.name-field .text-like-field').text().trim())
           .to.equal('anotherName');
@@ -143,7 +141,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         await renderComponent();
 
         this.set('isDisabled', true);
-        await wait();
+        await settled();
 
         expect(this.$('.form-control')).to.have.attr('disabled');
       });

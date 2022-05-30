@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get, getProperties } from '@ember/object';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 const atmWorkflowSchemaId = 'wfkId';
@@ -74,7 +74,7 @@ describe(
 
       const actionResultPromise = this.get('action').execute();
       rejectDump('someError');
-      await wait();
+      await settled();
       const actionResult = await actionResultPromise;
 
       expect(failureNotifySpy).to.be.calledWith(

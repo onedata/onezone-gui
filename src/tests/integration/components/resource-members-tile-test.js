@@ -5,7 +5,6 @@ import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject from '@ember/object';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 
 describe('Integration | Component | resource members tile', function () {
   setupRenderingTest();
@@ -18,11 +17,10 @@ describe('Integration | Component | resource members tile', function () {
       effUserList: resolve({ length: 4 }),
     }));
     await render(hbs `{{resource-members-tile record=record}}`);
-    return wait().then(() => {
-      expect(this.$('.direct-groups-counter').text()).to.contain('1');
-      expect(this.$('.direct-users-counter').text()).to.contain('2');
-      expect(this.$('.effective-groups-counter').text()).to.contain('3');
-      expect(this.$('.effective-users-counter').text()).to.contain('4');
-    });
+
+    expect(this.$('.direct-groups-counter').text()).to.contain('1');
+    expect(this.$('.direct-users-counter').text()).to.contain('2');
+    expect(this.$('.effective-groups-counter').text()).to.contain('3');
+    expect(this.$('.effective-users-counter').text()).to.contain('4');
   });
 });

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import { lookupService } from '../../../helpers/stub-service';
 import hbs from 'htmlbars-inline-precompile';
 import {
@@ -15,10 +15,8 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import { A } from '@ember/array';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
 
@@ -111,7 +109,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
           name: 'file2.json',
           dump: dump2,
         });
-        await wait();
+        await settled();
 
         expect($modalBody.find('.upload-details .filename').text().trim())
           .to.equal('file2.json');
@@ -304,7 +302,7 @@ function itChangesOperationToCreateOnEmptyTargetWorkflows() {
       const $modalBody = $(getModalBody());
 
       this.get('atmWorkflowSchemas').clear();
-      await wait();
+      await settled();
 
       expect($modalBody.find('.option-create input').prop('checked')).to.equal(true);
       done();

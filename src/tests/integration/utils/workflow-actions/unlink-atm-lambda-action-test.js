@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import UnlinkAtmLambdaAction from 'onezone-gui/utils/workflow-actions/unlink-atm-lambda-action';
 import sinon from 'sinon';
@@ -13,8 +13,6 @@ import {
   getModalBody,
   getModalFooter,
 } from '../../../helpers/modal';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import $ from 'jquery';
@@ -110,7 +108,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
     it('is enabled, when information about atmLambda usages is being acquired',
       async function () {
-        await wait();
+        await settled();
         expect(this.get('action.disabled')).to.be.false;
         expect(String(this.get('action.tip'))).to.be.empty;
       });
@@ -118,7 +116,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
     it('is enabled, when information about atmLambda usages is not available',
       async function () {
         this.get('usedAtmLambdasDefer').reject();
-        await wait();
+        await settled();
 
         expect(this.get('action.disabled')).to.be.false;
         expect(String(this.get('action.tip'))).to.be.empty;
@@ -126,7 +124,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
     it('is enabled, when there are no atmLambda usages', async function () {
       this.get('usedAtmLambdasDefer').resolve([{}, {}]);
-      await wait();
+      await settled();
 
       expect(this.get('action.disabled')).to.be.false;
       expect(String(this.get('action.tip'))).to.be.empty;
@@ -139,7 +137,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
       } = this.getProperties('usedAtmLambdasDefer', 'atmLambda');
 
       usedAtmLambdasDefer.resolve([{}, atmLambda, {}]);
-      await wait();
+      await settled();
 
       expect(this.get('action.disabled')).to.be.true;
       expect(String(this.get('action.tip'))).to.equal(
@@ -150,7 +148,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
     it('shows modal on execute', async function () {
       await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
-      await wait();
+      await settled();
 
       expect($(getModal())).to.have.class('unlink-atm-lambda-modal');
       expect($(getModalBody()).text()).to.contain('inventory1');
@@ -162,7 +160,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
         await render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.cancel-btn')[0]);
         const actionResult = await resultPromise;
 
@@ -191,7 +189,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
 
@@ -229,7 +227,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click($(getModalBody()).find('input[value="allInventories"]')[0]);
         await click($(getModalFooter()).find('.submit-btn')[0]);
         const actionResult = await actionResultPromise;
@@ -264,9 +262,8 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.submit-btn')[0]);
-        await wait();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
@@ -305,10 +302,9 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click($(getModalBody()).find('input[value="allInventories"]')[0]);
         await click($(getModalFooter()).find('.submit-btn')[0]);
-        await wait();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(

@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
 import {
   getModal,
@@ -19,7 +17,7 @@ import {
 import $ from 'jquery';
 
 describe(
-  'Integration | Util | space actions/remove space action',
+  'Integration | Utility | space actions/remove space action',
   function () {
     setupRenderingTest();
 
@@ -56,20 +54,19 @@ describe(
 
       await render(hbs `{{global-modal-mounter}}`);
       action.execute();
+      await settled();
 
-      return wait().then(() => {
-        expect($(getModal())).to.have.class('question-modal');
-        expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
-        expect($(getModalHeader()).find('h1').text().trim())
-          .to.equal('Remove space');
-        expect($(getModalBody()).text().trim()).to.contain(
-          'You are about to delete the space space1.'
-        );
-        expect($(getModalBody()).find('.one-checkbox')).to.exist;
-        const $yesButton = $(getModalFooter()).find('.question-yes');
-        expect($yesButton.text().trim()).to.equal('Remove');
-        expect($yesButton).to.have.class('btn-danger');
-      });
+      expect($(getModal())).to.have.class('question-modal');
+      expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
+      expect($(getModalHeader()).find('h1').text().trim())
+        .to.equal('Remove space');
+      expect($(getModalBody()).text().trim()).to.contain(
+        'You are about to delete the space space1.'
+      );
+      expect($(getModalBody()).find('.one-checkbox')).to.exist;
+      const $yesButton = $(getModalFooter()).find('.question-yes');
+      expect($yesButton.text().trim()).to.equal('Remove');
+      expect($yesButton).to.have.class('btn-danger');
     });
 
     it(
@@ -82,13 +79,11 @@ describe(
 
         await render(hbs `{{global-modal-mounter}}`);
         const resultPromise = action.execute();
+        await settled();
 
-        return wait()
-          .then(() => click($(getModalFooter()).find('.question-no')[0]))
-          .then(() => resultPromise)
-          .then(actionResult =>
-            expect(get(actionResult, 'status')).to.equal('cancelled')
-          );
+        await click($(getModalFooter()).find('.question-no')[0]);
+        const actionResult = await resultPromise;
+        expect(get(actionResult, 'status')).to.equal('cancelled');
       }
     );
 
@@ -113,21 +108,19 @@ describe(
 
         await render(hbs `{{global-modal-mounter}}`);
         const actionResultPromise = action.execute();
+        await settled();
 
-        return wait()
-          .then(() => click($(getModalBody()).find('.one-checkbox')[0]))
-          .then(() => click($(getModalFooter()).find('.question-yes')[0]))
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(removeSpaceStub).to.be.calledOnce;
-            expect(removeSpaceStub).to.be.calledWith('spaceId');
-            expect(successNotifySpy).to.be.calledWith(sinon.match.has(
-              'string',
-              'The space has been successfully removed.'
-            ));
-            expect(get(actionResult, 'status')).to.equal('done');
-            expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;
-          });
+        await click($(getModalBody()).find('.one-checkbox')[0]);
+        await click($(getModalFooter()).find('.question-yes')[0]);
+        const actionResult = await actionResultPromise;
+        expect(removeSpaceStub).to.be.calledOnce;
+        expect(removeSpaceStub).to.be.calledWith('spaceId');
+        expect(successNotifySpy).to.be.calledWith(sinon.match.has(
+          'string',
+          'The space has been successfully removed.'
+        ));
+        expect(get(actionResult, 'status')).to.equal('done');
+        expect(redirectToCollectionIfResourceNotExistSpy).to.be.calledOnce;
       }
     );
 
@@ -148,27 +141,23 @@ describe(
 
         await render(hbs `{{global-modal-mounter}}`);
         const actionResultPromise = action.execute();
+        await settled();
 
-        return wait()
-          .then(() => click($(getModalBody()).find('.one-checkbox')[0]))
-          .then(() => click($(getModalFooter()).find('.question-yes')[0]))
-          .then(() => {
-            rejectRemove('someError');
-            return wait();
-          })
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(failureNotifySpy).to.be.calledWith(
-              sinon.match.has('string', 'removing the space'),
-              'someError'
-            );
-            const {
-              status,
-              error,
-            } = getProperties(actionResult, 'status', 'error');
-            expect(status).to.equal('failed');
-            expect(error).to.equal('someError');
-          });
+        await click($(getModalBody()).find('.one-checkbox')[0]);
+        await click($(getModalFooter()).find('.question-yes')[0]);
+        rejectRemove('someError');
+        await settled();
+        const actionResult = await actionResultPromise;
+        expect(failureNotifySpy).to.be.calledWith(
+          sinon.match.has('string', 'removing the space'),
+          'someError'
+        );
+        const {
+          status,
+          error,
+        } = getProperties(actionResult, 'status', 'error');
+        expect(status).to.equal('failed');
+        expect(error).to.equal('someError');
       }
     );
   }

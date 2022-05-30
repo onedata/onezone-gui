@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { htmlSafe } from '@ember/template';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { Promise, resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import EmberObject, { set } from '@ember/object';
 import { isSlideActive, getSlide } from '../../../helpers/one-carousel';
@@ -303,7 +301,7 @@ describe(
       const selectorSlide = getSlide('selector');
       await fillIn(selectorSlide.querySelector('.search-bar'), '3');
       set(recordEntries[0], 'otherName', 'o3');
-      await wait();
+      await settled();
 
       const records = selectorSlide.querySelectorAll('.record-item');
       expect(records).to.have.length(1);
@@ -323,7 +321,7 @@ describe(
       }}`);
       await click('.one-tile');
       rejectPromise('recordserror');
-      await wait();
+      await settled();
 
       expect(fetchRecordsSpy).to.be.calledOnce;
       expect(getSlide('selector')
@@ -346,7 +344,7 @@ describe(
         }}`);
         await click('.one-tile');
         rejectPromise('recordserror');
-        await wait();
+        await settled();
         await click('.template-back');
         await click('.one-tile');
 

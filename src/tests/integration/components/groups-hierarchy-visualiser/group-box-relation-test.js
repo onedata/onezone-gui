@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, triggerEvent } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { get, set } from '@ember/object';
-import { triggerEvent } from 'ember-native-dom-helpers';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService, lookupService } from '../../../helpers/stub-service';
 import Service from '@ember/service';

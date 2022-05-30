@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve } from 'rsvp';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | content atm inventories workflows/loading view',
   function () {
@@ -67,7 +65,7 @@ describe('Integration | Component | content atm inventories workflows/loading vi
 
         await renderComponent();
         rejectProxy({ id: 'notFound' });
-        await wait();
+        await settled();
 
         expect(this.$('.resource-not-found')).to.exist;
         expectContentElementsCount(this, 1);
@@ -83,7 +81,7 @@ describe('Integration | Component | content atm inventories workflows/loading vi
 
         await renderComponent();
         rejectProxy({ id: 'forbidden' });
-        await wait();
+        await settled();
 
         expect(this.$('.no-permissions')).to.exist;
         expectContentElementsCount(this, 1);
@@ -99,7 +97,7 @@ describe('Integration | Component | content atm inventories workflows/loading vi
 
         await renderComponent();
         rejectProxy({ id: 'someError' });
-        await wait();
+        await settled();
 
         const $errorContainer = this.$('.resource-load-error');
         expect($errorContainer).to.exist;

@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
-import { click, fillIn } from 'ember-native-dom-helpers';
+import { render, click, fillIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { registerService } from '../../helpers/stub-service';
 import EmberObject from '@ember/object';
 import Service from '@ember/service';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 
@@ -61,27 +59,22 @@ describe('Integration | Component | content users', function () {
     this.set('user', MOCKED_USER);
   });
 
-  it('renders full name', async function (done) {
+  it('renders full name', async function () {
     await render(hbs `{{content-users user=user}}`);
-    wait().then(() => {
-      expect(this.$('.full-name-editor').text().trim())
-        .to.equal(this.get('user.fullName'));
-      done();
-    });
+
+    expect(this.$('.full-name-editor').text().trim())
+      .to.equal(this.get('user.fullName'));
   });
 
-  it('renders username', async function (done) {
+  it('renders username', async function () {
     await render(hbs `{{content-users user=user}}`);
-    wait().then(() => {
-      expect(this.$('.username-editor').text().trim())
-        .to.equal(this.get('user.username'));
-      done();
-    });
+
+    expect(this.$('.username-editor').text().trim())
+      .to.equal(this.get('user.username'));
   });
 
   it('renders copiable user id', async function () {
     await render(hbs `{{content-users user=user}}`);
-    await wait();
 
     expect(this.$('.user-id-clipboard-line input').val())
       .to.equal(this.get('user.entityId'));
@@ -89,64 +82,52 @@ describe('Integration | Component | content users', function () {
 
   it('renders linked account', async function () {
     await render(hbs `{{content-users user=user}}`);
-    return wait().then(() => {
-      expect(this.$('.google-account'), 'google-account').to.exist;
-      expect(
-        this.$('.google-account .account-type', 'Google+ text').text().trim()
-      ).to.equal('Google+');
-      expect(
-        this.$('.google-account .account-email', 'email text').text().trim()
-      ).to.equal('one@one.one');
-    });
+
+    expect(this.$('.google-account'), 'google-account').to.exist;
+    expect(
+      this.$('.google-account .account-type', 'Google+ text').text().trim()
+    ).to.equal('Google+');
+    expect(
+      this.$('.google-account .account-email', 'email text').text().trim()
+    ).to.equal('one@one.one');
   });
 
-  it('allows to change display name', async function (done) {
+  it('allows to change display name', async function () {
     await render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newName = 'testName';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
-    wait().then(() => {
-      click('.full-name-editor .one-label').then(() => {
-        fillIn('.full-name-editor input', newName).then(() => {
-          click('.full-name-editor .save-icon').then(() => {
-            expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.full-name-editor').text().trim())
-              .to.equal(user.get('fullName'));
-            expect(user.get('fullName')).to.equal(newName);
-            done();
-          });
-        });
-      });
-    });
+
+    await click('.full-name-editor .one-label');
+    await fillIn('.full-name-editor input', newName);
+    await click('.full-name-editor .save-icon');
+    expect(saveSpy).to.be.calledOnce;
+    expect(this.$('.full-name-editor').text().trim())
+      .to.equal(user.get('fullName'));
+    expect(user.get('fullName')).to.equal(newName);
   });
 
-  it('allows to change username', async function (done) {
+  it('allows to change username', async function () {
     await render(hbs `{{content-users user=user}}`);
     const user = this.get('user');
     const newUsername = 'testUsername';
     const saveSpy = sinon.spy(() => resolve());
     user.save = saveSpy;
-    wait().then(() => {
-      click('.username-editor .one-label').then(() => {
-        fillIn('.username-editor input', newUsername).then(() => {
-          click('.username-editor .save-icon').then(() => {
-            expect(saveSpy).to.be.calledOnce;
-            expect(this.$('.username-editor').text().trim())
-              .to.equal(user.get('username'));
-            expect(user.get('username')).to.equal(newUsername);
-            done();
-          });
-        });
-      });
-    });
+
+    await click('.username-editor .one-label');
+    await fillIn('.username-editor input', newUsername);
+    await click('.username-editor .save-icon');
+    expect(saveSpy).to.be.calledOnce;
+    expect(this.$('.username-editor').text().trim())
+      .to.equal(user.get('username'));
+    expect(user.get('username')).to.equal(newUsername);
   });
 
   it('renders password section for user with basicAuth enabled', async function () {
     await render(hbs `{{content-users user=user}}`);
-    return wait().then(() => {
-      expect(this.$('.change-password-row .one-inline-editor')).to.exist;
-    });
+
+    expect(this.$('.change-password-row .one-inline-editor')).to.exist;
   });
 
   it(
@@ -154,9 +135,8 @@ describe('Integration | Component | content users', function () {
     async function () {
       this.set('user.basicAuthEnabled', false);
       await render(hbs `{{content-users user=user}}`);
-      return wait().then(() => {
-        expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
-      });
+
+      expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
     }
   );
 });

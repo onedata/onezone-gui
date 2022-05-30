@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { reject } from 'rsvp';
 import {
   getModal,
@@ -23,7 +21,7 @@ import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
 import $ from 'jquery';
 
 describe(
-  'Integration | Util | space actions/add harvester to space action',
+  'Integration | Utility | space actions/add harvester to space action',
   function () {
     setupRenderingTest();
 
@@ -73,26 +71,22 @@ describe(
 
       await render(hbs `{{global-modal-mounter}}`);
       action.execute();
+      await settled();
 
       const dropdownHelper = new RecordHelper();
-      return wait()
-        .then(() => {
-          expect($(getModal())).to.have.class('record-selector-modal');
-          expect($(getModalHeader()).find('h1').text().trim())
-            .to.equal('Add one of your harvesters');
-          expect($(getModalBody()).find('p').text().trim()).to.equal(
-            'Choose harvester which should consume metadata from space "space1":'
-          );
-          expect($(getModalFooter()).find('.record-selector-submit').text().trim())
-            .to.equal('Add');
-          return dropdownHelper.open();
-        })
-        .then(() => {
-          expect(dropdownHelper.getNthOption(1).innerText.trim()).to.equal('harvester1');
-          expect(dropdownHelper.getNthOption(1).querySelector('.oneicon-light-bulb'))
-            .to.exist;
-          expect(dropdownHelper.getNthOption(2)).to.not.exist;
-        });
+      expect($(getModal())).to.have.class('record-selector-modal');
+      expect($(getModalHeader()).find('h1').text().trim())
+        .to.equal('Add one of your harvesters');
+      expect($(getModalBody()).find('p').text().trim()).to.equal(
+        'Choose harvester which should consume metadata from space "space1":'
+      );
+      expect($(getModalFooter()).find('.record-selector-submit').text().trim())
+        .to.equal('Add');
+      await dropdownHelper.open();
+      expect(dropdownHelper.getNthOption(1).innerText.trim()).to.equal('harvester1');
+      expect(dropdownHelper.getNthOption(1).querySelector('.oneicon-light-bulb'))
+        .to.exist;
+      expect(dropdownHelper.getNthOption(2)).to.not.exist;
     });
 
     it(
@@ -113,21 +107,19 @@ describe(
 
         await render(hbs `{{global-modal-mounter}}`);
         const actionResultPromise = action.execute();
+        await settled();
 
         const dropdownHelper = new RecordHelper();
-        return wait()
-          .then(() => dropdownHelper.selectOption(1))
-          .then(() => click($(getModalFooter()).find('.record-selector-submit')[0]))
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(addHarvesterStub).to.be.calledOnce;
-            expect(addHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
-            expect(successNotifySpy).to.be.calledWith(sinon.match.has(
-              'string',
-              'The harvester has been successfully added to the space.'
-            ));
-            expect(get(actionResult, 'status')).to.equal('done');
-          });
+        await dropdownHelper.selectOption(1);
+        await click($(getModalFooter()).find('.record-selector-submit')[0]);
+        const actionResult = await actionResultPromise;
+        expect(addHarvesterStub).to.be.calledOnce;
+        expect(addHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
+        expect(successNotifySpy).to.be.calledWith(sinon.match.has(
+          'string',
+          'The harvester has been successfully added to the space.'
+        ));
+        expect(get(actionResult, 'status')).to.equal('done');
       }
     );
 
@@ -149,24 +141,22 @@ describe(
 
         await render(hbs `{{global-modal-mounter}}`);
         const actionResultPromise = action.execute();
+        await settled();
 
         const dropdownHelper = new RecordHelper();
-        return wait()
-          .then(() => dropdownHelper.selectOption(1))
-          .then(() => click($(getModalFooter()).find('.record-selector-submit')[0]))
-          .then(() => actionResultPromise)
-          .then(actionResult => {
-            expect(failureNotifySpy).to.be.calledWith(
-              sinon.match.has('string', 'adding the harvester to the space'),
-              'someError'
-            );
-            const {
-              status,
-              error,
-            } = getProperties(actionResult, 'status', 'error');
-            expect(status).to.equal('failed');
-            expect(error).to.equal('someError');
-          });
+        await dropdownHelper.selectOption(1);
+        await click($(getModalFooter()).find('.record-selector-submit')[0]);
+        const actionResult = await actionResultPromise;
+        expect(failureNotifySpy).to.be.calledWith(
+          sinon.match.has('string', 'adding the harvester to the space'),
+          'someError'
+        );
+        const {
+          status,
+          error,
+        } = getProperties(actionResult, 'status', 'error');
+        expect(status).to.equal('failed');
+        expect(error).to.equal('someError');
       }
     );
   }

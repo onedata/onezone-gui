@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -11,7 +10,6 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { selectChoose } from '../../helpers/ember-power-select';
 import $ from 'jquery';
 
@@ -372,7 +370,7 @@ describe('Integration | Component | content atm inventories workflows', function
 
         await renderComponent();
         rejectCallback();
-        await wait();
+        await settled();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'loading');

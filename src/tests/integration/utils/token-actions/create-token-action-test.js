@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 
-describe('Integration | Util | token actions/create token action', function () {
+describe('Integration | Utility | token actions/create token action', function () {
   setupRenderingTest();
 
   beforeEach(function () {

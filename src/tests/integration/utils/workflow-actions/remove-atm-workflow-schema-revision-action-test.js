@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/remove-atm-workflow-schema-revision-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
 import {
   getModal,
@@ -54,7 +52,7 @@ describe(
     it('shows modal on execute', async function () {
       await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
-      await wait();
+      await settled();
 
       expect($(getModal())).to.have.class('question-modal');
       expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
@@ -73,7 +71,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.question-no')[0]);
         const actionResult = await resultPromise;
 
@@ -94,7 +92,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.question-yes')[0]);
         const actionResult = await actionResultPromise;
 
@@ -121,10 +119,10 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await wait();
+        await settled();
         await click($(getModalFooter()).find('.question-yes')[0]);
         rejectRemove('someError');
-        await wait();
+        await settled();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(

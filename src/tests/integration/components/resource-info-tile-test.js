@@ -7,7 +7,6 @@ import Service from '@ember/service';
 import EmberObject, { get } from '@ember/object';
 import { resolve } from 'rsvp';
 import { registerService } from '../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
 
 describe('Integration | Component | resource info tile', function () {
   setupRenderingTest();
@@ -39,11 +38,10 @@ describe('Integration | Component | resource info tile', function () {
     });
     this.set('record', record);
     await render(hbs `{{resource-info-tile record=record}}`);
-    return wait().then(() => {
-      expect(this.$('.resource-name')).to.contain(get(record, 'name'));
-      expect(this.$('.id input')).to.have.value(get(record, 'entityId'));
-      expect(this.$('.creator .one-icon')).to.have.class('oneicon-user');
-      expect(this.$('.creator')).to.contain('user1');
-    });
+
+    expect(this.$('.resource-name')).to.contain(get(record, 'name'));
+    expect(this.$('.id input')).to.have.value(get(record, 'entityId'));
+    expect(this.$('.creator .one-icon')).to.have.class('oneicon-user');
+    expect(this.$('.creator')).to.contain('user1');
   });
 });

@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
-import wait from 'ember-test-helpers/wait';
 
 const basicCategory = 'Basic';
 const advancedCategory = 'Advanced';
@@ -63,13 +61,10 @@ describe('Integration | Component | token template selector', function () {
   it('has only first category expanded', async function () {
     await render(hbs `{{token-template-selector}}`);
 
-    return wait()
-      .then(() => {
-        expect(this.$()[0].querySelectorAll('.one-collapsible-list-item.active'))
-          .to.have.length(1);
-        expect(this.$()[0].querySelector('.one-collapsible-list-item')
-          .classList.contains('active')).to.be.true;
-      });
+    expect(this.$()[0].querySelectorAll('.one-collapsible-list-item.active'))
+      .to.have.length(1);
+    expect(this.$()[0].querySelector('.one-collapsible-list-item')
+      .classList.contains('active')).to.be.true;
   });
 
   it('notifies about selected template', async function () {

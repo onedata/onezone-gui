@@ -8,10 +8,9 @@ import {
   context,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { lookupService } from '../../../helpers/stub-service';
 import { selectChoose } from '../../../helpers/ember-power-select';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';

@@ -1,12 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { htmlSafe } from '@ember/template';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 
 describe(
   'Integration | Component | token template selector/single step template',

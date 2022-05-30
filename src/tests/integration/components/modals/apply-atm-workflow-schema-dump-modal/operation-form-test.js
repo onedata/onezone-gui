@@ -1,12 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
 import $ from 'jquery';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 
 const componentClass = 'operation-form';
 

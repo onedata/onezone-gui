@@ -1,13 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
-import { fillIn } from 'ember-native-dom-helpers';
 import EmberObject from '@ember/object';
 
 const componentClass = 'revision-details-form';
@@ -155,7 +153,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
           description: '',
         },
       });
-      await wait();
+      await settled();
 
       expectValues(this, oldRevision);
     });
@@ -168,7 +166,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
       await renderComponent();
 
       this.set('revisionNumber', 10);
-      await wait();
+      await settled();
 
       expectValues(this, newRevision);
     });
@@ -186,7 +184,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
           [revisionNumber]: newRevision,
         },
       }));
-      await wait();
+      await settled();
 
       expectValues(this, newRevision);
     });

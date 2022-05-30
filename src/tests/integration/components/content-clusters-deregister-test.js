@@ -1,15 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 import moment from 'moment';
 import Service from '@ember/service';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { registerService } from '../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
 
 const OnedataGraph = Service.extend({
@@ -35,14 +33,10 @@ describe('Integration | Component | content clusters deregister', function () {
         deregister=deregister
       }}`);
 
-      return wait().then(() => {
-        expect($('.content-clusters-deregister .btn-deregister'))
-          .to.have.attr('disabled');
-        return click('.content-clusters-deregister .btn-deregister')
-          .then(() => {
-            expect(deregister).to.be.not.called;
-          });
-      });
+      expect($('.content-clusters-deregister .btn-deregister'))
+        .to.have.attr('disabled');
+      await click('.content-clusters-deregister .btn-deregister');
+      expect(deregister).to.be.not.called;
     }
   );
 
@@ -61,17 +55,11 @@ describe('Integration | Component | content clusters deregister', function () {
         afterDeregister=afterDeregister
       }}`);
 
-      click('.content-clusters-deregister .one-checkbox-understand');
-
-      return wait().then(() => {
-        return click('.content-clusters-deregister .btn-deregister')
-          .then(() => {
-            expect(deregister).to.be.calledOnce;
-            return wait().then(() => {
-              expect(afterDeregister).to.be.calledOnce;
-            });
-          });
-      });
+      await click('.content-clusters-deregister .one-checkbox-understand');
+      await click('.content-clusters-deregister .btn-deregister');
+      expect(deregister).to.be.calledOnce;
+      await settled();
+      expect(afterDeregister).to.be.calledOnce;
     }
   );
 
@@ -103,17 +91,15 @@ describe('Integration | Component | content clusters deregister', function () {
         getOneproviderClusterResourceStats=getOneproviderClusterResourceStats
       }}`);
 
-      return wait().then(() => {
-        expect($('.row-cluster-oneprovider-stats')).to.exist;
-        expect($('.li-creation-time-count .active-since-date').text())
-          .to.match(/13 Mar 2019/);
-        expect($('.li-spaces-count .spaces-count-number').text())
-          .to.match(/4/);
-        expect($('.li-groups-count .groups-count-number').text())
-          .to.match(/3/);
-        expect($('.li-users-count .users-count-number').text())
-          .to.match(/2/);
-      });
+      expect($('.row-cluster-oneprovider-stats')).to.exist;
+      expect($('.li-creation-time-count .active-since-date').text())
+        .to.match(/13 Mar 2019/);
+      expect($('.li-spaces-count .spaces-count-number').text())
+        .to.match(/4/);
+      expect($('.li-groups-count .groups-count-number').text())
+        .to.match(/3/);
+      expect($('.li-users-count .users-count-number').text())
+        .to.match(/2/);
     }
   );
 });

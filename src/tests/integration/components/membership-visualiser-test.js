@@ -8,7 +8,6 @@ import { registerService, lookupService } from '../../helpers/stub-service';
 import _ from 'lodash';
 import { resolve, reject } from 'rsvp';
 import Service from '@ember/service';
-import wait from 'ember-test-helpers/wait';
 import $ from 'jquery';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 
@@ -100,9 +99,8 @@ describe('Integration | Component | membership visualiser', function () {
     await render(hbs `{{membership-visualiser
       contextRecord=user
       targetRecord=groups.[0]}}`);
-    return wait().then(() => {
-      expect(this.$('.membership')).to.have.length(4);
-    });
+
+    expect(this.$('.membership')).to.have.length(4);
   });
 
   it('renders limited number of possible paths and limit info message', async function () {
@@ -110,23 +108,21 @@ describe('Integration | Component | membership visualiser', function () {
       maxPathsNumber=3
       contextRecord=user
       targetRecord=groups.[0]}}`);
-    return wait().then(() => {
-      expect(this.$('.membership')).to.have.length(3);
-      expect(this.$('.limit-info')).to.exist;
-    });
+
+    expect(this.$('.membership')).to.have.length(3);
+    expect(this.$('.limit-info')).to.exist;
   });
 
   it('renders paths in growing-length order', async function () {
     await render(hbs `{{membership-visualiser
       contextRecord=user
       targetRecord=groups.[0]}}`);
-    return wait().then(() => {
-      let prevBlocksNumber = 2;
-      this.$('.membership').each(function () {
-        const blocksNumber = $(this).find('.membership-block').length;
-        expect(blocksNumber).to.be.gte(prevBlocksNumber);
-        prevBlocksNumber = blocksNumber;
-      });
+
+    let prevBlocksNumber = 2;
+    this.$('.membership').each(function () {
+      const blocksNumber = $(this).find('.membership-block').length;
+      expect(blocksNumber).to.be.gte(prevBlocksNumber);
+      prevBlocksNumber = blocksNumber;
     });
   });
 
@@ -135,8 +131,7 @@ describe('Integration | Component | membership visualiser', function () {
       contextRecord=user
       visibleBlocks=2
       targetRecord=groups.[0]}}`);
-    return wait().then(() => {
-      expect(this.$('.membership')).to.have.length(4);
-    });
+
+    expect(this.$('.membership')).to.have.length(4);
   });
 });

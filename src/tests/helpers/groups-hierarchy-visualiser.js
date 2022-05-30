@@ -1,4 +1,4 @@
-import { click, triggerEvent } from 'ember-native-dom-helpers';
+import { click, triggerEvent } from '@ember/test-helpers';
 import { resolve } from 'rsvp';
 import $ from 'jquery';
 

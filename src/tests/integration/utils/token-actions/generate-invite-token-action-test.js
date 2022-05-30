@@ -1,14 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import {
   getModal,
   getModalBody,
@@ -17,7 +15,7 @@ import {
 import TestComponent from 'onedata-gui-common/components/test-component';
 import $ from 'jquery';
 
-describe('Integration | Util | token actions/generate invite token action', function () {
+describe('Integration | Utility | token actions/generate invite token action', function () {
   setupRenderingTest();
 
   beforeEach(function () {
@@ -129,10 +127,9 @@ describe('Integration | Util | token actions/generate invite token action', func
 
     await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      expect($(getModal())).to.have.class('generate-invite-token-modal');
-    });
+    expect($(getModal())).to.have.class('generate-invite-token-modal');
   });
 
   it('passess inviteType and tokenTarget to the modal', async function () {
@@ -144,12 +141,11 @@ describe('Integration | Util | token actions/generate invite token action', func
 
     await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      const testComponent = $(getModalBody()).find('.test-component')[0].componentInstance;
-      expect(get(testComponent, 'inviteType')).to.equal('userJoinGroup');
-      expect(get(testComponent, 'targetRecord.entityId')).to.equal('sth');
-    });
+    const testComponent = $(getModalBody()).find('.test-component')[0].componentInstance;
+    expect(get(testComponent, 'inviteType')).to.equal('userJoinGroup');
+    expect(get(testComponent, 'targetRecord.entityId')).to.equal('sth');
   });
 
   it('resolves returned promise when modal has been closed', async function () {
@@ -162,11 +158,9 @@ describe('Integration | Util | token actions/generate invite token action', func
     await render(hbs `{{global-modal-mounter}}`);
     action.execute().then(() => promiseIsResolved = true);
 
-    return wait()
-      .then(() => {
-        expect(promiseIsResolved).to.be.false;
-        return click($(getModalFooter()).find('.modal-close')[0]);
-      })
-      .then(() => expect(promiseIsResolved).to.be.true);
+    await settled();
+    expect(promiseIsResolved).to.be.false;
+    await click($(getModalFooter()).find('.modal-close')[0]);
+    expect(promiseIsResolved).to.be.true;
   });
 });

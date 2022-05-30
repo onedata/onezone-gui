@@ -1,10 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, fillIn, focus, blur, click, find, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { fillIn, focus, blur, click, find } from 'ember-native-dom-helpers';
-import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
 import sinon from 'sinon';
@@ -487,7 +485,6 @@ describe(
           await addArgument();
 
           await fillIn('.entryName-field .form-control', 'somename');
-          await wait();
 
           expect(this.$('.entryName-field')).to.have.class('has-success');
           done();
@@ -705,7 +702,7 @@ describe(
         await fillWithMinimumData(this);
         await click('.btn-submit');
         rejectSubmit();
-        await wait();
+        await settled();
 
         expect(this.$('.name-field .form-control')).to.not.have.value('');
         done();

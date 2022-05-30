@@ -7,7 +7,6 @@ import { A } from '@ember/array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { Promise } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import { registerService } from '../../helpers/stub-service';
 import Service from '@ember/service';
 import { set } from '@ember/object';
@@ -75,11 +74,9 @@ describe('Integration | Component | content spaces providers', function () {
   it('renders providers list, atlas and support chart ', async function () {
     await render(hbs `{{content-spaces-providers space=space}}`);
 
-    return wait().then(() => {
-      expect(this.$('.space-providers-list'), 'providers list').to.exist;
-      expect(this.$('.space-providers-atlas'), 'providers atlas').to.exist;
-      expect(this.$('.space-providers-support-chart'), 'support chart')
-        .to.exist;
-    });
+    expect(this.$('.space-providers-list'), 'providers list').to.exist;
+    expect(this.$('.space-providers-atlas'), 'providers atlas').to.exist;
+    expect(this.$('.space-providers-support-chart'), 'support chart')
+      .to.exist;
   });
 });

@@ -6,6 +6,10 @@ import Application from '../app';
 import config from '../config/environment';
 import { unsuppressRejections } from './helpers/suppress-rejections';
 import handleHidepassed from './handle-hidepassed';
+import silenceDeprecations from 'onedata-gui-common/utils/silence-deprecations';
+
+// TODO: VFS-8903 Remove
+silenceDeprecations();
 
 mocha.setup({
   timeout: 15000,

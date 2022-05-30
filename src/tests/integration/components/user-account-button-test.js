@@ -6,7 +6,6 @@ import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import Service from '@ember/service';
 import SessionStub from '../../helpers/stubs/services/session';
-import wait from 'ember-test-helpers/wait';
 import { registerService, lookupService } from '../../helpers/stub-service';
 
 const userId = 'some_user_id';
@@ -51,11 +50,9 @@ describe('Integration | Component | user account button', function () {
 
       await render(hbs `{{user-account-button}}`);
 
-      wait().then(() => {
-        const $username = this.$('.user-account-button-username');
+      const $username = this.$('.user-account-button-username');
 
-        expect($username).to.exist;
-        expect($username, $username.text()).to.contain(username);
-      });
+      expect($username).to.exist;
+      expect($username, $username.text()).to.contain(username);
     });
 });

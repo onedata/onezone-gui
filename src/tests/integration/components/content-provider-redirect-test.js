@@ -6,7 +6,6 @@ import hbs from 'htmlbars-inline-precompile';
 import Service from '@ember/service';
 import { registerService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
 import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -79,10 +78,8 @@ describe('Integration | Component | content provider redirect', function () {
       const $contentProviderRedirect = this.$('.content-provider-redirect');
       expect($contentProviderRedirect).to.exist;
 
-      return wait().then(() => {
-        expect(locationReplace).to.be.calledOnce;
-        expect(locationReplace).to.be.calledWith(url);
-      });
+      expect(locationReplace).to.be.calledOnce;
+      expect(locationReplace).to.be.calledWith(url);
     }
   );
 
@@ -125,12 +122,10 @@ describe('Integration | Component | content provider redirect', function () {
         provider=provider
       }}`);
 
-      return wait().then(() => {
-        expect(checkIsProviderAvailable).to.be.calledOnce;
-        expect(showEndpointErrorModal).to.be.calledOnce;
-        expect(transitionToProviderOnMap).to.be.calledOnce;
-        expect(throwEndpointError).to.be.calledOnce;
-      });
+      expect(checkIsProviderAvailable).to.be.calledOnce;
+      expect(showEndpointErrorModal).to.be.calledOnce;
+      expect(transitionToProviderOnMap).to.be.calledOnce;
+      expect(throwEndpointError).to.be.calledOnce;
     }
   );
 });

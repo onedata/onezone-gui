@@ -1,15 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, fillIn, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { lookupService } from '../../helpers/stub-service';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
-import { fillIn, click } from 'ember-native-dom-helpers';
 import { set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
@@ -151,7 +149,7 @@ describe('Integration | Component | content tokens new', function () {
 
       expect(this.$('.submit-token [role="progressbar"]')).to.exist;
       resolveSubmit();
-      await wait();
+      await settled();
 
       expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
     }
@@ -176,7 +174,6 @@ describe('Integration | Component | content tokens new', function () {
       });
 
       await render(hbs `{{content-tokens-new}}`);
-      await wait();
 
       checkShowsTemplate('Custom');
       expect(this.$('.type-field .option-invite input').prop('checked')).to.be.true;

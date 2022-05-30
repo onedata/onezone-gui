@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, focus, blur, fillIn, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -9,7 +9,6 @@ import { resolve, Promise } from 'rsvp';
 import { set, setProperties } from '@ember/object';
 import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
-import { focus, blur, fillIn, click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 
 const exampleHarvester = {

@@ -3,7 +3,6 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { later } from '@ember/runloop';
@@ -46,12 +45,12 @@ describe('Integration | Component | one embedded container', function () {
     const iframe = this.$('iframe')[0];
     iframe.contentDocument.body.appendChild(s);
 
-    return wait().then(() => new Promise(resolve => {
+    await new Promise(resolve => {
       later(() => {
         expect(hello).to.be.calledOnce;
         expect(hello).to.be.calledWith('world');
         resolve();
       }, 10);
-    }));
+    });
   });
 });

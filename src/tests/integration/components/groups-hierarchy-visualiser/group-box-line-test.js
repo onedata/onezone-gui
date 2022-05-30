@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { set } from '@ember/object';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import $ from 'jquery';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService } from '../../../helpers/stub-service';
@@ -35,7 +33,7 @@ describe(
       expect($line.css('width')).to.be.equal('50px');
     });
 
-    it('renders actions on demand', async function (done) {
+    it('renders actions on demand', async function () {
       const line = EmberObject.create({
         x: 100,
         y: 100,
@@ -54,15 +52,12 @@ describe(
       const $line = this.$('.group-box-line');
       expect($line.find('.actions-trigger')).to.not.exist;
       set(line, 'hovered', true);
-      wait().then(() => {
-        const $actionsTrigger = $line.find('.actions-trigger');
-        expect($actionsTrigger).to.exist;
-        expect($('body .webui-popover')).to.not.exist;
-        click($actionsTrigger[0]).then(() => {
-          expect($('body .webui-popover.in')).to.exist;
-          done();
-        });
-      });
+      await settled();
+      const $actionsTrigger = $line.find('.actions-trigger');
+      expect($actionsTrigger).to.exist;
+      expect($('body .webui-popover')).to.not.exist;
+      await click($actionsTrigger[0]);
+      expect($('body .webui-popover.in')).to.exist;
     });
 
     it('does not render actions if actionsEnabled is false', async function () {
@@ -97,14 +92,13 @@ describe(
 
         this.set('line', line);
         await render(hbs `{{groups-hierarchy-visualiser/group-box-line line=line}}`);
-        return click(this.$('.group-box-line .actions-trigger')[0]).then(() => {
-          const $popover = $('body .webui-popover.in');
-          expect($popover.find('.disabled > .modify-privileges-action')).to.exist;
-        });
+        await click(this.$('.group-box-line .actions-trigger')[0]);
+        const $popover = $('body .webui-popover.in');
+        expect($popover.find('.disabled > .modify-privileges-action')).to.exist;
       }
     );
 
-    it('closes actions popover after action click', async function (done) {
+    it('closes actions popover after action click', async function () {
       const line = EmberObject.create({
         x: 100,
         y: 100,
@@ -125,13 +119,10 @@ describe(
           line=line
           modifyPrivileges=dummyCallback}}
       `);
-      click(this.$('.group-box-line .actions-trigger')[0]).then(() => {
-        const $popover = $('body .webui-popover.in');
-        click($popover.find('.modify-privileges-action')[0]).then(() => {
-          expect($popover).to.not.have.class('in');
-          done();
-        });
-      });
+      await click(this.$('.group-box-line .actions-trigger')[0]);
+      const $popover = $('body .webui-popover.in');
+      await click($popover.find('.modify-privileges-action')[0]);
+      expect($popover).to.not.have.class('in');
     });
   }
 );

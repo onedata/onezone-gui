@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import { getProperties, get } from '@ember/object';
 import { getModal } from '../../../helpers/modal';
-import wait from 'ember-test-helpers/wait';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, reject } from 'rsvp';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-atm-workflow-schema-dump';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
@@ -85,7 +83,7 @@ describe(
     it('shows modal on execute', async function () {
       await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
-      await wait();
+      await settled();
 
       expect($(getModal())).to.have.class('apply-atm-workflow-schema-dump-modal');
       expect($(getModal()).find('.dump-details').text())
@@ -108,7 +106,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click('.submit-btn');
         const actionResult = await actionResultPromise;
 
@@ -141,7 +139,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click('.option-create');
         await fillIn('.newWorkflowName-field .form-control', 'abcd');
         await click('.submit-btn');
@@ -177,7 +175,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click('.submit-btn');
         const actionResult = await actionResultPromise;
 
@@ -205,7 +203,7 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = action.execute();
-        await wait();
+        await settled();
         await click('.option-create');
         await click('.submit-btn');
         const actionResult = await actionResultPromise;
