@@ -13,7 +13,12 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import EmberObject, { computed, get, getProperties, observer } from '@ember/object';
+import EmberObject, {
+  computed,
+  get,
+  getProperties,
+  observer,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { scheduleOnce } from '@ember/runloop';
 import { Promise, resolve } from 'rsvp';
@@ -75,7 +80,9 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import RecordOptionsArrayProxy from 'onedata-gui-common/utils/record-options-array-proxy';
 import ArrayProxy from '@ember/array/proxy';
 import recordIcon from 'onedata-gui-common/utils/record-icon';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 
 const tokenInviteTypesWithoutTarget = [
   'registerOneprovider',

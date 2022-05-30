@@ -3,7 +3,12 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import EmberObject, { computed, get, getProperties, set } from '@ember/object';
+import EmberObject, {
+  computed,
+  get,
+  getProperties,
+  set,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';

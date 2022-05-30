@@ -63,7 +63,13 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, getProperties, set } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+  set,
+} from '@ember/object';
 import { sort } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';

@@ -11,13 +11,20 @@
 import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
+import {
+  Promise,
+  resolve,
+  all as allFulfilled,
+  hash as hashFulfilled,
+} from 'rsvp';
 import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import atmInventoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';

@@ -10,7 +10,12 @@ import { lookupService } from '../../../helpers/stub-service';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
-import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
+import {
+  getModal,
+  getModalHeader,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 import $ from 'jquery';
 
 describe(

@@ -15,7 +15,15 @@ import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextareaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { conditional, and, not, tag, equal, raw, array } from 'ember-awesome-macros';
+import {
+  conditional,
+  and,
+  not,
+  tag,
+  equal,
+  raw,
+  array,
+} from 'ember-awesome-macros';
 import { reads } from '@ember/object/computed';
 import { validator } from 'ember-cp-validations';
 import _ from 'lodash';

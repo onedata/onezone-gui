@@ -25,7 +25,16 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
-import { tag, equal, notEqual, raw, or, not, and, conditional } from 'ember-awesome-macros';
+import {
+  tag,
+  equal,
+  notEqual,
+  raw,
+  or,
+  not,
+  and,
+  conditional,
+} from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 import _ from 'lodash';
 import { scheduleOnce } from '@ember/runloop';

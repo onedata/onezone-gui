@@ -8,7 +8,11 @@ import sinon from 'sinon';
 import { defer, resolve, reject } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get, getProperties } from '@ember/object';
-import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
+import {
+  getModal,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';

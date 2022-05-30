@@ -9,7 +9,12 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, getProperties, get } from '@ember/object';
+import {
+  computed,
+  observer,
+  getProperties,
+  get,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { htmlSafe } from '@ember/string';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

@@ -10,7 +10,12 @@
 
 import Component from '@ember/component';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import EmberObject, { get, set, computed, observer } from '@ember/object';
+import EmberObject, {
+  get,
+  set,
+  computed,
+  observer,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -396,7 +401,7 @@ export default Component.extend(I18n, {
           }));
         }
         // fallthrough to remove old assign to harvester index, which could be
-        // used for gui index we have just created 
+        // used for gui index we have just created
         /* fallthrough */
         case 'unassigned':
           harvesterIndicesProxy.forEach(index => {

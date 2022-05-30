@@ -1,5 +1,12 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, before, afterEach, context } from 'mocha';
+import {
+  describe,
+  it,
+  beforeEach,
+  before,
+  afterEach,
+  context,
+} from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';

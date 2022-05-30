@@ -10,7 +10,12 @@
 import ArrayProxy from '@ember/array/proxy';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';
 import { promise } from 'ember-awesome-macros';
-import { computed, get, getProperties, observer } from '@ember/object';
+import {
+  computed,
+  get,
+  getProperties,
+  observer,
+} from '@ember/object';
 import _ from 'lodash';
 
 export default ArrayProxy.extend({

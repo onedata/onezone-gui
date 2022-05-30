@@ -2,7 +2,9 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupTest } from 'ember-mocha';
 import { set, get, setProperties } from '@ember/object';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import gri from 'onedata-gui-websocket-client/utils/gri';

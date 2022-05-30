@@ -9,7 +9,11 @@ import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
-import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
+import {
+  getModal,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 import TestComponent from 'onedata-gui-common/components/test-component';
 import $ from 'jquery';
 

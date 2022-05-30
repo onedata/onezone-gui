@@ -8,7 +8,12 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, getProperties } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';

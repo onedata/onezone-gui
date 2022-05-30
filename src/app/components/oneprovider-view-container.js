@@ -1,7 +1,7 @@
 /**
  * For given space let user select the Oneprovider and give a place where
  * some component (typically remote component from Oneprovider) will be rendered.
- * 
+ *
  * @module components/oneprovider-view-container
  * @author Jakub Liput
  * @copyright (C) 2019-2020 ACK CYFRONET AGH
@@ -9,9 +9,21 @@
  */
 
 import Component from '@ember/component';
-import EmberObject, { get, computed, observer } from '@ember/object';
+import EmberObject, {
+  get,
+  computed,
+  observer,
+} from '@ember/object';
 import { reads, not } from '@ember/object/computed';
-import { promise, notEmpty, array, raw, tag, conditional, gt } from 'ember-awesome-macros';
+import {
+  promise,
+  notEmpty,
+  array,
+  raw,
+  tag,
+  conditional,
+  gt,
+} from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';

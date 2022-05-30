@@ -10,7 +10,13 @@
 import Component from '@ember/component';
 import { inject as service } from '@ember/service';
 import { promise, or, raw } from 'ember-awesome-macros';
-import EmberObject, { computed, observer, get, getProperties, setProperties } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+  getProperties,
+  setProperties,
+} from '@ember/object';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import ActionsFactory from 'onedata-gui-common/utils/workflow-visualiser/actions-factory';
 import { Promise } from 'rsvp';

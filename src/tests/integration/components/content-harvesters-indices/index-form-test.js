@@ -4,7 +4,11 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { focus, blur, fillIn, click } from 'ember-native-dom-helpers';
-import { all as allFulfilled, resolve, Promise } from 'rsvp';
+import {
+  all as allFulfilled,
+  resolve,
+  Promise,
+} from 'rsvp';
 import _ from 'lodash';
 import sinon from 'sinon';
 import OneTooltipHelper from '../../../helpers/one-tooltip';

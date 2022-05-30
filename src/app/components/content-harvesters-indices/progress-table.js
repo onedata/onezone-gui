@@ -9,7 +9,13 @@
 
 import Component from '@ember/component';
 import { promise, subtract } from 'ember-awesome-macros';
-import { computed, observer, get, getProperties, setProperties } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+  setProperties,
+} from '@ember/object';
 import { A } from '@ember/array';
 import { reject } from 'rsvp';
 import { inject as service } from '@ember/service';

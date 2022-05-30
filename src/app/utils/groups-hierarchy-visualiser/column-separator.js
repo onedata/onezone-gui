@@ -1,7 +1,7 @@
 /**
  * Calculates positions of column separator elements. ColumnSeparator is logically
  * inside Column and separates that column from the Column.nextColumn.
- * 
+ *
  * Column separator consists of 4 lines:
  *  - top line,
  *  - bottom line,
@@ -9,7 +9,7 @@
  *    columns),
  *  - hovered line (only if there is a central line and relation between group
  *    boxes is hovered)
- * 
+ *
  * Real separator is created using only top and bottom lines. If there is no
  * relation, top and bottom lines are rendered in top/bottom half of the screen
  * and touches in the center. If there is a central line, which is a vertical part
@@ -17,14 +17,14 @@
  * parts of the area, that are not covered by central line. When central line is
  * long enough, top and bottom lines can be even invisible (hidden outside the
  * visible area).
- * 
+ *
  * When relation is hovered, hovered line is rendered. It covers up to 100% of
  * central line to connect two group box lines that are in hovered relation.
- * 
+ *
  * Separator is column-scroll independent. It is renderer outside column, so is
  * not affected by scroll position. Because of that, separator can be much
  * shorter than the maximum height of separated columns. If H is the available area
- * height, then separator is 3H long (can be 1H, but longer lines are better in 
+ * height, then separator is 3H long (can be 1H, but longer lines are better in
  * dealing with dynamic window resize), column content can have possibly infinite
  * height.
  *
@@ -34,7 +34,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, get, getProperties } from '@ember/object';
+import EmberObject, {
+  computed,
+  get,
+  getProperties,
+} from '@ember/object';
 import { reads, and } from '@ember/object/computed';
 
 export default EmberObject.extend({

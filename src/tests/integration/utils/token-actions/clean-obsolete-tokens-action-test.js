@@ -10,7 +10,11 @@ import { lookupService } from '../../../helpers/stub-service';
 import wait from 'ember-test-helpers/wait';
 import { click } from 'ember-native-dom-helpers';
 import { reject, resolve } from 'rsvp';
-import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
+import {
+  getModal,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 import $ from 'jquery';
 
 describe('Integration | Util | token actions/clean obsolete tokens action', function () {
