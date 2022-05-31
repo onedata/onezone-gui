@@ -40,7 +40,7 @@ export default Service.extend(
         return null;
       }
     ),
-    
+
     /**
      * @type {Ember.ComputedProperty<string|null>}
      */
@@ -68,7 +68,10 @@ export default Service.extend(
      */
     fetchPrivacyPolicy() {
       return this.getMessage('privacy_policy')
-        .then(message => DOMPurify.sanitize(message).toString());
+        .then(message => {
+          const messageText = DOMPurify.sanitize(message).toString();
+          return this.isMessageBodyEmpty(messageText) ? '' : messageText;
+        });
     },
 
     /**
@@ -76,7 +79,10 @@ export default Service.extend(
      */
     fetchTermsOfUse() {
       return this.getMessage('terms_of_use')
-        .then(message => DOMPurify.sanitize(message).toString());
+        .then(message => {
+          const messageText = DOMPurify.sanitize(message).toString();
+          return this.isMessageBodyEmpty(messageText) ? '' : messageText;
+        });
     },
 
     /**
@@ -89,15 +95,15 @@ export default Service.extend(
         this.getMessage('cookie_consent_notification'),
       ]).then(([privacyPolicyUrl, termsOfUseUrl, message]) =>
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
-          .replace(
-            /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
+        .replace(
+          /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
+          `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
         )
         .replace(
-            /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
-            `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
-          )
-        );
+          /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
+          `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
+        )
+      );
     },
 
     /**
@@ -123,6 +129,17 @@ export default Service.extend(
             return undefined;
           }
         });
+    },
+
+    /**
+     * @param {string} body
+     * @returns {boolean}
+     */
+    isMessageBodyEmpty(body) {
+      const span = document.createElement('span');
+      span.innerHTML = body;
+      const text = span.textContent || span.innerText || '';
+      return !text.trim();
     },
 
     /**

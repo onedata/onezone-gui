@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9457 Added additional checks for privacy policy and Term of Use
 * VFS-9355 Added more possible units to time series charts
 * VFS-9163 Added config for space with directory size statistics setting
 * VFS-9333 Added handling time series measurements in lambda arguments
