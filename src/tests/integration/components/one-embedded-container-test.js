@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, find } from '@ember/test-helpers';
+import { render, find, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { Promise } from 'rsvp';
-import { later } from '@ember/runloop';
 import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
 import oneEmbeddedContainerLayout from 'onezone-gui/templates/components/one-embedded-container';
 import {
@@ -43,14 +41,11 @@ describe('Integration | Component | one embedded container', function () {
       }}
     `);
     const iframe = find('iframe');
+    await waitUntil(() => iframe.contentDocument.readyState === 'complete');
     iframe.contentDocument.body.appendChild(s);
 
-    await new Promise(resolve => {
-      later(() => {
-        expect(hello).to.be.calledOnce;
-        expect(hello).to.be.calledWith('world');
-        resolve();
-      }, 10);
-    });
+    await waitUntil(() => hello.callCount > 0);
+    expect(hello).to.be.calledOnce;
+    expect(hello).to.be.calledWith('world');
   });
 });
