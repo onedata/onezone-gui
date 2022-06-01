@@ -4,12 +4,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, click, focus, blur, settled } from '@ember/test-helpers';
+import { render, fillIn, click, focus, blur, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
 import OneDatetimePickerHelper from '../../helpers/one-datetime-picker';
-import $ from 'jquery';
 import _ from 'lodash';
 import { lookupService } from '../../helpers/stub-service';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -20,6 +19,7 @@ import { set } from '@ember/object';
 import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize, underscore } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
+import { findInElementsByText } from '../../helpers/find';
 
 const tokenInviteTypes = [{
   inviteType: 'userJoinGroup',
@@ -291,14 +291,14 @@ describe('Integration | Component | token editor', function () {
   it('has class "token-editor"', async function () {
     await render(hbs `{{token-editor}}`);
 
-    expect(this.$('.token-editor')).to.exist;
+    expect(find('.token-editor')).to.exist;
   });
 
   it('renders "name" field', async function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
-    expectLabelToEqual(this, 'name', 'Name');
-    expect(this.$('.name-field input')).to.exist;
+    expectLabelToEqual('name', 'Name');
+    expect(find('.name-field input')).to.exist;
   });
 
   it('has not valid "name" when it is empty', async function () {
@@ -320,14 +320,14 @@ describe('Integration | Component | token editor', function () {
   it('renders "type" field', async function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
-    expectLabelToEqual(this, 'type', 'Type');
+    expectLabelToEqual('type', 'Type');
     [
       'access',
       'identity',
       'invite',
     ].forEach(type =>
-      expect(this.$(`.type-field .option-${type}`).text().trim())
-      .to.equal(_.upperFirst(type))
+      expect(find(`.type-field .option-${type}`))
+      .to.have.trimmed.text(_.upperFirst(type))
     );
   });
 
@@ -338,7 +338,7 @@ describe('Integration | Component | token editor', function () {
 
       expectToHaveValue(this, 'type', 'access');
       expectToBeValid(this, 'type');
-      expect(this.$('.type-field .option-access input').prop('checked')).to.be.true;
+      expect(find('.type-field .option-access input')).to.have.property('checked', true);
       expectToHaveValue(this, 'name', sinon.match(/Access .+/));
       expectToBeValid(this, 'name');
     }
@@ -387,7 +387,7 @@ describe('Integration | Component | token editor', function () {
         await render(hbs `{{token-editor mode="create"}}`);
 
         await click(`.type-field .option-${type}`);
-        expect(this.$('.inviteDetails-collapse')).to.not.have.class('in');
+        expect(find('.inviteDetails-collapse')).to.not.have.class('in');
       }
     );
   });
@@ -398,7 +398,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       await click('.type-field .option-invite');
-      expect(this.$('.inviteDetails-collapse')).to.have.class('in');
+      expect(find('.inviteDetails-collapse')).to.have.class('in');
     }
   );
 
@@ -408,12 +408,12 @@ describe('Integration | Component | token editor', function () {
     const inviteTypeHelper = new InviteTypeHelper();
 
     await click('.type-field .option-invite');
-    expectLabelToEqual(this, 'inviteType', 'Invite type');
+    expectLabelToEqual('inviteType', 'Invite type');
     await inviteTypeHelper.open();
     tokenInviteTypes.forEach(({ label, icon }, index) => {
-      const $option = $(inviteTypeHelper.getNthOption(index + 1));
-      expect($option.text().trim()).to.equal(label);
-      expect($option.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+      const option = inviteTypeHelper.getNthOption(index + 1);
+      expect(option).to.have.trimmed.text(label);
+      expect(option.querySelector('.one-icon')).to.have.class(`oneicon-${icon}`);
     });
   });
 
@@ -425,8 +425,8 @@ describe('Integration | Component | token editor', function () {
       await click('.type-field .option-invite');
       expectToHaveValue(this, 'inviteType', preselectedInviteType.inviteType);
       expectToBeValid(this, 'inviteType');
-      const $dropdownTrigger = $(new InviteTypeHelper().getTrigger());
-      expect($dropdownTrigger.text().trim()).to.equal(preselectedInviteType.label);
+      const dropdownTrigger = new InviteTypeHelper().getTrigger();
+      expect(dropdownTrigger).to.have.trimmed.text(preselectedInviteType.label);
     }
   );
 
@@ -485,19 +485,20 @@ describe('Integration | Component | token editor', function () {
           const targetHelper = new TargetHelper();
           await click('.type-field .option-invite');
           await new InviteTypeHelper().selectOption(index + 1);
-          const $collapse = this.$('.inviteTargetDetails-collapse');
-          const $placeholder =
-            this.$('.target-field .ember-power-select-placeholder');
-          expect($collapse).to.have.class('in');
-          expectLabelToEqual(this, 'target', '', true);
-          expect($placeholder.text().trim()).to.equal(targetPlaceholder);
+          const collapse = find('.inviteTargetDetails-collapse');
+          const placeholder =
+            find('.target-field .ember-power-select-placeholder');
+          expect(collapse).to.have.class('in');
+          expectLabelToEqual('target', '', true);
+          expect(placeholder).to.have.trimmed.text(targetPlaceholder);
           await targetHelper.open();
-          const $thirdOption = $(targetHelper.getNthOption(3));
-          expect($thirdOption).to.exist;
+          const thirdOption = targetHelper.getNthOption(3);
+          expect(thirdOption).to.exist;
           expect(targetHelper.getNthOption(4)).to.not.exist;
-          expect($thirdOption.find('.one-icon')).to.have.class(`oneicon-${icon}`);
-          expect($thirdOption.find('.text').text().trim())
-            .to.equal(`${targetModelName}2`);
+          expect(thirdOption.querySelector('.one-icon'))
+            .to.have.class(`oneicon-${icon}`);
+          expect(thirdOption.querySelector('.text'))
+            .to.have.trimmed.text(`${targetModelName}2`);
         }
       );
 
@@ -532,16 +533,20 @@ describe('Integration | Component | token editor', function () {
 
             await click('.type-field .option-invite');
             await new InviteTypeHelper().selectOption(index + 1);
-            expect(this.$('.invitePrivilegesDetails-collapse'))
+            expect(find('.invitePrivilegesDetails-collapse'))
               .to.have.class('in');
-            expectLabelToEqual(this, 'privileges', 'Privileges');
+            expectLabelToEqual('privileges', 'Privileges');
             expect(
-              this.$('.privileges-field .node-text').eq(0).text().trim()
-            ).to.equal(`${_.upperFirst(modelNameInPrivileges)} management`);
-            expect(this.$(
-              `.node-text:contains(View ${modelNameInPrivileges}) + .form-group .one-way-toggle`
-            )).to.have.class('checked');
-            expect(this.$('.privileges-field .one-way-toggle.checked'))
+              find('.privileges-field .node-text')
+            ).to.have.trimmed.text(`${_.upperFirst(modelNameInPrivileges)} management`);
+            const permissionContainer = findInElementsByText(
+              findAll('.node-text'),
+              `View ${modelNameInPrivileges}`
+            ).parentElement;
+            expect(
+              permissionContainer.querySelector('.one-way-toggle')
+            ).to.have.class('checked');
+            expect(findAll('.privileges-field .one-way-toggle.checked'))
               .to.have.length(1);
             const tooltipText = await new OneTooltipHelper(
               '.privileges-field .one-label-tip .oneicon'
@@ -559,9 +564,11 @@ describe('Integration | Component | token editor', function () {
 
             await click('.type-field .option-invite');
             await new InviteTypeHelper().selectOption(index + 1);
-            await click(this.$(
-              `.node-text:contains(Modify ${modelNameInPrivileges}) + .form-group .one-way-toggle`
-            )[0]);
+            const permissionContainer = findInElementsByText(
+              findAll('.node-text'),
+              `Modify ${modelNameInPrivileges}`
+            ).parentElement;
+            await click(permissionContainer.querySelector('.one-way-toggle'));
             const underscoredModelName = _.snakeCase(targetModelName);
             expectToHaveValue(this, 'privileges', [
               `${underscoredModelName}_view`,
@@ -578,7 +585,7 @@ describe('Integration | Component | token editor', function () {
 
             await click('.type-field .option-invite');
             await new InviteTypeHelper().selectOption(index + 1);
-            expect(this.$('.invitePrivilegesDetails-collapse'))
+            expect(find('.invitePrivilegesDetails-collapse'))
               .to.not.have.class('in');
           }
         );
@@ -591,7 +598,7 @@ describe('Integration | Component | token editor', function () {
 
           await click('.type-field .option-invite');
           await new InviteTypeHelper().selectOption(index + 1);
-          expect(this.$('.inviteTargetDetails-collapse'))
+          expect(find('.inviteTargetDetails-collapse'))
             .to.not.have.class('in');
         }
       );
@@ -614,13 +621,13 @@ describe('Integration | Component | token editor', function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
     await click('.type-field .option-invite');
-    expectLabelToEqual(this, 'usageLimit', 'Usage limit');
-    expect(this.$('.usageLimit-field .control-label').text().trim())
-      .to.equal('Usage limit:');
-    expect(this.$('.usageLimit-field .option-infinity').text().trim())
-      .to.equal('infinity');
-    expect(this.$('.usageLimit-field .option-number').text().trim())
-      .to.equal('');
+    expectLabelToEqual('usageLimit', 'Usage limit');
+    expect(find('.usageLimit-field .control-label'))
+      .to.have.trimmed.text('Usage limit:');
+    expect(find('.usageLimit-field .option-infinity'))
+      .to.have.trimmed.text('infinity');
+    expect(find('.usageLimit-field .option-number'))
+      .to.have.trimmed.text('');
   });
 
   it(
@@ -633,9 +640,9 @@ describe('Integration | Component | token editor', function () {
         usageLimitType: 'infinity',
       }));
       expectToBeValid(this, 'usageLimit');
-      expect(this.$('.usageLimit-field .option-infinity input'))
-        .to.have.prop('checked');
-      expect(this.$('.usageLimit-field .usageLimitNumber-field input'))
+      expect(find('.usageLimit-field .option-infinity input'))
+        .to.have.property('checked', true);
+      expect(find('.usageLimit-field .usageLimitNumber-field input'))
         .to.have.attr('disabled');
     }
   );
@@ -691,7 +698,7 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
-      expect(areAllCaveatsCollapsed(this)).to.be.true;
+      expect(areAllCaveatsCollapsed()).to.be.true;
     }
   );
 
@@ -701,7 +708,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       await toggleCaveatsSection();
-      expect(areAllCaveatsExpanded(this)).to.be.true;
+      expect(areAllCaveatsExpanded()).to.be.true;
     }
   );
 
@@ -713,8 +720,8 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('expire');
       await toggleCaveatsSection();
-      expect(areAllCaveatsExpanded(this)).to.be.false;
-      expect(isCaveatExpanded(this, 'expire')).to.be.true;
+      expect(areAllCaveatsExpanded()).to.be.false;
+      expect(isCaveatExpanded('expire')).to.be.true;
     }
   );
 
@@ -724,7 +731,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       expect(
-        this.$('.no-caveats-warning').text().trim().replace(/\s{2,}/g, ' ')
+        find('.no-caveats-warning').textContent.replace(/\s{2,}/g, ' ').trim()
       ).to.equal(
         'This token has no active caveats. Show possible options and customize caveats setup to make the token more secure.'
       );
@@ -737,7 +744,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       await click('.no-caveats-warning a');
-      expect(areAllCaveatsExpanded(this)).to.be.true;
+      expect(areAllCaveatsExpanded()).to.be.true;
     }
   );
 
@@ -747,7 +754,7 @@ describe('Integration | Component | token editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('expire');
     await toggleCaveatsSection();
-    expect(this.$('.no-caveats-warning')).to.not.exist;
+    expect(find('.no-caveats-warning')).to.not.exist;
   });
 
   ['view', 'edit'].forEach(mode => {
@@ -756,7 +763,7 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode=mode}}`);
 
-      expect(this.$('.no-caveats-warning')).to.not.exist;
+      expect(find('.no-caveats-warning')).to.not.exist;
     });
   });
 
@@ -775,12 +782,12 @@ describe('Integration | Component | token editor', function () {
 
         await toggleCaveatsSection();
         await (isEnabledByDefault ? toggleCaveat(name) : resolve());
-        const $disabledDescription = this.$(`.${name}DisabledText-field`);
+        const disabledDescriptionElem = find(`.${name}DisabledText-field`);
 
-        expectCaveatToggleState(this, name, false);
-        expectLabelToEqual(this, name, label);
-        expect(getFieldElement(this, name)).to.not.exist;
-        expect($disabledDescription.text().trim()).to.equal(disabledDescription);
+        expectCaveatToggleState(name, false);
+        expectLabelToEqual(name, label);
+        expect(getFieldElement(name)).to.not.exist;
+        expect(disabledDescriptionElem).to.have.trimmed.text(disabledDescription);
         const tooltipText = await new OneTooltipHelper(
           `.${name}Caveat-field .one-label-tip .oneicon`
         ).getText();
@@ -811,11 +818,11 @@ describe('Integration | Component | token editor', function () {
 
           await toggleCaveatsSection();
           await toggleCaveat(name);
-          expectCaveatToggleState(this, name, true);
-          expect(this.$(`.${name}DisabledText-field`)).to.not.exist;
+          expectCaveatToggleState(name, true);
+          expect(find(`.${name}DisabledText-field`)).to.not.exist;
 
           if (!dontTestValue) {
-            expect(getFieldElement(this, name)).to.exist;
+            expect(getFieldElement(name)).to.exist;
             expectCaveatToHaveValue(this, name, true);
           } else {
             expectCaveatToHaveEnabledState(this, name, true);
@@ -866,12 +873,12 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('interface');
-      const $restOption = this.$('.option-rest');
-      const $oneclientOption = this.$('.option-oneclient');
-      expect($restOption).to.exist;
-      expect($restOption.text().trim()).to.equal('REST');
-      expect($oneclientOption).to.exist;
-      expect($oneclientOption.text().trim()).to.equal('Oneclient');
+      const restOption = find('.option-rest');
+      const oneclientOption = find('.option-oneclient');
+      expect(restOption).to.exist;
+      expect(restOption).to.have.trimmed.text('REST');
+      expect(oneclientOption).to.exist;
+      expect(oneclientOption).to.have.trimmed.text('Oneclient');
 
       expectCaveatToHaveValue(this, 'interface', true, 'rest');
       expectToBeValid(this, 'interface');
@@ -999,9 +1006,10 @@ describe('Integration | Component | token editor', function () {
         await toggleCaveatsSection();
         await toggleCaveat('region');
         await click('.region-field .tags-input');
-        await click(
-          getTagsSelector().find(`.selector-item:contains(${label})`)[0]
-        );
+        await click(findInElementsByText(
+          getTagsSelector().querySelectorAll('.selector-item'),
+          label
+        ));
         expectCaveatToHaveValue(this, 'region', true,
           sinon.match.has('regionList', sinon.match([value])));
         expectToBeValid(this, 'region');
@@ -1033,12 +1041,14 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('region');
       await click('.region-field .tags-input');
-      await click(
-        getTagsSelector().find('.selector-item:contains("Europe")')[0]
-      );
-      await click(
-        getTagsSelector().find('.selector-item:contains("Asia")')[0]
-      );
+      await click(findInElementsByText(
+        getTagsSelector().querySelectorAll('.selector-item'),
+        'Europe'
+      ));
+      await click(findInElementsByText(
+        getTagsSelector().querySelectorAll('.selector-item'),
+        'Asia'
+      ));
       expectCaveatToHaveValue(this, 'region', true,
         sinon.match.has('regionList', sinon.match([
           'Asia',
@@ -1062,8 +1072,8 @@ describe('Integration | Component | token editor', function () {
         sinon.match.has('countryType', 'whitelist'));
       expectToBeInvalid(this, 'country');
       await click('.country-field .tags-input');
-      expect(this.$('.country-field .text-editor-input').attr('placeholder'))
-        .to.equal('Example: PL');
+      expect(find('.country-field .text-editor-input'))
+        .to.have.attr('placeholder', 'Example: PL');
     }
   );
 
@@ -1171,10 +1181,10 @@ describe('Integration | Component | token editor', function () {
         const typeSelectorHelper = new TagsSelectorDropdownHelper();
         await typeSelectorHelper.selectOption(index + 1);
         expect(typeSelectorHelper.getTrigger().innerText.trim()).to.equal(name);
-        const $selectorItems = getTagsSelector().find('.selector-item');
-        expect($selectorItems).to.have.length(list.length + 1);
+        const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
+        expect(selectorItems).to.have.length(list.length + 1);
         list.forEach(recordName => {
-          expect($selectorItems.filter(`:contains(${recordName})`)).to.exist;
+          expect(findInElementsByText(selectorItems, recordName)).to.exist;
         });
       }
     );
@@ -1186,7 +1196,7 @@ describe('Integration | Component | token editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('consumer');
     await click('.consumer-field .tags-input');
-    await click(getTagsSelector().find('.record-item')[0]);
+    await click(getTagsSelector().querySelector('.record-item'));
     expectCaveatToHaveValue(this, 'consumer', true, [{
       model: 'user',
       record: this.get('currentUser'),
@@ -1208,13 +1218,14 @@ describe('Integration | Component | token editor', function () {
         await toggleCaveat('consumer');
         await click('.consumer-field .tags-input');
         await new TagsSelectorDropdownHelper().selectOption(index + 1);
-        await click(getTagsSelector().find('.record-item')[0]);
-        await click(getTagsSelector().find('.record-item')[0]);
-        expect(getFieldElement(this, 'consumer').find('.tag-item')).to.have.length(2);
-        await click(getTagsSelector().find('.all-item')[0]);
-        const $tagItems = getFieldElement(this, 'consumer').find('.tag-item');
-        expect($tagItems).to.have.length(1);
-        expect($tagItems.text()).to.contain('Any');
+        await click(getTagsSelector().querySelector('.record-item'));
+        await click(getTagsSelector().querySelector('.record-item'));
+        expect(getFieldElement('consumer').querySelectorAll('.tag-item'))
+          .to.have.length(2);
+        await click(getTagsSelector().querySelector('.all-item'));
+        const tagItems = getFieldElement('consumer').querySelectorAll('.tag-item');
+        expect(tagItems).to.have.length(1);
+        expect(tagItems[0]).to.contain.text('Any');
       }
     );
   });
@@ -1225,11 +1236,11 @@ describe('Integration | Component | token editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('consumer');
     await click('.consumer-field .tags-input');
-    await click(getTagsSelector().find('.record-item')[1]);
-    await click(getTagsSelector().find('.record-item')[0]);
-    const $tagItems = getFieldElement(this, 'consumer').find('.tag-item');
-    expect($tagItems.eq(0).text().trim()).to.equal('currentuser');
-    expect($tagItems.eq(1).text().trim()).to.equal('group0user');
+    await click(getTagsSelector().querySelectorAll('.record-item')[1]);
+    await click(getTagsSelector().querySelector('.record-item'));
+    const tagItems = getFieldElement('consumer').querySelectorAll('.tag-item');
+    expect(tagItems[0]).to.have.trimmed.text('currentuser');
+    expect(tagItems[1]).to.have.trimmed.text('group0user');
   });
 
   it(
@@ -1243,12 +1254,12 @@ describe('Integration | Component | token editor', function () {
       const typeSelectorHelper = new TagsSelectorDropdownHelper();
       await typeSelectorHelper.selectOption(1);
       expect(typeSelectorHelper.getTrigger().innerText.trim()).to.equal('Service');
-      const $selectorItems = getTagsSelector().find('.selector-item');
-      expect($selectorItems).to.have.length(5);
+      const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
+      expect(selectorItems).to.have.length(5);
       _.times(3, i => {
-        expect($selectorItems.filter(`:contains(provider${i})`)).to.exist;
+        expect(findInElementsByText(selectorItems, `provider${i}`)).to.exist;
       });
-      expect($selectorItems.filter(':contains(onezone)')).to.exist;
+      expect(findInElementsByText(selectorItems, 'onezone')).to.exist;
     }
   );
 
@@ -1264,10 +1275,10 @@ describe('Integration | Component | token editor', function () {
       await typeSelectorHelper.selectOption(2);
       expect(typeSelectorHelper.getTrigger().innerText.trim())
         .to.equal('Service Onepanel');
-      const $selectorItems = getTagsSelector().find('.selector-item');
-      expect($selectorItems).to.have.length(4);
+      const selectorItems = getTagsSelector().querySelectorAll('.selector-item');
+      expect(selectorItems).to.have.length(4);
       _.times(3, i => {
-        expect($selectorItems.filter(`:contains(cluster${i})`)).to.exist;
+        expect(findInElementsByText(selectorItems, `cluster${i}`)).to.exist;
       });
     }
   );
@@ -1278,7 +1289,7 @@ describe('Integration | Component | token editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('service');
     await click('.service-field .tags-input');
-    await click(getTagsSelector().find('.record-item')[1]);
+    await click(getTagsSelector().querySelectorAll('.record-item')[1]);
     expectCaveatToHaveValue(this, 'service', true, [{
       model: 'service',
       record: this.get('mockedRecords.provider')[2],
@@ -1299,13 +1310,18 @@ describe('Integration | Component | token editor', function () {
         await toggleCaveat('service');
         await click('.service-field .tags-input');
         await new TagsSelectorDropdownHelper().selectOption(index + 1);
-        await click(getTagsSelector().find('.record-item:contains("0")')[0]);
-        await click(getTagsSelector().find('.record-item:contains("1")')[0]);
-        expect(getFieldElement(this, 'service').find('.tag-item')).to.have.length(2);
-        await click(getTagsSelector().find('.all-item')[0]);
-        const $tagItems = getFieldElement(this, 'service').find('.tag-item');
-        expect($tagItems).to.have.length(1);
-        expect($tagItems.text()).to.contain('Any');
+        await click(
+          findInElementsByText(getTagsSelector().querySelectorAll('.record-item'), '0')
+        );
+        await click(
+          findInElementsByText(getTagsSelector().querySelectorAll('.record-item'), '1')
+        );
+        expect(getFieldElement('service').querySelectorAll('.tag-item'))
+          .to.have.length(2);
+        await click(getTagsSelector().querySelector('.all-item'));
+        const tagItems = getFieldElement('service').querySelectorAll('.tag-item');
+        expect(tagItems).to.have.length(1);
+        expect(tagItems).to.contain.text('Any');
       }
     );
   });
@@ -1316,11 +1332,11 @@ describe('Integration | Component | token editor', function () {
     await toggleCaveatsSection();
     await toggleCaveat('service');
     await click('.service-field .tags-input');
-    await click(getTagsSelector().find('.record-item')[2]);
-    await click(getTagsSelector().find('.record-item')[1]);
-    const $tagItems = getFieldElement(this, 'service').find('.tag-item');
-    expect($tagItems.eq(0).text().trim()).to.equal('provider0');
-    expect($tagItems.eq(1).text().trim()).to.equal('provider1');
+    await click(getTagsSelector().querySelectorAll('.record-item')[2]);
+    await click(getTagsSelector().querySelectorAll('.record-item')[1]);
+    const tagItems = getFieldElement('service').querySelectorAll('.tag-item');
+    expect(tagItems[0]).to.have.trimmed.text('provider0');
+    expect(tagItems[1]).to.have.trimmed.text('provider1');
   });
 
   it(
@@ -1343,7 +1359,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+      await click(getFieldElement('path').querySelector('.add-field-button'));
       const selectedSpace = this.get('mockedRecords.space.lastObject');
       expectCaveatToHaveValue(this, 'path', true,
         sinon.match.hasNested('pathEntry0.pathSpace', selectedSpace));
@@ -1351,11 +1367,12 @@ describe('Integration | Component | token editor', function () {
         sinon.match.hasNested('pathEntry0.pathString', ''));
       expectToBeValid(this, 'path');
 
-      const $selectorTrigger = $(new PathSpaceHelper().getTrigger());
-      expect($selectorTrigger.find('.text').text().trim()).to.equal('space0');
-      const $entryInput = getFieldElement(this, 'path').find('.pathString-field input');
-      expect($entryInput).to.have.value('');
-      expect($entryInput.attr('placeholder')).to.equal('Example: /my/directory/path');
+      const selectorTrigger = new PathSpaceHelper().getTrigger();
+      expect(selectorTrigger.querySelector('.text')).to.have.trimmed.text('space0');
+      const entryInput = getFieldElement('path')
+        .querySelector('.pathString-field input');
+      expect(entryInput).to.have.value('');
+      expect(entryInput).to.have.attr('placeholder', 'Example: /my/directory/path');
       expectToBeValid(this, 'path');
     }
   );
@@ -1367,14 +1384,14 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+      await click(getFieldElement('path').querySelector('.add-field-button'));
       const pathSpaceHelper = new PathSpaceHelper();
       await pathSpaceHelper.open();
-      const $thirdOption = $(pathSpaceHelper.getNthOption(3));
-      expect($thirdOption).to.exist;
+      const thirdOption = pathSpaceHelper.getNthOption(3);
+      expect(thirdOption).to.exist;
       expect(pathSpaceHelper.getNthOption(4)).to.not.exist;
-      expect($thirdOption.find('.one-icon')).to.have.class('oneicon-space');
-      expect($thirdOption.find('.text').text().trim()).to.equal('space2');
+      expect(thirdOption.querySelector('.one-icon')).to.have.class('oneicon-space');
+      expect(thirdOption.querySelector('.text')).to.have.trimmed.text('space2');
     }
   );
 
@@ -1385,11 +1402,12 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+      await click(getFieldElement('path').querySelector('.add-field-button'));
       const pathSpaceHelper = new PathSpaceHelper();
       await pathSpaceHelper.selectOption(3);
-      const $selectorTrigger = $(pathSpaceHelper.getTrigger());
-      expect($selectorTrigger.find('.text').text().trim()).to.equal('space2');
+      const selectorTrigger = pathSpaceHelper.getTrigger();
+      expect(selectorTrigger.querySelector('.text'))
+        .to.have.trimmed.text('space2');
 
       const selectedSpace = this.get('mockedRecords.space.firstObject');
       expectCaveatToHaveValue(this, 'path', true,
@@ -1412,9 +1430,9 @@ describe('Integration | Component | token editor', function () {
 
         await toggleCaveatsSection();
         await toggleCaveat('path');
-        await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+        await click(getFieldElement('path').querySelector('.add-field-button'));
         await fillIn(
-          getFieldElement(this, 'path').find('.pathString-field input')[0],
+          getFieldElement('path').querySelector('.pathString-field input'),
           pathString
         );
         expectToBeValid(this, 'path');
@@ -1435,9 +1453,9 @@ describe('Integration | Component | token editor', function () {
 
         await toggleCaveatsSection();
         await toggleCaveat('path');
-        await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+        await click(getFieldElement('path').querySelector('.add-field-button'));
         await fillIn(
-          getFieldElement(this, 'path').find('.pathString-field input')[0],
+          getFieldElement('path').querySelector('.pathString-field input'),
           pathString
         );
         expectToBeInvalid(this, 'path');
@@ -1451,7 +1469,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       await toggleCaveatsSection();
-      expect(this.$('.readonlyEnabledText-field')).to.not.exist;
+      expect(find('.readonlyEnabledText-field')).to.not.exist;
     }
   );
 
@@ -1462,8 +1480,8 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('readonly');
-      expect(this.$('.readonlyEnabledText-field').text().trim())
-        .to.equal('This token allows only read access to user files.');
+      expect(find('.readonlyEnabledText-field'))
+        .to.have.trimmed.text('This token allows only read access to user files.');
 
       expectToBeValid(this, 'readonly');
     }
@@ -1489,8 +1507,8 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('objectId');
-      await click(getFieldElement(this, 'objectId').find('.add-field-button')[0]);
-      await fillIn(getFieldElement(this, 'objectId').find('input')[0], 'abc');
+      await click(getFieldElement('objectId').querySelector('.add-field-button'));
+      await fillIn(getFieldElement('objectId').querySelector('input'), 'abc');
       expectCaveatToHaveValue(this, 'objectId', true,
         sinon.match.has('objectIdEntry0', 'abc'));
       expectToBeValid(this, 'objectId');
@@ -1504,7 +1522,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('objectId');
-      await click(getFieldElement(this, 'objectId').find('.add-field-button')[0]);
+      await click(getFieldElement('objectId').querySelector('.add-field-button'));
       expectToBeInvalid(this, 'objectId');
     }
   );
@@ -1523,9 +1541,9 @@ describe('Integration | Component | token editor', function () {
       caveatsToCheck.forEach(caveatName => {
         const caveatSelector =
           `.dataAccessCaveats-field .${caveatName}Caveat-field.caveat-group`;
-        expect(this.$(caveatSelector)).to.exist;
+        expect(find(caveatSelector)).to.exist;
       });
-      expect(this.$('.dataAccessCaveats-field .caveat-group'))
+      expect(findAll('.dataAccessCaveats-field .caveat-group'))
         .to.have.length(caveatsToCheck.length);
     }
   );
@@ -1537,9 +1555,9 @@ describe('Integration | Component | token editor', function () {
 
       await click('.type-field .option-access');
       await toggleCaveatsSection();
-      expect(this.$('.serviceCaveat-collapse')).to.have.class('in');
-      expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
-      expect(this.$('.dataAccessCaveats-collapse')).to.have.class('in');
+      expect(find('.serviceCaveat-collapse')).to.have.class('in');
+      expect(find('.interfaceCaveat-collapse')).to.have.class('in');
+      expect(find('.dataAccessCaveats-collapse')).to.have.class('in');
     }
   );
 
@@ -1550,9 +1568,9 @@ describe('Integration | Component | token editor', function () {
 
       await click('.type-field .option-identity');
       await toggleCaveatsSection();
-      expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
-      expect(this.$('.interfaceCaveat-collapse')).to.have.class('in');
-      expect(this.$('.dataAccessCaveats-collapse')).to.not.have.class('in');
+      expect(find('.serviceCaveat-collapse')).to.not.have.class('in');
+      expect(find('.interfaceCaveat-collapse')).to.have.class('in');
+      expect(find('.dataAccessCaveats-collapse')).to.not.have.class('in');
     }
   );
 
@@ -1563,9 +1581,9 @@ describe('Integration | Component | token editor', function () {
 
       await click('.type-field .option-invite');
       await toggleCaveatsSection();
-      expect(this.$('.serviceCaveat-collapse')).to.not.have.class('in');
-      expect(this.$('.interfaceCaveat-collapse')).to.not.have.class('in');
-      expect(this.$('.dataAccessCaveats-collapse')).to.not.have.class('in');
+      expect(find('.serviceCaveat-collapse')).to.not.have.class('in');
+      expect(find('.interfaceCaveat-collapse')).to.not.have.class('in');
+      expect(find('.dataAccessCaveats-collapse')).to.not.have.class('in');
     }
   );
 
@@ -1576,9 +1594,9 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('objectId');
-      await click(getFieldElement(this, 'objectId').find('.add-field-button')[0]);
+      await click(getFieldElement('objectId').querySelector('.add-field-button'));
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+      await click(getFieldElement('path').querySelector('.add-field-button'));
       await click('.type-field .option-invite');
       expectToBeValid(this, 'objectId');
       expectToBeValid(this, 'path');
@@ -1588,7 +1606,7 @@ describe('Integration | Component | token editor', function () {
   it('shows service caveat warning in initial values configuration', async function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
-    expect(this.$('.service-caveat-warning')).to.exist;
+    expect(find('.service-caveat-warning')).to.exist;
   });
 
   it(
@@ -1598,7 +1616,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('service');
-      expect(this.$('.service-caveat-warning')).to.exist;
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1608,7 +1626,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
       await click('.type-field .option-invite');
-      expect(this.$('.service-caveat-warning')).to.not.exist;
+      expect(find('.service-caveat-warning')).to.not.exist;
     }
   );
 
@@ -1620,8 +1638,11 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('service');
       await click('.service-field .tags-input');
-      await click(getTagsSelector().find('.record-item:contains("onezone")')[0]);
-      expect(this.$('.service-caveat-warning')).to.exist;
+      await click(findInElementsByText(
+        getTagsSelector().querySelectorAll('.record-item'),
+        'onezone'
+      ));
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1632,7 +1653,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('service');
-      expect(this.$('.service-caveat-warning')).to.exist;
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1644,7 +1665,7 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('interface');
       await click('.interface-field .option-oneclient');
-      expect(this.$('.service-caveat-warning')).to.not.exist;
+      expect(find('.service-caveat-warning')).to.not.exist;
     }
   );
 
@@ -1656,7 +1677,7 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('interface');
       await click('.interface-field .option-rest');
-      expect(this.$('.service-caveat-warning')).to.exist;
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1667,7 +1688,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('readonly');
-      expect(this.$('.service-caveat-warning')).to.not.exist;
+      expect(find('.service-caveat-warning')).to.not.exist;
     }
   );
 
@@ -1678,7 +1699,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('path');
-      expect(this.$('.service-caveat-warning')).to.exist;
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1689,8 +1710,8 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
-      expect(this.$('.service-caveat-warning')).to.not.exist;
+      await click(getFieldElement('path').querySelector('.add-field-button'));
+      expect(find('.service-caveat-warning')).to.not.exist;
     }
   );
 
@@ -1701,7 +1722,7 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('objectId');
-      expect(this.$('.service-caveat-warning')).to.exist;
+      expect(find('.service-caveat-warning')).to.exist;
     }
   );
 
@@ -1712,8 +1733,8 @@ describe('Integration | Component | token editor', function () {
 
       await toggleCaveatsSection();
       await toggleCaveat('objectId');
-      await click(getFieldElement(this, 'objectId').find('.add-field-button')[0]);
-      expect(this.$('.service-caveat-warning')).to.not.exist;
+      await click(getFieldElement('objectId').querySelector('.add-field-button'));
+      expect(find('.service-caveat-warning')).to.not.exist;
     }
   );
 
@@ -1721,17 +1742,17 @@ describe('Integration | Component | token editor', function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
     await fillIn('.name-field input', '');
-    const $submit = this.$('.submit-token');
-    expect($submit).to.exist;
-    expect($submit.text().trim()).to.equal('Create token');
-    expect($submit).to.have.attr('disabled');
+    const submit = find('.submit-token');
+    expect(submit).to.exist;
+    expect(submit).to.have.trimmed.text('Create token');
+    expect(submit).to.have.attr('disabled');
   });
 
   it('renders enabled submit button when form becomes valid', async function () {
     await render(hbs `{{token-editor mode="create"}}`);
 
     await fillIn('.name-field input', 'abc');
-    expect(this.$('.submit-token')).to.not.have.attr('disabled');
+    expect(find('.submit-token')).to.not.have.attr('disabled');
   });
 
   it('calls injected onSubmit on submit click', async function () {
@@ -1762,9 +1783,10 @@ describe('Integration | Component | token editor', function () {
       // region tip and appears only on bamboo. Due to that bug this test cannot select
       // blacklist option. Removing tip from region fixes problem.
       await click('.region-field .tags-input');
-      await click(
-        getTagsSelector().find('.selector-item:contains("Europe")')[0]
-      );
+      await click(findInElementsByText(
+        getTagsSelector().querySelectorAll('.selector-item'),
+        'Europe'
+      ));
       // country
       await toggleCaveat('country');
       await new CountryTypeHelper().selectOption(2);
@@ -1781,11 +1803,11 @@ describe('Integration | Component | token editor', function () {
       // consumer
       await toggleCaveat('consumer');
       await click('.consumer-field .tags-input');
-      await click(getTagsSelector().find('.record-item')[0]);
+      await click(getTagsSelector().querySelectorAll('.record-item')[0]);
       // service
       await toggleCaveat('service');
       await click('.service-field .tags-input');
-      await click(getTagsSelector().find('.record-item')[1]);
+      await click(getTagsSelector().querySelectorAll('.record-item')[1]);
       // interface
       await toggleCaveat('interface');
       await click('.option-oneclient');
@@ -1793,17 +1815,17 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveat('readonly');
       // path
       await toggleCaveat('path');
-      await click(getFieldElement(this, 'path').find('.add-field-button')[0]);
+      await click(getFieldElement('path').querySelector('.add-field-button'));
       await new PathSpaceHelper().selectOption(1);
       await fillIn(
-        getFieldElement(this, 'path').find('.pathString-field input')[0],
+        getFieldElement('path').querySelector('.pathString-field input'),
         '/abc'
       );
       // objectid
       await toggleCaveat('objectId');
-      await click(getFieldElement(this, 'objectId').find('.add-field-button')[0]);
+      await click(getFieldElement('objectId').querySelector('.add-field-button'));
       await fillIn(
-        getFieldElement(this, 'objectId').find('input')[0],
+        getFieldElement('objectId').querySelector('input'),
         'objectid1'
       );
       await click('.submit-token');
@@ -1907,12 +1929,12 @@ describe('Integration | Component | token editor', function () {
 
       await fillIn('.name-field input', 'abc');
       await click('.submit-token');
-      expect(this.$('input:not([disabled])')).to.not.exist;
-      expect(this.$('.submit-token [role="progressbar"]')).to.exist;
+      expect(find('input:not([disabled])')).to.not.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.exist;
       submitResolve();
       await settled();
-      expect(this.$('input:not([disabled])')).to.exist;
-      expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
+      expect(find('input:not([disabled])')).to.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.not.exist;
     }
   );
 
@@ -1921,7 +1943,7 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor}}`);
 
-      expect(this.$('.token-editor')).to.have.class('create-mode');
+      expect(find('.token-editor')).to.have.class('create-mode');
     }
   );
 
@@ -1930,8 +1952,8 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
-      expect(this.$('.token-editor')).to.have.class('create-mode');
-      expect(this.$('.field-view-mode')).to.not.exist;
+      expect(find('.token-editor')).to.have.class('create-mode');
+      expect(find('.field-view-mode')).to.not.exist;
     }
   );
 
@@ -1940,8 +1962,8 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="view"}}`);
 
-      expect(this.$('.token-editor')).to.have.class('view-mode');
-      expect(this.$('.field-edit-mode')).to.not.exist;
+      expect(find('.token-editor')).to.have.class('view-mode');
+      expect(find('.field-edit-mode')).to.not.exist;
     }
   );
 
@@ -1950,10 +1972,12 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="view"}}`);
 
-      expectLabelToEqual(this, 'revoked', 'Revoked');
-      expect(getFieldElement(this, 'revoked').find('.one-way-toggle')).to.exist;
-      expectLabelToEqual(this, 'tokenString', 'Token');
-      expect(getFieldElement(this, 'tokenString').find('textarea')).to.exist;
+      expectLabelToEqual('revoked', 'Revoked');
+      expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
+        .to.exist;
+      expectLabelToEqual('tokenString', 'Token');
+      expect(getFieldElement('tokenString').querySelector('textarea'))
+        .to.exist;
     }
   );
 
@@ -1962,8 +1986,8 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="create"}}`);
 
-      expect(getFieldElement(this, 'tokenString')).to.not.exist;
-      expect(getFieldElement(this, 'revoked')).to.not.exist;
+      expect(getFieldElement('tokenString')).to.not.exist;
+      expect(getFieldElement('revoked')).to.not.exist;
     }
   );
 
@@ -2042,21 +2066,21 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="view" token=token}}`);
 
-      expect(getFieldElement(this, 'name').text()).to.contain('token1');
-      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+      expect(getFieldElement('name')).to.contain.text('token1');
+      expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.have.class('checked');
-      expect(getFieldElement(this, 'tokenString').find('textarea').val())
+      expect(getFieldElement('tokenString').querySelector('textarea').value)
         .to.contain('abc');
-      expect(getFieldElement(this, 'type').text()).to.contain('Access');
-      expect(getFieldElement(this, 'expire').text())
-        .to.contain(moment(now).format('YYYY/MM/DD H:mm'));
-      expect(getFieldElement(this, 'regionType').text()).to.contain('Deny');
-      expect(getFieldElement(this, 'regionList').text()).to.contain('Europe');
-      expect(getFieldElement(this, 'countryType').text()).to.contain('Deny');
-      expect(getFieldElement(this, 'countryList').text()).to.contain('PL');
-      expect(getFieldElement(this, 'asn').text()).to.contain('3');
-      expect(getFieldElement(this, 'ip').text()).to.contain('1.2.3.4/12');
-      const consumerCaveatText = getFieldElement(this, 'consumer').text();
+      expect(getFieldElement('type')).to.contain.text('Access');
+      expect(getFieldElement('expire'))
+        .to.contain.text(moment(now).format('YYYY/MM/DD H:mm'));
+      expect(getFieldElement('regionType')).to.contain.text('Deny');
+      expect(getFieldElement('regionList')).to.contain.text('Europe');
+      expect(getFieldElement('countryType')).to.contain.text('Deny');
+      expect(getFieldElement('countryList')).to.contain.text('PL');
+      expect(getFieldElement('asn')).to.contain.text('3');
+      expect(getFieldElement('ip')).to.contain.text('1.2.3.4/12');
+      const consumerCaveatText = getFieldElement('consumer').textContent;
       [
         'user1',
         'ID: usrunknown',
@@ -2068,7 +2092,7 @@ describe('Integration | Component | token editor', function () {
         'ID: prvunknown',
         'Any Oneprovider',
       ].forEach(consumer => expect(consumerCaveatText).to.contain(consumer));
-      const serviceCaveatText = getFieldElement(this, 'service').text();
+      const serviceCaveatText = getFieldElement('service').textContent;
       [
         'provider0',
         'ID: prvunknown',
@@ -2079,26 +2103,43 @@ describe('Integration | Component | token editor', function () {
         'cluster2',
         'Any Oneprovider Onepanel',
       ].forEach(service => expect(serviceCaveatText).to.contain(service));
-      expect(getFieldElement(this, 'interface').text()).to.contain('Oneclient');
-      expect(getFieldElement(this, 'readonlyView').find('.one-way-toggle'))
+      expect(getFieldElement('interface')).to.contain.text('Oneclient');
+      expect(getFieldElement('readonlyView').querySelector('.one-way-toggle'))
         .to.have.class('checked');
-      expect(getFieldElement(this, 'readonlyEnabledText')).to.not.exist;
-      const pathsFields = getFieldElement(this, 'path').find('.pathEntry-field');
+      expect(getFieldElement('readonlyEnabledText')).to.not.exist;
+      const pathsFields =
+        getFieldElement('path').querySelectorAll('.pathEntry-field');
       expect(pathsFields).to.have.length(3);
-      expect(pathsFields.eq(0).find('.pathSpace-field .oneicon-space')).to.exist;
-      expect(pathsFields.eq(0).find('.pathSpace-field').text()).to.contain('space1');
-      expect(pathsFields.eq(0).find('.pathString-field').text()).to.contain('/abc/def');
-      expect(pathsFields.eq(1).find('.pathSpace-field .oneicon-space')).to.exist;
-      expect(pathsFields.eq(1).find('.pathSpace-field').text()).to.contain('space1');
-      expect(pathsFields.eq(1).find('.pathString-field').text()).to.contain('/');
-      expect(pathsFields.eq(2).find('.pathSpace-field .oneicon-space')).to.exist;
-      expect(pathsFields.eq(2).find('.pathSpace-field').text()).to.contain('ID: unknown');
-      expect(pathsFields.eq(2).find('.pathString-field').text()).to.contain('/abc/def/ghi');
-      const objectIdsFields = getFieldElement(this, 'objectId').find('.objectIdEntry-field');
+      expect(
+        pathsFields[0].querySelector('.pathSpace-field .oneicon-space')).to.exist;
+      expect(
+        pathsFields[0].querySelector('.pathSpace-field')
+      ).to.contain.text('space1');
+      expect(
+        pathsFields[0].querySelector('.pathString-field')
+      ).to.contain.text('/abc/def');
+      expect(
+        pathsFields[1].querySelector('.pathSpace-field .oneicon-space')).to.exist;
+      expect(
+        pathsFields[1].querySelector('.pathSpace-field')
+      ).to.contain.text('space1');
+      expect(
+        pathsFields[1].querySelector('.pathString-field')
+      ).to.contain.text('/');
+      expect(
+        pathsFields[2].querySelector('.pathSpace-field .oneicon-space')).to.exist;
+      expect(
+        pathsFields[2].querySelector('.pathSpace-field')
+      ).to.contain.text('ID: unknown');
+      expect(
+        pathsFields[2].querySelector('.pathString-field')
+      ).to.contain.text('/abc/def/ghi');
+      const objectIdsFields =
+        getFieldElement('objectId').querySelectorAll('.objectIdEntry-field');
       expect(objectIdsFields).to.have.length(2);
-      expect(objectIdsFields.eq(0).text()).to.contain('abc');
-      expect(objectIdsFields.eq(1).text()).to.contain('def');
-      expect(this.$('.submit-token')).to.not.exist;
+      expect(objectIdsFields[0]).to.contain.text('abc');
+      expect(objectIdsFields[1]).to.contain.text('def');
+      expect(find('.submit-token')).to.not.exist;
     }
   );
 
@@ -2124,19 +2165,20 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="view" token=token}}`);
 
-      expect(getFieldElement(this, 'name').text()).to.contain('token1');
-      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+      expect(getFieldElement('name')).to.contain.text('token1');
+      expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.not.have.class('checked');
-      expect(getFieldElement(this, 'type').text()).to.contain('Invite');
-      expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
-      expect(getFieldElement(this, 'target').text()).to.contain('space1');
-      expect(getFieldElement(this, 'privileges').find('.one-way-toggle.checked'))
-        .to.have.length(3);
-      expect(getFieldElement(this, 'usageLimit')).to.not.exist;
-      expectLabelToEqual(this, 'usageCount', 'Usage count');
-      expect(getFieldElement(this, 'usageCount').text()).to.contain('5 / 10');
-      expect(this.$('.caveat-group-toggle')).to.not.exist;
-      expect(this.$('.caveats-expand')).to.not.exist;
+      expect(getFieldElement('type')).to.contain.text('Invite');
+      expect(getFieldElement('inviteType')).to.contain.text('Invite user to space');
+      expect(getFieldElement('target')).to.contain.text('space1');
+      expect(
+        getFieldElement('privileges').querySelectorAll('.one-way-toggle.checked')
+      ).to.have.length(3);
+      expect(getFieldElement('usageLimit')).to.not.exist;
+      expectLabelToEqual('usageCount', 'Usage count');
+      expect(getFieldElement('usageCount')).to.contain.text('5 / 10');
+      expect(find('.caveat-group-toggle')).to.not.exist;
+      expect(find('.caveats-expand')).to.not.exist;
     }
   );
 
@@ -2161,17 +2203,18 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="view" token=token}}`);
 
-      expect(getFieldElement(this, 'name').text()).to.contain('token1');
-      expect(getFieldElement(this, 'type').text()).to.contain('Invite');
-      expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
-      expect(getFieldElement(this, 'target').text()).to.contain('ID: space1');
-      expect(getFieldElement(this, 'privileges').find('.one-way-toggle.checked'))
-        .to.have.length(3);
-      expect(getFieldElement(this, 'usageLimit')).to.not.exist;
-      expectLabelToEqual(this, 'usageCount', 'Usage count');
-      expect(getFieldElement(this, 'usageCount').text()).to.contain('5 / 10');
-      expect(this.$('.caveat-group-toggle')).to.not.exist;
-      expect(this.$('.caveats-expand')).to.not.exist;
+      expect(getFieldElement('name')).to.contain.text('token1');
+      expect(getFieldElement('type')).to.contain.text('Invite');
+      expect(getFieldElement('inviteType')).to.contain.text('Invite user to space');
+      expect(getFieldElement('target')).to.contain.text('ID: space1');
+      expect(
+        getFieldElement('privileges').querySelectorAll('.one-way-toggle.checked')
+      ).to.have.length(3);
+      expect(getFieldElement('usageLimit')).to.not.exist;
+      expectLabelToEqual('usageCount', 'Usage count');
+      expect(getFieldElement('usageCount')).to.contain.text('5 / 10');
+      expect(find('.caveat-group-toggle')).to.not.exist;
+      expect(find('.caveats-expand')).to.not.exist;
     }
   );
 
@@ -2180,11 +2223,11 @@ describe('Integration | Component | token editor', function () {
     async function () {
       await render(hbs `{{token-editor mode="edit"}}`);
 
-      expect(this.$('.token-editor')).to.have.class('edit-mode');
-      const $editFields = this.$('.field-edit-mode');
-      expect($editFields).to.have.length(2);
-      expect($editFields.filter('.name-field')).to.exist;
-      expect($editFields.filter('.revoked-field')).to.exist;
+      expect(find('.token-editor')).to.have.class('edit-mode');
+      const editFields = findAll('.field-edit-mode');
+      expect(editFields).to.have.length(2);
+      expect(editFields[0].matches('.name-field')).to.be.true;
+      expect(editFields[1].matches('.revoked-field')).to.be.true;
     }
   );
 
@@ -2199,8 +2242,9 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="edit" token=token}}`);
 
-      expect(getFieldElement(this, 'name').find('input').val()).to.equal('token1');
-      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+      expect(getFieldElement('name').querySelector('input'))
+        .to.have.value('token1');
+      expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.have.class('checked');
     }
   );
@@ -2221,8 +2265,9 @@ describe('Integration | Component | token editor', function () {
         revoked: false,
       });
 
-      expect(getFieldElement(this, 'name').find('input').val()).to.equal('token1');
-      expect(getFieldElement(this, 'revoked').find('.one-way-toggle'))
+      expect(getFieldElement('name').querySelector('input'))
+        .to.have.value('token1');
+      expect(getFieldElement('revoked').querySelector('.one-way-toggle'))
         .to.have.class('checked');
     }
   );
@@ -2236,14 +2281,14 @@ describe('Integration | Component | token editor', function () {
 
     await render(hbs `{{token-editor mode="edit" token=token}}`);
 
-    const $submit = this.$('.submit-token');
-    const $cancel = this.$('.cancel-edition');
-    expect($submit).to.exist;
-    expect($submit.text().trim()).to.equal('Save');
-    expect($submit).to.not.have.attr('disabled');
-    expect($cancel).to.exist;
-    expect($cancel.text().trim()).to.equal('Cancel');
-    expect($cancel).to.not.have.attr('disabled');
+    const submit = find('.submit-token');
+    const cancel = find('.cancel-edition');
+    expect(submit).to.exist;
+    expect(submit).to.have.trimmed.text('Save');
+    expect(submit).to.not.have.attr('disabled');
+    expect(cancel).to.exist;
+    expect(cancel).to.have.trimmed.text('Cancel');
+    expect(cancel).to.not.have.attr('disabled');
   });
 
   it(
@@ -2258,7 +2303,7 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="edit" token=token}}`);
 
       await fillIn('.name-field input', '');
-      expect(this.$('.submit-token')).to.have.attr('disabled');
+      expect(find('.submit-token')).to.have.attr('disabled');
     }
   );
 
@@ -2317,14 +2362,14 @@ describe('Integration | Component | token editor', function () {
       await render(hbs `{{token-editor mode="edit" token=token onSubmit=(action submit)}}`);
 
       await click('.submit-token');
-      expect(this.$('input:not([disabled])')).to.not.exist;
-      expect(this.$('.submit-token [role="progressbar"]')).to.exist;
-      expect(this.$('.cancel-edition')).to.have.attr('disabled');
+      expect(find('input:not([disabled])')).to.not.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.exist;
+      expect(find('.cancel-edition')).to.have.attr('disabled');
       submitResolve();
       await settled();
-      expect(this.$('input:not([disabled])')).to.exist;
-      expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
-      expect(this.$('.cancel-edition')).to.not.have.attr('disabled');
+      expect(find('input:not([disabled])')).to.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.not.exist;
+      expect(find('.cancel-edition')).to.not.have.attr('disabled');
     }
   );
 
@@ -2413,19 +2458,20 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="create" token=token}}`);
 
-      expect(getFieldElement(this, 'name').find('input')).to.have.value('my token');
-      expect(getFieldElement(this, 'type').find('.option-access input').prop('checked'))
-        .to.be.true;
-      expect(areAllCaveatsExpanded(this)).to.be.true;
-      expect(getFieldElement(this, 'expire').find('input'))
+      expect(getFieldElement('name').querySelector('input'))
+        .to.have.value('my token');
+      expect(getFieldElement('type').querySelector('.option-access input'))
+        .to.have.property('checked', true);
+      expect(areAllCaveatsExpanded()).to.be.true;
+      expect(getFieldElement('expire').querySelector('input'))
         .to.have.value(moment(now).format('YYYY/MM/DD H:mm'));
-      expect(getFieldElement(this, 'regionType').text()).to.contain('Deny');
-      expect(getFieldElement(this, 'regionList').text()).to.contain('Europe');
-      expect(getFieldElement(this, 'countryType').text()).to.contain('Deny');
-      expect(getFieldElement(this, 'countryList').text()).to.contain('PL');
-      expect(getFieldElement(this, 'asn').text()).to.contain('3');
-      expect(getFieldElement(this, 'ip').text()).to.contain('1.2.3.4/12');
-      const consumerCaveatText = getFieldElement(this, 'consumer').text();
+      expect(getFieldElement('regionType')).to.contain.text('Deny');
+      expect(getFieldElement('regionList')).to.contain.text('Europe');
+      expect(getFieldElement('countryType')).to.contain.text('Deny');
+      expect(getFieldElement('countryList')).to.contain.text('PL');
+      expect(getFieldElement('asn')).to.contain.text('3');
+      expect(getFieldElement('ip')).to.contain.text('1.2.3.4/12');
+      const consumerCaveatText = getFieldElement('consumer').textContent;
       [
         'user1',
         'ID: usrunknown',
@@ -2437,7 +2483,7 @@ describe('Integration | Component | token editor', function () {
         'ID: prvunknown',
         'Any Oneprovider',
       ].forEach(consumer => expect(consumerCaveatText).to.contain(consumer));
-      const serviceCaveatText = getFieldElement(this, 'service').text();
+      const serviceCaveatText = getFieldElement('service').textContent;
       [
         'provider0',
         'ID: prvunknown',
@@ -2449,20 +2495,21 @@ describe('Integration | Component | token editor', function () {
         'Any Oneprovider Onepanel',
       ].forEach(service => expect(serviceCaveatText).to.contain(service));
       expect(
-        getFieldElement(this, 'interface').find('.option-oneclient input')
-        .prop('checked')
-      ).to.be.true;
-      expectCaveatToggleState(this, 'readonly', true);
-      const pathsFields = getFieldElement(this, 'path').find('.pathEntry-field');
+        getFieldElement('interface').querySelector('.option-oneclient input')
+      ).to.have.property('checked', true);
+      expectCaveatToggleState('readonly', true);
+      const pathsFields = getFieldElement('path')
+        .querySelectorAll('.pathEntry-field');
       expect(pathsFields).to.have.length(2);
-      expect(pathsFields.eq(0).find('.pathSpace-field').text()).to.contain('space1');
-      expect(pathsFields.eq(0).find('.pathString-field').find('input')).to.have.value('/abc/def');
-      expect(pathsFields.eq(1).find('.pathSpace-field').text()).to.contain('space1');
-      expect(pathsFields.eq(1).find('.pathString-field').find('input')).to.have.value('/');
-      const objectIdsFields = getFieldElement(this, 'objectId').find('.objectIdEntry-field');
+      expect(pathsFields[0].querySelector('.pathSpace-field')).to.contain.text('space1');
+      expect(pathsFields[0].querySelector('.pathString-field input')).to.have.value('/abc/def');
+      expect(pathsFields[1].querySelector('.pathSpace-field')).to.contain.text('space1');
+      expect(pathsFields[1].querySelector('.pathString-field input')).to.have.value('/');
+      const objectIdsFields =
+        getFieldElement('objectId').querySelectorAll('.objectIdEntry-field');
       expect(objectIdsFields).to.have.length(2);
-      expect(objectIdsFields.eq(0).find('input')).to.have.value('abc');
-      expect(objectIdsFields.eq(1).find('input')).to.have.value('def');
+      expect(objectIdsFields[0].querySelector('input')).to.have.value('abc');
+      expect(objectIdsFields[1].querySelector('input')).to.have.value('def');
     }
   );
 
@@ -2481,12 +2528,14 @@ describe('Integration | Component | token editor', function () {
 
       await render(hbs `{{token-editor mode="create" token=token}}`);
 
-      expect(getFieldElement(this, 'name').find('input')).to.have.value('my token');
-      expect(getFieldElement(this, 'type').find('.option-invite input').prop('checked'))
-        .to.be.true;
-      expect(getFieldElement(this, 'inviteType').text()).to.contain('Invite user to space');
-      expect(getFieldElement(this, 'target').text()).to.contain('space2');
-      expect(areAllCaveatsCollapsed(this)).to.be.true;
+      expect(getFieldElement('name').querySelector('input'))
+        .to.have.value('my token');
+      expect(getFieldElement('type').querySelector('.option-invite input'))
+        .to.have.property('checked', true);
+      expect(getFieldElement('inviteType'))
+        .to.contain.text('Invite user to space');
+      expect(getFieldElement('target')).to.contain.text('space2');
+      expect(areAllCaveatsCollapsed()).to.be.true;
     }
   );
 });
@@ -2522,7 +2571,7 @@ class PathSpaceHelper extends EmberPowerSelectHelper {
 }
 
 function getTagsSelector() {
-  return $('.webui-popover.in .tags-selector');
+  return document.querySelector('.webui-popover.in .tags-selector');
 }
 
 class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
@@ -2643,20 +2692,21 @@ function expectCaveatToHaveEnabledState(testCase, caveatName, isEnabled) {
   );
 }
 
-function expectLabelToEqual(testCase, fieldName, label, omitColon = false) {
+function expectLabelToEqual(fieldName, label, omitColon = false) {
   const isCaveat = !basicFieldNameToFieldPath[fieldName];
   const domFieldName = isCaveat ? `${fieldName}Enabled` : fieldName;
   label = (isCaveat || omitColon) ? label : `${label}:`;
-  expect(testCase.$(`.${domFieldName}-field label`).eq(0).text().trim()).to.equal(label);
+  expect(find(`.${domFieldName}-field label`))
+    .to.have.trimmed.text(label);
 }
 
-function expectCaveatToggleState(testCase, caveatName, isChecked) {
-  const $toggle = testCase.$(`.${caveatName}Enabled-field .one-way-toggle`);
-  expect($toggle).to.exist;
+function expectCaveatToggleState(caveatName, isChecked) {
+  const toggle = find(`.${caveatName}Enabled-field .one-way-toggle`);
+  expect(toggle).to.exist;
   if (isChecked) {
-    expect($toggle).to.have.class('checked');
+    expect(toggle).to.have.class('checked');
   } else {
-    expect($toggle).to.not.have.class('checked');
+    expect(toggle).to.not.have.class('checked');
   }
 }
 
@@ -2668,21 +2718,21 @@ function toggleCaveatsSection() {
   return click('.caveats-expand');
 }
 
-function getFieldElement(testCase, fieldName) {
-  return testCase.$(`.${fieldName}-field`);
+function getFieldElement(fieldName) {
+  return find(`.${fieldName}-field`);
 }
 
-function isCaveatExpanded(testCase, caveatName) {
-  return testCase.$(`.${caveatName}Caveat-field > .field-component > .fields-group-collapse`)
-    .hasClass('in');
+function isCaveatExpanded(caveatName) {
+  return find(`.${caveatName}Caveat-field > .field-component > .fields-group-collapse`)
+    .matches('.in');
 }
 
-function areAllCaveatsExpanded(testCase) {
-  return testCase.$('.caveat-group > .field-component > .fields-group-collapse:not(.in)')
+function areAllCaveatsExpanded() {
+  return findAll('.caveat-group > .field-component > .fields-group-collapse:not(.in)')
     .length === 0;
 }
 
-function areAllCaveatsCollapsed(testCase) {
-  return testCase.$('.caveat-group > .field-component > .fields-group-collapse.in')
+function areAllCaveatsCollapsed() {
+  return findAll('.caveat-group > .field-component > .fields-group-collapse.in')
     .length === 0;
 }

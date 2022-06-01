@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
@@ -42,7 +42,7 @@ describe('Integration | Component | one embedded container', function () {
         iprop="world"
       }}
     `);
-    const iframe = this.$('iframe')[0];
+    const iframe = find('iframe');
     iframe.contentDocument.body.appendChild(s);
 
     await new Promise(resolve => {

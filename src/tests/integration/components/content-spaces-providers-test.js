@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { A } from '@ember/array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
@@ -74,9 +74,9 @@ describe('Integration | Component | content spaces providers', function () {
   it('renders providers list, atlas and support chart ', async function () {
     await render(hbs `{{content-spaces-providers space=space}}`);
 
-    expect(this.$('.space-providers-list'), 'providers list').to.exist;
-    expect(this.$('.space-providers-atlas'), 'providers atlas').to.exist;
-    expect(this.$('.space-providers-support-chart'), 'support chart')
+    expect(find('.space-providers-list'), 'providers list').to.exist;
+    expect(find('.space-providers-atlas'), 'providers atlas').to.exist;
+    expect(find('.space-providers-support-chart'), 'support chart')
       .to.exist;
   });
 });

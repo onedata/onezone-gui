@@ -11,31 +11,29 @@ describe('Integration | Component | login box/social box list', function () {
 
   it('shows spinner when loading', async function () {
     await render(hbs `{{login-box/social-box-list isLoading=true}}`);
-    expect(this.$('.spin-spinner')).to.exist;
+    expect(find('.spin-spinner')).to.exist;
   });
 
   it('shows error message if occurred', async function () {
     const errorMsg = 'some really bad error';
     this.set('errorMsg', errorMsg);
     await render(hbs `{{login-box/social-box-list errorMessage=errorMsg}}`);
-    expect(this.$().text()).to.contain(errorMsg);
+    expect(this.element).to.contain.text(errorMsg);
   });
 
-  it('shows clickable "show more" button', async function (done) {
+  it('shows clickable "show more" button', async function () {
     const showMoreSpy = sinon.spy();
     this.set('showMoreSpy', showMoreSpy);
     await render(hbs `{{login-box/social-box-list
       showMoreButton=true
       showMoreClick=(action showMoreSpy)}}
     `);
-    expect(this.$('.login-icon-box.more')).to.exist;
-    click('.login-icon-box.more').then(() => {
-      expect(showMoreSpy).to.be.calledOnce;
-      done();
-    });
+    expect(find('.login-icon-box.more')).to.exist;
+    await click('.login-icon-box.more');
+    expect(showMoreSpy).to.be.calledOnce;
   });
 
-  it('shows clickable basicAuth', async function (done) {
+  it('shows clickable basicAuth', async function () {
     const basicAuthSpy = sinon.spy();
     this.set('basicAuthSpy', basicAuthSpy);
     this.set('supportedAuthorizers', [{
@@ -46,14 +44,12 @@ describe('Integration | Component | login box/social box list', function () {
       supportedAuthorizers=supportedAuthorizers
       usernameLoginClick=(action basicAuthSpy)}}
     `);
-    expect(this.$('.login-icon-box.basicAuth')).to.exist;
-    click('.login-icon-box.basicAuth').then(() => {
-      expect(basicAuthSpy).to.be.calledOnce;
-      done();
-    });
+    expect(find('.login-icon-box.basicAuth')).to.exist;
+    await click('.login-icon-box.basicAuth');
+    expect(basicAuthSpy).to.be.calledOnce;
   });
 
-  it('shows clickable custom auth providers', async function (done) {
+  it('shows clickable custom auth providers', async function () {
     const authenticateSpy = sinon.spy(() => resolve());
     this.set('authenticateSpy', authenticateSpy);
     this.set('supportedAuthorizers', [{
@@ -65,11 +61,9 @@ describe('Integration | Component | login box/social box list', function () {
       supportedAuthorizers=supportedAuthorizers
       authenticate=(action authenticateSpy)}}
     `);
-    expect(this.$('.login-icon-box.provider1')).to.exist;
-    expect(this.$('.login-icon-box.provider2')).to.exist;
-    click('.login-icon-box.provider1').then(() => {
-      expect(authenticateSpy).to.be.calledWith('provider1');
-      done();
-    });
+    expect(find('.login-icon-box.provider1')).to.exist;
+    expect(find('.login-icon-box.provider2')).to.exist;
+    await click('.login-icon-box.provider1');
+    expect(authenticateSpy).to.be.calledWith('provider1');
   });
 });

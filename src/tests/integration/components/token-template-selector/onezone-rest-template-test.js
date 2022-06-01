@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 
@@ -15,11 +15,12 @@ describe(
       async function () {
         await render(hbs `{{token-template-selector/onezone-rest-template}}`);
 
-        const $tile = this.$('.one-tile');
-        expect($tile).to.have.class('template-onezoneRest');
-        expect($tile.find('.tile-title').text().trim()).to.equal('Onezone REST access');
-        expect($tile.find('.main-image'))
-          .to.have.attr('src', 'assets/images/token-templates/onezone-rest.svg');
+        const tile = find('.one-tile');
+        expect(tile).to.have.class('template-onezoneRest');
+        expect(tile.querySelector('.tile-title'))
+          .to.have.trimmed.text('Onezone REST access');
+        expect(tile.querySelector('.main-image')).to.have
+          .attr('src', 'assets/images/token-templates/onezone-rest.svg');
       }
     );
 

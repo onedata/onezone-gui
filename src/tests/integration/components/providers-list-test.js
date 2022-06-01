@@ -2,11 +2,10 @@ import { A } from '@ember/array';
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import _ from 'lodash';
-import $ from 'jquery';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
 
@@ -67,19 +66,19 @@ describe('Integration | Component | providers list', function () {
   it('renders list of providers', async function () {
     await render(hbs `{{providers-list providersData=providersData}}`);
 
-    const list = this.$('.one-collapsible-list');
-    expect(list.children()).to.have.length(4);
-    const firstItem = $(list.children()[1]);
-    expect(firstItem).to.be.visible;
-    expect(firstItem).to.contain('provider1');
+    const list = find('.one-collapsible-list');
+    expect(list.children).to.have.length(4);
+    const firstItem = list.children[1];
+    expect(firstItem).to.be.displayed;
+    expect(firstItem).to.contain.text('provider1');
   });
 
   it('sets icon colors according to provider object setting', async function () {
     await render(hbs `{{providers-list providersData=providersData}}`);
 
     const firstItemIcon =
-      this.$('.one-collapsible-list-item:nth-child(2) .one-icon');
-    expect(firstItemIcon.attr('style'))
+      find('.one-collapsible-list-item:nth-child(2) .one-icon');
+    expect(firstItemIcon.getAttribute('style'))
       .to.contain(this.get('providersData')[0].color);
   });
 
@@ -130,7 +129,7 @@ describe('Integration | Component | providers list', function () {
       providerActions=actions
     }}`);
     await click('.one-collapsible-list-item:nth-child(2) .provider-menu-toggle');
-    await click($('.webui-popover.in .action-trigger')[0]);
+    await click(document.querySelector('.webui-popover.in .action-trigger'));
     expect(actionSpy).to.be.calledOnce;
     expect(actionSpy).to.be.calledWith(this.get('providersData')[0].provider);
   });
@@ -141,10 +140,12 @@ describe('Integration | Component | providers list', function () {
       selectedSpace=selectedSpace
     }}`);
 
-    const firstProviderItem = this.$(
+    const firstProviderItem = find(
       '.one-collapsible-list-item:nth-child(2)'
     );
-    expect(firstProviderItem.find('.supported-spaces')).to.contain('2');
-    expect(firstProviderItem.find('.space-support-size')).to.contain('2 MiB');
+    expect(firstProviderItem.querySelector('.supported-spaces'))
+      .to.contain.text('2');
+    expect(firstProviderItem.querySelector('.space-support-size'))
+      .to.contain.text('2 MiB');
   });
 });

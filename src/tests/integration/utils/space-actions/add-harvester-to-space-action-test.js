@@ -18,7 +18,6 @@ import { suppressRejections } from '../../../helpers/suppress-rejections';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
-import $ from 'jquery';
 
 describe(
   'Integration | Utility | space actions/add harvester to space action',
@@ -74,16 +73,16 @@ describe(
       await settled();
 
       const dropdownHelper = new RecordHelper();
-      expect($(getModal())).to.have.class('record-selector-modal');
-      expect($(getModalHeader()).find('h1').text().trim())
-        .to.equal('Add one of your harvesters');
-      expect($(getModalBody()).find('p').text().trim()).to.equal(
+      expect(getModal()).to.have.class('record-selector-modal');
+      expect(getModalHeader().querySelector('h1'))
+        .to.have.trimmed.text('Add one of your harvesters');
+      expect(getModalBody().querySelector('p')).to.have.trimmed.text(
         'Choose harvester which should consume metadata from space "space1":'
       );
-      expect($(getModalFooter()).find('.record-selector-submit').text().trim())
-        .to.equal('Add');
+      expect(getModalFooter().querySelector('.record-selector-submit'))
+        .to.have.trimmed.text('Add');
       await dropdownHelper.open();
-      expect(dropdownHelper.getNthOption(1).innerText.trim()).to.equal('harvester1');
+      expect(dropdownHelper.getNthOption(1)).to.have.trimmed.text('harvester1');
       expect(dropdownHelper.getNthOption(1).querySelector('.oneicon-light-bulb'))
         .to.exist;
       expect(dropdownHelper.getNthOption(2)).to.not.exist;
@@ -111,7 +110,7 @@ describe(
 
         const dropdownHelper = new RecordHelper();
         await dropdownHelper.selectOption(1);
-        await click($(getModalFooter()).find('.record-selector-submit')[0]);
+        await click(getModalFooter().querySelector('.record-selector-submit'));
         const actionResult = await actionResultPromise;
         expect(addHarvesterStub).to.be.calledOnce;
         expect(addHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
@@ -145,7 +144,7 @@ describe(
 
         const dropdownHelper = new RecordHelper();
         await dropdownHelper.selectOption(1);
-        await click($(getModalFooter()).find('.record-selector-submit')[0]);
+        await click(getModalFooter().querySelector('.record-selector-submit'));
         const actionResult = await actionResultPromise;
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'adding the harvester to the space'),

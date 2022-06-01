@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, settled } from '@ember/test-helpers';
+import { render, click, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
-import $ from 'jquery';
 import { get } from '@ember/object';
 
 const possibleTargetModels = [{
@@ -55,29 +54,29 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
   it('has class "advanced-token-filters"', async function () {
     await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
-    expect(this.$('.advanced-token-filters')).to.exist;
+    expect(find('.advanced-token-filters')).to.exist;
   });
 
   it('shows "type" filter', async function () {
     await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
-    const $typeFilterRow = this.$('.type-filter-row');
-    expect($typeFilterRow).to.exist;
-    expect($typeFilterRow.find('.filter-label').text().trim()).to.equal('Type:');
-    expect($typeFilterRow.find('.btn-all').text().trim()).to.equal('All');
-    expect($typeFilterRow.find('.btn-access').text().trim()).to.equal('Access');
-    expect($typeFilterRow.find('.btn-identity').text().trim()).to.equal('Identity');
-    expect($typeFilterRow.find('.btn-invite').text().trim()).to.equal('Invite');
+    const typeFilterRow = find('.type-filter-row');
+    expect(typeFilterRow).to.exist;
+    expect(typeFilterRow.querySelector('.filter-label')).to.have.trimmed.text('Type:');
+    expect(typeFilterRow.querySelector('.btn-all')).to.have.trimmed.text('All');
+    expect(typeFilterRow.querySelector('.btn-access')).to.have.trimmed.text('Access');
+    expect(typeFilterRow.querySelector('.btn-identity')).to.have.trimmed.text('Identity');
+    expect(typeFilterRow.querySelector('.btn-invite')).to.have.trimmed.text('Invite');
   });
 
   it('uses "All" as a default value of "type" filter', async function () {
     await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
-    const $typeFilterRow = this.$('.type-filter-row');
-    expect($typeFilterRow.find('.btn-all')).to.have.class('active');
-    expect($typeFilterRow.find('.btn-access')).to.not.have.class('active');
-    expect($typeFilterRow.find('.btn-identity')).to.not.have.class('active');
-    expect($typeFilterRow.find('.btn-invite')).to.not.have.class('active');
+    const typeFilterRow = find('.type-filter-row');
+    expect(typeFilterRow.querySelector('.btn-all')).to.have.class('active');
+    expect(typeFilterRow.querySelector('.btn-access')).to.not.have.class('active');
+    expect(typeFilterRow.querySelector('.btn-identity')).to.not.have.class('active');
+    expect(typeFilterRow.querySelector('.btn-invite')).to.not.have.class('active');
   });
 
   it('notifies about filters state on initial render', async function () {
@@ -118,13 +117,13 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
     await selectType('invite');
-    const $targetFilterRow =
-      this.$('.target-filter-row-collapse.in .target-filter-row');
-    expect($targetFilterRow).to.exist;
-    expect($targetFilterRow.find('.filter-label').text().trim())
-      .to.equal('Target:');
-    expect($targetFilterRow.find('.target-model-filter')).to.exist;
-    expect($targetFilterRow.find('.target-record-filter')).to.exist;
+    const targetFilterRow =
+      find('.target-filter-row-collapse.in .target-filter-row');
+    expect(targetFilterRow).to.exist;
+    expect(targetFilterRow.querySelector('.filter-label'))
+      .to.have.trimmed.text('Target:');
+    expect(targetFilterRow.querySelector('.target-model-filter')).to.exist;
+    expect(targetFilterRow.querySelector('.target-record-filter')).to.exist;
   });
 
   [
@@ -138,7 +137,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         await render(hbs `{{sidebar-tokens/advanced-filters}}`);
 
         await selectType(type);
-        expect(this.$('.target-filter-row-collapse')).to.not.have.class('in');
+        expect(find('.target-filter-row-collapse')).to.not.have.class('in');
       }
     );
   });
@@ -152,12 +151,12 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     await selectType('invite');
     await targetModelHelper.open();
     possibleTargetModels.forEach(({ name, icon }, index) => {
-      const $item = $(targetModelHelper.getNthOption(index + 1));
-      expect($item).to.exist;
-      expect($item.find('.model-name').text().trim()).to.equal(name);
+      const item = targetModelHelper.getNthOption(index + 1);
+      expect(item).to.exist;
+      expect(item.querySelector('.model-name')).to.have.trimmed.text(name);
       if (icon) {
-        expect($item.find('.model-icon')).to.have.class(
-          `oneicon-${icon}`);
+        expect(item.querySelector('.model-icon'))
+          .to.have.class(`oneicon-${icon}`);
       }
     });
   });
@@ -196,7 +195,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     `);
 
     await selectType('invite');
-    expect(this.$('.target-record-filter .ember-power-select-trigger'))
+    expect(find('.target-record-filter .ember-power-select-trigger'))
       .to.have.attr('aria-disabled');
   });
 
@@ -210,7 +209,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       const targetModelHelper = new TargetModelHelper();
       await selectType('invite');
       await targetModelHelper.selectOption(2);
-      expect(this.$('.target-record-filter .ember-power-select-trigger'))
+      expect(find('.target-record-filter .ember-power-select-trigger'))
         .to.not.have.attr('aria-disabled');
     }
   );
@@ -228,13 +227,13 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         await selectType('invite');
         await targetModelHelper.selectOption(index + 2);
         await targetRecordHelper.open();
-        const $allItem = $(targetRecordHelper.getNthOption(1));
-        const $firstRecordItem = $(targetRecordHelper.getNthOption(2));
-        const $secondRecordItem = $(targetRecordHelper.getNthOption(3));
+        const allItem = targetRecordHelper.getNthOption(1);
+        const firstRecordItem = targetRecordHelper.getNthOption(2);
+        const secondRecordItem = targetRecordHelper.getNthOption(3);
 
-        expect($allItem.text().trim()).to.equal('All');
-        expect($firstRecordItem.text().trim()).to.equal(`${modelName}1`);
-        expect($secondRecordItem.text().trim()).to.equal(`${modelName}2`);
+        expect(allItem).to.have.trimmed.text('All');
+        expect(firstRecordItem).to.have.trimmed.text(`${modelName}1`);
+        expect(secondRecordItem).to.have.trimmed.text(`${modelName}2`);
       }
     );
   });
@@ -288,13 +287,13 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     await selectType('invite');
     await targetModelHelper.selectOption(2);
     await targetRecordHelper.open();
-    const $allItem = $(targetRecordHelper.getNthOption(1));
-    const $clusterItem = $(targetRecordHelper.getNthOption(2));
-    const $nonExistingItem = $(targetRecordHelper.getNthOption(3));
+    const allItem = targetRecordHelper.getNthOption(1);
+    const clusterItem = targetRecordHelper.getNthOption(2);
+    const nonExistingItem = targetRecordHelper.getNthOption(3);
 
-    expect($allItem.text().trim()).to.equal('All');
-    expect($clusterItem.text().trim()).to.equal('cluster1');
-    expect($nonExistingItem).to.not.exist;
+    expect(allItem).to.have.trimmed.text('All');
+    expect(clusterItem).to.have.trimmed.text('cluster1');
+    expect(nonExistingItem).to.not.exist;
   });
 
   it('resets target record filter to "All" on target model filter change', async function () {
@@ -347,7 +346,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       await settled();
       await targetRecordHelper.open();
       expect(changeSpy).to.have.callCount(changesCount);
-      expect($(targetRecordHelper.getTrigger()).text()).to.contain('cluster1');
+      expect(targetRecordHelper.getTrigger()).to.contain.text('cluster1');
       expect(targetRecordHelper.getNthOption(3)).to.be.null;
     }
   );
@@ -379,7 +378,7 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       await settled();
       await targetRecordHelper.open();
       expect(changeSpy).to.have.callCount(changesCount + 1);
-      expect($(targetRecordHelper.getTrigger()).text()).to.contain('All');
+      expect(targetRecordHelper.getTrigger()).to.contain.text('All');
       expect(targetRecordHelper.getNthOption(3)).to.be.null;
       expect(changeSpy.lastCall).to.be.calledWith({
         type: 'invite',
@@ -413,8 +412,8 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       );
       await settled();
       expect(changeSpy).to.have.callCount(changesCount + 1);
-      expect($(targetModelHelper.getTrigger()).text()).to.contain('All');
-      expect($(targetRecordHelper.getTrigger()).text()).to.contain('All');
+      expect(targetModelHelper.getTrigger()).to.contain.text('All');
+      expect(targetRecordHelper.getTrigger()).to.contain.text('All');
       expect(changeSpy.lastCall).to.be.calledWith({
         type: 'invite',
         targetModelName: 'all',

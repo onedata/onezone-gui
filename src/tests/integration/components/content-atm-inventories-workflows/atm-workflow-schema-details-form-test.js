@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, settled } from '@ember/test-helpers';
+import { render, fillIn, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
@@ -20,8 +20,9 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
     it('has class "atm-workflow-schema-details-form"', async function () {
       await render(hbs `{{content-atm-inventories-workflows/atm-workflow-schema-details-form}}`);
 
-      expect(this.$().children()).to.have.class('atm-workflow-schema-details-form')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0])
+        .to.have.class('atm-workflow-schema-details-form');
     });
 
     context('in "view" mode', function () {
@@ -34,10 +35,10 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       it('shows workflow data', async function () {
         await renderComponent();
 
-        expect(this.$('.name-field .text-like-field').text().trim())
-          .to.equal('workflow1');
-        expect(this.$('.summary-field .textarea-field').text().trim())
-          .to.equal('workflowSummary');
+        expect(find('.name-field .text-like-field'))
+          .to.have.trimmed.text('workflow1');
+        expect(find('.summary-field .textarea-field'))
+          .to.have.trimmed.text('workflowSummary');
       });
 
       it('does not show summary field when it is empty', async function () {
@@ -45,7 +46,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
         await renderComponent();
 
-        expect(this.$('.summary-field')).to.not.exist;
+        expect(find('.summary-field')).to.not.exist;
       });
 
       it('updates form values on workflow change', async function () {
@@ -54,8 +55,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         this.set('atmWorkflowSchema.name', 'anotherName');
         await settled();
 
-        expect(this.$('.name-field .text-like-field').text().trim())
-          .to.equal('anotherName');
+        expect(find('.name-field .text-like-field'))
+          .to.have.trimmed.text('anotherName');
       });
     });
 
@@ -73,8 +74,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
       it('shows workflow data', async function () {
         await renderComponent();
 
-        expect(this.$('.name-field .form-control')).to.have.value('workflow1');
-        expect(this.$('.summary-field .form-control'))
+        expect(find('.name-field .form-control')).to.have.value('workflow1');
+        expect(find('.summary-field .form-control'))
           .to.have.value('workflowSummary');
       });
 
@@ -83,7 +84,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
         await renderComponent();
 
-        expect(this.$('.has-error')).to.not.exist;
+        expect(find('.has-error')).to.not.exist;
         expect(changeSpy).to.be.calledWith({
           data: sinon.match({
             name: 'workflow1',
@@ -94,7 +95,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         changeSpy.resetHistory();
 
         await fillIn('.name-field .form-control', '');
-        expect(this.$('.has-error')).to.have.class('name-field');
+        expect(find('.has-error')).to.have.class('name-field');
         expect(changeSpy).to.be.to.be.calledWith({
           data: sinon.match({
             name: '',
@@ -106,7 +107,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
 
         await fillIn('.name-field .form-control', 'someName');
         await fillIn('.summary-field .form-control', '');
-        expect(this.$('.has-error')).to.not.exist;
+        expect(find('.has-error')).to.not.exist;
         expect(changeSpy).to.be.calledWith({
           data: sinon.match({
             name: 'someName',
@@ -122,7 +123,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         this.set('atmWorkflowSchema.name', 'anotherName');
         await settled();
 
-        expect(this.$('.name-field .form-control')).to.have.value('workflow1');
+        expect(find('.name-field .form-control')).to.have.value('workflow1');
       });
 
       it('updates form values when leaving "edit" mode', async function () {
@@ -133,8 +134,8 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         this.set('mode', 'view');
         await settled();
 
-        expect(this.$('.name-field .text-like-field').text().trim())
-          .to.equal('anotherName');
+        expect(find('.name-field .text-like-field'))
+          .to.have.trimmed.text('anotherName');
       });
 
       it('disables all fields when "isDisabled" is true', async function () {
@@ -143,7 +144,7 @@ describe('Integration | Component | content atm inventories workflows/atm workfl
         this.set('isDisabled', true);
         await settled();
 
-        expect(this.$('.form-control')).to.have.attr('disabled');
+        expect(find('.form-control')).to.have.attr('disabled');
       });
     });
   });
@@ -163,14 +164,14 @@ function itShowsFields(mode) {
   it('has two fields - name and summary', async function () {
     await renderComponent();
 
-    const $nameField = this.$('.name-field');
-    const $nameLabel = $nameField.find('.control-label');
-    expect($nameField).to.exist.and.to.have.class(`field-${mode}-mode`);
-    expect($nameLabel.text().trim()).to.equal('Name:');
+    const nameField = find('.name-field');
+    const nameLabel = nameField.querySelector('.control-label');
+    expect(nameField).to.exist.and.to.have.class(`field-${mode}-mode`);
+    expect(nameLabel).to.have.trimmed.text('Name:');
 
-    const $summaryField = this.$('.summary-field');
-    const $summaryLabel = $summaryField.find('.control-label');
-    expect($summaryField).to.exist.and.to.have.class(`field-${mode}-mode`);
-    expect($summaryLabel.text().trim()).to.equal('Summary:');
+    const summaryField = find('.summary-field');
+    const summaryLabel = summaryField.querySelector('.control-label');
+    expect(summaryField).to.exist.and.to.have.class(`field-${mode}-mode`);
+    expect(summaryLabel).to.have.trimmed.text('Summary:');
   });
 }

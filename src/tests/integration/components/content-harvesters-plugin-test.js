@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Service from '@ember/service';
 import { registerService, lookupService } from '../../helpers/stub-service';
@@ -31,7 +31,7 @@ describe('Integration | Component | content harvesters plugin', function () {
     this.set('resolvingAjax', resolvingAjax);
     await render(hbs `{{content-harvesters-plugin _ajax=resolvingAjax}}`);
 
-    const iframe = this.$('iframe')[0];
+    const iframe = find('iframe');
     const loadEvent = new Event('load');
     iframe.dispatchEvent(loadEvent);
     expect(iframe.appProxy).to.equal(injectedData);

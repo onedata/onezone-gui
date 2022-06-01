@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { registerService } from '../../helpers/stub-service';
 import EmberObject from '@ember/object';
@@ -62,34 +62,34 @@ describe('Integration | Component | content users', function () {
   it('renders full name', async function () {
     await render(hbs `{{content-users user=user}}`);
 
-    expect(this.$('.full-name-editor').text().trim())
-      .to.equal(this.get('user.fullName'));
+    expect(find('.full-name-editor'))
+      .to.have.trimmed.text(this.get('user.fullName'));
   });
 
   it('renders username', async function () {
     await render(hbs `{{content-users user=user}}`);
 
-    expect(this.$('.username-editor').text().trim())
-      .to.equal(this.get('user.username'));
+    expect(find('.username-editor'))
+      .to.have.trimmed.text(this.get('user.username'));
   });
 
   it('renders copiable user id', async function () {
     await render(hbs `{{content-users user=user}}`);
 
-    expect(this.$('.user-id-clipboard-line input').val())
-      .to.equal(this.get('user.entityId'));
+    expect(find('.user-id-clipboard-line input'))
+      .to.have.value(this.get('user.entityId'));
   });
 
   it('renders linked account', async function () {
     await render(hbs `{{content-users user=user}}`);
 
-    expect(this.$('.google-account'), 'google-account').to.exist;
+    expect(find('.google-account'), 'google-account').to.exist;
     expect(
-      this.$('.google-account .account-type', 'Google+ text').text().trim()
-    ).to.equal('Google+');
+      find('.google-account .account-type'), 'Google+ text'
+    ).to.have.trimmed.text('Google+');
     expect(
-      this.$('.google-account .account-email', 'email text').text().trim()
-    ).to.equal('one@one.one');
+      find('.google-account .account-email'), 'email text'
+    ).to.have.trimmed.text('one@one.one');
   });
 
   it('allows to change display name', async function () {
@@ -103,8 +103,8 @@ describe('Integration | Component | content users', function () {
     await fillIn('.full-name-editor input', newName);
     await click('.full-name-editor .save-icon');
     expect(saveSpy).to.be.calledOnce;
-    expect(this.$('.full-name-editor').text().trim())
-      .to.equal(user.get('fullName'));
+    expect(find('.full-name-editor'))
+      .to.have.trimmed.text(user.get('fullName'));
     expect(user.get('fullName')).to.equal(newName);
   });
 
@@ -119,15 +119,15 @@ describe('Integration | Component | content users', function () {
     await fillIn('.username-editor input', newUsername);
     await click('.username-editor .save-icon');
     expect(saveSpy).to.be.calledOnce;
-    expect(this.$('.username-editor').text().trim())
-      .to.equal(user.get('username'));
+    expect(find('.username-editor'))
+      .to.have.trimmed.text(user.get('username'));
     expect(user.get('username')).to.equal(newUsername);
   });
 
   it('renders password section for user with basicAuth enabled', async function () {
     await render(hbs `{{content-users user=user}}`);
 
-    expect(this.$('.change-password-row .one-inline-editor')).to.exist;
+    expect(find('.change-password-row .one-inline-editor')).to.exist;
   });
 
   it(
@@ -136,7 +136,7 @@ describe('Integration | Component | content users', function () {
       this.set('user.basicAuthEnabled', false);
       await render(hbs `{{content-users user=user}}`);
 
-      expect(this.$('.change-password-row .one-inline-editor')).to.not.exist;
+      expect(find('.change-password-row .one-inline-editor')).to.not.exist;
     }
   );
 });

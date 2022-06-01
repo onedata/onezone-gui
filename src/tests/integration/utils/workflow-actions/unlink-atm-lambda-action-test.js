@@ -15,7 +15,6 @@ import {
 } from '../../../helpers/modal';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import $ from 'jquery';
 
 describe('Integration | Utility | workflow actions/unlink atm lambda action',
   function () {
@@ -150,9 +149,9 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
       this.get('action').execute();
       await settled();
 
-      expect($(getModal())).to.have.class('unlink-atm-lambda-modal');
-      expect($(getModalBody()).text()).to.contain('inventory1');
-      expect($(getModalBody()).text()).to.contain('lambda1');
+      expect(getModal()).to.have.class('unlink-atm-lambda-modal');
+      expect(getModalBody()).to.contain.text('inventory1');
+      expect(getModalBody()).to.contain.text('lambda1');
     });
 
     it('returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
@@ -161,7 +160,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
         const resultPromise = this.get('action').execute();
         await settled();
-        await click($(getModalFooter()).find('.cancel-btn')[0]);
+        await click(getModalFooter().querySelector('.cancel-btn'));
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
@@ -190,7 +189,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
         const actionResultPromise = action.execute();
         await settled();
-        await click($(getModalFooter()).find('.submit-btn')[0]);
+        await click(getModalFooter().querySelector('.submit-btn'));
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledOnce;
@@ -228,8 +227,8 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
         const actionResultPromise = action.execute();
         await settled();
-        await click($(getModalBody()).find('input[value="allInventories"]')[0]);
-        await click($(getModalFooter()).find('.submit-btn')[0]);
+        await click(getModalBody().querySelector('input[value="allInventories"]'));
+        await click(getModalFooter().querySelector('.submit-btn'));
         const actionResult = await actionResultPromise;
 
         expect(removeRelationStub).to.be.calledThrice;
@@ -263,7 +262,7 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
         const actionResultPromise = action.execute();
         await settled();
-        await click($(getModalFooter()).find('.submit-btn')[0]);
+        await click(getModalFooter().querySelector('.submit-btn'));
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(
@@ -303,8 +302,8 @@ describe('Integration | Utility | workflow actions/unlink atm lambda action',
 
         const actionResultPromise = action.execute();
         await settled();
-        await click($(getModalBody()).find('input[value="allInventories"]')[0]);
-        await click($(getModalFooter()).find('.submit-btn')[0]);
+        await click(getModalBody().querySelector('input[value="allInventories"]'));
+        await click(getModalFooter().querySelector('.submit-btn'));
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(

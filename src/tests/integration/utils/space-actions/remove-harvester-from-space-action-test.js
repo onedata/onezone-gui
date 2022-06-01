@@ -15,7 +15,6 @@ import {
   getModalFooter,
 } from '../../../helpers/modal';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
-import $ from 'jquery';
 
 describe(
   'Integration | Utility | space actions/remove harvester from space action',
@@ -61,16 +60,16 @@ describe(
       action.execute();
       await settled();
 
-      expect($(getModal())).to.have.class('question-modal');
-      expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
-      expect($(getModalHeader()).find('h1').text().trim())
-        .to.equal('Remove harvester from space');
-      expect($(getModalBody()).text().trim()).to.equal(
+      expect(getModal()).to.have.class('question-modal');
+      expect(getModalHeader().querySelector('.oneicon-sign-warning-rounded')).to.exist;
+      expect(getModalHeader().querySelector('h1'))
+        .to.have.trimmed.text('Remove harvester from space');
+      expect(getModalBody()).to.have.trimmed.text(
         'Are you sure you want to remove harvester "harvester1" from space "space1"?'
       );
-      const $yesButton = $(getModalFooter()).find('.question-yes');
-      expect($yesButton.text().trim()).to.equal('Remove');
-      expect($yesButton).to.have.class('btn-danger');
+      const yesButton = getModalFooter().querySelector('.question-yes');
+      expect(yesButton).to.have.trimmed.text('Remove');
+      expect(yesButton).to.have.class('btn-danger');
     });
 
     it(
@@ -85,7 +84,7 @@ describe(
         const resultPromise = action.execute();
         await settled();
 
-        await click($(getModalFooter()).find('.question-no')[0]);
+        await click(getModalFooter().querySelector('.question-no'));
         const actionResult = await resultPromise;
         expect(get(actionResult, 'status')).to.equal('cancelled');
       }
@@ -111,7 +110,7 @@ describe(
         const actionResultPromise = action.execute();
         await settled();
 
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await click(getModalFooter().querySelector('.question-yes'));
         const actionResult = await actionResultPromise;
         expect(removeHarvesterStub).to.be.calledOnce;
         expect(removeHarvesterStub).to.be.calledWith('harvesterId', 'spaceId');
@@ -143,7 +142,7 @@ describe(
         const actionResultPromise = action.execute();
         await settled();
 
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await click(getModalFooter().querySelector('.question-yes'));
         const actionResult = await actionResultPromise;
         expect(failureNotifySpy).to.be.calledWith(
           sinon.match.has('string', 'removing the harvester from the space'),

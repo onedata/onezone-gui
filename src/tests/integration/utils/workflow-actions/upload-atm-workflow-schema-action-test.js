@@ -13,7 +13,6 @@ import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-a
 import { lookupService } from '../../../helpers/stub-service';
 import triggerFileInputChange from '../../../helpers/trigger-file-input-change';
 import sinon from 'sinon';
-import $ from 'jquery';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 const atmInventoryId = 'invid';
@@ -100,9 +99,9 @@ describe(
       await triggerUploadInputChange(filename, JSON.stringify(dump));
       await settled();
 
-      expect($(getModal())).to.have.class('apply-atm-workflow-schema-dump-modal');
-      expect($(getModal()).find('.upload-details').text()).to.contain(filename);
-      expect($(getModal()).find('.dump-details .error')).to.not.exist;
+      expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
+      expect(getModal().querySelector('.dump-details .error')).to.not.exist;
     });
 
     it('allows to reupload another file', async function () {
@@ -113,7 +112,7 @@ describe(
       await triggerUploadInputChange('file2.json', JSON.stringify(dump));
       await settled();
 
-      expect($(getModal()).find('.upload-details').text()).to.contain('file2.json');
+      expect(getModal().querySelector('.upload-details')).to.contain.text('file2.json');
     });
 
     ['name', 'revision'].forEach(fieldName => {
@@ -127,8 +126,8 @@ describe(
           await triggerUploadInputChange(filename, JSON.stringify(dump));
           await settled();
 
-          expect($(getModal()).find('.upload-details').text()).to.contain(filename);
-          expect($(getModal()).find('.dump-details .error')).to.exist;
+          expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
+          expect(getModal().querySelector('.dump-details .error')).to.exist;
         });
     });
 
@@ -140,8 +139,8 @@ describe(
         await triggerUploadInputChange(filename, 'random content');
         await settled();
 
-        expect($(getModal()).find('.upload-details').text()).to.contain(filename);
-        expect($(getModal()).find('.dump-details .error')).to.exist;
+        expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
+        expect(getModal().querySelector('.dump-details .error')).to.exist;
       });
 
     it('executes merging workflows on submit - notification on success',
@@ -243,7 +242,7 @@ describe(
 
 export async function triggerUploadInputChange(filename, fileContent) {
   await triggerFileInputChange(
-    $('.upload-atm-workflow-schema-action-input')[0],
+    document.querySelector('.upload-atm-workflow-schema-action-input'),
     [{ name: filename, content: fileContent, mimeType: 'application/json' }]
   );
 }

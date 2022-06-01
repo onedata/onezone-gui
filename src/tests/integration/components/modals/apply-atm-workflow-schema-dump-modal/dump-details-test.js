@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 const componentClass = 'dump-details';
@@ -13,8 +13,8 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     it(`has class "${componentClass}"`, async function () {
       await renderComponent();
 
-      expect(this.$().children()).to.have.class(componentClass)
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0]).to.have.class(componentClass);
     });
 
     it('shows workflow dump details (known values)', async function () {
@@ -32,7 +32,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
       await renderComponent();
 
-      expectDetails(this, { name: 'w1', summary: 'summary', revisionNumber: '3' });
+      expectDetails({ name: 'w1', summary: 'summary', revisionNumber: '3' });
     });
 
     it('shows workflow dump details (unknown values)', async function () {
@@ -50,7 +50,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
       await renderComponent();
 
-      expectDetails(this, {
+      expectDetails({
         name: 'none',
         summary: 'none',
         revisionNumber: 'none',
@@ -63,11 +63,11 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
         await renderComponent();
 
-        expect(this.$('.name')).to.not.exist;
-        expect(this.$('.summary')).to.not.exist;
-        expect(this.$('.revision-number')).to.not.exist;
-        expect(this.$('.error').text().trim())
-          .to.equal('Uploaded file is not a valid workflow dump.');
+        expect(find('.name')).to.not.exist;
+        expect(find('.summary')).to.not.exist;
+        expect(find('.revision-number')).to.not.exist;
+        expect(find('.error'))
+          .to.have.trimmed.text('Uploaded file is not a valid workflow dump.');
       });
   });
 
@@ -77,12 +77,12 @@ async function renderComponent() {
   }}`);
 }
 
-function expectDetails(testCase, { name, summary, revisionNumber }) {
-  expect(testCase.$('.name-label').text().trim()).to.equal('Name:');
-  expect(testCase.$('.name').text().trim()).to.equal(name);
-  expect(testCase.$('.summary-label').text().trim()).to.equal('Summary:');
-  expect(testCase.$('.summary').text().trim()).to.equal(summary);
-  expect(testCase.$('.revision-number-label').text().trim()).to.equal('Revision:');
-  expect(testCase.$('.revision-number').text().trim()).to.equal(revisionNumber);
-  expect(testCase.$('.error')).to.not.exist;
+function expectDetails({ name, summary, revisionNumber }) {
+  expect(find('.name-label')).to.have.trimmed.text('Name:');
+  expect(find('.name')).to.have.trimmed.text(name);
+  expect(find('.summary-label')).to.have.trimmed.text('Summary:');
+  expect(find('.summary')).to.have.trimmed.text(summary);
+  expect(find('.revision-number-label')).to.have.trimmed.text('Revision:');
+  expect(find('.revision-number')).to.have.trimmed.text(revisionNumber);
+  expect(find('.error')).to.not.exist;
 }

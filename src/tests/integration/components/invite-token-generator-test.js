@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -33,7 +33,7 @@ describe('Integration | Component | invite token generator', function () {
 
     await render(hbs `{{invite-token-generator}}`);
 
-    expect(this.$('.invite-token-generator')).to.exist;
+    expect(find('.invite-token-generator')).to.exist;
   });
 
   it('shows token in textarea', async function () {
@@ -48,11 +48,11 @@ describe('Integration | Component | invite token generator', function () {
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
-    const $tokenTextarea = this.$('.token-textarea');
-    expect($tokenTextarea).to.exist;
-    expect($tokenTextarea.val()).to.equal(correctToken);
-    expect(this.$('.spinner')).to.not.exist;
-    expect(this.$('.resource-load-error')).to.not.exist;
+    const tokenTextarea = find('.token-textarea');
+    expect(tokenTextarea).to.exist;
+    expect(tokenTextarea).to.have.value(correctToken);
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
   it('shows spinner while token is being generated', async function () {
@@ -66,9 +66,9 @@ describe('Integration | Component | invite token generator', function () {
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
-    expect(this.$('.token-textarea')).to.not.exist;
-    expect(this.$('.spinner')).to.exist;
-    expect(this.$('.resource-load-error')).to.not.exist;
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
   it('shows error when token generation has failed', async function () {
@@ -83,11 +83,11 @@ describe('Integration | Component | invite token generator', function () {
     `);
 
     expect(this.get('createTokenStub')).to.be.calledOnce;
-    expect(this.$('.token-textarea')).to.not.exist;
-    expect(this.$('.spinner')).to.not.exist;
-    const $errorContainer = this.$('.resource-load-error');
-    expect($errorContainer).to.exist;
-    expect($errorContainer.text()).to.contain('tokenError');
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.not.exist;
+    const errorContainer = find('.resource-load-error');
+    expect(errorContainer).to.exist;
+    expect(errorContainer).to.contain.text('tokenError');
   });
 
   it('sets correct url for "custom token" action', async function () {
@@ -124,7 +124,7 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    expect(this.$('.custom-token-action')).to.have.attr('href', 'correctUrl');
+    expect(find('.custom-token-action')).to.have.attr('href', 'correctUrl');
   });
 
   it(
@@ -227,9 +227,9 @@ describe('Integration | Component | invite token generator', function () {
       await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
       if (subjectDescription) {
-        expect(this.$('.subject-description').text().trim()).to.equal(subjectDescription);
+        expect(find('.subject-description')).to.have.trimmed.text(subjectDescription);
       } else {
-        expect(this.$('.subject-description')).to.not.exist;
+        expect(find('.subject-description')).to.not.exist;
       }
     });
 
@@ -241,8 +241,8 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        expect(this.$('.limitations-text').text().trim())
-          .to.equal(limitationsDescription);
+        expect(find('.limitations-text'))
+          .to.have.trimmed.text(limitationsDescription);
       }
     );
 
@@ -253,7 +253,7 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        expect(this.$('.custom-token-action')).to.not.exist;
+        expect(find('.custom-token-action')).to.not.exist;
       });
     } else {
       it(`shows "custom token" link for ${inviteType} invite token`, async function () {
@@ -262,7 +262,7 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        expect(this.$('.custom-token-action')).to.exist;
+        expect(find('.custom-token-action')).to.exist;
       });
     }
   });
@@ -286,7 +286,7 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    expect(this.$('.token-textarea').val()).to.match(
+    expect(find('.token-textarea').value).to.match(
       /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
     );
   });
@@ -304,7 +304,7 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    expect(this.$('.token-textarea').val()).to.match(
+    expect(find('.token-textarea').value).to.match(
       /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
     );
   });

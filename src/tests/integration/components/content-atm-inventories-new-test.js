@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, click } from '@ember/test-helpers';
+import { render, fillIn, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -12,7 +12,7 @@ describe('Integration | Component | content atm inventories new', function () {
   it('has class "content-atm-inventories-new', async function () {
     await render(hbs `{{content-atm-inventories-new}}`);
 
-    expect(this.$('.content-atm-inventories-new')).to.exist;
+    expect(this.element.children[0]).to.have.class('content-atm-inventories-new');
   });
 
   it('does not allow to create new automation inventory when name is empty',
@@ -21,7 +21,7 @@ describe('Integration | Component | content atm inventories new', function () {
 
       await fillIn('.new-atm-inventory-name', '');
 
-      expect(this.$('.btn-primary')).to.have.attr('disabled');
+      expect(find('.btn-primary')).to.have.attr('disabled');
     });
 
   it('allows to create new automation inventory', async function () {

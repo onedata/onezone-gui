@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, focus, blur, fillIn, click } from '@ember/test-helpers';
+import { render, focus, blur, fillIn, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import {
   all as allFulfilled,
@@ -28,33 +28,33 @@ describe('Integration | Component | content harvesters indices/index form', func
   it('has class "content-harvesters-indices-index-form"', async function () {
     await render(hbs `{{content-harvesters-indices/index-form}}`);
 
-    expect(this.$('.content-harvesters-indices-index-form')).to.have.length(1);
+    expect(findAll('.content-harvesters-indices-index-form')).to.have.length(1);
   });
 
   context('in create mode', function () {
     it('shows empty text input with "Name" label and no placeholder', async function (done) {
       await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-      const $formGroup = this.$('.name-field');
-      const $input = $formGroup.find('input');
-      expect($formGroup).to.exist;
-      expect($formGroup.find('.control-label').text().trim()).to.equal('Name:');
-      expect($input).to.exist.and.to.have.attr('type', 'text');
-      expect($input).to.have.value('');
-      expect($input).to.not.have.attr('placeholder');
+      const formGroup = find('.name-field');
+      const input = formGroup.querySelector('input');
+      expect(formGroup).to.exist;
+      expect(formGroup.querySelector('.control-label')).to.have.trimmed.text('Name:');
+      expect(input).to.exist.and.to.have.attr('type', 'text');
+      expect(input).to.have.value('');
+      expect(input).to.not.have.attr('placeholder');
       done();
     });
 
     it('shows empty textearea with "Schema" label and no placeholder', async function (done) {
       await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-      const $formGroup = this.$('.schema-field');
-      const $textarea = $formGroup.find('textarea');
-      expect($formGroup).to.exist;
-      expect($formGroup.find('.control-label').text().trim()).to.equal('Schema:');
-      expect($textarea).to.exist;
-      expect($textarea).to.have.value('');
-      expect($textarea).to.not.have.attr('placeholder');
+      const formGroup = find('.schema-field');
+      const textarea = formGroup.querySelector('textarea');
+      expect(formGroup).to.exist;
+      expect(formGroup.querySelector('.control-label')).to.have.trimmed.text('Schema:');
+      expect(textarea).to.exist;
+      expect(textarea).to.have.value('');
+      expect(textarea).to.not.have.attr('placeholder');
       done();
     });
 
@@ -63,17 +63,18 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $formGroup = this.$('.includeMetadata-field');
-        const $toggleGroups = $formGroup.find('.toggle-field-renderer');
-        expect($formGroup).to.exist;
-        expect($formGroup.find('.control-label').eq(0).text().trim())
-          .to.equal('Include metadata:');
-        expect($toggleGroups).to.have.length(3);
+        const formGroup = find('.includeMetadata-field');
+        const toggleGroups = formGroup.querySelectorAll('.toggle-field-renderer');
+        expect(formGroup).to.exist;
+        expect(formGroup.querySelector('.control-label'))
+          .to.have.trimmed.text('Include metadata:');
+        expect(toggleGroups).to.have.length(3);
         ['Basic', 'JSON', 'RDF'].forEach((metadataType, index) => {
-          const $toggleGroup = $toggleGroups.eq(index);
-          expect($toggleGroup.find('.control-label').text().trim())
-            .to.equal(metadataType);
-          expect($toggleGroup.find('.one-way-toggle')).to.have.class('checked');
+          const toggleGroup = toggleGroups[index];
+          expect(toggleGroup.querySelector('.control-label'))
+            .to.have.trimmed.text(metadataType);
+          expect(toggleGroup.querySelector('.one-way-toggle'))
+            .to.have.class('checked');
         });
 
         const tooltip = new OneTooltipHelper(
@@ -97,12 +98,12 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $formGroup = this.$('.includeFileDetails-field');
-        const $toggleGroups = $formGroup.find('.toggle-field-renderer');
-        expect($formGroup).to.exist;
-        expect($formGroup.find('.control-label').eq(0).text().trim())
-          .to.equal('Include file details:');
-        expect($toggleGroups).to.have.length(6);
+        const formGroup = find('.includeFileDetails-field');
+        const toggleGroups = formGroup.querySelectorAll('.toggle-field-renderer');
+        expect(formGroup).to.exist;
+        expect(formGroup.querySelector('.control-label'))
+          .to.have.trimmed.text('Include file details:');
+        expect(toggleGroups).to.have.length(6);
         [
           'File name',
           'File type',
@@ -111,10 +112,11 @@ describe('Integration | Component | content harvesters indices/index form', func
           'Archive info',
           'Metadata existence flags',
         ].forEach((fieldLabel, index) => {
-          const $toggleGroup = $toggleGroups.eq(index);
-          expect($toggleGroup.find('.control-label').text().trim())
-            .to.equal(fieldLabel);
-          expect($toggleGroup.find('.one-way-toggle')).to.have.class('checked');
+          const toggleGroup = toggleGroups[index];
+          expect(toggleGroup.querySelector('.control-label'))
+            .to.have.trimmed.text(fieldLabel);
+          expect(toggleGroup.querySelector('.one-way-toggle'))
+            .to.have.class('checked');
         });
 
         const tooltip = new OneTooltipHelper(
@@ -132,11 +134,11 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $formGroup = this.$('.includeRejectionReason-field');
-        expect($formGroup).to.exist;
-        expect($formGroup.find('.control-label').text().trim())
-          .to.equal('Include rejection reason:');
-        expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
+        const formGroup = find('.includeRejectionReason-field');
+        expect(formGroup).to.exist;
+        expect(formGroup.querySelector('.control-label'))
+          .to.have.trimmed.text('Include rejection reason:');
+        expect(formGroup.querySelector('.one-way-toggle')).to.have.class('checked');
 
         const tooltip = new OneTooltipHelper(
           '.includeRejectionReason-field .one-label-tip .oneicon'
@@ -153,11 +155,11 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $formGroup = this.$('.retryOnRejection-field');
-        expect($formGroup).to.exist;
-        expect($formGroup.find('.control-label').text().trim())
-          .to.equal('Retry on rejection:');
-        expect($formGroup.find('.one-way-toggle')).to.have.class('checked');
+        const formGroup = find('.retryOnRejection-field');
+        expect(formGroup).to.exist;
+        expect(formGroup.querySelector('.control-label'))
+          .to.have.trimmed.text('Retry on rejection:');
+        expect(formGroup.querySelector('.one-way-toggle')).to.have.class('checked');
 
         const tooltip = new OneTooltipHelper(
           '.retryOnRejection-field .one-label-tip .oneicon'
@@ -187,9 +189,9 @@ describe('Integration | Component | content harvesters indices/index form', func
           await focus(fieldInputSelector);
           await blur(fieldInputSelector);
           if (isOptional) {
-            expect(this.$(fieldGroupSelector)).to.not.have.class('has-error');
+            expect(find(fieldGroupSelector)).to.not.have.class('has-error');
           } else {
-            expect(this.$(fieldGroupSelector)).to.have.class('has-error');
+            expect(find(fieldGroupSelector)).to.have.class('has-error');
           }
           done();
         }
@@ -202,7 +204,7 @@ describe('Integration | Component | content harvesters indices/index form', func
 
           await fillIn(fieldInputSelector, 'abc');
           await blur(fieldInputSelector);
-          expect(this.$(fieldInputSelector)).to.not.have.class('has-error');
+          expect(find(fieldInputSelector)).to.not.have.class('has-error');
           done();
         }
       );
@@ -222,10 +224,10 @@ describe('Integration | Component | content harvesters indices/index form', func
           it(testDescription, async function (done) {
             await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-            const $metadataToggles = this.$('.includeMetadata-field .one-way-toggle');
+            const metadataToggles = findAll('.includeMetadata-field .one-way-toggle');
             // Uncheck all toggles to make sure, that the validation state will be visible
             // due to modification.
-            await allFulfilled($metadataToggles.toArray().map(toggle => click(toggle)));
+            await allFulfilled(metadataToggles.map(toggle => click(toggle)));
             if (basicMetadataSelected) {
               await click('.metadataXattrs-field .one-way-toggle');
             }
@@ -235,16 +237,16 @@ describe('Integration | Component | content harvesters indices/index form', func
             if (rdfMetadataSelected) {
               await click('.metadataRdf-field .one-way-toggle');
             }
-            const $invalidToggleGroups =
-              this.$('.includeMetadata-field .toggle-field-renderer.has-error');
-            const $errorMessage = this.$('.includeMetadata-field .field-message');
+            const invalidToggleGroups =
+              findAll('.includeMetadata-field .toggle-field-renderer.has-error');
+            const errorMessage = find('.includeMetadata-field .field-message');
             if (shouldBeInvalid) {
-              expect($invalidToggleGroups).to.have.length(3);
-              expect($errorMessage.text().trim())
-                .to.equal('At least one type must be enabled');
+              expect(invalidToggleGroups).to.have.length(3);
+              expect(errorMessage)
+                .to.have.trimmed.text('At least one type must be enabled');
             } else {
-              expect($invalidToggleGroups).to.not.exist;
-              expect($errorMessage).to.not.exist;
+              expect(invalidToggleGroups).to.have.length(0);
+              expect(errorMessage).to.not.exist;
             }
             done();
           });
@@ -255,7 +257,7 @@ describe('Integration | Component | content harvesters indices/index form', func
     it('does not have any field in "view" mode', async function (done) {
       await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-      expect(this.$('.field-view-mode')).to.not.exist;
+      expect(find('.field-view-mode')).to.not.exist;
       done();
     });
 
@@ -264,14 +266,14 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $cancel = this.$('button.cancel-btn');
-        const $create = this.$('button.create-btn');
-        expect($cancel).to.exist;
-        expect($cancel).to.not.have.attr('disabled');
-        expect($cancel.text().trim()).to.equal('Cancel');
-        expect($create).to.exist;
-        expect($create).to.have.attr('disabled');
-        expect($create.text().trim()).to.equal('Create index');
+        const cancel = find('button.cancel-btn');
+        const create = find('button.create-btn');
+        expect(cancel).to.exist;
+        expect(cancel).to.not.have.attr('disabled');
+        expect(cancel).to.have.trimmed.text('Cancel');
+        expect(create).to.exist;
+        expect(create).to.have.attr('disabled');
+        expect(create).to.have.trimmed.text('Create index');
         done();
       }
     );
@@ -282,7 +284,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
         await fillIn('.name-field input', 'abc');
-        expect(this.$('.create-btn')).to.not.have.attr('disabled');
+        expect(find('.create-btn')).to.not.have.attr('disabled');
         done();
       }
     );
@@ -292,10 +294,10 @@ describe('Integration | Component | content harvesters indices/index form', func
       async function (done) {
         await render(hbs `{{content-harvesters-indices/index-form mode="create"}}`);
 
-        const $metadataToggles = this.$('.includeMetadata-field .one-way-toggle');
+        const metadataToggles = findAll('.includeMetadata-field .one-way-toggle');
         await fillIn('.name-field input', 'abc');
-        await allFulfilled($metadataToggles.toArray().map(toggle => click(toggle)));
-        expect(this.$('.create-btn')).to.have.attr('disabled');
+        await allFulfilled(metadataToggles.map(toggle => click(toggle)));
+        expect(find('.create-btn')).to.have.attr('disabled');
         done();
       }
     );
@@ -385,9 +387,9 @@ describe('Integration | Component | content harvesters indices/index form', func
 
         await fillIn('.name-field input', 'abc');
         await click('.create-btn');
-        expect(this.$('.cancel-btn')).to.have.attr('disabled');
-        expect(this.$('.create-btn')).to.have.attr('disabled');
-        expect(this.$('.create-btn [role="progressbar"]')).to.exist;
+        expect(find('.cancel-btn')).to.have.attr('disabled');
+        expect(find('.create-btn')).to.have.attr('disabled');
+        expect(find('.create-btn [role="progressbar"]')).to.exist;
         done();
       }
     );
@@ -417,7 +419,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         index=index
       }}`);
 
-      expect(this.$('.field-edit-mode')).to.not.exist;
+      expect(find('.field-edit-mode')).to.not.exist;
       done();
     });
 
@@ -427,7 +429,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         index=index
       }}`);
 
-      expect(this.$('.name-field')).to.not.exist;
+      expect(find('.name-field')).to.not.exist;
       done();
     });
 
@@ -441,8 +443,8 @@ describe('Integration | Component | content harvesters indices/index form', func
         includeMetadata: metadataTypes.without(metadataType),
       },
       alteredChecks: {
-        [`metadata${_.upperFirst(metadataType)}`]: testCase => expect(
-          testCase.$(`.metadata${_.upperFirst(metadataType)}-field .one-way-toggle`)
+        [`metadata${_.upperFirst(metadataType)}`]: () => expect(
+          find(`.metadata${_.upperFirst(metadataType)}-field .one-way-toggle`)
         ).to.not.have.class('checked'),
       },
     })), ...fileDetailsFields.map(fieldName => ({
@@ -451,8 +453,8 @@ describe('Integration | Component | content harvesters indices/index form', func
         includeFileDetails: fileDetailsFields.without(fieldName),
       },
       alteredChecks: {
-        [fieldName]: testCase => expect(
-          testCase.$(`.${fieldName}-field .one-way-toggle`)
+        [fieldName]: () => expect(
+          find(`.${fieldName}-field .one-way-toggle`)
         ).to.not.have.class('checked'),
       },
     })), ...['includeRejectionReason', 'retryOnRejection'].map(fieldName => ({
@@ -461,8 +463,8 @@ describe('Integration | Component | content harvesters indices/index form', func
         [fieldName]: false,
       },
       alteredChecks: {
-        [fieldName]: testCase => expect(
-          testCase.$(`.${fieldName}-field .one-way-toggle`)
+        [fieldName]: () => expect(
+          find(`.${fieldName}-field .one-way-toggle`)
         ).to.not.have.class('checked'),
       },
     }))].forEach(({ descriptionSuffix, alteredRecordProps, alteredChecks }) => {
@@ -470,8 +472,8 @@ describe('Integration | Component | content harvesters indices/index form', func
         Object.assign(this.get('index'), alteredRecordProps);
 
         const checks = {
-          schema: testCase =>
-            expect(testCase.$('.schema-field textarea')).to.have.value('indexSchema'),
+          schema: () =>
+            expect(find('.schema-field textarea')).to.have.value('indexSchema'),
         };
         [
           'metadataXattrs',
@@ -486,8 +488,8 @@ describe('Integration | Component | content harvesters indices/index form', func
           'includeRejectionReason',
           'retryOnRejection',
         ].forEach(fieldName =>
-          checks[fieldName] = testCase =>
-          expect(testCase.$(`.${fieldName}-field .one-way-toggle`))
+          checks[fieldName] = () =>
+          expect(find(`.${fieldName}-field .one-way-toggle`))
           .to.have.class('checked')
         );
         Object.assign(checks, alteredChecks);
@@ -497,7 +499,7 @@ describe('Integration | Component | content harvesters indices/index form', func
           index=index
         }}`);
 
-        Object.values(checks).forEach(check => check(this));
+        Object.values(checks).forEach(check => check());
         done();
       });
     });
@@ -508,7 +510,7 @@ describe('Integration | Component | content harvesters indices/index form', func
         index=index
       }}`);
 
-      expect(this.$('button')).to.not.exist;
+      expect(find('button')).to.not.exist;
       done();
     });
   });

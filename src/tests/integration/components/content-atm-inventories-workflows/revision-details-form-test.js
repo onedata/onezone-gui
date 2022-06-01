@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, settled } from '@ember/test-helpers';
+import { render, fillIn, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import $ from 'jquery';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import sinon from 'sinon';
 import EmberObject from '@ember/object';
@@ -43,28 +42,28 @@ describe('Integration | Component | content atm inventories workflows/revision d
 
     it('has class "revision-details-form"', async function () {
       await renderComponent();
-      expect(this.$().children()).to.have.class(componentClass)
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0]).to.have.class(componentClass);
     });
 
     it('has dropdown field "state" with revision states as options', async function () {
       await renderComponent();
 
-      expect(this.$('.state-field .control-label').text().trim()).to.equal('State:');
+      expect(find('.state-field .control-label')).to.have.trimmed.text('State:');
       await clickTrigger('.state-field');
-      const $options = $('.ember-power-select-option');
-      expect($options).to.have.length(states.length);
+      const options = document.querySelectorAll('.ember-power-select-option');
+      expect(options).to.have.length(states.length);
       states.forEach(({ label }, idx) =>
-        expect($options.eq(idx).text().trim()).to.equal(label)
+        expect(options[idx]).to.have.trimmed.text(label)
       );
     });
 
     it('has textarea field "description"', async function () {
       await renderComponent();
 
-      expect(this.$('.description-field .control-label').text().trim())
-        .to.equal('Description:');
-      expect(this.$('.description-field textarea')).to.exist;
+      expect(find('.description-field .control-label'))
+        .to.have.trimmed.text('Description:');
+      expect(find('.description-field textarea')).to.exist;
     });
 
     it('shows revision data', async function () {
@@ -72,7 +71,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
 
       await renderComponent();
 
-      expectValues(this, revision);
+      expectValues(revision);
     });
 
     states.forEach(({ value, label }) => {
@@ -155,7 +154,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
       });
       await settled();
 
-      expectValues(this, oldRevision);
+      expectValues(oldRevision);
     });
 
     it('changes visible data on revision number update', async function () {
@@ -168,7 +167,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
       this.set('revisionNumber', 10);
       await settled();
 
-      expectValues(this, newRevision);
+      expectValues(newRevision);
     });
 
     it('changes visible data on workflow schema update', async function () {
@@ -186,7 +185,7 @@ describe('Integration | Component | content atm inventories workflows/revision d
       }));
       await settled();
 
-      expectValues(this, newRevision);
+      expectValues(newRevision);
     });
   });
 
@@ -198,9 +197,9 @@ async function renderComponent() {
   }}`);
 }
 
-function expectValues(testCase, { state, description }) {
-  expect(testCase.$('.state-field .dropdown-field-trigger').text())
-    .to.contain(states.findBy('value', state).label);
-  expect(testCase.$('.description-field .form-control'))
+function expectValues({ state, description }) {
+  expect(find('.state-field .dropdown-field-trigger'))
+    .to.contain.text(states.findBy('value', state).label);
+  expect(find('.description-field .form-control'))
     .to.have.value(description);
 }

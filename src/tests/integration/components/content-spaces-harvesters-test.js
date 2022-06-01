@@ -6,7 +6,7 @@ import {
   afterEach,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, settled, click } from '@ember/test-helpers';
+import { render, settled, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -16,7 +16,6 @@ import sinon from 'sinon';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import GenerateInviteTokenAction from 'onezone-gui/utils/token-actions/generate-invite-token-action';
-import $ from 'jquery';
 import EmberObject from '@ember/object';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import Service from '@ember/service';
@@ -68,7 +67,7 @@ describe('Integration | Component | content spaces harvesters', function () {
   it('has class "content-spaces-harvesters"', async function () {
     await render(hbs `{{content-spaces-harvesters}}`);
 
-    expect(this.$('.content-spaces-harvesters')).to.exist;
+    expect(find('.content-spaces-harvesters')).to.exist;
   });
 
   it('shows spinner when harvesters are being loaded', async function () {
@@ -78,10 +77,10 @@ describe('Integration | Component | content spaces harvesters', function () {
 
     await render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    expect(this.$('.spinner')).to.exist;
-    expect(this.$('.resources-list')).to.not.exist;
-    expect(this.$('.resource-load-error')).to.not.exist;
-    expect(this.$('.content-info')).to.not.exist;
+    expect(find('.spinner')).to.exist;
+    expect(find('.resources-list')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
+    expect(find('.content-info')).to.not.exist;
   });
 
   it('shows info page when there are no harvesters yet', async function () {
@@ -89,20 +88,20 @@ describe('Integration | Component | content spaces harvesters', function () {
 
     await render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    expect(this.$('.spinner')).to.not.exist;
-    expect(this.$('.resources-list')).to.not.exist;
-    expect(this.$('.resource-load-error')).to.not.exist;
-    expect(this.$('.content-info')).to.exist;
-    expect(this.$('h1').text().trim()).to.equal('Space harvesters');
-    expect(this.$('.lead').text().trim()).to.equal(
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resources-list')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
+    expect(find('.content-info')).to.exist;
+    expect(find('h1')).to.have.trimmed.text('Space harvesters');
+    expect(find('.lead')).to.have.trimmed.text(
       'This space does not provide metadata to any harvester. To start indexing process, add a harvester.'
     );
-    const $buttons = this.$('.action-buttons button.btn-primary');
-    expect($buttons).to.have.length(2);
-    expect($buttons.eq(0)).to.have.class('add-harvester-to-space-trigger');
-    expect($buttons.eq(0).text().trim()).to.equal('Add one of your harvesters');
-    expect($buttons.eq(1)).to.have.class('generate-invite-token-action');
-    expect($buttons.eq(1).text().trim()).to.equal('Invite harvester using token');
+    const buttons = findAll('.action-buttons button.btn-primary');
+    expect(buttons).to.have.length(2);
+    expect(buttons[0]).to.have.class('add-harvester-to-space-trigger');
+    expect(buttons[0]).to.have.trimmed.text('Add one of your harvesters');
+    expect(buttons[1]).to.have.class('generate-invite-token-action');
+    expect(buttons[1]).to.have.trimmed.text('Invite harvester using token');
   });
 
   it('allows to add harvester through empty content info', function () {
@@ -124,13 +123,13 @@ describe('Integration | Component | content spaces harvesters', function () {
   it('shows list of space harvesters', async function () {
     await render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    expect(this.$('.spinner')).to.not.exist;
-    expect(this.$('.resource-load-error')).to.not.exist;
-    const $harvesterItems = this.$('.resource-item');
-    expect($harvesterItems).to.have.length(2);
-    expect($harvesterItems.find('.oneicon-light-bulb')).to.exist;
-    expect($harvesterItems.eq(0).text()).to.contain('harvester1');
-    expect($harvesterItems.eq(1).text()).to.contain('harvester2');
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
+    const harvesterItems = findAll('.resource-item');
+    expect(harvesterItems).to.have.length(2);
+    expect(harvesterItems[0].querySelector('.oneicon-light-bulb')).to.exist;
+    expect(harvesterItems[0]).to.contain.text('harvester1');
+    expect(harvesterItems[1]).to.contain.text('harvester2');
   });
 
   it('performs removing harvester from space', async function () {
@@ -161,8 +160,8 @@ describe('Integration | Component | content spaces harvesters', function () {
       }]);
       await settled();
 
-      expect(this.$('.content-info')).to.not.exist;
-      expect(this.$('.resources-list')).to.exist;
+      expect(find('.content-info')).to.not.exist;
+      expect(find('.resources-list')).to.exist;
     }
   );
 
@@ -174,22 +173,26 @@ describe('Integration | Component | content spaces harvesters', function () {
       this.get('space.harvesterList.content.list.content').clear();
       await settled();
 
-      expect(this.$('.resources-list')).to.not.exist;
-      expect(this.$('.content-info')).to.exist;
+      expect(find('.resources-list')).to.not.exist;
+      expect(find('.content-info')).to.exist;
     }
   );
 
   it('executes adding harvester from list view', async function () {
     await testAddingHarvester(async () => {
       await click('h1 .collapsible-toolbar-toggle');
-      await click($('.dropdown-menu .add-harvester-to-space-trigger')[0]);
+      await click(document.querySelector(
+        '.dropdown-menu .add-harvester-to-space-trigger'
+      ));
     });
   });
 
   it('executes inviting harvester using token from list view', async function () {
     await testInvitingHarvesterUsingToken(async () => {
       await click('h1 .collapsible-toolbar-toggle');
-      await click($('.dropdown-menu .generate-invite-token-action')[0]);
+      await click(document.querySelector(
+        '.dropdown-menu .generate-invite-token-action'
+      ));
     });
   });
 
@@ -205,9 +208,9 @@ describe('Integration | Component | content spaces harvesters', function () {
 
     await render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    const $harvesterItems = this.$('.resource-item a');
-    expect($harvesterItems).to.have.length(1);
-    expect($harvesterItems.eq(0)).to.have.attr('href', '#correct-url');
+    const harvesterItems = findAll('.resource-item a');
+    expect(harvesterItems).to.have.length(1);
+    expect(harvesterItems[0]).to.have.attr('href', '#correct-url');
   });
 
   it('shows error when harvesters cannot be loaded', async function () {
@@ -216,12 +219,12 @@ describe('Integration | Component | content spaces harvesters', function () {
 
     await render(hbs `{{content-spaces-harvesters space=space}}`);
 
-    expect(this.$('.spinner')).to.not.exist;
-    expect(this.$('.resources-list')).to.not.exist;
-    expect(this.$('.content-info')).to.not.exist;
-    const $loadError = this.$('.resource-load-error');
-    expect($loadError).to.exist;
-    expect($loadError.text()).to.contain('someError');
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resources-list')).to.not.exist;
+    expect(find('.content-info')).to.not.exist;
+    const loadError = find('.resource-load-error');
+    expect(loadError).to.exist;
+    expect(loadError).to.contain.text('someError');
   });
 });
 

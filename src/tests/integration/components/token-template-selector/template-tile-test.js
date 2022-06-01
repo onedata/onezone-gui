@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
@@ -24,25 +24,25 @@ describe('Integration | Component | token template selector/template tile', func
   it('renders one-tile with class "token-template-selector-template-tile"', async function () {
     await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.one-tile')).to.have.class('token-template-selector-template-tile');
+    expect(find('.one-tile')).to.have.class('token-template-selector-template-tile');
   });
 
   it('has class template-{templateName}', async function () {
     await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.one-tile')).to.have.class('template-custom');
+    expect(find('.one-tile')).to.have.class('template-custom');
   });
 
   it('does not have "more" link', async function () {
     await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.more-link')).to.not.exist;
+    expect(find('.more-link')).to.not.exist;
   });
 
   it('shows template name in title', async function () {
     await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.tile-title').text().trim()).to.equal('Custom');
+    expect(find('.tile-title')).to.have.trimmed.text('Custom');
   });
 
   it('notifies about click', async function () {

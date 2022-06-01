@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import $ from 'jquery';
 import { resolve } from 'rsvp';
 
 describe('Integration | Component | sidebar spaces/space item', function () {
@@ -19,8 +18,8 @@ describe('Integration | Component | sidebar spaces/space item', function () {
   it('renders space name and icon', async function () {
     await render(hbs `{{sidebar-spaces/space-item item=space}}`);
 
-    expect(this.$()).to.contain(this.get('space.name'));
-    expect(this.$('.oneicon-space')).to.exist;
+    expect(this.element).to.contain.text(this.get('space.name'));
+    expect(find('.oneicon-space')).to.exist;
   });
 
   it('allows to rename space through "Rename" action', async function () {
@@ -29,19 +28,17 @@ describe('Integration | Component | sidebar spaces/space item', function () {
 
     await render(hbs `{{sidebar-spaces/space-item item=space}}`);
 
-    return click('.collapsible-toolbar-toggle')
-      .then(() => {
-        const renameTrigger =
-          $('body .webui-popover.in .rename-space-action')[0];
-        return click(renameTrigger);
-      })
-      .then(() => fillIn('.name-editor .form-control', 'newName'))
-      .then(() => click('.name-editor .save-icon'))
-      .then(() => {
-        const $spaceNameNode = this.$('.sidebar-item-title');
-        expect($spaceNameNode).to.contain('newName');
-        expect($spaceNameNode).to.not.have.class('editor');
-        expect(saveSpy).to.be.calledOnce;
-      });
+    await click('.collapsible-toolbar-toggle');
+    const renameTrigger =
+      document.querySelector('body .webui-popover.in .rename-space-action');
+    await click(renameTrigger);
+
+    await fillIn('.name-editor .form-control', 'newName');
+    await click('.name-editor .save-icon');
+
+    const spaceNameNode = find('.sidebar-item-title');
+    expect(spaceNameNode).to.contain.text('newName');
+    expect(spaceNameNode).to.not.have.class('editor');
+    expect(saveSpy).to.be.calledOnce;
   });
 });

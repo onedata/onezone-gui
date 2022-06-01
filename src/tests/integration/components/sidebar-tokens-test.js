@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { get } from '@ember/object';
-import $ from 'jquery';
 import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
 
 class TargetModelHelper extends EmberPowerSelectHelper {
@@ -67,7 +66,7 @@ describe('Integration | Component | sidebar tokens', function () {
 
     await render(hbs `{{sidebar-tokens model=model}}`);
 
-    const renderedTokens = this.$('.token-item');
+    const renderedTokens = findAll('.token-item');
     expect(renderedTokens).to.have.length(tokens.length);
   });
 
@@ -77,17 +76,17 @@ describe('Integration | Component | sidebar tokens', function () {
 
     await render(hbs `{{sidebar-tokens model=model}}`);
 
-    this.$('.token-item').each((index, element) => {
+    findAll('.token-item').forEach((element, index) => {
       const originIndex = tokensOrder[index];
-      expect($(element).find('.token-name'))
-        .to.contain(get(tokens[originIndex], 'name'));
+      expect(element.querySelector('.token-name'))
+        .to.contain.text(get(tokens[originIndex], 'name'));
     });
   });
 
   it('shows advanced token filters by default', async function () {
     await render(hbs `{{sidebar-tokens model=model}}`);
 
-    expect(this.$('.advanced-filters-collapse.in .advanced-token-filters'))
+    expect(find('.advanced-filters-collapse.in .advanced-token-filters'))
       .to.exist;
   });
 
@@ -104,14 +103,12 @@ describe('Integration | Component | sidebar tokens', function () {
     it(`shows only ${type} tokens, when type filter is "${type}"`, async function () {
       await render(hbs `{{sidebar-tokens model=model}}`);
 
-      return click(`.btn-${type}`)
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(count);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain(type);
-          });
-        });
+      await click(`.btn-${type}`);
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(count);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text(type);
+      });
     });
   });
 
@@ -121,16 +118,14 @@ describe('Integration | Component | sidebar tokens', function () {
       await render(hbs `{{sidebar-tokens model=model}}`);
 
       const targetModelHelper = new TargetModelHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(2);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain('invite');
-            expect($(element).text()).to.contain('cluster');
-          });
-        });
+      await click('.btn-invite');
+      await targetModelHelper.selectOption(2);
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(2);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text('invite');
+        expect(element).to.contain.text('cluster');
+      });
     }
   );
 
@@ -141,15 +136,13 @@ describe('Integration | Component | sidebar tokens', function () {
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => targetRecordHelper.selectOption(2))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(1);
-          expect(renderedTokens.text()).to.contain('invite');
-          expect(renderedTokens.text()).to.contain('cluster1');
-        });
+      await click('.btn-invite');
+      await targetModelHelper.selectOption(2);
+      await targetRecordHelper.selectOption(2);
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(1);
+      expect(renderedTokens[0]).to.contain.text('invite');
+      expect(renderedTokens[0]).to.contain.text('cluster1');
     }
   );
 
@@ -160,17 +153,15 @@ describe('Integration | Component | sidebar tokens', function () {
 
       const targetModelHelper = new TargetModelHelper();
       const targetRecordHelper = new TargetRecordHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => targetRecordHelper.selectOption(2))
-        .then(() => click('.btn-access'))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(2);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain('access');
-          });
-        });
+      await click('.btn-invite');
+      await targetModelHelper.selectOption(2);
+      await targetRecordHelper.selectOption(2);
+      await click('.btn-access');
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(2);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text('access');
+      });
     }
   );
 });

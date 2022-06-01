@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import Service from '@ember/service';
@@ -50,9 +50,9 @@ describe('Integration | Component | user account button', function () {
 
       await render(hbs `{{user-account-button}}`);
 
-      const $username = this.$('.user-account-button-username');
+      const usernameElem = find('.user-account-button-username');
 
-      expect($username).to.exist;
-      expect($username, $username.text()).to.contain(username);
+      expect(usernameElem).to.exist;
+      expect(usernameElem).to.contain.text(username);
     });
 });

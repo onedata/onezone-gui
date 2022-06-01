@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn, settled } from '@ember/test-helpers';
+import { render, click, fillIn, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -20,42 +20,42 @@ describe('Integration | Component | content tokens', function () {
   it('has class content-tokens', async function () {
     await render(hbs `{{content-tokens}}`);
 
-    expect(this.$('.content-tokens')).to.exist;
+    expect(find('.content-tokens')).to.exist;
   });
 
   it('shows token name in header', async function () {
     await render(hbs `{{content-tokens token=token}}`);
 
-    expect(this.$('h1 .token-name').text().trim())
-      .to.equal(this.get('token.name'));
+    expect(find('h1 .token-name'))
+      .to.have.trimmed.text(this.get('token.name'));
   });
 
   it('shows modify action trigger', async function () {
     await render(hbs `{{content-tokens token=token}}`);
 
-    const $trigger = this.$('.edit-token-action-btn').eq(0);
-    expect($trigger).to.exist;
-    expect($trigger.text().trim()).to.equal('Modify');
-    expect($trigger.find('.one-icon')).to.have.class('oneicon-rename');
-    expect($trigger.parents('.one-collapsible-toolbar-item.disabled')).to.not.exist;
+    const trigger = find('.edit-token-action-btn');
+    expect(trigger).to.exist;
+    expect(trigger).to.contain.text('Modify');
+    expect(trigger.querySelector('.one-icon')).to.have.class('oneicon-rename');
+    expect(trigger.closest('.one-collapsible-toolbar-item.disabled')).to.not.exist;
   });
 
   it('shows token editor component in view mode with token data', async function () {
     await render(hbs `{{content-tokens token=token}}`);
 
-    expect(this.$('.token-editor')).to.have.class('view-mode');
+    expect(find('.token-editor')).to.have.class('view-mode');
     // Not have to test other fields - we only need to check if token is passed to
     // token-editor component. Token data rendering is deeply tested in token-editor tests.
-    expect(this.$('.name-field').text()).to.contain('token name');
+    expect(find('.name-field')).to.contain.text('token name');
   });
 
   it('changes mode to "edit" after clicking "Modify" button', async function () {
     await render(hbs `{{content-tokens token=token}}`);
 
     await click('.edit-token-action-btn');
-    expect(this.$('.token-editor')).to.have.class('edit-mode');
-    const $trigger = this.$('.edit-token-action-btn').eq(0);
-    expect($trigger.parents('.one-collapsible-toolbar-item.disabled')).to.exist;
+    expect(find('.token-editor')).to.have.class('edit-mode');
+    const trigger = find('.edit-token-action-btn');
+    expect(trigger.closest('.one-collapsible-toolbar-item.disabled')).to.exist;
   });
 
   it(
@@ -103,10 +103,10 @@ describe('Integration | Component | content tokens', function () {
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
-      expect(this.$('.submit-token [role="progressbar"]')).to.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.exist;
       resolveSubmit({ status: 'done' });
       await settled();
-      expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.not.exist;
     }
   );
 
@@ -124,7 +124,7 @@ describe('Integration | Component | content tokens', function () {
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
-      expect(this.$('.token-editor')).to.have.class('view-mode');
+      expect(find('.token-editor')).to.have.class('view-mode');
     }
   );
 
@@ -142,7 +142,7 @@ describe('Integration | Component | content tokens', function () {
 
       await click('.edit-token-action-btn');
       await click('.submit-token');
-      expect(this.$('.token-editor')).to.have.class('edit-mode');
+      expect(find('.token-editor')).to.have.class('edit-mode');
     }
   );
 
@@ -155,9 +155,9 @@ describe('Integration | Component | content tokens', function () {
       await fillIn('.name-field input', 'test');
       await click('.revoked-field .one-way-toggle');
       await click('.cancel-edition');
-      expect(this.$('.token-editor')).to.have.class('view-mode');
-      expect(this.$('.name-field').text()).to.contain('token name');
-      expect(this.$('.revoked-field .one-way-toggle')).to.not.have.class('checked');
+      expect(find('.token-editor')).to.have.class('view-mode');
+      expect(find('.name-field')).to.contain.text('token name');
+      expect(find('.revoked-field .one-way-toggle')).to.not.have.class('checked');
     }
   );
 
@@ -171,9 +171,9 @@ describe('Integration | Component | content tokens', function () {
         name: 'another token',
       });
       await settled();
-      expect(this.$('.token-editor')).to.have.class('view-mode');
-      const $trigger = this.$('.edit-token-action-btn').eq(0);
-      expect($trigger.parents('.one-collapsible-toolbar-item.disabled')).to.not.exist;
+      expect(find('.token-editor')).to.have.class('view-mode');
+      const trigger = find('.edit-token-action-btn');
+      expect(trigger.closest('.one-collapsible-toolbar-item.disabled')).to.not.exist;
     }
   );
 });

@@ -7,13 +7,12 @@ import {
   afterEach,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
-import $ from 'jquery';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 
 describe('Integration | Component | content atm inventories workflows/list view',
@@ -68,36 +67,37 @@ describe('Integration | Component | content atm inventories workflows/list view'
     it('has class "content-atm-inventories-workflows-list-view"', async function () {
       await render(hbs `{{content-atm-inventories-workflows/list-view}}`);
 
-      expect(this.$().children()).to.have.class('content-atm-inventories-workflows-list-view')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0])
+        .to.have.class('content-atm-inventories-workflows-list-view');
     });
 
     it('has header "Workflows"', async function () {
       await renderComponent();
 
-      expect(this.$('.header-row h1 .one-label').text().trim()).to.equal('Workflows');
+      expect(find('.header-row h1 .one-label')).to.have.trimmed.text('Workflows');
     });
 
     it('shows list of workflow schemas of given automation inventory', async function () {
       await renderComponent();
 
-      expect(this.$('.atm-workflow-schemas-list')).to.exist;
-      const $entries = this.$('.atm-workflow-schemas-list-entry');
-      expect($entries).to.have.length(2);
-      expect($entries.eq(0).text()).to.contain('w0');
-      expect($entries.eq(1).text()).to.contain('w1');
+      expect(find('.atm-workflow-schemas-list')).to.exist;
+      const entries = findAll('.atm-workflow-schemas-list-entry');
+      expect(entries).to.have.length(2);
+      expect(entries[0]).to.contain.text('w0');
+      expect(entries[1]).to.contain.text('w1');
     });
 
     it('has "add new workflow" button, which calls "onAddAtmWorkflowSchema" callback on click',
       async function () {
         await renderComponent();
 
-        const $addFunctionBtn = this.$('.header-row .open-add-atm-workflow-schema-trigger');
-        expect($addFunctionBtn.text().trim()).to.equal('Add new workflow');
+        const addFunctionBtn = find('.header-row .open-add-atm-workflow-schema-trigger');
+        expect(addFunctionBtn).to.have.trimmed.text('Add new workflow');
         const addFunctionSpy = this.get('addFunctionSpy');
         expect(addFunctionSpy).to.not.be.called;
 
-        await click($addFunctionBtn[0]);
+        await click(addFunctionBtn);
 
         expect(addFunctionSpy).to.be.calledOnce;
       });
@@ -135,9 +135,9 @@ describe('Integration | Component | content atm inventories workflows/list view'
         await renderComponent();
 
         await click('.revision-actions-trigger');
-        await click($(
-          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
-        )[0]);
+        await click(document.querySelector(
+          '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        ));
 
         expect(this.get('createdAtmWorkflowSchemaRevisionSpy')).to.be.calledOnce
           .and.to.be.calledWith(sinon.match({ name: 'w0' }), 4);

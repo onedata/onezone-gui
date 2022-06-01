@@ -3,7 +3,6 @@ import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import $ from 'jquery';
 
 describe('Integration | Component | remove token modal', function () {
   setupRenderingTest();
@@ -17,6 +16,7 @@ describe('Integration | Component | remove token modal', function () {
   it('renders token name inside message', async function () {
     await render(hbs `{{remove-token-modal opened=true token=token}}`);
 
-    expect($('body .remove-token-modal.in')).to.contain(this.get('token.name'));
+    expect(document.querySelector('.remove-token-modal.in'))
+      .to.contain.text(this.get('token.name'));
   });
 });

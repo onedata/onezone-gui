@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn, settled } from '@ember/test-helpers';
+import { render, click, fillIn, settled, find } from '@ember/test-helpers';
 import { lookupService } from '../../../helpers/stub-service';
 import hbs from 'htmlbars-inline-precompile';
 import {
@@ -15,7 +15,6 @@ import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
-import $ from 'jquery';
 import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
@@ -99,7 +98,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
 
       it('allows changing uploaded file to another one', async function (done) {
         await showModal(this);
-        const $modalBody = $(getModalBody());
+        const modalBody = getModalBody();
 
         const dump2 = generateAtmWorkflowSchemaDump();
         dump2.name = 'w2';
@@ -111,17 +110,16 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
         });
         await settled();
 
-        expect($modalBody.find('.upload-details .filename').text().trim())
-          .to.equal('file2.json');
-        expect($modalBody.find('.dump-details .name').text().trim())
-          .to.equal(dump2.name);
-        expect($modalBody.find('.option-merge input').prop('checked'))
-          .to.equal(true);
-        expect($modalBody
-          .find('.targetWorkflow-field .dropdown-field-trigger')
-          .text().trim()
-        ).to.equal('wf2');
-        expect($modalBody.find('.newWorkflowName-field .form-control'))
+        expect(modalBody.querySelector('.upload-details .filename'))
+          .to.have.trimmed.text('file2.json');
+        expect(modalBody.querySelector('.dump-details .name'))
+          .to.have.trimmed.text(dump2.name);
+        expect(modalBody.querySelector('.option-merge input'))
+          .to.have.property('checked', true);
+        expect(modalBody
+          .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+        ).to.have.trimmed.text('wf2');
+        expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
           .to.have.value('w2');
         done();
       });
@@ -148,21 +146,21 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal'
 
       it('allows changing target inventory', async function (done) {
         await showModal(this);
-        const $modalBody = $(getModalBody());
+        const modalBody = getModalBody();
 
         await clickTrigger('.targetAtmInventory-field');
-        const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(2);
-        expect($options.eq(0).text().trim()).to.equal('inv1');
-        expect($options.eq(1).text().trim()).to.equal('inv2');
+        const options = document.querySelectorAll('.ember-power-select-option');
+        expect(options).to.have.length(2);
+        expect(options[0]).to.have.trimmed.text('inv1');
+        expect(options[1]).to.have.trimmed.text('inv2');
         await selectChoose('.targetAtmInventory-field', 'inv2');
 
-        expect($modalBody
-          .find('.targetAtmInventory-field .dropdown-field-trigger')
-          .text().trim()
-        ).to.equal('inv2');
-        expect($modalBody.find('.no-target-workflow-warning')).to.exist;
-        expect($modalBody.find('.option-create input').prop('checked')).to.equal(true);
+        expect(modalBody
+          .querySelector('.targetAtmInventory-field .dropdown-field-trigger')
+        ).to.have.trimmed.text('inv2');
+        expect(modalBody.querySelector('.no-target-workflow-warning')).to.exist;
+        expect(modalBody.querySelector('.option-create input'))
+          .to.have.property('checked', true);
         done();
       });
 
@@ -198,45 +196,43 @@ function itShowsModalWithContent() {
       const dump = this.get('dump');
       await showModal(this);
 
-      const $modal = $(getModal());
-      const $modalHeader = $(getModalHeader());
-      const $modalBody = $(getModalBody());
-      const $modalFooter = $(getModalFooter());
+      const modal = getModal();
+      const modalHeader = getModalHeader();
+      const modalBody = getModalBody();
+      const modalFooter = getModalFooter();
 
-      expect($modal).to.have.class('apply-atm-workflow-schema-dump-modal');
-      expect($modalHeader.find('h1').text().trim()).to.equal(expectedTitle);
+      expect(modal).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect(modalHeader.querySelector('h1')).to.have.trimmed.text(expectedTitle);
       if (isUploadMode) {
-        expect($modalBody.find('.upload-details .filename').text().trim())
-          .to.equal('file.json');
+        expect(modalBody.querySelector('.upload-details .filename'))
+          .to.have.trimmed.text('file.json');
       } else {
-        expect($modalBody.find('.upload-details')).to.not.exist;
+        expect(modalBody.querySelector('.upload-details')).to.not.exist;
       }
-      expect($modalBody.find('.dump-details')).to.exist;
-      expect($modalBody.find('.dump-details .name').text().trim())
-        .to.equal(dump.name);
+      expect(modalBody.querySelector('.dump-details')).to.exist;
+      expect(modalBody.querySelector('.dump-details .name'))
+        .to.have.trimmed.text(dump.name);
       if (isUploadMode) {
-        expect($modalBody.find('.inventory-selector')).to.not.exist;
+        expect(modalBody.querySelector('.inventory-selector')).to.not.exist;
       } else {
-        expect($modalBody
-          .find('.targetAtmInventory-field .dropdown-field-trigger')
-          .text().trim()
-        ).to.equal('inv1');
+        expect(modalBody
+          .querySelector('.targetAtmInventory-field .dropdown-field-trigger')
+        ).to.have.trimmed.text('inv1');
       }
-      expect($modalBody.find('.operation-form')).to.exist;
-      expect($modalBody.find('.option-merge input').prop('checked'))
-        .to.equal(true);
-      expect($modalBody
-        .find('.targetWorkflow-field .dropdown-field-trigger')
-        .text().trim()
-      ).to.equal('wf1');
-      expect($modalBody.find('.newWorkflowName-field .form-control'))
+      expect(modalBody.querySelector('.operation-form')).to.exist;
+      expect(modalBody.querySelector('.option-merge input'))
+        .to.have.property('checked', true);
+      expect(modalBody
+        .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+      ).to.have.trimmed.text('wf1');
+      expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
         .to.have.value('w1');
-      const $submitBtn = $modalFooter.find('.submit-btn');
-      const $cancelBtn = $modalFooter.find('.cancel-btn');
-      expect($submitBtn).to.have.class('btn-primary');
-      expect($submitBtn.text().trim()).to.equal('Apply');
-      expect($cancelBtn).to.have.class('btn-default');
-      expect($cancelBtn.text().trim()).to.equal('Cancel');
+      const submitBtn = modalFooter.querySelector('.submit-btn');
+      const cancelBtn = modalFooter.querySelector('.cancel-btn');
+      expect(submitBtn).to.have.class('btn-primary');
+      expect(submitBtn).to.have.trimmed.text('Apply');
+      expect(cancelBtn).to.have.class('btn-default');
+      expect(cancelBtn).to.have.trimmed.text('Cancel');
       done();
     });
 }
@@ -247,15 +243,15 @@ function itShowsWorkflowDumpError() {
       const isUploadMode = this.get('modalOptions.dumpSourceType') === 'upload';
       this.set('dumpSourceProxy.content.dump', null);
       await showModal(this);
-      const $modalBody = $(getModalBody());
+      const modalBody = getModalBody();
 
       if (isUploadMode) {
-        expect($modalBody.find('.upload-details .filename').text().trim())
-          .to.equal('file.json');
+        expect(modalBody.querySelector('.upload-details .filename'))
+          .to.have.trimmed.text('file.json');
       }
-      expect($modalBody.find('.dump-details .error')).to.exist;
-      expect($modalBody.find('.inventory-selector')).to.not.exist;
-      expect($modalBody.find('.operation-form')).to.not.exist;
+      expect(modalBody.querySelector('.dump-details .error')).to.exist;
+      expect(modalBody.querySelector('.inventory-selector')).to.not.exist;
+      expect(modalBody.querySelector('.operation-form')).to.not.exist;
       done();
     });
 }
@@ -263,20 +259,19 @@ function itShowsWorkflowDumpError() {
 function itAllowsChangingTargetWorkflow() {
   it('allows changing target workflow', async function (done) {
     await showModal(this);
-    const $modalBody = $(getModalBody());
+    const modalBody = getModalBody();
 
     await clickTrigger('.targetWorkflow-field');
-    const $options = $('.ember-power-select-option');
-    expect($options).to.have.length(2);
-    expect($options.eq(0).text().trim()).to.equal('wf1');
-    expect($options.eq(1).text().trim()).to.equal('wf3');
+    const options = document.querySelectorAll('.ember-power-select-option');
+    expect(options).to.have.length(2);
+    expect(options[0]).to.have.trimmed.text('wf1');
+    expect(options[1]).to.have.trimmed.text('wf3');
     await selectChoose('.targetWorkflow-field', 'wf3');
 
-    expect($modalBody
-      .find('.targetWorkflow-field .dropdown-field-trigger')
-      .text().trim()
-    ).to.equal('wf3');
-    expect($modalBody.find('.revision-conflict-warning')).to.exist;
+    expect(modalBody
+      .querySelector('.targetWorkflow-field .dropdown-field-trigger')
+    ).to.have.trimmed.text('wf3');
+    expect(modalBody.querySelector('.revision-conflict-warning')).to.exist;
     done();
   });
 }
@@ -284,13 +279,15 @@ function itAllowsChangingTargetWorkflow() {
 function itAllowsChangingOperationAndNewWorkflowName() {
   it('allows changing operation and new workflow name', async function (done) {
     await showModal(this);
-    const $modalBody = $(getModalBody());
+    const modalBody = getModalBody();
 
     await click('.option-create');
     await fillIn('.newWorkflowName-field .form-control', 'xyz');
 
-    expect($modalBody.find('.option-create input').prop('checked')).to.equal(true);
-    expect($modalBody.find('.newWorkflowName-field .form-control')).to.have.value('xyz');
+    expect(modalBody.querySelector('.option-create input'))
+      .to.have.property('checked', true);
+    expect(modalBody.querySelector('.newWorkflowName-field .form-control'))
+      .to.have.value('xyz');
     done();
   });
 }
@@ -299,12 +296,13 @@ function itChangesOperationToCreateOnEmptyTargetWorkflows() {
   it('changes operation from "merge" to "create" when there are no target workflows available',
     async function (done) {
       await showModal(this);
-      const $modalBody = $(getModalBody());
+      const modalBody = getModalBody();
 
       this.get('atmWorkflowSchemas').clear();
       await settled();
 
-      expect($modalBody.find('.option-create input').prop('checked')).to.equal(true);
+      expect(modalBody.querySelector('.option-create input'))
+        .to.have.property('checked', true);
       done();
     });
 }
@@ -350,7 +348,7 @@ function itBlocksSubmitWhenWorkflowNameEmpty() {
     await click('.option-create');
     await fillIn('.newWorkflowName-field .form-control', '');
 
-    expect(this.$('.submit-btn')).to.be.disabled;
+    expect(find('.submit-btn')).to.have.attr('disabled');
     done();
   });
 }
@@ -364,7 +362,7 @@ function itDoesntBlockSubmitWnehWorkflowNameIsEmptyInMerge() {
       await fillIn('.newWorkflowName-field .form-control', '');
       await click('.option-merge');
 
-      expect(this.$('.submit-btn')).to.be.not.disabled;
+      expect(find('.submit-btn')).to.not.have.attr('disabled');
       done();
     });
 }
@@ -403,16 +401,16 @@ function itBlocksControlsAndCloseWhenSubmitting() {
 
       expect(onHideSpy).to.not.be.called;
       if (isUploadMode) {
-        expect(this.$('.upload-btn')).to.be.disabled;
+        expect(find('.upload-btn')).to.have.attr('disabled');
       } else {
-        expect(this.$('.targetAtmInventory-field .dropdown-field-trigger'))
+        expect(find('.targetAtmInventory-field .dropdown-field-trigger'))
           .to.have.attr('aria-disabled');
       }
-      expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
+      expect(find('.targetWorkflow-field .dropdown-field-trigger'))
         .to.have.attr('aria-disabled');
-      expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
-      expect(this.$('.one-way-radio-group')).to.have.class('disabled');
-      expect($(getModalFooter()).find('.cancel-btn')).to.be.disabled;
+      expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
+      expect(find('.one-way-radio-group')).to.have.class('disabled');
+      expect(getModalFooter().querySelector('.cancel-btn')).to.have.attr('disabled');
       done();
     });
 }

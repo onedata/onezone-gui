@@ -1,14 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, settled } from '@ember/test-helpers';
+import { render, click, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import moment from 'moment';
 import Service from '@ember/service';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { registerService } from '../../helpers/stub-service';
-import $ from 'jquery';
 
 const OnedataGraph = Service.extend({
   request: notImplementedReject,
@@ -33,9 +32,8 @@ describe('Integration | Component | content clusters deregister', function () {
         deregister=deregister
       }}`);
 
-      expect($('.content-clusters-deregister .btn-deregister'))
-        .to.have.attr('disabled');
-      await click('.content-clusters-deregister .btn-deregister');
+      expect(find('.btn-deregister')).to.have.attr('disabled');
+      await click('.btn-deregister');
       expect(deregister).to.be.not.called;
     }
   );
@@ -55,8 +53,8 @@ describe('Integration | Component | content clusters deregister', function () {
         afterDeregister=afterDeregister
       }}`);
 
-      await click('.content-clusters-deregister .one-checkbox-understand');
-      await click('.content-clusters-deregister .btn-deregister');
+      await click('.one-checkbox-understand');
+      await click('.btn-deregister');
       expect(deregister).to.be.calledOnce;
       await settled();
       expect(afterDeregister).to.be.calledOnce;
@@ -91,14 +89,14 @@ describe('Integration | Component | content clusters deregister', function () {
         getOneproviderClusterResourceStats=getOneproviderClusterResourceStats
       }}`);
 
-      expect($('.row-cluster-oneprovider-stats')).to.exist;
-      expect($('.li-creation-time-count .active-since-date').text())
+      expect(find('.row-cluster-oneprovider-stats')).to.exist;
+      expect(find('.li-creation-time-count .active-since-date').textContent)
         .to.match(/13 Mar 2019/);
-      expect($('.li-spaces-count .spaces-count-number').text())
+      expect(find('.li-spaces-count .spaces-count-number').textContent)
         .to.match(/4/);
-      expect($('.li-groups-count .groups-count-number').text())
+      expect(find('.li-groups-count .groups-count-number').textContent)
         .to.match(/3/);
-      expect($('.li-users-count .users-count-number').text())
+      expect(find('.li-users-count .users-count-number').textContent)
         .to.match(/2/);
     }
   );

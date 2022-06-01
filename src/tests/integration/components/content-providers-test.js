@@ -6,24 +6,17 @@ import hbs from 'htmlbars-inline-precompile';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
-import Service from '@ember/service';
-import { registerService, lookupService } from '../../helpers/stub-service';
+import { lookupService } from '../../helpers/stub-service';
 
 function po(val) {
   return PromiseObject.create({ promise: resolve(val) });
 }
 
-const Router = Service.extend({
-  urlFor() {
-    return 'https://example.com';
-  },
-});
-
 describe('Integration | Component | content providers', function () {
   setupRenderingTest();
 
   beforeEach(function () {
-    registerService(this, 'router', Router);
+    sinon.stub(lookupService(this, '-routing'), 'transitionTo').returns(null);
   });
 
   it(
@@ -38,10 +31,10 @@ describe('Integration | Component | content providers', function () {
         dispatchEvent() {},
       };
       this.set('_window', _window);
-      const providerId = 'id1';
+      const providerGri = 'provider.id1.instance:auto';
       const list = [
         po({
-          id: providerId,
+          id: providerGri,
           latitude: 10,
           longitude: 20,
           online: true,

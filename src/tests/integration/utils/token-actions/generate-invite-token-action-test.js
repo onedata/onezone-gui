@@ -13,7 +13,6 @@ import {
   getModalFooter,
 } from '../../../helpers/modal';
 import TestComponent from 'onedata-gui-common/components/test-component';
-import $ from 'jquery';
 
 describe('Integration | Utility | token actions/generate invite token action', function () {
   setupRenderingTest();
@@ -129,7 +128,7 @@ describe('Integration | Utility | token actions/generate invite token action', f
     action.execute();
     await settled();
 
-    expect($(getModal())).to.have.class('generate-invite-token-modal');
+    expect(getModal()).to.have.class('generate-invite-token-modal');
   });
 
   it('passess inviteType and tokenTarget to the modal', async function () {
@@ -143,7 +142,8 @@ describe('Integration | Utility | token actions/generate invite token action', f
     action.execute();
     await settled();
 
-    const testComponent = $(getModalBody()).find('.test-component')[0].componentInstance;
+    const testComponent =
+      getModalBody().querySelector('.test-component').componentInstance;
     expect(get(testComponent, 'inviteType')).to.equal('userJoinGroup');
     expect(get(testComponent, 'targetRecord.entityId')).to.equal('sth');
   });
@@ -160,7 +160,7 @@ describe('Integration | Utility | token actions/generate invite token action', f
 
     await settled();
     expect(promiseIsResolved).to.be.false;
-    await click($(getModalFooter()).find('.modal-close')[0]);
+    await click(getModalFooter().querySelector('.modal-close'));
     expect(promiseIsResolved).to.be.true;
   });
 });

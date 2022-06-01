@@ -5,7 +5,7 @@ import {
   beforeEach,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, click, settled } from '@ember/test-helpers';
+import { render, fillIn, click, settled, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -61,15 +61,15 @@ describe('Integration | Component | token consumer', function () {
   it('has class "token-consumer"', async function () {
     await render(hbs `{{token-consumer}}`);
 
-    expect(this.$('.token-consumer')).to.exist;
+    expect(find('.token-consumer')).to.exist;
   });
 
   it('has token input', async function () {
     await render(hbs `{{token-consumer}}`);
 
-    const $input = this.$('input[type="text"].token-string');
-    expect($input).to.exist;
-    expect($input).to.have.attr('placeholder', 'Enter token...');
+    const input = find('input[type="text"].token-string');
+    expect(input).to.exist;
+    expect(input).to.have.attr('placeholder', 'Enter token...');
   });
 
   it('does not invoke examine on init', async function () {
@@ -81,12 +81,10 @@ describe('Integration | Component | token consumer', function () {
   it('invokes examine on token input', async function () {
     await render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', 'token')
-      .then(() => {
-        const examineStub = this.get('examineStub');
-        expect(examineStub).to.be.calledOnce;
-        expect(examineStub).to.be.calledWith('token');
-      });
+    await fillIn('.token-string', 'token');
+    const examineStub = this.get('examineStub');
+    expect(examineStub).to.be.calledOnce;
+    expect(examineStub).to.be.calledWith('token');
   });
 
   it('invokes examine many times on subsequent token input', async function () {
@@ -117,7 +115,7 @@ describe('Integration | Component | token consumer', function () {
       await render(hbs `{{token-consumer}}`);
 
       await fillIn('.token-string', 'token');
-      expect(this.$('.token-type').text().trim()).to.equal(typeText);
+      expect(find('.token-type')).to.have.trimmed.text(typeText);
     });
 
     it(`does not show "Join" button for ${name} token`, async function () {
@@ -126,10 +124,10 @@ describe('Integration | Component | token consumer', function () {
       await render(hbs `{{token-consumer}}`);
 
       await fillIn('.token-string', 'token');
-      expect(this.$('.no-join-message').text().trim()).to.equal(
+      expect(find('.no-join-message')).to.have.trimmed.text(
         'This is not an invite token and cannot be used to join to any resource.'
       );
-      expect(this.$('.confirm-btn')).to.not.exist;
+      expect(find('.confirm-btn')).to.not.exist;
     });
   });
 
@@ -279,8 +277,8 @@ describe('Integration | Component | token consumer', function () {
         await render(hbs `{{token-consumer}}`);
 
         await fillIn('.token-string', 'token');
-        expect(this.$('.no-join-message').text().trim()).to.equal(noJoinMessage);
-        expect(this.$('.confirm-btn')).to.not.exist;
+        expect(find('.no-join-message')).to.have.trimmed.text(noJoinMessage);
+        expect(find('.confirm-btn')).to.not.exist;
       });
     } else {
       it(`shows "Confirm" button for invite ${inviteType} token`, async function () {
@@ -293,8 +291,8 @@ describe('Integration | Component | token consumer', function () {
         await render(hbs `{{token-consumer}}`);
 
         await fillIn('.token-string', 'token');
-        expect(this.$('.no-join-message')).to.not.exist;
-        expect(this.$('.confirm-btn')).to.exist;
+        expect(find('.no-join-message')).to.not.exist;
+        expect(find('.confirm-btn')).to.exist;
       });
     }
 
@@ -308,8 +306,8 @@ describe('Integration | Component | token consumer', function () {
       await render(hbs `{{token-consumer}}`);
 
       await fillIn('.token-string', 'token');
-      expect(this.$('.token-type').text().trim()).to.equal(typeText);
-      expect(this.$('.type-info .warning-icon')).to.not.exist;
+      expect(find('.token-type')).to.have.trimmed.text(typeText);
+      expect(find('.type-info .warning-icon')).to.not.exist;
     });
 
     if (modelToSelect) {
@@ -327,18 +325,18 @@ describe('Integration | Component | token consumer', function () {
 
           const joiningRecordHelper = new JoiningRecordHelper();
           await fillIn('.token-string', 'token');
-          const $recordSelector = this.$('.joining-record-selector');
-          expect($recordSelector).to.exist;
-          expect(this.$('.selector-description').text().trim())
-            .to.equal(selectorDescription);
+          const recordSelector = find('.joining-record-selector');
+          expect(recordSelector).to.exist;
+          expect(find('.selector-description'))
+            .to.have.trimmed.text(selectorDescription);
           expect(
-            $recordSelector.find('.ember-power-select-placeholder').text().trim()
-          ).to.equal(selectorPlaceholder);
+            recordSelector.querySelector('.ember-power-select-placeholder')
+          ).to.have.trimmed.text(selectorPlaceholder);
           await joiningRecordHelper.open();
           _.range(3).forEach(i => {
             const option = joiningRecordHelper.getNthOption(i + 1);
-            expect(option.innerText).to.contain(`${modelToSelect}${i}`);
-            expect(option.querySelector(`.oneicon-${selectorIcon}`)).to.exist;
+            expect(option).to.contain.text(`${modelToSelect}${i}`);
+            expect(option).to.contain(`.oneicon-${selectorIcon}`);
           });
         }
       );
@@ -355,7 +353,7 @@ describe('Integration | Component | token consumer', function () {
           await render(hbs `{{token-consumer}}`);
 
           await fillIn('.token-string', 'token');
-          expect(this.$('.confirm-btn')).to.have.attr('disabled');
+          expect(find('.confirm-btn')).to.have.attr('disabled');
         }
       );
 
@@ -372,7 +370,7 @@ describe('Integration | Component | token consumer', function () {
 
           await fillIn('.token-string', 'token');
           await new JoiningRecordHelper().selectOption(1);
-          expect(this.$('.confirm-btn')).to.not.have.attr('disabled');
+          expect(find('.confirm-btn')).to.not.have.attr('disabled');
         }
       );
     } else {
@@ -389,25 +387,27 @@ describe('Integration | Component | token consumer', function () {
           await render(hbs `{{token-consumer}}`);
 
           await fillIn('.token-string', 'token');
-          expect(this.$('.joining-record-selector')).to.not.exist;
+          expect(find('.joining-record-selector')).to.not.exist;
         }
       );
 
-      it(
-        `has enabled "Confirm" button for invite ${inviteType} token`,
-        async function () {
-          stubExamine(this, 'token', resolve({
-            type: {
-              inviteToken: inviteSpec,
-            },
-          }));
+      if (!noJoinMessage) {
+        it(
+          `has enabled "Confirm" button for invite ${inviteType} token`,
+          async function () {
+            stubExamine(this, 'token', resolve({
+              type: {
+                inviteToken: inviteSpec,
+              },
+            }));
 
-          await render(hbs `{{token-consumer}}`);
+            await render(hbs `{{token-consumer}}`);
 
-          await fillIn('.token-string', 'token');
-          expect(this.$('.confirm-btn')).to.not.have.attr('disabled');
-        }
-      );
+            await fillIn('.token-string', 'token');
+            expect(find('.confirm-btn')).to.not.have.attr('disabled');
+          }
+        );
+      }
     }
   });
 
@@ -426,11 +426,11 @@ describe('Integration | Component | token consumer', function () {
       await render(hbs `{{token-consumer}}`);
 
       await fillIn('.token-string', 'token');
-      expect(this.$('.token-type').text().trim())
-        .to.equal('Invitation to join a space');
-      const $warningIcon = this.$('.type-info .warning-icon');
-      expect($warningIcon).to.exist;
-      const tooltipText = await new OneTooltipHelper($warningIcon[0]).getText();
+      expect(find('.token-type'))
+        .to.have.trimmed.text('Invitation to join a space');
+      const warningIcon = find('.type-info .warning-icon');
+      expect(warningIcon).to.exist;
+      const tooltipText = await new OneTooltipHelper(warningIcon).getText();
       expect(tooltipText).to.equal(
         'Cannot resolve invite target name, this token might be outdated or invalid.'
       );
@@ -444,8 +444,8 @@ describe('Integration | Component | token consumer', function () {
 
     await fillIn('.token-string', 'token');
 
-    expect(this.$('.invalid-token-message').text().trim())
-      .to.equal('Provided token is invalid.');
+    expect(find('.invalid-token-message'))
+      .to.have.trimmed.text('Provided token is invalid.');
   });
 
   it('informs about other examine errors', async function () {
@@ -454,15 +454,15 @@ describe('Integration | Component | token consumer', function () {
     await render(hbs `{{token-consumer}}`);
 
     await fillIn('.token-string', 'token');
-    expect(this.$('.resource-load-error').text()).to.contain('someOtherError');
+    expect(find('.resource-load-error')).to.contain.text('someOtherError');
   });
 
   it('interprets whitespaces in token input as an empty value', async function () {
     await render(hbs `{{token-consumer}}`);
 
     await fillIn('.token-string', '   ');
-    expect(this.$('.invalid-token-message')).to.not.exist;
-    expect(this.$('.token-type')).to.not.exist;
+    expect(find('.invalid-token-message')).to.not.exist;
+    expect(find('.token-type')).to.not.exist;
     expect(this.get('examineStub')).to.not.be.called;
   });
 
@@ -472,8 +472,8 @@ describe('Integration | Component | token consumer', function () {
       await render(hbs `{{token-consumer}}`);
 
       await fillIn('.token-string', '!@#$%^&*()');
-      expect(this.$('.invalid-token-message')).to.exist;
-      expect(this.$('.token-type')).to.not.exist;
+      expect(find('.invalid-token-message')).to.exist;
+      expect(find('.token-type')).to.not.exist;
       expect(this.get('examineStub')).to.not.be.called;
     }
   );
@@ -484,12 +484,12 @@ describe('Integration | Component | token consumer', function () {
 
     await render(hbs `{{token-consumer}}`);
 
-    expect(this.$('.spinner')).to.not.exist;
+    expect(find('.spinner')).to.not.exist;
     await fillIn('.token-string', 'token');
-    expect(this.$('.spinner')).to.exist;
+    expect(find('.spinner')).to.exist;
     resolveRequest();
     await settled();
-    expect(this.$('.spinner')).to.not.exist;
+    expect(find('.spinner')).to.not.exist;
   });
 
   it(
@@ -549,10 +549,10 @@ describe('Integration | Component | token consumer', function () {
 
       await fillIn('.token-string', 'token');
       await click('.confirm-btn');
-      expect(this.$('.confirm-btn [role="progressbar"]')).to.exist;
+      expect(find('.confirm-btn [role="progressbar"]')).to.exist;
       resolveSubmit();
       await settled();
-      expect(this.$('.confirm-btn [role="progressbar"]')).to.not.exist;
+      expect(find('.confirm-btn [role="progressbar"]')).to.not.exist;
     }
   );
 });

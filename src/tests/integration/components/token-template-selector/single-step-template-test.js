@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import { htmlSafe } from '@ember/template';
@@ -28,8 +28,8 @@ describe(
         templateName="custom"
       }}`);
 
-      expect(this.$('.template-custom')).to.exist;
-      expect(this.$('.tile-title').text().trim()).to.equal('Custom');
+      expect(find('.template-custom')).to.exist;
+      expect(find('.tile-title')).to.have.trimmed.text('Custom');
     });
 
     it('renders template image', async function () {
@@ -38,7 +38,7 @@ describe(
         imagePath="some-path.svg"
       }}`);
 
-      expect(this.$('.main-image')).to.have.attr('src', 'some-path.svg');
+      expect(find('.main-image')).to.have.attr('src', 'some-path.svg');
     });
 
     it('notifies about selection', async function () {

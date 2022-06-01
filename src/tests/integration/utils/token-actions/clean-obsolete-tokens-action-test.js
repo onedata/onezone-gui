@@ -13,7 +13,6 @@ import {
   getModalBody,
   getModalFooter,
 } from '../../../helpers/modal';
-import $ from 'jquery';
 
 describe('Integration | Utility | token actions/clean obsolete tokens action', function () {
   setupRenderingTest();
@@ -118,7 +117,7 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
     action.execute();
     await settled();
 
-    expect($(getModal())).to.have.class('clean-obsolete-tokens-modal');
+    expect(getModal()).to.have.class('clean-obsolete-tokens-modal');
   });
 
   it('passes only obsolete tokens to modal', async function () {
@@ -131,16 +130,16 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
     action.execute();
     await settled();
 
-    const $accessTokens = getAccessTokenItems();
-    const $identityTokens = getIdentityTokenItems();
-    const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-    expect($accessTokens).to.have.length(1);
-    expect($accessTokens.text().trim()).to.equal('access token 1');
-    expect($identityTokens).to.have.length(1);
-    expect($identityTokens.text().trim()).to.equal('identity token 1');
-    expect($inviteTokens).to.have.length(1);
-    expect($inviteTokens.text().trim()).to.equal('invite token 2');
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
   });
 
   it('passes information about visible tokens to modal', async function () {
@@ -157,19 +156,19 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
     action.execute();
     await settled();
 
-    const $accessTokens = getAccessTokenItems();
-    const $identityTokens = getIdentityTokenItems();
-    const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-    expect($accessTokens).to.have.length(1);
-    expect($accessTokens.text().trim()).to.equal('access token 1');
-    expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
-    expect($identityTokens).to.have.length(1);
-    expect($identityTokens.text().trim()).to.equal('identity token 1');
-    expect($identityTokens.find('.one-checkbox')).to.not.have.class('checked');
-    expect($inviteTokens).to.have.length(1);
-    expect($inviteTokens.text().trim()).to.equal('invite token 2');
-    expect($inviteTokens.find('.one-checkbox')).to.not.have.class('checked');
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(accessTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(identityTokens[0].querySelector('.one-checkbox')).to.not.have.class('checked');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
+    expect(inviteTokens[0].querySelector('.one-checkbox')).to.not.have.class('checked');
   });
 
   it('marks all tokens as visible when visibility is not specified', async function () {
@@ -187,19 +186,19 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
     action.execute();
     await settled();
 
-    const $accessTokens = getAccessTokenItems();
-    const $identityTokens = getIdentityTokenItems();
-    const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-    expect($accessTokens).to.have.length(1);
-    expect($accessTokens.text().trim()).to.equal('access token 1');
-    expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
-    expect($identityTokens).to.have.length(1);
-    expect($identityTokens.text().trim()).to.equal('identity token 1');
-    expect($identityTokens.find('.one-checkbox')).to.have.class('checked');
-    expect($inviteTokens).to.have.length(1);
-    expect($inviteTokens.text().trim()).to.equal('invite token 2');
-    expect($inviteTokens.find('.one-checkbox')).to.have.class('checked');
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(accessTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(identityTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
+    expect(inviteTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
   });
 
   it(
@@ -214,7 +213,7 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
       const resultPromise = action.execute();
       await settled();
 
-      await click($(getModalFooter()).find('.remove-tokens-cancel')[0]);
+      await click(getModalFooter().querySelector('.remove-tokens-cancel'));
       const actionResult = await resultPromise;
       expect(get(actionResult, 'status')).to.equal('cancelled');
     }
@@ -246,7 +245,7 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
     const actionResultPromise = action.execute();
     await settled();
 
-    await click($(getModalFooter()).find('.remove-tokens-submit')[0]);
+    await click(getModalFooter().querySelector('.remove-tokens-submit'));
     const actionResult = await actionResultPromise;
     expect(deleteTokenStub).to.be.calledThrice;
     tokens.filterBy('isObsolete').forEach(token =>
@@ -287,7 +286,7 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
       const actionResultPromise = action.execute();
       await settled();
 
-      await click($(getModalFooter()).find('.remove-tokens-submit')[0]);
+      await click(getModalFooter().querySelector('.remove-tokens-submit'));
       const actionResult = await actionResultPromise;
       expect(reloadTokensSpy).to.be.calledOnce;
       expect(reloadCalledAfterRemove).to.be.true;
@@ -324,7 +323,7 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
       const actionResultPromise = action.execute();
       await settled();
 
-      await click($(getModalFooter()).find('.remove-tokens-submit')[0]);
+      await click(getModalFooter().querySelector('.remove-tokens-submit'));
       const actionResult = await actionResultPromise;
       expect(failureNotifySpy).to.be.calledWith(
         sinon.match.has('string', 'removing tokens'),
@@ -341,13 +340,13 @@ describe('Integration | Utility | token actions/clean obsolete tokens action', f
 });
 
 function getAccessTokenItems() {
-  return $(getModalBody()).find('.access-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.access-tokens-list .checkbox-list-item');
 }
 
 function getIdentityTokenItems() {
-  return $(getModalBody()).find('.identity-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.identity-tokens-list .checkbox-list-item');
 }
 
 function getInviteTokenItems() {
-  return $(getModalBody()).find('.invite-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.invite-tokens-list .checkbox-list-item');
 }

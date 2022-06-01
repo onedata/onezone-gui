@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Service from '@ember/service';
 import { registerService } from '../../helpers/stub-service';
@@ -75,8 +75,8 @@ describe('Integration | Component | content provider redirect', function () {
         _location=fakeLocation
       }}`);
 
-      const $contentProviderRedirect = this.$('.content-provider-redirect');
-      expect($contentProviderRedirect).to.exist;
+      const contentProviderRedirect = find('.content-provider-redirect');
+      expect(contentProviderRedirect).to.exist;
 
       expect(locationReplace).to.be.calledOnce;
       expect(locationReplace).to.be.calledWith(url);

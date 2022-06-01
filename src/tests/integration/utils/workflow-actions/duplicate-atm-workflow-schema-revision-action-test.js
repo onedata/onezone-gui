@@ -12,7 +12,6 @@ import { resolve, reject } from 'rsvp';
 import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-atm-workflow-schema-dump';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
-import $ from 'jquery';
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 const atmInventoryId = 'invid';
@@ -85,9 +84,9 @@ describe(
       this.get('action').execute();
       await settled();
 
-      expect($(getModal())).to.have.class('apply-atm-workflow-schema-dump-modal');
-      expect($(getModal()).find('.dump-details').text())
-        .to.contain(this.get('atmWorkflowSchemaDump.name'));
+      expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
+      expect(getModal().querySelector('.dump-details'))
+        .to.contain.text(this.get('atmWorkflowSchemaDump.name'));
     });
 
     it('executes merging workflows on submit (success scenario)',

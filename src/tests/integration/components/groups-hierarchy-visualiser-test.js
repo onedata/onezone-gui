@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn, settled } from '@ember/test-helpers';
+import { render, click, fillIn, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, {
   computed,
@@ -20,7 +20,6 @@ import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import Workspace from 'onezone-gui/utils/groups-hierarchy-visualiser/workspace';
 import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visualiser';
 import { A } from '@ember/array';
-import $ from 'jquery';
 import sinon from 'sinon';
 
 function getContainerStyle(style) {
@@ -195,11 +194,11 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
         </div>
       `);
 
-      const $columns = this.$('.column');
-      expect($columns).to.have.length(3);
-      expect($columns.eq(0)).to.have.class('children');
-      expect($columns.eq(1)).to.have.class('startPoint');
-      expect($columns.eq(2)).to.have.class('parents');
+      const columns = findAll('.column');
+      expect(columns).to.have.length(3);
+      expect(columns[0]).to.have.class('children');
+      expect(columns[1]).to.have.class('startPoint');
+      expect(columns[2]).to.have.class('parents');
     }
   );
 
@@ -210,7 +209,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     await helper.clickRelation('a1', 'children', 'b1', 'children');
     expect(helper.getGroupBox('b1', 'children', 'c1')).to.exist;
     await helper.clickRelation('a1', 'children', 'b1', 'children');
@@ -226,7 +225,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     await helper.clickRelation(null, 'startPoint', 'a1', 'parents');
     expect(helper.getGroupBox('a1', 'parents', 'z1')).to.exist;
     await helper.clickRelation(null, 'startPoint', 'a1', 'parents');
@@ -240,10 +239,10 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
-    expect($groupBox).to.exist;
-    expect($groupBox.find('.group-name').text().trim()).to.equal('a1');
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
+    expect(groupBox).to.exist;
+    expect(groupBox.querySelector('.group-name')).to.have.trimmed.text('a1');
     expect(helper.getAllGroupBoxes(null, 'startPoint')).to.have.length(1);
   });
 
@@ -254,15 +253,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     [
       'b1',
       'b2',
     ].forEach(groupId => {
-      const $groupBox = helper.getGroupBox('a1', 'children', groupId);
-      expect($groupBox).to.exist;
-      expect($groupBox.find('.group-name').text().trim()).to.equal(
-        groupId);
+      const groupBox = helper.getGroupBox('a1', 'children', groupId);
+      expect(groupBox).to.exist;
+      expect(groupBox.querySelector('.group-name')).to.have.trimmed.text(groupId);
     });
     expect(helper.getAllGroupBoxes('a1', 'children')).to.have.length(2);
   });
@@ -274,15 +272,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     [
       'z1',
       'z2',
     ].forEach(groupId => {
-      const $groupBox = helper.getGroupBox('a1', 'parents', groupId);
-      expect($groupBox).to.exist;
-      expect($groupBox.find('.group-name').text().trim()).to.equal(
-        groupId);
+      const groupBox = helper.getGroupBox('a1', 'parents', groupId);
+      expect(groupBox).to.exist;
+      expect(groupBox.querySelector('.group-name')).to.have.trimmed.text(groupId);
     });
     expect(helper.getAllGroupBoxes('a1', 'parents')).to.have.length(2);
   });
@@ -294,8 +291,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    expect(helper.getAllGroupBoxes(null, 'empty')).to.not.exist;
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    expect(helper.getAllGroupBoxes(null, 'empty')).to.have.length(0);
   });
 
   it('removes columns that are outside screen', async function () {
@@ -305,7 +302,7 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     await helper.clickRelation('a1', 'children', 'b1', 'children');
     expect(helper.getColumn('a1', 'parents')).to.not.exist;
   });
@@ -317,18 +314,18 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    let $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
-    let $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    let groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
+    let groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
     expect(
-      Number.parseFloat($groupBox2.get(0).style.top) -
-      Number.parseFloat($groupBox1.get(0).style.top)
+      Number.parseFloat(groupBox2.style.top) -
+      Number.parseFloat(groupBox1.style.top)
     ).to.be.gt(0);
-    $groupBox1 = helper.getGroupBox('a1', 'parents', 'z1');
-    $groupBox2 = helper.getGroupBox('a1', 'parents', 'z2');
+    groupBox1 = helper.getGroupBox('a1', 'parents', 'z1');
+    groupBox2 = helper.getGroupBox('a1', 'parents', 'z2');
     expect(
-      Number.parseFloat($groupBox2.get(0).style.top) -
-      Number.parseFloat($groupBox1.get(0).style.top)
+      Number.parseFloat(groupBox2.style.top) -
+      Number.parseFloat(groupBox1.style.top)
     ).to.be.gt(0);
   });
 
@@ -342,14 +339,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     this.set('workspace.searchString', '2');
     await settled();
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
-    const $groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox1 = helper.getGroupBox('a1', 'children', 'b1');
+    const groupBox2 = helper.getGroupBox('a1', 'children', 'b2');
     expect(
-      Number.parseFloat($groupBox2.get(0).style.top) -
-      Number.parseFloat($groupBox1.get(0).style.top)
+      Number.parseFloat(groupBox2.style.top) -
+      Number.parseFloat(groupBox1.style.top)
     ).to.be.lt(0);
-    expect($groupBox1).to.have.class('filtered-out');
+    expect(groupBox1).to.have.class('filtered-out');
     expect(helper.getGroupBox(null, 'startPoint', 'a1'))
       .to.have.class('filtered-out');
   });
@@ -368,9 +365,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox('a1', 'children', 'b1');
-    await helper.clickGroupBoxActions($groupBox, ['.view-group-action']);
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox('a1', 'children', 'b1');
+    await helper.clickGroupBoxActions(groupBox, ['.view-group-action']);
     expect(get(redirectedToGroup, 'name')).to.equal('b1');
   });
 
@@ -392,9 +389,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $childGroupBox = helper.getGroupBox(null, 'startPoint', 'a1');
-    await helper.clickGroupBoxActions($childGroupBox, [
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const childGroupBox = helper.getGroupBox(null, 'startPoint', 'a1');
+    await helper.clickGroupBoxActions(childGroupBox, [
       '.add-parent-group-action',
       '.add-parent-group-action + .nested-actions .create-new-action',
     ]);
@@ -425,9 +422,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $parentGroupBox = helper.getGroupBox(null, 'startPoint', 'a1');
-    await helper.clickGroupBoxActions($parentGroupBox, [
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const parentGroupBox = helper.getGroupBox(null, 'startPoint', 'a1');
+    await helper.clickGroupBoxActions(parentGroupBox, [
       '.add-child-group-action',
       '.add-child-group-action + .nested-actions .create-new-action',
     ]);
@@ -457,9 +454,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
-    await helper.clickGroupBoxActions($groupBox, ['.remove-group-action']);
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox('a1', 'children', 'b2');
+    await helper.clickGroupBoxActions(groupBox, ['.remove-group-action']);
     await click('.group-remove-modal .proceed');
     expect(get(removedGroup, 'name')).to.equal('b2');
     expect(helper.getGroupBox('a1', 'children', 'b2')).to.not.exist;
@@ -481,14 +478,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    let $groupBox = helper.getGroupBox('a1', 'children', 'b2');
-    await helper.clickGroupBoxActions($groupBox, ['.leave-group-action']);
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    let groupBox = helper.getGroupBox('a1', 'children', 'b2');
+    await helper.clickGroupBoxActions(groupBox, ['.leave-group-action']);
     await click('.leave-modal .proceed');
     expect(get(leftGroup, 'name')).to.equal('b2');
-    $groupBox = helper.getGroupBox('a1', 'children', 'b2');
-    expect($groupBox).to.exist;
-    expect($groupBox.find('.direct-membership-icon')).to.not.exist;
+    groupBox = helper.getGroupBox('a1', 'children', 'b2');
+    expect(groupBox).to.exist;
+    expect(groupBox.querySelector('.direct-membership-icon')).to.not.exist;
   });
 
   it('removes relation', async function () {
@@ -510,9 +507,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox('a1', 'children', 'b2');
-    await helper.clickRelationActions($groupBox, '.remove-relation-action');
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox('a1', 'children', 'b2');
+    await helper.clickRelationActions(groupBox, '.remove-relation-action');
     await click('.remove-relation-modal .proceed');
     expect(get(parentGroup, 'name')).to.equal('a1');
     expect(get(childGroup, 'name')).to.equal('b2');
@@ -527,13 +524,14 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
-    await helper.clickGroupBoxActions($groupBox, [
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
+    await helper.clickGroupBoxActions(groupBox, [
       '.add-child-group-action',
       '.add-child-group-action + .nested-actions .generate-invite-token-action ',
     ]);
-    const token = $('.generate-invite-token-modal .token-textarea').val();
+    const token =
+      document.querySelector('.generate-invite-token-modal .token-textarea').value;
     expect(token).to.contain('groupJoinGroup');
     expect(token).to.contain('a1');
   });
@@ -577,9 +575,9 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
-    await helper.clickGroupBoxActions($groupBox, [
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const groupBox = helper.getGroupBox(null, 'startPoint', 'a1');
+    await helper.clickGroupBoxActions(groupBox, [
       '.add-parent-group-action',
       '.add-parent-group-action + .nested-actions .join-using-token-action',
     ]);
@@ -610,10 +608,10 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     }));
     this.get('_window').resizeHandler();
     await settled();
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     expect(helper.getAllColumns()).to.have.length(1);
-    expect(this.$('.line-to-child')).to.not.exist;
-    expect(this.$('.line-to-parent')).to.not.exist;
+    expect(find('.line-to-child')).to.not.exist;
+    expect(find('.line-to-parent')).to.not.exist;
   });
 
   it('adds empty columns when area is getting bigger', async function () {
@@ -636,16 +634,16 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
     }));
     this.get('_window').resizeHandler();
     await settled();
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
-    const $columns = helper.getAllColumns();
-    expect($columns).to.have.length(3);
-    const $emptyColumns = $columns.filter('.empty');
-    const $nonEmptyColumn = $columns.filter(':not(.empty)');
-    expect($emptyColumns).to.have.length(2);
-    $emptyColumns.each(function () {
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
+    const columns = helper.getAllColumns();
+    expect(columns).to.have.length(3);
+    const emptyColumns = columns.filter((elem) => elem.matches('.empty'));
+    const nonEmptyColumn = columns.filter((elem) => !elem.matches('.empty'));
+    expect(emptyColumns).to.have.length(2);
+    emptyColumns.forEach((col) => {
       expect(
-        Number.parseFloat($nonEmptyColumn.get(0).style.left) -
-        Number.parseFloat(this.style.left)
+        Number.parseFloat(nonEmptyColumn[0].style.left) -
+        Number.parseFloat(col.style.left)
       ).to.be.lt(0);
     });
   });
@@ -674,10 +672,10 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       }));
       this.get('_window').resizeHandler();
       await settled();
-      const helper = new GroupsHierarchyVisualiserHelper(this.$());
-      const $columns = helper.getAllColumns();
-      const $nonEmptyColumn = $columns.filter(':not(.empty)');
-      expect($nonEmptyColumn).to.have.length(1);
+      const helper = new GroupsHierarchyVisualiserHelper(this.element);
+      const columns = helper.getAllColumns();
+      const nonEmptyColumn = columns.filter((elem) => !elem.matches('.empty'));
+      expect(nonEmptyColumn).to.have.length(1);
     }
   );
 
@@ -688,15 +686,15 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       </div>
     `);
 
-    const helper = new GroupsHierarchyVisualiserHelper(this.$());
+    const helper = new GroupsHierarchyVisualiserHelper(this.element);
     await helper.clickRelation('a1', 'children', 'b1', 'children');
-    let $columns = helper.getAllColumns();
-    const $nonEmptyColumnsBefore = $columns.filter(':not(.empty)');
+    let columns = helper.getAllColumns();
+    const nonEmptyColumnsBefore = columns.filter((elem) => !elem.matches('.empty'));
     set(this.get('group._childList').objectAt(1), 'isDeleted', true);
     await settled();
-    $columns = helper.getAllColumns();
-    const $nonEmptyColumnsAfter = $columns.filter(':not(.empty)');
-    expect($nonEmptyColumnsAfter.length)
-      .to.be.lt($nonEmptyColumnsBefore.length);
+    columns = helper.getAllColumns();
+    const nonEmptyColumnsAfter = columns.filter((elem) => !elem.matches('.empty'));
+    expect(nonEmptyColumnsAfter.length)
+      .to.be.lt(nonEmptyColumnsBefore.length);
   });
 });

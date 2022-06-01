@@ -14,7 +14,6 @@ import {
 import sinon from 'sinon';
 import TestComponent from 'onedata-gui-common/components/test-component';
 import { get } from '@ember/object';
-import $ from 'jquery';
 
 describe('Integration | Component | modals/generate invite token modal', function () {
   setupRenderingTest();
@@ -39,12 +38,12 @@ describe('Integration | Component | modals/generate invite token modal', functio
     function () {
       return showModal(this)
         .then(() => {
-          const $modal = $(getModal());
-          const $modalBody = $(getModalBody());
-          const $modalFooter = $(getModalFooter());
-          expect($modal).to.have.class('generate-invite-token-modal');
-          expect($modalBody.find('.invite-token-generator')).to.exist;
-          expect($modalFooter.find('.modal-close').text().trim()).to.equal('Close');
+          const modal = getModal();
+          const modalBody = getModalBody();
+          const modalFooter = getModalFooter();
+          expect(modal).to.have.class('generate-invite-token-modal');
+          expect(modalBody.querySelector('.invite-token-generator')).to.exist;
+          expect(modalFooter.querySelector('.modal-close')).to.have.trimmed.text('Close');
         });
     }
   );
@@ -96,7 +95,10 @@ describe('Integration | Component | modals/generate invite token modal', functio
         this.set('modalOptions.inviteType', inviteType);
 
         return showModal(this)
-          .then(() => expect($(getModalHeader()).find('h1').text().trim()).to.equal(header));
+          .then(() =>
+            expect(getModalHeader().querySelector('h1'))
+            .to.have.trimmed.text(header)
+          );
       }
     );
   });
@@ -105,7 +107,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
     'closes modal on cancel click',
     function () {
       return showModal(this)
-        .then(() => click($(getModalFooter()).find('.modal-close')[0]))
+        .then(() => click(getModalFooter().querySelector('.modal-close')))
         .then(() => expect(isModalOpened()).to.be.false);
     }
   );
@@ -122,7 +124,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
       return showModal(this)
         .then(() => {
           const testComponent =
-            $(getModalBody()).find('.test-component')[0].componentInstance;
+            getModalBody().querySelector('.test-component').componentInstance;
           expect(get(testComponent, 'inviteType')).to.equal('userJoinSpace');
           expect(get(testComponent, 'targetRecord.entityId')).to.equal('sth');
         });
@@ -133,7 +135,7 @@ describe('Integration | Component | modals/generate invite token modal', functio
     'closes modal on "custom token" click',
     function () {
       return showModal(this)
-        .then(() => click($(getModalBody()).find('.custom-token-action')[0]))
+        .then(() => click(getModalBody().querySelector('.custom-token-action')))
         .then(() => expect(isModalOpened()).to.be.false);
     }
   );

@@ -14,7 +14,6 @@ import {
   getModalBody,
   getModalFooter,
 } from '../../../helpers/modal';
-import $ from 'jquery';
 
 describe(
   'Integration | Utility | workflow actions/remove atm workflow schema revision action',
@@ -54,15 +53,15 @@ describe(
       this.get('action').execute();
       await settled();
 
-      expect($(getModal())).to.have.class('question-modal');
-      expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
-      expect($(getModalHeader()).find('h1').text().trim()).to.equal('Remove workflow revision');
-      expect($(getModalBody()).text().trim()).to.contain(
+      expect(getModal()).to.have.class('question-modal');
+      expect(getModalHeader().querySelector('.oneicon-sign-warning-rounded')).to.exist;
+      expect(getModalHeader().querySelector('h1')).to.have.trimmed.text('Remove workflow revision');
+      expect(getModalBody()).to.contain.text(
         'You are about to delete revision 3 of the workflow workflow1.'
       );
-      const $yesButton = $(getModalFooter()).find('.question-yes');
-      expect($yesButton.text().trim()).to.equal('Remove');
-      expect($yesButton).to.have.class('btn-danger');
+      const yesButton = getModalFooter().querySelector('.question-yes');
+      expect(yesButton).to.have.trimmed.text('Remove');
+      expect(yesButton).to.have.class('btn-danger');
     });
 
     it(
@@ -72,7 +71,7 @@ describe(
 
         const resultPromise = this.get('action').execute();
         await settled();
-        await click($(getModalFooter()).find('.question-no')[0]);
+        await click(getModalFooter().querySelector('.question-no'));
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
@@ -93,7 +92,7 @@ describe(
 
         const actionResultPromise = this.get('action').execute();
         await settled();
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await click(getModalFooter().querySelector('.question-yes'));
         const actionResult = await actionResultPromise;
 
         expect(removeRevisionStub).to.be.calledOnce
@@ -120,7 +119,7 @@ describe(
 
         const actionResultPromise = this.get('action').execute();
         await settled();
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await click(getModalFooter().querySelector('.question-yes'));
         rejectRemove('someError');
         await settled();
         const actionResult = await actionResultPromise;
