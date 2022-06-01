@@ -11,7 +11,7 @@
  */
 
 import Component from '@ember/component';
-import { get, set, computed, observer } from '@ember/object';
+import { get, set, computed, observer, defineProperty } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -123,21 +123,24 @@ export default Component.extend(I18n, {
       mode,
       configurationProxy,
     } = this.getProperties('mode', 'configurationProxy');
-    let editorValue;
     if (mode === 'view') {
-      editorValue = reads('configurationProxy.guiPluginConfigStringified');
-    } else if (value === undefined) {
-      editorValue = get(configurationProxy, 'guiPluginConfigStringified');
+      defineProperty(
+        this,
+        'editorValue',
+        reads('configurationProxy.guiPluginConfigStringified')
+      );
     } else {
-      editorValue = value;
+      const propertyValue = value === undefined ?
+        get(configurationProxy, 'guiPluginConfigStringified') : value;
+      defineProperty(
+        this,
+        'editorValue',
+        undefined,
+        propertyValue
+      );
     }
-    if (isValid === undefined) {
-      isValid = true;
-    }
-    this.setProperties({
-      editorValue: editorValue,
-      isValid,
-    });
+    this.notifyPropertyChange('editorValue');
+    this.set('isValid', isValid === undefined ? true : isValid);
   },
 
   actions: {
