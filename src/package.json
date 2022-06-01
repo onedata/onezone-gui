@@ -17,6 +17,7 @@
     "clean": "rm -rf tmp dist rel node_modules .sass-cache tests/test-results.xml"
   },
   "devDependencies": {
+    "@babel/runtime": "7.12.5",
     "@ember/jquery": "2.0.0",
     "@ember/optional-features": "0.6.3",
     "autosize": "4.0.2",
@@ -31,6 +32,7 @@
     "color": "2.0.1",
     "contrast": "1.0.1",
     "dompurify": "2.0.7",
+    "echarts": "5.2.2",
     "ember-ajax": "3.1.0",
     "ember-awesome-macros": "5.0.1",
     "ember-bootstrap": "2.4.0",
@@ -89,6 +91,7 @@
     "ember-simple-auth": "1.8.2",
     "ember-sinon": "3.0.0",
     "ember-source": "3.4.8",
+    "ember-source-channel-url": "1.1.0",
     "ember-sticky-element": "0.2.3",
     "ember-truth-helpers": "2.1.0",
     "ember-try": "1.0.0",

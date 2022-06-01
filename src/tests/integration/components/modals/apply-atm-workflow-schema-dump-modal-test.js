@@ -14,7 +14,7 @@ import generateAtmWorkflowSchemaDump from '../../../helpers/workflows/generate-a
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
-import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
+import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';

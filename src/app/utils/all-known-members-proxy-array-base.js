@@ -15,6 +15,7 @@ import {
   get,
   getProperties,
   observer,
+  defineProperty,
 } from '@ember/object';
 import _ from 'lodash';
 
@@ -94,23 +95,28 @@ export default ArrayProxy.extend({
     const memberModelName = this.get('memberModelName');
     const upperFirstMemberModelName = _.upperFirst(memberModelName);
 
-    const toSet = {};
     ['group', 'space'].forEach(modelName => {
-      toSet[`${modelName}sProxy`] = promise.array(computed(function proxy() {
-        return this.get('recordManager').getUserRecordList(modelName)
-          .then(recordList => get(recordList, 'list'));
-      }));
-      toSet[`${modelName}s${upperFirstMemberModelName}sListsProxy`] = promise.array(
-        computed(`${modelName}sProxy.@each.isReloading`, function computedLists() {
-          return this.get(`${modelName}sProxy`)
-            .then(parents => onlyFulfilledValues(
-              parents.mapBy(`eff${upperFirstMemberModelName}List`)
-            ))
-            .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
-        })
+      defineProperty(
+        this,
+        `${modelName}sProxy`,
+        promise.array(computed(function proxy() {
+          return this.get('recordManager').getUserRecordList(modelName)
+            .then(recordList => get(recordList, 'list'));
+        }))
+      );
+      defineProperty(
+        this,
+        `${modelName}s${upperFirstMemberModelName}sListsProxy`,
+        promise.array(
+          computed(`${modelName}sProxy.@each.isReloading`, function computedLists() {
+            return this.get(`${modelName}sProxy`)
+              .then(parents => onlyFulfilledValues(
+                parents.mapBy(`eff${upperFirstMemberModelName}List`)
+              ))
+              .then(effLists => onlyFulfilledValues(effLists.compact().mapBy('list')));
+          })
+        )
       );
     });
-
-    this.setProperties(toSet);
   },
 });

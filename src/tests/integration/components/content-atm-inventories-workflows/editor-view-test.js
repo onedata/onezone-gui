@@ -10,7 +10,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { selectChoose } from '../../../helpers/ember-power-select';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import EmberObject, { get } from '@ember/object';
 import _ from 'lodash';
 import ModifyAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-workflow-schema-revision-action';

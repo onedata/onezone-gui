@@ -5,7 +5,7 @@ import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import _ from 'lodash';
-import { clickTrigger } from '../../../helpers/ember-power-select';
+import { clickTrigger } from 'ember-power-select/test-support/helpers';
 import { Promise } from 'rsvp';
 import Store from 'onedata-gui-common/utils/workflow-visualiser/store';
 

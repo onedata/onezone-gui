@@ -31,6 +31,7 @@ import EmberObject, {
   get,
   set,
   getProperties,
+  defineProperty,
 } from '@ember/object';
 import { reads, sort, filterBy, bool } from '@ember/object/computed';
 import { A } from '@ember/array';
@@ -440,7 +441,7 @@ export default EmberObject.extend({
 
   prevColumnObserver: observer('prevColumn', function prevColumnObserver() {
     if (this.get('prevColumn')) {
-      this.set('x', computed('prevColumn.x', 'width', function x() {
+      defineProperty(this, 'x', computed('prevColumn.x', 'width', function x() {
         const width = this.get('width');
         const prevX = this.get('prevColumn.x');
         return prevX === undefined ? 0 : prevX + width;

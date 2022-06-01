@@ -14,7 +14,7 @@ import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { resolve, Promise } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { selectChoose } from '../../helpers/ember-power-select';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';

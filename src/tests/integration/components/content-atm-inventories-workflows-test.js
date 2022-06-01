@@ -10,7 +10,7 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
-import { selectChoose } from '../../helpers/ember-power-select';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 
 describe('Integration | Component | content atm inventories workflows', function () {
   setupRenderingTest();
