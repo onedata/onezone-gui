@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 import { onezoneDefaultRootPath } from 'onedata-gui-common/utils/onedata-urls';
 
 describe('Integration | Component | login box/social box list/social box',
@@ -21,22 +20,22 @@ describe('Integration | Component | login box/social box list/social box',
         iconPath=iconPath
       }}
       `);
-      expect(this.$('.social-icon-image').attr('style'))
+      expect(find('.social-icon-image').getAttribute('style'))
         .to.contain(iconPath);
     });
 
     it('renders spinner in active state', async function () {
       await render(hbs `{{login-box/social-box-list/social-box active=true}}`);
-      expect(this.$('.spin-spinner')).to.exist;
+      expect(find('.spin-spinner')).to.exist;
     });
 
     it('adds authorizer type as a class to box', async function () {
       await render(hbs `{{login-box/social-box-list/social-box authId="example"}}`);
-      expect(this.$('.login-icon-box.example')).to.exist;
+      expect(find('.login-icon-box.example')).to.exist;
     });
 
     it('handles click like a standard anchor if link property is specified',
-      async function (done) {
+      async function () {
         const link = 'http://test.com';
         const windowMock = {
           location: undefined,
@@ -49,23 +48,19 @@ describe('Integration | Component | login box/social box list/social box',
           link="http://test.com"
           _window=windowMock}}
         `);
-        click('.login-icon-box').then(() => {
-          expect(windowMock.location).to.be.equal(link);
-          done();
-        });
+        await click('.login-icon-box');
+        expect(windowMock.location).to.be.equal(link);
       }
     );
 
-    it('calls action on click', async function (done) {
+    it('calls action on click', async function () {
       const clickSpy = sinon.spy();
       this.set('clickSpy', clickSpy);
 
       await render(hbs `{{login-box/social-box-list/social-box
         action=(action clickSpy)}}`);
-      click('.login-icon-box').then(() => {
-        expect(clickSpy).to.be.calledOnce;
-        done();
-      });
+      await click('.login-icon-box');
+      expect(clickSpy).to.be.calledOnce;
     });
   }
 );

@@ -8,7 +8,12 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, getProperties } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import clusterizeProviders from 'onedata-gui-common/utils/clusterize-providers-by-coordinates';
@@ -207,19 +212,19 @@ export default Component.extend({
   didInsertElement() {
     this._super(...arguments);
     const {
+      element,
       _window,
       _windowResizeHandler,
-    } = this.getProperties('_window', '_windowResizeHandler');
+    } = this.getProperties('element', '_window', '_windowResizeHandler');
     this.checkOneproviderAuthenticationError();
     $(_window).on('resize', _windowResizeHandler);
     this._windowResized();
-    const thisElement = this.$()[0];
-    thisElement.addEventListener('mousedown', (event) => {
+    element.addEventListener('mousedown', (event) => {
       safeExec(this, () => {
         this.set('dragStartXY', { x: event.clientX, y: event.clientY });
       });
     }, true);
-    thisElement.addEventListener('mouseup', (event) => {
+    element.addEventListener('mouseup', (event) => {
       safeExec(this, () => {
         const dragStartXY = this.get('dragStartXY');
         this.set('dragStartXY', {});

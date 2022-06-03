@@ -1,6 +1,6 @@
 /**
  * Container for signed-in user's shared file browser
- * 
+ *
  * @module components/content-spaces-shares
  * @author Jakub Liput
  * @copyright (C) 2019-2021 ACK CYFRONET AGH
@@ -54,7 +54,11 @@ export default ContentOneproviderContainerBase.extend(I18n, {
 
   actions: {
     onShowShareList() {
-      this.$('.content-back-link').click();
+      const element = this.get('element');
+      const contentBackLink = element && element.querySelector('.content-back-link');
+      if (contentBackLink) {
+        contentBackLink.click();
+      }
     },
   },
 });

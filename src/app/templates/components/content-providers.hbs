@@ -21,7 +21,7 @@
               )
             }}
               {{provider-place
-                class=(concat "provider-place-" square.providers.[0].id)
+                class=(concat "provider-place-" (model-routable-id square.providers.[0]))
                 provider=square.providers
                 atlasWidth=1500
                 circleSizeScale=_providerCircleScale

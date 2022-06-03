@@ -12,7 +12,13 @@ import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { inject as service } from '@ember/service';
-import { get, getProperties, observer, computed, setProperties } from '@ember/object';
+import {
+  get,
+  getProperties,
+  observer,
+  computed,
+  setProperties,
+} from '@ember/object';
 import { collect } from '@ember/object/computed';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import areWorkflowSchemaRevisionsEqual from 'onedata-gui-common/utils/workflow-visualiser/are-workflow-schema-revisions-equal';

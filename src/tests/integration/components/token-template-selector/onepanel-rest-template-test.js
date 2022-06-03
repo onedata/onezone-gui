@@ -1,14 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { click } from 'ember-native-dom-helpers';
 
 describe(
   'Integration | Component | token template selector/onepanel rest template',
@@ -44,11 +43,11 @@ describe(
       async function () {
         await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
 
-        const $tile = this.$('.one-tile');
-        expect($tile).to.have.class('template-onepanelRest');
-        expect($tile.find('.tile-title').text().trim())
-          .to.equal('Onepanel REST access');
-        expect($tile.find('.main-image')).to.have
+        const tile = find('.one-tile');
+        expect(tile).to.have.class('template-onepanelRest');
+        expect(tile.querySelector('.tile-title'))
+          .to.have.trimmed.text('Onepanel REST access');
+        expect(tile.querySelector('.main-image')).to.have
           .attr('src', 'assets/images/token-templates/onepanel-rest.svg');
       }
     );
@@ -57,12 +56,12 @@ describe(
       await render(hbs `{{token-template-selector/onepanel-rest-template}}`);
 
       await click('.one-tile');
-      const $records = this.$('.record-item');
-      expect($records).to.have.length(2);
-      expect($records.eq(0).text().trim()).to.equal('onezone2');
-      expect($records.eq(1).text().trim()).to.equal('oneprovider1');
-      expect($records.find('.oneicon-onezone')).to.exist;
-      expect($records.find('.oneicon-provider')).to.exist;
+      const records = findAll('.record-item');
+      expect(records).to.have.length(2);
+      expect(records[0]).to.have.trimmed.text('onezone2');
+      expect(records[1]).to.have.trimmed.text('oneprovider1');
+      expect(records[0].querySelector('.oneicon-onezone')).to.exist;
+      expect(records[1].querySelector('.oneicon-provider')).to.exist;
     });
 
     it('passes template name and template for oneprovider via selection handler',

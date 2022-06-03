@@ -1,17 +1,19 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
-import { getModal, getModalHeader, getModalBody, getModalFooter } from '../../../helpers/modal';
-import $ from 'jquery';
+import {
+  getModal,
+  getModalHeader,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 
 describe(
   'Integration | Utility | workflow actions/remove atm inventory action',
@@ -48,18 +50,18 @@ describe(
     it('shows modal on execute', async function () {
       await render(hbs `{{global-modal-mounter}}`);
       this.get('action').execute();
-      await wait();
+      await settled();
 
-      expect($(getModal())).to.have.class('question-modal');
-      expect($(getModalHeader()).find('.oneicon-sign-warning-rounded')).to.exist;
-      expect($(getModalHeader()).find('h1').text().trim())
-        .to.equal('Remove automation inventory');
-      expect($(getModalBody()).text().trim()).to.contain(
+      expect(getModal()).to.have.class('question-modal');
+      expect(getModalHeader().querySelector('.oneicon-sign-warning-rounded')).to.exist;
+      expect(getModalHeader().querySelector('h1'))
+        .to.have.trimmed.text('Remove automation inventory');
+      expect(getModalBody()).to.contain.text(
         'You are about to delete the automation inventory inventory1.'
       );
-      const $yesButton = $(getModalFooter()).find('.question-yes');
-      expect($yesButton.text().trim()).to.equal('Remove');
-      expect($yesButton).to.have.class('btn-danger');
+      const yesButton = getModalFooter().querySelector('.question-yes');
+      expect(yesButton).to.have.trimmed.text('Remove');
+      expect(yesButton).to.have.class('btn-danger');
     });
 
     it(
@@ -68,8 +70,8 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const resultPromise = this.get('action').execute();
-        await wait();
-        await click($(getModalFooter()).find('.question-no')[0]);
+        await settled();
+        await click(getModalFooter().querySelector('.question-no'));
         const actionResult = await resultPromise;
 
         expect(get(actionResult, 'status')).to.equal('cancelled');
@@ -93,8 +95,8 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await wait();
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await settled();
+        await click(getModalFooter().querySelector('.question-yes'));
         const actionResult = await actionResultPromise;
 
         expect(removeRecordStub).to.be.calledOnce;
@@ -121,10 +123,10 @@ describe(
         await render(hbs `{{global-modal-mounter}}`);
 
         const actionResultPromise = this.get('action').execute();
-        await wait();
-        await click($(getModalFooter()).find('.question-yes')[0]);
+        await settled();
+        await click(getModalFooter().querySelector('.question-yes'));
         rejectRemove('someError');
-        await wait();
+        await settled();
         const actionResult = await actionResultPromise;
 
         expect(failureNotifySpy).to.be.calledWith(

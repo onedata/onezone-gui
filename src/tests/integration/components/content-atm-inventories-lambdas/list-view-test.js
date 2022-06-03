@@ -1,13 +1,12 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 import { lookupService } from '../../../helpers/stub-service';
 
 describe('Integration | Component | content atm inventories lambdas/list view',
@@ -90,18 +89,19 @@ describe('Integration | Component | content atm inventories lambdas/list view',
     it('has class "content-atm-inventories-lambdas-list-view"', async function () {
       await render(hbs `{{content-atm-inventories-lambdas/list-view}}`);
 
-      expect(this.$().children()).to.have.class('content-atm-inventories-lambdas-list-view')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0])
+        .to.have.class('content-atm-inventories-lambdas-list-view');
     });
 
     it('shows list of lambdas of given automation inventory', async function () {
       await renderComponent();
 
-      expect(this.$('.lambdas-list')).to.exist;
-      const $entries = this.$('.atm-lambdas-list-entry');
-      expect($entries).to.have.length(2);
-      expect($entries.eq(0).text()).to.contain('f0');
-      expect($entries.eq(1).text()).to.contain('f1');
+      expect(find('.lambdas-list')).to.exist;
+      const entries = findAll('.atm-lambdas-list-entry');
+      expect(entries).to.have.length(2);
+      expect(entries[0]).to.contain.text('f0');
+      expect(entries[1]).to.contain.text('f1');
     });
 
     context('in "presentation" mode', async function () {
@@ -113,20 +113,20 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         async function () {
           await renderComponent();
 
-          expect(this.$('.header-row h1 .one-label').text().trim()).to.equal('Lambdas');
-          expect(this.$('.atm-lambdas-list')).to.have.class('mode-presentation');
+          expect(find('.header-row h1 .one-label')).to.have.trimmed.text('Lambdas');
+          expect(find('.atm-lambdas-list')).to.have.class('mode-presentation');
         });
 
       it('has "add new lambda" button, which calls "onAddAtmLambda" callback on click',
         async function () {
           await renderComponent();
 
-          const $addAtmLambdaBtn = this.$('.header-row .open-add-atm-lambda-trigger');
-          expect($addAtmLambdaBtn.text().trim()).to.equal('Add new lambda');
+          const addAtmLambdaBtn = find('.header-row .open-add-atm-lambda-trigger');
+          expect(addAtmLambdaBtn).to.have.trimmed.text('Add new lambda');
           const addAtmLambdaSpy = this.get('addAtmLambdaSpy');
           expect(addAtmLambdaSpy).to.not.be.called;
 
-          await click($addAtmLambdaBtn[0]);
+          await click(addAtmLambdaBtn);
 
           expect(addAtmLambdaSpy).to.be.calledOnce;
         });
@@ -134,7 +134,7 @@ describe('Integration | Component | content atm inventories lambdas/list view',
       it('does not show back link', async function () {
         await renderComponent();
 
-        expect(this.$('.content-back-link')).to.not.exist;
+        expect(find('.content-back-link')).to.not.exist;
       });
     });
 
@@ -151,17 +151,17 @@ describe('Integration | Component | content atm inventories lambdas/list view',
         async function () {
           await renderComponent();
 
-          expect(this.$('.header-row .resource-name').text().trim())
-            .to.equal('Choose lambda');
-          expect(this.$('.atm-lambdas-list')).to.have.class('mode-selection');
-          expect(this.$().text()).to.contain('f1').and.to.not.contain('f2');
+          expect(find('.header-row .resource-name'))
+            .to.have.trimmed.text('Choose lambda');
+          expect(find('.atm-lambdas-list')).to.have.class('mode-selection');
+          expect(this.element).to.contain.text('f1').and.to.not.contain.text('f2');
         });
 
       it('allows to see all available lambda functions', async function () {
         await renderComponent();
 
         await click('.btn-all');
-        expect(this.$().text()).to.contain('f2');
+        expect(this.element).to.contain.text('f2');
       });
 
       it('passes notification about selection done using "add to workflow" button',

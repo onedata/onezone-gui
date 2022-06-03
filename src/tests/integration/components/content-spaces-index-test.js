@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -9,7 +9,6 @@ import { resolve } from 'rsvp';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -93,11 +92,9 @@ describe('Integration | Component | content spaces index', function () {
       showResourceMembershipTile=false
     }}`);
 
-    return wait().then(() => {
-      expect(
-        this.$('.resource-browse-tile .main-figure .one-label').text(),
-        'browse files tile text'
-      ).to.match(/Alpha/);
-    });
+    expect(
+      find('.resource-browse-tile .main-figure .one-label').textContent,
+      'browse files tile text'
+    ).to.match(/Alpha/);
   });
 });

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject from '@ember/object';
 
@@ -29,7 +29,7 @@ describe(
         name: testName,
       }));
       await render(hbs `{{membership-visualiser/membership-block record=record}}`);
-      expect(this.$('.record-name').text().trim()).to.be.equal(testName);
+      expect(find('.record-name')).to.have.trimmed.text(testName);
     });
 
     Object.keys(icons).forEach(modelType => {
@@ -43,7 +43,7 @@ describe(
         await render(hbs `
           {{membership-visualiser/membership-block record=record}}
         `);
-        expect(this.$(`.oneicon-${icons[modelType]}`)).to.exist;
+        expect(find(`.oneicon-${icons[modelType]}`)).to.exist;
       });
     });
   }

@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 
 const componentClass = 'upload-details';
 
@@ -23,8 +22,8 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     it(`has class "${componentClass}"`, async function () {
       await renderComponent();
 
-      expect(this.$().children()).to.have.class(componentClass)
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0]).to.have.class(componentClass);
     });
 
     it('shows selected file name and upload button',
@@ -36,10 +35,10 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
         await renderComponent();
 
-        expect(this.$('.filename').text().trim()).to.equal(filename);
-        const $uploadBtn = this.$('.upload-btn');
-        expect($uploadBtn.text().trim()).to.equal('Change file');
-        expect($uploadBtn).to.have.class('btn-default');
+        expect(find('.filename')).to.have.trimmed.text(filename);
+        const uploadBtn = find('.upload-btn');
+        expect(uploadBtn).to.have.trimmed.text('Change file');
+        expect(uploadBtn).to.have.class('btn-default');
       });
 
     it('calls "onReupload" callback on upload button click', async function () {
@@ -57,7 +56,7 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
 
       await renderComponent();
 
-      expect(this.$('.upload-btn')).to.be.disabled;
+      expect(find('.upload-btn')).to.have.attr('disabled');
     });
   });
 

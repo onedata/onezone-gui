@@ -1,6 +1,6 @@
 /**
  * Container object that deals with harvester gui plugin manifest.
- * 
+ *
  * @module utils/harvester-configuration/gui-plugin-manifest
  * @author Michał Borzęcki
  * @copyright (C) 2019 ACK CYFRONET AGH
@@ -14,7 +14,10 @@ import $ from 'jquery';
 import { Promise } from 'rsvp';
 import { isNone } from '@ember/utils';
 import { isArray } from '@ember/array';
-import { includeMetadataCorrectValues, includeFileDetailsCorrectValues } from 'onezone-gui/models/index';
+import {
+  includeMetadataCorrectValues,
+  includeFileDetailsCorrectValues,
+} from 'onezone-gui/models/index';
 
 export default PromiseObject.extend({
   /**

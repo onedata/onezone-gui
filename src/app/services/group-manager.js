@@ -11,7 +11,12 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
 import _ from 'lodash';
-import { Promise, resolve, reject, all as allFulfilled } from 'rsvp';
+import {
+  Promise,
+  resolve,
+  reject,
+  all as allFulfilled,
+} from 'rsvp';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';

@@ -1,36 +1,31 @@
-import wait from 'ember-test-helpers/wait';
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve, reject, Promise } from 'rsvp';
-import { click } from 'ember-native-dom-helpers';
 import { parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 
 describe('Integration | Component | invite token generator', function () {
-  const { afterEach } = setupRenderingTest();
+  setupRenderingTest();
 
   beforeEach(function () {
+    const onezoneTimestamp = 12345;
     const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
+    sinon.stub(lookupService(this, 'onezoneServer'), 'getServerTime')
+      .resolves(onezoneTimestamp);
     this.setProperties({
       targetRecord: {
         entityType: 'group',
         entityId: 'group0',
       },
       routerStub,
+      onezoneTimestamp,
     });
-  });
-
-  afterEach(function () {
-    const fakeClock = this.get('fakeClock');
-    if (fakeClock) {
-      fakeClock.restore();
-    }
   });
 
   it('has class invite-token-generator', async function () {
@@ -38,7 +33,7 @@ describe('Integration | Component | invite token generator', function () {
 
     await render(hbs `{{invite-token-generator}}`);
 
-    expect(this.$('.invite-token-generator')).to.exist;
+    expect(find('.invite-token-generator')).to.exist;
   });
 
   it('shows token in textarea', async function () {
@@ -52,15 +47,12 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        const $tokenTextarea = this.$('.token-textarea');
-        expect($tokenTextarea).to.exist;
-        expect($tokenTextarea.val()).to.equal(correctToken);
-        expect(this.$('.spinner')).to.not.exist;
-        expect(this.$('.resource-load-error')).to.not.exist;
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    const tokenTextarea = find('.token-textarea');
+    expect(tokenTextarea).to.exist;
+    expect(tokenTextarea).to.have.value(correctToken);
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
   it('shows spinner while token is being generated', async function () {
@@ -73,13 +65,10 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        expect(this.$('.token-textarea')).to.not.exist;
-        expect(this.$('.spinner')).to.exist;
-        expect(this.$('.resource-load-error')).to.not.exist;
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
   it('shows error when token generation has failed', async function () {
@@ -93,24 +82,16 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        expect(this.$('.token-textarea')).to.not.exist;
-        expect(this.$('.spinner')).to.not.exist;
-        const $errorContainer = this.$('.resource-load-error');
-        expect($errorContainer).to.exist;
-        expect($errorContainer.text()).to.contain('tokenError');
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.not.exist;
+    const errorContainer = find('.resource-load-error');
+    expect(errorContainer).to.exist;
+    expect(errorContainer).to.contain.text('tokenError');
   });
 
   it('sets correct url for "custom token" action', async function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve());
-    const timestamp = 1584525600;
-    this.set('fakeClock', sinon.useFakeTimers({
-      now: timestamp * 1000,
-      shouldAdvanceTime: true,
-    }));
     const correctRouteOptions = {
       activeSlide: 'form',
       tokenTemplate: btoa(JSON.stringify({
@@ -122,7 +103,7 @@ describe('Integration | Component | invite token generator', function () {
         },
         caveats: [{
           type: 'time',
-          validUntil: timestamp + 14 * 24 * 60 * 60,
+          validUntil: this.get('onezoneTimestamp') + 14 * 24 * 60 * 60,
         }],
       })),
     };
@@ -143,10 +124,7 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() =>
-        expect(this.$('.custom-token-action')).to.have.attr('href', 'correctUrl')
-      );
+    expect(find('.custom-token-action')).to.have.attr('href', 'correctUrl');
   });
 
   it(
@@ -164,9 +142,8 @@ describe('Integration | Component | invite token generator', function () {
         }}
       `);
 
-      return wait()
-        .then(() => click('.custom-token-action'))
-        .then(() => expect(clickSpy).to.be.calledOnce);
+      await click('.custom-token-action');
+      expect(clickSpy).to.be.calledOnce;
     }
   );
 
@@ -250,9 +227,9 @@ describe('Integration | Component | invite token generator', function () {
       await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
       if (subjectDescription) {
-        expect(this.$('.subject-description').text().trim()).to.equal(subjectDescription);
+        expect(find('.subject-description')).to.have.trimmed.text(subjectDescription);
       } else {
-        expect(this.$('.subject-description')).to.not.exist;
+        expect(find('.subject-description')).to.not.exist;
       }
     });
 
@@ -264,11 +241,8 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() =>
-            expect(this.$('.limitations-text').text().trim())
-            .to.equal(limitationsDescription)
-          );
+        expect(find('.limitations-text'))
+          .to.have.trimmed.text(limitationsDescription);
       }
     );
 
@@ -279,8 +253,7 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() => expect(this.$('.custom-token-action')).to.not.exist);
+        expect(find('.custom-token-action')).to.not.exist;
       });
     } else {
       it(`shows "custom token" link for ${inviteType} invite token`, async function () {
@@ -289,8 +262,7 @@ describe('Integration | Component | invite token generator', function () {
 
         await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() => expect(this.$('.custom-token-action')).to.exist);
+        expect(find('.custom-token-action')).to.exist;
       });
     }
   });
@@ -314,10 +286,9 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() => expect(this.$('.token-textarea').val()).to.match(
-        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
-      ));
+    expect(find('.token-textarea').value).to.match(
+      /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
+    );
   });
 
   it('allows to generate onedatify with import command', async function () {
@@ -333,10 +304,9 @@ describe('Integration | Component | invite token generator', function () {
       }}
     `);
 
-    return wait()
-      .then(() => expect(this.$('.token-textarea').val()).to.match(
-        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
-      ));
+    expect(find('.token-textarea').value).to.match(
+      /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
+    );
   });
 });
 

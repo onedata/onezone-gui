@@ -6,7 +6,7 @@ import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get } from '@ember/object';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 
 describe(
   'Integration | Utility | workflow actions/create atm lambda action',
@@ -92,7 +92,7 @@ describe(
 
       const actionResultPromise = action.execute();
       rejectCreate('someError');
-      await wait();
+      await settled();
       const actionResult = await actionResultPromise;
 
       expect(get(actionResult, 'status')).to.equal('failed');

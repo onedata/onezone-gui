@@ -1,11 +1,10 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
 
 describe('Integration | Component | content atm inventories workflows/creator view',
@@ -28,24 +27,25 @@ describe('Integration | Component | content atm inventories workflows/creator vi
     it('has class "content-atm-inventories-workflows-creator-view"', async function () {
       await render(hbs `{{content-atm-inventories-workflows/creator-view}}`);
 
-      expect(this.$().children()).to.have.class('content-atm-inventories-workflows-creator-view')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0])
+        .to.have.class('content-atm-inventories-workflows-creator-view');
     });
 
     it('has header "Add new workflow"', async function () {
       await renderComponent();
 
-      expect(this.$('.header-row h1').text().trim()).to.equal('Add new workflow');
+      expect(find('.header-row h1')).to.have.trimmed.text('Add new workflow');
     });
 
     it('shows empty workflow schema details form in edit mode', async function () {
       await renderComponent();
 
-      const $form = this.$('.atm-workflow-schema-details-form');
-      expect($form).to.exist;
-      expect($form.find('.field-view-mode')).to.not.exist;
-      expect($form.find('.name-field .form-control')).to.have.value('');
-      expect($form.find('.summary-field .form-control')).to.have.value('');
+      const form = find('.atm-workflow-schema-details-form');
+      expect(form).to.exist;
+      expect(form.querySelector('.field-view-mode')).to.not.exist;
+      expect(form.querySelector('.name-field .form-control')).to.have.value('');
+      expect(form.querySelector('.summary-field .form-control')).to.have.value('');
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {

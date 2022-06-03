@@ -4,8 +4,8 @@ import { setupRenderingTest } from 'ember-mocha';
 import { lookupService } from '../../helpers/stub-service';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 import { get } from '@ember/object';
+import { settled } from '@ember/test-helpers';
 
 describe('Integration | Service | url action runner', function () {
   setupRenderingTest();
@@ -16,7 +16,7 @@ describe('Integration | Service | url action runner', function () {
     }
   });
 
-  it('allows to run "remove space" action from transition', function () {
+  it('allows to run "remove space" action from transition', async function () {
     const space = {};
     sinon.stub(lookupService(this, 'record-manager'), 'getRecordById')
       .withArgs('space', 'space1').resolves(space);
@@ -39,7 +39,7 @@ describe('Integration | Service | url action runner', function () {
 
     service.runFromTransition(transition);
 
-    return wait()
-      .then(() => expect(executeStub).to.be.calledOnce);
+    await settled();
+    expect(executeStub).to.be.calledOnce;
   });
 });

@@ -40,7 +40,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, observer, get } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { A } from '@ember/array';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';

@@ -223,6 +223,10 @@ export default Component.extend(I18n, {
       atmWorkflowSchemas = [];
     }
 
+    if (this.get('isDestroyed')) {
+      return;
+    }
+
     const {
       dump,
       selectedOperation: prevSelectedOperation,

@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 
 describe(
@@ -16,10 +15,10 @@ describe(
       async function () {
         await render(hbs `{{token-template-selector/identity-template}}`);
 
-        const $tile = this.$('.one-tile');
-        expect($tile).to.have.class('template-identity');
-        expect($tile.find('.tile-title').text().trim()).to.equal('Identity proof');
-        expect($tile.find('.main-image'))
+        const tile = find('.one-tile');
+        expect(tile).to.have.class('template-identity');
+        expect(tile.querySelector('.tile-title')).to.have.trimmed.text('Identity proof');
+        expect(tile.querySelector('.main-image'))
           .to.have.attr('src', 'assets/images/token-templates/identity.svg');
       }
     );

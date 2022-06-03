@@ -1,9 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -11,9 +10,7 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
-import { click, fillIn } from 'ember-native-dom-helpers';
-import { selectChoose } from '../../helpers/ember-power-select';
-import $ from 'jquery';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 
 describe('Integration | Component | content atm inventories workflows', function () {
   setupRenderingTest();
@@ -209,15 +206,14 @@ describe('Integration | Component | content atm inventories workflows', function
   it('has class "content-atm-inventories-workflows"', async function () {
     await render(hbs `{{content-atm-inventories-workflows}}`);
 
-    expect(this.$().children()).to.have.class('content-atm-inventories-workflows')
-      .and.to.have.length(1);
+    expect(this.element.children).to.have.length(1);
+    expect(this.element.children[0]).to.have.class('content-atm-inventories-workflows');
   });
 
   it('contains carousel with five slides', async function () {
     await renderComponent();
 
-    const $slides = this.$('.one-carousel-slide');
-    expect($slides).to.have.length(5);
+    expect(findAll('.one-carousel-slide')).to.have.length(5);
     expect(getSlide('list')).to.exist;
     expect(getSlide('editor')).to.exist;
     expect(getSlide('lambdaSelector')).to.exist;
@@ -312,9 +308,9 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(
           getSlide('list').querySelector('.revision-actions-trigger')
         );
-        await click($(
-          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
-        )[0]);
+        await click(document.querySelector(
+          '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        ));
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'editor');
@@ -372,7 +368,7 @@ describe('Integration | Component | content atm inventories workflows', function
 
         await renderComponent();
         rejectCallback();
-        await wait();
+        await settled();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'loading');

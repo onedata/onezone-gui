@@ -1,20 +1,24 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, before, afterEach, context } from 'mocha';
+import {
+  describe,
+  it,
+  beforeEach,
+  before,
+  afterEach,
+  context,
+} from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, settled, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { resolve, Promise } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
-import { selectChoose } from '../../helpers/ember-power-select';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import { set, setProperties, get } from '@ember/object';
-import $ from 'jquery';
 
 describe('Integration | Component | content atm inventories lambdas', function () {
   setupRenderingTest();
@@ -138,15 +142,14 @@ describe('Integration | Component | content atm inventories lambdas', function (
   it('has class "content-atm-inventories-lambdas"', async function () {
     await render(hbs `{{content-atm-inventories-lambdas}}`);
 
-    expect(this.$().children()).to.have.class('content-atm-inventories-lambdas')
-      .and.to.have.length(1);
+    expect(this.element.children).to.have.length(1);
+    expect(this.element.children[0]).to.have.class('content-atm-inventories-lambdas');
   });
 
   it('contains carousel with two slides', async function () {
     await renderComponent();
 
-    const $slides = this.$('.one-carousel-slide');
-    expect($slides).to.have.length(2);
+    expect(findAll('.one-carousel-slide')).to.have.length(2);
     expect(getSlide('list')).to.exist;
     expect(getSlide('editor')).to.exist;
     expect(isSlideActive('list')).to.be.true;
@@ -232,9 +235,9 @@ describe('Integration | Component | content atm inventories lambdas', function (
         await click(
           getSlide('list').querySelectorAll('.revision-actions-trigger')[1]
         );
-        await click($(
-          'body .webui-popover.in .create-atm-lambda-revision-action-trigger'
-        )[0]);
+        await click(document.querySelector(
+          '.webui-popover.in .create-atm-lambda-revision-action-trigger'
+        ));
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
@@ -437,7 +440,7 @@ function itShowsLoader() {
 
     await renderComponent();
     rejectCallback();
-    await wait();
+    await settled();
 
     expect(isSlideActive('editor')).to.be.true;
     expect(getSlide('editor').querySelector('.resource-load-error')).to.exist;

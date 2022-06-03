@@ -1,14 +1,18 @@
 import { expect } from 'chai';
-import { describe, it, before, beforeEach, afterEach } from 'mocha';
+import {
+  describe,
+  it,
+  before,
+  beforeEach,
+  afterEach,
+} from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import RemoveAtmInventoryAction from 'onezone-gui/utils/workflow-actions/remove-atm-inventory-action';
 import CopyRecordIdAction from 'onedata-gui-common/utils/clipboard-actions/copy-record-id-action';
 import sinon from 'sinon';
-import $ from 'jquery';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { resolve } from 'rsvp';
 
 describe(
@@ -49,10 +53,10 @@ describe(
     it('renders automation inventory name, icon and menu trigger', async function () {
       await renderComponent();
 
-      expect(this.$()).to.contain(this.get('atmInventory.name'));
+      expect(this.element).to.contain.text(this.get('atmInventory.name'));
       // TODO VFS-7455 change icon
-      expect(this.$('.oneicon-atm-inventory')).to.exist;
-      expect(this.$('.collapsible-toolbar-toggle')).to.exist;
+      expect(find('.oneicon-atm-inventory')).to.exist;
+      expect(find('.collapsible-toolbar-toggle')).to.exist;
     });
 
     it('renders actions in dots menu', async function () {
@@ -60,7 +64,7 @@ describe(
 
       await click('.atm-inventory-menu-trigger');
 
-      const popoverContent = $('body .webui-popover.in');
+      const popoverContent = document.querySelector('body .webui-popover.in');
       [{
         selector: '.rename-atm-inventory-action-trigger',
         name: 'Rename',
@@ -78,10 +82,10 @@ describe(
         name: 'Copy ID',
         icon: 'copy',
       }].forEach(({ selector, name, icon }) => {
-        const $trigger = popoverContent.find(selector);
-        expect($trigger).to.exist;
-        expect($trigger).to.contain(name);
-        expect($trigger.find('.one-icon')).to.have.class(`oneicon-${icon}`);
+        const trigger = popoverContent.querySelector(selector);
+        expect(trigger).to.exist;
+        expect(trigger).to.contain.text(name);
+        expect(trigger.querySelector('.one-icon')).to.have.class(`oneicon-${icon}`);
       });
     });
 
@@ -101,14 +105,15 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const renameTrigger =
-          $('body .webui-popover.in .rename-atm-inventory-action-trigger')[0];
+        const renameTrigger = document.querySelector(
+          '.webui-popover.in .rename-atm-inventory-action-trigger'
+        );
         await click(renameTrigger);
         await fillIn('.atm-inventory-name .form-control', 'newName');
         await click('.atm-inventory-name .save-icon');
 
-        const $atmInventoryNameNode = this.$('.atm-inventory-name');
-        expect($atmInventoryNameNode).to.not.have.class('editor');
+        const atmInventoryNameNode = find('.atm-inventory-name');
+        expect(atmInventoryNameNode).to.not.have.class('editor');
         expect(executeStub).to.be.calledOnce;
       });
 
@@ -125,8 +130,9 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const removeTrigger =
-          $('body .webui-popover.in .remove-atm-inventory-action-trigger')[0];
+        const removeTrigger = document.querySelector(
+          '.webui-popover.in .remove-atm-inventory-action-trigger'
+        );
         await click(removeTrigger);
 
         expect(executeStub).to.be.calledOnce;
@@ -144,8 +150,9 @@ describe(
 
         await renderComponent();
         await click('.atm-inventory-menu-trigger');
-        const removeTrigger =
-          $('body .webui-popover.in .copy-record-id-action-trigger')[0];
+        const removeTrigger = document.querySelector(
+          'body .webui-popover.in .copy-record-id-action-trigger'
+        );
         await click(removeTrigger);
 
         expect(executeStub).to.be.calledOnce;

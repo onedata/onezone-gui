@@ -1,12 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import Service from '@ember/service';
 import SessionStub from '../../helpers/stubs/services/session';
-import wait from 'ember-test-helpers/wait';
 import { registerService, lookupService } from '../../helpers/stub-service';
 
 const userId = 'some_user_id';
@@ -51,11 +50,9 @@ describe('Integration | Component | user account button', function () {
 
       await render(hbs `{{user-account-button}}`);
 
-      wait().then(() => {
-        const $username = this.$('.user-account-button-username');
+      const usernameElem = find('.user-account-button-username');
 
-        expect($username).to.exist;
-        expect($username, $username.text()).to.contain(username);
-      });
+      expect(usernameElem).to.exist;
+      expect(usernameElem).to.contain.text(username);
     });
 });

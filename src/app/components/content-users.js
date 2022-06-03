@@ -22,6 +22,7 @@ import { collect } from '@ember/object/computed';
 import Action from 'onedata-gui-common/utils/action';
 import { tag } from 'ember-awesome-macros';
 import moment from 'moment';
+import $ from 'jquery';
 
 const animationTimeout = 333;
 
@@ -206,7 +207,7 @@ export default Component.extend(...mixins, {
 
   /**
    * Shows global info about save error.
-   * @param {object} error 
+   * @param {object} error
    * @returns {undefined}
    */
   _saveErrorHandler(error) {
@@ -301,14 +302,16 @@ export default Component.extend(...mixins, {
     },
     toggleAuthorizersDropdown() {
       const {
+        element,
         _formAnimationTimeoutId,
         _animationTimeout,
       } = this.getProperties(
+        'element',
         '_formAnimationTimeoutId',
         '_animationTimeout'
       );
-      const dropdownDesc = this.$('.show-dropdown-description');
-      const authDropdown = this.$('.authorizers-dropdown');
+      const dropdownDesc = $(element.querySelector('.show-dropdown-description'));
+      const authDropdown = $(element.querySelector('.authorizers-dropdown'));
       clearTimeout(_formAnimationTimeoutId);
 
       this.toggleProperty('_isProvidersDropdownVisible');

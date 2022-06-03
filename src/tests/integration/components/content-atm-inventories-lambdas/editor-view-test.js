@@ -1,12 +1,18 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, before, afterEach, context } from 'mocha';
+import {
+  describe,
+  it,
+  beforeEach,
+  before,
+  afterEach,
+  context,
+} from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import { lookupService } from '../../../helpers/stub-service';
-import { selectChoose } from '../../../helpers/ember-power-select';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-action';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
@@ -50,8 +56,9 @@ describe(
     it('has class "content-atm-inventories-lambdas-editor-view"', async function () {
       await render(hbs `{{content-atm-inventories-lambdas/editor-view}}`);
 
-      expect(this.$().children()).to.have.class('content-atm-inventories-lambdas-editor-view')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0])
+        .to.have.class('content-atm-inventories-lambdas-editor-view');
     });
 
     it('calls "onBackSlide" callback on back link click', async function () {
@@ -74,8 +81,7 @@ describe(
         it('has header "Add new lambda"', async function (done) {
           await renderComponent();
 
-          expect(this.$('.header-row h1').text().trim())
-            .to.equal('Add new lambda');
+          expect(find('.header-row h1')).to.have.trimmed.text('Add new lambda');
           done();
         });
 
@@ -84,7 +90,7 @@ describe(
         it('renders empty form', async function (done) {
           await renderComponent();
 
-          expect(this.$('.name-field .form-control')).to.have.value('');
+          expect(find('.name-field .form-control')).to.have.value('');
           done();
         });
 
@@ -124,8 +130,8 @@ describe(
         it('has header "Add new lambda revision"', async function (done) {
           await renderComponent();
 
-          expect(this.$('.header-row h1').text().trim())
-            .to.equal('Add new lambda revision');
+          expect(find('.header-row h1'))
+            .to.have.trimmed.text('Add new lambda revision');
           done();
         });
 
@@ -135,7 +141,7 @@ describe(
           async function (done) {
             await renderComponent();
 
-            expect(this.$('.name-field .form-control')).to.have.value('f1');
+            expect(find('.name-field .form-control')).to.have.value('f1');
             done();
           });
 
@@ -176,8 +182,8 @@ describe(
       it('has header "Modify lambda revision"', async function (done) {
         await renderComponent();
 
-        expect(this.$('.header-row h1').text().trim())
-          .to.contain('Modify lambda revision');
+        expect(find('.header-row h1'))
+          .to.contain.text('Modify lambda revision');
         done();
       });
 
@@ -187,7 +193,7 @@ describe(
         async function (done) {
           await renderComponent();
 
-          expect(this.$('.name-field .form-control')).to.have.value('f1');
+          expect(find('.name-field .form-control')).to.have.value('f1');
           done();
         });
 
@@ -231,8 +237,8 @@ function itShowsFormInMode(mode) {
   it(`shows form in "${mode}" mode`, async function (done) {
     await renderComponent();
 
-    const $form = this.$('.atm-lambda-form');
-    expect($form).to.have.class(`mode-${mode}`);
+    const form = find('.atm-lambda-form');
+    expect(form).to.have.class(`mode-${mode}`);
     done();
   });
 }

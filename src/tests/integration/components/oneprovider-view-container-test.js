@@ -1,13 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 import { getStorageOneproviderKey } from 'onezone-gui/mixins/choose-default-oneprovider';
 import { lookupService } from '../../helpers/stub-service';
@@ -67,10 +65,8 @@ describe('Integration | Component | oneprovider view container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      return wait().then(() => {
-        expect(this.$('.content-header-section')).to.contain('hello header');
-        expect(this.$('.oneprovider-view-container-inner')).to.contain('hello body');
-      });
+      expect(find('.content-header-section')).to.contain.text('hello header');
+      expect(find('.oneprovider-view-container-inner')).to.contain.text('hello body');
     });
 
     it('renders name of selected Oneprovider in tab bar mode', async function () {
@@ -85,10 +81,8 @@ describe('Integration | Component | oneprovider view container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      return wait().then(() => {
-        expect(this.$('.oneprovider-name'), 'current oneprovider name')
-          .to.contain(this.get('oneproviderName'));
-      });
+      expect(find('.oneprovider-name'), 'current oneprovider name')
+        .to.contain.text(this.get('oneproviderName'));
     });
 
     it('renders container header and no body if all Oneproviders are offline',
@@ -112,12 +106,10 @@ describe('Integration | Component | oneprovider view container', function () {
           {{/oneprovider-view-container}}
         `);
 
-        return wait().then(() => {
-          expect(this.$('.content-header-section'), 'header')
-            .to.contain('hello header');
-          expect(this.$('.oneprovider-view-container-inner'), 'body')
-            .to.not.contain('hello body');
-        });
+        expect(find('.content-header-section'), 'header')
+          .to.contain.text('hello header');
+        expect(find('.oneprovider-view-container-inner'), 'body')
+          .to.not.contain.text('hello body');
       }
     );
 
@@ -141,10 +133,8 @@ describe('Integration | Component | oneprovider view container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      return wait().then(() => {
-        expect(this.$('.space-providers-tab-bar'), 'space-providers-tab-bar')
-          .to.exist;
-      });
+      expect(find('.space-providers-tab-bar'), 'space-providers-tab-bar')
+        .to.exist;
     });
   });
 
@@ -224,24 +214,19 @@ describe('Integration | Component | oneprovider view container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      return wait()
-        .then(() => {
-          expect(this.$('.selected-provider-entity-id'), 'selected op id before change')
-            .to.contain(provider1.entityId);
-          expect(this.$('.content-iframe-base-url'))
-            .to.contain(provider1.onezoneHostedBaseUrl);
-          return click(
-            `.space-providers-tab-bar .tab-bar-li.item-${provider2.entityId} .nav-link`
-          );
-        })
-        .then(() => {
-          expect(changeOneproviderId).to.be.calledOnce;
-          expect(changeOneproviderId).to.be.calledWith('op2');
-          expect(this.$('.selected-provider-entity-id'), 'selected op id after change')
-            .to.contain(provider2.entityId);
-          expect(this.$('.content-iframe-base-url'))
-            .to.contain(provider2.onezoneHostedBaseUrl);
-        });
+      expect(find('.selected-provider-entity-id'), 'selected op id before change')
+        .to.contain.text(provider1.entityId);
+      expect(find('.content-iframe-base-url'))
+        .to.contain.text(provider1.onezoneHostedBaseUrl);
+      await click(
+        `.space-providers-tab-bar .tab-bar-li.item-${provider2.entityId} .nav-link`
+      );
+      expect(changeOneproviderId).to.be.calledOnce;
+      expect(changeOneproviderId).to.be.calledWith('op2');
+      expect(find('.selected-provider-entity-id'), 'selected op id after change')
+        .to.contain.text(provider2.entityId);
+      expect(find('.content-iframe-base-url'))
+        .to.contain.text(provider2.onezoneHostedBaseUrl);
     });
 
     it('gets and sets default space Oneprovider using localStorage', async function () {
@@ -286,22 +271,17 @@ describe('Integration | Component | oneprovider view container', function () {
         {{/oneprovider-view-container}}
       `);
 
-      return wait()
-        .then(() => {
-          expect(_localStorage[storageKey], 'initial storage oneproviderId')
-            .to.equal(provider2.entityId);
-          expect(this.get('oneproviderId'), 'initial context oneproviderId')
-            .to.equal(provider2.entityId);
-          return click(
-            `.space-providers-tab-bar .tab-bar-li.item-${provider1.entityId} .nav-link`
-          );
-        })
-        .then(() => {
-          expect(_localStorage[storageKey], 'changed storage oneproviderId')
-            .to.equal(provider1.entityId);
-          expect(this.get('oneproviderId'), 'changed context oneproviderId')
-            .to.equal(provider1.entityId);
-        });
+      expect(_localStorage[storageKey], 'initial storage oneproviderId')
+        .to.equal(provider2.entityId);
+      expect(this.get('oneproviderId'), 'initial context oneproviderId')
+        .to.equal(provider2.entityId);
+      await click(
+        `.space-providers-tab-bar .tab-bar-li.item-${provider1.entityId} .nav-link`
+      );
+      expect(_localStorage[storageKey], 'changed storage oneproviderId')
+        .to.equal(provider1.entityId);
+      expect(this.get('oneproviderId'), 'changed context oneproviderId')
+        .to.equal(provider1.entityId);
     });
   });
 });

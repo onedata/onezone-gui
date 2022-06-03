@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject from '@ember/object';
 
@@ -16,7 +16,7 @@ describe('Integration | Component | record name', function () {
 
     await render(hbs `{{record-name record=user}}`);
 
-    expect(this.$('.record-name').text().trim()).to.equal('user_name');
+    expect(find('.record-name')).to.have.trimmed.text('user_name');
   });
 
   it('renders name and username for user', async function () {
@@ -28,7 +28,7 @@ describe('Integration | Component | record name', function () {
 
     await render(hbs `{{record-name record=user}}`);
 
-    expect(this.$('.record-name-general').text().trim()).to.equal('user_name');
-    expect(this.$('.record-username').text().trim()).to.equal('(username)');
+    expect(find('.record-name-general')).to.have.trimmed.text('user_name');
+    expect(find('.record-username')).to.have.trimmed.text('(username)');
   });
 });

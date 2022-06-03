@@ -71,17 +71,17 @@ export default Component.extend(I18n, {
    * Just an one-way alias
    * @type {Provider}
    */
-  space: computed.reads('item'),
+  space: reads('item'),
 
   /**
    * @type {Ember.computed<string>}
    */
-  spaceId: computed.reads('space.entityId'),
+  spaceId: reads('space.entityId'),
 
   /**
    * @type {Ember.Computed<models/ProviderList>}
    */
-  _providerList: computed.reads('space.providerList'),
+  _providerList: reads('space.providerList'),
 
   /**
    * True if we know the list of provider ids (eg. for counting spaces)

@@ -11,7 +11,9 @@
  */
 
 import { getProperties, get } from '@ember/object';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 
 const consumerModelToPrefix = {
   user: 'usr',

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { set } from '@ember/object';
 import I18nStub from '../../../helpers/i18n-stub';
@@ -10,7 +10,6 @@ import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { A } from '@ember/array';
 import { resolve } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
 import { createEmptyColumnModel } from 'onezone-gui/utils/groups-hierarchy-visualiser/column';
 
 describe(
@@ -41,7 +40,7 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      expect(this.$('.column .spinner')).to.exist;
+      expect(find('.column .spinner')).to.exist;
     });
 
     it('shows group name in header for startPoint type', async function () {
@@ -62,9 +61,7 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      return wait(() => {
-        expect(this.$('.column-header').text()).to.contain('testname');
-      });
+      expect(find('.column-header')).to.contain.text('testname');
     });
 
     it('shows group name in header for children type', async function () {
@@ -78,8 +75,8 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      expect(this.$('.column-header').text().trim())
-        .to.equal('Children of testname');
+      expect(find('.column-header'))
+        .to.have.trimmed.text('Children of testname');
     });
 
     it('shows group name in header for parents type', async function () {
@@ -93,8 +90,8 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      expect(this.$('.column-header').text().trim())
-        .to.equal('Parents of testname');
+      expect(find('.column-header'))
+        .to.have.trimmed.text('Parents of testname');
     });
 
     it('shows empty header for empty type', async function () {
@@ -104,7 +101,7 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      expect(this.$('.column-header').text().trim()).to.equal('');
+      expect(find('.column-header')).to.have.trimmed.text('');
     });
 
     it('renders column in proper position', async function () {
@@ -116,9 +113,9 @@ describe(
 
       this.set('column', column);
       await render(hbs `{{groups-hierarchy-visualiser/column column=column}}`);
-      const $column = this.$('.column');
-      expect($column.css('width')).to.equal('100px');
-      expect($column.css('left')).to.equal('50px');
+      const columnElem = find('.column');
+      expect(columnElem.style.width).to.equal('100px');
+      expect(columnElem.style.left).to.equal('50px');
     });
   }
 );
