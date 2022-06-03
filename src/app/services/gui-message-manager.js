@@ -12,6 +12,7 @@ import { get, computed } from '@ember/object';
 import DOMPurify from 'npm:dompurify';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { Promise } from 'rsvp';
+import hasEmptyHtmlContent from 'onedata-gui-common/utils/has-empty-html-content';
 
 const cookiesAcceptedCookieName = 'cookies-accepted';
 
@@ -70,7 +71,7 @@ export default Service.extend(
       return this.getMessage('privacy_policy')
         .then(message => {
           const messageText = DOMPurify.sanitize(message).toString();
-          return this.isMessageBodyEmpty(messageText) ? '' : messageText;
+          return hasEmptyHtmlContent(messageText) ? '' : messageText;
         });
     },
 
@@ -81,7 +82,7 @@ export default Service.extend(
       return this.getMessage('terms_of_use')
         .then(message => {
           const messageText = DOMPurify.sanitize(message).toString();
-          return this.isMessageBodyEmpty(messageText) ? '' : messageText;
+          return hasEmptyHtmlContent(messageText) ? '' : messageText;
         });
     },
 
@@ -93,17 +94,21 @@ export default Service.extend(
         this.get('privacyPolicyProxy').then(() => this.get('privacyPolicyUrl')),
         this.get('termsOfUseProxy').then(() => this.get('termsOfUseUrl')),
         this.getMessage('cookie_consent_notification'),
-      ]).then(([privacyPolicyUrl, termsOfUseUrl, message]) =>
-        DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
-        .replace(
-          /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-          `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
-        )
-        .replace(
-          /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
-          `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
-        )
-      );
+      ]).then(([privacyPolicyUrl, termsOfUseUrl, message]) => {
+        const messageText = DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString();
+        if (hasEmptyHtmlContent(messageText)) {
+          return '';
+        } else {
+          return messageText.replace(
+              /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
+              `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
+            )
+            .replace(
+              /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
+              `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
+            );
+        }
+      });
     },
 
     /**
@@ -129,17 +134,6 @@ export default Service.extend(
             return undefined;
           }
         });
-    },
-
-    /**
-     * @param {string} body
-     * @returns {boolean}
-     */
-    isMessageBodyEmpty(body) {
-      const span = document.createElement('span');
-      span.innerHTML = body;
-      const text = span.textContent || span.innerText || '';
-      return !text.trim();
     },
 
     /**
