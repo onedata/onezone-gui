@@ -288,9 +288,10 @@ export default LoginFormContainer.extend(
         if (!element) {
           return;
         }
+        const $element = $(element);
 
-        const loginForm = $(element).find('.basicauth-login-form-container');
-        const authorizersSelect = $(element).find('.authorizers-select-container');
+        const loginForm = $element.find('.basicauth-login-form-container');
+        const authorizersSelect = $element.find('.authorizers-select-container');
         clearTimeout(_formAnimationTimeoutId);
 
         this.toggleProperty('isUsernameLoginActive');

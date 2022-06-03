@@ -222,8 +222,7 @@ describe(
           });
 
         await renderComponent();
-        const atmLambdas = findAll('.atm-lambdas-list-entry');
-        const firstAtmLambda = atmLambdas[0];
+        const firstAtmLambda = find('.atm-lambdas-list-entry');
 
         await click(firstAtmLambda.querySelector('.atm-lambda-actions-trigger'));
         await click(document.querySelector(
@@ -320,8 +319,7 @@ describe(
       it('blocks redesigning lambda revision as new revision when lambda is onedataFunction',
         async function () {
           await renderComponent();
-          const lambdas = findAll('.atm-lambdas-list-entry');
-          const firstLambda = lambdas[0];
+          const firstLambda = find('.atm-lambdas-list-entry');
 
           await click(firstLambda.querySelector('.revision-actions-trigger'));
           const actionTrigger = document.querySelector(

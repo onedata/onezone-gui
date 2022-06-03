@@ -64,7 +64,7 @@ describe(
       expect(records[1].querySelector('.oneicon-provider')).to.exist;
     });
 
-    it('passes template name and  template for oneprovider via selection handler',
+    it('passes template name and template for oneprovider via selection handler',
       async function () {
         const selectedSpy = this.set('selectedSpy', sinon.spy());
 
