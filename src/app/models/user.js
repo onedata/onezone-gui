@@ -23,6 +23,7 @@ export default Model.extend(GraphSingleModelMixin, {
   username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
+  canInviteProviders: attr('boolean'),
 
   /**
    * Properties:
@@ -86,8 +87,8 @@ export default Model.extend(GraphSingleModelMixin, {
   },
 
   /**
-   * @param {*} entityType 
-   * @param {*} token 
+   * @param {*} entityType
+   * @param {*} token
    * @returns {Object} joined record
    */
   _joinRelation(entityType, token) {
