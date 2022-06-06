@@ -16,7 +16,14 @@ export default {
     spaceJoinHarvester: createSubjectDescription('owner of space'),
   },
   limitationsDescription: '<strong>This token will expire in 2 weeks and has no usage count limit.</strong> ',
-  onedatifyLimitationsDescription: '<strong>Tokens used below will expire in 2 weeks and have no usage count limit.</strong>',
+  onedatifyLimitationsDescription: {
+    withRegistrationToken: '<strong>Tokens included below will expire in 2 weeks and have no usage count limit.</strong>',
+    withoutRegistrationToken: '<strong>The support token included below will expire in 2 weeks and has no usage count limit.</strong>',
+  },
   customTokenLabel: 'Create&nbsp;a&nbsp;custom&nbsp;token',
   postCustomTokenLabel: ' if you require different parameters.',
+  ozRegistrationTokenVariableDescription: {
+    content: 'A valid <code>{{variable}}</code> must be defined for the above command to work. Please contact a Onezone admin to acquire such a token.',
+    tip: 'This Onezone enforces a restricted policy that prevents regular users from registering new Oneprovider instances at will.',
+  },
 };

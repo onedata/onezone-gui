@@ -23,5 +23,13 @@
     inputClass="token-textarea"
     textareaRows=7
   }}
+  {{#if variablesDescription}}
+    <p class="variables-description">
+      {{variablesDescription.content}}
+      {{#if variablesDescription.tip}}
+        {{one-label-tip title=variablesDescription.tip}}
+      {{/if}}
+    </p>
+  {{/if}}
 {{/promise-proxy-container}}
 {{yield}}
