@@ -88,7 +88,11 @@ Fetch dependencies:
       - tar -czf deps.tar.gz onezone-gui/src/node_modules
       description: Package dependencies
   final-tasks:
-  - script:  *clear-env
+  - script: &clear-env
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - curl ${bamboo.OnedataFinalTasksURL} | bash -
+      description: Clear env
   artifacts:
   - name: deps.tar.gz
     pattern: deps.tar.gz
@@ -127,11 +131,7 @@ Run tests:
       ignore-time: 'false'
       test-results: onezone-gui/src/tmp/test-results.xml
       description: Parse test results
-  - script: &clear-env
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - curl ${bamboo.OnedataFinalTasksURL} | bash -
-      description: Clear env
+  - script: *clear-env
   requirements:
   - gui
   artifact-subscriptions:
