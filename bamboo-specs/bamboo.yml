@@ -64,7 +64,7 @@ Fetch dependencies:
         buildHangingConfig.enabled: 'false'
   tasks:
   - checkout: &checkout
-      path: onepanel-gui
+      path: onezone-gui
       force-clean-build: 'true'
       description: Checkout Default Repository
   - script: &init-submodules
