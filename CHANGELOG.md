@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9457 Added additional checks for privacy policy and Term of Use
 * VFS-9336 Added toggle turning on lambda result streaming
 * VFS-8805 Changed names in space sidebar menu to be more descriptive
 * VFS-9355 Added more possible units to time series charts
