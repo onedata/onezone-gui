@@ -233,12 +233,14 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       dataSpec,
       isOptional,
       defaultValue,
+      relayMethod,
     } = getProperties(
       entry || {},
       'name',
       'dataSpec',
       'isOptional',
-      'defaultValue'
+      'defaultValue',
+      'relayMethod',
     );
     if (!name || !dataSpec) {
       return;
@@ -258,6 +260,8 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
           undefined : JSON.stringify(defaultValue),
         entryIsOptional: isOptional === true,
       });
+    } else {
+      set(formEntry, 'entryIsViaFile', relayMethod === 'filePipe');
     }
   });
   return formData;

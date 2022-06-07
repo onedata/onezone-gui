@@ -64,7 +64,8 @@
     order: 2;
   }
 
-  .entryIsOptional-field {
+  .entryIsOptional-field,
+  .entryIsViaFile-field {
     order: 3;
   }
 
@@ -142,8 +143,7 @@
         flex: 1 1 100%;
       }
 
-      .entryIsArray-field,
-      .entryIsOptional-field {
+      .right-floating-toggle {
         .control-label {
           width: initial;
           min-width: initial;
@@ -182,8 +182,7 @@
         margin-left: $padding-base-vertical;
       }
 
-      .entryIsArray-field,
-      .entryIsOptional-field {
+      .right-floating-toggle {
         flex: 0 1 $entry-toggle-container-width;
         height: $input-height-base;
 
@@ -196,6 +195,7 @@
           bottom: 90%;
           left: 50%;
           transform: translateX(-50%);
+          white-space: nowrap;
         }
 
         .field-component {
@@ -207,7 +207,8 @@
         transform: translateX(#{$x-offset-to-center-toggles});
       }
 
-      .entryIsOptional-field {
+      .entryIsOptional-field,
+      .entryIsViaFile-field {
         transform: translateX(-#{$x-offset-to-center-toggles});
       }
 
