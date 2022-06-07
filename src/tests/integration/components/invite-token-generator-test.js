@@ -315,15 +315,15 @@ describe('Integration | Component | invite token generator', function () {
       );
 
       this.render(hbs `
-      {{invite-token-generator
-        inviteType="onedatify"
-        targetRecord=targetRecord
-      }}
-    `);
+        {{invite-token-generator
+          inviteType="onedatify"
+          targetRecord=targetRecord
+        }}
+      `);
 
       return wait()
         .then(() => expect(this.$('.token-textarea').val()).to.match(
-          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
+          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
         ));
     });
 
@@ -334,15 +334,15 @@ describe('Integration | Component | invite token generator', function () {
       stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
 
       this.render(hbs `
-      {{invite-token-generator
-        inviteType="onedatifyWithImport"
-        targetRecord=targetRecord
-      }}
-    `);
+        {{invite-token-generator
+          inviteType="onedatifyWithImport"
+          targetRecord=targetRecord
+        }}
+      `);
 
       return wait()
         .then(() => expect(this.$('.token-textarea').val()).to.match(
-          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
+          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
         ));
     });
 
@@ -392,7 +392,7 @@ describe('Integration | Component | invite token generator', function () {
 
       await wait();
       expect(find('.token-textarea').value).to.match(
-        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
       );
       done();
     });
@@ -411,7 +411,7 @@ describe('Integration | Component | invite token generator', function () {
 
       await wait();
       expect(find('.token-textarea').value).to.match(
-        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
       );
       done();
     });
@@ -438,7 +438,7 @@ describe('Integration | Component | invite token generator', function () {
             'The support token included below will expire in 2 weeks and has no usage count limit.'
           );
           expect(find('.variables-description').textContent.trim()).to.equal(
-            'A valid $PROVIDER_REGISTRATION_TOKEN must be defined for the above command to work. Please contact a Onezone admin to acquire such a token.'
+            'A valid $PROVIDER_REGISTRATION_TOKEN must be defined for the above command to work. Please contact a Onezone administrator to acquire such a token.'
           );
           const tipText =
             await new OneTooltipHelper(find('.variables-description .one-icon'))

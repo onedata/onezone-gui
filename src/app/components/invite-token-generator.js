@@ -107,14 +107,17 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<String>}
    */
   limitationsDescription: computed(
-    'inviteType',
+    'isOnedatifyInviteType',
     'canCurrentUserInviteProviders',
     function limitationsDescription() {
       const {
-        inviteType,
+        isOnedatifyInviteType,
         canCurrentUserInviteProviders,
-      } = this.getProperties('inviteType', 'canCurrentUserInviteProviders');
-      if (onedatifyInviteTypes.includes(inviteType)) {
+      } = this.getProperties(
+        'isOnedatifyInviteType',
+        'canCurrentUserInviteProviders'
+      );
+      if (isOnedatifyInviteType) {
         return canCurrentUserInviteProviders ?
           this.t('onedatifyLimitationsDescription.withRegistrationToken') :
           this.t('onedatifyLimitationsDescription.withoutRegistrationToken');
@@ -127,33 +130,35 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  showCustomTokenLink: not(array.includes(
+  isOnedatifyInviteType: array.includes(
     raw(onedatifyInviteTypes),
     'inviteType'
-  )),
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  showCustomTokenLink: not('isOnedatifyInviteType'),
 
   /**
    * @type {ComputedProperty<string|null>}
    */
   variablesDescription: computed(
-    'inviteType',
+    'isOnedatifyInviteType',
     'canCurrentUserInviteProviders',
     'ozRegistrationTokenVariable',
     function variablesDescription() {
       const {
-        inviteType,
+        isOnedatifyInviteType,
         canCurrentUserInviteProviders,
         ozRegistrationTokenVariable,
       } = this.getProperties(
-        'inviteType',
+        'isOnedatifyInviteType',
         'canCurrentUserInviteProviders',
         'ozRegistrationTokenVariable',
       );
 
-      if (
-        onedatifyInviteTypes.includes(inviteType) &&
-        !canCurrentUserInviteProviders
-      ) {
+      if (isOnedatifyInviteType && !canCurrentUserInviteProviders) {
         return {
           content: this.t('ozRegistrationTokenVariableDescription.content', {
             variable: ozRegistrationTokenVariable,
@@ -223,18 +228,20 @@ export default Component.extend(I18n, {
       tokenManager,
       targetRecordId,
       inviteType,
+      isOnedatifyInviteType,
       canCurrentUserInviteProviders,
       ozRegistrationTokenVariable,
     } = this.getProperties(
       'tokenManager',
       'targetRecordId',
       'inviteType',
+      'isOnedatifyInviteType',
       'canCurrentUserInviteProviders',
       'ozRegistrationTokenVariable',
     );
 
     let tokenPromise;
-    if (onedatifyInviteTypes.includes(inviteType)) {
+    if (isOnedatifyInviteType) {
       const ozRegistrationTokenPromise = canCurrentUserInviteProviders ?
         tokenManager.createTemporaryInviteToken('registerOneprovider') : resolve(null);
       const supportSpaceTokenPromise =

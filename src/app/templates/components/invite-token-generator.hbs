@@ -5,7 +5,7 @@
 {{/if}}
 {{#promise-proxy-container proxy=dataLoadingProxy sizeClass="sm"}}
   <p class="limitations-description">
-    <span class="limitations-text">{{limitationsDescription}}</span>
+    <span class="limitations-text"><strong>{{limitationsDescription}}</strong></span>
     {{#if showCustomTokenLink}}
       <a
         href={{customTokenUrlProxy.content}}
