@@ -83,10 +83,10 @@ Fetch dependencies:
       working-dir: onezone-gui
       description: Fetch dependencies
   - script:
-      interpreter: SHELL
-      scripts:
-      - tar -czf deps.tar.gz $(ls -d onezone-gui/src/node_modules onezone-gui/src/bower_components 2>/dev/null)
-      description: Package dependencies
+    interpreter: SHELL
+    scripts:
+    - tar -czf deps.tar.gz $(ls -d onezone-gui/src/node_modules onezone-gui/src/bower_components 2>/dev/null)
+    description: Package dependencies
   final-tasks:
   - script: &clear-env
     interpreter: BINSH_OR_CMDEXE
