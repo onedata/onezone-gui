@@ -109,8 +109,6 @@ Run tests:
     all-other-apps:
       custom:
         auto: {}
-        clover:
-          useLocalLicenseKey: 'true'
         buildHangingConfig.enabled: 'false'
   tasks:
   - checkout:
@@ -158,14 +156,12 @@ Run tests:
   artifact-subscriptions:
   - artifact: deps.tar.gz
 Build and publish:
-  key: JOB1
+  key: BAP
   other:
     clean-working-dir: true
     all-other-apps:
       custom:
         auto: {}
-        clover:
-          useLocalLicenseKey: 'true'
         buildHangingConfig.enabled: 'false'
   tasks:
   - checkout:
