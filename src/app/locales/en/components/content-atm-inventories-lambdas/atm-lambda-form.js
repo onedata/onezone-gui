@@ -163,6 +163,9 @@ export default {
         entryIsArray: {
           label: 'Array',
         },
+        entryIsViaFile: {
+          label: 'Via file',
+        },
       },
     },
     resources: Object.assign({}, taskResourcesFields, {

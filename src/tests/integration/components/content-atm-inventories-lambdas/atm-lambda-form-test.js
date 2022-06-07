@@ -941,6 +941,32 @@ describe(
           done();
         });
 
+      it('creates lambda result "via file" on submit button click',
+        async function (done) {
+          await renderCreate(this);
+
+          const revision = await fillWithMinimumData(this);
+          await addResult();
+          const resSelector = '.results-field .collection-item:first-child';
+          await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
+          await selectChoose(`${resSelector} .type-field`, 'Integer');
+          await click(`${resSelector} .entryIsViaFile-field .one-way-toggle`);
+          await click('.btn-submit');
+
+          expect(this.get('submitStub')).to.be.calledOnce
+            .and.to.be.calledWith(Object.assign(revision, {
+              resultSpecs: [{
+                name: 'entry',
+                dataSpec: {
+                  type: 'integer',
+                  valueConstraints: {},
+                },
+                relayMethod: 'filePipe',
+              }],
+            }));
+          done();
+        });
+
       it('disables sumbit button when one of fields is invalid', async function (done) {
         await renderCreate(this);
 
@@ -1234,6 +1260,7 @@ describe(
           resultSpecs: resultTypesToCheck.map(({ dataSpec }, idx) => ({
             name: `entry${idx}`,
             dataSpec,
+            relayMethod: idx === 0 ? 'filePipe' : 'returnValue',
           })),
         });
 
@@ -1249,6 +1276,12 @@ describe(
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
           expect($entry.find('.type-field .field-component').text().trim())
             .to.equal(type);
+          const $isViaFileToggle = $entry.find('.entryIsViaFile-field .form-control');
+          if (idx === 0) {
+            expect($isViaFileToggle).to.have.class('checked');
+          } else {
+            expect($isViaFileToggle).to.not.have.class('checked');
+          }
         });
         done();
       });
