@@ -63,11 +63,11 @@ Fetch dependencies:
         auto: {}
         buildHangingConfig.enabled: 'false'
   tasks:
-  - checkout:
-      path: onezone-gui
+  - checkout: &checkout
+      path: onepanel-gui
       force-clean-build: 'true'
       description: Checkout Default Repository
-  - script:
+  - script: &init-submodules
       interpreter: SHELL
       scripts:
       - |-
@@ -88,11 +88,7 @@ Fetch dependencies:
       - tar -czf deps.tar.gz $(ls -d onezone-gui/src/node_modules onezone-gui/src/bower_components 2>/dev/null)
       description: Package dependencies
   final-tasks:
-  - script:
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - curl ${bamboo.OnedataFinalTasksURL} | bash -
-      description: Clear env
+  - script: *clear-env
   artifacts:
   - name: deps.tar.gz
     pattern: deps.tar.gz
@@ -111,19 +107,8 @@ Run tests:
         auto: {}
         buildHangingConfig.enabled: 'false'
   tasks:
-  - checkout:
-      path: onezone-gui
-      force-clean-build: 'true'
-      description: Checkout Default Repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-        git remote -v
-        make submodules
-      working-dir: onezone-gui
-      description: Init submodules
+  - checkout: *checkout
+  - script: *init-submodules
   - script:
       interpreter: SHELL
       scripts:
@@ -146,7 +131,7 @@ Run tests:
       ignore-time: 'false'
       test-results: onezone-gui/src/tmp/test-results.xml
       description: Parse test results
-  - script:
+  - script: &clear-env
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - curl ${bamboo.OnedataFinalTasksURL} | bash -
@@ -203,11 +188,7 @@ Build and publish:
       working-dir: onezone-gui
       description: Docker build and push
   final-tasks:
-  - script:
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - curl ${bamboo.OnedataFinalTasksURL} | bash -
-      description: Clear env
+  - script: *clear-env
   artifacts:
   - name: docker-build-list.json
     location: onezone-gui
