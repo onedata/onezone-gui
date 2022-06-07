@@ -1,3 +1,3 @@
 export default {
-  header: 'automation',
+  header: 'automation workflows',
 };
