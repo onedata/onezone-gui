@@ -17,8 +17,8 @@ import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import DOMPurify from 'npm:dompurify';
-import isIp from 'npm:is-ip';
+import DOMPurify from 'dompurify';
+import isIp from 'is-ip';
 import $ from 'jquery';
 
 const ANIMATION_TIMEOUT = 333;

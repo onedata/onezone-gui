@@ -16,8 +16,10 @@ test: deps run_tests
 
 test_xunit_output: deps run_tests_xunit_output
 
-deps:
-	cd $(SRC_DIR) && npm install
+deps: src/node_modules
+
+src/node_modules: src/package.json
+	cd $(SRC_DIR) && npm run deps
 
 build_mock:
 	cd $(SRC_DIR) && ember build --environment=development --output-path=../$(REL_DIR)
@@ -29,13 +31,16 @@ build_prod:
 	cd $(SRC_DIR) && ember build --environment=production --output-path=../$(REL_DIR)
 
 clean:
-	cd $(SRC_DIR) && rm -rf node_modules dist tmp ../$(REL_DIR)/*
+	cd $(SRC_DIR) && npm run clean
 
 run_tests:
 	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test
 
 run_tests_xunit_output:
 	cd $(SRC_DIR) && xvfb-run $(XVFB_ARGS) ember test -r xunit
+
+lint: src/node_modules
+	cd $(SRC_DIR) && npm run-script lint
 
 ##
 ## Submodules
