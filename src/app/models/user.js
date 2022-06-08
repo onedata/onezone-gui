@@ -23,6 +23,7 @@ export default Model.extend(GraphSingleModelMixin, {
   username: attr('string'),
   basicAuthEnabled: attr('boolean'),
   hasPassword: attr('boolean'),
+  canInviteProviders: attr('boolean'),
 
   /**
    * Properties:
