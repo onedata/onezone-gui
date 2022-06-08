@@ -43,7 +43,7 @@ describe('Integration | Component | content spaces harvesters', function () {
       harvesterList: harvesterListPromise,
       getRelation(name) {
         if (name === 'harvesterList') {
-          return harvesterListPromise;
+          return this.get('harvesterList');
         }
       },
     }));
@@ -232,7 +232,7 @@ describe('Integration | Component | content spaces harvesters', function () {
   context('handles errors', function () {
     suppressRejections();
 
-    it('shows error when harvesters cannot be loaded', function () {
+    it('shows error when harvesters cannot be loaded', function (done) {
       this.set('space.harvesterList', promiseObject(reject('someError')));
 
       this.render(hbs `{{content-spaces-harvesters space=space}}`);
@@ -245,6 +245,7 @@ describe('Integration | Component | content spaces harvesters', function () {
           const $loadError = this.$('.resource-load-error');
           expect($loadError).to.exist;
           expect($loadError.text()).to.contain('someError');
+          done();
         });
     });
   });
