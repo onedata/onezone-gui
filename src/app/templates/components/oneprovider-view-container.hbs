@@ -67,11 +67,12 @@
               tabBarClass
               (if mapSelectorEnabled "with-map-selector")
             )
-            items=providerItems
+            items=tabBarItems
             selectedItem=selectedProviderItem
-            selectDefaultOnInit=false
+            selectDefaultOnInit=true
             selectedItemChanged=(action "selectedProviderChanged")
             tabBarLiComponentName="provider-tab-li"
+            isSorted=false
           }}
             {{#if mapSelectorEnabled}}
               {{oneproviders-map-selector
@@ -86,43 +87,51 @@
         {{/if}}
       </div>
     </div>
-    <div
-      class={{concat-classes
-      "row absolute-flex-content-child-stretch oneprovider-view-container-inner"
-      contentContainerClass
-    }}>
-      {{#if showAllOfflineInfo}}
-        {{content-info
-          header=(tt this "allOneprovidersOffline")
-          imagePath=(root-url "assets/images/data-error-no-providers.svg")
-          class="preserve-header scroll-breakpoint-600"
-        }}
-      {{else}}
-        {{#promise-proxy-container proxy=oneproviderViewProxy}}
-          {{#if isEmbeddableOneprovider}}
-            {{#if selectedProvider.online}}
-              {{yield (hash
-                body=(component "oneprovider-view-container/container-body")
-                contentIframeBaseUrl=contentIframeBaseUrl
-                selectedProvider=selectedProvider
-              )}}
+    {{#if (not-eq oneproviderId "overview")}}
+      <div
+        class={{concat-classes
+        "row absolute-flex-content-child-stretch oneprovider-view-container-inner"
+        contentContainerClass
+      }}>
+        {{#if showAllOfflineInfo}}
+          {{content-info
+            header=(tt this "allOneprovidersOffline")
+            imagePath=(root-url "assets/images/data-error-no-providers.svg")
+            class="preserve-header scroll-breakpoint-600"
+          }}
+        {{else}}
+          {{#promise-proxy-container proxy=oneproviderViewProxy}}
+            {{#if isEmbeddableOneprovider}}
+              {{#if selectedProvider.online}}
+                {{yield (hash
+                  body=(component "oneprovider-view-container/container-body")
+                  contentIframeBaseUrl=contentIframeBaseUrl
+                  selectedProvider=selectedProvider
+                )}}
+              {{else}}
+                {{content-info
+                  header=(tt this "oneproviderOffline")
+                  imagePath=(root-url "assets/images/no-connection.svg")
+                  class="preserve-header scroll-breakpoint-600"
+                }}
+              {{/if}}
             {{else}}
-              {{content-info
-                header=(tt this "oneproviderOffline")
-                imagePath=(root-url "assets/images/no-connection.svg")
-                class="preserve-header scroll-breakpoint-600"
+              {{content-provider-redirect
+                provider=selectedProvider
+                spaceId=space.entityId
+                resourceType=resourceType
               }}
             {{/if}}
-          {{else}}
-            {{content-provider-redirect
-              provider=selectedProvider
-              spaceId=space.entityId
-              resourceType=resourceType
-            }}
-          {{/if}}
-        {{/promise-proxy-container}}
-      {{/if}}
-    </div>
+          {{/promise-proxy-container}}
+        {{/if}}
+      </div>
+    {{else}}
+      {{yield (hash
+        body=(component "oneprovider-view-container/container-body")
+        contentIframeBaseUrl=contentIframeBaseUrl
+        selectedProvider="overview"
+      )}}
+    {{/if}}
   {{else}}
     {{content-spaces-no-support class="cancel-absolute-flex-content-padding"}}
   {{/if}}

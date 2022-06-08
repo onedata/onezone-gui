@@ -12,11 +12,14 @@ import layout from '../templates/components/provider-tab-li';
 import TabBarLi from 'onedata-gui-common/components/one-tab-bar/tab-bar-li';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default TabBarLi.extend({
+export default TabBarLi.extend(I18n, {
   layout,
 
   providerManager: service(),
+
+  i18nPrefix: 'components.providerTabLi',
 
   /**
    * @type {ComputedProperty<Promise<Models.Provider>>}

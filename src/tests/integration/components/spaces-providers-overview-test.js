@@ -17,7 +17,7 @@ const I18nStub = Service.extend({
 
 const NavigationStateStub = Service.extend({});
 
-describe('Integration | Component | content spaces providers', function () {
+describe('Integration | Component | spaces providers overview', function () {
   setupRenderingTest();
 
   beforeEach(function beforeEach() {
@@ -72,7 +72,10 @@ describe('Integration | Component | content spaces providers', function () {
   });
 
   it('renders providers list, atlas and support chart ', async function () {
-    await render(hbs `{{content-spaces-providers space=space}}`);
+    await render(hbs `{{spaces-providers-overview
+      space=space
+      providersProxy=space.providerList.list
+    }}`);
 
     expect(find('.space-providers-list'), 'providers list').to.exist;
     expect(find('.space-providers-atlas'), 'providers atlas').to.exist;
