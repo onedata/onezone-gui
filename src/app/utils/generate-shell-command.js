@@ -1,5 +1,5 @@
 /**
- * Functions to generate shell commands that are presented to user 
+ * Functions to generate shell commands that are presented to user
  *
  * @module utils/generate-shell-command
  * @author Jakub Liput, Michał Borzęcki
@@ -15,26 +15,45 @@ function escapeCommandString(string) {
   return (string || '').replace(/'/g, '\\\'');
 }
 
-function _curlCommand(url, supportToken, onezoneRegistrationToken, suffix = '') {
+function _curlCommand({
+  url,
+  supportToken,
+  onezoneRegistrationToken,
+  onezoneRegistrationTokenVariable,
+  suffix = '',
+}) {
+  const registrationTokenContent = onezoneRegistrationTokenVariable ?
+    `"${onezoneRegistrationTokenVariable}"` :
+    `'${escapeCommandString(onezoneRegistrationToken)}'`;
   const onezoneUrl = _onezoneUrl().replace(/'/g, '\\\'');
-  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token '${escapeCommandString(onezoneRegistrationToken)}' --token '${escapeCommandString(supportToken)}'${suffix ? ' ' + suffix : ''}`;
+  return `curl ${url} | sh -s onedatify --onezone-url '${onezoneUrl}' --registration-token ${registrationTokenContent} --token '${escapeCommandString(supportToken)}'${suffix ? ' ' + suffix : ''}`;
 }
 
 const GENERATORS = {
-  onedatify({ supportToken, onezoneRegistrationToken }) {
-    return _curlCommand(
-      'https://get.onedata.org/onedatify.sh',
+  onedatify({
+    supportToken,
+    onezoneRegistrationToken,
+    onezoneRegistrationTokenVariable,
+  }) {
+    return _curlCommand({
+      url: 'https://get.onedata.org/onedatify.sh',
       supportToken,
       onezoneRegistrationToken,
-      '--import'
-    );
+      onezoneRegistrationTokenVariable,
+      suffix: '--import',
+    });
   },
-  oneprovider({ supportToken, onezoneRegistrationToken }) {
-    return _curlCommand(
-      'https://get.onedata.org/onedatify.sh',
+  oneprovider({
+    supportToken,
+    onezoneRegistrationToken,
+    onezoneRegistrationTokenVariable,
+  }) {
+    return _curlCommand({
+      url: 'https://get.onedata.org/onedatify.sh',
       supportToken,
-      onezoneRegistrationToken
-    );
+      onezoneRegistrationToken,
+      onezoneRegistrationTokenVariable,
+    });
   },
 };
 
