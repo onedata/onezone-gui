@@ -79,7 +79,7 @@ Fetch dependencies:
   - script:
       interpreter: SHELL
       scripts:
-      - ./make.py deps
+      - ./make.py -r ${bamboo.agentWorkingDirectory} deps
       working-dir: onezone-gui
       description: Fetch dependencies
   - script:
@@ -117,7 +117,7 @@ Run tests:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
-        ./make.py lint
+        ./make.py -r ${bamboo.agentWorkingDirectory} lint
         LINT_RESULT=$?
         ./make.py run_tests_xunit_output
         return `expr $LINT_RESULT + $?`
@@ -151,7 +151,7 @@ Build and publish:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - ./make.py build_prod
+      - ./make.py -r ${bamboo.agentWorkingDirectory} build_prod
       working-dir: onezone-gui
       description: Build (production)
   - script:
