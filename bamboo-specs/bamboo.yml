@@ -56,7 +56,7 @@ stages:
     - Build and publish
 Fetch dependencies:
   key: FD
-  other:
+  other: &other-job-configuration
     clean-working-dir: true
     all-other-apps:
       custom:
@@ -79,7 +79,7 @@ Fetch dependencies:
   - script:
       interpreter: SHELL
       scripts:
-      - ./make.py -r ${bamboo.agentWorkingDirectory} deps
+      - ./make.py deps
       working-dir: onezone-gui
       description: Fetch dependencies
   - script:
@@ -104,12 +104,7 @@ Fetch dependencies:
 Run tests:
   key: TEST
   description: Build app in test environment and invoke ember tests
-  other:
-    clean-working-dir: true
-    all-other-apps:
-      custom:
-        auto: {}
-        buildHangingConfig.enabled: 'false'
+  other: *other-job-configuration
   tasks:
   - checkout: *checkout
   - script: *init-submodules
@@ -122,16 +117,10 @@ Run tests:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
-        ./make.py -r ${bamboo.agentWorkingDirectory} lint
+        ./make.py lint
         LINT_RESULT=$?
-        ./make.py -r ${bamboo.agentWorkingDirectory} run_tests_xunit_output
-        TEST_CI_RESULT=$?
-        if [ $LINT_RESULT -ne 0 ]; then
-          exit $LINT_RESULT
-        fi
-        if [ $TEST_CI_RESULT -ne 0 ]; then
-          exit $TEST_CI_RESULT
-        fi
+        ./make.py run_tests_xunit_output
+        return `expr $LINT_RESULT + $?`
       working-dir: onezone-gui
       description: Run unit tests
   final-tasks:
@@ -147,26 +136,13 @@ Run tests:
   - artifact: deps.tar.gz
 Build and publish:
   key: BAP
-  other:
-    clean-working-dir: true
-    all-other-apps:
-      custom:
-        auto: {}
-        buildHangingConfig.enabled: 'false'
+  other: *other-job-configuration
   tasks:
   - checkout:
       path: onezone-gui
       force-clean-build: 'true'
       description: Checkout Default Repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-        git remote -v
-        make submodules
-      working-dir: onezone-gui
-      description: Init submodules
+  - script: *init-submodules
   - script:
       interpreter: SHELL
       scripts:
@@ -175,7 +151,7 @@ Build and publish:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - ./make.py -r ${bamboo.agentWorkingDirectory} build_prod
+      - ./make.py build_prod
       working-dir: onezone-gui
       description: Build (production)
   - script:
