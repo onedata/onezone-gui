@@ -10,8 +10,9 @@ const defineSassBreakpoints = require(
 );
 const colors = require('./lib/onedata-gui-common/config/colors');
 const breakpoints = require('./lib/onedata-gui-common/config/breakpoints');
-
 const sass = require('sass');
+
+const environment = EmberApp.env();
 
 module.exports = function (defaults) {
   const app = new EmberApp(defaults, {
@@ -73,6 +74,9 @@ module.exports = function (defaults) {
     },
     'ember-cli-chartist': {
       useCustomCSS: true,
+    },
+    'autoImport': {
+      publicAssetURL: environment === 'test' ? '/assets/' : './assets/',
     },
   });
 

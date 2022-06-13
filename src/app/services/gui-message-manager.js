@@ -9,7 +9,7 @@
 
 import Service, { inject as service } from '@ember/service';
 import { get, computed } from '@ember/object';
-import DOMPurify from 'npm:dompurify';
+import DOMPurify from 'dompurify';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
 import { Promise } from 'rsvp';
 import hasEmptyHtmlContent from 'onedata-gui-common/utils/has-empty-html-content';
