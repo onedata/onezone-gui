@@ -1,0 +1,194 @@
+---
+version: 2
+plan:
+  key: VFS-OZG
+plan-permissions:
+- groups:
+  - plggveildev
+  permissions:
+  - view
+  - edit
+  - build
+  - clone
+- users:
+  - plgborzecki
+  - plgjliput
+  permissions:
+  - view
+  - edit
+  - build
+  - clone
+  - admin
+---
+version: 2
+plan:
+  project-key: VFS
+  key: OZG
+  name: onezone-gui
+repositories:
+- onezone-gui:
+    scope: global
+branches:
+  create: for-new-branch
+  delete:
+    after-deleted-days: 7
+    after-inactive-days: 30
+  link-to-jira: true
+labels: []
+dependencies:
+  require-all-stages-passing: false
+  enabled-for-branches: true
+  block-strategy: none
+  plans: []
+other:
+  concurrent-build-plugin: system-default
+stages:
+- Dependencies:
+    manual: false
+    final: false
+    jobs:
+    - Fetch dependencies
+- Test and build:
+    manual: false
+    final: false
+    jobs:
+    - Run tests
+    - Build and publish
+Fetch dependencies:
+  key: FD
+  other: &other-job-configuration
+    clean-working-dir: true
+    all-other-apps:
+      custom:
+        auto: {}
+        buildHangingConfig.enabled: 'false'
+  tasks:
+  - checkout: &checkout
+      path: onezone-gui
+      force-clean-build: 'true'
+      description: Checkout Default Repository
+  - script: &init-submodules
+      interpreter: SHELL
+      scripts:
+      - |-
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodules
+      working-dir: onezone-gui
+      description: Init submodules
+  - script:
+      interpreter: SHELL
+      scripts:
+      - ./make.py -r ${bamboo.agentWorkingDirectory} deps
+      working-dir: onezone-gui
+      description: Fetch dependencies
+  - script:
+      interpreter: SHELL
+      scripts:
+      - tar -czf deps.tar.gz onezone-gui/src/node_modules
+      description: Package dependencies
+  final-tasks:
+  - script: &clear-env
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - curl ${bamboo.OnedataFinalTasksURL} | bash -
+      description: Clear env
+  artifacts:
+  - name: deps.tar.gz
+    pattern: deps.tar.gz
+    shared: true
+    required: true
+  requirements:
+  - gui
+  artifact-subscriptions: []
+Run tests:
+  key: TEST
+  description: Build app in test environment and invoke ember tests
+  other: *other-job-configuration
+  tasks:
+  - checkout: *checkout
+  - script: *init-submodules
+  - script:
+      interpreter: SHELL
+      scripts:
+      - tar -xzmf deps.tar.gz
+      description: Unpack dependencies
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - ./make.py -r ${bamboo.agentWorkingDirectory} run_tests_xunit_output
+      working-dir: onezone-gui
+      description: Run unit tests
+  final-tasks:
+  - test-parser:
+      type: junit
+      ignore-time: 'false'
+      test-results: onezone-gui/src/tmp/test-results.xml
+      description: Parse test results
+  - script: *clear-env
+  requirements:
+  - gui
+  artifact-subscriptions:
+  - artifact: deps.tar.gz
+Build and publish:
+  key: BAP
+  other: *other-job-configuration
+  tasks:
+  - checkout:
+      path: onezone-gui
+      force-clean-build: 'true'
+      description: Checkout Default Repository
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodules || exit $?
+      working-dir: onezone-gui
+      description: Init submodules
+  - script:
+      interpreter: SHELL
+      scripts:
+      - tar -xzmf deps.tar.gz
+      description: Unpack dependencies
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - ./make.py -r ${bamboo.agentWorkingDirectory} build_prod
+      working-dir: onezone-gui
+      description: Build (production)
+  - script:
+      interpreter: SHELL
+      scripts:
+      - rm -rf src
+      working-dir: onezone-gui
+      description: Remove redundant source files
+  - script:
+      interpreter: SHELL
+      scripts:
+      - |-
+        . /home/bamboo/.credsrc
+        ./bamboos/scripts/publish_gui_pkg_docker.sh --user ${ONEDATA_DOCKER_USER} --password ${ONEDATA_DOCKER_PASS}
+      working-dir: onezone-gui
+      description: Docker build and push
+  final-tasks:
+  - script: *clear-env
+  artifacts:
+  - &art-item-build
+    name: docker-build-list.json
+    location: onezone-gui
+    pattern: docker-build-list.json
+    shared: true
+    required: true
+  - <<: *art-item-build
+    name: docker-build-report.txt
+    pattern: docker-build-report.txt
+  - <<: *art-item-build
+    name: gui-image.conf
+    pattern: gui-image.conf
+  requirements:
+  - gui
+  artifact-subscriptions:
+  - artifact: deps.tar.gz
+...
