@@ -56,7 +56,7 @@ stages:
     - Build and publish
 Fetch dependencies:
   key: FD
-  other:
+  other: &other-job-configuration
     clean-working-dir: true
     all-other-apps:
       custom:
@@ -104,12 +104,7 @@ Fetch dependencies:
 Run tests:
   key: TEST
   description: Build app in test environment and invoke ember tests
-  other:
-    clean-working-dir: true
-    all-other-apps:
-      custom:
-        auto: {}
-        buildHangingConfig.enabled: 'false'
+  other: *other-job-configuration
   tasks:
   - checkout: *checkout
   - script: *init-submodules
@@ -142,12 +137,7 @@ Run tests:
   - artifact: deps.tar.gz
 Build and publish:
   key: BAP
-  other:
-    clean-working-dir: true
-    all-other-apps:
-      custom:
-        auto: {}
-        buildHangingConfig.enabled: 'false'
+  other: *other-job-configuration
   tasks:
   - checkout:
       path: onezone-gui
@@ -190,21 +180,18 @@ Build and publish:
   final-tasks:
   - script: *clear-env
   artifacts:
-  - name: docker-build-list.json
+  - &art-item-build
+    name: docker-build-list.json
     location: onezone-gui
     pattern: docker-build-list.json
     shared: true
     required: true
-  - name: docker-build-report.txt
-    location: onezone-gui
+  - <<: *art-item-build
+    name: docker-build-report.txt
     pattern: docker-build-report.txt
-    shared: true
-    required: true
-  - name: gui-image.conf
-    location: onezone-gui
+  - <<: *art-item-build
+    name: gui-image.conf
     pattern: gui-image.conf
-    shared: true
-    required: true
   requirements:
   - gui
   artifact-subscriptions:
