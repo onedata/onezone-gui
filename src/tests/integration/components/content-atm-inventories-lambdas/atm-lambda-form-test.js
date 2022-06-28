@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupComponentTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
-import { fillIn, focus, blur, click, find } from 'ember-native-dom-helpers';
+import { fillIn, focus, blur, click } from 'ember-native-dom-helpers';
 import wait from 'ember-test-helpers/wait';
 import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
 import $ from 'jquery';
@@ -22,141 +22,31 @@ const states = [{
   label: 'Deprecated',
 }];
 
-const argumentAndResultCommonTypes = [{
-  dataSpec: {
-    type: 'integer',
-    valueConstraints: {},
-  },
-  label: 'Integer',
-}, {
-  dataSpec: {
-    type: 'string',
-    valueConstraints: {},
-  },
-  label: 'String',
-}, {
-  dataSpec: {
-    type: 'object',
-    valueConstraints: {},
-  },
-  label: 'Object',
-  // TODO: VFS-7816 uncomment or remove future code
-  // }, {
-  //   dataSpec: {
-  //     type: 'histogram',
-  //     valueConstraints: {},
-  //   },
-  //   label: 'Histogram',
-}, {
-  dataSpec: {
-    type: 'file',
-    valueConstraints: {
-      fileType: 'ANY',
-    },
-  },
-  label: 'Any file',
-}, {
-  dataSpec: {
-    type: 'file',
-    valueConstraints: {
-      fileType: 'REG',
-    },
-  },
-  label: 'Regular file',
-}, {
-  dataSpec: {
-    type: 'file',
-    valueConstraints: {
-      fileType: 'DIR',
-    },
-  },
-  label: 'Directory',
-}, {
-  dataSpec: {
-    type: 'file',
-    valueConstraints: {
-      fileType: 'SYMLNK',
-    },
-  },
-  label: 'Symbolic link',
-}, {
-  dataSpec: {
-    type: 'dataset',
-    valueConstraints: {},
-  },
-  label: 'Dataset',
-}, {
-  // TODO: VFS-7816 uncomment or remove future code
-  //   dataSpec: {
-  //     type: 'archive',
-  //     valueConstraints: {},
-  //   },
-  //   label: 'Archive',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'singleValue',
-  //     },
-  //   },
-  //   label: 'Single value store',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'list',
-  //     },
-  //   },
-  //   label: 'List store',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'map',
-  //     },
-  //   },
-  //   label: 'Map store',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'treeForest',
-  //     },
-  //   },
-  //   label: 'Tree forest store',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'range',
-  //     },
-  //   },
-  //   label: 'Range store',
-  // }, {
-  //   dataSpec: {
-  //     type: 'storeCredentials',
-  //     valueConstraints: {
-  //       storeType: 'histogram',
-  //     },
-  //   },
-  //   label: 'Histogram store',
-  // }, {
-  dataSpec: {
-    type: 'range',
-    valueConstraints: {},
-  },
-  label: 'Range',
-}, {
-  label: 'Time series measurement',
-}];
+const argumentAndResultCommonTypes = [
+  'Integer',
+  'String',
+  'Object',
+  'File',
+  'Dataset',
+  'Range',
+  'Array',
+  'Time series measurement',
+];
 
-const argumentTypes = [...argumentAndResultCommonTypes, {
-  dataSpec: {
-    type: 'onedatafsCredentials',
-    valueConstraints: {},
-  },
-  label: 'OnedataFS credentials',
-}];
+// Selection of types from `argumentAndResultCommonTypes` which does not take
+// any additional parameters and are ease to convert to dataSpec object.
+const testConvenientTypes = [
+  'Integer',
+  'String',
+  'Object',
+  'Dataset',
+  'Range',
+];
+
+const argumentTypes = [
+  ...argumentAndResultCommonTypes,
+  'OnedataFS credentials',
+];
 const resultTypes = argumentAndResultCommonTypes;
 
 describe(
@@ -454,8 +344,8 @@ describe(
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
-        const $entryTypeField = $entry.find('.type-field .dropdown-field-trigger');
-        expect($entryTypeField.text().trim()).to.equal('Integer');
+        const $entryTypeField = $entry.find('.data-spec-editor .dropdown-field-trigger');
+        expect($entryTypeField.text().trim()).to.equal('');
 
         const $entryIsOptionalLabel = $entry.find('.entryIsOptional-field .control-label');
         const $entryIsOptionalField = $entry.find('.entryIsOptional-field .form-control');
@@ -519,12 +409,28 @@ describe(
           await renderCreate(this);
           await addArgument();
 
-          await clickTrigger('.type-field');
+          await clickTrigger('.data-spec-editor');
 
           const $options = $('.ember-power-select-option');
           expect($options).to.have.length(argumentTypes.length);
-          argumentTypes.forEach(({ label }, i) =>
-            expect($options.eq(i).text().trim()).to.equal(label)
+          argumentTypes.forEach((type, i) =>
+            expect($options.eq(i).text().trim()).to.equal(type)
+          );
+          done();
+        });
+
+      it('provides argument types options in array for "argument type" field',
+        async function (done) {
+          await renderCreate(this);
+          await addArgument();
+
+          await selectChoose('.data-spec-editor', 'Array');
+          await clickTrigger('.data-spec-editor');
+
+          const $options = $('.ember-power-select-option');
+          expect($options).to.have.length(argumentTypes.length - 1);
+          argumentTypes.without('OnedataFS credentials').forEach((type, i) =>
+            expect($options.eq(i).text().trim()).to.equal(type)
           );
           done();
         });
@@ -567,8 +473,8 @@ describe(
         expect($entryNameField).to.have.attr('placeholder', 'Name');
         expect($entryNameField).to.have.value('');
 
-        const $entryTypeField = $entry.find('.type-field .dropdown-field-trigger');
-        expect($entryTypeField.text().trim()).to.equal('Integer');
+        const $entryTypeField = $entry.find('.data-spec-editor .dropdown-field-trigger');
+        expect($entryTypeField.text().trim()).to.equal('');
         done();
       });
 
@@ -630,12 +536,12 @@ describe(
         await renderCreate(this);
         await addResult();
 
-        await clickTrigger('.type-field');
+        await clickTrigger('.data-spec-editor');
 
         const $options = $('.ember-power-select-option');
         expect($options).to.have.length(resultTypes.length);
-        resultTypes.forEach(({ label }, i) =>
-          expect($options.eq(i).text().trim()).to.equal(label)
+        resultTypes.forEach((type, i) =>
+          expect($options.eq(i).text().trim()).to.equal(type)
         );
         done();
       });
@@ -726,8 +632,8 @@ describe(
           const nthArgSelector = `.arguments-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthArgSelector} .entryName-field .form-control`, `arg${i}`);
           await selectChoose(
-            `${nthArgSelector} .type-field`,
-            argumentTypes[i].label
+            `${nthArgSelector} .data-spec-editor`,
+            testConvenientTypes[i]
           );
           if (i === 0) {
             await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
@@ -738,8 +644,8 @@ describe(
           const nthResSelector = `.results-field .collection-item:nth-child(${i + 1})`;
           await fillIn(`${nthResSelector} .entryName-field .form-control`, `res${i}`);
           await selectChoose(
-            `${nthResSelector} .type-field`,
-            argumentTypes[i].label
+            `${nthResSelector} .data-spec-editor`,
+            testConvenientTypes[i]
           );
         }
 
@@ -769,11 +675,16 @@ describe(
             },
           },
           preferredBatchSize: 250,
-          argumentSpecs: argumentTypes.slice(0, 2)
-            .map(({ dataSpec }, idx) => {
+          argumentSpecs: testConvenientTypes.slice(0, 2)
+            .map((type, idx) => {
               const arg = {
                 name: `arg${idx}`,
-                dataSpec,
+                dataSpec: {
+                  // It's very oversimplified to infer dataSpec from it's translation
+                  // but it's good enough for test purposes.
+                  type: type.toLowerCase(),
+                  valueConstraints: {},
+                },
                 isOptional: idx === 0,
               };
               if (idx === 0) {
@@ -781,9 +692,14 @@ describe(
               }
               return arg;
             }),
-          resultSpecs: resultTypes.slice(0, 2).map(({ dataSpec }, idx) => ({
+          resultSpecs: testConvenientTypes.slice(0, 2).map((type, idx) => ({
             name: `res${idx}`,
-            dataSpec,
+            dataSpec: {
+              // It's very oversimplified to infer dataSpec from it's translation
+              // but it's good enough for test purposes.
+              type: type.toLowerCase(),
+              valueConstraints: {},
+            },
             relayMethod: 'returnValue',
           })),
           resourceSpec: {
@@ -815,132 +731,6 @@ describe(
           });
       });
 
-      argumentTypes.rejectBy('label', 'Time series measurement')
-        .forEach(({ dataSpec, label }) => {
-          it(`creates lambda with "${label}"-typed argument on submit button click`,
-            async function (done) {
-              await renderCreate(this);
-
-              const revision = await fillWithMinimumData(this);
-              await addArgument();
-              const argSelector = '.arguments-field .collection-item:first-child';
-              await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
-              await selectChoose(`${argSelector} .type-field`, label);
-              await click('.btn-submit');
-
-              expect(this.get('submitStub')).to.be.calledOnce
-                .and.to.be.calledWith(Object.assign(revision, {
-                  argumentSpecs: [{
-                    name: 'entry',
-                    dataSpec,
-                    isOptional: false,
-                  }],
-                }));
-              done();
-            });
-        });
-
-      it('creates lambda with "Time series measurement"-typed argument on submit button click',
-        async function (done) {
-          await renderCreate(this);
-
-          const revision = await fillWithMinimumData(this);
-          await addArgument();
-          const argSelector = '.arguments-field .collection-item:first-child';
-          await fillIn(`${argSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${argSelector} .type-field`, 'Time series measurement');
-          await click(
-            `${argSelector} .timeSeriesMeasurementValueConstraints-field .add-field-button`
-          );
-          await selectChoose(`${argSelector} .nameMatcherType-field`, 'Has prefix');
-          await fillIn(`${argSelector} .nameMatcher-field .form-control`, 'file_');
-          await selectChoose(`${argSelector} .unit-field`, 'Custom');
-          await fillIn(`${argSelector} .customUnit-field .form-control`, 'liters');
-          await click('.btn-submit');
-
-          expect(this.get('submitStub')).to.be.calledOnce
-            .and.to.be.calledWith(Object.assign(revision, {
-              argumentSpecs: [{
-                name: 'entry',
-                dataSpec: {
-                  type: 'timeSeriesMeasurement',
-                  valueConstraints: {
-                    specs: [{
-                      nameMatcherType: 'hasPrefix',
-                      nameMatcher: 'file_',
-                      unit: 'custom:liters',
-                    }],
-                  },
-                },
-                isOptional: false,
-              }],
-            }));
-          done();
-        });
-
-      resultTypes.rejectBy('label', 'Time series measurement')
-        .forEach(({ dataSpec, label }) => {
-          it(`creates lambda with "${label}"-typed result on submit button click`,
-            async function (done) {
-              await renderCreate(this);
-
-              const revision = await fillWithMinimumData(this);
-              await addResult();
-              const resSelector = '.results-field .collection-item:first-child';
-              await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-              await selectChoose(`${resSelector} .type-field`, label);
-              await click('.btn-submit');
-
-              expect(this.get('submitStub')).to.be.calledOnce
-                .and.to.be.calledWith(Object.assign(revision, {
-                  resultSpecs: [{
-                    name: 'entry',
-                    dataSpec,
-                    relayMethod: 'returnValue',
-                  }],
-                }));
-              done();
-            });
-        });
-
-      it('creates lambda with "Time series measurement"-typed result on submit button click',
-        async function (done) {
-          await renderCreate(this);
-
-          const revision = await fillWithMinimumData(this);
-          await addResult();
-          const resSelector = '.results-field .collection-item:first-child';
-          await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .type-field`, 'Time series measurement');
-          await click(
-            `${resSelector} .timeSeriesMeasurementValueConstraints-field .add-field-button`
-          );
-          await selectChoose(`${resSelector} .nameMatcherType-field`, 'Has prefix');
-          await fillIn(`${resSelector} .nameMatcher-field .form-control`, 'file_');
-          await selectChoose(`${resSelector} .unit-field`, 'Custom');
-          await fillIn(`${resSelector} .customUnit-field .form-control`, 'liters');
-          await click('.btn-submit');
-
-          expect(this.get('submitStub')).to.be.calledOnce
-            .and.to.be.calledWith(Object.assign(revision, {
-              resultSpecs: [{
-                name: 'entry',
-                dataSpec: {
-                  type: 'timeSeriesMeasurement',
-                  valueConstraints: {
-                    specs: [{
-                      nameMatcherType: 'hasPrefix',
-                      nameMatcher: 'file_',
-                      unit: 'custom:liters',
-                    }],
-                  },
-                },
-                relayMethod: 'returnValue',
-              }],
-            }));
-          done();
-        });
-
       it('creates lambda result "via file" on submit button click',
         async function (done) {
           await renderCreate(this);
@@ -949,7 +739,7 @@ describe(
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .type-field`, 'Integer');
+          await selectChoose(`${resSelector} .data-spec-editor`, 'Integer');
           await click(`${resSelector} .entryIsViaFile-field .one-way-toggle`);
           await click('.btn-submit');
 
@@ -1030,7 +820,7 @@ describe(
           expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.type-field .field-component').text().trim())
+          expect($argument.find('.data-spec-editor').text().trim())
             .to.equal('String');
           expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
@@ -1038,7 +828,7 @@ describe(
             .to.have.value('"default"');
           const $result = this.$('.results-field .entry-field');
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.type-field .field-component').text().trim())
+          expect($result.find('.data-spec-editor').text().trim())
             .to.equal('Integer');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
@@ -1181,15 +971,17 @@ describe(
         });
 
       it('shows arguments of passed lambda', async function (done) {
-        const argumentTypesToCheck =
-          argumentTypes.rejectBy('label', 'Time series measurement');
+        const argumentTypesToCheck = testConvenientTypes.slice(0, 2);
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
           },
-          argumentSpecs: argumentTypesToCheck.map(({ dataSpec }, idx) => ({
+          argumentSpecs: argumentTypesToCheck.map((type, idx) => ({
             name: `entry${idx}`,
-            dataSpec,
+            dataSpec: {
+              type: type.toLocaleLowerCase(),
+              valueConstraints: {},
+            },
             isOptional: idx === 0,
             defaultValue: idx === 0 ? 'val0' : null,
           })),
@@ -1200,10 +992,10 @@ describe(
         expect(this.$('.field-enabled')).to.not.exist;
         const $entries = this.$('.arguments-field .entry-field');
         expect($entries).to.have.length(argumentTypesToCheck.length);
-        argumentTypesToCheck.forEach(({ label: type }, idx) => {
+        argumentTypesToCheck.forEach((type, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.type-field .field-component').text().trim())
+          expect($entry.find('.data-spec-editor').text().trim())
             .to.equal(type);
           const $optionalToggle = $entry.find('.entryIsOptional-field .form-control');
           const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
@@ -1220,46 +1012,18 @@ describe(
         done();
       });
 
-      it('shows time series measurement argument of passed lambda', async function (done) {
-        this.set('revision', {
-          operationSpec: {
-            engine: 'openfaas',
-          },
-          argumentSpecs: [{
-            name: 'entry1',
-            dataSpec: {
-              type: 'timeSeriesMeasurement',
-              valueConstraints: {
-                specs: [{
-                  nameMatcherType: 'hasPrefix',
-                  nameMatcher: 'file_',
-                  unit: 'custom:liters',
-                }],
-              },
-            },
-            isOptional: false,
-            defaultValue: null,
-          }],
-        });
-
-        await renderView(this);
-
-        expect(find('.arguments-field .nameMatcherType-field').textContent).to.contain('Has prefix');
-        expect(find('.arguments-field .nameMatcher-field input').value).to.equal('file_');
-        expect(find('.arguments-field .unit-field').textContent).to.contain('Custom');
-        expect(find('.arguments-field .customUnit-field input').value).to.equal('liters');
-        done();
-      });
-
       it('shows results of passed lambda', async function (done) {
-        const resultTypesToCheck = resultTypes.rejectBy('label', 'Time series measurement');
+        const resultTypesToCheck = testConvenientTypes.slice(0, 2);
         this.set('revision', {
           operationSpec: {
             engine: 'openfaas',
           },
-          resultSpecs: resultTypesToCheck.map(({ dataSpec }, idx) => ({
+          resultSpecs: resultTypesToCheck.map((type, idx) => ({
             name: `entry${idx}`,
-            dataSpec,
+            dataSpec: {
+              type: type.toLocaleLowerCase(),
+              valueConstraints: {},
+            },
             relayMethod: idx === 0 ? 'filePipe' : 'returnValue',
           })),
         });
@@ -1271,10 +1035,10 @@ describe(
         const $entries = this.$('.results-field .entry-field');
         expect($entries).to.have.length(resultTypesToCheck.length);
 
-        resultTypesToCheck.forEach(({ label: type }, idx) => {
+        resultTypesToCheck.forEach((type, idx) => {
           const $entry = $entries.eq(idx);
           expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.type-field .field-component').text().trim())
+          expect($entry.find('.data-spec-editor').text().trim())
             .to.equal(type);
           const $isViaFileToggle = $entry.find('.entryIsViaFile-field .form-control');
           if (idx === 0) {
@@ -1283,35 +1047,6 @@ describe(
             expect($isViaFileToggle).to.not.have.class('checked');
           }
         });
-        done();
-      });
-
-      it('shows time series measurement result of passed lambda', async function (done) {
-        this.set('revision', {
-          operationSpec: {
-            engine: 'openfaas',
-          },
-          resultSpecs: [{
-            name: 'entry1',
-            dataSpec: {
-              type: 'timeSeriesMeasurement',
-              valueConstraints: {
-                specs: [{
-                  nameMatcherType: 'hasPrefix',
-                  nameMatcher: 'file_',
-                  unit: 'custom:liters',
-                }],
-              },
-            },
-          }],
-        });
-
-        await renderView(this);
-
-        expect(find('.results-field .nameMatcherType-field').textContent).to.contain('Has prefix');
-        expect(find('.results-field .nameMatcher-field input').value).to.equal('file_');
-        expect(find('.results-field .unit-field').textContent).to.contain('Custom');
-        expect(find('.results-field .customUnit-field input').value).to.equal('liters');
         done();
       });
     });
@@ -1389,7 +1124,7 @@ describe(
           expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
           const $argument = this.$('.arguments-field .entry-field');
           expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.type-field .field-component').text().trim())
+          expect($argument.find('.data-spec-editor').text().trim())
             .to.equal('String');
           expect($argument.find('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
@@ -1397,7 +1132,7 @@ describe(
             .to.have.value('"default"');
           const $result = this.$('.results-field .entry-field');
           expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.type-field .field-component').text().trim())
+          expect($result.find('.data-spec-editor').text().trim())
             .to.equal('Integer');
           expect(this.$('.readonly-field .form-control')).to.have.class('checked');
           expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
