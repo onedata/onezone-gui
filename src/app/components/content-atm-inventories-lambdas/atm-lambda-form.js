@@ -33,8 +33,7 @@ import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import {
   FormElement as DataSpecEditor,
-  dataSpecTypes,
-} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -433,40 +432,20 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       validator('exclusion', { in: reservedNames }),
     ],
   });
-  const entryTypeOptions = [
-    { value: 'integer' },
-    { value: 'string' },
-    { value: 'object' },
-    { value: 'anyFile' },
-    { value: 'regularFile' },
-    { value: 'directory' },
-    { value: 'symlink' },
-    { value: 'dataset' },
-    { value: 'range' },
-  ];
-  if (isForArguments) {
-    entryTypeOptions.push({ value: 'onedatafsCredentials' });
-  } else {
-    entryTypeOptions.push({ value: 'timeSeriesMeasurement' });
-  }
   const generateEntryDataSpecField = mode => {
     const field = DataSpecEditor.create({
       name: 'entryDataSpec',
-      allowedTypes: isForArguments ?
-        dataSpecTypes : dataSpecTypes.without('onedatafsCredentials'),
+      dataTypeFilters: [{
+        filterType: 'forbiddenType',
+        forbiddenType: {
+          type: 'onedatafsCredentials',
+        },
+        ignoredContexts: isForArguments ? ['root'] : [],
+      }],
     });
     field.changeMode(mode);
     return field;
   };
-  const generateEntryIsArrayField = mode => ToggleField.extend({
-    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-  }).create({
-    classes: 'right-floating-toggle',
-    mode,
-    name: 'entryIsArray',
-    defaultValue: false,
-    component,
-  });
   const generateEntryIsOptionalField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
@@ -540,7 +519,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
         fields: [
           generateEntryNameField(mode),
           generateEntryDataSpecField(mode),
-          generateEntryIsArrayField(mode),
           ...(isForArguments ? [
             generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),

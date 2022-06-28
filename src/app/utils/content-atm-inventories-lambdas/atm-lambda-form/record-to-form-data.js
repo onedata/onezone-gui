@@ -8,9 +8,10 @@
  */
 
 import { set, setProperties, getProperties } from '@ember/object';
-import { dataSpecToType } from 'onedata-gui-common/utils/workflow-visualiser/data-spec-converters';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
-import { dataSpecToFormValues } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import {
+  dataSpecToFormValues,
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -246,13 +247,11 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
       return;
     }
 
-    const { isArray } = dataSpecToType(dataSpec);
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
     const formEntry = set(formData, valueName, createValuesContainer({
       entryName: name,
       entryDataSpec: dataSpecToFormValues(dataSpec),
-      entryIsArray: isArray,
     }));
     if (dataType === 'argument') {
       setProperties(formEntry, {

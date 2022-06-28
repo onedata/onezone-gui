@@ -9,7 +9,9 @@
 
 import { get, getProperties } from '@ember/object';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import { formValuesToDataSpec } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import {
+  formValuesToDataSpec,
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
 
 /**
  * @param {Object} formData
@@ -109,7 +111,6 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
       const {
         entryName,
         entryDataSpec,
-        entryIsArray,
         entryIsOptional,
         entryDefaultValue,
         entryIsViaFile,
@@ -117,13 +118,12 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         entry,
         'entryName',
         'entryDataSpec',
-        'entryIsArray',
         'entryIsOptional',
         'entryDefaultValue',
         'entryIsViaFile',
       );
 
-      const dataSpec = formValuesToDataSpec(entryDataSpec, entryIsArray);
+      const dataSpec = formValuesToDataSpec(entryDataSpec);
       const lambdaData = {
         name: entryName,
         dataSpec,
