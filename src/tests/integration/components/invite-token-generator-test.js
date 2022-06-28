@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach } from 'mocha';
+import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, find } from '@ember/test-helpers';
+import { render, click, find, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
@@ -9,6 +9,7 @@ import { resolve, reject, Promise } from 'rsvp';
 import { parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';
 import { suppressRejections } from '../../helpers/suppress-rejections';
+import OneTooltipHelper from '../../helpers/one-tooltip';
 
 describe('Integration | Component | invite token generator', function () {
   setupRenderingTest();
@@ -16,6 +17,8 @@ describe('Integration | Component | invite token generator', function () {
   beforeEach(function () {
     const onezoneTimestamp = 12345;
     const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
+    sinon.stub(lookupService(this, 'recordManager'), 'getCurrentUserRecord')
+      .callsFake(() => this.get('userRecord'));
     sinon.stub(lookupService(this, 'onezoneServer'), 'getServerTime')
       .resolves(onezoneTimestamp);
     this.setProperties({
@@ -25,6 +28,9 @@ describe('Integration | Component | invite token generator', function () {
       },
       routerStub,
       onezoneTimestamp,
+      userRecord: {
+        canInviteProviders: true,
+      },
     });
   });
 
@@ -148,7 +154,7 @@ describe('Integration | Component | invite token generator', function () {
   );
 
   const standardLimitations = 'This token will expire in 2 weeks and has no usage count limit.';
-  const onedatifyLimitations = 'Tokens used below will expire in 2 weeks and have no usage count limit.';
+  const onedatifyLimitations = 'Tokens included below will expire in 2 weeks and have no usage count limit.';
   const passToUserDescription = 'Copy below token and pass it to the user you would like to invite.';
   const passToGroupDescription = 'Copy below token and pass it to the owner of group you would like to invite.';
 
@@ -267,46 +273,167 @@ describe('Integration | Component | invite token generator', function () {
     }
   });
 
-  it('allows to generate onedatify command', async function () {
-    const space = { entityId: 'space0' };
-    this.set('targetRecord', space);
-    stubCreateToken(this,
-      ['supportSpace', 'space0'],
-      resolve('supporttoken')
-    );
-    stubCreateToken(this,
-      ['registerOneprovider'],
-      resolve('registertoken')
-    );
+  context('when user has truthy "canInviteProviders"', function () {
+    it('allows to generate onedatify command', async function (done) {
+      const space = { entityId: 'space0' };
+      this.set('targetRecord', space);
+      stubCreateToken(this,
+        ['supportSpace', 'space0'],
+        resolve('supporttoken')
+      );
+      stubCreateToken(this,
+        ['registerOneprovider'],
+        resolve('registertoken')
+      );
 
-    await render(hbs `
-      {{invite-token-generator
-        inviteType="onedatify"
-        targetRecord=targetRecord
-      }}
-    `);
+      render(hbs `
+        {{invite-token-generator
+          inviteType="onedatify"
+          targetRecord=targetRecord
+        }}
+      `);
 
-    expect(find('.token-textarea').value).to.match(
-      /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken'$/
-    );
+      console.log('11111');
+
+      await settled();
+
+      console.log('bbbbb');
+
+      expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
+      );
+
+      console.log('22222');
+
+      done();
+    });
+
+    it('allows to generate onedatify with import command', async function (done) {
+      const space = { entityId: 'space0' };
+      this.set('targetRecord', space);
+      stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
+      stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
+
+      render(hbs `
+        {{invite-token-generator
+          inviteType="onedatifyWithImport"
+          targetRecord=targetRecord
+        }}
+      `);
+
+      await settled();
+
+      expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
+      );
+
+      done();
+    });
+
+    ['onedatify', 'onedatifyWithImport'].forEach((inviteType) => {
+      it(`does not show variables description for ${inviteType} invite token`,
+        async function (done) {
+          const space = { entityId: 'space0' };
+          this.set('targetRecord', space);
+          stubCreateToken(this,
+            ['supportSpace', 'space0'],
+            resolve('supporttoken')
+          );
+
+          render(hbs `
+            {{invite-token-generator
+              inviteType="onedatify"
+              targetRecord=targetRecord
+            }}
+          `);
+
+          await settled();
+          expect(find('.variables-description')).to.not.exist;
+          done();
+        }
+      );
+    });
   });
 
-  it('allows to generate onedatify with import command', async function () {
-    const space = { entityId: 'space0' };
-    this.set('targetRecord', space);
-    stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
-    stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
+  context('when user has falsy "canInviteProviders"', function () {
+    beforeEach(function () {
+      this.set('userRecord.canInviteProviders', false);
+    });
 
-    await render(hbs `
-      {{invite-token-generator
-        inviteType="onedatifyWithImport"
-        targetRecord=targetRecord
-      }}
-    `);
+    it('allows to generate onedatify command', async function (done) {
+      const space = { entityId: 'space0' };
+      this.set('targetRecord', space);
+      stubCreateToken(this,
+        ['supportSpace', 'space0'],
+        resolve('supporttoken')
+      );
 
-    expect(find('.token-textarea').value).to.match(
-      /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*' --registration-token 'registertoken' --token 'supporttoken' --import$/
-    );
+      render(hbs `
+        {{invite-token-generator
+          inviteType="onedatify"
+          targetRecord=targetRecord
+        }}
+      `);
+
+      await settled();
+      expect(find('.token-textarea').value).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
+      );
+      done();
+    });
+
+    it('allows to generate onedatify with import command', async function (done) {
+      const space = { entityId: 'space0' };
+      this.set('targetRecord', space);
+      stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
+
+      render(hbs `
+        {{invite-token-generator
+          inviteType="onedatifyWithImport"
+          targetRecord=targetRecord
+        }}
+      `);
+
+      await settled();
+      expect(find('.token-textarea').value).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
+      );
+      done();
+    });
+
+    ['onedatify', 'onedatifyWithImport'].forEach((inviteType) => {
+      it(`shows correct limitations and variables description for ${inviteType} invite token`,
+        async function (done) {
+          const space = { entityId: 'space0' };
+          this.set('targetRecord', space);
+          stubCreateToken(this,
+            ['supportSpace', 'space0'],
+            resolve('supporttoken')
+          );
+
+          render(hbs `
+            {{invite-token-generator
+              inviteType="onedatify"
+              targetRecord=targetRecord
+            }}
+          `);
+
+          await settled();
+          expect(find('.limitations-text').textContent.trim()).to.equal(
+            'The support token included below will expire in 2 weeks and has no usage count limit.'
+          );
+          expect(find('.variables-description').textContent.trim()).to.equal(
+            'A valid $PROVIDER_REGISTRATION_TOKEN must be defined for the above command to work. Please contact a Onezone administrator to acquire such a token.'
+          );
+          const tipText =
+            await new OneTooltipHelper(find('.variables-description .one-icon'))
+            .getText();
+          expect(tipText).to.equal(
+            'This Onezone enforces a restricted policy that prevents regular users from registering new Oneprovider instances at will.'
+          );
+          done();
+        });
+    });
   });
 });
 

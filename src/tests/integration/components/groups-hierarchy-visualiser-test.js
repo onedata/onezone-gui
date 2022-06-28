@@ -136,6 +136,8 @@ describe('Integration | Component | groups hierarchy visualiser', function () {
       },
     }));
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
+    sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserRecord')
+      .returns({});
 
     const group = GroupStub.create({
       name: 'a1',
