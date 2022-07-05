@@ -2,9 +2,7 @@ SRC_DIR	 ?= src
 REL_DIR	 ?= rel
 XVFB_ARGS ?= --server-args="-screen 0, 1366x768x24"
 
-.PHONY: deps build_mock build_dev build_prod run_tests run_tests_xunit_output dev mock rel test test_xunit_output clean lint
-
-.PHONY: dev mock rel test test_xunit_output deps build_mock build_dev build_prod clean run_tests run_tests_xunit_output submodules
+.PHONY: deps build_mock build_dev build_prod run_tests run_tests_xunit_output dev mock rel test test_xunit_output clean lint submodules
 
 all: dev
 
