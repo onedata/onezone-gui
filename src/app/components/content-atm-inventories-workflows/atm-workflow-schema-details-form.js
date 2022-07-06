@@ -10,7 +10,12 @@
  */
 
 import Component from '@ember/component';
-import { observer, computed, getProperties, get } from '@ember/object';
+import {
+  observer,
+  computed,
+  getProperties,
+  get,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { tag, or, not } from 'ember-awesome-macros';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';

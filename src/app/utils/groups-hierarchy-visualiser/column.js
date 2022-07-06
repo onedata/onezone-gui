@@ -8,13 +8,13 @@
  *  * calculates position values for lines and group boxes, that are the same
  *    across whole column,
  *  * calculates column X position using prevColumn X position
- * 
+ *
  * Column ID:
  *  Each column has an integer columnId, which is unique across the whole
  *  application. ID for new column is equal to lastGeneratedId+1. It means, that
  *  columnId generates an order, which tells us that one column has been created
  *  later than another.
- * 
+ *
  * Column types:
  *  To read more about column types, see documentation for
  *  components/groups-hierarchy-visualiser.
@@ -25,7 +25,14 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, observer, get, set, getProperties } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+  set,
+  getProperties,
+  defineProperty,
+} from '@ember/object';
 import { reads, sort, filterBy, bool } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { resolve } from 'rsvp';
@@ -380,7 +387,7 @@ export default EmberObject.extend({
       // Existence of childrenRelationGroupBox usually means that nextColumn
       // also exists, but when some dynamic columns changes occur, there are
       // situations when these properties are not fully recalculated
-      // (childrenRelationGroupBox !== null but nextColumn === null) 
+      // (childrenRelationGroupBox !== null but nextColumn === null)
       if (nextColumn && childrenRelationGroupBox) {
         // Reset hover state
         groupBoxesWithRightLines
@@ -413,7 +420,7 @@ export default EmberObject.extend({
       // Existence of parentsRelationGroupBox usually means that prevColumn
       // also exists, but when some dynamic columns changes occur, there are
       // situations when these properties are not fully recalculated
-      // (parentsRelationGroupBox !== null but prevColumn === null) 
+      // (parentsRelationGroupBox !== null but prevColumn === null)
       if (prevColumn && parentsRelationGroupBox) {
         // Reset hover state
         groupBoxesWithLeftLines
@@ -434,7 +441,7 @@ export default EmberObject.extend({
 
   prevColumnObserver: observer('prevColumn', function prevColumnObserver() {
     if (this.get('prevColumn')) {
-      this.set('x', computed('prevColumn.x', 'width', function x() {
+      defineProperty(this, 'x', computed('prevColumn.x', 'width', function x() {
         const width = this.get('width');
         const prevX = this.get('prevColumn.x');
         return prevX === undefined ? 0 : prevX + width;
@@ -470,7 +477,7 @@ export default EmberObject.extend({
 
   /**
    * Creates new group box
-   * @param {Group} group 
+   * @param {Group} group
    * @returns {Utils/GroupHierarchyVisualiser/GroupBox}
    */
   createGroupBox(group) {
@@ -483,7 +490,7 @@ export default EmberObject.extend({
   /**
    * Finds group box that can be a trigger for siblingColumn
    * (siblingColumn.relatedGroup and groupBox.group are the same and relation fits)
-   * @param {Utils/GroupHierarchyVisualiser/Column} siblingColumn 
+   * @param {Utils/GroupHierarchyVisualiser/Column} siblingColumn
    * @param {string} expectedRelationType One of `parents`, `children`
    * @returns {Utils/GroupHierarchyVisualiser/GroupBox|null}
    */

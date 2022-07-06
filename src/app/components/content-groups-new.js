@@ -26,7 +26,7 @@ export default Component.extend(I18n, {
 
   didInsertElement() {
     this._super(...arguments);
-    this.$('#new-group-name').focus();
+    this.get('element').querySelector('#new-group-name').focus();
   },
 
   actions: {

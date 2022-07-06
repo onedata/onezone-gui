@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { creatorDataToToken } from 'onezone-gui/utils/token-editor-utils';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 import { get, getProperties } from '@ember/object';
 import _ from 'lodash';
 

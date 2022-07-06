@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import {
@@ -10,13 +11,10 @@ import {
   getModalFooter,
 } from '../../../helpers/modal';
 import sinon from 'sinon';
-import { click } from 'ember-native-dom-helpers';
 import { Promise } from 'rsvp';
 
 describe('Integration | Component | modals/unlink atm lambda modal', function () {
-  setupComponentTest('modals/unlink-atm-lambda-modal', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const atmInventory = {
@@ -38,33 +36,33 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     async function () {
       await showModal(this);
 
-      const $modal = getModal();
-      const $modalHeader = getModalHeader();
-      const $modalBody = getModalBody();
-      const $modalFooter = getModalFooter();
+      const modal = getModal();
+      const modalHeader = getModalHeader();
+      const modalBody = getModalBody();
+      const modalFooter = getModalFooter();
 
-      expect($modal).to.have.class('unlink-atm-lambda-modal');
-      expect($modalHeader.find('.oneicon-sign-warning-rounded')).to.exist;
-      expect($modalHeader.find('h1').text().trim()).to.equal('Unlink lambda');
-      expect($modalBody.find('.description').text().trim()).to.contain(
+      expect(modal).to.have.class('unlink-atm-lambda-modal');
+      expect(modalHeader.querySelector('.oneicon-sign-warning-rounded')).to.exist;
+      expect(modalHeader.querySelector('h1')).to.have.trimmed.text('Unlink lambda');
+      expect(modalBody.querySelector('.description')).to.contain.text(
         'You are about to unlink lambda lambda1 from inventory inventory1.'
       );
-      const $options = $modalBody.find('.radio-inline');
-      expect($options.eq(0).find('input').prop('checked')).to.be.true;
-      expect($options.eq(0).text().trim())
-        .to.equal('Unlink from this inventory (inventory1)');
-      expect($options.eq(1).find('input').prop('checked')).to.be.false;
-      expect($options.eq(1).text().trim())
-        .to.equal('Unlink from all my inventories (if possible)');
-      expect($modalBody.find('.description').text().trim()).to.contain(
+      const options = modalBody.querySelectorAll('.radio-inline');
+      expect(options[0].querySelector('input')).to.have.property('checked', true);
+      expect(options[0])
+        .to.have.trimmed.text('Unlink from this inventory (inventory1)');
+      expect(options[1].querySelector('input')).to.have.property('checked', false);
+      expect(options[1])
+        .to.have.trimmed.text('Unlink from all my inventories (if possible)');
+      expect(modalBody.querySelector('.description')).to.contain.text(
         'You are about to unlink lambda lambda1 from inventory inventory1.'
       );
-      const $submitBtn = $modalFooter.find('.submit-btn');
-      const $cancelBtn = $modalFooter.find('.cancel-btn');
-      expect($submitBtn).to.have.class('btn-danger');
-      expect($submitBtn.text().trim()).to.equal('Unlink');
-      expect($cancelBtn).to.have.class('btn-default');
-      expect($cancelBtn.text().trim()).to.equal('Cancel');
+      const submitBtn = modalFooter.querySelector('.submit-btn');
+      const cancelBtn = modalFooter.querySelector('.cancel-btn');
+      expect(submitBtn).to.have.class('btn-danger');
+      expect(submitBtn).to.have.trimmed.text('Unlink');
+      expect(cancelBtn).to.have.class('btn-default');
+      expect(cancelBtn).to.have.trimmed.text('Cancel');
     });
 
   it('submits info about "thisInventory" selection', async function () {
@@ -73,7 +71,7 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     await showModal(this);
 
     await click('.radio-inline:nth-child(1) input');
-    await click(getModalFooter().find('.submit-btn')[0]);
+    await click(getModalFooter().querySelector('.submit-btn'));
 
     expect(submitStub).to.be.calledWith({ inventoriesToUnlink: 'thisInventory' });
   });
@@ -84,7 +82,7 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     await showModal(this);
 
     await click('.radio-inline:nth-child(2) input');
-    await click(getModalFooter().find('.submit-btn')[0]);
+    await click(getModalFooter().querySelector('.submit-btn'));
 
     expect(submitStub).to.be.calledWith({ inventoriesToUnlink: 'allInventories' });
   });
@@ -93,14 +91,15 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     const submitStub = sinon.stub().returns(new Promise(() => {}));
     this.set('modalOptions.onSubmit', submitStub);
     await showModal(this);
-    const $submitBtn = getModalFooter().find('.submit-btn');
+    const submitBtn = getModalFooter().querySelector('.submit-btn');
 
-    await click($submitBtn[0]);
+    await click(submitBtn);
 
-    expect(getModalBody().find('.one-way-radio-group')).to.have.class('disabled');
-    expect($submitBtn).to.have.attr('disabled');
-    expect($submitBtn).to.have.class('pending');
-    expect(getModalFooter().find('.cancel-btn')).to.have.attr('disabled');
+    expect(getModalBody().querySelector('.one-way-radio-group'))
+      .to.have.class('disabled');
+    expect(submitBtn).to.have.attr('disabled');
+    expect(submitBtn).to.have.class('pending');
+    expect(getModalFooter().querySelector('.cancel-btn')).to.have.attr('disabled');
   });
 
   it('closes modal on cancel click', async function () {
@@ -108,7 +107,7 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     await showModal(this);
     expect(onHideSpy).to.not.been.called;
 
-    await click(getModalFooter().find('.cancel-btn')[0]);
+    await click(getModalFooter().querySelector('.cancel-btn'));
     expect(onHideSpy).to.be.calledOnce;
   });
 
@@ -116,7 +115,7 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
     await showModal(this);
 
-    await click(getModal()[0]);
+    await click(getModal());
     expect(onHideSpy).to.be.calledOnce;
   });
 
@@ -126,8 +125,8 @@ describe('Integration | Component | modals/unlink atm lambda modal', function ()
     const onHideSpy = sinon.spy(this.get('modalManager'), 'onModalHide');
     await showModal(this);
 
-    await click(getModalFooter().find('.submit-btn')[0]);
-    await click(getModal()[0]);
+    await click(getModalFooter().querySelector('.submit-btn'));
+    await click(getModal());
 
     expect(onHideSpy).to.not.be.called;
   });
@@ -139,7 +138,7 @@ async function showModal(testCase) {
     modalOptions,
   } = testCase.getProperties('modalManager', 'modalOptions');
 
-  testCase.render(hbs `{{global-modal-mounter}}`);
+  await render(hbs `{{global-modal-mounter}}`);
 
   await modalManager.show('unlink-atm-lambda-modal', modalOptions).shownPromise;
 }

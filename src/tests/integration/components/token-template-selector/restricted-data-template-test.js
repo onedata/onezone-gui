@@ -1,20 +1,18 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
-import { click } from 'ember-native-dom-helpers';
 
 describe(
   'Integration | Component | token template selector/restricted data template',
   function () {
-    setupComponentTest('token-template-selector/restricted-data-template', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const spaces = [{
@@ -41,42 +39,42 @@ describe(
 
     it(
       'renders tile with "template-restrictedData" class, correct title and image',
-      function () {
-        this.render(hbs `{{token-template-selector/restricted-data-template}}`);
+      async function () {
+        await render(hbs `{{token-template-selector/restricted-data-template}}`);
 
-        const $tile = this.$('.one-tile');
-        expect($tile).to.have.class('template-restrictedData');
-        expect($tile.find('.tile-title').text().trim())
-          .to.equal('Restricted data access');
-        expect($tile.find('.main-image')).to.have
+        const tile = find('.one-tile');
+        expect(tile).to.have.class('template-restrictedData');
+        expect(tile.querySelector('.tile-title'))
+          .to.have.trimmed.text('Restricted data access');
+        expect(tile.querySelector('.main-image')).to.have
           .attr('src', 'assets/images/token-templates/restricted-data-access.svg');
       }
     );
 
     it('shows list of spaces', async function () {
-      this.render(hbs `{{token-template-selector/restricted-data-template}}`);
+      await render(hbs `{{token-template-selector/restricted-data-template}}`);
 
       await click('.one-tile');
-      const $records = this.$('.record-item');
-      expect($records).to.have.length(2);
-      expect($records.eq(0).text().trim()).to.equal('s1');
-      expect($records.eq(1).text().trim()).to.equal('s2');
-      expect($records.find('.oneicon-space')).to.exist;
+      const records = findAll('.record-item');
+      expect(records).to.have.length(2);
+      expect(records[0]).to.have.trimmed.text('s1');
+      expect(records[1]).to.have.trimmed.text('s2');
+      expect(records[0].querySelector('.oneicon-space')).to.exist;
     });
 
     it('shows information about no spaces to choose', async function () {
       this.get('spaces').clear();
 
-      this.render(hbs `{{token-template-selector/restricted-data-template}}`);
+      await render(hbs `{{token-template-selector/restricted-data-template}}`);
 
       await click('.one-tile');
-      expect(this.$('.no-records-info').text().trim()).to.equal('You have no spaces.');
+      expect(find('.no-records-info')).to.have.trimmed.text('You have no spaces.');
     });
 
     it('passes template name and template via selection handler', async function () {
       const selectedSpy = this.set('selectedSpy', sinon.spy());
 
-      this.render(hbs `{{token-template-selector/restricted-data-template
+      await render(hbs `{{token-template-selector/restricted-data-template
         onSelected=selectedSpy
       }}`);
 

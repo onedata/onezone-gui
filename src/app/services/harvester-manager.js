@@ -10,7 +10,11 @@
 import Service, { inject as service } from '@ember/service';
 import { get, getProperties, set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { resolve, reject, all as allFulfilled } from 'rsvp';
+import {
+  resolve,
+  reject,
+  all as allFulfilled,
+} from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import GuiPluginManifest from 'onezone-gui/utils/harvester-configuration/gui-plugin-manifest';

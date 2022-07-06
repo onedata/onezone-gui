@@ -55,7 +55,8 @@ export default Component.extend(I18n, {
   ),
 
   activeSlideObserver: observer('activeSlide', function activeSlideObserver() {
-    const scrollableParent = this.$().parents('.ps')[0];
+    const element = this.get('element');
+    const scrollableParent = element && element.closest('.ps');
     if (scrollableParent) {
       scrollableParent.scroll({
         top: 0,

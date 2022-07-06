@@ -1,20 +1,16 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, fillIn, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
-import { clickTrigger, selectChoose } from '../../../../helpers/ember-power-select';
-import $ from 'jquery';
+import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 
 const componentClass = 'operation-form';
 
 describe('Integration | Component | modals/apply atm workflow schema dump modal/operation form',
   function () {
-    setupComponentTest('modals/apply-atm-workflow-schema-dump-modal/operation-form', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       this.setProperties({
@@ -30,33 +26,36 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
     });
 
     it(`has class "${componentClass}"`, async function () {
-      await render(this);
+      await renderComponent();
 
-      expect(this.$().children()).to.have.class(componentClass)
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0]).to.have.class(componentClass);
     });
 
     it('shows "merge" operation with workflows dropdown and "create" operation with name input',
       async function () {
-        await render(this);
+        await renderComponent();
 
-        const $options = this.$('.radio-inline');
-        expect($options.eq(0)).to.have.class('option-merge');
-        expect($options.eq(0).text().trim()).to.equal('Merge into existing workflow');
-        expect($options.eq(0).find('input').prop('checked')).to.equal(false);
-        expect($options.eq(1)).to.have.class('option-create');
-        expect($options.eq(1).text().trim()).to.equal('Persist as new workflow');
-        expect($options.eq(1).find('input').prop('checked')).to.equal(false);
+        const options = findAll('.radio-inline');
+        expect(options[0]).to.have.class('option-merge');
+        expect(options[0]).to.have.trimmed.text('Merge into existing workflow');
+        expect(options[0].querySelector('input')).to.have.property('checked', false);
+        expect(options[1]).to.have.class('option-create');
+        expect(options[1]).to.have.trimmed.text('Persist as new workflow');
+        expect(options[1].querySelector('input')).to.have.property('checked', false);
 
-        expect(this.$('.no-target-workflow-warning')).to.not.exist;
-        expect(this.$('.targetWorkflow-field .control-label').text().trim()).to.equal('Target:');
-        expect(this.$('.targetWorkflow-field .dropdown-field-trigger').text().trim())
-          .to.equal('Select target workflow...');
-        expect(this.$('.targetWorkflow-field .dropdown-field-trigger')).to.have.attr('aria-disabled');
+        expect(find('.no-target-workflow-warning')).to.not.exist;
+        expect(find('.targetWorkflow-field .control-label'))
+          .to.have.trimmed.text('Target:');
+        expect(find('.targetWorkflow-field .dropdown-field-trigger'))
+          .to.have.trimmed.text('Select target workflow...');
+        expect(find('.targetWorkflow-field .dropdown-field-trigger'))
+          .to.have.attr('aria-disabled');
 
-        expect(this.$('.newWorkflowName-field .control-label').text().trim()).to.equal('Name:');
-        expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
-        expect(this.$('.newWorkflowName-field .form-control'))
+        expect(find('.newWorkflowName-field .control-label'))
+          .to.have.trimmed.text('Name:');
+        expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
+        expect(find('.newWorkflowName-field .form-control'))
           .to.have.attr('placeholder', 'Enter name for new workflow...');
       });
 
@@ -64,39 +63,40 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
       async function () {
         this.set('selectedOperation', 'merge');
 
-        await render(this);
+        await renderComponent();
 
-        expect(this.$('.option-merge input').prop('checked')).to.equal(true);
-        expect(this.$('.option-create input').prop('checked')).to.equal(false);
+        expect(find('.option-merge input')).to.have.property('checked', true);
+        expect(find('.option-create input')).to.have.property('checked', false);
 
-        expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
+        expect(find('.targetWorkflow-field .dropdown-field-trigger'))
           .to.not.have.attr('aria-disabled');
-        expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
+        expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
       });
 
     it('has selected "create" operation and enabled name input when selectedOperation is "create"',
       async function () {
         this.set('selectedOperation', 'create');
 
-        await render(this);
+        await renderComponent();
 
-        expect(this.$('.option-merge input').prop('checked')).to.equal(false);
-        expect(this.$('.option-create input').prop('checked')).to.equal(true);
+        expect(find('.option-merge input')).to.have.property('checked', false);
+        expect(find('.option-create input')).to.have.property('checked', true);
 
-        expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
+        expect(find('.targetWorkflow-field .dropdown-field-trigger'))
           .to.have.attr('aria-disabled');
-        expect(this.$('.newWorkflowName-field .form-control')).to.be.not.disabled;
+        expect(find('.newWorkflowName-field .form-control'))
+          .to.not.have.attr('disabled');
       });
 
     it('allows changing operation', async function () {
       this.set('selectedOperation', 'create');
-      await render(this);
+      await renderComponent();
 
       await click('.option-merge');
 
       expect(this.get('onValueChange')).to.be.calledOnce
         .and.to.be.calledWith('selectedOperation', 'merge');
-      expect(this.$('.option-merge input').prop('checked')).to.equal(true);
+      expect(find('.option-merge input')).to.have.property('checked', true);
     });
 
     it('shows target workflows to choose in dropdown', async function () {
@@ -105,14 +105,14 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'merge',
         targetWorkflows,
       });
-      await render(this);
+      await renderComponent();
 
       await clickTrigger('.targetWorkflow-field');
 
-      const $options = $('.ember-power-select-option');
-      expect($options).to.have.length(targetWorkflows.length);
+      const options = document.querySelectorAll('.ember-power-select-option');
+      expect(options).to.have.length(targetWorkflows.length);
       targetWorkflows.sortBy('name').forEach(({ name }, idx) =>
-        expect($options.eq(idx).text().trim()).to.equal(name)
+        expect(options[idx]).to.have.trimmed.text(name)
       );
     });
 
@@ -123,10 +123,10 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         targetWorkflows,
         selectedTargetWorkflow: targetWorkflows[0],
       });
-      await render(this);
+      await renderComponent();
 
-      expect(this.$('.targetWorkflow-field .dropdown-field-trigger').text().trim())
-        .to.equal(targetWorkflows[0].name);
+      expect(find('.targetWorkflow-field .dropdown-field-trigger'))
+        .to.have.trimmed.text(targetWorkflows[0].name);
     });
 
     it('allows changing selected target workflow', async function () {
@@ -136,14 +136,14 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         targetWorkflows,
         selectedTargetWorkflow: targetWorkflows[0],
       });
-      await render(this);
+      await renderComponent();
 
       await selectChoose('.targetWorkflow-field', targetWorkflows[1].name);
 
       expect(this.get('onValueChange')).to.be.calledOnce
         .and.to.be.calledWith('selectedTargetWorkflow', targetWorkflows[1]);
-      expect(this.$('.targetWorkflow-field .dropdown-field-trigger').text().trim())
-        .to.equal(targetWorkflows[1].name);
+      expect(find('.targetWorkflow-field .dropdown-field-trigger'))
+        .to.have.trimmed.text(targetWorkflows[1].name);
     });
 
     it('shows provided new workflow name', async function () {
@@ -151,9 +151,9 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'create',
         newWorkflowName: 'abc',
       });
-      await render(this);
+      await renderComponent();
 
-      expect(this.$('.newWorkflowName-field .form-control')).to.have.value('abc');
+      expect(find('.newWorkflowName-field .form-control')).to.have.value('abc');
     });
 
     it('allows changing new workflow name', async function () {
@@ -161,13 +161,13 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
         selectedOperation: 'create',
         newWorkflowName: 'xyz',
       });
-      await render(this);
+      await renderComponent();
 
       await fillIn('.newWorkflowName-field .form-control', 'abc');
 
       expect(this.get('onValueChange')).to.be.calledOnce
         .and.to.be.calledWith('newWorkflowName', 'abc');
-      expect(this.$('.newWorkflowName-field .form-control'))
+      expect(find('.newWorkflowName-field .form-control'))
         .to.have.value('abc');
     });
 
@@ -187,13 +187,13 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
             targetWorkflows: [],
           });
 
-          await render(this);
+          await renderComponent();
 
-          expect(this.$('.option-merge')).to.have.class('disabled');
-          expect(this.$('.targetWorkflow-field')).to.not.exist;
-          const $noTargetWorkflowWarning = this.$('.no-target-workflow-warning');
-          expect($noTargetWorkflowWarning).to.exist;
-          expect($noTargetWorkflowWarning.text().trim()).to.equal(noTargetWarning);
+          expect(find('.option-merge')).to.have.class('disabled');
+          expect(find('.targetWorkflow-field')).to.not.exist;
+          const noTargetWorkflowWarning = find('.no-target-workflow-warning');
+          expect(noTargetWorkflowWarning).to.exist;
+          expect(noTargetWorkflowWarning).to.have.trimmed.text(noTargetWarning);
         });
 
       it(`shows "override" warning when selected target workflow has conflicting revision and selectedOperation is "merge" - ${dumpSourceType} scanario`,
@@ -207,11 +207,11 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
             selectedTargetWorkflow: targetWorkflows[0],
           });
 
-          await render(this);
+          await renderComponent();
 
-          const $warning = this.$('.revision-conflict-warning');
-          expect($warning).to.exist;
-          expect($warning.text().trim()).to.equal(overrideWarning);
+          const warning = find('.revision-conflict-warning');
+          expect(warning).to.exist;
+          expect(warning).to.have.trimmed.text(overrideWarning);
         });
     });
 
@@ -224,9 +224,9 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
           selectedTargetWorkflow: targetWorkflows[0],
         });
 
-        await render(this);
+        await renderComponent();
 
-        expect(this.$('.revision-conflict-warning')).to.not.exist;
+        expect(find('.revision-conflict-warning')).to.not.exist;
       });
 
     it('does not show "override" warning when selected target workflow has conflicting revision and selectedOperation is "create"',
@@ -239,25 +239,25 @@ describe('Integration | Component | modals/apply atm workflow schema dump modal/
           selectedTargetWorkflow: targetWorkflows[0],
         });
 
-        await render(this);
+        await renderComponent();
 
-        expect(this.$('.revision-conflict-warning')).to.not.exist;
+        expect(find('.revision-conflict-warning')).to.not.exist;
       });
 
     it('disables controls when isDisabled is true', async function () {
       this.set('isDisabled', true);
 
-      await render(this);
+      await renderComponent();
 
-      expect(this.$('.one-way-radio-group')).to.have.class('disabled');
-      expect(this.$('.targetWorkflow-field .dropdown-field-trigger'))
+      expect(find('.one-way-radio-group')).to.have.class('disabled');
+      expect(find('.targetWorkflow-field .dropdown-field-trigger'))
         .to.have.attr('aria-disabled');
-      expect(this.$('.newWorkflowName-field .form-control')).to.be.disabled;
+      expect(find('.newWorkflowName-field .form-control')).to.have.attr('disabled');
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
+async function renderComponent() {
+  await render(hbs `{{modals/apply-atm-workflow-schema-dump-modal/operation-form
     dumpSourceType=dumpSourceType
     selectedOperation=selectedOperation
     targetWorkflows=targetWorkflows
@@ -267,7 +267,6 @@ async function render(testCase) {
     onValueChange=onValueChange
     isDisabled=isDisabled
   }}`);
-  await wait();
 }
 
 function generateTargetWorkflows(count, reversedOrder) {

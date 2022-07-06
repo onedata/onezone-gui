@@ -20,7 +20,7 @@
  *    - GroupBoxLine (including GroupBoxRightLine and GroupBoxLeftLine) - calculates
  *      position and hover state of lines related to specified group box.
  *    - Relation - simple class which represents a parent-child relation.
- * 
+ *
  *                   GroupsHierarchyVisualiser component
  *                                    |
  *                    +---------------+---------------+
@@ -48,7 +48,7 @@
  *                    |1-1                            |1-1
  *                    |                               |
  *            MembershipRelation              MembershipRelation
- * 
+ *
  *  * Components:
  *    - GroupsHierarchyVisualiser component - renders columns, related column
  *      separators and needed modals, handles group and relation actions.
@@ -69,7 +69,7 @@
  *    - modals: GroupLeaveModal, GroupRemoveModal, GroupRemoveRelationModal,
  *      GroupCreateRelativeModal, GroupAddYourGroupModal, GroupJoinUsingTokenModal,
  *      PrivilegesEditorModal.
- * 
+ *
  *                        GroupsHierarchyVisualiser
  *                                    |
  *                    +---------------+---------------+
@@ -87,7 +87,7 @@
  *                                 |1-1               |1-1               |1-2
  *                                 |                  |                  |
  *                         GroupBoxLeftLine   GroupBoxRightLine  GroupBoxRelation
- * 
+ *
  * Column types:
  *   There are four types of columns:
  *     * empty - column used as a placeholder. It does not represent any
@@ -108,7 +108,7 @@
  *       be a model with an empty array, for startPoint it must contain an array
  *       with exactly one group, for children/parents there are no requirements -
  *       can contain many groups, or be an empty array.
- * 
+ *
  * Flow:
  *   * GroupsHierarchyVisualiser component attaches its' own window resize
  *     handlers and setups Workspace and ColumnManager objects (Workspace is
@@ -153,7 +153,7 @@
  *     prevColumn.
  *   * GroupsHierarchyVisualiser/ColumnSeparator component renders separator,
  *     GroupsHierarchyVisualiser/GroupBox component renders group box,
- *     GroupsHierarchyVisualiser/GroupBoxLine component renders right and left 
+ *     GroupsHierarchyVisualiser/GroupBoxLine component renders right and left
  *     group box line and GroupsHierarchyVisualiser/GroupBoxRelation renders
  *     relation indicator. There are no calculations, that depend on already
  *     rendered components (e.g. real height of rendered group box) - all values
@@ -192,6 +192,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
+import $ from 'jquery';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -594,9 +595,14 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   recalculateAvailableArea() {
-    this.get('workspace').setProperties({
-      width: this.$().width(),
-      height: this.$().height(),
+    const {
+      element,
+      workspace,
+    } = this.getProperties('element', 'workspace');
+    const $element = $(element);
+    setProperties(workspace, {
+      width: $element.width(),
+      height: $element.height(),
     });
   },
 
@@ -677,7 +683,7 @@ export default Component.extend(I18n, {
 
   /**
    * Creates column model using column relation specification
-   * @param {Utils/GroupsHierarchyVisualiser/Column} column 
+   * @param {Utils/GroupsHierarchyVisualiser/Column} column
    * @returns {PromiseArray<Array<Group>>}
    */
   createColumnModel(column) {

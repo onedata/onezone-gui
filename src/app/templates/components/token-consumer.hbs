@@ -40,14 +40,14 @@
             triggerEvent="hover"
           }}
         {{/if}}
-        {{#if media.isMobile}}
+        {{#if (media "isMobile")}}
           {{id-info
             idType=inviteTargetModelName
             idValue=inviteTargetId
           }}
         {{/if}}
       </p>
-      {{#unless (or media.isMobile noJoinMessage)}}
+      {{#unless (or (media "isMobile") noJoinMessage)}}
         <figure class="consume-token-image">
           <figure class="invite-subject-image">
             <img class="subject-image" src={{root-url invitedModelImagePath}}>

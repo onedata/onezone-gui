@@ -10,7 +10,11 @@
 import Service, { inject as service } from '@ember/service';
 import { get } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { Promise, resolve, all as allFulfilled } from 'rsvp';
+import {
+  Promise,
+  resolve,
+  all as allFulfilled,
+} from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { entityType as clusterEntityType } from 'onezone-gui/models/cluster';
 

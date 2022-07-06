@@ -1,130 +1,103 @@
-import wait from 'ember-test-helpers/wait';
 import { expect } from 'chai';
-import { describe, context, it, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { describe, it, beforeEach, context } from 'mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve, reject, Promise } from 'rsvp';
-import TestAdapter from '@ember/test/adapter';
-import Ember from 'ember';
-import { find, click } from 'ember-native-dom-helpers';
 import { parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import _ from 'lodash';
+import { suppressRejections } from '../../helpers/suppress-rejections';
 import OneTooltipHelper from '../../helpers/one-tooltip';
 
 describe('Integration | Component | invite token generator', function () {
-  setupComponentTest('invite-token-generator', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
-    this.originalLoggerError = Ember.Logger.error;
-    this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function () {};
-    Ember.Test.adapter.exception = function () {};
-
+    const onezoneTimestamp = 12345;
     const routerStub = sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
     sinon.stub(lookupService(this, 'recordManager'), 'getCurrentUserRecord')
       .callsFake(() => this.get('userRecord'));
+    sinon.stub(lookupService(this, 'onezoneServer'), 'getServerTime')
+      .resolves(onezoneTimestamp);
     this.setProperties({
       targetRecord: {
         entityType: 'group',
         entityId: 'group0',
       },
       routerStub,
+      onezoneTimestamp,
       userRecord: {
         canInviteProviders: true,
       },
     });
   });
 
-  afterEach(function () {
-    const fakeClock = this.get('fakeClock');
-    if (fakeClock) {
-      fakeClock.restore();
-    }
-    Ember.Logger.error = this.originalLoggerError;
-    Ember.Test.adapter.exception = this.originalTestAdapterException;
-  });
-
-  it('has class invite-token-generator', function () {
+  it('has class invite-token-generator', async function () {
     stubCreateToken(this, [undefined, undefined], resolve());
 
-    this.render(hbs `{{invite-token-generator}}`);
+    await render(hbs `{{invite-token-generator}}`);
 
-    expect(this.$('.invite-token-generator')).to.exist;
+    expect(find('.invite-token-generator')).to.exist;
   });
 
-  it('shows token in textarea', function () {
+  it('shows token in textarea', async function () {
     const correctToken = 'userJoinGroup-token';
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve(correctToken));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        const $tokenTextarea = this.$('.token-textarea');
-        expect($tokenTextarea).to.exist;
-        expect($tokenTextarea.val()).to.equal(correctToken);
-        expect(this.$('.spinner')).to.not.exist;
-        expect(this.$('.resource-load-error')).to.not.exist;
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    const tokenTextarea = find('.token-textarea');
+    expect(tokenTextarea).to.exist;
+    expect(tokenTextarea).to.have.value(correctToken);
+    expect(find('.spinner')).to.not.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
-  it('shows spinner while token is being generated', function () {
+  it('shows spinner while token is being generated', async function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], new Promise(() => {}));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        expect(this.$('.token-textarea')).to.not.exist;
-        expect(this.$('.spinner')).to.exist;
-        expect(this.$('.resource-load-error')).to.not.exist;
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.exist;
+    expect(find('.resource-load-error')).to.not.exist;
   });
 
-  it('shows error when token generation has failed', function () {
+  it('shows error when token generation has failed', async function () {
+    suppressRejections();
     stubCreateToken(this, ['userJoinGroup', 'group0'], reject('tokenError'));
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
       }}
     `);
 
-    return wait()
-      .then(() => {
-        expect(this.get('createTokenStub')).to.be.calledOnce;
-        expect(this.$('.token-textarea')).to.not.exist;
-        expect(this.$('.spinner')).to.not.exist;
-        const $errorContainer = this.$('.resource-load-error');
-        expect($errorContainer).to.exist;
-        expect($errorContainer.text()).to.contain('tokenError');
-      });
+    expect(this.get('createTokenStub')).to.be.calledOnce;
+    expect(find('.token-textarea')).to.not.exist;
+    expect(find('.spinner')).to.not.exist;
+    const errorContainer = find('.resource-load-error');
+    expect(errorContainer).to.exist;
+    expect(errorContainer).to.contain.text('tokenError');
   });
 
-  it('sets correct url for "custom token" action', function () {
+  it('sets correct url for "custom token" action', async function () {
     stubCreateToken(this, ['userJoinGroup', 'group0'], resolve());
-    const timestamp = 1584525600;
-    this.set('fakeClock', sinon.useFakeTimers({
-      now: timestamp * 1000,
-      shouldAdvanceTime: true,
-    }));
     const correctRouteOptions = {
       activeSlide: 'form',
       tokenTemplate: btoa(JSON.stringify({
@@ -136,7 +109,7 @@ describe('Integration | Component | invite token generator', function () {
         },
         caveats: [{
           type: 'time',
-          validUntil: timestamp + 14 * 24 * 60 * 60,
+          validUntil: this.get('onezoneTimestamp') + 14 * 24 * 60 * 60,
         }],
       })),
     };
@@ -150,37 +123,33 @@ describe('Integration | Component | invite token generator', function () {
       }
     });
 
-    this.render(hbs `
+    await render(hbs `
       {{invite-token-generator
         inviteType="userJoinGroup"
         targetRecord=targetRecord
       }}
     `);
 
-    return wait()
-      .then(() =>
-        expect(this.$('.custom-token-action')).to.have.attr('href', 'correctUrl')
-      );
+    expect(find('.custom-token-action')).to.have.attr('href', 'correctUrl');
   });
 
   it(
     'calls passed onCustomTokenClick when "custom token" action has been clicked',
-    function () {
+    async function () {
       stubCreateToken(this, ['userJoinGroup', 'group0'], resolve());
       const clickSpy = sinon.spy();
-      this.on('clickHandler', clickSpy);
+      this.set('clickHandler', clickSpy);
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="userJoinGroup"
           targetRecord=targetRecord
-          onCustomTokenClick=(action "clickHandler")
+          onCustomTokenClick=(action clickHandler)
         }}
       `);
 
-      return wait()
-        .then(() => click('.custom-token-action'))
-        .then(() => expect(clickSpy).to.be.calledOnce);
+      await click('.custom-token-action');
+      expect(clickSpy).to.be.calledOnce;
     }
   );
 
@@ -257,60 +226,55 @@ describe('Integration | Component | invite token generator', function () {
     limitationsDescription,
     dontShowCustomToken,
   }) => {
-    it(`shows correct subject description for ${inviteType} invite token`, function () {
+    it(`shows correct subject description for ${inviteType} invite token`, async function () {
       this.set('inviteType', inviteType);
       stubCreateToken(this, [inviteType, undefined], resolve());
 
-      this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+      await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
       if (subjectDescription) {
-        expect(this.$('.subject-description').text().trim()).to.equal(subjectDescription);
+        expect(find('.subject-description')).to.have.trimmed.text(subjectDescription);
       } else {
-        expect(this.$('.subject-description')).to.not.exist;
+        expect(find('.subject-description')).to.not.exist;
       }
     });
 
     it(
       `shows correct limitations description for ${inviteType} invite token`,
-      function () {
+      async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() =>
-            expect(this.$('.limitations-text').text().trim())
-            .to.equal(limitationsDescription)
-          );
+        expect(find('.limitations-text'))
+          .to.have.trimmed.text(limitationsDescription);
       }
     );
 
     if (dontShowCustomToken) {
-      it(`does not show "custom token" link for ${inviteType} invite token`, function () {
+      it(`does not show "custom token" link for ${inviteType} invite token`, async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() => expect(this.$('.custom-token-action')).to.not.exist);
+        expect(find('.custom-token-action')).to.not.exist;
       });
     } else {
-      it(`shows "custom token" link for ${inviteType} invite token`, function () {
+      it(`shows "custom token" link for ${inviteType} invite token`, async function () {
         this.set('inviteType', inviteType);
         stubCreateToken(this, [inviteType, undefined], resolve());
 
-        this.render(hbs `{{invite-token-generator inviteType=inviteType}}`);
+        await render(hbs `{{invite-token-generator inviteType=inviteType}}`);
 
-        return wait()
-          .then(() => expect(this.$('.custom-token-action')).to.exist);
+        expect(find('.custom-token-action')).to.exist;
       });
     }
   });
 
   context('when user has truthy "canInviteProviders"', function () {
-    it('allows to generate onedatify command', function () {
+    it('allows to generate onedatify command', async function (done) {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this,
@@ -322,36 +286,38 @@ describe('Integration | Component | invite token generator', function () {
         resolve('registertoken')
       );
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatify"
           targetRecord=targetRecord
         }}
       `);
 
-      return wait()
-        .then(() => expect(this.$('.token-textarea').val()).to.match(
-          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
-        ));
+      expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
+      );
+
+      done();
     });
 
-    it('allows to generate onedatify with import command', function () {
+    it('allows to generate onedatify with import command', async function (done) {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
       stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatifyWithImport"
           targetRecord=targetRecord
         }}
       `);
 
-      return wait()
-        .then(() => expect(this.$('.token-textarea').val()).to.match(
-          /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
-        ));
+      expect(this.$('.token-textarea').val()).to.match(
+        /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
+      );
+
+      done();
     });
 
     ['onedatify', 'onedatifyWithImport'].forEach((inviteType) => {
@@ -364,17 +330,17 @@ describe('Integration | Component | invite token generator', function () {
             resolve('supporttoken')
           );
 
-          this.render(hbs `
+          await render(hbs `
             {{invite-token-generator
               inviteType="onedatify"
               targetRecord=targetRecord
             }}
           `);
 
-          await wait();
           expect(find('.variables-description')).to.not.exist;
           done();
-        });
+        }
+      );
     });
   });
 
@@ -391,14 +357,13 @@ describe('Integration | Component | invite token generator', function () {
         resolve('supporttoken')
       );
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatify"
           targetRecord=targetRecord
         }}
       `);
 
-      await wait();
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
       );
@@ -410,14 +375,13 @@ describe('Integration | Component | invite token generator', function () {
       this.set('targetRecord', space);
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
 
-      this.render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatifyWithImport"
           targetRecord=targetRecord
         }}
       `);
 
-      await wait();
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
       );
@@ -434,14 +398,13 @@ describe('Integration | Component | invite token generator', function () {
             resolve('supporttoken')
           );
 
-          this.render(hbs `
+          await render(hbs `
             {{invite-token-generator
               inviteType="onedatify"
               targetRecord=targetRecord
             }}
           `);
 
-          await wait();
           expect(find('.limitations-text').textContent.trim()).to.equal(
             'The support token included below will expire in 2 weeks and has no usage count limit.'
           );

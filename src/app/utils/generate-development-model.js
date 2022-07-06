@@ -11,13 +11,20 @@
 import { camelize, underscore } from '@ember/string';
 import _ from 'lodash';
 import { A } from '@ember/array';
-import { Promise, resolve, all as allFulfilled, hash as hashFulfilled } from 'rsvp';
+import {
+  Promise,
+  resolve,
+  all as allFulfilled,
+  hash as hashFulfilled,
+} from 'rsvp';
 import { get, set, setProperties } from '@ember/object';
 import groupPrivilegesFlags from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import harvesterPrivilegesFlags from 'onedata-gui-websocket-client/utils/harvester-privileges-flags';
 import atmInventoryPrivilegesFlags from 'onedata-gui-websocket-client/utils/atm-inventory-privileges-flags';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import moment from 'moment';
@@ -907,212 +914,217 @@ function attachProgressToHarvesterIndices(
   }));
 }
 
-async function attachAtmLambdasToAtmInventory(store, atmInventory) {
-  const atmInventoryList = await createListRecord(store, 'atmInventory', [atmInventory]);
-  return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
-    return store.createRecord('atmLambda', {
-      atmInventoryList,
-      revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
-        registry[revisionNumber] = {
-          name: `Function ${index}`,
-          state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
-          summary: `Some very complicated function #${index}.${revisionNumber}`,
-          operationSpec: {
-            engine: 'openfaas',
-            dockerImage: `some-super-docker-image:${index}.${revisionNumber}`,
-            dockerExecutionOptions: {
-              readonly: true,
-              mountOneclient: true,
-              oneclientMountPoint: '/mnt/oneclient',
-              oneclientOptions: '-k',
-            },
-          },
-          preferredBatchSize: 100,
-          argumentSpecs: [{
-            name: 'arg1',
-            dataSpec: {
-              type: 'array',
-              valueConstraints: {
-                itemDataSpec: {
-                  type: 'string',
+function attachAtmLambdasToAtmInventory(store, atmInventory) {
+  return createListRecord(store, 'atmInventory', [atmInventory])
+    .then((atmInventoryList) => {
+      return allFulfilled(_.range(NUMBER_OF_ATM_LAMBDAS).map((index) => {
+        return store.createRecord('atmLambda', {
+          atmInventoryList,
+          revisionRegistry: [1, 2, 3].reduce((registry, revisionNumber) => {
+            registry[revisionNumber] = {
+              name: `Function ${index}`,
+              state: revisionNumber % 2 === 0 ? 'stable' : 'draft',
+              summary: `Some very complicated function #${index}.${revisionNumber}`,
+              operationSpec: {
+                engine: 'openfaas',
+                dockerImage: `some-super-docker-image:${index}.${revisionNumber}`,
+                dockerExecutionOptions: {
+                  readonly: true,
+                  mountOneclient: true,
+                  oneclientMountPoint: '/mnt/oneclient',
+                  oneclientOptions: '-k',
                 },
               },
-            },
-            isOptional: true,
-            defaultValue: '"some value"',
-          }, {
-            name: 'arg2',
-            dataSpec: { type: 'onedatafsCredentials' },
-          }],
-          resultSpecs: [{
-            name: 'res1',
-            dataSpec: {
-              type: 'array',
-              valueConstraints: {
-                itemDataSpec: {
-                  type: 'string',
+              preferredBatchSize: 100,
+              argumentSpecs: [{
+                name: 'arg1',
+                dataSpec: {
+                  type: 'array',
+                  valueConstraints: {
+                    itemDataSpec: {
+                      type: 'string',
+                    },
+                  },
                 },
+                isOptional: true,
+                defaultValue: '"some value"',
+              }, {
+                name: 'arg2',
+                dataSpec: { type: 'onedatafsCredentials' },
+              }],
+              resultSpecs: [{
+                name: 'res1',
+                dataSpec: {
+                  type: 'array',
+                  valueConstraints: {
+                    itemDataSpec: {
+                      type: 'string',
+                    },
+                  },
+                },
+              }, {
+                name: 'res2',
+                dataSpec: {
+                  type: 'timeSeriesMeasurement',
+                  valueConstraints: {
+                    specs: [{
+                      nameMatcherType: 'exact',
+                      nameMatcher: 'total_size',
+                      unit: 'bytes',
+                    }, {
+                      nameMatcherType: 'hasPrefix',
+                      nameMatcher: 'volume_',
+                      unit: 'custom:liters',
+                    }],
+                  },
+                },
+              }],
+              resourceSpec: {
+                cpuRequested: 2,
+                cpuLimit: 10,
+                memoryRequested: 100 * 1024 * 1024,
+                memoryLimit: 200 * 1024 * 1024,
+                ephemeralStorageRequested: 300 * 1024 * 1024,
+                ephemeralStorageLimit: null,
               },
-            },
-          }, {
-            name: 'res2',
-            dataSpec: {
-              type: 'timeSeriesMeasurement',
-              valueConstraints: {
-                specs: [{
-                  nameMatcherType: 'exact',
-                  nameMatcher: 'total_size',
-                  unit: 'bytes',
-                }, {
-                  nameMatcherType: 'hasPrefix',
-                  nameMatcher: 'volume_',
-                  unit: 'custom:liters',
-                }],
-              },
-            },
-          }],
-          resourceSpec: {
-            cpuRequested: 2,
-            cpuLimit: 10,
-            memoryRequested: 100 * 1024 * 1024,
-            memoryLimit: 200 * 1024 * 1024,
-            ephemeralStorageRequested: 300 * 1024 * 1024,
-            ephemeralStorageLimit: null,
-          },
-        };
-        return registry;
-      }, {}),
-    }).save();
-  })).then(atmLambdas =>
-    createListRecord(store, 'atmLambda', atmLambdas)
-  ).then(listRecord => {
-    set(atmInventory, 'atmLambdaList', listRecord);
-    return atmInventory.save();
-  });
+            };
+            return registry;
+          }, {}),
+        }).save();
+      }));
+    }).then((atmLambdas) => {
+      return createListRecord(store, 'atmLambda', atmLambdas);
+    }).then((atmLambdasList) => {
+      set(atmInventory, 'atmLambdaList', atmLambdasList);
+      return atmInventory.save();
+    });
 }
 
-async function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
-  const inventoryAtmLambdas = await get(await get(atmInventory, 'atmLambdaList'), 'list');
-  const atmWorkflowSchemas = await allFulfilled(
-    _.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map(async (index) => {
-      const workflowAtmLambdas =
-        await createListRecord(store, 'atmLambda', inventoryAtmLambdas);
-      return await store.createRecord('atmWorkflowSchema', {
-        name: `Workflow ${index}`,
-        summary: `Some very complicated workflow #${index}`,
-        atmLambdaList: workflowAtmLambdas,
-        atmInventory,
-        revisionRegistry: {
-          1: {
-            description: 'My 1st revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-          2: {
-            description: 'My 2nd revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-          3: {
-            description: 'My 3rd revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-          4: {
-            description: 'My 4th revision',
-            state: 'stable',
-            lanes: [{
-              id: 'lane1',
-              name: 'lane 1',
-              maxRetries: 1,
-              storeIteratorSpec: {
-                storeSchemaId: 'store1',
-                maxBatchSize: 50,
-              },
-              parallelBoxes: [{
-                id: 'pbox1-1',
-                name: 'Parallel box',
-                tasks: [],
-              }],
-            }],
-            stores: [{
-              id: 'store1',
-              name: 'store 1',
-              type: 'list',
-              config: {
-                itemDataSpec: {
-                  type: 'string',
-                  valueConstraints: {},
+function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
+  return get(atmInventory, 'atmLambdaList')
+    .then((atmLambdaList) => get(atmLambdaList, 'list'))
+    .then((atmLambdas) => {
+      return allFulfilled(_.range(NUMBER_OF_ATM_WORKFLOW_SCHEMAS).map((index) => {
+        return createListRecord(store, 'atmLambda', atmLambdas)
+          .then((workflowAtmLambdas) => {
+            return store.createRecord('atmWorkflowSchema', {
+              name: `Workflow ${index}`,
+              summary: `Some very complicated workflow #${index}`,
+              atmLambdaList: workflowAtmLambdas,
+              atmInventory,
+              revisionRegistry: {
+                1: {
+                  description: 'My 1st revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
+                },
+                2: {
+                  description: 'My 2nd revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
+                },
+                3: {
+                  description: 'My 3rd revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
+                },
+                4: {
+                  description: 'My 4th revision',
+                  state: 'stable',
+                  lanes: [{
+                    id: 'lane1',
+                    name: 'lane 1',
+                    maxRetries: 1,
+                    storeIteratorSpec: {
+                      storeSchemaId: 'store1',
+                      maxBatchSize: 50,
+                    },
+                    parallelBoxes: [{
+                      id: 'pbox1-1',
+                      name: 'Parallel box',
+                      tasks: [],
+                    }],
+                  }],
+                  stores: [{
+                    id: 'store1',
+                    name: 'store 1',
+                    type: 'list',
+                    config: {
+                      itemDataSpec: {
+                        type: 'string',
+                        valueConstraints: {},
+                      },
+                    },
+                  }, {
+                    id: 'store2',
+                    name: 'store 2',
+                    type: 'timeSeries',
+                    config: {
+                      schemas: [{
+                        nameGeneratorType: 'exact',
+                        nameGenerator: 'exactGeneratorName',
+                        unit: 'bytes',
+                        metrics: {
+                          sum5s: {
+                            aggregator: 'sum',
+                            resolution: 5,
+                            retention: 1440,
+                          },
+                          max1h: {
+                            aggregator: 'max',
+                            resolution: 60 * 60,
+                            retention: 1000,
+                          },
+                        },
+                      }, {
+                        nameGeneratorType: 'addPrefix',
+                        nameGenerator: 'file_',
+                        unit: 'bytes',
+                        metrics: {
+                          sum5s: {
+                            aggregator: 'sum',
+                            resolution: 5,
+                            retention: 1440,
+                          },
+                          max1h: {
+                            aggregator: 'max',
+                            resolution: 60 * 60,
+                            retention: 1000,
+                          },
+                        },
+                      }],
+                    },
+                  }],
+                },
+                5: {
+                  description: 'My 5th revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
+                },
+                6: {
+                  description: 'My 6th revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
+                },
+                7: {
+                  description: 'My 7th revision',
+                  state: 'draft',
+                  lanes: [],
+                  stores: [],
                 },
               },
-            }, {
-              id: 'store2',
-              name: 'store 2',
-              type: 'timeSeries',
-              config: {
-                schemas: [{
-                  nameGeneratorType: 'exact',
-                  nameGenerator: 'exactGeneratorName',
-                  unit: 'bytes',
-                  metrics: {
-                    sum5s: {
-                      aggregator: 'sum',
-                      resolution: 5,
-                      retention: 1440,
-                    },
-                    max1h: {
-                      aggregator: 'max',
-                      resolution: 60 * 60,
-                      retention: 1000,
-                    },
-                  },
-                }, {
-                  nameGeneratorType: 'addPrefix',
-                  nameGenerator: 'file_',
-                  unit: 'bytes',
-                  metrics: {
-                    sum5s: {
-                      aggregator: 'sum',
-                      resolution: 5,
-                      retention: 1440,
-                    },
-                    max1h: {
-                      aggregator: 'max',
-                      resolution: 60 * 60,
-                      retention: 1000,
-                    },
-                  },
-                }],
-              },
-            }],
-          },
-          5: {
-            description: 'My 5th revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-          6: {
-            description: 'My 6th revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-          7: {
-            description: 'My 7th revision',
-            state: 'draft',
-            lanes: [],
-            stores: [],
-          },
-        },
-      }).save();
-    })
-  );
-  const listRecord =
-    await createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas);
-  set(atmInventory, 'atmWorkflowSchemaList', listRecord);
-  return await atmInventory.save();
+            }).save();
+          });
+      }));
+    }).then((atmWorkflowSchemas) =>
+      createListRecord(store, 'atmWorkflowSchema', atmWorkflowSchemas)
+    ).then((atmWorkflowSchemaList) => {
+      set(atmInventory, 'atmWorkflowSchemaList', atmWorkflowSchemaList);
+      return atmInventory.save();
+    });
 }

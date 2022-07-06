@@ -28,7 +28,7 @@ export default Component.extend(I18n, {
 
   didInsertElement() {
     this._super(...arguments);
-    this.$('#new-atm-inventory-name').focus();
+    this.get('element').querySelector('#new-atm-inventory-name').focus();
   },
 
   actions: {

@@ -10,7 +10,14 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, set, trySet, defineProperty } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  set,
+  trySet,
+  defineProperty,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -22,7 +29,18 @@ import NumberField from 'onedata-gui-common/utils/form-component/number-field';
 import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
-import { tag, eq, neq, or, not, and, raw, isEmpty, conditional, array } from 'ember-awesome-macros';
+import {
+  tag,
+  eq,
+  neq,
+  or,
+  not,
+  and,
+  raw,
+  isEmpty,
+  conditional,
+  array,
+} from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import {

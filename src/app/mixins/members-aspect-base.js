@@ -8,7 +8,12 @@
  */
 
 import Mixin from '@ember/object/mixin';
-import { computed, get, getProperties, observer } from '@ember/object';
+import {
+  computed,
+  get,
+  getProperties,
+  observer,
+} from '@ember/object';
 import { union, collect } from '@ember/object/computed';
 import { A } from '@ember/array';
 import { inject as service } from '@ember/service';
@@ -22,7 +27,15 @@ import { isArray } from '@ember/array';
 import { next, scheduleOnce } from '@ember/runloop';
 import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
-import { and, or, not, array, raw, equal, conditional } from 'ember-awesome-macros';
+import {
+  and,
+  or,
+  not,
+  array,
+  raw,
+  equal,
+  conditional,
+} from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { classify } from '@ember/string';
 
@@ -31,7 +44,6 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeActions: service(),
   tokenActions: service(),
   userActions: service(),
-  media: service(),
   navigationState: service(),
   recordManager: service(),
 
@@ -663,12 +675,15 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     },
     recordsLoaded() {
       next(() => safeExec(this, () => {
-        const memberIdToExpand = this.get('memberIdToExpand');
-        if (memberIdToExpand) {
-          const memberItemHeader = this.$(
+        const {
+          memberIdToExpand,
+          element,
+        } = this.getProperties('memberIdToExpand', 'element');
+        if (memberIdToExpand && element) {
+          const memberItemHeader = element.querySelector(
             `.member-${memberIdToExpand} .one-collapsible-list-item-header`
           );
-          if (get(memberItemHeader, 'length')) {
+          if (memberItemHeader) {
             memberItemHeader.click();
             this.set('memberIdToExpand', null);
           }

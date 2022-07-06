@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, fillIn, settled, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
@@ -10,14 +10,10 @@ import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { set, get, setProperties } from '@ember/object';
 import { Promise, resolve } from 'rsvp';
-import { click, fillIn } from 'ember-native-dom-helpers';
-import { selectChoose } from '../../helpers/ember-power-select';
-import $ from 'jquery';
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 
 describe('Integration | Component | content atm inventories workflows', function () {
-  setupComponentTest('content-atm-inventories-workflows', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const store = lookupService(this, 'store');
@@ -207,18 +203,17 @@ describe('Integration | Component | content atm inventories workflows', function
     });
   });
 
-  it('has class "content-atm-inventories-workflows"', function () {
-    this.render(hbs `{{content-atm-inventories-workflows}}`);
+  it('has class "content-atm-inventories-workflows"', async function () {
+    await render(hbs `{{content-atm-inventories-workflows}}`);
 
-    expect(this.$().children()).to.have.class('content-atm-inventories-workflows')
-      .and.to.have.length(1);
+    expect(this.element.children).to.have.length(1);
+    expect(this.element.children[0]).to.have.class('content-atm-inventories-workflows');
   });
 
   it('contains carousel with five slides', async function () {
-    await render(this);
+    await renderComponent();
 
-    const $slides = this.$('.one-carousel-slide');
-    expect($slides).to.have.length(5);
+    expect(findAll('.one-carousel-slide')).to.have.length(5);
     expect(getSlide('list')).to.exist;
     expect(getSlide('editor')).to.exist;
     expect(getSlide('lambdaSelector')).to.exist;
@@ -227,7 +222,7 @@ describe('Integration | Component | content atm inventories workflows', function
   });
 
   it('shows workflow schemas list when "view" query param is empty', async function () {
-    await render(this);
+    await renderComponent();
 
     expect(isSlideActive('list')).to.be.true;
     const listSlide = getSlide('list');
@@ -245,7 +240,7 @@ describe('Integration | Component | content atm inventories workflows', function
     });
 
     it('shows workflow schemas list', async function (done) {
-      await render(this);
+      await renderComponent();
 
       expect(isSlideActive('list')).to.be.true;
       expect(getSlide('list').innerText).to.contain('w0 summary');
@@ -259,14 +254,14 @@ describe('Integration | Component | content atm inventories workflows', function
           revision: '2',
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
         done();
       });
 
     it('allows to open creator view', async function (done) {
-      await render(this);
+      await renderComponent();
 
       await click(
         getSlide('list').querySelector('.open-add-atm-workflow-schema-trigger')
@@ -280,7 +275,7 @@ describe('Integration | Component | content atm inventories workflows', function
     });
 
     it('allows to open editor view for specific workflow schema', async function (done) {
-      await render(this);
+      await renderComponent();
 
       await click(getSlide('list').querySelector('.revisions-table-revision-entry'));
 
@@ -293,7 +288,7 @@ describe('Integration | Component | content atm inventories workflows', function
 
     it('allows to create new revision and opens it in editor after creation',
       async function (done) {
-        await render(this);
+        await renderComponent();
 
         await click(
           getSlide('list').querySelector('.revisions-table-create-revision-entry')
@@ -308,14 +303,14 @@ describe('Integration | Component | content atm inventories workflows', function
 
     it('allows to redesign existing revision and opens it in editor after creation',
       async function (done) {
-        await render(this);
+        await renderComponent();
 
         await click(
           getSlide('list').querySelector('.revision-actions-trigger')
         );
-        await click($(
-          'body .webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
-        )[0]);
+        await click(document.querySelector(
+          '.webui-popover.in .create-atm-workflow-schema-revision-action-trigger'
+        ));
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'editor');
@@ -336,7 +331,7 @@ describe('Integration | Component | content atm inventories workflows', function
       async function (done) {
         set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', null);
 
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'creator');
@@ -352,7 +347,7 @@ describe('Integration | Component | content atm inventories workflows', function
           .withArgs('atmWorkflowSchema', 'abc')
           .returns(new Promise(() => {}));
 
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'loading');
@@ -371,9 +366,9 @@ describe('Integration | Component | content atm inventories workflows', function
           .withArgs('atmWorkflowSchema', 'abc')
           .returns(new Promise((resolve, reject) => { rejectCallback = reject; }));
 
-        await render(this);
+        await renderComponent();
         rejectCallback();
-        await wait();
+        await settled();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'loading');
@@ -387,7 +382,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationState = lookupService(this, 'navigation-state');
         set(navigationState, 'aspectOptions.workflowId', 'w1id');
         set(navigationState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'editor');
@@ -400,7 +395,7 @@ describe('Integration | Component | content atm inventories workflows', function
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', 'w1id');
       set(navigationState, 'aspectOptions.revision', '2');
-      await render(this);
+      await renderComponent();
 
       await click(getSlide('editor').querySelector('.content-back-link'));
 
@@ -416,7 +411,7 @@ describe('Integration | Component | content atm inventories workflows', function
     it('allows to go back from creator page', async function (done) {
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', null);
-      await render(this);
+      await renderComponent();
 
       await click(getSlide('editor').querySelector('.content-back-link'));
 
@@ -436,7 +431,7 @@ describe('Integration | Component | content atm inventories workflows', function
       this.get('getRecordByIdStub')
         .withArgs('atmWorkflowSchema', 'abc')
         .returns(new Promise(() => {}));
-      await render(this);
+      await renderComponent();
 
       await click(getSlide('editor').querySelector('.content-back-link'));
 
@@ -477,7 +472,7 @@ describe('Integration | Component | content atm inventories workflows', function
           });
         },
       });
-      await render(this);
+      await renderComponent();
       await fillIn('.name-field .form-control', 'someName');
       await click('.btn-content-info');
 
@@ -492,7 +487,7 @@ describe('Integration | Component | content atm inventories workflows', function
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
       set(navigationsState, 'aspectOptions.revision', '2');
-      await render(this);
+      await renderComponent();
       const editorSlide = getSlide('editor');
       const lambdaSelectorSlide = getSlide('lambdaSelector');
       const taskDetailsSlide = getSlide('taskDetails');
@@ -538,7 +533,7 @@ describe('Integration | Component | content atm inventories workflows', function
           this.get('attachAtmLambdaToAtmInventoryStub');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -577,7 +572,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
 
@@ -595,7 +590,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -613,7 +608,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -632,7 +627,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const lambdaSelectorSlide = getSlide('lambdaSelector');
         const taskDetailsSlide = getSlide('taskDetails');
@@ -649,7 +644,7 @@ describe('Integration | Component | content atm inventories workflows', function
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
       set(navigationsState, 'aspectOptions.revision', '2');
-      await render(this);
+      await renderComponent();
       const editorSlide = getSlide('editor');
       const taskDetailsSlide = getSlide('taskDetails');
 
@@ -688,7 +683,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const taskDetailsSlide = getSlide('taskDetails');
 
@@ -705,7 +700,7 @@ describe('Integration | Component | content atm inventories workflows', function
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
-        await render(this);
+        await renderComponent();
         const editorSlide = getSlide('editor');
         const taskDetailsSlide = getSlide('taskDetails');
 
@@ -728,7 +723,7 @@ describe('Integration | Component | content atm inventories workflows', function
           revision: '2',
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(get(navigationsState, 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
@@ -746,7 +741,7 @@ describe('Integration | Component | content atm inventories workflows', function
           revision: '2',
         });
 
-        await render(this);
+        await renderComponent();
 
         expect(get(navigationsState, 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
@@ -755,11 +750,10 @@ describe('Integration | Component | content atm inventories workflows', function
   });
 });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows
     atmInventory=atmInventory
   }}`);
-  await wait();
 }
 
 function expectSlideContainsView(slideId, viewName) {

@@ -20,7 +20,13 @@ import EmberObject, {
 import UploadObject from 'onezone-gui/utils/upload-object';
 import { A } from '@ember/array';
 import { reads } from '@ember/object/computed';
-import { array, gt, raw, conditional, collect } from 'ember-awesome-macros';
+import {
+  array,
+  gt,
+  raw,
+  conditional,
+  collect,
+} from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';

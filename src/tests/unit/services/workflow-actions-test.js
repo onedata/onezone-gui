@@ -21,17 +21,10 @@ import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow
 import { get } from '@ember/object';
 
 describe('Unit | Service | workflow actions', function () {
-  setupTest('service:workflow-actions', {
-    needs: [
-      'service:recordManager',
-      'service:workflowManager',
-      'service:globalNotify',
-      'service:i18n',
-    ],
-  });
+  setupTest();
 
   it('creates OpenCreateAtmInventoryViewAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const action = service.createOpenCreateAtmInventoryViewAction();
 
@@ -39,7 +32,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates CreateAtmInventoryAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const rawAtmInventory = { name: 'someName' };
     const action = service.createCreateAtmInventoryAction({
@@ -51,7 +44,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates ModifyAtmInventoryAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
     const atmInventoryDiff = {};
@@ -67,7 +60,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates RemoveAtmInventoryAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
     const action = service.createRemoveAtmInventoryAction({
@@ -79,7 +72,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates CreateAtmLambdaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
     const initialRevision = {};
@@ -94,7 +87,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates CreateAtmLambdaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmLambda = {};
     const revisionContent = {};
@@ -109,7 +102,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates ModifyAtmLambdaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmLambda = {};
     const revisionNumber = 2;
@@ -127,7 +120,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates UnlinkAtmLambdaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmLambda = {};
     const atmInventory = {};
@@ -142,7 +135,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates ModifyAtmWorkflowSchemaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const atmWorkflowSchemaDiff = {};
@@ -158,7 +151,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates RemoveAtmWorkflowSchemaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const action = service.createRemoveAtmWorkflowSchemaAction({
@@ -170,7 +163,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates CreateAtmWorkflowSchemaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
     const rawAtmWorkflowSchema = {};
@@ -185,7 +178,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates UploadAtmWorkflowSchemaAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmInventory = {};
     const action = service.createUploadAtmWorkflowSchemaAction({
@@ -197,7 +190,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates DumpAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const action = service.createDumpAtmWorkflowSchemaRevisionAction({
@@ -211,7 +204,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates ModifyAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const revisionDiff = {};
@@ -228,7 +221,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates CreateAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const action = service.createCreateAtmWorkflowSchemaRevisionAction({
@@ -242,7 +235,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates RemoveAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const action = service.createRemoveAtmWorkflowSchemaRevisionAction({
@@ -256,7 +249,7 @@ describe('Unit | Service | workflow actions', function () {
   });
 
   it('creates DuplicateAtmWorkflowSchemaRevisionAction instance', function () {
-    const service = this.subject();
+    const service = this.owner.lookup('service:workflow-actions');
 
     const atmWorkflowSchema = {};
     const action = service.createDuplicateAtmWorkflowSchemaRevisionAction({

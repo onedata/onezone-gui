@@ -13,7 +13,12 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { get, set, computed, observer } from '@ember/object';
+import EmberObject, {
+  get,
+  set,
+  computed,
+  observer,
+} from '@ember/object';
 import { A } from '@ember/array';
 import { next, later, debounce } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';

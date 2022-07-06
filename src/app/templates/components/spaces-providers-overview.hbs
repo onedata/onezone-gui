@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="col-xs-12 col-md-7 col-lg-8 col-space-provider-atlas-chart">
-      {{#unless media.isMobile}}
+      {{#unless (media "isMobile")}}
         <div class="row row-space-providers-map">
           <div class="row content-row loadable-row">
             <h1>{{tt this "providersMap"}}</h1>

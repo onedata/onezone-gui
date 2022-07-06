@@ -6,10 +6,7 @@ import sinon from 'sinon';
 import { registerService, lookupService } from '../../helpers/stub-service';
 
 describe('Unit | Service | token actions', function () {
-  setupTest('service:token-actions', {
-    // Specify the other units that are required for this test.
-    // needs: ['service:foo']
-  });
+  setupTest();
 
   beforeEach(function () {
     registerService(this, 'global-notify', GlobalNotifyStub);
@@ -38,7 +35,7 @@ describe('Unit | Service | token actions', function () {
       .withArgs('services.tokenActions.tokenRemoveSuccess')
       .returns('success');
 
-    const service = this.subject();
+    const service = this.owner.lookup('service:token-actions');
 
     return service.deleteToken(token).finally(() => {
       expect(deleteTokenStub).to.be.calledWith(token.id);
@@ -66,7 +63,7 @@ describe('Unit | Service | token actions', function () {
       .withArgs('services.tokenActions.removingToken')
       .returns('removing token');
 
-    const service = this.subject();
+    const service = this.owner.lookup('service:token-actions');
 
     return service.deleteToken(token).catch(() => {}).finally(() => {
       expect(deleteTokenStub).to.be.calledWith(token.id);

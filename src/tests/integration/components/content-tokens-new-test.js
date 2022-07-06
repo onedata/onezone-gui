@@ -1,21 +1,18 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, fillIn, click, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import { lookupService } from '../../helpers/stub-service';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
-import wait from 'ember-test-helpers/wait';
-import { fillIn, click } from 'ember-native-dom-helpers';
 import { set } from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
 describe('Integration | Component | content tokens new', function () {
-  setupComponentTest('content-tokens-new', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const spaces = [{
@@ -94,14 +91,14 @@ describe('Integration | Component | content tokens new', function () {
       });
   });
 
-  it('has class "content-tokens-new', function () {
-    this.render(hbs `{{content-tokens-new}}`);
+  it('has class "content-tokens-new', async function () {
+    await render(hbs `{{content-tokens-new}}`);
 
-    expect(this.$('.content-tokens-new')).to.exist;
+    expect(find('.content-tokens-new')).to.exist;
   });
 
   it('shows list of token templates at the beginning', async function () {
-    this.render(hbs `{{content-tokens-new}}`);
+    await render(hbs `{{content-tokens-new}}`);
 
     expect(isSlideActive('templates')).to.be.true;
   });
@@ -117,7 +114,7 @@ describe('Integration | Component | content tokens new', function () {
         sinon.stub(tokenActions, 'createCreateTokenAction')
         .returns(createTokenAction);
 
-      await renderAndSelectTemplate(this, 'custom');
+      await renderAndSelectTemplate('custom');
       await fillIn('.name-field input', 'abc');
       await click('.submit-token');
 
@@ -146,15 +143,15 @@ describe('Integration | Component | content tokens new', function () {
       sinon.stub(tokenActions, 'createCreateTokenAction')
         .returns(createTokenAction);
 
-      await renderAndSelectTemplate(this, 'custom');
+      await renderAndSelectTemplate('custom');
       await fillIn('.name-field input', 'abc');
       await click('.submit-token');
 
-      expect(this.$('.submit-token [role="progressbar"]')).to.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.exist;
       resolveSubmit();
-      await wait();
+      await settled();
 
-      expect(this.$('.submit-token [role="progressbar"]')).to.not.exist;
+      expect(find('.submit-token [role="progressbar"]')).to.not.exist;
     }
   );
 
@@ -176,21 +173,20 @@ describe('Integration | Component | content tokens new', function () {
         })),
       });
 
-      this.render(hbs `{{content-tokens-new}}`);
-      await wait();
+      await render(hbs `{{content-tokens-new}}`);
 
       checkShowsTemplate('Custom');
-      expect(this.$('.type-field .option-invite input').prop('checked')).to.be.true;
-      expect(this.$('.inviteType-field').text()).to.contain('Invite user to harvester');
-      expect(this.$('.target-field').text()).to.contain('harvester1');
-      expect(this.$('.expire-field').find('input').val()).to.contain('2020/03/18');
+      expect(find('.type-field .option-invite input')).to.have.property('checked', true);
+      expect(find('.inviteType-field')).to.contain.text('Invite user to harvester');
+      expect(find('.target-field')).to.contain.text('harvester1');
+      expect(find('.expire-field input').value).to.contain('2020/03/18');
     }
   );
 
   it(
     'does not show selected template name on token template selector slide',
-    function () {
-      this.render(hbs `{{content-tokens-new}}`);
+    async function () {
+      await render(hbs `{{content-tokens-new}}`);
 
       expect(getSlide('templates').querySelector('.header-row .template-name'))
         .to.not.exist;
@@ -198,96 +194,98 @@ describe('Integration | Component | content tokens new', function () {
   );
 
   it('allows to select "Onezone REST" template', async function () {
-    await renderAndSelectTemplate(this, 'onezoneRest');
+    await renderAndSelectTemplate('onezoneRest');
 
     checkShowsTemplate('Onezone REST');
-    checkTokenEditorHasName(this, /Onezone REST .+/);
-    const $serviceCaveatTags = this.$('.service-field .tag-item');
-    expect($serviceCaveatTags).to.have.length(1);
-    expect($serviceCaveatTags.text().trim()).to.equal('onezone');
-    expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
+    checkTokenEditorHasName(/Onezone REST .+/);
+    const serviceCaveatTags = findAll('.service-field .tag-item');
+    expect(serviceCaveatTags).to.have.length(1);
+    expect(serviceCaveatTags[0]).to.have.trimmed.text('onezone');
+    expect(find('.interface-field .option-rest input')).to.have.property('checked', true);
   });
 
   it('allows to select "Oneprovider REST" template', async function () {
-    await renderAndSelectTemplate(this, 'oneproviderRest');
+    await renderAndSelectTemplate('oneproviderRest');
 
     checkShowsTemplate('Oneprovider REST/CDMI');
-    checkTokenEditorHasName(this, /Oneprovider REST .+/);
-    const $serviceCaveatTags = this.$('.service-field .tag-item');
-    expect($serviceCaveatTags).to.have.length(1);
-    expect($serviceCaveatTags.text().trim()).to.equal('Any Oneprovider');
-    expect(this.$('.interface-field .option-rest input').prop('checked')).to.be.true;
+    checkTokenEditorHasName(/Oneprovider REST .+/);
+    const serviceCaveatTags = findAll('.service-field .tag-item');
+    expect(serviceCaveatTags).to.have.length(1);
+    expect(serviceCaveatTags[0]).to.have.trimmed.text('Any Oneprovider');
+    expect(find('.interface-field .option-rest input')).to.have.property('checked', true);
   });
 
   it('allows to select "Oneclient" template', async function () {
-    await renderAndSelectTemplate(this, 'oneclient');
+    await renderAndSelectTemplate('oneclient');
 
     checkShowsTemplate('Oneclient access');
-    checkTokenEditorHasName(this, /Oneclient .+/);
-    expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
+    checkTokenEditorHasName(/Oneclient .+/);
+    expect(find('.interface-field .option-oneclient input'))
+      .to.have.property('checked', true);
   });
 
   it('allows to select "Oneclient in Oneprovider" template', async function () {
-    await renderAndSelectTemplate(this, 'oneclientInOneprovider');
+    await renderAndSelectTemplate('oneclientInOneprovider');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Oneclient access in specific Oneprovider');
-    checkTokenEditorHasName(this, /Oneclient in provider0 .+/);
-    const $serviceCaveatTags = this.$('.service-field .tag-item');
-    expect($serviceCaveatTags).to.have.length(1);
-    expect($serviceCaveatTags.text().trim()).to.equal('provider0');
-    expect(this.$('.interface-field .option-oneclient input').prop('checked')).to.be.true;
+    checkTokenEditorHasName(/Oneclient in provider0 .+/);
+    const serviceCaveatTags = findAll('.service-field .tag-item');
+    expect(serviceCaveatTags).to.have.length(1);
+    expect(serviceCaveatTags[0]).to.have.trimmed.text('provider0');
+    expect(find('.interface-field .option-oneclient input'))
+      .to.have.property('checked', true);
   });
 
   it('allows to select "Read-only data" template', async function () {
-    await renderAndSelectTemplate(this, 'readonlyData');
+    await renderAndSelectTemplate('readonlyData');
 
     checkShowsTemplate('Read‐only data access');
-    checkTokenEditorHasName(this, /Read-only data .+/);
-    expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
+    checkTokenEditorHasName(/Read-only data .+/);
+    expect(find('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
   });
 
   it('allows to select "Read-only data for user" template', async function () {
-    await renderAndSelectTemplate(this, 'readonlyDataForUser');
+    await renderAndSelectTemplate('readonlyDataForUser');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Read‐only data access for specific user');
-    checkTokenEditorHasName(this, /Read-only data for me .+/);
-    const $consumerCaveatTags = this.$('.consumer-field .tag-item');
-    expect($consumerCaveatTags).to.have.length(1);
-    expect($consumerCaveatTags.text().trim()).to.equal('me');
-    expect(this.$('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
+    checkTokenEditorHasName(/Read-only data for me .+/);
+    const consumerCaveatTags = findAll('.consumer-field .tag-item');
+    expect(consumerCaveatTags).to.have.length(1);
+    expect(consumerCaveatTags[0]).to.have.trimmed.text('me');
+    expect(find('.readonlyEnabled-field .one-way-toggle')).to.have.class('checked');
   });
 
   it('allows to select "Restricted data" template', async function () {
-    await renderAndSelectTemplate(this, 'restrictedData');
+    await renderAndSelectTemplate('restrictedData');
     await click('.record-item:first-child');
 
     checkShowsTemplate('Restricted data access');
-    checkTokenEditorHasName(this, /Restricted data acc\. space0 .+/);
-    const $pathEntries = this.$('.pathEntry-field');
-    expect($pathEntries).to.have.length(1);
-    expect($pathEntries.find('.pathSpace-field').text()).to.contain('space0');
-    expect($pathEntries.find('.pathString-field input')).to.have.value('/');
+    checkTokenEditorHasName(/Restricted data acc\. space0 .+/);
+    const pathEntries = findAll('.pathEntry-field');
+    expect(pathEntries).to.have.length(1);
+    expect(pathEntries[0].querySelector('.pathSpace-field')).to.contain.text('space0');
+    expect(pathEntries[0].querySelector('.pathString-field input')).to.have.value('/');
   });
 
   it('allows to select "Identity" template', async function () {
-    await renderAndSelectTemplate(this, 'identity');
+    await renderAndSelectTemplate('identity');
 
     checkShowsTemplate('Identity proof');
-    checkTokenEditorHasName(this, /Identity .+/);
-    expect(this.$('.type-field .option-identity input').prop('checked')).to.be.true;
+    checkTokenEditorHasName(/Identity .+/);
+    expect(find('.type-field .option-identity input')).to.have.property('checked', true);
   });
 
   it('allows to select "Custom" template', async function () {
-    await renderAndSelectTemplate(this, 'custom');
+    await renderAndSelectTemplate('custom');
 
     checkShowsTemplate('Custom');
-    checkTokenEditorHasName(this, /Access .+/);
+    checkTokenEditorHasName(/Access .+/);
   });
 
   it('allows to come back from the form to templates list', async function () {
-    await renderAndSelectTemplate(this, 'onezoneRest');
+    await renderAndSelectTemplate('onezoneRest');
     await click('.content-back-link');
 
     expect(isSlideActive('templates')).to.be.true;
@@ -296,19 +294,19 @@ describe('Integration | Component | content tokens new', function () {
   it(
     'resets form back to the templates default after user chose template, modified form, came back to templates list and selected the same template again',
     async function () {
-      await renderAndSelectTemplate(this, 'onezoneRest');
+      await renderAndSelectTemplate('onezoneRest');
       await click('.interface-field .option-oneclient');
       await click('.content-back-link');
       await selectTemplate('onezoneRest');
 
-      expect(this.$('.interface-field .option-oneclient input').prop('checked'))
-        .to.be.false;
+      expect(find('.interface-field .option-oneclient input'))
+        .to.have.property('checked', false);
     }
   );
 });
 
-async function renderAndSelectTemplate(testCase, templateName) {
-  testCase.render(hbs `{{content-tokens-new}}`);
+async function renderAndSelectTemplate(templateName) {
+  await render(hbs `{{content-tokens-new}}`);
   await selectTemplate(templateName);
 }
 
@@ -322,10 +320,10 @@ function checkShowsTemplate(readableTemplateName) {
 }
 
 function checkTemplateNameInHeader(expectedName) {
-  expect(getSlide('form').querySelector('.header-row .template-name').textContent)
-    .to.contain(expectedName);
+  expect(getSlide('form').querySelector('.header-row .template-name'))
+    .to.contain.text(expectedName);
 }
 
-function checkTokenEditorHasName(testCase, nameRegexp) {
-  expect(testCase.$('.name-field input').val()).to.match(nameRegexp);
+function checkTokenEditorHasName(nameRegexp) {
+  expect(find('.name-field input').value).to.match(nameRegexp);
 }

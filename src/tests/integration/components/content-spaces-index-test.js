@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
@@ -8,7 +9,6 @@ import { resolve } from 'rsvp';
 import { registerService, lookupService } from '../../helpers/stub-service';
 import CurrentUser from 'onedata-gui-websocket-client/services/current-user';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 
 const TestCurrentUser = CurrentUser.extend({
   userProxy: promiseObject(resolve({
@@ -18,9 +18,7 @@ const TestCurrentUser = CurrentUser.extend({
 });
 
 describe('Integration | Component | content spaces index', function () {
-  setupComponentTest('content-spaces-index', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'currentUser', TestCurrentUser);
@@ -30,7 +28,7 @@ describe('Integration | Component | content spaces index', function () {
     };
   });
 
-  it('renders a tile with resolved default Oneprovider', function () {
+  it('renders a tile with resolved default Oneprovider', async function () {
     const provider1 = {
       id: 'provider.p1.instance:private',
       entityId: 'op1',
@@ -88,17 +86,15 @@ describe('Integration | Component | content spaces index', function () {
       _localStorage,
     });
 
-    this.render(hbs `{{content-spaces-index
+    await render(hbs `{{content-spaces-index
       _localStorage=_localStorage
       space=space
       showResourceMembershipTile=false
     }}`);
 
-    return wait().then(() => {
-      expect(
-        this.$('.resource-browse-tile .main-figure .one-label').text(),
-        'browse files tile text'
-      ).to.match(/Alpha/);
-    });
+    expect(
+      find('.resource-browse-tile .main-figure .one-label').textContent,
+      'browse files tile text'
+    ).to.match(/Alpha/);
   });
 });

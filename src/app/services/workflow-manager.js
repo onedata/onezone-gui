@@ -8,12 +8,25 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { computed, observer, get, getProperties } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+} from '@ember/object';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { entityType as atmInventoryEntityType } from 'onezone-gui/models/atm-inventory';
-import { entityType as atmWorkflowSchemaEntityType } from 'onezone-gui/models/atm-workflow-schema';
+import {
+  entityType as atmInventoryEntityType,
+} from 'onezone-gui/models/atm-inventory';
+import {
+  entityType as atmWorkflowSchemaEntityType,
+} from 'onezone-gui/models/atm-workflow-schema';
 import { entityType as atmLambdaEntityType } from 'onezone-gui/models/atm-lambda';
-import { all as allFulfilled, allSettled, resolve } from 'rsvp';
+import {
+  all as allFulfilled,
+  allSettled,
+  resolve,
+} from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import { promise } from 'ember-awesome-macros';
 import onlyFulfilledValues from 'onedata-gui-common/utils/only-fulfilled-values';

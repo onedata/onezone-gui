@@ -1,20 +1,21 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import CleanObsoleteTokensAction from 'onezone-gui/utils/token-actions/clean-obsolete-tokens-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
-import wait from 'ember-test-helpers/wait';
-import { click } from 'ember-native-dom-helpers';
 import { reject, resolve } from 'rsvp';
-import { getModal, getModalBody, getModalFooter } from '../../../helpers/modal';
+import {
+  getModal,
+  getModalBody,
+  getModalFooter,
+} from '../../../helpers/modal';
 
-describe('Integration | Util | token actions/clean obsolete tokens action', function () {
-  setupComponentTest('global-modal-mounter', {
-    integration: true,
-  });
+describe('Integration | Utility | token actions/clean obsolete tokens action', function () {
+  setupRenderingTest();
 
   beforeEach(function () {
     const tokens = [{
@@ -53,7 +54,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
   it('has correct className, icon and title', function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
 
@@ -69,7 +70,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
   it('has correct tip when there is something to clean', function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
 
@@ -78,7 +79,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
   it('has correct tip when there is nothing to clean', function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
     });
 
     expect(String(get(action, 'tip')))
@@ -88,7 +89,7 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
   it('is disabled when there are no tokens to remove', function () {
     const tokens = this.get('tokens').setEach('isObsolete', false);
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: {
         collection: tokens,
       },
@@ -99,135 +100,129 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
 
   it('is enabled when there are tokens to remove', function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
 
     expect(get(action, 'disabled')).to.be.false;
   });
 
-  it('shows modal on execute', function () {
+  it('shows modal on execute', async function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
 
-    this.render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      expect(getModal()).to.have.class('clean-obsolete-tokens-modal');
-    });
+    expect(getModal()).to.have.class('clean-obsolete-tokens-modal');
   });
 
-  it('passes only obsolete tokens to modal', function () {
+  it('passes only obsolete tokens to modal', async function () {
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
 
-    this.render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      const $accessTokens = getAccessTokenItems();
-      const $identityTokens = getIdentityTokenItems();
-      const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-      expect($accessTokens).to.have.length(1);
-      expect($accessTokens.text().trim()).to.equal('access token 1');
-      expect($identityTokens).to.have.length(1);
-      expect($identityTokens.text().trim()).to.equal('identity token 1');
-      expect($inviteTokens).to.have.length(1);
-      expect($inviteTokens.text().trim()).to.equal('invite token 2');
-    });
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
   });
 
-  it('passes information about visible tokens to modal', function () {
+  it('passes information about visible tokens to modal', async function () {
     const tokens = this.get('tokens');
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: {
         collection: tokens,
         visibleCollection: tokens.slice(0, 2),
       },
     });
 
-    this.render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      const $accessTokens = getAccessTokenItems();
-      const $identityTokens = getIdentityTokenItems();
-      const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-      expect($accessTokens).to.have.length(1);
-      expect($accessTokens.text().trim()).to.equal('access token 1');
-      expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
-      expect($identityTokens).to.have.length(1);
-      expect($identityTokens.text().trim()).to.equal('identity token 1');
-      expect($identityTokens.find('.one-checkbox')).to.not.have.class('checked');
-      expect($inviteTokens).to.have.length(1);
-      expect($inviteTokens.text().trim()).to.equal('invite token 2');
-      expect($inviteTokens.find('.one-checkbox')).to.not.have.class('checked');
-    });
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(accessTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(identityTokens[0].querySelector('.one-checkbox')).to.not.have.class('checked');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
+    expect(inviteTokens[0].querySelector('.one-checkbox')).to.not.have.class('checked');
   });
 
-  it('marks all tokens as visible when visibility is not specified', function () {
+  it('marks all tokens as visible when visibility is not specified', async function () {
     const tokens = this.get('tokens');
     const context = {
       collection: tokens,
       visibleCollection: undefined,
     };
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context,
     });
 
-    this.render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `{{global-modal-mounter}}`);
     action.execute();
+    await settled();
 
-    return wait().then(() => {
-      const $accessTokens = getAccessTokenItems();
-      const $identityTokens = getIdentityTokenItems();
-      const $inviteTokens = getInviteTokenItems();
+    const accessTokens = getAccessTokenItems();
+    const identityTokens = getIdentityTokenItems();
+    const inviteTokens = getInviteTokenItems();
 
-      expect($accessTokens).to.have.length(1);
-      expect($accessTokens.text().trim()).to.equal('access token 1');
-      expect($accessTokens.find('.one-checkbox')).to.have.class('checked');
-      expect($identityTokens).to.have.length(1);
-      expect($identityTokens.text().trim()).to.equal('identity token 1');
-      expect($identityTokens.find('.one-checkbox')).to.have.class('checked');
-      expect($inviteTokens).to.have.length(1);
-      expect($inviteTokens.text().trim()).to.equal('invite token 2');
-      expect($inviteTokens.find('.one-checkbox')).to.have.class('checked');
-    });
+    expect(accessTokens).to.have.length(1);
+    expect(accessTokens[0]).to.have.trimmed.text('access token 1');
+    expect(accessTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(identityTokens).to.have.length(1);
+    expect(identityTokens[0]).to.have.trimmed.text('identity token 1');
+    expect(identityTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
+    expect(inviteTokens).to.have.length(1);
+    expect(inviteTokens[0]).to.have.trimmed.text('invite token 2');
+    expect(inviteTokens[0].querySelector('.one-checkbox')).to.have.class('checked');
   });
 
   it(
     'returns promise with cancelled ActionResult after execute() and modal close using "Cancel"',
-    function () {
+    async function () {
       const action = CleanObsoleteTokensAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: this.get('context'),
       });
 
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       const resultPromise = action.execute();
+      await settled();
 
-      return wait()
-        .then(() => click(getModalFooter().find('.remove-tokens-cancel')[0]))
-        .then(() => resultPromise)
-        .then(actionResult =>
-          expect(get(actionResult, 'status')).to.equal('cancelled')
-        );
+      await click(getModalFooter().querySelector('.remove-tokens-cancel'));
+      const actionResult = await resultPromise;
+      expect(get(actionResult, 'status')).to.equal('cancelled');
     }
   );
 
-  it('executes removing selected tokens on submit (success scenario)', function () {
+  it('executes removing selected tokens on submit (success scenario)', async function () {
     const tokens = this.get('tokens');
     const action = CleanObsoleteTokensAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: this.get('context'),
     });
     const tokenManager = lookupService(this, 'token-manager');
@@ -246,31 +241,29 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
       'success'
     );
 
-    this.render(hbs `{{global-modal-mounter}}`);
+    await render(hbs `{{global-modal-mounter}}`);
     const actionResultPromise = action.execute();
+    await settled();
 
-    return wait()
-      .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
-      .then(() => actionResultPromise)
-      .then(actionResult => {
-        expect(deleteTokenStub).to.be.calledThrice;
-        tokens.filterBy('isObsolete').forEach(token =>
-          expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
-        );
-        expect(reloadTokensSpy).to.be.calledOnce;
-        expect(reloadCalledAfterRemove).to.be.true;
-        expect(successNotifySpy).to.be.calledWith(
-          sinon.match.has('string', 'Selected tokens have been removed.')
-        );
-        expect(get(actionResult, 'status')).to.equal('done');
-      });
+    await click(getModalFooter().querySelector('.remove-tokens-submit'));
+    const actionResult = await actionResultPromise;
+    expect(deleteTokenStub).to.be.calledThrice;
+    tokens.filterBy('isObsolete').forEach(token =>
+      expect(deleteTokenStub).to.be.calledWith(get(token, 'id'))
+    );
+    expect(reloadTokensSpy).to.be.calledOnce;
+    expect(reloadCalledAfterRemove).to.be.true;
+    expect(successNotifySpy).to.be.calledWith(
+      sinon.match.has('string', 'Selected tokens have been removed.')
+    );
+    expect(get(actionResult, 'status')).to.equal('done');
   });
 
   it(
     'executes removing selected tokens on submit (remove failure scenario)',
-    function () {
+    async function () {
       const action = CleanObsoleteTokensAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: this.get('context'),
       });
       const tokenManager = lookupService(this, 'token-manager');
@@ -289,35 +282,33 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
         'backendError'
       );
 
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       const actionResultPromise = action.execute();
+      await settled();
 
-      return wait()
-        .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
-        .then(() => actionResultPromise)
-        .then(actionResult => {
-          expect(reloadTokensSpy).to.be.calledOnce;
-          expect(reloadCalledAfterRemove).to.be.true;
+      await click(getModalFooter().querySelector('.remove-tokens-submit'));
+      const actionResult = await actionResultPromise;
+      expect(reloadTokensSpy).to.be.calledOnce;
+      expect(reloadCalledAfterRemove).to.be.true;
 
-          expect(failureNotifySpy).to.be.calledWith(
-            sinon.match.has('string', 'removing tokens'),
-            'error'
-          );
-          const {
-            status,
-            error,
-          } = getProperties(actionResult, 'status', 'error');
-          expect(status).to.equal('failed');
-          expect(error).to.equal('error');
-        });
+      expect(failureNotifySpy).to.be.calledWith(
+        sinon.match.has('string', 'removing tokens'),
+        'error'
+      );
+      const {
+        status,
+        error,
+      } = getProperties(actionResult, 'status', 'error');
+      expect(status).to.equal('failed');
+      expect(error).to.equal('error');
     }
   );
 
   it(
     'executes removing selected tokens on submit (reload failure scenario)',
-    function () {
+    async function () {
       const action = CleanObsoleteTokensAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: this.get('context'),
       });
       const tokenManager = lookupService(this, 'token-manager');
@@ -328,36 +319,34 @@ describe('Integration | Util | token actions/clean obsolete tokens action', func
         'backendError'
       );
 
-      this.render(hbs `{{global-modal-mounter}}`);
+      await render(hbs `{{global-modal-mounter}}`);
       const actionResultPromise = action.execute();
+      await settled();
 
-      return wait()
-        .then(() => click(getModalFooter().find('.remove-tokens-submit')[0]))
-        .then(() => actionResultPromise)
-        .then(actionResult => {
-          expect(failureNotifySpy).to.be.calledWith(
-            sinon.match.has('string', 'removing tokens'),
-            'error'
-          );
-          const {
-            status,
-            error,
-          } = getProperties(actionResult, 'status', 'error');
-          expect(status).to.equal('failed');
-          expect(error).to.equal('error');
-        });
+      await click(getModalFooter().querySelector('.remove-tokens-submit'));
+      const actionResult = await actionResultPromise;
+      expect(failureNotifySpy).to.be.calledWith(
+        sinon.match.has('string', 'removing tokens'),
+        'error'
+      );
+      const {
+        status,
+        error,
+      } = getProperties(actionResult, 'status', 'error');
+      expect(status).to.equal('failed');
+      expect(error).to.equal('error');
     }
   );
 });
 
 function getAccessTokenItems() {
-  return getModalBody().find('.access-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.access-tokens-list .checkbox-list-item');
 }
 
 function getIdentityTokenItems() {
-  return getModalBody().find('.identity-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.identity-tokens-list .checkbox-list-item');
 }
 
 function getInviteTokenItems() {
-  return getModalBody().find('.invite-tokens-list .checkbox-list-item');
+  return getModalBody().querySelectorAll('.invite-tokens-list .checkbox-list-item');
 }

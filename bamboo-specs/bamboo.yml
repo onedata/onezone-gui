@@ -116,7 +116,11 @@ Run tests:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - ./make.py -r ${bamboo.agentWorkingDirectory} run_tests_xunit_output
+      - |-
+        ./make.py -r ${bamboo.agentWorkingDirectory} lint
+        LINT_RESULT=$?
+        ./make.py run_tests_xunit_output
+        return `expr $LINT_RESULT + $?`
       working-dir: onezone-gui
       description: Run unit tests
   final-tasks:
@@ -138,15 +142,7 @@ Build and publish:
       path: onezone-gui
       force-clean-build: 'true'
       description: Checkout Default Repository
-  - script:
-      interpreter: SHELL
-      scripts:
-      - |-
-        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-        git remote -v
-        make submodules || exit $?
-      working-dir: onezone-gui
-      description: Init submodules
+  - script: *init-submodules
   - script:
       interpreter: SHELL
       scripts:

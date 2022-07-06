@@ -7,7 +7,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { getProperties, get, set } from '@ember/object';
+import EmberObject, {
+  getProperties,
+  get,
+  set,
+} from '@ember/object';
 import { resolve, all as allFulfilled } from 'rsvp';
 
 /**

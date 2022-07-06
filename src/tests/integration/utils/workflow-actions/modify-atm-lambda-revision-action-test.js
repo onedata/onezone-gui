@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import sinon from 'sinon';
 import { reject } from 'rsvp';
@@ -10,9 +10,7 @@ import { get } from '@ember/object';
 describe(
   'Integration | Utility | workflow actions/modify atm lambda revision action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     it('executes modifying lambda revision (success scenario)', async function () {
       const updateStub = sinon
@@ -33,7 +31,7 @@ describe(
         },
       };
       const action = ModifyAtmLambdaRevisionAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmLambda,
           revisionNumber: 2,
@@ -76,7 +74,7 @@ describe(
         },
       };
       const action = ModifyAtmLambdaRevisionAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmLambda,
           revisionNumber: 2,

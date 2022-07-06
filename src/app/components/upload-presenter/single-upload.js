@@ -220,11 +220,14 @@ export default Component.extend({
         minimizeTargetSelector,
         isMinimized,
         onToggleMinimize,
+        element,
       } = this.getProperties(
         'minimizeTargetSelector',
         'isMinimized',
-        'onToggleMinimize'
+        'onToggleMinimize',
+        'element'
       );
+      const $element = $(element);
       if (minimize === undefined) {
         minimize = !isMinimized;
       }
@@ -235,7 +238,7 @@ export default Component.extend({
           this.cancelScheduledMinimalization();
 
           const target = $(minimizeTargetSelector);
-          if (target) {
+          if (target && target.length) {
             const {
               top: targetTop,
               left: targetLeft,
@@ -243,13 +246,13 @@ export default Component.extend({
             const {
               top: uploadTop,
               left: uploadLeft,
-            } = this.$().offset();
+            } = $element.offset();
             const deltaTop = targetTop + target.outerHeight() / 2 -
-              uploadTop - this.$().outerHeight();
+              uploadTop - $element.outerHeight();
             const deltaLeft = targetLeft + target.outerWidth() / 2 -
-              uploadLeft - this.$().outerWidth() / 2;
+              uploadLeft - $element.outerWidth() / 2;
             const component = this;
-            this.$().css({
+            $element.css({
               bottom: -deltaTop,
               left: deltaLeft,
               transform: 'scaleX(0)',

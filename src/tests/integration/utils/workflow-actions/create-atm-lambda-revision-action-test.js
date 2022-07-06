@@ -1,19 +1,17 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get } from '@ember/object';
-import wait from 'ember-test-helpers/wait';
+import { settled } from '@ember/test-helpers';
 
 describe(
   'Integration | Utility | workflow actions/create atm lambda revision action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const workflowManager = lookupService(this, 'workflow-manager');
@@ -50,7 +48,7 @@ describe(
         .withArgs(atmLambda.entityId, 3, revisionContent)
         .resolves();
       const action = CreateAtmLambdaRevisionAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmLambda,
           revisionContent,
@@ -78,7 +76,7 @@ describe(
         'revisionContent'
       );
       const action = CreateAtmLambdaRevisionAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmLambda,
           revisionContent,
@@ -91,7 +89,7 @@ describe(
 
       const actionResultPromise = action.execute();
       rejectCreate('someError');
-      await wait();
+      await settled();
       const actionResult = await actionResultPromise;
 
       expect(get(actionResult, 'status')).to.equal('failed');

@@ -7,7 +7,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { default as Service, inject as service } from '@ember/service';
+import {
+  default as Service,
+  inject as service,
+} from '@ember/service';
 import { get } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import OpenCreateTokenViewAction from 'onezone-gui/utils/token-actions/open-create-token-view-action';

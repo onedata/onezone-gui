@@ -22,7 +22,7 @@
       value=onlyDirect
       class="direct-selector view-mode-selector"
       type="radio"
-      justified=media.isMobile
+      justified=(media "isMobile")
       onChange=(action (mut onlyDirect)) as |bg|
     }}
       <div class="btn-group" role="group">
@@ -40,7 +40,7 @@
       value=aspect
       class="mode-selector view-mode-selector"
       type="radio"
-      justified=media.isMobile
+      justified=(media "isMobile")
       onChange=(action (mut aspect)) as |bg|
     }}
       <div class="btn-group" role="group">

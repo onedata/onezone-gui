@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject from '@ember/object';
 
@@ -17,11 +18,9 @@ const icons = {
 describe(
   'Integration | Component | membership visualiser/membership block',
   function () {
-    setupComponentTest('membership-visualiser/membership-block', {
-      integration: true,
-    });
+    setupRenderingTest();
 
-    it('renders record name', function () {
+    it('renders record name', async function () {
       const testName = 'testName';
       this.set('record', EmberObject.create({
         constructor: {
@@ -29,22 +28,22 @@ describe(
         },
         name: testName,
       }));
-      this.render(hbs `{{membership-visualiser/membership-block record=record}}`);
-      expect(this.$('.record-name').text().trim()).to.be.equal(testName);
+      await render(hbs `{{membership-visualiser/membership-block record=record}}`);
+      expect(find('.record-name')).to.have.trimmed.text(testName);
     });
 
     Object.keys(icons).forEach(modelType => {
-      it(`renders icon for ${modelType}`, function () {
+      it(`renders icon for ${modelType}`, async function () {
         this.set('record', EmberObject.create({
           constructor: {
             modelName: modelType,
           },
           type: 'team',
         }));
-        this.render(hbs `
+        await render(hbs `
           {{membership-visualiser/membership-block record=record}}
         `);
-        expect(this.$(`.oneicon-${icons[modelType]}`)).to.exist;
+        expect(find(`.oneicon-${icons[modelType]}`)).to.exist;
       });
     });
   }

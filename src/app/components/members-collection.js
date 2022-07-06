@@ -9,7 +9,13 @@
  */
 
 import Component from '@ember/component';
-import { observer, get, getProperties, set, computed } from '@ember/object';
+import {
+  observer,
+  get,
+  getProperties,
+  set,
+  computed,
+} from '@ember/object';
 import { reads } from '@ember/object/computed';
 import notImplementedWarn from 'onedata-gui-common/utils/not-implemented-warn';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';

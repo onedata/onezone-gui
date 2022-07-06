@@ -1,36 +1,27 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, doubleClick } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
-import Service from '@ember/service';
-import { registerService, lookupService } from '../../helpers/stub-service';
+import { lookupService } from '../../helpers/stub-service';
 
 function po(val) {
   return PromiseObject.create({ promise: resolve(val) });
 }
 
-const Router = Service.extend({
-  urlFor() {
-    return 'https://example.com';
-  },
-});
-
 describe('Integration | Component | content providers', function () {
-  setupComponentTest('content-providers', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
-    registerService(this, 'router', Router);
+    sinon.stub(lookupService(this, '-routing'), 'transitionTo').returns(null);
   });
 
   it(
     'invokes transition to provider-redirect on double click if provider status is online',
-    function () {
+    async function () {
       const router = lookupService(this, 'router');
       const exampleUrl = 'https://example.com';
       sinon.stub(router, 'urlFor').returns(exampleUrl);
@@ -40,10 +31,10 @@ describe('Integration | Component | content providers', function () {
         dispatchEvent() {},
       };
       this.set('_window', _window);
-      const providerId = 'id1';
+      const providerGri = 'provider.id1.instance:auto';
       const list = [
         po({
-          id: providerId,
+          id: providerGri,
           latitude: 10,
           longitude: 20,
           online: true,
@@ -66,18 +57,14 @@ describe('Integration | Component | content providers', function () {
         transitionToProviderRedirect,
       });
 
-      this.render(hbs `{{content-providers
+      await render(hbs `{{content-providers
         _window=_window
         providerList=providerList
         transitionToProviderRedirect=transitionToProviderRedirect
       }}`);
 
-      return wait().then(() => {
-        this.$('.provider-place-id1').dblclick();
-        return wait().then(() => {
-          expect(_window.open).to.be.calledOnce;
-          expect(_window.open).to.be.calledWith(exampleUrl);
-        });
-      });
+      await doubleClick('.provider-place-id1');
+      expect(_window.open).to.be.calledOnce;
+      expect(_window.open).to.be.calledWith(exampleUrl);
     });
 });

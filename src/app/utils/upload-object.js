@@ -4,7 +4,7 @@
  * files/dirs in single upload. UploadObject objects creates a tree
  * structure linked using `children` array and `parent` reference. Also each
  * object has reference to root object.
- * 
+ *
  * Properties like objectSize or isUploading are calculated recurrently for
  * dirs. For files these fields must be set manually.
  *
@@ -14,9 +14,21 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, observer, get } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+} from '@ember/object';
 import { inject as service } from '@ember/service';
-import { conditional, equal, sum, array, raw, writable, or } from 'ember-awesome-macros';
+import {
+  conditional,
+  equal,
+  sum,
+  array,
+  raw,
+  writable,
+  or,
+} from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 import moment from 'moment';

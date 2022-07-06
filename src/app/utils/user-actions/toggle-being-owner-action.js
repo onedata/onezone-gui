@@ -13,7 +13,15 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
-import { array, and, or, not, equal, raw, conditional } from 'ember-awesome-macros';
+import {
+  array,
+  and,
+  or,
+  not,
+  equal,
+  raw,
+  conditional,
+} from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Action.extend({

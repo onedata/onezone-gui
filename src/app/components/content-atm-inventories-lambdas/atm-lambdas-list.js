@@ -31,7 +31,6 @@ export default Component.extend(I18n, {
   ],
 
   i18n: service(),
-  media: service(),
 
   /**
    * @override
