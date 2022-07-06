@@ -238,7 +238,7 @@ export default Component.extend({
           this.cancelScheduledMinimalization();
 
           const target = $(minimizeTargetSelector);
-          if (target) {
+          if (target && target.length) {
             const {
               top: targetTop,
               left: targetLeft,

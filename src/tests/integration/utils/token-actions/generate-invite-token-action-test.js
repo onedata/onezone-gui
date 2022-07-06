@@ -21,6 +21,8 @@ describe('Integration | Utility | token actions/generate invite token action', f
     sinon.stub(lookupService(this, 'token-manager'), 'createTemporaryInviteToken')
       .resolves('token');
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns('');
+    sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserRecord')
+      .returns({});
     this.setProperties({
       context: {
         inviteType: 'userJoinGroup',

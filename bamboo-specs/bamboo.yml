@@ -171,21 +171,18 @@ Build and publish:
   final-tasks:
   - script: *clear-env
   artifacts:
-  - name: docker-build-list.json
+  - &art-item-build
+    name: docker-build-list.json
     location: onezone-gui
     pattern: docker-build-list.json
     shared: true
     required: true
-  - name: docker-build-report.txt
-    location: onezone-gui
+  - <<: *art-item-build
+    name: docker-build-report.txt
     pattern: docker-build-report.txt
-    shared: true
-    required: true
-  - name: gui-image.conf
-    location: onezone-gui
+  - <<: *art-item-build
+    name: gui-image.conf
     pattern: gui-image.conf
-    shared: true
-    required: true
   requirements:
   - gui
   artifact-subscriptions:

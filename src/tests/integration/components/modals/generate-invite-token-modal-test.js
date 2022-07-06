@@ -22,6 +22,8 @@ describe('Integration | Component | modals/generate invite token modal', functio
     sinon.stub(lookupService(this, 'token-manager'), 'createTemporaryInviteToken')
       .resolves('token');
     sinon.stub(lookupService(this, 'router'), 'urlFor').returns(null);
+    sinon.stub(lookupService(this, 'record-manager'), 'getCurrentUserRecord')
+      .returns({});
     this.setProperties({
       modalManager: lookupService(this, 'modal-manager'),
       modalOptions: {

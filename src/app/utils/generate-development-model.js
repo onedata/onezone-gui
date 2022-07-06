@@ -365,6 +365,7 @@ function createUserRecord(store, listRecords) {
     fullName: USERNAME,
     basicAuthEnabled: true,
     hasPassword: false,
+    canInviteProviders: true,
     username: USER_LOGIN,
   });
   Object.values(listRecords).forEach(lr =>
