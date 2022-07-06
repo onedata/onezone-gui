@@ -286,24 +286,16 @@ describe('Integration | Component | invite token generator', function () {
         resolve('registertoken')
       );
 
-      render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatify"
           targetRecord=targetRecord
         }}
       `);
 
-      console.log('11111');
-
-      await settled();
-
-      console.log('bbbbb');
-
       expect(this.$('.token-textarea').val()).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
       );
-
-      console.log('22222');
 
       done();
     });
@@ -314,14 +306,12 @@ describe('Integration | Component | invite token generator', function () {
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
       stubCreateToken(this, ['registerOneprovider'], resolve('registertoken'));
 
-      render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatifyWithImport"
           targetRecord=targetRecord
         }}
       `);
-
-      await settled();
 
       expect(this.$('.token-textarea').val()).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
@@ -340,14 +330,13 @@ describe('Integration | Component | invite token generator', function () {
             resolve('supporttoken')
           );
 
-          render(hbs `
+          await render(hbs `
             {{invite-token-generator
               inviteType="onedatify"
               targetRecord=targetRecord
             }}
           `);
 
-          await settled();
           expect(find('.variables-description')).to.not.exist;
           done();
         }
@@ -368,14 +357,13 @@ describe('Integration | Component | invite token generator', function () {
         resolve('supporttoken')
       );
 
-      render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatify"
           targetRecord=targetRecord
         }}
       `);
 
-      await settled();
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
       );
@@ -387,14 +375,13 @@ describe('Integration | Component | invite token generator', function () {
       this.set('targetRecord', space);
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
 
-      render(hbs `
+      await render(hbs `
         {{invite-token-generator
           inviteType="onedatifyWithImport"
           targetRecord=targetRecord
         }}
       `);
 
-      await settled();
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
       );
@@ -411,14 +398,13 @@ describe('Integration | Component | invite token generator', function () {
             resolve('supporttoken')
           );
 
-          render(hbs `
+          await render(hbs `
             {{invite-token-generator
               inviteType="onedatify"
               targetRecord=targetRecord
             }}
           `);
 
-          await settled();
           expect(find('.limitations-text').textContent.trim()).to.equal(
             'The support token included below will expire in 2 weeks and has no usage count limit.'
           );
