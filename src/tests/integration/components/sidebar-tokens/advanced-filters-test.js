@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, settled, find } from '@ember/test-helpers';
+import { render, click, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
-import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
+import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import { get } from '@ember/object';
 
 const possibleTargetModels = [{
@@ -147,11 +147,11 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       {{sidebar-tokens/advanced-filters collection=tokensCollection}}
     `);
 
-    const targetModelHelper = new TargetModelHelper();
     await selectType('invite');
-    await targetModelHelper.open();
+    await clickTrigger('.target-model-filter');
+    const options = findAll('.ember-power-select-option');
     possibleTargetModels.forEach(({ name, icon }, index) => {
-      const item = targetModelHelper.getNthOption(index + 1);
+      const item = options[index];
       expect(item).to.exist;
       expect(item.querySelector('.model-name')).to.have.trimmed.text(name);
       if (icon) {
@@ -164,12 +164,11 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
   it('notifies about filters state after target model filter change', async function () {
     const changeSpy = sinon.spy();
     this.set('change', changeSpy);
-    let optionsToCheck = possibleTargetModels
-      .map((option, i) => Object.assign({ optionIndex: i + 1 }, option));
     // Need to move "All" model to the end, because it is a preselected option and
     // cannot be choosen again at the beginning.
-    optionsToCheck =
-      optionsToCheck.without(optionsToCheck[0]).concat([optionsToCheck[0]]);
+    const optionsToCheck = possibleTargetModels
+      .without(possibleTargetModels[0])
+      .concat([possibleTargetModels[0]]);
 
     await render(hbs `
       {{sidebar-tokens/advanced-filters
@@ -177,10 +176,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         onChange=(action change)}}
     `);
 
-    const targetModelHelper = new TargetModelHelper();
     await selectType('invite');
-    for (const { modelName, optionIndex } of optionsToCheck) {
-      await targetModelHelper.selectOption(optionIndex);
+    for (const { modelName, name } of optionsToCheck) {
+      await selectChoose('.target-model-filter', name);
       expect(changeSpy.lastCall).to.be.calledWith({
         type: 'invite',
         targetModelName: modelName,
@@ -206,30 +204,28 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         {{sidebar-tokens/advanced-filters collection=tokensCollection}}
       `);
 
-      const targetModelHelper = new TargetModelHelper();
       await selectType('invite');
-      await targetModelHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
       expect(find('.target-record-filter .ember-power-select-trigger'))
         .to.not.have.attr('aria-disabled');
     }
   );
 
-  possibleTargetModels.slice(1).forEach(({ name, modelName }, index) => {
+  possibleTargetModels.slice(1).forEach(({ name, modelName }) => {
     it(
       `renders "All" and two records in target record filter when target model is set to "${name}"`,
       async function () {
         await render(hbs `
           {{sidebar-tokens/advanced-filters collection=tokensCollection}}
         `);
-
-        const targetModelHelper = new TargetModelHelper();
-        const targetRecordHelper = new TargetRecordHelper();
         await selectType('invite');
-        await targetModelHelper.selectOption(index + 2);
-        await targetRecordHelper.open();
-        const allItem = targetRecordHelper.getNthOption(1);
-        const firstRecordItem = targetRecordHelper.getNthOption(2);
-        const secondRecordItem = targetRecordHelper.getNthOption(3);
+        await selectChoose('.target-model-filter', name);
+        await clickTrigger('.target-record-filter');
+        const [
+          allItem,
+          firstRecordItem,
+          secondRecordItem,
+        ] = findAll('.ember-power-select-option');
 
         expect(allItem).to.have.trimmed.text('All');
         expect(firstRecordItem).to.have.trimmed.text(`${modelName}1`);
@@ -250,18 +246,15 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         collection=tokensCollection
         onChange=(action change)}}
     `);
-
-    const targetModelHelper = new TargetModelHelper();
-    const targetRecordHelper = new TargetRecordHelper();
     await selectType('invite');
-    await targetModelHelper.selectOption(3);
-    await targetRecordHelper.selectOption(2);
+    await selectChoose('.target-model-filter', 'Cluster');
+    await selectChoose('.target-record-filter', 'cluster1');
     expect(changeSpy.lastCall).to.be.calledWith({
       type: 'invite',
       targetModelName: 'cluster',
       targetRecord: clusterRecords[0],
     });
-    await targetRecordHelper.selectOption(1);
+    await selectChoose('.target-record-filter', 'All');
     expect(changeSpy.lastCall).to.be.calledWith({
       type: 'invite',
       targetModelName: 'cluster',
@@ -282,14 +275,14 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       {{sidebar-tokens/advanced-filters collection=tokensCollection}}
     `);
 
-    const targetModelHelper = new TargetModelHelper();
-    const targetRecordHelper = new TargetRecordHelper();
     await selectType('invite');
-    await targetModelHelper.selectOption(2);
-    await targetRecordHelper.open();
-    const allItem = targetRecordHelper.getNthOption(1);
-    const clusterItem = targetRecordHelper.getNthOption(2);
-    const nonExistingItem = targetRecordHelper.getNthOption(3);
+    await selectChoose('.target-model-filter', 'Cluster');
+    await clickTrigger('.target-record-filter');
+    const [
+      allItem,
+      clusterItem,
+      nonExistingItem,
+    ] = findAll('.ember-power-select-option');
 
     expect(allItem).to.have.trimmed.text('All');
     expect(clusterItem).to.have.trimmed.text('cluster1');
@@ -306,12 +299,10 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         onChange=(action change)}}
     `);
 
-    const targetModelHelper = new TargetModelHelper();
-    const targetRecordHelper = new TargetRecordHelper();
     await selectType('invite');
-    await targetModelHelper.selectOption(3);
-    await targetRecordHelper.selectOption(2);
-    await targetModelHelper.selectOption(4);
+    await selectChoose('.target-model-filter', 'Cluster');
+    await selectChoose('.target-record-filter', 'cluster1');
+    await selectChoose('.target-model-filter', 'Group');
     expect(changeSpy.lastCall).to.be.calledWith({
       type: 'invite',
       targetModelName: 'group',
@@ -331,11 +322,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
           onChange=(action change)}}
       `);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
       await selectType('invite');
-      await targetModelHelper.selectOption(3);
-      await targetRecordHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
       const changesCount = changeSpy.callCount;
       this.set(
         'tokensCollection',
@@ -344,10 +333,12 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         )
       );
       await settled();
-      await targetRecordHelper.open();
+      await clickTrigger('.target-record-filter');
+      const options = findAll('.ember-power-select-option');
       expect(changeSpy).to.have.callCount(changesCount);
-      expect(targetRecordHelper.getTrigger()).to.contain.text('cluster1');
-      expect(targetRecordHelper.getNthOption(3)).to.be.null;
+      expect(find('.target-record-filter .ember-basic-dropdown-trigger'))
+        .to.contain.text('cluster1');
+      expect(options).to.have.length(2);
     }
   );
 
@@ -363,11 +354,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
           onChange=(action change)}}
       `);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
       await selectType('invite');
-      await targetModelHelper.selectOption(3);
-      await targetRecordHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
       const changesCount = changeSpy.callCount;
       this.set(
         'tokensCollection',
@@ -376,10 +365,12 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
         )
       );
       await settled();
-      await targetRecordHelper.open();
+      await clickTrigger('.target-record-filter');
+      const options = findAll('.ember-power-select-option');
       expect(changeSpy).to.have.callCount(changesCount + 1);
-      expect(targetRecordHelper.getTrigger()).to.contain.text('All');
-      expect(targetRecordHelper.getNthOption(3)).to.be.null;
+      expect(find('.target-record-filter .ember-basic-dropdown-trigger'))
+        .to.contain.text('All');
+      expect(options).to.have.length(2);
       expect(changeSpy.lastCall).to.be.calledWith({
         type: 'invite',
         targetModelName: 'cluster',
@@ -400,11 +391,9 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
           onChange=(action change)}}
       `);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
       await selectType('invite');
-      await targetModelHelper.selectOption(3);
-      await targetRecordHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
       const changesCount = changeSpy.callCount;
       this.set(
         'tokensCollection',
@@ -412,8 +401,10 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
       );
       await settled();
       expect(changeSpy).to.have.callCount(changesCount + 1);
-      expect(targetModelHelper.getTrigger()).to.contain.text('All');
-      expect(targetRecordHelper.getTrigger()).to.contain.text('All');
+      expect(find('.target-model-filter .ember-basic-dropdown-trigger'))
+        .to.contain.text('All');
+      expect(find('.target-record-filter .ember-basic-dropdown-trigger'))
+        .to.contain.text('All');
       expect(changeSpy.lastCall).to.be.calledWith({
         type: 'invite',
         targetModelName: 'all',
@@ -422,18 +413,6 @@ describe('Integration | Component | sidebar tokens/advanced filters', function (
     }
   );
 });
-
-class TargetModelHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-model-filter');
-  }
-}
-
-class TargetRecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-record-filter');
-  }
-}
 
 function createTokenStub(modelName, idx) {
   return {
