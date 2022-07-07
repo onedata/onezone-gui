@@ -124,10 +124,10 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<string|undefined>}
    */
   specialText: computed(
-    'browser.browser.browserCode',
+    'browser.browserName',
     'currentOpeningCompleted',
     function specialText() {
-      const isSafari = (this.get('browser.browser.browserCode') === 'safari');
+      const isSafari = (this.get('browser.browserName') === 'safari');
       const isAuthenticated = this.get('session.isAuthenticated');
       if (isSafari && !isAuthenticated && !this.get('currentOpeningCompleted')) {
         return 'safariCert';
