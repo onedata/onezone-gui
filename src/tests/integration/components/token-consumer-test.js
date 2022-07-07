@@ -5,14 +5,14 @@ import {
   beforeEach,
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, fillIn, click, settled, find } from '@ember/test-helpers';
+import { render, fillIn, click, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
+import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
@@ -323,7 +323,6 @@ describe('Integration | Component | token consumer', function () {
 
           await render(hbs `{{token-consumer}}`);
 
-          const joiningRecordHelper = new JoiningRecordHelper();
           await fillIn('.token-string', 'token');
           const recordSelector = find('.joining-record-selector');
           expect(recordSelector).to.exist;
@@ -332,11 +331,11 @@ describe('Integration | Component | token consumer', function () {
           expect(
             recordSelector.querySelector('.ember-power-select-placeholder')
           ).to.have.trimmed.text(selectorPlaceholder);
-          await joiningRecordHelper.open();
+          await clickTrigger('.joining-record-selector');
+          const options = findAll('.ember-power-select-option');
           _.range(3).forEach(i => {
-            const option = joiningRecordHelper.getNthOption(i + 1);
-            expect(option).to.contain.text(`${modelToSelect}${i}`);
-            expect(option).to.contain(`.oneicon-${selectorIcon}`);
+            expect(options[i]).to.contain.text(`${modelToSelect}${i}`);
+            expect(options[i]).to.contain(`.oneicon-${selectorIcon}`);
           });
         }
       );
@@ -369,7 +368,7 @@ describe('Integration | Component | token consumer', function () {
           await render(hbs `{{token-consumer}}`);
 
           await fillIn('.token-string', 'token');
-          await new JoiningRecordHelper().selectOption(1);
+          await selectChoose('.joining-record-selector', `${modelToSelect}0`);
           expect(find('.confirm-btn')).to.not.have.attr('disabled');
         }
       );
@@ -512,9 +511,8 @@ describe('Integration | Component | token consumer', function () {
 
       await render(hbs `{{token-consumer}}`);
 
-      const joiningRecordHelper = new JoiningRecordHelper();
       await fillIn('.token-string', 'token');
-      await joiningRecordHelper.selectOption(1);
+      await selectChoose('.joining-record-selector', 'group0');
       await click('.confirm-btn');
       expect(createConsumeInviteTokenActionStub).to.be.calledOnce;
       expect(createConsumeInviteTokenActionStub).to.be.calledWith(sinon.match({
@@ -559,10 +557,4 @@ describe('Integration | Component | token consumer', function () {
 
 function stubExamine(testSuite, token, response) {
   testSuite.get('examineStub').withArgs(token).returns(response);
-}
-
-class JoiningRecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.joining-record-selector', '.ember-basic-dropdown-content');
-  }
 }

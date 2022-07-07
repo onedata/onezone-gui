@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, settled } from '@ember/test-helpers';
+import { render, click, settled, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import { get, getProperties } from '@ember/object';
@@ -17,7 +17,7 @@ import {
 import { suppressRejections } from '../../../helpers/suppress-rejections';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve } from 'rsvp';
-import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
+import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 
 describe(
   'Integration | Utility | space actions/add harvester to space action',
@@ -71,8 +71,6 @@ describe(
       await render(hbs `{{global-modal-mounter}}`);
       action.execute();
       await settled();
-
-      const dropdownHelper = new RecordHelper();
       expect(getModal()).to.have.class('record-selector-modal');
       expect(getModalHeader().querySelector('h1'))
         .to.have.trimmed.text('Add one of your harvesters');
@@ -81,11 +79,12 @@ describe(
       );
       expect(getModalFooter().querySelector('.record-selector-submit'))
         .to.have.trimmed.text('Add');
-      await dropdownHelper.open();
-      expect(dropdownHelper.getNthOption(1)).to.have.trimmed.text('harvester1');
-      expect(dropdownHelper.getNthOption(1).querySelector('.oneicon-light-bulb'))
+      await clickTrigger('.record-selector-modal');
+      const options = findAll('.ember-power-select-option');
+      expect(options).to.have.length(1);
+      expect(options[0]).to.have.trimmed.text('harvester1');
+      expect(options[0].querySelector('.oneicon-light-bulb'))
         .to.exist;
-      expect(dropdownHelper.getNthOption(2)).to.not.exist;
     });
 
     it(
@@ -108,8 +107,7 @@ describe(
         const actionResultPromise = action.execute();
         await settled();
 
-        const dropdownHelper = new RecordHelper();
-        await dropdownHelper.selectOption(1);
+        await selectChoose('.record-selector-modal', 'harvester1');
         await click(getModalFooter().querySelector('.record-selector-submit'));
         const actionResult = await actionResultPromise;
         expect(addHarvesterStub).to.be.calledOnce;
@@ -142,8 +140,7 @@ describe(
         const actionResultPromise = action.execute();
         await settled();
 
-        const dropdownHelper = new RecordHelper();
-        await dropdownHelper.selectOption(1);
+        await selectChoose('.record-selector-modal', 'harvester1');
         await click(getModalFooter().querySelector('.record-selector-submit'));
         const actionResult = await actionResultPromise;
         expect(failureNotifySpy).to.be.calledWith(
@@ -160,9 +157,3 @@ describe(
     );
   }
 );
-
-class RecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.modal-content', 'body .ember-basic-dropdown-content');
-  }
-}

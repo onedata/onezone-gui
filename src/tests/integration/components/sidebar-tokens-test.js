@@ -4,19 +4,7 @@ import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { get } from '@ember/object';
-import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
-
-class TargetModelHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-model-filter');
-  }
-}
-
-class TargetRecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-record-filter');
-  }
-}
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 
 describe('Integration | Component | sidebar tokens', function () {
   setupRenderingTest();
@@ -117,9 +105,8 @@ describe('Integration | Component | sidebar tokens', function () {
     async function () {
       await render(hbs `{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
       await click('.btn-invite');
-      await targetModelHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
       const renderedTokens = findAll('.token-item');
       expect(renderedTokens).to.have.length(2);
       renderedTokens.forEach((element) => {
@@ -134,11 +121,9 @@ describe('Integration | Component | sidebar tokens', function () {
     async function () {
       await render(hbs `{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
       await click('.btn-invite');
-      await targetModelHelper.selectOption(2);
-      await targetRecordHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
       const renderedTokens = findAll('.token-item');
       expect(renderedTokens).to.have.length(1);
       expect(renderedTokens[0]).to.contain.text('invite');
@@ -149,13 +134,11 @@ describe('Integration | Component | sidebar tokens', function () {
   it(
     'does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
     async function () {
-      await render(hbs `{{sidebar-tokens model=model}}`);
+      await render(hbs`{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
       await click('.btn-invite');
-      await targetModelHelper.selectOption(2);
-      await targetRecordHelper.selectOption(2);
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
       await click('.btn-access');
       const renderedTokens = findAll('.token-item');
       expect(renderedTokens).to.have.length(2);

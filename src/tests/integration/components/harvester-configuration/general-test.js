@@ -7,7 +7,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, Promise } from 'rsvp';
 import { set, setProperties } from '@ember/object';
-import EmberPowerSelectHelper from '../../../helpers/ember-power-select-helper';
+import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import OneTooltipHelper from '../../../helpers/one-tooltip';
 import sinon from 'sinon';
 
@@ -114,21 +114,19 @@ describe('Integration | Component | harvester configuration/general', function (
 
         await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
-        const typeDropdown = new TypeHelper();
         const tooltip =
           new OneTooltipHelper('.type-field .one-label-tip .oneicon');
-        await typeDropdown.open();
+        await clickTrigger('.type-field');
         const formGroup = find('.type-field');
-        const trigger = typeDropdown.getTrigger();
+        const trigger = find('.type-field .ember-basic-dropdown-trigger');
         expect(formGroup).to.exist;
         expect(formGroup.querySelector('.control-label'))
           .to.have.trimmed.text('Backend type:');
         expect(trigger).to.have.trimmed.text('Postgre');
-        expect(typeDropdown.getNthOption(1))
-          .to.have.trimmed.text('Postgre');
-        expect(typeDropdown.getNthOption(2))
-          .to.have.trimmed.text('Elasticsearch');
-        expect(typeDropdown.getNthOption(3)).to.not.exist;
+        const options = findAll('.ember-power-select-option');
+        expect(options).to.have.length(2);
+        expect(options[0]).to.have.trimmed.text('Postgre');
+        expect(options[1]).to.have.trimmed.text('Elasticsearch');
 
         const tipText = await tooltip.getText();
         expect(tipText).to.equal(
@@ -209,8 +207,7 @@ describe('Integration | Component | harvester configuration/general', function (
         await render(hbs `{{harvester-configuration/general mode="create"}}`);
 
         await click('.useDefaultHarvestingBackend-field .one-way-toggle');
-        const typeDropdown = new TypeHelper();
-        await typeDropdown.selectOption(1);
+        await selectChoose('.type-field', 'Elasticsearch');
         await fillIn('.endpoint-field input', 'someendpoint');
         await click('.useDefaultHarvestingBackend-field .one-way-toggle');
         expectBackendTypeState(false, 'Elasticsearch');
@@ -342,8 +339,7 @@ describe('Integration | Component | harvester configuration/general', function (
         await fillIn('.name-field input', 'abc');
         await click('.useDefaultHarvestingBackend-field .one-way-toggle');
 
-        const typeDropdown = new TypeHelper();
-        await typeDropdown.selectOption(1);
+        await selectChoose('.type-field', 'Postgre');
         await fillIn('.endpoint-field input', 'def');
         await click('.autoSetup-field .one-way-toggle');
         await click('.submit-btn');
@@ -606,8 +602,7 @@ describe('Integration | Component | harvester configuration/general', function (
 
       await click('.edit-btn');
       await fillIn('.name-field input', 'newname');
-      const typeDropdown = new TypeHelper();
-      await typeDropdown.selectOption(1);
+      await selectChoose('.type-field', 'Postgre');
       await fillIn('.endpoint-field input', 'newendpoint');
       await click('.public-field .one-way-toggle');
       await click('.submit-btn');
@@ -646,12 +641,6 @@ describe('Integration | Component | harvester configuration/general', function (
     );
   });
 });
-
-class TypeHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.type-field', '.ember-basic-dropdown-content');
-  }
-}
 
 function expectBackendTypeState(isEnabled, value) {
   const typeTrigger = find('.type-field .dropdown-field-trigger');
