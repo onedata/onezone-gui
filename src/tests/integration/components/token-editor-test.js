@@ -2527,45 +2527,9 @@ describe('Integration | Component | token editor', function () {
   );
 });
 
-// class InviteTypeHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.inviteType-field', '.ember-basic-dropdown-content');
-//   }
-// }
-
-// class TargetHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.target-field', '.ember-basic-dropdown-content');
-//   }
-// }
-
-// class RegionTypeHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.regionType-field', '.ember-basic-dropdown-content');
-//   }
-// }
-
-// class CountryTypeHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.countryType-field', '.ember-basic-dropdown-content');
-//   }
-// }
-
-// class PathSpaceHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.pathSpace-field', '.ember-basic-dropdown-content');
-//   }
-// }
-
 function getTagsSelector() {
   return document.querySelector('.webui-popover.in .tags-selector');
 }
-
-// class TagsSelectorDropdownHelper extends EmberPowerSelectHelper {
-//   constructor() {
-//     super('.webui-popover.in .tags-selector .ember-basic-dropdown');
-//   }
-// }
 
 const basicFieldNameToFieldPath = {
   name: 'basic.name',
