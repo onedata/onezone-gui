@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9394 Removed ember-browser-info
 * VFS-9520 Changed sidebar look to be more compact
 * VFS-9508 Updated EmberJS to v3.4.8
 * VFS-9475 Added support for limited invitation token generation (restricted provider registration policy)
