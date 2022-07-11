@@ -26,9 +26,9 @@
     }
 
     .entryName-field,
-    .entryDataSpec-field .type-field,
+    .entryDataSpec-field,
     .entryDefaultValue-field {
-      .control-label {
+      > .control-label {
         display: none;
       }
     }
@@ -36,41 +36,6 @@
 
   .mountSpaceOptions-field {
     margin-left: $nested-fields-indent;
-  }
-
-  .entry-name {
-    order: 0;
-  }
-
-  .entryDataSpec-field {
-    .type-field {
-      order: 1;
-    }
-
-    .valueConstraints-field {
-      order: 4;
-      flex-basis: 100%;
-    }
-
-    &,
-    > .field-component,
-    .entryDataSpec-collapse,
-    .entryDataSpec-children {
-      display: contents;
-    }
-  }
-
-  .entryIsArray-field {
-    order: 2;
-  }
-
-  .entryIsOptional-field,
-  .entryIsViaFile-field {
-    order: 3;
-  }
-
-  .entryDefaultValue-field {
-    order: 5;
   }
 
   .resources-field {
@@ -92,21 +57,6 @@
     text-align: left;
     .btn {
       margin-left: $padding-small-horizontal;
-    }
-  }
-
-  .time-series-measurement-value-constraints-editor {
-    flex-basis: 100%;
-
-    > .control-label {
-      width: 100%;
-      padding: 0;
-      margin-bottom: 5px;
-    }
-
-    .add-field-button {
-      margin-top: 0;
-      margin-bottom: $form-group-margin-bottom;
     }
   }
 
@@ -138,7 +88,7 @@
 
     @media (max-width: $screen-sm-max) {
       .entryName-field,
-      .entryDataSpec-field .type-field,
+      .entryDataSpec-field,
       .entryDefaultValue-field {
         flex: 1 1 100%;
       }
@@ -159,7 +109,7 @@
       width: 12em;
     }
 
-    .fields-group-children.-children {
+    .atm-lambda-root-children {
       > * {
         margin-right: $padding-right;
       }
@@ -176,7 +126,7 @@
         flex: 0 1 calc(50% - #{$padding-right / 2});
       }
 
-      .entryDataSpec-field .type-field {
+      .entryDataSpec-field {
         flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
         min-width: 13em;
         margin-left: $padding-base-vertical;
@@ -203,13 +153,9 @@
         }
       }
 
-      .entryIsArray-field {
-        transform: translateX(#{$x-offset-to-center-toggles});
-      }
-
       .entryIsOptional-field,
       .entryIsViaFile-field {
-        transform: translateX(-#{$x-offset-to-center-toggles});
+        transform: translateX(#{$x-offset-to-center-toggles});
       }
 
       .entryDefaultValue-field {

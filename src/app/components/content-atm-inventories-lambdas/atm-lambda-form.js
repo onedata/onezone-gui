@@ -33,7 +33,7 @@ import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import {
   FormElement as DataSpecEditor,
-} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -151,6 +151,7 @@ export default Component.extend(I18n, {
     const component = this;
 
     return FormFieldsRootGroup.extend({
+      name: 'atm-lambda-root',
       i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
       ownerSource: reads('component'),
       isEnabled: not(or('component.isSubmitting', eq('component.mode', raw('view')))),
@@ -437,9 +438,9 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
       name: 'entryDataSpec',
       dataTypeFilters: [{
         filterType: 'forbiddenType',
-        forbiddenType: {
+        forbiddenTypes: [{
           type: 'onedatafsCredentials',
-        },
+        }],
         ignoredContexts: isForArguments ? ['root'] : [],
       }],
     });

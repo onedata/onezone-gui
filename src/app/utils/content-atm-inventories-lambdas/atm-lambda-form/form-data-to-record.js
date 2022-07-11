@@ -11,7 +11,7 @@ import { get, getProperties } from '@ember/object';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import {
   formValuesToDataSpec,
-} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 /**
  * @param {Object} formData

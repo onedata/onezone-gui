@@ -11,7 +11,7 @@ import { set, setProperties, getProperties } from '@ember/object';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
 import {
   dataSpecToFormValues,
-} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor/data-spec-editor2';
+} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
