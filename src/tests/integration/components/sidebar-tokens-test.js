@@ -1,28 +1,13 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { get } from '@ember/object';
-import $ from 'jquery';
-import { click } from 'ember-native-dom-helpers';
-import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
-
-class TargetModelHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-model-filter');
-  }
-}
-
-class TargetRecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.target-record-filter');
-  }
-}
+import { selectChoose } from 'ember-power-select/test-support/helpers';
 
 describe('Integration | Component | sidebar tokens', function () {
-  setupComponentTest('sidebar-tokens', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     this.setProperties({
@@ -64,32 +49,32 @@ describe('Integration | Component | sidebar tokens', function () {
     });
   });
 
-  it('renders all tokens', function () {
+  it('renders all tokens', async function () {
     const tokens = this.get('model.collection.list');
 
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
-    const renderedTokens = this.$('.token-item');
+    const renderedTokens = findAll('.token-item');
     expect(renderedTokens).to.have.length(tokens.length);
   });
 
-  it('renders tokens in correct order', function () {
+  it('renders tokens in correct order', async function () {
     const tokens = this.get('model.collection.list');
     const tokensOrder = this.get('tokensOrder');
 
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
-    this.$('.token-item').each((index, element) => {
+    findAll('.token-item').forEach((element, index) => {
       const originIndex = tokensOrder[index];
-      expect($(element).find('.token-name'))
-        .to.contain(get(tokens[originIndex], 'name'));
+      expect(element.querySelector('.token-name'))
+        .to.contain.text(get(tokens[originIndex], 'name'));
     });
   });
 
-  it('shows advanced token filters by default', function () {
-    this.render(hbs `{{sidebar-tokens model=model}}`);
+  it('shows advanced token filters by default', async function () {
+    await render(hbs `{{sidebar-tokens model=model}}`);
 
-    expect(this.$('.advanced-filters-collapse.in .advanced-token-filters'))
+    expect(find('.advanced-filters-collapse.in .advanced-token-filters'))
       .to.exist;
   });
 
@@ -103,76 +88,63 @@ describe('Integration | Component | sidebar tokens', function () {
     type: 'invite',
     count: 3,
   }].forEach(({ type, count }) => {
-    it(`shows only ${type} tokens, when type filter is "${type}"`, function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    it(`shows only ${type} tokens, when type filter is "${type}"`, async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
-      return click(`.btn-${type}`)
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(count);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain(type);
-          });
-        });
+      await click(`.btn-${type}`);
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(count);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text(type);
+      });
     });
   });
 
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - all"',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(2);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain('invite');
-            expect($(element).text()).to.contain('cluster');
-          });
-        });
+      await click('.btn-invite');
+      await selectChoose('.target-model-filter', 'Cluster');
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(2);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text('invite');
+        expect(element).to.contain.text('cluster');
+      });
     }
   );
 
   it(
     'shows only cluster invite tokens, when type filter is "invite" and target filter is "cluster - cluster1"',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs `{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => targetRecordHelper.selectOption(2))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(1);
-          expect(renderedTokens.text()).to.contain('invite');
-          expect(renderedTokens.text()).to.contain('cluster1');
-        });
+      await click('.btn-invite');
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(1);
+      expect(renderedTokens[0]).to.contain.text('invite');
+      expect(renderedTokens[0]).to.contain.text('cluster1');
     }
   );
 
   it(
     'does not take "invite" dedicated filters into account after change from "invite" to "access" filter',
-    function () {
-      this.render(hbs `{{sidebar-tokens model=model}}`);
+    async function () {
+      await render(hbs`{{sidebar-tokens model=model}}`);
 
-      const targetModelHelper = new TargetModelHelper();
-      const targetRecordHelper = new TargetRecordHelper();
-      return click('.btn-invite')
-        .then(() => targetModelHelper.selectOption(2))
-        .then(() => targetRecordHelper.selectOption(2))
-        .then(() => click('.btn-access'))
-        .then(() => {
-          const renderedTokens = this.$('.token-item');
-          expect(renderedTokens).to.have.length(2);
-          renderedTokens.each((i, element) => {
-            expect($(element).text()).to.contain('access');
-          });
-        });
+      await click('.btn-invite');
+      await selectChoose('.target-model-filter', 'Cluster');
+      await selectChoose('.target-record-filter', 'cluster1');
+      await click('.btn-access');
+      const renderedTokens = findAll('.token-item');
+      expect(renderedTokens).to.have.length(2);
+      renderedTokens.forEach((element) => {
+        expect(element).to.contain.text('access');
+      });
     }
   );
 });

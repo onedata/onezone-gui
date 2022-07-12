@@ -194,7 +194,8 @@ export default Component.extend(I18n, {
   didInsertElement() {
     this._super(...arguments);
 
-    const perfectScrollbar = this.$().closest('.perfect-scrollbar-element')[0];
+    const element = this.get('element');
+    const perfectScrollbar = element && element.closest('.perfect-scrollbar-element');
     if (perfectScrollbar) {
       perfectScrollbar
         .addEventListener('scroll', this.get('parentScrollEventListener'));
@@ -204,7 +205,8 @@ export default Component.extend(I18n, {
   willDestroyElement() {
     this._super(...arguments);
 
-    const perfectScrollbar = this.$().closest('.perfect-scrollbar-element')[0];
+    const element = this.get('element');
+    const perfectScrollbar = element && element.closest('.perfect-scrollbar-element');
     if (perfectScrollbar) {
       perfectScrollbar
         .removeEventListener('scroll', this.get('parentScrollEventListener'));

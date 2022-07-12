@@ -12,7 +12,9 @@ import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import { all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
-import { tokenInviteTypeToTargetModelMapping } from 'onezone-gui/models/token';
+import {
+  tokenInviteTypeToTargetModelMapping,
+} from 'onezone-gui/models/token';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as tokenEntityType } from 'onezone-gui/models/token';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';

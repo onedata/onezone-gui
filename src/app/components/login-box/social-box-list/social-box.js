@@ -11,14 +11,14 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { htmlSafe } from '@ember/string';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
-import contrast from 'npm:contrast';
+import contrast from 'contrast';
 import {
   defaultIconBackgroundColor,
   defaultIconPath,
   darkFgColor,
   lightFgColor,
 } from 'onezone-gui/utils/auth-box-config';
-import Color from 'npm:color';
+import Color from 'color';
 
 export default Component.extend({
   tagName: 'div',

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupModelTest } from 'ember-mocha';
+import { setupTest } from 'ember-mocha';
 import sinon from 'sinon';
 import Service from '@ember/service';
 
@@ -15,9 +15,7 @@ const TokenManagerStub = Service.extend({
 });
 
 describe('Unit | Model | group', function () {
-  setupModelTest('group', {
-    needs: [],
-  });
+  setupTest();
 
   beforeEach(function () {
     registerService(this, 'onedata-token-api', OnedataTokenApiMock);
@@ -26,7 +24,7 @@ describe('Unit | Model | group', function () {
   });
 
   it('resolves invite token using token api service and graph', function () {
-    const record = this.subject();
+    const record = this.owner.lookup('service:store').createRecord('group', {});
     record.set('id', 'group.some_id.instance');
 
     const TOKEN = 'abcd';

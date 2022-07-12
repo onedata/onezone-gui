@@ -22,8 +22,8 @@ describe('Unit | Utility | generate development model', function () {
           gri: 'sth.7g35du7c.instance',
           entityId: '7g35du7c',
           init() {
-            const save = sinon.stub(this, 'save');
-            save.resolves(this);
+            this._super(...arguments);
+            const save = sinon.spy(this, 'save');
             stubsToCheck.push(save);
             const list = A();
             list.save = () => Promise.resolve();
@@ -31,7 +31,9 @@ describe('Unit | Utility | generate development model', function () {
               promise: Promise.resolve(list),
             }));
           },
-          save() {},
+          save() {
+            return resolve(this);
+          },
           then(callback) {
             return resolve(callback(this));
           },

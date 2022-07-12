@@ -9,7 +9,7 @@
  */
 
 import Component from '@ember/component';
-import { get, computed, observer } from '@ember/object';
+import { get, computed, observer, defineProperty } from '@ember/object';
 import { tag } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -84,7 +84,8 @@ export default Component.extend(I18n, {
   filteredRecordsSetter: observer(
     'filterDependentKeys',
     function filteredRecordsSetter() {
-      this.set(
+      defineProperty(
+        this,
         'filteredRecords',
         computed(
           `recordsProxy.@each.{${this.get('filterDependentKeys').join(',')}}`,

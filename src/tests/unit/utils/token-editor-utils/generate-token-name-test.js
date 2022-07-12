@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
+import {
+  describe,
+  it,
+  beforeEach,
+  afterEach,
+} from 'mocha';
 import generateTokenName from 'onezone-gui/utils/token-editor-utils/generate-token-name';
 import sinon from 'sinon';
 import moment from 'moment';

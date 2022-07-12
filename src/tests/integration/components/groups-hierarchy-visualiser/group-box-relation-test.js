@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, triggerEvent, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import EmberObject, { get, set } from '@ember/object';
-import { triggerEvent } from 'ember-native-dom-helpers';
 import I18nStub from '../../../helpers/i18n-stub';
 import { registerService, lookupService } from '../../../helpers/stub-service';
 import Service from '@ember/service';
@@ -19,9 +19,7 @@ const GlobalNotifyStub = Service.extend({
 describe(
   'Integration | Component | groups hierarchy visualiser/group box relation',
   function () {
-    setupComponentTest('groups-hierarchy-visualiser/group-box-relation', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function beforeEach() {
       registerService(this, 'i18n', I18nStub);
@@ -29,22 +27,22 @@ describe(
       set(lookupService(this, 'global-notify'), 'spy', sinon.spy());
     });
 
-    it('renders information about insufficient privileges', function () {
+    it('renders information about insufficient privileges', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: false,
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           group=group}}
       `);
-      const $relation = this.$('.group-box-relation');
-      expect($relation).to.have.class('no-view');
-      expect($relation.find('.oneicon-no-view')).to.exist;
+      const relation = find('.group-box-relation');
+      expect(relation).to.have.class('no-view');
+      expect(relation).to.contain('.oneicon-no-view');
     });
 
-    it('shows spinner when loading relation', function () {
+    it('shows spinner when loading relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -53,17 +51,17 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
       `);
-      const $relation = this.$('.group-box-relation');
-      expect($relation).to.have.class('loading');
-      expect($relation.find('.spinner')).to.exist;
+      const relation = find('.group-box-relation');
+      expect(relation).to.have.class('loading');
+      expect(relation).to.contain('.spinner');
     });
 
-    it('shows error icon on error', function () {
+    it('shows error icon on error', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -72,17 +70,17 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
       `);
-      const $relation = this.$('.group-box-relation');
-      expect($relation).to.have.class('error');
-      expect($relation.find('.oneicon-ban-left')).to.exist;
+      const relation = find('.group-box-relation');
+      expect(relation).to.have.class('error');
+      expect(relation).to.contain('.oneicon-ban-left');
     });
 
-    it('shows error details on double click', function () {
+    it('shows error details on double click', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -92,19 +90,18 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
       `);
-      return triggerEvent('.group-box-relation', 'dblclick').then(() => {
-        const notifySpy = get(lookupService(this, 'global-notify'), 'spy');
-        expect(notifySpy).to.be.calledOnce;
-        expect(notifySpy.args[0][1]).to.equal('error');
-      });
+      await triggerEvent('.group-box-relation', 'dblclick');
+      const notifySpy = get(lookupService(this, 'global-notify'), 'spy');
+      expect(notifySpy).to.be.calledOnce;
+      expect(notifySpy.args[0][1]).to.equal('error');
     });
 
-    it('shows children relation', function () {
+    it('shows children relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         childList: EmberObject.create({
@@ -114,18 +111,18 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="children"
           group=group}}
       `);
-      const $relation = this.$('.group-box-relation');
-      expect($relation).to.have.class('loaded');
-      expect($relation.find('.oneicon-arrow-right')).to.exist;
-      expect($relation.find('.relations-number').text()).to.equal('5');
+      const relation = find('.group-box-relation');
+      expect(relation).to.have.class('loaded');
+      expect(relation).to.contain('.oneicon-arrow-right');
+      expect(relation.querySelector('.relations-number')).to.have.trimmed.text('5');
     });
 
-    it('shows parents relation', function () {
+    it('shows parents relation', async function () {
       const group = EmberObject.create({
         hasViewPrivilege: true,
         parentList: EmberObject.create({
@@ -135,15 +132,15 @@ describe(
       });
 
       this.set('group', group);
-      this.render(hbs `
+      await render(hbs `
         {{groups-hierarchy-visualiser/group-box-relation
           relationType="parents"
           group=group}}
       `);
-      const $relation = this.$('.group-box-relation');
-      expect($relation).to.have.class('loaded');
-      expect($relation.find('.oneicon-arrow-left')).to.exist;
-      expect($relation.find('.relations-number').text()).to.equal('5');
+      const relation = find('.group-box-relation');
+      expect(relation).to.have.class('loaded');
+      expect(relation).to.contain('.oneicon-arrow-left');
+      expect(relation.querySelector('.relations-number')).to.have.trimmed.text('5');
     });
   }
 );

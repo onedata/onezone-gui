@@ -25,7 +25,16 @@ import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import ClipboardField from 'onedata-gui-common/utils/form-component/clipboard-field';
-import { tag, equal, notEqual, raw, or, not, and, conditional } from 'ember-awesome-macros';
+import {
+  tag,
+  equal,
+  notEqual,
+  raw,
+  or,
+  not,
+  and,
+  conditional,
+} from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 import _ from 'lodash';
 import { scheduleOnce } from '@ember/runloop';
@@ -351,13 +360,19 @@ export default Component.extend(I18n, {
     const {
       mode,
       backendTypesListProxy,
-    } = this.getProperties('mode', 'backendTypesListProxy');
+      element,
+    } = this.getProperties('mode', 'backendTypesListProxy', 'element');
     if (mode === 'create') {
       backendTypesListProxy.then(() => {
         scheduleOnce(
           'afterRender',
           this,
-          () => this.$('.name-field input').focus()
+          () => {
+            const input = element.querySelector('.name-field input');
+            if (input) {
+              input.focus();
+            }
+          }
         );
       });
     }

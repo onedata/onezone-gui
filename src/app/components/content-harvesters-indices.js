@@ -8,7 +8,13 @@
  */
 
 import Component from '@ember/component';
-import { computed, observer, get, getProperties, set } from '@ember/object';
+import {
+  computed,
+  observer,
+  get,
+  getProperties,
+  set,
+} from '@ember/object';
 import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
@@ -95,7 +101,7 @@ export default Component.extend(
     globalActions: collect('createAction'),
 
     /**
-     * @override 
+     * @override
      * @type {Ember.ComputedProperty<string>}
      */
     globalActionsTitle: computed(function globalActionsTitle() {

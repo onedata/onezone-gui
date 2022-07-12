@@ -1,29 +1,27 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, fillIn, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import { fillIn, click } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | content atm inventories new', function () {
-  setupComponentTest('content-atm-inventories-new', {
-    integration: true,
-  });
+  setupRenderingTest();
 
-  it('has class "content-atm-inventories-new', function () {
-    this.render(hbs `{{content-atm-inventories-new}}`);
+  it('has class "content-atm-inventories-new', async function () {
+    await render(hbs `{{content-atm-inventories-new}}`);
 
-    expect(this.$('.content-atm-inventories-new')).to.exist;
+    expect(this.element.children[0]).to.have.class('content-atm-inventories-new');
   });
 
   it('does not allow to create new automation inventory when name is empty',
     async function () {
-      this.render(hbs `{{content-atm-inventories-new}}`);
+      await render(hbs `{{content-atm-inventories-new}}`);
 
       await fillIn('.new-atm-inventory-name', '');
 
-      expect(this.$('.btn-primary')).to.have.attr('disabled');
+      expect(find('.btn-primary')).to.have.attr('disabled');
     });
 
   it('allows to create new automation inventory', async function () {
@@ -32,7 +30,7 @@ describe('Integration | Component | content atm inventories new', function () {
       lookupService(this, 'workflow-actions'),
       'createCreateAtmInventoryAction'
     ).callsFake(() => ({ execute: executeStub }));
-    this.render(hbs `{{content-atm-inventories-new}}`);
+    await render(hbs `{{content-atm-inventories-new}}`);
 
     await fillIn('.new-atm-inventory-name', 'someName');
     await click('.btn-primary');

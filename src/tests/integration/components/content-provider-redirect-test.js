@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Service from '@ember/service';
 import { registerService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
 import { resolve } from 'rsvp';
 import { oneproviderAbbrev } from 'onedata-gui-common/utils/onedata-urls';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -27,9 +27,7 @@ const AlertStub = Service.extend({
 });
 
 describe('Integration | Component | content provider redirect', function () {
-  setupComponentTest('content-provider-redirect', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     registerService(this, 'onezone-server', OnezoneServerStub);
@@ -39,7 +37,7 @@ describe('Integration | Component | content provider redirect', function () {
 
   it(
     'redirects to Oneprovider hosted in Onezone URL',
-    function () {
+    async function () {
       const clusterEntityId = '12345';
       const provider = {
         entityId: 'test1',
@@ -71,24 +69,22 @@ describe('Integration | Component | content provider redirect', function () {
 
       this.setProperties({ provider, fakeLocation, checkIsProviderAvailable });
 
-      this.render(hbs `{{content-provider-redirect
+      await render(hbs `{{content-provider-redirect
         checkIsProviderAvailable=checkIsProviderAvailable
         provider=provider
         _location=fakeLocation
       }}`);
 
-      const $contentProviderRedirect = this.$('.content-provider-redirect');
-      expect($contentProviderRedirect).to.exist;
+      const contentProviderRedirect = find('.content-provider-redirect');
+      expect(contentProviderRedirect).to.exist;
 
-      return wait().then(() => {
-        expect(locationReplace).to.be.calledOnce;
-        expect(locationReplace).to.be.calledWith(url);
-      });
+      expect(locationReplace).to.be.calledOnce;
+      expect(locationReplace).to.be.calledWith(url);
     }
   );
 
   it('redirects to data index and invokes alert then provider is not available',
-    function () {
+    async function () {
       const provider = {
         entityId: 'test1',
         belongsTo(relName) {
@@ -118,7 +114,7 @@ describe('Integration | Component | content provider redirect', function () {
         throwEndpointError,
       });
 
-      this.render(hbs `{{content-provider-redirect
+      await render(hbs `{{content-provider-redirect
         checkIsProviderAvailable=checkIsProviderAvailable
         showEndpointErrorModal=showEndpointErrorModal
         transitionToProviderOnMap=transitionToProviderOnMap
@@ -126,12 +122,10 @@ describe('Integration | Component | content provider redirect', function () {
         provider=provider
       }}`);
 
-      return wait().then(() => {
-        expect(checkIsProviderAvailable).to.be.calledOnce;
-        expect(showEndpointErrorModal).to.be.calledOnce;
-        expect(transitionToProviderOnMap).to.be.calledOnce;
-        expect(throwEndpointError).to.be.calledOnce;
-      });
+      expect(checkIsProviderAvailable).to.be.calledOnce;
+      expect(showEndpointErrorModal).to.be.calledOnce;
+      expect(transitionToProviderOnMap).to.be.calledOnce;
+      expect(throwEndpointError).to.be.calledOnce;
     }
   );
 });

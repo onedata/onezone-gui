@@ -1,13 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import wait from 'ember-test-helpers/wait';
 import sinon from 'sinon';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import _ from 'lodash';
-import { clickTrigger } from '../../../helpers/ember-power-select';
-import $ from 'jquery';
+import { clickTrigger } from 'ember-power-select/test-support/helpers';
 import { Promise } from 'rsvp';
 import Store from 'onedata-gui-common/utils/workflow-visualiser/store';
 
@@ -109,9 +107,7 @@ const exampleTask = {
 
 describe('Integration | Component | content atm inventories workflows/task details view',
   function () {
-    setupComponentTest('content-atm-inventories-workflows/task-details-view', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       this.setProperties({
@@ -126,11 +122,11 @@ describe('Integration | Component | content atm inventories workflows/task detai
 
     it('has class "content-atm-inventories-workflows-task-details-view"',
       async function () {
-        await render(this);
+        await renderComponent();
 
-        expect(this.$().children())
-          .to.have.class('content-atm-inventories-workflows-task-details-view')
-          .and.to.have.length(1);
+        expect(this.element.children).to.have.length(1);
+        expect(this.element.children[0])
+          .to.have.class('content-atm-inventories-workflows-task-details-view');
       });
 
     context('in "create" mode', function () {
@@ -180,20 +176,20 @@ describe('Integration | Component | content atm inventories workflows/task detai
       });
 
       it('fills task form with task data', async function () {
-        await render(this);
+        await renderComponent();
 
-        expect(this.$('.name-field .form-control')).to.have.value(exampleTask.name);
+        expect(find('.name-field .form-control')).to.have.value(exampleTask.name);
         // TODO: VFS-7816 uncomment or remove future code
-        // expect(this.$('.argumentMapping-field .valueBuilderStore-field').text().trim())
-        //   .to.contain('singleValueIntegerStore');
-        expect(this.$('.resultMapping-field .targetStore-field').text().trim())
-          .to.contain('singleValueStringStore');
+        // expect(find('.argumentMapping-field .valueBuilderStore-field'))
+        //   .to.contain.text('singleValueIntegerStore');
+        expect(find('.resultMapping-field .targetStore-field'))
+          .to.contain.text('singleValueStringStore');
       });
     });
   });
 
-async function render(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-workflows/task-details-view
+async function renderComponent() {
+  await render(hbs `{{content-atm-inventories-workflows/task-details-view
     mode=mode
     atmLambda=atmLambda
     revisionNumber=revisionNumber
@@ -203,20 +199,19 @@ async function render(testCase) {
     onCancel=cancelSpy
     onApplyChanges=applyChangesSpy
   }}`);
-  await wait();
 }
 
 function itHasHeader(headerText) {
   it(`has header "${headerText}"`, async function () {
-    await render(this);
+    await renderComponent();
 
-    expect(this.$('.header-row h1').text().trim()).to.equal(headerText);
+    expect(find('.header-row h1')).to.have.trimmed.text(headerText);
   });
 }
 
 function itCallsOnBackSlideOnBackLinkClick() {
   it('calls "onBackSlide" callback on back link click', async function () {
-    await render(this);
+    await renderComponent();
 
     const backSlideSpy = this.get('backSlideSpy');
     expect(backSlideSpy).to.be.not.called;
@@ -229,38 +224,38 @@ function itCallsOnBackSlideOnBackLinkClick() {
 
 function itShowsTaskFormInMode(mode) {
   it(`shows task form in "${mode}" mode`, async function () {
-    await render(this);
+    await renderComponent();
 
-    expect(this.$('.task-form')).to.exist.and.to.have.class(`mode-${mode}`);
+    expect(find('.task-form')).to.exist.and.to.have.class(`mode-${mode}`);
   });
 }
 
 function itShowsAtmLambdaDetailsToTaskForm() {
   it('passes lambda details to task form', async function () {
-    await render(this);
+    await renderComponent();
 
-    expect(this.$('.task-form .atm-lambda-name').text())
-      .to.contain(exampleAtmLambdaRevision.name);
-    expect(this.$('.task-form .atm-lambda-summary').text())
-      .to.contain(exampleAtmLambdaRevision.summary);
+    expect(find('.task-form .atm-lambda-name'))
+      .to.contain.text(exampleAtmLambdaRevision.name);
+    expect(find('.task-form .atm-lambda-summary'))
+      .to.contain.text(exampleAtmLambdaRevision.summary);
   });
 }
 
 function itProvidesStoresInTaskForm() {
   it('provides stores in task form', async function () {
-    await render(this);
+    await renderComponent();
 
     await clickTrigger('.targetStore-field');
 
-    const $options = $('.ember-power-select-option');
-    expect($options.eq(2).text().trim()).to.equal('listStringStore');
-    expect($options.eq(3).text().trim()).to.equal('singleValueStringStore');
+    const options = document.querySelectorAll('.ember-power-select-option');
+    expect(options[2]).to.have.trimmed.text('listStringStore');
+    expect(options[3]).to.have.trimmed.text('singleValueStringStore');
   });
 }
 
 function itCallsOnCancelOnCancelClick() {
   it('calls "onCancel" callback on "Cancel" button click', async function () {
-    await render(this);
+    await renderComponent();
 
     const cancelSpy = this.get('cancelSpy');
     expect(cancelSpy).to.be.not.called;
@@ -273,59 +268,59 @@ function itCallsOnCancelOnCancelClick() {
 
 function itShowsButtons({ cancelBtnText, submitBtnText }) {
   it(`shows "${cancelBtnText}" and "${submitBtnText}" buttons`, async function () {
-    await render(this);
+    await renderComponent();
 
-    const $cancelBtn = this.$('.btn-cancel');
-    expect($cancelBtn.text().trim()).to.equal(cancelBtnText);
-    expect($cancelBtn).to.have.class('btn-default');
-    const $submitBtn = this.$('.btn-submit');
-    expect($submitBtn.text().trim()).to.equal(submitBtnText);
-    expect($submitBtn).to.have.class('btn-primary');
+    const cancelBtn = find('.btn-cancel');
+    expect(cancelBtn).to.have.trimmed.text(cancelBtnText);
+    expect(cancelBtn).to.have.class('btn-default');
+    const submitBtn = find('.btn-submit');
+    expect(submitBtn).to.have.trimmed.text(submitBtnText);
+    expect(submitBtn).to.have.class('btn-primary');
   });
 }
 
 function itHasEnabledSubmitWhenFormIsValid() {
   it('has enabled submitting button when form is valid', async function () {
-    await render(this);
+    await renderComponent();
 
-    expect(this.$('.btn-submit')).to.be.not.disabled;
+    expect(find('.btn-submit')).to.not.have.attr('disabled');
   });
 }
 
 function itHasDisabledSubmitWhenFormIsInvalid() {
   it('has enabled submitting button when form is invalid', async function () {
-    await render(this);
+    await renderComponent();
 
     await fillIn('.name-field .form-control', '');
 
-    expect(this.$('.btn-submit')).to.be.disabled;
+    expect(find('.btn-submit')).to.have.attr('disabled');
   });
 }
 
 function itBlocksButtonsAndFormDuringSubmission() {
   it('blocks buttons and form during the submission', async function () {
     this.set('applyChangesSpy', sinon.stub().returns(new Promise(() => {})));
-    await render(this);
+    await renderComponent();
 
     await click('.btn-submit');
 
-    expect(this.$('.btn-submit')).to.be.disabled;
-    expect(this.$('.btn-cancel')).to.be.disabled;
-    expect(this.$('.task-form')).to.have.class('form-disabled');
+    expect(find('.btn-submit')).to.have.attr('disabled');
+    expect(find('.btn-cancel')).to.have.attr('disabled');
+    expect(find('.task-form')).to.have.class('form-disabled');
   });
 }
 
 function itSubmitsFormDataOnSubmitClick(formDataMatcher) {
   it('submits form data on submit click', async function () {
     const applyChangesSpy = this.get('applyChangesSpy');
-    await render(this);
+    await renderComponent();
 
     expect(applyChangesSpy).to.be.not.called;
     await fillIn('.name-field .form-control', 'newName');
     await click('.btn-submit');
 
-    expect(this.$('.btn-submit')).to.be.not.disabled;
-    expect(this.$('.task-form')).to.have.class('form-enabled');
+    expect(find('.btn-submit')).to.not.have.attr('disabled');
+    expect(find('.task-form')).to.have.class('form-enabled');
     expect(applyChangesSpy).to.be.calledOnce
       .and.to.be.calledWith(Object.assign({ name: 'newName' }, formDataMatcher));
   });

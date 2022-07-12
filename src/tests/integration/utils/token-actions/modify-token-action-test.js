@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import ModifyTokenAction from 'onezone-gui/utils/token-actions/modify-token-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
 import { lookupService } from '../../../helpers/stub-service';
 import { reject, resolve } from 'rsvp';
 
-describe('Integration | Util | token actions/modify token action', function () {
-  setupComponentTest('global-modal-mounter', {
-    integration: true,
-  });
+describe('Integration | Utility | token actions/modify token action', function () {
+  setupRenderingTest();
 
   it('executes modifying token (success scenario)', function () {
     const tokenDiff = {
@@ -27,7 +25,7 @@ describe('Integration | Util | token actions/modify token action', function () {
       }),
     };
     const action = ModifyTokenAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: {
         token,
         tokenDiff,
@@ -70,7 +68,7 @@ describe('Integration | Util | token actions/modify token action', function () {
       },
     };
     const action = ModifyTokenAction.create({
-      ownerSource: this,
+      ownerSource: this.owner,
       context: {
         token,
         tokenDiff,

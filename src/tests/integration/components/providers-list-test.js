@@ -1,20 +1,16 @@
 import { A } from '@ember/array';
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
-import wait from 'ember-test-helpers/wait';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, fillIn, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { click, fillIn } from 'ember-native-dom-helpers';
 import sinon from 'sinon';
 import _ from 'lodash';
-import $ from 'jquery';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise } from 'rsvp';
 
 describe('Integration | Component | providers list', function () {
-  setupComponentTest('providers-list', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const spaces = A([{
@@ -67,67 +63,60 @@ describe('Integration | Component | providers list', function () {
     });
   });
 
-  it('renders list of providers', function () {
-    this.render(hbs `{{providers-list providersData=providersData}}`);
+  it('renders list of providers', async function () {
+    await render(hbs `{{providers-list providersData=providersData}}`);
 
-    const list = this.$('.one-collapsible-list');
-    expect(list.children()).to.have.length(4);
-    const firstItem = $(list.children()[1]);
-    expect(firstItem).to.be.visible;
-    expect(firstItem).to.contain('provider1');
+    const list = find('.one-collapsible-list');
+    expect(list.children).to.have.length(4);
+    const firstItem = list.children[1];
+    expect(firstItem).to.be.displayed;
+    expect(firstItem).to.contain.text('provider1');
   });
 
-  it('sets icon colors according to provider object setting', function () {
-    this.render(hbs `{{providers-list providersData=providersData}}`);
+  it('sets icon colors according to provider object setting', async function () {
+    await render(hbs `{{providers-list providersData=providersData}}`);
 
     const firstItemIcon =
-      this.$('.one-collapsible-list-item:nth-child(2) .one-icon');
-    expect(firstItemIcon.attr('style'))
+      find('.one-collapsible-list-item:nth-child(2) .one-icon');
+    expect(firstItemIcon.getAttribute('style'))
       .to.contain(this.get('providersData')[0].color);
   });
 
-  it('triggers providers filter state changed action on init', function () {
+  it('triggers providers filter state changed action on init', async function () {
     const providersFilterSpy = sinon.spy();
-    this.on('providersFilter', providersFilterSpy);
+    this.set('providersFilter', providersFilterSpy);
 
-    this.render(hbs `
-        {{providers-list 
-          providersData=providersData
-          providersFilterAction=(action "providersFilter")}}
-      `);
-    return wait().then(() => {
-      expect(providersFilterSpy).to.be.calledOnce;
-      expect(providersFilterSpy).to.be.calledWith(
-        sinon.match.array.deepEquals(
-          _.map(this.get('providersData'), 'provider')
-        )
-      );
-    });
+    await render(hbs `{{providers-list
+      providersData=providersData
+      providersFilterAction=(action providersFilter)
+    }}`);
+    expect(providersFilterSpy).to.be.calledOnce;
+    expect(providersFilterSpy).to.be.calledWith(
+      sinon.match.array.deepEquals(
+        _.map(this.get('providersData'), 'provider')
+      )
+    );
   });
 
   it('triggers providers filter state changed action after query input',
-    function (done) {
+    async function () {
       const providersFilterSpy = sinon.spy();
-      this.on('providersFilter', providersFilterSpy);
+      this.set('providersFilter', providersFilterSpy);
 
-      this.render(hbs `
-            {{providers-list 
-              providersData=providersData
-              providersFilterAction=(action "providersFilter")}}
-          `);
-      wait().then(() => {
-        fillIn('.search-bar', '1').then(() => {
-          expect(providersFilterSpy).to.be.calledTwice;
-          expect(providersFilterSpy).to.be.calledWith(
-            sinon.match.array.deepEquals([this.get('providersData')[0].provider])
-          );
-          done();
-        });
-      });
+      await render(hbs `{{providers-list
+        providersData=providersData
+        providersFilterAction=(action providersFilter)
+      }}`);
+
+      await fillIn('.search-bar', '1');
+      expect(providersFilterSpy).to.be.calledTwice;
+      expect(providersFilterSpy).to.be.calledWith(
+        sinon.match.array.deepEquals([this.get('providersData')[0].provider])
+      );
     }
   );
 
-  it('handles with custom provider actions', function (done) {
+  it('handles with custom provider actions', async function () {
     const actionSpy = sinon.spy();
     this.set('actions', [{
       text: 'Action',
@@ -135,34 +124,28 @@ describe('Integration | Component | providers list', function () {
       class: 'action-trigger',
     }]);
 
-    this.render(hbs `
-            {{providers-list 
-              providersData=providersData
-              providerActions=actions}}
-          `);
-    click('.one-collapsible-list-item:nth-child(2) .provider-menu-toggle').then(() => {
-      click($('.webui-popover.in .action-trigger')[0]).then(() => {
-        expect(actionSpy).to.be.calledOnce;
-        expect(actionSpy).to.be.calledWith(this.get('providersData')[0].provider);
-        done();
-      });
-    });
+    await render(hbs `{{providers-list
+      providersData=providersData
+      providerActions=actions
+    }}`);
+    await click('.one-collapsible-list-item:nth-child(2) .provider-menu-toggle');
+    await click(document.querySelector('.webui-popover.in .action-trigger'));
+    expect(actionSpy).to.be.calledOnce;
+    expect(actionSpy).to.be.calledWith(this.get('providersData')[0].provider);
   });
 
-  it('shows information about supported spaces', function () {
-    this.render(hbs `
-              {{providers-list 
-                providersData=providersData
-                selectedSpace=selectedSpace
-              }}
-            `);
-    return wait().then(() => {
-      const firstProviderItem = this.$(
-        '.one-collapsible-list-item:nth-child(2)'
-      );
-      expect(firstProviderItem.find('.supported-spaces')).to.contain('2');
-      expect(firstProviderItem.find('.space-support-size')).to.contain('2 MiB');
-    });
+  it('shows information about supported spaces', async function () {
+    await render(hbs `{{providers-list
+      providersData=providersData
+      selectedSpace=selectedSpace
+    }}`);
 
+    const firstProviderItem = find(
+      '.one-collapsible-list-item:nth-child(2)'
+    );
+    expect(firstProviderItem.querySelector('.supported-spaces'))
+      .to.contain.text('2');
+    expect(firstProviderItem.querySelector('.space-support-size'))
+      .to.contain.text('2 MiB');
   });
 });

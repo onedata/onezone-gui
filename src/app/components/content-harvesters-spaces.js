@@ -105,7 +105,7 @@ export default Component.extend(I18n, GlobalActions, {
   ),
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<Array<Action>>}
    */
   globalActions: collect(

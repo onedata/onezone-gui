@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import ToggleBeingOwnerAction from 'onezone-gui/utils/user-actions/toggle-being-owner-action';
 import { get } from '@ember/object';
 import sinon from 'sinon';
@@ -8,10 +8,8 @@ import { lookupService } from '../../../helpers/stub-service';
 import { reject } from 'rsvp';
 import { A } from '@ember/array';
 
-describe('Integration | Util | user actions/toggle-being-owner-action', function () {
-  setupComponentTest('global-modal-mounter', {
-    integration: true,
-  });
+describe('Integration | Utility | user actions/toggle-being-owner-action', function () {
+  setupRenderingTest();
 
   beforeEach(function () {
     const currentUser = {
@@ -40,7 +38,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   });
 
   it('has className "toggle-being-owner-trigger"', function () {
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
 
     expect(get(action, 'className')).to.equal('toggle-being-owner-trigger');
   });
@@ -49,7 +47,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(String(get(action, 'title'))).to.equal('Make an owner');
   });
@@ -61,7 +59,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     } = this.getProperties('context', 'ownerRecord');
     context.owners = [ownerRecord];
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(String(get(action, 'title'))).to.equal('Remove ownership');
   });
@@ -70,7 +68,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const context = this.get('context');
     context.owners = null;
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(get(action, 'disabled')).to.be.false;
   });
@@ -85,7 +83,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
       } = this.getProperties('context', 'ownerRecord', 'currentUser');
       context.owners = [ownerRecord, currentUser, {}];
 
-      const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+      const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
       expect(get(action, 'disabled')).to.be.false;
     }
@@ -99,7 +97,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     context.ownerRecord = currentUser;
     context.owners = A([currentUser]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(get(action, 'disabled')).to.be.true;
     expect(String(get(action, 'tip')))
@@ -113,7 +111,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     } = this.getProperties('context', 'currentUser');
     context.owners = A([currentUser]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(get(action, 'disabled')).to.be.false;
   });
@@ -122,7 +120,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const context = this.get('context');
     context.owners = A([context.ownerRecord, {}]);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     expect(get(action, 'disabled')).to.be.true;
     expect(String(get(action, 'tip')))
@@ -130,7 +128,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   });
 
   it('has icon "role-holders"', function () {
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner });
 
     expect(get(action, 'icon')).to.equal('role-holders');
   });
@@ -139,7 +137,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -163,7 +161,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
   it('notifies success on removing owner action success', function () {
     const context = this.get('context');
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -189,7 +187,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const context = this.get('context');
     context.owners = context.owners.without(context.ownerRecord);
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),
@@ -220,7 +218,7 @@ describe('Integration | Util | user actions/toggle-being-owner-action', function
     const error = { id: 'err' };
     const context = this.get('context');
 
-    const action = ToggleBeingOwnerAction.create({ ownerSource: this, context });
+    const action = ToggleBeingOwnerAction.create({ ownerSource: this.owner, context });
 
     const addOwnerStub = sinon.stub(
       lookupService(this, 'record-manager'),

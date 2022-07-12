@@ -15,7 +15,15 @@ import { computed, get, getProperties } from '@ember/object';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
-import { tag, eq, raw, not, and, bool, getBy } from 'ember-awesome-macros';
+import {
+  tag,
+  eq,
+  raw,
+  not,
+  and,
+  bool,
+  getBy,
+} from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'form',

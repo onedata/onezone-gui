@@ -10,7 +10,7 @@
 import SecondLevelItems from 'onedata-gui-common/components/one-sidebar/second-level-items';
 import { inject as service } from '@ember/service';
 import layout from 'onedata-gui-common/templates/components/one-sidebar/second-level-items';
-import { computed } from '@ember/object';
+import { computed, defineProperty } from '@ember/object';
 import { reads, collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
@@ -185,6 +185,6 @@ export default SecondLevelItems.extend(I18n, {
   init() {
     this._super(...arguments);
     // overwrite injected property
-    this.set('internalSecondLevelItems', reads('spaceSecondLevelItems'));
+    defineProperty(this, 'internalSecondLevelItems', reads('spaceSecondLevelItems'));
   },
 });

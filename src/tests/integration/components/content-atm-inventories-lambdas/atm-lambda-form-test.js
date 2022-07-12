@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, fillIn, focus, blur, click, find, findAll, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { fillIn, focus, blur, click } from 'ember-native-dom-helpers';
-import wait from 'ember-test-helpers/wait';
-import { clickTrigger, selectChoose } from '../../../helpers/ember-power-select';
-import $ from 'jquery';
+import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { registerService } from '../../../helpers/stub-service';
@@ -52,9 +50,7 @@ const resultTypes = argumentAndResultCommonTypes;
 describe(
   'Integration | Component | content atm inventories lambdas/atm lambda form',
   function () {
-    setupComponentTest('content-atm-inventories-lambdas/atm-lambda-form', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       registerService(this, 'media', Service.extend({
@@ -72,10 +68,10 @@ describe(
     });
 
     it('has class "atm-lambda-form"', async function (done) {
-      this.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
+      await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form}}`);
 
-      expect(this.$().children()).to.have.class('atm-lambda-form')
-        .and.to.have.length(1);
+      expect(this.element.children).to.have.length(1);
+      expect(this.element.children[0]).to.have.class('atm-lambda-form');
       done();
     });
 
@@ -83,18 +79,18 @@ describe(
       it('has class "mode-create"', async function (done) {
         await renderCreate(this);
 
-        expect(this.$('.atm-lambda-form')).to.have.class('mode-create');
+        expect(find('.atm-lambda-form')).to.have.class('mode-create');
         done();
       });
 
       it('renders empty "name" field', async function (done) {
         await renderCreate(this);
 
-        const $label = this.$('.name-field .control-label');
-        const $field = this.$('.name-field .form-control');
-        expect($label.text().trim()).to.equal('Name:');
-        expect($field).to.have.attr('type', 'text');
-        expect($field).to.have.value('');
+        const label = find('.name-field .control-label');
+        const field = find('.name-field .form-control');
+        expect(label).to.have.trimmed.text('Name:');
+        expect(field).to.have.attr('type', 'text');
+        expect(field).to.have.value('');
         done();
       });
 
@@ -104,7 +100,7 @@ describe(
         await focus('.name-field .form-control');
         await blur('.name-field .form-control');
 
-        expect(this.$('.name-field')).to.have.class('has-error');
+        expect(find('.name-field')).to.have.class('has-error');
         done();
       });
 
@@ -113,17 +109,17 @@ describe(
 
         await fillIn('.name-field .form-control', 'somename');
 
-        expect(this.$('.name-field')).to.have.class('has-success');
+        expect(find('.name-field')).to.have.class('has-success');
         done();
       });
 
       it('renders "state" field with preselected "draft" option', async function (done) {
         await renderCreate(this);
 
-        const $label = this.$('.state-field .control-label');
-        const $field = this.$('.state-field .dropdown-field-trigger');
-        expect($label.text().trim()).to.equal('State:');
-        expect($field.text().trim()).to.equal('Draft');
+        const label = find('.state-field .control-label');
+        const field = find('.state-field .dropdown-field-trigger');
+        expect(label).to.have.trimmed.text('State:');
+        expect(field).to.have.trimmed.text('Draft');
         done();
       });
 
@@ -132,10 +128,10 @@ describe(
 
         await clickTrigger('.state-field');
 
-        const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(3);
+        const options = document.querySelectorAll('.ember-power-select-option');
+        expect(options).to.have.length(3);
         states.forEach(({ label }, idx) =>
-          expect($options.eq(idx).text().trim()).to.equal(label)
+          expect(options[idx]).to.have.trimmed.text(label)
         );
         done();
       });
@@ -143,11 +139,11 @@ describe(
       it('renders empty "summary" field', async function (done) {
         await renderCreate(this);
 
-        const $label = this.$('.summary-field .control-label');
-        const $field = this.$('.summary-field .form-control');
-        expect($label.text().trim()).to.equal('Summary (optional):');
-        expect($field).to.have.attr('type', 'text');
-        expect($field).to.have.value('');
+        const label = find('.summary-field .control-label');
+        const field = find('.summary-field .form-control');
+        expect(label).to.have.trimmed.text('Summary (optional):');
+        expect(field).to.have.attr('type', 'text');
+        expect(field).to.have.value('');
         done();
       });
 
@@ -157,7 +153,7 @@ describe(
         await focus('.summary-field .form-control');
         await blur('.summary-field .form-control');
 
-        expect(this.$('.summary-field')).to.have.class('has-success');
+        expect(find('.summary-field')).to.have.class('has-success');
         done();
       });
 
@@ -165,10 +161,10 @@ describe(
         async function (done) {
           await renderCreate(this);
 
-          const $label = this.$('.engine-field .control-label');
-          const $field = this.$('.engine-field .dropdown-field-trigger');
-          expect($label.text().trim()).to.equal('Engine:');
-          expect($field.text().trim()).to.equal('OpenFaaS');
+          const label = find('.engine-field .control-label');
+          const field = find('.engine-field .dropdown-field-trigger');
+          expect(label).to.have.trimmed.text('Engine:');
+          expect(field).to.have.trimmed.text('OpenFaaS');
           done();
         });
 
@@ -177,9 +173,9 @@ describe(
 
         await clickTrigger('.engine-field');
 
-        const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(1);
-        expect($options.eq(0).text().trim()).to.equal('OpenFaaS');
+        const options = document.querySelectorAll('.ember-power-select-option');
+        expect(options).to.have.length(1);
+        expect(options[0]).to.have.trimmed.text('OpenFaaS');
         done();
       });
 
@@ -187,19 +183,19 @@ describe(
         it('shows only openfaas-related fields', async function (done) {
           await renderCreate(this);
 
-          expect(this.$('.openfaasOptions-collapse')).to.have.class('in');
-          expect(this.$('.onedataFunctionOptions-collapse')).to.not.have.class('in');
+          expect(find('.openfaasOptions-collapse')).to.have.class('in');
+          expect(find('.onedataFunctionOptions-collapse')).to.not.exist;
           done();
         });
 
         it('renders empty "docker image" field', async function (done) {
           await renderCreate(this);
 
-          const $label = this.$('.dockerImage-field .control-label');
-          const $field = this.$('.dockerImage-field .form-control');
-          expect($label.text().trim()).to.equal('Docker image:');
-          expect($field).to.have.attr('type', 'text');
-          expect($field).to.have.value('');
+          const label = find('.dockerImage-field .control-label');
+          const field = find('.dockerImage-field .form-control');
+          expect(label).to.have.trimmed.text('Docker image:');
+          expect(field).to.have.attr('type', 'text');
+          expect(field).to.have.value('');
           done();
         });
 
@@ -210,7 +206,7 @@ describe(
             await focus('.dockerImage-field .form-control');
             await blur('.dockerImage-field .form-control');
 
-            expect(this.$('.dockerImage-field')).to.have.class('has-error');
+            expect(find('.dockerImage-field')).to.have.class('has-error');
             done();
           });
 
@@ -220,27 +216,27 @@ describe(
 
             await fillIn('.dockerImage-field .form-control', 'somename');
 
-            expect(this.$('.dockerImage-field')).to.have.class('has-success');
+            expect(find('.dockerImage-field')).to.have.class('has-success');
             done();
           });
 
         it('renders checked "readonly" toggle', async function (done) {
           await renderCreate(this);
 
-          const $label = this.$('.readonly-field .control-label');
-          const $field = this.$('.readonly-field .form-control');
-          expect($label.text().trim()).to.equal('Read-only:');
-          expect($field).to.have.class('checked');
+          const label = find('.readonly-field .control-label');
+          const field = find('.readonly-field .form-control');
+          expect(label).to.have.trimmed.text('Read-only:');
+          expect(field).to.have.class('checked');
           done();
         });
 
         it('renders checked "mount space" toggle', async function (done) {
           await renderCreate(this);
 
-          const $label = this.$('.mountSpace-field .control-label');
-          const $field = this.$('.mountSpace-field .form-control');
-          expect($label.text().trim()).to.equal('Mount space:');
-          expect($field).to.have.class('checked');
+          const label = find('.mountSpace-field .control-label');
+          const field = find('.mountSpace-field .form-control');
+          expect(label).to.have.trimmed.text('Mount space:');
+          expect(field).to.have.class('checked');
           done();
         });
 
@@ -249,47 +245,49 @@ describe(
             async function (done) {
               await renderCreate(this);
 
-              await toggleMountSpace(this, true);
+              await toggleMountSpace(true);
 
-              expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
+              expect(find('.mountSpaceOptions-collapse')).to.have.class('in');
               done();
             });
 
           it('renders "mount point" field with "/mnt/onedata" as a default value',
             async function (done) {
               await renderCreate(this);
-              await toggleMountSpace(this, true);
+              await toggleMountSpace(true);
 
-              const $fieldsGroup = this.$('.mountSpaceOptions-field');
-              const $label = $fieldsGroup.find('.mountPoint-field .control-label');
-              const $field = $fieldsGroup.find('.mountPoint-field .form-control');
-              expect($label.text().trim()).to.equal('Mount point:');
-              expect($field).to.have.attr('type', 'text');
-              expect($field).to.have.value('/mnt/onedata');
+              const fieldsGroup = find('.mountSpaceOptions-field');
+              const label = fieldsGroup.querySelector('.mountPoint-field .control-label');
+              const field = fieldsGroup.querySelector('.mountPoint-field .form-control');
+              expect(label).to.have.trimmed.text('Mount point:');
+              expect(field).to.have.attr('type', 'text');
+              expect(field).to.have.value('/mnt/onedata');
               done();
             });
 
           it('marks "mount point" field as invalid when it is empty',
             async function (done) {
               await renderCreate(this);
-              await toggleMountSpace(this, true);
+              await toggleMountSpace(true);
 
               await fillIn('.mountPoint-field .form-control', '');
 
-              expect(this.$('.mountPoint-field')).to.have.class('has-error');
+              expect(find('.mountPoint-field')).to.have.class('has-error');
               done();
             });
 
           it('renders empty "oneclient options" field', async function (done) {
             await renderCreate(this);
-            await toggleMountSpace(this, true);
+            await toggleMountSpace(true);
 
-            const $fieldsGroup = this.$('.mountSpaceOptions-field');
-            const $label = $fieldsGroup.find('.oneclientOptions-field .control-label');
-            const $field = $fieldsGroup.find('.oneclientOptions-field .form-control');
-            expect($label.text().trim()).to.equal('Oneclient options:');
-            expect($field).to.have.attr('type', 'text');
-            expect($field).to.have.value('');
+            const fieldsGroup = find('.mountSpaceOptions-field');
+            const label =
+              fieldsGroup.querySelector('.oneclientOptions-field .control-label');
+            const field =
+              fieldsGroup.querySelector('.oneclientOptions-field .form-control');
+            expect(label).to.have.trimmed.text('Oneclient options:');
+            expect(field).to.have.attr('type', 'text');
+            expect(field).to.have.value('');
             done();
           });
 
@@ -300,7 +298,7 @@ describe(
               await focus('.oneclientOptions-field .form-control');
               await blur('.oneclientOptions-field .form-control');
 
-              expect(this.$('.oneclientOptions-field')).to.have.class('has-success');
+              expect(find('.oneclientOptions-field')).to.have.class('has-success');
               done();
             });
         });
@@ -310,9 +308,9 @@ describe(
             async function (done) {
               await renderCreate(this);
 
-              await toggleMountSpace(this, false);
+              await toggleMountSpace(false);
 
-              expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
+              expect(find('.mountSpaceOptions-collapse')).to.not.have.class('in');
               done();
             });
         });
@@ -321,12 +319,12 @@ describe(
       it('renders "arguments" field with no argument defined', async function (done) {
         await renderCreate(this);
 
-        const $label = this.$('.arguments-field .control-label');
-        const $entries = this.$('.arguments-field .entry-field');
-        const $addBtn = this.$('.arguments-field .add-field-button');
-        expect($label.text().trim()).to.equal('Arguments:');
-        expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add argument');
+        const label = find('.arguments-field .control-label');
+        const entries = findAll('.arguments-field .entry-field');
+        const addBtn = find('.arguments-field .add-field-button');
+        expect(label).to.have.trimmed.text('Arguments:');
+        expect(entries).to.have.length(0);
+        expect(addBtn).to.have.trimmed.text('Add argument');
         done();
       });
 
@@ -335,28 +333,32 @@ describe(
 
         await addArgument();
 
-        const $entries = this.$('.arguments-field .entry-field');
-        expect($entries).to.have.length(1);
-        const $entry = $entries.eq(0);
+        const entries = findAll('.arguments-field .entry-field');
+        expect(entries).to.have.length(1);
+        const entry = entries[0];
 
-        const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameField).to.have.attr('type', 'text');
-        expect($entryNameField).to.have.attr('placeholder', 'Name');
-        expect($entryNameField).to.have.value('');
+        const entryNameField = entry.querySelector('.entryName-field .form-control');
+        expect(entryNameField).to.have.attr('type', 'text');
+        expect(entryNameField).to.have.attr('placeholder', 'Name');
+        expect(entryNameField).to.have.value('');
 
-        const $entryTypeField = $entry.find('.data-spec-editor .dropdown-field-trigger');
-        expect($entryTypeField.text().trim()).to.equal('');
+        const entryTypeField = entry.querySelector('.data-spec-editor .dropdown-field-trigger');
+        expect(entryTypeField).to.have.trimmed.text('');
 
-        const $entryIsOptionalLabel = $entry.find('.entryIsOptional-field .control-label');
-        const $entryIsOptionalField = $entry.find('.entryIsOptional-field .form-control');
-        expect($entryIsOptionalLabel.text().trim()).to.equal('Optional');
-        expect($entryIsOptionalField).to.not.have.class('checked');
+        const entryIsOptionalLabel =
+          entry.querySelector('.entryIsOptional-field .control-label');
+        const entryIsOptionalField =
+          entry.querySelector('.entryIsOptional-field .form-control');
+        expect(entryIsOptionalLabel).to.have.trimmed.text('Optional');
+        expect(entryIsOptionalField).to.not.have.class('checked');
 
-        const $entryDefaultValueLabel = $entry.find('.entryDefaultValue-field .control-label');
-        const $entryDefaultValueField = $entry.find('.entryDefaultValue-field .form-control');
-        expect($entryDefaultValueLabel.text().trim()).to.equal('Default value:');
-        expect($entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
-        expect($entryDefaultValueField).to.have.value('');
+        const entryDefaultValueLabel =
+          entry.querySelector('.entryDefaultValue-field .control-label');
+        const entryDefaultValueField =
+          entry.querySelector('.entryDefaultValue-field .form-control');
+        expect(entryDefaultValueLabel).to.have.trimmed.text('Default value:');
+        expect(entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
+        expect(entryDefaultValueField).to.have.value('');
         done();
       });
 
@@ -368,7 +370,7 @@ describe(
           await focus('.entryName-field .form-control');
           await blur('.entryName-field .form-control');
 
-          expect(this.$('.entryName-field')).to.have.class('has-error');
+          expect(find('.entryName-field')).to.have.class('has-error');
           done();
         });
 
@@ -378,9 +380,8 @@ describe(
           await addArgument();
 
           await fillIn('.entryName-field .form-control', 'somename');
-          await wait();
 
-          expect(this.$('.entryName-field')).to.have.class('has-success');
+          expect(find('.entryName-field')).to.have.class('has-success');
           done();
         });
 
@@ -394,13 +395,13 @@ describe(
           await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
           await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
 
-          const $fieldMessages = this.$('.arguments-field .collection-item .field-message');
-          expect($fieldMessages).to.have.length(2);
+          const fieldMessages = findAll('.arguments-field .collection-item .field-message');
+          expect(fieldMessages).to.have.length(2);
           [0, 1].forEach(i =>
-            expect($fieldMessages.eq(i).text().trim())
-            .to.equal('This field must have a unique value')
+            expect(fieldMessages[i])
+            .to.have.trimmed.text('This field must have a unique value')
           );
-          expect(this.$('.entryName-field.has-error')).to.have.length(2);
+          expect(findAll('.entryName-field.has-error')).to.have.length(2);
           done();
         });
 
@@ -411,10 +412,10 @@ describe(
 
           await clickTrigger('.data-spec-editor');
 
-          const $options = $('.ember-power-select-option');
-          expect($options).to.have.length(argumentTypes.length);
+          const options = document.querySelectorAll('.ember-power-select-option');
+          expect(options).to.have.length(argumentTypes.length);
           argumentTypes.forEach((type, i) =>
-            expect($options.eq(i).text().trim()).to.equal(type)
+            expect(options[i]).to.have.trimmed.text(type)
           );
           done();
         });
@@ -427,10 +428,10 @@ describe(
           await selectChoose('.data-spec-editor', 'Array');
           await clickTrigger('.data-spec-editor');
 
-          const $options = $('.ember-power-select-option');
-          expect($options).to.have.length(argumentTypes.length - 1);
+          const options = document.querySelectorAll('.ember-power-select-option');
+          expect(options).to.have.length(argumentTypes.length - 1);
           argumentTypes.without('OnedataFS credentials').forEach((type, i) =>
-            expect($options.eq(i).text().trim()).to.equal(type)
+            expect(options[i]).to.have.trimmed.text(type)
           );
           done();
         });
@@ -443,19 +444,19 @@ describe(
           await focus('.entryDefaultValue-field .form-control');
           await blur('.entryDefaultValue-field .form-control');
 
-          expect(this.$('.entryDefaultValue-field')).to.have.class('has-success');
+          expect(find('.entryDefaultValue-field')).to.have.class('has-success');
           done();
         });
 
       it('renders "results" field with no result defined', async function (done) {
         await renderCreate(this);
 
-        const $label = this.$('.results-field .control-label');
-        const $entries = this.$('.results-field .entries-field');
-        const $addBtn = this.$('.results-field .add-field-button');
-        expect($label.text().trim()).to.equal('Results:');
-        expect($entries).to.have.length(0);
-        expect($addBtn.text().trim()).to.equal('Add result');
+        const label = find('.results-field .control-label');
+        const entries = findAll('.results-field .entries-field');
+        const addBtn = find('.results-field .add-field-button');
+        expect(label).to.have.trimmed.text('Results:');
+        expect(entries).to.have.length(0);
+        expect(addBtn).to.have.trimmed.text('Add result');
         done();
       });
 
@@ -464,17 +465,17 @@ describe(
 
         await addResult();
 
-        const $entries = this.$('.results-field .entry-field');
-        expect($entries).to.have.length(1);
-        const $entry = $entries.eq(0);
+        const entries = findAll('.results-field .entry-field');
+        expect(entries).to.have.length(1);
+        const entry = entries[0];
 
-        const $entryNameField = $entry.find('.entryName-field .form-control');
-        expect($entryNameField).to.have.attr('type', 'text');
-        expect($entryNameField).to.have.attr('placeholder', 'Name');
-        expect($entryNameField).to.have.value('');
+        const entryNameField = entry.querySelector('.entryName-field .form-control');
+        expect(entryNameField).to.have.attr('type', 'text');
+        expect(entryNameField).to.have.attr('placeholder', 'Name');
+        expect(entryNameField).to.have.value('');
 
-        const $entryTypeField = $entry.find('.data-spec-editor .dropdown-field-trigger');
-        expect($entryTypeField.text().trim()).to.equal('');
+        const entryTypeField = entry.querySelector('.data-spec-editor .dropdown-field-trigger');
+        expect(entryTypeField).to.have.trimmed.text('');
         done();
       });
 
@@ -485,7 +486,7 @@ describe(
         await focus('.entryName-field .form-control');
         await blur('.entryName-field .form-control');
 
-        expect(this.$('.entryName-field')).to.have.class('has-error');
+        expect(find('.entryName-field')).to.have.class('has-error');
         done();
       });
 
@@ -496,7 +497,7 @@ describe(
 
           await fillIn('.entryName-field .form-control', 'exception');
 
-          expect(this.$('.entryName-field')).to.have.class('has-error');
+          expect(find('.entryName-field')).to.have.class('has-error');
           done();
         }
       );
@@ -508,7 +509,7 @@ describe(
 
           await fillIn('.entryName-field .form-control', 'somename');
 
-          expect(this.$('.entryName-field')).to.have.class('has-success');
+          expect(find('.entryName-field')).to.have.class('has-success');
           done();
         });
 
@@ -522,13 +523,13 @@ describe(
           await fillIn(`${nthArgSelector(0)} .entryName-field .form-control`, 'somename');
           await fillIn(`${nthArgSelector(1)} .entryName-field .form-control`, 'somename');
 
-          const $fieldMessages = this.$('.results-field .collection-item .field-message');
-          expect($fieldMessages).to.have.length(2);
+          const fieldMessages = findAll('.results-field .collection-item .field-message');
+          expect(fieldMessages).to.have.length(2);
           [0, 1].forEach(i =>
-            expect($fieldMessages.eq(i).text().trim())
-            .to.equal('This field must have a unique value')
+            expect(fieldMessages[i])
+            .to.have.trimmed.text('This field must have a unique value')
           );
-          expect(this.$('.entryName-field.has-error')).to.have.length(2);
+          expect(findAll('.entryName-field.has-error')).to.have.length(2);
           done();
         });
 
@@ -538,10 +539,10 @@ describe(
 
         await clickTrigger('.data-spec-editor');
 
-        const $options = $('.ember-power-select-option');
-        expect($options).to.have.length(resultTypes.length);
+        const options = document.querySelectorAll('.ember-power-select-option');
+        expect(options).to.have.length(resultTypes.length);
         resultTypes.forEach((type, i) =>
-          expect($options.eq(i).text().trim()).to.equal(type)
+          expect(options[i]).to.have.trimmed.text(type)
         );
         done();
       });
@@ -550,15 +551,15 @@ describe(
         async function (done) {
           await renderCreate(this);
 
-          const $resourcesSection = this.$('.resources-field');
-          expect($resourcesSection.find('.control-label').eq(0).text().trim())
-            .to.equal('Resources');
+          const resourcesSection = find('.resources-field');
+          expect(resourcesSection.querySelector('.control-label'))
+            .to.have.trimmed.text('Resources');
           // Check if translations for resources fields are loaded
-          expect($resourcesSection.text()).to.contain('Limit');
+          expect(resourcesSection).to.contain.text('Limit');
 
-          expect($resourcesSection.find('.cpuRequested-field .form-control'))
+          expect(resourcesSection.querySelector('.cpuRequested-field .form-control'))
             .to.have.value('0.1');
-          expect($resourcesSection.find('.cpuLimit-field .form-control'))
+          expect(resourcesSection.querySelector('.cpuLimit-field .form-control'))
             .to.have.value('');
           [{
             resourceName: 'memory',
@@ -569,14 +570,14 @@ describe(
             requested: ['0', 'MiB'],
             limit: ['', 'MiB'],
           }].forEach(({ resourceName, requested, limit }) => {
-            const $requested = this.$(`.${resourceName}Requested-field`);
-            expect($requested.find('input')).to.have.value(requested[0]);
-            expect($requested.find('.ember-power-select-trigger').text())
-              .to.contain(requested[1]);
-            const $limit = this.$(`.${resourceName}Limit-field`);
-            expect($limit.find('input')).to.have.value(limit[0]);
-            expect($limit.find('.ember-power-select-trigger').text())
-              .to.contain(limit[1]);
+            const requestedField = find(`.${resourceName}Requested-field`);
+            expect(requestedField.querySelector('input')).to.have.value(requested[0]);
+            expect(requestedField.querySelector('.ember-power-select-trigger'))
+              .to.contain.text(requested[1]);
+            const limitField = find(`.${resourceName}Limit-field`);
+            expect(limitField.querySelector('input')).to.have.value(limit[0]);
+            expect(limitField.querySelector('.ember-power-select-trigger'))
+              .to.contain.text(limit[1]);
           });
           done();
         });
@@ -584,7 +585,7 @@ describe(
       it('creates simple lambda on submit button click', async function (done) {
         await renderCreate(this);
 
-        const revision = await fillWithMinimumData(this);
+        const revision = await fillWithMinimumData();
         await click('.btn-submit');
 
         expect(this.get('submitStub')).to.be.calledOnce
@@ -595,10 +596,10 @@ describe(
       it('resets form on successfull submission', async function (done) {
         await renderCreate(this);
 
-        await fillWithMinimumData(this);
+        await fillWithMinimumData();
         await click('.btn-submit');
 
-        expect(this.$('.name-field .form-control')).to.have.value('');
+        expect(find('.name-field .form-control')).to.have.value('');
         done();
       });
 
@@ -609,12 +610,12 @@ describe(
           new Promise((resolve, reject) => rejectSubmit = reject)
         );
 
-        await fillWithMinimumData(this);
+        await fillWithMinimumData();
         await click('.btn-submit');
         rejectSubmit();
-        await wait();
+        await settled();
 
-        expect(this.$('.name-field .form-control')).to.not.have.value('');
+        expect(find('.name-field .form-control')).to.not.have.value('');
         done();
       });
 
@@ -719,7 +720,7 @@ describe(
           async function (done) {
             await renderCreate(this);
 
-            const revision = await fillWithMinimumData(this);
+            const revision = await fillWithMinimumData();
             await selectChoose('.state-field', label);
             await click('.btn-submit');
 
@@ -735,7 +736,7 @@ describe(
         async function (done) {
           await renderCreate(this);
 
-          const revision = await fillWithMinimumData(this);
+          const revision = await fillWithMinimumData();
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
@@ -760,10 +761,10 @@ describe(
       it('disables sumbit button when one of fields is invalid', async function (done) {
         await renderCreate(this);
 
-        await fillWithMinimumData(this);
+        await fillWithMinimumData();
         await fillIn('.name-field .form-control', '');
 
-        expect(this.$('.btn-submit')).to.have.attr('disabled');
+        expect(find('.btn-submit')).to.have.attr('disabled');
         done();
       });
 
@@ -771,10 +772,10 @@ describe(
         await renderCreate(this);
         this.set('submitStub', sinon.stub().returns(new Promise(() => {})));
 
-        await fillWithMinimumData(this);
+        await fillWithMinimumData();
         await click('.btn-submit');
 
-        expect(this.$('.btn-submit')).to.have.attr('disabled');
+        expect(find('.btn-submit')).to.have.attr('disabled');
         done();
       });
 
@@ -810,46 +811,48 @@ describe(
 
           await renderCreate(this);
 
-          expect(this.$('.field-disabled')).to.have.length(0);
-          expect(this.$('.name-field .form-control')).to.have.value('myname');
+          expect(findAll('.field-disabled')).to.have.length(0);
+          expect(find('.name-field .form-control')).to.have.value('myname');
           // In create mode state is always draft on init
-          expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-          expect(this.$('.summary-field .form-control')).to.have.value('summary');
-          expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
-          expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
-          expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
-          const $argument = this.$('.arguments-field .entry-field');
-          expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.data-spec-editor').text().trim())
-            .to.equal('String');
-          expect($argument.find('.entryIsOptional-field .form-control'))
+          expect(find('.state-field .field-component')).to.have.trimmed.text('Draft');
+          expect(find('.summary-field .form-control')).to.have.value('summary');
+          expect(find('.engine-field .field-component')).to.have.trimmed.text('OpenFaaS');
+          expect(find('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(find('.preferredBatchSize-field .form-control')).to.have.value('150');
+          const argument = find('.arguments-field .entry-field');
+          expect(argument.querySelector('.entryName-field .form-control'))
+            .to.have.value('arg');
+          expect(argument.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('String');
+          expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
-          expect($argument.find('.entryDefaultValue-field .form-control'))
+          expect(argument.querySelector('.entryDefaultValue-field .form-control'))
             .to.have.value('"default"');
-          const $result = this.$('.results-field .entry-field');
-          expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.data-spec-editor').text().trim())
-            .to.equal('Integer');
-          expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-          expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
-          expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
-          expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          const result = find('.results-field .entry-field');
+          expect(result.querySelector('.entryName-field .form-control'))
+            .to.have.value('res');
+          expect(result.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('Integer');
+          expect(find('.readonly-field .form-control')).to.have.class('checked');
+          expect(find('.mountSpace-field .form-control')).to.have.class('checked');
+          expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
+          expect(find('.oneclientOptions-field .form-control')).to.have.value('oc-options');
           done();
         });
     });
 
     context('in "view" mode', function () {
       it('has class "mode-view"', async function (done) {
-        await renderView(this);
+        await renderView();
 
-        expect(this.$('.atm-lambda-form')).to.have.class('mode-view');
+        expect(find('.atm-lambda-form')).to.have.class('mode-view');
         done();
       });
 
       it('does not show submit button', async function (done) {
-        await renderView(this);
+        await renderView();
 
-        expect(this.$('.btn-submit')).to.not.exist;
+        expect(find('.btn-submit')).to.not.exist;
         done();
       });
 
@@ -880,30 +883,30 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
-          expect(this.$('.field-enabled')).to.not.exist;
-          expect(this.$('.name-field .form-control')).to.have.value('myname');
-          expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-          expect(this.$('.summary-field .form-control')).to.have.value('summary');
-          expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
-          expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
-          expect(this.$('.onedataFunctionOptions-field')).to.not.exist;
-          expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-          expect(this.$('.mountSpace-field .form-control')).to.exist
+          expect(find('.field-enabled')).to.not.exist;
+          expect(find('.name-field .form-control')).to.have.value('myname');
+          expect(find('.state-field .field-component')).to.have.trimmed.text('Draft');
+          expect(find('.summary-field .form-control')).to.have.value('summary');
+          expect(find('.engine-field .field-component')).to.have.trimmed.text('OpenFaaS');
+          expect(find('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(find('.onedataFunctionOptions-field')).to.not.exist;
+          expect(find('.readonly-field .form-control')).to.have.class('checked');
+          expect(find('.mountSpace-field .form-control')).to.exist
             .and.to.not.have.class('checked');
-          expect(this.$('.mountSpaceOptions-collapse')).to.not.have.class('in');
-          expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
-          expect(this.$('.cpuLimitUnlimitedDesc-field .form-control'))
-            .to.have.value(undefined);
-          expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
-          expect(this.$('.memoryLimitUnlimitedDesc-field .form-control'))
-            .to.have.value(undefined);
-          expect(this.$('.ephemeralStorageRequested-field .form-control'))
+          expect(find('.mountSpaceOptions-collapse')).to.not.have.class('in');
+          expect(find('.cpuRequested-field .form-control')).to.have.value('0.1');
+          expect(find('.cpuLimit-field .form-control'))
+            .to.have.value('');
+          expect(find('.memoryRequested-field .form-control')).to.have.value('128');
+          expect(find('.memoryLimit-field .form-control'))
+            .to.have.value('');
+          expect(find('.ephemeralStorageRequested-field .form-control'))
             .to.have.value('0');
           expect(
-            this.$('.ephemeralStorageLimitUnlimitedDesc-field .form-control')
-          ).to.have.value(undefined);
+            find('.ephemeralStorageLimit-field .form-control')
+          ).to.have.value('');
           done();
         });
 
@@ -930,21 +933,21 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
-          expect(this.$('.field-enabled')).to.not.exist;
-          expect(this.$('.name-field .form-control')).to.have.value('myname');
-          expect(this.$('.state-field .field-component').text().trim()).to.equal('Draft');
-          expect(this.$('.summary-field .form-control')).to.have.value('summary');
-          expect(this.$('.summary-field .form-control')).to.have.value('summary');
-          expect(this.$('.onedataFunctionName-field .form-control')).to.have.value('myfunc');
-          expect(this.$('.openfaasOptions-field')).to.not.exist;
-          expect(this.$('.cpuRequested-field .form-control')).to.have.value('0.1');
-          expect(this.$('.cpuLimit-field .form-control')).to.have.value('1');
-          expect(this.$('.memoryRequested-field .form-control')).to.have.value('128');
-          expect(this.$('.memoryLimit-field .form-control')).to.have.value('256');
-          expect(this.$('.ephemeralStorageRequested-field .form-control')).to.have.value('1');
-          expect(this.$('.ephemeralStorageLimit-field .form-control')).to.have.value('10');
+          expect(find('.field-enabled')).to.not.exist;
+          expect(find('.name-field .form-control')).to.have.value('myname');
+          expect(find('.state-field .field-component')).to.have.trimmed.text('Draft');
+          expect(find('.summary-field .form-control')).to.have.value('summary');
+          expect(find('.summary-field .form-control')).to.have.value('summary');
+          expect(find('.onedataFunctionName-field .form-control')).to.have.value('myfunc');
+          expect(find('.openfaasOptions-field')).to.not.exist;
+          expect(find('.cpuRequested-field .form-control')).to.have.value('0.1');
+          expect(find('.cpuLimit-field .form-control')).to.have.value('1');
+          expect(find('.memoryRequested-field .form-control')).to.have.value('128');
+          expect(find('.memoryLimit-field .form-control')).to.have.value('256');
+          expect(find('.ephemeralStorageRequested-field .form-control')).to.have.value('1');
+          expect(find('.ephemeralStorageLimit-field .form-control')).to.have.value('10');
           done();
         });
 
@@ -961,12 +964,13 @@ describe(
             },
           });
 
-          await renderView(this);
+          await renderView();
 
-          expect(this.$('.field-enabled')).to.not.exist;
-          expect(this.$('.mountSpaceOptions-collapse')).to.have.class('in');
-          expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
-          expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          expect(find('.field-enabled')).to.not.exist;
+          expect(find('.mountSpaceOptions-collapse')).to.have.class('in');
+          expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
+          expect(find('.oneclientOptions-field .form-control'))
+            .to.have.value('oc-options');
           done();
         });
 
@@ -987,25 +991,28 @@ describe(
           })),
         });
 
-        await renderView(this);
+        await renderView();
 
-        expect(this.$('.field-enabled')).to.not.exist;
-        const $entries = this.$('.arguments-field .entry-field');
-        expect($entries).to.have.length(argumentTypesToCheck.length);
+        expect(find('.field-enabled')).to.not.exist;
+        const entries = findAll('.arguments-field .entry-field');
+        expect(entries).to.have.length(argumentTypesToCheck.length);
         argumentTypesToCheck.forEach((type, idx) => {
-          const $entry = $entries.eq(idx);
-          expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.data-spec-editor').text().trim())
-            .to.equal(type);
-          const $optionalToggle = $entry.find('.entryIsOptional-field .form-control');
-          const $defaultValueField = $entry.find('.entryDefaultValue-field .form-control');
+          const entry = entries[idx];
+          expect(entry.querySelector('.entryName-field .form-control'))
+            .to.have.value(`entry${idx}`);
+          expect(entry.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text(type);
+          const optionalToggle =
+            entry.querySelector('.entryIsOptional-field .form-control');
+          const defaultValueField =
+            entry.querySelector('.entryDefaultValue-field .form-control');
           if (idx === 0) {
-            expect($optionalToggle).to.have.class('checked');
-            expect($defaultValueField).to.have.value('"val0"');
+            expect(optionalToggle).to.have.class('checked');
+            expect(defaultValueField).to.have.value('"val0"');
           } else {
-            expect($optionalToggle).to.not.have.class('checked');
-            if ($defaultValueField.length) {
-              expect($defaultValueField).to.have.value('');
+            expect(optionalToggle).to.not.have.class('checked');
+            if (defaultValueField.length) {
+              expect(defaultValueField).to.have.value('');
             }
           }
         });
@@ -1028,23 +1035,25 @@ describe(
           })),
         });
 
-        await renderView(this);
+        await renderView();
 
-        expect(this.$('.field-enabled')).to.not.exist;
-        expect(this.$('.results-field')).to.exist;
-        const $entries = this.$('.results-field .entry-field');
-        expect($entries).to.have.length(resultTypesToCheck.length);
+        expect(find('.field-enabled')).to.not.exist;
+        expect(find('.results-field')).to.exist;
+        const entries = findAll('.results-field .entry-field');
+        expect(entries).to.have.length(resultTypesToCheck.length);
 
         resultTypesToCheck.forEach((type, idx) => {
-          const $entry = $entries.eq(idx);
-          expect($entry.find('.entryName-field .form-control')).to.have.value(`entry${idx}`);
-          expect($entry.find('.data-spec-editor').text().trim())
-            .to.equal(type);
-          const $isViaFileToggle = $entry.find('.entryIsViaFile-field .form-control');
+          const entry = entries[idx];
+          expect(entry.querySelector('.entryName-field .form-control'))
+            .to.have.value(`entry${idx}`);
+          expect(entry.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text(type);
+          const isViaFileToggle =
+            entry.querySelector('.entryIsViaFile-field .form-control');
           if (idx === 0) {
-            expect($isViaFileToggle).to.have.class('checked');
+            expect(isViaFileToggle).to.have.class('checked');
           } else {
-            expect($isViaFileToggle).to.not.have.class('checked');
+            expect(isViaFileToggle).to.not.have.class('checked');
           }
         });
         done();
@@ -1063,19 +1072,19 @@ describe(
       it('has class "mode-edit"', async function (done) {
         await renderEdit(this);
 
-        expect(this.$('.atm-lambda-form')).to.have.class('mode-edit');
+        expect(find('.atm-lambda-form')).to.have.class('mode-edit');
         done();
       });
 
       it('renders two buttons - save and cancel', async function (done) {
         await renderEdit(this);
 
-        const $saveBtn = this.$('.btn-submit');
-        const $cancelBtn = this.$('.btn-cancel');
-        expect($saveBtn).to.exist;
-        expect($saveBtn.text().trim()).to.equal('Save');
-        expect($cancelBtn).to.exist;
-        expect($cancelBtn.text().trim()).to.equal('Cancel');
+        const saveBtn = find('.btn-submit');
+        const cancelBtn = find('.btn-cancel');
+        expect(saveBtn).to.exist;
+        expect(saveBtn).to.have.trimmed.text('Save');
+        expect(cancelBtn).to.exist;
+        expect(cancelBtn).to.have.trimmed.text('Cancel');
         done();
       });
 
@@ -1111,33 +1120,36 @@ describe(
 
           await renderEdit(this);
 
-          const $enabledFields =
-            this.$('.field-enabled:not(.form-fields-group-renderer)');
-          expect($enabledFields).to.have.length(1);
-          expect($enabledFields).to.have.class('state-field');
+          const enabledFields =
+            findAll('.field-enabled:not(.form-fields-group-renderer)');
+          expect(enabledFields).to.have.length(1);
+          expect(enabledFields[0]).to.have.class('state-field');
 
-          expect(this.$('.name-field .form-control')).to.have.value('myname');
-          expect(this.$('.state-field .field-component').text().trim()).to.equal('Stable');
-          expect(this.$('.summary-field .form-control')).to.have.value('summary');
-          expect(this.$('.engine-field .field-component').text().trim()).to.equal('OpenFaaS');
-          expect(this.$('.dockerImage-field .form-control')).to.to.have.value('myimage');
-          expect(this.$('.preferredBatchSize-field .form-control')).to.have.value('150');
-          const $argument = this.$('.arguments-field .entry-field');
-          expect($argument.find('.entryName-field .form-control')).to.have.value('arg');
-          expect($argument.find('.data-spec-editor').text().trim())
-            .to.equal('String');
-          expect($argument.find('.entryIsOptional-field .form-control'))
+          expect(find('.name-field .form-control')).to.have.value('myname');
+          expect(find('.state-field .field-component')).to.have.trimmed.text('Stable');
+          expect(find('.summary-field .form-control')).to.have.value('summary');
+          expect(find('.engine-field .field-component')).to.have.trimmed.text('OpenFaaS');
+          expect(find('.dockerImage-field .form-control')).to.to.have.value('myimage');
+          expect(find('.preferredBatchSize-field .form-control')).to.have.value('150');
+          const argument = find('.arguments-field .entry-field');
+          expect(argument.querySelector('.entryName-field .form-control'))
+            .to.have.value('arg');
+          expect(argument.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('String');
+          expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
-          expect($argument.find('.entryDefaultValue-field .form-control'))
+          expect(argument.querySelector('.entryDefaultValue-field .form-control'))
             .to.have.value('"default"');
-          const $result = this.$('.results-field .entry-field');
-          expect($result.find('.entryName-field .form-control')).to.have.value('res');
-          expect($result.find('.data-spec-editor').text().trim())
-            .to.equal('Integer');
-          expect(this.$('.readonly-field .form-control')).to.have.class('checked');
-          expect(this.$('.mountSpace-field .form-control')).to.have.class('checked');
-          expect(this.$('.mountPoint-field .form-control')).to.have.value('/some/path');
-          expect(this.$('.oneclientOptions-field .form-control')).to.have.value('oc-options');
+          const result = find('.results-field .entry-field');
+          expect(result.querySelector('.entryName-field .form-control'))
+            .to.have.value('res');
+          expect(result.querySelector('.data-spec-editor'))
+            .to.have.trimmed.text('Integer');
+          expect(find('.readonly-field .form-control')).to.have.class('checked');
+          expect(find('.mountSpace-field .form-control')).to.have.class('checked');
+          expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
+          expect(find('.oneclientOptions-field .form-control'))
+            .to.have.value('oc-options');
           done();
         });
 
@@ -1180,8 +1192,8 @@ describe(
 
           await click('.btn-submit');
 
-          expect(this.$('.btn-submit')).to.have.attr('disabled');
-          expect(this.$('.btn-cancel')).to.have.attr('disabled');
+          expect(find('.btn-submit')).to.have.attr('disabled');
+          expect(find('.btn-cancel')).to.have.attr('disabled');
           done();
         });
     });
@@ -1190,21 +1202,19 @@ describe(
 
 async function renderCreate(testCase) {
   testCase.set('submitStub', sinon.stub().resolves());
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="create"
     revision=revision
     onSubmit=submitStub
     defaultAtmResourceSpec=defaultAtmResourceSpec
   }}`);
-  await wait();
 }
 
-async function renderView(testCase) {
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+async function renderView() {
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="view"
     revision=revision
   }}`);
-  await wait();
 }
 
 async function renderEdit(testCase) {
@@ -1212,19 +1222,18 @@ async function renderEdit(testCase) {
     submitStub: sinon.stub().resolves(),
     cancelSpy: sinon.spy(),
   });
-  testCase.render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
+  await render(hbs `{{content-atm-inventories-lambdas/atm-lambda-form
     mode="edit"
     revision=revision
     onSubmit=submitStub
     onCancel=cancelSpy
   }}`);
-  await wait();
 }
 
-async function toggleMountSpace(testCase, toggleChecked) {
-  const $mountToggle = testCase.$('.mountSpace-field .form-control');
-  if ($mountToggle.is('.checked') !== toggleChecked) {
-    await click($mountToggle[0]);
+async function toggleMountSpace(toggleChecked) {
+  const mountToggle = find('.mountSpace-field .form-control');
+  if (mountToggle.matches('.checked') !== toggleChecked) {
+    await click(mountToggle);
   }
 }
 
@@ -1236,10 +1245,10 @@ async function addResult() {
   await click('.results-field .add-field-button');
 }
 
-async function fillWithMinimumData(testCase) {
+async function fillWithMinimumData() {
   await fillIn('.name-field .form-control', 'myname');
   await fillIn('.dockerImage-field .form-control', 'myimage');
-  await toggleMountSpace(testCase, false);
+  await toggleMountSpace(false);
 
   return {
     name: 'myname',

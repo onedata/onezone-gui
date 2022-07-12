@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import ModifyAtmInventoryAction from 'onezone-gui/utils/workflow-actions/modify-atm-inventory-action';
 import sinon from 'sinon';
 import { resolve, reject } from 'rsvp';
@@ -10,9 +10,7 @@ import { get } from '@ember/object';
 describe(
   'Integration | Utility | workflow actions/modify atm inventory action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     it('executes modifying automation inventory (success scenario)', function () {
       const atmInventoryDiff = {
@@ -27,7 +25,7 @@ describe(
         }),
       };
       const action = ModifyAtmInventoryAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmInventory,
           atmInventoryDiff,
@@ -66,7 +64,7 @@ describe(
         },
       };
       const action = ModifyAtmInventoryAction.create({
-        ownerSource: this,
+        ownerSource: this.owner,
         context: {
           atmInventory,
           atmInventoryDiff,

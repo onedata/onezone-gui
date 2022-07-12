@@ -10,7 +10,10 @@
       class="cancel-ack"
       triggerSelector=(concat ".cancel-ack-" parentView.elementId)
       open=ackPopoverOpened}}
-      {{#click-outside action=(action "toggleAckPopover" false) except-selector=(concat ".cancel-ack-" parentView.elementId)}}
+      {{#click-outside
+        onClickOutside=(action "toggleAckPopover" false)
+        exceptSelector=(concat ".cancel-ack-" parentView.elementId)
+      }}
         <h1>{{tt this "ackHeader"}}</h1>
         <p>{{tt this "ackMessage"}}</p>
         <div class="text-right">

@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, click, find } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../../helpers/stub-service';
 import sinon from 'sinon';
 import { htmlSafe } from '@ember/template';
-import { click } from 'ember-native-dom-helpers';
 
 describe('Integration | Component | token template selector/template tile', function () {
-  setupComponentTest('token-template-selector/template-tile', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
     const tStub = sinon.stub(lookupService(this, 'i18n'), 't');
@@ -23,34 +21,34 @@ describe('Integration | Component | token template selector/template tile', func
     });
   });
 
-  it('renders one-tile with class "token-template-selector-template-tile"', function () {
-    this.render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
+  it('renders one-tile with class "token-template-selector-template-tile"', async function () {
+    await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.one-tile')).to.have.class('token-template-selector-template-tile');
+    expect(find('.one-tile')).to.have.class('token-template-selector-template-tile');
   });
 
-  it('has class template-{templateName}', function () {
-    this.render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
+  it('has class template-{templateName}', async function () {
+    await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.one-tile')).to.have.class('template-custom');
+    expect(find('.one-tile')).to.have.class('template-custom');
   });
 
-  it('does not have "more" link', function () {
-    this.render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
+  it('does not have "more" link', async function () {
+    await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.more-link')).to.not.exist;
+    expect(find('.more-link')).to.not.exist;
   });
 
-  it('shows template name in title', function () {
-    this.render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
+  it('shows template name in title', async function () {
+    await render(hbs `{{token-template-selector/template-tile templateName="custom"}}`);
 
-    expect(this.$('.tile-title').text().trim()).to.equal('Custom');
+    expect(find('.tile-title')).to.have.trimmed.text('Custom');
   });
 
   it('notifies about click', async function () {
     const clickSpy = this.set('clickSpy', sinon.spy());
 
-    this.render(hbs `{{token-template-selector/template-tile
+    await render(hbs `{{token-template-selector/template-tile
       templateName="custom"
       onClick=clickSpy
     }}`);

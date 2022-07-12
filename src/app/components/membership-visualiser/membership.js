@@ -18,6 +18,7 @@ import notImplementedThrow from 'onedata-gui-common/utils/not-implemented-throw'
 import MembershipRelation from 'onedata-gui-websocket-client/utils/membership-relation';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
+import $ from 'jquery';
 
 export default Component.extend(I18n, {
   classNames: ['membership-row', 'membership'],
@@ -329,7 +330,7 @@ export default Component.extend(I18n, {
   },
 
   getScrollContainer() {
-    return this.$().children('.ps');
+    return $(this.get('element')).children('.ps');
   },
 
   recalculateScrollButtonsVisibility() {

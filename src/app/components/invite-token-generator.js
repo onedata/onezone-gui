@@ -190,7 +190,7 @@ export default Component.extend(I18n, {
         'tokenManager'
       );
 
-      if (!showCustomTokenLink) {
+      if (!showCustomTokenLink || !inviteType) {
         return resolve();
       } else {
         return tokenManager.createTemporaryInviteTokenTemplate(inviteType, targetRecordId)

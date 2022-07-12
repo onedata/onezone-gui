@@ -17,8 +17,9 @@ import handleLoginEndpoint from 'onezone-gui/utils/handle-login-endpoint';
 import _ from 'lodash';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import createDataProxyMixin from 'onedata-gui-common/utils/create-data-proxy-mixin';
-import DOMPurify from 'npm:dompurify';
-import isIp from 'npm:is-ip';
+import DOMPurify from 'dompurify';
+import isIp from 'is-ip';
+import $ from 'jquery';
 
 const ANIMATION_TIMEOUT = 333;
 
@@ -277,20 +278,30 @@ export default LoginFormContainer.extend(
           isProvidersDropdownVisible,
           _formAnimationTimeoutId,
           _animationTimeout,
+          element,
         } = this.getProperties(
           'isProvidersDropdownVisible',
           '_formAnimationTimeoutId',
-          '_animationTimeout'
+          '_animationTimeout',
+          'element'
         );
-        const loginForm = this.$('.basicauth-login-form-container');
-        const authorizersSelect = this.$('.authorizers-select-container');
+        if (!element) {
+          return;
+        }
+        const $element = $(element);
+
+        const loginForm = $element.find('.basicauth-login-form-container');
+        const authorizersSelect = $element.find('.authorizers-select-container');
         clearTimeout(_formAnimationTimeoutId);
 
         this.toggleProperty('isUsernameLoginActive');
         if (this.get('isUsernameLoginActive')) {
           this._animateHide(authorizersSelect);
           this._animateShow(loginForm, true);
-          this.$('.login-username').focus();
+          const usernameInput = element.querySelector('.login-username');
+          if (usernameInput) {
+            usernameInput.focus();
+          }
           // hide dropdown
           if (isProvidersDropdownVisible) {
             this.send('showMoreClick');
@@ -315,9 +326,14 @@ export default LoginFormContainer.extend(
         const {
           _dropdownAnimationTimeoutId,
           _animationTimeout,
-        } = this.getProperties('_dropdownAnimationTimeoutId', '_animationTimeout');
+          element,
+        } = this.getProperties(
+          '_dropdownAnimationTimeoutId',
+          '_animationTimeout',
+          'element'
+        );
         this.toggleProperty('isProvidersDropdownVisible');
-        const authorizersDropdown = this.$('.authorizers-dropdown');
+        const authorizersDropdown = $(element).find('.authorizers-dropdown');
         clearTimeout(_dropdownAnimationTimeoutId);
         if (this.get('isProvidersDropdownVisible')) {
           this._animateShow(authorizersDropdown);

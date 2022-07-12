@@ -1,30 +1,26 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import DumpAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/dump-atm-workflow-schema-revision-action';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
 import { lookupService } from '../../../helpers/stub-service';
 import { get, getProperties } from '@ember/object';
-import wait from 'ember-test-helpers/wait';
-import suppressRejections from '../../../helpers/suppress-rejections';
+import { settled } from '@ember/test-helpers';
+import { suppressRejections } from '../../../helpers/suppress-rejections';
 
 const atmWorkflowSchemaId = 'wfkId';
 
 describe(
   'Integration | Utility | workflow actions/dump atm workflow schema revision action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
-
-    suppressRejections();
+    setupRenderingTest();
 
     beforeEach(function () {
       const downloadSpy = sinon.spy();
       this.setProperties({
         action: DumpAtmWorkflowSchemaRevisionAction.create({
-          ownerSource: this,
+          ownerSource: this.owner,
           context: {
             atmWorkflowSchema: {
               entityId: atmWorkflowSchemaId,
@@ -67,6 +63,7 @@ describe(
     );
 
     it('executes dumping workflow revision (failure scenario)', async function () {
+      suppressRejections();
       let rejectDump;
       sinon.stub(lookupService(this, 'workflow-manager'), 'getAtmWorkflowSchemaDump')
         .returns(new Promise((resolve, reject) => rejectDump = reject));
@@ -77,7 +74,7 @@ describe(
 
       const actionResultPromise = this.get('action').execute();
       rejectDump('someError');
-      await wait();
+      await settled();
       const actionResult = await actionResultPromise;
 
       expect(failureNotifySpy).to.be.calledWith(

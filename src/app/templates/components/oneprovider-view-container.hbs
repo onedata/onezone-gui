@@ -9,7 +9,7 @@
         {{/if}}
       {{/promise-proxy-container}}
       <div class="row row-content-tab-bar">
-        {{#if (and (not media.isMobile) isTabBarCollapsed (not showAllOfflineInfo))}}
+        {{#if (and (not (media "isMobile")) isTabBarCollapsed (not showAllOfflineInfo))}}
           <div class={{concat-classes
             "current-oneprovider-bar"
             (if multiOneproviders "current-oneprovider-bar-multi")

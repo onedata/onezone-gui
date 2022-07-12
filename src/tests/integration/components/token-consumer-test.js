@@ -1,31 +1,26 @@
 import { expect } from 'chai';
-import { describe, it, beforeEach, afterEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import {
+  describe,
+  it,
+  beforeEach,
+} from 'mocha';
+import { setupRenderingTest } from 'ember-mocha';
+import { render, fillIn, click, settled, find, findAll } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
-import wait from 'ember-test-helpers/wait';
-import { fillIn, click } from 'ember-native-dom-helpers';
 import { Promise, resolve, reject } from 'rsvp';
 import _ from 'lodash';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
-import EmberPowerSelectHelper from '../../helpers/ember-power-select-helper';
-import TestAdapter from '@ember/test/adapter';
-import Ember from 'ember';
+import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
+import { suppressRejections } from '../../helpers/suppress-rejections';
 
 describe('Integration | Component | token consumer', function () {
-  setupComponentTest('token-consumer', {
-    integration: true,
-  });
+  setupRenderingTest();
 
   beforeEach(function () {
-    this.originalLoggerError = Ember.Logger.error;
-    this.originalTestAdapterException = TestAdapter.exception;
-    Ember.Logger.error = function () {};
-    Ember.Test.adapter.exception = function () {};
-
     const tokenManager = lookupService(this, 'token-manager');
     const examineStub = sinon.stub(tokenManager, 'examineToken').returns(resolve());
     const verifyInviteTokenStub = sinon.stub(tokenManager, 'verifyInviteToken')
@@ -60,58 +55,49 @@ describe('Integration | Component | token consumer', function () {
       mockedRecords,
       verifyInviteTokenStub,
     });
+    suppressRejections();
   });
 
-  afterEach(function () {
-    Ember.Logger.error = this.originalLoggerError;
-    Ember.Test.adapter.exception = this.originalTestAdapterException;
+  it('has class "token-consumer"', async function () {
+    await render(hbs `{{token-consumer}}`);
+
+    expect(find('.token-consumer')).to.exist;
   });
 
-  it('has class "token-consumer"', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('has token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
-    expect(this.$('.token-consumer')).to.exist;
+    const input = find('input[type="text"].token-string');
+    expect(input).to.exist;
+    expect(input).to.have.attr('placeholder', 'Enter token...');
   });
 
-  it('has token input', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('does not invoke examine on init', async function () {
+    await render(hbs `{{token-consumer}}`);
 
-    const $input = this.$('input[type="text"].token-string');
-    expect($input).to.exist;
-    expect($input).to.have.attr('placeholder', 'Enter token...');
+    expect(this.get('examineStub')).to.not.be.called;
   });
 
-  it('does not invoke examine on init', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('invokes examine on token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
-    return wait()
-      .then(() => expect(this.get('examineStub')).to.not.be.called);
+    await fillIn('.token-string', 'token');
+    const examineStub = this.get('examineStub');
+    expect(examineStub).to.be.calledOnce;
+    expect(examineStub).to.be.calledWith('token');
   });
 
-  it('invokes examine on token input', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('invokes examine many times on subsequent token input', async function () {
+    await render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', 'token')
-      .then(() => {
-        const examineStub = this.get('examineStub');
-        expect(examineStub).to.be.calledOnce;
-        expect(examineStub).to.be.calledWith('token');
-      });
-  });
-
-  it('invokes examine many times on subsequent token input', function () {
-    this.render(hbs `{{token-consumer}}`);
-
-    return fillIn('.token-string', 'token')
-      .then(() => fillIn('.token-string', 'token1'))
-      .then(() => fillIn('.token-string', 'token12'))
-      .then(() => {
-        const examineStub = this.get('examineStub');
-        expect(examineStub).to.be.calledThrice;
-        expect(examineStub).to.be.calledWith('token');
-        expect(examineStub).to.be.calledWith('token1');
-        expect(examineStub).to.be.calledWith('token12');
-      });
+    await fillIn('.token-string', 'token');
+    await fillIn('.token-string', 'token1');
+    await fillIn('.token-string', 'token12');
+    const examineStub = this.get('examineStub');
+    expect(examineStub).to.be.calledThrice;
+    expect(examineStub).to.be.calledWith('token');
+    expect(examineStub).to.be.calledWith('token1');
+    expect(examineStub).to.be.calledWith('token12');
   });
 
   [{
@@ -123,27 +109,25 @@ describe('Integration | Component | token consumer', function () {
     typeText: 'Identity token',
     name: 'identity',
   }].forEach(({ type, typeText, name }) => {
-    it(`shows type information for ${name} token`, function () {
+    it(`shows type information for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', 'token')
-        .then(() => expect(this.$('.token-type').text().trim()).to.equal(typeText));
+      await fillIn('.token-string', 'token');
+      expect(find('.token-type')).to.have.trimmed.text(typeText);
     });
 
-    it(`does not show "Join" button for ${name} token`, function () {
+    it(`does not show "Join" button for ${name} token`, async function () {
       stubExamine(this, 'token', resolve({ type }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', 'token')
-        .then(() => {
-          expect(this.$('.no-join-message').text().trim()).to.equal(
-            'This is not an invite token and cannot be used to join to any resource.'
-          );
-          expect(this.$('.confirm-btn')).to.not.exist;
-        });
+      await fillIn('.token-string', 'token');
+      expect(find('.no-join-message')).to.have.trimmed.text(
+        'This is not an invite token and cannot be used to join to any resource.'
+      );
+      expect(find('.confirm-btn')).to.not.exist;
     });
   });
 
@@ -283,59 +267,53 @@ describe('Integration | Component | token consumer', function () {
     const inviteType = inviteSpec.inviteType;
 
     if (noJoinMessage) {
-      it(`does not show "Confirm" button for invite ${inviteType} token`, function () {
+      it(`does not show "Confirm" button for invite ${inviteType} token`, async function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
           },
         }));
 
-        this.render(hbs `{{token-consumer}}`);
+        await render(hbs `{{token-consumer}}`);
 
-        return fillIn('.token-string', 'token')
-          .then(() => {
-            expect(this.$('.no-join-message').text().trim()).to.equal(noJoinMessage);
-            expect(this.$('.confirm-btn')).to.not.exist;
-          });
+        await fillIn('.token-string', 'token');
+        expect(find('.no-join-message')).to.have.trimmed.text(noJoinMessage);
+        expect(find('.confirm-btn')).to.not.exist;
       });
     } else {
-      it(`shows "Confirm" button for invite ${inviteType} token`, function () {
+      it(`shows "Confirm" button for invite ${inviteType} token`, async function () {
         stubExamine(this, 'token', resolve({
           type: {
             inviteToken: inviteSpec,
           },
         }));
 
-        this.render(hbs `{{token-consumer}}`);
+        await render(hbs `{{token-consumer}}`);
 
-        return fillIn('.token-string', 'token')
-          .then(() => {
-            expect(this.$('.no-join-message')).to.not.exist;
-            expect(this.$('.confirm-btn')).to.exist;
-          });
+        await fillIn('.token-string', 'token');
+        expect(find('.no-join-message')).to.not.exist;
+        expect(find('.confirm-btn')).to.exist;
       });
     }
 
-    it(`shows type information for invite ${inviteType} token`, function () {
+    it(`shows type information for invite ${inviteType} token`, async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: inviteSpec,
         },
       }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', 'token')
-        .then(() => {
-          expect(this.$('.token-type').text().trim()).to.equal(typeText);
-          expect(this.$('.type-info .warning-icon')).to.not.exist;
-        });
+      await fillIn('.token-string', 'token');
+      expect(find('.token-type')).to.have.trimmed.text(typeText);
+      expect(find('.type-info .warning-icon')).to.not.exist;
     });
 
     if (modelToSelect) {
       it(
         `shows joining record selector for invite ${inviteType} token`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
@@ -343,66 +321,61 @@ describe('Integration | Component | token consumer', function () {
             targetName: 'someRecord',
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
-          const joiningRecordHelper = new JoiningRecordHelper();
-          return fillIn('.token-string', 'token')
-            .then(() => {
-              const $recordSelector = this.$('.joining-record-selector');
-              expect($recordSelector).to.exist;
-              expect(this.$('.selector-description').text().trim())
-                .to.equal(selectorDescription);
-              expect(
-                $recordSelector.find('.ember-power-select-placeholder').text().trim()
-              ).to.equal(selectorPlaceholder);
-              return joiningRecordHelper.open();
-            })
-            .then(() => {
-              _.range(3).forEach(i => {
-                const option = joiningRecordHelper.getNthOption(i + 1);
-                expect(option.innerText).to.contain(`${modelToSelect}${i}`);
-                expect(option.querySelector(`.oneicon-${selectorIcon}`)).to.exist;
-              });
-            });
+          await fillIn('.token-string', 'token');
+          const recordSelector = find('.joining-record-selector');
+          expect(recordSelector).to.exist;
+          expect(find('.selector-description'))
+            .to.have.trimmed.text(selectorDescription);
+          expect(
+            recordSelector.querySelector('.ember-power-select-placeholder')
+          ).to.have.trimmed.text(selectorPlaceholder);
+          await clickTrigger('.joining-record-selector');
+          const options = findAll('.ember-power-select-option');
+          _.range(3).forEach(i => {
+            expect(options[i]).to.contain.text(`${modelToSelect}${i}`);
+            expect(options[i]).to.contain(`.oneicon-${selectorIcon}`);
+          });
         }
       );
 
       it(
         `has disabled "Confirm" button for invite ${inviteType} token when no target record is selected`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
             },
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
-          return fillIn('.token-string', 'token')
-            .then(() => expect(this.$('.confirm-btn')).to.have.attr('disabled'));
+          await fillIn('.token-string', 'token');
+          expect(find('.confirm-btn')).to.have.attr('disabled');
         }
       );
 
       it(
         `has enabled "Confirm" button for invite ${inviteType} token when target record is selected`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
             },
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
-          return fillIn('.token-string', 'token')
-            .then(() => new JoiningRecordHelper().selectOption(1))
-            .then(() => expect(this.$('.confirm-btn')).to.not.have.attr('disabled'));
+          await fillIn('.token-string', 'token');
+          await selectChoose('.joining-record-selector', `${modelToSelect}0`);
+          expect(find('.confirm-btn')).to.not.have.attr('disabled');
         }
       );
     } else {
       it(
         `does not show joining record selector for invite ${inviteType} token`,
-        function () {
+        async function () {
           stubExamine(this, 'token', resolve({
             type: {
               inviteToken: inviteSpec,
@@ -410,34 +383,36 @@ describe('Integration | Component | token consumer', function () {
             targetName: 'someRecord',
           }));
 
-          this.render(hbs `{{token-consumer}}`);
+          await render(hbs `{{token-consumer}}`);
 
-          return fillIn('.token-string', 'token')
-            .then(() => expect(this.$('.joining-record-selector')).to.not.exist);
+          await fillIn('.token-string', 'token');
+          expect(find('.joining-record-selector')).to.not.exist;
         }
       );
 
-      it(
-        `has enabled "Confirm" button for invite ${inviteType} token`,
-        function () {
-          stubExamine(this, 'token', resolve({
-            type: {
-              inviteToken: inviteSpec,
-            },
-          }));
+      if (!noJoinMessage) {
+        it(
+          `has enabled "Confirm" button for invite ${inviteType} token`,
+          async function () {
+            stubExamine(this, 'token', resolve({
+              type: {
+                inviteToken: inviteSpec,
+              },
+            }));
 
-          this.render(hbs `{{token-consumer}}`);
+            await render(hbs `{{token-consumer}}`);
 
-          return fillIn('.token-string', 'token')
-            .then(() => expect(this.$('.confirm-btn')).to.not.have.attr('disabled'));
-        }
-      );
+            await fillIn('.token-string', 'token');
+            expect(find('.confirm-btn')).to.not.have.attr('disabled');
+          }
+        );
+      }
     }
   });
 
   it(
     'shows "unknown" target name and warning for invite token when target name is null',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -447,89 +422,78 @@ describe('Integration | Component | token consumer', function () {
         },
       }));
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', 'token')
-        .then(() => {
-          expect(this.$('.token-type').text().trim())
-            .to.equal('Invitation to join a space');
-          const $warningIcon = this.$('.type-info .warning-icon');
-          expect($warningIcon).to.exist;
-          return new OneTooltipHelper($warningIcon[0]).getText();
-        })
-        .then(tooltipText => expect(tooltipText).to.equal(
-          'Cannot resolve invite target name, this token might be outdated or invalid.'
-        ));
+      await fillIn('.token-string', 'token');
+      expect(find('.token-type'))
+        .to.have.trimmed.text('Invitation to join a space');
+      const warningIcon = find('.type-info .warning-icon');
+      expect(warningIcon).to.exist;
+      const tooltipText = await new OneTooltipHelper(warningIcon).getText();
+      expect(tooltipText).to.equal(
+        'Cannot resolve invite target name, this token might be outdated or invalid.'
+      );
     }
   );
 
-  it('informs about incorrect token', function () {
+  it('informs about incorrect token', async function () {
     stubExamine(this, 'token', reject({ id: 'badValueToken' }));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', 'token')
-      .then(() =>
-        expect(this.$('.invalid-token-message').text().trim())
-        .to.equal('Provided token is invalid.')
-      );
+    await fillIn('.token-string', 'token');
+
+    expect(find('.invalid-token-message'))
+      .to.have.trimmed.text('Provided token is invalid.');
   });
 
-  it('informs about other examine errors', function () {
+  it('informs about other examine errors', async function () {
     stubExamine(this, 'token', reject({ id: 'someOtherError' }));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', 'token')
-      .then(() =>
-        expect(this.$('.resource-load-error').text()).to.contain('someOtherError')
-      );
+    await fillIn('.token-string', 'token');
+    expect(find('.resource-load-error')).to.contain.text('someOtherError');
   });
 
-  it('interprets whitespaces in token input as an empty value', function () {
-    this.render(hbs `{{token-consumer}}`);
+  it('interprets whitespaces in token input as an empty value', async function () {
+    await render(hbs `{{token-consumer}}`);
 
-    return fillIn('.token-string', '   ')
-      .then(() => {
-        expect(this.$('.invalid-token-message')).to.not.exist;
-        expect(this.$('.token-type')).to.not.exist;
-        expect(this.get('examineStub')).to.not.be.called;
-      });
+    await fillIn('.token-string', '   ');
+    expect(find('.invalid-token-message')).to.not.exist;
+    expect(find('.token-type')).to.not.exist;
+    expect(this.get('examineStub')).to.not.be.called;
   });
 
   it(
     'interprets forbidden-only characters in token input as an incorrect token',
-    function () {
-      this.render(hbs `{{token-consumer}}`);
+    async function () {
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', '!@#$%^&*()')
-        .then(() => {
-          expect(this.$('.invalid-token-message')).to.exist;
-          expect(this.$('.token-type')).to.not.exist;
-          expect(this.get('examineStub')).to.not.be.called;
-        });
+      await fillIn('.token-string', '!@#$%^&*()');
+      expect(find('.invalid-token-message')).to.exist;
+      expect(find('.token-type')).to.not.exist;
+      expect(this.get('examineStub')).to.not.be.called;
     }
   );
 
-  it('shows spinner while examining token', function () {
+  it('shows spinner while examining token', async function () {
     let resolveRequest;
     stubExamine(this, 'token', new Promise(resolve => resolveRequest = resolve));
 
-    this.render(hbs `{{token-consumer}}`);
+    await render(hbs `{{token-consumer}}`);
 
-    expect(this.$('.spinner')).to.not.exist;
-    return fillIn('.token-string', 'token')
-      .then(() => {
-        expect(this.$('.spinner')).to.exist;
-        resolveRequest();
-        return wait();
-      })
-      .then(() => expect(this.$('.spinner')).to.not.exist);
+    expect(find('.spinner')).to.not.exist;
+    await fillIn('.token-string', 'token');
+    expect(find('.spinner')).to.exist;
+    resolveRequest();
+    await settled();
+    expect(find('.spinner')).to.not.exist;
   });
 
   it(
     'passess data to ConsumeInviteTokenAction instance and executes it',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -545,27 +509,24 @@ describe('Integration | Component | token consumer', function () {
         sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      const joiningRecordHelper = new JoiningRecordHelper();
-      return fillIn('.token-string', 'token')
-        .then(() => joiningRecordHelper.selectOption(1))
-        .then(() => click('.confirm-btn'))
-        .then(() => {
-          expect(createConsumeInviteTokenActionStub).to.be.calledOnce;
-          expect(createConsumeInviteTokenActionStub).to.be.calledWith(sinon.match({
-            joiningRecord: this.get('mockedRecords.group')[0],
-            targetModelName: 'space',
-            token: 'token',
-          }));
-          expect(consumeInviteTokenAction.execute).to.be.calledOnce;
-        });
+      await fillIn('.token-string', 'token');
+      await selectChoose('.joining-record-selector', 'group0');
+      await click('.confirm-btn');
+      expect(createConsumeInviteTokenActionStub).to.be.calledOnce;
+      expect(createConsumeInviteTokenActionStub).to.be.calledWith(sinon.match({
+        joiningRecord: this.get('mockedRecords.group')[0],
+        targetModelName: 'space',
+        token: 'token',
+      }));
+      expect(consumeInviteTokenAction.execute).to.be.calledOnce;
     }
   );
 
   it(
     'has confirm button blocked until ConsumeInviteTokenAction execution is done',
-    function () {
+    async function () {
       stubExamine(this, 'token', resolve({
         type: {
           inviteToken: {
@@ -582,28 +543,18 @@ describe('Integration | Component | token consumer', function () {
       sinon.stub(tokenActions, 'createConsumeInviteTokenAction')
         .returns(consumeInviteTokenAction);
 
-      this.render(hbs `{{token-consumer}}`);
+      await render(hbs `{{token-consumer}}`);
 
-      return fillIn('.token-string', 'token')
-        .then(() => click('.confirm-btn'))
-        .then(() => {
-          expect(this.$('.confirm-btn [role="progressbar"]')).to.exist;
-          resolveSubmit();
-          return wait();
-        })
-        .then(() =>
-          expect(this.$('.confirm-btn [role="progressbar"]')).to.not.exist
-        );
+      await fillIn('.token-string', 'token');
+      await click('.confirm-btn');
+      expect(find('.confirm-btn [role="progressbar"]')).to.exist;
+      resolveSubmit();
+      await settled();
+      expect(find('.confirm-btn [role="progressbar"]')).to.not.exist;
     }
   );
 });
 
 function stubExamine(testSuite, token, response) {
   testSuite.get('examineStub').withArgs(token).returns(response);
-}
-
-class JoiningRecordHelper extends EmberPowerSelectHelper {
-  constructor() {
-    super('.joining-record-selector', '.ember-basic-dropdown-content');
-  }
 }

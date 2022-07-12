@@ -7,7 +7,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, observer, get } from '@ember/object';
+import EmberObject, {
+  computed,
+  observer,
+  get,
+} from '@ember/object';
 import Service, { inject as service } from '@ember/service';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import { entityType as shareEntityType } from 'onezone-gui/models/share';
@@ -132,7 +136,7 @@ export default Service.extend(UserProxyMixin, {
   },
 
   /**
-   * @param {Models.Share} share 
+   * @param {Models.Share} share
    * @returns {Promise<Models.Space>}
    */
   getSpaceForShare(share) {

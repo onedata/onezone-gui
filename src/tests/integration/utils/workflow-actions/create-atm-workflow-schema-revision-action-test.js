@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { setupComponentTest } from 'ember-mocha';
+import { setupRenderingTest } from 'ember-mocha';
 import CreateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-workflow-schema-revision-action';
 import sinon from 'sinon';
 import { reject } from 'rsvp';
@@ -10,9 +10,7 @@ import { get, set, getProperties } from '@ember/object';
 describe(
   'Integration | Utility | workflow actions/create atm workflow schema revision action',
   function () {
-    setupComponentTest('test-component', {
-      integration: true,
-    });
+    setupRenderingTest();
 
     beforeEach(function () {
       const workflowSchemaId = 'w1';
@@ -27,7 +25,7 @@ describe(
       };
       this.setProperties({
         action: CreateAtmWorkflowSchemaRevisionAction.create({
-          ownerSource: this,
+          ownerSource: this.owner,
           context: {
             atmWorkflowSchema,
           },
