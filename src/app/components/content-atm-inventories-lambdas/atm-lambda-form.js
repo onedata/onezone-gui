@@ -436,7 +436,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   const generateEntryDataSpecField = mode => {
     const field = DataSpecEditor.create({
       name: 'entryDataSpec',
-      dataTypeFilters: [{
+      dataSpecFilters: [{
         filterType: 'forbiddenType',
         forbiddenTypes: [{
           type: 'onedatafsCredentials',
