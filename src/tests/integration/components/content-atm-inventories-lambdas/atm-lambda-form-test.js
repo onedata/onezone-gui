@@ -342,8 +342,8 @@ describe(
         expect(entryNameField).to.have.attr('placeholder', 'Name');
         expect(entryNameField).to.have.value('');
 
-        const entryTypeField = entry.querySelector('.data-spec-editor .dropdown-field-trigger');
-        expect(entryTypeField).to.have.trimmed.text('');
+        const entryTypeField = entry.querySelector('.data-spec-editor');
+        expect(entryTypeField).to.have.trimmed.text('Select type...');
 
         const entryIsOptionalLabel =
           entry.querySelector('.entryIsOptional-field .control-label');
@@ -474,8 +474,8 @@ describe(
         expect(entryNameField).to.have.attr('placeholder', 'Name');
         expect(entryNameField).to.have.value('');
 
-        const entryTypeField = entry.querySelector('.data-spec-editor .dropdown-field-trigger');
-        expect(entryTypeField).to.have.trimmed.text('');
+        const entryTypeField = entry.querySelector('.data-spec-editor');
+        expect(entryTypeField).to.have.trimmed.text('Select type...');
         done();
       });
 
