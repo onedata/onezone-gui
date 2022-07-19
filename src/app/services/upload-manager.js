@@ -149,10 +149,11 @@ export default Service.extend(I18n, {
    */
   floatingSummaryRootDirectory: computed(
     function floatingSummaryRootDirectory() {
-      return UploadObject.create(getOwner(this).ownerInjection(), {
+      return UploadObject.extend({
+        children: reads('uploadManager.floatingUploads'),
+      }).create(getOwner(this).ownerInjection(), {
         uploadManager: this,
         objectType: 'root',
-        children: reads('uploadManager.floatingUploads'),
       });
     }
   ),
