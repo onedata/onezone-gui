@@ -156,6 +156,14 @@ export default function generateDevelopmentModel(store) {
               get(providers, 'content').mapBy('entityId'),
               _.fill(Array(NUMBER_OF_PROVIDERS), perProviderSize)
             ));
+            space.set('supportParametersRegistry', _.zipObject(
+              get(providers, 'content').mapBy('entityId'),
+              _.fill(Array(NUMBER_OF_PROVIDERS), {
+                accountingEnabled: false,
+                dirStatsServiceEnabled: true,
+                dirStatsServiceStatus: 'enabled',
+              })
+            ));
             return allFulfilled([
               createListRecord(store, 'provider', providerList),
               createListRecord(store, 'share', shareList),

@@ -18,7 +18,21 @@ import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 import spacePrivilegesFlags from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import computedCurrentUserPrivileges from 'onedata-gui-common/utils/computed-current-user-privileges';
 
+/**
+ * @typedef {Object} SpaceSupportParameters
+ * @property {boolean} accountingEnabled
+ * @property {boolean} dirStatsServiceEnabled
+ * @property {DirStatsServiceStatus} dirStatsServiceStatus
+ */
+
+/**
+ * @typedef {'initializing'|'enabled'|'stopping'|'disabled'} DirStatsServiceStatus
+ */
+
 export const entityType = 'space';
+export const aspects = {
+  supportParameters: 'support_parameters',
+};
 
 export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   onedataGraphUtils: service(),
@@ -36,6 +50,12 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
    * @type {Object}
    */
   supportSizes: attr('object'),
+
+  /**
+   * Maps: Oneprovider ID -> parameters of specific Oneprovider space support
+   * @type {ComputedProperty<Object<string, SpaceSupportParameters>>}
+   */
+  supportParametersRegistry: attr('object'),
 
   /**
    * Information about space. Available fields:

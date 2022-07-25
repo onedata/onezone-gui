@@ -12,7 +12,14 @@ import { get, getProperties } from '@ember/object';
 import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
-import { entityType as spaceEntityType } from 'onezone-gui/models/space';
+import {
+  entityType as spaceEntityType,
+  aspects as spaceAspects,
+} from 'onezone-gui/models/space';
+
+/**
+ * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
+ */
 
 export default Service.extend({
   store: service(),
@@ -371,5 +378,39 @@ export default Service.extend({
             });
         })
       );
+  },
+
+  /**
+   * @param {string} spaceId
+   * @param {string} providerId
+   * @param {SpaceSupportParametersUpdate} spaceSupportParametersUpdate
+   * @returns {Promise<void>}
+   */
+  async modifySupportParameters(spaceId, providerId, spaceSupportParametersUpdate) {
+    const {
+      onedataGraph,
+      recordManager,
+    } = this.getProperties('onedataGraph', 'recordManager');
+
+    const requestGri = gri({
+      entityType: spaceEntityType,
+      entityId: spaceId,
+      aspect: spaceAspects.supportParameters,
+      aspectId: providerId,
+    });
+    await onedataGraph.request({
+      operation: 'update',
+      gri: requestGri,
+      data: spaceSupportParametersUpdate,
+    });
+
+    try {
+      await recordManager.reloadRecordById('space', spaceId);
+    } catch (error) {
+      console.error(
+        'service:space-manager: Cannot reload space model after support parameters modification due to:',
+        error
+      );
+    }
   },
 });

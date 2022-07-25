@@ -1,0 +1,46 @@
+.provider-config {
+  .space-settings-info {
+    margin-bottom: $padding-large-vertical;
+  }
+
+  .dir-stats-config-info {
+    margin-top: $padding-large-vertical;
+  }
+
+  .dir-stats-config-label {
+    @include font-semibold;
+  }
+
+  .dir-stats-icon {
+    font-size: 1.8em;
+    position: absolute;
+    transform: translateY(-4px);
+  }
+
+  .dir-stats-warning {
+    margin-left: 28px;
+  }
+
+  .dir-stats-config.content-section {
+    padding-bottom: 2px;
+  }
+
+  .dir-stats-config-toggle {
+    margin-right: 1em;
+  }
+
+  .content-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    > * {
+      margin-bottom: 0.5em;
+    }
+  }
+
+  .status-container {
+    margin-left: auto;
+    align-self: flex-start;
+  }
+}
