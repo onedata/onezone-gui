@@ -29,7 +29,10 @@
         providersProxy=providersProxy
       }}
     {{else}}
-      some content
+      {{content-spaces-providers/provider-config
+        space=space
+        provider=container.selectedProvider
+      }}
     {{/if}}
   {{/container.body}}
 {{/oneprovider-view-container}}
