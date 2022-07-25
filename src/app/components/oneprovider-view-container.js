@@ -14,15 +14,16 @@ import EmberObject, {
   computed,
   observer,
 } from '@ember/object';
-import { reads, not } from '@ember/object/computed';
+import { reads } from '@ember/object/computed';
 import {
   promise,
   notEmpty,
-  array,
   raw,
   tag,
   conditional,
   gt,
+  and,
+  not,
 } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
@@ -48,6 +49,12 @@ const OneproviderTabItem = EmberObject.extend({
    */
   provider: undefined,
 
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  shouldBeEnabledWhenOffline: false,
+
   icon: 'provider',
   id: reads('provider.entityId'),
   type: 'provider',
@@ -55,7 +62,7 @@ const OneproviderTabItem = EmberObject.extend({
   version: reads('provider.version'),
   domain: reads('provider.domain'),
   entityId: reads('provider.entityId'),
-  disabled: not('provider.online'),
+  disabled: and(not('shouldBeEnabledWhenOffline'), not('provider.online')),
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
@@ -119,6 +126,20 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    * @type {boolean}
    */
   isOverviewEnabled: false,
+
+  /**
+   * When true, then assumes that each Oneprovider will have it's dedicated view
+   * from the Onezone gui (aka there will be no iframes for Oneprovider views).
+   * @virtual optional
+   * @type {boolean}
+   */
+  isOneproviderViewLocal: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  shouldOfflineOneprovidersBeEnabled: false,
 
   /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
@@ -199,12 +220,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
+  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
+  hintTriggersConfiguration: tag`.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
@@ -230,14 +251,25 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
+    'oneproviderId',
+    'isOverviewEnabled',
     'selectedProvider',
     'tabBarItems',
     function selectedProviderItem() {
       const {
+        oneproviderId,
+        isOverviewEnabled,
         selectedProvider,
         tabBarItems,
-      } = this.getProperties('selectedProvider', 'tabBarItems');
-      if (selectedProvider) {
+      } = this.getProperties(
+        'oneproviderId',
+        'isOverviewEnabled',
+        'selectedProvider',
+        'tabBarItems'
+      );
+      if (oneproviderId === 'overview' && isOverviewEnabled) {
+        return OverviewTabItem;
+      } else if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
         return tabBarItems.findBy('id', providerEntityId);
       }
@@ -260,9 +292,20 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   ),
 
-  providerItems: array.map(
-    'providers',
-    provider => OneproviderTabItem.create({ provider })
+  providerItems: computed(
+    'providers.[]',
+    'shouldOfflineOneprovidersBeEnabled',
+    function providerItems() {
+      const {
+        providers,
+        shouldOfflineOneprovidersBeEnabled,
+      } = this.getProperties('providers', 'shouldOfflineOneprovidersBeEnabled');
+
+      return (providers || []).map((provider) => OneproviderTabItem.create({
+        provider,
+        shouldBeEnabledWhenOffline: shouldOfflineOneprovidersBeEnabled,
+      }));
+    }
   ),
 
   /**
@@ -329,15 +372,23 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   init() {
     this._super(...arguments);
-    this.get('initialProvidersListProxy').then(list => {
+
+    const {
+      initialProvidersListProxy,
+      isOneproviderViewLocal,
+    } = this.getProperties('initialProvidersListProxy', 'isOneproviderViewLocal');
+
+    initialProvidersListProxy.then(list => {
       const oneproviderId = this.get('oneproviderId');
       if (!oneproviderId) {
         return this.selectDefaultProvider(list);
       }
     });
-    next(() => {
-      safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
-    });
+    if (!isOneproviderViewLocal) {
+      next(() => {
+        safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
+      });
+    }
   },
 
   willDestroyElement() {
