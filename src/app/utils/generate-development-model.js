@@ -159,7 +159,7 @@ export default function generateDevelopmentModel(store) {
             space.set('supportParametersRegistry', _.zipObject(
               get(providers, 'content').mapBy('entityId'),
               _.fill(Array(NUMBER_OF_PROVIDERS), {
-                accountingEnabled: false,
+                accountingEnabled: true,
                 dirStatsServiceEnabled: true,
                 dirStatsServiceStatus: 'enabled',
               })

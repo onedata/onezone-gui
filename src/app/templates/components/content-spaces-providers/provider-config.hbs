@@ -16,7 +16,7 @@
           {{tt this "dirStatsService.label"}}
         </label>
         {{one-way-toggle
-          class=(concat "form-control toggle-field-dir-stats-config")
+          class="form-control toggle-field-dir-stats-config"
           inputId="dir-stats-config"
           checked=dirStatsServiceEnabled
           spinnerSide=(if (media "isMobile") "left" "right")
@@ -24,14 +24,15 @@
           isReadOnly=dirStatsToggleDisabled
           lockHint=dirStatsToggleLockHint
         }}
+      </div>
+      <div class="subheader-text dir-stats-config-info">
+        {{tt this "dirStatsService.description"}}
         <div class="status-container">
+          <label class="inline-label">{{tt this "dirStatsService.statusLabel"}}:</label>
           <span class="status-badge label {{dirStatsServiceStatusClass}}">
             {{dirStatsServiceStatusTranslation}}
           </span>
         </div>
-      </div>
-      <div class="subheader-text dir-stats-config-info">
-        {{tt this "dirStatsService.description"}}
       </div>
       {{#if (not dirStatsServiceEnabled)}}
         <p>
@@ -47,6 +48,31 @@
           {{tt this "dirStatsService.additionalLoadWarning"}}
         </span>
       </p>
+    </div>
+  </div>
+  <div class="iconified-block">
+    <div class="icon-section">
+      {{one-icon icon="support"}}
+    </div>
+    <div class="accounting-config content-section">
+      <div class="content-section-header">
+        <label
+          for="accounting-enabled"
+          class="inline-label dir-stats-config-label"
+        >
+          {{tt this "accounting.label"}}
+        </label>
+        {{one-way-toggle
+          class="form-control toggle-field-accounting"
+          inputId="accounting-enabled"
+          checked=accountingEnabled
+          isReadOnly=true
+          lockHint=(tt this "accounting.disabledAccounting")
+        }}
+      </div>
+      <div class="subheader-text accounting-info">
+        {{tt this "accounting.description"}}
+      </div>
     </div>
   </div>
 </div>

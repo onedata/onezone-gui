@@ -1,10 +1,15 @@
 .provider-config {
+  .content-section > :last-child {
+    padding-bottom: 0;
+  }
+
   .space-settings-info {
     margin-bottom: $padding-large-vertical;
   }
 
-  .dir-stats-config-info {
+  .subheader-text {
     margin-top: $padding-large-vertical;
+    padding-bottom: 1em;
   }
 
   .dir-stats-config-label {
@@ -29,18 +34,12 @@
     margin-right: 1em;
   }
 
-  .content-section-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-
-    > * {
-      margin-bottom: 0.5em;
-    }
-  }
-
   .status-container {
-    margin-left: auto;
-    align-self: flex-start;
+    margin-top: 1em;
+
+    label {
+      @include font-semibold();
+      margin-right: 0.5em;
+    }
   }
 }
