@@ -19,6 +19,6 @@ export default {
   accounting: {
     label: 'Accounting',
     description: 'If enabled, statistics of quota usage over time will be collected for this space. Accounting relies on the directory statistics service and requires that they are enabled together.',
-    disabledAccounting: 'Accounting settings can by changed only by the Oneprovider administrator via the support configuration in the Onepanel administrative interface.',
+    disabledAccounting: 'Accounting settings are managed by a Oneprovider administrator.',
   },
 };

@@ -25,7 +25,6 @@ const dirStatsServiceStatusClasses = {
   stopping: 'label-warning',
   disabled: 'label-default',
 };
-const spaceUpdateInterval = 3000;
 
 export default Component.extend(I18n, {
   classNames: ['provider-config', 'row', 'content-row', 'no-border'],
@@ -50,11 +49,6 @@ export default Component.extend(I18n, {
    * @type {Models.Provider}
    */
   provider: undefined,
-
-  /**
-   * @type {number}
-   */
-  spaceUpdateInterval,
 
   /**
    * @type {ComputedProperty<SpaceSupportParameters>}
