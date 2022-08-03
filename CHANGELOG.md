@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9637 Restricted audit log store types - removed file and dataset
 * VFS-9625 Fixed hiding tooltip when it is controlled manually
 * VFS-9335 Added charts dashboards to workflow GUI
 * VFS-8716 Introduced new data specs editor to the automation gui

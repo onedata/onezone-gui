@@ -76,6 +76,13 @@ module.exports = function (defaults) {
     'ember-cli-chartist': {
       useCustomCSS: true,
     },
+    'ace': {
+      themes: ['textmate'],
+      modes: ['json', 'xml'],
+      workers: ['json', 'xml'],
+      exts: ['searchbox'],
+      workerPath: './assets/ace',
+    },
     'autoImport': {
       publicAssetURL: environment === 'test' ? '/assets/' : './assets/',
     },
