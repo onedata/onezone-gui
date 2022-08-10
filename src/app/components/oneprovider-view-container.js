@@ -68,7 +68,7 @@ const OneproviderTabItem = EmberObject.extend({
   }),
 });
 
-const OverviewTabItem = EmberObject.create({
+const OverviewTabItem = EmberObject.extend({
   id: 'overview',
   type: 'overview',
   entityId: 'overview',
@@ -220,12 +220,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
+  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggersConfiguration: tag`.${'collapsedSelectorHintTriggerClass'}`,
+  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
@@ -268,7 +268,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         'tabBarItems'
       );
       if (oneproviderId === 'overview' && isOverviewEnabled) {
-        return OverviewTabItem;
+        return OverviewTabItem.create({ name: this.tt('overview') });
       } else if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
         return tabBarItems.findBy('id', providerEntityId);
@@ -285,7 +285,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
         providerItems,
       } = this.getProperties('isOverviewEnabled', 'providerItems');
       if (isOverviewEnabled) {
-        return [OverviewTabItem, ...providerItems];
+        return [OverviewTabItem.create({ name: this.tt('overview') }), ...providerItems];
       } else {
         return providerItems;
       }

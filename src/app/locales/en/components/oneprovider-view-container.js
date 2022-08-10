@@ -15,4 +15,5 @@ export default {
     },
     close: 'Close',
   },
+  overview: 'Overview',
 };
