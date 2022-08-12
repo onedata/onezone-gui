@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9443 Fixed show overview tab in mobile mode in space providers page
 * VFS-9665 Moved directory size statistics configuration to Onezone
 * VFS-9335 Added charts dashboards to workflow GUI
 * VFS-8716 Introduced new data specs editor to the automation gui

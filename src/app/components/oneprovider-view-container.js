@@ -68,13 +68,6 @@ const OneproviderTabItem = EmberObject.extend({
   }),
 });
 
-const OverviewTabItem = EmberObject.create({
-  id: 'overview',
-  type: 'overview',
-  entityId: 'overview',
-  icon: 'overview',
-});
-
 export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tagName: '',
 
@@ -220,12 +213,12 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   /**
    * @type {ComputedProperty<String>}
    */
-  collapsedSelectorHintTriggerClass: tag`collapsed-selector-hint-trigger-${'componentGuid'}`,
+  collapsedSelectorHintTriggerClass: tag `collapsed-selector-hint-trigger-${'componentGuid'}`,
 
   /**
    * @type {ComputedProperty<String>}
    */
-  hintTriggersConfiguration: tag`.${'collapsedSelectorHintTriggerClass'}`,
+  hintTriggersConfiguration: tag `.${'collapsedSelectorHintTriggerClass'}`,
 
   validatedOneproviderIdProxy: promise.object(computed(
     'oneproviderId',
@@ -249,26 +242,39 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     return sortedOneprovidersList(this.get('space.providerList.list').toArray());
   }),
 
+  overviewTabItem: computed(function overviewTabItem() {
+    return {
+      id: 'overview',
+      type: 'overview',
+      entityId: 'overview',
+      icon: 'overview',
+      name: this.tt('overview')
+    };
+  }),
+
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
     'oneproviderId',
     'isOverviewEnabled',
     'selectedProvider',
     'tabBarItems',
+    'overviewTabItem',
     function selectedProviderItem() {
       const {
         oneproviderId,
         isOverviewEnabled,
         selectedProvider,
         tabBarItems,
+        overviewTabItem,
       } = this.getProperties(
         'oneproviderId',
         'isOverviewEnabled',
         'selectedProvider',
-        'tabBarItems'
+        'tabBarItems',
+        'overviewTabItem'
       );
       if (oneproviderId === 'overview' && isOverviewEnabled) {
-        return OverviewTabItem;
+        return overviewTabItem;
       } else if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
         return tabBarItems.findBy('id', providerEntityId);
@@ -279,13 +285,15 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tabBarItems: computed(
     'isOverviewEnabled',
     'providerItems',
+    'overviewTabItem',
     function tabBarItems() {
       const {
         isOverviewEnabled,
         providerItems,
-      } = this.getProperties('isOverviewEnabled', 'providerItems');
+        overviewTabItem,
+      } = this.getProperties('isOverviewEnabled', 'providerItems', 'overviewTabItem');
       if (isOverviewEnabled) {
-        return [OverviewTabItem, ...providerItems];
+        return [overviewTabItem, ...providerItems];
       } else {
         return providerItems;
       }
