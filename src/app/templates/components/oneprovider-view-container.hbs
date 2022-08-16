@@ -87,7 +87,7 @@
         {{/if}}
       </div>
     </div>
-    {{#if (not-eq oneproviderId "overview")}}
+    {{#if (and (not-eq oneproviderId "overview") (not isOneproviderViewLocal))}}
       <div
         class={{concat-classes
         "row absolute-flex-content-child-stretch oneprovider-view-container-inner"
@@ -129,7 +129,7 @@
       {{yield (hash
         body=(component "oneprovider-view-container/container-body")
         contentIframeBaseUrl=contentIframeBaseUrl
-        selectedProvider="overview"
+        selectedProvider=(if (eq oneproviderId "overview") "overview" selectedProvider)
       )}}
     {{/if}}
   {{else}}

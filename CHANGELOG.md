@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9443 Fixed show overview tab in mobile mode in space providers page
+* VFS-9665 Moved directory size statistics configuration to Onezone
 * VFS-9637 Restricted audit log store types - removed file and dataset
 * VFS-9625 Fixed hiding tooltip when it is controlled manually
 * VFS-9335 Added charts dashboards to workflow GUI

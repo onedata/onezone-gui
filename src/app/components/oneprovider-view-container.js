@@ -14,15 +14,16 @@ import EmberObject, {
   computed,
   observer,
 } from '@ember/object';
-import { reads, not } from '@ember/object/computed';
+import { reads } from '@ember/object/computed';
 import {
   promise,
   notEmpty,
-  array,
   raw,
   tag,
   conditional,
   gt,
+  and,
+  not,
 } from 'ember-awesome-macros';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { next } from '@ember/runloop';
@@ -48,6 +49,12 @@ const OneproviderTabItem = EmberObject.extend({
    */
   provider: undefined,
 
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  shouldBeEnabledWhenOffline: false,
+
   icon: 'provider',
   id: reads('provider.entityId'),
   type: 'provider',
@@ -55,17 +62,10 @@ const OneproviderTabItem = EmberObject.extend({
   version: reads('provider.version'),
   domain: reads('provider.domain'),
   entityId: reads('provider.entityId'),
-  disabled: not('provider.online'),
+  disabled: and(not('shouldBeEnabledWhenOffline'), not('provider.online')),
   elementClass: computed('provider.online', function elementClass() {
     return `provider-${this.get('provider.online') ? 'on' : 'off'}line`;
   }),
-});
-
-const OverviewTabItem = EmberObject.create({
-  id: 'overview',
-  type: 'overview',
-  entityId: 'overview',
-  icon: 'overview',
 });
 
 export default Component.extend(I18n, ChooseDefaultOneprovider, {
@@ -119,6 +119,20 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
    * @type {boolean}
    */
   isOverviewEnabled: false,
+
+  /**
+   * When true, then assumes that each Oneprovider will have it's dedicated view
+   * from the Onezone gui (aka there will be no iframes for Oneprovider views).
+   * @virtual optional
+   * @type {boolean}
+   */
+  isOneproviderViewLocal: false,
+
+  /**
+   * @virtual optional
+   * @type {boolean}
+   */
+  shouldOfflineOneprovidersBeEnabled: false,
 
   /**
    * In collapsed mode, the currently chosen Oneprovider is displayed and
@@ -228,16 +242,40 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     return sortedOneprovidersList(this.get('space.providerList.list').toArray());
   }),
 
+  overviewTabItem: computed(function overviewTabItem() {
+    return {
+      id: 'overview',
+      type: 'overview',
+      entityId: 'overview',
+      icon: 'overview',
+      name: this.tt('overview')
+    };
+  }),
+
   // TODO: handle deletion of currently selected provider
   selectedProviderItem: computed(
+    'oneproviderId',
+    'isOverviewEnabled',
     'selectedProvider',
     'tabBarItems',
+    'overviewTabItem',
     function selectedProviderItem() {
       const {
+        oneproviderId,
+        isOverviewEnabled,
         selectedProvider,
         tabBarItems,
-      } = this.getProperties('selectedProvider', 'tabBarItems');
-      if (selectedProvider) {
+        overviewTabItem,
+      } = this.getProperties(
+        'oneproviderId',
+        'isOverviewEnabled',
+        'selectedProvider',
+        'tabBarItems',
+        'overviewTabItem'
+      );
+      if (oneproviderId === 'overview' && isOverviewEnabled) {
+        return overviewTabItem;
+      } else if (selectedProvider) {
         const providerEntityId = get(selectedProvider, 'entityId');
         return tabBarItems.findBy('id', providerEntityId);
       }
@@ -247,22 +285,35 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
   tabBarItems: computed(
     'isOverviewEnabled',
     'providerItems',
+    'overviewTabItem',
     function tabBarItems() {
       const {
         isOverviewEnabled,
         providerItems,
-      } = this.getProperties('isOverviewEnabled', 'providerItems');
+        overviewTabItem,
+      } = this.getProperties('isOverviewEnabled', 'providerItems', 'overviewTabItem');
       if (isOverviewEnabled) {
-        return [OverviewTabItem, ...providerItems];
+        return [overviewTabItem, ...providerItems];
       } else {
         return providerItems;
       }
     }
   ),
 
-  providerItems: array.map(
-    'providers',
-    provider => OneproviderTabItem.create({ provider })
+  providerItems: computed(
+    'providers.[]',
+    'shouldOfflineOneprovidersBeEnabled',
+    function providerItems() {
+      const {
+        providers,
+        shouldOfflineOneprovidersBeEnabled,
+      } = this.getProperties('providers', 'shouldOfflineOneprovidersBeEnabled');
+
+      return (providers || []).map((provider) => OneproviderTabItem.create({
+        provider,
+        shouldBeEnabledWhenOffline: shouldOfflineOneprovidersBeEnabled,
+      }));
+    }
   ),
 
   /**
@@ -329,15 +380,23 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
 
   init() {
     this._super(...arguments);
-    this.get('initialProvidersListProxy').then(list => {
+
+    const {
+      initialProvidersListProxy,
+      isOneproviderViewLocal,
+    } = this.getProperties('initialProvidersListProxy', 'isOneproviderViewLocal');
+
+    initialProvidersListProxy.then(list => {
       const oneproviderId = this.get('oneproviderId');
       if (!oneproviderId) {
         return this.selectDefaultProvider(list);
       }
     });
-    next(() => {
-      safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
-    });
+    if (!isOneproviderViewLocal) {
+      next(() => {
+        safeExec(this, 'set', 'pointerEvents.pointerNoneToMainContent', true);
+      });
+    }
   },
 
   willDestroyElement() {

@@ -1,5 +1,5 @@
 /**
- * A providers view for single space - show supporting providers summary 
+ * A providers view for single space - show supporting providers summary
  * and settings per provider
  *
  * @module components/content-spaces-providers
@@ -34,7 +34,15 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
   globalClipboard: service(),
   media: service(),
 
+  /**
+   * @override
+   */
   i18nPrefix: 'components.contentSpacesProviders',
+
+  /**
+   * @override
+   */
+  hasEmbeddedIframes: false,
 
   /**
    * @virtual
@@ -43,7 +51,7 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
   space: undefined,
 
   /**
-   * @override 
+   * @override
    * @type {Ember.ComputedProperty<string>}
    */
   globalActionsTitle: computed(function () {
@@ -54,7 +62,7 @@ export default ContentOneproviderContainerBase.extend(...mixins, {
   providersProxy: reads('space.providerList.list'),
 
   /**
-   * One of: providerId or string `overview`. Value depends which tab is active 
+   * One of: providerId or string `overview`. Value depends which tab is active
    * @type {ComputedProperty<String>}
    */
   oneproviderId: or('navigationState.aspectOptions.oneproviderId', raw('overview')),

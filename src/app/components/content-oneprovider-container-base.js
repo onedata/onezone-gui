@@ -3,7 +3,7 @@
  * Template of these components renders `oneprovider-view-container`
  * at the template root (which is tagless) and typically a header and body
  * of the view. The body is typically an embedde component.
- * 
+ *
  * @module components/content-oneprovider-container-base
  * @author Jakub Liput
  * @copyright (C) 2021 ACK CYFRONET AGH
@@ -19,10 +19,15 @@ export default Component.extend(I18n, {
   classNames: [
     'oneprovider-view-container',
     'absolute-flex-content',
-    'no-pointer-events',
   ],
+  classNameBindings: ['hasEmbeddedIframes:no-pointer-events'],
 
   navigationState: service(),
+
+  /**
+   * @type {boolean}
+   */
+  hasEmbeddedIframes: true,
 
   /**
    * @type {string}

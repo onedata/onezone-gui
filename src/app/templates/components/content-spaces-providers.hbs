@@ -6,6 +6,8 @@
   oneproviderIdChanged=(action "oneproviderIdChanged")
   isTabBarCollapsed=false
   isOverviewEnabled=true
+  isOneproviderViewLocal=true
+  shouldOfflineOneprovidersBeEnabled=true
   mapSelectorEnabled=true
   as |container|
 }}
@@ -27,9 +29,9 @@
         providersProxy=providersProxy
       }}
     {{else}}
-      {{embedded-content-space-config
-        baseUrl=container.contentIframeBaseUrl
-        spaceEntityId=space.entityId
+      {{content-spaces-providers/provider-config
+        space=space
+        provider=container.selectedProvider
       }}
     {{/if}}
   {{/container.body}}
