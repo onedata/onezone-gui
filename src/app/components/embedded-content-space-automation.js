@@ -10,8 +10,9 @@
 import OneproviderEmbeddedContainer from 'onezone-gui/components/oneprovider-embedded-container';
 import layout from 'onezone-gui/templates/components/one-embedded-container';
 import { inject as service } from '@ember/service';
+import EmbeddedBrowserCommon from 'onezone-gui/mixins/embedded-browser-common';
 
-export default OneproviderEmbeddedContainer.extend({
+export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   layout,
 
   navigationState: service(),
@@ -82,6 +83,8 @@ export default OneproviderEmbeddedContainer.extend({
     'closePreviewTab',
     'changeTab',
     'chooseWorkflowSchemaToRun',
+    'getDataUrl',
+    'getDatasetsUrl',
   ]),
 
   actions: {
