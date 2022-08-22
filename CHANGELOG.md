@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9531 Improved automation store content browser
 * VFS-9443 Fixed show overview tab in mobile mode in space providers page
 * VFS-9665 Moved directory size statistics configuration to Onezone
 * VFS-9637 Restricted audit log store types - removed file and dataset
