@@ -4,5 +4,10 @@
   imagePath=(root-url "assets/images/cluster-register-provider.svg")
   textTemplate="components/-content-clusters-add-lead"
 }}
-  {{invite-token-generator inviteType="registerOneprovider"}}
+  {{#if canCurrentUserInviteProviders}}
+    {{invite-token-generator inviteType="registerOneprovider"}}
+  {{else}}
+    <div class="alert alert-warning text-center">{{tt this "restrictedRegistrationWarn"}}</div>
+    <p class="text-center"><strong>{{tt this "contactAdminToGetToken"}}</strong></p>
+  {{/if}}
 {{/content-info}}

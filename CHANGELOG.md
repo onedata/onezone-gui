@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9771 Added support for limited invitation token generation (restricted provider registration policy) in "Add new cluster" view
 * VFS-9475 Added support for limited invitation token generation (restricted provider registration policy)
 * VFS-8650 Changed default temporary invite token TTL to 2 weeks
 * VFS-8631 Added terms of use page
