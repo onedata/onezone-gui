@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9760 Added charts functionalities allowing usage of many TS. collections in dashboards
 * VFS-9771 Added support for limited invitation token generation (restricted provider registration policy) in "Add new cluster" view
 * VFS-9443 Fixed show overview tab in mobile mode in space providers page
 * VFS-9665 Moved directory size statistics configuration to Onezone
