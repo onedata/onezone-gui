@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9531 Improved automation store content browser
 * VFS-9760 Added charts functionalities allowing usage of many TS. collections in dashboards
 * VFS-9771 Added support for limited invitation token generation (restricted provider registration policy) in "Add new cluster" view
 * VFS-9443 Fixed show overview tab in mobile mode in space providers page
