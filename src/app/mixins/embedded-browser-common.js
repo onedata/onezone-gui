@@ -62,8 +62,10 @@ export default Mixin.create({
       aspectOptions = navigationState.mergedAspectOptions(aspectOptions);
     } else {
       // preserve oneprovider in case there is view-changing URL (eg. from data to datasets)
-      aspectOptions.oneproviderId =
-        get(navigationState, 'aspectOptions.oneproviderId') || null;
+      if (type !== 'providers' || !options.oneproviderId) {
+        aspectOptions.oneproviderId =
+          get(navigationState, 'aspectOptions.oneproviderId') || null;
+      }
       for (const option in aspectOptions) {
         if (aspectOptions[option] == null) {
           delete aspectOptions[option];
@@ -127,6 +129,15 @@ export default Mixin.create({
      */
     getShareUrl(options) {
       return this.getBrowserUrl('shares', options);
+    },
+
+    /**
+     * @param {Object} options
+     * @param {String} options.oneproviderId
+     * @returns {String} URL to providers settings view
+     */
+    getProvidersUrl(options) {
+      return this.getBrowserUrl('providers', options);
     },
   },
 });
