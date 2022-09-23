@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9879 Fixed using lambdas defined in non-current inventory
 * VFS-9478 Updated gui common
 * VFS-9607 Added get providers url internal frontend method
 * VFS-9531 Improved automation store content browser
