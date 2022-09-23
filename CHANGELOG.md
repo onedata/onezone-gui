@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9877 Fixed bug in replacing parent window URL in Safari
 * VFS-9478 Updated gui common
 * VFS-9607 Added get providers url internal frontend method
 * VFS-9531 Improved automation store content browser
