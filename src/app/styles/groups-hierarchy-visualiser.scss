@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .groups-hierarchy-visualiser {
   $animation-time: 0.3s;
   $column-header-height: 50px;
@@ -49,7 +51,7 @@
     border-radius: $border-radius-large;
     background-color: $color-one-white;
     opacity: 1;
-    transition: transition-linear(top, $animation-time / 2), transition-linear(left, $animation-time), transition-linear(opacity, $animation-time);
+    transition: transition-linear(top, $animation-time * 0.5), transition-linear(left, $animation-time), transition-linear(opacity, $animation-time);
     font-size: 0.9em;
 
     &:hover, &.hovered {
@@ -121,7 +123,7 @@
     $relation-icon-margin-fix: 0.2em;
 
     position: absolute;
-    top: 100% * (2 / 3);
+    top: 100% * math.div(2, 3);
     padding: 0 0.8 * $padding-xs-horizontal;
     border-radius: $border-radius-base;
     background-color: $relation-indicator-color;
@@ -223,14 +225,14 @@
   .column-separator {
     position: absolute;
     top: 0;
-    transform: translateY($column-header-height) translateX(-$line-height / 2);
+    transform: translateY($column-header-height) translateX(-$line-height * 0.5);
     transition: transition-linear(left, $animation-time);
     z-index: 1;
   }
 
   .column-separator-placeholder {
     position: absolute;
-    width: $line-height / 2;
+    width: $line-height * 0.5;
     background-color: $main-border-color;
   }
 
@@ -242,7 +244,7 @@
 
     &.hovered {
       width: $line-height * 2;
-      transform: translateX(-$line-height / 2) translateY(-$line-height / 2);
+      transform: translateX(-$line-height * 0.5) translateY(-$line-height * 0.5);
       border-bottom: $line-height solid $line-active-color;
       background-color: $line-active-color;
       box-sizing: content-box;
@@ -253,7 +255,7 @@
     position: absolute;
     height: $line-height;
     background-color: $line-color;
-    transition: transition-linear(top, $animation-time / 2), transition-linear(left, $animation-time), transition-linear(width, $animation-time);
+    transition: transition-linear(top, $animation-time * 0.5), transition-linear(left, $animation-time), transition-linear(width, $animation-time);
     transform: translateX(-$line-height);
 
     // adds extra height to make hover more available to user
@@ -269,7 +271,7 @@
 
     &.hovered {
       height: $line-height * 2;
-      transform: translateX(-$line-height) translateY(-$line-height / 2);
+      transform: translateX(-$line-height) translateY(-$line-height * 0.5);
       background-color: $line-active-color;
     }
 

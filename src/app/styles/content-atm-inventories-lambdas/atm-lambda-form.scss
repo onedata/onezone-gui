@@ -1,7 +1,9 @@
+@use "sass:math";
+
 .atm-lambda-form {
   $padding-right: 15em;
   $space-for-remove-entry: 1em;
-  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) / 2;
+  $entry-toggle-container-width: ($padding-right - $space-for-remove-entry) * 0.5;
   $nested-fields-indent: 2em;
 
   .form .one-way-toggle {
@@ -64,7 +66,7 @@
     .arguments-field,
     .results-field {
       > .control-label {
-        margin-bottom: $form-group-margin-bottom / 2;
+        margin-bottom: $form-group-margin-bottom * 0.5;
       }
     }
   }
@@ -103,7 +105,7 @@
   }
 
   @media (min-width: $screen-md-min) {
-    $x-offset-to-center-toggles: ($entry-toggle-container-width - $toggle-width) / 6;
+    $x-offset-to-center-toggles: math.div($entry-toggle-container-width - $toggle-width, 6);
 
     .control-label {
       width: 12em;
@@ -123,11 +125,11 @@
     .arguments-field,
     .results-field {
       .entryName-field {
-        flex: 0 1 calc(50% - #{$padding-right / 2});
+        flex: 0 1 calc(50% - #{$padding-right * 0.5});
       }
 
       .entryDataSpec-field {
-        flex: 0 1 calc(50% - #{$padding-right / 2} - #{$padding-base-vertical});
+        flex: 0 1 calc(50% - #{$padding-right * 0.5} - #{$padding-base-vertical});
         min-width: 13em;
         margin-left: $padding-base-vertical;
       }
