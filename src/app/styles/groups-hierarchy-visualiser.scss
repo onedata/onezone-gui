@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 
 .groups-hierarchy-visualiser {
   $animation-time: 0.3s;
@@ -170,7 +170,7 @@
       transform: $relation-indicator-translate-y translateX(-100%) translateX(2 * $padding-xs-horizontal);
       .one-icon {
         margin-left: -$relation-icon-margin-fix;
-      } 
+      }
     }
 
     &.children {
@@ -179,7 +179,7 @@
       .one-icon {
         margin-left: -$relation-icon-margin-fix;
         margin-right: -$relation-icon-margin-fix;
-      } 
+      }
     }
 
     &.error {
