@@ -10,7 +10,7 @@ const defineSassBreakpoints = require(
 );
 const colors = require('./lib/onedata-gui-common/config/colors');
 const breakpoints = require('./lib/onedata-gui-common/config/breakpoints');
-const sass = require('sass');
+const sass = require('sass-embedded');
 
 const environment = EmberApp.env();
 
@@ -44,6 +44,7 @@ module.exports = function (defaults) {
     'babel': {},
     'sassOptions': {
       implementation: sass,
+      outputStyle: 'expanded',
       includePaths: [
         'app/styles',
         // onedata-gui-common addon
