@@ -118,7 +118,6 @@ import userActions from './services/user-actions';
 import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
-import uploadObject from './utils/upload-object';
 import atmWorkflow from './utils/atm-workflow';
 import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
@@ -280,7 +279,6 @@ const translations = {
     uploadManager,
   },
   utils: {
-    uploadObject,
     atmWorkflow,
     harvesterActions: {
       removeSpaceFromHarvesterAction,

@@ -30,7 +30,6 @@ import {
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 import _ from 'lodash';
-import { getOwner } from '@ember/application';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 
 export default Service.extend(I18n, {
@@ -151,7 +150,7 @@ export default Service.extend(I18n, {
     function floatingSummaryRootDirectory() {
       return UploadObject.extend({
         children: reads('uploadManager.floatingUploads'),
-      }).create(getOwner(this).ownerInjection(), {
+      }).create({
         uploadManager: this,
         objectType: 'root',
       });
@@ -259,7 +258,7 @@ export default Service.extend(I18n, {
    * @param {number} updateData.uploadId
    * @param {string} updateData.path
    * @param {number} updateData.bytesUploaded
-   * @param {boolean} updateData.error
+   * @param {unknown} updateData.error
    * @param {boolean} updateData.success
    */
   updateUploadProgress({
@@ -499,7 +498,7 @@ export default Service.extend(I18n, {
       'children'
     );
 
-    const uploadObject = UploadObject.create(getOwner(this).ownerInjection(), {
+    const uploadObject = UploadObject.create({
       objectPath,
       objectType,
       fileId,

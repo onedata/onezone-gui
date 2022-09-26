@@ -19,7 +19,6 @@ import EmberObject, {
   observer,
   get,
 } from '@ember/object';
-import { inject as service } from '@ember/service';
 import {
   conditional,
   equal,
@@ -29,18 +28,10 @@ import {
   writable,
   or,
 } from 'ember-awesome-macros';
-import I18n from 'onedata-gui-common/mixins/components/i18n';
 import _ from 'lodash';
 import moment from 'moment';
 
-export default EmberObject.extend(I18n, {
-  i18n: service(),
-
-  /**
-   * @override
-   */
-  i18nPrefix: 'utils.uploadObject',
-
+export default EmberObject.extend({
   /**
    * Full upload object path. It should be trimmed from `/` character
    * @virtual
@@ -147,7 +138,7 @@ export default EmberObject.extend(I18n, {
   /**
    * Errors related to uploading this file or nested files in directory.
    * @virtual
-   * @type {Ember.ComputedProperty<Array<string>>}
+   * @type {Ember.ComputedProperty<Array<unknown>>}
    */
   errors: writable(conditional(
     equal('objectType', raw('file')),
@@ -158,25 +149,6 @@ export default EmberObject.extend(I18n, {
       []
     )
   )),
-
-  /**
-   * Error message based on `errors` array
-   * @virtual
-   * @type {Ember.ComputedProperty<Array<string>>}
-   */
-  errorMessage: computed('errors.[]', function errorMessage() {
-    const errors = this.get('errors');
-    if (errors.length) {
-      if (errors.length === 1) {
-        return this.tt('uploadError', { error: errors[0] });
-      } else {
-        return this.tt('uploadMultipleError', {
-          firstError: errors[0],
-          otherErrorsCount: errors.length - 1,
-        });
-      }
-    }
-  }),
 
   /**
    * True if object is cancelled, false otherwise. Should be overridden with
