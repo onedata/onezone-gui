@@ -416,6 +416,7 @@ export default Service.extend({
         scope: 'auto',
       }),
       operation: 'create',
+      subscribe: false,
     });
     await allSettled([
       recordManager.reloadRecordListById('atmInventory', atmInventoryId, 'atmLambda'),
