@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9877 Fixed bug in replacing parent window URL in Safari
 * VFS-9623 Increased speed of SASS compilation and fixed its unnecessary recompilation
 * VFS-9879 Fixed using lambdas defined in non-current inventory
 * VFS-9478 Updated gui common
