@@ -1,0 +1,9 @@
+{{#one-icon
+  class="upload-object-error-icon text-danger clickable"
+  icon="checkbox-filled-warning"
+  click=(action "showErrorModal")
+}}
+  {{#if errorMessage}}
+    {{one-tooltip title=errorMessage}}
+  {{/if}}
+{{/one-icon}}
