@@ -1,10 +1,13 @@
 <div class="upload-object-nesting-space" style={{nestingSpaceWidthStyle}}></div>
 <div
-  class="upload-object-nesting-container"
+  class="upload-object-nesting-container clickable"
   onclick={{action "toggleExpand" value="target"}}
 >
   <div class="upload-object-heading-row {{if isExpandable "clickable"}}">
-    {{one-icon class=(concat uploadObject.objectType "-icon upload-object-icon") icon=objectIcon}}
+    {{one-icon
+      class=(concat uploadObject.objectType "-icon upload-object-icon")
+      icon=objectIcon
+    }}
     {{#if fileUrl}}
       {{#truncated-string class="upload-object-name"}}
         <a href={{fileUrl}} class="black upload-object-link">
@@ -18,14 +21,16 @@
     {{/if}}
     <div class="upload-object-icons">
       {{#if (eq uploadObject.state "failed")}}
-        {{#one-icon class="upload-object-error-icon text-danger" icon="checkbox-filled-warning"}}
-          {{#if uploadObject.errorMessage}}
-            {{one-tooltip title=uploadObject.errorMessage}}
-          {{/if}}
-        {{/one-icon}}
+        {{upload-presenter/error-indicator uploadObject=uploadObject}}
       {{/if}}
       {{#if isExpandable}}
-        {{one-icon class=(concat-classes "upload-object-expanded-icon" (if isExpanded "expanded")) icon="arrow-down"}}
+        {{one-icon
+          class=(concat-classes
+            "upload-object-expanded-icon"
+            (if isExpanded "expanded")
+          )
+          icon="arrow-down"
+        }}
       {{/if}}
     </div>
     {{#unless isCancelledDirectory}}
@@ -42,7 +47,8 @@
       onCancel=onCancel
       canCancel=uploadObject.canBeCancelled
       isCancelled=uploadObject.isCancelled
-      iconClass="upload-object-cancel"}}
+      iconClass="upload-object-cancel"
+    }}
   </div>
   <div class="progress upload-object-progress-bar">
     <div
@@ -51,6 +57,12 @@
       style={{unless isCancelledDirectory progressBarWidthStyle}}
     >
     </div>
-    {{one-tooltip title=(if uploadObject.isCancelled (tt this "cancelled") (concat uploadObject.progress "%")) delayShow=200}}
+    {{one-tooltip
+      title=(if uploadObject.isCancelled
+        (tt this "cancelled")
+        (concat uploadObject.progress "%")
+      )
+      delayShow=200
+    }}
   </div>
 </div>

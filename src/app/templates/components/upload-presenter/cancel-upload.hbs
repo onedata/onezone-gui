@@ -1,15 +1,22 @@
 {{#one-icon
-  class=(concat-classes "cancel-action" iconClass (concat "cancel-ack-" parentView.elementId) (unless canCancel "disabled"))
+  class=(concat-classes
+    "cancel-action"
+    iconClass
+    (concat "cancel-ack-" parentView.elementId)
+    (if canCancel "clickable" "disabled")
+  )
   icon="ban-left"
   click=(action "toggleAckPopover" (not ackPopoverOpened))}}
-  {{one-tooltip title=(tt this (if isCancelled "cancelled" "cancel"))}}
+  {{one-tooltip title=(tt this (if isCancelled "cancelled" "cancel"))
+}}
 {{/one-icon}}
 {{#if canCancel}}
   {{#render-later triggerRender=ackPopoverOpened}}
     {{#one-webui-popover
       class="cancel-ack"
       triggerSelector=(concat ".cancel-ack-" parentView.elementId)
-      open=ackPopoverOpened}}
+      open=ackPopoverOpened
+    }}
       {{#click-outside
         onClickOutside=(action "toggleAckPopover" false)
         exceptSelector=(concat ".cancel-ack-" parentView.elementId)

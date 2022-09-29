@@ -14,10 +14,10 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import { htmlSafe } from '@ember/string';
-import $ from 'jquery';
+import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
 export default Component.extend(I18n, {
-  classNames: ['up-upload-summary-header'],
+  classNames: ['up-upload-summary-header', 'clickable'],
   classNameBindings: ['isCancelled:cancelled'],
 
   /**
@@ -113,8 +113,8 @@ export default Component.extend(I18n, {
   }),
 
   click(event) {
-    if (!$(event.target).closest('.upload-summary-header-icons').length) {
-      this.get('onToggleExpand')();
+    if (isDirectlyClicked(event)) {
+      this.onToggleExpand?.();
     }
   },
 

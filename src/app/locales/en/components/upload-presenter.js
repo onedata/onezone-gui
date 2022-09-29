@@ -9,7 +9,6 @@ export default {
   },
   uploadObjectInfo: {
     progressOf: 'of',
-    uploadFailedTip: 'Upload failed',
   },
   cancelUpload: {
     cancel: 'Cancel',
@@ -18,5 +17,10 @@ export default {
     ackMessage: 'Are you sure you want to cancel this upload?',
     ackYes: 'Yes',
     ackNo: 'No',
+  },
+  errorIndicator: {
+    uploading: 'uploading',
+    uploadError: 'Upload error: "{{error}}"',
+    uploadMultipleError: 'Upload errors: "{{firstError}}" and {{otherErrorsCount}} more',
   },
 };

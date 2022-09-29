@@ -24,6 +24,7 @@ import { inject as service } from '@ember/service';
 import { A } from '@ember/array';
 import _ from 'lodash';
 import $ from 'jquery';
+import isDirectlyClicked from 'onedata-gui-common/utils/is-directly-clicked';
 
 const minimizeIndicationClass = 'minimize-target-animation';
 
@@ -292,9 +293,13 @@ export default Component.extend({
       this.set('isSummaryDirectoryVisible', false);
     },
     goToUploads(event) {
-      if (!$(event.target).closest('.upload-summary-header-icons').length) {
-        this.get('router')
-          .transitionTo('onedata.sidebar.content', 'uploads', 'all');
+      if (
+        isDirectlyClicked(
+          event,
+          event.currentTarget.querySelector('.up-upload-summary-header')
+        )
+      ) {
+        this.router.transitionTo('onedata.sidebar.content', 'uploads', 'all');
       }
     },
   },
