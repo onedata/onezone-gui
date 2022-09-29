@@ -113,7 +113,7 @@ export default Component.extend(I18n, {
   }),
 
   click(event) {
-    if (isDirectlyClicked(event, event.currentTarget)) {
+    if (isDirectlyClicked(event)) {
       this.onToggleExpand?.();
     }
   },
