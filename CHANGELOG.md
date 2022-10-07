@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9910 Allowed changing lambda revision in automation task
 * VFS-9840 Fixed showing current time series data spec editor value
 * VFS-9712 Added detailed view of upload errors
 * VFS-9877 Fixed bug in replacing parent window URL in Safari
