@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9614 Added "preserveCurrentOptions" to Onezone GUI iframe integration API
 * VFS-9840 Fixed showing current time series data spec editor value
 * VFS-9712 Added detailed view of upload errors
 * VFS-9877 Fixed bug in replacing parent window URL in Safari
