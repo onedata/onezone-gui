@@ -75,6 +75,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getShareUrl',
     'getExecuteWorkflowUrl',
     'getProvidersUrl',
+    'getAccessTokenUrl',
   ]),
 
   actions: {
