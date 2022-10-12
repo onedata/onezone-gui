@@ -1,7 +1,7 @@
 /**
  * Resolves selected default Oneprovider for some space or tries to deduct a first default
  * Oneprovider if not chosen yet.
- * 
+ *
  * @module mixins/choose-default-oneprovider
  * @author Jakub Liput
  * @copyright (C) 2020 ACK CYFRONET AGH
@@ -12,6 +12,7 @@ import Mixin from '@ember/object/mixin';
 import { resolve, allSettled } from 'rsvp';
 import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-gui-oneprovider';
 import createPropertyComparator from 'onedata-gui-common/utils/create-property-comparator';
+import { assert } from '@ember/debug';
 
 const storageOneproviderIdKey = 'chooseDefaultOneproviderMixin.oneproviderId';
 
@@ -39,10 +40,14 @@ export default Mixin.create({
   /**
    * Find Oneprovider that should be currently chosen if saved default Oneprovider
    * is not available
-   * @param {Array<Models.Provider>} onlineOneproviders 
+   * @param {Array<Models.Provider>} onlineOneproviders
    * @returns {Models.Provider}
    */
   findCurrentDefaultOneprovider(onlineOneproviders) {
+    assert(
+      'findCurrentDefaultOneprovider: onlineOneproviders should be not null/undefined',
+      onlineOneproviders
+    );
     const sortedOnlineOneproviders = [...onlineOneproviders.toArray()].sort(
       createPropertyComparator('name')
     );
@@ -62,7 +67,7 @@ export default Mixin.create({
   },
 
   chooseDefaultOneprovider(
-    oneproviders = this.get('providers'),
+    oneproviders = (this.get('providers') || []),
     spaceId = this.get('space.entityId')
   ) {
     if (!oneproviders) {
