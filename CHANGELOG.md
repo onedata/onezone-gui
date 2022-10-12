@@ -6,7 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-9339 Added access token url 
+* VFS-9339 Added passing access token creation URL to embedded Oneprovider GUI 
 * VFS-9840 Fixed showing current time series data spec editor value
 * VFS-9712 Added detailed view of upload errors
 * VFS-9877 Fixed bug in replacing parent window URL in Safari
