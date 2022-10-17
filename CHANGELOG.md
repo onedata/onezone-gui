@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
 * VFS-9771 Added support for limited invitation token generation (restricted provider registration policy) in "Add new cluster" view
 * VFS-9475 Added support for limited invitation token generation (restricted provider registration policy)
 * VFS-8650 Changed default temporary invite token TTL to 2 weeks
