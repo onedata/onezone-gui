@@ -129,8 +129,9 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
         dataSpec,
       };
       if (dataType === 'argument') {
-        if (dataSpec &&
-          !['storeCredentials', 'onedatafsCredentials'].includes(dataSpec.type) &&
+        if (
+          dataSpec &&
+          dataSpec.type !== 'storeCredentials' &&
           entryDefaultValue
         ) {
           try {

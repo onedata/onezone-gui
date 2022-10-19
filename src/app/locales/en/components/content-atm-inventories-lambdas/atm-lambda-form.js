@@ -50,9 +50,6 @@ const argumentAndResultTypes = {
   range: {
     label: 'Range',
   },
-  onedatafsCredentials: {
-    label: 'OnedataFS credentials',
-  },
   timeSeriesMeasurement: {
     label: 'Time series measurement',
   },

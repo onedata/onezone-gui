@@ -105,7 +105,7 @@ export const entityType = 'atm_workflow_schema';
 
 /**
  * @typedef {Object} AtmTaskArgumentMappingValueBuilder
- * @property {'onedatafsCredentials'|'iteratedItem'|'const'|'singleValueStoreContent'} valueBuilderType
+ * @property {'iteratedItem'|'const'|'singleValueStoreContent'} valueBuilderType
  * @property {any} valueBuilderRecipe has different meaning depending on `valueBuilderType`:
  *  - JSON value for `'const'`,
  *  - store schema id for `'singleValueStoreContent'`
