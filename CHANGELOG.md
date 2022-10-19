@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
 * VFS-9624 Applied experimental fix for random error messages on removing space
 * VFS-9840 Fixed showing current time series data spec editor value
 * VFS-9712 Added detailed view of upload errors
