@@ -13,6 +13,7 @@ import { all as allFulfilled } from 'rsvp';
 import OnedataApplicationRoute from 'onedata-gui-common/routes/application';
 import DevelopmentModelRouteMixin from 'onedata-gui-websocket-client/mixins/routes/development-model';
 import generateDevelopmentModel from 'onezone-gui/utils/generate-development-model';
+import UnifiedGuiController from 'onedata-gui-common/utils/unified-gui-controller';
 
 export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   onedataWebsocket: service(),
@@ -30,6 +31,7 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
 
   beforeModel() {
     const superResult = this._super(...arguments);
+    UnifiedGuiController.setAsOpened();
     const {
       guiMessageManager,
       onedataWebsocket,
