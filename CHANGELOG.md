@@ -8,6 +8,8 @@ CHANGELOG
 
 * VFS-9767 Added support for new automation workflow execution states
 * VFS-9824 Removed "OnedataFS credentials" automation type
+* VFS-9339 Added passing access token creation URL to embedded Oneprovider GUI
+* VFS-9614 Added "preserveCurrentOptions" to Onezone GUI iframe integration API
 * VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
 * VFS-9624 Applied experimental fix for random error messages on removing space
 * VFS-9840 Fixed showing current time series data spec editor value
