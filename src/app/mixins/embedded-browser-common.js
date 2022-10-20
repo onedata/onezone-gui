@@ -12,6 +12,13 @@ import Mixin from '@ember/object/mixin';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import { get } from '@ember/object';
 
+/**
+ * @typedef {Object} BrowserUrlGeneratorOptions
+ * @property {Object} [preserveCurrentOptions=false] If true, do not remove current URL
+ *   options: dataset, dir, tab. If false, if these are not provided in `options` they are
+ *   removed from URL options.
+ */
+
 export default Mixin.create({
   // required property: _location: Location
   // required property: router: Ember.Router
@@ -21,9 +28,10 @@ export default Mixin.create({
   /**
    * @param {String} type one of: data, datasets, shares, transfers
    * @param {Object} options
+   * @param {BrowserUrlGeneratorOptions} geneatorOptions
    * @returns {String} URL to browser item (opened or selected)
    */
-  getBrowserUrl(type, options) {
+  getBrowserUrl(type, options, generatorOptions = {}) {
     const {
       _location,
       router,
@@ -35,6 +43,7 @@ export default Mixin.create({
       'navigationState',
       'embeddedBrowserType'
     );
+    const preserveCurrentOptions = generatorOptions.preserveCurrentOptions || false;
     const aspect = type;
     let aspectOptions = Object.assign({}, options);
     const selected = options.selected;
@@ -44,21 +53,31 @@ export default Mixin.create({
     // and use common names
     switch (type) {
       case 'datasets':
-        aspectOptions.dataset = aspectOptions.datasetId || null;
+        aspectOptions.dataset = aspectOptions.datasetId ||
+          preserveCurrentOptions ? undefined : null;
         delete aspectOptions.datasetId;
         break;
       case 'data':
-        aspectOptions.dir = aspectOptions.fileId || null;
+        aspectOptions.dir = aspectOptions.fileId ||
+          preserveCurrentOptions ? undefined : null;
         delete aspectOptions.fileId;
         break;
       case 'transfers':
-        aspectOptions.tab = aspectOptions.tabId || null;
+        aspectOptions.tab = aspectOptions.tabId ||
+          preserveCurrentOptions ? undefined : null;
         delete aspectOptions.tabId;
         break;
       default:
         break;
     }
     if (type === embeddedBrowserType) {
+      if (preserveCurrentOptions) {
+        for (const option in aspectOptions) {
+          if (aspectOptions[option] === undefined) {
+            delete aspectOptions[option];
+          }
+        }
+      }
       aspectOptions = navigationState.mergedAspectOptions(aspectOptions);
     } else {
       // preserve oneprovider in case there is view-changing URL (eg. from data to datasets)
@@ -95,20 +114,22 @@ export default Mixin.create({
      * @param {Object} options
      * @param {String} options.fileId
      * @param {Array<String>} options.selected
+     * @param {BrowserUrlGeneratorOptions} geneatorOptions
      * @returns {String} URL to selected or opened item in file browser
      */
-    getDataUrl(options) {
-      return this.getBrowserUrl('data', options);
+    getDataUrl(options, generatorOptions) {
+      return this.getBrowserUrl('data', options, generatorOptions);
     },
 
     /**
      * @param {Object} options
      * @param {String} options.datasetId
      * @param {Array<String>} options.selected
+     * @param {BrowserUrlGeneratorOptions} geneatorOptions
      * @returns {String} URL to selected or opened item in dataset browser
      */
-    getDatasetsUrl(options) {
-      return this.getBrowserUrl('datasets', options);
+    getDatasetsUrl(options, generatorOptions) {
+      return this.getBrowserUrl('datasets', options, generatorOptions);
     },
 
     /**
@@ -116,28 +137,31 @@ export default Mixin.create({
      * @param {String} options.fileId if provided, adds a tab with transfers for specific
      *  file
      * @param {String} options.tabId see transfers tabs in oneprovider-gui
+     * @param {BrowserUrlGeneratorOptions} geneatorOptions
      * @returns {String} URL to transfers view
      */
-    getTransfersUrl(options) {
-      return this.getBrowserUrl('transfers', options);
+    getTransfersUrl(options, generatorOptions) {
+      return this.getBrowserUrl('transfers', options, generatorOptions);
     },
 
     /**
      * @param {Object} options
      * @param {String} options.shareId
+     * @param {BrowserUrlGeneratorOptions} geneatorOptions
      * @returns {String} URL to shares view
      */
-    getShareUrl(options) {
-      return this.getBrowserUrl('shares', options);
+    getShareUrl(options, generatorOptions) {
+      return this.getBrowserUrl('shares', options, generatorOptions);
     },
 
     /**
      * @param {Object} options
      * @param {String} options.oneproviderId
+     * @param {BrowserUrlGeneratorOptions} geneatorOptions
      * @returns {String} URL to providers settings view
      */
-    getProvidersUrl(options) {
-      return this.getBrowserUrl('providers', options);
+    getProvidersUrl(options, generatorOptions) {
+      return this.getBrowserUrl('providers', options, generatorOptions);
     },
 
     /**
