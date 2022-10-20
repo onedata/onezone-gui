@@ -163,5 +163,37 @@ export default Mixin.create({
     getProvidersUrl(options, generatorOptions) {
       return this.getBrowserUrl('providers', options, generatorOptions);
     },
+
+    /**
+     * @returns {String} URL to create token view
+     */
+    getAccessTokenUrl() {
+      const {
+        router,
+        _location,
+      } = this.getProperties('router', '_location');
+      const tokenTemplate = {
+        type: { accessToken: {} },
+        caveats: [{
+          type: 'interface',
+          interface: 'rest',
+        }, {
+          type: 'service',
+          whitelist: ['opw-*'],
+        }],
+      };
+      return _location.origin + _location.pathname + router.urlFor(
+        'onedata.sidebar.content',
+        'tokens',
+        'new', {
+          queryParams: {
+            options: serializeAspectOptions({
+              activeSlide: 'form',
+              tokenTemplate: btoa(JSON.stringify(tokenTemplate)),
+            }),
+          },
+        }
+      );
+    },
   },
 });
