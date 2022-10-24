@@ -211,7 +211,7 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Event} unloadEvent 
+   * @param {Event} unloadEvent
    * @returns {undefined}
    */
   onPageUnload(unloadEvent) {
@@ -335,7 +335,6 @@ export default Service.extend(I18n, {
       fileId,
       spaceId,
     });
-    this.updateDataForOneprovider(oneprovider);
   },
 
   /**
@@ -519,7 +518,7 @@ export default Service.extend(I18n, {
   },
 
   /**
-   * @param {Models.Provider} oneprovider 
+   * @param {Models.Provider} oneprovider
    * @returns {Utils.EmbeddedIframe}
    */
   getEmbeddedIframe(oneprovider) {
