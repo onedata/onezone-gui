@@ -39,6 +39,9 @@ import { resolve } from 'rsvp';
 const nameComparator = createPropertyComparator('name');
 
 function sortedOneprovidersList(list) {
+  if (!list) {
+    return [];
+  }
   return [...list].sort(nameComparator);
 }
 
@@ -238,8 +241,15 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
     }
   )),
 
+  /**
+   * @type {ComputedProperty<Array<Models.Provider>>}
+   */
   providers: computed('space.providerList.list.@each.name', function providers() {
-    return sortedOneprovidersList(this.get('space.providerList.list').toArray());
+    const list = this.get('space.providerList.list');
+    if (!list) {
+      return [];
+    }
+    return sortedOneprovidersList(list.toArray());
   }),
 
   overviewTabItem: computed(function overviewTabItem() {
@@ -248,7 +258,7 @@ export default Component.extend(I18n, ChooseDefaultOneprovider, {
       type: 'overview',
       entityId: 'overview',
       icon: 'overview',
-      name: this.tt('overview')
+      name: this.tt('overview'),
     };
   }),
 

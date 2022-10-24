@@ -39,7 +39,6 @@ import {
   raw,
   isEmpty,
   conditional,
-  array,
 } from 'ember-awesome-macros';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
@@ -454,13 +453,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   const generateEntryDataSpecField = mode => {
     const field = DataSpecEditor.create({
       name: 'entryDataSpec',
-      dataSpecFilters: [{
-        filterType: 'forbiddenType',
-        forbiddenTypes: [{
-          type: 'onedatafsCredentials',
-        }],
-        ignoredContexts: isForArguments ? ['root'] : [],
-      }],
     });
     field.changeMode(mode);
     return field;
@@ -484,18 +476,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     component,
   });
   const generateEntryDefaultValueField = mode => JsonField.extend({
-    isVisible: not(or(
-      and('isInViewMode', isEmpty('value')),
-      array.includes(raw([
-        // TODO: VFS-7816 uncomment or remove future code
-        // 'singleValueStore',
-        // 'listStore',
-        // 'mapStore',
-        // 'treeForestStore',
-        // 'histogramStore',
-        'onedatafsCredentials',
-      ]), 'parent.value.entryType')
-    )),
+    isVisible: not(and('isInViewMode', isEmpty('value'))),
   }).create({
     mode,
     name: 'entryDefaultValue',
