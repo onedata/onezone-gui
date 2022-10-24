@@ -7,6 +7,13 @@ CHANGELOG
 ### Latest changes
 
 * VFS-9910 Allowed changing lambda revision in automation task
+* VFS-10012 Fixed hanging file uploads
+* VFS-9767 Added support for new automation workflow execution states
+* VFS-9824 Removed "OnedataFS credentials" automation type
+* VFS-9339 Added passing access token creation URL to embedded Oneprovider GUI
+* VFS-9614 Added "preserveCurrentOptions" to Onezone GUI iframe integration API
+* VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
+* VFS-9624 Applied experimental fix for random error messages on removing space
 * VFS-9840 Fixed showing current time series data spec editor value
 * VFS-9712 Added detailed view of upload errors
 * VFS-9877 Fixed bug in replacing parent window URL in Safari

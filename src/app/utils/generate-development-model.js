@@ -956,9 +956,6 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
                 },
                 isOptional: true,
                 defaultValue: '"some value"',
-              }, {
-                name: 'arg2',
-                dataSpec: { type: 'onedatafsCredentials' },
               }],
               resultSpecs: [{
                 name: 'res1',
