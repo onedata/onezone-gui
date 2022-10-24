@@ -15,6 +15,16 @@
     margin-top: $padding-base-vertical;
   }
 
+  @media (min-width: $screen-sm-min) {
+    .atmLambdaRevisionNumber-field {
+      max-width: $form-max-width;
+
+      .dropdown-field-trigger {
+        width: 50%;
+      }
+    }
+  }
+
   @media (max-width: $screen-xs-max) {
     .task-form-container {
       margin-left: $mobile-horizontal-content-padding;
