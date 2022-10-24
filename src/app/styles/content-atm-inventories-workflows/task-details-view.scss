@@ -5,7 +5,6 @@
     margin: $padding-large-vertical 0;
   }
 
-  .revisionNumber-field,
   .name-field,
   .form-fields-collection-group,
   .resources-field > .field-component {
@@ -14,6 +13,16 @@
 
   .btn-toolbar {
     margin-top: $padding-base-vertical;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    .atmLambdaRevisionNumber-field {
+      max-width: $form-max-width;
+
+      .dropdown-field-trigger {
+        width: 50%;
+      }
+    }
   }
 
   @media (max-width: $screen-xs-max) {
