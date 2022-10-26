@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10019 Fixed types accepted by time series store during writing
 * VFS-10004 Fixed generation of URL for data views
 * VFS-9910 Allowed changing lambda revision in automation task
 * VFS-10012 Fixed hanging file uploads
