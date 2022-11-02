@@ -15,6 +15,11 @@ export default ApiSamples.extend({
   router: service(),
 
   /**
+   * @override
+   */
+  i18nPrefix: 'components.apiSamples',
+
+  /**
    * @type {Location}
    */
   _location: location,
