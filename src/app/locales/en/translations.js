@@ -106,6 +106,7 @@ import providersList from './components/providers-list';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
+import spaceRestApiModal from './components/modals/space-rest-api-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -119,6 +120,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import atmWorkflow from './utils/atm-workflow';
+import spaceRestApiAction from './utils/space-rest-api-action';
 import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
@@ -174,6 +176,7 @@ const translations = {
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
       applyAtmWorkflowSchemaDumpModal,
+      spaceRestApiModal,
     },
     errors: {
       shareNotFound,
@@ -280,6 +283,7 @@ const translations = {
   },
   utils: {
     atmWorkflow,
+    spaceRestApiAction,
     harvesterActions: {
       removeSpaceFromHarvesterAction,
     },

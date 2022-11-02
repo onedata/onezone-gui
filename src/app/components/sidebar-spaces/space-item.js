@@ -28,6 +28,7 @@ export default Component.extend(I18n, {
   router: service(),
   navigationState: service(),
   clipboardActions: service(),
+  restApiAction: service(),
 
   /**
    * @override
@@ -146,6 +147,19 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
+  openRestApiAction: computed('spaceId', function openRestApiAction() {
+    const {
+      spaceId,
+      restApiAction,
+    } = this.getProperties('spaceId', 'restApiAction');
+    return restApiAction.createSpaceRestApiAction({
+      spaceId: spaceId,
+    });
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Utils.Action>}
+   */
   removeAction: computed('space', function removeAction() {
     const {
       spaceActions,
@@ -183,7 +197,13 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  itemActions: collect('renameAction', 'leaveAction', 'removeAction', 'copyIdAction'),
+  itemActions: collect(
+    'renameAction',
+    'leaveAction',
+    'removeAction',
+    'copyIdAction',
+    'openRestApiAction'
+  ),
 
   actions: {
     editorClick(event) {

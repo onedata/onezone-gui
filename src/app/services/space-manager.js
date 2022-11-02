@@ -30,6 +30,7 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   recordManager: service(),
+  apiSamplesManager: service(),
 
   /**
    * Fetches collection of all spaces
@@ -412,5 +413,10 @@ export default Service.extend({
         error
       );
     }
+  },
+
+  getApiSamples(spaceId, scope = 'private') {
+    const apiSamplesManager = this.apiSamplesManager;
+    return apiSamplesManager.getApiSamples(spaceId, 'space', scope);
   },
 });
