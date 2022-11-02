@@ -735,7 +735,6 @@ export default Component.extend(GlobalActions, I18n, {
     async taskProviderDataAccepted(taskData) {
       try {
         const atmLambda = this.get('taskDetailsProviderData.atmLambda');
-        const revisionNumber = this.get('taskDetailsProviderData.revisionNumber');
         const atmLambdaId = get(atmLambda, 'entityId');
         const atmInventory = this.get('atmInventory');
         const atmLambdasInInventory = await get(
@@ -748,12 +747,7 @@ export default Component.extend(GlobalActions, I18n, {
             get(atmInventory, 'entityId')
           );
         }
-        this.finishTaskDetailsProvider(
-          Object.assign({
-            lambdaId: atmLambdaId,
-            lambdaRevisionNumber: revisionNumber,
-          }, taskData)
-        );
+        this.finishTaskDetailsProvider(taskData);
       } catch (e) {
         this.cancelTaskDetailsProvider();
       }

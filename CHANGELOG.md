@@ -6,7 +6,13 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-9339 Added passing access token creation URL to embedded Oneprovider GUI 
+* VFS-10019 Fixed types accepted by time series store during writing
+* VFS-10004 Fixed generation of URL for data views
+* VFS-9910 Allowed changing lambda revision in automation task
+* VFS-10012 Fixed hanging file uploads
+* VFS-9767 Added support for new automation workflow execution states
+* VFS-9824 Removed "OnedataFS credentials" automation type
+* VFS-9339 Added passing access token creation URL to embedded Oneprovider GUI
 * VFS-9614 Added "preserveCurrentOptions" to Onezone GUI iframe integration API
 * VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
 * VFS-9624 Applied experimental fix for random error messages on removing space

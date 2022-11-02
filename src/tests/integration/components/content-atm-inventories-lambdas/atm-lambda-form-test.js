@@ -41,10 +41,7 @@ const testConvenientTypes = [
   'Range',
 ];
 
-const argumentTypes = [
-  ...argumentAndResultCommonTypes,
-  'OnedataFS credentials',
-];
+const argumentTypes = argumentAndResultCommonTypes;
 const resultTypes = argumentAndResultCommonTypes;
 
 describe(
@@ -429,8 +426,8 @@ describe(
           await clickTrigger('.data-spec-editor');
 
           const options = document.querySelectorAll('.ember-power-select-option');
-          expect(options).to.have.length(argumentTypes.length - 1);
-          argumentTypes.without('OnedataFS credentials').forEach((type, i) =>
+          expect(options).to.have.length(argumentTypes.length);
+          argumentTypes.forEach((type, i) =>
             expect(options[i]).to.have.trimmed.text(type)
           );
           done();
