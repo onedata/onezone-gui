@@ -152,7 +152,7 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
-  openApiSamplesActions: computed('space', function openApiSamplesActions() {
+  openApiSamplesAction: computed('space', function openApiSamplesAction() {
     const {
       space,
       apiSamplesActions,
@@ -209,7 +209,7 @@ export default Component.extend(I18n, {
     'leaveAction',
     'removeAction',
     'copyIdAction',
-    'openApiSamplesActions'
+    'openApiSamplesAction'
   ),
 
   actions: {

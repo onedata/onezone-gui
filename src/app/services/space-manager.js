@@ -30,7 +30,6 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   recordManager: service(),
-  apiSamplesManager: service(),
 
   /**
    * Fetches collection of all spaces

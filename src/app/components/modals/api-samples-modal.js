@@ -37,7 +37,7 @@ export default Component.extend(I18n, {
   modalOptions: undefined,
 
   /**
-   * @type {Models.Space}
+   * @type {Object}
    */
   record: reads('modalOptions.record'),
 
