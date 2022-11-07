@@ -1,5 +1,5 @@
 /**
- * Shows modal with REST API info for space
+ * Shows modal with API samples info for passed record
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -16,13 +16,13 @@ import { promise } from 'ember-awesome-macros';
 export default Component.extend(I18n, {
   tagName: '',
 
-  spaceManager: service(),
+  apiSamplesManager: service(),
   i18n: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.spaceRestApiModal',
+  i18nPrefix: 'components.modals.apiSamplesModal',
 
   /**
    * @virtual
@@ -37,17 +37,32 @@ export default Component.extend(I18n, {
   modalOptions: undefined,
 
   /**
+   * @type {Models.Space}
+   */
+  record: reads('modalOptions.record'),
+
+  /**
    * @type {ComputedProperty<String>}
    */
-  spaceId: reads('modalOptions.spaceId'),
+  apiSubject: reads('modalOptions.apiSubject'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  recordId: reads('record.entityId'),
 
   /**
    * @type {ComputedProperty<PromiseObject<Array<ApiSample>>>}
    */
-  apiSamplesProxy: promise.object(computed('spaceId', function apiSamplesProxy() {
-    const spaceId = this.spaceId;
-    return this.spaceManager.getApiSamples(spaceId);
-  })),
+  apiSamplesProxy: promise.object(computed(
+    'recordId',
+    'apiSubject',
+    function apiSamplesProxy() {
+      const recordId = this.recordId;
+      const apiSubject = this.apiSubject;
+      return this.apiSamplesManager.getApiSamples(recordId, apiSubject);
+    }
+  )),
 
   /**
    * @type {ComputedProperty<Array<ApiSample>>}

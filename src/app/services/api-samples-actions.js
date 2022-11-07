@@ -1,5 +1,5 @@
 /**
- * Provides show rest api functions ready to use for GUI.
+ * Provides show api samples functions ready to use for GUI.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -7,19 +7,20 @@
  */
 
 import Service from '@ember/service';
-import SpaceRestApiAction from '../utils/space-rest-api-action';
+import ShowApiSamplesAction from '../utils/show-api-samples-action';
 
 export default Service.extend({
   /**
    * @param {Object} context context specification:
    *   ```
    *   {
-   *     spaceId: String,
+   *     record: Object,
+   *     apiSubject: String,
    *   }
    *   ```
-   * @returns {Utils.SpaceRestApiAction}
+   * @returns {Utils.ShowApiSamplesAction}
    */
-  createSpaceRestApiAction(context) {
-    return SpaceRestApiAction.create({ ownerSource: this, context });
+  createShowApiSamplesAction(context) {
+    return ShowApiSamplesAction.create({ ownerSource: this, context });
   },
 });

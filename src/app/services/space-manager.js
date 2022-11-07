@@ -414,9 +414,4 @@ export default Service.extend({
       );
     }
   },
-
-  getApiSamples(spaceId, scope = 'private') {
-    const apiSamplesManager = this.apiSamplesManager;
-    return apiSamplesManager.getApiSamples(spaceId, 'space', scope);
-  },
 });

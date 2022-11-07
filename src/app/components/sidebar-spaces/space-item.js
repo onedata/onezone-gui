@@ -28,7 +28,7 @@ export default Component.extend(I18n, {
   router: service(),
   navigationState: service(),
   clipboardActions: service(),
-  restApiAction: service(),
+  apiSamplesActions: service(),
 
   /**
    * @override
@@ -78,6 +78,11 @@ export default Component.extend(I18n, {
    * @type {Ember.computed<string>}
    */
   spaceId: reads('space.entityId'),
+
+  /**
+   * @type {String}
+   */
+  apiSubject: 'space',
 
   /**
    * @type {Ember.Computed<models/ProviderList>}
@@ -147,13 +152,15 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
-  openRestApiAction: computed('spaceId', function openRestApiAction() {
+  openApiSamplesActions: computed('space', function openApiSamplesActions() {
     const {
-      spaceId,
-      restApiAction,
-    } = this.getProperties('spaceId', 'restApiAction');
-    return restApiAction.createSpaceRestApiAction({
-      spaceId: spaceId,
+      space,
+      apiSamplesActions,
+      apiSubject,
+    } = this.getProperties('space', 'apiSamplesActions', 'apiSubject');
+    return apiSamplesActions.createShowApiSamplesAction({
+      record: space,
+      apiSubject,
     });
   }),
 
@@ -202,7 +209,7 @@ export default Component.extend(I18n, {
     'leaveAction',
     'removeAction',
     'copyIdAction',
-    'openRestApiAction'
+    'openApiSamplesActions'
   ),
 
   actions: {

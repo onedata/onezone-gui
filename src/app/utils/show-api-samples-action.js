@@ -1,5 +1,5 @@
 /**
- * Open modal with rest api for space
+ * Open modal with api samples for passed record
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -7,7 +7,6 @@
  */
 
 import Action from 'onedata-gui-common/utils/action';
-import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 
@@ -17,12 +16,12 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.spaceRestApiAction',
+  i18nPrefix: 'utils.showApiSamplesAction',
 
   /**
    * @override
    */
-  className: 'space-rest-api-action-trigger',
+  className: 'show-api-samples-action-trigger',
 
   /**
    * @override
@@ -32,14 +31,20 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<String>}
    */
-  spaceId: reads('context.spaceId'),
+  record: reads('context.record'),
+
+  /**
+   * @type {ComputedProperty<String>}
+   */
+  apiSubject: reads('context.apiSubject'),
 
   /**
    * @override
    */
   async onExecute() {
-    return await this.modalManager.show('space-rest-api-modal', {
-      spaceId: this.spaceId,
+    return await this.modalManager.show('api-samples-modal', {
+      record: this.record,
+      apiSubject: this.apiSubject,
     }).hiddenPromise;
   },
 });
