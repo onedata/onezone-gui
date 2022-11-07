@@ -16,8 +16,6 @@ import { promise } from 'ember-awesome-macros';
 export default Component.extend(I18n, {
   tagName: '',
 
-  apiStringGenerator: service(),
-  restApiGenerator: service(),
   spaceManager: service(),
   i18n: service(),
 
@@ -37,11 +35,6 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   modalOptions: undefined,
-
-  /**
-   * @override
-   */
-  modalClass: 'space-rest-api-modal',
 
   /**
    * @type {ComputedProperty<String>}

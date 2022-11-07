@@ -32,13 +32,6 @@ export default Action.extend({
   /**
    * @type {ComputedProperty<String>}
    */
-  title: computed(function title() {
-    return this.t('title');
-  }),
-
-  /**
-   * @type {ComputedProperty<String>}
-   */
   spaceId: reads('context.spaceId'),
 
   /**

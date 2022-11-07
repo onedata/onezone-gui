@@ -1,5 +1,5 @@
 {{#global-modal
-  class=modalClass
+  class="space-rest-api-modal"
   modalId=modalId
   size="lg"
   as |modal|
@@ -18,13 +18,13 @@
     }}
       {{api-samples
         apiSamples=apiSamples
-        previewMode=false
+        apiSubject="space"
       }}
     {{/promise-proxy-container}}
   {{/modal.body}}
   {{#modal.footer class="btn-toolbar"}}
-    {{#bs-button type="default" class="modal-close" onClick=modal.close}}
+    {{#one-button type="default" class="modal-close" onClick=modal.close}}
       {{tt this "close"}}
-    {{/bs-button}}
+    {{/one-button}}
   {{/modal.footer}}
 {{/global-modal}}
