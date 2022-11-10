@@ -1,5 +1,5 @@
 {{#global-modal
-  class="api-samples-modal"
+  classNames="api-samples-modal"
   modalId=modalId
   size="lg"
   as |modal|
@@ -9,7 +9,7 @@
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
   {{/modal.header}}
-  {{#modal.body class="api-samples"}}
+  {{#modal.body}}
     {{#promise-proxy-container
       proxy=apiSamplesProxy
       sizeClass="sm"
@@ -18,7 +18,7 @@
     }}
       {{api-samples
         apiSamples=apiSamples
-        apiSubject="space"
+        apiSubject=apiSubject
       }}
     {{/promise-proxy-container}}
   {{/modal.body}}

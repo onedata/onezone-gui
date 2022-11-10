@@ -1,5 +1,5 @@
 /**
- * Provides show api samples functions ready to use for GUI.
+ * Provides api samples functions ready to use for GUI.
  *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -7,7 +7,7 @@
  */
 
 import Service from '@ember/service';
-import ShowApiSamplesAction from '../utils/show-api-samples-action';
+import ShowApiSamplesAction from '../utils/api-samples-actions/show-api-samples-action';
 
 export default Service.extend({
   /**

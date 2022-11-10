@@ -25,7 +25,7 @@ export default ApiSamples.extend({
   _location: location,
 
   /**
-   * @type {String} One of: 'onezone', 'oneprovider'
+   * @override
    */
   product: 'onezone',
 
@@ -33,10 +33,6 @@ export default ApiSamples.extend({
    * @type {String} URL to create access token view
    */
   accessTokenUrl: computed(function accessTokenUrl() {
-    const {
-      router,
-      _location,
-    } = this.getProperties('router', '_location');
     const tokenTemplate = {
       type: { accessToken: {} },
       caveats: [{
@@ -47,7 +43,7 @@ export default ApiSamples.extend({
         whitelist: ['ozw-onezone'],
       }],
     };
-    return _location.origin + _location.pathname + router.urlFor(
+    return this._location.origin + this._location.pathname + this.router.urlFor(
       'onedata.sidebar.content',
       'tokens',
       'new', {

@@ -60,6 +60,7 @@ export default Component.extend(I18n, {
     function apiSamplesProxy() {
       const recordId = this.recordId;
       const apiSubject = this.apiSubject;
+      // works until apiSubject is equal to model name
       return this.apiSamplesManager.getApiSamples(recordId, apiSubject);
     }
   )),

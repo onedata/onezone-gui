@@ -121,7 +121,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import atmWorkflow from './utils/atm-workflow';
-import showApiSamplesAction from './utils/show-api-samples-action';
+import showApiSamplesAction from './utils/api-samples-actions/show-api-samples-action';
 import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
@@ -285,7 +285,9 @@ const translations = {
   },
   utils: {
     atmWorkflow,
-    showApiSamplesAction,
+    apiSamplesActions: {
+      showApiSamplesAction,
+    },
     harvesterActions: {
       removeSpaceFromHarvesterAction,
     },

@@ -4,7 +4,7 @@ export default {
   apiSamples,
   apiCommandTipIntro: {
     rest: {
-      space: 'The Onezone\'s REST API can be used to access information and contents of space.',
+      space: 'The Onezone\'s REST API can be used for space management and retrieving information about the space and its members.',
     },
   },
 };

@@ -80,11 +80,6 @@ export default Component.extend(I18n, {
   spaceId: reads('space.entityId'),
 
   /**
-   * @type {String}
-   */
-  apiSubject: 'space',
-
-  /**
    * @type {Ember.Computed<models/ProviderList>}
    */
   _providerList: reads('space.providerList'),
@@ -156,11 +151,10 @@ export default Component.extend(I18n, {
     const {
       space,
       apiSamplesActions,
-      apiSubject,
-    } = this.getProperties('space', 'apiSamplesActions', 'apiSubject');
+    } = this.getProperties('space', 'apiSamplesActions');
     return apiSamplesActions.createShowApiSamplesAction({
       record: space,
-      apiSubject,
+      apiSubject: 'space',
     });
   }),
 

@@ -16,7 +16,7 @@ export default Action.extend({
   /**
    * @override
    */
-  i18nPrefix: 'utils.showApiSamplesAction',
+  i18nPrefix: 'utils.apiSamplesActions.showApiSamplesAction',
 
   /**
    * @override
@@ -29,7 +29,7 @@ export default Action.extend({
   icon: 'rest',
 
   /**
-   * @type {ComputedProperty<String>}
+   * @type {ComputedProperty<Object>}
    */
   record: reads('context.record'),
 
