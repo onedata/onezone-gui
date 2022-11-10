@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9162 Added api samples modal for space
 * VFS-10065 Fixed list of API operation in API tab for archived file
 * VFS-10037 Added "rate" and "timeDerivative" time series chart functions
 * VFS-10019 Fixed types accepted by time series store during writing
