@@ -42,12 +42,16 @@
 }
 
 .webui-popover-provider-info {
-  max-width: 500px;
+  max-width: 400px;
 
   .popup-title {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #d6d6d6;
+    margin-right: 6px;
+    padding-bottom: 12px;
     .one-label {
-      font-size: $font-size-h4;
+      font-size: $font-size-h5;
+      text-transform: uppercase;
     }
   }
   .table {
@@ -55,20 +59,21 @@
     tr {
       .property-name {
         padding-left: 0;
+        width: 100px;
       }
       td {
         overflow-wrap: break-word;
+        padding: 6px;
       }
     }
-  }
-  .property-name {
-    width: 85px;
   }
   .clipboard-line {
     margin-top: -5px;
   }
   .webui-popover-content {
-    padding: $padding-large-horizontal;
+    padding: $padding-small-horizontal;
+    padding-right: 8px;
+    padding-bottom: 8px;
   }
   &.bottom, &.bottom-right {
     .webui-arrow {
