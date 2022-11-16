@@ -40,47 +40,6 @@
     backface-visibility: hidden;
   }
 }
-
-.webui-popover-provider-info {
-  max-width: 400px;
-
-  .popup-title {
-    margin-bottom: 14px;
-    border-bottom: 1px solid #d6d6d6;
-    margin-right: 6px;
-    padding-bottom: 12px;
-    .one-label {
-      font-size: $font-size-h5;
-      text-transform: uppercase;
-    }
-  }
-  .table {
-    margin-bottom: 0;
-    tr {
-      .property-name {
-        padding-left: 0;
-        width: 100px;
-      }
-      td {
-        overflow-wrap: break-word;
-        padding: 6px;
-      }
-    }
-  }
-  .clipboard-line {
-    margin-top: -5px;
-  }
-  .webui-popover-content {
-    padding: $padding-small-horizontal;
-    padding-right: 8px;
-    padding-bottom: 8px;
-  }
-  &.bottom, &.bottom-right {
-    .webui-arrow {
-      margin-left: -$padding-base-vertical;
-    }
-  }
-}
 .provider-info-trigger {
   height: 18px;
   vertical-align: middle;
