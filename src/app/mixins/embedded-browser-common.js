@@ -54,17 +54,17 @@ export default Mixin.create({
     switch (type) {
       case 'datasets':
         aspectOptions.dataset = aspectOptions.datasetId ||
-          preserveCurrentOptions ? undefined : null;
+          (preserveCurrentOptions ? undefined : null);
         delete aspectOptions.datasetId;
         break;
       case 'data':
         aspectOptions.dir = aspectOptions.fileId ||
-          preserveCurrentOptions ? undefined : null;
+          (preserveCurrentOptions ? undefined : null);
         delete aspectOptions.fileId;
         break;
       case 'transfers':
         aspectOptions.tab = aspectOptions.tabId ||
-          preserveCurrentOptions ? undefined : null;
+          (preserveCurrentOptions ? undefined : null);
         delete aspectOptions.tabId;
         break;
       default:

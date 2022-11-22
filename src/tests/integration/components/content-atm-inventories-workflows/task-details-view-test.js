@@ -41,6 +41,7 @@ const exampleAtmLambdaRevision = {
 };
 
 const exampleAtmLambda = {
+  entityId: 'f1id',
   revisionRegistry: {
     1: exampleAtmLambdaRevision,
   },
@@ -145,6 +146,8 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itHasDisabledSubmitWhenFormIsInvalid();
       itBlocksButtonsAndFormDuringSubmission();
       itSubmitsFormDataOnSubmitClick({
+        lambdaId: 'f1id',
+        lambdaRevisionNumber: 1,
         argumentMappings: [],
         resultMappings: [],
         timeSeriesStoreConfig: null,
@@ -170,6 +173,8 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itHasDisabledSubmitWhenFormIsInvalid();
       itBlocksButtonsAndFormDuringSubmission();
       itSubmitsFormDataOnSubmitClick({
+        lambdaId: 'f1id',
+        lambdaRevisionNumber: 1,
         argumentMappings: exampleTask.argumentMappings,
         resultMappings: exampleTask.resultMappings,
         timeSeriesStoreConfig: null,
@@ -234,9 +239,9 @@ function itShowsAtmLambdaDetailsToTaskForm() {
   it('passes lambda details to task form', async function () {
     await renderComponent();
 
-    expect(find('.task-form .atm-lambda-name'))
+    expect(find('.task-form .atmLambdaName-field'))
       .to.contain.text(exampleAtmLambdaRevision.name);
-    expect(find('.task-form .atm-lambda-summary'))
+    expect(find('.task-form .atmLambdaSummary-field'))
       .to.contain.text(exampleAtmLambdaRevision.summary);
   });
 }

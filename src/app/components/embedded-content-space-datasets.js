@@ -137,6 +137,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getTransfersUrl',
     'getShareUrl',
     'getProvidersUrl',
+    'getAccessTokenUrl',
   ]),
 
   _location: location,

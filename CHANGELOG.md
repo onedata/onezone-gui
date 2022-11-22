@@ -7,6 +7,11 @@ CHANGELOG
 ### Latest changes
 
 * VFS-9596 Added tests for data spec editor
+* VFS-10065 Fixed list of API operation in API tab for archived file
+* VFS-10037 Added "rate" and "timeDerivative" time series chart functions
+* VFS-10019 Fixed types accepted by time series store during writing
+* VFS-10004 Fixed generation of URL for data views
+* VFS-9910 Allowed changing lambda revision in automation task
 * VFS-10012 Fixed hanging file uploads
 * VFS-9767 Added support for new automation workflow execution states
 * VFS-9824 Removed "OnedataFS credentials" automation type
