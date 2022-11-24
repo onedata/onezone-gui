@@ -16,7 +16,6 @@
         "inline-icon-container"
         (if providerInfoOpened "not-animation" "animation")
       }}
-
     >
       {{one-icon icon="provider" color=iconColor}}
       {{one-icon icon="browser-info"}}
@@ -24,22 +23,11 @@
   </div>
   <span class="tab-name one-label">{{provider.name}}</span>
 {{/truncated-string}}{{yield}}
-{{#render-later triggerRender=providerInfoOpened}}
-  {{#one-webui-popover
-    popoverStyle="provider-info"
-    open=providerInfoOpened
-    triggerSelector=(concat "#" elementId " .provider-info-trigger")
-    as |popover|
+{{#record-info-popover
+  isOpened=providerInfoOpened
+  triggerSelector=(concat "#" elementId " .provider-info-trigger")
+}}
+  {{provider-info-content
+    provider=provider
   }}
-    {{#click-outside
-      onClickOutside=(action (mut providerInfoOpened) false)
-      exceptSelector=".provider-info-trigger, .webui-popover-provider-info"
-    }}
-      {{provider-info-content
-        class="form-group without-margin"
-        provider=provider
-      }}
-    {{/click-outside}}
-  {{/one-webui-popover}}
-{{/render-later}}
-
+{{/record-info-popover}}
