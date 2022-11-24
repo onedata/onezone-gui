@@ -362,6 +362,7 @@ export default Service.extend(
 
     /**
      * Performs request to elasticsearch
+     * @param {object} options
      * @param {string} options.harvesterId
      * @param {string} options.indexId
      * @param {string} options.method
@@ -408,6 +409,7 @@ export default Service.extend(
     /**
      * Prepares CURL request command equivalent to the dataRequest call with the
      * same arguments.
+     * @param {object} options
      * @param {String} options.harvesterId
      * @param {String} options.indexId
      * @param {'private'|'public'} options.viewMode
