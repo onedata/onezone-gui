@@ -1,0 +1,122 @@
+.content-spaces-marketplace {
+  .list-entries {
+    padding-top: 1em;
+    padding-left: 0;
+  }
+  .spaces-marketplace-item {
+    // FIXME: make sure that content will not overflow
+    // --fixed-height: 18em;
+    // height: var(--fixed-height);
+    // max-height: var(--fixed-height);
+    overflow-y: auto;
+
+    .icon-section {
+      .oneicon-space-empty {
+        font-weight: bold;
+      }
+      .secondary-icon {
+        margin-top: 0.25em;
+      }
+    }
+
+    .marketplace-item-row.title-row {
+      align-items: flex-start;
+    }
+
+    .marketplace-item-row {
+      display: flex;
+      align-items: baseline;
+      min-height: 2.5em;
+      .row-label {
+        @include font-semibold;
+        margin-right: 0.5em;
+      }
+    }
+
+    .support-row {
+      display: flex;
+      align-items: center;
+
+      .support-providers-count {
+        display: flex;
+        align-items: center;
+      }
+
+      .support-providers-icon {
+        font-size: 180%;
+      }
+
+      .providers-count-sign {
+        margin-left: 0.1em;
+        margin-right: -0.1em;
+      }
+    }
+
+    .space-name {
+      @include font-semibold;
+      font-size: 120%;
+      flex-grow: 1;
+      margin-bottom: 1em;
+    }
+
+    // --marketplace-description-background-color: $color-one-semiwhite;
+    --marketplace-description-background-color: #{$main-tabbed-content-background};
+    --marketplace-description-border-color: #{$main-border-color};
+
+    .description-row {
+      margin-top: 0.5em;
+      height: 7em;
+      max-height: 7em;
+      position: relative;
+      z-index: 0;
+      overflow: hidden;
+      border: 1px solid;
+      border-color: var(--marketplace-description-border-color);
+      background-color: var(--marketplace-description-background-color);
+      border-radius: $border-radius-base;
+      .markdown-view {
+        margin: 1em;
+      }
+      &::after {
+        content: ' ';
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 5em;
+        background: linear-gradient(transparent, var(--marketplace-description-background-color));
+        z-index: 1;
+      }
+      .expand-btn {
+        padding: 0.5em;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        z-index: 2;
+        a {
+          @include font-semibold;
+        }
+      }
+      &.description-row-expanded {
+        height: auto;
+        max-height: none;
+        .expand-btn {
+          display: none;
+        }
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.iconified-block-active {
+  $leading-color: $color-one-light-blue;
+  --iconified-block-icon-color: #{$color-one-blue-gray};
+  --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-background-color: #{darken($leading-color, 5%)};
+  --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
+  --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
+
+}

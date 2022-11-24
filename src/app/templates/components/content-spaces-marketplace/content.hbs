@@ -1,0 +1,12 @@
+<div class="row content-row header-row hidden-xs">
+  <h1>
+    <span class="one-label">
+      {{!-- FIXME: i18n --}}
+      Spaces marketplace
+    </span>
+    {{actions-toolbar actionsArray=globalActions}}
+  </h1>
+</div>
+<div class="row content-row">
+  {{content-spaces-marketplace/list viewModel=viewModel}}
+</div>

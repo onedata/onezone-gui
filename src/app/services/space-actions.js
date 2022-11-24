@@ -28,7 +28,7 @@ export default Service.extend(I18n, {
   /**
    * @type {Ember.Computed<Array<SidebarButtonDefinition>>}
    */
-  buttons: collect('btnCreate'),
+  buttons: collect('btnCreate', 'btnMarketplace'),
 
   // TODO: the button should have optional link option to define a subroute
   // to go from sidebar route
@@ -40,6 +40,21 @@ export default Service.extend(I18n, {
       tip: this.t('btnCreate.hint'),
       class: 'create-space-btn',
       action: () => router.transitionTo('onedata.sidebar.content', 'spaces', 'new'),
+    };
+  }),
+
+  btnMarketplace: computed(function btnMarketplace() {
+    return {
+      icon: 'cart',
+      title: this.t('btnMarketplace.title'),
+      sidebarTitle: this.t('btnMarketplace.title'),
+      class: 'marketplace-btn',
+      // FIXME: implement
+      action: () => this.router.transitionTo(
+        'onedata.sidebar.content',
+        'spaces',
+        'join'
+      ),
     };
   }),
 

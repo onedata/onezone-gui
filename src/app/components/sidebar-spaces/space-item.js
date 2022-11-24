@@ -132,6 +132,8 @@ export default Component.extend(I18n, {
    */
   _totalSupportSizeHumanReadable: computedPipe('_totalSupportSize', bytesToString),
 
+  isInMarketplace: reads('space.advertisedInMarketplace'),
+
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */

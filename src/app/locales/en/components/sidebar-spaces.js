@@ -4,11 +4,14 @@ export default {
     leave: 'Leave',
     totalStorageHint: 'Total size of the space: {{{size}}}',
     supportCountHint: 'Number of supporting providers: {{{count}}}',
+    // FIXME: discuss translation
+    advertisedInMarketplace: 'This space is advertised in the marketplace',
     spacePersistence: 'space persistence',
   },
   secondLevelItems: {
     aspects: {
       index: 'Overview',
+      configuration: 'Configuration',
       data: 'Files',
       transfers: 'Transfers',
       datasets: 'Datasets, Archives',

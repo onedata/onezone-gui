@@ -49,6 +49,14 @@ export default SecondLevelItems.extend(I18n, {
     };
   }),
 
+  itemConfiguration: computed(function itemConfiguration() {
+    return {
+      id: 'configuration',
+      label: this.t('aspects.configuration'),
+      icon: 'settings',
+    };
+  }),
+
   itemData: computed('space.privileges.readData', function itemData() {
     const i18n = this.get('i18n');
     const privileges = this.get('space.privileges');
@@ -172,6 +180,7 @@ export default SecondLevelItems.extend(I18n, {
 
   spaceSecondLevelItems: collect(
     'itemIndex',
+    'itemConfiguration',
     'itemData',
     'itemShares',
     'itemTransfers',

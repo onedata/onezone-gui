@@ -23,6 +23,7 @@ import sidebarProviders from './components/sidebar-providers';
 import sidebarGroups from './components/sidebar-groups';
 import contentSpacesEmpty from './components/content-spaces-empty';
 import contentSpacesIndex from './components/content-spaces-index';
+import contentSpacesConfiguration from './components/content-spaces-configuration';
 import contentSpacesNew from './components/content-spaces-new';
 import contentSpacesNoSupport from './components/content-spaces-no-support';
 import contentSpacesSupport from './components/content-spaces-support';
@@ -194,6 +195,7 @@ const translations = {
     sidebarGroups,
     contentSpacesEmpty,
     contentSpacesIndex,
+    contentSpacesConfiguration,
     contentSpacesNew,
     contentProviderEmpty,
     contentSpacesNoSupport,

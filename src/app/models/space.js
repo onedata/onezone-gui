@@ -44,6 +44,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
   currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
+  advertisedInMarketplace: attr('boolean'),
 
   /**
    * Maps: provider name => capacity in bytes provided for this space

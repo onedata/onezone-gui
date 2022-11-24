@@ -500,6 +500,7 @@ function createSpacesRecords(store) {
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
+      advertisedInMarketplace: index === 0,
     }).save();
   }));
 }
