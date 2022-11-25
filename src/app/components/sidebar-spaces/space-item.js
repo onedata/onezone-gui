@@ -28,6 +28,7 @@ export default Component.extend(I18n, {
   router: service(),
   navigationState: service(),
   clipboardActions: service(),
+  apiSamplesActions: service(),
 
   /**
    * @override
@@ -146,6 +147,20 @@ export default Component.extend(I18n, {
   /**
    * @type {Ember.ComputedProperty<Utils.Action>}
    */
+  openApiSamplesAction: computed('space', function openApiSamplesAction() {
+    const {
+      space,
+      apiSamplesActions,
+    } = this.getProperties('space', 'apiSamplesActions');
+    return apiSamplesActions.createShowApiSamplesAction({
+      record: space,
+      apiSubject: 'space',
+    });
+  }),
+
+  /**
+   * @type {Ember.ComputedProperty<Utils.Action>}
+   */
   removeAction: computed('space', function removeAction() {
     const {
       spaceActions,
@@ -183,7 +198,13 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Utils.Action>>}
    */
-  itemActions: collect('renameAction', 'leaveAction', 'removeAction', 'copyIdAction'),
+  itemActions: collect(
+    'renameAction',
+    'leaveAction',
+    'removeAction',
+    'copyIdAction',
+    'openApiSamplesAction'
+  ),
 
   actions: {
     editorClick(event) {
