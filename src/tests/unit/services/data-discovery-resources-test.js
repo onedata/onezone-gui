@@ -132,7 +132,7 @@ describe('Unit | Service | data discovery resources', function () {
       .then(value => expect(value).to.equal('public'));
   });
 
-  it('injects info about viewMode (internal) into appProxy', function () {
+  it('injects info about viewMode (private) into appProxy', function () {
     const service = this.owner.lookup('service:data-discovery-resources');
     const router = lookupService(this, 'router');
     sinon.stub(router, 'isActive')
@@ -142,7 +142,7 @@ describe('Unit | Service | data discovery resources', function () {
     const appProxy = service.createAppProxyObject();
 
     return appProxy.viewModeRequest()
-      .then(value => expect(value).to.equal('internal'));
+      .then(value => expect(value).to.equal('private'));
   });
 
   it('injects info about onezone url into appProxy', function () {
