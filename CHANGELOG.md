@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10088 Hidden access token hint in harvester public view
+* VFS-9162 Added api samples modal for space
 * VFS-9997 Improved showing popover info content for user and provider
 * VFS-10065 Fixed list of API operation in API tab for archived file
 * VFS-10037 Added "rate" and "timeDerivative" time series chart functions

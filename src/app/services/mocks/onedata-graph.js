@@ -52,6 +52,47 @@ const spaceHandlers = {
       throw messageNotSupported;
     }
   },
+  api_samples() {
+    return {
+      rest: {
+        samples: [{
+          swaggerOperationId: 'get_space',
+          requiresAuthorization: true,
+          placeholders: {},
+          path: '/space/spaceid',
+          name: 'Get space details',
+          description: 'Return space details.',
+          method: 'GET',
+          data: null,
+          followRedirects: false,
+          headers: {},
+        }, {
+          swaggerOperationId: 'list_space_users',
+          requiresAuthorization: true,
+          placeholders: {},
+          path: '/space/spaceid/users',
+          name: 'List space users',
+          description: 'Returns the list of users.',
+          method: 'GET',
+          data: null,
+          followRedirects: false,
+          headers: {},
+        }, {
+          swaggerOperationId: 'list_space_privileges',
+          requiresAuthorization: true,
+          placeholders: {},
+          path: '/spaces/privileges',
+          name: 'List all space privileges',
+          description: 'Returns the list of all avaailable space privileges.',
+          method: 'GET',
+          data: null,
+          followRedirects: false,
+          headers: {},
+        }],
+        apiRoot: 'https://dev-onezone.default.svc.cluster.local/api/v3/onezone',
+      }
+    };
+  },
 };
 
 const groupHandlers = {
