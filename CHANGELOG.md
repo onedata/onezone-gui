@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10107 Fixed smooth scroll in Chrome
 * VFS-9596 Added tests for data spec editor
 * VFS-10088 Hidden access token hint in harvester public view
 * VFS-9162 Added api samples modal for space
