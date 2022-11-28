@@ -95,6 +95,7 @@ import contentAtmInventoriesLambdas from './components/content-atm-inventories-l
 import contentAtmInventoriesWorkflows from './components/content-atm-inventories-workflows';
 import emptyCollectionSidebar from './components/empty-collection-sidebar';
 import providerTabLi from './components/provider-tab-li';
+import apiSamples from './components/api-samples';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -106,6 +107,7 @@ import providersList from './components/providers-list';
 import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
+import apiSamplesModal from './components/modals/api-samples-modal';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -119,6 +121,7 @@ import guiUtils from './services/gui-utils';
 import uploadManager from './services/upload-manager';
 
 import atmWorkflow from './utils/atm-workflow';
+import showApiSamplesAction from './utils/api-samples-actions/show-api-samples-action';
 import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-space-from-harvester-action';
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
@@ -174,6 +177,7 @@ const translations = {
       generateInviteTokenModal,
       unlinkAtmLambdaModal,
       applyAtmWorkflowSchemaDumpModal,
+      apiSamplesModal,
     },
     errors: {
       shareNotFound,
@@ -265,6 +269,7 @@ const translations = {
     providerInfoContent,
     providersList,
     providerTabLi,
+    apiSamples,
   },
   services: {
     tokenActions,
@@ -280,6 +285,9 @@ const translations = {
   },
   utils: {
     atmWorkflow,
+    apiSamplesActions: {
+      showApiSamplesAction,
+    },
     harvesterActions: {
       removeSpaceFromHarvesterAction,
     },

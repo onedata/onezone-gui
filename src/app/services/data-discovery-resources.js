@@ -91,7 +91,7 @@ export default Service.extend({
     };
   },
 
-  getIndexRelatedRequestOptions(requestOptions = {}) {
+  async getIndexRelatedRequestOptions(requestOptions = {}) {
     const {
       harvesterId,
       harvesterIndices,
@@ -100,20 +100,23 @@ export default Service.extend({
       'harvesterIndices'
     );
 
+    const completedRequestOptions = { ...requestOptions };
+    completedRequestOptions.viewMode = await this.viewModeRequest();
     if (!harvesterId) {
       return reject('Harvester ID is not specified.');
     } else {
+      completedRequestOptions.harvesterId = harvesterId;
+
       const indexName = get(requestOptions, 'indexName');
-      return harvesterIndices.then(indices => {
-        const index = indices.findBy('guiPluginName', indexName);
-        if (!index) {
-          throw new Error(`Cannot find index "${indexName}".`);
-        } else {
-          const indexId = get(index, 'aspectId');
-          return Object.assign({ harvesterId, indexId }, requestOptions);
-        }
-      });
+      const availableIndices = await harvesterIndices;
+      const index = availableIndices.findBy('guiPluginName', indexName);
+      if (!index) {
+        throw new Error(`Cannot find index "${indexName}".`);
+      } else {
+        completedRequestOptions.indexId = get(index, 'aspectId');
+      }
     }
+    return completedRequestOptions;
   },
 
   /**
@@ -158,11 +161,11 @@ export default Service.extend({
   /**
    * @returns {Promise<string>} resolves to gui plugin mode. One of:
    *  - `public` (public access outside Onezone layout)
-   *  - `internal` (access via harvester page inside Onezone layout)
+   *  - `private` (access via harvester page inside Onezone layout)
    */
   viewModeRequest() {
     const router = this.get('router');
-    const mode = router.isActive('public.harvesters') ? 'public' : 'internal';
+    const mode = router.isActive('public.harvesters') ? 'public' : 'private';
     return resolve(mode);
   },
 
