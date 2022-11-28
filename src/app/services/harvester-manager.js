@@ -362,11 +362,12 @@ export default Service.extend(
 
     /**
      * Performs request to elasticsearch
-     * @param {string} harvesterId
-     * @param {string} indexId
-     * @param {string} method
-     * @param {string} path
-     * @param {any} body
+     * @param {object} options
+     * @param {string} options.harvesterId
+     * @param {string} options.indexId
+     * @param {string} options.method
+     * @param {string} options.path
+     * @param {any} options.body
      * @returns {Promise<any>} request result
      */
     dataRequest({ harvesterId, indexId, method, path, body }) {
@@ -408,14 +409,16 @@ export default Service.extend(
     /**
      * Prepares CURL request command equivalent to the dataRequest call with the
      * same arguments.
-     * @param {String} harvesterId
-     * @param {String} indexId
-     * @param {String} method
-     * @param {String} path
-     * @param {any} body
+     * @param {object} options
+     * @param {String} options.harvesterId
+     * @param {String} options.indexId
+     * @param {'private'|'public'} options.viewMode
+     * @param {String} options.method
+     * @param {String} options.path
+     * @param {any} options.body
      * @returns {Promise<String>} curl command
      */
-    dataCurlRequest({ harvesterId, indexId, method, path, body }) {
+    dataCurlRequest({ harvesterId, indexId, viewMode, method, path, body }) {
       const onedataGraph = this.get('onedataGraph');
 
       const requestData = {
@@ -429,7 +432,7 @@ export default Service.extend(
           entityId: harvesterId,
           aspect: 'gen_curl_query',
           aspectId: indexId,
-          scope: 'auto',
+          scope: viewMode,
         }),
         operation: 'create',
         data: requestData,

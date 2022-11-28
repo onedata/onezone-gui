@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
-import { render, click, fillIn, settled } from '@ember/test-helpers';
+import { render, click, fillIn, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import UploadAtmWorkflowSchemaAction from 'onezone-gui/utils/workflow-actions/upload-atm-workflow-schema-action';
 import { getProperties } from '@ember/object';
-import { getModal } from '../../../helpers/modal';
+import { getModal, isModalOpened } from '../../../helpers/modal';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { promiseArray } from 'onedata-gui-common/utils/ember/promise-array';
 import { resolve, reject } from 'rsvp';
@@ -94,10 +94,9 @@ describe(
 
     it('shows modal on file upload', async function () {
       const filename = 'file.json';
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs`{{global-modal-mounter}}`);
       const dump = generateAtmWorkflowSchemaDump();
       await triggerUploadInputChange(filename, JSON.stringify(dump));
-      await settled();
 
       expect(getModal()).to.have.class('apply-atm-workflow-schema-dump-modal');
       expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
@@ -105,12 +104,10 @@ describe(
     });
 
     it('allows to reupload another file', async function () {
-      await render(hbs `{{global-modal-mounter}}`);
+      await render(hbs`{{global-modal-mounter}}`);
       const dump = generateAtmWorkflowSchemaDump();
       await triggerUploadInputChange('file.json', JSON.stringify(dump));
-      await settled();
       await triggerUploadInputChange('file2.json', JSON.stringify(dump));
-      await settled();
 
       expect(getModal().querySelector('.upload-details')).to.contain.text('file2.json');
     });
@@ -119,25 +116,23 @@ describe(
       it(`shows info about invalid uploaded file (missing ${fieldName})`,
         async function () {
           const filename = 'file.json';
-          await render(hbs `{{global-modal-mounter}}`);
+          await render(hbs`{{global-modal-mounter}}`);
 
           const dump = generateAtmWorkflowSchemaDump();
           delete dump[fieldName];
           await triggerUploadInputChange(filename, JSON.stringify(dump));
-          await settled();
 
           expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
           expect(getModal().querySelector('.dump-details .error')).to.exist;
         });
     });
 
-    it('shows info about invalid uploaded file (non-json conten)',
+    it('shows info about invalid uploaded file (non-json content)',
       async function () {
         const filename = 'file.json';
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs`{{global-modal-mounter}}`);
 
         await triggerUploadInputChange(filename, 'random content');
-        await settled();
 
         expect(getModal().querySelector('.upload-details')).to.contain.text(filename);
         expect(getModal().querySelector('.dump-details .error')).to.exist;
@@ -152,10 +147,9 @@ describe(
           'success'
         );
         const dump = generateAtmWorkflowSchemaDump();
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs`{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
-        await settled();
         await click('.submit-btn');
 
         expect(mergeStub).to.be.calledOnce.and.to.be.calledWith('wf1id', dump);
@@ -174,10 +168,9 @@ describe(
           'success'
         );
         const dump = generateAtmWorkflowSchemaDump();
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs`{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
-        await settled();
         await click('.option-create');
         await fillIn('.newWorkflowName-field .form-control', 'abcd');
         await click('.submit-btn');
@@ -201,10 +194,9 @@ describe(
           'backendError'
         );
         const dump = generateAtmWorkflowSchemaDump();
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs`{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
-        await settled();
         await click('.submit-btn');
 
         expect(failureNotifySpy).to.be.calledWith(
@@ -224,10 +216,9 @@ describe(
           'backendError'
         );
         const dump = generateAtmWorkflowSchemaDump();
-        await render(hbs `{{global-modal-mounter}}`);
+        await render(hbs`{{global-modal-mounter}}`);
 
         await triggerUploadInputChange('file.json', JSON.stringify(dump));
-        await settled();
         await click('.option-create');
         await click('.submit-btn');
 
@@ -241,8 +232,10 @@ describe(
 );
 
 export async function triggerUploadInputChange(filename, fileContent) {
+  const uploadInput = document.querySelector('.upload-atm-workflow-schema-action-input');
   await triggerFileInputChange(
-    document.querySelector('.upload-atm-workflow-schema-action-input'),
+    uploadInput,
     [{ name: filename, content: fileContent, mimeType: 'application/json' }]
   );
+  await waitUntil(() => !uploadInput.matches('.loading-file') && isModalOpened());
 }
