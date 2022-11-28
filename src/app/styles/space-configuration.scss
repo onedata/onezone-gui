@@ -1,0 +1,12 @@
+.space-configuration {
+  .form-group {
+    display: flex;
+  }
+  .space-tags.one-inline-editor.editor {
+    flex-grow: 1;
+  }
+  .form-component .control-label {
+    width: 13em;
+    text-align: left;
+  }
+}

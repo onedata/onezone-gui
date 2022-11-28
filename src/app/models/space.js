@@ -40,11 +40,13 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   privilegeManager: service(),
 
   name: attr('string'),
+  organizationName: attr('string'),
   scope: attr('string'),
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
   currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
   advertisedInMarketplace: attr('boolean'),
+  tags: attr('array', { defaultValue: () => [] }),
 
   /**
    * Maps: provider name => capacity in bytes provided for this space

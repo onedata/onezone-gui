@@ -1,0 +1,37 @@
+<form class="form-horizontal form-component">
+  <div class="form-group space-name-form-group">
+    <label class="control-label">{{tt this "spaceName.label"}}:</label>
+    {{one-inline-editor
+      class="space-name"
+      value=space.name
+      onSave=(action "saveValue" "name")
+    }}
+  </div>
+  <div class="form-group organization-name-form-group">
+    <label class="control-label">
+      {{tt this "organizationName.label"}}:
+      {{one-label-tip title=(tt this "organizationName.tip")}}
+    </label>
+    {{one-inline-editor
+      class="organization-name"
+      value=space.organizationName
+      onSave=(action "saveValue" "organizationName")
+    }}
+  </div>
+  <div class="form-group space-tags-form-group">
+    <label class="control-label">
+      {{tt this "spaceTags.label"}}:
+    </label>
+    {{one-inline-editor
+      class="space-tags"
+      editorType="tags"
+      value=spaceTags
+      onSave=(action "saveValue" "tags")
+    }}
+      {{!-- {{tags-input
+        class="space-tags"
+        readonly=true
+        tags=spaceTags
+      }} --}}
+  </div>
+</form>

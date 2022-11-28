@@ -501,6 +501,8 @@ function createSpacesRecords(store) {
         sharedDirectories: 0,
       },
       advertisedInMarketplace: index === 0,
+      // FIXME: test data
+      // tags: index === 0 ? ['hello', 'world'] : [],
     }).save();
   }));
 }

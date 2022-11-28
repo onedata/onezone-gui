@@ -29,6 +29,12 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.contentSpacesConfiguration',
 
+  /**
+   * @virtual
+   * @type {Model.Space}
+   */
+  space: undefined,
+
   // FIXME: move to content spaces marketplace
   // advertiseMySpaceAction: computed(function advertiseMySpaceAction() {
   //   return {
