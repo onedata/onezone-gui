@@ -258,15 +258,22 @@ const DumpLoader = EmberObject.extend({
     input.classList.add('upload-atm-workflow-schema-action-input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', '.json');
-    input.addEventListener('change', () => {
+    input.addEventListener('change', async () => {
       if (!input.files || !input.files.length) {
         return;
       }
+
+      input.disabled = true;
+      input.classList.add('loading-file');
+
       const file = input.files[0];
-      this.fileSelected(file);
+      await this.fileSelected(file);
       // We need to clear input, to allow user to upload the same file again later
       // (which, without clearing the input, would not trigger input change).
       input.value = '';
+
+      input.classList.remove('loading-file');
+      input.disabled = false;
     });
     _body.appendChild(input);
     this.set('uploadInputElement', input);
