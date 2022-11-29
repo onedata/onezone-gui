@@ -31,7 +31,11 @@
           disableToggleIcon=true
           class=(if memberProxy.privilegesProxy.isModified "item-modified-header")
         }}
-          {{#if memberProxy.member.type}}
+          {{#if (eq memberProxy.member.constructor.modelName "user")}}
+            {{user-info-with-icon
+              user=memberProxy.member
+            }}
+          {{else}}
             <span class="item-icon-container">
               {{record-icon
                 class="item-icon"
@@ -46,10 +50,6 @@
               }}
             </span>
             {{record-name record=memberProxy.member}}
-          {{else}}
-            {{user-info-with-icon
-              user=memberProxy.member
-            }}
           {{/if}}
           <div class="right-container">
             {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}

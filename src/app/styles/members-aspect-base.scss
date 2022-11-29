@@ -88,6 +88,10 @@
     .user-info-with-icon {
       padding-left: 5px;
 
+      > .truncated-string {
+        display: inline;
+      }
+
       .user-fullname {
         padding-left: 10px;
       }
