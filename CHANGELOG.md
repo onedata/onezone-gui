@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9312 Removed $.css() usages
 * VFS-9313 Removed ":hidden" and ":visible" jQuery selectors usages
 * VFS-9310 Removed $.parents() usages
 * VFS-10107 Fixed smooth scroll in Chrome

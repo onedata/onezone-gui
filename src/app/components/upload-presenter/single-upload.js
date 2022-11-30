@@ -19,6 +19,7 @@ import { next, later, cancel } from '@ember/runloop';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import notImplementedIgnore from 'onedata-gui-common/utils/not-implemented-ignore';
 import $ from 'jquery';
+import dom from 'onedata-gui-common/utils/dom';
 
 const minimizeAfterFinishDelay = 10000;
 
@@ -252,15 +253,16 @@ export default Component.extend({
             const deltaLeft = targetLeft + target.outerWidth() / 2 -
               uploadLeft - $element.outerWidth() / 2;
             const component = this;
-            $element.css({
-              bottom: -deltaTop,
-              left: deltaLeft,
+            dom.setStyles($element[0], {
+              bottom: `${-deltaTop}px`,
+              left: `${deltaLeft}px`,
               transform: 'scaleX(0)',
-              opacity: 0.2,
-            }).animate({
+              opacity: '0.2',
+            });
+            $element.animate({
               height: 0,
             }, 550, function afterMinimizeAnimation() {
-              $(this).css({ display: 'none' });
+              dom.setStyle(this, 'display', 'none');
               // minimalization state could change in the middle of animation
               if (minimize !== component.get('isMinimized')) {
                 safeExec(component, 'onToggleMinimize');
