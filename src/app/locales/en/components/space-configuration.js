@@ -20,4 +20,9 @@ export default {
   advertised: {
     label: 'Advertise in marketplace',
   },
+  contactEmail: {
+    label: 'Contact e-mail',
+  },
+  save: 'Save',
+  discard: 'Discard changes',
 };

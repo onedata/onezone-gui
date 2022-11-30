@@ -47,6 +47,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   directMembership: attr('boolean', { defaultValue: false }),
   advertisedInMarketplace: attr('boolean'),
   tags: attr('array', { defaultValue: () => [] }),
+  contactEmail: attr('string'),
 
   /**
    * Maps: provider name => capacity in bytes provided for this space

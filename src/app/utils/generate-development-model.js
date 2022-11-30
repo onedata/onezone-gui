@@ -505,6 +505,7 @@ function createSpacesRecords(store) {
       // FIXME: test data
       tags: index === 0 ? ['hello', 'world'] : [],
       description: index === 0 ? exampleMarkdownLong : '',
+      contactEmail: index === 0 ? 'user@example.com' : '',
     }).save();
   }));
 }

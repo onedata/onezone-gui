@@ -29,6 +29,7 @@
   .btn-group.description-editor-mode-selector {
     flex-grow: 0;
     display: flex;
+    padding: $padding-base-vertical * 0.5 $padding-base-horizontal;
     // experimental style for fine-align btn-group with button with icons
     &.flex-aligned {
       button {
@@ -44,9 +45,11 @@
       }
     }
   }
-  .description-editor-mode-selector {
-    display: flex;
+  .description-submit-buttons {
     padding: $padding-base-vertical * 0.5 $padding-base-horizontal;
+    .btn + .btn {
+      margin-left: 0.5em;
+    }
   }
   // FIXME: DRY styles with marketplace item
   .space-description-markdown-container {

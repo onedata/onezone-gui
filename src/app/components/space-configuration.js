@@ -3,7 +3,7 @@
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { isEmpty } from 'ember-awesome-macros';
+import { isEmpty, eq, notEqual } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 /**
@@ -38,6 +38,14 @@ export default Component.extend(I18n, {
    */
   currentDescription: '',
 
+  /**
+   * Previous value of current description before it was set using
+   * `setDescriptionValueFromRecord`.
+   * It is null when
+   * @type {string|null}
+   */
+  preCurrentDescription: null,
+
   //#endregion
 
   /**
@@ -55,6 +63,8 @@ export default Component.extend(I18n, {
       return !this.currentDescription || /^\s*$/.test(this.currentDescription);
     }
   ),
+
+  isDescriptionModified: notEqual('currentDescription', 'preCurrentDescription'),
 
   spaceObserver: observer('space', function spaceObserver() {
     this.setDescriptionValueFromRecord();
@@ -79,7 +89,11 @@ export default Component.extend(I18n, {
   },
 
   setDescriptionValueFromRecord() {
-    this.set('currentDescription', this.space.description);
+    const description = this.space.description;
+    this.setProperties({
+      preCurrentDescription: description,
+      currentDescription: description,
+    });
   },
 
   actions: {
@@ -95,15 +109,28 @@ export default Component.extend(I18n, {
           break;
         }
         case 'advertised': {
-          // FIXME: implement advertised change
-          throw new Error('advertised state change not implemented');
+          // FIXME: stop for confirmation modal
+          // FIXME: this could be RPC in final implementation
+          this.saveSpaceValue('advertisedInMarketplace', value);
+          break;
         }
         case 'description': {
-          await this.saveSpaceValue('description', this.currentDescription);
+          await this.saveSpaceValue('description', value);
           this.setDescriptionValueFromRecord();
           break;
         }
+        case 'contactEmail': {
+          await this.saveSpaceValue('contactEmail', value);
+          break;
+        }
         default:
+          break;
+      }
+    },
+    discardValue(fieldId) {
+      switch (fieldId) {
+        case 'description':
+          this.setDescriptionValueFromRecord();
           break;
       }
     },

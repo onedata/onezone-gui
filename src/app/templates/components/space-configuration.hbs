@@ -58,6 +58,24 @@
         {{/bg.button}}
       </div>
     {{/bs-button-group}}
+    {{#if isDescriptionModified}}
+      <div class="description-submit-buttons">
+        {{#one-button
+          type="warning"
+          size="sm"
+          onClick=(action "discardValue" "description")
+        }}
+          {{tt this "discard"}}
+        {{/one-button}}
+        {{#one-button
+          type="primary"
+          size="sm"
+          onClick=(action "saveValue" "description" currentDescription)
+        }}
+          {{tt this "save"}}
+        {{/one-button}}
+      </div>
+    {{/if}}
     <hr class="description-separator">
   </div>
   <div class={{concat-classes
@@ -121,4 +139,16 @@
       lockHint=undefined
     }}
   </div>
+  {{#if isAdvertised}}
+    <div class="form-group contact-email-form-group">
+      <label class="control-label">
+        {{tt this "contactEmail.label"}}:
+      </label>
+      {{one-inline-editor
+        class="concact-email"
+        value=space.contactEmail
+        onSave=(action "saveValue" "contactEmail")
+      }}
+    </div>
+  {{/if}}
 </div>
