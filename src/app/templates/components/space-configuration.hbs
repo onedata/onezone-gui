@@ -64,17 +64,17 @@
     "form-group description-content-form-group"
     (if (eq descriptionEditorMode "edit") "fill-flex-using-column")
     (if
-      (and (eq descriptionEditorMode "view") (not space.description))
+      (and (eq descriptionEditorMode "view") (not currentDescription))
       "description-empty"
     )
   }}
   >
     {{#if (eq descriptionEditorMode "view")}}
       {{#perfect-scrollbar-element class="space-description-markdown-container"}}
-        {{#if space.description}}
+        {{#if currentDescription}}
           {{one-markdown-to-html
             class="markdown-view space-description-markdown-view"
-            markdown=space.description
+            markdown=currentDescription
           }}
         {{else}}
           <div
@@ -90,7 +90,7 @@
       {{ember-ace
         class="fill-flex-using-column"
         editorClass="fill-flex-using-column"
-        value=space.description
+        value=currentDescription
         mode="ace/mode/markdown"
         theme="ace/theme/textmate"
         tabSize=2
@@ -99,6 +99,7 @@
         showLineNumbers=true
         showPrintMargin=false
         readOnly=false
+        update=(action "currentDescriptionChanged")
       }}
     {{/if}}
   </div>

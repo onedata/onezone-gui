@@ -1,7 +1,7 @@
 // FIXME: jsdoc
 
 import Component from '@ember/component';
-import { get, set, computed } from '@ember/object';
+import { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
@@ -30,6 +30,13 @@ export default Component.extend(I18n, {
    */
   descriptionEditorMode: 'view',
 
+  /**
+   * Current value of description presented in view (in rendered form) or editor (raw
+   * markdown source).
+   * @type {string}
+   */
+  currentDescription: '',
+
   //#endregion
 
   /**
@@ -40,6 +47,15 @@ export default Component.extend(I18n, {
   }),
 
   isAdvertised: reads('space.advertisedInMarketplace'),
+
+  spaceObserver: observer('space.description', function spaceObserver() {
+    this.setDescriptionValueFromRecord();
+  }),
+
+  init() {
+    this._super(...arguments);
+    this.spaceObserver();
+  },
 
   /**
    * @param {string} propertyName
@@ -52,6 +68,10 @@ export default Component.extend(I18n, {
     }
     set(this.space, propertyName, value);
     await this.space.save();
+  },
+
+  setDescriptionValueFromRecord() {
+    this.set('currentDescription', this.space.description);
   },
 
   actions: {
@@ -73,6 +93,9 @@ export default Component.extend(I18n, {
         default:
           break;
       }
+    },
+    currentDescriptionChanged(value) {
+      this.set('currentDescription', value);
     },
   },
 });
