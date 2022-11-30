@@ -3,6 +3,7 @@
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { isEmpty } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 
 /**
@@ -48,7 +49,14 @@ export default Component.extend(I18n, {
 
   isAdvertised: reads('space.advertisedInMarketplace'),
 
-  spaceObserver: observer('space.description', function spaceObserver() {
+  isCurrentDescriptionEmpty: computed(
+    'currentDescription',
+    function isCurrentDescriptionEmpty() {
+      return !this.currentDescription || /^\s*$/.test(this.currentDescription);
+    }
+  ),
+
+  spaceObserver: observer('space', function spaceObserver() {
     this.setDescriptionValueFromRecord();
   }),
 
@@ -89,6 +97,11 @@ export default Component.extend(I18n, {
         case 'advertised': {
           // FIXME: implement advertised change
           throw new Error('advertised state change not implemented');
+        }
+        case 'description': {
+          await this.saveSpaceValue('description', this.currentDescription);
+          this.setDescriptionValueFromRecord();
+          break;
         }
         default:
           break;

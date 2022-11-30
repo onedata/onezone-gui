@@ -64,14 +64,16 @@
     "form-group description-content-form-group"
     (if (eq descriptionEditorMode "edit") "fill-flex-using-column")
     (if
-      (and (eq descriptionEditorMode "view") (not currentDescription))
+      (and (eq descriptionEditorMode "view") isCurrentDescriptionEmpty)
       "description-empty"
     )
   }}
   >
     {{#if (eq descriptionEditorMode "view")}}
-      {{#perfect-scrollbar-element class="space-description-markdown-container"}}
-        {{#if currentDescription}}
+      {{#perfect-scrollbar-element
+        class="space-description-markdown-container"
+      }}
+        {{#unless isCurrentDescriptionEmpty}}
           {{one-markdown-to-html
             class="markdown-view space-description-markdown-view"
             markdown=currentDescription
@@ -84,11 +86,15 @@
             <span class="description-empty-text">{{tt this "description.emptyText"}}</span>
             {{one-icon icon="rename" class="description-empty-icon"}}
           </div>
-        {{/if}}
+        {{/unless}}
       {{/perfect-scrollbar-element}}
-    {{else}}
+    {{/if}}
+    {{#render-later triggerRender=(eq descriptionEditorMode "edit")}}
       {{ember-ace
-        class="fill-flex-using-column"
+        class=(concat-classes
+          "fill-flex-using-column"
+          (unless (eq descriptionEditorMode "edit") "hidden")
+        )
         editorClass="fill-flex-using-column"
         value=currentDescription
         mode="ace/mode/markdown"
@@ -101,7 +107,7 @@
         readOnly=false
         update=(action "currentDescriptionChanged")
       }}
-    {{/if}}
+    {{/render-later}}
   </div>
   <div class="form-group advertised-form-group">
     <label class="control-label">
