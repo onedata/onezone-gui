@@ -1,4 +1,4 @@
-<form class="form-horizontal form-component">
+<div class="form-horizontal space-configuration-form fill-flex-using-column">
   <div class="form-group space-name-form-group">
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
     {{one-inline-editor
@@ -28,10 +28,90 @@
       value=spaceTags
       onSave=(action "saveValue" "tags")
     }}
-      {{!-- {{tags-input
-        class="space-tags"
-        readonly=true
-        tags=spaceTags
-      }} --}}
   </div>
-</form>
+  <div class="form-group description-form-group">
+    <label class="control-label">
+      {{tt this "description.label"}}:
+    </label>
+    {{#bs-button-group
+      value=descriptionEditorMode
+      class="description-editor-mode-selector flex-aligned"
+      type="radio"
+      onChange=(action (mut descriptionEditorMode)) as |bg|
+    }}
+      <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-description-view" value="view"}}
+          {{one-icon
+            class="tab-icon"
+            icon="view"
+          }}
+          <div class="tab-name">{{tt this "description.radio.view"}}</div>
+        {{/bg.button}}
+      </div>
+      <div class="btn-group" role="group">
+        {{#bg.button type="default" class="btn-sm btn-description-edit" value="edit"}}
+          {{one-icon
+            class="tab-icon"
+            icon="markdown"
+          }}
+          <div class="tab-name">{{tt this "description.radio.edit"}}</div>
+        {{/bg.button}}
+      </div>
+    {{/bs-button-group}}
+    <hr class="description-separator">
+  </div>
+  <div class={{concat-classes
+    "form-group description-content-form-group"
+    (if (eq descriptionEditorMode "edit") "fill-flex-using-column")
+    (if
+      (and (eq descriptionEditorMode "view") (not space.description))
+      "description-empty"
+    )
+  }}
+  >
+    {{#if (eq descriptionEditorMode "view")}}
+      {{#perfect-scrollbar-element class="space-description-markdown-container"}}
+        {{#if space.description}}
+          {{one-markdown-to-html
+            class="markdown-view space-description-markdown-view"
+            markdown=space.description
+          }}
+        {{else}}
+          <div
+            class="description-empty-message"
+            onclick={{action (mut descriptionEditorMode) "edit"}}
+          >
+            <span class="description-empty-text">{{tt this "description.emptyText"}}</span>
+            {{one-icon icon="rename" class="description-empty-icon"}}
+          </div>
+        {{/if}}
+      {{/perfect-scrollbar-element}}
+    {{else}}
+      {{ember-ace
+        class="fill-flex-using-column"
+        editorClass="fill-flex-using-column"
+        value=space.description
+        mode="ace/mode/markdown"
+        theme="ace/theme/textmate"
+        tabSize=2
+        useWrapMode=true
+        highlightActiveLine=true
+        showLineNumbers=true
+        showPrintMargin=false
+        readOnly=false
+      }}
+    {{/if}}
+  </div>
+  <div class="form-group advertised-form-group">
+    <label class="control-label">
+      {{tt this "advertised.label"}}:
+    </label>
+    {{one-way-toggle
+      class="form-control"
+      isReadOnly=false
+      checked=isAdvertised
+      update=(action "saveValue" "advertised")
+      lockHint=undefined
+    }}
+  </div>
+</div>

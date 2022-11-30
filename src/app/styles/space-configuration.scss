@@ -1,12 +1,93 @@
 .space-configuration {
-  .form-group {
+  .space-configuration-form {
+    // margins specially adjusted to fit spacing between form labels
+    padding-top: 20px;
+    padding-bottom: 20px;
     display: flex;
+    flex-direction: column;
+    .control-label {
+      width: 13em;
+      text-align: left;
+    }
+    .one-way-toggle {
+      padding: $padding-base-vertical $padding-base-horizontal;
+      padding-bottom: 0;
+    }
+    .form-group {
+      display: flex;
+    }
+    .advertised-form-group {
+      align-items: center;
+      .control-label {
+        width: auto;
+      }
+    }
   }
   .space-tags.one-inline-editor.editor {
     flex-grow: 1;
   }
-  .form-component .control-label {
-    width: 13em;
-    text-align: left;
+  .btn-group.description-editor-mode-selector {
+    flex-grow: 0;
+    display: flex;
+    // experimental style for fine-align btn-group with button with icons
+    &.flex-aligned {
+      button {
+        display: flex;
+        align-items: center;
+        .tab-icon, .tab-name {
+          line-height: 1.2;
+        }
+        .tab-icon.one-icon {
+          top: auto;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+  .description-editor-mode-selector {
+    display: flex;
+    padding: $padding-base-vertical * 0.5 $padding-base-horizontal;
+  }
+  // FIXME: DRY styles with marketplace item
+  .space-description-markdown-container {
+    width: 100%;
+    padding: 1em;
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: $main-tabbed-content-background;
+    border: 1px solid;
+    border-color: $main-border-color;
+    border-radius: $border-radius-base;
+    .space-description-markdown-view {
+      margin-top: 0;
+    }
+  }
+  .description-form-group {
+    margin-bottom: 10px;
+  }
+  .description-content-form-group {
+    min-height: 10em;
+    &.description-empty {
+      min-height: auto;
+    }
+    .description-empty-message {
+      display: inline-flex;
+      align-items: flex-end;
+      cursor: pointer;
+      color: $main-text-color-disabled;
+      .description-empty-icon {
+        font-size: 170%;
+        margin-left: 1em;
+      }
+      &:hover {
+        .description-empty-icon {
+          color: $color-one-success;
+        }
+      }
+    }
+  }
+  hr.description-separator {
+    margin-left: 1em;
+    flex-grow: 1;
   }
 }

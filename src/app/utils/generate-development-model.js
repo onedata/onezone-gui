@@ -32,6 +32,7 @@ import {
   generateSpaceEntityId,
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
+import { exampleMarkdownLong } from 'onezone-gui/components/content-spaces-marketplace';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -502,7 +503,8 @@ function createSpacesRecords(store) {
       },
       advertisedInMarketplace: index === 0,
       // FIXME: test data
-      // tags: index === 0 ? ['hello', 'world'] : [],
+      tags: index === 0 ? ['hello', 'world'] : [],
+      description: index === 0 ? exampleMarkdownLong : '',
     }).save();
   }));
 }

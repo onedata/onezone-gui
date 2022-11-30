@@ -9,4 +9,15 @@ export default {
   spaceTags: {
     label: 'Tags',
   },
+  description: {
+    label: 'Description',
+    radio: {
+      view: 'Preview',
+      edit: 'Editor',
+    },
+    emptyText: 'Not set. Click here to edit...',
+  },
+  advertised: {
+    label: 'Advertise in marketplace',
+  },
 };
