@@ -86,11 +86,13 @@
 
   .header-content-container {
     .user-info-with-icon {
-      padding-left: 5px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 9px;
+      padding-right: 210px;
+      width: 100%;
 
-      > .truncated-string {
-        display: inline;
-      }
 
       .user-fullname {
         padding-left: 10px;
