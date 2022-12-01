@@ -9,6 +9,7 @@ import computedT from 'onedata-gui-common/utils/computed-t';
 import { Promise } from 'rsvp';
 import { validator, buildValidations } from 'ember-cp-validations';
 import { inject as service } from '@ember/service';
+import _ from 'lodash';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -72,6 +73,8 @@ export default Component.extend(validations, I18n, {
    */
   preCurrentDescription: null,
 
+  blankInlineEditors: undefined,
+
   //#endregion
 
   /**
@@ -114,6 +117,12 @@ export default Component.extend(validations, I18n, {
     raw('')
   ),
 
+  blankInlineErrors: conditional(
+    'isAdvertised',
+    'blankInlineEditors',
+    raw(Object.freeze({}))
+  ),
+
   spaceObserver: observer('space', function spaceObserver() {
     this.setDescriptionValueFromRecord();
   }),
@@ -121,6 +130,7 @@ export default Component.extend(validations, I18n, {
   init() {
     this._super(...arguments);
     this.spaceObserver();
+    this.set('blankInlineEditors', {});
   },
 
   /**
@@ -217,6 +227,19 @@ export default Component.extend(validations, I18n, {
     },
     currentDescriptionChanged(value) {
       this.set('currentDescription', value);
+    },
+    inlineEditorChange(fieldId, value) {
+      if (_.isEmpty(value)) {
+        this.set('blankInlineEditors', {
+          ...this.blankInlineEditors,
+          [fieldId]: true,
+        });
+      } else if (this.blankInlineEditors[fieldId]) {
+        this.set('blankInlineEditors', {
+          ...this.blankInlineEditors,
+          [fieldId]: false,
+        });
+      }
     },
   },
 });

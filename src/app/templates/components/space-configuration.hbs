@@ -1,13 +1,23 @@
+{{log blankInlineEditors}}
 <div class="form-horizontal space-configuration-form fill-flex-using-column">
-  <div class="form-group space-name-form-group">
+  <div class={{concat-classes
+    "form-group space-name-form-group"
+    (if blankInlineErrors.name "has-error")
+  }}>
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
     {{one-inline-editor
       class="space-name"
       value=spaceName
       onSave=(action "saveValue" "name")
+      onInputValueChanged=(action "inlineEditorChange" "name")
+      saveButtonDisabled=blankInlineEditors.name
+      saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
     }}
   </div>
-  <div class="form-group organization-name-form-group">
+  <div class={{concat-classes
+    "form-group organization-name-form-group"
+    (if blankInlineErrors.organizationName "has-error")
+  }}>
     <label class="control-label">
       {{tt this "organizationName.label"}}:
       {{one-label-tip title=(tt this "organizationName.tip")}}
@@ -15,6 +25,12 @@
     {{one-inline-editor
       class="organization-name"
       value=organizationName
+      onInputValueChanged=(action "inlineEditorChange" "organizationName")
+      saveButtonDisabled=blankInlineErrors.organizationName
+      saveButtonTip=(if
+        blankInlineErrors.organizationName
+        (tt this "fieldCannotBeEmptyWhenAdvertising")
+      )
       onSave=(action "saveValue" "organizationName")
     }}
   </div>

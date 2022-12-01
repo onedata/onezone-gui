@@ -30,4 +30,6 @@ export default {
   },
   save: 'Save',
   discard: 'Discard changes',
+  fieldCannotBeEmptyWhenAdvertising: 'This field cannot be blank when space is advertised in marketplace',
+  fieldCannotBeEmpty: 'This field cannot be blank',
 };
