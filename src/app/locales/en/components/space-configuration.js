@@ -19,6 +19,10 @@ export default {
   },
   advertised: {
     label: 'Advertise in marketplace',
+    lockHint: {
+      // FIXME: consult i18n
+      requiredFieldsEmpty: 'Advertising space in marketplace requires organization name, tags and description to be set.',
+    },
   },
   contactEmail: {
     label: 'Contact e-mail',

@@ -3,8 +3,9 @@
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { isEmpty, eq, notEqual } from 'ember-awesome-macros';
+import { notEqual, not, isEmpty, and, or, bool, conditional, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -55,6 +56,12 @@ export default Component.extend(I18n, {
     return get(this.space ?? {}, 'tags')?.map(tag => ({ label: tag }));
   }),
 
+  spaceName: reads('space.name'),
+
+  spaceDescription: reads('space.description'),
+
+  organizationName: reads('space.organizationName'),
+
   isAdvertised: reads('space.advertisedInMarketplace'),
 
   isCurrentDescriptionEmpty: computed(
@@ -65,6 +72,20 @@ export default Component.extend(I18n, {
   ),
 
   isDescriptionModified: notEqual('currentDescription', 'preCurrentDescription'),
+
+  isAdvertisedToggleDisabled: bool('advertisedToggleLockHint'),
+
+  areAdvertiseRequirementsMet: or(
+    isEmpty('organizationName'),
+    isEmpty('spaceTags'),
+    isEmpty('spaceDescription'),
+  ),
+
+  advertisedToggleLockHint: conditional(
+    and(not('isAdvertised'), 'areAdvertiseRequirementsMet'),
+    computedT('advertised.lockHint.requiredFieldsEmpty'),
+    raw('')
+  ),
 
   spaceObserver: observer('space', function spaceObserver() {
     this.setDescriptionValueFromRecord();
@@ -89,7 +110,7 @@ export default Component.extend(I18n, {
   },
 
   setDescriptionValueFromRecord() {
-    const description = this.space.description;
+    const description = this.spaceDescription;
     this.setProperties({
       preCurrentDescription: description,
       currentDescription: description,

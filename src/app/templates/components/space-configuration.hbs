@@ -3,7 +3,7 @@
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
     {{one-inline-editor
       class="space-name"
-      value=space.name
+      value=spaceName
       onSave=(action "saveValue" "name")
     }}
   </div>
@@ -14,7 +14,7 @@
     </label>
     {{one-inline-editor
       class="organization-name"
-      value=space.organizationName
+      value=organizationName
       onSave=(action "saveValue" "organizationName")
     }}
   </div>
@@ -132,11 +132,11 @@
       {{tt this "advertised.label"}}:
     </label>
     {{one-way-toggle
-      class="form-control"
-      isReadOnly=false
+      class="form-control advertised-toggle"
+      isReadOnly=isAdvertisedToggleDisabled
       checked=isAdvertised
       update=(action "saveValue" "advertised")
-      lockHint=undefined
+      lockHint=advertisedToggleLockHint
     }}
   </div>
   {{#if isAdvertised}}

@@ -501,11 +501,19 @@ function createSpacesRecords(store) {
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
-      advertisedInMarketplace: index === 0,
-      // FIXME: test data
-      tags: index === 0 ? ['hello', 'world'] : [],
-      description: index === 0 ? exampleMarkdownLong : '',
-      contactEmail: index === 0 ? 'user@example.com' : '',
+      // FIXME: test data 2
+      ...(index !== 1 ? {} : {
+        advertisedInMarketplace: true,
+        tags: ['hello', 'world'],
+        description: exampleMarkdownLong,
+        contactEmail: 'user@example.com',
+      }),
+
+      // FIXME: test data 2
+      // advertisedInMarketplace: index === 0,
+      // tags: index === 0 ? ['hello', 'world'] : [],
+      // description: index === 0 ? exampleMarkdownLong : '',
+      // contactEmail: index === 0 ? 'user@example.com' : '',
     }).save();
   }));
 }

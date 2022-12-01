@@ -37,44 +37,6 @@ describe('Integration | Component | content-spaces-configuration', function () {
     expect(helper.element.querySelector('.space-tags-form-group').textContent)
       .to.match(/Tags:\s+hello\s+world\s+foo\s+\s+bar/);
   });
-
-  it('allows space name edition and save', async function () {
-    const helper = new Helper(this);
-    await helper.initSpace({
-      name: 'Hello world',
-    });
-
-    await helper.render();
-    await click(helper.spaceNameEditor.querySelector('.one-label'));
-    await fillIn(helper.spaceNameEditor.querySelector('input'), 'Foo bar');
-    await click(helper.spaceNameEditor.querySelector('.save-icon'));
-
-    expect(helper.spaceNameEditor).to.contain.text('Foo bar');
-    expect(get(helper.space, 'name')).to.equal('Foo bar');
-  });
-
-  it('allows organization name edition and save', async function () {
-    const helper = new Helper(this);
-    await helper.initSpace({
-      organizationName: 'The Corporation',
-    });
-
-    await helper.render();
-    await click(helper.organizationNameEditor.querySelector('.one-label'));
-    await fillIn(
-      helper.organizationNameEditor.querySelector('input'),
-      'The Software House'
-    );
-    await click(helper.organizationNameEditor.querySelector('.save-icon'));
-
-    expect(helper.organizationNameEditor).to.contain.text('The Software House');
-    expect(get(helper.space, 'organizationName')).to.equal('The Software House');
-  });
-
-  // FIXME: display organization name with tooltip "display name of the organization that manages the space"
-  // FIXME: it shows error on name save failure
-  // FIXME: jakiś napis, jak nie ma organization name (not set?)
-  // FIXME: enter w formularzu czasami powoduje przeładowanie strony
 });
 
 class Helper {
@@ -97,15 +59,6 @@ class Helper {
   }
   get header() {
     return this.element.querySelector('.header-row');
-  }
-  get spaceConfiguration() {
-    return this.element.querySelector('.space-configuration');
-  }
-  get spaceNameEditor() {
-    return this.spaceConfiguration.querySelector('.space-name');
-  }
-  get organizationNameEditor() {
-    return this.spaceConfiguration.querySelector('.organization-name');
   }
 
   async render() {
