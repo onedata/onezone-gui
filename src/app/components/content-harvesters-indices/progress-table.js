@@ -25,7 +25,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import WindowResizeHandler from 'onedata-gui-common/mixins/components/window-resize-handler';
 import moment from 'moment';
 import { scheduleOnce, next } from '@ember/runloop';
-import $ from 'jquery';
+import dom from 'onedata-gui-common/utils/dom';
 
 const initialEdgeScrollState = Object.freeze({
   top: true,
@@ -403,13 +403,8 @@ export default Component.extend(I18n, WindowResizeHandler, {
   },
 
   recalculateChanges() {
-    const {
-      progressData,
-      currentSeqSum,
-      element,
-    } = this.getProperties('progressData', 'currentSeqSum', 'element');
     let sum = 0;
-    progressData.forEach(({ progress }) =>
+    this.progressData.forEach(({ progress }) =>
       progress
       .filter(({ currentSeq }) => typeof currentSeq === 'number')
       .mapBy('currentSeq')
@@ -419,65 +414,69 @@ export default Component.extend(I18n, WindowResizeHandler, {
     );
     this.setProperties({
       currentSeqSum: sum,
-      previousSeqSum: currentSeqSum,
+      previousSeqSum: this.currentSeqSum,
     });
-    if (this.get('element')) {
-      const $element = $(element);
-      $element.find('.activity-indicator').removeClass('pulse-mint');
+
+    const activityIndicator = this.element?.querySelector('.activity-indicator');
+    if (activityIndicator) {
+      activityIndicator.classList.remove('pulse-mint');
       next(() => {
-        safeExec(this, () => $element.find('.activity-indicator').addClass('pulse-mint'));
+        safeExec(this, () => activityIndicator.classList.add('pulse-mint'));
       });
     }
   },
 
   recalculateTableLayout() {
-    const {
-      element,
-      useTableLayout,
-    } = this.getProperties('element', 'useTableLayout');
-
-    if (!element || !useTableLayout) {
+    if (!this.element || !this.useTableLayout) {
       this.set('edgeScrollState', initialEdgeScrollState);
       return;
     }
-    const $element = $(element);
+    const ps = this.element.querySelector('.ps');
+    if (!ps) {
+      return;
+    }
 
-    const $ps = $element.find('.ps');
-    const scrollLeftOffset = $ps.scrollLeft();
-    const scrollTopOffset = $ps.scrollTop();
-    const $constantRowLabels = $element.find('.row-label.constant-row-label');
-    const $floatingRowLabels = $element.find('.row-label.floating-row-label');
-    const $constantColumnLabels = $element.find('.constant-column-labels .table-cell');
-    const $floatingColumnLabelsRow = $element.find('.floating-column-labels');
-    const $floatingColumnLabels = $floatingColumnLabelsRow.find('.table-cell');
-    const $rightShadowOverlay = $element.find('.right-shadow-overlay');
+    const scrollLeftOffset = ps.scrollLeft;
+    const scrollTopOffset = ps.scrollTop;
+    const constantRowLabels = [...this.element.querySelectorAll('.row-label.constant-row-label')];
+    const floatingRowLabels = [...this.element.querySelectorAll('.row-label.floating-row-label')];
+    const constantColumnLabels = [...this.element.querySelectorAll('.constant-column-labels .table-cell')];
+    const floatingColumnLabelsRow =
+      this.element.querySelector('.floating-column-labels');
+    const floatingColumnLabels = [...floatingColumnLabelsRow.querySelectorAll('.table-cell')];
+    const rightShadowOverlay =
+      this.element.querySelector('.right-shadow-overlay');
 
-    $constantRowLabels.each(function each(index) {
-      $floatingRowLabels.eq(index).css({
-        height: `${parseFloat($(this).css('height'))}px`,
-      });
+    constantRowLabels.forEach((constantLabel, idx) => {
+      dom.setStyle(
+        floatingRowLabels[idx],
+        'height',
+        dom.getStyle(constantLabel, 'height')
+      );
     });
-    $floatingRowLabels.css({
+    dom.setStyles(floatingRowLabels, {
       left: `${scrollLeftOffset}px`,
-      width: $constantRowLabels.css('width'),
+      width: dom.getStyle(constantRowLabels[0], 'width'),
       visibility: 'visible',
     });
 
-    $constantColumnLabels.each(function each(index) {
-      $floatingColumnLabels.eq(index).css({
-        width: `${parseFloat($(this).css('width'))}px`,
-      });
+    constantColumnLabels.forEach((constantLabel, idx) => {
+      dom.setStyle(
+        floatingColumnLabels[idx],
+        'width',
+        dom.getStyle(constantLabel, 'width')
+      );
     });
-    $floatingColumnLabels.css({
-      height: $constantColumnLabels.css('height'),
+    dom.setStyles(floatingColumnLabels, {
+      height: dom.getStyle(constantColumnLabels[0], 'height'),
       visibility: 'visible',
     });
-    $floatingColumnLabelsRow.css({
-      top: `${scrollTopOffset}px`,
-    });
-    $rightShadowOverlay.css({
-      height: $constantColumnLabels.css('height'),
-    });
+    dom.setStyle(floatingColumnLabelsRow, 'top', `${scrollTopOffset}px`);
+    dom.setStyle(
+      rightShadowOverlay,
+      'height',
+      dom.getStyle(constantColumnLabels[0], 'height')
+    );
   },
 
   actions: {
