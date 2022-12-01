@@ -6,13 +6,38 @@ import { reads } from '@ember/object/computed';
 import { notEqual, not, isEmpty, and, or, bool, conditional, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
+import { Promise } from 'rsvp';
+import { validator, buildValidations } from 'ember-cp-validations';
+import { inject as service } from '@ember/service';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
  */
 
-export default Component.extend(I18n, {
+/**
+ * Taken from: http: //emailregex.com/
+ * @type {RegExp}
+ */
+const emailRegex =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+// FIXME: duplicated code with enable marketplace advertisement modal
+const validations = buildValidations({
+  contactEmail: [
+    validator('format', {
+      regex: emailRegex,
+      allowBlank: false,
+      message() {
+        return String(this.model.t('mustBeValidEmail'));
+      },
+    }),
+  ],
+});
+
+export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
+
+  modalManager: service(),
 
   /**
    * @override
@@ -63,6 +88,8 @@ export default Component.extend(I18n, {
   organizationName: reads('space.organizationName'),
 
   isAdvertised: reads('space.advertisedInMarketplace'),
+
+  contactEmail: reads('space.contactEmail'),
 
   isCurrentDescriptionEmpty: computed(
     'currentDescription',
@@ -117,43 +144,76 @@ export default Component.extend(I18n, {
     });
   },
 
+  async saveValue(fieldId, value) {
+    switch (fieldId) {
+      case 'name':
+      case 'organizationName':
+        await this.saveSpaceValue(fieldId, value);
+        break;
+      case 'tags': {
+        const tagsRawValue = value?.map(({ label }) => label) || [];
+        await this.saveSpaceValue('tags', tagsRawValue);
+        break;
+      }
+      case 'advertised': {
+        // FIXME: stop for confirmation modal
+        // FIXME: this could be RPC in final implementation
+        if (value) {
+          await this.confirmAdvertisementEnable();
+        } else {
+          await this.confirmAdvertisementDisable();
+        }
+        break;
+      }
+      case 'description': {
+        await this.saveSpaceValue('description', value);
+        this.setDescriptionValueFromRecord();
+        break;
+      }
+      case 'contactEmail': {
+        await this.saveSpaceValue('contactEmail', value);
+        break;
+      }
+      default:
+        break;
+    }
+  },
+  discardValue(fieldId) {
+    switch (fieldId) {
+      case 'description':
+        this.setDescriptionValueFromRecord();
+        break;
+    }
+  },
+
+  async confirmAdvertisementEnable() {
+    return new Promise(resolve => {
+      this.modalManager.show('space-configuration/enable-marketplace-advertisement', {
+        space: this.space,
+        onSubmit: (isConfirmed) => {
+          resolve(isConfirmed);
+        },
+      });
+    });
+  },
+
+  async confirmAdvertisementDisable() {
+    return new Promise(resolve => {
+      this.modalManager.show('space-configuration/disable-marketplace-advertisement', {
+        space: this.space,
+        onSubmit: (isConfirmed) => {
+          resolve(isConfirmed);
+        },
+      });
+    });
+  },
+
   actions: {
     async saveValue(fieldId, value) {
-      switch (fieldId) {
-        case 'name':
-        case 'organizationName':
-          await this.saveSpaceValue(fieldId, value);
-          break;
-        case 'tags': {
-          const tagsRawValue = value?.map(({ label }) => label) || [];
-          await this.saveSpaceValue('tags', tagsRawValue);
-          break;
-        }
-        case 'advertised': {
-          // FIXME: stop for confirmation modal
-          // FIXME: this could be RPC in final implementation
-          this.saveSpaceValue('advertisedInMarketplace', value);
-          break;
-        }
-        case 'description': {
-          await this.saveSpaceValue('description', value);
-          this.setDescriptionValueFromRecord();
-          break;
-        }
-        case 'contactEmail': {
-          await this.saveSpaceValue('contactEmail', value);
-          break;
-        }
-        default:
-          break;
-      }
+      return this.saveValue(fieldId, value);
     },
     discardValue(fieldId) {
-      switch (fieldId) {
-        case 'description':
-          this.setDescriptionValueFromRecord();
-          break;
-      }
+      return this.discardValue(fieldId);
     },
     currentDescriptionChanged(value) {
       this.set('currentDescription', value);

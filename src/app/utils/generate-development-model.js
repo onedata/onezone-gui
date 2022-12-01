@@ -502,18 +502,19 @@ function createSpacesRecords(store) {
         sharedDirectories: 0,
       },
       // FIXME: test data 2
-      ...(index !== 1 ? {} : {
-        advertisedInMarketplace: true,
-        tags: ['hello', 'world'],
-        description: exampleMarkdownLong,
-        contactEmail: 'user@example.com',
-      }),
+      // ...(index !== 1 ? {} : {
+      //   advertisedInMarketplace: true,
+      //   tags: ['hello', 'world'],
+      //   description: exampleMarkdownLong,
+      //   contactEmail: 'user@example.com',
+      // }),
 
       // FIXME: test data 2
-      // advertisedInMarketplace: index === 0,
-      // tags: index === 0 ? ['hello', 'world'] : [],
-      // description: index === 0 ? exampleMarkdownLong : '',
-      // contactEmail: index === 0 ? 'user@example.com' : '',
+      advertisedInMarketplace: index === 1,
+      organizationName: 'ACK Cyfronet AGH',
+      tags: index === 0 ? ['hello', 'world'] : [],
+      description: index === 0 ? exampleMarkdownLong : '',
+      contactEmail: index === 0 ? 'user@example.com' : '',
     }).save();
   }));
 }

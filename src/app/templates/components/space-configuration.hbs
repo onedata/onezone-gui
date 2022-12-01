@@ -145,10 +145,11 @@
         {{tt this "contactEmail.label"}}:
       </label>
       {{one-inline-editor
-        class="concact-email"
-        value=space.contactEmail
+        class="contact-email"
+        value=contactEmail
         onSave=(action "saveValue" "contactEmail")
       }}
     </div>
+    {{validations.attrs.contactEmail.message}}
   {{/if}}
 </div>

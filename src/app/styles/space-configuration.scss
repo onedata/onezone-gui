@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     .control-label {
-      width: 13em;
+      width: 14em;
       text-align: left;
     }
     .one-way-toggle {
@@ -18,9 +18,10 @@
     }
     .advertised-form-group {
       align-items: center;
-      .control-label {
-        width: auto;
-      }
+      // FIXME: maybe to be flexible
+      // .control-label {
+      //   width: auto;
+      // }
     }
   }
   .space-tags.one-inline-editor.editor {

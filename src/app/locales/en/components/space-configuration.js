@@ -1,4 +1,5 @@
 export default {
+  mustBeValidEmail: 'elo elo',
   organizationName: {
     label: 'Organization name',
     tip: 'Display name of the organization that manages the space',
