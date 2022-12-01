@@ -90,11 +90,6 @@ export default Component.extend(validations, I18n, {
 
   areButtonsDisabled: or('isSubmitting', not('contactEmailField.isValid')),
 
-  init() {
-    this._super(...arguments);
-    window.com = this;
-  },
-
   async enableMarketplaceAdvertisement() {
     this.space.setProperties({
       advertisedInMarketplace: true,

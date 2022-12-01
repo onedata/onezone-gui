@@ -111,6 +111,7 @@ import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
 import apiSamplesModal from './components/modals/api-samples-modal';
 import enableMarketplaceAdvertisementModal from './components/modals/space-configuration/enable-marketplace-advertisement';
+import disableMarketplaceAdvertisementModal from './components/modals/space-configuration/disable-marketplace-advertisement';
 
 import spaceActions from './services/space-actions';
 import groupActions from './services/group-actions';
@@ -183,6 +184,7 @@ const translations = {
       apiSamplesModal,
       spaceConfiguration: {
         enableMarketplaceAdvertisementModal,
+        disableMarketplaceAdvertisementModal,
       },
     },
     errors: {
