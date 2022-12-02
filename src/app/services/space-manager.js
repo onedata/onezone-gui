@@ -8,7 +8,8 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import { get, getProperties } from '@ember/object';
+import EmberObject, { get, getProperties } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -16,10 +17,36 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
+import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
  */
+
+// FIXME: move to separate file - this will be a model in list:
+/**
+ * space.null.marketplace_spaces
+ * ->list: [gri1, gri2]
+ *
+ * gri1: space.id1.marketplace_data
+ */
+const SpaceMarketplaceModel = EmberObject.extend({
+  name: '',
+  organizationName: '',
+  description: '',
+  tags: Object.freeze([]),
+  isOwned: false,
+});
+
+const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
+  space: undefined,
+
+  name: reads('space.name'),
+  organizationName: reads('space.organizationName'),
+  description: reads('space.description'),
+  tags: reads('space.tags'),
+  spaceId: reads('space.entityId'),
+});
 
 export default Service.extend({
   store: service(),
@@ -412,5 +439,42 @@ export default Service.extend({
         error
       );
     }
+  },
+
+  // FIXME: prototype method - this should be live list
+  async getSpacesMarketplaceData() {
+    // const requestGri = gri({
+    //   entityType: 'space',
+    //   entityId: 'null',
+    //   aspect: 'marketplace_spaces',
+    // });
+    const allSpaces = (await this.getSpaces()).get('list').toArray();
+    const advertisedSpaces = allSpaces
+      .filter(space => get(space, 'advertisedInMarketplace'));
+    const ownedSpaces = advertisedSpaces.map(space =>
+      SpaceMarketplaceData.create({
+        space,
+        isOwned: true,
+      })
+    );
+    return [
+      ...ownedSpaces,
+      SpaceMarketplaceModel.create({
+        name: 'Shared space number one',
+        organizationName: 'ACK Cyfronet AGH',
+        tags: ['large', 'experimental', 'scientific'],
+        description: exampleMarkdownLong,
+        isOwned: false,
+        spaceId: 'space-10',
+      }),
+      SpaceMarketplaceModel.create({
+        name: 'Other space',
+        organizationName: 'Uniwersytet Jagielloński',
+        tags: ['small', 'scientific'],
+        description: exampleMarkdownShort,
+        isOwned: false,
+        spaceId: 'space-11',
+      }),
+    ];
   },
 });

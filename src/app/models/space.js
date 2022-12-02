@@ -40,12 +40,14 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   privilegeManager: service(),
 
   name: attr('string'),
-  organizationName: attr('string'),
   scope: attr('string'),
   currentUserEffPrivileges: attr('array', { defaultValue: () => [] }),
   currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
+  // FIXME: prototype fields for marketplace
   advertisedInMarketplace: attr('boolean'),
+  organizationName: attr('string'),
+  description: attr('string'),
   tags: attr('array', { defaultValue: () => [] }),
   contactEmail: attr('string'),
 
