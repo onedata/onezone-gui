@@ -1,46 +1,31 @@
 .provider-info-name {
-  $transition-time: 0.5s;
-  // a hack to set a stacking context to fix issues in Safari/WebKit
-  perspective: 1px;
-  background-color: transparent;
-  .inline-icon-container {
-    width: 25px;
-    transition: transform $transition-time;
-    transform-style: preserve-3d;
-    &.not-animation {
-      transform: rotateY(180deg);
-      vertical-align: top;
-      .oneicon-browser-info.one-icon {
-        opacity: 1;
-      }
+  &.nav-link .flippable-icons .inline-icon-container {
+    .flippable-front {
+      transform: translate(-4px, -6px);
     }
-    &.animation {
-      vertical-align: top;
+
+    .flippable-back {
+      transform: rotateY(180deg) translate(4px, -6px);
+      color: inherit;
     }
   }
-  &:hover {
+  .provider-info-trigger {
+    vertical-align: middle;
+  }
+
+  .flippable-icons {
     .inline-icon-container {
-      &.animation {
-        transform: rotateY(180deg);
-        .oneicon-browser-info.one-icon {
-          opacity: 1;
-        }
-      }
+      width: 18px;
+      height: 18px;
+      margin-left: 5px;
+    }
+
+    .flippable-front {
+      transform: translate(-4px, -15px);
+    }
+
+    .flippable-back {
+      transform: rotateY(180deg) translate(4px, -15px);
     }
   }
-  .oneicon-browser-info.one-icon {
-    transform: rotateY(180deg) translateY(-50%) translateY(1px);
-    color: inherit;
-    opacity: 0;
-    transition: opacity $transition-time;
-  }
-  .oneicon-provider.one-icon {
-    // for Safari <= 15.3
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-}
-.provider-info-trigger {
-  height: 18px;
-  vertical-align: middle;
 }
