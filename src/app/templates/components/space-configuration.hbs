@@ -34,7 +34,10 @@
       onSave=(action "saveValue" "organizationName")
     }}
   </div>
-  <div class="form-group space-tags-form-group">
+  <div class={{concat-classes
+    "form-group space-tags-form-group"
+    (if blankInlineErrors.tags "has-error")
+  }}>
     <label class="control-label">
       {{tt this "spaceTags.label"}}:
     </label>
@@ -42,7 +45,13 @@
       class="space-tags"
       editorType="tags"
       value=spaceTags
+      isSaveDisabled=blankInlineErrors.tags
+      saveButtonTip=(if
+        blankInlineErrors.tags
+        (tt this "fieldCannotBeEmptyWhenAdvertising")
+      )
       onSave=(action "saveValue" "tags")
+      onInputValueChanged=(action "inlineEditorChange" "tags")
     }}
   </div>
   <div class="form-group description-form-group">
