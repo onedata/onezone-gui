@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-10130 Added additional modal when turning on/off dir stats
+* VFS-10046 Added popover with user info in members page
 * VFS-10107 Fixed smooth scroll in Chrome
 * VFS-9596 Added tests for data spec editor
 * VFS-10088 Hidden access token hint in harvester public view
