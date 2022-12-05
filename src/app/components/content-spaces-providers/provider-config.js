@@ -172,35 +172,26 @@ export default Component.extend(I18n, {
       const spaceSupportParametersUpdate = {
         dirStatsServiceEnabled,
       };
-      const translationPrefix = 'modal.' + (dirStatsServiceEnabled ? 'enable' : 'disable');
+      const nextDirStatsEnabledValue = dirStatsServiceEnabled ? 'enabled' : 'disabled';
 
-      return this.modalManager
-        .show('question-modal', {
-          headerIcon: 'sign-warning-rounded',
-          headerText: this.t(`${translationPrefix}.header`),
-          descriptionParagraphs: [{
-            text: this.t(`${translationPrefix}.question`),
-          }, {
-            text: this.t(`${translationPrefix}.description`),
-          }],
-          yesButtonText: this.t(`${translationPrefix}.buttonConfirm`),
-          yesButtonType: 'danger',
-          onSubmit: async () => {
-            try {
-              await spaceManager.modifySupportParameters(
-                get(space, 'entityId'),
-                get(provider, 'entityId'),
-                spaceSupportParametersUpdate
-              );
-            } catch (error) {
-              globalNotify.backendError(
-                this.t('dirStatsService.configuringDirStats'),
-                error
-              );
-              throw error;
-            }
-          },
-        }).hiddenPromise;
+      return this.modalManager.show('toggle-dir-stats-question-modal', {
+        nextDirStatsEnabledValue,
+        onSubmit: async () => {
+          try {
+            await spaceManager.modifySupportParameters(
+              get(space, 'entityId'),
+              get(provider, 'entityId'),
+              spaceSupportParametersUpdate
+            );
+          } catch (error) {
+            globalNotify.backendError(
+              this.t('dirStatsService.configuringDirStats'),
+              error
+            );
+            throw error;
+          }
+        },
+      });
 
     },
 
