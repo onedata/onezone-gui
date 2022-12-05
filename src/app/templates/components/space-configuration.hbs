@@ -10,7 +10,7 @@
       value=spaceName
       onSave=(action "saveValue" "name")
       onInputValueChanged=(action "inlineEditorChange" "name")
-      saveButtonDisabled=blankInlineEditors.name
+      isSaveDisabled=blankInlineEditors.name
       saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
     }}
   </div>
@@ -26,7 +26,7 @@
       class="organization-name"
       value=organizationName
       onInputValueChanged=(action "inlineEditorChange" "organizationName")
-      saveButtonDisabled=blankInlineErrors.organizationName
+      isSaveDisabled=blankInlineErrors.organizationName
       saveButtonTip=(if
         blankInlineErrors.organizationName
         (tt this "fieldCannotBeEmptyWhenAdvertising")
