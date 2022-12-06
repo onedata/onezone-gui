@@ -171,13 +171,22 @@
     }}
   </div>
   {{#if isAdvertised}}
-    <div class="form-group contact-email-form-group">
+    <div class={{concat-classes
+    "form-group contact-email-form-group"
+    (if blankInlineEditors.contactEmail "has-error")
+  }}>
       <label class="control-label">
         {{tt this "contactEmail.label"}}:
       </label>
       {{one-inline-editor
         class="contact-email"
         value=contactEmail
+        onInputValueChanged=(action "inlineEditorChange" "contactEmail")
+        isSaveDisabled=blankInlineErrors.contactEmail
+        saveButtonTip=(if
+          blankInlineErrors.contactEmail
+          (tt this "fieldCannotBeEmptyWhenAdvertising")
+        )
         onSave=(action "saveValue" "contactEmail")
       }}
     </div>
