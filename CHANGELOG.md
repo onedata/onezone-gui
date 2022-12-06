@@ -9,6 +9,7 @@ CHANGELOG
 * VFS-9312 Removed $.css() usages
 * VFS-9313 Removed ":hidden" and ":visible" jQuery selectors usages
 * VFS-9310 Removed $.parents() usages
+* VFS-10046 Added popover with user info in members page
 * VFS-10107 Fixed smooth scroll in Chrome
 * VFS-9596 Added tests for data spec editor
 * VFS-10088 Hidden access token hint in harvester public view
