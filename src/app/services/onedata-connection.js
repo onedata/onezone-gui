@@ -1,8 +1,8 @@
 /**
  * Exports a real onedata-connection service or its mock.
- * @module services/onedata-connection
+ *
  * @author Jakub Liput, Michał Borzęcki
- * @copyright (C) 2018-2020 ACK CYFRONET AGH
+ * @copyright (C) 2018-2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -55,6 +55,9 @@ const OnezoneConnection = ProductionSymbol.extend({
    * @type {ComputedProperty<AtmResourceSpec>}
    */
   defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
+
+  // FIXME: development name of handshake attribute
+  availableSpaceTags: reads('attributes.availableSpaceTags'),
 
   /**
    * @type {ComputedProperty<EmberObject>}

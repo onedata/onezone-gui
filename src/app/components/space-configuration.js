@@ -26,6 +26,7 @@ export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
 
   modalManager: service(),
+  onedataConnection: service(),
 
   /**
    * @override
@@ -113,6 +114,25 @@ export default Component.extend(validations, I18n, {
   ),
 
   emailValidation: reads('validations.attrs.currentContactEmail'),
+
+  allowedTags: computed(
+    'onedataConnection.availableSpaceTags',
+    function allowedTags() {
+      return (this.onedataConnection.availableSpaceTags ?? []).map(tag => ({
+        label: tag,
+      }));
+    }
+  ),
+
+  spaceTagsEditorSettings: computed('allowedTags', function spaceTagsEditorSettings() {
+    return {
+      type: 'tags',
+      tagEditorComponentName: 'tags-input/selector-editor',
+      tagEditorSettings: {
+        allowedTags: this.allowedTags,
+      }
+    };
+  }),
 
   spaceObserver: observer('space', function spaceObserver() {
     this.setCurrentValuesFromRecord();

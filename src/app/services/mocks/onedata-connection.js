@@ -31,6 +31,13 @@ export default OnedataConnection.extend({
     ephemeralStorageRequested: 0,
     ephemeralStorageLimit: null,
   })),
+  availableSpaceTags: Object.freeze([
+    'small',
+    'large',
+    'testing',
+    'scientific',
+    'commercial',
+  ]),
   onezoneRecord: computed(function onezoneRecord() {
     return EmberObject.create({
       name: zoneName,

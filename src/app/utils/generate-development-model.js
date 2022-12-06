@@ -505,7 +505,7 @@ function createSpacesRecords(store) {
       ...(index !== 0 ? {} : {
         advertisedInMarketplace: true,
         organizationName: 'ACK Cyfronet AGH',
-        tags: ['hello', 'world'],
+        tags: ['scientific', 'large'],
         description: exampleMarkdownLong,
         contactEmail: 'user@example.com',
       }),
@@ -513,7 +513,7 @@ function createSpacesRecords(store) {
       // FIXME: test data 2
       // advertisedInMarketplace: false,
       // organizationName: 'ACK Cyfronet AGH',
-      // tags: index === 0 ? ['hello', 'world'] : [],
+      // tags: index === 0 ? ['scientific', 'large'] : [],
       // description: index === 0 ? exampleMarkdownLong : '',
       // contactEmail: index === 0 ? 'user@example.com' : '',
     }).save();
