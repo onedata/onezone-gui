@@ -438,12 +438,20 @@ export default Component.extend(I18n, WindowResizeHandler, {
 
     const scrollLeftOffset = ps.scrollLeft;
     const scrollTopOffset = ps.scrollTop;
-    const constantRowLabels = [...this.element.querySelectorAll('.row-label.constant-row-label')];
-    const floatingRowLabels = [...this.element.querySelectorAll('.row-label.floating-row-label')];
-    const constantColumnLabels = [...this.element.querySelectorAll('.constant-column-labels .table-cell')];
+    const constantRowLabels = [
+      ...this.element.querySelectorAll('.row-label.constant-row-label'),
+    ];
+    const floatingRowLabels = [
+      ...this.element.querySelectorAll('.row-label.floating-row-label'),
+    ];
+    const constantColumnLabels = [
+      ...this.element.querySelectorAll('.constant-column-labels .table-cell'),
+    ];
     const floatingColumnLabelsRow =
       this.element.querySelector('.floating-column-labels');
-    const floatingColumnLabels = [...floatingColumnLabelsRow.querySelectorAll('.table-cell')];
+    const floatingColumnLabels = [
+      ...floatingColumnLabelsRow.querySelectorAll('.table-cell'),
+    ];
     const rightShadowOverlay =
       this.element.querySelector('.right-shadow-overlay');
 
