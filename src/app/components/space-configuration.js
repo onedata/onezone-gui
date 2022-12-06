@@ -7,31 +7,18 @@ import { notEqual, not, isEmpty, and, or, bool, conditional, raw } from 'ember-a
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { Promise } from 'rsvp';
-import { validator, buildValidations } from 'ember-cp-validations';
+import { buildValidations } from 'ember-cp-validations';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
+import emailValidator from 'onedata-gui-common/utils/validators/email';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
  */
 
-/**
- * Taken from: http: //emailregex.com/
- * @type {RegExp}
- */
-const emailRegex =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-// FIXME: duplicated code with enable marketplace advertisement modal
 const validations = buildValidations({
-  contactEmail: [
-    validator('format', {
-      regex: emailRegex,
-      allowBlank: false,
-      message() {
-        return String(this.model.t('mustBeValidEmail'));
-      },
-    }),
+  currentContactEmail: [
+    emailValidator(),
   ],
 });
 
@@ -65,9 +52,11 @@ export default Component.extend(validations, I18n, {
    */
   currentDescription: '',
 
+  currentContactEmail: '',
+
   /**
    * Previous value of current description before it was set using
-   * `setDescriptionValueFromRecord`.
+   * `setCurrentValuesFromRecord`.
    * It is null when
    * @type {string|null}
    */
@@ -123,8 +112,10 @@ export default Component.extend(validations, I18n, {
     raw(Object.freeze({}))
   ),
 
+  emailValidation: reads('validations.attrs.currentContactEmail'),
+
   spaceObserver: observer('space', function spaceObserver() {
-    this.setDescriptionValueFromRecord();
+    this.setCurrentValuesFromRecord();
   }),
 
   init() {
@@ -146,11 +137,12 @@ export default Component.extend(validations, I18n, {
     await this.space.save();
   },
 
-  setDescriptionValueFromRecord() {
+  setCurrentValuesFromRecord() {
     const description = this.spaceDescription;
     this.setProperties({
       preCurrentDescription: description,
       currentDescription: description,
+      currentContactEmail: this.space.contactEmail,
     });
   },
 
@@ -180,7 +172,7 @@ export default Component.extend(validations, I18n, {
           return;
         }
         await this.saveSpaceValue('description', value);
-        this.setDescriptionValueFromRecord();
+        this.setCurrentValuesFromRecord();
         break;
       }
       case 'contactEmail': {
@@ -194,7 +186,7 @@ export default Component.extend(validations, I18n, {
   discardValue(fieldId) {
     switch (fieldId) {
       case 'description':
-        this.setDescriptionValueFromRecord();
+        this.setCurrentValuesFromRecord();
         break;
     }
   },
@@ -246,6 +238,10 @@ export default Component.extend(validations, I18n, {
     currentDescriptionChanged(value) {
       this.set('currentDescription', value);
       this.inlineEditorChange('description', value);
+    },
+    currentEmailChanged(value) {
+      this.set('currentContactEmail', value);
+      this.inlineEditorChange('contactEmail', value);
     },
     inlineEditorChange(fieldId, value) {
       this.inlineEditorChange(fieldId, value);

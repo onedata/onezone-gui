@@ -1,5 +1,4 @@
 export default {
-  mustBeValidEmail: 'This field must be a valid e-mail address',
   header: 'Advertise space in marketplace',
   body: {
     // FIXME: consult i18n

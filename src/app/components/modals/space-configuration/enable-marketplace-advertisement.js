@@ -7,30 +7,11 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { or, not } from 'ember-awesome-macros';
-import { validator, buildValidations } from 'ember-cp-validations';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
+import { emailRegex } from 'onedata-gui-common/utils/validators/email';
 
-/**
- * Taken from: http: //emailregex.com/
- * @type {RegExp}
- */
-const emailRegex =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-const validations = buildValidations({
-  contactEmail: [
-    validator('format', {
-      regex: emailRegex,
-      allowBlank: false,
-      message() {
-        return String(this.t('mustBeValidEmail'));
-      },
-    }),
-  ],
-});
-
-export default Component.extend(validations, I18n, {
+export default Component.extend(I18n, {
   tagName: '',
 
   i18n: service(),

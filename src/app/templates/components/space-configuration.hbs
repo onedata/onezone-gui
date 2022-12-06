@@ -1,4 +1,3 @@
-{{log blankInlineEditors}}
 <div class="form-horizontal space-configuration-form fill-flex-using-column">
   <div class={{concat-classes
     "form-group space-name-form-group"
@@ -173,7 +172,7 @@
   {{#if isAdvertised}}
     <div class={{concat-classes
     "form-group contact-email-form-group"
-    (if blankInlineEditors.contactEmail "has-error")
+    (if emailValidation.error "has-error")
   }}>
       <label class="control-label">
         {{tt this "contactEmail.label"}}:
@@ -181,15 +180,11 @@
       {{one-inline-editor
         class="contact-email"
         value=contactEmail
-        onInputValueChanged=(action "inlineEditorChange" "contactEmail")
-        isSaveDisabled=blankInlineErrors.contactEmail
-        saveButtonTip=(if
-          blankInlineErrors.contactEmail
-          (tt this "fieldCannotBeEmptyWhenAdvertising")
-        )
+        onInputValueChanged=(action "currentEmailChanged")
+        isSaveDisabled=emailValidation.error
+        saveButtonTip=emailValidation.message
         onSave=(action "saveValue" "contactEmail")
       }}
     </div>
-    {{validations.attrs.contactEmail.message}}
   {{/if}}
 </div>
