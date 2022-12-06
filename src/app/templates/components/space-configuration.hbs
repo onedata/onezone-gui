@@ -2,7 +2,7 @@
 <div class="form-horizontal space-configuration-form fill-flex-using-column">
   <div class={{concat-classes
     "form-group space-name-form-group"
-    (if blankInlineErrors.name "has-error")
+    (if blankInlineEditors.name "has-error")
   }}>
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
     {{one-inline-editor
@@ -92,13 +92,19 @@
         }}
           {{tt this "discard"}}
         {{/one-button}}
-        {{#one-button
-          type="primary"
-          size="sm"
-          onClick=(action "saveValue" "description" currentDescription)
-        }}
-          {{tt this "save"}}
-        {{/one-button}}
+        <div class="btn-tooltip-container">
+          {{#one-button
+            type="primary"
+            size="sm"
+            disabled=blankInlineErrors.description
+            onClick=(action "saveValue" "description" currentDescription)
+          }}
+            {{tt this "save"}}
+          {{/one-button}}
+          {{#if blankInlineErrors.description}}
+            {{one-tooltip title=(tt this "fieldCannotBeEmptyWhenAdvertising")}}
+          {{/if}}
+        </div>
       </div>
     {{/if}}
     <hr class="description-separator">

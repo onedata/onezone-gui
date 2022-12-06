@@ -176,6 +176,9 @@ export default Component.extend(validations, I18n, {
         break;
       }
       case 'description': {
+        if (this.blankInlineErrors.description) {
+          return;
+        }
         await this.saveSpaceValue('description', value);
         this.setDescriptionValueFromRecord();
         break;
@@ -218,6 +221,21 @@ export default Component.extend(validations, I18n, {
     });
   },
 
+  inlineEditorChange(fieldId, value) {
+    const normalizedValue = typeof value === 'string' ? value.trim() : value;
+    if (_.isEmpty(normalizedValue)) {
+      this.set('blankInlineEditors', {
+        ...this.blankInlineEditors,
+        [fieldId]: true,
+      });
+    } else if (this.blankInlineEditors[fieldId]) {
+      this.set('blankInlineEditors', {
+        ...this.blankInlineEditors,
+        [fieldId]: false,
+      });
+    }
+  },
+
   actions: {
     async saveValue(fieldId, value) {
       return this.saveValue(fieldId, value);
@@ -227,19 +245,10 @@ export default Component.extend(validations, I18n, {
     },
     currentDescriptionChanged(value) {
       this.set('currentDescription', value);
+      this.inlineEditorChange('description', value);
     },
     inlineEditorChange(fieldId, value) {
-      if (_.isEmpty(value)) {
-        this.set('blankInlineEditors', {
-          ...this.blankInlineEditors,
-          [fieldId]: true,
-        });
-      } else if (this.blankInlineEditors[fieldId]) {
-        this.set('blankInlineEditors', {
-          ...this.blankInlineEditors,
-          [fieldId]: false,
-        });
-      }
+      this.inlineEditorChange(fieldId, value);
     },
   },
 });
