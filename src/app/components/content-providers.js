@@ -228,14 +228,11 @@ export default Component.extend({
       safeExec(this, () => {
         const dragStartXY = this.get('dragStartXY');
         this.set('dragStartXY', {});
-        if (dragStartXY.x === event.clientX && dragStartXY.y === event
-          .clientY) {
-          const target = $(event.target);
+        if (dragStartXY.x === event.clientX && dragStartXY.y === event.clientY) {
           if (!this.get('_mobileMode')) {
             const ignoredElements =
               '.provider-place, .jvectormap-zoomin, .jvectormap-zoomout';
-            if (!target.is(ignoredElements) &&
-              target.parents(ignoredElements).length === 0) {
+            if (!event.target.closest(ignoredElements)) {
               const queryMapState = this._getQueryMapState();
               this.get('router').transitionTo(
                 'onedata.sidebar.content',
