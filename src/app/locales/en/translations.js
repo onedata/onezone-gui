@@ -132,6 +132,7 @@ import removeSpaceFromHarvesterAction from './utils/harvester-actions/remove-spa
 import addHarvesterToSpaceAction from './utils/space-actions/add-harvester-to-space-action';
 import removeHarvesterFromSpaceAction from './utils/space-actions/remove-harvester-from-space-action';
 import removeSpaceAction from './utils/space-actions/remove-space-action';
+import chooseSpaceToAdvertiseAction from './utils/space-actions/choose-space-to-advertise-action';
 import cleanObsoleteTokensAction from './utils/token-actions/clean-obsolete-tokens-action';
 import createTokenAction from './utils/token-actions/create-token-action';
 import openCreateTokenViewAction from './utils/token-actions/open-create-token-view-action';
@@ -309,6 +310,7 @@ const translations = {
       addHarvesterToSpaceAction,
       removeHarvesterFromSpaceAction,
       removeSpaceAction,
+      chooseSpaceToAdvertiseAction,
     },
     tokenActions: {
       cleanObsoleteTokensAction,

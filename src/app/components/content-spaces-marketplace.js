@@ -1,7 +1,7 @@
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import EmberObject, { computed } from '@ember/object';
-import { isEmpty, promise } from 'ember-awesome-macros';
+import { isEmpty, promise, collect } from 'ember-awesome-macros';
 import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
 import { inject as service } from '@ember/service';
 

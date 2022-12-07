@@ -34,7 +34,7 @@ export default Action.extend({
   /**
    * @override
    */
-  icon: 'cart',
+  icon: 'add-filled',
 
   /**
    * @override

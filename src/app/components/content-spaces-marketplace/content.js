@@ -1,18 +1,20 @@
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { collect } from 'ember-awesome-macros';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
+import { inject as service } from '@ember/service';
 
-export default Component.extend({
-  globalActions: collect('advertiseBtn'),
+export default Component.extend(GlobalActions, {
+  spaceActions: service(),
+
+  /**
+   * @override
+   */
+  globalActions: collect('chooseSpaceToAdvertiseAction'),
 
   viewModel: undefined,
 
-  advertiseBtn: computed('advertiseBtn', function advertiseBtn() {
-    return {
-      title: 'Advertise your space',
-      buttonStyle: 'default',
-      icon: 'add-filled',
-      action: () => {},
-    };
+  chooseSpaceToAdvertiseAction: computed(function chooseSpaceToAdvertiseAction() {
+    return this.spaceActions.createChooseSpaceToAdvertiseAction();
   }),
 });
