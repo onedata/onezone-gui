@@ -61,7 +61,7 @@ export default Service.extend({
   /**
    * Fetches collection of all spaces
    *
-   * @returns {Promise<DS.RecordArray<Space>>} resolves to an array of providers
+   * @returns {Promise<Models.SpaceList>}
    */
   getSpaces() {
     return this.get('currentUser')

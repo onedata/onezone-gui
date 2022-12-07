@@ -14,6 +14,7 @@ import { collect } from '@ember/object/computed';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
+import ChooseSpaceToAdvertiseAction from 'onezone-gui/utils/space-actions/choose-space-to-advertise-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -49,7 +50,6 @@ export default Service.extend(I18n, {
       title: this.t('btnMarketplace.title'),
       sidebarTitle: this.t('btnMarketplace.title'),
       class: 'marketplace-btn',
-      // FIXME: implement
       action: () => this.router.transitionTo(
         'onedata.sidebar.content',
         'spaces',
@@ -68,6 +68,15 @@ export default Service.extend(I18n, {
 
   createRemoveHarvesterFromSpaceAction(context) {
     return RemoveHarvesterFromSpaceAction.create({ ownerSource: this, context });
+  },
+
+  // FIXME: context is not needed
+  /**
+   * @param {ChooseSpaceToAdvertiseContext} context
+   * @returns
+   */
+  createChooseSpaceToAdvertiseAction(context) {
+    return ChooseSpaceToAdvertiseAction.create({ ownerSource: this, context });
   },
 
   /**
