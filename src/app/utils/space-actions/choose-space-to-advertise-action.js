@@ -43,17 +43,17 @@ export default Action.extend({
     const result = ActionResult.create();
     await this.modalManager
       .show('spaces/choose-space-to-advertise-modal', {
-        onSubmit: async (space) => await this.configureSpace(space),
+        onSubmit: async (spaceId) => await this.configureSpace(spaceId),
       }).hiddenPromise;
     set(result, 'status', 'done');
     return result;
   },
 
-  async configureSpace(space) {
+  async configureSpace(spaceId) {
     return this.router.transitionTo(
-      'onedata.sidebar.content',
+      'onedata.sidebar.content.aspect',
       'spaces',
-      space,
+      spaceId,
       'configuration',
     );
   },

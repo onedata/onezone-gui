@@ -75,7 +75,7 @@ export default Service.extend(I18n, {
    * @param {ChooseSpaceToAdvertiseContext} context
    * @returns
    */
-  createChooseSpaceToAdvertiseAction(context) {
+  createChooseSpaceToAdvertiseAction(context = {}) {
     return ChooseSpaceToAdvertiseAction.create({ ownerSource: this, context });
   },
 

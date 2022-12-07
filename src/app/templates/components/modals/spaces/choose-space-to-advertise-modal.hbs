@@ -50,7 +50,7 @@
         type="primary"
         class="proceed-btn"
         disabled=(not isProceedAvailable)
-        onClick=modal.submit
+        onClick=(if isProceedAvailable (action modal.submit selectedSpace.entityId))
       }}
         {{tt this "proceed"}}
       {{/one-button}}

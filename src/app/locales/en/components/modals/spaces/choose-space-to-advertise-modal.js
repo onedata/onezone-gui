@@ -7,5 +7,6 @@ export default {
   introText: 'Choose space to configure its advertising settings from selector below.',
   close: 'Close',
   cancel: 'Cancel',
+  proceed: 'Proceed',
   dropdownPlaceholder: 'Choose space to configure...',
 };

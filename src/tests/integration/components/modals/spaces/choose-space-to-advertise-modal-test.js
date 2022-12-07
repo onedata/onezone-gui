@@ -18,7 +18,7 @@ import { all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
 import sleep from 'onedata-gui-common/utils/sleep';
 
-describe('Integration | Component | modals/spaces/choose-space-to-advertise', function () {
+describe('Integration | Component | modals/spaces/choose-space-to-advertise-modal', function () {
   setupRenderingTest();
 
   /**
@@ -81,6 +81,7 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise', fu
       expect(helper.cancelButton).to.contain.text('Cancel');
       expect(helper.proceedButton).to.exist;
       expect(helper.proceedButton).to.have.attr('disabled');
+      expect(helper.proceedButton).to.contain.text('Proceed');
     }
   );
 
@@ -191,7 +192,7 @@ class Helper {
   async showModal() {
     await render(hbs`{{global-modal-mounter}}`);
     return await this.modalManager
-      .show('spaces/choose-space-to-advertise', this.modalOptions)
+      .show('spaces/choose-space-to-advertise-modal', this.modalOptions)
       .shownPromise;
   }
 }

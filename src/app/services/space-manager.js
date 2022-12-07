@@ -457,24 +457,25 @@ export default Service.extend({
         isOwned: true,
       })
     );
+    // FIXME: testing code
     return [
-      ...ownedSpaces,
-      SpaceMarketplaceModel.create({
-        name: 'Shared space number one',
-        organizationName: 'ACK Cyfronet AGH',
-        tags: ['large', 'experimental', 'scientific'],
-        description: exampleMarkdownLong,
-        isOwned: false,
-        spaceId: 'space-10',
-      }),
-      SpaceMarketplaceModel.create({
-        name: 'Other space',
-        organizationName: 'Uniwersytet Jagielloński',
-        tags: ['small', 'scientific'],
-        description: exampleMarkdownShort,
-        isOwned: false,
-        spaceId: 'space-11',
-      }),
+      // ...ownedSpaces,
+      // SpaceMarketplaceModel.create({
+      //   name: 'Shared space number one',
+      //   organizationName: 'ACK Cyfronet AGH',
+      //   tags: ['large', 'experimental', 'scientific'],
+      //   description: exampleMarkdownLong,
+      //   isOwned: false,
+      //   spaceId: 'space-10',
+      // }),
+      // SpaceMarketplaceModel.create({
+      //   name: 'Other space',
+      //   organizationName: 'Uniwersytet Jagielloński',
+      //   tags: ['small', 'scientific'],
+      //   description: exampleMarkdownShort,
+      //   isOwned: false,
+      //   spaceId: 'space-11',
+      // }),
     ];
   },
 });

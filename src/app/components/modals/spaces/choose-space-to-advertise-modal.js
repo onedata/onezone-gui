@@ -96,19 +96,19 @@ export default Component.extend(I18n, {
   },
 
   actions: {
-    async submit(submitCallback, result) {
-      if (!this.isProceedAvailable) {
-        return;
-      }
-      this.set('isSubmitting', true);
-      try {
-        await submitCallback(result);
-      } catch {
-        // FIXME: implement
-      } finally {
-        safeExec(this, () => this.set('isSubmitting', false));
-      }
-    },
+    // async submit(submitCallback) {
+    //   if (!this.isProceedAvailable) {
+    //     return;
+    //   }
+    //   this.set('isSubmitting', true);
+    //   try {
+    //     await submitCallback(this.selectedSpace);
+    //   } catch {
+    //     // FIXME: implement
+    //   } finally {
+    //     safeExec(this, () => this.set('isSubmitting', false));
+    //   }
+    // },
     spaceChanged(space) {
       this.set('selectedSpace', space);
     },

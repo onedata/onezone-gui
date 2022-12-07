@@ -45,7 +45,7 @@ export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
   currentUserIsOwner: attr('boolean'),
   directMembership: attr('boolean', { defaultValue: false }),
   // FIXME: prototype fields for marketplace
-  advertisedInMarketplace: attr('boolean'),
+  advertisedInMarketplace: attr('boolean', { defaultValue: false }),
   organizationName: attr('string'),
   description: attr('string'),
   tags: attr('array', { defaultValue: () => [] }),
