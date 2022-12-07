@@ -18,9 +18,21 @@
       {{else if areAllSpacesAdvertised}}
         <p>{{tt this "allAdvertisedText"}}</p>
       {{else}}
-          {{log 'a' allSpaces.length}}
-          {{log 'n' nonAdvertisedSpaces.length}}
         <p>{{tt this "introText"}}</p>
+        {{#one-dropdown
+          triggerClass="spaces-dropdown-trigger"
+          options=nonAdvertisedSpaces
+          selected=selectedSpace
+          placeholder=(tt this "dropdownPlaceholder")
+          onchange=(action "spaceChanged")
+          as |space|
+        }}
+          <div class="option-container">
+            {{#truncated-string class="text"}}
+              {{name-conflict item=space}}
+            {{/truncated-string}}
+          </div>
+        {{/one-dropdown}}
       {{/if}}
     {{/promise-proxy-container}}
   {{/modal.body}}
@@ -33,15 +45,16 @@
     }}
       {{tt this closeButtonType}}
     {{/one-button}}
-    {{#one-button
-      type="primary"
-      buttonType="submit"
-      class="proceed-btn"
-      onClick=(action "submit" modal.submit)
-      disabled=areButtonsDisabled
-    }}
-      {{tt this "proceed"}}
-    {{/one-button}}
+    {{#if isProceedButtonVisible}}
+      {{#one-button
+        type="primary"
+        class="proceed-btn"
+        disabled=(not isProceedAvailable)
+        onClick=modal.submit
+      }}
+        {{tt this "proceed"}}
+      {{/one-button}}
+    {{/if}}
   {{/modal.footer}}
 
 {{/global-modal}}

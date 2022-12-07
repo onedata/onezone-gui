@@ -37,8 +37,12 @@ export default Component.extend(I18n, {
 
   //#region state
 
-  // FIXME: remove if empty
-  selectedSpace: undefined,
+  isSubmitting: false,
+
+  /**
+   * @type {Models.Space}
+   */
+  selectedSpace: null,
 
   //#endregion
 
@@ -55,12 +59,19 @@ export default Component.extend(I18n, {
     raw(false)
   ),
 
+  // spacesToAdvertiseOptions: computed(
+  //   'nonAdvertisedSpaces',
+  //   function spacesToAdvertiseOptions() {
+
+  //   }
+  // ),
+
   noSpaces: isEmpty('allSpaces'),
 
   areAllSpacesAdvertised: and(not('noSpaces'), isEmpty('nonAdvertisedSpaces')),
 
   // FIXME: remove if not used, only if space is selected
-  isProceedAvailable: false,
+  isProceedAvailable: and('isProceedButtonVisible', notEmpty('selectedSpace')),
 
   isProceedButtonVisible: not(or('noSpaces', 'areAllSpacesAdvertised')),
 
@@ -86,18 +97,20 @@ export default Component.extend(I18n, {
 
   actions: {
     async submit(submitCallback, result) {
-      if (this.areButtonsDisabled) {
+      if (!this.isProceedAvailable) {
         return;
       }
       this.set('isSubmitting', true);
       try {
-        await this.enableMarketplaceAdvertisement();
         await submitCallback(result);
       } catch {
         // FIXME: implement
       } finally {
         safeExec(this, () => this.set('isSubmitting', false));
       }
+    },
+    spaceChanged(space) {
+      this.set('selectedSpace', space);
     },
   },
 });

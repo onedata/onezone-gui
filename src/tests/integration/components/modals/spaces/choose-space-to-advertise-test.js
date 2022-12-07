@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { assert } from '@ember/debug';
 import { render, find } from '@ember/test-helpers';
 import createSpace from '../../../../helpers/create-space';
+import OneDropdownHelper from '../../../../helpers/one-dropdown';
 import { lookupService } from '../../../../helpers/stub-service';
 import {
   getModal,
@@ -15,6 +16,7 @@ import {
 import sinon from 'sinon';
 import { all as allFulfilled } from 'rsvp';
 import { get } from '@ember/object';
+import sleep from 'onedata-gui-common/utils/sleep';
 
 describe('Integration | Component | modals/spaces/choose-space-to-advertise', function () {
   setupRenderingTest();
@@ -35,6 +37,7 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise', fu
     expect(helper.body).to.contain.text('You do not belong to any space.');
     expect(helper.cancelButton).to.exist;
     expect(helper.cancelButton).to.contain.text('Close');
+    expect(helper.proceedButton).to.not.exist;
   });
 
   it('renders header, "all advertised" text and close button if all of user spaces are advertised',
@@ -51,6 +54,7 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise', fu
       expect(helper.body).to.contain.text('All your spaces are already advertised.');
       expect(helper.cancelButton).to.exist;
       expect(helper.cancelButton).to.contain.text('Close');
+      expect(helper.proceedButton).to.not.exist;
     }
   );
 
@@ -58,7 +62,7 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise', fu
     async function () {
       const helper = new Helper(this);
       helper.setSpaces([{
-          name: 'Not-advertised space',
+          name: 'Non-advertised space',
           advertisedInMarketplace: false,
         },
         {
@@ -75,6 +79,58 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise', fu
       );
       expect(helper.cancelButton).to.exist;
       expect(helper.cancelButton).to.contain.text('Cancel');
+      expect(helper.proceedButton).to.exist;
+      expect(helper.proceedButton).to.have.attr('disabled');
+    }
+  );
+
+  it('lists non-advertised spaces in dropdown',
+    async function () {
+      const helper = new Helper(this);
+      helper.setSpaces([{
+          name: 'One',
+          advertisedInMarketplace: false,
+        },
+        {
+          name: 'Two',
+          advertisedInMarketplace: false,
+        },
+        {
+          name: 'Advertised space',
+          advertisedInMarketplace: true,
+        },
+      ]);
+
+      await helper.showModal();
+      const dropdown = helper.dropdown;
+      await dropdown.open();
+
+      expect(await dropdown.getOptionsText()).to.deep.equal(['One', 'Two']);
+    }
+  );
+
+  it('lists non-advertised spaces in dropdown',
+    async function () {
+      const helper = new Helper(this);
+      helper.setSpaces([{
+          name: 'One',
+          advertisedInMarketplace: false,
+        },
+        {
+          name: 'Two',
+          advertisedInMarketplace: false,
+        },
+        {
+          name: 'Advertised space',
+          advertisedInMarketplace: true,
+        },
+      ]);
+
+      await helper.showModal();
+      const dropdown = helper.dropdown;
+      await dropdown.open();
+
+      expect(await dropdown.getOptionsText()).to.deep.equal(['One', 'Two']);
     }
   );
 });
@@ -105,6 +161,7 @@ class Helper {
   get modal() {
     return getModal();
   }
+  /** @type {HTMLElement} */
   get body() {
     return getModalBody();
   }
@@ -116,6 +173,12 @@ class Helper {
   }
   get cancelButton() {
     return this.footer.querySelector('.cancel-btn');
+  }
+  get proceedButton() {
+    return this.footer.querySelector('.proceed-btn');
+  }
+  get dropdown() {
+    return new OneDropdownHelper('.spaces-dropdown-trigger');
   }
 
   get modalManager() {
