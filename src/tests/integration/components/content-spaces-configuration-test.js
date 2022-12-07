@@ -3,10 +3,9 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { assert } from '@ember/debug';
-import { render, find, click, fillIn } from '@ember/test-helpers';
+import { render, find } from '@ember/test-helpers';
 import createSpace from '../../helpers/create-space';
 import { lookupService } from '../../helpers/stub-service';
-import { get } from '@ember/object';
 
 describe('Integration | Component | content-spaces-configuration', function () {
   setupRenderingTest();
