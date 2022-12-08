@@ -10,7 +10,7 @@
   {{#each filteredCollection as |spaceItem|}}
     {{content-spaces-marketplace/item viewModel=viewModel spaceItem=spaceItem}}
   {{else}}
-    {{#if searchValue}}
+    {{#if viewModel.searchValue}}
       <p>{{tt this "noMatchingResults"}}</p>
     {{/if}}
   {{/each}}
