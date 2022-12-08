@@ -7,7 +7,7 @@
   </div>
 </div>
 <ul class="list-entries">
-  {{#each sortedCollection as |spaceItem|}}
+  {{#each filteredCollection as |spaceItem|}}
     {{content-spaces-marketplace/item viewModel=viewModel spaceItem=spaceItem}}
   {{else}}
     {{#if searchValue}}

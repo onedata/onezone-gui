@@ -3,9 +3,15 @@ import Component from '@ember/component';
 import { collect } from 'ember-awesome-macros';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { inject as service } from '@ember/service';
+import I18n from 'onedata-gui-common/mixins/components/i18n';
 
-export default Component.extend(GlobalActions, {
+export default Component.extend(I18n, GlobalActions, {
   spaceActions: service(),
+
+  /**
+   * @override
+   */
+  i18nPrefix: 'components.contentSpacesMarketplace.content',
 
   /**
    * @override
