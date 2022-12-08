@@ -4,67 +4,97 @@
     padding-left: 0;
   }
   .spaces-marketplace-item {
-    // FIXME: make sure that content will not overflow
-    // --fixed-height: 18em;
-    // height: var(--fixed-height);
-    // max-height: var(--fixed-height);
-    overflow-y: auto;
-
     .icon-section {
+      .one-icon:first-of-type {
+        // special adjustment for space item header
+        margin-top: -0.15em;
+      }
       .oneicon-space-empty {
         font-weight: bold;
       }
-      .secondary-icon {
-        margin-top: 0.25em;
-      }
     }
 
-    .marketplace-item-row.title-row {
+    .content-section {
+      // special adjustment for space item
+      padding: 12px 16px 16px 16px;
+    }
+
+    .basic-info-row {
+      display: flex;
       align-items: flex-start;
+      .basic-info-col {
+        flex-grow: 1;
+      }
     }
 
     .marketplace-item-row {
       display: flex;
-      align-items: baseline;
-      min-height: 2.5em;
-      .row-label {
-        @include font-semibold;
-        margin-right: 0.5em;
+    }
+
+    .secondary-row {
+      display: flex;
+      align-items: center;
+      margin-top: 0.5em;
+      .col-separator {
+        margin-left: 1em;
+        margin-right: 1em;
+        &::after {
+          height: 32px;
+          content: ' ';
+          border-left: 1px solid;
+          border-color: $main-border-color;
+        }
+      }
+      .support-list {
+        display: flex;
+        .support-item {
+          display: flex;
+          align-items: center;
+          .one-icon {
+            font-size: 150%;
+          }
+          .one-icon + .text {
+            margin-left: 0.2em;
+          }
+          .text {
+            font-size: 90%;
+          }
+          +.support-item {
+            margin-left: 0.5em;
+          }
+        }
       }
     }
 
-    .support-row {
-      display: flex;
-      align-items: center;
-
-      .support-providers-count {
-        display: flex;
-        align-items: center;
+    .title-row {
+      align-items: baseline;
+      .space-name {
+        margin-right: 1em;
       }
-
-      .support-providers-icon {
-        font-size: 180%;
-      }
-
-      .providers-count-sign {
-        margin-left: 0.1em;
-        margin-right: -0.1em;
+      .tags-container {
+        flex-grow: 1;
+        .tags-input {
+          .tag-item {
+            margin-bottom: 0.25em;
+          }
+        }
       }
     }
 
     .space-name {
       @include font-semibold;
       font-size: 120%;
-      flex-grow: 1;
-      margin-bottom: 1em;
     }
 
-    // --marketplace-description-background-color: $color-one-semiwhite;
+    .organization-name {
+      @include font-semibold;
+    }
+
     --marketplace-description-background-color: #{$main-tabbed-content-background};
     --marketplace-description-border-color: #{$main-border-color};
 
     .description-row {
-      margin-top: 0.5em;
+      margin-top: 1em;
       height: 7em;
       max-height: 7em;
       position: relative;
@@ -111,12 +141,20 @@
   }
 }
 
-.iconified-block-active {
+.iconified-block-marketplace-available {
   $leading-color: $color-one-light-blue;
   --iconified-block-icon-color: #{$color-one-blue-gray};
   --iconified-block-border-color: #{darken($leading-color, 15%)};
   --iconified-block-icon-background-color: #{darken($leading-color, 5%)};
   --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
   --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
+}
 
+.iconified-block-marketplace-owned {
+  $leading-color: lighten($color-one-success, 30%);
+  --iconified-block-icon-color: #{darken($color-one-success, 10%)};
+  --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-background-color: #{$leading-color};
+  --iconified-block-icon-background-color-hover: #{darken($leading-color, 3%)};
+  --iconified-block-background-color-hover: #{$main-content-hover-background};
 }

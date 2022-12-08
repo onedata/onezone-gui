@@ -1,53 +1,47 @@
 <div class="icon-section">
   {{one-icon icon="space-empty"}}
-  {{#if spaceItem.isOwned}}
-    {{one-icon icon="cart-checked" class="secondary-icon"}}
-  {{/if}}
 </div>
 <div class="content-section">
-  <div class="row marketplace-item-row title-row">
-    <div class="space-name">{{spaceItem.name}}</div>
-    <div class="main-button">
-      {{#if spaceItem.isOwned}}
-        {{#one-button size="sm" onClick=(action "configureSpace")}}
-          Configure
-        {{/one-button}}
-      {{else}}
-        {{#one-button size="sm" type="primary" onClick=(action "requestAccess")}}
-          Request access
-        {{/one-button}}
-      {{/if}}
-    </div>
-  </div>
-  <div class="row marketplace-item-row organization-row">
-    <div class="row-label">Organization:</div>
-    <div class="row-value">
-      {{spaceItem.organizationName}}
-    </div>
-  </div>
-  <div class="row marketplace-item-row support-row">
-    <div class="row-label">Support:</div>
-    <div class="support-total-size">3 TiB,&nbsp;</div>
-    <div class="support-providers-count">
-      {{!-- <span class="providers-count-number">3</span>
-      <span class="providers-count-sign">×</span>
-      {{one-icon icon="provider" class="support-providers-icon"}}
-      <span class="providers-list-start-sign">→</span> --}}
-      <div class="support-providers-list">
-        {{tags-input
-          readonly=true
-          tags=supportingProvidersTags
-        }}
+  <div class="basic-info-row">
+    <div class="basic-info-col">
+      <div class="row marketplace-item-row title-row">
+        <div class="space-name">{{spaceItem.name}}</div>
+        <div class="tags-container">
+          {{tags-input readonly=true tags=tags}}
+        </div>
+      </div>
+      <div class="row marketplace-item-row secondary-row">
+        <span class="organization-name">{{spaceItem.organizationName}}</span>
+        <span class="col-separator"></span>
+        <div class="support-list">
+          <div class="support-item">
+            {{one-icon icon="support"}}
+            <div class="text">3 TiB</div>
+          </div>
+          <div class="support-item">
+            {{one-icon icon="provider"}}
+            <div class="text">Kraków</div>
+          </div>
+          <div class="support-item">
+            {{one-icon icon="provider"}}
+            <div class="text">Paris</div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row marketplace-item-row">
-    <div class="row-label">Tags:</div>
-    <div class="row-value">
-      {{tags-input
-        readonly=true
-        tags=tags
-      }}
+    <div class="access-info-col">
+      <div class="main-button">
+        {{#if spaceItem.isOwned}}
+          {{#one-button size="sm" onClick=(action "configureSpace")}}
+            Configure
+          {{/one-button}}
+        {{else}}
+          {{#one-button size="sm" onClick=(action "requestAccess")}}
+            {{one-icon icon="cart"}}
+            Request access
+          {{/one-button}}
+        {{/if}}
+      </div>
     </div>
   </div>
   <div class="row marketplace-item-row description-row {{if isDescriptionExpanded "description-row-expanded"}}">

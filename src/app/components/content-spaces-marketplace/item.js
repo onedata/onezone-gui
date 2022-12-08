@@ -4,7 +4,7 @@ import { array, raw } from 'ember-awesome-macros';
 
 export default Component.extend({
   classNames: ['spaces-marketplace-item', 'iconified-block'],
-  classNameBindings: ['spaceItem.isOwned::iconified-block-success'],
+  classNameBindings: ['spaceItem.isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
 
   viewModel: undefined,
 
@@ -18,6 +18,7 @@ export default Component.extend({
     'spaceItem.supportingProviders',
     function supportingProvidersTags() {
       return [
+        { icon: 'support', label: '3 TiB' },
         { icon: 'provider', label: 'Kraków' },
         { icon: 'provider', label: 'Paris' },
       ];
