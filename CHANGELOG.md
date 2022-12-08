@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10130 Added additional modal when turning on/off dir stats
 * VFS-10128 Allowed mapping task result to many targets
 * VFS-9312 Removed $.css() usages
 * VFS-9313 Removed ":hidden" and ":visible" jQuery selectors usages

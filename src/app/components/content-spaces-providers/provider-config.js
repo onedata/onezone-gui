@@ -32,6 +32,7 @@ export default Component.extend(I18n, {
   i18n: service(),
   spaceManager: service(),
   globalNotify: service(),
+  modalManager: service(),
 
   /**
    * @override
@@ -171,20 +172,26 @@ export default Component.extend(I18n, {
       const spaceSupportParametersUpdate = {
         dirStatsServiceEnabled,
       };
+      const nextDirStatsEnabledValue = dirStatsServiceEnabled ? 'enabled' : 'disabled';
 
-      try {
-        await spaceManager.modifySupportParameters(
-          get(space, 'entityId'),
-          get(provider, 'entityId'),
-          spaceSupportParametersUpdate
-        );
-      } catch (error) {
-        globalNotify.backendError(
-          this.t('dirStatsService.configuringDirStats'),
-          error
-        );
-        throw error;
-      }
+      return this.modalManager.show('toggle-dir-stats-question-modal', {
+        nextDirStatsEnabledValue,
+        onSubmit: async () => {
+          try {
+            await spaceManager.modifySupportParameters(
+              get(space, 'entityId'),
+              get(provider, 'entityId'),
+              spaceSupportParametersUpdate
+            );
+          } catch (error) {
+            globalNotify.backendError(
+              this.t('dirStatsService.configuringDirStats'),
+              error
+            );
+            throw error;
+          }
+        },
+      });
     },
   },
 });
