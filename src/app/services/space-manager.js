@@ -469,7 +469,7 @@ export default Service.extend({
         spaceId: 'space-10',
       }),
       SpaceMarketplaceModel.create({
-        name: 'Other space',
+        name: 'Xyz space',
         organizationName: 'Uniwersytet Jagielloński',
         tags: ['small', 'scientific'],
         description: exampleMarkdownShort,

@@ -1,7 +1,7 @@
 import EmberObject, { get, computed } from '@ember/object';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import { isEmpty, promise, collect } from 'ember-awesome-macros';
-import { reads } from '@ember/object/computed';
+import { isEmpty, promise, collect, array } from 'ember-awesome-macros';
+import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import filterObjects from 'onedata-gui-common/utils/filter-objects';
 
@@ -26,8 +26,10 @@ export default EmberObject.extend(OwnerInjector, {
 
   spaceItems: reads('spaceItemsProxy.content'),
 
+  sortOptions: Object.freeze(['isOwned:asc', 'name:asc']),
+
   // FIXME: define sorting
-  sortedCollection: reads('spaceItems'),
+  sortedCollection: sort('spaceItems', 'sortOptions'),
 
   filteredCollection: computed(
     'sortedCollection.[]',
