@@ -35,10 +35,10 @@ export default EmberObject.extend(OwnerInjector, {
     'sortedCollection.[]',
     'searchValue',
     function filteredCollection() {
-      return filterObjects(
-        this.sortedCollection,
-        this.searchValue
-      );
+      return filterObjects(this.sortedCollection, this.searchValue, {
+        searchInTags: true,
+        stringProperties: ['name', 'organizationName'],
+      });
     }
   ),
 
