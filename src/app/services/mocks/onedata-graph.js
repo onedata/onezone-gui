@@ -90,7 +90,7 @@ const spaceHandlers = {
           headers: {},
         }],
         apiRoot: 'https://dev-onezone.default.svc.cluster.local/api/v3/onezone',
-      }
+      },
     };
   },
 };
