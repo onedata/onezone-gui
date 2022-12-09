@@ -8,7 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import EmberObject, { get, getProperties } from '@ember/object';
+import EmberObject, { get, getProperties, computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
@@ -18,6 +18,7 @@ import {
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
 import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
+import { entityType as providerEntityType } from 'onezone-gui/models/provider';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
@@ -35,7 +36,10 @@ const SpaceMarketplaceModel = EmberObject.extend({
   organizationName: '',
   description: '',
   tags: Object.freeze([]),
+  spaceId: '',
   isOwned: false,
+  supportSize: 0,
+  providerIds: Object.freeze([]),
 });
 
 const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
@@ -46,6 +50,19 @@ const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
   description: reads('space.description'),
   tags: reads('space.tags'),
   spaceId: reads('space.entityId'),
+  supportSize: reads('space.totalSize'),
+  providerIds: computed('space.supportSizes', function providerIds() {
+    return Object.keys(get(this.space, 'supportSizes'));
+  }),
+  // FIXME: to consult
+  // providerGris: computed('space.supportSizes', function providers() {
+  //   const providersIds = Object.keys(get(this.space, 'supportSizes'));
+  //   return providersIds.map(entityId => gri({
+  //     entityType: providerEntityType,
+  //     entityId,
+  //     aspect: 'instance',
+  //   }));
+  // }),
 });
 
 export default Service.extend({
@@ -467,6 +484,8 @@ export default Service.extend({
         description: exampleMarkdownLong,
         isOwned: false,
         spaceId: 'space-10',
+        supportSize: 1000000000,
+        providerIds: ['oneprovider1', 'oneprovider2'],
       }),
       SpaceMarketplaceModel.create({
         name: 'Xyz space',
@@ -475,6 +494,8 @@ export default Service.extend({
         description: exampleMarkdownShort,
         isOwned: false,
         spaceId: 'space-11',
+        supportSize: 300000000,
+        providerIds: ['oneprovider2', 'oneprovider3'],
       }),
     ];
   },

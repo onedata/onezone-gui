@@ -5,7 +5,7 @@
   <div class="basic-info-row">
     <div class="basic-info-col">
       <div class="row marketplace-item-row title-row">
-        <div class="space-name">{{spaceItem.name}}</div>
+        <div class="space-name">{{spaceName}}</div>
         <div class="tags-container">
           {{tags-input readonly=true tags=tags}}
         </div>
@@ -16,16 +16,17 @@
         <div class="support-list">
           <div class="support-item">
             {{one-icon icon="support"}}
-            <div class="text">3 TiB</div>
+            <div class="text">
+              {{bytes-to-string spaceItem.supportSize}}
+            </div>
           </div>
-          <div class="support-item">
-            {{one-icon icon="provider"}}
-            <div class="text">Kraków</div>
-          </div>
-          <div class="support-item">
-            {{one-icon icon="provider"}}
-            <div class="text">Paris</div>
-          </div>
+          {{!-- FIXME: loading? --}}
+          {{#each providers as |provider|}}
+            <div class="support-item">
+              {{one-icon icon="provider"}}
+              <div class="text">{{provider.name}}</div>
+            </div>
+          {{/each}}
         </div>
       </div>
     </div>

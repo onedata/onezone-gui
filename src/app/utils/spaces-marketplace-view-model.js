@@ -20,17 +20,28 @@ export default EmberObject.extend(OwnerInjector, {
 
   isEmpty: isEmpty('spaceItems'),
 
+  /**
+   * @type {ComputedProperty<PromiseObject<Array<SpaceMarketplaceData>>>}
+   */
   spaceItemsProxy: promise.object(computed(function spaceItemsProxy() {
     return this.spaceManager.getSpacesMarketplaceData();
   })),
 
+  /**
+   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   */
   spaceItems: reads('spaceItemsProxy.content'),
 
   sortOptions: Object.freeze(['isOwned:asc', 'name:asc']),
 
-  // FIXME: define sorting
+  /**
+   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   */
   sortedCollection: sort('spaceItems', 'sortOptions'),
 
+  /**
+   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   */
   filteredCollection: computed(
     'sortedCollection.[]',
     'searchValue',

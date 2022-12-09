@@ -18,7 +18,9 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
-  // FIXME: sorting
+  /**
+   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   */
   filteredCollection: reads('viewModel.filteredCollection'),
 
   actions: {

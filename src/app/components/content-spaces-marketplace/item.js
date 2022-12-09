@@ -1,9 +1,12 @@
+// FIXME: jsdoc
+
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { array, raw } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { promise } from 'ember-awesome-macros';
+import { all as allFulfilled } from 'rsvp';
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-item', 'iconified-block'],
@@ -16,33 +19,31 @@ export default Component.extend(I18n, {
 
   router: service(),
   spaceActions: service(),
+  providerManager: service(),
+
+  /**
+   * @virtual
+   * @type {Utils.SpacesMarketplaceViewModel}
+   */
+  viewModel: undefined,
+
+  /**
+   * @virtual
+   * @type {SpaceMarketplaceData}
+   */
+  spaceItem: undefined,
 
   //#region state
 
   isRequested: false,
 
-  //#endregion
-
-  viewModel: undefined,
-
-  spaceItem: undefined,
-
   isDescriptionExpanded: false,
+
+  //#endregion
 
   isOwned: reads('spaceItem.isOwned'),
 
-  tagsString: array.join('spaceItem.tags', raw(', ')),
-
-  supportingProvidersTags: computed(
-    'spaceItem.supportingProviders',
-    function supportingProvidersTags() {
-      return [
-        { icon: 'support', label: '3 TiB' },
-        { icon: 'provider', label: 'Kraków' },
-        { icon: 'provider', label: 'Paris' },
-      ];
-    }
-  ),
+  spaceName: reads('spaceItem.name'),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
@@ -68,6 +69,25 @@ export default Component.extend(I18n, {
     );
   }),
 
+  providersProxy: promise.object(computed(
+    'spaceItem.providerIds',
+    async function providersProxy() {
+      const ids = this.spaceItem.providerIds;
+      // try {
+      const pro = await allFulfilled(ids.map(entityId => {
+        return this.providerManager.getRecordById(entityId);
+      }));
+      // debugger;
+      return pro;
+      // } catch (error) {
+      // debugger;
+      // }
+
+    }
+  )),
+
+  providers: reads('providersProxy.content'),
+
   actions: {
     requestAccess() {
       (async () => {
@@ -78,7 +98,6 @@ export default Component.extend(I18n, {
           this.set('isRequested', true);
         }
       })();
-      // FIXME: change into disabled button
     },
     expandDescription() {
       this.set('isDescriptionExpanded', true);
