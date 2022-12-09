@@ -70,15 +70,19 @@ export default Action.extend({
             await this.sendRequest(requestData);
             this.showSuccessInfo(requestData);
             this.modalManager.hide(modalInstance.id);
+            set(result, 'status', 'done');
           } catch (error) {
             // FIXME: fix bad background between two modals
             this.showErrorInfo(error);
+            set(result, 'status', 'error');
           }
+        },
+        onHide: () => {
+          set(result, 'status', 'cancelled');
         },
         spaceMarketplaceData: this.spaceMarketplaceData,
       });
     await modalInstance.hiddenPromise;
-    set(result, 'status', 'done');
     return result;
   },
 

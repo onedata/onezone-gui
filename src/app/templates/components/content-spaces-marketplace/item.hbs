@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="access-info-col">
-      {{#if spaceItem.isOwned}}
+      {{#if isOwned}}
         <div class="access-granted-container">
           {{one-icon icon="cart-checked"}}
           <span class="text">{{tt this "accessGranted"}}</span>
@@ -46,6 +46,11 @@
             {{one-icon icon="link-external"}}
           </a>
         </div>
+      {{else if isRequested}}
+        {{#one-button size="sm" disabled=true}}
+          {{one-icon icon="cart"}}
+          <span class="text">{{tt this "requestSent"}}</span>
+        {{/one-button}}
       {{else}}
         {{#one-button size="sm" onClick=(action "requestAccess")}}
           {{one-icon icon="cart"}}

@@ -3,5 +3,6 @@ export default {
   visitSpace: 'Visit space',
   configure: 'Configure',
   requestAccess: 'Request access',
+  requestSent: 'Request sent',
   expandDescription: 'Expand description',
 };

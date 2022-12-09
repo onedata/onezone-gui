@@ -1,5 +1,6 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { array, raw } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -16,11 +17,19 @@ export default Component.extend(I18n, {
   router: service(),
   spaceActions: service(),
 
+  //#region state
+
+  isRequested: false,
+
+  //#endregion
+
   viewModel: undefined,
 
   spaceItem: undefined,
 
   isDescriptionExpanded: false,
+
+  isOwned: reads('spaceItem.isOwned'),
 
   tagsString: array.join('spaceItem.tags', raw(', ')),
 
@@ -61,9 +70,14 @@ export default Component.extend(I18n, {
 
   actions: {
     requestAccess() {
-      this.spaceActions.createRequestSpaceAccessAction({
-        spaceMarketplaceData: this.spaceItem,
-      }).execute();
+      (async () => {
+        const result = await this.spaceActions.createRequestSpaceAccessAction({
+          spaceMarketplaceData: this.spaceItem,
+        }).execute();
+        if (result.status === 'done') {
+          this.set('isRequested', true);
+        }
+      })();
       // FIXME: change into disabled button
     },
     expandDescription() {
