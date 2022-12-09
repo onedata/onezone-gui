@@ -30,18 +30,28 @@
       </div>
     </div>
     <div class="access-info-col">
-      <div class="main-button">
-        {{#if spaceItem.isOwned}}
-          {{#one-button size="sm" onClick=(action "configureSpace")}}
-            Configure
-          {{/one-button}}
-        {{else}}
-          {{#one-button size="sm" onClick=(action "requestAccess")}}
-            {{one-icon icon="cart"}}
-            Request access
-          {{/one-button}}
-        {{/if}}
-      </div>
+      {{#if spaceItem.isOwned}}
+        <div class="access-granted-container">
+          {{one-icon icon="cart-checked"}}
+          <span class="text">{{tt this "accessGranted"}}</span>
+        </div>
+        <div class="access-links-container">
+          <a href={{visitSpaceHref}} class="visit-space-link space-link">
+            <span class="text">{{tt this "visitSpace"}}</span>
+            {{one-icon icon="link-external"}}
+          </a>
+          <span class="col-separator"></span>
+          <a href={{configureSpaceHref}} class="configure-space-link space-link">
+            <span class="text">{{tt this "configure"}}</span>
+            {{one-icon icon="link-external"}}
+          </a>
+        </div>
+      {{else}}
+        {{#one-button size="sm" onClick=(action "requestAccess")}}
+          {{one-icon icon="cart"}}
+          <span class="text">{{tt this "requestAccess"}}</span>
+        {{/one-button}}
+      {{/if}}
     </div>
   </div>
   <div class="row marketplace-item-row description-row {{if isDescriptionExpanded "description-row-expanded"}}">
@@ -51,7 +61,7 @@
     }}
     {{#unless isDescriptionExpanded}}
       <div class="expand-btn">
-        <a class="navy" onclick={{action "expandDescription"}}>Expand description...</a>
+        <a class="navy" onclick={{action "expandDescription"}}>{{tt this "expandDescription"}}</a>
       </div>
     {{/unless}}
   </div>

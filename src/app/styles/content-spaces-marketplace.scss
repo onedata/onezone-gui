@@ -35,16 +35,6 @@
       display: flex;
       align-items: center;
       margin-top: 0.5em;
-      .col-separator {
-        margin-left: 1em;
-        margin-right: 1em;
-        &::after {
-          height: 32px;
-          content: ' ';
-          border-left: 1px solid;
-          border-color: $main-border-color;
-        }
-      }
       .support-list {
         display: flex;
         .support-item {
@@ -88,6 +78,55 @@
 
     .organization-name {
       @include font-semibold;
+    }
+
+    .access-info-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      > * {
+        margin-top: 0.25em;
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+    }
+
+    .col-separator {
+      margin-left: 1em;
+      margin-right: 1em;
+      &::after {
+        height: 32px;
+        content: ' ';
+        border-left: 1px solid;
+        border-color: $main-border-color;
+      }
+    }
+
+    .access-granted-container {
+      display: flex;
+      align-items: center;
+      margin-right: 0.5em;
+      .one-icon {
+        font-size: 2em;
+      }
+      .text {
+        margin-left: 0.4em;
+      }
+    }
+
+    .access-links-container {
+      margin-top: 0.75em;
+      margin-right: 0.35em;
+    }
+
+    .space-link {
+      display: inline-flex;
+      align-items: center;
+      .one-icon {
+        margin-left: 0.2em;
+        font-size: 120%;
+      }
     }
 
     --marketplace-description-background-color: #{$main-tabbed-content-background};
