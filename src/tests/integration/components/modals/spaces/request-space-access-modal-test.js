@@ -15,6 +15,7 @@ import {
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
 import { all as allFulfilled } from 'rsvp';
+import { click, fillIn } from '@ember/test-helpers';
 
 describe('Integration | Component | modals/spaces/request-space-access-modal', function () {
   setupRenderingTest();
@@ -23,8 +24,6 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
     const helper = new Helper(this);
     helper.setSpaceMarketplaceData({
       name: 'Foo bar',
-      organizationName: 'The Corporation',
-      spaceId: 'dummy_space_id',
     });
 
     await helper.showModal();
@@ -32,6 +31,40 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
     expect(helper.header).to.contain.text('Request space access');
     expect(helper.body).to.contain.text(
       'You are about to request access to Foo bar space.'
+    );
+  });
+
+  it('renders a textarea for message and email input', async function () {
+    const helper = new Helper(this);
+
+    await helper.showModal();
+
+    console.log(helper.modal.outerHTML);
+
+    expect(helper.emailInput, 'email').to.exist;
+    expect(helper.messageTextarea, 'message').to.exist;
+  });
+
+  it('calls onSubmit with data from form and space marketplace data', async function () {
+    const helper = new Helper(this);
+    helper.setSpaceMarketplaceData({
+      spaceId: 'space_id_1',
+    });
+    const submitSpy = sinon.spy();
+    helper.modalOptions.onSubmit = submitSpy;
+
+    await helper.showModal();
+    await fillIn(helper.emailInput, 'user@example.com');
+    await fillIn(helper.messageTextarea, 'Hello, this is dog.');
+    await click(helper.proceedButton);
+
+    expect(submitSpy).to.have.been.calledOnce;
+    expect(submitSpy).to.have.been.calledWith(
+      sinon.match({
+        email: 'user@example.com',
+        message: 'Hello, this is dog.',
+        spaceId: 'space_id_1',
+      })
     );
   });
 });
@@ -43,16 +76,22 @@ class Helper {
     this.mochaContext = mochaContext;
     this.store = lookupService(this.mochaContext, 'store');
     this.modalOptions = {};
+    this.initDefaultSpaceMarketplaceData();
   }
 
-  async setSpaceMarketplaceData(spaceMarketplaceData) {
-    this.modalOptions = {
-      spaceMarketplaceData: {
-        ...spaceMarketplaceData,
-      },
+  initDefaultSpaceMarketplaceData() {
+    const defaultSpaceMarketplaceData = {
+      name: 'Default space name',
+      organizationName: 'Default Corporation',
+      spaceId: 'default_space_id',
     };
+    this.setSpaceMarketplaceData(defaultSpaceMarketplaceData);
+  }
+  setSpaceMarketplaceData(spaceMarketplaceData) {
+    this.modalOptions.spaceMarketplaceData = spaceMarketplaceData;
   }
 
+  /** @type {HTMLElement} */
   get modal() {
     return getModal();
   }
@@ -60,11 +99,21 @@ class Helper {
   get body() {
     return getModalBody();
   }
+  /** @type {HTMLElement} */
   get header() {
     return getModalHeader();
   }
+  /** @type {HTMLElement} */
   get footer() {
     return getModalFooter();
+  }
+  /** @type {HTMLTextAreaElement} */
+  get messageTextarea() {
+    return this.body.querySelector('.message-field textarea');
+  }
+  /** @type {HTMLInputElement} */
+  get emailInput() {
+    return this.body.querySelector('.email-field input');
   }
   get cancelButton() {
     return this.footer.querySelector('.cancel-btn');

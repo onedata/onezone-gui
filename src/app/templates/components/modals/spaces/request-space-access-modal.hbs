@@ -13,26 +13,27 @@
 
   {{#modal.body}}
     <p>{{tt this "body.intro" spaceName=spaceName}}</p>
+    <form class="form form-horizontal form-component request-access-form">
+      {{form-component/field-renderer field=rootField}}
+    </form>
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}
-    {{!-- {{#one-button
+    {{#one-button
       type="default"
       class="cancel-btn"
       onClick=modal.close
     }}
-      {{tt this closeButtonType}}
+      {{tt this "cancel"}}
     {{/one-button}}
-    {{#if isProceedButtonVisible}}
-      {{#one-button
-        type="primary"
-        class="proceed-btn"
-        disabled=(not isProceedAvailable)
-        onClick=(if isProceedAvailable (action modal.submit selectedSpace.entityId))
-      }}
-        {{tt this "proceed"}}
-      {{/one-button}}
-    {{/if}} --}}
+    {{#one-button
+      type="primary"
+      class="proceed-btn"
+      disabled=(not isProceedAvailable)
+      onClick=(if isProceedAvailable (action "submit" modal.submit))
+    }}
+      {{tt this "proceed"}}
+    {{/one-button}}
   {{/modal.footer}}
 
 {{/global-modal}}
