@@ -42,7 +42,7 @@ export default Component.extend(I18n, {
     }
   ),
 
-  messageField: computed(function contactEmailField() {
+  messageField: computed(function messageField() {
     return TextAreaField.create({
       ownerSource: this,
       name: 'message',
@@ -51,7 +51,7 @@ export default Component.extend(I18n, {
     });
   }),
 
-  emailField: computed(function contactEmailField() {
+  emailField: computed(function emailField() {
     return TextField.create({
       ownerSource: this,
       name: 'email',
@@ -61,8 +61,7 @@ export default Component.extend(I18n, {
     });
   }),
 
-  // FIXME: implement basing on form validation
-  isProceedAvailable: true,
+  isProceedAvailable: reads('rootField.isValid'),
 
   actions: {
     /**

@@ -67,6 +67,32 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
       })
     );
   });
+
+  it('has proceed button disabled if message and email is not set', async function () {
+    const helper = new Helper(this);
+    const submitSpy = sinon.spy();
+    helper.modalOptions.onSubmit = submitSpy;
+
+    await helper.showModal();
+
+    expect(helper.proceedButton).to.have.attr('disabled');
+    await click(helper.proceedButton);
+    expect(submitSpy).to.have.not.been.called;
+  });
+
+  it('has proceed button disabled if email is not in valid format', async function () {
+    const helper = new Helper(this);
+    const submitSpy = sinon.spy();
+    helper.modalOptions.onSubmit = submitSpy;
+
+    await helper.showModal();
+    await fillIn(helper.messageTextarea, 'hehe');
+    await fillIn(helper.emailInput, 'haha');
+
+    expect(helper.proceedButton).to.have.attr('disabled');
+    await click(helper.proceedButton);
+    expect(submitSpy).to.have.not.been.called;
+  });
 });
 
 class Helper {

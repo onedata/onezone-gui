@@ -5,4 +5,10 @@ export default {
   },
   cancel: 'Cancel',
   proceed: 'Proceed',
+  message: {
+    label: 'Message to space maintainer',
+  },
+  email: {
+    label: 'Your e-mail address',
+  },
 };

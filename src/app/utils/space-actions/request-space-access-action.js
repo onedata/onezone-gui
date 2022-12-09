@@ -12,6 +12,7 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
+import { htmlSafe } from '@ember/string';
 
 // FIXME: valid context jsdoc / types
 /**
@@ -29,11 +30,14 @@ import ActionResult from 'onedata-gui-common/utils/action-result';
 export default Action.extend({
   modalManager: service(),
   router: service(),
+  spaceManager: service(),
+  globalNotify: service(),
+  alert: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'utils.spaceActions.chooseSpaceToAdvertiseAction',
+  i18nPrefix: 'utils.spaceActions.requestSpaceAccessAction',
 
   /**
    * @override
@@ -44,12 +48,12 @@ export default Action.extend({
   /**
    * @override
    */
-  className: 'choose-space-to-advertise-trigger',
+  className: 'request-space-access-trigger',
 
   /**
    * @override
    */
-  icon: 'add-filled',
+  icon: 'cart',
 
   spaceMarketplaceData: reads('context.spaceMarketplaceData'),
 
@@ -58,16 +62,40 @@ export default Action.extend({
    */
   async onExecute() {
     const result = ActionResult.create();
-    await this.modalManager
+    const modalInstance = this.modalManager
       .show('spaces/request-space-access-modal', {
+        hideAfterSubmit: false,
         onSubmit: async (requestData) => {
-          await this.sendRequest(requestData);
-          // FIXME: modal or notify with information about next steps (wait for access)
+          try {
+            await this.sendRequest(requestData);
+            this.showSuccessInfo(requestData);
+            this.modalManager.hide(modalInstance.id);
+          } catch (error) {
+            // FIXME: fix bad background between two modals
+            this.showErrorInfo(error);
+          }
         },
         spaceMarketplaceData: this.spaceMarketplaceData,
-      }).hiddenPromise;
+      });
+    await modalInstance.hiddenPromise;
     set(result, 'status', 'done');
     return result;
+  },
+
+  showSuccessInfo(requestData) {
+    const text = this.t('requestSuccess.text', {
+      email: requestData.email,
+    });
+    this.alert.success(htmlSafe(`<p>${text}</p>`), {
+      header: this.t('requestSuccess.header'),
+    });
+  },
+
+  showErrorInfo(error) {
+    this.globalNotify.backendError(
+      this.t('sendingRequest'),
+      error
+    );
   },
 
   /**

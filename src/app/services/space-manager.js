@@ -486,15 +486,17 @@ export default Service.extend({
    * @returns {Promise}
    */
   async requestSpaceAccess(requestData) {
-    const requestGri = gri({
-      entityType: spaceEntityType,
-      entityId: requestData.spaceId,
-      aspect: 'request_membership',
-    });
-    return this.onedataGraph.request({
-      gri: requestGri,
-      operation: 'create',
-      subscribe: false,
-    });
+    // FIXME: mocked successful response
+    return {};
+    // const requestGri = gri({
+    //   entityType: spaceEntityType,
+    //   entityId: requestData.spaceId,
+    //   aspect: 'request_membership',
+    // });
+    // return this.onedataGraph.request({
+    //   gri: requestGri,
+    //   operation: 'create',
+    //   subscribe: false,
+    // });
   },
 });
