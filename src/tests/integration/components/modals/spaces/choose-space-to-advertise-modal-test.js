@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { assert } from '@ember/debug';
-import { render, find } from '@ember/test-helpers';
+import { render } from '@ember/test-helpers';
 import createSpace from '../../../../helpers/create-space';
 import OneDropdownHelper from '../../../../helpers/one-dropdown';
 import { lookupService } from '../../../../helpers/stub-service';
@@ -15,8 +15,6 @@ import {
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
 import { all as allFulfilled } from 'rsvp';
-import { get } from '@ember/object';
-import sleep from 'onedata-gui-common/utils/sleep';
 
 describe('Integration | Component | modals/spaces/choose-space-to-advertise-modal', function () {
   setupRenderingTest();

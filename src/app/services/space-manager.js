@@ -478,4 +478,23 @@ export default Service.extend({
       }),
     ];
   },
+
+  // FIXME: to consult
+
+  /**
+   * @param {SpaceAccessRequestMessageData} requestData
+   * @returns {Promise}
+   */
+  async requestSpaceAccess(requestData) {
+    const requestGri = gri({
+      entityType: spaceEntityType,
+      entityId: requestData.spaceId,
+      aspect: 'request_membership',
+    });
+    return this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      subscribe: false,
+    });
+  },
 });

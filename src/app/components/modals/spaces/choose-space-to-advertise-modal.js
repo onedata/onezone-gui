@@ -7,9 +7,6 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { or, not, promise, conditional, raw, isEmpty, array, and, notEmpty } from 'ember-awesome-macros';
-import TextField from 'onedata-gui-common/utils/form-component/text-field';
-import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
-import { emailRegex } from 'onedata-gui-common/utils/validators/email';
 
 export default Component.extend(I18n, {
   tagName: '',

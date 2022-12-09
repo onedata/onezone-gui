@@ -14,6 +14,7 @@ export default Component.extend(I18n, {
   i18nPrefix: 'components.contentSpacesMarketplace.item',
 
   router: service(),
+  spaceActions: service(),
 
   viewModel: undefined,
 
@@ -59,8 +60,12 @@ export default Component.extend(I18n, {
   }),
 
   actions: {
-    configureSpace() {},
-    requestAccess() {},
+    requestAccess() {
+      this.spaceActions.createRequestSpaceAccessAction({
+        spaceMarketplaceData: this.spaceItem,
+      }).execute();
+      // FIXME: change into disabled button
+    },
     expandDescription() {
       this.set('isDescriptionExpanded', true);
     },

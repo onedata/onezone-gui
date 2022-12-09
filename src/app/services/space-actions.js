@@ -15,6 +15,7 @@ import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-acti
 import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harvester-to-space-action';
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
 import ChooseSpaceToAdvertiseAction from 'onezone-gui/utils/space-actions/choose-space-to-advertise-action';
+import RequestSpaceAccessAction from 'onezone-gui/utils/space-actions/request-space-access-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -70,13 +71,18 @@ export default Service.extend(I18n, {
     return RemoveHarvesterFromSpaceAction.create({ ownerSource: this, context });
   },
 
-  // FIXME: context is not needed
+  // FIXME: context is not needed?
   /**
    * @param {ChooseSpaceToAdvertiseContext} context
-   * @returns
+   * @returns {Utils.SpaceActions.ChooseSpaceToAdvertiseAction}
    */
   createChooseSpaceToAdvertiseAction(context = {}) {
     return ChooseSpaceToAdvertiseAction.create({ ownerSource: this, context });
+  },
+
+  // FIXME: describe context or is not needed?
+  createRequestSpaceAccessAction(context) {
+    return RequestSpaceAccessAction.create({ ownerSource: this, context });
   },
 
   /**
