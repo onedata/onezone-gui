@@ -4,13 +4,23 @@
     height: 0.7em;
     display: inline-block;
     position: relative;
-    vertical-align: middle;
+    vertical-align: text-bottom;
     font-size: 180%;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 1px;
   }
 
-  &.nav-link .flippable-icons .icon-container {
-    .oneicon-browser-info.one-icon {
-      color: inherit;
+  &.nav-link {
+    .flippable-icons .icon-container {
+      .oneicon-browser-info.one-icon {
+        color: inherit;
+      }
+    }
+    .provider-info-trigger {
+      margin-bottom: 0px;
     }
   }
+  
+  
 }
