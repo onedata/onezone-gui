@@ -1,3 +1,5 @@
+// FIXME: jsdoc
+
 import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -55,13 +57,20 @@ export default Component.extend(...mixins, {
     this.removeOverflowDetectionListener();
   },
 
+  toggleExpand(shouldBeExpanded) {
+    this.set('isExpanded', shouldBeExpanded);
+    (async () => {
+      await waitForRender();
+      this.detectOverflow();
+    })();
+  },
+
   actions: {
     expand() {
-      this.set('isExpanded', true);
-      (async () => {
-        await waitForRender();
-        this.detectOverflow();
-      })();
+      this.toggleExpand(true);
+    },
+    collapse() {
+      this.toggleExpand(false);
     },
   },
 });

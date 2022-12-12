@@ -3,7 +3,19 @@
   markdown=spaceItem.description
 }}
 {{#if hasOverflow}}
-  <div class="expand-btn">
-    <a class="navy" onclick={{action "expand"}}>{{tt this "expand"}}</a>
+  <div class="toggle-expand-btn expand-btn">
+    <a class="toggle-expand-anchor navy" onclick={{action "expand"}}>
+      {{one-icon icon="arrow-down"}}
+      <span class="text">{{tt this "expand"}}</span>
+      {{one-icon icon="arrow-down"}}
+    </a>
+  </div>
+{{else if isExpanded}}
+  <div class="toggle-expand-btn collapse-btn">
+    <a class="toggle-expand-anchor navy" onclick={{action "collapse"}}>
+      {{one-icon icon="arrow-up"}}
+      <span class="text">{{tt this "collapse"}}</span>
+      {{one-icon icon="arrow-up"}}
+    </a>
   </div>
 {{/if}}
