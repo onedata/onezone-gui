@@ -1,4 +1,7 @@
 .content-spaces-providers {
+  .col-space-provider-list > .row {
+    padding-top: 22px;
+  }
   .provider-item {
     .provider-item-name-line {
       max-width: calc(100% - 3em);
