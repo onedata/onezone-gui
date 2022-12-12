@@ -148,7 +148,7 @@
   background-color: var(--marketplace-description-background-color);
   border-radius: $border-radius-base;
   .markdown-view {
-    margin: 1em;
+    margin: 1em 1.3em;
   }
   &.has-overflow {
     &::after {

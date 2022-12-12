@@ -1,4 +1,7 @@
 .request-space-access-modal {
+  p + .request-access-form {
+    margin-top: 1em;
+  }
   .message-field {
     textarea {
       min-height: 10em;

@@ -68,15 +68,15 @@
   // FIXME: DRY styles with marketplace item
   .space-description-markdown-container {
     width: 100%;
-    padding: 1em;
     margin-top: 0;
     margin-bottom: 0;
+    padding-bottom: 1em;
     background-color: $main-tabbed-content-background;
     border: 1px solid;
     border-color: $main-border-color;
     border-radius: $border-radius-base;
     .space-description-markdown-view {
-      margin-top: 0;
+      margin: 1em 1.3em;
     }
   }
   .description-form-group {
