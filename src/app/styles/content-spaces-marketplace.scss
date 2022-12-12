@@ -131,54 +131,59 @@
 
     --marketplace-description-background-color: #{$main-tabbed-content-background};
     --marketplace-description-border-color: #{$main-border-color};
+  }
+}
 
-    .description-row {
-      margin-top: 1em;
-      height: 7em;
-      max-height: 7em;
-      position: relative;
-      z-index: 0;
-      overflow: hidden;
-      border: 1px solid;
-      border-color: var(--marketplace-description-border-color);
-      background-color: var(--marketplace-description-background-color);
-      border-radius: $border-radius-base;
-      .markdown-view {
-        margin: 1em;
-      }
-      &::after {
-        content: ' ';
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 5em;
-        background: linear-gradient(transparent, var(--marketplace-description-background-color));
-        z-index: 1;
-      }
-      .expand-btn {
-        padding: 0.5em;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 0;
-        z-index: 2;
-        a {
-          @include font-semibold;
-        }
-      }
-      &.description-row-expanded {
-        height: auto;
-        max-height: none;
-        .expand-btn {
-          display: none;
-        }
-        &::after {
-          display: none;
-        }
-      }
+.marketplace-space-description {
+  display: block;
+  width: 100%;
+  margin-top: 1em;
+  height: 7em;
+  max-height: 7em;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  border: 1px solid;
+  border-color: var(--marketplace-description-border-color);
+  background-color: var(--marketplace-description-background-color);
+  border-radius: $border-radius-base;
+  .markdown-view {
+    margin: 1em;
+  }
+  &.has-overflow {
+    &::after {
+      content: ' ';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 4em;
+      background: linear-gradient(transparent 0%, var(--marketplace-description-background-color) 50%, var(--marketplace-description-background-color));
+      z-index: 1;
+    }
+  }
+  .expand-btn {
+    padding: 0.5em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    z-index: 2;
+    a {
+      @include font-semibold;
+    }
+  }
+  &.is-expanded {
+    height: auto;
+    max-height: none;
+    .expand-btn {
+      display: none;
+    }
+    &::after {
+      display: none;
     }
   }
 }
+
 
 .iconified-block-marketplace-available {
   $leading-color: $color-one-light-blue;

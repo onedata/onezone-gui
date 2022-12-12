@@ -60,16 +60,10 @@
       {{/if}}
     </div>
   </div>
-  <div class="row marketplace-item-row description-row {{if isDescriptionExpanded "description-row-expanded"}}">
-    {{one-markdown-to-html
-      class="markdown-view"
-      markdown=spaceItem.description
+  <div class="row marketplace-item-row description-row">
+    {{content-spaces-marketplace/space-description
+      spaceItem=spaceItem
     }}
-    {{#unless isDescriptionExpanded}}
-      <div class="expand-btn">
-        <a class="navy" onclick={{action "expandDescription"}}>{{tt this "expandDescription"}}</a>
-      </div>
-    {{/unless}}
   </div>
 </div>
 {{yield}}

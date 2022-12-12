@@ -4,5 +4,4 @@ export default {
   configure: 'Configure',
   requestAccess: 'Request access',
   requestSent: 'Request sent',
-  expandDescription: 'Expand description',
 };

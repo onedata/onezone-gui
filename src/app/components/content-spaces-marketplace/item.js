@@ -73,16 +73,9 @@ export default Component.extend(I18n, {
     'spaceItem.providerIds',
     async function providersProxy() {
       const ids = this.spaceItem.providerIds;
-      // try {
-      const pro = await allFulfilled(ids.map(entityId => {
+      return allFulfilled(ids.map(entityId => {
         return this.providerManager.getRecordById(entityId);
       }));
-      // debugger;
-      return pro;
-      // } catch (error) {
-      // debugger;
-      // }
-
     }
   )),
 
@@ -98,9 +91,6 @@ export default Component.extend(I18n, {
           this.set('isRequested', true);
         }
       })();
-    },
-    expandDescription() {
-      this.set('isDescriptionExpanded', true);
     },
   },
 });
