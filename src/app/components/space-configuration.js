@@ -11,6 +11,7 @@ import { buildValidations } from 'ember-cp-validations';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import emailValidator from 'onedata-gui-common/utils/validators/email';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -27,6 +28,7 @@ export default Component.extend(validations, I18n, {
 
   modalManager: service(),
   onedataConnection: service(),
+  router: service(),
 
   /**
    * @override
@@ -130,8 +132,22 @@ export default Component.extend(validations, I18n, {
       tagEditorComponentName: 'tags-input/selector-editor',
       tagEditorSettings: {
         allowedTags: this.allowedTags,
-      }
+      },
     };
+  }),
+
+  viewInMarketplaceHref: computed('space.entityId', function viewInMarketplaceHref() {
+    return this.router.urlFor(
+      'onedata.sidebar.content',
+      'spaces',
+      'join', {
+        queryParams: {
+          options: serializeAspectOptions({
+            selectedSpace: this.space.entityId,
+          }),
+        },
+      }
+    );
   }),
 
   spaceObserver: observer('space', function spaceObserver() {

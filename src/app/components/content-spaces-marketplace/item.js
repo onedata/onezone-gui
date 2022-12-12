@@ -11,6 +11,7 @@ import { all as allFulfilled } from 'rsvp';
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-item', 'iconified-block'],
   classNameBindings: ['spaceItem.isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
+  attributeBindings: ['spaceId:space-id'],
 
   /**
    * @override
@@ -44,6 +45,8 @@ export default Component.extend(I18n, {
   isOwned: reads('spaceItem.isOwned'),
 
   spaceName: reads('spaceItem.name'),
+
+  spaceId: reads('spaceItem.spaceId'),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
