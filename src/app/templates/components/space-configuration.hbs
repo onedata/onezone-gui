@@ -168,6 +168,12 @@
       update=(action "saveValue" "advertised")
       lockHint=advertisedToggleLockHint
     }}
+    {{#if isAdvertised}}
+      <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
+        <span class="text">{{tt this "viewInMarketplace"}}</span>
+        {{one-icon icon="link-external"}}
+      </a>
+    {{/if}}
   </div>
   {{#if isAdvertised}}
     <div class={{concat-classes

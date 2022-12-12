@@ -17,11 +17,24 @@
       display: flex;
     }
     .advertised-form-group {
+      display: flex;
       align-items: center;
       // FIXME: maybe to be flexible
       // .control-label {
       //   width: auto;
       // }
+      .view-in-marketplace-link {
+        display: inline-flex;
+        align-items: center;
+        margin: $padding-base-vertical $padding-base-horizontal;
+        margin-bottom: 0;
+        .one-icon {
+          font-size: 150%;
+        }
+        .text + .one-icon {
+          margin-left: 0.2em;
+        }
+      }
     }
   }
   .space-tags.one-inline-editor.editor {

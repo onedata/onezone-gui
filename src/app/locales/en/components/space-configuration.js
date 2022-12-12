@@ -27,6 +27,7 @@ export default {
   contactEmail: {
     label: 'Contact e-mail',
   },
+  viewInMarketplace: 'View in marketplace',
   save: 'Save',
   discard: 'Discard changes',
   fieldCannotBeEmptyWhenAdvertising: 'This field cannot be blank when space is advertised in marketplace',
