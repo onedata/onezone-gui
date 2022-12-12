@@ -1,31 +1,16 @@
 .provider-info-name {
-  &.nav-link .flippable-icons .inline-icon-container {
-    .flippable-front {
-      transform: translate(-4px, -6px);
-    }
-
-    .flippable-back {
-      transform: rotateY(180deg) translate(4px, -6px);
-      color: inherit;
-    }
-  }
   .provider-info-trigger {
+    width: 0.7em;
+    height: 0.7em;
+    display: inline-block;
+    position: relative;
     vertical-align: middle;
+    font-size: 180%;
   }
 
-  .flippable-icons {
-    .inline-icon-container {
-      width: 18px;
-      height: 18px;
-      margin-left: 5px;
-    }
-
-    .flippable-front {
-      transform: translate(-4px, -15px);
-    }
-
-    .flippable-back {
-      transform: rotateY(180deg) translate(4px, -15px);
+  &.nav-link .flippable-icons .icon-container {
+    .oneicon-browser-info.one-icon {
+      color: inherit;
     }
   }
 }

@@ -4,7 +4,7 @@
   mouseLeave=(action "changeIconHover" false)
 }}
   <div
-    class="inline-icon-container provider-info-trigger"
+    class="icon-container provider-info-trigger"
     {{action
       (mut providerInfoOpened)
       (not providerInfoOpened)
@@ -14,7 +14,8 @@
     {{flippable-icons
       iconName="provider"
       isHovered=isIconHovered
-      shouldAnimated=(not providerInfoOpened)
+      suppressFlipping=providerInfoOpened
+      iconColor=iconColor
     }}
   </div>
   <span class="tab-name one-label">{{provider.name}}</span>
