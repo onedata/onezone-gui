@@ -1,4 +1,4 @@
-// FIXME: i18n consult
+// TODO: VFS-10252 consult i18n
 export default {
   sendingRequest: 'sending request',
   requestSuccess: {

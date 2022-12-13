@@ -56,7 +56,7 @@ const OnezoneConnection = ProductionSymbol.extend({
    */
   defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
 
-  // FIXME: development name of handshake attribute
+  // TODO: VFS-10252 integrate with backend
   availableSpaceTags: reads('attributes.availableSpaceTags'),
 
   /**

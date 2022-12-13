@@ -19,10 +19,6 @@
     .advertised-form-group {
       display: flex;
       align-items: center;
-      // FIXME: maybe to be flexible
-      // .control-label {
-      //   width: auto;
-      // }
       .view-in-marketplace-link {
         display: inline-flex;
         align-items: center;
@@ -65,16 +61,11 @@
       margin-left: 0.5em;
     }
   }
-  // FIXME: DRY styles with marketplace item
   .space-description-markdown-container {
     width: 100%;
     margin-top: 0;
     margin-bottom: 0;
     padding-bottom: 1em;
-    background-color: $main-tabbed-content-background;
-    border: 1px solid;
-    border-color: $main-border-color;
-    border-radius: $border-radius-base;
     .space-description-markdown-view {
       margin: 1em 1.3em;
     }

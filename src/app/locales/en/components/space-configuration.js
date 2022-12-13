@@ -1,3 +1,4 @@
+// TODO: VFS-10252 consult i18n
 export default {
   organizationName: {
     label: 'Organization name',
@@ -20,7 +21,6 @@ export default {
   advertised: {
     label: 'Advertise in marketplace',
     lockHint: {
-      // FIXME: consult i18n
       requiredFieldsEmpty: 'Advertising space in marketplace requires organization name, tags and description to be set.',
     },
   },

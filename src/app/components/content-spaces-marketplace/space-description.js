@@ -21,7 +21,10 @@ const mixins = [
 ];
 
 export default Component.extend(...mixins, {
-  classNames: ['marketplace-space-description'],
+  classNames: [
+    'marketplace-space-description',
+    'space-description-markdown-container',
+  ],
   classNameBindings: ['hasOverflow:has-overflow', 'isExpanded:is-expanded'],
 
   /**

@@ -128,9 +128,6 @@
         font-size: 120%;
       }
     }
-
-    --marketplace-description-background-color: #{$main-tabbed-content-background};
-    --marketplace-description-border-color: #{$main-border-color};
   }
 }
 
@@ -143,10 +140,6 @@
   position: relative;
   z-index: 0;
   overflow: hidden;
-  border: 1px solid;
-  border-color: var(--marketplace-description-border-color);
-  background-color: var(--marketplace-description-background-color);
-  border-radius: $border-radius-base;
   .markdown-view {
     margin: 1em 1.3em;
   }
@@ -157,7 +150,7 @@
       bottom: 0;
       width: 100%;
       height: 4em;
-      background: linear-gradient(transparent 0%, var(--marketplace-description-background-color) 50%, var(--marketplace-description-background-color));
+      background: linear-gradient(transparent 0%, var(--space-description-background-color) 50%, var(--space-description-background-color));
       z-index: 1;
     }
   }

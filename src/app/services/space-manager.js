@@ -17,19 +17,18 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
-import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
-import { entityType as providerEntityType } from 'onezone-gui/models/provider';
+import { exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
  */
 
-// FIXME: move to separate file - this will be a model in list:
+// TODO: VFS-10252 prototype of SpaceMarketplaceModel; integrate with backend
 /**
- * space.null.marketplace_spaces
- * ->list: [gri1, gri2]
- *
- * gri1: space.id1.marketplace_data
+ * Target model:
+ * - list GRI: `space.null.marketplace_spaces`
+ *   - content: `list: [gri1, gri2]`
+ * - single marketplace data record: `space.id1.marketplace_data`
  */
 const SpaceMarketplaceModel = EmberObject.extend({
   name: '',
@@ -39,9 +38,11 @@ const SpaceMarketplaceModel = EmberObject.extend({
   spaceId: '',
   isOwned: false,
   supportSize: 0,
+  // TODO: VFS-10252 maybe it will be list of GRIs; integrate with backend
   providerIds: Object.freeze([]),
 });
 
+// TODO: VFS-10252 mock for SpaceMarketplaceModel
 const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
   space: undefined,
 
@@ -54,15 +55,6 @@ const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
   providerIds: computed('space.supportSizes', function providerIds() {
     return Object.keys(get(this.space, 'supportSizes'));
   }),
-  // FIXME: to consult
-  // providerGris: computed('space.supportSizes', function providers() {
-  //   const providersIds = Object.keys(get(this.space, 'supportSizes'));
-  //   return providersIds.map(entityId => gri({
-  //     entityType: providerEntityType,
-  //     entityId,
-  //     aspect: 'instance',
-  //   }));
-  // }),
 });
 
 export default Service.extend({
@@ -458,13 +450,15 @@ export default Service.extend({
     }
   },
 
-  // FIXME: prototype method - this should be live list
+  // TODO: VFS-10252 it will be probably live list
   async getSpacesMarketplaceData() {
+    // TODO: VFS-10252 integrate with backend
     // const requestGri = gri({
     //   entityType: 'space',
     //   entityId: 'null',
     //   aspect: 'marketplace_spaces',
     // });
+    // TODO: VFS-10252 creating mock of space marketplace records
     const allSpaces = (await this.getSpaces()).get('list').toArray();
     const advertisedSpaces = allSpaces
       .filter(space => get(space, 'advertisedInMarketplace'));
@@ -474,7 +468,6 @@ export default Service.extend({
         isOwned: true,
       })
     );
-    // FIXME: testing code
     return [
       ...ownedSpaces,
       SpaceMarketplaceModel.create({
@@ -500,14 +493,12 @@ export default Service.extend({
     ];
   },
 
-  // FIXME: to consult
-
+  // TODO: VFS-10252 mock of successful response; integrate with backend
   /**
    * @param {SpaceAccessRequestMessageData} requestData
    * @returns {Promise}
    */
-  async requestSpaceAccess(requestData) {
-    // FIXME: mocked successful response
+  async requestSpaceAccess( /* requestData */ ) {
     return {};
     // const requestGri = gri({
     //   entityType: spaceEntityType,
