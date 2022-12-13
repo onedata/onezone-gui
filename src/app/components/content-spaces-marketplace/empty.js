@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * Welcome screen shown when there are no spaces in marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';

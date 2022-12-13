@@ -20,6 +20,7 @@ import ActionResult from 'onedata-gui-common/utils/action-result';
 export default Action.extend({
   modalManager: service(),
   router: service(),
+  gloalNotify: service(),
 
   /**
    * @override
@@ -41,12 +42,29 @@ export default Action.extend({
    */
   async onExecute() {
     const result = ActionResult.create();
-    await this.modalManager
+    const modalInstance = this.modalManager
       .show('spaces/choose-space-to-advertise-modal', {
-        onSubmit: async (spaceId) => await this.configureSpace(spaceId),
-      }).hiddenPromise;
-    set(result, 'status', 'done');
+        hideAfterSubmit: false,
+        onSubmit: async (spaceId) => {
+          try {
+            await this.configureSpace(spaceId);
+            this.modalManager.hide(modalInstance.id);
+            set(result, 'status', 'done');
+          } catch (error) {
+            this.showErrorInfo(error);
+            set(result, 'status', 'error');
+          }
+        },
+      });
+    await modalInstance.hiddenPromise;
     return result;
+  },
+
+  showErrorInfo(error) {
+    this.globalNotify.backendError(
+      this.t('openingSpaceConfiguration'),
+      error
+    );
   },
 
   async configureSpace(spaceId) {

@@ -1,3 +1,4 @@
+// TODO: VFS-10252 consult i18n
 export default {
   header: 'Request space access',
   body: {

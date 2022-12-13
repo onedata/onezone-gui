@@ -1,5 +1,3 @@
-// FIXME: jsdoc
-
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
@@ -18,13 +16,6 @@ export default Component.extend(I18n, {
    * @override
    */
   i18nPrefix: 'components.modals.spaces.chooseSpaceToAdvertiseModal',
-
-  // FIXME: maybe not needed
-  /**
-   * @virtual
-   * @type {Object}
-   */
-  modalOptions: undefined,
 
   /**
    * @virtual
@@ -56,18 +47,10 @@ export default Component.extend(I18n, {
     raw(false)
   ),
 
-  // spacesToAdvertiseOptions: computed(
-  //   'nonAdvertisedSpaces',
-  //   function spacesToAdvertiseOptions() {
-
-  //   }
-  // ),
-
   noSpaces: isEmpty('allSpaces'),
 
   areAllSpacesAdvertised: and(not('noSpaces'), isEmpty('nonAdvertisedSpaces')),
 
-  // FIXME: remove if not used, only if space is selected
   isProceedAvailable: and('isProceedButtonVisible', notEmpty('selectedSpace')),
 
   isProceedButtonVisible: not(or('noSpaces', 'areAllSpacesAdvertised')),
@@ -85,27 +68,12 @@ export default Component.extend(I18n, {
     this.set('isSubmitting', true);
     try {
       await submitCallback(result);
-    } catch {
-      // FIXME: implement (cannot open space configuration)
     } finally {
       safeExec(this, () => this.set('isSubmitting', false));
     }
   },
 
   actions: {
-    // async submit(submitCallback) {
-    //   if (!this.isProceedAvailable) {
-    //     return;
-    //   }
-    //   this.set('isSubmitting', true);
-    //   try {
-    //     await submitCallback(this.selectedSpace);
-    //   } catch {
-    //     // FIXME: implement
-    //   } finally {
-    //     safeExec(this, () => this.set('isSubmitting', false));
-    //   }
-    // },
     spaceChanged(space) {
       this.set('selectedSpace', space);
     },

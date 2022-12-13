@@ -111,8 +111,6 @@ import shareNotFound from './components/errors/share-not-found';
 import openShareFailed from './components/errors/open-share-failed';
 import offlineProviders from './components/errors/offline-providers';
 import apiSamplesModal from './components/modals/api-samples-modal';
-import enableMarketplaceAdvertisementModal from './components/modals/space-configuration/enable-marketplace-advertisement';
-import disableMarketplaceAdvertisementModal from './components/modals/space-configuration/disable-marketplace-advertisement';
 import spacesModals from './components/modals/spaces';
 
 import spaceActions from './services/space-actions';
@@ -186,10 +184,6 @@ const translations = {
       unlinkAtmLambdaModal,
       applyAtmWorkflowSchemaDumpModal,
       apiSamplesModal,
-      spaceConfiguration: {
-        enableMarketplaceAdvertisementModal,
-        disableMarketplaceAdvertisementModal,
-      },
       spaces: spacesModals,
     },
     errors: {

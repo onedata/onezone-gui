@@ -1,5 +1,4 @@
-// FIXME: consult i18n
-
+// TODO: VFS-10252 consult i18n
 export default {
   header: 'Advertise space',
   noSpacesText: 'You do not belong to any space.',

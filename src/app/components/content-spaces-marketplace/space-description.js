@@ -1,4 +1,12 @@
-// FIXME: jsdoc
+/**
+ * Description of space for marketplace rendered from HTML to Markdown. It's collapsed
+ * container has max height and can be expanded if rendered description overflows the
+ * container.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';

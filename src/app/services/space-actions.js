@@ -71,16 +71,17 @@ export default Service.extend(I18n, {
     return RemoveHarvesterFromSpaceAction.create({ ownerSource: this, context });
   },
 
-  // FIXME: context is not needed?
   /**
-   * @param {ChooseSpaceToAdvertiseContext} context
    * @returns {Utils.SpaceActions.ChooseSpaceToAdvertiseAction}
    */
-  createChooseSpaceToAdvertiseAction(context = {}) {
-    return ChooseSpaceToAdvertiseAction.create({ ownerSource: this, context });
+  createChooseSpaceToAdvertiseAction() {
+    return ChooseSpaceToAdvertiseAction.create({ ownerSource: this });
   },
 
-  // FIXME: describe context or is not needed?
+  /**
+   * @param {RequestSpaceAccessActionContext} context
+   * @returns {Utils.SpaceActions.RequestSpaceAccessAction}
+   */
   createRequestSpaceAccessAction(context) {
     return RequestSpaceAccessAction.create({ ownerSource: this, context });
   },

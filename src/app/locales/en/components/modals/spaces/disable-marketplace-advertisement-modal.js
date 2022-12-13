@@ -1,4 +1,4 @@
-// FIXME: consult i18n
+// TODO: VFS-10252 consult i18n
 export default {
   header: 'Turn off advertising of this space',
   body: {
@@ -6,4 +6,5 @@ export default {
   },
   cancel: 'Cancel',
   proceed: 'Proceed',
+  disablingAdvertisement: 'disabling space advertisement',
 };

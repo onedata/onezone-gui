@@ -1,4 +1,10 @@
-// FIXME: jsdoc
+/**
+ * Single space item in marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
@@ -36,6 +42,11 @@ export default Component.extend(I18n, {
 
   //#region state
 
+  /**
+   * The access has been requested in current component instance.
+   * It is stored as component state, because there is currently no such state in model.
+   * @type {boolean}
+   */
   isRequested: false,
 
   isDescriptionExpanded: false,

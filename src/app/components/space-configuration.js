@@ -1,4 +1,11 @@
-// FIXME: jsdoc
+/**
+ * A "form" with inline-editors for changing space properties, especiall used when
+ * publishing space in marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
@@ -55,6 +62,10 @@ export default Component.extend(validations, I18n, {
    */
   currentDescription: '',
 
+  /**
+   * Current value of description in email inline editor (not necessarily saved).
+   * @type {string}
+   */
   currentContactEmail: '',
 
   /**
@@ -65,11 +76,17 @@ export default Component.extend(validations, I18n, {
    */
   preCurrentDescription: null,
 
+  /**
+   * Stores mapping: form field id -> is currently edited value blank?
+   * Initialized on init.
+   * @type {Object<string, boolean>}
+   */
   blankInlineEditors: undefined,
 
   //#endregion
 
   /**
+   * Space tags ready to use in component.
    * @type {ComputedProperty<Array<Tag>>}
    */
   spaceTags: computed('space.tags', function spaceTags() {
@@ -109,12 +126,21 @@ export default Component.extend(validations, I18n, {
     raw('')
   ),
 
+  /**
+   * Like `blankInlineEditors` stores information if some inline edited field is blank,
+   * but only if space is advertised, so blank editors should cause showing validation
+   * error. Used in showing validation messsaged.
+   * @type {Object<string, boolean>}
+   */
   blankInlineErrors: conditional(
     'isAdvertised',
     'blankInlineEditors',
     raw(Object.freeze({}))
   ),
 
+  /**
+   * @type {EmberCpValidations.Validation.ResultCollection}
+   */
   emailValidation: reads('validations.attrs.currentContactEmail'),
 
   allowedTags: computed(
@@ -161,6 +187,7 @@ export default Component.extend(validations, I18n, {
   },
 
   /**
+   * Generic function to change and save single property of space model.
    * @param {string} propertyName
    * @param {any} value
    * @returns {Promise<void>}
@@ -173,6 +200,10 @@ export default Component.extend(validations, I18n, {
     await this.space.save();
   },
 
+  /**
+   * Resets current inline edited values cache to values from record.
+   * @returns {void}
+   */
   setCurrentValuesFromRecord() {
     const description = this.spaceDescription;
     this.setProperties({
@@ -182,6 +213,12 @@ export default Component.extend(validations, I18n, {
     });
   },
 
+  /**
+   * Save inline edited value.
+   * @param {string} fieldId ID of field used in this component - see switch cases.
+   * @param {any} value Value from component - it will be serialized to model.
+   * @returns
+   */
   async saveValue(fieldId, value) {
     switch (fieldId) {
       case 'name':
@@ -194,8 +231,6 @@ export default Component.extend(validations, I18n, {
         break;
       }
       case 'advertised': {
-        // FIXME: stop for confirmation modal
-        // FIXME: this could be RPC in final implementation
         if (value) {
           await this.confirmAdvertisementEnable();
         } else {
@@ -213,6 +248,7 @@ export default Component.extend(validations, I18n, {
       }
       case 'contactEmail': {
         await this.saveSpaceValue('contactEmail', value);
+        this.setCurrentValuesFromRecord();
         break;
       }
       default:
@@ -229,7 +265,7 @@ export default Component.extend(validations, I18n, {
 
   async confirmAdvertisementEnable() {
     return new Promise(resolve => {
-      this.modalManager.show('space-configuration/enable-marketplace-advertisement', {
+      this.modalManager.show('spaces/enable-marketplace-advertisement-modal', {
         space: this.space,
         onSubmit: (isConfirmed) => {
           resolve(isConfirmed);
@@ -240,7 +276,7 @@ export default Component.extend(validations, I18n, {
 
   async confirmAdvertisementDisable() {
     return new Promise(resolve => {
-      this.modalManager.show('space-configuration/disable-marketplace-advertisement', {
+      this.modalManager.show('spaces/disable-marketplace-advertisement-modal', {
         space: this.space,
         onSubmit: (isConfirmed) => {
           resolve(isConfirmed);

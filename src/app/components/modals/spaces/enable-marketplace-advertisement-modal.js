@@ -1,7 +1,14 @@
-// FIXME: jsdoc
+/**
+ * Confirmation of turning on space advertising in marketplace.
+ * Includes submit action (standalone modal).
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, setProperties } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
@@ -15,11 +22,12 @@ export default Component.extend(I18n, {
   tagName: '',
 
   i18n: service(),
+  globalNotify: service(),
 
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.spaceConfiguration.enableMarketplaceAdvertisementModal',
+  i18nPrefix: 'components.modals.spaces.enableMarketplaceAdvertisementModal',
 
   /**
    * @virtual
@@ -71,12 +79,19 @@ export default Component.extend(I18n, {
 
   areButtonsDisabled: or('isSubmitting', not('contactEmailField.isValid')),
 
+  // TODO: VFS-10252 this could be RPC in final implementation
   async enableMarketplaceAdvertisement() {
-    this.space.setProperties({
+    setProperties(this.space, {
       advertisedInMarketplace: true,
       contactEmail: this.contactEmailField.value,
     });
-    await this.space.save();
+    try {
+      await this.space.save();
+    } catch (error) {
+      this.space.rollbackAttributes();
+      await this.space.reload();
+      throw error;
+    }
   },
 
   actions: {
@@ -88,8 +103,8 @@ export default Component.extend(I18n, {
       try {
         await this.enableMarketplaceAdvertisement();
         await submitCallback(result);
-      } catch {
-        // FIXME: implement
+      } catch (error) {
+        this.globalNotify.backendError(this.t('enablingAdvertisement'), error);
       } finally {
         safeExec(this, () => this.set('isSubmitting', false));
       }

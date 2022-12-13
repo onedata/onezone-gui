@@ -1,6 +1,5 @@
 /**
- * FIXME: doc
- * A configuration aspect of space.
+ * A configuration aspect of space, allowing setting name and other properties.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -26,17 +25,4 @@ export default Component.extend(I18n, {
    * @type {Model.Space}
    */
   space: undefined,
-
-  // FIXME: move to content spaces marketplace
-  // advertiseMySpaceAction: computed(function advertiseMySpaceAction() {
-  //   return {
-  //     // FIXME: implement
-  //     action: () => {},
-  //     title: this.t('advertiseMySpace'),
-  //     class: 'view-options-action',
-  //     icon: 'marketplace-space',
-  //   };
-  // }),
-
-  // globalActions: collect('advertiseMySpaceAction'),
 });
