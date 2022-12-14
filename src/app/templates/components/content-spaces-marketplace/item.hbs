@@ -20,7 +20,7 @@
               {{bytes-to-string spaceItem.supportSize}}
             </div>
           </div>
-          {{!-- FIXME: loading? --}}
+          {{!-- TODO: VFS-10252 maybe some loading state is needed --}}
           {{#each providers as |provider|}}
             <div class="support-item">
               {{one-icon icon="provider"}}

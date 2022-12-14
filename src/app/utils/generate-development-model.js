@@ -32,7 +32,7 @@ import {
   generateSpaceEntityId,
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
-import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
+import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -501,21 +501,19 @@ function createSpacesRecords(store) {
         creationTime: 1540995468,
         sharedDirectories: 0,
       },
-      // FIXME: test data 2
-      ...(index !== 0 ? {} : {
+      ...(index === 0 ? {
         advertisedInMarketplace: true,
         organizationName: 'ACK Cyfronet AGH',
         tags: ['scientific', 'large'],
         description: exampleMarkdownLong,
         contactEmail: 'user@example.com',
+      } : {
+        advertisedInMarketplace: false,
+        organizationName: '',
+        tags: [],
+        description: '',
+        contactEmail: '',
       }),
-
-      // FIXME: test data 2
-      // advertisedInMarketplace: false,
-      // organizationName: 'ACK Cyfronet AGH',
-      // tags: index === 0 ? ['scientific', 'large'] : [],
-      // description: index === 0 ? exampleMarkdownLong : '',
-      // contactEmail: index === 0 ? 'user@example.com' : '',
     }).save();
   }));
 }

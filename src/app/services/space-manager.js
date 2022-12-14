@@ -3,7 +3,7 @@
  *
  * @module services/space-manager
  * @author Jakub Liput
- * @copyright (C) 2018 ACK CYFRONET AGH
+ * @copyright (C) 2018-2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -17,7 +17,7 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
-import { exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
+import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate

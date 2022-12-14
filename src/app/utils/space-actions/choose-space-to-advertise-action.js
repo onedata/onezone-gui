@@ -12,11 +12,6 @@ import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 
-// FIXME: context is not needed
-/**
- * @typedef {Object} ChooseSpaceToAdvertiseContext
- */
-
 export default Action.extend({
   modalManager: service(),
   router: service(),

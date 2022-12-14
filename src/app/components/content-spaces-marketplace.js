@@ -1,9 +1,14 @@
+/**
+ * Content container view of marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
-import EmberObject, { computed } from '@ember/object';
-import { isEmpty, promise, collect } from 'ember-awesome-macros';
-import { exampleMarkdownShort, exampleMarkdownLong } from 'onezone-gui/utils/mock-data';
-import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
 
 export default Component.extend({

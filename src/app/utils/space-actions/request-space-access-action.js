@@ -14,7 +14,6 @@ import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
 import { htmlSafe } from '@ember/string';
 
-// FIXME: valid context jsdoc / types
 /**
  * @typedef {Object} RequestSpaceAccessActionContext
  * @property {SpaceMarketplaceModel} spaceMarketplaceData
@@ -72,7 +71,6 @@ export default Action.extend({
             this.modalManager.hide(modalInstance.id);
             set(result, 'status', 'done');
           } catch (error) {
-            // FIXME: fix bad background between two modals
             this.showErrorInfo(error);
             set(result, 'status', 'error');
           }
