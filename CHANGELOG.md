@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10254 Added "Boolean" data type to automation
 * VFS-10245 Added error translation for internal server error with reference
 * VFS-10130 Added additional modal when turning on/off dir stats
 * VFS-10128 Allowed mapping task result to many targets

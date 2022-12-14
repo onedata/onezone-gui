@@ -22,6 +22,7 @@ const states = [{
 
 const argumentAndResultCommonTypes = [
   'Integer',
+  'Boolean',
   'String',
   'Object',
   'File',
@@ -35,6 +36,7 @@ const argumentAndResultCommonTypes = [
 // any additional parameters and are ease to convert to dataSpec object.
 const testConvenientTypes = [
   'Integer',
+  'Boolean',
   'String',
   'Object',
   'Dataset',
