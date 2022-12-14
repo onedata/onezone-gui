@@ -11,7 +11,9 @@
         </div>
       </div>
       <div class="row marketplace-item-row secondary-row">
-        <span class="organization-name">{{spaceItem.organizationName}}</span>
+        {{#truncated-string class="organization-name"}}
+          {{spaceItem.organizationName}}
+        {{/truncated-string}}
         <span class="col-separator"></span>
         <div class="support-list">
           <div class="support-item">

@@ -471,7 +471,7 @@ export default Service.extend({
     return [
       ...ownedSpaces,
       SpaceMarketplaceModel.create({
-        name: 'Shared space number one',
+        name: 'Shared space number one Shared space number one Shared space number one',
         organizationName: 'ACK Cyfronet AGH',
         tags: ['large', 'experimental', 'scientific'],
         description: exampleMarkdownLong,

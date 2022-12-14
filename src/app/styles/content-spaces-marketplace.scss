@@ -1,4 +1,14 @@
 .content-spaces-marketplace {
+  @mixin vertical-flex-gap($size: 0.5em, $additional-margin-top: 0) {
+    margin-top: -$size + $additional-margin-top;
+    > * {
+      padding-top: $size;
+    }
+  }
+
+  @media (max-width: $screen-xs-max) {
+    padding: 0 1em;
+  }
   .list-entries {
     padding-top: 1em;
     padding-left: 0;
@@ -22,8 +32,12 @@
     .basic-info-row {
       display: flex;
       align-items: flex-start;
+      flex-wrap: wrap;
+      @include vertical-flex-gap(0.75em);
       .basic-info-col {
         flex-grow: 1;
+        width: 20em;
+        padding-right: 1em;
       }
     }
 
@@ -34,12 +48,27 @@
     .secondary-row {
       display: flex;
       align-items: center;
-      margin-top: 0.5em;
+      @include vertical-flex-gap($additional-margin-top: 0.5em);
+      overflow: hidden;
+      max-width: calc(100% - 1em);
       .support-list {
         display: flex;
+        max-width: 50%;
+        overflow: hidden;
+        position: relative;
+        padding-right: 2em;
+        &::after {
+          position: absolute;
+          content: ' ';
+          right: 0;
+          height: 100%;
+          width: 2em;
+          background: linear-gradient(to right, transparent, white);
+        }
         .support-item {
           display: flex;
           align-items: center;
+          white-space: nowrap;
           .one-icon {
             font-size: 150%;
           }
@@ -58,6 +87,8 @@
 
     .title-row {
       align-items: baseline;
+      flex-wrap: wrap;
+      @include vertical-flex-gap;
       .space-name {
         margin-right: 1em;
       }
@@ -78,6 +109,7 @@
 
     .organization-name {
       @include font-semibold;
+      min-width: 0;
     }
 
     .access-info-col {
@@ -128,6 +160,15 @@
         font-size: 120%;
       }
     }
+
+    &.iconified-block-marketplace-owned {
+      .access-info-col {
+        align-items: flex-start;
+        .access-granted-container {
+          margin-left: -0.2em;
+        }
+      }
+    }
   }
 }
 
@@ -164,6 +205,9 @@
     z-index: 2;
     a {
       @include font-semibold;
+    }
+    .text {
+      text-align: center;
     }
     .toggle-expand-anchor {
       display: inline-flex;
