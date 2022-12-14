@@ -1,13 +1,17 @@
-import EmberObject, { get, computed } from '@ember/object';
+/**
+ * View model for space marketplace components.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
+import EmberObject, { computed } from '@ember/object';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import { isEmpty, promise, collect, array } from 'ember-awesome-macros';
+import { isEmpty, promise } from 'ember-awesome-macros';
 import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import filterObjects from 'onedata-gui-common/utils/filter-objects';
-
-/**
- * @typede
- */
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -47,8 +51,8 @@ export default EmberObject.extend(OwnerInjector, {
     'searchValue',
     function filteredCollection() {
       return filterObjects(this.sortedCollection, this.searchValue, {
-        searchInTags: true,
-        stringProperties: ['name', 'organizationName'],
+        stringProperties: ['name', 'organizationName', 'description'],
+        arrayProperties: ['tags'],
       });
     }
   ),

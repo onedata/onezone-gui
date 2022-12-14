@@ -1,5 +1,3 @@
-// FIXME: jsdoc
-
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
@@ -14,7 +12,6 @@ import {
   getModalFooter,
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
-import { all as allFulfilled } from 'rsvp';
 import { click, fillIn } from '@ember/test-helpers';
 
 describe('Integration | Component | modals/spaces/request-space-access-modal', function () {

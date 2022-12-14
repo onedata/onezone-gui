@@ -301,6 +301,9 @@ export default Component.extend(validations, I18n, {
   },
 
   actions: {
+    lost() {
+      window.alert('lost');
+    },
     async saveValue(fieldId, value) {
       return this.saveValue(fieldId, value);
     },

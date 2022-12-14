@@ -114,11 +114,6 @@ describe('Integration | Component | space-configuration', function () {
 
     expect(helper.advertisedToggle.isDisabled()).to.be.false;
   });
-
-  // FIXME: display organization name with tooltip "display name of the organization that manages the space"
-  // FIXME: it shows error on name save failure
-  // FIXME: jakiś napis, jak nie ma organization name (not set?)
-  // FIXME: enter w formularzu czasami powoduje przeładowanie strony
 });
 
 class Helper {
