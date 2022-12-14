@@ -54,6 +54,7 @@
       }
     }
     .description-form-group {
+      flex-wrap: wrap;
       @media (max-width: $screen-xs-max) {
         margin-bottom: 0.5em;
       }
@@ -86,7 +87,6 @@
       }
     }
     @media (max-width: $screen-xs-max) {
-      padding-right: 0;
       button {
         min-height: 2.4em;
       }
@@ -96,7 +96,7 @@
     }
   }
   .description-submit-buttons {
-    padding: $padding-base-vertical * 0.5 $padding-base-horizontal;
+    white-space: nowrap;
     .btn + .btn {
       margin-left: 0.5em;
     }
