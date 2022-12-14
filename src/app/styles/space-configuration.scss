@@ -5,8 +5,7 @@
   }
   .space-configuration-form {
     // margins specially adjusted to fit spacing between form labels
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 1em;
     display: flex;
     flex-direction: column;
     .control-label {
@@ -64,8 +63,9 @@
       align-items: stretch;
     }
   }
-  .space-tags.one-inline-editor.editor {
+  .one-inline-editor.editor {
     flex-grow: 1;
+    max-width: 50em;
   }
   .btn-group.description-editor-mode-selector {
     flex-grow: 0;
