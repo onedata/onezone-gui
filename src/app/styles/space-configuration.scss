@@ -11,11 +11,13 @@
     flex-direction: column;
     .control-label {
       width: 14em;
+      min-width: 14em;
       text-align: left;
       padding-top: 0;
       margin-bottom: 0;
       @media (max-width: $screen-xs-max) {
-        width: 10em;
+        width: 8em;
+        min-width: 8em;
       }
     }
     .one-way-toggle {
@@ -26,6 +28,9 @@
       align-items: center;
       &:last-child {
         margin-bottom: 0;
+      }
+      .one-inline-editor {
+        overflow: hidden;
       }
     }
     .advertised-form-group {
