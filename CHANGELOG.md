@@ -6,6 +6,16 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10245 Added error translation for internal server error with reference
+* VFS-10130 Added additional modal when turning on/off dir stats
+* VFS-10128 Allowed mapping task result to many targets
+* VFS-9312 Removed $.css() usages
+* VFS-9313 Removed ":hidden" and ":visible" jQuery selectors usages
+* VFS-9310 Removed $.parents() usages
+* VFS-8656 Removed jQuery from websocket client
+* VFS-10046 Added popover with user info in members page
+* VFS-10107 Fixed smooth scroll in Chrome
+* VFS-9596 Added tests for data spec editor
 * VFS-10088 Hidden access token hint in harvester public view
 * VFS-9162 Added api samples modal for space
 * VFS-9997 Improved showing popover info content for user and provider

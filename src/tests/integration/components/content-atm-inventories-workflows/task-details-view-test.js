@@ -187,7 +187,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
         // TODO: VFS-7816 uncomment or remove future code
         // expect(find('.argumentMapping-field .valueBuilderStore-field'))
         //   .to.contain.text('singleValueIntegerStore');
-        expect(find('.resultMapping-field .targetStore-field'))
+        expect(find('.singleResultMappings-field .targetStore-field'))
           .to.contain.text('singleValueStringStore');
       });
     });
@@ -250,11 +250,13 @@ function itProvidesStoresInTaskForm() {
   it('provides stores in task form', async function () {
     await renderComponent();
 
+    await click('.singleResultMappings-add-field-button');
     await clickTrigger('.targetStore-field');
 
     const options = document.querySelectorAll('.ember-power-select-option');
-    expect(options[2]).to.have.trimmed.text('listStringStore');
-    expect(options[3]).to.have.trimmed.text('singleValueStringStore');
+
+    expect(options[1]).to.have.trimmed.text('listStringStore');
+    expect(options[2]).to.have.trimmed.text('singleValueStringStore');
   });
 }
 
