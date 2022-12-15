@@ -13,6 +13,7 @@ export default Component.extend(I18n, GlobalActions, {
    */
   i18nPrefix: 'components.contentSpacesMarketplace.content',
 
+  // FIXME: this does not work, consult; add globalActionsTitle
   /**
    * @override
    */
