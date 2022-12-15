@@ -1,5 +1,6 @@
 // TODO: VFS-10252 consult i18n
 export default {
+  notSet: 'Not set.',
   organizationName: {
     label: 'Organization name',
     tip: 'Display name of the organization that manages the space',

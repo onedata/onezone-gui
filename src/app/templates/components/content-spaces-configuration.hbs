@@ -3,6 +3,16 @@
     <span class="one-label">
       {{tt this "header"}}
     </span>
+    {{#if isReadOnly}}
+      <span class="labels-container">
+        <span class="label label-warning">
+          <span class="text">{{tt this "readonly"}}</span>
+          {{#if readOnlyTip}}
+            {{one-tooltip title=readOnlyTip}}
+          {{/if}}
+        </span>
+      </span>
+    {{/if}}
   </h1>
 </div>
 <div class="row content-row fill-flex-using-column">

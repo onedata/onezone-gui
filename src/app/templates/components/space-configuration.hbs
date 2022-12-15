@@ -4,14 +4,22 @@
     (if blankInlineEditors.name "has-error")
   }}>
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
-    {{one-inline-editor
-      class="space-name"
-      value=spaceName
-      onSave=(action "saveValue" "name")
-      onInputValueChanged=(action "inlineEditorChange" "name")
-      isSaveDisabled=blankInlineEditors.name
-      saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
-    }}
+    {{#if isReadOnly}}
+      {{#if spaceName}}
+        <span class="static-value">{{spaceName}}</span>
+      {{else}}
+        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+      {{/if}}
+    {{else}}
+      {{one-inline-editor
+        class="space-name"
+        value=spaceName
+        onSave=(action "saveValue" "name")
+        onInputValueChanged=(action "inlineEditorChange" "name")
+        isSaveDisabled=blankInlineEditors.name
+        saveButtonTip=(if blankInlineEditors.name (tt this "fieldCannotBeEmpty"))
+      }}
+    {{/if}}
   </div>
   <div class={{concat-classes
     "form-group organization-name-form-group"
@@ -21,17 +29,25 @@
       {{tt this "organizationName.label"}}:
       {{one-label-tip title=(tt this "organizationName.tip")}}
     </label>
-    {{one-inline-editor
-      class="organization-name"
-      value=organizationName
-      onInputValueChanged=(action "inlineEditorChange" "organizationName")
-      isSaveDisabled=blankInlineErrors.organizationName
-      saveButtonTip=(if
-        blankInlineErrors.organizationName
-        (tt this "fieldCannotBeEmptyWhenAdvertising")
-      )
-      onSave=(action "saveValue" "organizationName")
-    }}
+    {{#if isReadOnly}}
+      {{#if organizationName}}
+        <span class="static-value">{{organizationName}}</span>
+      {{else}}
+        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+      {{/if}}
+    {{else}}
+      {{one-inline-editor
+        class="organization-name"
+        value=organizationName
+        onInputValueChanged=(action "inlineEditorChange" "organizationName")
+        isSaveDisabled=blankInlineErrors.organizationName
+        saveButtonTip=(if
+          blankInlineErrors.organizationName
+          (tt this "fieldCannotBeEmptyWhenAdvertising")
+        )
+        onSave=(action "saveValue" "organizationName")
+      }}
+    {{/if}}
   </div>
   <div class={{concat-classes
     "form-group space-tags-form-group"
@@ -40,18 +56,26 @@
     <label class="control-label">
       {{tt this "spaceTags.label"}}:
     </label>
-    {{one-inline-editor
-      class="space-tags"
-      editorSettings=spaceTagsEditorSettings
-      value=spaceTags
-      isSaveDisabled=blankInlineErrors.tags
-      saveButtonTip=(if
-        blankInlineErrors.tags
-        (tt this "fieldCannotBeEmptyWhenAdvertising")
-      )
-      onSave=(action "saveValue" "tags")
-      onInputValueChanged=(action "inlineEditorChange" "tags")
-    }}
+    {{#if isReadOnly}}
+      {{#if areSpaceTagsEmpty}}
+        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+      {{else}}
+        {{tags-input class="space-tags static-value" tags=spaceTags readonly=true}}
+      {{/if}}
+    {{else}}
+      {{one-inline-editor
+        class="space-tags"
+        editorSettings=spaceTagsEditorSettings
+        value=spaceTags
+        isSaveDisabled=blankInlineErrors.tags
+        saveButtonTip=(if
+          blankInlineErrors.tags
+          (tt this "fieldCannotBeEmptyWhenAdvertising")
+        )
+        onSave=(action "saveValue" "tags")
+        onInputValueChanged=(action "inlineEditorChange" "tags")
+      }}
+    {{/if}}
   </div>
   <div class="form-group description-form-group">
     <label class="control-label">
@@ -127,13 +151,19 @@
             markdown=currentDescription
           }}
         {{else}}
-          <div
-            class="description-empty-message"
-            onclick={{action (mut descriptionEditorMode) "edit"}}
-          >
-            <span class="description-empty-text">{{tt this "description.emptyText"}}</span>
-            {{one-icon icon="rename" class="description-empty-icon"}}
-          </div>
+          {{#if isReadOnly}}
+            <div class="description-empty-message">
+              <span class="description-empty-text">{{tt this "notSet"}}</span>
+            </div>
+          {{else}}
+            <div
+              class="description-empty-message"
+              onclick={{action (mut descriptionEditorMode) "edit"}}
+            >
+              <span class="description-empty-text">{{tt this "description.emptyText"}}</span>
+              {{one-icon icon="rename" class="description-empty-icon"}}
+            </div>
+          {{/if}}
         {{/unless}}
       {{/perfect-scrollbar-element}}
     {{/if}}
@@ -152,7 +182,7 @@
         highlightActiveLine=true
         showLineNumbers=true
         showPrintMargin=false
-        readOnly=false
+        readOnly=isReadOnly
         update=(action "currentDescriptionChanged")
       }}
     {{/render-later}}
@@ -163,10 +193,10 @@
     </label>
     {{one-way-toggle
       class="form-control advertised-toggle"
-      isReadOnly=isAdvertisedToggleDisabled
+      isReadOnly=(or isReadOnly isAdvertisedToggleDisabled)
       checked=isAdvertised
       update=(action "saveValue" "advertised")
-      lockHint=advertisedToggleLockHint
+      lockHint=(or readOnlyTip advertisedToggleLockHint)
     }}
     {{#if isAdvertised}}
       <a href={{viewInMarketplaceHref}} class="view-in-marketplace-link">
@@ -183,14 +213,22 @@
       <label class="control-label">
         {{tt this "contactEmail.label"}}:
       </label>
-      {{one-inline-editor
-        class="contact-email"
-        value=contactEmail
-        onInputValueChanged=(action "currentEmailChanged")
-        isSaveDisabled=emailValidation.error
-        saveButtonTip=emailValidation.message
-        onSave=(action "saveValue" "contactEmail")
-      }}
+      {{#if isReadOnly}}
+        {{#if contactEmail}}
+          <span class="static-value">{{contactEmail}}</span>
+        {{else}}
+          <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+        {{/if}}
+      {{else}}
+        {{one-inline-editor
+          class="contact-email"
+          value=contactEmail
+          onInputValueChanged=(action "currentEmailChanged")
+          isSaveDisabled=emailValidation.error
+          saveButtonTip=emailValidation.message
+          onSave=(action "saveValue" "contactEmail")
+        }}
+      {{/if}}
     </div>
   {{/if}}
 </div>

@@ -8,6 +8,13 @@
     padding-top: 1em;
     display: flex;
     flex-direction: column;
+    .static-value {
+      padding: $padding-base-vertical $padding-base-horizontal;
+    }
+    .static-not-set {
+      font-style: italic;
+      color: $main-text-color-disabled;
+    }
     .control-label {
       width: 14em;
       min-width: 14em;

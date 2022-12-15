@@ -19,6 +19,7 @@ import { inject as service } from '@ember/service';
 import _ from 'lodash';
 import emailValidator from 'onedata-gui-common/utils/validators/email';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -85,6 +86,20 @@ export default Component.extend(validations, I18n, {
 
   //#endregion
 
+  isReadOnly: not('space.privileges.update'),
+
+  readOnlyTip: conditional(
+    'isReadOnly',
+    computed(function readOnlyTip() {
+      return insufficientPrivilegesMessage({
+        i18n: this.i18n,
+        modelName: 'space',
+        privilegeFlag: 'space_update',
+      });
+    }),
+    raw('')
+  ),
+
   /**
    * Space tags ready to use in component.
    * @type {ComputedProperty<Array<Tag>>}
@@ -92,6 +107,8 @@ export default Component.extend(validations, I18n, {
   spaceTags: computed('space.tags', function spaceTags() {
     return get(this.space ?? {}, 'tags')?.map(tag => ({ label: tag }));
   }),
+
+  areSpaceTagsEmpty: isEmpty('spaceTags'),
 
   spaceName: reads('space.name'),
 

@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-// FIXME: remove jquery after merginig jquery remove to develop
+// FIXME: remove jquery after merginig VFS-10247 to develop
 import $ from 'jquery';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
