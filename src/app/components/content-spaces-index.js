@@ -30,6 +30,7 @@ export default Component.extend(
     router: service(),
     guiUtils: service(),
     i18n: service(),
+    modalManager: service(),
 
     /**
      * @override 
@@ -142,6 +143,26 @@ export default Component.extend(
     ),
 
     /**
+     * @type {Ember.ComputedProperty<Array<Action>>}
+     */
+    globalActions: computed('openApiSamplesModalAction', function globalActions() {
+      return [this.get('openApiSamplesModalAction')];
+    }),
+
+    /**
+     * @type {Ember.ComputedProperty<AspectAction>}
+     */
+    openApiSamplesModalAction: computed(function openApiSamplesModalAction() {
+      return {
+        action: () => this.send('openApiSamplesModal'),
+        title: this.t('restApi'),
+        class: 'open-rest-api btn-rest-api',
+        buttonStyle: 'default',
+        icon: 'rest',
+      };
+    }),
+
+    /**
      * Shows global info about save error.
      * @param {object} error 
      * @returns {undefined}
@@ -171,6 +192,12 @@ export default Component.extend(
         }
         set(space, 'name', name);
         return this._saveSpace();
+      },
+      async openApiSamplesModal() {
+        return await this.modalManager.show('api-samples-modal', {
+          record: this.space,
+          apiSubject: 'space',
+        }).hiddenPromise;
       },
     },
   });
