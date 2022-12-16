@@ -1,14 +1,15 @@
 .provider-info-name {
+  .oneprovider-name.truncated-string {
+    display: inline-flex;
+    align-items: center;
+    .one-label {
+      margin-left: 0.3em;
+    }
+  }
   .provider-info-trigger {
-    width: 0.7em;
-    height: 0.7em;
-    display: inline-block;
     position: relative;
-    vertical-align: text-bottom;
-    font-size: 180%;
     margin-left: 4px;
     margin-right: 4px;
-    margin-bottom: 1px;
   }
 
   &.nav-link {

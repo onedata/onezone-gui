@@ -115,10 +115,16 @@
       }
     }
     .oneprovider-name.truncated-string {
-      display: inline-block;
+      display: inline-flex;
       font-weight: bold;
       max-width: calc(100% - 180px);
-      vertical-align: middle;
+      align-items: baseline;
+      .one-label {
+        margin-left: 0.3em;
+      }
+      .provider-info-trigger {
+        align-self: center;
+      }
     }
     .choose-oneprovider-link {
       margin-left: 4px;
