@@ -16,7 +16,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { or, not } from 'ember-awesome-macros';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
-import { emailRegex } from 'onedata-gui-common/utils/validators/email';
+import { validator } from 'ember-cp-validations';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -72,8 +72,13 @@ export default Component.extend(I18n, {
       ownerSource: this,
       name: 'contactEmail',
       defaultValue: this.space.contactEmail || '',
-      regex: emailRegex,
       isOptional: false,
+      customValidators: [
+        validator('format', {
+          type: 'email',
+          allowBlank: false,
+        }),
+      ],
     });
   }),
 

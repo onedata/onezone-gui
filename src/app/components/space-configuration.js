@@ -17,18 +17,19 @@ import { Promise } from 'rsvp';
 import { buildValidations } from 'ember-cp-validations';
 import { inject as service } from '@ember/service';
 import _ from 'lodash';
-import emailValidator from 'onedata-gui-common/utils/validators/email';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import { validator } from 'ember-cp-validations';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
  */
 
 const validations = buildValidations({
-  currentContactEmail: [
-    emailValidator(),
-  ],
+  currentContactEmail: validator('format', {
+    type: 'email',
+    allowBlank: false,
+  }),
 });
 
 export default Component.extend(validations, I18n, {

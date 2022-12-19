@@ -5,7 +5,7 @@ import { computed } from '@ember/object';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import TextAreaField from 'onedata-gui-common/utils/form-component/textarea-field';
 import FormFieldsRootGroup from 'onedata-gui-common/utils/form-component/form-fields-root-group';
-import { emailRegex } from 'onedata-gui-common/utils/validators/email';
+import { validator } from 'ember-cp-validations';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -56,8 +56,13 @@ export default Component.extend(I18n, {
       ownerSource: this,
       name: 'email',
       defaultValue: '',
-      regex: emailRegex,
       isOptional: false,
+      customValidators: [
+        validator('format', {
+          type: 'email',
+          allowBlank: false,
+        }),
+      ],
     });
   }),
 
