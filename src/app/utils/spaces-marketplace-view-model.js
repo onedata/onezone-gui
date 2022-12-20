@@ -11,7 +11,7 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { isEmpty, promise } from 'ember-awesome-macros';
 import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import filterObjects from 'onedata-gui-common/utils/filter-objects';
+import filterSpaces from 'onedata-gui-common/utils/filter-spaces';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -50,10 +50,7 @@ export default EmberObject.extend(OwnerInjector, {
     'sortedCollection.[]',
     'searchValue',
     function filteredCollection() {
-      return filterObjects(this.sortedCollection, this.searchValue, {
-        stringProperties: ['name', 'organizationName', 'description'],
-        arrayProperties: ['tags'],
-      });
+      return filterSpaces(this.sortedCollection, this.searchValue);
     }
   ),
 
