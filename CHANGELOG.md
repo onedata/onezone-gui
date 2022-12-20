@@ -6,7 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
-* VFS-9311 Removed $.*width(), $.*height(), $.offset() and $.position() usages
+* VFS-9311 Removed `$.*width()`, `$.*height()`, `$.offset()` and `$.position()` usages
+* VFS-10245 Added error translation for internal server error with reference
 * VFS-10130 Added additional modal when turning on/off dir stats
 * VFS-10128 Allowed mapping task result to many targets
 * VFS-9312 Removed $.css() usages
