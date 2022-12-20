@@ -11,8 +11,6 @@
 import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-// FIXME: remove jquery after merginig VFS-10247 to develop
-import $ from 'jquery';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 const mixins = [
@@ -57,8 +55,8 @@ export default Component.extend(...mixins, {
   didInsertElement() {
     this._super(...arguments);
     this.setProperties({
-      overflowElement: $(this.element.querySelector('.markdown-view')),
-      overflowParentElement: $(this.element),
+      overflowElement: this.element.querySelector('.markdown-view'),
+      overflowParentElement: this.element,
     });
     this.addOverflowDetectionListener();
   },
