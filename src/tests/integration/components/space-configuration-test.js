@@ -128,7 +128,12 @@ class Helper {
     return await createSpace(this.store, data);
   }
   async initSpace(data) {
-    this.space = await this.createSpace(data);
+    this.space = await this.createSpace({
+      privileges: {
+        update: true,
+      },
+      ...data,
+    });
   }
 
   get element() {

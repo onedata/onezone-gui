@@ -1,3 +1,11 @@
+/**
+ * Modal with information about advertising own space and go-to-configuration action.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';

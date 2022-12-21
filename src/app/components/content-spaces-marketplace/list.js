@@ -1,3 +1,11 @@
+/**
+ * Spaces in marketplace list with search.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import Component from '@ember/component';
 import { reads } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';

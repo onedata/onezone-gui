@@ -1,3 +1,11 @@
+/**
+ * Non-empty marketplace aspect content (header, spaces list etc.).
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2022 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
+
 import { computed } from '@ember/object';
 import Component from '@ember/component';
 import { collect } from 'ember-awesome-macros';
