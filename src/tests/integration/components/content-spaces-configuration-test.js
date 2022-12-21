@@ -6,9 +6,11 @@ import { assert } from '@ember/debug';
 import { render, find } from '@ember/test-helpers';
 import createSpace from '../../helpers/create-space';
 import { lookupService } from '../../helpers/stub-service';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
 
 describe('Integration | Component | content-spaces-configuration', function () {
   setupRenderingTest();
+  clearStoreAfterEach();
 
   it('renders "Space configuration" in header', async function () {
     const helper = new Helper(this);

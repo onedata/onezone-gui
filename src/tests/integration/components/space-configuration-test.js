@@ -8,9 +8,11 @@ import createSpace from '../../helpers/create-space';
 import { lookupService } from '../../helpers/stub-service';
 import { get } from '@ember/object';
 import ToggleHelper from '../../helpers/toggle';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
 
 describe('Integration | Component | space-configuration', function () {
   setupRenderingTest();
+  clearStoreAfterEach();
 
   it('renders space name, organization name and tags values with labels', async function () {
     const helper = new Helper(this);

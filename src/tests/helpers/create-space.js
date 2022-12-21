@@ -7,9 +7,11 @@ export default async function createSpace(store, data = {}) {
     providerList: store.createRecord('provider-list', { list: [] }),
   };
   await allSettled(Object.values(listRecords).map(r => r.save()));
-  return await store.createRecord('space', {
+  const record = store.createRecord('space', {
     name: 'test space',
     ...listRecords,
     ...data,
-  }).save();
+  });
+  await record.save();
+  return record;
 }

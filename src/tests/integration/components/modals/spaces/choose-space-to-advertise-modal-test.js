@@ -15,9 +15,11 @@ import {
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
 import { all as allFulfilled } from 'rsvp';
+import { clearStoreAfterEach } from '../../../../helpers/clear-store';
 
 describe('Integration | Component | modals/spaces/choose-space-to-advertise-modal', function () {
   setupRenderingTest();
+  clearStoreAfterEach();
 
   /**
    * @param {Helper} helper
