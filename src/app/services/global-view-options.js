@@ -1,23 +1,16 @@
 /**
- * Provides options for core views (containers) that needs to be configured when
- * displaying specific views.
+ * Implementation of `global-view-options` for `onezone-gui`.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import Service, { inject as service } from '@ember/service';
-import { computed } from '@ember/object';
+import GlobalViewOptionsBase from 'onedata-gui-common/services/global-view-options';
 
-export default Service.extend({
-  navigationState: service(),
-
+export default GlobalViewOptionsBase.extend({
   /**
-   * Static definition of classes that need to be added to main-content when displaying
-   * specific aspects.
-   * Maps: resource type -> aspect -> options object
-   * @type {Object}
+   * @override
    */
   staticViewOptions: Object.freeze({
     spaces: {
@@ -26,17 +19,4 @@ export default Service.extend({
       },
     },
   }),
-
-  /**
-   * Options of main-content component.
-   * @type {Object}
-   */
-  mainContentViewOptions: computed(
-    'staticViewOptions',
-    'navigationState.{activeResourceType,activeAspect}',
-    function mainContentViewOptions() {
-      return this.staticViewOptions[this.navigationState.activeResourceType]
-        ?.[this.navigationState.activeAspect] ?? {};
-    }
-  ),
 });
