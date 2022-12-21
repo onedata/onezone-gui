@@ -1,6 +1,5 @@
 /**
- * Opens modal with information about adding a space to advertising and selection which
- * space should be addded.
+ * Opens modal with space request message to send.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -66,17 +65,12 @@ export default Action.extend({
         hideAfterSubmit: false,
         onSubmit: async (requestData) => {
           try {
-            await this.sendRequest(requestData);
+            await result.interceptPromise(this.sendRequest(requestData));
             this.showSuccessInfo(requestData);
             this.modalManager.hide(modalInstance.id);
-            set(result, 'status', 'done');
-          } catch (error) {
-            this.showErrorInfo(error);
-            set(result, 'status', 'error');
+          } catch {
+            this.notifyFailure(result);
           }
-        },
-        onHide: () => {
-          set(result, 'status', 'cancelled');
         },
         spaceMarketplaceData: this.spaceMarketplaceData,
       });
@@ -91,13 +85,6 @@ export default Action.extend({
     this.alert.success(htmlSafe(`<p>${text}</p>`), {
       header: this.t('requestSuccess.header'),
     });
-  },
-
-  showErrorInfo(error) {
-    this.globalNotify.backendError(
-      this.t('sendingRequest'),
-      error
-    );
   },
 
   /**

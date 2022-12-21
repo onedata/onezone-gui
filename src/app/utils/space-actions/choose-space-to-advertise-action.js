@@ -1,13 +1,12 @@
 /**
  * Opens modal with information about adding a space to advertising and selection which
- * space should be addded.
+ * space should be added.
  *
  * @author Jakub Liput
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { set } from '@ember/object';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
 import ActionResult from 'onedata-gui-common/utils/action-result';
@@ -42,24 +41,15 @@ export default Action.extend({
         hideAfterSubmit: false,
         onSubmit: async (spaceId) => {
           try {
-            await this.configureSpace(spaceId);
+            await result.interceptPromise(this.configureSpace(spaceId));
             this.modalManager.hide(modalInstance.id);
-            set(result, 'status', 'done');
-          } catch (error) {
-            this.showErrorInfo(error);
-            set(result, 'status', 'error');
+          } catch {
+            this.notifyFailure(result);
           }
         },
       });
     await modalInstance.hiddenPromise;
     return result;
-  },
-
-  showErrorInfo(error) {
-    this.globalNotify.backendError(
-      this.t('openingSpaceConfiguration'),
-      error
-    );
   },
 
   async configureSpace(spaceId) {
