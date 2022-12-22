@@ -9,5 +9,4 @@ export default {
   addSupport: 'Add support',
   browseFiles: 'Browse files',
   sharesCount: 'Shares',
-  restApi: 'REST API',
 };
