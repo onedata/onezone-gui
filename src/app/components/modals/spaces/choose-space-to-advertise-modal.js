@@ -44,7 +44,7 @@ export default Component.extend(I18n, {
 
   allSpacesProxy: promise.object(computed(async function allSpacesProxy() {
     const spaceList = await this.spaceManager.getSpaces();
-    return (await get(spaceList, 'list')).toArray();
+    return (await get(spaceList, 'list'));
   })),
 
   allSpaces: reads('allSpacesProxy.content'),
@@ -61,7 +61,7 @@ export default Component.extend(I18n, {
 
   isProceedAvailable: and('isProceedButtonVisible', notEmpty('selectedSpace')),
 
-  isProceedButtonVisible: not(or('noSpaces', 'areAllSpacesAdvertised')),
+  isProceedButtonVisible: notEmpty('nonAdvertisedSpaces'),
 
   closeButtonType: conditional(
     'isProceedButtonVisible',

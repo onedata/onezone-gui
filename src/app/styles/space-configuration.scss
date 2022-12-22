@@ -108,7 +108,7 @@
       margin-left: 0.5em;
     }
   }
-  .space-description-markdown-container {
+  .markdown-container {
     width: 100%;
     margin-top: 0;
     margin-bottom: 0;
@@ -121,7 +121,7 @@
     min-height: 10em;
     &.description-empty {
       min-height: auto;
-      .space-description-markdown-container {
+      .markdown-container {
         padding: 1em;
         padding-top: 0.8em;
         padding-left: 1.2em;
