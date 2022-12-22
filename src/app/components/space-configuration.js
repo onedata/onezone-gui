@@ -38,6 +38,7 @@ export default Component.extend(validations, I18n, {
   modalManager: service(),
   onedataConnection: service(),
   router: service(),
+  globalNotify: service(),
 
   /**
    * @override
@@ -292,15 +293,40 @@ export default Component.extend(validations, I18n, {
     });
   },
 
+  // TODO: VFS-10252 this could be RPC in final implementation
+  async disableMarketplaceAdvertisement() {
+    set(this.space, 'advertisedInMarketplace', false);
+    try {
+      await this.space.save();
+    } catch (error) {
+      this.space.rollbackAttributes();
+      await this.space.reload();
+      throw error;
+    }
+  },
+
   async confirmAdvertisementDisable() {
-    return new Promise(resolve => {
-      this.modalManager.show('spaces/disable-marketplace-advertisement-modal', {
-        space: this.space,
-        onSubmit: (isConfirmed) => {
-          resolve(isConfirmed);
-        },
-      });
+    const modalT = (key) => this.t(`confirmAdvertisementDisable.${key}`);
+    const modalInstance = this.modalManager.show('question-modal', {
+      headerIcon: 'sign-warning-rounded',
+      headerText: modalT('header'),
+      descriptionParagraphs: [{
+        text: modalT('body.text'),
+      }],
+      yesButtonText: modalT('proceed'),
+      noButtonText: modalT('cancel'),
+      yesButtonType: 'warning',
+      hideAfterSubmit: false,
+      onSubmit: async () => {
+        try {
+          await this.disableMarketplaceAdvertisement();
+          this.modalManager.hide(modalInstance.id);
+        } catch (error) {
+          this.globalNotify.backendError(modalT('disablingAdvertisement'), error);
+        }
+      },
     });
+    await modalInstance.hiddenPromise;
   },
 
   inlineEditorChange(fieldId, value) {

@@ -6,7 +6,6 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import Action from 'onedata-gui-common/utils/action';
