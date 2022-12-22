@@ -154,7 +154,7 @@ export default Component.extend(
     /**
      * @type {Ember.ComputedProperty<AspectAction>}
      */
-    openApiSamplesModalAction: computed(function openApiSamplesModalAction() {
+    openApiSamplesModalAction: computed('space', function openApiSamplesModalAction() {
       return this.apiSamplesActions.createShowApiSamplesAction({
         record: this.space,
         apiSubject: 'space',
