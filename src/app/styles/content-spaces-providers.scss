@@ -1,9 +1,16 @@
 .content-spaces-providers {
+  .col-space-provider-list > .row {
+    padding-top: 1.5em;
+  }
   .provider-item {
     .provider-item-name-line {
       max-width: calc(100% - 3em);
     }
   }
+  .spaces-providers-overview {
+    padding-top: 0.6em;
+  }
+
   .row-space-providers-support-chart .inner-row-content {
     padding-top: $padding-large-vertical;
     padding-left: $padding-large-horizontal;
@@ -26,7 +33,7 @@
   }
   .col-space-provider-atlas-chart {
     @media (min-width: $screen-md-min) {
-      padding-left: $padding-large-horizontal;
+      padding-left: $content-col-padding;
     }
   }
 
