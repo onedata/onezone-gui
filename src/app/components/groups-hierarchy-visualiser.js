@@ -192,7 +192,7 @@ import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/group-privileges-flags';
 import PrivilegeRecordProxy from 'onezone-gui/utils/privilege-record-proxy';
 import { getOwner } from '@ember/application';
-import $ from 'jquery';
+import dom from 'onedata-gui-common/utils/dom';
 
 export default Component.extend(I18n, {
   classNames: ['groups-hierarchy-visualiser'],
@@ -595,14 +595,9 @@ export default Component.extend(I18n, {
    * @returns {undefined}
    */
   recalculateAvailableArea() {
-    const {
-      element,
-      workspace,
-    } = this.getProperties('element', 'workspace');
-    const $element = $(element);
-    setProperties(workspace, {
-      width: $element.width(),
-      height: $element.height(),
+    setProperties(this.workspace, {
+      width: this.element ? dom.width(this.element, dom.LayoutBox.ContentBox) : 0,
+      height: this.element ? dom.height(this.element, dom.LayoutBox.ContentBox) : 0,
     });
   },
 
