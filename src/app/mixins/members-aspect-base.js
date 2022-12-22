@@ -539,6 +539,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   init() {
     this._super(...arguments);
 
+    // FIXME: make observer for some options
     const {
       aspect,
       member,

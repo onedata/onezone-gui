@@ -1,0 +1,66 @@
+{{#global-modal
+  classNames="confirm-join-request-modal"
+  modalId=modalId
+  size="lg"
+  as |modal|
+}}
+  {{!-- FIXME: if verification rejected, show error --}}
+  {{!-- FIXME: check look of loading spinner --}}
+  {{#if verificationProxy.isFulfilled}}
+    {{#modal.header}}
+      <h1>
+        {{!-- FIXME: if verification failed - show warning sign --}}
+        {{#if isInvalid}}
+          {{one-icon icon="sign-warning-rounded"}}
+          <span class="one-label">{{tt this "header.invalid"}}</span>
+        {{else}}
+          {{one-icon icon="sign-info-rounded"}}
+          <span class="one-label">{{tt this "header.valid"}}</span>
+        {{/if}}
+      </h1>
+    {{/modal.header}}
+  {{/if}}
+
+  {{#modal.body}}
+    {{#promise-proxy-container proxy=verificationProxy}}
+      {{#if isValid}}
+        <p>An access to space was requested using spaces marketplace.</p>
+        {{!-- FIXME: space -> user circles --}}
+
+{{!-- FIXME: mock start --}}
+
+<div class="fake-join">
+</div>
+
+{{!-- FIXME: mock end --}}
+
+
+      {{else}}
+        <p>Space join request is invalid or out-of-date.</p>
+      {{/if}}
+    {{/promise-proxy-container}}
+  {{/modal.body}}
+
+  {{#if verificationProxy.isFulfilled}}
+    {{#modal.footer class="btn-toolbar"}}
+      {{#one-button
+        type="default"
+        class="cancel-btn"
+        onClick=modal.close
+      }}
+        {{tt this closeButtonType}}
+      {{/one-button}}
+      {{#if isProceedButtonVisible}}
+        {{#one-button
+          type="primary"
+          class="proceed-btn"
+          disabled=(not isProceedAvailable)
+          onClick=(if isProceedAvailable (action modal.submit))
+        }}
+          {{tt this "proceed"}}
+        {{/one-button}}
+      {{/if}}
+    {{/modal.footer}}
+  {{/if}}
+
+{{/global-modal}}

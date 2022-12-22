@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { get } from '@ember/object';
+import { get, observer, set } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
@@ -27,6 +27,7 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   spaceActions: service(),
   spaceManager: service(),
   globalNotify: service(),
+  modalManager: service(),
 
   /**
    * @override
@@ -52,6 +53,31 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
    * @override
    */
   record: reads('space'),
+
+  init() {
+    this._super(...arguments);
+    this.urlActionObserver();
+  },
+
+  // FIXME: move to space members view
+  // FIXME: refactor
+  urlActionObserver: observer(
+    'navigationState.aspectOptions.action',
+    async function urlActionObserver() {
+      const action = this.navigationState.aspectOptions.action;
+      if (!action) {
+        return;
+      }
+      if (action === 'confirmJoinRequest') {
+        const joinRequestId = this.navigationState.aspectOptions.joinRequestId;
+        if (joinRequestId) {
+          await this.openConfirmJoinRequestModal(joinRequestId);
+          this.navigationState.changeRouteAspectOptions({ joinRequestId: null }, true);
+        }
+      }
+      this.navigationState.changeRouteAspectOptions({ action: null }, true);
+    }
+  ),
 
   /**
    * @override
@@ -145,5 +171,12 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
       spaceActions,
     } = this.getProperties('space', 'spaceActions');
     return spaceActions.joinSpaceAsUser(space);
+  },
+
+  // FIXME: mock data
+  async openConfirmJoinRequestModal(joinRequestId) {
+    await this.modalManager.show('spaces/confirm-join-request-modal', {
+      joinRequestId,
+    }).hiddenPromise;
   },
 });

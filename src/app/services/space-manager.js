@@ -517,4 +517,14 @@ export default Service.extend({
   getAvailableSpaceTags() {
     return this.onedataConnection.availableSpaceTags;
   },
+
+  // TODO: VFS-10252 integrate with backend
+  async checkSpaceAccessRequest( /*userId, spaceId*/ ) {
+    return {
+      isValid: true,
+    };
+  },
+
+  // TODO: VFS-10252 integrate with backend
+  async grantSpaceAccess( /*userId, spaceId*/ ) {},
 });
