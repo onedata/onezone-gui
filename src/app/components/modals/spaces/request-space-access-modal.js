@@ -52,19 +52,15 @@ export default Component.extend(I18n, {
 
   messageField: computed(function messageField() {
     return TextAreaField.create({
-      ownerSource: this,
       name: 'message',
       defaultValue: '',
-      isOptional: false,
     });
   }),
 
   emailField: computed(function emailField() {
     return TextField.create({
-      ownerSource: this,
       name: 'email',
       defaultValue: '',
-      isOptional: false,
       customValidators: [
         validator('format', {
           type: 'email',

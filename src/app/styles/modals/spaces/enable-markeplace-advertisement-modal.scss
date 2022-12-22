@@ -9,4 +9,12 @@
       width: auto;
     }
   }
+  .marketplace-link {
+    display: inline-flex;
+    align-items: center;
+    .one-icon {
+      margin-left: 0.2em;
+      font-size: 120%;
+    }
+  }
 }

@@ -6,13 +6,13 @@
     </div>
   </div>
 </div>
-<ul class="list-entries iconified-block-marketplace-owned-container">
-  {{#each filteredCollection as |spaceItem|}}
-    {{content-spaces-marketplace/item viewModel=viewModel spaceItem=spaceItem}}
-  {{else}}
-    {{#if viewModel.searchValue}}
-      <p>{{tt this "noMatchingResults"}}</p>
-    {{/if}}
-  {{/each}}
-</ul>
+{{#if filteredCollection.length}}
+  <ul class="list-entries iconified-block-marketplace-owned-container">
+    {{#each filteredCollection as |spaceItem|}}
+      {{content-spaces-marketplace/item viewModel=viewModel spaceItem=spaceItem}}
+    {{/each}}
+  </ul>
+{{else if viewModel.searchValue}}
+  <p class="no-matching-results">{{tt this "noMatchingResults"}}</p>
+{{/if}}
 {{yield}}

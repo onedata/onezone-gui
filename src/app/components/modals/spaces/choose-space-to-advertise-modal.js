@@ -12,7 +12,7 @@ import { reads } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { or, not, promise, conditional, raw, isEmpty, array, and, notEmpty } from 'ember-awesome-macros';
+import { not, promise, conditional, raw, isEmpty, array, and, notEmpty } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: '',

@@ -13,7 +13,16 @@
   {{/modal.header}}
 
   {{#modal.body}}
-    <p>{{tt this "body.text"}}</p>
+    <p>
+      {{tt this "body.textIntro"}}
+      <a class="marketplace-link navy" href={{marketplaceHref}}>
+        <span class="text">{{tt this "body.spacesMarketplace"}}</span>
+        {{one-icon icon="link-external"}}
+      </a>.
+    </p>
+    <p>
+      {{tt this "body.textExtended"}}
+    </p>
     <form class="form form-horizontal form-component contact-form">
       {{form-component/field-renderer field=rootField}}
     </form>
@@ -24,7 +33,6 @@
       type="default"
       class="cancel-btn"
       onClick=modal.close
-      disabled=areButtonsDisabled
     }}
       {{tt this "cancel"}}
     {{/one-button}}

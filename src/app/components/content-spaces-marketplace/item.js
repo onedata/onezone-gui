@@ -15,6 +15,7 @@ import { promise } from 'ember-awesome-macros';
 import { all as allFulfilled } from 'rsvp';
 
 export default Component.extend(I18n, {
+  tagName: 'li',
   classNames: ['spaces-marketplace-item', 'iconified-block'],
   classNameBindings: ['spaceItem.isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
   attributeBindings: ['spaceId:space-id'],

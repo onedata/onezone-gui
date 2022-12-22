@@ -36,7 +36,7 @@ export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
 
   modalManager: service(),
-  onedataConnection: service(),
+  spaceManager: service(),
   router: service(),
   globalNotify: service(),
 
@@ -133,14 +133,14 @@ export default Component.extend(validations, I18n, {
 
   isAdvertisedToggleDisabled: bool('advertisedToggleLockHint'),
 
-  areAdvertiseRequirementsMet: or(
+  areAdvertiseRequirementsNotMet: or(
     isEmpty('organizationName'),
     isEmpty('spaceTags'),
     isEmpty('spaceDescription'),
   ),
 
   advertisedToggleLockHint: conditional(
-    and(not('isAdvertised'), 'areAdvertiseRequirementsMet'),
+    and(not('isAdvertised'), 'areAdvertiseRequirementsNotMet'),
     computedT('advertised.lockHint.requiredFieldsEmpty'),
     raw('')
   ),
@@ -163,9 +163,8 @@ export default Component.extend(validations, I18n, {
   emailValidation: reads('validations.attrs.currentContactEmail'),
 
   allowedTags: computed(
-    'onedataConnection.availableSpaceTags',
     function allowedTags() {
-      return (this.onedataConnection.availableSpaceTags ?? []).map(tag => ({
+      return (this.spaceManager.getAvailableSpaceTags() ?? []).map(tag => ({
         label: tag,
       }));
     }
@@ -345,9 +344,6 @@ export default Component.extend(validations, I18n, {
   },
 
   actions: {
-    lost() {
-      window.alert('lost');
-    },
     async saveValue(fieldId, value) {
       return this.saveValue(fieldId, value);
     },

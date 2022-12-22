@@ -83,19 +83,18 @@ describe('Integration | Component | space-configuration', function () {
     ['organizationName', ''],
     ['tags', []],
     ['description', ''],
-  ].forEach(([fieldName, value]) => {
+  ].forEach(([fieldName, emptyValue]) => {
     it(`has disabled advertised toggle if ${fieldName} field is empty`, async function () {
       const helper = new Helper(this);
-      await helper.initSpace({
+      const spaceData = {
         advertisedInMarketplace: false,
         organizationName: 'hello',
         tags: ['world'],
         description: 'foo',
-
-        ...{
-          [fieldName]: value,
-        },
-      });
+      };
+      // override specific field value to be empty
+      spaceData[fieldName] = emptyValue;
+      await helper.initSpace(spaceData);
 
       await helper.render();
 

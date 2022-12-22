@@ -23,6 +23,7 @@ export default Component.extend(I18n, {
 
   i18n: service(),
   globalNotify: service(),
+  router: service(),
 
   /**
    * @override
@@ -57,6 +58,14 @@ export default Component.extend(I18n, {
 
   space: reads('modalOptions.space'),
 
+  marketplaceHref: computed(function marketplaceHref() {
+    return this.router.urlFor(
+      'onedata.sidebar.content',
+      'spaces',
+      'join'
+    );
+  }),
+
   rootField: computed(function rootField() {
     return FormFieldsRootGroup.create({
       ownerSource: this,
@@ -69,10 +78,8 @@ export default Component.extend(I18n, {
 
   contactEmailField: computed(function contactEmailField() {
     return TextField.create({
-      ownerSource: this,
       name: 'contactEmail',
       defaultValue: this.space.contactEmail || '',
-      isOptional: false,
       customValidators: [
         validator('format', {
           type: 'email',
@@ -94,7 +101,11 @@ export default Component.extend(I18n, {
       await this.space.save();
     } catch (error) {
       this.space.rollbackAttributes();
-      await this.space.reload();
+      try {
+        await this.space.reload();
+      } catch (error) {
+        console.error('reloading space after save error failed', error);
+      }
       throw error;
     }
   },

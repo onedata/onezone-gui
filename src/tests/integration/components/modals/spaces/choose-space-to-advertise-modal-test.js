@@ -103,34 +103,8 @@ describe('Integration | Component | modals/spaces/choose-space-to-advertise-moda
       ]);
 
       await helper.showModal();
+
       const dropdown = helper.dropdown;
-      await dropdown.open();
-
-      expect(await dropdown.getOptionsText()).to.deep.equal(['One', 'Two']);
-    }
-  );
-
-  it('lists non-advertised spaces in dropdown',
-    async function () {
-      const helper = new Helper(this);
-      helper.setSpaces([{
-          name: 'One',
-          advertisedInMarketplace: false,
-        },
-        {
-          name: 'Two',
-          advertisedInMarketplace: false,
-        },
-        {
-          name: 'Advertised space',
-          advertisedInMarketplace: true,
-        },
-      ]);
-
-      await helper.showModal();
-      const dropdown = helper.dropdown;
-      await dropdown.open();
-
       expect(await dropdown.getOptionsText()).to.deep.equal(['One', 'Two']);
     }
   );

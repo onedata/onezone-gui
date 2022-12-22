@@ -5,11 +5,7 @@
   }}>
     <label class="control-label">{{tt this "spaceName.label"}}:</label>
     {{#if isReadOnly}}
-      {{#if spaceName}}
-        <span class="static-value">{{spaceName}}</span>
-      {{else}}
-        <span class="static-value static-not-set">{{tt this "notSet"}}</span>
-      {{/if}}
+      <span class="static-value">{{spaceName}}</span>
     {{else}}
       {{one-inline-editor
         class="space-name"

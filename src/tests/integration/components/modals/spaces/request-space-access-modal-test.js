@@ -36,8 +36,6 @@ describe('Integration | Component | modals/spaces/request-space-access-modal', f
 
     await helper.showModal();
 
-    console.log(helper.modal.outerHTML);
-
     expect(helper.emailInput, 'email').to.exist;
     expect(helper.messageTextarea, 'message').to.exist;
   });

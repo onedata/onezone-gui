@@ -16,6 +16,8 @@ import { inject as service } from '@ember/service';
 const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
+  classNames: ['spaces-markeplace-list'],
+
   navigationState: service(),
 
   /**
@@ -45,8 +47,7 @@ export default Component.extend(I18n, {
     if (!this.urlSelectedSpace || !this.element) {
       return;
     }
-    // /** @type {HTMLElement} */
-    // const scrollElement = this.element.closest('.ps');
+    /** @type {HTMLElement} */
     const itemElement = this.element.querySelector(`[space-id=${this.urlSelectedSpace}]`);
     if (!itemElement) {
       return;

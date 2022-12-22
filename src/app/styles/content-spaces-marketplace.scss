@@ -9,9 +9,13 @@
   @media (max-width: $screen-xs-max) {
     padding: 0 1em;
   }
-  .list-entries {
-    padding-top: 1em;
-    padding-left: 0;
+  .spaces-markeplace-list {
+    .list-entries, .no-matching-results {
+      padding-top: 1em;
+    }
+    .list-entries {
+      padding-left: 0;
+    }
   }
   .spaces-marketplace-item {
     .icon-section {

@@ -37,6 +37,14 @@
       }
       .one-inline-editor {
         overflow: hidden;
+        // Overflow hidden, which is used for limiting input size cuts input shadows.
+        // Below code gives some margin for visibility of overflown shadows.
+        // Right margin is not modified, because it contains buttons and space for shadow.
+        $overflow-visible-margin: 1em;
+        @each $direction in top bottom left {
+          padding-#{$direction}: $overflow-visible-margin;
+          margin-#{$direction}: -$overflow-visible-margin;
+        }
       }
     }
     .advertised-form-group {

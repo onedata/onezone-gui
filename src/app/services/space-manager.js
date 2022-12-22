@@ -66,6 +66,7 @@ export default Service.extend({
   onedataGraph: service(),
   onedataGraphUtils: service(),
   recordManager: service(),
+  onedataConnection: service(),
 
   /**
    * Fetches collection of all spaces
@@ -510,5 +511,10 @@ export default Service.extend({
     //   operation: 'create',
     //   subscribe: false,
     // });
+  },
+
+  // TODO: VFS-10252 mock of possible implementation; integrate with backend
+  getAvailableSpaceTags() {
+    return this.onedataConnection.availableSpaceTags;
   },
 });
