@@ -38,6 +38,7 @@ import {
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { classify } from '@ember/string';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import animateCss from 'onedata-gui-common/utils/animate-css';
 
 export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
@@ -673,7 +674,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     debounce(this, 'expandSelectedMember', 0);
   },
 
-  expandSelectedMember() {
+  async expandSelectedMember() {
     if (!this.isDestroyed && this.memberIdToExpand && this.element) {
       /** @type {HTMLElement} */
       const memberItemHeader = this.element.querySelector(
@@ -683,6 +684,10 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
         memberItemHeader.scrollIntoView();
         if (!memberItemHeader.classList.contains('opened')) {
           memberItemHeader.click();
+          (async () => {
+            await waitForRender();
+            animateCss(memberItemHeader, 'pulse-bg-opened-list-item-header');
+          })();
         }
         this.set('memberIdToExpand', null);
       }
