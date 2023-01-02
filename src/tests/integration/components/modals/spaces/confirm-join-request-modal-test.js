@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import hbs from 'htmlbars-inline-precompile';
 import { assert } from '@ember/debug';
-import { render } from '@ember/test-helpers';
+import { render, click } from '@ember/test-helpers';
 import createSpace from '../../../../helpers/create-space';
 import { lookupService } from '../../../../helpers/stub-service';
 import {
@@ -63,6 +63,29 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.cancelButton).to.contain.text('Cancel');
     expect(helper.proceedButton).to.exist;
     expect(helper.proceedButton).to.contain.text('Confirm');
+  });
+
+  it('invokes grantSpaceAccess on confirm click', async function () {
+    const helper = new Helper(this);
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      joinRequestId,
+    };
+    const checkSpaceAccessRequest = sinon.stub(
+      helper.spaceManager,
+      'checkSpaceAccessRequest'
+    );
+    const grantSpaceAccess = sinon.stub(
+      helper.spaceManager,
+      'grantSpaceAccess'
+    );
+    checkSpaceAccessRequest.resolves({ isValid: true });
+
+    await helper.showModal();
+    await click(helper.proceedButton);
+
+    expect(grantSpaceAccess).to.have.been.calledOnce;
+    expect(grantSpaceAccess).to.have.been.calledWith(joinRequestId);
   });
 
   it('renders header and close button if space join request is invalid', async function () {

@@ -529,5 +529,5 @@ export default Service.extend({
   },
 
   // TODO: VFS-10252 integrate with backend
-  async grantSpaceAccess( /*userId, spaceId*/ ) {},
+  async grantSpaceAccess( /* requestId */ ) {},
 });

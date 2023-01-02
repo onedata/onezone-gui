@@ -14,6 +14,7 @@ export default {
       text: 'The space join request is either not valid or has expired.',
     },
   },
+  grantingSpaceAccess: 'granting space access',
   cancel: 'Cancel',
   close: 'Close',
   proceed: 'Confirm',

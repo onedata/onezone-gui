@@ -68,7 +68,7 @@
           type="primary"
           class="proceed-btn"
           disabled=(not isProceedAvailable)
-          onClick=(if isProceedAvailable (action modal.submit))
+          onClick=(action "confirm")
         }}
           {{tt this "proceed"}}
         {{/one-button}}

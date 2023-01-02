@@ -17,6 +17,8 @@ export default Component.extend(I18n, {
   i18n: service(),
   spaceManager: service(),
   recordManager: service(),
+  globalNotify: service(),
+  modalManager: service(),
 
   closeButtonType: conditional(
     'isValid',
@@ -30,11 +32,16 @@ export default Component.extend(I18n, {
    */
   modalId: undefined,
 
-  verificationProxy: promise.object(computed(async function verificationProxy() {
-    return await this.spaceManager.checkSpaceAccessRequest({
-      joinRequestId: this.modalOptions.joinRequestId,
-    });
-  })),
+  verificationProxy: promise.object(computed(
+    'joinRequestId',
+    async function verificationProxy() {
+      return await this.spaceManager.checkSpaceAccessRequest({
+        joinRequestId: this.joinRequestId,
+      });
+    }
+  )),
+
+  joinRequestId: reads('modalOptions.joinRequestId'),
 
   isValid: reads('verificationProxy.content.isValid'),
 
@@ -55,4 +62,18 @@ export default Component.extend(I18n, {
   isProceedButtonVisible: reads('isValid'),
 
   isProceedAvailable: reads('isValid'),
+
+  actions: {
+    async confirm() {
+      if (!this.isProceedAvailable) {
+        return;
+      }
+      try {
+        await this.spaceManager.grantSpaceAccess(this.joinRequestId);
+        this.modalManager.hide(this.modalId);
+      } catch (error) {
+        this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
+      }
+    },
+  },
 });
