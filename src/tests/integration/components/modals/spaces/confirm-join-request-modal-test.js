@@ -13,11 +13,11 @@ import {
   getModalFooter,
 } from '../../../../helpers/modal';
 import sinon from 'sinon';
+import { Promise } from 'rsvp';
 
 describe('Integration | Component | modals/spaces/confirm-join-request-modal', function () {
   setupRenderingTest();
 
-  // FIXME: fulfill test
   it('renders header and close button if space join request is invalid', async function () {
     const helper = new Helper(this);
     const joinRequestId = 'join_request_id';
@@ -59,6 +59,26 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     expect(helper.cancelButton).to.contain.text('Cancel');
   });
 
+  it('renders loading header and spinner only when verification request is being made', async function () {
+    const helper = new Helper(this);
+    const joinRequestId = 'join_request_id';
+    helper.modalOptions = {
+      joinRequestId,
+    };
+    const checkSpaceAccessRequest = sinon.stub(
+      helper.spaceManager,
+      'checkSpaceAccessRequest'
+    );
+    checkSpaceAccessRequest.returns(new Promise(() => {}));
+
+    await helper.showModal();
+
+    expect(helper.header).to.contain.text('Verifying add user request...');
+    expect(helper.body).to.contain('.spin-spinner-block');
+    expect(helper.cancelButton).to.not.exist;
+    expect(helper.proceedButton).to.not.exist;
+  });
+
 });
 
 class Helper {
@@ -88,10 +108,10 @@ class Helper {
     return getModalFooter();
   }
   get cancelButton() {
-    return this.footer.querySelector('.cancel-btn');
+    return this.footer?.querySelector('.cancel-btn');
   }
   get proceedButton() {
-    return this.footer.querySelector('.proceed-btn');
+    return this.footer?.querySelector('.proceed-btn');
   }
 
   get modalManager() {
