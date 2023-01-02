@@ -17,6 +17,7 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
 import { Promise } from 'rsvp';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,
@@ -59,7 +60,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     this.urlActionObserver();
   },
 
-  // FIXME: move to space members view
   // FIXME: refactor
   urlActionObserver: observer(
     'navigationState.aspectOptions.action',
@@ -68,14 +68,16 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
       if (!action) {
         return;
       }
+      const changedRouteAspectOptions = { action: null };
       if (action === 'confirmJoinRequest') {
         const joinRequestId = this.navigationState.aspectOptions.joinRequestId;
         if (joinRequestId) {
           await this.openConfirmJoinRequestModal(joinRequestId);
-          this.navigationState.changeRouteAspectOptions({ joinRequestId: null }, true);
+          changedRouteAspectOptions.joinRequestId = null;
         }
       }
-      this.navigationState.changeRouteAspectOptions({ action: null }, true);
+      await waitForRender();
+      this.navigationState.changeRouteAspectOptions(changedRouteAspectOptions, true);
     }
   ),
 

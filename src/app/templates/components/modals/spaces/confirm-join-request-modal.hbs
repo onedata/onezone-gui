@@ -10,12 +10,12 @@
     {{#modal.header}}
       <h1>
         {{!-- FIXME: if verification failed - show warning sign --}}
-        {{#if isInvalid}}
-          {{one-icon icon="sign-warning-rounded"}}
-          <span class="one-label">{{tt this "header.invalid"}}</span>
-        {{else}}
+        {{#if isValid}}
           {{one-icon icon="sign-info-rounded"}}
           <span class="one-label">{{tt this "header.valid"}}</span>
+        {{else}}
+          {{one-icon icon="sign-warning-rounded"}}
+          <span class="one-label">{{tt this "header.invalid"}}</span>
         {{/if}}
       </h1>
     {{/modal.header}}

@@ -20,11 +20,9 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
   // FIXME: fulfill test
   it('renders header and close button if space join request is invalid', async function () {
     const helper = new Helper(this);
-    const spaceId = 'space_id';
-    const userId = 'user_id';
+    const joinRequestId = 'join_request_id';
     helper.modalOptions = {
-      spaceId,
-      userId,
+      joinRequestId,
     };
     const checkSpaceAccessRequest = sinon.stub(
       helper.spaceManager,
@@ -41,18 +39,16 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
 
   it('renders header and cancel button if space join request is valid', async function () {
     const helper = new Helper(this);
-    const spaceId = 'space_id';
-    const userId = 'user_id';
+    const joinRequestId = 'join_request_id';
     helper.modalOptions = {
-      spaceId,
-      userId,
+      joinRequestId,
     };
     const checkSpaceAccessRequest = sinon.stub(
       helper.spaceManager,
       'checkSpaceAccessRequest'
     );
     checkSpaceAccessRequest.resolves({ isValid: false });
-    checkSpaceAccessRequest.withArgs(sinon.match({ userId, spaceId })).resolves({
+    checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
       isValid: true,
     });
 
