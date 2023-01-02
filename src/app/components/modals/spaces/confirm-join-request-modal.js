@@ -41,6 +41,11 @@ export default Component.extend(I18n, {
     }
   )),
 
+  /**
+   * @type {({ userId: string, spaceId: string }) => void}
+   */
+  onConfirmed: reads('modalOptions.onConfirmed'),
+
   joinRequestId: reads('modalOptions.joinRequestId'),
 
   isValid: reads('verificationProxy.content.isValid'),
@@ -71,6 +76,10 @@ export default Component.extend(I18n, {
       try {
         await this.spaceManager.grantSpaceAccess(this.joinRequestId);
         this.modalManager.hide(this.modalId);
+        this.onConfirmed({
+          spaceId: this.spaceId,
+          userId: this.userId,
+        });
       } catch (error) {
         this.globalNotify.backendError(this.t('grantingSpaceAccess'), error);
       }

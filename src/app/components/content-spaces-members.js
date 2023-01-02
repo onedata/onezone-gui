@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { get, observer, set } from '@ember/object';
+import { get, observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
@@ -55,12 +55,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
    */
   record: reads('space'),
 
-  init() {
-    this._super(...arguments);
-    this.urlActionObserver();
-  },
-
-  // FIXME: refactor
   urlActionObserver: observer(
     'navigationState.aspectOptions.action',
     async function urlActionObserver() {
@@ -80,6 +74,11 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
       this.navigationState.changeRouteAspectOptions(changedRouteAspectOptions, true);
     }
   ),
+
+  init() {
+    this._super(...arguments);
+    this.urlActionObserver();
+  },
 
   /**
    * @override
@@ -179,6 +178,16 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   async openConfirmJoinRequestModal(joinRequestId) {
     await this.modalManager.show('spaces/confirm-join-request-modal', {
       joinRequestId,
+      onConfirmed: ({ userId }) => {
+        // assuming that spaceId is the same as on view
+        if (!userId) {
+          return;
+        }
+        this.navigationState.setRouteAspectOptions({
+          member: userId,
+        });
+        // TODO: VFS-10252 check how it behaves when space will be pushed to list
+      },
     }).hiddenPromise;
   },
 });
