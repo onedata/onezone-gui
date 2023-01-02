@@ -1,0 +1,41 @@
+{{!-- FIXME: add styles --}}
+<figure class="invite-subject-image">
+  <img class="subject-image" src={{root-url invitedModelImagePath}}>
+  <figcaption class="subject-image-label">
+    {{#if joiningRecord}}
+      <div class="subject-description">
+        {{#truncated-string class="text subject-name"}}
+          {{record-name record=joiningRecord}}
+        {{/truncated-string}}
+        {{id-info
+          idType=joiningModelName
+          idValue=joiningRecord.entityId
+        }}
+      </div>
+    {{else}}
+      {{#truncated-string class="text select-below-label"}}
+        {{or placeholderUnderSubjectImage (tt this "placeholderUnderSubjectImage")}}
+      {{/truncated-string}}
+    {{/if}}
+  </figcaption>
+</figure>
+<figure class="join-arrow-image">
+  <figcaption class="arrow-label">
+    {{tt this (concat 'label.' arrowLabelType)}}
+  </figcaption>
+  <div class="arrow"></div>
+</figure>
+<figure class="invite-target-image">
+  <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
+  <figcaption class="subject-image-label subject-name">
+    <div class="subject-description">
+      {{#truncated-string class="text"}}
+        {{inviteTargetName}}
+      {{/truncated-string}}
+      {{id-info
+        idType=inviteTargetModelName
+        idValue=inviteTargetId
+      }}
+    </div>
+  </figcaption>
+</figure>

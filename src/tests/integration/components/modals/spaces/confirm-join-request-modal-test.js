@@ -56,6 +56,9 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     await helper.showModal();
 
     expect(helper.header).to.contain.text('Add user to space');
+    expect(helper.body).to.contain.text(
+      'An access to space has been requested using spaces marketplace.'
+    );
     expect(helper.cancelButton).to.exist;
     expect(helper.cancelButton).to.contain.text('Cancel');
     expect(helper.proceedButton).to.exist;
@@ -80,6 +83,9 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     await helper.showModal();
 
     expect(helper.header).to.contain.text('Invalid join space request');
+    expect(helper.body).to.contain.text(
+      'The space join request is either not valid or has expired.'
+    );
     expect(helper.cancelButton).to.exist;
     expect(helper.cancelButton).to.contain.text('Close');
     expect(helper.proceedButton).to.not.exist;

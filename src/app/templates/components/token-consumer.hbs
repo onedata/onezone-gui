@@ -48,64 +48,19 @@
         {{/if}}
       </p>
       {{#unless (or (media "isMobile") noJoinMessage)}}
-        <figure class="consume-token-image">
-          <figure class="invite-subject-image">
-            <img class="subject-image" src={{root-url invitedModelImagePath}}>
-            <figcaption class="subject-image-label">
-              {{#if joiningRecordSelectorModelName}}
-                {{#if selectedJoiningRecordOption}}
-                  <div class="subject-description">
-                    {{#truncated-string class="text subject-name"}}
-                      {{selectedJoiningRecordOption.label}}
-                    {{/truncated-string}}
-                    {{id-info
-                      idType=joiningModelName
-                      idValue=joiningId
-                    }}
-                  </div>
-                {{else}}
-                  {{#truncated-string class="text select-below-label"}}
-                    {{tt this "placeholderUnderSubjectImage"}}
-                  {{/truncated-string}}
-                {{/if}}
-              {{else}}
-                <div class="subject-description">
-                  {{#truncated-string class="text subject-name"}}
-                    {{record-name record=currentUser}}
-                  {{/truncated-string}}
-                  {{id-info
-                    idType=joiningModelName
-                    idValue=currentUser.entityId
-                  }}
-                </div>
-              {{/if}}
-            </figcaption>
-          </figure>
-          <figure class="join-arrow-image">
-            <figcaption class="arrow-label">
-              {{#if spaceHarvesterRelationToken}}
-                {{tt this "addLabel"}}
-              {{else}}
-                {{tt this "joinLabel"}}
-              {{/if}}
-            </figcaption>
-            <div class="arrow"></div>
-          </figure>
-          <figure class="invite-target-image">
-            <img class="subject-image" src={{root-url inviteTargetModelImagePath}}>
-            <figcaption class="subject-image-label subject-name">
-              <div class="subject-description">
-                {{#truncated-string class="text"}}
-                  {{inviteTargetName}}
-                {{/truncated-string}}
-                {{id-info
-                  idType=inviteTargetModelName
-                  idValue=inviteTargetId
-                }}
-              </div>
-            </figcaption>
-          </figure>
-        </figure>
+        {{join-image
+          class="consume-token-image"
+          joiningModelName=(or joiningRecordSelectorModelName "user")
+          joiningRecord=(if joiningRecordSelectorModelName
+            selectedJoiningRecordOption.value
+            currentUser
+          )
+          inviteTargetModelName=inviteTargetModelName
+          inviteTargetId=inviteTargetId
+          inviteTargetName=inviteTargetName
+          arrowLabelType=(if spaceHarvesterRelationToken "add" "join")
+          placeholderUnderSubjectImage=(tt this "placeholderUnderSubjectImage")
+        }}
       {{/unless}}
     </div>
   {{/if}}

@@ -33,10 +33,23 @@
       proxy=verificationProxy
     }}
       {{#if isValid}}
-        <p>An access to space was requested using spaces marketplace.</p>
-        {{!-- FIXME: space -> user circles --}}
+        <p>{{tt this "body.valid.text"}}</p>
+        {{#promise-proxy-container
+          tagName="div"
+          class=(if userProxy.isPending "loadable-row")
+          proxy=userProxy
+        }}
+          {{join-image
+            class="user-join-space-image"
+            joiningModelName="user"
+            joiningRecord=userProxy.content
+            inviteTargetModelName="space"
+            inviteTargetId=spaceId
+            inviteTargetName=spaceName
+          }}
+        {{/promise-proxy-container}}
       {{else}}
-        <p>Space join request is invalid or out-of-date.</p>
+        <p>{{tt this "body.invalid.text"}}</p>
       {{/if}}
     {{/promise-proxy-container}}
   {{/modal.body}}

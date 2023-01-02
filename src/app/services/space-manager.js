@@ -519,9 +519,12 @@ export default Service.extend({
   },
 
   // TODO: VFS-10252 integrate with backend
-  async checkSpaceAccessRequest( /*userId, spaceId*/ ) {
+  async checkSpaceAccessRequest( /*requestId*/ ) {
     return {
       isValid: true,
+      userId: 'user0',
+      spaceId: 'space-101',
+      spaceName: 'Space One-Zero-One',
     };
   },
 
