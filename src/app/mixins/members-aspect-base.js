@@ -11,7 +11,6 @@ import Mixin from '@ember/object/mixin';
 import {
   computed,
   get,
-  getProperties,
   observer,
 } from '@ember/object';
 import { union, collect } from '@ember/object/computed';
@@ -24,7 +23,7 @@ import _ from 'lodash';
 import { getOwner } from '@ember/application';
 import notImplementedReject from 'onedata-gui-common/utils/not-implemented-reject';
 import { isArray } from '@ember/array';
-import { next, scheduleOnce } from '@ember/runloop';
+import { debounce, scheduleOnce } from '@ember/runloop';
 import { resolve } from 'rsvp';
 import Action from 'onedata-gui-common/utils/action';
 import {
@@ -38,6 +37,7 @@ import {
 } from 'ember-awesome-macros';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { classify } from '@ember/string';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   privilegeManager: service(),
@@ -536,16 +536,20 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     });
   }),
 
+  selectedMemberObserver: observer(
+    'navigationState.aspectOptions.member',
+    function selectedMemberObserver() {
+      const member = this.navigationState.aspectOptions.member;
+      this.set('memberIdToExpand', member || null);
+      if (member) {
+        this.scheduleExpandSelectedMember();
+      }
+    }
+  ),
+
   init() {
     this._super(...arguments);
-
-    // FIXME: make observer for some options
-    const {
-      aspect,
-      member,
-    } = getProperties(this.get('navigationState.queryParams'), 'aspect', 'member');
-
-    this.set('memberIdToExpand', member);
+    const aspect = this.navigationState.queryParams.aspect;
 
     if (['memberships', 'privileges'].includes(aspect)) {
       this.setProperties({
@@ -569,6 +573,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
       }
       this.set('viewToolsVisible', viewToolsVisible === 'true');
     }
+    this.selectedMemberObserver();
   },
 
   /**
@@ -663,6 +668,27 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     );
   },
 
+  async scheduleExpandSelectedMember() {
+    await waitForRender();
+    debounce(this, 'expandSelectedMember', 0);
+  },
+
+  expandSelectedMember() {
+    if (!this.isDestroyed && this.memberIdToExpand && this.element) {
+      /** @type {HTMLElement} */
+      const memberItemHeader = this.element.querySelector(
+        `.member-${this.memberIdToExpand} .one-collapsible-list-item-header`
+      );
+      if (memberItemHeader) {
+        memberItemHeader.scrollIntoView();
+        if (!memberItemHeader.classList.contains('opened')) {
+          memberItemHeader.click();
+        }
+        this.set('memberIdToExpand', null);
+      }
+    }
+  },
+
   actions: {
     toogleViewTools() {
       this.toggleProperty('viewToolsVisible');
@@ -675,21 +701,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
       this.set('aspect', String(aspect));
     },
     recordsLoaded() {
-      next(() => safeExec(this, () => {
-        const {
-          memberIdToExpand,
-          element,
-        } = this.getProperties('memberIdToExpand', 'element');
-        if (memberIdToExpand && element) {
-          const memberItemHeader = element.querySelector(
-            `.member-${memberIdToExpand} .one-collapsible-list-item-header`
-          );
-          if (memberItemHeader) {
-            memberItemHeader.click();
-            this.set('memberIdToExpand', null);
-          }
-        }
-      }));
+      this.scheduleExpandSelectedMember();
     },
     recordsSelected(type, records) {
       const targetListName = type === 'user' ?
