@@ -8,7 +8,9 @@ export default {
   },
   body: {
     valid: {
-      text: 'An access to space has been requested using spaces marketplace.',
+      text: 'An access to <strong>{{spaceName}}</strong> space has been requested by <strong>{{userName}}</strong> using spaces marketplace.',
+      info: 'Right after granting the access, the user will gain default privileges to space, but you can modify them.',
+      question: 'Do you want to confirm granting access?',
     },
     invalid: {
       text: 'The space join request is either not valid or has expired.',

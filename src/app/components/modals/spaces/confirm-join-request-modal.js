@@ -56,6 +56,8 @@ export default Component.extend(I18n, {
 
   spaceName: reads('verificationProxy.content.spaceName'),
 
+  userName: reads('userProxy.content.name'),
+
   // FIXME: check if user info is available by other user
   userProxy: promise.object(computed('userId', async function userProxy() {
     if (!this.userId) {

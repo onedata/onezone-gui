@@ -4,8 +4,6 @@
   size="lg"
   as |modal|
 }}
-  {{!-- FIXME: if verification rejected, show error --}}
-  {{!-- FIXME: check look of loading spinner --}}
   {{#modal.header}}
     <h1>
       {{#if verificationProxy.isFulfilled}}
@@ -33,20 +31,22 @@
       proxy=verificationProxy
     }}
       {{#if isValid}}
-        <p>{{tt this "body.valid.text"}}</p>
         {{#promise-proxy-container
           tagName="div"
           class=(if userProxy.isPending "loadable-row")
           proxy=userProxy
         }}
+          <p>{{tt this "body.valid.text" spaceName=spaceName userName=userName}}</p>
+          <p>{{tt this "body.valid.info"}}</p>
           {{join-image
-            class="user-join-space-image"
+            class="user-join-space-image hidden-xs"
             joiningModelName="user"
             joiningRecord=userProxy.content
             inviteTargetModelName="space"
             inviteTargetId=spaceId
             inviteTargetName=spaceName
           }}
+          <p>{{tt this "body.valid.question"}}</p>
         {{/promise-proxy-container}}
       {{else}}
         <p>{{tt this "body.invalid.text"}}</p>
