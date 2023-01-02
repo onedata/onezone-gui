@@ -1,4 +1,11 @@
-// FIXME: jsdoc
+/**
+ * Image with names and IDs showing that some `joiningRecord` wants to join to some
+ * `inviteTarget`.
+ *
+ * @author Jakub Liput, Agnieszka Warchoł
+ * @copyright (C) 2023 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import {
@@ -38,7 +45,6 @@ export default Component.extend(I18n, {
   joiningRecord: undefined,
 
   /**
-   * FIXME: check possible values
    * @virtual
    * @type {'group'|'space'|'harvester'|'cluster'|'atmInventory'}
    */

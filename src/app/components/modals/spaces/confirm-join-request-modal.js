@@ -1,4 +1,11 @@
-// FIXME: jsdoc
+/**
+ * Verifies, shows info and allows to confirm access request to space made by some user
+ * using spaces marketplace.
+ *
+ * @author Jakub Liput
+ * @copyright (C) 2023 ACK CYFRONET AGH
+ * @license This software is released under the MIT license cited in 'LICENSE.txt'.
+ */
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
@@ -7,7 +14,13 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import { promise, conditional, raw } from 'ember-awesome-macros';
 
-// FIXME: document modalOptions
+/**
+ * @typedef {Object} ConfirmJoinRequestModalOptions
+ * @property {({ userId: string, spaceId: string }) => void} onConfirmed Callback invoked
+ *   after access granting method has been successfully resolved.
+ * @property {string} joinRequestId Request ID used in granting access to space used in
+ *   `spaceManager#grantSpaceAccess`.
+ */
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -31,6 +44,12 @@ export default Component.extend(I18n, {
    * @type {String}
    */
   modalId: undefined,
+
+  /**
+   * @virtual
+   * @type {ConfirmJoinRequestModalOptions}
+   */
+  modalOptions: undefined,
 
   verificationProxy: promise.object(computed(
     'joinRequestId',
@@ -58,7 +77,7 @@ export default Component.extend(I18n, {
 
   userName: reads('userProxy.content.name'),
 
-  // FIXME: check if user info is available by other user
+  // TODO: VFS-10252 check if user info will be available by other user
   userProxy: promise.object(computed('userId', async function userProxy() {
     if (!this.userId) {
       return null;

@@ -174,7 +174,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
     return spaceActions.joinSpaceAsUser(space);
   },
 
-  // FIXME: mock data
   async openConfirmJoinRequestModal(joinRequestId) {
     await this.modalManager.show('spaces/confirm-join-request-modal', {
       joinRequestId,
