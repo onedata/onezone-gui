@@ -11,7 +11,7 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { isEmpty, promise } from 'ember-awesome-macros';
 import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
-import filterSpaces from 'onedata-gui-common/utils/filter-spaces';
+import filterSpaces from 'onezone-gui/utils/filter-spaces';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
