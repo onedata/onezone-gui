@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10060 Added "avg" time series aggregator to automation
 * VFS-10000 Added one style for flippable icons
 * VFS-10111 Added rest api button on overview space page
 * VFS-9311 Removed `$.*width()`, `$.*height()`, `$.offset()` and `$.position()` usages
