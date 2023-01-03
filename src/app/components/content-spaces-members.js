@@ -182,8 +182,10 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
         if (!userId) {
           return;
         }
-        this.navigationState.setRouteAspectOptions({
+        this.navigationState.changeRouteAspectOptions({
           member: userId,
+          action: null,
+          joinRequestId: null,
         });
         // TODO: VFS-10252 check how it behaves when space will be pushed to list
       },

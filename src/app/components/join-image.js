@@ -13,6 +13,7 @@ import {
   getBy,
 } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 const recordImages = {
   user: 'assets/images/consume-token/user.svg',
@@ -61,6 +62,12 @@ export default Component.extend(I18n, {
    * @type {string}
    */
   inviteTargetName: undefined,
+
+  /**
+   * @virtual optional
+   * @type {string|SafeString}
+   */
+  placeholderUnderSubjectImage: computedT('placeholderUnderSubjectImage'),
 
   /**
    * @type {'join'|'add'}

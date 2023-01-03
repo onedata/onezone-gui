@@ -541,10 +541,17 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
     'navigationState.aspectOptions.member',
     function selectedMemberObserver() {
       const member = this.navigationState.aspectOptions.member;
-      this.set('memberIdToExpand', member || null);
-      if (member) {
-        this.scheduleExpandSelectedMember();
+      if (!member) {
+        return;
       }
+      this.set('memberIdToExpand', member);
+      (async () => {
+        await waitForRender();
+        this.navigationState.changeRouteAspectOptions({
+          member: null,
+        });
+      })();
+      this.scheduleExpandSelectedMember();
     }
   ),
 
@@ -675,7 +682,7 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
   },
 
   async expandSelectedMember() {
-    if (!this.isDestroyed && this.memberIdToExpand && this.element) {
+    if (this.memberIdToExpand && this.element) {
       /** @type {HTMLElement} */
       const memberItemHeader = this.element.querySelector(
         `.member-${this.memberIdToExpand} .one-collapsible-list-item-header`
