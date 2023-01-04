@@ -41,6 +41,10 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
   it('renders header, confirm and cancel button if space join request is valid', async function () {
     const helper = new Helper(this);
     const joinRequestId = 'join_request_id';
+    const userId = 'user_id';
+    const spaceId = 'space_id';
+    const spaceName = 'space_id';
+    const userName = 'Zenek';
     helper.modalOptions = {
       joinRequestId,
     };
@@ -51,13 +55,17 @@ describe('Integration | Component | modals/spaces/confirm-join-request-modal', f
     checkSpaceAccessRequest.resolves({ isValid: false });
     checkSpaceAccessRequest.withArgs(sinon.match({ joinRequestId })).resolves({
       isValid: true,
+      userId,
+      spaceId,
+      spaceName,
     });
+    await helper.stubUser(userId, { name: userName });
 
     await helper.showModal();
 
     expect(helper.header).to.contain.text('Add user to space');
     expect(helper.body).to.contain.text(
-      'An access to space has been requested using spaces marketplace.'
+      `An access to ${spaceName} space has been requested by ${userName} using spaces marketplace.`
     );
     expect(helper.cancelButton).to.exist;
     expect(helper.cancelButton).to.contain.text('Cancel');
@@ -170,6 +178,12 @@ class Helper {
   async createSpace(data) {
     return await createSpace(this.store, data);
   }
+  async stubUser(userId, userData) {
+    const getRecordById = sinon.stub(this.recordManager, 'getRecordById');
+    const userRecord = this.store.createRecord('user', userData);
+    await userRecord.save();
+    getRecordById.withArgs('user', userId).resolves(userRecord);
+  }
 
   get modal() {
     return getModal();
@@ -196,6 +210,9 @@ class Helper {
   }
   get spaceManager() {
     return lookupService(this.mochaContext, 'spaceManager');
+  }
+  get recordManager() {
+    return lookupService(this.mochaContext, 'recordManager');
   }
 
   async showModal() {
