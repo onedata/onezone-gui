@@ -99,6 +99,7 @@ import emptyCollectionSidebar from './components/empty-collection-sidebar';
 import providerTabLi from './components/provider-tab-li';
 import apiSamples from './components/api-samples';
 import spaceConfiguration from './components/space-configuration';
+import joinImage from './components/join-image';
 
 import oneproviderAuthenticationError from './components/alerts/oneprovider-authentication-error';
 import cleanObsoleteTokensModal from './components/modals/clean-obsolete-tokens-modal';
@@ -280,6 +281,7 @@ const translations = {
     providerTabLi,
     apiSamples,
     spaceConfiguration,
+    joinImage,
   },
   services: {
     tokenActions,

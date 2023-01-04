@@ -1,0 +1,79 @@
+{{#global-modal
+  classNames="confirm-join-request-modal"
+  modalId=modalId
+  size="lg"
+  as |modal|
+}}
+  {{#modal.header}}
+    <h1>
+      {{#if verificationProxy.isFulfilled}}
+        {{#if isValid}}
+          {{one-icon icon="sign-info-rounded"}}
+          <span class="one-label">{{tt this "header.valid"}}</span>
+        {{else}}
+          {{one-icon icon="sign-warning-rounded"}}
+          <span class="one-label">{{tt this "header.invalid"}}</span>
+        {{/if}}
+      {{else if verificationProxy.isPending}}
+        {{one-icon icon="sign-info-rounded"}}
+        <span class="one-label">{{tt this "header.loading"}}</span>
+      {{else}}
+        {{one-icon icon="sign-error-rounded"}}
+        <span class="one-label">{{tt this "header.failed"}}</span>
+      {{/if}}
+    </h1>
+  {{/modal.header}}
+
+  {{#modal.body}}
+    {{#promise-proxy-container
+      tagName="div"
+      class=(if verificationProxy.isPending "loadable-row")
+      proxy=verificationProxy
+    }}
+      {{#if isValid}}
+        {{#promise-proxy-container
+          tagName="div"
+          class=(if userProxy.isPending "loadable-row")
+          proxy=userProxy
+        }}
+          <p>{{tt this "body.valid.text" spaceName=spaceName userName=userName}}</p>
+          <p>{{tt this "body.valid.info"}}</p>
+          {{join-image
+            class="user-join-space-image hidden-xs"
+            joiningModelName="user"
+            joiningRecord=userProxy.content
+            inviteTargetModelName="space"
+            inviteTargetId=spaceId
+            inviteTargetName=spaceName
+          }}
+          <p>{{tt this "body.valid.question"}}</p>
+        {{/promise-proxy-container}}
+      {{else}}
+        <p>{{tt this "body.invalid.text"}}</p>
+      {{/if}}
+    {{/promise-proxy-container}}
+  {{/modal.body}}
+
+  {{#if verificationProxy.isSettled}}
+    {{#modal.footer class="btn-toolbar"}}
+      {{#one-button
+        type="default"
+        class="cancel-btn"
+        onClick=modal.close
+      }}
+        {{tt this closeButtonType}}
+      {{/one-button}}
+      {{#if isProceedButtonVisible}}
+        {{#one-button
+          type="primary"
+          class="proceed-btn"
+          disabled=(not isProceedAvailable)
+          onClick=(action "confirm")
+        }}
+          {{tt this "proceed"}}
+        {{/one-button}}
+      {{/if}}
+    {{/modal.footer}}
+  {{/if}}
+
+{{/global-modal}}

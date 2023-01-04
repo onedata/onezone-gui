@@ -16,6 +16,7 @@ import AddHarvesterToSpaceAction from 'onezone-gui/utils/space-actions/add-harve
 import RemoveHarvesterFromSpaceAction from 'onezone-gui/utils/space-actions/remove-harvester-from-space-action';
 import ChooseSpaceToAdvertiseAction from 'onezone-gui/utils/space-actions/choose-space-to-advertise-action';
 import RequestSpaceAccessAction from 'onezone-gui/utils/space-actions/request-space-access-action';
+import ConfirmSpaceJoinRequestAction from 'onezone-gui/utils/space-actions/confirm-space-join-request-action';
 
 export default Service.extend(I18n, {
   router: service(),
@@ -84,6 +85,14 @@ export default Service.extend(I18n, {
    */
   createRequestSpaceAccessAction(context) {
     return RequestSpaceAccessAction.create({ ownerSource: this, context });
+  },
+
+  /**
+   * @param {ConfirmSpaceJoinRequestActionContext} context
+   * @returns {Utils.SpaceActions.ConfirmSpaceJoinRequestAction}
+   */
+  createConfirmSpaceJoinRequestAction(context) {
+    return ConfirmSpaceJoinRequestAction.create({ ownerSource: this, context });
   },
 
   /**

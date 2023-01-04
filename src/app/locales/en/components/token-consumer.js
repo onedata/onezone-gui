@@ -45,7 +45,6 @@ export default {
   joiningRecordSelectorDescription: 'To consume this token, please select a {{joiningModelName}} of yours that will {{actionOnSubject}} the {{targetModelName}} <strong>{{targetRecordName}}</strong>:',
   placeholderUnderSubjectImage: 'Select below...',
   joinLabel: 'join',
-  addLabel: 'add',
   beAddedLabel: 'be added to',
   joiningModelName: {
     group: 'group',

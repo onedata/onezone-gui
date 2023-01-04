@@ -99,11 +99,16 @@ export default function generateDevelopmentModel(store) {
   let spaces;
   let providers;
   let harvesters;
+  let user;
 
   return createGuiMessages(store)
-    // create users
+    // create main user record
+    .then(async () => {
+      user = await createUserRecord(store);
+    })
+    // create other users
     .then(() => createUsersRecords(store))
-    .then(u => users = u)
+    .then(otherUsers => users = [user, ...otherUsers])
     // create main resources lists
     .then(() => hashFulfilled(
       types.reduce((promiseHash, type) => {
@@ -238,7 +243,7 @@ export default function generateDevelopmentModel(store) {
         allFulfilled(groups.map(record =>
           allFulfilled([
             attachUsersGroupsToModel(
-              store, record, 'group', false, users.slice(0, 2), groups.slice(0, 2)
+              store, record, 'group', false, users.slice(0, 3), groups.slice(0, 3)
             ),
             attachUsersGroupsToModel(
               store, record, 'group', true, users, groups
@@ -254,12 +259,12 @@ export default function generateDevelopmentModel(store) {
           allFulfilled(spaces.map(record =>
             allFulfilled([
               attachUsersGroupsToModel(
-                store, record, 'space', false, users.slice(0, 2), groups.slice(0, 2)
+                store, record, 'space', false, users.slice(0, 3), groups.slice(0, 3)
               ),
               attachUsersGroupsToModel(
                 store, record, 'space', true, users, groups
               ),
-              attachOwnersToModel(store, record, users.slice(1, 2)),
+              attachOwnersToModel(store, record, users.slice(0, 1)),
               attachMembershipsToModel(
                 store, record, 'space', groups
               ),
@@ -333,7 +338,7 @@ export default function generateDevelopmentModel(store) {
       attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
       .then(() => listRecords)
     )
-    .then(listRecords => createUserRecord(store, listRecords));
+    .then(listRecords => addListRecordsToMainUser(user, listRecords));
 }
 
 function createGuiMessages(store) {
@@ -368,7 +373,7 @@ function createGuiMessages(store) {
   }));
 }
 
-function createUserRecord(store, listRecords) {
+function createUserRecord(store) {
   const userRecord = store.createRecord('user', {
     id: store.userGri(USER_ID),
     fullName: USERNAME,
@@ -377,6 +382,10 @@ function createUserRecord(store, listRecords) {
     canInviteProviders: true,
     username: USER_LOGIN,
   });
+  return userRecord.save();
+}
+
+function addListRecordsToMainUser(userRecord, listRecords) {
   Object.values(listRecords).forEach(lr =>
     userRecord.set(camelize(lr.constructor.modelName), lr)
   );
@@ -717,6 +726,7 @@ function createAtmInventoryRecords(store) {
 function createUsersRecords(store) {
   return allFulfilled(_.range(NUMBER_OF_SHARED_USERS).map((index) => {
     return store.createRecord('user', {
+      id: store.userGri(`user${index}`),
       name: `user${index}`,
       username: `username${index}`,
     }).save();

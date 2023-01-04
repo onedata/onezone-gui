@@ -4,7 +4,7 @@
  *
  * @module services/url-action-runner
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -21,6 +21,10 @@ export default UrlActionRunner.extend({
     this._super(...arguments);
 
     this.registerActionRunner('removeSpace', this.removeSpaceActionRunner.bind(this));
+    this.registerActionRunner(
+      'confirmJoinSpaceRequest',
+      this.confirmSpaceJoinRequestActionRunner.bind(this)
+    );
   },
 
   /**
@@ -29,6 +33,8 @@ export default UrlActionRunner.extend({
    * @returns {Promise}
    */
   removeSpaceActionRunner(actionParams) {
+    // NOTE: legacy name of parameter - in new code please follow convention:
+    // `action_camelCaseKey`
     const spaceId = get(actionParams || {}, 'action_space_id');
     if (!spaceId) {
       return reject();
@@ -41,5 +47,19 @@ export default UrlActionRunner.extend({
 
     return recordManager.getRecordById('space', spaceId)
       .then(space => spaceActions.createRemoveSpaceAction({ space }).execute());
+  },
+
+  /**
+   * @param {Object} actionParams
+   * @param {String} actionParams.action_request_id
+   * @returns {Promise}
+   */
+  async confirmSpaceJoinRequestActionRunner(actionParams) {
+    const requestId = get(actionParams || {}, 'action_requestId');
+    if (!requestId) {
+      throw new Error();
+    }
+
+    return this.spaceActions.createConfirmSpaceJoinRequestAction({ requestId }).execute();
   },
 });

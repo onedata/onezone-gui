@@ -13,6 +13,7 @@ import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import UserProxyMixin from 'onedata-gui-websocket-client/mixins/user-proxy';
 import { inject as service } from '@ember/service';
+import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 
 export default Component.extend(I18n, UserProxyMixin, {
   tagName: '',
@@ -38,7 +39,9 @@ export default Component.extend(I18n, UserProxyMixin, {
   queryParams: computed('currentUser.userId', function queryParams() {
     return {
       aspect: 'memberships',
-      member: this.get('currentUser.userId'),
+      options: serializeAspectOptions({
+        member: this.currentUser.userId,
+      }),
     };
   }),
 });
