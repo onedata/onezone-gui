@@ -4,7 +4,7 @@
  *
  * @module services/url-action-runner
  * @author Michał Borzęcki
- * @copyright (C) 2020 ACK CYFRONET AGH
+ * @copyright (C) 2020-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -33,6 +33,8 @@ export default UrlActionRunner.extend({
    * @returns {Promise}
    */
   removeSpaceActionRunner(actionParams) {
+    // NOTE: legacy name of parameter - in new code please follow convention:
+    // `action_camelCaseKey`
     const spaceId = get(actionParams || {}, 'action_space_id');
     if (!spaceId) {
       return reject();
@@ -53,7 +55,7 @@ export default UrlActionRunner.extend({
    * @returns {Promise}
    */
   async confirmSpaceJoinRequestActionRunner(actionParams) {
-    const requestId = get(actionParams || {}, 'action_request_id');
+    const requestId = get(actionParams || {}, 'action_requestId');
     if (!requestId) {
       throw new Error();
     }
