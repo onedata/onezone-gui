@@ -21,6 +21,10 @@ export default UrlActionRunner.extend({
     this._super(...arguments);
 
     this.registerActionRunner('removeSpace', this.removeSpaceActionRunner.bind(this));
+    this.registerActionRunner(
+      'confirmJoinSpaceRequest',
+      this.confirmSpaceJoinRequestActionRunner.bind(this)
+    );
   },
 
   /**
@@ -41,5 +45,19 @@ export default UrlActionRunner.extend({
 
     return recordManager.getRecordById('space', spaceId)
       .then(space => spaceActions.createRemoveSpaceAction({ space }).execute());
+  },
+
+  /**
+   * @param {Object} actionParams
+   * @param {String} actionParams.action_request_id
+   * @returns {Promise}
+   */
+  async confirmSpaceJoinRequestActionRunner(actionParams) {
+    const requestId = get(actionParams || {}, 'action_request_id');
+    if (!requestId) {
+      throw new Error();
+    }
+
+    return this.spaceActions.createConfirmSpaceJoinRequestAction({ requestId }).execute();
   },
 });

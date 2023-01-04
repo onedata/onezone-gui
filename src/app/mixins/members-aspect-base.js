@@ -678,10 +678,13 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
 
   async scheduleExpandSelectedMember() {
     await waitForRender();
+    // This code does not eliminate repeated calls, but it limits calls in typical
+    // scenarios. Note, that `expandSelectedMember` is however safe to be invoked multiple
+    // times.
     debounce(this, 'expandSelectedMember', 0);
   },
 
-  async expandSelectedMember() {
+  expandSelectedMember() {
     if (this.memberIdToExpand && this.element) {
       /** @type {HTMLElement} */
       const memberItemHeader = this.element.querySelector(
@@ -692,6 +695,9 @@ export default Mixin.create(createDataProxyMixin('owners', { type: 'array' }), {
         if (!memberItemHeader.classList.contains('opened')) {
           memberItemHeader.click();
           (async () => {
+            // Must wait for render, because above click will cause
+            // element to have its classname changed after next render, and below code
+            // will execute before that render.
             await waitForRender();
             animateCss(memberItemHeader, 'pulse-bg-opened-list-item-header');
           })();

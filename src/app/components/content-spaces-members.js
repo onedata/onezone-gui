@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { get, observer } from '@ember/object';
+import { get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { groupedFlags } from 'onedata-gui-websocket-client/utils/space-privileges-flags';
 import { inject as service } from '@ember/service';
@@ -17,18 +17,15 @@ import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import MembersAspectBase from 'onezone-gui/mixins/members-aspect-base';
 import layout from 'onezone-gui/templates/components/-members-aspect-base';
 import { Promise } from 'rsvp';
-import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
   layout,
   classNames: ['members-aspect-base', 'content-spaces-members'],
 
   i18n: service(),
-  navigationState: service(),
   spaceActions: service(),
   spaceManager: service(),
   globalNotify: service(),
-  modalManager: service(),
 
   /**
    * @override
@@ -54,26 +51,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
    * @override
    */
   record: reads('space'),
-
-  urlActionObserver: observer(
-    'navigationState.aspectOptions.action',
-    async function urlActionObserver() {
-      const action = this.navigationState.aspectOptions.action;
-      if (!action) {
-        return;
-      }
-      const changedRouteAspectOptions = { action: null };
-      if (action === 'confirmJoinRequest') {
-        const joinRequestId = this.navigationState.aspectOptions.joinRequestId;
-        if (joinRequestId) {
-          await this.openConfirmJoinRequestModal(joinRequestId);
-          changedRouteAspectOptions.joinRequestId = null;
-        }
-      }
-      await waitForRender();
-      this.navigationState.changeRouteAspectOptions(changedRouteAspectOptions, true);
-    }
-  ),
 
   init() {
     this._super(...arguments);
@@ -172,23 +149,5 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
       spaceActions,
     } = this.getProperties('space', 'spaceActions');
     return spaceActions.joinSpaceAsUser(space);
-  },
-
-  async openConfirmJoinRequestModal(joinRequestId) {
-    await this.modalManager.show('spaces/confirm-join-request-modal', {
-      joinRequestId,
-      onConfirmed: ({ userId }) => {
-        // assuming that spaceId is the same as on view
-        if (!userId) {
-          return;
-        }
-        this.navigationState.changeRouteAspectOptions({
-          member: userId,
-          action: null,
-          joinRequestId: null,
-        });
-        // TODO: VFS-10252 check how it behaves when space will be pushed to list
-      },
-    }).hiddenPromise;
   },
 });

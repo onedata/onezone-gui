@@ -523,8 +523,8 @@ export default Service.extend({
     return {
       isValid: true,
       userId: 'user0',
-      spaceId: 'space-101',
-      spaceName: 'Space One-Zero-One',
+      spaceId: 'space-0',
+      spaceName: 'Space 0',
     };
   },
 
