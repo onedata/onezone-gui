@@ -1,5 +1,13 @@
 .content-harvesters-spaces {
   .header-content-container {
     display: inline-flex;
+
+    .one-label {
+      padding-left: 1em;
+    }
+
+    .item-icon-container {
+      margin-right: 0;
+    }
   }
 }

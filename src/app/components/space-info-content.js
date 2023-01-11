@@ -7,9 +7,9 @@
  */
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
-import spaceInfoContent from '../../lib/onedata-gui-common/addon/components/space-info-content';
+import SpaceInfoContent from 'onedata-gui-common/components/space-info-content';
 
-export default spaceInfoContent.extend({
+export default SpaceInfoContent.extend({
   router: service(),
   guiUtils: service(),
 
