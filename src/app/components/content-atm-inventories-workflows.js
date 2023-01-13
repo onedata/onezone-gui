@@ -279,29 +279,11 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   registerRouteChangeHandler() {
-    const {
-      routeChangeHandler,
-      router,
-    } = this.getProperties('routeChangeHandler', 'router');
-
-    // Making sure if router has `.on` method (`routeWillChange` hack)
-    // TODO: VFS-8267 Remove this check
-    if (typeof router.on === 'function') {
-      router.on('routeWillChange', routeChangeHandler);
-    }
+    this.router.on('routeWillChange', this.routeChangeHandler);
   },
 
   unregisterRouteChangeHandler() {
-    const {
-      routeChangeHandler,
-      router,
-    } = this.getProperties('routeChangeHandler', 'router');
-
-    // Making sure if router has `.on` method (`routeWillChange` hack)
-    // TODO: VFS-8267 Remove this check
-    if (typeof router.off === 'function') {
-      router.off('routeWillChange', routeChangeHandler);
-    }
+    this.router.off('routeWillChange', this.routeChangeHandler);
   },
 
   registerPageUnloadHandler() {
@@ -447,6 +429,10 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   async handleRouteChange(transition) {
+    if (transition.isAborted) {
+      return;
+    }
+    // FIXME: check if it should be checked
     if (this.shouldBlockTransitionDueToUnsavedChanges()) {
       transition.abort();
       const userDecision = await this.askUserAndProcessUnsavedChanges();
