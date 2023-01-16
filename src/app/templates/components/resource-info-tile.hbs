@@ -11,7 +11,7 @@
         <tr>
           <td class="property-name">{{tt this "creator"}}</td>
           {{#if (eq creatorIcon "user")}}
-            <td class="property-value">
+            <td class="property-value user-info">
               {{user-info-with-icon
                 user=creatorProxy.content
               }}
@@ -19,7 +19,12 @@
           {{else}}
             {{#truncated-string
               tagName="td"
-              class=(concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special"))}}
+              class=(concat-classes 
+                "property-value creator" 
+                (if creatorIcon "has-icon") 
+                (if isSpecialCreator "special")
+              )
+            }}
               {{#if creatorIcon}}
                 {{one-icon icon=creatorIcon}}
               {{/if}}
