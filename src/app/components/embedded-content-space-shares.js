@@ -26,6 +26,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   navigationState: service(),
   globalNotify: service(),
   router: service(),
+  modalManager: service(),
 
   /**
    * @virtual
@@ -86,6 +87,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'getDataUrl',
     'getDatasetsUrl',
     'showShareList',
+    'openRestApiModal',
   ]),
 
   actions: {

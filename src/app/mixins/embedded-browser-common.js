@@ -195,5 +195,12 @@ export default Mixin.create({
         }
       );
     },
+
+    async openRestApiModal(space) {
+      return await this.modalManager.show('api-samples-modal', {
+        record: space,
+        apiSubject: 'space',
+      }).hiddenPromise;
+    },
   },
 });

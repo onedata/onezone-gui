@@ -22,6 +22,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   globalNotify: service(),
   router: service(),
   navigationState: service(),
+  modalManager: service(),
 
   /**
    * @override
@@ -76,6 +77,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getExecuteWorkflowUrl',
     'getProvidersUrl',
     'getAccessTokenUrl',
+    'openRestApiModal',
   ]),
 
   actions: {
