@@ -16,20 +16,10 @@ const exampleAtmLambdaRevision = {
   argumentSpecs: [{
     name: 'argint',
     dataSpec: {
-      type: 'integer',
+      type: 'number',
       valueConstraints: {},
     },
     isOptional: true,
-    // TODO: VFS-7816 uncomment or remove future code
-    // }, {
-    //   name: 'argstore',
-    //   dataSpec: {
-    //     type: 'storeCredentials',
-    //     valueConstraints: {
-    //       storeType: 'singleValue',
-    //     },
-    //   },
-    //   isOptional: true,
   }],
   resultSpecs: [{
     name: 'resstring',
@@ -48,16 +38,6 @@ const exampleAtmLambda = {
 };
 
 const exampleStores = [{
-  // TODO: VFS-7816 uncomment or remove future code
-  //   id: 'singleValueIntegerId',
-  //   name: 'singleValueIntegerStore',
-  //   type: 'singleValue',
-  //   dataSpec: {
-  //     type: 'integer',
-  //     valueConstraints: {},
-  //   },
-  //   requiresInitialContent: false,
-  // }, {
   id: 'listStringStoreId',
   name: 'listStringStore',
   type: 'list',
@@ -89,12 +69,6 @@ const exampleTask = {
     valueBuilder: {
       valueBuilderType: 'iteratedItem',
     },
-    // }, {
-    //   argumentName: 'argstore',
-    //   valueBuilder: {
-    //     valueBuilderType: 'storeCredentials',
-    //     valueBuilderRecipe: 'singleValueIntegerId',
-    //   },
   }],
   resultMappings: [{
     resultName: 'resstring',
@@ -184,9 +158,6 @@ describe('Integration | Component | content atm inventories workflows/task detai
         await renderComponent();
 
         expect(find('.name-field .form-control')).to.have.value(exampleTask.name);
-        // TODO: VFS-7816 uncomment or remove future code
-        // expect(find('.argumentMapping-field .valueBuilderStore-field'))
-        //   .to.contain.text('singleValueIntegerStore');
         expect(find('.singleResultMappings-field .targetStore-field'))
           .to.contain.text('singleValueStringStore');
       });
