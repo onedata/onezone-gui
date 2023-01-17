@@ -15,7 +15,9 @@ export default SpaceInfoContent.extend({
 
   showRestApiModalLink: true,
 
-  link: computed('space', function link() {
+  showLinkToFileBrowser: true,
+
+  linkToFileBrowser: computed('space', function link() {
     const {
       router,
       space,
@@ -29,16 +31,12 @@ export default SpaceInfoContent.extend({
     );
   }),
 
-  async onExecute() {
-    return await this.modalManager.show('api-samples-modal', {
-      record: this.space,
-      apiSubject: 'space',
-    }).hiddenPromise;
-  },
-
   actions: {
-    openRestApiModal() {
-      this.onExecute();
+    async openRestApiModal() {
+      return await this.modalManager.show('api-samples-modal', {
+        record: this.space,
+        apiSubject: 'space',
+      }).hiddenPromise;
     },
   },
 });
