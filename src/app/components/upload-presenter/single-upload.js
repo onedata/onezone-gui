@@ -221,14 +221,12 @@ export default Component.extend({
         minimizeTargetSelector,
         isMinimized,
         onToggleMinimize,
-        element,
       } = this.getProperties(
         'minimizeTargetSelector',
         'isMinimized',
         'onToggleMinimize',
-        'element'
       );
-      const $element = $(element);
+
       if (minimize === undefined) {
         minimize = !isMinimized;
       }
@@ -238,28 +236,28 @@ export default Component.extend({
         if (!isMinimized && minimizeTargetSelector) {
           this.cancelScheduledMinimalization();
 
-          const target = $(minimizeTargetSelector);
-          if (target && target.length) {
+          const target = document.querySelector(minimizeTargetSelector);
+          if (this.element && target) {
             const {
               top: targetTop,
               left: targetLeft,
-            } = target.offset();
+            } = dom.offset(target);
             const {
               top: uploadTop,
               left: uploadLeft,
-            } = $element.offset();
-            const deltaTop = targetTop + target.outerHeight() / 2 -
-              uploadTop - $element.outerHeight();
-            const deltaLeft = targetLeft + target.outerWidth() / 2 -
-              uploadLeft - $element.outerWidth() / 2;
+            } = dom.offset(this.element);
+            const deltaTop = targetTop + dom.height(target) / 2 -
+              uploadTop - dom.height(this.element);
+            const deltaLeft = targetLeft + dom.width(target) / 2 -
+              uploadLeft - dom.width(this.element) / 2;
             const component = this;
-            dom.setStyles($element[0], {
+            dom.setStyles(this.element, {
               bottom: `${-deltaTop}px`,
               left: `${deltaLeft}px`,
               transform: 'scaleX(0)',
               opacity: '0.2',
             });
-            $element.animate({
+            $(this.element).animate({
               height: 0,
             }, 550, function afterMinimizeAnimation() {
               dom.setStyle(this, 'display', 'none');

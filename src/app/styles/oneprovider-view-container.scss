@@ -115,10 +115,11 @@
       }
     }
     .oneprovider-name.truncated-string {
-      display: inline-block;
       font-weight: bold;
       max-width: calc(100% - 180px);
-      vertical-align: middle;
+      .one-label {
+        margin-left: 0.3em;
+      }
     }
     .choose-oneprovider-link {
       margin-left: 4px;

@@ -19,9 +19,11 @@ import isStandaloneGuiOneprovider from 'onedata-gui-common/utils/is-standalone-g
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import ChooseDefaultOneprovider from 'onezone-gui/mixins/choose-default-oneprovider';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
+import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 
 export default Component.extend(
   I18n,
+  GlobalActions,
   ProvidersColors,
   ChooseDefaultOneprovider, {
     classNames: ['content-spaces-index'],
@@ -30,6 +32,7 @@ export default Component.extend(
     router: service(),
     guiUtils: service(),
     i18n: service(),
+    apiSamplesActions: service(),
 
     /**
      * @override 
@@ -140,6 +143,23 @@ export default Component.extend(
         }
       )
     ),
+
+    /**
+     * @type {Ember.ComputedProperty<Array<Action>>}
+     */
+    globalActions: computed('openApiSamplesModalAction', function globalActions() {
+      return [this.openApiSamplesModalAction];
+    }),
+
+    /**
+     * @type {Ember.ComputedProperty<AspectAction>}
+     */
+    openApiSamplesModalAction: computed('space', function openApiSamplesModalAction() {
+      return this.apiSamplesActions.createShowApiSamplesAction({
+        record: this.space,
+        apiSubject: 'space',
+      });
+    }),
 
     /**
      * Shows global info about save error.

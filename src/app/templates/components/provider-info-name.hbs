@@ -1,25 +1,22 @@
 {{#truncated-string
-  class="oneprovider-name"
+  class="oneprovider-name flippable-icons-with-text"
   mouseEnter=(action "changeIconHover" true)
   mouseLeave=(action "changeIconHover" false)
 }}
   <div
-    class="inline-icon-container provider-info-trigger"
+    class="icon-container provider-info-trigger popover-info-trigger"
     {{action
       (mut providerInfoOpened)
       (not providerInfoOpened)
       bubbles=false
     }}
   >
-    <div
-      class={{concat-classes
-        "inline-icon-container"
-        (if providerInfoOpened "not-animation" "animation")
-      }}
-    >
-      {{one-icon icon="provider" color=iconColor}}
-      {{one-icon icon="browser-info"}}
-    </div>
+    {{flippable-icons
+      iconName="provider"
+      isHovered=isIconHovered
+      suppressFlipping=providerInfoOpened
+      iconColor=iconColor
+    }}
   </div>
   <span class="tab-name one-label">{{provider.name}}</span>
 {{/truncated-string}}{{yield}}
