@@ -13,10 +13,19 @@ export default SpaceInfoContent.extend({
   router: service(),
   guiUtils: service(),
 
-  showRestApiModalLink: true,
+  /**
+   * @override
+   */
+  showLinkToRestApiModal: true,
 
+  /**
+   * @override
+   */
   showLinkToFileBrowser: true,
 
+  /**
+   * @override
+   */
   linkToFileBrowser: computed('space', function link() {
     const {
       router,
