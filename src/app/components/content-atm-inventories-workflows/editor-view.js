@@ -226,10 +226,18 @@ export default Component.extend(I18n, {
           description = '',
           lanes = [],
           stores = [],
-      } = getProperties(revision || {}, 'state', 'description', 'lanes', 'stores');
+          dashboardSpec = null,
+      } = getProperties(revision || {},
+        'state',
+        'description',
+        'lanes',
+        'stores',
+        'dashboardSpec'
+      );
       const visualiserData = {
         lanes,
         stores,
+        dashboardSpec,
       };
       const detailsData = {
         state,
