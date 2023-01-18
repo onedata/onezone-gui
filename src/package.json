@@ -83,7 +83,7 @@
     "ember-lodash": "4.19.5",
     "ember-math-helpers": "2.13.0",
     "ember-maybe-import-regenerator": "0.1.6",
-    "ember-mocha": "0.15.0",
+    "ember-mocha": "0.16.2",
     "ember-models-table": "2.7.0",
     "ember-moment": "8.0.1",
     "ember-native-dom-helpers": "0.7.0",

@@ -9,7 +9,7 @@ import {
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, settled, findAll } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
 import { resolve, Promise, all as allFulfilled } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';

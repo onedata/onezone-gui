@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, settled } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import RemoveSpaceAction from 'onezone-gui/utils/space-actions/remove-space-action';
 import { get, getProperties } from '@ember/object';
 import sinon from 'sinon';
