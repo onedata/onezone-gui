@@ -120,7 +120,7 @@ export default Component.extend(validations, I18n, {
 
   isAdvertised: reads('space.advertisedInMarketplace'),
 
-  contactEmail: reads('space.contactEmail'),
+  contactEmail: reads('space.marketplaceContactEmail'),
 
   isCurrentDescriptionEmpty: computed(
     'currentDescription',
@@ -227,7 +227,7 @@ export default Component.extend(validations, I18n, {
     this.setProperties({
       preCurrentDescription: description,
       currentDescription: description,
-      currentContactEmail: this.space.contactEmail,
+      currentContactEmail: this.contactEmail,
     });
   },
 
@@ -265,7 +265,7 @@ export default Component.extend(validations, I18n, {
         break;
       }
       case 'contactEmail': {
-        await this.saveSpaceValue('contactEmail', value);
+        await this.saveSpaceValue('marketplaceContactEmail', value);
         this.setCurrentValuesFromRecord();
         break;
       }

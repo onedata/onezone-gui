@@ -52,11 +52,6 @@ export default Component.extend(I18n, GlobalActions, MembersAspectBase, {
    */
   record: reads('space'),
 
-  init() {
-    this._super(...arguments);
-    this.urlActionObserver();
-  },
-
   /**
    * @override
    */

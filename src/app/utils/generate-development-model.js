@@ -515,13 +515,13 @@ function createSpacesRecords(store) {
         organizationName: 'ACK Cyfronet AGH',
         tags: ['scientific', 'large'],
         description: exampleMarkdownLong,
-        contactEmail: 'user@example.com',
+        marketplaceContactEmail: 'user@example.com',
       } : {
         advertisedInMarketplace: false,
         organizationName: '',
         tags: [],
         description: '',
-        contactEmail: '',
+        marketplaceContactEmail: '',
       }),
     }).save();
   }));

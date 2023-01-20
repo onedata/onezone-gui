@@ -6,7 +6,7 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed } from '@ember/object';
+import EmberObject, { computed, get } from '@ember/object';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { isEmpty, promise } from 'ember-awesome-macros';
 import { reads, sort } from '@ember/object/computed';
@@ -25,10 +25,13 @@ export default EmberObject.extend(OwnerInjector, {
   isEmpty: isEmpty('spaceItems'),
 
   /**
-   * @type {ComputedProperty<PromiseObject<Array<SpaceMarketplaceData>>>}
+   * @type {ComputedProperty<PromiseObject<Array<SpaceMarketplaceInfo>>>}
    */
-  spaceItemsProxy: promise.object(computed(function spaceItemsProxy() {
-    return this.spaceManager.getSpacesMarketplaceData();
+  spaceItemsProxy: promise.object(computed(async function spaceItemsProxy() {
+    const listRecord = await this.spaceManager.getSpacesMarketplaceList();
+    const records = get(listRecord, 'list').toArray();
+    await records.every(record => record.isLoaded);
+    return records;
   })),
 
   /**

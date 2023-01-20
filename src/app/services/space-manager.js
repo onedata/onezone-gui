@@ -18,6 +18,7 @@ import {
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
 import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import _ from 'lodash';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
@@ -450,48 +451,24 @@ export default Service.extend({
       );
     }
   },
-
-  // TODO: VFS-10252 it will be probably live list
-  async getSpacesMarketplaceData() {
+  /**
+   * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
+   */
+  async getSpacesMarketplaceList() {
     // TODO: VFS-10252 integrate with backend
-    // const requestGri = gri({
-    //   entityType: 'space',
-    //   entityId: 'null',
-    //   aspect: 'marketplace_spaces',
-    // });
-    // TODO: VFS-10252 creating mock of space marketplace records
-    const allSpaces = (await this.getSpaces()).get('list').toArray();
-    const advertisedSpaces = allSpaces
-      .filter(space => get(space, 'advertisedInMarketplace'));
-    const ownedSpaces = advertisedSpaces.map(space =>
-      SpaceMarketplaceData.create({
-        space,
-        isOwned: true,
-      })
-    );
-    return [
-      ...ownedSpaces,
-      SpaceMarketplaceModel.create({
-        name: 'Shared space number one Shared space number one Shared space number one',
-        organizationName: 'ACK Cyfronet AGH',
-        tags: ['large', 'experimental', 'scientific'],
-        description: exampleMarkdownLong,
-        isOwned: false,
-        spaceId: 'space-10',
-        supportSize: 1000000000,
-        providerIds: ['oneprovider1', 'oneprovider2'],
-      }),
-      SpaceMarketplaceModel.create({
-        name: 'Xyz space',
-        organizationName: 'Uniwersytet Jagielloński',
-        tags: ['small', 'scientific'],
-        description: 'Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat. Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat. Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.',
-        isOwned: false,
-        spaceId: 'space-11',
-        supportSize: 300000000,
-        providerIds: ['oneprovider2', 'oneprovider3'],
-      }),
-    ];
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: 'marketplace_list',
+      scope: 'protected',
+    });
+    return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {
+      adapterOptions: {
+        _meta: {
+          subscribe: false,
+        },
+      },
+    });
   },
 
   // TODO: VFS-10252 mock of successful response; integrate with backend
@@ -513,9 +490,9 @@ export default Service.extend({
     // });
   },
 
-  // TODO: VFS-10252 mock of possible implementation; integrate with backend
   getAvailableSpaceTags() {
-    return this.onedataConnection.availableSpaceTags;
+    // TODO: VFS-10217 show categories of tags
+    return _.flatten(Object.values(this.onedataConnection.availableSpaceTags));
   },
 
   // TODO: VFS-10252 integrate with backend

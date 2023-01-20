@@ -12,21 +12,20 @@
       </div>
       <div class="row marketplace-item-row secondary-row">
         {{#truncated-string class="organization-name"}}
-          {{spaceItem.organizationName}}
+          {{organizationName}}
         {{/truncated-string}}
         <span class="col-separator"></span>
         <div class="support-list">
           <div class="support-item">
             {{one-icon icon="support"}}
             <div class="text">
-              {{bytes-to-string spaceItem.supportSize}}
+              {{bytes-to-string supportSize}}
             </div>
           </div>
-          {{!-- TODO: VFS-10252 maybe some loading state is needed --}}
-          {{#each providers as |provider|}}
+          {{#each providerNames as |providerName|}}
             <div class="support-item">
               {{one-icon icon="provider"}}
-              <div class="text">{{provider.name}}</div>
+              <div class="text">{{providerName}}</div>
             </div>
           {{/each}}
         </div>

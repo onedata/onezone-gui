@@ -12,7 +12,7 @@ describe('Integration | Component | content-spaces-marketplace/empty', function 
 
   it('renders empty marketplace message with action button when there are no advertised spaces', async function () {
     const helper = new Helper(this);
-    sinon.stub(helper.spaceManager, 'getSpacesMarketplaceData').resolves([]);
+    helper.stubEmptyMarketplaceInfoList();
     await helper.render();
 
     expect(helper.element).to.contain.text('No spaces in the marketplace');
@@ -38,7 +38,12 @@ class Helper {
   get element() {
     return find('.spaces-marketplace-empty');
   }
-
+  stubEmptyMarketplaceInfoList() {
+    const emptyListRecord = this.store.createRecord('spaceMarketplaceInfoList', {
+      list: [],
+    });
+    sinon.stub(this.spaceManager, 'getSpacesMarketplaceList').resolves(emptyListRecord);
+  }
   async render() {
     await render(hbs`{{content-spaces-marketplace/empty}}`);
   }

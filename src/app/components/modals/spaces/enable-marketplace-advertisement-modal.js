@@ -79,7 +79,7 @@ export default Component.extend(I18n, {
   contactEmailField: computed(function contactEmailField() {
     return TextField.create({
       name: 'contactEmail',
-      defaultValue: this.space.contactEmail || '',
+      defaultValue: this.space.marketplaceContactEmail || '',
       customValidators: [
         validator('format', {
           type: 'email',
@@ -95,7 +95,7 @@ export default Component.extend(I18n, {
   async enableMarketplaceAdvertisement() {
     setProperties(this.space, {
       advertisedInMarketplace: true,
-      contactEmail: this.contactEmailField.value,
+      marketplaceContactEmail: this.contactEmailField.value,
     });
     try {
       await this.space.save();

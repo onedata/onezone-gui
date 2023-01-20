@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
+import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -17,8 +17,8 @@ import { all as allFulfilled } from 'rsvp';
 export default Component.extend(I18n, {
   tagName: 'li',
   classNames: ['spaces-marketplace-item', 'iconified-block'],
-  classNameBindings: ['spaceItem.isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
-  attributeBindings: ['spaceId:space-id'],
+  classNameBindings: ['isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
+  attributeBindings: ['spaceId:data-space-id'],
 
   /**
    * @override
@@ -27,7 +27,8 @@ export default Component.extend(I18n, {
 
   router: service(),
   spaceActions: service(),
-  providerManager: service(),
+  currentUser: service(),
+  guiUtils: service(),
 
   /**
    * @virtual
@@ -37,7 +38,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {SpaceMarketplaceData}
+   * @type {SpaceMarketplaceInfo}
    */
   spaceItem: undefined,
 
@@ -54,11 +55,19 @@ export default Component.extend(I18n, {
 
   //#endregion
 
-  isOwned: reads('spaceItem.isOwned'),
-
   spaceName: reads('spaceItem.name'),
 
-  spaceId: reads('spaceItem.spaceId'),
+  spaceId: reads('spaceItem.entityId'),
+
+  providerNames: reads('spaceItem.providerNames'),
+
+  isOwned: computed('userSpacesIds', function isOwned() {
+    return this.userSpacesIds.includes(this.spaceId);
+  }),
+
+  supportSize: reads('spaceItem.totalSupportSize'),
+
+  organizationName: reads('spaceItem.organizationName'),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
@@ -66,35 +75,34 @@ export default Component.extend(I18n, {
     }));
   }),
 
-  visitSpaceHref: computed('spaceItem.spaceId', function visitSpaceHref() {
+  userSpacesIds: computed(
+    'currentUser.user.spaceList.content.list',
+    function userSpacesIds() {
+      // Both current and space list should be loaded before reaching spaces marketplace,
+      // so do not care about async relationship loading.
+      const currentUserRecord = this.currentUser.user;
+      const userSpaces = get(currentUserRecord, 'spaceList.content.list').toArray();
+      return userSpaces.map(space => get(space, 'entityId'));
+    }
+  ),
+
+  visitSpaceHref: computed('spaceItem.entityId', function visitSpaceHref() {
     return this.router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      this.spaceItem.spaceId,
+      this.guiUtils.getRoutableIdFor(this.spaceItem),
       'index',
     );
   }),
 
-  configureSpaceHref: computed('spaceItem.spaceId', function configureSpaceHref() {
+  configureSpaceHref: computed('spaceItem.entityId', function configureSpaceHref() {
     return this.router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      this.spaceItem.spaceId,
+      this.guiUtils.getRoutableIdFor(this.spaceItem),
       'configuration',
     );
   }),
-
-  providersProxy: promise.object(computed(
-    'spaceItem.providerIds',
-    async function providersProxy() {
-      const ids = this.spaceItem.providerIds;
-      return allFulfilled(ids.map(entityId => {
-        return this.providerManager.getRecordById(entityId);
-      }));
-    }
-  )),
-
-  providers: reads('providersProxy.content'),
 
   actions: {
     requestAccess() {
