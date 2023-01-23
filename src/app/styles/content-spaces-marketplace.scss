@@ -164,7 +164,7 @@
       }
     }
 
-    &.iconified-block-marketplace-owned {
+    &.iconified-block-marketplace-access-granted {
       @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
         .access-info-col {
           flex-direction: row;
@@ -270,7 +270,7 @@
   --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
 }
 
-.iconified-block-marketplace-owned {
+.iconified-block-marketplace-access-granted {
   $leading-color: lighten($color-one-success, 30%);
   --iconified-block-icon-color: #{darken($color-one-success, 10%)};
   --iconified-block-border-color: #{darken($leading-color, 15%)};

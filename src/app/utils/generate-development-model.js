@@ -33,6 +33,14 @@ import {
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
 import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import { entityType as spaceEntityType } from 'onezone-gui/models/space';
+import {
+  aspect as spaceMarketplaceInfoListAspect,
+} from 'onezone-gui/models/space-marketplace-info-list';
+import {
+  aspect as spaceMarketplaceInfoAspect,
+} from 'onezone-gui/models/space-marketplace-info';
+import { exampleMarkdownShort } from 'onedata-gui-common/utils/mock-data';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -338,6 +346,10 @@ export default function generateDevelopmentModel(store) {
       attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
       .then(() => listRecords)
     )
+    .then(async (listRecords) => {
+      await generateMarketplaceMock(store, listRecords);
+      return listRecords;
+    })
     .then(listRecords => addListRecordsToMainUser(user, listRecords));
 }
 
@@ -512,8 +524,8 @@ function createSpacesRecords(store) {
       },
       ...(index === 0 ? {
         advertisedInMarketplace: true,
-        organizationName: 'ACK Cyfronet AGH',
-        tags: ['scientific', 'large'],
+        organizationName: 'The company',
+        tags: ['EU-funded', 'energy', 'environment'],
         description: exampleMarkdownLong,
         marketplaceContactEmail: 'user@example.com',
       } : {
@@ -1156,4 +1168,65 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
       set(atmInventory, 'atmWorkflowSchemaList', atmWorkflowSchemaList);
       return atmInventory.save();
     });
+}
+
+async function generateMarketplaceMock(store, listRecords) {
+  const spaceList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'space-list'
+  );
+  const providerList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'provider-list'
+  );
+  const firstSpace = get(spaceList, 'list').toArray()[0];
+  const providerNames = get(providerList, 'list').toArray().map(provider =>
+    get(provider, 'name')
+  );
+  const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
+    id: gri({
+      entityType: spaceEntityType,
+      entityId: get(firstSpace, 'entityId'),
+      aspect: spaceMarketplaceInfoAspect,
+      scope: 'protected',
+    }),
+    name: get(firstSpace, 'name'),
+    organizationName: get(firstSpace, 'organizationName'),
+    description: get(firstSpace, 'description'),
+    tags: get(firstSpace, 'tags'),
+    creationTime: (new Date().getTime() / 1000) - 100000,
+    totalSupportSize: get(firstSpace, 'totalSize'),
+    providerNames,
+  });
+  const otherSpaceInfo = store.createRecord('spaceMarketplaceInfo', {
+    id: gri({
+      entityType: spaceEntityType,
+      entityId: 'space-marketplace-info-0',
+      aspect: spaceMarketplaceInfoAspect,
+      scope: 'protected',
+    }),
+    name: 'A space to rent',
+    organizationName: 'ACK Cyfronet AGH',
+    description: exampleMarkdownShort,
+    tags: [
+      'multidimensional-data',
+      'international-issues',
+      'regions-and-cities',
+      'society',
+      'technology',
+      'transport',
+    ],
+    creationTime: (new Date().getTime() / 1000) - 200000,
+    totalSupportSize: 3 * Math.pow(1024, 4),
+    providerNames: providerNames.slice(1, 2),
+  });
+  await allFulfilled([ownedSpaceMarketplaceInfo.save(), otherSpaceInfo.save()]);
+  const listRecord = store.createRecord('spaceMarketplaceInfoList', {
+    id: gri({
+      entityType: spaceEntityType,
+      entityId: null,
+      aspect: spaceMarketplaceInfoListAspect,
+      scope: 'protected',
+    }),
+    list: [ownedSpaceMarketplaceInfo, otherSpaceInfo],
+  });
+  await listRecord.save();
 }

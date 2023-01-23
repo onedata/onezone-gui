@@ -39,7 +39,7 @@ export default EmberObject.extend(OwnerInjector, {
    */
   spaceItems: reads('spaceItemsProxy.content'),
 
-  sortOptions: Object.freeze(['isOwned:asc', 'name:asc']),
+  sortOptions: Object.freeze(['isAccessGranted:asc', 'name:asc']),
 
   /**
    * @type {ComputedProperty<Array<SpaceMarketplaceData>>}

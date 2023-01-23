@@ -31,9 +31,7 @@ export default OnedataConnection.extend({
     ephemeralStorageRequested: 0,
     ephemeralStorageLimit: null,
   })),
-  // FIXME: new version on backend
-  availableSpaceTags: Object.freeze([]),
-  availableMarketplaceTags: Object.freeze({
+  availableSpaceTags: Object.freeze({
     general: [
       'archival',
       'big-data',

@@ -11,13 +11,13 @@ import { computed, get } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { promise } from 'ember-awesome-macros';
-import { all as allFulfilled } from 'rsvp';
 
 export default Component.extend(I18n, {
   tagName: 'li',
   classNames: ['spaces-marketplace-item', 'iconified-block'],
-  classNameBindings: ['isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
+  classNameBindings: [
+    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available'
+  ],
   attributeBindings: ['spaceId:data-space-id'],
 
   /**
@@ -61,7 +61,7 @@ export default Component.extend(I18n, {
 
   providerNames: reads('spaceItem.providerNames'),
 
-  isOwned: computed('userSpacesIds', function isOwned() {
+  isAccessGranted: computed('userSpacesIds', function isAccessGranted() {
     return this.userSpacesIds.includes(this.spaceId);
   }),
 

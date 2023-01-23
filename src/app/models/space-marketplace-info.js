@@ -6,31 +6,18 @@
 
 import Model from 'ember-data/model';
 import attr from 'ember-data/attr';
-import { reads } from '@ember/object/computed';
-import { inject as service } from '@ember/service';
 import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/static-graph-model';
 import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-single-model';
-import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 
-export const entityType = 'space';
-export const aspects = {
-  supportParameters: 'support_parameters',
-};
+export const aspect = 'marketplace_data';
 
-export default Model.extend(GraphSingleModelMixin, InvitingModelMixin, {
-  onedataGraphUtils: service(),
-  currentUser: service(),
-  privilegeManager: service(),
-
+export default Model.extend(GraphSingleModelMixin, {
   name: attr('string'),
   organizationName: attr('string'),
   description: attr('string'),
   tags: attr('array', { defaultValue: () => [] }),
+  // TODO: VFS-10427 use space-marketplace-info creationTime property in views
   creationTime: attr('number'),
-  // FIXME: bug in backend ppp -> pp
-  totalSuppportSize: attr('number'),
+  totalSupportSize: attr('number'),
   providerNames: attr('array'),
-
-  // FIXME: for compatibility with space, maybe to refactor
-  totalSupportSize: reads('totalSuppportSize'),
 }).reopenClass(StaticGraphModelMixin);

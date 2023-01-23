@@ -17,7 +17,9 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
-import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import {
+  aspect as spaceMarketplaceInfoListAspect,
+} from 'onezone-gui/models/space-marketplace-info-list';
 import _ from 'lodash';
 
 /**
@@ -37,7 +39,7 @@ const SpaceMarketplaceModel = EmberObject.extend({
   description: '',
   tags: Object.freeze([]),
   spaceId: '',
-  isOwned: false,
+  isAccessGranted: false,
   supportSize: 0,
   // TODO: VFS-10252 maybe it will be list of GRIs; integrate with backend
   providerIds: Object.freeze([]),
@@ -459,7 +461,7 @@ export default Service.extend({
     const requestGri = gri({
       entityType: 'space',
       entityId: 'null',
-      aspect: 'marketplace_list',
+      aspect: spaceMarketplaceInfoListAspect,
       scope: 'protected',
     });
     return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {

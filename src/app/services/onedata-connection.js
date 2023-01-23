@@ -60,10 +60,7 @@ const OnezoneConnection = ProductionSymbol.extend({
    * Maps: category -> array of available tags to use in spaces
    * @type {Object<string, Array<string>>}
    */
-  availableMarketplaceTags: reads('attributes.availableMarketplaceTags'),
-
-  // FIXME: new version on backend
-  availableSpaceTags: reads('availableMarketplaceTags'),
+  availableSpaceTags: reads('attributes.availableSpaceTags'),
 
   /**
    * @type {ComputedProperty<EmberObject>}
