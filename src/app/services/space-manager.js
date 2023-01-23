@@ -8,8 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import EmberObject, { get, getProperties, computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { get, getProperties } from '@ember/object';
 import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
