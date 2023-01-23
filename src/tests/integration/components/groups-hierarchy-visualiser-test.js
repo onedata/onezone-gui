@@ -22,8 +22,6 @@ import GroupsHierarchyVisualiserHelper from '../../helpers/groups-hierarchy-visu
 import { A } from '@ember/array';
 import sinon from 'sinon';
 
-// FIXME: tests are failing on ember-models-table 2.15
-
 function getContainerStyle(style) {
   return htmlSafe(`width: ${style.width}px; height: ${style.height}px;`);
 }
