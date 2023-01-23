@@ -9,9 +9,9 @@ import {
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, fillIn, settled, findAll } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { isSlideActive, getSlide } from '../../helpers/one-carousel';
-import { resolve, Promise } from 'rsvp';
+import { resolve, Promise, all as allFulfilled } from 'rsvp';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { selectChoose } from 'ember-power-select/test-support/helpers';
@@ -19,9 +19,12 @@ import CreateAtmLambdaAction from 'onezone-gui/utils/workflow-actions/create-atm
 import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/create-atm-lambda-revision-action';
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 import { set, setProperties, get } from '@ember/object';
+import { clearStoreAfterEach } from '../../helpers/clear-store';
 
 describe('Integration | Component | content atm inventories lambdas', function () {
   setupRenderingTest();
+
+  clearStoreAfterEach();
 
   before(function () {
     // Instatiate Action class to make its `prototype.execute` available for
@@ -31,7 +34,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
     ModifyAtmLambdaRevisionAction.create();
   });
 
-  beforeEach(function () {
+  beforeEach(async function () {
     const store = lookupService(this, 'store');
     const lambda0 = store.createRecord('atm-lambda', {
       id: 'atm_lambda.lambda0.instance:private',
@@ -90,6 +93,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
     const atmLambdaList = store.createRecord('atmLambdaList', {
       list: atmLambdas,
     });
+    await atmLambdaList.save();
     const atmInventory = store.createRecord('atmInventory', {
       privileges: {
         view: true,
@@ -97,12 +101,15 @@ describe('Integration | Component | content atm inventories lambdas', function (
       },
       atmLambdaList,
     });
+    await atmInventory.save();
     const atmInventoryList = store.createRecord('atmInventoryList', {
       list: [atmInventory],
     });
+    await atmInventoryList.save();
     atmLambdas.forEach(atmLambda =>
       set(atmLambda, 'atmInventoryList', atmInventoryList)
     );
+    await allFulfilled(atmLambdas.invoke('save'));
 
     const recordManager = lookupService(this, 'record-manager');
     const navigationState = lookupService(this, 'navigation-state');

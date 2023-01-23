@@ -89,10 +89,15 @@ export default Model.extend(GraphSingleModelMixin, {
   originalAtmLambda: belongsTo('atm-lambda'),
 
   /**
-   * ID taken from `originalAtmLambda` relation. Set in `didLoad`.
-   * @type {String}
+   * ID taken from `originalAtmLambda` relation.
+   * @type {ComputedProperty<string|null>}
    */
-  originalAtmLambdaId: undefined,
+  originalAtmLambdaId: computed('isLoaded', function originalAtmLambdaId() {
+    if (!this.isLoaded) {
+      return null;
+    }
+    return this.relationEntityId('originalAtmLambda');
+  }),
 
   /**
    * @type {ComputedProperty<RevisionNumber>}
@@ -111,12 +116,4 @@ export default Model.extend(GraphSingleModelMixin, {
    * @type {ComputedProperty<AtmLambdaRevision>}
    */
   latestRevision: getBy('revisionRegistry', 'latestRevisionNumber'),
-
-  didLoad() {
-    this._super(...arguments);
-    this.set(
-      'originalAtmLambdaId',
-      this.relationEntityId('originalAtmLambda')
-    );
-  },
 }).reopenClass(StaticGraphModelMixin);
