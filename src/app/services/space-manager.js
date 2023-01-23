@@ -456,7 +456,7 @@ export default Service.extend({
   /**
    * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
    */
-  async getSpacesMarketplaceList() {
+  async getSpacesMarketplaceList(reload = false) {
     // TODO: VFS-10252 integrate with backend
     const requestGri = gri({
       entityType: 'space',
@@ -465,6 +465,7 @@ export default Service.extend({
       scope: 'protected',
     });
     return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {
+      reload,
       adapterOptions: {
         _meta: {
           subscribe: false,

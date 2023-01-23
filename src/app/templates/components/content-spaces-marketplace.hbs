@@ -1,5 +1,7 @@
-{{#if isEmpty}}
-  {{content-spaces-marketplace/empty viewModel=viewModel}}
-{{else}}
-  {{content-spaces-marketplace/content viewModel=viewModel}}
-{{/if}}
+{{#promise-proxy-container proxy=viewModel.spaceItemsProxy}}
+  {{#if isEmpty}}
+    {{content-spaces-marketplace/empty viewModel=viewModel}}
+  {{else}}
+    {{content-spaces-marketplace/content viewModel=viewModel}}
+  {{/if}}
+{{/promise-proxy-container}}

@@ -7,7 +7,7 @@
  */
 
 import Component from '@ember/component';
-import { computed, get } from '@ember/object';
+import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -16,7 +16,7 @@ export default Component.extend(I18n, {
   tagName: 'li',
   classNames: ['spaces-marketplace-item', 'iconified-block'],
   classNameBindings: [
-    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available'
+    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available',
   ],
   attributeBindings: ['spaceId:data-space-id'],
 
@@ -61,9 +61,7 @@ export default Component.extend(I18n, {
 
   providerNames: reads('spaceItem.providerNames'),
 
-  isAccessGranted: computed('userSpacesIds', function isAccessGranted() {
-    return this.userSpacesIds.includes(this.spaceId);
-  }),
+  isAccessGranted: reads('spaceItem.isAccessGranted'),
 
   supportSize: reads('spaceItem.totalSupportSize'),
 
@@ -75,34 +73,29 @@ export default Component.extend(I18n, {
     }));
   }),
 
-  userSpacesIds: computed(
-    'currentUser.user.spaceList.content.list',
-    function userSpacesIds() {
-      // Both current and space list should be loaded before reaching spaces marketplace,
-      // so do not care about async relationship loading.
-      const currentUserRecord = this.currentUser.user;
-      const userSpaces = get(currentUserRecord, 'spaceList.content.list').toArray();
-      return userSpaces.map(space => get(space, 'entityId'));
+  visitSpaceHref: computed(
+    'spaceItem.spaceMarketplaceInfo.entityId',
+    function visitSpaceHref() {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        this.guiUtils.getRoutableIdFor(this.spaceItem.spaceMarketplaceInfo),
+        'index',
+      );
     }
   ),
 
-  visitSpaceHref: computed('spaceItem.entityId', function visitSpaceHref() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      this.guiUtils.getRoutableIdFor(this.spaceItem),
-      'index',
-    );
-  }),
-
-  configureSpaceHref: computed('spaceItem.entityId', function configureSpaceHref() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      this.guiUtils.getRoutableIdFor(this.spaceItem),
-      'configuration',
-    );
-  }),
+  configureSpaceHref: computed(
+    'spaceItem.spaceMarketplaceInfo.entityId',
+    function configureSpaceHref() {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        this.guiUtils.getRoutableIdFor(this.spaceItem.spaceMarketplaceInfo),
+        'configuration',
+      );
+    }
+  ),
 
   actions: {
     requestAccess() {

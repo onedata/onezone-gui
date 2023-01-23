@@ -12,9 +12,11 @@ import { isEmpty, promise } from 'ember-awesome-macros';
 import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import filterSpaces from 'onezone-gui/utils/filter-spaces';
+import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
+  currentUser: service(),
 
   //#region state
 
@@ -27,24 +29,54 @@ export default EmberObject.extend(OwnerInjector, {
   /**
    * @type {ComputedProperty<PromiseObject<Array<SpaceMarketplaceInfo>>>}
    */
-  spaceItemsProxy: promise.object(computed(async function spaceItemsProxy() {
-    const listRecord = await this.spaceManager.getSpacesMarketplaceList();
-    const records = get(listRecord, 'list').toArray();
-    await records.every(record => record.isLoaded);
-    return records;
-  })),
+  spaceMarketplaceInfosProxy: promise.object(computed(
+    async function spaceMarketplaceInfosProxy() {
+      const listRecord = await this.spaceManager.getSpacesMarketplaceList(true);
+      const records = get(listRecord, 'list').toArray();
+      await records.every(record => record.isLoaded);
+      return records;
+    }
+  )),
 
   /**
-   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   * @type {ComputedProperty<PromiseObject<Array<Utils.SpacesMarketplaceItem>>>}
+   */
+  spaceItemsProxy: promise.object(computed(
+    'spaceMarketplaceInfosProxy',
+    async function spaceItemsProxy() {
+      const spaceMarketplaceInfos = await this.spaceMarketplaceInfosProxy;
+      const viewModel = this;
+      return spaceMarketplaceInfos.map(spaceMarketplaceInfo =>
+        SpacesMarketplaceItem.create({
+          spaceMarketplaceInfo,
+          viewModel,
+        })
+      );
+    }
+  )),
+
+  /**
+   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
   spaceItems: reads('spaceItemsProxy.content'),
 
   sortOptions: Object.freeze(['isAccessGranted:asc', 'name:asc']),
 
   /**
-   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
   sortedCollection: sort('spaceItems', 'sortOptions'),
+
+  userSpacesIds: computed(
+    'currentUser.user.spaceList.content.list',
+    function userSpacesIds() {
+      // Both current and space list should be loaded before reaching spaces marketplace,
+      // so do not care about async relationship loading.
+      const currentUserRecord = this.currentUser.user;
+      const userSpaces = get(currentUserRecord, 'spaceList.content.list').toArray();
+      return userSpaces.map(space => get(space, 'entityId'));
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
