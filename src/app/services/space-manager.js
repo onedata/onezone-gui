@@ -26,40 +26,6 @@ import _ from 'lodash';
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
  */
 
-// TODO: VFS-10252 prototype of SpaceMarketplaceModel; integrate with backend
-/**
- * Target model:
- * - list GRI: `space.null.marketplace_spaces`
- *   - content: `list: [gri1, gri2]`
- * - single marketplace data record: `space.id1.marketplace_data`
- */
-const SpaceMarketplaceModel = EmberObject.extend({
-  name: '',
-  organizationName: '',
-  description: '',
-  tags: Object.freeze([]),
-  spaceId: '',
-  isAccessGranted: false,
-  supportSize: 0,
-  // TODO: VFS-10252 maybe it will be list of GRIs; integrate with backend
-  providerIds: Object.freeze([]),
-});
-
-// TODO: VFS-10252 mock for SpaceMarketplaceModel
-const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
-  space: undefined,
-
-  name: reads('space.name'),
-  organizationName: reads('space.organizationName'),
-  description: reads('space.description'),
-  tags: reads('space.tags'),
-  spaceId: reads('space.entityId'),
-  supportSize: reads('space.totalSize'),
-  providerIds: computed('space.supportSizes', function providerIds() {
-    return Object.keys(get(this.space, 'supportSizes'));
-  }),
-});
-
 export default Service.extend({
   store: service(),
   currentUser: service(),
@@ -457,7 +423,6 @@ export default Service.extend({
    * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
    */
   async getSpacesMarketplaceList(reload = false) {
-    // TODO: VFS-10252 integrate with backend
     const requestGri = gri({
       entityType: 'space',
       entityId: 'null',
@@ -474,7 +439,7 @@ export default Service.extend({
     });
   },
 
-  // TODO: VFS-10252 mock of successful response; integrate with backend
+  // TODO: VFS-10384 mock of successful response; integrate with backend
   /**
    * @param {SpaceAccessRequestMessageData} requestData
    * @returns {Promise}
@@ -498,7 +463,7 @@ export default Service.extend({
     return _.flatten(Object.values(this.onedataConnection.availableSpaceTags));
   },
 
-  // TODO: VFS-10252 integrate with backend
+  // TODO: VFS-10384 integrate with backend
   async checkSpaceAccessRequest( /*requestId*/ ) {
     return {
       isValid: true,
@@ -508,6 +473,6 @@ export default Service.extend({
     };
   },
 
-  // TODO: VFS-10252 integrate with backend
+  // TODO: VFS-10384 integrate with backend
   async grantSpaceAccess( /* requestId */ ) {},
 });

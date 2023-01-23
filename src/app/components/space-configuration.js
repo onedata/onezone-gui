@@ -292,7 +292,6 @@ export default Component.extend(validations, I18n, {
     });
   },
 
-  // TODO: VFS-10252 this could be RPC in final implementation
   async disableMarketplaceAdvertisement() {
     set(this.space, 'advertisedInMarketplace', false);
     try {

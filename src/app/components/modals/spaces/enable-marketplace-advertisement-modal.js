@@ -91,7 +91,6 @@ export default Component.extend(I18n, {
 
   areButtonsDisabled: or('isSubmitting', not('contactEmailField.isValid')),
 
-  // TODO: VFS-10252 this could be RPC in final implementation
   async enableMarketplaceAdvertisement() {
     setProperties(this.space, {
       advertisedInMarketplace: true,
