@@ -84,9 +84,19 @@ export default Model.extend(
      */
     hasViewPrivilege: equal('scope', 'private'),
 
+    providerOnlineObserver: observer(
+      'provider.online',
+      function providerOnlineObserver() {
+        if (!this.isLoaded) {
+          return;
+        }
+        // not using replace, because we want see pending state of isOnlineProxy property
+        this.updateIsOnlineProxy();
+      }
+    ),
+
     asyncPropertiesObserver: observer(
-      'isLoaded',
-      'provider.{name,domain,online}',
+      'provider.{name,domain}',
       function asyncPropertiesObserver() {
         if (!this.isLoaded) {
           return;
@@ -106,7 +116,9 @@ export default Model.extend(
       this.set('isLoadedDeferred', defer());
       // TODO: this does not work properly with localstorage adapter
       // so some views can be broken (undefined name and domain)
-      this.asyncPropertiesObserver();
+      if (this.isLoaded) {
+        this.asyncPropertiesObserver();
+      }
     },
 
     /**
@@ -166,8 +178,6 @@ export default Model.extend(
       return hash({
         name: this.updateNameProxy({ replace: true }),
         domain: this.updateDomainProxy({ replace: true }),
-        // not using replace, because we want see pending state of isOnlineProxy property
-        online: this.updateIsOnlineProxy(),
       });
     },
 
