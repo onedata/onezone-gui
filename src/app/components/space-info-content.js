@@ -26,16 +26,11 @@ export default SpaceInfoContent.extend({
   /**
    * @override
    */
-  linkToFileBrowser: computed('space', function link() {
-    const {
-      router,
-      space,
-      guiUtils,
-    } = this.getProperties('router', 'space', 'guiUtils');
-    return router.urlFor(
+  linkToFileBrowser: computed('space', function linkToFileBrowser() {
+    return this.router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      guiUtils.getRoutableIdFor(space),
+      this.guiUtils.getRoutableIdFor(this.space),
       'data'
     );
   }),
