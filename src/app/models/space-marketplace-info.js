@@ -16,8 +16,17 @@ export default Model.extend(GraphSingleModelMixin, {
   organizationName: attr('string'),
   description: attr('string'),
   tags: attr('array', { defaultValue: () => [] }),
+
   // TODO: VFS-10427 use space-marketplace-info creationTime property in views
   creationTime: attr('number'),
+
+  /**
+   * Note that it may be 0 if the space is not supported at all.
+   */
   totalSupportSize: attr('number'),
+
+  /**
+   * Note that it may be an empty array if the space is not supported at all.
+   */
   providerNames: attr('array'),
 }).reopenClass(StaticGraphModelMixin);
