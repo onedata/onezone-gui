@@ -702,6 +702,7 @@ describe(
             },
             relayMethod: 'returnValue',
           })),
+          configParameterSpecs: [],
           resourceSpec: {
             cpuRequested: 2,
             cpuLimit: 3,
@@ -1265,6 +1266,7 @@ async function fillWithMinimumData() {
     preferredBatchSize: 100,
     argumentSpecs: [],
     resultSpecs: [],
+    configParameterSpecs: [],
     resourceSpec: {
       cpuRequested: 0.1,
       cpuLimit: null,
