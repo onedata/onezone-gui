@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10060 Added "avg" time series aggregator to automation
 * VFS-10287 Added user popover in space overview
 * VFS-10129 Added workflow and lane charts dashboard
 * VFS-10000 Added one style for flippable icons
