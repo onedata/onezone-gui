@@ -1192,7 +1192,7 @@ async function generateMarketplaceMock(store, listRecords) {
     organizationName: get(firstSpace, 'organizationName'),
     description: get(firstSpace, 'description'),
     tags: get(firstSpace, 'tags'),
-    creationTime: (new Date().getTime() / 1000) - 100000,
+    creationTime: Math.floor((new Date().getTime() / 1000) - 100000),
     totalSupportSize: get(firstSpace, 'totalSize'),
     providerNames,
   });

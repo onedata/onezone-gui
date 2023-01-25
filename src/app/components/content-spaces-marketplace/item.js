@@ -38,7 +38,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {SpaceMarketplaceInfo}
+   * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
 
@@ -101,7 +101,7 @@ export default Component.extend(I18n, {
     requestAccess() {
       (async () => {
         const result = await this.spaceActions.createRequestSpaceAccessAction({
-          spaceMarketplaceData: this.spaceItem,
+          spaceMarketplaceData: this.spaceItem.spaceMarketplaceInfo,
         }).execute();
         if (result.status === 'done') {
           this.set('isRequested', true);

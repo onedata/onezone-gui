@@ -32,7 +32,7 @@ export default Component.extend(I18n, {
   viewModel: undefined,
 
   /**
-   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
   filteredCollection: reads('viewModel.filteredCollection'),
 

@@ -8,6 +8,7 @@
 
 import EmberObject, { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
+import { promise } from 'ember-awesome-macros';
 
 export default EmberObject.extend({
   /**
@@ -32,11 +33,17 @@ export default EmberObject.extend({
   providerNames: reads('spaceMarketplaceInfo.providerNames'),
   spaceId: reads('spaceMarketplaceInfo.entityId'),
 
-  isAccessGranted: computed(
+  /**
+   * @type {ComputedProperty<boolean|null>}
+   */
+  isAccessGranted: reads('isAccessGrantedProxy.content'),
+
+  isAccessGrantedProxy: promise.object(computed(
     'spaceId',
-    'viewModel.userSpacesIds',
-    function isAccessGranted() {
-      return this.viewModel.userSpacesIds.includes(this.spaceId);
+    'viewModel.userSpacesIdsProxy',
+    async function isAccessGrantedProxy() {
+      const userSpacesIds = await this.viewModel.userSpacesIdsProxy;
+      return userSpacesIds.includes(this.spaceId);
     }
-  ),
+  )),
 });

@@ -13,6 +13,7 @@ import { reads, sort } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
+import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -27,14 +28,12 @@ export default EmberObject.extend(OwnerInjector, {
   isEmpty: isEmpty('spaceItems'),
 
   /**
-   * @type {ComputedProperty<PromiseObject<Array<SpaceMarketplaceInfo>>>}
+   * @type {ComputedProperty<PromiseObject<DS.ManyArray<Models.SpaceMarketplaceInfo>>>}
    */
   spaceMarketplaceInfosProxy: promise.object(computed(
     async function spaceMarketplaceInfosProxy() {
       const listRecord = await this.spaceManager.getSpacesMarketplaceList(true);
-      const records = get(listRecord, 'list').toArray();
-      await records.every(record => record.isLoaded);
-      return records;
+      return await get(listRecord, 'list');
     }
   )),
 
@@ -67,19 +66,17 @@ export default EmberObject.extend(OwnerInjector, {
    */
   sortedCollection: sort('spaceItems', 'sortOptions'),
 
-  userSpacesIds: computed(
+  userSpacesIdsProxy: promise.object(computed(
     'currentUser.user.spaceList.content.list',
-    function userSpacesIds() {
-      // Both current and space list should be loaded before reaching spaces marketplace,
-      // so do not care about async relationship loading.
-      const currentUserRecord = this.currentUser.user;
-      const userSpaces = get(currentUserRecord, 'spaceList.content.list').toArray();
-      return userSpaces.map(space => get(space, 'entityId'));
+    async function userSpacesIds() {
+      const currentUserRecord = await this.currentUser.userProxy;
+      const spaceList = await get(currentUserRecord, 'spaceList');
+      return spaceList.hasMany('list').ids().map(spaceGri => parseGri(spaceGri).entityId);
     }
-  ),
+  )),
 
   /**
-   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
   filteredCollection: computed(
     'sortedCollection.[]',
