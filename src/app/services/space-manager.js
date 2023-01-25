@@ -8,8 +8,7 @@
  */
 
 import Service, { inject as service } from '@ember/service';
-import EmberObject, { get, getProperties, computed } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { get, getProperties } from '@ember/object';
 import { resolve, all as allFulfilled } from 'rsvp';
 import ignoreForbiddenError from 'onedata-gui-common/utils/ignore-forbidden-error';
 import gri from 'onedata-gui-websocket-client/utils/gri';
@@ -17,45 +16,14 @@ import {
   entityType as spaceEntityType,
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
-import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import {
+  aspect as spaceMarketplaceInfoListAspect,
+} from 'onezone-gui/models/space-marketplace-info-list';
+import _ from 'lodash';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
  */
-
-// TODO: VFS-10252 prototype of SpaceMarketplaceModel; integrate with backend
-/**
- * Target model:
- * - list GRI: `space.null.marketplace_spaces`
- *   - content: `list: [gri1, gri2]`
- * - single marketplace data record: `space.id1.marketplace_data`
- */
-const SpaceMarketplaceModel = EmberObject.extend({
-  name: '',
-  organizationName: '',
-  description: '',
-  tags: Object.freeze([]),
-  spaceId: '',
-  isOwned: false,
-  supportSize: 0,
-  // TODO: VFS-10252 maybe it will be list of GRIs; integrate with backend
-  providerIds: Object.freeze([]),
-});
-
-// TODO: VFS-10252 mock for SpaceMarketplaceModel
-const SpaceMarketplaceData = SpaceMarketplaceModel.extend({
-  space: undefined,
-
-  name: reads('space.name'),
-  organizationName: reads('space.organizationName'),
-  description: reads('space.description'),
-  tags: reads('space.tags'),
-  spaceId: reads('space.entityId'),
-  supportSize: reads('space.totalSize'),
-  providerIds: computed('space.supportSizes', function providerIds() {
-    return Object.keys(get(this.space, 'supportSizes'));
-  }),
-});
 
 export default Service.extend({
   store: service(),
@@ -450,51 +418,27 @@ export default Service.extend({
       );
     }
   },
-
-  // TODO: VFS-10252 it will be probably live list
-  async getSpacesMarketplaceData() {
-    // TODO: VFS-10252 integrate with backend
-    // const requestGri = gri({
-    //   entityType: 'space',
-    //   entityId: 'null',
-    //   aspect: 'marketplace_spaces',
-    // });
-    // TODO: VFS-10252 creating mock of space marketplace records
-    const allSpaces = (await this.getSpaces()).get('list').toArray();
-    const advertisedSpaces = allSpaces
-      .filter(space => get(space, 'advertisedInMarketplace'));
-    const ownedSpaces = advertisedSpaces.map(space =>
-      SpaceMarketplaceData.create({
-        space,
-        isOwned: true,
-      })
-    );
-    return [
-      ...ownedSpaces,
-      SpaceMarketplaceModel.create({
-        name: 'Shared space number one Shared space number one Shared space number one',
-        organizationName: 'ACK Cyfronet AGH',
-        tags: ['large', 'experimental', 'scientific'],
-        description: exampleMarkdownLong,
-        isOwned: false,
-        spaceId: 'space-10',
-        supportSize: 1000000000,
-        providerIds: ['oneprovider1', 'oneprovider2'],
-      }),
-      SpaceMarketplaceModel.create({
-        name: 'Xyz space',
-        organizationName: 'Uniwersytet Jagielloński',
-        tags: ['small', 'scientific'],
-        description: 'Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat. Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat. Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.',
-        isOwned: false,
-        spaceId: 'space-11',
-        supportSize: 300000000,
-        providerIds: ['oneprovider2', 'oneprovider3'],
-      }),
-    ];
+  /**
+   * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
+   */
+  async getSpacesMarketplaceList(reload = false) {
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: spaceMarketplaceInfoListAspect,
+      scope: 'protected',
+    });
+    return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {
+      reload,
+      adapterOptions: {
+        _meta: {
+          subscribe: false,
+        },
+      },
+    });
   },
 
-  // TODO: VFS-10252 mock of successful response; integrate with backend
+  // TODO: VFS-10384 mock of successful response; integrate with backend
   /**
    * @param {SpaceAccessRequestMessageData} requestData
    * @returns {Promise}
@@ -513,12 +457,12 @@ export default Service.extend({
     // });
   },
 
-  // TODO: VFS-10252 mock of possible implementation; integrate with backend
   getAvailableSpaceTags() {
-    return this.onedataConnection.availableSpaceTags;
+    // TODO: VFS-10217 show categories of tags
+    return _.flatten(Object.values(this.onedataConnection.availableSpaceTags));
   },
 
-  // TODO: VFS-10252 integrate with backend
+  // TODO: VFS-10384 integrate with backend
   async checkSpaceAccessRequest( /*requestId*/ ) {
     return {
       isValid: true,
@@ -528,6 +472,6 @@ export default Service.extend({
     };
   },
 
-  // TODO: VFS-10252 integrate with backend
+  // TODO: VFS-10384 integrate with backend
   async grantSpaceAccess( /* requestId */ ) {},
 });

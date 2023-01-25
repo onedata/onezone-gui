@@ -9,7 +9,7 @@
   @media (max-width: $screen-xs-max) {
     padding: 0 1em;
   }
-  .spaces-markeplace-list {
+  .spaces-marketplace-list {
     .list-entries, .no-matching-results {
       padding-top: 1em;
     }
@@ -57,7 +57,6 @@
       max-width: calc(100% - 1em);
       .support-list {
         display: flex;
-        max-width: 50%;
         overflow: hidden;
         position: relative;
         padding-right: 2em;
@@ -165,7 +164,7 @@
       }
     }
 
-    &.iconified-block-marketplace-owned {
+    &.iconified-block-marketplace-access-granted {
       @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
         .access-info-col {
           flex-direction: row;
@@ -271,7 +270,7 @@
   --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
 }
 
-.iconified-block-marketplace-owned {
+.iconified-block-marketplace-access-granted {
   $leading-color: lighten($color-one-success, 30%);
   --iconified-block-icon-color: #{darken($color-one-success, 10%)};
   --iconified-block-border-color: #{darken($leading-color, 15%)};

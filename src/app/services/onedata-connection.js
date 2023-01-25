@@ -56,7 +56,10 @@ const OnezoneConnection = ProductionSymbol.extend({
    */
   defaultAtmResourceSpec: reads('attributes.defaultAtmResourceSpec'),
 
-  // TODO: VFS-10252 integrate with backend
+  /**
+   * Maps: category -> array of available tags to use in spaces
+   * @type {Object<string, Array<string>>}
+   */
   availableSpaceTags: reads('attributes.availableSpaceTags'),
 
   /**

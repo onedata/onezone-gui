@@ -38,7 +38,7 @@ export default Component.extend(...mixins, {
 
   /**
    * @virtual
-   * @type {SpaceMarketplaceData}
+   * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
 

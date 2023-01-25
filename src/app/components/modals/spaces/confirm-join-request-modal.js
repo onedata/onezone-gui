@@ -77,7 +77,7 @@ export default Component.extend(I18n, {
 
   userName: reads('userProxy.content.name'),
 
-  // TODO: VFS-10252 check if user info will be available by other user
+  // TODO: VFS-10384 check if user info will be available by other user
   userProxy: promise.object(computed('userId', async function userProxy() {
     if (!this.userId) {
       return null;

@@ -16,7 +16,7 @@ import { inject as service } from '@ember/service';
 const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
-  classNames: ['spaces-markeplace-list'],
+  classNames: ['spaces-marketplace-list'],
 
   navigationState: service(),
 
@@ -32,7 +32,7 @@ export default Component.extend(I18n, {
   viewModel: undefined,
 
   /**
-   * @type {ComputedProperty<Array<SpaceMarketplaceData>>}
+   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
   filteredCollection: reads('viewModel.filteredCollection'),
 
@@ -48,7 +48,7 @@ export default Component.extend(I18n, {
       return;
     }
     /** @type {HTMLElement} */
-    const itemElement = this.element.querySelector(`[space-id=${this.urlSelectedSpace}]`);
+    const itemElement = this.element.querySelector(`[data-space-id="${this.urlSelectedSpace}"]`);
     if (!itemElement) {
       return;
     }

@@ -13,9 +13,8 @@
       </li>
       <li>
         {{tt this "p2t"}}
-        {{#link-to "onedata.sidebar.content" "tokens" "join"}}
-          {{tt this "p2a"}}
-        {{/link-to}}
+        {{!-- no line break because of dot on the end --}}
+        {{#link-to "onedata.sidebar.content" "tokens" "join"}}{{tt this "p2a"}}{{/link-to}}.
       </li>
       <li>
         {{tt this "p3t1"}}
@@ -24,6 +23,13 @@
         {{/link-to}}
         {{tt this "p3t2"}}
       </li>
-    </ul>  
+      <li>
+        {{tt this "pMarketPrefix"}}
+        {{#link-to "onedata.sidebar.content" "spaces" "join"}}
+          {{tt this "pMarketAnchor"}}
+        {{/link-to}}
+        {{tt this "pMarketSuffix"}}
+      </li>
+    </ul>
   </p>
 {{/content-info}}

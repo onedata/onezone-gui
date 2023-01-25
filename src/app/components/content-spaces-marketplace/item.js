@@ -11,14 +11,14 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { promise } from 'ember-awesome-macros';
-import { all as allFulfilled } from 'rsvp';
 
 export default Component.extend(I18n, {
   tagName: 'li',
   classNames: ['spaces-marketplace-item', 'iconified-block'],
-  classNameBindings: ['spaceItem.isOwned:iconified-block-marketplace-owned:iconified-block-marketplace-available'],
-  attributeBindings: ['spaceId:space-id'],
+  classNameBindings: [
+    'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available',
+  ],
+  attributeBindings: ['spaceId:data-space-id'],
 
   /**
    * @override
@@ -27,7 +27,8 @@ export default Component.extend(I18n, {
 
   router: service(),
   spaceActions: service(),
-  providerManager: service(),
+  currentUser: service(),
+  guiUtils: service(),
 
   /**
    * @virtual
@@ -37,7 +38,7 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {SpaceMarketplaceData}
+   * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
 
@@ -54,11 +55,17 @@ export default Component.extend(I18n, {
 
   //#endregion
 
-  isOwned: reads('spaceItem.isOwned'),
-
   spaceName: reads('spaceItem.name'),
 
-  spaceId: reads('spaceItem.spaceId'),
+  spaceId: reads('spaceItem.entityId'),
+
+  providerNames: reads('spaceItem.providerNames'),
+
+  isAccessGranted: reads('spaceItem.isAccessGranted'),
+
+  supportSize: reads('spaceItem.totalSupportSize'),
+
+  organizationName: reads('spaceItem.organizationName'),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
@@ -66,41 +73,35 @@ export default Component.extend(I18n, {
     }));
   }),
 
-  visitSpaceHref: computed('spaceItem.spaceId', function visitSpaceHref() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      this.spaceItem.spaceId,
-      'index',
-    );
-  }),
-
-  configureSpaceHref: computed('spaceItem.spaceId', function configureSpaceHref() {
-    return this.router.urlFor(
-      'onedata.sidebar.content.aspect',
-      'spaces',
-      this.spaceItem.spaceId,
-      'configuration',
-    );
-  }),
-
-  providersProxy: promise.object(computed(
-    'spaceItem.providerIds',
-    async function providersProxy() {
-      const ids = this.spaceItem.providerIds;
-      return allFulfilled(ids.map(entityId => {
-        return this.providerManager.getRecordById(entityId);
-      }));
+  visitSpaceHref: computed(
+    'spaceItem.spaceMarketplaceInfo.entityId',
+    function visitSpaceHref() {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        this.guiUtils.getRoutableIdFor(this.spaceItem.spaceMarketplaceInfo),
+        'index',
+      );
     }
-  )),
+  ),
 
-  providers: reads('providersProxy.content'),
+  configureSpaceHref: computed(
+    'spaceItem.spaceMarketplaceInfo.entityId',
+    function configureSpaceHref() {
+      return this.router.urlFor(
+        'onedata.sidebar.content.aspect',
+        'spaces',
+        this.guiUtils.getRoutableIdFor(this.spaceItem.spaceMarketplaceInfo),
+        'configuration',
+      );
+    }
+  ),
 
   actions: {
     requestAccess() {
       (async () => {
         const result = await this.spaceActions.createRequestSpaceAccessAction({
-          spaceMarketplaceData: this.spaceItem,
+          spaceMarketplaceData: this.spaceItem.spaceMarketplaceInfo,
         }).execute();
         if (result.status === 'done') {
           this.set('isRequested', true);

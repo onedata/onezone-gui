@@ -71,11 +71,10 @@ export default Action.extend({
           );
         }
 
-        // TODO: VFS-10252 check how it behaves when space will be pushed to list
+        // TODO: VFS-10384 check how it behaves when space will be pushed to list
       },
     });
     await modalInstance.hiddenPromise;
-    result.cancelIfPending();
     return result;
   },
 });
