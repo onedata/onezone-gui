@@ -93,6 +93,7 @@ export default function formDataToRecord(formData) {
     preferredBatchSize: Number.parseInt(preferredBatchSize) || 1,
     argumentSpecs: lambdaArguments,
     resultSpecs: lambdaResults,
+    configParameterSpecs: [],
     resourceSpec,
   };
 }

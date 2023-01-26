@@ -1,60 +1,5 @@
 import taskResourcesFields from '../../onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 
-const argumentAndResultTypes = {
-  integer: {
-    label: 'Integer',
-  },
-  string: {
-    label: 'String',
-  },
-  object: {
-    label: 'Object',
-  },
-  anyFile: {
-    label: 'Any file',
-  },
-  regularFile: {
-    label: 'Regular file',
-  },
-  directory: {
-    label: 'Directory',
-  },
-  symlink: {
-    label: 'Symbolic link',
-  },
-  dataset: {
-    label: 'Dataset',
-  },
-  // TODO: VFS-7816 uncomment or remove future code
-  // archive: {
-  //   label: 'Archive',
-  // },
-  // singleValueStore: {
-  //   label: 'Single value store',
-  // },
-  // listStore: {
-  //   label: 'List store',
-  // },
-  // mapStore: {
-  //   label: 'Map store',
-  // },
-  // treeForestStore: {
-  //   label: 'Tree forest store',
-  // },
-  // rangeStore: {
-  //   label: 'Range store',
-  // },
-  // histogramStore: {
-  //   label: 'Histogram store',
-  // },
-  range: {
-    label: 'Range',
-  },
-  timeSeriesMeasurement: {
-    label: 'Time series measurement',
-  },
-};
-
 export default {
   fields: {
     name: {
@@ -126,13 +71,6 @@ export default {
             notUnique: 'This field must have a unique value',
           },
         },
-        entryType: {
-          label: 'Type',
-          options: argumentAndResultTypes,
-        },
-        entryIsArray: {
-          label: 'Array',
-        },
         entryIsOptional: {
           label: 'Optional',
         },
@@ -152,13 +90,6 @@ export default {
           errors: {
             notUnique: 'This field must have a unique value',
           },
-        },
-        entryType: {
-          label: 'Type',
-          options: argumentAndResultTypes,
-        },
-        entryIsArray: {
-          label: 'Array',
         },
         entryIsViaFile: {
           label: 'Via file',
