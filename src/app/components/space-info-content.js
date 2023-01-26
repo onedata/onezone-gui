@@ -1,6 +1,6 @@
 /**
  * Content of popup with information about space
- * 
+ *
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
@@ -23,6 +23,13 @@ export default SpaceInfoContent.extend({
    */
   showLinkToFileBrowser: true,
 
+  async onOpenRestApiModal() {
+    return await this.modalManager.show('api-samples-modal', {
+      record: this.space,
+      apiSubject: 'space',
+    }).hiddenPromise;
+  },
+
   /**
    * @override
    */
@@ -34,13 +41,4 @@ export default SpaceInfoContent.extend({
       'data'
     );
   }),
-
-  actions: {
-    async openRestApiModal() {
-      return await this.modalManager.show('api-samples-modal', {
-        record: this.space,
-        apiSubject: 'space',
-      }).hiddenPromise;
-    },
-  },
 });
