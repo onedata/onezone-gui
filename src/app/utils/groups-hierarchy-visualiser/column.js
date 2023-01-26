@@ -446,6 +446,9 @@ export default EmberObject.extend({
         const prevX = this.get('prevColumn.x');
         return prevX === undefined ? 0 : prevX + width;
       }));
+      // Without this `get` new value of `x` is not calculated. We need to
+      // trigger first calculation manually.
+      this.get('x');
     }
   }),
 
