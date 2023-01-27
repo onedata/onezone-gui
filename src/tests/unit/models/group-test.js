@@ -23,9 +23,10 @@ describe('Unit | Model | group', function () {
     registerService(this, 'token-manager', TokenManagerStub);
   });
 
-  it('resolves invite token using token api service and graph', function () {
-    const record = this.owner.lookup('service:store').createRecord('group', {});
-    record.set('id', 'group.some_id.instance');
+  it('resolves invite token using token api service and graph', async function () {
+    const record = this.owner.lookup('service:store').createRecord('group', {
+      id: 'group.some_id.instance',
+    });
 
     const TOKEN = 'abcd';
     const tokenManager = lookupService(this, 'token-manager');

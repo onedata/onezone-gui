@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, doubleClick } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import PromiseObject from 'onedata-gui-common/utils/ember/promise-object';
 import { resolve } from 'rsvp';
 import sinon from 'sinon';
