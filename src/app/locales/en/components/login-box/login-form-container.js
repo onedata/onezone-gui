@@ -9,7 +9,7 @@ export default {
   authEndpointError: 'Getting authentication endpoint failed',
   authEndpointConfError: 'Authorization configuration is invalid, please contact system administrator',
   noSignInMethods: 'There are no sign-in methods configured.',
-  signInTestMode: 'This is the test sign-in page - based on test.auth.config - used for sign-in simulation and diagnostics.',
+  signInTestMode: 'This is the test sign-in page — based on test.auth.config — used for sign-in simulation and diagnostics.',
   goBackToMainPage: 'Go back to the main page.',
   sessionExpired: 'Your session has expired',
   ipWarning: 'This page has been entered using server\'s IP address, some of the content will be unavailable or malfunctioning. Please use the server domain to ensure full functionality.',
