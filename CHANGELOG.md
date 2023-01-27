@@ -6,6 +6,11 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-9129 Updated EmberJS to v3.8.3
+* VFS-10304 Fixed broken columns movement in groups hierarchy visualiser
+* VFS-10254 Added "Boolean" data type to automation, changed "Integer" to "Number" data type
+* VFS-10414 Fixed displaying the same space name for each share in shares sidebar
+* VFS-10060 Added "avg" time series aggregator to automation
 * VFS-10287 Added user popover in space overview
 * VFS-10129 Added workflow and lane charts dashboard
 * VFS-10000 Added one style for flippable icons
