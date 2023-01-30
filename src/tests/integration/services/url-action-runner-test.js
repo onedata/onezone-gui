@@ -31,9 +31,11 @@ describe('Integration | Service | url action runner', function () {
 
     const service = lookupService(this, 'url-action-runner');
     const transition = {
-      queryParams: {
-        action_name: 'removeSpace',
-        action_space_id: 'space1',
+      to: {
+        queryParams: {
+          action_name: 'removeSpace',
+          action_space_id: 'space1',
+        },
       },
     };
 

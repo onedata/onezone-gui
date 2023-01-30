@@ -19,7 +19,7 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import OneproviderClusterInfoMixin from 'onezone-gui/mixins/models/oneprovider-cluster-info';
 import InvitingModelMixin from 'onezone-gui/mixins/models/inviting-model';
 import validateOnepanelConnection from 'onedata-gui-common/utils/validate-onepanel-connection';
-import { Promise } from 'rsvp';
+import { defer } from 'rsvp';
 import {
   onepanelAbbrev,
 } from 'onedata-gui-common/utils/onedata-urls';
@@ -59,6 +59,12 @@ export default Model.extend(
     info: attr('object'),
 
     /**
+     * Deferred object that is revolved when record loads.
+     * @type {RSVP.Deferred}
+     */
+    isLoadedDeferred: undefined,
+
+    /**
      * @type {ComputedProperty<Number>}
      */
     creationTime: reads('info.creationTime'),
@@ -78,30 +84,48 @@ export default Model.extend(
      */
     hasViewPrivilege: equal('scope', 'private'),
 
-    reloadAsyncProperties: observer(
+    providerOnlineObserver: observer(
+      'provider.online',
+      function providerOnlineObserver() {
+        if (!this.isLoaded) {
+          return;
+        }
+        // not using replace, because we want see pending state of isOnlineProxy property
+        this.updateIsOnlineProxy();
+      }
+    ),
+
+    asyncPropertiesObserver: observer(
       'provider.{name,domain}',
-      function reloadProviderProperties() {
+      function asyncPropertiesObserver() {
+        if (!this.isLoaded) {
+          return;
+        }
         return this.loadAsyncProperties();
       }
     ),
 
+    isLoadedObserver: observer('isLoaded', function isLoadedObserver() {
+      if (this.isLoaded) {
+        this.isLoadedDeferred.resolve();
+      }
+    }),
+
     init() {
       this._super(...arguments);
+      this.set('isLoadedDeferred', defer());
       // TODO: this does not work properly with localstorage adapter
       // so some views can be broken (undefined name and domain)
-      if (this.get('isLoaded')) {
-        this.reloadAsyncProperties();
-      } else {
-        this.on('ready', () => {
-          this.reloadAsyncProperties();
-        });
+      if (this.isLoaded) {
+        this.asyncPropertiesObserver();
       }
     },
 
     /**
      * @override
      */
-    fetchName() {
+    async fetchName() {
+      await this.isLoadedDeferred.promise;
       if (this.get('type') === 'oneprovider') {
         return this.get('provider')
           .then(provider => provider && get(provider, 'name'));
@@ -113,7 +137,8 @@ export default Model.extend(
     /**
      * @override
      */
-    fetchDomain() {
+    async fetchDomain() {
+      await this.isLoadedDeferred.promise;
       if (this.get('type') === 'oneprovider') {
         return this.get('provider')
           .then(provider => provider && get(provider, 'domain'));
@@ -125,14 +150,9 @@ export default Model.extend(
     /**
      * @override
      */
-    fetchIsOnline() {
-      if (this.get('isLoaded')) {
-        return this._fetchIsOnline();
-      } else {
-        return new Promise((resolve, reject) => {
-          this.on('didLoad', () => this._fetchIsOnline().then(resolve, reject));
-        });
-      }
+    async fetchIsOnline() {
+      await this.isLoadedDeferred.promise;
+      return this._fetchIsOnline();
     },
 
     /**
@@ -156,8 +176,8 @@ export default Model.extend(
 
     loadAsyncProperties() {
       return hash({
-        name: this.updateNameProxy(),
-        domain: this.updateDomainProxy(),
+        name: this.updateNameProxy({ replace: true }),
+        domain: this.updateDomainProxy({ replace: true }),
       });
     },
 

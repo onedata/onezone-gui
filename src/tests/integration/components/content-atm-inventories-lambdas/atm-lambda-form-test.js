@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, context, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, fillIn, focus, blur, click, find, findAll, settled } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { clickTrigger, selectChoose } from 'ember-power-select/test-support/helpers';
 import sinon from 'sinon';
 import { Promise } from 'rsvp';
@@ -21,7 +21,8 @@ const states = [{
 }];
 
 const argumentAndResultCommonTypes = [
-  'Integer',
+  'Number',
+  'Boolean',
   'String',
   'Object',
   'File',
@@ -34,7 +35,8 @@ const argumentAndResultCommonTypes = [
 // Selection of types from `argumentAndResultCommonTypes` which does not take
 // any additional parameters and are ease to convert to dataSpec object.
 const testConvenientTypes = [
-  'Integer',
+  'Number',
+  'Boolean',
   'String',
   'Object',
   'Dataset',
@@ -700,6 +702,7 @@ describe(
             },
             relayMethod: 'returnValue',
           })),
+          configParameterSpecs: [],
           resourceSpec: {
             cpuRequested: 2,
             cpuLimit: 3,
@@ -737,7 +740,7 @@ describe(
           await addResult();
           const resSelector = '.results-field .collection-item:first-child';
           await fillIn(`${resSelector} .entryName-field .form-control`, 'entry');
-          await selectChoose(`${resSelector} .data-spec-editor`, 'Integer');
+          await selectChoose(`${resSelector} .data-spec-editor`, 'Number');
           await click(`${resSelector} .entryIsViaFile-field .one-way-toggle`);
           await click('.btn-submit');
 
@@ -746,7 +749,7 @@ describe(
               resultSpecs: [{
                 name: 'entry',
                 dataSpec: {
-                  type: 'integer',
+                  type: 'number',
                   valueConstraints: {},
                 },
                 relayMethod: 'filePipe',
@@ -802,7 +805,7 @@ describe(
             }],
             resultSpecs: [{
               name: 'res',
-              dataSpec: { type: 'integer' },
+              dataSpec: { type: 'number' },
             }],
           });
 
@@ -829,7 +832,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('Integer');
+            .to.have.trimmed.text('Number');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
@@ -1111,7 +1114,7 @@ describe(
             }],
             resultSpecs: [{
               name: 'res',
-              dataSpec: { type: 'integer' },
+              dataSpec: { type: 'number' },
             }],
           });
 
@@ -1141,7 +1144,7 @@ describe(
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
           expect(result.querySelector('.data-spec-editor'))
-            .to.have.trimmed.text('Integer');
+            .to.have.trimmed.text('Number');
           expect(find('.readonly-field .form-control')).to.have.class('checked');
           expect(find('.mountSpace-field .form-control')).to.have.class('checked');
           expect(find('.mountPoint-field .form-control')).to.have.value('/some/path');
@@ -1263,6 +1266,7 @@ async function fillWithMinimumData() {
     preferredBatchSize: 100,
     argumentSpecs: [],
     resultSpecs: [],
+    configParameterSpecs: [],
     resourceSpec: {
       cpuRequested: 0.1,
       cpuLimit: null,

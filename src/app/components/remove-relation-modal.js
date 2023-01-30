@@ -108,6 +108,7 @@ export default ProceedProcessModal.extend({
   /**
    * @type {Ember.ComputedProperty<string>}
    */
+  // eslint-disable-next-line ember/no-string-prototype-extensions
   parentType: string.camelize('parent.constructor.modelName'),
 
   /**
