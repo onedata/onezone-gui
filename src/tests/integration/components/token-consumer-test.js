@@ -6,7 +6,7 @@ import {
 } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, fillIn, click, settled, find, findAll } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { Promise, resolve, reject } from 'rsvp';
