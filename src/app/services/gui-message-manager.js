@@ -40,7 +40,7 @@ export default Service.extend(
         return null;
       }
     ),
-    
+
     /**
      * @type {Ember.ComputedProperty<string|null>}
      */
@@ -89,15 +89,15 @@ export default Service.extend(
         this.getMessage('cookie_consent_notification'),
       ]).then(([privacyPolicyUrl, termsOfUseUrl, message]) =>
         DOMPurify.sanitize(message, { ALLOWED_TAGS: ['#text'] }).toString()
-          .replace(
-            /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
-            `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
+        .replace(
+          /\[privacy-policy\](.*?)\[\/privacy-policy\]/gi,
+          `<a href="${privacyPolicyUrl || ''}" class="clickable privacy-policy-link">$1</a>`
         )
         .replace(
-            /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
-            `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
-          )
-        );
+          /\[terms-of-use\](.*?)\[\/terms-of-use\]/gi,
+          `<a href="${termsOfUseUrl || ''}" class="clickable terms-of-use-link">$1</a>`
+        )
+      );
     },
 
     /**
@@ -129,7 +129,14 @@ export default Service.extend(
      * @returns {undefined}
      */
     acceptCookies() {
-      this.get('cookies').write(cookiesAcceptedCookieName, true, { path: '/' });
+      // Setting cookie consent lifetime to ~ 6 months - a half of the maximum
+      // lifetime set by ePrivacy Directive and a maximum lifetime for some
+      // of protection authorities. More information here:
+      // https://www.cookieyes.com/knowledge-base/cookie-consent/how-long-does-cookie-consent-last
+      this.get('cookies').write(cookiesAcceptedCookieName, true, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30 * 6,
+      });
       this.set('areCookiesAccepted', true);
     },
   }

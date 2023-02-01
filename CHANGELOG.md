@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10432 Fixed cookie consent persistence
 * VFS-10012 Fixed hanging file uploads
 * VFS-9926 Redirecting from non-iframed Oneprovider GUI to provider view in Onezone GUI
 * VFS-9771 Added support for limited invitation token generation (restricted provider registration policy) in "Add new cluster" view
