@@ -59,7 +59,7 @@ export default {
       name: 'Name',
       uploading: 'uploading',
       uploaded: 'uploaded',
-      cannotLoadManifest: 'cannot load manifest - upload correct GUI plugin',
+      cannotLoadManifest: 'cannot load manifest — upload correct GUI plugin',
       version: 'Version',
       unknown: 'unknown',
     },

@@ -6,7 +6,7 @@ export default {
   harvester: 'harvester',
   cluster: 'cluster',
   atmInventory: 'automation inventory',
-  showingFirstNPaths: 'Limit reached - showing first {{limit}} results.',
+  showingFirstNPaths: 'Limit reached — showing first {{limit}} results.',
   membershipBlock: {
     viewUser: 'View user',
     viewGroup: 'View group',
