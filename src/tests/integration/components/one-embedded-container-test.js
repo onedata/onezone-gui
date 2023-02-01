@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, find, waitUntil } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import OneEmbeddedContainer from 'onezone-gui/components/one-embedded-container';
 import oneEmbeddedContainerLayout from 'onezone-gui/templates/components/one-embedded-container';

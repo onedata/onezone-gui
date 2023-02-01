@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach, context } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, find } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { lookupService } from '../../helpers/stub-service';
 import sinon from 'sinon';
 import { resolve, reject, Promise } from 'rsvp';
@@ -293,7 +293,7 @@ describe('Integration | Component | invite token generator', function () {
         }}
       `);
 
-      expect(this.$('.token-textarea').val()).to.match(
+      expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
       );
 
@@ -313,7 +313,7 @@ describe('Integration | Component | invite token generator', function () {
         }}
       `);
 
-      expect(this.$('.token-textarea').val()).to.match(
+      expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
       );
 
