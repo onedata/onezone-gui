@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10432 Fixed cookie consent persistence
 * VFS-10312 Changed name conflict and disambiguation separator from "#" to "@"
 * VFS-9129 Updated EmberJS to v3.8.3
 * VFS-10304 Fixed broken columns movement in groups hierarchy visualiser
