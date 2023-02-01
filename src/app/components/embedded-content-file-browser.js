@@ -22,7 +22,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   globalNotify: service(),
   router: service(),
   navigationState: service(),
-  modalManager: service(),
 
   /**
    * @override

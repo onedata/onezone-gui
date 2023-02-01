@@ -19,7 +19,6 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
   globalNotify: service(),
   router: service(),
   navigationState: service(),
-  modalManager: service(),
 
   /**
    * Entity ID of space for which datasets browser is displayed.

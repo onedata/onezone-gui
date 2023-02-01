@@ -12,6 +12,7 @@ import SpaceInfoContent from 'onedata-gui-common/components/space-info-content';
 export default SpaceInfoContent.extend({
   router: service(),
   guiUtils: service(),
+  modalManager: service(),
 
   /**
    * @override

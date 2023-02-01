@@ -26,7 +26,6 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
   navigationState: service(),
   globalNotify: service(),
   router: service(),
-  modalManager: service(),
 
   /**
    * @virtual

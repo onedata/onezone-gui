@@ -37,6 +37,11 @@ export default Component.extend(I18n, {
   modalOptions: undefined,
 
   /**
+   * @type {string}
+   */
+  icon: reads('apiSubject'),
+
+  /**
    * @type {Object}
    */
   record: reads('modalOptions.record'),
