@@ -140,7 +140,14 @@ export default Service.extend(
      * @returns {undefined}
      */
     acceptCookies() {
-      this.get('cookies').write(cookiesAcceptedCookieName, true, { path: '/' });
+      // Setting cookie consent lifetime to ~ 6 months - a half of the maximum
+      // lifetime set by ePrivacy Directive and a maximum lifetime for some
+      // of protection authorities. More information here:
+      // https://www.cookieyes.com/knowledge-base/cookie-consent/how-long-does-cookie-consent-last
+      this.get('cookies').write(cookiesAcceptedCookieName, true, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30 * 6,
+      });
       this.set('areCookiesAccepted', true);
     },
   }
