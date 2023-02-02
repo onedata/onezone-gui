@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, find } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import Service from '@ember/service';
 import EmberObject, { get } from '@ember/object';
 import { resolve } from 'rsvp';
@@ -14,6 +14,9 @@ describe('Integration | Component | resource info tile', function () {
   beforeEach(function () {
     const exampleUser = EmberObject.create({
       name: 'user1',
+      fullName: 'user1_fullname',
+      username: 'user1_username',
+      entityId: 'user1_id',
     });
 
     const storeStub = Service.extend({
@@ -41,7 +44,8 @@ describe('Integration | Component | resource info tile', function () {
 
     expect(find('.resource-name')).to.contain.text(get(record, 'name'));
     expect(find('.id input')).to.have.value(get(record, 'entityId'));
-    expect(find('.creator .one-icon')).to.have.class('oneicon-user');
-    expect(find('.creator')).to.contain.text('user1');
+    expect(find('.user-with-icon .flippable-front.one-icon')).to.have.class('oneicon-user');
+    expect(find('.user-fullname')).to.contain.text('user1_fullname');
+    expect(find('.user-username')).to.contain.text('user1_username');
   });
 });

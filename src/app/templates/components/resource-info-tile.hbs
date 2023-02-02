@@ -10,14 +10,27 @@
         </tr>
         <tr>
           <td class="property-name">{{tt this "creator"}}</td>
-          {{#truncated-string
-            tagName="td"
-            class=(concat-classes "property-value creator" (if creatorIcon "has-icon") (if isSpecialCreator "special"))}}
-            {{#if creatorIcon}}
-              {{one-icon icon=creatorIcon}}
-            {{/if}}
-            {{creatorName}}
-          {{/truncated-string}}
+          {{#if (eq creatorIcon "user")}}
+            <td class="property-value user-info">
+              {{user-info-with-icon
+                user=creatorProxy.content
+              }}
+            </td>
+          {{else}}
+            {{#truncated-string
+              tagName="td"
+              class=(concat-classes 
+                "property-value creator" 
+                (if creatorIcon "has-icon") 
+                (if isSpecialCreator "special")
+              )
+            }}
+              {{#if creatorIcon}}
+                {{one-icon icon=creatorIcon}}
+              {{/if}}
+              {{creatorName}}
+            {{/truncated-string}}
+          {{/if}}
         </tr>
         <tr>
           <td class="property-name">{{tt this "creationTime"}}</td>

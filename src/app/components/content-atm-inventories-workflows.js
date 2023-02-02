@@ -24,7 +24,8 @@ import { scheduleOnce } from '@ember/runloop';
 import preventPageUnload from 'onedata-gui-common/utils/prevent-page-unload';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
-import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import { serializeAspectOptions, parseAspectOptions } from 'onedata-gui-common/services/navigation-state';
+import _ from 'lodash';
 
 export default Component.extend(GlobalActions, I18n, {
   classNames: ['content-atm-inventories-workflows'],
@@ -279,29 +280,11 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   registerRouteChangeHandler() {
-    const {
-      routeChangeHandler,
-      router,
-    } = this.getProperties('routeChangeHandler', 'router');
-
-    // Making sure if router has `.on` method (`routeWillChange` hack)
-    // TODO: VFS-8267 Remove this check
-    if (typeof router.on === 'function') {
-      router.on('routeWillChange', routeChangeHandler);
-    }
+    this.router.on('routeWillChange', this.routeChangeHandler);
   },
 
   unregisterRouteChangeHandler() {
-    const {
-      routeChangeHandler,
-      router,
-    } = this.getProperties('routeChangeHandler', 'router');
-
-    // Making sure if router has `.on` method (`routeWillChange` hack)
-    // TODO: VFS-8267 Remove this check
-    if (typeof router.off === 'function') {
-      router.off('routeWillChange', routeChangeHandler);
-    }
+    this.router.off('routeWillChange', this.routeChangeHandler);
   },
 
   registerPageUnloadHandler() {
@@ -447,7 +430,14 @@ export default Component.extend(GlobalActions, I18n, {
   },
 
   async handleRouteChange(transition) {
+    if (transition.isAborted || isTransitionWithinEditor(transition)) {
+      return;
+    }
+
     if (this.shouldBlockTransitionDueToUnsavedChanges()) {
+      // Aborting transition doesn't work properly for query-params-only
+      // transitions. This should be fixed in Ember 3.20.3.
+      // TODO: VFS-10419 Check if Ember 3.20 fixed this issue.
       transition.abort();
       const userDecision = await this.askUserAndProcessUnsavedChanges();
       if (userDecision === 'save' || userDecision === 'ignore') {
@@ -762,3 +752,41 @@ export default Component.extend(GlobalActions, I18n, {
     },
   },
 });
+
+/**
+ * Compares `transition.from` and `transition.to` routes and returns information
+ * whether or not user is still in the current workflow editor.
+ * @param {Transition} transition
+ * @returns {boolean}
+ */
+function isTransitionWithinEditor(transition) {
+  let routesToCompare = [transition.from, transition.to];
+  if (routesToCompare[0].name !== routesToCompare[1].name) {
+    // Route changed.
+    return false;
+  }
+  while (routesToCompare[0] && routesToCompare[1]) {
+    if (!_.isEqual(routesToCompare[0].params, routesToCompare[1].params)) {
+      // Route params changed.
+      return false;
+    }
+    routesToCompare = [routesToCompare[0].parent, routesToCompare[1].parent];
+  }
+  if (routesToCompare[0] || routesToCompare[1]) {
+    // Should be impossible. If there were inconsitencies between "from" and
+    // "to" route parents sequence length, then we assume that route is changed.
+    return false;
+  }
+
+  const fromAspectOptions = parseAspectOptions(transition.from.queryParams?.options);
+  const toAspectOptions = parseAspectOptions(transition.to.queryParams?.options);
+
+  if (!fromAspectOptions.workflowId || !fromAspectOptions.revision) {
+    // No information about which workflow is being edited. We act as everything
+    // is fine - it might be some incorrect URL and we don't know how to fix it here.
+    return true;
+  }
+
+  return fromAspectOptions.workflowId === toAspectOptions.workflowId &&
+    fromAspectOptions.revision === toAspectOptions.revision;
+}

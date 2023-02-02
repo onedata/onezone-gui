@@ -218,7 +218,7 @@ export default {
         consumerCaveat: {
           consumerEnabled: {
             label: 'Consumer',
-            tip: 'Limits the consumers that can use the token. Consumer is the token bearer that utilizes the token - performs a request with an access token or attempts to consume an invite token. If the caveat is present, the consumer must prove their identity using an identity token.',
+            tip: 'Limits the consumers that can use the token. Consumer is the token bearer that utilizes the token — performs a request with an access token or attempts to consume an invite token. If the caveat is present, the consumer must prove their identity using an identity token.',
           },
           consumerDisabledText: {
             text: 'This token can be consumed by anyone.',
@@ -227,7 +227,7 @@ export default {
         serviceCaveat: {
           serviceEnabled: {
             label: 'Service',
-            tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request - e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
+            tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request — e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
           },
           serviceDisabledText: {
             text: 'This token can be used to interact with any service.',
