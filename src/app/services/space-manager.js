@@ -457,9 +457,12 @@ export default Service.extend({
     // });
   },
 
+  /**
+   * Maps: categoryName -> Array of available tags.
+   * @returns {Object<string, Array<string>>}
+   */
   getAvailableSpaceTags() {
-    // TODO: VFS-10217 show categories of tags
-    return _.flatten(Object.values(this.onedataConnection.availableSpaceTags));
+    return this.onedataConnection.availableSpaceTags;
   },
 
   // TODO: VFS-10384 integrate with backend

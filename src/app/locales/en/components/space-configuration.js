@@ -1,5 +1,8 @@
+import spaceTagsSelector from './space-configuration/space-tags-selector';
+
 // TODO: VFS-10252 consult i18n
 export default {
+  spaceTagsSelector,
   notSet: 'Not set.',
   organizationName: {
     label: 'Organization name',

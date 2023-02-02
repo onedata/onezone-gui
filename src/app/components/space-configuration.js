@@ -173,10 +173,7 @@ export default Component.extend(validations, I18n, {
   spaceTagsEditorSettings: computed('allowedTags', function spaceTagsEditorSettings() {
     return {
       type: 'tags',
-      tagEditorComponentName: 'tags-input/selector-editor',
-      tagEditorSettings: {
-        allowedTags: this.allowedTags,
-      },
+      tagEditorComponentName: 'space-configuration/space-tags-selector',
     };
   }),
 
