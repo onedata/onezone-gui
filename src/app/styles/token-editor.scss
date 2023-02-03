@@ -218,13 +218,22 @@
     }
   }
 
-  .service-caveat-warning {
+  .token-alert {
+    .alert-header {
+      @include font-semibold();
+      text-transform: uppercase;
+    }
+
     p {
       margin-bottom: $padding-base-vertical;
 
       &:last-child {
         margin-bottom: 0;
       }
+    }
+
+    ul {
+      margin: 0;
     }
   }
 
