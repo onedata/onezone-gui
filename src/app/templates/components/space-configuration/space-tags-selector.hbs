@@ -34,7 +34,13 @@
       {{/each}}
     {{/bs-button-group}}
 
-    <hr class="content-separator">
+    <input
+      class="input-sm form-control filter-tags-input"
+      type="text"
+      value={{tagsFilterValue}}
+      oninput={{action (mut tagsFilterValue) value="target.value"}}
+      placeholder={{tt this "searchPlaceholder"}}
+    >
 
     {{#perfect-scrollbar-element class="tags-container"}}
       {{#if tagsToRender.length}}
@@ -49,7 +55,9 @@
           {{/each}}
         </ul>
       {{else}}
-        <p class="text-center">{{tt this "allCategoryTagsUsed"}}</p>
+        <p class="text-center no-tags-left-text">
+          {{tt this (if tagsFilterValue "noTagsForFilter" "allCategoryTagsUsed")}}
+        </p>
       {{/if}}
     {{/perfect-scrollbar-element}}
   {{/click-outside}}

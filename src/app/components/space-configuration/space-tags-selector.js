@@ -35,6 +35,11 @@ export default Component.extend(I18n, {
    */
   selectedCategory: undefined,
 
+  /**
+   * @type {string}
+   */
+  tagsFilterValue: '',
+
   //#endregion
 
   /**
@@ -67,7 +72,7 @@ export default Component.extend(I18n, {
    * Maps: categoryName -> Array of available tags objects for tags input.
    * @returns {Object<string, Array<Tag>>}
    */
-  availableTagsByCategory: computed(function availableTagsByCategory() {
+  availableTagsByCategory: computed('usedTagLabels', function availableTagsByCategory() {
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
     const result = [];
     for (const categoryName in availableSpaceTags) {
@@ -87,7 +92,23 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<Array<Tag>>}
    */
-  tagsToRender: getBy('availableTagsByCategory', 'selectedCategory'),
+  tagsToRender: computed(
+    'availableTagsByCategory',
+    'selectedCategory',
+    'tagsFilterValue',
+    function tagsToRender() {
+      const availableCategoryTags =
+        this.availableTagsByCategory[this.selectedCategory] ?? [];
+      const normalizedFilterValue = this.tagsFilterValue?.trim().toLowerCase();
+      if (normalizedFilterValue) {
+        return availableCategoryTags.filter(({ label }) =>
+          label.includes(normalizedFilterValue)
+        );
+      } else {
+        return availableCategoryTags;
+      }
+    }
+  ),
 
   /**
    * @type {ComputedProperty<Array<string>>}

@@ -161,10 +161,22 @@
 }
 
 .one-webui-popover.space-tags-selector {
+  $spacing: 4px;
   width: 16em;
   height: 23em;
   padding-bottom: 0;
   .tags-container {
-    padding-bottom: 4px;
+    padding-bottom: $spacing;
+  }
+  // make small input more compact
+  .input-sm.filter-tags-input {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .filter-tags-input, .tags-container {
+    margin-top: $spacing;
+  }
+  .no-tags-left-text {
+    margin: 1em;
   }
 }
