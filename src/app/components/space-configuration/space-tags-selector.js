@@ -18,6 +18,8 @@ import { getBy } from 'ember-awesome-macros';
 import _ from 'lodash';
 
 export default Component.extend(I18n, {
+  classNames: ['space-tags-selector-editor'],
+
   i18n: service(),
   spaceManager: service(),
 

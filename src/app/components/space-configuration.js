@@ -36,7 +36,6 @@ export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
 
   modalManager: service(),
-  spaceManager: service(),
   router: service(),
   globalNotify: service(),
 
@@ -162,15 +161,7 @@ export default Component.extend(validations, I18n, {
    */
   emailValidation: reads('validations.attrs.currentContactEmail'),
 
-  allowedTags: computed(
-    function allowedTags() {
-      return (this.spaceManager.getAvailableSpaceTags() ?? []).map(tag => ({
-        label: tag,
-      }));
-    }
-  ),
-
-  spaceTagsEditorSettings: computed('allowedTags', function spaceTagsEditorSettings() {
+  spaceTagsEditorSettings: computed(function spaceTagsEditorSettings() {
     return {
       type: 'tags',
       tagEditorComponentName: 'space-configuration/space-tags-selector',

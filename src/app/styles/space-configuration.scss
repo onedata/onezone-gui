@@ -159,3 +159,12 @@
     }
   }
 }
+
+.one-webui-popover.space-tags-selector {
+  width: 16em;
+  height: 23em;
+  padding-bottom: 0;
+  .tags-container {
+    padding-bottom: 4px;
+  }
+}

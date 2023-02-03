@@ -1,5 +1,5 @@
 {{#one-webui-popover
-  class="space-tags-selector"
+  class="tags-selector space-tags-selector"
   open=true
   triggerSelector=(concat "#" elementId)
   arrow=false
@@ -36,7 +36,7 @@
 
     <hr class="content-separator">
 
-    {{#perfect-scrollbar-element}}
+    {{#perfect-scrollbar-element class="tags-container"}}
       {{#if tagsToRender.length}}
         <ul class="selector-list">
           {{#each tagsToRender key="id" as |tag|}}
