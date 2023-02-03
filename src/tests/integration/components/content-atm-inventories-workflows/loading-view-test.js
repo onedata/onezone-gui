@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, click, settled, find } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 import { Promise, resolve } from 'rsvp';
 import { suppressRejections } from '../../../helpers/suppress-rejections';

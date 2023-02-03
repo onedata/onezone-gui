@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { setupRenderingTest } from 'ember-mocha';
 import { render, fillIn, click, focus, blur, settled, find, findAll } from '@ember/test-helpers';
-import hbs from 'htmlbars-inline-precompile';
+import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 import OneDatetimePickerHelper from '../../helpers/one-datetime-picker';
@@ -167,12 +167,12 @@ const caveats = [{
   name: 'consumer',
   label: 'Consumer',
   disabledDescription: 'This token can be consumed by anyone.',
-  tip: 'Limits the consumers that can use the token. Consumer is the token bearer that utilizes the token - performs a request with an access token or attempts to consume an invite token. If the caveat is present, the consumer must prove their identity using an identity token.',
+  tip: 'Limits the consumers that can use the token. Consumer is the token bearer that utilizes the token — performs a request with an access token or attempts to consume an invite token. If the caveat is present, the consumer must prove their identity using an identity token.',
 }, {
   name: 'service',
   label: 'Service',
   disabledDescription: 'This token can be used to interact with any service.',
-  tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request - e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
+  tip: 'Limits the services that can process the token. Service is the Onedata service that received the client\'s request — e.g. the Oneprovider service chosen by a user to mount a Oneclient or make a CDMI request.',
 }, {
   name: 'readonly',
   label: 'Read‐only',

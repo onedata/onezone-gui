@@ -6,6 +6,19 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10357 Added support for "manage archives" privilege
+* VFS-10442 Added eslint rule detecting wrong usage of hyphen in translations
+* VFS-10432 Fixed cookie consent persistence
+* VFS-10312 Changed name conflict and disambiguation separator from "#" to "@"
+* VFS-9129 Updated EmberJS to v3.8.3
+* VFS-10304 Fixed broken columns movement in groups hierarchy visualiser
+* VFS-10254 Added "Boolean" data type to automation, changed "Integer" to "Number" data type
+* VFS-10414 Fixed displaying the same space name for each share in shares sidebar
+* VFS-10060 Added "avg" time series aggregator to automation
+* VFS-10287 Added user popover in space overview
+* VFS-10129 Added workflow and lane charts dashboard
+* VFS-10000 Added one style for flippable icons
+* VFS-10111 Added rest api button on overview space page
 * VFS-9311 Removed `$.*width()`, `$.*height()`, `$.offset()` and `$.position()` usages
 * VFS-10245 Added error translation for internal server error with reference
 * VFS-10130 Added additional modal when turning on/off dir stats
