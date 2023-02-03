@@ -176,18 +176,18 @@ const caveats = [{
 }, {
   name: 'readonly',
   label: 'Read‐only',
-  disabledDescription: 'This token can be used for both reading and writing user files.',
+  disabledDescription: 'This token is not limited to read-only data access.',
   tip: 'Allows only read access to user files.',
   dontTestValue: true,
 }, {
   name: 'path',
   label: 'Path',
-  disabledDescription: 'This token does not limit paths in which data can be accessed.',
+  disabledDescription: 'This token is not limited to data access to specific paths.',
   tip: 'Limits the paths in which data can be accessed with the token. If a directory path is given, the token allows to access all nested files and directories starting from the specified directory.',
 }, {
   name: 'objectId',
   label: 'Object ID',
-  disabledDescription: 'This token does not limit object ids in which data can be accessed.',
+  disabledDescription: 'This token is not limited to data access to specific object IDs.',
   tip: 'Limits the object ids in which data can be accessed with the token. The object ids comply with the CDMI format and can be used in the Oneprovider\'s REST and CDMI APIs. If a directory object id is given, the token allows to access all nested files and directories starting from the specified directory.',
 }];
 const preselectedInviteType = tokenInviteTypes[0];
@@ -1471,7 +1471,7 @@ describe('Integration | Component | token editor', function () {
       await toggleCaveatsSection();
       await toggleCaveat('readonly');
       expect(find('.readonlyEnabledText-field'))
-        .to.have.trimmed.text('This token allows only read access to user files.');
+        .to.have.trimmed.text('This token is limited to read-only data access.');
 
       expectToBeValid(this, 'readonly');
     }
