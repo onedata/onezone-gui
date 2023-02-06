@@ -40,7 +40,9 @@ export default Component.extend(I18n, {
   /**
    * @type {string}
    */
-  icon: recordIcon('apiSubject'),
+  icon: computed('apiSubject', function icon() {
+    return recordIcon(this.get('apiSubject'));
+  }),
 
   /**
    * @type {Object}
