@@ -13,4 +13,7 @@ export default {
   cancel: 'Cancel',
   proceed: 'Proceed',
   enablingAdvertisement: 'enabling space advertisement',
+  // TODO: VFS-10252 if translations will be the same with space-configuration, consider
+  // removing redundancy
+  emailVisibleAlert: 'Note, that the marketplace contact e-mail address will be visible to anyone who gains an access to the space.',
 };

@@ -158,6 +158,44 @@
       display: none;
     }
   }
+  .contact-email-form-group {
+    .contact-email-value-container {
+      max-width: 40%;
+    }
+    .one-inline-editor.editor.contact-email {
+      min-width: 22em;
+      max-width: 40em;
+      max-width: 40%;
+    }
+    .email-visible-alert {
+      display: flex;
+      align-items: center;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+      padding-left: 3em;
+      // max-width: 40%;
+      .email-visible-alert-icon {
+        color: $color-one-warning;
+        margin-right: 0.5em;
+        font-size: 150%;
+      }
+    }
+    @media (max-width: $screen-sm-max) {
+      flex-wrap: wrap;
+      .contact-email-value-container {
+        max-width: calc(100% - 20em);
+        min-width: 50%;
+      }
+      .one-inline-editor.contact-email {
+        min-width: auto;
+        max-width: none;
+      }
+      .email-visible-alert {
+        padding-left: 0;
+        max-width: none;
+      }
+    }
+  }
 }
 
 .one-webui-popover.space-tags-selector {

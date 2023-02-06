@@ -9,6 +9,9 @@
       width: auto;
     }
   }
+  .contact-form + .email-visible-alert {
+    margin-top: 0;
+  }
   .marketplace-link {
     display: inline-flex;
     align-items: center;
