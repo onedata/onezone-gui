@@ -29,7 +29,7 @@ export default {
     },
   },
   contactEmail: {
-    label: 'Contact e-mail',
+    label: 'Marketplace contact e-mail',
   },
   viewInMarketplace: 'View in marketplace',
   save: 'Save',
