@@ -276,9 +276,14 @@ export default Component.extend(I18n, {
   areAllCaveatsExpanded: false,
 
   /**
-   * @type {booleal}
+   * @type {boolean}
    */
   areServiceCaveatWarningDetailsVisible: false,
+
+  /**
+   * @type {boolean}
+   */
+  areDataAccessCaveatWarningDetailsVisible: false,
 
   /**
    * @type {ComputedProperty<String>}
@@ -1382,19 +1387,7 @@ export default Component.extend(I18n, {
   /**
    * @type {ComputedProperty<boolean>}
    */
-  isServiceCaveatWarningVisible: and(
-    // type: access token
-    equal('basicGroup.value.type', raw('access')),
-    // service caveat is disabled or is enabled and empty, or is enabled with
-    // Onezone service selected
-    or(
-      not('serviceCaveatGroup.value.serviceEnabled'),
-      isEmpty('serviceCaveatGroup.value.service'),
-      array.find(
-        'serviceCaveatGroup.value.service',
-        option => get(option, 'record.serviceType') === 'onezone'
-      )
-    ),
+  hasNoDataAccessCaveat: and(
     // interface caveat is disabled or enabled with selection != oneclient
     or(
       not('interfaceCaveatGroup.value.interfaceEnabled'),
@@ -1412,6 +1405,33 @@ export default Component.extend(I18n, {
       not('objectIdCaveatGroup.value.objectIdEnabled'),
       isEmpty('objectIdCaveatGroup.value.objectId.__fieldsValueNames')
     )
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isServiceCaveatWarningVisible: and(
+    // type: access token
+    equal('basicGroup.value.type', raw('access')),
+    // service caveat is disabled or is enabled and empty, or is enabled with
+    // Onezone service selected
+    or(
+      not('serviceCaveatGroup.value.serviceEnabled'),
+      isEmpty('serviceCaveatGroup.value.service'),
+      array.find(
+        'serviceCaveatGroup.value.service',
+        option => get(option, 'record.serviceType') === 'onezone'
+      )
+    ),
+    'hasNoDataAccessCaveat'
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isDataAccessCaveatWarningVisible: and(
+    equal('basicGroup.value.type', raw('access')),
+    not('hasNoDataAccessCaveat')
   ),
 
   modeObserver: observer('mode', function modeObserver() {

@@ -7,6 +7,7 @@ CHANGELOG
 ### Latest changes
 
 * VFS-10486 Removed custom zoom in tests rendering
+* VFS-10378 Added information about data access tokens in tokens form
 * VFS-10357 Added support for "manage archives" privilege
 * VFS-10442 Added eslint rule detecting wrong usage of hyphen in translations
 * VFS-10432 Fixed cookie consent persistence
