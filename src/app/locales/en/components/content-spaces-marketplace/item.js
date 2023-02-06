@@ -5,4 +5,5 @@ export default {
   configure: 'Configure',
   requestAccess: 'Request access',
   requestSent: 'Request sent',
+  creationTimeTooltip: 'The space was created at {{creationTimeText}}',
 };

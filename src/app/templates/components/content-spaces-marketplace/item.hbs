@@ -14,6 +14,14 @@
         {{#truncated-string class="organization-name"}}
           {{organizationName}}
         {{/truncated-string}}
+        <span class="col-separator hidden-xs hidden-sm"></span>
+        <div class="creation-time hidden-xs hidden-sm">
+          {{one-icon icon="create-time" class="creation-time-icon"}}
+          <span class="creation-time-text">
+            {{date-format creationTime format="date"}}
+          </span>
+          {{one-tooltip title=creationTimeTooltip}}
+        </div>
         <span class="col-separator"></span>
         <div class="support-list">
           <div class="support-item">

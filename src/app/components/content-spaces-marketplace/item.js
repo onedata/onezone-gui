@@ -11,6 +11,7 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { dateFormat } from 'onedata-gui-common/helpers/date-format';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -66,6 +67,17 @@ export default Component.extend(I18n, {
   supportSize: reads('spaceItem.totalSupportSize'),
 
   organizationName: reads('spaceItem.organizationName'),
+
+  creationTime: reads('spaceItem.creationTime'),
+
+  creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
+    const creationTimeText = dateFormat([this.creationTime], {
+        format: 'dateWithMinutes',
+      })
+      // replacing spaces with non-breakable spaces
+      .replaceAll(' ', ' ');
+    return this.t('creationTimeTooltip', { creationTimeText });
+  }),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
