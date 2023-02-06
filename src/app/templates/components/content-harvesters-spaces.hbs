@@ -30,7 +30,10 @@
       </div>
     {{/content-info}}
   {{else}}
-    {{resources-list items=spaceItems}}
+    {{resources-list 
+      items=spaceItems
+      isResourceWithAdditionalInfo=true
+    }}
   {{/if}}
 {{/promise-proxy-container}}
 

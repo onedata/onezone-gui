@@ -11,6 +11,7 @@
 import Mixin from '@ember/object/mixin';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import { get } from '@ember/object';
+import { inject as service } from '@ember/service';
 
 /**
  * @typedef {Object} BrowserUrlGeneratorOptions
@@ -20,6 +21,8 @@ import { get } from '@ember/object';
  */
 
 export default Mixin.create({
+  modalManager: service(),
+
   // required property: _location: Location
   // required property: router: Ember.Router
   // required property: navigationState: Ember.Service
@@ -194,6 +197,13 @@ export default Mixin.create({
           },
         }
       );
+    },
+
+    async openRestApiModal(space) {
+      return await this.modalManager.show('api-samples-modal', {
+        record: space,
+        apiSubject: 'space',
+      }).hiddenPromise;
     },
   },
 });

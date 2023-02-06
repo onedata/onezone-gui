@@ -138,6 +138,7 @@ export default OneproviderEmbeddedContainer.extend(EmbeddedBrowserCommon, {
     'getShareUrl',
     'getProvidersUrl',
     'getAccessTokenUrl',
+    'openRestApiModal',
   ]),
 
   _location: location,
