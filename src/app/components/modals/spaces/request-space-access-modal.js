@@ -36,6 +36,7 @@ export default Component.extend(I18n, {
   spaceId: reads('spaceMarketplaceData.spaceId'),
 
   rootField: computed(
+    'i18nPrefix',
     'messageField',
     'emailField',
     function rootField() {
@@ -54,6 +55,7 @@ export default Component.extend(I18n, {
     return TextAreaField.create({
       name: 'message',
       defaultValue: '',
+      isOptional: true,
     });
   }),
 
