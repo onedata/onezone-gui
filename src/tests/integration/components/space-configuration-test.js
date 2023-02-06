@@ -82,7 +82,6 @@ describe('Integration | Component | space-configuration', function () {
 
   [
     ['organizationName', ''],
-    ['tags', []],
     ['description', ''],
   ].forEach(([fieldName, emptyValue]) => {
     it(`has disabled advertised toggle if ${fieldName} field is empty`, async function () {
@@ -108,7 +107,7 @@ describe('Integration | Component | space-configuration', function () {
     await helper.initSpace({
       advertisedInMarketplace: false,
       organizationName: 'hello',
-      tags: ['world'],
+      tags: [],
       description: 'foo',
     });
 

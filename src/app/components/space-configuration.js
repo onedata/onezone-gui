@@ -161,7 +161,6 @@ export default Component.extend(validations, I18n, {
 
   areAdvertiseRequirementsNotMet: or(
     isEmpty('organizationName'),
-    isEmpty('spaceTags'),
     isEmpty('spaceDescription'),
   ),
 
