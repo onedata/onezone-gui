@@ -9,6 +9,7 @@ import { lookupService } from '../../helpers/stub-service';
 import { get } from '@ember/object';
 import ToggleHelper from '../../helpers/toggle';
 import { clearStoreAfterEach } from '../../helpers/clear-store';
+import sinon from 'sinon';
 
 describe('Integration | Component | space-configuration', function () {
   setupRenderingTest();
@@ -115,6 +116,51 @@ describe('Integration | Component | space-configuration', function () {
 
     expect(helper.advertisedToggle.isDisabled()).to.be.false;
   });
+
+  it('does not renders validation error for tags input in edit mode when it contains only tags', async function () {
+    const helper = new Helper(this);
+    await helper.initSpace({
+      name: 'Hello world',
+      organizationName: 'The Corporation',
+      tags: ['hello', 'world'],
+    });
+
+    sinon.stub(helper.spaceManager, 'getAvailableSpaceTags').returns({
+      firstCategory: ['hello', 'world'],
+    });
+
+    await helper.render();
+    await click(helper.spaceTagsInlineEditor);
+
+    const tagItems = [...helper.spaceTagsInlineEditor.querySelectorAll('.tag-item')];
+    expect(helper.spaceTagsFormGroup).to.not.have.class('has-error');
+    expect(helper.spaceTagsInlineEditor).to.not.have.class('save-disabled');
+    for (const tagItem of tagItems) {
+      expect(tagItem).to.not.have.class('tag-item-danger');
+    }
+  });
+
+  it('renders validation error for tags input in edit mode when it contains unsupported tags', async function () {
+    const helper = new Helper(this);
+    await helper.initSpace({
+      name: 'Hello world',
+      organizationName: 'The Corporation',
+      tags: ['hello', 'world'],
+    });
+
+    sinon.stub(helper.spaceManager, 'getAvailableSpaceTags').returns({
+      firstCategory: ['hello'],
+    });
+
+    await helper.render();
+    await click(helper.spaceTagsInlineEditor);
+    const tagItems = [...helper.spaceTagsInlineEditor.querySelectorAll('.tag-item')];
+
+    expect(helper.spaceTagsFormGroup).to.have.class('has-error');
+    expect(helper.spaceTagsInlineEditor).to.have.class('save-disabled');
+    expect(tagItems[0]).to.not.have.class('tag-item-danger');
+    expect(tagItems[1]).to.have.class('tag-item-danger');
+  });
 });
 
 class Helper {
@@ -148,6 +194,16 @@ class Helper {
   }
   get advertisedToggle() {
     return new ToggleHelper(this.element.querySelector('.advertised-toggle'));
+  }
+  get spaceTagsFormGroup() {
+    return this.element.querySelector('.space-tags-form-group');
+  }
+  get spaceTagsInlineEditor() {
+    return this.spaceTagsFormGroup.querySelector('.one-inline-editor.space-tags');
+  }
+
+  get spaceManager() {
+    return lookupService(this.mochaContext, 'spaceManager');
   }
 
   async render() {

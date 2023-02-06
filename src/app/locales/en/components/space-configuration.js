@@ -45,4 +45,5 @@ export default {
     proceed: 'Proceed',
     disablingAdvertisement: 'disabling space advertisement',
   },
+  someTagsUnsupported: 'Some of entered tags are currently not supported. Remove them to be able to save changes.',
 };

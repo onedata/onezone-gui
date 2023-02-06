@@ -10,12 +10,14 @@
 import Component from '@ember/component';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
-import {
+import EmberObject, {
   computed,
   observer,
 } from '@ember/object';
-import { getBy } from 'ember-awesome-macros';
+import { conditional, raw, array } from 'ember-awesome-macros';
 import _ from 'lodash';
+import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
+import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
   classNames: ['space-tags-selector-editor'],
@@ -70,7 +72,7 @@ export default Component.extend(I18n, {
 
   /**
    * Maps: categoryName -> Array of available tags objects for tags input.
-   * @returns {Object<string, Array<Tag>>}
+   * @returns {Object<string, Array<SpaceTag>>}
    */
   availableTagsByCategory: computed('usedTagLabels', function availableTagsByCategory() {
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
@@ -79,7 +81,7 @@ export default Component.extend(I18n, {
       result[categoryName] = availableSpaceTags[categoryName]
         .filter(label => !this.usedTagLabels.includes(label))
         .sort()
-        .map(label => ({ label }));
+        .map(label => SpaceTag.create({ ownerSource: this, label }));
     }
     return result;
   }),
@@ -90,7 +92,7 @@ export default Component.extend(I18n, {
   }),
 
   /**
-   * @type {ComputedProperty<Array<Tag>>}
+   * @type {ComputedProperty<Array<SpaceTag>>}
    */
   tagsToRender: computed(
     'availableTagsByCategory',
@@ -141,4 +143,56 @@ export default Component.extend(I18n, {
       this.onTagsAdded([tag]);
     },
   },
+});
+
+/**
+ * Implements `Tag` type for use with space tags.
+ * @type {EmberObject}
+ */
+export const SpaceTag = EmberObject.extend(I18n, OwnerInjector, {
+  spaceManager: service(),
+  i18n: service(),
+
+  i18nPrefix: 'components.spaceConfiguration.spaceTagsSelector.spaceTag',
+
+  /**
+   * Implements `Tag.label` property.
+   * @virtual
+   * @type {string}
+   */
+  label: undefined,
+
+  /**
+   * Implements `Tag.className` optional property.
+   * @type {ComputedProperty<string>}
+   */
+  className: conditional(
+    'isSupportedTag',
+    raw(''),
+    raw('tag-item-danger'),
+  ),
+
+  /**
+   * Implements `Tag.tip` optional property.
+   * @type {ComputedProperty<SafeString>}
+   */
+  tip: conditional(
+    'isSupportedTag',
+    null,
+    computedT('unsupported'),
+  ),
+
+  /**
+   * @type {ComputedProperty<boolean>}
+   */
+  isSupportedTag: array.includes('availableLabels', 'label'),
+
+  /**
+   * @type {ComputedProperty<Array<string>>}
+   */
+  availableLabels: computed(function availableLabels() {
+    return _.flatten(Object.values(
+      this.spaceManager.getAvailableSpaceTags()
+    ));
+  }),
 });
