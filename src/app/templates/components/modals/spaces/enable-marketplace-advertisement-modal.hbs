@@ -23,7 +23,10 @@
     <p>
       {{tt this "body.textExtended"}}
     </p>
-    <form class="form form-horizontal form-component contact-form">
+    <form
+      class="form form-horizontal form-component contact-form"
+      onsubmit={{prevent-default}}
+    >
       {{form-component/field-renderer field=rootField}}
     </form>
   {{/modal.body}}
