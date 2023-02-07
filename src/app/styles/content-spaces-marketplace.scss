@@ -1,3 +1,5 @@
+$spaces-marketplace-items-spacing: 20px;
+
 .content-spaces-marketplace {
   @media (max-width: $screen-xs-max) {
     padding: 0 1em;
@@ -6,7 +8,7 @@
 
 .spaces-marketplace-list {
   .list-entries, .no-matching-results {
-    padding-top: 1em;
+    padding-top: $spaces-marketplace-items-spacing;
   }
   .list-entries {
     padding-left: 0;
@@ -21,8 +23,12 @@
     }
   }
 
-  height: 280px;
+  height: 300px;
   overflow: hidden;
+
+  &.iconified-block + .spaces-marketplace-item.iconified-block {
+    margin-top: $spaces-marketplace-items-spacing;
+  }
 
   &.iconified-block-marketplace-access-granted {
     @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
@@ -51,12 +57,15 @@
   }
 
   .icon-section {
-    .one-icon:first-of-type {
-      // special adjustment for space item header
-      margin-top: -0.15em;
-    }
+    padding: 20px 26px;
     .oneicon-space-empty {
       font-weight: bold;
+    }
+    @media (max-width: $screen-md-max) {
+      padding: 14px;
+      .one-icon {
+        display: none;
+      }
     }
   }
 
@@ -64,7 +73,7 @@
     display: flex;
     flex-direction: column;
     // special adjustment for space item
-    padding: 12px 16px 16px 16px;
+    padding: 18px 24px;
   }
 
   .basic-info-row {
@@ -88,7 +97,7 @@
     $secondary-row-icon-size: 150%;
     display: flex;
     align-items: center;
-    @include vertical-flex-gap($additional-margin-top: 0.5em);
+    @include vertical-flex-gap($additional-margin-top: 0.75em);
     overflow: hidden;
     max-width: calc(100% - 1em);
     .creation-time {
@@ -214,21 +223,18 @@
   .description-row {
     flex-direction: column;
     border-top: 1px solid $main-border-color;
-    margin-top: 1em;
+    margin-top: 1.5em;
   }
 }
 
 .marketplace-space-description {
-  --marketplace-space-description-height: 12em;
   display: block;
   width: 100%;
-  height: var(--marketplace-space-description-height);
-  max-height: var(--marketplace-space-description-height);
   position: relative;
   z-index: 0;
   overflow: hidden;
   .markdown-view {
-    margin-top: 1em;
+    margin-top: 1.5em;
   }
   &.has-overflow {
     &::after {
@@ -269,8 +275,8 @@
 
 .iconified-block-marketplace-available {
   $leading-color: $color-one-light-blue;
-  --iconified-block-icon-color: #{$color-one-blue-gray};
   --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-color: #{darken($leading-color, 25%)};
   --iconified-block-icon-background-color: #{darken($leading-color, 5%)};
   --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
   --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
@@ -278,8 +284,8 @@
 
 .iconified-block-marketplace-access-granted {
   $leading-color: lighten($color-one-success, 30%);
-  --iconified-block-icon-color: #{darken($color-one-success, 10%)};
   --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-color: #{darken($leading-color, 25%)};
   --iconified-block-icon-background-color: #{$leading-color};
   --iconified-block-icon-background-color-hover: #{darken($leading-color, 3%)};
   --iconified-block-background-color-hover: #{$main-content-hover-background};
