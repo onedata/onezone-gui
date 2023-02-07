@@ -199,14 +199,14 @@
     {{/if}}
   </div>
   {{#if isAdvertised}}
-    <div class={{concat-classes
-    "form-group contact-email-form-group"
-    (if emailValidation.error "has-error")
-  }}>
-      <label class="control-label">
-        {{tt this "contactEmail.label"}}:
-      </label>
-      <div class="contact-email-value-container">
+    <div class="contact-email-form-container">
+      <div class={{concat-classes
+        "form-group contact-email-form-group"
+        (if emailValidation.error "has-error")
+      }}>
+        <label class="control-label">
+          {{tt this "contactEmail.label"}}:
+        </label>
         {{#if isReadOnly}}
           {{#if contactEmail}}
             <span class="static-value">{{contactEmail}}</span>
