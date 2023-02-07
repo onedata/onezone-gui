@@ -25,7 +25,8 @@ export default OnedataApplicationRoute.extend(DevelopmentModelRouteMixin, {
   clearLocalStoragePrefix: 'onezone-gui:',
 
   developmentModelConfig: Object.freeze({
-    clearOnReload: false,
+    // FIXME: set to false
+    clearOnReload: true,
   }),
   generateDevelopmentModel,
 

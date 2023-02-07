@@ -1,4 +1,3 @@
 export default {
-  expand: 'Expand description',
-  collapse: 'Collapse description',
+  expand: 'Show full description',
 };

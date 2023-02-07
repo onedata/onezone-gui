@@ -33,12 +33,6 @@ export default Component.extend(I18n, {
 
   /**
    * @virtual
-   * @type {Utils.SpacesMarketplaceViewModel}
-   */
-  viewModel: undefined,
-
-  /**
-   * @virtual
    * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
@@ -69,6 +63,14 @@ export default Component.extend(I18n, {
   organizationName: reads('spaceItem.organizationName'),
 
   creationTime: reads('spaceItem.creationTime'),
+
+  creationDateText: computed('creationTime', function creationDateText() {
+    return dateFormat([this.creationTime], {
+        format: 'date',
+      })
+      // replacing spaces with non-breakable spaces
+      .replaceAll(' ', ' ');
+  }),
 
   creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
     const creationTimeText = dateFormat([this.creationTime], {
