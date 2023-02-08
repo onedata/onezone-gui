@@ -19,7 +19,6 @@ import {
 import {
   aspect as spaceMarketplaceInfoListAspect,
 } from 'onezone-gui/models/space-marketplace-info-list';
-import _ from 'lodash';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate

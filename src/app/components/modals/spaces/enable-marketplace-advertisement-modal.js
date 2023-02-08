@@ -124,10 +124,5 @@ export default Component.extend(I18n, {
         safeExec(this, () => this.set('isSubmitting', false));
       }
     },
-    /** @param {SubmitEvent} event */
-    handleFormSubmit(event) {
-      debugger;
-      // event.preventDefault();
-    },
   },
 });
