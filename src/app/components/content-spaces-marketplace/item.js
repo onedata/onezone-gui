@@ -65,11 +65,7 @@ export default Component.extend(I18n, {
 
   spaceId: reads('spaceItem.entityId'),
 
-  providerNames: reads('spaceItem.providerNames'),
-
   isAccessGranted: reads('spaceItem.isAccessGranted'),
-
-  supportSize: reads('spaceItem.totalSupportSize'),
 
   organizationName: reads('spaceItem.organizationName'),
 

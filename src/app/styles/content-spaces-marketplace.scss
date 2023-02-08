@@ -1,4 +1,5 @@
 $spaces-marketplace-items-spacing: 20px;
+$spaces-marketplace-item-secondary-row-icon-size: 150%;
 
 .content-spaces-marketplace {
   @media (max-width: $screen-xs-max) {
@@ -94,7 +95,6 @@ $spaces-marketplace-items-spacing: 20px;
   }
 
   .secondary-row {
-    $secondary-row-icon-size: 150%;
     display: flex;
     align-items: center;
     @include vertical-flex-gap($additional-margin-top: 0.75em);
@@ -104,42 +104,11 @@ $spaces-marketplace-items-spacing: 20px;
       display: flex;
       align-items: center;
       .one-icon {
-        font-size: $secondary-row-icon-size;
+        font-size: $spaces-marketplace-item-secondary-row-icon-size;
       }
       .creation-time-icon {
         margin-left: -0.2em;
         margin-right: 0.2em;
-      }
-    }
-    .support-list {
-      display: flex;
-      overflow: hidden;
-      position: relative;
-      padding-right: 2em;
-      &::after {
-        position: absolute;
-        content: ' ';
-        right: 0;
-        height: 100%;
-        width: 2em;
-        background: linear-gradient(to right, transparent, white);
-      }
-      .support-item {
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        .one-icon {
-          font-size: $secondary-row-icon-size;
-        }
-        .one-icon + .text {
-          margin-left: 0.2em;
-        }
-        .text {
-          font-size: 90%;
-        }
-        +.support-item {
-          margin-left: 0.5em;
-        }
       }
     }
   }
@@ -207,7 +176,7 @@ $spaces-marketplace-items-spacing: 20px;
   }
 
   .access-links-container {
-    margin-top: 0.75em;
+    margin-top: 1em;
     margin-right: 0.35em;
   }
 
@@ -228,6 +197,54 @@ $spaces-marketplace-items-spacing: 20px;
 
   .more-tag {
     text-decoration: underline;
+  }
+
+  .space-item-support-list {
+    // guarantee some space for previous flex elements
+    max-width: calc(100% - 8em);
+    @media (min-width: $screen-md-min) {
+      max-width: calc(100% - 17em);
+    }
+  }
+}
+
+.space-item-support-list {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  padding-right: 2em;
+
+  &.has-overflow {
+    &::after {
+      position: absolute;
+      content: ' ';
+      right: 0;
+      height: 100%;
+      width: 2em;
+      background: linear-gradient(to right, transparent, white);
+    }
+  }
+
+  .list-container {
+    display: flex;
+  }
+
+  .support-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    .one-icon {
+      font-size: $spaces-marketplace-item-secondary-row-icon-size;
+    }
+    .one-icon + .text {
+      margin-left: 0.2em;
+    }
+    .text {
+      font-size: 90%;
+    }
+    +.support-item {
+      margin-left: 0.5em;
+    }
   }
 }
 

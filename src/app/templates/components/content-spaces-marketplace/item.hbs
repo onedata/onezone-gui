@@ -17,7 +17,7 @@
                   <div class="tags-input">
                     {{#each moreTags as |tag|}}
                       {{!-- using .tag-label element is not necessary here --}}
-                      <div class="tag-item tag-item-danger">{{tag.label}}</div>
+                      <div class="tag-item">{{tag.label}}</div>
                     {{/each}}
                   </div>
                 {{/one-tooltip}}
@@ -39,20 +39,9 @@
           {{one-tooltip title=creationTimeTooltip}}
         </div>
         <span class="col-separator"></span>
-        <div class="support-list">
-          <div class="support-item">
-            {{one-icon icon="support"}}
-            <div class="text">
-              {{bytes-to-string supportSize}}
-            </div>
-          </div>
-          {{#each providerNames as |providerName|}}
-            <div class="support-item">
-              {{record-icon modelName="provider"}}
-              <div class="text">{{providerName}}</div>
-            </div>
-          {{/each}}
-        </div>
+        {{content-spaces-marketplace/space-item-support-list
+          spaceItem=spaceItem
+        }}
       </div>
     </div>
     <div class="access-info-col">
