@@ -1,0 +1,39 @@
+.space-item-support-list {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  padding-right: 2em;
+
+  &.has-overflow {
+    &::after {
+      position: absolute;
+      content: ' ';
+      right: 0;
+      height: 100%;
+      width: 2em;
+      background: linear-gradient(to right, transparent, white);
+    }
+  }
+
+  .list-container {
+    display: flex;
+  }
+
+  .support-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    .one-icon {
+      font-size: $spaces-marketplace-item-secondary-row-icon-size;
+    }
+    .one-icon + .text {
+      margin-left: 0.2em;
+    }
+    .text {
+      font-size: 90%;
+    }
+    +.support-item {
+      margin-left: 0.5em;
+    }
+  }
+}

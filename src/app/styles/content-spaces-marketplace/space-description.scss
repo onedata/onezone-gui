@@ -1,0 +1,45 @@
+.marketplace-space-description {
+  display: block;
+  width: 100%;
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  .markdown-view {
+    margin-top: 1.5em;
+  }
+  &.has-overflow {
+    &::after {
+      content: ' ';
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 4em;
+      background: linear-gradient(transparent 0%, var(--markdown-container-background-color, white) 60%, var(--markdown-container-background-color, white));
+      z-index: 1;
+    }
+  }
+  .toggle-expand-btn {
+    display: inline-flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    z-index: 2;
+    justify-content: center;
+    width: 14em;
+    a {
+      @include font-semibold;
+    }
+    .text {
+      text-align: center;
+    }
+    .toggle-expand-anchor {
+      display: inline-flex;
+      align-items: center;
+      .expand-icon {
+        margin-right: 0.2em;
+        font-size: 200%;
+      }
+    }
+  }
+}
