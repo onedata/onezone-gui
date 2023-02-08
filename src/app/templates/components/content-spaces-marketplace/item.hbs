@@ -7,7 +7,23 @@
       <div class="row marketplace-item-row title-row">
         {{name-conflict tagName="div" class="space-name" item=spaceItem}}
         <div class="tags-container">
-          {{tags-input readonly=true tags=tags}}
+          {{#tags-input readonly=true tags=limitedTags}}
+            {{#if moreTags.length}}
+              <li class="tag-item tag-item-plaintext more-tag clickable">
+                <div class="tag-label more-tag-text">
+                  {{tt this "moreTags" count=moreTags.length}}
+                </div>
+                {{#one-tooltip class="tooltip-with-tags"}}
+                  <div class="tags-input">
+                    {{#each moreTags as |tag|}}
+                      {{!-- using .tag-label element is not necessary here --}}
+                      <div class="tag-item tag-item-danger">{{tag.label}}</div>
+                    {{/each}}
+                  </div>
+                {{/one-tooltip}}
+              </li>
+            {{/if}}
+          {{/tags-input}}
         </div>
       </div>
       <div class="row marketplace-item-row secondary-row">

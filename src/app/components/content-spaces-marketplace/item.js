@@ -12,6 +12,7 @@ import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
+import { or, and, raw, gt, difference } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -30,12 +31,22 @@ export default Component.extend(I18n, {
   spaceActions: service(),
   currentUser: service(),
   guiUtils: service(),
+  media: service(),
 
   /**
    * @virtual
    * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
+
+  /**
+   * @type {number}
+   */
+  tagsLimit: or(
+    and('media.isMobile', raw(4)),
+    and('media.isTablet', raw(6)),
+    raw(12),
+  ),
 
   //#region state
 
@@ -86,6 +97,36 @@ export default Component.extend(I18n, {
       label: tagName,
     }));
   }),
+
+  tagsLimitExceeded: gt('tags.length', 'tagsLimit'),
+
+  tagsDisplayedOnLimitExceed: difference('tagsLimit', 1),
+
+  limitedTags: computed(
+    'tagsLimitExceeded',
+    'tagsDisplayedOnLimitExceed',
+    function limitedTags() {
+      if (this.get('tagsLimitExceeded')) {
+        return this.tags.slice(0, this.tagsDisplayedOnLimitExceed);
+      } else {
+        return this.tags;
+      }
+    }
+  ),
+
+  moreTags: computed(
+    'tagsLimitExceeded',
+    'tagsDisplayedOnLimitExceed',
+    function moreTags() {
+      if (this.tagsLimitExceeded) {
+        return this.tags.slice(this.tagsDisplayedOnLimitExceed);
+      } else {
+        return [];
+      }
+    }
+  ),
+
+  // moreTags: array.slice('tags', 'tagsLimit'),
 
   visitSpaceHref: computed(
     'spaceItem.spaceMarketplaceInfo.entityId',
