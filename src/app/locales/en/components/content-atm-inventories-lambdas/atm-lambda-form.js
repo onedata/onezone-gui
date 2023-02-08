@@ -76,7 +76,7 @@ export default {
         },
         entryDefaultValue: {
           label: 'Default value',
-          placeholder: 'Default value (optional)',
+          valueCreatorButtonLabel: 'Set default value',
         },
       },
     },

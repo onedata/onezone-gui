@@ -354,10 +354,9 @@ describe(
         const entryDefaultValueLabel =
           entry.querySelector('.entryDefaultValue-field .control-label');
         const entryDefaultValueField =
-          entry.querySelector('.entryDefaultValue-field .form-control');
+          entry.querySelector('.entryDefaultValue-field');
         expect(entryDefaultValueLabel).to.have.trimmed.text('Default value:');
-        expect(entryDefaultValueField).to.have.attr('placeholder', 'Default value (optional)');
-        expect(entryDefaultValueField).to.have.value('');
+        expect(entryDefaultValueField).to.contain('.create-value-btn');
         done();
       });
 
@@ -432,18 +431,6 @@ describe(
           argumentTypes.forEach((type, i) =>
             expect(options[i]).to.have.trimmed.text(type)
           );
-          done();
-        });
-
-      it('marks "argument default value" field as valid when it is empty',
-        async function (done) {
-          await renderCreate(this);
-          await addArgument();
-
-          await focus('.entryDefaultValue-field .form-control');
-          await blur('.entryDefaultValue-field .form-control');
-
-          expect(find('.entryDefaultValue-field')).to.have.class('has-success');
           done();
         });
 
@@ -637,7 +624,8 @@ describe(
           );
           if (i === 0) {
             await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
-            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '"val0"');
+            await click(`${nthArgSelector} .entryDefaultValue-field .create-value-btn`)
+            await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '10');
           }
 
           await addResult();
@@ -686,10 +674,8 @@ describe(
                   valueConstraints: {},
                 },
                 isOptional: idx === 0,
+                defaultValue: idx === 0 ? 10 : null,
               };
-              if (idx === 0) {
-                arg.defaultValue = 'val0';
-              }
               return arg;
             }),
           resultSpecs: testConvenientTypes.slice(0, 2).map((type, idx) => ({
@@ -827,7 +813,7 @@ describe(
           expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect(argument.querySelector('.entryDefaultValue-field .form-control'))
-            .to.have.value('"default"');
+            .to.have.value('default');
           const result = find('.results-field .entry-field');
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');
@@ -987,7 +973,7 @@ describe(
               valueConstraints: {},
             },
             isOptional: idx === 0,
-            defaultValue: idx === 0 ? 'val0' : null,
+            defaultValue: idx === 0 ? 10 : null,
           })),
         });
 
@@ -1005,15 +991,13 @@ describe(
           const optionalToggle =
             entry.querySelector('.entryIsOptional-field .form-control');
           const defaultValueField =
-            entry.querySelector('.entryDefaultValue-field .form-control');
+            entry.querySelector('.entryDefaultValue-field');
           if (idx === 0) {
             expect(optionalToggle).to.have.class('checked');
-            expect(defaultValueField).to.have.value('"val0"');
+            expect(defaultValueField.querySelector('input')).to.have.value('10');
           } else {
             expect(optionalToggle).to.not.have.class('checked');
-            if (defaultValueField.length) {
-              expect(defaultValueField).to.have.value('');
-            }
+            expect(defaultValueField.querySelector('input')).to.not.exist;
           }
         });
         done();
@@ -1139,7 +1123,7 @@ describe(
           expect(argument.querySelector('.entryIsOptional-field .form-control'))
             .to.have.class('checked');
           expect(argument.querySelector('.entryDefaultValue-field .form-control'))
-            .to.have.value('"default"');
+            .to.have.value('default');
           const result = find('.results-field .entry-field');
           expect(result.querySelector('.entryName-field .form-control'))
             .to.have.value('res');

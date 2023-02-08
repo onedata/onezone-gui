@@ -28,11 +28,24 @@
     }
 
     .entryName-field,
-    .entryDataSpec-field,
-    .entryDefaultValue-field {
+    .entryDataSpec-field {
       > .control-label {
         display: none;
       }
+    }
+  }
+
+  .entry-field {
+    min-width: 0;
+  }
+
+  .entryDefaultValue-field {
+    flex-wrap: wrap;
+    min-width: 0;
+    .control-label {
+      padding-top: 0;
+      margin-bottom: 0.4em;
+      width: 100%;
     }
   }
 
