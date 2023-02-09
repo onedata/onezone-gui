@@ -5,37 +5,52 @@
 </h1>
 <table class="table table-condensed table-info">
   <tbody>
-    <tr class="row-with-input">
+    <tr class="row-with-text">
       <td class="property-name">{{tt this "name"}}</td>
       <td class="property-value">
-        {{one-clipboard-line
+        {{#one-clipboard-line
           size="sm"
           value=provider.name
           showText=false
           btnType="success"
+          type="html"
         }}
+          {{#truncated-string}}
+            {{provider.name}}
+          {{/truncated-string}}
+        {{/one-clipboard-line}}
       </td>
     </tr>
-    <tr class="row-with-input">
+    <tr class="row-with-text">
       <td class="property-name">{{tt this "domain"}}</td>
       <td class="property-value">
-        {{one-clipboard-line
+        {{#one-clipboard-line
           size="sm"
           value=provider.domain
           showText=false
           btnType="success"
+          type="html"
         }}
+          {{#truncated-string}}
+            {{provider.domain}}
+          {{/truncated-string}}
+        {{/one-clipboard-line}}
       </td>
     </tr>
-    <tr class="row-with-input">
+    <tr class="row-with-text">
       <td class="property-name">{{tt this "id"}}</td>
       <td class="property-value id">
-        {{one-clipboard-line
+        {{#one-clipboard-line
           size="sm"
           value=provider.entityId
           showText=false
           btnType="success"
+          type="html"
         }}
+          {{#truncated-string}}
+            {{provider.entityId}}
+          {{/truncated-string}}
+        {{/one-clipboard-line}}
       </td>
     </tr>
     <tr class="row-with-text">

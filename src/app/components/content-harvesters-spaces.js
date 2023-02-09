@@ -180,6 +180,13 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
     );
   }),
 
+  /**
+   * @override
+   */
+  triggerSelector: computed('space', function triggerSelector() {
+    return `.item-icon-container[data-record-id="${this.space.entityId}"]`;
+  }),
+
   actions: computed('parentHarvester', 'space', function actions() {
     const {
       harvesterActions,
