@@ -442,27 +442,6 @@ export default Service.extend({
     }
   },
 
-  // FIXME: to remove
-  /**
-   * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
-   */
-  async getSpacesMarketplaceList(reload = false) {
-    const requestGri = gri({
-      entityType: 'space',
-      entityId: 'null',
-      aspect: spaceMarketplaceInfoListAspect,
-      scope: 'protected',
-    });
-    return this.store.findRecord('spaceMarketplaceInfoList', requestGri, {
-      reload,
-      adapterOptions: {
-        _meta: {
-          subscribe: false,
-        },
-      },
-    });
-  },
-
   // TODO: VFS-10384 mock of successful response; integrate with backend
   /**
    * @param {SpaceAccessRequestMessageData} requestData
@@ -524,7 +503,7 @@ export default Service.extend({
 
   /**
    * @param {InfiniteScrollListingParams} listingParams
-   * @returns {Promise<{ list: Array<Models.SpaceMarketplaceInfo>, isLast: boolean }>}
+   * @returns {Promise<{ array: Array<Models.SpaceMarketplaceInfo>, isLast: boolean }>}
    */
   async fetchSpacesMarkeplaceInfoRecords(listingParams) {
     const { list: idsList, isLast } = await this.fetchSpacesMarkeplaceIds(listingParams);
@@ -537,9 +516,9 @@ export default Service.extend({
       }));
     });
     // FIXME: think about fetching single spaces failures
-    const list = await allFulfilled(recordsPromises);
+    const array = await allFulfilled(recordsPromises);
     return {
-      list,
+      array,
       isLast,
     };
   },

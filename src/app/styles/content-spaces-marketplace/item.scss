@@ -9,7 +9,8 @@
   height: 300px;
   overflow: hidden;
 
-  &.iconified-block + .spaces-marketplace-item.iconified-block {
+  // override default spacing
+  &, &.iconified-block + .iconified-block.spaces-marketplace-item {
     margin-top: $spaces-marketplace-items-spacing;
   }
 

@@ -16,11 +16,16 @@ import { or, and, raw, gt, difference } from 'ember-awesome-macros';
 
 export default Component.extend(I18n, {
   tagName: 'li',
-  classNames: ['spaces-marketplace-item', 'iconified-block'],
+  classNames: [
+    'spaces-marketplace-item',
+    'iconified-block',
+    // implements infinite scroll table row
+    'data-row',
+  ],
   classNameBindings: [
     'isAccessGranted:iconified-block-marketplace-access-granted:iconified-block-marketplace-available',
   ],
-  attributeBindings: ['spaceId:data-space-id'],
+  attributeBindings: ['id:data-row-id'],
 
   /**
    * @override
@@ -63,7 +68,12 @@ export default Component.extend(I18n, {
 
   spaceName: reads('spaceItem.name'),
 
-  spaceId: reads('spaceItem.entityId'),
+  /**
+   * Implements `id` property for use in infinite scroll (in pair to `id` of
+   * `Utils.SpacesMarketplaceItem`).
+   * @type {string}
+   */
+  id: reads('spaceItem.id'),
 
   isAccessGranted: reads('spaceItem.isAccessGranted'),
 

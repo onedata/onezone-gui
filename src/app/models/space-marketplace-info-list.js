@@ -10,6 +10,7 @@ import StaticGraphModelMixin from 'onedata-gui-websocket-client/mixins/models/st
 import listConflictModel from 'onedata-gui-websocket-client/mixins/models/list-conflict-model';
 import GraphListModelMixin from 'onedata-gui-websocket-client/mixins/models/graph-list-model';
 
+// FIXME: to remove
 export const aspect = 'marketplace_list';
 
 export default Model.extend(GraphListModelMixin, listConflictModel, {

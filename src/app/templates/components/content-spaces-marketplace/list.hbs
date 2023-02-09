@@ -6,10 +6,17 @@
     </div>
   </div>
 </div>
-{{#if filteredCollection.length}}
+{{#if entries.length}}
   <ul class="list-entries iconified-block-marketplace-access-granted-container">
-    {{#each filteredCollection as |spaceItem|}}
-      {{content-spaces-marketplace/item viewModel=viewModel spaceItem=spaceItem}}
+    <li class="table-start-row"></li>
+    <li class="first-row" style={{infiniteScroll.firstRowModel.style}}></li>
+    {{!-- FIXME: maybe no entries message should be rendered here to enable infinite scroll refresh --}}
+    {{#each entries as |spaceItem|}}
+      {{content-spaces-marketplace/item
+        class="data-row"
+        viewModel=viewModel
+        spaceItem=spaceItem
+      }}
     {{/each}}
   </ul>
 {{else if viewModel.searchValue}}

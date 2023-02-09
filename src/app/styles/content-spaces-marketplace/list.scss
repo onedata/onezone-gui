@@ -1,5 +1,11 @@
 .spaces-marketplace-list {
-  .list-entries, .no-matching-results {
+  .table-start-row, .first-row {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+  .no-matching-results {
     padding-top: $spaces-marketplace-items-spacing;
   }
   .list-entries {

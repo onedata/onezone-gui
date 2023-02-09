@@ -14,6 +14,7 @@ import config from 'ember-get-config';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
+import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
@@ -33,34 +34,70 @@ export default Component.extend(I18n, {
    */
   viewModel: undefined,
 
+  //#region state
+
+  /**
+   * @type {Utils.InfiniteScroll}
+   */
+  infiniteScroll: undefined,
+
+  //#endregion
+
+  // FIXME: synchronize with scss using the service (300 height + 20 margin-top)
+  rowHeight: 320,
+
+  // FIXME: review properties
+  spaceItems: reads('viewModel.spaceItems'),
+
+  // FIXME: review old properties
   /**
    * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
    */
-  filteredCollection: reads('viewModel.filteredCollection'),
+  // filteredCollection: reads('viewModel.filteredCollection'),
 
   urlSelectedSpace: reads('navigationState.aspectOptions.selectedSpace'),
 
+  entries: reads('viewModel.entries'),
+
   collectionObserver: observer(
-    'filteredCollection.@each.name',
+    'entries.@each.name',
     function collectionObserver() {
-      addConflictLabels(this.filteredCollection, 'name', 'spaceId');
+      addConflictLabels(this.entries, 'name', 'spaceId');
     }
   ),
+
+  init() {
+    this._super(...arguments);
+    this.initInfiniteScroll();
+  },
 
   /**
    * @override
    */
   didInsertElement() {
     this._super(...arguments);
-    this.scrollToSelectedSpace();
+    this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
+    // FIXME: implement jump
+    // this.scrollToSelectedSpace();
   },
 
+  initInfiniteScroll() {
+    window.entries = this.entries;
+    // FIXME: maybe registering adjustScrollAfterBeginningChange is needed (ifinite-scroll-table)
+    const infiniteScroll = InfiniteScroll.create({
+      entries: this.entries,
+      singleRowHeight: this.rowHeight,
+    });
+    this.set('infiniteScroll', infiniteScroll);
+  },
+
+  // FIXME: reimplement
   scrollToSelectedSpace() {
     if (!this.urlSelectedSpace || !this.element) {
       return;
     }
     /** @type {HTMLElement} */
-    const itemElement = this.element.querySelector(`[data-space-id="${this.urlSelectedSpace}"]`);
+    const itemElement = this.element.querySelector(`[data-row-id="${this.urlSelectedSpace}"]`);
     if (!itemElement) {
       return;
     }

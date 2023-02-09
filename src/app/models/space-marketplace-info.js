@@ -12,6 +12,11 @@ import GraphSingleModelMixin from 'onedata-gui-websocket-client/mixins/models/gr
 export const aspect = 'marketplace_data';
 
 export default Model.extend(GraphSingleModelMixin, {
+  /**
+   * Index used for infinite scroll listing.
+   */
+  index: attr('string'),
+
   name: attr('string'),
   organizationName: attr('string'),
   description: attr('string'),

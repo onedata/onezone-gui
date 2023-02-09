@@ -1,4 +1,4 @@
-{{#promise-proxy-container proxy=viewModel.spaceItemsProxy}}
+{{#promise-proxy-container proxy=viewModel.entries.initialLoad}}
   {{#if isEmpty}}
     {{content-spaces-marketplace/empty viewModel=viewModel}}
   {{else}}
