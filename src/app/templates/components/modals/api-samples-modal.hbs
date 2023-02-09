@@ -8,6 +8,14 @@
     <h1>
       <span class="one-label">{{tt this "header"}}</span>
     </h1>
+    <h2 class="normal-case">
+      {{#truncated-string class="record-name"}}
+        <div class="inline-icon-container">
+          {{one-icon icon=icon}}
+        </div>
+        {{record.name}}
+      {{/truncated-string}}
+    </h2>
   {{/modal.header}}
   {{#modal.body}}
     {{#promise-proxy-container
