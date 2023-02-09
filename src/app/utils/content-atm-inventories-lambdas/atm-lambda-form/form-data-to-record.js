@@ -12,7 +12,7 @@ import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/wor
 import {
   formValuesToDataSpec,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { formValueToRawValue as atmFormValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/value-editors'
+import { formValueToRawValue as atmFormValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/value-editors';
 
 /**
  * @param {Object} formData

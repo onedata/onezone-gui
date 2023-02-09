@@ -624,7 +624,7 @@ describe(
           );
           if (i === 0) {
             await click(`${nthArgSelector} .entryIsOptional-field .form-control`);
-            await click(`${nthArgSelector} .entryDefaultValue-field .create-value-btn`)
+            await click(`${nthArgSelector} .entryDefaultValue-field .create-value-btn`);
             await fillIn(`${nthArgSelector} .entryDefaultValue-field .form-control`, '10');
           }
 

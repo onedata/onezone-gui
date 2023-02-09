@@ -51,8 +51,7 @@ import {
   formValuesToDataSpec as dataSpecEditorValuesToDataSpec,
   FormElement as DataSpecEditor,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { ValueEditorField as AtmValueEditorField } from 'onedata-gui-common/utils/atm-workflow/value-editors'
-import _ from 'lodash';
+import { ValueEditorField as AtmValueEditorField } from 'onedata-gui-common/utils/atm-workflow/value-editors';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -480,15 +479,21 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   });
   const generateEntryDefaultValueField = mode => AtmValueEditorField.extend({
     isVisible: or(not('isInViewMode'), 'value.hasValue'),
+    entryDataSpecField: computed('parent.fields.[]', function entryDataSpecField() {
+      return this.parent?.fields.find((field) => field.name === 'entryDataSpec');
+    }),
     atmDataSpecSetter: observer(
-      'parent.entryDataSpecField.{value,isValid}',
+      'entryDataSpecField.{value,isValid}',
       function atmDataSpecSetter() {
-        const entryDataSpecField = this.parent?.entryDataSpecField;
-        const atmDataSpec = entryDataSpecField?.isValid ?
-          dataSpecEditorValuesToDataSpec(entryDataSpecField.value) : null;
+        const atmDataSpec = this.entryDataSpecField?.isValid ?
+          dataSpecEditorValuesToDataSpec(this.entryDataSpecField.value) : null;
         this.set('atmDataSpec', atmDataSpec);
       }
     ),
+    init() {
+      this._super(...arguments);
+      this.atmDataSpecSetter();
+    },
   }).create({
     mode,
     name: 'entryDefaultValue',
@@ -524,14 +529,12 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     },
     fieldFactoryMethod(uniqueFieldValueName) {
       const mode = this.get('mode') !== 'view' ? 'edit' : 'view';
-      const entryDataSpecField = generateEntryDataSpecField(mode);
       return FormFieldsGroup.create({
         name: 'entry',
         valueName: uniqueFieldValueName,
-        entryDataSpecField,
         fields: [
           generateEntryNameField(mode),
-          entryDataSpecField,
+          generateEntryDataSpecField(mode),
           ...(isForArguments ? [
             generateEntryIsOptionalField(mode),
             generateEntryDefaultValueField(mode),
