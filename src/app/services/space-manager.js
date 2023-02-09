@@ -19,9 +19,33 @@ import {
 import {
   aspect as spaceMarketplaceInfoListAspect,
 } from 'onezone-gui/models/space-marketplace-info-list';
+import {
+  aspect as spaceMarketplaceInfoAspect,
+} from 'onezone-gui/models/space-marketplace-info';
+
+const listMarketplaceAspect = 'list_marketplace';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
+ */
+
+/**
+ * @typedef {Object} SpaceMarketplaceInfiniteScrollListingParams
+ * @property {number} index
+ * @property {}
+ */
+
+// FIXME: make generic type for infinite scroll
+/**
+ * @typedef {Object} SpaceMarketplaceInfiniteScrollListingParams
+ * @property {string|null} [index] an anchor where the listing should start.
+ * @property {number} [limit] how many log entries should be fetched
+ * @property {number} [offset] says where the listing should start relative to
+ *   the provided `index`. Default is 0 which means that the
+ *   specified log entry will be the first one in the results. When negative
+ *   integer is provided, the listing will start before specified log entry.
+ *   When it is a positive integer, it will omit that number of entries during
+ *   the listing.
  */
 
 export default Service.extend({
@@ -417,6 +441,8 @@ export default Service.extend({
       );
     }
   },
+
+  // FIXME: to remove
   /**
    * @returns {<Promise<Models.SpaceMarketplaceInfoList>>}
    */
@@ -476,4 +502,45 @@ export default Service.extend({
 
   // TODO: VFS-10384 integrate with backend
   async grantSpaceAccess( /* requestId */ ) {},
+
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @returns {Promise<{ list: Array<{ spaceId: string, index: string }>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceIds(listingParams) {
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: listMarketplaceAspect,
+      scope: 'protected',
+    });
+    return await this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data: listingParams,
+      subscribe: false,
+    });
+  },
+
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @returns {Promise<{ list: Array<Models.SpaceMarketplaceInfo>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceInfoRecords(listingParams) {
+    const { list: idsList, isLast } = await this.fetchSpacesMarkeplaceIds(listingParams);
+    const recordsPromises = idsList.map(({ spaceId }) => {
+      return this.store.findRecord('spaceMarketplaceInfo', gri({
+        entityType: 'space',
+        entityId: spaceId,
+        aspect: spaceMarketplaceInfoAspect,
+        scope: 'auto',
+      }));
+    });
+    // FIXME: think about fetching single spaces failures
+    const list = await allFulfilled(recordsPromises);
+    return {
+      list,
+      isLast,
+    };
+  },
 });
