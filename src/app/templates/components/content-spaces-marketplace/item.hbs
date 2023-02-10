@@ -14,12 +14,12 @@
                   {{tt this "moreTags" count=moreTags.length}}
                 </div>
                 {{#one-tooltip class="tooltip-with-tags"}}
-                  <div class="tags-input">
+                  <ul class="tags-input">
                     {{#each moreTags as |tag|}}
                       {{!-- using .tag-label element is not necessary here --}}
-                      <div class="tag-item">{{tag.label}}</div>
+                      <li class="tag-item">{{tag.label}}</li>
                     {{/each}}
-                  </div>
+                  </ul>
                 {{/one-tooltip}}
               </li>
             {{/if}}
