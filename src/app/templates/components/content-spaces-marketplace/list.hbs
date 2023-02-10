@@ -6,6 +6,14 @@
     </div>
   </div>
 </div>
+<div class="form-group tags-filter-form-group">
+  {{tags-input
+    tags=(or tags (array))
+    tagEditorComponentName="space-configuration/space-tags-selector"
+    readonly=false
+    onChange=(action "changeTagsFilter")
+  }}
+</div>
 {{#if entries.length}}
   <ul class="list-entries iconified-block-marketplace-access-granted-container">
     <li class="special-row table-start-row"></li>

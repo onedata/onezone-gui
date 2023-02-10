@@ -486,29 +486,38 @@ export default Service.extend({
 
   /**
    * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} [tags]
    * @returns {Promise<{ list: Array<{ spaceId: string, index: string }>, isLast: boolean }>}
    */
-  async fetchSpacesMarkeplaceIds(listingParams) {
+  async fetchSpacesMarkeplaceIds(listingParams, tags) {
     const requestGri = gri({
       entityType: 'space',
       entityId: 'null',
       aspect: listMarketplaceAspect,
       scope: 'protected',
     });
+    const data = { ...listingParams };
+    if (tags) {
+      data.tags = tags;
+    }
     return await this.onedataGraph.request({
       gri: requestGri,
       operation: 'create',
-      data: listingParams,
+      data,
       subscribe: false,
     });
   },
 
   /**
    * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} [tags]
    * @returns {Promise<{ array: Array<Models.SpaceMarketplaceInfo>, isLast: boolean }>}
    */
-  async fetchSpacesMarkeplaceInfoRecords(listingParams) {
-    const { list: idsList, isLast } = await this.fetchSpacesMarkeplaceIds(listingParams);
+  async fetchSpacesMarkeplaceInfoRecords(listingParams, tags) {
+    const { list: idsList, isLast } = await this.fetchSpacesMarkeplaceIds(
+      listingParams,
+      tags
+    );
     const recordsPromises = idsList.map(({ spaceId }) => {
       return this.store.findRecord('spaceMarketplaceInfo', gri({
         entityType: 'space',

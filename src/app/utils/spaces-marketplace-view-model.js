@@ -14,6 +14,7 @@ import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
 import filterSpaces from 'onezone-gui/utils/filter-spaces';
+import _ from 'lodash';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -25,6 +26,11 @@ export default EmberObject.extend(OwnerInjector, {
    * @type {string}
    */
   searchValue: '',
+
+  /**
+   * @type {Array<SpaceTag>|null}
+   */
+  tagsFilter: null,
 
   /**
    * @type {Array<Utils.SpacesMarketplaceItem>}
@@ -105,10 +111,15 @@ export default EmberObject.extend(OwnerInjector, {
       limit,
       offset,
     };
+    const tags = this.tagsFilter ?
+      this.tagsFilter.map(({ label }) => label) : undefined;
     const {
       array: recordsArray,
       isLast,
-    } = await this.spaceManager.fetchSpacesMarkeplaceInfoRecords(listingParams);
+    } = await this.spaceManager.fetchSpacesMarkeplaceInfoRecords(
+      listingParams,
+      tags
+    );
     const array = recordsArray.map(spaceMarketplaceInfo => SpacesMarketplaceItem.create({
       spaceMarketplaceInfo,
       viewModel,
@@ -125,6 +136,15 @@ export default EmberObject.extend(OwnerInjector, {
    */
   changeSearchValue(value) {
     this.set('searchValue', value);
+    this.entries.scheduleReload({ head: true });
+  },
+
+  /**
+   * @public
+   * @param {Array<SpaceTag>} tags
+   */
+  changeTagsFilter(tags) {
+    this.set('tagsFilter', _.isEmpty(tags) ? null : tags);
     this.entries.scheduleReload({ head: true });
   },
 });

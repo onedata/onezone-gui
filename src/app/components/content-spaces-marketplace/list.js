@@ -54,6 +54,11 @@ export default Component.extend(I18n, {
 
   entries: reads('viewModel.entries'),
 
+  /**
+   * @type {Array<SpaceTag>}
+   */
+  tags: reads('viewModel.tagsFilter'),
+
   collectionObserver: observer(
     'entries.@each.name',
     function collectionObserver() {
@@ -112,6 +117,9 @@ export default Component.extend(I18n, {
   actions: {
     changeSearchValue(newValue) {
       debounce(this.viewModel, 'changeSearchValue', newValue, typingActionDebouce);
+    },
+    changeTagsFilter(tags) {
+      this.viewModel.changeTagsFilter(tags);
     },
   },
 });
