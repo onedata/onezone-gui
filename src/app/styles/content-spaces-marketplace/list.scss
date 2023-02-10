@@ -1,9 +1,16 @@
 .spaces-marketplace-list {
-  .table-start-row, .first-row {
+  .first-row, .table-start-row {
     height: 0;
+  }
+  .special-row {
+    // reset default browser styles for li
     padding: 0;
     margin: 0;
     list-style-type: none;
+  }
+  .loading-row {
+    position: relative;
+    height: 100px;
   }
   .no-matching-results {
     padding-top: $spaces-marketplace-items-spacing;

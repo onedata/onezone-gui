@@ -17,9 +17,6 @@ import {
   aspects as spaceAspects,
 } from 'onezone-gui/models/space';
 import {
-  aspect as spaceMarketplaceInfoListAspect,
-} from 'onezone-gui/models/space-marketplace-info-list';
-import {
   aspect as spaceMarketplaceInfoAspect,
 } from 'onezone-gui/models/space-marketplace-info';
 
@@ -101,6 +98,11 @@ export default Service.extend({
       .then(user => {
         return this.get('store').createRecord('space', {
             name,
+            // FIXME: debug code
+            advertisedInMarketplace: true,
+            description: 'deskrypcja',
+            marketplaceContactEmail: 'a@a.pl',
+            organizationName: 'AGH',
             _meta: {
               authHint: ['asUser', get(user, 'entityId')],
             },

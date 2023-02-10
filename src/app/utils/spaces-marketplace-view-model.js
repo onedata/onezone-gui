@@ -72,12 +72,10 @@ export default EmberObject.extend(OwnerInjector, {
     const entries = ReplacingChunksArray.create({
       fetch: this.fetchEntries.bind(this),
       startIndex: 0,
-      endIndex: 50,
-      indexMargin: 10,
+      endIndex: 10,
+      indexMargin: 5,
     });
     this.set('entries', entries);
-    // FIXME: debug
-    window.xd = entries;
   },
 
   /**

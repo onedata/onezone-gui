@@ -15,6 +15,7 @@ import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
+import { and } from 'ember-awesome-macros';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
@@ -64,6 +65,16 @@ export default Component.extend(I18n, {
     function collectionObserver() {
       addConflictLabels(this.entries, 'name', 'spaceId');
     }
+  ),
+
+  showFetchPrevLoader: and(
+    'entries.initialLoad.isSettled',
+    'infiniteScroll.fetchingStatus.isFetchingPrev'
+  ),
+
+  showFetchNextLoader: and(
+    'entries.initialLoad.isSettled',
+    'infiniteScroll.fetchingStatus.isFetchingNext'
   ),
 
   init() {

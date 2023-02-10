@@ -1,4 +1,5 @@
 {{#promise-proxy-container proxy=viewModel.entries.initialLoad}}
+  {{!-- FIXME: sprawdzić, czy błędy pierwszego załadowania są obsługiwane --}}
   {{#if isEmpty}}
     {{content-spaces-marketplace/empty viewModel=viewModel}}
   {{else}}
