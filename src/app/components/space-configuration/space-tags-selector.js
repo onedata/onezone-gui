@@ -20,7 +20,7 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
-  classNames: ['space-tags-selector-editor'],
+  classNames: ['space-tags-selector-editor', 'tags-input-selector-editor'],
 
   i18n: service(),
   spaceManager: service(),

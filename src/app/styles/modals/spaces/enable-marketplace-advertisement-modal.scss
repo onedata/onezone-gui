@@ -4,9 +4,10 @@
   }
   .contactEmail-field {
     label {
-      min-width: auto;
-      text-align: left;
-      width: auto;
+      @media (min-width: $screen-sm-min) {
+        text-align: left;
+        width: auto;
+      }
     }
   }
   .contact-form + .email-visible-alert {
