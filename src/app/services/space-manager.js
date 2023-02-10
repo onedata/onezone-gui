@@ -461,7 +461,9 @@ export default Service.extend({
    * @returns {Object<string, Array<string>>}
    */
   getAvailableSpaceTags() {
-    return this.onedataConnection.availableSpaceTags;
+    const availableSpaceTags = this.onedataConnection.availableSpaceTags;
+    return (availableSpaceTags && typeof availableSpaceTags === 'object') ?
+      availableSpaceTags : {};
   },
 
   // TODO: VFS-10384 integrate with backend

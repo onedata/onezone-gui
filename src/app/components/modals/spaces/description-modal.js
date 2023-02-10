@@ -30,7 +30,7 @@ export default Component.extend(I18n, {
   /**
    * @override
    */
-  i18nPrefix: 'components.modals.spaces.spacesMarketplaceItemModal',
+  i18nPrefix: 'components.modals.spaces.descriptionModal',
 
   /**
    * @virtual

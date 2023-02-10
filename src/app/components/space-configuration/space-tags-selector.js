@@ -88,7 +88,7 @@ export default Component.extend(I18n, {
 
   tagCategories: computed(function tagCategories() {
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
-    return Object.keys(availableSpaceTags);
+    return Object.keys(availableSpaceTags ?? {});
   }),
 
   /**
@@ -104,13 +104,18 @@ export default Component.extend(I18n, {
       const normalizedFilterValue = this.tagsFilterValue?.trim().toLowerCase();
       if (normalizedFilterValue) {
         return availableCategoryTags.filter(({ label }) =>
-          label.includes(normalizedFilterValue)
+          label.toLowerCase().includes(normalizedFilterValue)
         );
       } else {
         return availableCategoryTags;
       }
     }
   ),
+
+  noTagsInOnezone: computed('tagCategories.[]', function noTagsInOnezone() {
+    return _.isEmpty(this.tagCategories) ||
+      _.isEmpty(_.flatten(Object.values(this.tagCategories)));
+  }),
 
   /**
    * @type {ComputedProperty<Array<string>>}

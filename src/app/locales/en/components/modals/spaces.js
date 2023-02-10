@@ -9,5 +9,5 @@ export default {
   requestSpaceAccessModal,
   enableMarketplaceAdvertisementModal,
   confirmJoinRequestModal,
-  spacesMarketplaceItemModal: descriptionModal,
+  descriptionModal,
 };
