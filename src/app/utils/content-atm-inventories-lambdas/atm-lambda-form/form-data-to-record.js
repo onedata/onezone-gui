@@ -12,6 +12,7 @@ import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/wor
 import {
   formValuesToDataSpec,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { formValueToRawValue as atmFormValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/value-editors';
 
 /**
  * @param {Object} formData
@@ -132,14 +133,9 @@ function formArgResToRecordArgRes(dataType, formArgRes) {
       if (dataType === 'argument') {
         if (
           dataSpec &&
-          dataSpec.type !== 'storeCredentials' &&
-          entryDefaultValue
+          dataSpec.type !== 'storeCredentials'
         ) {
-          try {
-            lambdaData.defaultValue = JSON.parse(entryDefaultValue);
-          } catch (e) {
-            lambdaData.defaultValue = null;
-          }
+          lambdaData.defaultValue = atmFormValueToRawValue(entryDefaultValue);
         }
         lambdaData.isOptional = entryIsOptional;
       } else {

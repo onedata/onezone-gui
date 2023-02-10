@@ -6,6 +6,8 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10499 Improved editor of automation task argument constant value
+* VFS-10366 Improved editor of lambda argument default value
 * VFS-9999 Added detailed space details popovers with space information in various views
 * VFS-10486 Removed custom zoom in tests rendering
 * VFS-10378 Added information about data access tokens in tokens form
