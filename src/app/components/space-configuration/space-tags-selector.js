@@ -92,6 +92,19 @@ export default Component.extend(I18n, {
   }),
 
   /**
+   * Data for displaying categories selector
+   * @type {ComputedProperty<Array<{ id: string, name: SafeString|string }>}
+   */
+  tagCategoriesItems: computed('tagCategories', function tagCategoriesNames() {
+    return this.tagCategories.map(categoryId => ({
+      id: categoryId,
+      name: this.t(`category.${categoryId}`, {}, {
+        defaultValue: _.upperFirst(categoryId),
+      }),
+    }));
+  }),
+
+  /**
    * @type {ComputedProperty<Array<SpaceTag>>}
    */
   tagsToRender: computed(

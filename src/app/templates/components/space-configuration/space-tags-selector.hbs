@@ -26,14 +26,14 @@
         onChange=(action (mut selectedCategory))
         as |bg|
       }}
-        {{#each tagCategories as |categoryName|}}
+        {{#each tagCategoriesItems as |categoryItem|}}
           <div class="btn-group" role="group">
             {{#bg.button
               type="default"
-              class=(concat "btn-sm btn-" categoryName)
-              value=categoryName
+              class=(concat "btn-sm btn-" categoryItem.id)
+              value=categoryItem.id
             }}
-              {{tt this (concat "category." categoryName)}}
+              {{categoryItem.name}}
             {{/bg.button}}
           </div>
         {{/each}}
