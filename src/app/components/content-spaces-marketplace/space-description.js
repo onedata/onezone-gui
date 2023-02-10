@@ -69,7 +69,7 @@ export default Component.extend(...mixins, {
 
   actions: {
     expand() {
-      this.showDescriptionModal(true);
+      this.showDescriptionModal();
     },
   },
 });

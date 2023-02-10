@@ -50,7 +50,7 @@
       {{#perfect-scrollbar-element class="tags-container"}}
         {{#if tagsToRender.length}}
           <ul class="selector-list">
-            {{#each tagsToRender key="id" as |tag|}}
+            {{#each tagsToRender key="label" as |tag|}}
               <li
                 class="selector-item"
                 {{action "tagSelected" tag}}
