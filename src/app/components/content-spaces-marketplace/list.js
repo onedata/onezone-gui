@@ -50,12 +50,6 @@ export default Component.extend(I18n, {
   // FIXME: review properties
   spaceItems: reads('viewModel.spaceItems'),
 
-  // FIXME: review old properties
-  /**
-   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
-   */
-  // filteredCollection: reads('viewModel.filteredCollection'),
-
   urlSelectedSpace: reads('navigationState.aspectOptions.selectedSpace'),
 
   entries: reads('viewModel.entries'),

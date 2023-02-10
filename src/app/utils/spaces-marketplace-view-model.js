@@ -2,7 +2,7 @@
  * View model for space marketplace components.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -13,6 +13,7 @@ import { inject as service } from '@ember/service';
 import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
+import filterSpaces from 'onezone-gui/utils/filter-spaces';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -34,14 +35,6 @@ export default EmberObject.extend(OwnerInjector, {
 
   isEmpty: isEmpty('entries'),
 
-  // FIXME: disabled frontend sorting
-  // sortOptions: Object.freeze(['isAccessGranted:asc', 'name:asc']),
-
-  /**
-   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
-   */
-  // sortedCollection: sort('spaceItems', 'sortOptions'),
-
   userSpacesIdsProxy: promise.object(computed(
     'currentUser.user.spaceList.content.list',
     async function userSpacesIds() {
@@ -51,18 +44,6 @@ export default EmberObject.extend(OwnerInjector, {
     }
   )),
 
-  // FIXME: disabled frontend filtering - implement filtering in other level
-  /**
-   * @type {ComputedProperty<Array<Utils.SpacesMarketplaceItem>>}
-   */
-  // filteredCollection: computed(
-  //   'sortedCollection.[]',
-  //   'searchValue',
-  //   function filteredCollection() {
-  //     return filterSpaces(this.sortedCollection, this.searchValue);
-  //   }
-  // ),
-
   init() {
     this._super(...arguments);
     this.initEntries();
@@ -70,12 +51,48 @@ export default EmberObject.extend(OwnerInjector, {
 
   initEntries() {
     const entries = ReplacingChunksArray.create({
-      fetch: this.fetchEntries.bind(this),
+      fetch: this.fetchFilteredEntries.bind(this),
       startIndex: 0,
       endIndex: 10,
       indexMargin: 5,
     });
     this.set('entries', entries);
+  },
+
+  /**
+   * Fetches next chunks of space marketplace items until an array of requested length
+   * (`limit`) is made, containing space items that are conforming current search string
+   * (`this.searchValue`).
+   * @returns {{ array: Array<Utils.SpacesMarketplaceItem>, isLast: boolean }}
+   */
+  async fetchFilteredEntries(index, limit, offset, array) {
+    let finalIsLast = false;
+    let currentIndex = index;
+    let currentOffset = offset;
+    let currentLimit = limit;
+    const finalArray = [];
+    while (currentLimit && !finalIsLast) {
+      const result = await this.fetchEntries(
+        currentIndex,
+        currentLimit,
+        currentOffset,
+        array
+      );
+      const entriesMatchingToAdd = filterSpaces(result.array, this.searchValue)
+        .slice(0, limit - finalArray.length);
+      finalArray.push(...entriesMatchingToAdd);
+      currentIndex = result.array.at(-1)?.index ?? null;
+      if (currentIndex === null) {
+        break;
+      }
+      currentOffset = 1;
+      currentLimit = Math.min(limit, limit - finalArray.length);
+      finalIsLast = result.isLast;
+    }
+    return {
+      array: finalArray,
+      isLast: finalIsLast,
+    };
   },
 
   /**
@@ -108,5 +125,6 @@ export default EmberObject.extend(OwnerInjector, {
    */
   changeSearchValue(value) {
     this.set('searchValue', value);
+    this.entries.scheduleReload({ head: true });
   },
 });
