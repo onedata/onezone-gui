@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10365 Improved editor of automation store default value
 * VFS-10499 Improved editor of automation task argument constant value
 * VFS-10366 Improved editor of lambda argument default value
 * VFS-9999 Added detailed space details popovers with space information in various views
