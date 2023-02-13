@@ -991,7 +991,7 @@ function attachAtmLambdasToAtmInventory(store, atmInventory) {
                   },
                 },
                 isOptional: true,
-                defaultValue: '"some value"',
+                defaultValue: ['some value'],
               }],
               resultSpecs: [{
                 name: 'res1',

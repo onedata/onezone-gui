@@ -7,7 +7,7 @@
   &.has-overflow {
     &::after {
       position: absolute;
-      content: ' ';
+      content: '';
       right: 0;
       height: 100%;
       width: 2em;

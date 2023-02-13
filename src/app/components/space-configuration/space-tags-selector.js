@@ -20,7 +20,7 @@ import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import computedT from 'onedata-gui-common/utils/computed-t';
 
 export default Component.extend(I18n, {
-  classNames: ['space-tags-selector-editor'],
+  classNames: ['space-tags-selector-editor', 'tags-input-selector-editor'],
 
   i18n: service(),
   spaceManager: service(),
@@ -88,7 +88,20 @@ export default Component.extend(I18n, {
 
   tagCategories: computed(function tagCategories() {
     const availableSpaceTags = this.spaceManager.getAvailableSpaceTags();
-    return Object.keys(availableSpaceTags);
+    return Object.keys(availableSpaceTags ?? {});
+  }),
+
+  /**
+   * Data for displaying categories selector
+   * @type {ComputedProperty<Array<{ id: string, name: SafeString|string }>}
+   */
+  tagCategoriesItems: computed('tagCategories', function tagCategoriesNames() {
+    return this.tagCategories.map(categoryId => ({
+      id: categoryId,
+      name: this.t(`category.${categoryId}`, {}, {
+        defaultValue: _.upperFirst(categoryId),
+      }),
+    }));
   }),
 
   /**
@@ -104,13 +117,18 @@ export default Component.extend(I18n, {
       const normalizedFilterValue = this.tagsFilterValue?.trim().toLowerCase();
       if (normalizedFilterValue) {
         return availableCategoryTags.filter(({ label }) =>
-          label.includes(normalizedFilterValue)
+          label.toLowerCase().includes(normalizedFilterValue)
         );
       } else {
         return availableCategoryTags;
       }
     }
   ),
+
+  noTagsInOnezone: computed('tagCategories.[]', function noTagsInOnezone() {
+    return _.isEmpty(this.tagCategories) ||
+      _.isEmpty(_.flatten(Object.values(this.tagCategories)));
+  }),
 
   /**
    * @type {ComputedProperty<Array<string>>}

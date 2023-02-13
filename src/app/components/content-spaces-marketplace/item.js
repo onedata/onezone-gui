@@ -13,6 +13,7 @@ import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { dateFormat } from 'onedata-gui-common/helpers/date-format';
 import { or, and, raw, gt, difference } from 'ember-awesome-macros';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -82,19 +83,21 @@ export default Component.extend(I18n, {
   creationTime: reads('spaceItem.creationTime'),
 
   creationDateText: computed('creationTime', function creationDateText() {
-    return dateFormat([this.creationTime], {
+    return htmlSafe(
+      dateFormat([this.creationTime], {
         format: 'date',
       })
-      // replacing spaces with non-breakable spaces
-      .replaceAll(' ', ' ');
+      .replaceAll(' ', '&nbsp;')
+    );
   }),
 
   creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
-    const creationTimeText = dateFormat([this.creationTime], {
+    const creationTimeText = htmlSafe(
+      dateFormat([this.creationTime], {
         format: 'dateWithMinutes',
       })
-      // replacing spaces with non-breakable spaces
-      .replaceAll(' ', ' ');
+      .replaceAll(' ', '&nbsp;')
+    );
     return this.t('creationTimeTooltip', { creationTimeText });
   }),
 
@@ -112,7 +115,7 @@ export default Component.extend(I18n, {
     'tagsLimitExceeded',
     'tagsDisplayedOnLimitExceed',
     function limitedTags() {
-      if (this.get('tagsLimitExceeded')) {
+      if (this.tagsLimitExceeded) {
         return this.tags.slice(0, this.tagsDisplayedOnLimitExceed);
       } else {
         return this.tags;
@@ -131,8 +134,6 @@ export default Component.extend(I18n, {
       }
     }
   ),
-
-  // moreTags: array.slice('tags', 'tagsLimit'),
 
   visitSpaceHref: computed(
     'spaceItem.spaceMarketplaceInfo.entityId',
