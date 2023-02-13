@@ -70,7 +70,7 @@ export default Component.extend(I18n, GlobalActions, {
     return spaces.map(space => SpaceListItem.create({
       ownerSource: this,
       parentHarvester: harvester,
-      space,
+      record: space,
     }));
   }),
 
@@ -141,22 +141,17 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @virtual
    */
-  space: undefined,
-
-  /**
-   * @virtual
-   */
   parentHarvester: undefined,
 
   /**
    * @override
    */
-  label: reads('space.name'),
+  label: reads('record.name'),
 
   /**
    * @override
    */
-  conflictingLabelSource: reads('space'),
+  conflictingLabelSource: reads('record'),
 
   /**
    * @override
@@ -166,36 +161,29 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @override
    */
-  link: computed('space', function link() {
+  link: computed('record', function link() {
     const {
       router,
-      space,
+      record,
       guiUtils,
-    } = this.getProperties('router', 'space', 'guiUtils');
+    } = this.getProperties('router', 'record', 'guiUtils');
     return router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      guiUtils.getRoutableIdFor(space),
+      guiUtils.getRoutableIdFor(record),
       'index'
     );
   }),
 
-  /**
-   * @override
-   */
-  triggerSelector: computed('space', function triggerSelector() {
-    return `.item-icon-container[data-record-id="${this.space.entityId}"]`;
-  }),
-
-  actions: computed('parentHarvester', 'space', function actions() {
+  actions: computed('parentHarvester', 'record', function actions() {
     const {
       harvesterActions,
       parentHarvester,
-      space,
-    } = this.getProperties('harvesterActions', 'parentHarvester', 'space');
+      record,
+    } = this.getProperties('harvesterActions', 'parentHarvester', 'record');
     return [harvesterActions.createRemoveSpaceFromHarvesterAction({
       harvester: parentHarvester,
-      space,
+      space: record,
     })];
   }),
 
