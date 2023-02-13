@@ -32,7 +32,8 @@ import {
   generateSpaceEntityId,
   generateShareEntityId,
 } from 'onedata-gui-websocket-client/utils/development-model-common';
-import { exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import { exampleMarkdownShort, exampleMarkdownLong } from 'onedata-gui-common/utils/mock-data';
+import { generateSpaceMarketplaceInfoGri } from 'onezone-gui/services/space-manager';
 
 const USER_ID = 'stub_user_id';
 const USERNAME = 'Stub User';
@@ -100,6 +101,14 @@ export default function generateDevelopmentModel(store) {
   let providers;
   let harvesters;
   let user;
+
+  // Current workaround for lack of development model generator state.
+  // TODO: VFS-10515 Refactor onezone-gui data mock to be like oneprovider-gui
+  // mock-backend
+  const globalDevelopmentModel = set(store, 'developmentModel', {
+    listRecords: [],
+    entityRecords: {},
+  });
 
   return createGuiMessages(store)
     // create main user record
@@ -334,15 +343,14 @@ export default function generateDevelopmentModel(store) {
       })))
       .then(() => listRecords)
     )
-    .then(listRecords =>
-      attachProgressToHarvesterIndices(store, harvesters, spaces, providers)
-      .then(() => listRecords)
-    )
-    .then(async (listRecords) => {
-      await generateMarketplaceMock(store, listRecords);
-      return listRecords;
-    })
-    .then(listRecords => addListRecordsToMainUser(user, listRecords));
+    .then(async listRecords => {
+      await attachProgressToHarvesterIndices(store, harvesters, spaces, providers);
+      const marketplaceRecords = await generateMarketplaceMock(store, listRecords);
+      globalDevelopmentModel.entityRecords.spaceMarketplaceInfo = marketplaceRecords;
+      await addListRecordsToMainUser(user, listRecords);
+      globalDevelopmentModel.listRecords = listRecords;
+      return user;
+    });
 }
 
 function createGuiMessages(store) {
@@ -1163,64 +1171,48 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
 }
 
 // FIXME: implement basic mock for marketplace infinite scroll
-// async function generateMarketplaceMock(store, listRecords) {
-//   const spaceList = Object.values(listRecords).find(lr =>
-//     lr.constructor.modelName === 'space-list'
-//   );
-//   const providerList = Object.values(listRecords).find(lr =>
-//     lr.constructor.modelName === 'provider-list'
-//   );
-//   const firstSpace = get(spaceList, 'list').toArray()[0];
-//   const providerNames = get(providerList, 'list').toArray().map(provider =>
-//     get(provider, 'name')
-//   );
-//   const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
-//     id: gri({
-//       entityType: spaceEntityType,
-//       entityId: get(firstSpace, 'entityId'),
-//       aspect: spaceMarketplaceInfoAspect,
-//       scope: 'protected',
-//     }),
-//     name: get(firstSpace, 'name'),
-//     organizationName: get(firstSpace, 'organizationName'),
-//     description: get(firstSpace, 'description'),
-//     tags: get(firstSpace, 'tags'),
-//     creationTime: Math.floor((new Date().getTime() / 1000) - 100000),
-//     totalSupportSize: get(firstSpace, 'totalSize'),
-//     providerNames,
-//   });
-//   const otherSpaceInfo = store.createRecord('spaceMarketplaceInfo', {
-//     id: gri({
-//       entityType: spaceEntityType,
-//       entityId: 'space-marketplace-info-0',
-//       aspect: spaceMarketplaceInfoAspect,
-//       scope: 'protected',
-//     }),
-//     // for testing name disambiguation
-//     name: 'Space 0',
-//     organizationName: 'ACK Cyfronet AGH',
-//     description: exampleMarkdownShort,
-//     tags: [
-//       'multidimensional-data',
-//       'international-issues',
-//       'regions-and-cities',
-//       'society',
-//       'technology',
-//       'transport',
-//     ],
-//     creationTime: (new Date().getTime() / 1000) - 200000,
-//     totalSupportSize: 3 * Math.pow(1024, 4),
-//     providerNames: providerNames.slice(1, 2),
-//   });
-//   await allFulfilled([ownedSpaceMarketplaceInfo.save(), otherSpaceInfo.save()]);
-//   const listRecord = store.createRecord('spaceMarketplaceInfoList', {
-//     id: gri({
-//       entityType: spaceEntityType,
-//       entityId: null,
-//       aspect: spaceMarketplaceInfoListAspect,
-//       scope: 'protected',
-//     }),
-//     list: [ownedSpaceMarketplaceInfo, otherSpaceInfo],
-//   });
-//   await listRecord.save();
-// }
+async function generateMarketplaceMock(store, listRecords) {
+  const spaceList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'space-list'
+  );
+  const providerList = Object.values(listRecords).find(lr =>
+    lr.constructor.modelName === 'provider-list'
+  );
+  // NOTE: this mock is basic - it adds some spaces to marketplace no matter,
+  // if they are currently advertised or not
+  const firstSpace = get(spaceList, 'list').toArray()[0];
+  const providerNames = get(providerList, 'list').toArray().map(provider =>
+    get(provider, 'name')
+  );
+  const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
+    id: generateSpaceMarketplaceInfoGri('space-0'),
+    indx: 'Space 0 @ space-0',
+    name: get(firstSpace, 'name'),
+    organizationName: get(firstSpace, 'organizationName'),
+    description: get(firstSpace, 'description'),
+    tags: get(firstSpace, 'tags'),
+    creationTime: Math.floor((new Date().getTime() / 1000) - 100000),
+    totalSupportSize: get(firstSpace, 'totalSize'),
+    providerNames,
+  });
+  const otherSpaceInfo = store.createRecord('spaceMarketplaceInfo', {
+    id: generateSpaceMarketplaceInfoGri('space-market-info-1'),
+    index: 'Space 0 @ space-market-info-1',
+    // for testing name disambiguation
+    name: 'Space 0',
+    organizationName: 'ACK Cyfronet AGH',
+    description: exampleMarkdownShort,
+    tags: [
+      'multidimensional-data',
+      'international-issues',
+      'regions-and-cities',
+      'society',
+      'technology',
+      'transport',
+    ],
+    creationTime: (new Date().getTime() / 1000) - 200000,
+    totalSupportSize: 3 * Math.pow(1024, 4),
+    providerNames: providerNames.slice(1, 2),
+  });
+  return await allFulfilled([ownedSpaceMarketplaceInfo.save(), otherSpaceInfo.save()]);
+}

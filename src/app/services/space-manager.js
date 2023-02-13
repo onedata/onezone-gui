@@ -20,7 +20,7 @@ import {
   aspect as spaceMarketplaceInfoAspect,
 } from 'onezone-gui/models/space-marketplace-info';
 
-const listMarketplaceAspect = 'list_marketplace';
+export const listMarketplaceAspect = 'list_marketplace';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
@@ -44,6 +44,16 @@ const listMarketplaceAspect = 'list_marketplace';
  *   When it is a positive integer, it will omit that number of entries during
  *   the listing.
  */
+
+// FIXME: maybe move to models/space-marketplace-info
+export function generateSpaceMarketplaceInfoGri(spaceId) {
+  return gri({
+    entityType: 'space',
+    entityId: spaceId,
+    aspect: spaceMarketplaceInfoAspect,
+    scope: 'auto',
+  });
+}
 
 export default Service.extend({
   store: service(),
@@ -519,12 +529,10 @@ export default Service.extend({
       tags
     );
     const recordsPromises = idsList.map(({ spaceId }) => {
-      return this.store.findRecord('spaceMarketplaceInfo', gri({
-        entityType: 'space',
-        entityId: spaceId,
-        aspect: spaceMarketplaceInfoAspect,
-        scope: 'auto',
-      }));
+      return this.store.findRecord(
+        'spaceMarketplaceInfo',
+        generateSpaceMarketplaceInfoGri(spaceId)
+      );
     });
     // FIXME: think about fetching single spaces failures
     const array = await allFulfilled(recordsPromises);
