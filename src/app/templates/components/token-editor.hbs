@@ -26,8 +26,53 @@
       {{/if}}
       {{form-component/field-renderer field=caveatsGroup}}
     {{/if}}
+    {{#if isDataAccessCaveatWarningVisible}}
+      <div class="data-access-caveat-warning token-alert alert alert-warning">
+        <p class="alert-header">{{tt this "dataAccessCaveatWarning.header"}}</p>
+        <p>
+          {{tt this "dataAccessCaveatWarning.basicText"}}
+          <a
+            class="clickable"
+            {{action
+              (mut areDataAccessCaveatWarningDetailsVisible)
+              (not areDataAccessCaveatWarningDetailsVisible)
+            }}
+          >
+            {{tt this (concat
+              "dataAccessCaveatWarning."
+              (if areDataAccessCaveatWarningDetailsVisible "hideDetailsLink" "showDetailsLink")
+            )}}
+          </a>
+        </p>
+        {{#if areDataAccessCaveatWarningDetailsVisible}}
+          <div class="data-access-caveat-warning-details">
+            <p>
+              {{tt this "dataAccessCaveatWarning.detailsIntro"}}
+              <ul>
+                {{#each
+                  (array "Interface" "Readonly" "Path" "ObjectId")
+                  as |tPart|
+                }}
+                  <li>{{tt this (concat "dataAccessCaveatWarning.details" tPart "Item")}}</li>
+                {{/each}}
+              </ul>
+            </p>
+            <p>
+              {{tt this "dataAccessCaveatWarning.detailsNeverEnclose"}}
+            </p>
+            <p>
+              {{one-doc-see-more
+                linkName=(tt this "dataAccessCaveatWarning.documentationLink")
+                docPath="using_onedata/tokens[data-access-caveats].html"
+              }}
+            </p>
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
     {{#if isServiceCaveatWarningVisible}}
-      <div class="service-caveat-warning alert alert-warning">
+      <div class="service-caveat-warning token-alert alert alert-warning">
+        <p class="alert-header">{{tt this "serviceCaveatWarning.header"}}</p>
         <p>
           {{tt this "serviceCaveatWarning.basicText"}}
           <a

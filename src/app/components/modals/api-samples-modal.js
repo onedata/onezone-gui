@@ -12,6 +12,7 @@ import { computed } from '@ember/object';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { reads } from '@ember/object/computed';
 import { promise } from 'ember-awesome-macros';
+import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, {
   tagName: '',
@@ -35,6 +36,13 @@ export default Component.extend(I18n, {
    * @type {Object}
    */
   modalOptions: undefined,
+
+  /**
+   * @type {string}
+   */
+  icon: computed('apiSubject', function icon() {
+    return recordIcon(this.get('apiSubject'));
+  }),
 
   /**
    * @type {Object}

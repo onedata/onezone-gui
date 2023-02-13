@@ -1,3 +1,13 @@
+const warningCommon = {
+  showDetailsLink: 'Show details...',
+  hideDetailsLink: 'Hide details',
+  detailsInterfaceItem: 'Interface = Oneclient',
+  detailsReadonlyItem: 'Read‐only',
+  detailsPathItem: 'Path',
+  detailsObjectIdItem: 'Object ID',
+  detailsNeverEnclose: 'Never enclose your tokens (even those secured with proper caveats) to services that are not trusted.',
+};
+
 export default {
   fields: {
     basic: {
@@ -260,10 +270,10 @@ export default {
             tip: 'Allows only read access to user files.',
           },
           readonlyEnabledText: {
-            text: 'This token allows only read access to user files.',
+            text: 'This token is limited to read-only data access.',
           },
           readonlyDisabledText: {
-            text: 'This token can be used for both reading and writing user files.',
+            text: 'This token is not limited to read-only data access.',
           },
         },
         pathCaveat: {
@@ -279,7 +289,7 @@ export default {
             },
           },
           pathDisabledText: {
-            text: 'This token does not limit paths in which data can be accessed.',
+            text: 'This token is not limited to data access to specific paths.',
           },
         },
         objectIdCaveat: {
@@ -288,7 +298,7 @@ export default {
             tip: 'Limits the object ids in which data can be accessed with the token. The object ids comply with the CDMI format and can be used in the Oneprovider\'s REST and CDMI APIs. If a directory object id is given, the token allows to access all nested files and directories starting from the specified directory.',
           },
           objectIdDisabledText: {
-            text: 'This token does not limit object ids in which data can be accessed.',
+            text: 'This token is not limited to data access to specific object IDs.',
           },
         },
       },
@@ -300,18 +310,19 @@ export default {
   noCaveatsExpand: 'Show possible options',
   noCaveatsAfterExpand: 'and customize caveats setup to make the token more secure.',
   serviceCaveatWarning: {
+    ...warningCommon,
+    header: 'Full access token',
     basicText: 'This is a powerful token granting full access to your account ‐ <strong>can be safely used only in Onezone REST API</strong>.',
-    showDetailsLink: 'Show details...',
-    hideDetailsLink: 'Hide details',
     detailsIntro: 'To obtain a token that can be securely used for accessing other services (e.g. Oneprovider REST/CDMI API or mounting Oneclient), you should add <strong>at least one</strong> of the following caveats:',
     detailsServiceItem: 'Service (but without Onezone service whitelisted)',
-    detailsInterfaceItem: 'Interface = Oneclient',
-    detailsReadonlyItem: 'Read‐only',
-    detailsPathItem: 'Path',
-    detailsObjectIdItem: 'Object ID',
-    detailsNeverEnclose: 'Never enclose your tokens (even those secured with proper caveats) to services that are not trusted.',
     documentationLink: 'tokens',
-    detailsLearnMore: 'Learn more...',
+  },
+  dataAccessCaveatWarning: {
+    ...warningCommon,
+    header: 'Data access token',
+    basicText: 'This token is suitable for <strong>data access only</strong>; other operations will be denied.',
+    detailsIntro: 'Data access tokens can be securely used for accessing data access services (e.g. Oneprovider REST/CDMI API or mounting Oneclient). Such a token must have <strong>at least one</strong> of the following caveats:',
+    documentationLink: 'data access caveats',
   },
   createToken: 'Create token',
   saveToken: 'Save',

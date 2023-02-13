@@ -26,7 +26,6 @@ import FormFieldsGroup from 'onedata-gui-common/utils/form-component/form-fields
 import FormFieldsCollectionGroup from 'onedata-gui-common/utils/form-component/form-fields-collection-group';
 import TextField from 'onedata-gui-common/utils/form-component/text-field';
 import NumberField from 'onedata-gui-common/utils/form-component/number-field';
-import JsonField from 'onedata-gui-common/utils/form-component/json-field';
 import DropdownField from 'onedata-gui-common/utils/form-component/dropdown-field';
 import ToggleField from 'onedata-gui-common/utils/form-component/toggle-field';
 import {
@@ -49,8 +48,10 @@ import {
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import {
+  formValuesToDataSpec as dataSpecEditorValuesToDataSpec,
   FormElement as DataSpecEditor,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { ValueEditorField as AtmValueEditorField } from 'onedata-gui-common/utils/atm-workflow/value-editors';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -452,6 +453,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
   });
   const generateEntryDataSpecField = mode => {
     const field = DataSpecEditor.create({
+      ownerSource: component,
       name: 'entryDataSpec',
     });
     field.changeMode(mode);
@@ -475,12 +477,26 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     defaultValue: false,
     component,
   });
-  const generateEntryDefaultValueField = mode => JsonField.extend({
-    isVisible: not(and('isInViewMode', isEmpty('value'))),
+  const generateEntryDefaultValueField = mode => AtmValueEditorField.extend({
+    isVisible: or(not('isInViewMode'), 'value.hasValue'),
+    entryDataSpecField: computed('parent.fields.[]', function entryDataSpecField() {
+      return this.parent?.fields.find((field) => field.name === 'entryDataSpec');
+    }),
+    atmDataSpecSetter: observer(
+      'entryDataSpecField.{value,isValid}',
+      function atmDataSpecSetter() {
+        const atmDataSpec = this.entryDataSpecField?.isValid ?
+          dataSpecEditorValuesToDataSpec(this.entryDataSpecField.value) : null;
+        this.set('atmDataSpec', atmDataSpec);
+      }
+    ),
+    init() {
+      this._super(...arguments);
+      this.atmDataSpecSetter();
+    },
   }).create({
     mode,
     name: 'entryDefaultValue',
-    defaultValue: '',
     isOptional: true,
   });
 

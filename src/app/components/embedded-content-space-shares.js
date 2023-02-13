@@ -86,6 +86,7 @@ export default OneproviderEmbeddedContainer.extend(...mixins, {
     'getDataUrl',
     'getDatasetsUrl',
     'showShareList',
+    'openRestApiModal',
   ]),
 
   actions: {
