@@ -10,7 +10,16 @@
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
 import { reads, notEmpty } from '@ember/object/computed';
-import { notEqual, not, isEmpty, and, or, bool, conditional, raw } from 'ember-awesome-macros';
+import {
+  notEqual,
+  not,
+  isEmpty,
+  and,
+  or,
+  bool,
+  conditional,
+  raw,
+} from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
 import { Promise } from 'rsvp';
@@ -94,6 +103,8 @@ export default Component.extend(validations, I18n, {
   blankInlineEditors: undefined,
 
   //#endregion
+
+  spaceId: reads('space.entityId'),
 
   isReadOnly: not('space.privileges.update'),
 
@@ -194,14 +205,14 @@ export default Component.extend(validations, I18n, {
     };
   }),
 
-  viewInMarketplaceHref: computed('space.entityId', function viewInMarketplaceHref() {
+  viewInMarketplaceHref: computed('spaceId', function viewInMarketplaceHref() {
     return this.router.urlFor(
       'onedata.sidebar.content',
       'spaces',
       'join', {
         queryParams: {
           options: serializeAspectOptions({
-            selectedSpace: this.space.entityId,
+            selectedSpace: this.spaceId,
           }),
         },
       }

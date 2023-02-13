@@ -12,17 +12,15 @@ import { reads } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import { inject as service } from '@ember/service';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { and } from 'ember-awesome-macros';
+import waitForRender from 'onedata-gui-common/utils/wait-for-render';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
-
-  navigationState: service(),
 
   /**
    * @override
@@ -50,9 +48,11 @@ export default Component.extend(I18n, {
   // FIXME: review properties
   spaceItems: reads('viewModel.spaceItems'),
 
-  urlSelectedSpace: reads('navigationState.aspectOptions.selectedSpace'),
-
   entries: reads('viewModel.entries'),
+
+  entriesInitialLoad: reads('viewModel.entriesInitialLoad'),
+
+  selectedSpaceId: reads('viewModel.selectedSpaceId'),
 
   /**
    * @type {Array<SpaceTag>}
@@ -69,12 +69,12 @@ export default Component.extend(I18n, {
   ),
 
   showFetchPrevLoader: and(
-    'entries.initialLoad.isSettled',
+    'entriesInitialLoad.isSettled',
     'infiniteScroll.fetchingStatus.isFetchingPrev'
   ),
 
   showFetchNextLoader: and(
-    'entries.initialLoad.isSettled',
+    'entriesInitialLoad.isSettled',
     'infiniteScroll.fetchingStatus.isFetchingNext'
   ),
 
@@ -89,13 +89,15 @@ export default Component.extend(I18n, {
    */
   didInsertElement() {
     this._super(...arguments);
-    this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
-    // FIXME: implement jump
-    // this.scrollToSelectedSpace();
+    (async () => {
+      await this.entriesInitialLoad;
+      this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
+      await waitForRender();
+      this.scrollToSelectedSpace();
+    })();
   },
 
   initInfiniteScroll() {
-    window.entries = this.entries;
     // FIXME: maybe registering adjustScrollAfterBeginningChange is needed (ifinite-scroll-table)
     const infiniteScroll = InfiniteScroll.create({
       entries: this.entries,
@@ -106,11 +108,13 @@ export default Component.extend(I18n, {
 
   // FIXME: reimplement
   scrollToSelectedSpace() {
-    if (!this.urlSelectedSpace || !this.element) {
+    if (!this.selectedSpaceId || !this.element) {
       return;
     }
     /** @type {HTMLElement} */
-    const itemElement = this.element.querySelector(`[data-row-id="${this.urlSelectedSpace}"]`);
+    const itemElement = this.element.querySelector(
+      `[data-row-id="${this.selectedSpaceId}"]`
+    );
     if (!itemElement) {
       return;
     }

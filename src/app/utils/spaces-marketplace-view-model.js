@@ -6,7 +6,8 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, get } from '@ember/object';
+import EmberObject, { computed, get, defineProperty } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { isEmpty, promise } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
@@ -15,10 +16,18 @@ import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
 import ReplacingChunksArray from 'onedata-gui-common/utils/replacing-chunks-array';
 import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import _ from 'lodash';
+import { Promise } from 'rsvp';
+import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
   currentUser: service(),
+
+  /**
+   * @virtual optional
+   * @type {string|null}
+   */
+  selectedSpaceId: null,
 
   //#region state
 
@@ -37,6 +46,11 @@ export default EmberObject.extend(OwnerInjector, {
    */
   entries: undefined,
 
+  /**
+   * @type {Promise}
+   */
+  entriesInitialLoad: undefined,
+
   //#endregion
 
   isEmpty: isEmpty('entries'),
@@ -50,19 +64,38 @@ export default EmberObject.extend(OwnerInjector, {
     }
   )),
 
+  selectedSpaceMarketplaceInfoProxy: promise.object(computed(
+    'selectedSpaceId',
+    async function selectedSpaceMarketplaceInfoProxy() {
+      if (!this.selectedSpaceId) {
+        return null;
+      }
+      return this.spaceManager.getSpaceMarketplaceInfo(this.selectedSpaceId);
+    }
+  )),
+
   init() {
     this._super(...arguments);
+    // infinite loading before entries array is initialized async
+    this.set('entriesInitialLoad', promiseObject(new Promise(() => {})));
     this.initEntries();
   },
 
-  initEntries() {
+  async initEntries() {
+    const selectedSpaceMarketplaceInfo = await this.selectedSpaceMarketplaceInfoProxy;
+    const initialJumpIndex = selectedSpaceMarketplaceInfo &&
+      get(selectedSpaceMarketplaceInfo, 'index') || null;
     const entries = ReplacingChunksArray.create({
       fetch: this.fetchFilteredEntries.bind(this),
       startIndex: 0,
       endIndex: 10,
       indexMargin: 5,
+      initialJumpIndex,
     });
     this.set('entries', entries);
+    defineProperty(this, 'entriesInitialLoad', reads('entries.initialLoad'));
+    // needed after defineProperty
+    this.notifyPropertyChange('entriesInitialLoad');
   },
 
   /**

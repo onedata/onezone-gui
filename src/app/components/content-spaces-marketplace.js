@@ -19,6 +19,7 @@ export default Component.extend({
   viewModel: computed(function viewModel() {
     return SpacesMarketplaceViewModel.create({
       ownerSource: this,
+      selectedSpaceId: this.selectedSpaceId,
     });
   }),
 });

@@ -530,17 +530,21 @@ export default Service.extend({
       listingParams,
       tags
     );
-    const recordsPromises = idsList.map(({ spaceId }) => {
-      return this.store.findRecord(
-        'spaceMarketplaceInfo',
-        generateSpaceMarketplaceInfoGri(spaceId)
-      );
-    });
+    const recordsPromises = idsList.map(({ spaceId }) =>
+      this.getSpaceMarketplaceInfo(spaceId)
+    );
     // FIXME: think about fetching single spaces failures
     const array = await allFulfilled(recordsPromises);
     return {
       array,
       isLast,
     };
+  },
+
+  async getSpaceMarketplaceInfo(spaceId) {
+    return this.store.findRecord(
+      'spaceMarketplaceInfo',
+      generateSpaceMarketplaceInfoGri(spaceId)
+    );
   },
 });
