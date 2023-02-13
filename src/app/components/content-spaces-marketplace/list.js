@@ -59,10 +59,12 @@ export default Component.extend(I18n, {
    */
   tags: reads('viewModel.tagsFilter'),
 
-  collectionObserver: observer(
+  entriesObserver: observer(
     'entries.@each.name',
-    function collectionObserver() {
-      addConflictLabels(this.entries, 'name', 'spaceId');
+    function entriesObserver() {
+      if (this.entries) {
+        addConflictLabels(this.entries, 'name', 'spaceId');
+      }
     }
   ),
 
@@ -79,6 +81,7 @@ export default Component.extend(I18n, {
   init() {
     this._super(...arguments);
     this.initInfiniteScroll();
+    this.entriesObserver();
   },
 
   /**
