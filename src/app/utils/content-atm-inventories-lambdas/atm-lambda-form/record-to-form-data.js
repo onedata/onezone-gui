@@ -12,6 +12,7 @@ import { createValuesContainer } from 'onedata-gui-common/utils/form-component/v
 import {
   dataSpecToFormValues,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { rawValueToFormValue as atmRawValueToFormValue } from 'onedata-gui-common/utils/atm-workflow/value-editors';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -255,8 +256,7 @@ function recordArgResToFormArgRes(dataType, recordArgRes) {
     }));
     if (dataType === 'argument') {
       setProperties(formEntry, {
-        entryDefaultValue: defaultValue === null || defaultValue === undefined ?
-          undefined : JSON.stringify(defaultValue),
+        entryDefaultValue: atmRawValueToFormValue(defaultValue, true),
         entryIsOptional: isOptional === true,
       });
     } else {
