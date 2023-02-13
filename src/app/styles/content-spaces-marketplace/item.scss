@@ -1,0 +1,209 @@
+.spaces-marketplace-item {
+  @mixin vertical-flex-gap($size: 0.5em, $additional-margin-top: 0) {
+    margin-top: -$size + $additional-margin-top;
+    > * {
+      padding-top: $size;
+    }
+  }
+
+  height: 300px;
+  overflow: hidden;
+
+  &.iconified-block + .spaces-marketplace-item.iconified-block {
+    margin-top: $spaces-marketplace-items-spacing;
+  }
+
+  &.iconified-block-marketplace-access-granted {
+    @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+      .access-info-col {
+        flex-direction: row;
+        min-width: 100%;
+        align-items: center;
+        .access-granted-container {
+          margin-left: -0.2em;
+        }
+        .access-links-container {
+          margin-top: 0;
+          margin-left: 1em;
+        }
+      }
+    }
+    @media (max-width: $screen-xs-max) {
+      .access-info-col {
+        min-width: 100%;
+        align-items: flex-start;
+        .access-granted-container {
+          margin-left: -0.2em;
+        }
+      }
+    }
+  }
+
+  .icon-section {
+    padding: 20px 26px;
+    .oneicon-space-empty {
+      font-weight: bold;
+    }
+    @media (max-width: $screen-md-max) {
+      padding: 14px;
+      .one-icon {
+        display: none;
+      }
+    }
+  }
+
+  .content-section {
+    display: flex;
+    flex-direction: column;
+    // special adjustment for space item
+    padding: 18px 24px;
+  }
+
+  .basic-info-row {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    @include vertical-flex-gap(0.75em);
+    .basic-info-col {
+      flex-grow: 1;
+      width: 20em;
+      padding-right: 1em;
+    }
+  }
+
+  .marketplace-item-row {
+    display: flex;
+    min-height: 0;
+  }
+
+  .secondary-row {
+    display: flex;
+    align-items: center;
+    @include vertical-flex-gap($additional-margin-top: 0.75em);
+    overflow: hidden;
+    max-width: calc(100% - 1em);
+    .creation-time {
+      display: flex;
+      align-items: center;
+      .one-icon {
+        font-size: $spaces-marketplace-item-secondary-row-icon-size;
+      }
+      .creation-time-icon {
+        margin-left: -0.2em;
+        margin-right: 0.2em;
+      }
+    }
+  }
+
+  .title-row {
+    align-items: baseline;
+    flex-wrap: wrap;
+    @include vertical-flex-gap;
+    .space-name {
+      margin-right: 1em;
+    }
+    .tags-container {
+      flex-grow: 1;
+      .tags-input {
+        .tag-item {
+          margin-bottom: 0.25em;
+        }
+      }
+    }
+  }
+
+  .space-name {
+    @include font-semibold;
+    font-size: 120%;
+  }
+
+  .organization-name {
+    @include font-semibold;
+    min-width: 0;
+  }
+
+  .access-info-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    > * {
+      margin-top: 0.25em;
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+  }
+
+  .col-separator {
+    margin-left: 1em;
+    margin-right: 1em;
+    &::after {
+      height: 32px;
+      content: ' ';
+      border-left: 1px solid;
+      border-color: $main-border-color;
+    }
+  }
+
+  .access-granted-container {
+    display: flex;
+    align-items: center;
+    margin-right: 0.5em;
+    .one-icon {
+      font-size: 2em;
+    }
+    .text {
+      margin-left: 0.4em;
+    }
+  }
+
+  .access-links-container {
+    margin-top: 1em;
+    margin-right: 0.35em;
+  }
+
+  .space-link {
+    display: inline-flex;
+    align-items: center;
+    .one-icon {
+      margin-left: 0.2em;
+      font-size: 120%;
+    }
+  }
+
+  .description-row {
+    flex-direction: column;
+    border-top: 1px solid $main-border-color;
+    margin-top: 1.5em;
+  }
+
+  .more-tag {
+    text-decoration: underline;
+  }
+
+  .space-item-support-list {
+    // guarantee some space for previous flex elements
+    max-width: calc(100% - 8em);
+    @media (min-width: $screen-md-min) {
+      max-width: calc(100% - 17em);
+    }
+  }
+}
+
+.iconified-block-marketplace-available {
+  $leading-color: $color-one-light-blue;
+  --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-color: #{darken($leading-color, 25%)};
+  --iconified-block-icon-background-color: #{darken($leading-color, 5%)};
+  --iconified-block-icon-background-color-hover: #{darken($leading-color, 8%)};
+  --iconified-block-background-color-hover: #{darken($leading-color, 3%)};
+}
+
+.iconified-block-marketplace-access-granted {
+  $leading-color: lighten($color-one-success, 30%);
+  --iconified-block-border-color: #{darken($leading-color, 15%)};
+  --iconified-block-icon-color: #{darken($leading-color, 25%)};
+  --iconified-block-icon-background-color: #{$leading-color};
+  --iconified-block-icon-background-color-hover: #{darken($leading-color, 3%)};
+  --iconified-block-background-color-hover: #{$main-content-hover-background};
+}

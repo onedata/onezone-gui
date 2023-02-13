@@ -1,34 +1,47 @@
 <div class="icon-section">
-  {{one-icon icon="space-empty"}}
+  {{one-icon icon="space"}}
 </div>
 <div class="content-section">
   <div class="basic-info-row">
     <div class="basic-info-col">
       <div class="row marketplace-item-row title-row">
-        <div class="space-name">{{spaceName}}</div>
+        {{name-conflict tagName="div" class="space-name" item=spaceItem}}
         <div class="tags-container">
-          {{tags-input readonly=true tags=tags}}
+          {{#tags-input readonly=true tags=limitedTags}}
+            {{#if moreTags.length}}
+              <li class="tag-item tag-item-plaintext more-tag clickable">
+                <div class="tag-label more-tag-text">
+                  {{tt this "moreTags" count=moreTags.length}}
+                </div>
+                {{#one-tooltip class="tooltip-with-tags"}}
+                  <ul class="tags-input">
+                    {{#each moreTags as |tag|}}
+                      {{!-- using .tag-label element is not necessary here --}}
+                      <li class="tag-item">{{tag.label}}</li>
+                    {{/each}}
+                  </ul>
+                {{/one-tooltip}}
+              </li>
+            {{/if}}
+          {{/tags-input}}
         </div>
       </div>
       <div class="row marketplace-item-row secondary-row">
         {{#truncated-string class="organization-name"}}
           {{organizationName}}
         {{/truncated-string}}
-        <span class="col-separator"></span>
-        <div class="support-list">
-          <div class="support-item">
-            {{one-icon icon="support"}}
-            <div class="text">
-              {{bytes-to-string supportSize}}
-            </div>
-          </div>
-          {{#each providerNames as |providerName|}}
-            <div class="support-item">
-              {{record-icon modelName="provider"}}
-              <div class="text">{{providerName}}</div>
-            </div>
-          {{/each}}
+        <span class="col-separator hidden-xs hidden-sm"></span>
+        <div class="creation-time hidden-xs hidden-sm">
+          {{one-icon icon="create-time" class="creation-time-icon"}}
+          <span class="creation-time-text">
+            {{creationDateText}}
+          </span>
+          {{one-tooltip title=creationTimeTooltip}}
         </div>
+        <span class="col-separator"></span>
+        {{content-spaces-marketplace/space-item-support-list
+          spaceItem=spaceItem
+        }}
       </div>
     </div>
     <div class="access-info-col">

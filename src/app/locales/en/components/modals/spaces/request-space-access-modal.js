@@ -8,6 +8,7 @@ export default {
   proceed: 'Proceed',
   message: {
     label: 'Message to space maintainer',
+    placeholder: 'Optional message to space maintainer',
   },
   email: {
     label: 'Your e-mail address',

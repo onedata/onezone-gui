@@ -7,11 +7,13 @@
  */
 
 import Component from '@ember/component';
+import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { debounce } from '@ember/runloop';
 import config from 'ember-get-config';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
+import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 
 const typingActionDebouce = config.timing.typingActionDebouce;
 
@@ -38,6 +40,16 @@ export default Component.extend(I18n, {
 
   urlSelectedSpace: reads('navigationState.aspectOptions.selectedSpace'),
 
+  collectionObserver: observer(
+    'filteredCollection.@each.name',
+    function collectionObserver() {
+      addConflictLabels(this.filteredCollection, 'name', 'spaceId');
+    }
+  ),
+
+  /**
+   * @override
+   */
   didInsertElement() {
     this._super(...arguments);
     this.scrollToSelectedSpace();

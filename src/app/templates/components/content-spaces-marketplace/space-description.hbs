@@ -5,17 +5,8 @@
 {{#if hasOverflow}}
   <div class="toggle-expand-btn expand-btn">
     <a class="toggle-expand-anchor navy" onclick={{action "expand"}}>
-      {{one-icon icon="arrow-down"}}
+      {{one-icon icon="info-modal" class="expand-icon"}}
       <span class="text">{{tt this "expand"}}</span>
-      {{one-icon icon="arrow-down"}}
-    </a>
-  </div>
-{{else if isExpanded}}
-  <div class="toggle-expand-btn collapse-btn">
-    <a class="toggle-expand-anchor navy" onclick={{action "collapse"}}>
-      {{one-icon icon="arrow-up"}}
-      <span class="text">{{tt this "collapse"}}</span>
-      {{one-icon icon="arrow-up"}}
     </a>
   </div>
 {{/if}}

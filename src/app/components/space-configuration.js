@@ -9,7 +9,7 @@
 
 import Component from '@ember/component';
 import { get, set, computed, observer } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, notEmpty } from '@ember/object/computed';
 import { notEqual, not, isEmpty, and, or, bool, conditional, raw } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import computedT from 'onedata-gui-common/utils/computed-t';
@@ -20,6 +20,7 @@ import _ from 'lodash';
 import { serializeAspectOptions } from 'onedata-gui-common/services/navigation-state';
 import insufficientPrivilegesMessage from 'onedata-gui-common/utils/i18n/insufficient-privileges-message';
 import { validator } from 'ember-cp-validations';
+import { SpaceTag } from './space-configuration/space-tags-selector';
 
 /**
  * @typedef {'view'|'edit'} SpaceConfigDescriptionEditorMode
@@ -36,9 +37,9 @@ export default Component.extend(validations, I18n, {
   classNames: ['space-configuration', 'fill-flex-using-column', 'fill-flex-limited'],
 
   modalManager: service(),
-  spaceManager: service(),
   router: service(),
   globalNotify: service(),
+  spaceManager: service(),
 
   /**
    * @override
@@ -70,6 +71,12 @@ export default Component.extend(validations, I18n, {
    * @type {string}
    */
   currentContactEmail: '',
+
+  /**
+   * Current value of tags array in editable tags input (not necessarily saved).
+   * @type {Array<SpaceTag>}
+   */
+  currentSpaceTags: Object.freeze([]),
 
   /**
    * Previous value of current description before it was set using
@@ -107,7 +114,26 @@ export default Component.extend(validations, I18n, {
    * @type {ComputedProperty<Array<Tag>>}
    */
   spaceTags: computed('space.tags', function spaceTags() {
-    return get(this.space ?? {}, 'tags')?.map(tag => ({ label: tag }));
+    return get(this.space ?? {}, 'tags')?.map(label => {
+      return SpaceTag.create({
+        ownerSource: this,
+        label,
+      });
+    });
+  }),
+
+  /**
+   * @type {ComputedProperty<string|null>}
+   */
+  tagsInputErrorMessage: conditional(
+    'areSomeInputTagsUnsupported',
+    computedT('someTagsUnsupported'),
+  ),
+
+  areSomeInputTagsUnsupported: notEmpty('unsupportedInputTags'),
+
+  unsupportedInputTags: computed('currentSpaceTags', function unsupportedInputTags() {
+    return this.currentSpaceTags.filter(({ isSupportedTag }) => !isSupportedTag);
   }),
 
   areSpaceTagsEmpty: isEmpty('spaceTags'),
@@ -135,7 +161,6 @@ export default Component.extend(validations, I18n, {
 
   areAdvertiseRequirementsNotMet: or(
     isEmpty('organizationName'),
-    isEmpty('spaceTags'),
     isEmpty('spaceDescription'),
   ),
 
@@ -162,21 +187,10 @@ export default Component.extend(validations, I18n, {
    */
   emailValidation: reads('validations.attrs.currentContactEmail'),
 
-  allowedTags: computed(
-    function allowedTags() {
-      return (this.spaceManager.getAvailableSpaceTags() ?? []).map(tag => ({
-        label: tag,
-      }));
-    }
-  ),
-
-  spaceTagsEditorSettings: computed('allowedTags', function spaceTagsEditorSettings() {
+  spaceTagsEditorSettings: computed(function spaceTagsEditorSettings() {
     return {
       type: 'tags',
-      tagEditorComponentName: 'tags-input/selector-editor',
-      tagEditorSettings: {
-        allowedTags: this.allowedTags,
-      },
+      tagEditorComponentName: 'space-configuration/space-tags-selector',
     };
   }),
 
@@ -228,6 +242,7 @@ export default Component.extend(validations, I18n, {
       preCurrentDescription: description,
       currentDescription: description,
       currentContactEmail: this.contactEmail,
+      currentSpaceTags: this.spaceTags,
     });
   },
 
@@ -246,6 +261,7 @@ export default Component.extend(validations, I18n, {
       case 'tags': {
         const tagsRawValue = value?.map(({ label }) => label) || [];
         await this.saveSpaceValue('tags', tagsRawValue);
+        this.setCurrentValuesFromRecord();
         break;
       }
       case 'advertised': {
@@ -356,6 +372,13 @@ export default Component.extend(validations, I18n, {
     currentEmailChanged(value) {
       this.set('currentContactEmail', value);
       this.inlineEditorChange('contactEmail', value);
+    },
+    /**
+     * @param {Array<SpaceTag>} value
+     */
+    currentSpaceTagsChanged(value) {
+      this.set('currentSpaceTags', value);
+      this.inlineEditorChange('tags', value);
     },
     inlineEditorChange(fieldId, value) {
       this.inlineEditorChange(fieldId, value);

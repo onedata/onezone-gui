@@ -158,4 +158,29 @@
       display: none;
     }
   }
+  .contact-email-form-container {
+    display: flex;
+    @media (max-width: $screen-md-max) {
+      flex-wrap: wrap;
+      .email-visible-alert {
+        min-width: 100%;
+        padding-left: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  .email-visible-alert {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.5em;
+    padding-left: 3em;
+    .email-visible-alert-icon {
+      color: $color-one-warning;
+      margin-right: 0.5em;
+      font-size: 150%;
+    }
+  }
 }
+
+@import './space-configuration/space-tags-selector';

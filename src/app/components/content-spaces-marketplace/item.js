@@ -11,6 +11,9 @@ import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
+import { dateFormat } from 'onedata-gui-common/helpers/date-format';
+import { or, and, raw, gt, difference } from 'ember-awesome-macros';
+import { htmlSafe } from '@ember/string';
 
 export default Component.extend(I18n, {
   tagName: 'li',
@@ -29,18 +32,22 @@ export default Component.extend(I18n, {
   spaceActions: service(),
   currentUser: service(),
   guiUtils: service(),
-
-  /**
-   * @virtual
-   * @type {Utils.SpacesMarketplaceViewModel}
-   */
-  viewModel: undefined,
+  media: service(),
 
   /**
    * @virtual
    * @type {Utils.SpacesMarketplaceItem}
    */
   spaceItem: undefined,
+
+  /**
+   * @type {number}
+   */
+  tagsLimit: or(
+    and('media.isMobile', raw(4)),
+    and('media.isTablet', raw(6)),
+    raw(12),
+  ),
 
   //#region state
 
@@ -59,19 +66,64 @@ export default Component.extend(I18n, {
 
   spaceId: reads('spaceItem.entityId'),
 
-  providerNames: reads('spaceItem.providerNames'),
-
   isAccessGranted: reads('spaceItem.isAccessGranted'),
 
-  supportSize: reads('spaceItem.totalSupportSize'),
-
   organizationName: reads('spaceItem.organizationName'),
+
+  creationTime: reads('spaceItem.creationTime'),
+
+  creationDateText: computed('creationTime', function creationDateText() {
+    return htmlSafe(
+      dateFormat([this.creationTime], {
+        format: 'date',
+      })
+      .replaceAll(' ', '&nbsp;')
+    );
+  }),
+
+  creationTimeTooltip: computed('creationTime', function creationTimeTooltip() {
+    const creationTimeText = htmlSafe(
+      dateFormat([this.creationTime], {
+        format: 'dateWithMinutes',
+      })
+      .replaceAll(' ', '&nbsp;')
+    );
+    return this.t('creationTimeTooltip', { creationTimeText });
+  }),
 
   tags: computed('spaceItem.tags', function tags() {
     return this.spaceItem.tags.map(tagName => ({
       label: tagName,
     }));
   }),
+
+  tagsLimitExceeded: gt('tags.length', 'tagsLimit'),
+
+  tagsDisplayedOnLimitExceed: difference('tagsLimit', 1),
+
+  limitedTags: computed(
+    'tagsLimitExceeded',
+    'tagsDisplayedOnLimitExceed',
+    function limitedTags() {
+      if (this.tagsLimitExceeded) {
+        return this.tags.slice(0, this.tagsDisplayedOnLimitExceed);
+      } else {
+        return this.tags;
+      }
+    }
+  ),
+
+  moreTags: computed(
+    'tagsLimitExceeded',
+    'tagsDisplayedOnLimitExceed',
+    function moreTags() {
+      if (this.tagsLimitExceeded) {
+        return this.tags.slice(this.tagsDisplayedOnLimitExceed);
+      } else {
+        return [];
+      }
+    }
+  ),
 
   visitSpaceHref: computed(
     'spaceItem.spaceMarketplaceInfo.entityId',

@@ -23,9 +23,15 @@
     <p>
       {{tt this "body.textExtended"}}
     </p>
-    <form class="form form-horizontal form-component contact-form">
+    <form
+      class="form form-horizontal form-component contact-form"
+      onsubmit={{prevent-default}}
+    >
       {{form-component/field-renderer field=rootField}}
     </form>
+    <div class="alert alert-warning email-visible-alert">
+      {{tt this "emailVisibleAlert"}}
+    </div>
   {{/modal.body}}
 
   {{#modal.footer class="btn-toolbar"}}

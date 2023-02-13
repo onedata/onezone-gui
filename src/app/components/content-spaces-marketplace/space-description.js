@@ -11,7 +11,7 @@
 import Component from '@ember/component';
 import ContentOverflowDetector from 'onedata-gui-common/mixins/content-overflow-detector';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
-import waitForRender from 'onedata-gui-common/utils/wait-for-render';
+import { inject as service } from '@ember/service';
 
 const mixins = [
   I18n,
@@ -21,20 +21,15 @@ const mixins = [
 export default Component.extend(...mixins, {
   classNames: [
     'marketplace-space-description',
-    'markdown-container',
   ],
-  classNameBindings: ['hasOverflow:has-overflow', 'isExpanded:is-expanded'],
+  classNameBindings: ['hasOverflow:has-overflow'],
+
+  modalManager: service(),
 
   /**
    * @override
    */
   i18nPrefix: 'components.contentSpacesMarketplace.spaceDescription',
-
-  //#region state
-
-  isExpanded: false,
-
-  //#endregion
 
   /**
    * @virtual
@@ -66,20 +61,15 @@ export default Component.extend(...mixins, {
     this.removeOverflowDetectionListener();
   },
 
-  toggleExpand(shouldBeExpanded) {
-    this.set('isExpanded', shouldBeExpanded);
-    (async () => {
-      await waitForRender();
-      this.detectOverflow();
-    })();
+  showDescriptionModal() {
+    this.modalManager.show('spaces/description-modal', {
+      spaceData: this.spaceItem,
+    });
   },
 
   actions: {
     expand() {
-      this.toggleExpand(true);
-    },
-    collapse() {
-      this.toggleExpand(false);
+      this.showDescriptionModal();
     },
   },
 });

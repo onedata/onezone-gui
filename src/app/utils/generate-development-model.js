@@ -1203,7 +1203,8 @@ async function generateMarketplaceMock(store, listRecords) {
       aspect: spaceMarketplaceInfoAspect,
       scope: 'protected',
     }),
-    name: 'A space to rent',
+    // for testing name disambiguation
+    name: 'Space 0',
     organizationName: 'ACK Cyfronet AGH',
     description: exampleMarkdownShort,
     tags: [

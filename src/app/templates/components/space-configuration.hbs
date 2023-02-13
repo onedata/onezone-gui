@@ -47,7 +47,7 @@
   </div>
   <div class={{concat-classes
     "form-group space-tags-form-group"
-    (if blankInlineErrors.tags "has-error")
+    (if tagsInputErrorMessage "has-error")
   }}>
     <label class="control-label">
       {{tt this "spaceTags.label"}}:
@@ -63,13 +63,10 @@
         class="space-tags"
         editorSettings=spaceTagsEditorSettings
         value=spaceTags
-        isSaveDisabled=blankInlineErrors.tags
-        saveButtonTip=(if
-          blankInlineErrors.tags
-          (tt this "fieldCannotBeEmptyWhenAdvertising")
-        )
+        isSaveDisabled=(bool tagsInputErrorMessage)
+        saveButtonTip=tagsInputErrorMessage
+        onInputValueChanged=(action "currentSpaceTagsChanged")
         onSave=(action "saveValue" "tags")
-        onInputValueChanged=(action "inlineEditorChange" "tags")
       }}
     {{/if}}
   </div>
@@ -202,29 +199,35 @@
     {{/if}}
   </div>
   {{#if isAdvertised}}
-    <div class={{concat-classes
-    "form-group contact-email-form-group"
-    (if emailValidation.error "has-error")
-  }}>
-      <label class="control-label">
-        {{tt this "contactEmail.label"}}:
-      </label>
-      {{#if isReadOnly}}
-        {{#if contactEmail}}
-          <span class="static-value">{{contactEmail}}</span>
+    <div class="contact-email-form-container">
+      <div class={{concat-classes
+        "form-group contact-email-form-group"
+        (if emailValidation.error "has-error")
+      }}>
+        <label class="control-label">
+          {{tt this "contactEmail.label"}}:
+        </label>
+        {{#if isReadOnly}}
+          {{#if contactEmail}}
+            <span class="static-value">{{contactEmail}}</span>
+          {{else}}
+            <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+          {{/if}}
         {{else}}
-          <span class="static-value static-not-set">{{tt this "notSet"}}</span>
+          {{one-inline-editor
+            class="contact-email"
+            value=contactEmail
+            onInputValueChanged=(action "currentEmailChanged")
+            isSaveDisabled=emailValidation.error
+            saveButtonTip=emailValidation.message
+            onSave=(action "saveValue" "contactEmail")
+          }}
         {{/if}}
-      {{else}}
-        {{one-inline-editor
-          class="contact-email"
-          value=contactEmail
-          onInputValueChanged=(action "currentEmailChanged")
-          isSaveDisabled=emailValidation.error
-          saveButtonTip=emailValidation.message
-          onSave=(action "saveValue" "contactEmail")
-        }}
-      {{/if}}
+      </div>
+      <div class="email-visible-alert">
+        {{one-icon class="email-visible-alert-icon" icon="sign-warning-rounded"}}
+        {{tt this "emailVisibleAlert"}}
+      </div>
     </div>
   {{/if}}
 </div>

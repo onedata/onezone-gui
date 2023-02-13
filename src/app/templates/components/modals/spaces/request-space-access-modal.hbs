@@ -15,7 +15,10 @@
 
   {{#modal.body}}
     <p>{{tt this "body.intro" spaceName=spaceName}}</p>
-    <form class="form form-horizontal form-component request-access-form">
+    <form
+      class="form form-horizontal form-component request-access-form"
+      onsubmit={{prevent-default}}
+    >
       {{form-component/field-renderer field=rootField}}
     </form>
   {{/modal.body}}

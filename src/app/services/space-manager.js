@@ -19,7 +19,6 @@ import {
 import {
   aspect as spaceMarketplaceInfoListAspect,
 } from 'onezone-gui/models/space-marketplace-info-list';
-import _ from 'lodash';
 
 /**
  * @typedef {Pick<SpaceSupportParameters, 'dirStatsServiceEnabled'>} SpaceSupportParametersUpdate
@@ -457,9 +456,14 @@ export default Service.extend({
     // });
   },
 
+  /**
+   * Maps: categoryName -> Array of available tags.
+   * @returns {Object<string, Array<string>>}
+   */
   getAvailableSpaceTags() {
-    // TODO: VFS-10217 show categories of tags
-    return _.flatten(Object.values(this.onedataConnection.availableSpaceTags));
+    const availableSpaceTags = this.onedataConnection.availableSpaceTags;
+    return (availableSpaceTags && typeof availableSpaceTags === 'object') ?
+      availableSpaceTags : {};
   },
 
   // TODO: VFS-10384 integrate with backend

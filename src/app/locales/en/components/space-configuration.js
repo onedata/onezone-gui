@@ -1,5 +1,8 @@
+import spaceTagsSelector from './space-configuration/space-tags-selector';
+
 // TODO: VFS-10252 consult i18n
 export default {
+  spaceTagsSelector,
   notSet: 'Not set.',
   organizationName: {
     label: 'Organization name',
@@ -26,7 +29,7 @@ export default {
     },
   },
   contactEmail: {
-    label: 'Contact e-mail',
+    label: 'Marketplace contact e-mail',
   },
   viewInMarketplace: 'View in marketplace',
   save: 'Save',
@@ -42,4 +45,6 @@ export default {
     proceed: 'Proceed',
     disablingAdvertisement: 'disabling space advertisement',
   },
+  someTagsUnsupported: 'Some of entered tags are currently not supported. Remove them to be able to save changes.',
+  emailVisibleAlert: 'Note, that the marketplace contact e-mail address will be visible to anyone who gains an access to the space.',
 };
