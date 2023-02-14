@@ -1186,7 +1186,7 @@ async function generateMarketplaceMock(store, listRecords) {
   );
   const ownedSpaceMarketplaceInfo = store.createRecord('spaceMarketplaceInfo', {
     id: generateSpaceMarketplaceInfoGri('space-0'),
-    indx: 'Space 0 @ space-0',
+    indx: 'Space 0@space-0',
     name: get(firstSpace, 'name'),
     organizationName: get(firstSpace, 'organizationName'),
     description: get(firstSpace, 'description'),
@@ -1195,24 +1195,30 @@ async function generateMarketplaceMock(store, listRecords) {
     totalSupportSize: get(firstSpace, 'totalSize'),
     providerNames,
   });
-  const otherSpaceInfo = store.createRecord('spaceMarketplaceInfo', {
-    id: generateSpaceMarketplaceInfoGri('space-market-info-1'),
-    index: 'Space 0 @ space-market-info-1',
-    // for testing name disambiguation
-    name: 'Space 0',
-    organizationName: 'ACK Cyfronet AGH',
-    description: exampleMarkdownShort,
-    tags: [
-      'multidimensional-data',
-      'international-issues',
-      'regions-and-cities',
-      'society',
-      'technology',
-      'transport',
-    ],
-    creationTime: (new Date().getTime() / 1000) - 200000,
-    totalSupportSize: 3 * Math.pow(1024, 4),
-    providerNames: providerNames.slice(1, 2),
-  });
-  return await allFulfilled([ownedSpaceMarketplaceInfo.save(), otherSpaceInfo.save()]);
+  const spaceInfoRecords = [ownedSpaceMarketplaceInfo];
+  const additionalSpaceInfoCount = 10;
+  for (let i = 0; i < additionalSpaceInfoCount; ++i) {
+    const name = `Space ${String(i).padStart(2, '0')}`;
+    const entityId = `space-market-info-${i}`;
+    const record = store.createRecord('spaceMarketplaceInfo', {
+      id: generateSpaceMarketplaceInfoGri(entityId),
+      index: `${name}@${entityId}`,
+      name,
+      organizationName: 'ACK Cyfronet AGH',
+      description: exampleMarkdownShort,
+      tags: [
+        'multidimensional-data',
+        'international-issues',
+        'regions-and-cities',
+        'society',
+        'technology',
+        'transport',
+      ],
+      creationTime: (new Date().getTime() / 1000) - 200000,
+      totalSupportSize: 3 * Math.pow(1024, 4),
+      providerNames: providerNames.slice(1, 2),
+    });
+    spaceInfoRecords.push(record);
+  }
+  return await allFulfilled(spaceInfoRecords.map(record => record.save()));
 }
