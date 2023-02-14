@@ -7,140 +7,72 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { get, getProperties } from '@ember/object';
 import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import {
   formValuesToDataSpec,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { formValueToRawValue as atmFormValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/value-editors';
+import { atmParametersSpecEditorValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 /**
  * @param {Object} formData
  * @returns {Object} `Models.AtmLambda`-like object
  */
 export default function formDataToRecord(formData) {
-  const {
-    name,
-    state,
-    summary,
-    engine,
-    openfaasOptions,
-    preferredBatchSize,
-    arguments: formArguments,
-    results: formResults,
-    resources,
-  } = getProperties(
-    formData,
-    'name',
-    'state',
-    'summary',
-    'engine',
-    'openfaasOptions',
-    'preferredBatchSize',
-    'arguments',
-    'results',
-    'resources'
-  );
   const operationSpec = {
-    engine,
+    engine: formData?.engine,
   };
-  switch (engine) {
+  switch (formData?.engine) {
     case 'openfaas': {
-      const {
-        dockerImage,
-        readonly,
-        mountSpace,
-        mountSpaceOptions,
-      } = getProperties(
-        openfaasOptions || {},
-        'dockerImage',
-        'readonly',
-        'mountSpace',
-        'mountSpaceOptions'
-      );
-      operationSpec.dockerImage = dockerImage;
+      const openfaasOptions = formData.openfaasOptions;
+      operationSpec.dockerImage = openfaasOptions?.dockerImage;
+
       const dockerExecutionOptions = {
-        readonly,
-        mountOneclient: mountSpace,
+        readonly: openfaasOptions?.readonly,
+        mountOneclient: openfaasOptions?.mountSpace,
       };
-      if (mountSpace) {
-        const {
-          mountPoint,
-          oneclientOptions,
-        } = getProperties(
-          mountSpaceOptions,
-          'mountPoint',
-          'oneclientOptions',
-        );
-        dockerExecutionOptions.oneclientMountPoint = mountPoint;
-        dockerExecutionOptions.oneclientOptions = oneclientOptions;
+      if (openfaasOptions?.mountSpace) {
+        const mountSpaceOptions = openfaasOptions.mountSpaceOptions;
+        dockerExecutionOptions.oneclientMountPoint = mountSpaceOptions?.mountPoint;
+        dockerExecutionOptions.oneclientOptions = mountSpaceOptions?.oneclientOptions;
       }
       operationSpec.dockerExecutionOptions = dockerExecutionOptions;
+
       break;
     }
     // More options - `'atmWorkflow'` and `'userForm'` - will be available
     // when backend will be ready.
   }
 
-  const lambdaArguments = formArgResToRecordArgRes('argument', formArguments);
-  const lambdaResults = formArgResToRecordArgRes('result', formResults);
-  const resourceSpec = serializeTaskResourcesFieldsValues(resources);
   return {
-    name,
-    state,
-    summary,
+    name: formData?.name,
+    state: formData?.state,
+    summary: formData?.summary,
     description: '',
     operationSpec,
-    preferredBatchSize: Number.parseInt(preferredBatchSize) || 1,
-    argumentSpecs: lambdaArguments,
-    resultSpecs: lambdaResults,
-    configParameterSpecs: [],
-    resourceSpec,
+    preferredBatchSize: Number.parseInt(formData?.preferredBatchSize) || 1,
+    argumentSpecs: atmParametersSpecEditorValueToRawValue(
+      formData.arguments
+    ),
+    resultSpecs: formResultsToRecordResults(formData.results),
+    configParameterSpecs: atmParametersSpecEditorValueToRawValue(
+      formData.configParameters
+    ),
+    resourceSpec: serializeTaskResourcesFieldsValues(formData?.resources),
   };
 }
 
 /**
- * Converts form arguments/results to record arguments/results
- * @param {String} dataType one of: `argument`, `result`
- * @param {Object} formArgRes arguments or results from form
+ * Converts form results to record results
+ * @param {Object} formResults results from form
  * @returns {Array<Object>} record data
  */
-function formArgResToRecordArgRes(dataType, formArgRes) {
-  return get(formArgRes, '__fieldsValueNames')
-    .map((valueName) => get(formArgRes, valueName))
+function formResultsToRecordResults(formResults) {
+  return (formResults?.__fieldsValueNames ?? [])
+    .map((valueName) => formResults[valueName])
     .filter(Boolean)
-    .map((entry) => {
-      const {
-        entryName,
-        entryDataSpec,
-        entryIsOptional,
-        entryDefaultValue,
-        entryIsViaFile,
-      } = getProperties(
-        entry,
-        'entryName',
-        'entryDataSpec',
-        'entryIsOptional',
-        'entryDefaultValue',
-        'entryIsViaFile',
-      );
-
-      const dataSpec = formValuesToDataSpec(entryDataSpec);
-      const lambdaData = {
-        name: entryName,
-        dataSpec,
-      };
-      if (dataType === 'argument') {
-        if (
-          dataSpec &&
-          dataSpec.type !== 'storeCredentials'
-        ) {
-          lambdaData.defaultValue = atmFormValueToRawValue(entryDefaultValue);
-        }
-        lambdaData.isOptional = entryIsOptional;
-      } else {
-        lambdaData.relayMethod = entryIsViaFile ? 'filePipe' : 'returnValue';
-      }
-      return lambdaData;
-    });
+    .map((entry) => ({
+      name: entry.entryName,
+      dataSpec: formValuesToDataSpec(entry.entryDataSpec),
+      relayMethod: entry.entryIsViaFile ? 'filePipe' : 'returnValue',
+    }));
 }
