@@ -18,4 +18,10 @@
   .list-entries {
     padding-left: 0;
   }
+  .form-group.search-form-group {
+    margin-bottom: 0;
+  }
+  .search-form-group + .tags-filter-form-group {
+    margin-top: $spaces-marketplace-items-spacing * 0.5;
+  }
 }

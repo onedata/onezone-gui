@@ -1,6 +1,9 @@
-<div class="form-group-light search-form-group">
+<div class="form-group search-form-group">
   <div class="input-group with-icon-addon">
-    {{search-bar search=(action "changeSearchValue") class="form-control"}}
+    {{search-bar
+      placeholder=(tt this "searchPlaceholder")
+      search=(action "changeSearchValue") class="form-control"
+    }}
     <div class="input-group-addon">
       {{one-icon icon="search"}}
     </div>
@@ -11,6 +14,8 @@
     tags=(or tags (array))
     tagEditorComponentName="space-configuration/space-tags-selector"
     readonly=false
+    isClearButtonVisible=true
+    editPlaceholder=(tt this "tagsFilterPlaceholder")
     onChange=(action "changeTagsFilter")
   }}
 </div>
