@@ -146,21 +146,6 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @override
    */
-  label: reads('record.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('record'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('space'),
-
-  /**
-   * @override
-   */
   link: computed('record', function link() {
     const {
       router,

@@ -110,21 +110,6 @@ const HarvesterListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @override
    */
-  label: reads('record.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('record'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('harvester'),
-
-  /**
-   * @override
-   */
   link: computed('record', function link() {
     const {
       router,

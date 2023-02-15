@@ -10,7 +10,7 @@
       <td class="property-value">
         {{one-clipboard-line
           size="sm"
-          value=provider.name
+          value=record.name
           type="text"
         }}
       </td>
@@ -20,7 +20,7 @@
       <td class="property-value">
         {{one-clipboard-line
           size="sm"
-          value=provider.domain
+          value=record.domain
           type="text"
         }}
       </td>
@@ -30,14 +30,14 @@
       <td class="property-value id">
         {{one-clipboard-line
           size="sm"
-          value=provider.entityId
+          value=record.entityId
           type="text"
         }}
       </td>
     </tr>
     <tr class="row-with-text">
       <td class="property-name">{{tt this "version"}}</td>
-      <td class="property-value">{{provider.version}}</td>
+      <td class="property-value">{{record.version}}</td>
     </tr>
   </tbody>
 </table>
