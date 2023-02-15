@@ -48,7 +48,7 @@ import {
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
 import { FormElement as DataSpecEditor } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { AtmParametersSpecEditor } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
+import { AtmParameterSpecsEditor } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -291,7 +291,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
    */
   argumentsFieldsCollectionGroup: computed(function argumentsFieldsCollectionGroup() {
-    return AtmParametersSpecEditor
+    return AtmParameterSpecsEditor
       .extend(disableFieldInEditMode(this))
       .create({
         name: 'arguments',
@@ -315,7 +315,7 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormElement>}
    */
   configParametersField: computed(function configParametersField() {
-    return AtmParametersSpecEditor
+    return AtmParameterSpecsEditor
       .extend(disableFieldInEditMode(this))
       .create({
         name: 'configParameters',

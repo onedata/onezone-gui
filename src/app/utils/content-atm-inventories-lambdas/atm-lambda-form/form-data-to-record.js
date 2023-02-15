@@ -11,7 +11,7 @@ import { serializeTaskResourcesFieldsValues } from 'onedata-gui-common/utils/wor
 import {
   formValuesToDataSpec,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { atmParametersSpecEditorValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
+import { atmParameterSpecsEditorValueToRawValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 /**
  * @param {Object} formData
@@ -50,11 +50,11 @@ export default function formDataToRecord(formData) {
     description: '',
     operationSpec,
     preferredBatchSize: Number.parseInt(formData?.preferredBatchSize) || 1,
-    argumentSpecs: atmParametersSpecEditorValueToRawValue(
+    argumentSpecs: atmParameterSpecsEditorValueToRawValue(
       formData.arguments
     ),
     resultSpecs: formResultsToRecordResults(formData.results),
-    configParameterSpecs: atmParametersSpecEditorValueToRawValue(
+    configParameterSpecs: atmParameterSpecsEditorValueToRawValue(
       formData.configParameters
     ),
     resourceSpec: serializeTaskResourcesFieldsValues(formData?.resources),

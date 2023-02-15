@@ -11,7 +11,7 @@ import { createValuesContainer } from 'onedata-gui-common/utils/form-component/v
 import {
   dataSpecToFormValues,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { rawValueToAtmParametersSpecEditorValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
+import { rawValueToAtmParameterSpecsEditorValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -87,11 +87,11 @@ export default function recordToFormData(revision, defaultAtmResourceSpec, formM
     summary: revision.summary,
     engine: operationSpec?.engine,
     preferredBatchSize: revision.preferredBatchSize,
-    arguments: rawValueToAtmParametersSpecEditorValue(
+    arguments: rawValueToAtmParameterSpecsEditorValue(
       revision.argumentSpecs
     ),
     results: recordResultsToFormResults(revision.resultSpecs),
-    configParameters: rawValueToAtmParametersSpecEditorValue(
+    configParameters: rawValueToAtmParameterSpecsEditorValue(
       revision.configParameterSpecs
     ),
     resources,
@@ -123,7 +123,7 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
     results: createValuesContainer({
       __fieldsValueNames: [],
     }),
-    configParameters: rawValueToAtmParametersSpecEditorValue([]),
+    configParameters: rawValueToAtmParameterSpecsEditorValue([]),
     resources: createValuesContainer({
       cpu: createValuesContainer({
         cpuRequested: getDefaultAtmResourceValue(
