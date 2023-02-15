@@ -7,9 +7,9 @@
  */
 
 import EmberObject, { computed, get, defineProperty } from '@ember/object';
-import { reads } from '@ember/object/computed';
+import { reads, notEmpty } from '@ember/object/computed';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import { isEmpty, promise } from 'ember-awesome-macros';
+import { isEmpty, promise, and, not, or } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -53,7 +53,18 @@ export default EmberObject.extend(OwnerInjector, {
 
   //#endregion
 
-  isEmpty: isEmpty('entries'),
+  isCurrentListEmpty: isEmpty('entries'),
+
+  noSpacesAvailable: and(
+    'entriesInitialLoad.isSettled',
+    'isCurrentListEmpty',
+    not('isAnyFilterActive'),
+  ),
+
+  isAnyFilterActive: or(
+    'searchValue',
+    notEmpty('tagsFilter'),
+  ),
 
   userSpacesIdsProxy: promise.object(computed(
     'currentUser.user.spaceList.content.list',
@@ -179,5 +190,12 @@ export default EmberObject.extend(OwnerInjector, {
   changeTagsFilter(tags) {
     this.set('tagsFilter', _.isEmpty(tags) ? null : tags);
     this.entries.scheduleReload({ head: true });
+  },
+
+  /**
+   * @public
+   */
+  async refreshList() {
+    return this.entries.scheduleReload();
   },
 });

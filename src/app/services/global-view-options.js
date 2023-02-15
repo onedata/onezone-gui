@@ -14,8 +14,13 @@ export default GlobalViewOptionsBase.extend({
    */
   staticViewOptions: Object.freeze({
     spaces: {
-      configuration: {
-        className: 'full-height fill-flex-using-column fill-flex-limited',
+      id: {
+        configuration: {
+          className: 'full-height fill-flex-using-column fill-flex-limited',
+        },
+      },
+      join: {
+        className: 'full-height scrollbar-above-spaces-marketplace',
       },
     },
   }),

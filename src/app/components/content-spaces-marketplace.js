@@ -14,8 +14,11 @@ import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-vie
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],
 
-  isEmpty: reads('viewModel.isEmpty'),
+  noSpacesAvailable: reads('viewModel.noSpacesAvailable'),
 
+  /**
+   * @type {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
+   */
   viewModel: computed(function viewModel() {
     return SpacesMarketplaceViewModel.create({
       ownerSource: this,

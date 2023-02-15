@@ -1170,8 +1170,9 @@ function attachAtmWorkflowSchemasToAtmInventory(store, atmInventory) {
     });
 }
 
-// FIXME: implement basic mock for marketplace infinite scroll
 async function generateMarketplaceMock(store, listRecords) {
+  const spaceInfoRecords = [];
+
   const spaceList = Object.values(listRecords).find(lr =>
     lr.constructor.modelName === 'space-list'
   );
@@ -1195,7 +1196,7 @@ async function generateMarketplaceMock(store, listRecords) {
     totalSupportSize: get(firstSpace, 'totalSize'),
     providerNames,
   });
-  const spaceInfoRecords = [ownedSpaceMarketplaceInfo];
+  spaceInfoRecords.push(ownedSpaceMarketplaceInfo);
   const additionalSpaceInfoCount = 10;
   for (let i = 0; i < additionalSpaceInfoCount; ++i) {
     const name = `Space ${String(i).padStart(2, '0')}`;
@@ -1220,5 +1221,6 @@ async function generateMarketplaceMock(store, listRecords) {
     });
     spaceInfoRecords.push(record);
   }
+
   return await allFulfilled(spaceInfoRecords.map(record => record.save()));
 }

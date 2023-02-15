@@ -9,15 +9,11 @@
 import Component from '@ember/component';
 import { observer } from '@ember/object';
 import { reads } from '@ember/object/computed';
-import { debounce } from '@ember/runloop';
-import config from 'ember-get-config';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import addConflictLabels from 'onedata-gui-common/utils/add-conflict-labels';
 import InfiniteScroll from 'onedata-gui-common/utils/infinite-scroll';
 import { and } from 'ember-awesome-macros';
 import waitForRender from 'onedata-gui-common/utils/wait-for-render';
-
-const typingActionDebouce = config.timing.typingActionDebouce;
 
 export default Component.extend(I18n, {
   classNames: ['spaces-marketplace-list'],
@@ -119,14 +115,5 @@ export default Component.extend(I18n, {
       return;
     }
     itemElement.scrollIntoView();
-  },
-
-  actions: {
-    changeSearchValue(newValue) {
-      debounce(this.viewModel, 'changeSearchValue', newValue, typingActionDebouce);
-    },
-    changeTagsFilter(tags) {
-      this.viewModel.changeTagsFilter(tags);
-    },
   },
 });

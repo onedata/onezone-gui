@@ -1,0 +1,10 @@
+.spaces-marketplace-filter-header {
+  padding-top: $spaces-marketplace-items-spacing;
+
+  .form-group.search-form-group {
+    margin-bottom: 0;
+  }
+  .search-form-group + .tags-filter-form-group {
+    margin-top: $spaces-marketplace-items-spacing * 0.5;
+  }
+}

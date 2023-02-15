@@ -7,6 +7,42 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
   }
 }
 
+.content-spaces-marketplace, .spaces-marketplace-empty {
+  position: relative;
+  min-height: 100%;
+}
+
+// FIXME: move to separate file
+
+.spaces-marketplace-header {
+  position: sticky;
+  z-index: 1;
+  margin-top: -$content-col-padding;
+  padding-top: $content-col-padding;
+  margin-left: -$content-col-padding;
+  padding-left: $content-col-padding;
+  margin-right: -$content-col-padding;
+  padding-right: $content-col-padding;
+  top: -$content-col-padding;
+  background-color: white;
+  padding-bottom: $spaces-marketplace-items-spacing * 0.5;
+
+  @include before-bottom-shadow;
+}
+
+.col-content.on-top {
+  .spaces-marketplace-header {
+    @include hide-before-shadow;
+  }
+}
+
+.scrollbar-above-spaces-marketplace {
+  ~ .ps__rail-y {
+    z-index: 2;
+  }
+}
+
+@import './content-spaces-marketplace/filter-header';
 @import './content-spaces-marketplace/list';
 @import './content-spaces-marketplace/item';
 @import './content-spaces-marketplace/space-item-support-list';
