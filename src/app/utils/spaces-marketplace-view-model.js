@@ -53,13 +53,48 @@ export default EmberObject.extend(OwnerInjector, {
 
   //#endregion
 
+  /**
+   * True, if the current list considering search conditions, is empty.
+   * @type {ComputedProperty<boolean>}
+   */
   isCurrentListEmpty: isEmpty('entries'),
 
+  /**
+   * True, when we are sure that there are no marketplace spaces available in system
+   * (before next fetch will be done).
+   * False, when we cannot determine if there are no spaces - maybe there are, but
+   * the view model is in the state that cannot say so (eg. the filter is on).
+   * @type {ComputedProperty<boolean>}
+   */
   noSpacesAvailable: and(
-    'entriesInitialLoad.isSettled',
+    'areSpacesAvailabilityConditionsMet',
     'isCurrentListEmpty',
-    not('isAnyFilterActive'),
   ),
+
+  /**
+   * True, when we are sure that there are spaces available in system (before next fetch
+   * will be done).
+   * False, when we cannot determine if there are spaces - maybe there are no space, but
+   * the view model is in the state that cannot say so (eg. the filter is on).
+   * @type {ComputedProperty<boolean>}
+   */
+  someSpacesAvailable: and(
+    'areSpacesAvailabilityConditionsMet',
+    not('isCurrentListEmpty'),
+  ),
+
+  /**
+   * Mainly for internal use. If true, then we can determine if there are or there are no
+   * spaces available at all, not considering filters.
+   * @type {ComputedProperty<boolean>}
+   */
+  areSpacesAvailabilityConditionsMet: and(
+    'entriesInitialLoad.isSettled',
+    not('isAnyFilterActive'),
+    not('entries.isReloading'),
+  ),
+
+  showEmptyListView: reads('noSpacesAvailable'),
 
   isAnyFilterActive: or(
     'searchValue',
@@ -90,6 +125,9 @@ export default EmberObject.extend(OwnerInjector, {
     // infinite loading before entries array is initialized async
     this.set('entriesInitialLoad', promiseObject(new Promise(() => {})));
     this.initEntries();
+
+    // FIXME: debug code
+    window.viewModel = this;
   },
 
   async initEntries() {

@@ -2,7 +2,7 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { collect, conditional, or, not } from 'ember-awesome-macros';
+import { collect, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import Action from 'onedata-gui-common/utils/action';
@@ -18,18 +18,12 @@ export default Component.extend(I18n, {
    */
   i18nPrefix: 'components.contentSpacesMarketplace.contentHeader',
 
-  someSpacesAvailable: not(or(
-    'viewModel.entriesInitialLoad.isPending',
-    'viewModel.noSpacesAvailable'
-  )),
-
   // TODO: VFS-10263 make "Add your space" action available in mobile mode
   // FIXME: jeśli jest refresh, to nie powinno być globalActions tylko lokalna tablica
   globalActions: conditional(
-    'someSpacesAvailable',
-    collect('refreshAdvertisedSpacesListAction', 'chooseSpaceToAdvertiseAction'),
-    // raw([]),
+    'viewModel.showEmptyListView',
     collect('refreshAdvertisedSpacesListAction'),
+    collect('refreshAdvertisedSpacesListAction', 'chooseSpaceToAdvertiseAction'),
   ),
 
   /**

@@ -19,6 +19,7 @@ import {
 import {
   aspect as spaceMarketplaceInfoAspect,
 } from 'onezone-gui/models/space-marketplace-info';
+import sleep from 'onedata-gui-common/utils/sleep';
 
 export const listMarketplaceAspect = 'list_marketplace';
 
@@ -530,6 +531,8 @@ export default Service.extend({
       listingParams,
       tags
     );
+    // FIXME: debug
+    await sleep(100);
     const recordsPromises = idsList.map(({ spaceId }) =>
       this.getSpaceMarketplaceInfo(spaceId)
     );

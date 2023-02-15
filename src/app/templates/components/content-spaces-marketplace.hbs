@@ -1,7 +1,7 @@
 {{content-spaces-marketplace/header viewModel=viewModel}}
 {{#promise-proxy-container proxy=viewModel.entriesInitialLoad}}
   {{!-- FIXME: sprawdzić, czy błędy pierwszego załadowania są obsługiwane --}}
-  {{#if noSpacesAvailable}}
+  {{#if viewModel.showEmptyListView}}
     {{content-spaces-marketplace/empty viewModel=viewModel}}
   {{else}}
     {{content-spaces-marketplace/list viewModel=viewModel}}

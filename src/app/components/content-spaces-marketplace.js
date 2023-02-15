@@ -7,15 +7,12 @@
  */
 
 import Component from '@ember/component';
-import { reads } from '@ember/object/computed';
 import { computed } from '@ember/object';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
 
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],
   classNameBindings: ['noSpacesAvailable:no-spaces-available'],
-
-  noSpacesAvailable: reads('viewModel.noSpacesAvailable'),
 
   /**
    * @type {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
