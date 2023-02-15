@@ -5,6 +5,8 @@
     margin-bottom: 0;
   }
   .search-form-group + .tags-filter-form-group {
-    margin-top: $spaces-marketplace-items-spacing * 0.5;
+    $vertical-margin: $spaces-marketplace-items-spacing * 0.5;
+    margin-top: $vertical-margin;
+    margin-bottom: $vertical-margin;
   }
 }

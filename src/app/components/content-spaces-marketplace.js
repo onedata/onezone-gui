@@ -13,6 +13,7 @@ import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-vie
 
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],
+  classNameBindings: ['noSpacesAvailable:no-spaces-available'],
 
   noSpacesAvailable: reads('viewModel.noSpacesAvailable'),
 

@@ -7,9 +7,13 @@ $spaces-marketplace-item-secondary-row-icon-size: 150%;
   }
 }
 
-.content-spaces-marketplace, .spaces-marketplace-empty {
-  position: relative;
-  min-height: 100%;
+.content-spaces-marketplace.no-spaces-available {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  .spaces-marketplace-header {
+    background-color: transparent;
+  }
 }
 
 // FIXME: move to separate file
