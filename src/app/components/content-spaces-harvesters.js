@@ -12,12 +12,11 @@ import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
 import { inject as service } from '@ember/service';
 import { computed, get } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { collect } from '@ember/object/computed';
 import { resolve } from 'rsvp';
 import { promise } from 'ember-awesome-macros';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
-import recordIcon from 'onedata-gui-common/utils/record-icon';
 
 export default Component.extend(I18n, GlobalActions, {
   classNames: ['content-spaces-harvesters'],

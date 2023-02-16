@@ -9,14 +9,13 @@
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import recordIcon from 'onedata-gui-common/utils/record-icon';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 
