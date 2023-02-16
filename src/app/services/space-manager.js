@@ -521,6 +521,31 @@ export default Service.extend({
     });
   },
 
+  // TODO: VFS-10524 use LS+ version of spaces marketplace info listing in list view
+  /**
+   * @param {InfiniteScrollListingParams} listingParams
+   * @param {Array<string>} tags
+   * @returns {Promise<{ list: Array<SpaceMarketplaceRawData>, isLast: boolean }>}
+   */
+  async fetchSpacesMarkeplaceRawData(listingParams, tags) {
+    const requestGri = gri({
+      entityType: 'space',
+      entityId: 'null',
+      aspect: 'list_marketplace_with_data',
+      scope: 'protected',
+    });
+    const data = { ...listingParams };
+    if (tags) {
+      data.tags = tags;
+    }
+    return await this.onedataGraph.request({
+      gri: requestGri,
+      operation: 'create',
+      data,
+      subscribe: false,
+    });
+  },
+
   /**
    * @param {InfiniteScrollListingParams} listingParams
    * @param {Array<string>} [tags]
