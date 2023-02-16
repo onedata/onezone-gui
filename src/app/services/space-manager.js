@@ -28,9 +28,8 @@ export const listMarketplaceAspect = 'list_marketplace';
  */
 
 /**
- * @typedef {Object} SpaceMarketplaceInfiniteScrollListingParams
- * @property {number} index
- * @property {}
+ * The same properties as in `Models.SpaceMarketplaceInfo` model.
+ * @typedef {Object} SpaceMarketplaceRawData
  */
 
 // FIXME: make generic type for infinite scroll
@@ -557,7 +556,7 @@ export default Service.extend({
       tags
     );
     // FIXME: debug
-    await sleep(100);
+    // await sleep(1000);
     const recordsPromises = idsList.map(({ spaceId }) =>
       this.getSpaceMarketplaceInfo(spaceId)
     );

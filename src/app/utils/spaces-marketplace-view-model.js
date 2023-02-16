@@ -18,6 +18,7 @@ import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import _ from 'lodash';
 import { Promise } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import { v4 as uuid } from 'ember-uuid';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -150,51 +151,24 @@ export default EmberObject.extend(OwnerInjector, {
   /**
    * Fetches next chunks of space marketplace items until an array of requested length
    * (`limit`) is made, containing space items that are conforming current search string
-   * (`this.searchValue`).
+   * (`this.searchValue`) and tags filter (`this.tagsFilter`).
    * @returns {{ array: Array<Utils.SpacesMarketplaceItem>, isLast: boolean }}
    */
-  async fetchFilteredEntries(index, limit, offset, array) {
-    let finalIsLast = false;
-    let currentIndex = index;
-    let currentOffset = offset;
-    let currentLimit = limit;
-    const finalArray = [];
-    while (currentLimit && !finalIsLast) {
-      const result = await this.fetchEntries(
-        currentIndex,
-        currentLimit,
-        currentOffset,
-        array
-      );
-      const entriesMatchingToAdd = filterSpaces(result.array, this.searchValue)
-        .slice(0, limit - finalArray.length);
-      finalArray.push(...entriesMatchingToAdd);
-      currentIndex = result.array.at(-1)?.index ?? null;
-      if (currentIndex === null) {
-        break;
-      }
-      currentOffset = 1;
-      currentLimit = Math.min(limit, limit - finalArray.length);
-      finalIsLast = result.isLast;
-    }
-    return {
-      array: finalArray,
-      isLast: finalIsLast,
-    };
+  async fetchFilteredEntries(index, limit, offset) {
+    const fetcher = new FilteredEntriesFetcher(this, { index, limit, offset });
+    return fetcher.performFetch();
   },
 
   /**
    * @returns {{ array: Array<Utils.SpacesMarketplaceItem>, isLast: boolean }}
    */
-  async fetchEntries(index, limit, offset, /* array */ ) {
+  async fetchEntries({ index, limit, offset, tags }) {
     const viewModel = this;
     const listingParams = {
       index,
       limit,
       offset,
     };
-    const tags = this.tagsFilter ?
-      this.tagsFilter.map(({ label }) => label) : undefined;
     const {
       array: recordsArray,
       isLast,
@@ -202,12 +176,14 @@ export default EmberObject.extend(OwnerInjector, {
       listingParams,
       tags
     );
-    const array = recordsArray.map(spaceMarketplaceInfo => SpacesMarketplaceItem.create({
-      spaceMarketplaceInfo,
-      viewModel,
-    }));
+    const resultArray = recordsArray.map(spaceMarketplaceInfo =>
+      SpacesMarketplaceItem.create({
+        spaceMarketplaceInfo,
+        viewModel,
+      })
+    );
     return {
-      array,
+      array: resultArray,
       isLast,
     };
   },
@@ -218,6 +194,7 @@ export default EmberObject.extend(OwnerInjector, {
    */
   changeSearchValue(value) {
     this.set('searchValue', value);
+    console.log('DEBUG: changeSearchValue', value, 'will scheduleReload');
     this.entries.scheduleReload({ head: true });
   },
 
@@ -237,3 +214,100 @@ export default EmberObject.extend(OwnerInjector, {
     return this.entries.scheduleReload();
   },
 });
+
+// FIXME: more jsdoc about this class; names of methods
+class FilteredEntriesFetcher {
+  /**
+   * @param {Utils.SpacesMarketplaceViewModel} viewModel
+   * @param {{ index: string, limit: number, offset: number }} fetchParams
+   */
+  constructor(viewModel, { index, limit, offset }) {
+    /** @type {Utils.SpacesMarketplaceViewModel} */
+    this.viewModel = viewModel;
+
+    /** @type {string} */
+    this.initialIndex = index;
+
+    /** @type {number} */
+    this.initialLimit = limit;
+
+    /** @type {number} */
+    this.initialOffset = offset;
+
+    this.reinitializeState();
+  }
+
+  async performFetch() {
+    while (this.currentLimit > 0 && !this.finalIsLast) {
+      /** @type {{ array: Array, isLast: boolean }} */
+      const result = await this.fetchEntries({
+        index: this.currentIndex,
+        limit: this.currentLimit,
+        offset: this.currentOffset,
+        tags: this.tags,
+      });
+      if (this.isCurrentFilterEqualViewFilter()) {
+        const entriesMatchingToAdd = filterSpaces(result.array, this.searchValue)
+          .slice(0, this.initialLimit - this.finalArray.length);
+        this.finalArray.push(...entriesMatchingToAdd);
+        this.currentIndex = result.array.at(-1)?.index ?? null;
+        if (this.currentIndex === null) {
+          break;
+        }
+        this.currentOffset = 1;
+        this.currentLimit = Math.min(
+          this.initialLimit,
+          this.initialLimit - this.finalArray.length
+        );
+        this.finalIsLast = result.isLast;
+        return {
+          array: this.finalArray,
+          isLast: this.finalIsLast,
+        };
+      } else {
+        this.reinitializeState();
+      }
+    }
+  }
+
+  isCurrentFilterEqualViewFilter() {
+    return this.searchValue === this.viewSearchValue &&
+      _.isEqual(this.tags, this.viewTags);
+  }
+
+  reinitializeState() {
+    /** @type {boolean} */
+    this.finalIsLast = false;
+
+    /** @type {string} */
+    this.currentIndex = this.initialIndex;
+
+    /** @type {number} */
+    this.currentOffset = this.initialOffset;
+
+    /** @type {number} */
+    this.currentLimit = this.initialLimit;
+
+    /** @type {Array} */
+    this.finalArray = [];
+
+    /** @type {string} */
+    this.searchValue = this.viewSearchValue;
+
+    /** @type {Array<string>} */
+    this.tags = this.viewTags;
+  }
+
+  async fetchEntries() {
+    return this.viewModel.fetchEntries(...arguments);
+  }
+
+  get viewSearchValue() {
+    return this.viewModel.searchValue;
+  }
+
+  get viewTags() {
+    return this.viewModel.tagsFilter ?
+      this.viewModel.tagsFilter.map(({ label }) => label) : undefined;
+  }
+}
