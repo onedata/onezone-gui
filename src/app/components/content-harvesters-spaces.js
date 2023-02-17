@@ -9,14 +9,13 @@
 
 import Component from '@ember/component';
 import { computed, get } from '@ember/object';
-import { reads, collect } from '@ember/object/computed';
+import { collect } from '@ember/object/computed';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
 import { inject as service } from '@ember/service';
 import safeExec from 'onedata-gui-common/utils/safe-method-execution';
 import GlobalActions from 'onedata-gui-common/mixins/components/global-actions';
 import { ResourceListItem } from 'onedata-gui-common/components/resources-list';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import recordIcon from 'onedata-gui-common/utils/record-icon';
 import { promise } from 'ember-awesome-macros';
 import { resolve } from 'rsvp';
 
@@ -70,7 +69,7 @@ export default Component.extend(I18n, GlobalActions, {
     return spaces.map(space => SpaceListItem.create({
       ownerSource: this,
       parentHarvester: harvester,
-      space,
+      record: space,
     }));
   }),
 
@@ -141,54 +140,34 @@ const SpaceListItem = ResourceListItem.extend(OwnerInjector, {
   /**
    * @virtual
    */
-  space: undefined,
-
-  /**
-   * @virtual
-   */
   parentHarvester: undefined,
 
   /**
    * @override
    */
-  label: reads('space.name'),
-
-  /**
-   * @override
-   */
-  conflictingLabelSource: reads('space'),
-
-  /**
-   * @override
-   */
-  icon: recordIcon('space'),
-
-  /**
-   * @override
-   */
-  link: computed('space', function link() {
+  link: computed('record', function link() {
     const {
       router,
-      space,
+      record,
       guiUtils,
-    } = this.getProperties('router', 'space', 'guiUtils');
+    } = this.getProperties('router', 'record', 'guiUtils');
     return router.urlFor(
       'onedata.sidebar.content.aspect',
       'spaces',
-      guiUtils.getRoutableIdFor(space),
+      guiUtils.getRoutableIdFor(record),
       'index'
     );
   }),
 
-  actions: computed('parentHarvester', 'space', function actions() {
+  actions: computed('parentHarvester', 'record', function actions() {
     const {
       harvesterActions,
       parentHarvester,
-      space,
-    } = this.getProperties('harvesterActions', 'parentHarvester', 'space');
+      record,
+    } = this.getProperties('harvesterActions', 'parentHarvester', 'record');
     return [harvesterActions.createRemoveSpaceFromHarvesterAction({
       harvester: parentHarvester,
-      space,
+      space: record,
     })];
   }),
 
