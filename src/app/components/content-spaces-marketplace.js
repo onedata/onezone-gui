@@ -8,11 +8,17 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
+import { inject as service } from '@ember/service';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
 
 export default Component.extend({
   classNames: ['content-spaces-marketplace'],
   classNameBindings: ['noSpacesAvailable:no-spaces-available'],
+
+  navigationState: service(),
+
+  selectedSpaceId: reads('navigationState.aspectOptions.selectedSpace'),
 
   /**
    * @type {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
