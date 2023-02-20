@@ -34,9 +34,9 @@ describe('Integration | Component | content atm inventories workflows', function
               },
             },
             argumentSpecs: [{
-              name: 'argobject',
+              name: 'argstring',
               dataSpec: {
-                type: 'object',
+                type: 'string',
                 valueConstraints: {},
               },
               isOptional: true,
@@ -516,7 +516,7 @@ describe('Integration | Component | content atm inventories workflows', function
           lambdaId: 'lambda1',
           lambdaRevisionNumber: 1,
           argumentMappings: [{
-            argumentName: 'argobject',
+            argumentName: 'argstring',
             valueBuilder: {
               valueBuilderType: 'iteratedItem',
             },
@@ -654,7 +654,7 @@ describe('Integration | Component | content atm inventories workflows', function
       expect(isSlideActive('taskDetails')).to.be.true;
       await fillIn(taskDetailsSlide.querySelector('.name-field .form-control'), 'newName');
       await selectChoose('.valueBuilderType-field', 'Constant value');
-      await fillIn('.valueBuilderConstValue-field .form-control', '{}');
+      await fillIn('.valueBuilderConstValue-field .form-control', 'abc');
       await click(taskDetailsSlide.querySelector('.btn-submit'));
 
       expect(isSlideActive('editor')).to.be.true;
@@ -668,10 +668,10 @@ describe('Integration | Component | content atm inventories workflows', function
         .to.deep.include({
           name: 'newName',
           argumentMappings: [{
-            argumentName: 'argobject',
+            argumentName: 'argstring',
             valueBuilder: {
               valueBuilderType: 'const',
-              valueBuilderRecipe: {},
+              valueBuilderRecipe: 'abc',
             },
           }],
         });
