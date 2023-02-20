@@ -17,6 +17,9 @@ describe('Integration | Component | resource info tile', function () {
       fullName: 'user1_fullname',
       username: 'user1_username',
       entityId: 'user1_id',
+      constructor: {
+        modelName: 'user',
+      },
     });
 
     const storeStub = Service.extend({
@@ -44,7 +47,7 @@ describe('Integration | Component | resource info tile', function () {
 
     expect(find('.resource-name')).to.contain.text(get(record, 'name'));
     expect(find('.id input')).to.have.value(get(record, 'entityId'));
-    expect(find('.user-with-icon .flippable-front.one-icon')).to.have.class('oneicon-user');
+    expect(find('.record-with-icon .flippable-front.one-icon')).to.have.class('oneicon-user');
     expect(find('.user-fullname')).to.contain.text('user1_fullname');
     expect(find('.user-username')).to.contain.text('user1_username');
   });
