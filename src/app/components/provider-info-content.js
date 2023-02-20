@@ -1,6 +1,6 @@
 /**
  * Content of popup with information about provider
- * 
+ *
  * @module components/provider-info-content
  * @author Agnieszka Warchoł
  * @copyright (C) 2022 ACK CYFRONET AGH
@@ -21,5 +21,5 @@ export default Component.extend(I18n, {
    * @virtual
    * @type {Models.Provider}
    */
-  provider: undefined,
+  record: undefined,
 });
