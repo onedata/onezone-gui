@@ -37,7 +37,10 @@
       </div>
     {{/content-info}}
   {{else}}
-    {{resources-list items=harvesterItems}}
+    {{resources-list
+      items=harvesterItems
+      isResourceWithAdditionalInfo=true
+    }}
   {{/if}}
 {{/promise-proxy-container}}
 {{yield}}
