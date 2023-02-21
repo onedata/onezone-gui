@@ -6,6 +6,7 @@ CHANGELOG
 
 ### Latest changes
 
+* VFS-10118 Added support for lambda configuration parameters
 * VFS-10367 Improved editor of input stores content in workflow execution wizard
 * VFS-10365 Improved editor of automation store default value
 * VFS-10499 Improved editor of automation task argument constant value
