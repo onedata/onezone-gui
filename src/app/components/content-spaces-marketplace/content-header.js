@@ -2,6 +2,7 @@
 
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import { reads } from '@ember/object/computed';
 import { collect, conditional } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import I18n from 'onedata-gui-common/mixins/components/i18n';
@@ -23,7 +24,7 @@ export default Component.extend(I18n, {
   globalActions: conditional(
     'viewModel.showEmptyListView',
     collect('refreshAdvertisedSpacesListAction'),
-    collect('refreshAdvertisedSpacesListAction', 'chooseSpaceToAdvertiseAction'),
+    collect('chooseSpaceToAdvertiseAction', 'refreshAdvertisedSpacesListAction'),
   ),
 
   /**
@@ -38,18 +39,22 @@ export default Component.extend(I18n, {
   refreshAdvertisedSpacesListAction: computed(
     'viewModel',
     function refreshAdvertisedSpacesListAction() {
-      return Action.create({
-        ownerSource: this,
-        i18nPrefix: `${this.i18nPrefix}.refreshAdvertisedSpacesListAction`,
-        className: 'refresh-advertised-spaces-list',
-        icon: 'refresh',
-        onExecute: async () => {
-          // FIXME: animation like in file browser?
-          const result = ActionResult.create();
-          await result.interceptPromise(this.viewModel.refreshList());
-          return result;
-        },
-      });
+      return Action
+        .extend({
+          disabled: reads('viewModel.isRefreshing'),
+        }).create({
+          viewModel: this.viewModel,
+          ownerSource: this,
+          i18nPrefix: `${this.i18nPrefix}.refreshAdvertisedSpacesListAction`,
+          className: 'refresh-advertised-spaces-list',
+          icon: 'refresh',
+          onExecute: async () => {
+            // FIXME: animation like in file browser?
+            const result = ActionResult.create();
+            await result.interceptPromise(this.viewModel.refreshList());
+            return result;
+          },
+        });
     }
   ),
 });

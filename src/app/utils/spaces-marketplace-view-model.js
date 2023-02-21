@@ -6,10 +6,10 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import EmberObject, { computed, get, defineProperty } from '@ember/object';
+import EmberObject, { computed, get, defineProperty, observer } from '@ember/object';
 import { reads, notEmpty } from '@ember/object/computed';
 import OwnerInjector from 'onedata-gui-common/mixins/owner-injector';
-import { isEmpty, promise, and, not, or } from 'ember-awesome-macros';
+import { isEmpty, promise, or, eq, raw } from 'ember-awesome-macros';
 import { inject as service } from '@ember/service';
 import SpacesMarketplaceItem from 'onezone-gui/utils/spaces-marketplace-item';
 import parseGri from 'onedata-gui-websocket-client/utils/parse-gri';
@@ -18,7 +18,6 @@ import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import _ from 'lodash';
 import { Promise } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
-import { v4 as uuid } from 'ember-uuid';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -52,6 +51,25 @@ export default EmberObject.extend(OwnerInjector, {
    */
   entriesInitialLoad: undefined,
 
+  /**
+   * Current state of refreshing process invoked by user.
+   * @type {boolean}
+   */
+  isRefreshing: false,
+
+  /**
+   * Main view state - it starts from `initialLoading`, when entries list is loaded for
+   * the first time. Then if there are no spaces in the marketplace at all,
+   * the state is transitioned to `noSpacesAvailable` showing welcome empty-marketplace
+   * screen. If at least one space is detected then state is transitioned to final `list`
+   * where list is rendered. List could be also empty (when filters are on or off), but
+   * when the component is initialized, there will be no more welcome screen.
+   * The state could be also transitioned directly from `initialLoading` to `list`
+   * if there are some spaces after initial load.
+   * @type {'initialLoading'|'noSpacesAvailable'|'list'}
+   */
+  viewState: 'initialLoading',
+
   //#endregion
 
   /**
@@ -60,42 +78,7 @@ export default EmberObject.extend(OwnerInjector, {
    */
   isCurrentListEmpty: isEmpty('entries'),
 
-  /**
-   * True, when we are sure that there are no marketplace spaces available in system
-   * (before next fetch will be done).
-   * False, when we cannot determine if there are no spaces - maybe there are, but
-   * the view model is in the state that cannot say so (eg. the filter is on).
-   * @type {ComputedProperty<boolean>}
-   */
-  noSpacesAvailable: and(
-    'areSpacesAvailabilityConditionsMet',
-    'isCurrentListEmpty',
-  ),
-
-  /**
-   * True, when we are sure that there are spaces available in system (before next fetch
-   * will be done).
-   * False, when we cannot determine if there are spaces - maybe there are no space, but
-   * the view model is in the state that cannot say so (eg. the filter is on).
-   * @type {ComputedProperty<boolean>}
-   */
-  someSpacesAvailable: and(
-    'areSpacesAvailabilityConditionsMet',
-    not('isCurrentListEmpty'),
-  ),
-
-  /**
-   * Mainly for internal use. If true, then we can determine if there are or there are no
-   * spaces available at all, not considering filters.
-   * @type {ComputedProperty<boolean>}
-   */
-  areSpacesAvailabilityConditionsMet: and(
-    'entriesInitialLoad.isSettled',
-    not('isAnyFilterActive'),
-    not('entries.isReloading'),
-  ),
-
-  showEmptyListView: reads('noSpacesAvailable'),
+  showEmptyListView: eq('viewState', raw('noSpacesAvailable')),
 
   isAnyFilterActive: or(
     'searchValue',
@@ -120,6 +103,31 @@ export default EmberObject.extend(OwnerInjector, {
       return this.spaceManager.getSpaceMarketplaceInfo(this.selectedSpaceId);
     }
   )),
+
+  viewStateChanger: observer('entriesInitialLoad.isSettled', 'entries.length', function viewStateChanger() {
+    const state = this.viewState;
+    switch (state) {
+      case 'initialLoading':
+        if (this.entriesInitialLoad.isSettled) {
+          if (!this.entries.length && !this.isAnyFilterActive) {
+            this.set('viewState', 'noSpacesAvailable');
+          } else {
+            this.set('viewState', 'list');
+          }
+        }
+        break;
+      case 'noSpacesAvailable':
+        if (this.entries.length && !this.isAnyFilterActive) {
+          this.set('viewState', 'list');
+        }
+        break;
+      case 'list':
+      default:
+        // Final state - if spaces list become empty, show small information about
+        // no spaces available on list. It could be problematic if we hide filter
+        break;
+    }
+  }),
 
   init() {
     this._super(...arguments);
@@ -194,6 +202,7 @@ export default EmberObject.extend(OwnerInjector, {
    */
   changeSearchValue(value) {
     this.set('searchValue', value);
+    // FIXME: debug
     console.log('DEBUG: changeSearchValue', value, 'will scheduleReload');
     this.entries.scheduleReload({ head: true });
   },
@@ -211,7 +220,16 @@ export default EmberObject.extend(OwnerInjector, {
    * @public
    */
   async refreshList() {
-    return this.entries.scheduleReload();
+    if (this.isRefreshing) {
+      return;
+    }
+    this.set('isRefreshing', true);
+    try {
+      await this.entries.scheduleReload();
+    } finally {
+      this.set('isRefreshing', false);
+    }
+
   },
 });
 
