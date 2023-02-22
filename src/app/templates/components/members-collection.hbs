@@ -31,30 +31,9 @@
           disableToggleIcon=true
           class=(if memberProxy.privilegesProxy.isModified "item-modified-header")
         }}
-          {{#if (or
-            (eq memberProxy.member.constructor.modelName "user")
-            (eq memberProxy.member.constructor.modelName "group")
-            )
+          {{record-info-with-icon
+            record=memberProxy.member
           }}
-            {{record-info-with-icon
-              record=memberProxy.member
-            }}
-          {{else}}
-            <span class="item-icon-container">
-              {{record-icon
-                class="item-icon"
-                record=memberProxy.member
-                useSubtypeIcon=true
-              }}
-              {{one-tooltip
-                title=memberProxy.member.name
-                placement="top"
-                arrowPlacement="left"
-                triggerEvents="hover"
-              }}
-            </span>
-            {{record-name record=memberProxy.member}}
-          {{/if}}
           <div class="right-container">
             {{#if (and showSaveCancel memberProxy.privilegesProxy.isModified)}}
               <span class="hidden-xs">
