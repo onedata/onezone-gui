@@ -7,7 +7,6 @@
  */
 
 import Component from '@ember/component';
-import { computed } from '@ember/object';
 import { reads } from '@ember/object/computed';
 import { inject as service } from '@ember/service';
 import SpacesMarketplaceViewModel from 'onezone-gui/utils/spaces-marketplace-view-model';
@@ -18,15 +17,34 @@ export default Component.extend({
 
   navigationState: service(),
 
-  selectedSpaceId: reads('navigationState.aspectOptions.selectedSpace'),
+  //#region state
 
   /**
-   * @type {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
+   * @type {Utils.SpacesMarketplaceViewModel}
    */
-  viewModel: computed(function viewModel() {
+  viewModel: undefined,
+
+  //#endregion
+
+  selectedSpaceId: reads('navigationState.aspectOptions.selectedSpace'),
+
+  init() {
+    this._super(...arguments);
+    this.set('viewModel', this.createViewModel());
+  },
+
+  didInsertElement() {
+    this._super(...arguments);
+    this.viewModel.mount(this.element);
+  },
+
+  /**
+   * @returns {ComputedProperty<Utils.SpacesMarketplaceViewModel>}
+   */
+  createViewModel() {
     return SpacesMarketplaceViewModel.create({
       ownerSource: this,
       selectedSpaceId: this.selectedSpaceId,
     });
-  }),
+  },
 });

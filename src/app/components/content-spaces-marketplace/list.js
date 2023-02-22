@@ -2,7 +2,7 @@
  * Spaces in marketplace list with search.
  *
  * @author Jakub Liput
- * @copyright (C) 2022 ACK CYFRONET AGH
+ * @copyright (C) 2022-2023 ACK CYFRONET AGH
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
@@ -85,16 +85,23 @@ export default Component.extend(I18n, {
    */
   didInsertElement() {
     this._super(...arguments);
+    this.infiniteScroll.mount(
+      this.element.querySelector('.list-entries'),
+      this.element.closest('.ps')
+    );
     (async () => {
       await this.entriesInitialLoad;
-      this.infiniteScroll.mount(this.element.querySelector('.list-entries'));
+      // FIXME: experimental wait for current task
+      // await this.viewModel.entries.taskQueue.currentTask?.deferred.promise;
       await waitForRender();
       this.scrollToSelectedSpace();
     })();
   },
 
   initInfiniteScroll() {
-    // FIXME: maybe registering adjustScrollAfterBeginningChange is needed (ifinite-scroll-table)
+    if (this.infiniteScroll) {
+      throw new Error('inifiniteScroll is already initialized');
+    }
     const infiniteScroll = InfiniteScroll.create({
       entries: this.entries,
       singleRowHeight: this.rowHeight,
@@ -102,8 +109,7 @@ export default Component.extend(I18n, {
     this.set('infiniteScroll', infiniteScroll);
   },
 
-  // FIXME: reimplement
-  scrollToSelectedSpace() {
+  async scrollToSelectedSpace() {
     if (!this.selectedSpaceId || !this.element) {
       return;
     }
@@ -114,6 +120,9 @@ export default Component.extend(I18n, {
     if (!itemElement) {
       return;
     }
-    itemElement.scrollIntoView();
+    const scrollOffset = itemElement.offsetTop -
+      window.parseInt(window.getComputedStyle(itemElement).marginTop) -
+      this.viewModel.getStickyHeaderHeight();
+    this.infiniteScroll.scrollHandler.scrollTo(null, scrollOffset);
   },
 });

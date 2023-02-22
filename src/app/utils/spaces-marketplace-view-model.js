@@ -18,6 +18,7 @@ import filterSpaces from 'onezone-gui/utils/filter-spaces';
 import _ from 'lodash';
 import { Promise } from 'rsvp';
 import { promiseObject } from 'onedata-gui-common/utils/ember/promise-object';
+import height from 'onedata-gui-common/utils/dom/height';
 
 export default EmberObject.extend(OwnerInjector, {
   spaceManager: service(),
@@ -30,6 +31,12 @@ export default EmberObject.extend(OwnerInjector, {
   selectedSpaceId: null,
 
   //#region state
+
+  /**
+   * HTMLElement of `Components.ContentSpacesMarketplace`
+   * @type {HTMLElement}
+   */
+  element: null,
 
   /**
    * @type {string}
@@ -139,6 +146,14 @@ export default EmberObject.extend(OwnerInjector, {
     window.viewModel = this;
   },
 
+  /**
+   * Adds reference to rendered element.
+   * @param {HTMLElement} element HTMLElement of `Components.ContentSpacesMarketplace`.
+   */
+  mount(element) {
+    this.set('element', element);
+  },
+
   async initEntries() {
     const selectedSpaceMarketplaceInfo = await this.selectedSpaceMarketplaceInfoProxy;
     const initialJumpIndex = selectedSpaceMarketplaceInfo &&
@@ -151,6 +166,8 @@ export default EmberObject.extend(OwnerInjector, {
       initialJumpIndex,
     });
     this.set('entries', entries);
+    // FIXME: debug
+    window.entries = entries;
     defineProperty(this, 'entriesInitialLoad', reads('entries.initialLoad'));
     // needed after defineProperty
     this.notifyPropertyChange('entriesInitialLoad');
@@ -229,7 +246,15 @@ export default EmberObject.extend(OwnerInjector, {
     } finally {
       this.set('isRefreshing', false);
     }
+  },
 
+  getStickyHeader() {
+    return this.element?.querySelector('.spaces-marketplace-header') ?? null;
+  },
+
+  getStickyHeaderHeight() {
+    const stickyHeader = this.getStickyHeader();
+    return stickyHeader && height(stickyHeader) || 0;
   },
 });
 
@@ -268,7 +293,7 @@ class FilteredEntriesFetcher {
         const entriesMatchingToAdd = filterSpaces(result.array, this.searchValue)
           .slice(0, this.initialLimit - this.finalArray.length);
         this.finalArray.push(...entriesMatchingToAdd);
-        this.currentIndex = result.array.at(-1)?.index ?? null;
+        this.currentIndex = _.last(result.array).index ?? null;
         if (this.currentIndex === null) {
           break;
         }
