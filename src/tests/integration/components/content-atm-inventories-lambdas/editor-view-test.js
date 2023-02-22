@@ -78,23 +78,21 @@ describe(
       });
 
       context('when "atmLambda" and "atmLambdaRevisionNumber" are empty', function () {
-        it('has header "Add new lambda"', async function (done) {
+        it('has header "Add new lambda"', async function () {
           await renderComponent();
 
           expect(find('.header-row h1')).to.have.trimmed.text('Add new lambda');
-          done();
         });
 
         itShowsFormInMode('create');
 
-        it('renders empty form', async function (done) {
+        it('renders empty form', async function () {
           await renderComponent();
 
           expect(find('.name-field .form-control')).to.have.value('');
-          done();
         });
 
-        it('allows to create new lambda', async function (done) {
+        it('allows to create new lambda', async function () {
           const {
             atmInventory,
             onAtmLambdaRevisionSaved,
@@ -114,8 +112,6 @@ describe(
           await click('.btn-submit');
           expect(createStub).to.be.calledOnce;
           expect(onAtmLambdaRevisionSaved).to.be.calledOnce;
-
-          done();
         });
       });
 
@@ -127,25 +123,23 @@ describe(
           });
         });
 
-        it('has header "Add new lambda revision"', async function (done) {
+        it('has header "Add new lambda revision"', async function () {
           await renderComponent();
 
           expect(find('.header-row h1'))
             .to.have.trimmed.text('Add new lambda revision');
-          done();
         });
 
         itShowsFormInMode('create');
 
         it('renders form with fields prefilled with data from lambda revision',
-          async function (done) {
+          async function () {
             await renderComponent();
 
             expect(find('.name-field .form-control')).to.have.value('f1');
-            done();
           });
 
-        it('allows to create new lambda revision', async function (done) {
+        it('allows to create new lambda revision', async function () {
           const {
             atmLambda,
             onAtmLambdaRevisionSaved,
@@ -164,8 +158,6 @@ describe(
           await click('.btn-submit');
           expect(createStub).to.be.calledOnce;
           expect(onAtmLambdaRevisionSaved).to.be.calledOnce;
-
-          done();
         });
       });
     });
@@ -179,25 +171,23 @@ describe(
         });
       });
 
-      it('has header "Modify lambda revision"', async function (done) {
+      it('has header "Modify lambda revision"', async function () {
         await renderComponent();
 
         expect(find('.header-row h1'))
           .to.contain.text('Modify lambda revision');
-        done();
       });
 
       itShowsFormInMode('edit');
 
       it('renders form with fields prefilled with data from lambda revision',
-        async function (done) {
+        async function () {
           await renderComponent();
 
           expect(find('.name-field .form-control')).to.have.value('f1');
-          done();
         });
 
-      it('allows to modify lambda revision', async function (done) {
+      it('allows to modify lambda revision', async function () {
         const {
           atmLambda,
           onAtmLambdaRevisionSaved,
@@ -215,8 +205,6 @@ describe(
         await click('.btn-submit');
         expect(modifyStub).to.be.calledOnce;
         expect(onAtmLambdaRevisionSaved).to.be.calledOnce;
-
-        done();
       });
     });
   }
@@ -234,12 +222,11 @@ async function renderComponent() {
 }
 
 function itShowsFormInMode(mode) {
-  it(`shows form in "${mode}" mode`, async function (done) {
+  it(`shows form in "${mode}" mode`, async function () {
     await renderComponent();
 
     const form = find('.atm-lambda-form');
     expect(form).to.have.class(`mode-${mode}`);
-    done();
   });
 }
 

@@ -169,7 +169,7 @@ describe('Integration | Component | content atm inventories lambdas', function (
       });
     });
 
-    it('shows lambdas list in "list" slide', async function (done) {
+    it('shows lambdas list in "list" slide', async function () {
       await renderComponent();
 
       const listSlide = getSlide('list');
@@ -177,11 +177,10 @@ describe('Integration | Component | content atm inventories lambdas', function (
       expect(listView).to.exist;
       expect(listView.innerText).to.contain('f0');
       expect(listView.innerText).to.contain('f1');
-      done();
     });
 
     it('shows lambdas list when "lambdaId" and "revision" are not empty',
-      async function (done) {
+      async function () {
         setProperties(get(lookupService(this, 'navigation-state'), 'aspectOptions'), {
           lambdaId: 'lambda1',
           revision: '2',
@@ -190,10 +189,9 @@ describe('Integration | Component | content atm inventories lambdas', function (
         await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
-        done();
       });
 
-    it('allows to open editor in creation mode', async function (done) {
+    it('allows to open editor in creation mode', async function () {
       await renderComponent();
 
       await click(
@@ -204,10 +202,9 @@ describe('Integration | Component | content atm inventories lambdas', function (
       expect(getSlide('editor').innerText).to.contain('Add new lambda');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'creator', lambdaId: null, revision: null });
-      done();
     });
 
-    it('allows to open editor for specific lambda', async function (done) {
+    it('allows to open editor for specific lambda', async function () {
       await renderComponent();
 
       await click(getSlide('list').querySelector('.revisions-table-revision-entry'));
@@ -218,10 +215,9 @@ describe('Integration | Component | content atm inventories lambdas', function (
         .to.equal('f0');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'editor', lambdaId: 'lambda0', revision: '1' });
-      done();
     });
 
-    it('allows to open new lambda revision creator', async function (done) {
+    it('allows to open new lambda revision creator', async function () {
       await renderComponent();
 
       await click(
@@ -232,11 +228,10 @@ describe('Integration | Component | content atm inventories lambdas', function (
       expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'creator', lambdaId: 'lambda1', revision: '1' });
-      done();
     });
 
     it('allows to open new lambda revision creator based on old revision',
-      async function (done) {
+      async function () {
         await renderComponent();
 
         await click(
@@ -250,7 +245,6 @@ describe('Integration | Component | content atm inventories lambdas', function (
         expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'creator', lambdaId: 'lambda1', revision: '1' });
-        done();
       });
   });
 
@@ -268,17 +262,16 @@ describe('Integration | Component | content atm inventories lambdas', function (
       });
 
     context('when "lambdaId" and "revision" query params are empty', function () {
-      it('shows lambda creator', async function (done) {
+      it('shows lambda creator', async function () {
         await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda');
         expect(getSlide('editor').querySelector('.name-field .form-control').value)
           .to.equal('');
-        done();
       });
 
-      it('allows to add new lambda', async function (done) {
+      it('allows to add new lambda', async function () {
         const atmInventory = this.get('atmInventory');
         const createStub = sinon.stub(CreateAtmLambdaAction.prototype, 'onExecute')
           .callsFake(function () {
@@ -295,8 +288,6 @@ describe('Integration | Component | content atm inventories lambdas', function (
         expect(isSlideActive('list')).to.be.true;
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'list', lambdaId: null, revision: null });
-
-        done();
       });
     });
 
@@ -309,17 +300,16 @@ describe('Integration | Component | content atm inventories lambdas', function (
 
       itShowsLoader();
 
-      it('shows lambda revision creator', async function (done) {
+      it('shows lambda revision creator', async function () {
         await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Add new lambda revision');
         expect(getSlide('editor').querySelector('.name-field .form-control').value)
           .to.equal('f0');
-        done();
       });
 
-      it('allows to add new lambda revision', async function (done) {
+      it('allows to add new lambda revision', async function () {
         const createStub = sinon.stub(CreateAtmLambdaRevisionAction.prototype, 'onExecute');
         await renderComponent();
 
@@ -329,7 +319,6 @@ describe('Integration | Component | content atm inventories lambdas', function (
         expect(isSlideActive('list')).to.be.true;
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'list', lambdaId: 'lambda0', revision: '1' });
-        done();
       });
     });
   });
@@ -342,11 +331,10 @@ describe('Integration | Component | content atm inventories lambdas', function (
     });
 
     context('when "lambdaId" and "revision" query params are empty', function () {
-      it('redirects to "list" view', async function (done) {
+      it('redirects to "list" view', async function () {
         await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
-        done();
       });
     });
 
@@ -364,17 +352,16 @@ describe('Integration | Component | content atm inventories lambdas', function (
         revision: '1',
       });
 
-      it('shows lambda revision editor', async function (done) {
+      it('shows lambda revision editor', async function () {
         await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expect(getSlide('editor').innerText).to.contain('Modify lambda revision');
         expect(getSlide('editor').querySelector('.name-field .form-control').value)
           .to.equal('f0');
-        done();
       });
 
-      it('allows to modify lambda revision', async function (done) {
+      it('allows to modify lambda revision', async function () {
         const modifyStub = sinon.stub(ModifyAtmLambdaRevisionAction.prototype, 'onExecute');
         await renderComponent();
 
@@ -384,7 +371,6 @@ describe('Integration | Component | content atm inventories lambdas', function (
         expect(isSlideActive('list')).to.be.true;
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'list', lambdaId: 'lambda0', revision: '1' });
-        done();
       });
     });
   });
@@ -399,7 +385,7 @@ async function renderComponent() {
 function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {
   const expectedQueryParams =
     Object.assign({ view: 'list' }, expectedListQueryParams);
-  it('allows to get back to "list" slide using back link', async function (done) {
+  it('allows to get back to "list" slide using back link', async function () {
     await renderComponent();
 
     await enterEditorCallback(this);
@@ -409,10 +395,9 @@ function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {
     expect(isSlideActive('list')).to.be.true;
     expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
       .to.deep.equal(expectedQueryParams);
-    done();
   });
 
-  it('allows to get back to "list" slide using cancel button', async function (done) {
+  it('allows to get back to "list" slide using cancel button', async function () {
     await renderComponent();
 
     await enterEditorCallback(this);
@@ -422,12 +407,11 @@ function itAllowsToGetBackToList(enterEditorCallback, expectedListQueryParams) {
     expect(isSlideActive('list')).to.be.true;
     expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
       .to.deep.equal(expectedQueryParams);
-    done();
   });
 }
 
 function itShowsLoader() {
-  it('shows loading page when lambda is being loaded', async function (done) {
+  it('shows loading page when lambda is being loaded', async function () {
     this.get('getRecordByIdStub')
       .withArgs('atmLambda', 'lambda0')
       .returns(new Promise(() => {}));
@@ -436,10 +420,9 @@ function itShowsLoader() {
 
     expect(isSlideActive('editor')).to.be.true;
     expect(getSlide('editor').querySelector('.spin-spinner')).to.exist;
-    done();
   });
 
-  it('shows error page when lambda loading failed', async function (done) {
+  it('shows error page when lambda loading failed', async function () {
     let rejectCallback;
     this.get('getRecordByIdStub')
       .withArgs('atmLambda', 'lambda0')
@@ -451,10 +434,9 @@ function itShowsLoader() {
 
     expect(isSlideActive('editor')).to.be.true;
     expect(getSlide('editor').querySelector('.resource-load-error')).to.exist;
-    done();
   });
 
-  it('allows to go back from loader page', async function (done) {
+  it('allows to go back from loader page', async function () {
     this.get('getRecordByIdStub')
       .withArgs('atmLambda', 'lambda0')
       .returns(new Promise(() => {}));
@@ -465,6 +447,5 @@ function itShowsLoader() {
     expect(isSlideActive('list')).to.be.true;
     expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
       .to.deep.equal({ view: 'list', lambdaId: 'lambda0', revision: '1' });
-    done();
   });
 }

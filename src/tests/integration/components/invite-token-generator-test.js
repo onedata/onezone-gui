@@ -274,7 +274,7 @@ describe('Integration | Component | invite token generator', function () {
   });
 
   context('when user has truthy "canInviteProviders"', function () {
-    it('allows to generate onedatify command', async function (done) {
+    it('allows to generate onedatify command', async function () {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this,
@@ -296,11 +296,9 @@ describe('Integration | Component | invite token generator', function () {
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken'$/
       );
-
-      done();
     });
 
-    it('allows to generate onedatify with import command', async function (done) {
+    it('allows to generate onedatify with import command', async function () {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
@@ -316,13 +314,11 @@ describe('Integration | Component | invite token generator', function () {
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token 'registertoken' --token 'supporttoken' --import$/
       );
-
-      done();
     });
 
     ['onedatify', 'onedatifyWithImport'].forEach((inviteType) => {
       it(`does not show variables description for ${inviteType} invite token`,
-        async function (done) {
+        async function () {
           const space = { entityId: 'space0' };
           this.set('targetRecord', space);
           stubCreateToken(this,
@@ -338,7 +334,6 @@ describe('Integration | Component | invite token generator', function () {
           `);
 
           expect(find('.variables-description')).to.not.exist;
-          done();
         }
       );
     });
@@ -349,7 +344,7 @@ describe('Integration | Component | invite token generator', function () {
       this.set('userRecord.canInviteProviders', false);
     });
 
-    it('allows to generate onedatify command', async function (done) {
+    it('allows to generate onedatify command', async function () {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this,
@@ -367,10 +362,9 @@ describe('Integration | Component | invite token generator', function () {
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken'$/
       );
-      done();
     });
 
-    it('allows to generate onedatify with import command', async function (done) {
+    it('allows to generate onedatify with import command', async function () {
       const space = { entityId: 'space0' };
       this.set('targetRecord', space);
       stubCreateToken(this, ['supportSpace', 'space0'], resolve('supporttoken'));
@@ -385,12 +379,11 @@ describe('Integration | Component | invite token generator', function () {
       expect(find('.token-textarea').value).to.match(
         /^curl https:\/\/get\.onedata\.org\/onedatify\.sh \| sh -s onedatify --onezone-url '.*?' --registration-token "\$PROVIDER_REGISTRATION_TOKEN" --token 'supporttoken' --import$/
       );
-      done();
     });
 
     ['onedatify', 'onedatifyWithImport'].forEach((inviteType) => {
       it(`shows correct limitations and variables description for ${inviteType} invite token`,
-        async function (done) {
+        async function () {
           const space = { entityId: 'space0' };
           this.set('targetRecord', space);
           stubCreateToken(this,
@@ -417,7 +410,6 @@ describe('Integration | Component | invite token generator', function () {
           expect(tipText).to.equal(
             'This Onezone enforces a restricted policy that prevents regular users from registering new Oneprovider instances at will.'
           );
-          done();
         });
     });
   });

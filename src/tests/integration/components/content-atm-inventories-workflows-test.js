@@ -239,16 +239,15 @@ describe('Integration | Component | content atm inventories workflows', function
       });
     });
 
-    it('shows workflow schemas list', async function (done) {
+    it('shows workflow schemas list', async function () {
       await renderComponent();
 
       expect(isSlideActive('list')).to.be.true;
       expect(getSlide('list').innerText).to.contain('w0 summary');
-      done();
     });
 
     it('shows workflow schemas list when "workflowId" and "revision" are not empty',
-      async function (done) {
+      async function () {
         setProperties(get(lookupService(this, 'navigation-state'), 'aspectOptions'), {
           workflowId: 'w1id',
           revision: '2',
@@ -257,10 +256,9 @@ describe('Integration | Component | content atm inventories workflows', function
         await renderComponent();
 
         expect(isSlideActive('list')).to.be.true;
-        done();
       });
 
-    it('allows to open creator view', async function (done) {
+    it('allows to open creator view', async function () {
       await renderComponent();
 
       await click(
@@ -271,10 +269,9 @@ describe('Integration | Component | content atm inventories workflows', function
       expectSlideContainsView('editor', 'creator');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'editor', workflowId: null, revision: null });
-      done();
     });
 
-    it('allows to open editor view for specific workflow schema', async function (done) {
+    it('allows to open editor view for specific workflow schema', async function () {
       await renderComponent();
 
       await click(getSlide('list').querySelector('.revisions-table-revision-entry'));
@@ -283,11 +280,10 @@ describe('Integration | Component | content atm inventories workflows', function
       expectSlideContainsView('editor', 'editor');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
-      done();
     });
 
     it('allows to create new revision and opens it in editor after creation',
-      async function (done) {
+      async function () {
         await renderComponent();
 
         await click(
@@ -298,11 +294,10 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'editor');
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w0id', revision: '1' });
-        done();
       });
 
     it('allows to redesign existing revision and opens it in editor after creation',
-      async function (done) {
+      async function () {
         await renderComponent();
 
         await click(
@@ -316,7 +311,6 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'editor');
         expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '3' });
-        done();
       });
   });
 
@@ -328,18 +322,17 @@ describe('Integration | Component | content atm inventories workflows', function
     });
 
     it('shows workflow schema creator when "workflowId" is empty',
-      async function (done) {
+      async function () {
         set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', null);
 
         await renderComponent();
 
         expect(isSlideActive('editor')).to.be.true;
         expectSlideContainsView('editor', 'creator');
-        done();
       });
 
     it('shows loading page when all query params are provided and workflow is being loaded',
-      async function (done) {
+      async function () {
         const navigationState = lookupService(this, 'navigation-state');
         set(navigationState, 'aspectOptions.workflowId', 'abc');
         set(navigationState, 'aspectOptions.revision', '2');
@@ -353,11 +346,10 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'loading');
         const editorSlide = getSlide('editor');
         expect(editorSlide.querySelector('.spin-spinner')).to.exist;
-        done();
       });
 
     it('shows error page when all query params are provided and workflow loading failed',
-      async function (done) {
+      async function () {
         const navigationState = lookupService(this, 'navigation-state');
         let rejectCallback;
         set(navigationState, 'aspectOptions.workflowId', 'abc');
@@ -374,11 +366,10 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'loading');
         const editorSlide = getSlide('editor');
         expect(editorSlide.querySelector('.resource-load-error')).to.exist;
-        done();
       });
 
     it('shows editor page when all query params are provided and workflow is loaded',
-      async function (done) {
+      async function () {
         const navigationState = lookupService(this, 'navigation-state');
         set(navigationState, 'aspectOptions.workflowId', 'w1id');
         set(navigationState, 'aspectOptions.revision', '2');
@@ -388,10 +379,9 @@ describe('Integration | Component | content atm inventories workflows', function
         expectSlideContainsView('editor', 'editor');
         const editorSlide = getSlide('editor');
         expect(editorSlide.querySelector('.header-row').innerText).to.contain('w1');
-        done();
       });
 
-    it('allows to go back from editor page', async function (done) {
+    it('allows to go back from editor page', async function () {
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', 'w1id');
       set(navigationState, 'aspectOptions.revision', '2');
@@ -405,10 +395,9 @@ describe('Integration | Component | content atm inventories workflows', function
         workflowId: 'w1id',
         revision: '2',
       });
-      done();
     });
 
-    it('allows to go back from creator page', async function (done) {
+    it('allows to go back from creator page', async function () {
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', null);
       await renderComponent();
@@ -421,10 +410,9 @@ describe('Integration | Component | content atm inventories workflows', function
         workflowId: null,
         revision: null,
       });
-      done();
     });
 
-    it('allows to go back from loader page', async function (done) {
+    it('allows to go back from loader page', async function () {
       const navigationState = lookupService(this, 'navigation-state');
       set(navigationState, 'aspectOptions.workflowId', 'abc');
       set(navigationState, 'aspectOptions.revision', '2');
@@ -441,10 +429,9 @@ describe('Integration | Component | content atm inventories workflows', function
         workflowId: 'abc',
         revision: '2',
       });
-      done();
     });
 
-    it('redirects to editor view after workflow creation', async function (done) {
+    it('redirects to editor view after workflow creation', async function () {
       set(lookupService(this, 'navigation-state'), 'aspectOptions.workflowId', null);
       const {
         atmWorkflowSchemas,
@@ -480,10 +467,9 @@ describe('Integration | Component | content atm inventories workflows', function
       expectSlideContainsView('editor', 'editor');
       expect(get(lookupService(this, 'navigation-state'), 'aspectOptions'))
         .to.deep.equal({ view: 'editor', workflowId: 'someId', revision: '1' });
-      done();
     });
 
-    it('allows to add new task', async function (done) {
+    it('allows to add new task', async function () {
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
       set(navigationsState, 'aspectOptions.revision', '2');
@@ -523,11 +509,10 @@ describe('Integration | Component | content atm inventories workflows', function
           }],
           resultMappings: [],
         });
-      done();
     });
 
     it('allows to add new task using lambda from another inventory',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         const attachAtmLambdaToAtmInventoryStub =
           this.get('attachAtmLambdaToAtmInventoryStub');
@@ -564,11 +549,10 @@ describe('Integration | Component | content atm inventories workflows', function
             argumentMappings: [],
             resultMappings: [],
           });
-        done();
       });
 
     it('allows to go back from lambdas selector during task creation',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -582,11 +566,10 @@ describe('Integration | Component | content atm inventories workflows', function
         expect(isSlideActive('editor')).to.be.true;
         const tasks = editorSlide.querySelectorAll('.workflow-visualiser-task');
         expect(tasks).to.have.length(1);
-        done();
       });
 
     it('allows to go back to lambdas selector from task details during task creation',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -600,11 +583,10 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(taskDetailsSlide.querySelector('.content-back-link'));
 
         expect(isSlideActive('lambdaSelector')).to.be.true;
-        done();
       });
 
     it('allows to go back to editor from task details during task creation',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -619,11 +601,10 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(lambdaSelectorSlide.querySelector('.content-back-link'));
 
         expect(isSlideActive('editor')).to.be.true;
-        done();
       });
 
     it('navigates to editor on "Cancel" click from task details during task creation',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -637,10 +618,9 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(taskDetailsSlide.querySelector('.btn-cancel'));
 
         expect(isSlideActive('editor')).to.be.true;
-        done();
       });
 
-    it('allows to modify existing task', async function (done) {
+    it('allows to modify existing task', async function () {
       const navigationsState = lookupService(this, 'navigation-state');
       set(navigationsState, 'aspectOptions.workflowId', 'w1id');
       set(navigationsState, 'aspectOptions.revision', '2');
@@ -675,11 +655,10 @@ describe('Integration | Component | content atm inventories workflows', function
             },
           }],
         });
-      done();
     });
 
     it('allows to go back to editor from task details during task modification',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -692,11 +671,10 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(taskDetailsSlide.querySelector('.content-back-link'));
 
         expect(isSlideActive('editor')).to.be.true;
-        done();
       });
 
     it('navigates to editor on "Cancel" click from task details during task modification',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions.workflowId', 'w1id');
         set(navigationsState, 'aspectOptions.revision', '2');
@@ -709,13 +687,12 @@ describe('Integration | Component | content atm inventories workflows', function
         await click(taskDetailsSlide.querySelector('.btn-cancel'));
 
         expect(isSlideActive('editor')).to.be.true;
-        done();
       });
   });
 
   context('when "view" query param is "lambdaSelector"', function () {
     it('redirects to editor view when component is entered directly via url',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions', {
           view: 'lambdaSelector',
@@ -727,13 +704,12 @@ describe('Integration | Component | content atm inventories workflows', function
 
         expect(get(navigationsState, 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
-        done();
       });
   });
 
   context('when "view" query param is "taskDetails"', function () {
     it('redirects to editor view when component is entered directly via url',
-      async function (done) {
+      async function () {
         const navigationsState = lookupService(this, 'navigation-state');
         set(navigationsState, 'aspectOptions', {
           view: 'taskDetails',
@@ -745,7 +721,6 @@ describe('Integration | Component | content atm inventories workflows', function
 
         expect(get(navigationsState, 'aspectOptions'))
           .to.deep.equal({ view: 'editor', workflowId: 'w1id', revision: '2' });
-        done();
       });
   });
 });
