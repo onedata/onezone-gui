@@ -293,7 +293,7 @@ class FilteredEntriesFetcher {
         const entriesMatchingToAdd = filterSpaces(result.array, this.searchValue)
           .slice(0, this.initialLimit - this.finalArray.length);
         this.finalArray.push(...entriesMatchingToAdd);
-        this.currentIndex = _.last(result.array).index ?? null;
+        this.currentIndex = _.last(result.array)?.index ?? null;
         if (this.currentIndex === null) {
           break;
         }
@@ -303,14 +303,14 @@ class FilteredEntriesFetcher {
           this.initialLimit - this.finalArray.length
         );
         this.finalIsLast = result.isLast;
-        return {
-          array: this.finalArray,
-          isLast: this.finalIsLast,
-        };
       } else {
         this.reinitializeState();
       }
     }
+    return {
+      array: this.finalArray,
+      isLast: this.finalIsLast,
+    };
   }
 
   isCurrentFilterEqualViewFilter() {
