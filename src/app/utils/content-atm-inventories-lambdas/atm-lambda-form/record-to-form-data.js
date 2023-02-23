@@ -7,12 +7,11 @@
  * @license This software is released under the MIT license cited in 'LICENSE.txt'.
  */
 
-import { set, setProperties, getProperties } from '@ember/object';
 import { createValuesContainer } from 'onedata-gui-common/utils/form-component/values-container';
 import {
   dataSpecToFormValues,
 } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { rawValueToFormValue as atmRawValueToFormValue } from 'onedata-gui-common/utils/atm-workflow/value-editors';
+import { rawValueToAtmParameterSpecsEditorValue } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 const fallbackDefaultAtmResourceSpec = {
   cpuRequested: 0.1,
@@ -34,110 +33,67 @@ export default function recordToFormData(revision, defaultAtmResourceSpec, formM
     return generateDefaultFormData(defaultAtmResourceSpec);
   }
 
-  const {
-    name,
-    state,
-    summary,
-    operationSpec,
-    preferredBatchSize,
-    argumentSpecs,
-    resultSpecs,
-    resourceSpec,
-  } = getProperties(
-    revision || {},
-    'name',
-    'state',
-    'summary',
-    'operationSpec',
-    'preferredBatchSize',
-    'argumentSpecs',
-    'resultSpecs',
-    'resourceSpec'
-  );
-
-  const {
-    engine,
-    dockerImage,
-    functionId,
-    dockerExecutionOptions,
-  } = getProperties(
-    operationSpec || {},
-    'engine',
-    'dockerImage',
-    'functionId',
-    'dockerExecutionOptions'
-  );
-
-  const {
-    readonly,
-    mountOneclient,
-    oneclientMountPoint,
-    oneclientOptions,
-  } = getProperties(
-    dockerExecutionOptions || {},
-    'readonly',
-    'mountOneclient',
-    'oneclientMountPoint',
-    'oneclientOptions'
-  );
-
-  const formArguments = recordArgResToFormArgRes('argument', argumentSpecs);
-  const formResults = recordArgResToFormArgRes('result', resultSpecs);
+  const operationSpec = revision.operationSpec;
+  const dockerExecutionOptions = operationSpec?.dockerExecutionOptions;
 
   const engineOptions = createValuesContainer();
-  switch (engine) {
+  switch (operationSpec?.engine) {
     case 'openfaas': {
-      const openfaasOptions =
-        set(engineOptions, 'openfaasOptions', createValuesContainer({
-          dockerImage,
-          readonly: Boolean(readonly),
-          mountSpace: Boolean(mountOneclient),
-        }));
-      if (mountOneclient) {
-        set(openfaasOptions, 'mountSpaceOptions', createValuesContainer({
-          mountPoint: oneclientMountPoint,
-          oneclientOptions,
-        }));
+      const openfaasOptions = engineOptions.openfaasOptions = createValuesContainer({
+        dockerImage: operationSpec.dockerImage,
+        readonly: Boolean(dockerExecutionOptions?.readonly),
+        mountSpace: Boolean(dockerExecutionOptions?.mountOneclient),
+      });
+      if (dockerExecutionOptions?.mountOneclient) {
+        openfaasOptions.mountSpaceOptions = createValuesContainer({
+          mountPoint: dockerExecutionOptions?.oneclientMountPoint,
+          oneclientOptions: dockerExecutionOptions?.oneclientOptions,
+        });
       }
       break;
     }
     case 'onedataFunction':
-      set(engineOptions, 'onedataFunctionOptions', createValuesContainer({
-        onedataFunctionName: functionId,
-      }));
+      engineOptions.onedataFunctionOptions = createValuesContainer({
+        onedataFunctionName: operationSpec.functionId,
+      });
       break;
   }
 
+  const resourceSpec = revision.resourceSpec;
   const resources = createValuesContainer({
     cpu: createValuesContainer({
-      cpuRequested: atmResourceValueAsInputString((resourceSpec || {}).cpuRequested),
-      cpuLimit: atmResourceValueAsInputString((resourceSpec || {}).cpuLimit),
+      cpuRequested: atmResourceValueAsInputString(resourceSpec?.cpuRequested),
+      cpuLimit: atmResourceValueAsInputString(resourceSpec?.cpuLimit),
     }),
     memory: createValuesContainer({
       memoryRequested: atmResourceValueAsInputString(
-        (resourceSpec || {}).memoryRequested
+        resourceSpec?.memoryRequested
       ),
-      memoryLimit: atmResourceValueAsInputString((resourceSpec || {}).memoryLimit),
+      memoryLimit: atmResourceValueAsInputString(resourceSpec?.memoryLimit),
     }),
     ephemeralStorage: createValuesContainer({
       ephemeralStorageRequested: atmResourceValueAsInputString(
-        (resourceSpec || {}).ephemeralStorageRequested
+        resourceSpec?.ephemeralStorageRequested
       ),
       ephemeralStorageLimit: atmResourceValueAsInputString(
-        (resourceSpec || {}).ephemeralStorageLimit
+        resourceSpec?.ephemeralStorageLimit
       ),
     }),
   });
-  const formState = formMode === 'create' ? 'draft' : state;
 
   return createValuesContainer(Object.assign({
-    name,
-    state: formState,
-    summary,
-    engine,
-    preferredBatchSize,
-    arguments: formArguments,
-    results: formResults,
+    name: revision.name,
+    state: formMode === 'create' ? 'draft' : revision.state,
+    summary: revision.summary,
+    engine: operationSpec?.engine,
+    preferredBatchSize: revision.preferredBatchSize,
+    arguments: rawValueToAtmParameterSpecsEditorValue(
+      revision.argumentSpecs
+    ),
+    results: recordResultsToFormResults(revision.resultSpecs),
+    configParameters: rawValueToAtmParameterSpecsEditorValue(
+      revision.configParameterSpecs
+    ),
     resources,
   }, engineOptions));
 }
@@ -167,6 +123,7 @@ function generateDefaultFormData(defaultAtmResourceSpec) {
     results: createValuesContainer({
       __fieldsValueNames: [],
     }),
+    configParameters: rawValueToAtmParameterSpecsEditorValue([]),
     resources: createValuesContainer({
       cpu: createValuesContainer({
         cpuRequested: getDefaultAtmResourceValue(
@@ -220,48 +177,26 @@ function atmResourceValueAsInputString(value) {
 }
 
 /**
- * Converts record arguments/results to form arguments/results
- * @param {String} dataType one of: `argument`, `result`
- * @param {Array<Object>} recordArgRes arguments or results from record
+ * Converts record results to form results
+ * @param {Array<Object>} recordResults results from record
  * @returns {Object} form field data
  */
-function recordArgResToFormArgRes(dataType, recordArgRes) {
+function recordResultsToFormResults(recordResults) {
   const formData = createValuesContainer({
     __fieldsValueNames: [],
   });
-  (recordArgRes || []).forEach((entry, idx) => {
-    const {
-      name,
-      dataSpec,
-      isOptional,
-      defaultValue,
-      relayMethod,
-    } = getProperties(
-      entry || {},
-      'name',
-      'dataSpec',
-      'isOptional',
-      'defaultValue',
-      'relayMethod',
-    );
-    if (!name || !dataSpec) {
+  recordResults?.forEach((entry, idx) => {
+    if (!entry.name || !entry.dataSpec) {
       return;
     }
 
     const valueName = `entry${idx}`;
     formData.__fieldsValueNames.push(valueName);
-    const formEntry = set(formData, valueName, createValuesContainer({
-      entryName: name,
-      entryDataSpec: dataSpecToFormValues(dataSpec),
-    }));
-    if (dataType === 'argument') {
-      setProperties(formEntry, {
-        entryDefaultValue: atmRawValueToFormValue(defaultValue, true),
-        entryIsOptional: isOptional === true,
-      });
-    } else {
-      set(formEntry, 'entryIsViaFile', relayMethod === 'filePipe');
-    }
+    formData[valueName] = createValuesContainer({
+      entryName: entry.name,
+      entryDataSpec: dataSpecToFormValues(entry.dataSpec),
+      entryIsViaFile: entry.relayMethod === 'filePipe',
+    });
   });
   return formData;
 }

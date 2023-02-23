@@ -122,6 +122,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itSubmitsFormDataOnSubmitClick({
         lambdaId: 'f1id',
         lambdaRevisionNumber: 1,
+        lambdaConfig: {},
         argumentMappings: [],
         resultMappings: [],
         timeSeriesStoreConfig: null,
@@ -149,6 +150,7 @@ describe('Integration | Component | content atm inventories workflows/task detai
       itSubmitsFormDataOnSubmitClick({
         lambdaId: 'f1id',
         lambdaRevisionNumber: 1,
+        lambdaConfig: {},
         argumentMappings: exampleTask.argumentMappings,
         resultMappings: exampleTask.resultMappings,
         timeSeriesStoreConfig: null,
