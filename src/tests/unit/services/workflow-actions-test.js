@@ -20,7 +20,7 @@ import RemoveAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-ac
 import DuplicateAtmWorkflowSchemaRevisionAction from 'onezone-gui/utils/workflow-actions/duplicate-atm-workflow-schema-revision-action';
 import { get } from '@ember/object';
 
-describe('Unit | Service | workflow actions', function () {
+describe('Unit | Service | workflow-actions', function () {
   setupTest();
 
   it('creates OpenCreateAtmInventoryViewAction instance', function () {

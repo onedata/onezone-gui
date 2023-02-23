@@ -19,7 +19,7 @@ const GuiMessageManagerStub = Service.extend({
   showPrivacyPolicyInfo() {},
 });
 
-describe('Integration | Component | cookies consent', function () {
+describe('Integration | Component | cookies-consent', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -8,7 +8,7 @@ import { Promise, resolve } from 'rsvp';
 import PromiseArray from 'onedata-gui-common/utils/ember/promise-array';
 import gri from 'onedata-gui-websocket-client/utils/gri';
 
-describe('Unit | Utility | generate development model', function () {
+describe('Unit | Utility | generate-development-model', function () {
   it('creates and saves records', function () {
     const stubsToCheck = [];
 

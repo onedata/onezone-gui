@@ -6,7 +6,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import EmberObject from '@ember/object';
 
 describe(
-  'Integration | Component | groups hierarchy visualiser/column separator',
+  'Integration | Component | groups-hierarchy-visualiser/column-separator',
   function () {
     setupRenderingTest();
 

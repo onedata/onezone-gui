@@ -5,7 +5,7 @@ import { render, find } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import EmberObject from '@ember/object';
 
-describe('Integration | Component | record name', function () {
+describe('Integration | Component | record-name', function () {
   setupRenderingTest();
 
   it('renders only name for user without username', async function () {

@@ -12,7 +12,7 @@ import EmberObject, { set } from '@ember/object';
 import { isSlideActive, getSlide } from '../../../helpers/one-carousel';
 
 describe(
-  'Integration | Component | token template selector/record selector template',
+  'Integration | Component | token-template-selector/record-selector-template',
   function () {
     setupRenderingTest();
 

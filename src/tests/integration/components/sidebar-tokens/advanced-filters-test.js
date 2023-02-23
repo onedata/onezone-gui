@@ -37,7 +37,7 @@ const possibleTargetModels = [{
   icon: 'user',
 }];
 
-describe('Integration | Component | sidebar tokens/advanced filters', function () {
+describe('Integration | Component | sidebar-tokens/advanced-filters', function () {
   setupRenderingTest();
 
   beforeEach(function () {

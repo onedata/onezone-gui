@@ -8,7 +8,7 @@ import { lookupService } from '../../../helpers/stub-service';
 import { reject, Promise } from 'rsvp';
 import { next } from '@ember/runloop';
 
-describe('Integration | Utility | workflow actions/create atm inventory action',
+describe('Integration | Utility | workflow-actions/create-atm-inventory-action',
   function () {
     setupRenderingTest();
 

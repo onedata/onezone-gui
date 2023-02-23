@@ -18,7 +18,7 @@ import CreateAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/cr
 import ModifyAtmLambdaRevisionAction from 'onezone-gui/utils/workflow-actions/modify-atm-lambda-revision-action';
 
 describe(
-  'Integration | Component | content atm inventories lambdas/editor view',
+  'Integration | Component | content-atm-inventories-lambdas/editor-view',
   function () {
     setupRenderingTest();
 

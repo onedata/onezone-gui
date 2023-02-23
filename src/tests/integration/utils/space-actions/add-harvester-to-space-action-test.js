@@ -20,7 +20,7 @@ import { resolve } from 'rsvp';
 import { selectChoose, clickTrigger } from 'ember-power-select/test-support/helpers';
 
 describe(
-  'Integration | Utility | space actions/add harvester to space action',
+  'Integration | Utility | space-actions/add-harvester-to-space-action',
   function () {
     setupRenderingTest();
 

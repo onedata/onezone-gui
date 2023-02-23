@@ -18,7 +18,7 @@ import { suppressRejections } from '../../../helpers/suppress-rejections';
 const atmInventoryId = 'invid';
 
 describe(
-  'Integration | Utility | workflow actions/upload atm workflow schema action',
+  'Integration | Utility | workflow-actions/upload-atm-workflow-schema-action',
   function () {
     const { afterEach } = setupRenderingTest();
 

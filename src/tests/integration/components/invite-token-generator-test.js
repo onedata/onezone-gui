@@ -11,7 +11,7 @@ import _ from 'lodash';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 import OneTooltipHelper from '../../helpers/one-tooltip';
 
-describe('Integration | Component | invite token generator', function () {
+describe('Integration | Component | invite-token-generator', function () {
   setupRenderingTest();
 
   beforeEach(function () {

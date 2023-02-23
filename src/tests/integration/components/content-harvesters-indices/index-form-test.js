@@ -22,7 +22,7 @@ const fileDetailsFields = [
   'metadataExistenceFlags',
 ];
 
-describe('Integration | Component | content harvesters indices/index form', function () {
+describe('Integration | Component | content-harvesters-indices/index-form', function () {
   setupRenderingTest();
 
   it('has class "content-harvesters-indices-index-form"', async function () {

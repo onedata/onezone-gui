@@ -17,7 +17,7 @@ import OneTooltipHelper from '../../helpers/one-tooltip';
 import { dasherize } from '@ember/string';
 import { suppressRejections } from '../../helpers/suppress-rejections';
 
-describe('Integration | Component | token consumer', function () {
+describe('Integration | Component | token-consumer', function () {
   setupRenderingTest();
 
   beforeEach(function () {

@@ -8,7 +8,7 @@ import sinon from 'sinon';
 
 const componentClass = 'operation-form';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal/operation form',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal/operation-form',
   function () {
     setupRenderingTest();
 

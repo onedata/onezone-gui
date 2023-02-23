@@ -47,11 +47,8 @@ import {
 } from 'onezone-gui/utils/content-atm-inventories-lambdas/atm-lambda-form';
 import { validator } from 'ember-cp-validations';
 import { createTaskResourcesFields } from 'onedata-gui-common/utils/workflow-visualiser/task-resources-fields';
-import {
-  formValuesToDataSpec as dataSpecEditorValuesToDataSpec,
-  FormElement as DataSpecEditor,
-} from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
-import { ValueEditorField as AtmValueEditorField } from 'onedata-gui-common/utils/atm-workflow/value-editors';
+import { FormElement as DataSpecEditor } from 'onedata-gui-common/utils/atm-workflow/data-spec-editor';
+import { AtmParameterSpecsEditor } from 'onedata-gui-common/utils/atm-workflow/atm-lambda';
 
 // TODO: VFS-7655 Add tooltips and placeholders
 
@@ -142,50 +139,25 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsRootGroup>}
    */
   fields: computed(function fields() {
-    const {
-      nameField,
-      stateField,
-      summaryField,
-      engineField,
-      openfaasOptionsFieldsGroup,
-      onedataFunctionOptionsFieldsGroup,
-      preferredBatchSizeField,
-      argumentsFieldsCollectionGroup,
-      resultsFieldsCollectionGroup,
-      resourcesFieldsGroup,
-    } = this.getProperties(
-      'nameField',
-      'stateField',
-      'summaryField',
-      'engineField',
-      'openfaasOptionsFieldsGroup',
-      'onedataFunctionOptionsFieldsGroup',
-      'preferredBatchSizeField',
-      'argumentsFieldsCollectionGroup',
-      'resultsFieldsCollectionGroup',
-      'resourcesFieldsGroup'
-    );
-
-    const component = this;
-
     return FormFieldsRootGroup.extend({
       name: 'atm-lambda-root',
       i18nPrefix: tag `${'component.i18nPrefix'}.fields`,
       ownerSource: reads('component'),
       isEnabled: not(or('component.isSubmitting', eq('component.mode', raw('view')))),
     }).create({
-      component,
+      component: this,
       fields: [
-        nameField,
-        stateField,
-        summaryField,
-        engineField,
-        openfaasOptionsFieldsGroup,
-        onedataFunctionOptionsFieldsGroup,
-        preferredBatchSizeField,
-        argumentsFieldsCollectionGroup,
-        resultsFieldsCollectionGroup,
-        resourcesFieldsGroup,
+        this.nameField,
+        this.stateField,
+        this.summaryField,
+        this.engineField,
+        this.openfaasOptionsFieldsGroup,
+        this.onedataFunctionOptionsFieldsGroup,
+        this.preferredBatchSizeField,
+        this.configParametersField,
+        this.argumentsFieldsCollectionGroup,
+        this.resultsFieldsCollectionGroup,
+        this.resourcesFieldsGroup,
       ],
     });
   }),
@@ -319,18 +291,38 @@ export default Component.extend(I18n, {
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
    */
   argumentsFieldsCollectionGroup: computed(function argumentsFieldsCollectionGroup() {
-    return createFunctionArgResGroup(this, 'argument');
+    return AtmParameterSpecsEditor
+      .extend(disableFieldInEditMode(this))
+      .create({
+        name: 'arguments',
+        label: this.t('fields.arguments.label'),
+        addButtonText: this.t('fields.arguments.addButtonText'),
+        classes: 'input-output-data-collection',
+      });
   }),
 
   /**
    * @type {ComputedProperty<Utils.FormComponent.FormFieldsCollectionGroup>}
    */
   resultsFieldsCollectionGroup: computed(function resultsFieldsCollectionGroup() {
-    return createFunctionArgResGroup(
+    return createFunctionResultsGroup(
       this,
-      'result',
       this.get('reservedResultNames')
     );
+  }),
+
+  /**
+   * @type {ComputedProperty<Utils.FormComponent.FormElement>}
+   */
+  configParametersField: computed(function configParametersField() {
+    return AtmParameterSpecsEditor
+      .extend(disableFieldInEditMode(this))
+      .create({
+        name: 'configParameters',
+        label: this.t('fields.configParameters.label'),
+        addButtonText: this.t('fields.configParameters.addButtonText'),
+        classes: 'input-output-data-collection',
+      });
   }),
 
   /**
@@ -418,16 +410,13 @@ function disableFieldInEditMode(component) {
 }
 
 /**
- * Generates a form collection group for arguments and results (as they are very
- * similar).
+ * Generates a form collection group for results
  * @param {Components.ContentAtmInventoriesLambdas.AtmLambdaForm} component
- * @param {String} dataType one of: `argument`, `result`
  * @param {Array<String>} reservedNames values of `entryName` field, which should be
  * considered incorrect (reserved)
  * @returns {Utils.FormComponent.FormFieldsCollectionGroup}
  */
-function createFunctionArgResGroup(component, dataType, reservedNames = []) {
-  const isForArguments = dataType === 'argument';
+function createFunctionResultsGroup(component, reservedNames = []) {
   const generateEntryNameField = mode => TextField.create({
     mode,
     name: 'entryName',
@@ -459,15 +448,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     field.changeMode(mode);
     return field;
   };
-  const generateEntryIsOptionalField = mode => ToggleField.extend({
-    addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
-  }).create({
-    classes: 'right-floating-toggle',
-    mode,
-    name: 'entryIsOptional',
-    defaultValue: false,
-    component,
-  });
   const generateEntryIsViaFileField = mode => ToggleField.extend({
     addColonToLabel: or('component.media.isMobile', 'component.media.isTablet'),
   }).create({
@@ -476,28 +456,6 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     name: 'entryIsViaFile',
     defaultValue: false,
     component,
-  });
-  const generateEntryDefaultValueField = mode => AtmValueEditorField.extend({
-    isVisible: or(not('isInViewMode'), 'value.hasValue'),
-    entryDataSpecField: computed('parent.fields.[]', function entryDataSpecField() {
-      return this.parent?.fields.find((field) => field.name === 'entryDataSpec');
-    }),
-    atmDataSpecSetter: observer(
-      'entryDataSpecField.{value,isValid}',
-      function atmDataSpecSetter() {
-        const atmDataSpec = this.entryDataSpecField?.isValid ?
-          dataSpecEditorValuesToDataSpec(this.entryDataSpecField.value) : null;
-        this.set('atmDataSpec', atmDataSpec);
-      }
-    ),
-    init() {
-      this._super(...arguments);
-      this.atmDataSpecSetter();
-    },
-  }).create({
-    mode,
-    name: 'entryDefaultValue',
-    isOptional: true,
   });
 
   const fieldsCollectionExtension = {
@@ -535,12 +493,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
         fields: [
           generateEntryNameField(mode),
           generateEntryDataSpecField(mode),
-          ...(isForArguments ? [
-            generateEntryIsOptionalField(mode),
-            generateEntryDefaultValueField(mode),
-          ] : [
-            generateEntryIsViaFileField(mode),
-          ]),
+          generateEntryIsViaFileField(mode),
         ],
       });
     },
@@ -552,6 +505,7 @@ function createFunctionArgResGroup(component, dataType, reservedNames = []) {
     disableFieldInEditMode(component),
     fieldsCollectionExtension
   ).create({
-    name: isForArguments ? 'arguments' : 'results',
+    name: 'results',
+    classes: 'input-output-data-collection',
   });
 }

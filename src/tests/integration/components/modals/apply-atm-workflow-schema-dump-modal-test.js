@@ -19,7 +19,7 @@ import { A } from '@ember/array';
 import sinon from 'sinon';
 import ObjectProxy from '@ember/object/proxy';
 
-describe('Integration | Component | modals/apply atm workflow schema dump modal',
+describe('Integration | Component | modals/apply-atm-workflow-schema-dump-modal',
   function () {
     setupRenderingTest();
 
